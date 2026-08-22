@@ -1,10 +1,12 @@
+import type { ReactElement } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { DisabledRegistrationNotice } from "@/views/RegisterView/DisabledRegistrationNotice";
 import { RegistrationForm } from "@/views/RegisterView/RegistrationForm";
-import type { ReactElement } from "react";
 
 const IS_REGISTRATION_DISABLED = isFlagEnabled(
   FeatureFlag.DisableSelfRegistration,
@@ -20,9 +22,11 @@ export function RegisterView(): ReactElement {
       subtitle={t`Start your journey with us`}
       footer={<AuthFooter />}
     >
-      {IS_REGISTRATION_DISABLED ?
+      {IS_REGISTRATION_DISABLED ? (
         <DisabledRegistrationNotice />
-      : <RegistrationForm />}
+      ) : (
+        <RegistrationForm />
+      )}
     </AuthLayout>
   );
 }

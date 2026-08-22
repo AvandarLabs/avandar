@@ -1,12 +1,6 @@
-import { Model } from "@avandar/models";
-import { isDefined, propEq } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { match } from "ts-pattern";
-import { getDisputedStatusColumn } from "./getDisputedStatusColumn";
-import {
-  createRebindRequired,
-  findBoundaryColumn,
-} from "./getResolvedMapLayerMetadataHelpers";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
   MapLayerMetadataResolution,
   MapLayerRebindRequired,
@@ -16,9 +10,18 @@ import type {
   BoundaryBinding,
   ResolveOptions,
 } from "./getResolvedMapLayerMetadata.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+
+import { Model } from "@avandar/models";
+import { isDefined, propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
+
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
+import { getDisputedStatusColumn } from "./getDisputedStatusColumn";
+import {
+  createRebindRequired,
+  findBoundaryColumn,
+} from "./getResolvedMapLayerMetadataHelpers";
 
 type AggregatingBinding = BoundaryBinding | MapLayer.GridBinBinding;
 
@@ -32,11 +35,9 @@ type ResolvedDenominator = NonNullable<
 /** Returns the boundary-dependent form of a layer binding. */
 function _getBoundaryBinding(layer: MapLayer.T): BoundaryBinding | undefined {
   const { geoBinding } = layer;
-  return (
-      geoBinding?.type === "joinToBoundaries" ||
-        geoBinding?.type === "aggregatePointsToBoundaries"
-    ) ?
-      geoBinding
+  return geoBinding?.type === "joinToBoundaries" ||
+    geoBinding?.type === "aggregatePointsToBoundaries"
+    ? geoBinding
     : undefined;
 }
 
@@ -45,8 +46,8 @@ function _getAggregatingBinding(
   layer: MapLayer.T,
 ): AggregatingBinding | undefined {
   const { geoBinding } = layer;
-  return geoBinding?.type === "binPointsToGrid" ?
-      geoBinding
+  return geoBinding?.type === "binPointsToGrid"
+    ? geoBinding
     : _getBoundaryBinding(layer);
 }
 
@@ -128,9 +129,8 @@ function _getResolvedBoundaryWithGeometry(options: {
       boundary.keyColumnId,
     );
   }
-  const displayNameColumn =
-    boundary.displayNameColumnId ?
-      findBoundaryColumn(
+  const displayNameColumn = boundary.displayNameColumnId
+    ? findBoundaryColumn(
         options.columns,
         options.dataset.id,
         boundary.displayNameColumnId,
@@ -279,9 +279,8 @@ export function getResolvedMapLayerMetadata(
   if (disputedStatusColumn && disputedStatusColumn.type === "rebindRequired") {
     return disputedStatusColumn;
   }
-  const aggregationMeasure =
-    aggregatingBinding ?
-      _getAggregationMeasure(options.layer, aggregatingBinding)
+  const aggregationMeasure = aggregatingBinding
+    ? _getAggregationMeasure(options.layer, aggregatingBinding)
     : undefined;
   if (typeof aggregationMeasure !== "string" && aggregationMeasure) {
     return aggregationMeasure;

@@ -1,6 +1,7 @@
 import { useQuery } from "@avandar/query-hooks";
 import { hasDefinedProps } from "@avandar/utils";
 import { useEffect } from "react";
+
 import { APIClient } from "@/clients/APIClient";
 import { Route as RootRoute } from "@/routes/__root";
 

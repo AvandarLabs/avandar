@@ -1,3 +1,6 @@
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
+import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
+
 import { Model } from "@avandar/models";
 import { AvaModelSchema } from "@models/zod/index.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
@@ -18,10 +21,9 @@ import { makeChatTurnSuffixFromOptions } from "@sbfn/chat/PostChatMessages/promp
 import { runChatAttemptsWithEscalation } from "@sbfn/chat/PostChatMessages/runChatAttemptsWithEscalation/runChatAttemptsWithEscalation.ts";
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
-import { getAppURL } from "$/env/getAppURL.ts";
 import { z } from "zod";
-import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
+
+import { getAppURL } from "$/env/getAppURL.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {
@@ -124,21 +126,21 @@ export const PostChatMessages = POST({
         includeSpatialDocumentation: false,
       });
       const systemContent =
-        context.app === "case-manager" ?
-          buildCaseManagerSystemPrompt({
-            datasets: schema.datasets,
-            columns: schema.columns,
-            concepts: schema.concepts,
-          })
-        : `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
+        context.app === "case-manager"
+          ? buildCaseManagerSystemPrompt({
+              datasets: schema.datasets,
+              columns: schema.columns,
+              concepts: schema.concepts,
+            })
+          : `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
       const turnSuffix =
-        context.app === "case-manager" ?
-          ""
-        : makeChatTurnSuffixFromOptions({
-            context,
-            retryContext,
-            lastUserPrompt,
-          });
+        context.app === "case-manager"
+          ? ""
+          : makeChatTurnSuffixFromOptions({
+              context,
+              retryContext,
+              lastUserPrompt,
+            });
 
       const priorClarifications = countClarificationsInHistory(messages);
       const clarificationCapReached =
@@ -221,8 +223,8 @@ export const PostChatMessages = POST({
         if (proposedCaseType) {
           return caseTypeDraftIntro(proposedCaseType.name);
         }
-        return context.app === "case-manager" ?
-            "I could not create those case types. Try choosing again or describing what you want."
+        return context.app === "case-manager"
+          ? "I could not create those case types. Try choosing again or describing what you want."
           : "I could not generate a query for that. Try rephrasing.";
       })();
 

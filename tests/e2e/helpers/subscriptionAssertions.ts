@@ -1,5 +1,6 @@
-import { expect } from "@playwright/test";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+
+import { expect } from "@playwright/test";
 
 type SubscriptionRow = {
   id: string;

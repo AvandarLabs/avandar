@@ -1,11 +1,13 @@
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
+
 import { afterEach, describe, expect, it } from "vitest";
+
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 import { useNuxOpenChatPanel } from "@/components/Nux/NuxTour/useNuxOpenChatPanel/useNuxOpenChatPanel";
 import { act, render, screen } from "@/test-utils";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { ReactNode } from "react";
 
 function Harness(): ReactNode {
   useNuxOpenChatPanel();

@@ -5,6 +5,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
+
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 
 export const Route = createFileRoute("/update-password")({
@@ -71,8 +72,8 @@ function UpdatePasswordPage() {
     },
     validate: {
       confirmPassword: (value: string, formValues: { password: string }) => {
-        return value !== formValues.password ?
-            t`Passwords do not match`
+        return value !== formValues.password
+          ? t`Passwords do not match`
           : undefined;
       },
     },
@@ -111,9 +112,7 @@ function UpdatePasswordPage() {
         />
         <Button type="submit" disabled={isPasswordUpdatePending}>
           <Trans>Update password</Trans>
-          {isPasswordUpdatePending ?
-            <Loader />
-          : null}
+          {isPasswordUpdatePending ? <Loader /> : null}
         </Button>
       </Stack>
     </form>

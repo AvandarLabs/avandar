@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { withDuckDb } from "./executedDuckDb";
 
 describe("executed test harness", () => {

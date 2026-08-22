@@ -1,6 +1,8 @@
-import { expect } from "@playwright/test";
-import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
+
+import { expect } from "@playwright/test";
+
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 
 /**
  * Opens a Workspace settings tab via the in-app Settings link and tab.

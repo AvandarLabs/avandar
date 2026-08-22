@@ -31,16 +31,16 @@ P1 exists to remove, reintroduced at the layer above it.
 
 ### 1.1 What already exists
 
-| Concern | Where | State |
-| --- | --- | --- |
-| The predicate | `util__is_resource_private_to_owner`, `util__has_non_owner_share` | Complete (P1) |
-| The guarantee | Narrowed short-circuit in `util__resource_effective_role` | Complete (P1) |
-| Admin visibility into the state | `rpc_workspaces__private_resource_counts`, Private resources panel | Complete (P1) |
-| General access dropdown | `ShareGeneralAccess`, two options | Complete, needs a third |
-| Share persistence | `resource_shares`, `is_restricted` | Complete |
-| Single-row share removal | `ResourceShareClient.deleteResourceShare` | Complete |
-| Atomic "clear every share" | nothing | **Missing** |
-| Owner-facing "make this private" control | nothing | **Missing** |
+| Concern                                  | Where                                                              | State                   |
+| ---------------------------------------- | ------------------------------------------------------------------ | ----------------------- |
+| The predicate                            | `util__is_resource_private_to_owner`, `util__has_non_owner_share`  | Complete (P1)           |
+| The guarantee                            | Narrowed short-circuit in `util__resource_effective_role`          | Complete (P1)           |
+| Admin visibility into the state          | `rpc_workspaces__private_resource_counts`, Private resources panel | Complete (P1)           |
+| General access dropdown                  | `ShareGeneralAccess`, two options                                  | Complete, needs a third |
+| Share persistence                        | `resource_shares`, `is_restricted`                                 | Complete                |
+| Single-row share removal                 | `ResourceShareClient.deleteResourceShare`                          | Complete                |
+| Atomic "clear every share"               | nothing                                                            | **Missing**             |
+| Owner-facing "make this private" control | nothing                                                            | **Missing**             |
 
 ---
 
@@ -75,13 +75,13 @@ P1 exists to remove, reintroduced at the layer above it.
 
 ## 3. Decisions
 
-| # | Decision | Rejected alternative and why |
-| --- | --- | --- |
-| J1 | Only the resource **owner** may select "Only me". The option renders disabled for everyone else, and the RPC rejects non-owners, so the client gate is not the only defense. | Any resource admin: the action deletes every non-owner share, so a non-owner admin who selects it locks themselves out on the spot. Owner plus Settings Admins is the same footgun, made worse by P1: the admin loses read access permanently and cannot undo it. |
-| J2 | Selecting `Restricted` while private writes nothing and flips a **local intent state**: the dropdown shows `Restricted` and the add-people row unlocks. Reopening the modal with still-zero shares shows "Only me" again. | Disabling the `Restricted` option would require the add-people row to stay enabled under "Only me", contradicting the point of the state. Dropping the add-row disable entirely loses the signal that "Only me" is a deliberate locked-down state. |
-| J3 | The RPC is `SECURITY INVOKER` with an explicit owner check and a post-condition assert. | `SECURITY DEFINER`, matching every other `rpc_` file in the repo. Rejected because this function never needs to touch a row the caller cannot already see, and definer would force the owner check, the workspace check, and the existence-oracle handling that `rpc_resources__transfer_ownership` documents to be re-derived by hand for a bypass that buys nothing. See §4.1. |
-| J4 | Confirmation is a stacked `modals.openConfirmModal`, the pattern `DeleteDashboardButton` and `WorkspaceUsersTab` already use. | An inline confirm strip inside the share modal introduces a second bespoke state machine in a component that already has one. `DangerousActionButton` is a button, and the trigger here is a `Select` option change. |
-| J5 | Dataset dependents are out of scope, recorded as a known limitation. | Detecting them means a JSONB scan across every dashboard's `config`, or a new dependency table. Either is materially larger than the rest of P1.5 combined. |
+| #   | Decision                                                                                                                                                                                                                  | Rejected alternative and why                                                                                                                                                                                                                                                                                                                                                     |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| J1  | Only the resource **owner** may select "Only me". The option renders disabled for everyone else, and the RPC rejects non-owners, so the client gate is not the only defense.                                              | Any resource admin: the action deletes every non-owner share, so a non-owner admin who selects it locks themselves out on the spot. Owner plus Settings Admins is the same footgun, made worse by P1: the admin loses read access permanently and cannot undo it.                                                                                                                |
+| J2  | Selecting `Restricted` while private writes nothing and flips a **local intent state**: the dropdown shows `Restricted` and the add-people row unlocks. Reopening the modal with still-zero shares shows "Only me" again. | Disabling the `Restricted` option would require the add-people row to stay enabled under "Only me", contradicting the point of the state. Dropping the add-row disable entirely loses the signal that "Only me" is a deliberate locked-down state.                                                                                                                               |
+| J3  | The RPC is `SECURITY INVOKER` with an explicit owner check and a post-condition assert.                                                                                                                                   | `SECURITY DEFINER`, matching every other `rpc_` file in the repo. Rejected because this function never needs to touch a row the caller cannot already see, and definer would force the owner check, the workspace check, and the existence-oracle handling that `rpc_resources__transfer_ownership` documents to be re-derived by hand for a bypass that buys nothing. See §4.1. |
+| J4  | Confirmation is a stacked `modals.openConfirmModal`, the pattern `DeleteDashboardButton` and `WorkspaceUsersTab` already use.                                                                                             | An inline confirm strip inside the share modal introduces a second bespoke state machine in a component that already has one. `DangerousActionButton` is a button, and the trigger here is a `Select` option change.                                                                                                                                                             |
+| J5  | Dataset dependents are out of scope, recorded as a known limitation.                                                                                                                                                      | Detecting them means a JSONB scan across every dashboard's `config`, or a new dependency table. Either is materially larger than the rest of P1.5 combined.                                                                                                                                                                                                                      |
 
 ---
 
@@ -249,8 +249,9 @@ the predicate and the three-way value. The orchestrator owns the derivation;
 
 ```ts
 // Mirrors util__has_non_owner_share exactly.
-hasNonOwnerShare(shares, ownerId) =
-  shares.some(s => s.principalType !== "user" || s.principalId !== ownerId)
+hasNonOwnerShare(shares, ownerId) = shares.some(
+  (s) => s.principalType !== "user" || s.principalId !== ownerId,
+);
 ```
 
 `ShareResourceModal`'s existing `filteredDirectShares` cannot be reused for
@@ -323,11 +324,11 @@ selected value, so choosing it is a no-op that never reaches the confirm.
 
 Body copy, assembled from up to three sentences in `shareCopy.ts`:
 
-| Clause | Condition | Copy |
-| --- | --- | --- |
-| Direct shares | any non-workspace, non-owner share | `{n} people and {m} groups will lose access.` (Lingui `plural`, each half omitted at zero) |
-| Workspace-wide | `!isRestricted` | `Everyone in {App} will lose access.` |
-| Reassurance | always | `Only you will be able to open it. You can share it again at any time.` |
+| Clause         | Condition                          | Copy                                                                                       |
+| -------------- | ---------------------------------- | ------------------------------------------------------------------------------------------ |
+| Direct shares  | any non-workspace, non-owner share | `{n} people and {m} groups will lose access.` (Lingui `plural`, each half omitted at zero) |
+| Workspace-wide | `!isRestricted`                    | `Everyone in {App} will lose access.`                                                      |
+| Reassurance    | always                             | `Only you will be able to open it. You can share it again at any time.`                    |
 
 The workspace-wide clause keys off `!isRestricted`, **not** off the presence of
 a `workspace`-principal share row. An unrestricted resource with no such row
@@ -337,9 +338,9 @@ silently drop the warning in exactly the case where it matters most.
 ### 6.5 Summary line
 
 `buildShareSummary` already has the branch: `!hasAnyShares && isRestricted`
-returns *"This {resource} is currently only accessible to its owner."* The
-change is to reword it to second person, *"Only you have access to this
-{resource}."*
+returns _"This {resource} is currently only accessible to its owner."_ The
+change is to reword it to second person, _"Only you have access to this
+{resource}."_
 
 No `isOwner` parameter is needed, and that is not an assumption but an
 invariant. If `derived === "private"` and someone has the modal open, they are

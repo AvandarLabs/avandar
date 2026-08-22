@@ -1,12 +1,13 @@
-import { propNotEq } from "@avandar/utils";
-import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { validateDashboardSlug } from "@sbfn/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.ts";
-import { z } from "zod";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type {
   DashboardsApi,
   DashboardSlugValidationFailure,
 } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types.ts";
+
+import { propNotEq } from "@avandar/utils";
+import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { validateDashboardSlug } from "@sbfn/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.ts";
+import { z } from "zod";
 
 const TAKEN_SLUG: DashboardSlugValidationFailure = {
   isValid: false,
@@ -51,8 +52,8 @@ function _hasSlugCollision(
   }>,
 ): boolean {
   const { dashboardId, existing } = options;
-  return dashboardId ?
-      (existing ?? []).find(propNotEq("id", dashboardId)) !== undefined
+  return dashboardId
+    ? (existing ?? []).find(propNotEq("id", dashboardId)) !== undefined
     : existing?.at(0) !== undefined;
 }
 

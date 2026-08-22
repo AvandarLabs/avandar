@@ -1,10 +1,12 @@
-import { Permissions } from "$/models/Permissions/Permissions.ts";
-import { describe, expect, it } from "vitest";
 import type {
   AppType,
   PermissionKey,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions.types.ts";
+
+import { describe, expect, it } from "vitest";
+
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 
 const PERMISSIONS_THAT_DEFINE_ROUTE_ACCESS = {
   data_sources: "data_sources__can_list_sources",

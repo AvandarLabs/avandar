@@ -1,6 +1,9 @@
+import type { OfflineChatSchema } from "$/types/offlineChat.types";
+
 import { prop } from "@avandar/utils";
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { Parser } from "node-sql-parser";
+
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { getOfflineDatasetFromPrompt } from "@/components/ChatPanel/offlineChatHelpers/getOfflineDatasetFromPrompt/getOfflineDatasetFromPrompt";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
@@ -8,7 +11,6 @@ import { forceFromTableToDatasetId } from "@/components/ChatPanel/offlineChatHel
 import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
 import { OfflineSqlTableNamespaces } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlTableNamespaces/OfflineSqlTableNamespaces";
 import { repairOfflineColumnFromError } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineColumnFromError";
-import type { OfflineChatSchema } from "$/types/offlineChat.types";
 
 const PARSER_DATABASE = "postgresql";
 const MAX_REPAIR_ROUNDS = 4;

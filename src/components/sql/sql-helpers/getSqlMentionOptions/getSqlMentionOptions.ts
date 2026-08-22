@@ -1,5 +1,6 @@
-import { isDefined } from "@avandar/utils";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+
+import { isDefined } from "@avandar/utils";
 
 export type SqlMentionOption =
   | {
@@ -30,9 +31,11 @@ export function getSqlMentionOptions(
   query: string,
 ): SqlMentionOption[] {
   return catalog.datasets.flatMap((dataset) => {
-    const datasetOption: SqlMentionOption | undefined =
-      _matchesQuery(dataset.name, query) ?
-        {
+    const datasetOption: SqlMentionOption | undefined = _matchesQuery(
+      dataset.name,
+      query,
+    )
+      ? {
           kind: "dataset",
           label: dataset.name,
           insertText: `"${dataset.id}"`,

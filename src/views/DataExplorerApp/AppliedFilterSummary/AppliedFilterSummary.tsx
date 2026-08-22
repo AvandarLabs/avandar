@@ -1,8 +1,10 @@
-import { Plural, Trans } from "@lingui/react/macro";
-import { Text } from "@mantine/core";
-import { countFilterRules } from "$/models/queries/StructuredQuery/countFilterRules/countFilterRules";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ReactNode } from "react";
+
+import { Plural, Trans } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
+
+import { countFilterRules } from "$/models/queries/StructuredQuery/countFilterRules/countFilterRules";
 
 type Props = {
   filters: StructuredQuery.FilterGroup;
@@ -45,11 +47,11 @@ export function AppliedFilterSummary({
         one="# filter applied"
         other="# filters applied"
       />
-      {ignored > 0 ?
+      {ignored > 0 ? (
         <Trans>
           , <Plural value={ignored} one="# not applied" other="# not applied" />
         </Trans>
-      : null}
+      ) : null}
     </Text>
   );
 }

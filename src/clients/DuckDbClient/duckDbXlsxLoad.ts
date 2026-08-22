@@ -1,3 +1,8 @@
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as duckdb from "@duckdb/duckdb-wasm";
+
 import { uuid } from "$/lib/uuid";
 import {
   buildXlsxReadRange,
@@ -11,10 +16,6 @@ import {
   registerXlsxFile,
 } from "@/clients/DuckDbClient/duckDbFileRegistry";
 import { escapeSqlSingleQuotedLiteral } from "@/clients/DuckDbClient/duckDbSqlText";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
-import type * as duckdb from "@duckdb/duckdb-wasm";
 
 type BaseDuckDbLoadXlsxOptions = {
   tableName: string;
@@ -160,23 +161,22 @@ async function _transcodeXlsxToParquet(
     xlsxStagingFile: string;
   }>,
 ): Promise<void> {
-  const sheetClause =
-    options.sheet ?
-      `, sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`
+  const sheetClause = options.sheet
+    ? `, sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`
     : "";
   // A range is only needed to skip a title block, and detecting the sheet's
   // width costs a read of its own, so neither happens without a skip.
   const lastColumn =
-    options.rowsToSkip > 0 ?
-      await _detectLastPopulatedColumn({
-        client: options.client,
-        conn: options.conn,
-        datasetDuckDbLease: options.datasetDuckDbLease,
-        rowsToSkip: options.rowsToSkip,
-        sheetClause,
-        xlsxStagingFile: options.xlsxStagingFile,
-      })
-    : undefined;
+    options.rowsToSkip > 0
+      ? await _detectLastPopulatedColumn({
+          client: options.client,
+          conn: options.conn,
+          datasetDuckDbLease: options.datasetDuckDbLease,
+          rowsToSkip: options.rowsToSkip,
+          sheetClause,
+          xlsxStagingFile: options.xlsxStagingFile,
+        })
+      : undefined;
   const range = buildXlsxReadRange(options.rowsToSkip, lastColumn);
   // Naming a range turns `stop_at_empty` off, which would pad the read out to
   // the format's maximum row, so it is switched back on alongside the range.

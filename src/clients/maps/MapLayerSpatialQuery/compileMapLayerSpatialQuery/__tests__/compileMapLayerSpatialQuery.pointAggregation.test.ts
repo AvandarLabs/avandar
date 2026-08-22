@@ -1,18 +1,21 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
+
+import { describe, expect, it } from "vitest";
+
 /**
  * Point-in-polygon aggregation compilation for compileMapLayerSpatialQuery.
  */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it } from "vitest";
+
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
 import {
   createGeometryLayerFixture,
   getParsedPointsSql,
   withAoiOverlay,
 } from "./compileMapLayerSpatialQuery.fixtures";
-import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 describe("compileMapLayerSpatialQuery point aggregation", () => {
   it("compiles point-in-polygon assignment with query-level suppression", () => {

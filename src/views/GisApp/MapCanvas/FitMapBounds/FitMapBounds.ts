@@ -1,8 +1,9 @@
-import { useReducedMotion } from "@mantine/hooks";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { MapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/useMapChromeInsets";
 import type { RefObject } from "react";
+
+import { useReducedMotion } from "@mantine/hooks";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 function _areBoundsEqual(
   options: Readonly<{
@@ -153,17 +154,15 @@ function useLegacyStoreUpdate(
   useEffect(
     function updateLegacyFitBoundsRequest() {
       const nextBounds: MapBounds | undefined =
-        (
-          southwestLongitude === undefined ||
-          southwestLatitude === undefined ||
-          northeastLongitude === undefined ||
-          northeastLatitude === undefined
-        ) ?
-          undefined
-        : [
-            [southwestLongitude, southwestLatitude],
-            [northeastLongitude, northeastLatitude],
-          ];
+        southwestLongitude === undefined ||
+        southwestLatitude === undefined ||
+        northeastLongitude === undefined ||
+        northeastLatitude === undefined
+          ? undefined
+          : [
+              [southwestLongitude, southwestLatitude],
+              [northeastLongitude, northeastLatitude],
+            ];
       store.update(nextBounds, { top, right, bottom, left });
     },
     [

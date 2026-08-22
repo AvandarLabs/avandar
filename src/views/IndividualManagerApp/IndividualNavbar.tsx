@@ -1,12 +1,14 @@
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ReactNode } from "react";
+
 import { NavLinkList } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Box, BoxProps, Loader, ScrollArea, Text } from "@mantine/core";
 import clsx from "clsx";
+
 import css from "@/views/IndividualManagerApp/IndividualNavbar.module.css";
 import { useConceptIndividuals } from "@/views/IndividualManagerApp/useConceptIndividuals";
 import { useVirtualIndividualLinks } from "@/views/IndividualManagerApp/useVirtualIndividualLinks";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ReactNode } from "react";
 
 type Props = {
   concept: Concept.T;
@@ -38,15 +40,16 @@ export function IndividualNavbar({
 
   return (
     <Box className={clsx(css.pane, className)} {...boxProps}>
-      {isLoading ?
+      {isLoading ? (
         <Loader m="md" size="sm" />
-      : allIndividuals.length === 0 ?
+      ) : allIndividuals.length === 0 ? (
         <Box ta="center" py="md">
           <Text>
             <Trans>No records yet</Trans>
           </Text>
         </Box>
-      : <ScrollArea viewportRef={parentRef} h="100%" w="100%">
+      ) : (
+        <ScrollArea viewportRef={parentRef} h="100%" w="100%">
           <NavLinkList
             links={individualLinks}
             pr="md"
@@ -57,7 +60,7 @@ export function IndividualNavbar({
             style={{ height: listHeight }}
           />
         </ScrollArea>
-      }
+      )}
     </Box>
   );
 }

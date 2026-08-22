@@ -1,8 +1,8 @@
-import type { Expect, IsEqual } from "@avandar/utils";
 import type { AvaMapConfigRead } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 import type {
   ExportLayout, // prettier-ignore
 } from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
+import type { Expect, IsEqual } from "@avandar/utils";
 
 /** Export furniture applied to every new and migrated map. */
 export const DEFAULT_EXPORT_LAYOUT: ExportLayout = {
@@ -88,7 +88,8 @@ export const exportLayoutUpdaters = {
       ...exportLayout,
       disclaimer: _normalizeDisclaimer(exportLayout.disclaimer),
     };
-    return _isSameLayout(config.exportLayout, normalizedExportLayout) ? config
+    return _isSameLayout(config.exportLayout, normalizedExportLayout)
+      ? config
       : { ...config, exportLayout: normalizedExportLayout };
   },
 };

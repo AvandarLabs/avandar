@@ -3,6 +3,7 @@ import { useMutation } from "@avandar/query-hooks";
 import { InputTextForm } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
+
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 
@@ -41,7 +42,7 @@ export function EmailSection({ email }: Props): JSX.Element {
           <Trans>Used to sign in to your account.</Trans>
         </Text>
       </Stack>
-      {isEditing ?
+      {isEditing ? (
         <InputTextForm
           required
           hideLabel
@@ -60,7 +61,8 @@ export function EmailSection({ email }: Props): JSX.Element {
             }
           }}
         />
-      : <Group justify="space-between" wrap="nowrap" gap="md">
+      ) : (
+        <Group justify="space-between" wrap="nowrap" gap="md">
           <Text size="sm" style={{ wordBreak: "break-all" }}>
             {email}
           </Text>
@@ -68,7 +70,7 @@ export function EmailSection({ email }: Props): JSX.Element {
             <Trans>Change</Trans>
           </Button>
         </Group>
-      }
+      )}
     </Stack>
   );
 }

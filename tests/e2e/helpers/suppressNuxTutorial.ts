@@ -1,4 +1,5 @@
 import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+
 import { getUserIdByEmail } from "../setup/e2eTestWorkspaceLifecycle";
 import { createSupabaseAdminClient } from "./supabaseAdminClient";
 

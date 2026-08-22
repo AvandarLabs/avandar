@@ -39,18 +39,16 @@ export async function sendRunPipelineRequest(options: {
     });
   } catch (error: unknown) {
     const cause: unknown =
-      error instanceof Error && "cause" in error ?
-        (error as Error & { cause?: unknown }).cause
-      : undefined;
+      error instanceof Error && "cause" in error
+        ? (error as Error & { cause?: unknown }).cause
+        : undefined;
     const code: unknown =
-      (
-        cause !== null &&
-        typeof cause === "object" &&
-        "code" in cause &&
-        typeof (cause as { code: unknown }).code === "string"
-      ) ?
-        (cause as { code: string }).code
-      : undefined;
+      cause !== null &&
+      typeof cause === "object" &&
+      "code" in cause &&
+      typeof (cause as { code: unknown }).code === "string"
+        ? (cause as { code: string }).code
+        : undefined;
 
     if (code === "ECONNREFUSED") {
       throw new Error(

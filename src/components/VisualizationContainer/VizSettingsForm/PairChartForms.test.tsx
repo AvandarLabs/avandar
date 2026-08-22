@@ -1,3 +1,7 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
+import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
+
 /**
  * The scatter and bubble forms keep their hand-coded pair-series
  * editors but render chart-level descriptors through the shared
@@ -5,13 +9,11 @@
  * and write back to the config.
  */
 import { describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
 import { fireEvent, render, screen } from "@/test-utils";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
-import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
 
 const COLUMNS: readonly QueryResult.Column[] = [
   { name: "spend", dataType: "double" },

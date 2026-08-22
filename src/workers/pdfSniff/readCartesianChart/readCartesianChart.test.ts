@@ -1,10 +1,12 @@
+import type { BBox, PageGeometry } from "../pdfSniff.types";
+
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
+
 import { clipToRegion } from "../clipToRegion/clipToRegion";
 import { extractPageGeometry } from "../extractPageGeometry/extractPageGeometry";
 import { loadPdfDocument } from "../loadPdfDocument/loadPdfDocument";
 import { readCartesianChart } from "./readCartesianChart";
-import type { BBox, PageGeometry } from "../pdfSniff.types";
 
 const OCHA =
   "public/test-data/pdf/gate/ocha-sudan-cholera-update-2025-07-03.pdf";

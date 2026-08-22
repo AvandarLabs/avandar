@@ -1,4 +1,7 @@
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+
 import { describe, expect, it } from "vitest";
+
 import { syncMap } from "@/views/GisApp/MapCanvas/syncMap/syncMap";
 import {
   asMapLibreMap,
@@ -8,7 +11,6 @@ import {
   emptyCollection,
   emptySpec,
 } from "@/views/GisApp/MapCanvas/syncMap/syncMap.fixtures";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 
 describe("syncMap", () => {
   it("adds sources before the layers that use them", () => {

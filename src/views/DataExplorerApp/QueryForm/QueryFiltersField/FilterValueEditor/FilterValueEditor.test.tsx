@@ -1,8 +1,10 @@
+import type { Props } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { FilterValueEditor } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor";
-import type { Props } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor";
 
 function _renderEditor(overrides: Partial<Props> = {}) {
   const props: Props = {

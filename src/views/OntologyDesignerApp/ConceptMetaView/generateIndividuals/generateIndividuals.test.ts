@@ -1,20 +1,3 @@
-/**
- * Tests for the DuckDB table `generateIndividuals` stages its rows in.
- *
- * The name is the whole subject here. It used to be the concept's bare id, and
- * a bare UUID in a table name always means a dataset, so the catalog held a
- * table that `RelationRef.fromTableName` read back as a dataset reference for
- * an id that is not a dataset. Every later consumer of that function inherits
- * the hole, and nothing about it is visible in the generated individuals, so
- * only a test on the emitted SQL and on the table's lifetime can hold it.
- */
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
-import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   DatasetColumnId,
@@ -29,6 +12,25 @@ import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+/**
+ * Tests for the DuckDB table `generateIndividuals` stages its rows in.
+ *
+ * The name is the whole subject here. It used to be the concept's bare id, and
+ * a bare UUID in a table name always means a dataset, so the catalog held a
+ * table that `RelationRef.fromTableName` read back as a dataset reference for
+ * an id that is not a dataset. Every later consumer of that function inherits
+ * the hole, and nothing about it is visible in the generated individuals, so
+ * only a test on the emitted SQL and on the table's lifetime can hold it.
+ */
+import { Model } from "@avandar/models";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
+import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";
 
 const {
   runQueryMock,

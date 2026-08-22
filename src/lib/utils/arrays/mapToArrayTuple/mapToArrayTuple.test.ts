@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { mapToArrayTuple } from "@/lib/utils/arrays/mapToArrayTuple/mapToArrayTuple";
 
 describe("mapToArrayTuple", () => {

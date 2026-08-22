@@ -2,6 +2,7 @@ import { Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Stack, Text, Title } from "@mantine/core";
 import { useNavigate, useParams } from "@tanstack/react-router";
+
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
@@ -10,6 +11,7 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+
 import { PrivacyLogTab } from "./PrivacyLogTab/PrivacyLogTab";
 import { WorkspaceDangerZone } from "./WorkspaceDangerZone";
 import { WorkspaceLanguageTab } from "./WorkspaceLanguageTab/WorkspaceLanguageTab";
@@ -116,8 +118,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
               initialValue: workspace.name,
               label: t`Workspace Name`,
               validateFn: (value: string) => {
-                return value.trim() === "" ?
-                    t`Workspace name is required`
+                return value.trim() === ""
+                  ? t`Workspace name is required`
                   : undefined;
               },
             },
@@ -135,9 +137,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
             });
           }}
         />
-        {isCurrentUserTheWorkspaceOwner ?
+        {isCurrentUserTheWorkspaceOwner ? (
           <WorkspaceDangerZone workspace={workspace} />
-        : null}
+        ) : null}
       </Stack>
     );
   };
@@ -166,7 +168,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
   return (
     <AppLayout title={t`Settings`}>
       <Container py="xxxl" size="xl">
-        {isCurrentUserTheWorkspaceOwner ?
+        {isCurrentUserTheWorkspaceOwner ? (
           <Tabs
             tabIds={OWNER_TAB_IDS}
             value={isOwnerTabId(tabName) ? tabName : "general"}
@@ -202,7 +204,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
             }}
           />
-        : <Tabs
+        ) : (
+          <Tabs
             tabIds={NON_OWNER_TAB_IDS}
             value={isNonOwnerTabId(tabName) ? tabName : "general"}
             onTabChange={navigateToTab}
@@ -233,7 +236,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
             }}
           />
-        }
+        )}
       </Container>
     </AppLayout>
   );

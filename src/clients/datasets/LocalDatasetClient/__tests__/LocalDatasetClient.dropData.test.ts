@@ -1,14 +1,16 @@
 import "fake-indexeddb/auto";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { UserId } from "$/models/User/User.types";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { LocalDataset } from "@/models/LocalDataset/LocalDataset.types";
+
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
+
 import { dropLocalDatasetData } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
 } from "@/db/dexie/dexieVersions/dexieVersions";
-import type { LocalDataset } from "@/models/LocalDataset/LocalDataset.types";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { UserId } from "$/models/User/User.types";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
 const db = AvaDexieVersionManager.getVersion(CURRENT_AVA_DEXIE_VERSION);
 

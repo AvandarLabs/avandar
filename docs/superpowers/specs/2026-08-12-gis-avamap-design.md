@@ -159,9 +159,14 @@ type GeoBinding =
   // No spatial extension. Points built client-side from two numeric columns.
   | { type: "latLngColumns"; latitude: QueryColumnId; longitude: QueryColumnId }
   // P7.3. WKT / WKB / GeoJSON text in one column.
-  | { type: "geometryColumn"; column: QueryColumnId; encoding: "wkt" | "wkb" | "geojson" }
+  | {
+      type: "geometryColumn";
+      column: QueryColumnId;
+      encoding: "wkt" | "wkb" | "geojson";
+    }
   // P7.2. Rows carry a key; geometry comes from a boundary layer.
-  | { type: "joinToBoundaries";
+  | {
+      type: "joinToBoundaries";
       boundary: BoundarySourceRef;
       dataKey: QueryColumnId;
       boundaryKey: string;
@@ -169,7 +174,12 @@ type GeoBinding =
       // Unmatched keys are reported, never silently dropped.
     }
   // Tier 2. Density without exposing points.
-  | { type: "binned"; grid: "hex" | "square"; sizeMeters: number; source: GeoBinding };
+  | {
+      type: "binned";
+      grid: "hex" | "square";
+      sizeMeters: number;
+      source: GeoBinding;
+    };
 ```
 
 `normalizedName` matching exists because P-code joins in this sector routinely
@@ -182,25 +192,48 @@ unmatched counts and can list the unmatched keys.
 ```ts
 type LayerSymbology =
   | { type: "circle"; radius: number; color: ColorSpec; stroke: StrokeSpec }
-  | { type: "proportionalSymbol"; value: QueryColumnId; maxRadius: number;
-      scale: "sqrt" | "linear"; color: ColorSpec }   // sqrt is the default
-  | { type: "cluster"; radiusPx: number; aggregate: ClusterAggregate; color: ColorSpec }
+  | {
+      type: "proportionalSymbol";
+      value: QueryColumnId;
+      maxRadius: number;
+      scale: "sqrt" | "linear";
+      color: ColorSpec;
+    } // sqrt is the default
+  | {
+      type: "cluster";
+      radiusPx: number;
+      aggregate: ClusterAggregate;
+      color: ColorSpec;
+    }
   | { type: "heatmap"; weight?: QueryColumnId; radiusPx: number; ramp: RampId }
-  | { type: "fill"; color: ColorSpec; outline: StrokeSpec }     // choropleth
+  | { type: "fill"; color: ColorSpec; outline: StrokeSpec } // choropleth
   | { type: "line"; color: ColorSpec; width: WidthSpec }
   | { type: "label"; column: QueryColumnId; textStyle: TextStyle };
 
 type ColorSpec =
   | { type: "single"; color: string }
-  | { type: "categorical"; column: QueryColumnId; palette: PaletteId;
-      assignments?: Record<string, string>; other: string; noData: NoDataStyle }
-  | { type: "graduated"; column: QueryColumnId; ramp: RampId;
+  | {
+      type: "categorical";
+      column: QueryColumnId;
+      palette: PaletteId;
+      assignments?: Record<string, string>;
+      other: string;
+      noData: NoDataStyle;
+    }
+  | {
+      type: "graduated";
+      column: QueryColumnId;
+      ramp: RampId;
       classification: Classification;
       normalizeBy?: { column: QueryColumnId; per: 1 | 1_000 | 100_000 };
-      noData: NoDataStyle };
+      noData: NoDataStyle;
+    };
 
 type Classification =
-  | { method: "quantile" | "equalInterval" | "jenks" | "stdDev"; classes: number }
+  | {
+      method: "quantile" | "equalInterval" | "jenks" | "stdDev";
+      classes: number;
+    }
   | { method: "manual"; breaks: readonly number[] };
 
 // "No data reported" is not "zero". This is required, not optional.
@@ -214,7 +247,7 @@ Three deliberate constraints:
   of a ramp is a known harm, so the model does not let a caller omit it.
 - `normalizeBy` makes rate-versus-count a first-class choice. Absolute-count
   choropleths mislead, and sector reporting expects per-capita or per-100,000.
-- `proportionalSymbol.scale` defaults to `sqrt` so symbol *area* is proportional
+- `proportionalSymbol.scale` defaults to `sqrt` so symbol _area_ is proportional
   to value, replacing the prototype's linear `3 * (value + 1)`.
 
 ### 4.3 `SensitivityPolicy`
@@ -249,7 +282,7 @@ guarantee.
 type LegendConfig = {
   title: string;
   units?: string;
-  breaks?: readonly { label: string; color: string }[];  // frozen at save time
+  breaks?: readonly { label: string; color: string }[]; // frozen at save time
   showNoData: boolean;
   position: "bottomLeft" | "bottomRight" | "topRight" | "hidden";
 };
@@ -264,8 +297,13 @@ Freezing breaks on save is what makes an exported sitrep map reproducible.
 ```ts
 type BasemapConfig =
   | { type: "builtIn"; style: MapStyleKey }
-  | { type: "custom"; kind: "xyz" | "wms" | "wmts"; url: string; attribution: string }
-  | { type: "none"; background: string };   // low-bandwidth and offline fallback
+  | {
+      type: "custom";
+      kind: "xyz" | "wms" | "wmts";
+      url: string;
+      attribution: string;
+    }
+  | { type: "none"; background: string }; // low-bandwidth and offline fallback
 ```
 
 `type: "none"` exists so the map is usable when tile hosts are unreachable,
@@ -308,12 +346,20 @@ function makeFeatureCollectionFromRows(
   binding: GeoBinding,
 ): {
   featureCollection: GeoJSON.FeatureCollection;
-  drops: readonly { reason: DropReason; count: number; sampleRowIndexes: number[] }[];
+  drops: readonly {
+    reason: DropReason;
+    count: number;
+    sampleRowIndexes: number[];
+  }[];
 };
 
 type DropReason =
-  | "nullCoordinate" | "nonNumericCoordinate" | "outOfRange"
-  | "suspectedLatLngSwap" | "nullIsland" | "unparseableGeometry"
+  | "nullCoordinate"
+  | "nonNumericCoordinate"
+  | "outOfRange"
+  | "suspectedLatLngSwap"
+  | "nullIsland"
+  | "unparseableGeometry"
   | "unmatchedBoundaryKey";
 ```
 
@@ -468,61 +514,61 @@ needs an external service.
 
 **Tier 1, the map types and math P7 implies**
 
-| Feature | Maps to | Wave |
-| --- | --- | --- |
-| Spatial join, point-in-polygon aggregation `[spatial]` | enables P7.2 | B |
-| Boundary join with P-code match diagnostics | enables P7.2 | B |
-| Classification methods and normalization | P7.5 | B |
-| Explicit no-data rendering | P7.5 | B |
-| Proportional symbols, sqrt-scaled, with size legend | P7.5 | C |
-| Clustering | new | C |
-| Heatmap | P7 current-state gap | C |
+| Feature                                                | Maps to              | Wave |
+| ------------------------------------------------------ | -------------------- | ---- |
+| Spatial join, point-in-polygon aggregation `[spatial]` | enables P7.2         | B    |
+| Boundary join with P-code match diagnostics            | enables P7.2         | B    |
+| Classification methods and normalization               | P7.5                 | B    |
+| Explicit no-data rendering                             | P7.5                 | B    |
+| Proportional symbols, sqrt-scaled, with size legend    | P7.5                 | C    |
+| Clustering                                             | new                  | C    |
+| Heatmap                                                | P7 current-state gap | C    |
 
 **Tier 2, operational analysis**
 
-| Feature | Maps to | Wave |
-| --- | --- | --- |
-| Buffer and distance analysis `[spatial]` | new | D |
-| AOI draw-to-filter, wired to P8 filters | new | D |
-| Time slider with animation | new | D |
-| Hex and grid binning `[spatial]` | new | C |
-| Measure distance and area; go-to coordinate or P-code | new | D |
-| Annotations (text, arrows, freehand, areas) | new, from Felt | D |
-| Isochrone travel-time access `[svc]` | new | E, stretch |
+| Feature                                               | Maps to        | Wave       |
+| ----------------------------------------------------- | -------------- | ---------- |
+| Buffer and distance analysis `[spatial]`              | new            | D          |
+| AOI draw-to-filter, wired to P8 filters               | new            | D          |
+| Time slider with animation                            | new            | D          |
+| Hex and grid binning `[spatial]`                      | new            | C          |
+| Measure distance and area; go-to coordinate or P-code | new            | D          |
+| Annotations (text, arrows, freehand, areas)           | new, from Felt | D          |
+| Isochrone travel-time access `[svc]`                  | new            | E, stretch |
 
 **Tier 3, do-no-harm**
 
-| Feature | Maps to | Wave |
-| --- | --- | --- |
-| Sensitive-layer mode, minimum-count suppression | new | model in 1, enforced in B |
-| Point jitter and centroid displacement | new | B |
-| Disputed-boundary styling and mandatory disclaimer | new | E, with export |
+| Feature                                            | Maps to | Wave                      |
+| -------------------------------------------------- | ------- | ------------------------- |
+| Sensitive-layer mode, minimum-count suppression    | new     | model in 1, enforced in B |
+| Point jitter and centroid displacement             | new     | B                         |
+| Disputed-boundary styling and mandatory disclaimer | new     | E, with export            |
 
 **Tier 4, geospatial data quality**
 
-| Feature | Maps to | Wave |
-| --- | --- | --- |
-| Coordinate validation panel (swap, range, null island, DMS) | new | C |
-| Geometry columns: WKT, WKB, GeoJSON | P7.3 | B |
-| CRS reprojection `[spatial]` | new | C |
-| Zoom-based simplification `[spatial]` | new | B |
+| Feature                                                     | Maps to | Wave |
+| ----------------------------------------------------------- | ------- | ---- |
+| Coordinate validation panel (swap, range, null island, DMS) | new     | C    |
+| Geometry columns: WKT, WKB, GeoJSON                         | P7.3    | B    |
+| CRS reprojection `[spatial]`                                | new     | C    |
+| Zoom-based simplification `[spatial]`                       | new     | B    |
 
 **Tier 5, output and field reality**
 
-| Feature | Maps to | Wave |
-| --- | --- | --- |
-| Print and PDF export with full map furniture | new | E |
-| Offline basemap caching | new, with P9 | E |
-| Custom XYZ, WMS, WMTS sources; satellite; no-basemap | P7.1 adjacent | A |
-| Scale bar, coordinate readout, attribution | new | A |
-| Per-layer popup config; click through to case record | new | A |
-| Bookmarks and saved views | new | A |
-| Multi-layer stack with reorder and visibility | P7.4 | A |
-| Persist map configuration | P7.6 | A |
-| Map PBlock in a dashboard | P7.7 | E |
-| ABox and HDX layer sources | P7.8 | client half in 1; full in E |
-| Permissions on maps | P7.9 | 1 |
-| Style picker repaired; logs, error and empty states | P7.1 | 1 |
+| Feature                                              | Maps to       | Wave                        |
+| ---------------------------------------------------- | ------------- | --------------------------- |
+| Print and PDF export with full map furniture         | new           | E                           |
+| Offline basemap caching                              | new, with P9  | E                           |
+| Custom XYZ, WMS, WMTS sources; satellite; no-basemap | P7.1 adjacent | A                           |
+| Scale bar, coordinate readout, attribution           | new           | A                           |
+| Per-layer popup config; click through to case record | new           | A                           |
+| Bookmarks and saved views                            | new           | A                           |
+| Multi-layer stack with reorder and visibility        | P7.4          | A                           |
+| Persist map configuration                            | P7.6          | A                           |
+| Map PBlock in a dashboard                            | P7.7          | E                           |
+| ABox and HDX layer sources                           | P7.8          | client half in 1; full in E |
+| Permissions on maps                                  | P7.9          | 1                           |
+| Style picker repaired; logs, error and empty states  | P7.1          | 1                           |
 
 ## 11. Phases and landing order
 

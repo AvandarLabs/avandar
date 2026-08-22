@@ -1,5 +1,6 @@
-import { openFileImportFlow } from "./openFileImportFlow";
 import type { FileWithPath } from "@mantine/dropzone";
+
+import { openFileImportFlow } from "./openFileImportFlow";
 
 /**
  * Drop handler for the app-wide dropzone: picks the first dropped file

@@ -1,9 +1,11 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ReactNode } from "react";
+
 import { isNullish } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Anchor } from "@mantine/core";
+
 import { isSafePopupUrlTemplate } from "$/models/AvaMap/AvaMapConfig/isSafePopupUrlTemplate";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   action: MapLayer.PopupAction | undefined;

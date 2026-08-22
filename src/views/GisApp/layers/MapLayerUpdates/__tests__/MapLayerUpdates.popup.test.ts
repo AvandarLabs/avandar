@@ -1,16 +1,19 @@
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+
 import { prop } from "@avandar/utils";
+import { describe, expect, it } from "vitest";
+
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it } from "vitest";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+
 import {
   createBoundLayer,
   createDataset,
   createNumericColumn,
   createTextColumn,
 } from "./MapLayerUpdates.fixtures";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 describe("withPopupColumns", () => {
   it("selects the columns and adds them to the layer's query", () => {

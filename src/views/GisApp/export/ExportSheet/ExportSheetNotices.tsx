@@ -1,9 +1,11 @@
-import { useLingui } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
-import { getExportFilterReadout } from "@/views/GisApp/export/getExportFilterReadout/getExportFilterReadout";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Stack, Text } from "@mantine/core";
+
+import { getExportFilterReadout } from "@/views/GisApp/export/getExportFilterReadout/getExportFilterReadout";
 
 type Props = { config: AvaMapConfig.T };
 
@@ -36,26 +38,26 @@ export function ExportSheetNotices({ config }: Props): ReactNode {
   const filterReadout = getExportFilterReadout(config);
   const aggregateLayer = _findAggregateOnlyLayer(config.layers);
   const threshold =
-    aggregateLayer?.sensitivity.mode === "aggregateOnly" ?
-      aggregateLayer.sensitivity.minCellCount
-    : undefined;
+    aggregateLayer?.sensitivity.mode === "aggregateOnly"
+      ? aggregateLayer.sensitivity.minCellCount
+      : undefined;
 
   return (
     <Stack gap="xs">
-      {filterReadout.timeWindow !== undefined ?
+      {filterReadout.timeWindow !== undefined ? (
         <Text size="sm">{t`Time window: ${filterReadout.timeWindow}`}</Text>
-      : null}
-      {filterReadout.hasAoi ?
+      ) : null}
+      {filterReadout.hasAoi ? (
         <Text size="sm">{t`Area of interest applied`}</Text>
-      : null}
-      {aggregateLayer !== undefined && threshold !== undefined ?
+      ) : null}
+      {aggregateLayer !== undefined && threshold !== undefined ? (
         <Text size="sm">
           {t`This map includes ${aggregateLayer.name}, a layer set to Aggregate only. The export applies the same suppression as the screen: areas with fewer than ${threshold} records are shown as suppressed, never as zero.`}
         </Text>
-      : null}
-      {_isDarkBasemap(config.basemap) ?
+      ) : null}
+      {_isDarkBasemap(config.basemap) ? (
         <Text size="sm">{t`A dark or satellite basemap may photocopy poorly.`}</Text>
-      : null}
+      ) : null}
     </Stack>
   );
 }

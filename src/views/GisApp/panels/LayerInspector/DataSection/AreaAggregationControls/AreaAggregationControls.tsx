@@ -1,11 +1,12 @@
-import { AggregationMeasureSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect";
-import { AggregationOperationSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { Model } from "@avandar/models";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { Model } from "@avandar/models";
 import type { ReactNode } from "react";
+
+import { AggregationMeasureSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect";
+import { AggregationOperationSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect";
 
 type Props = {
   layer: MapLayer.T;
@@ -37,7 +38,7 @@ export function AreaAggregationControls({
         sourceColumns={sourceColumns}
         onLayerChange={onLayerChange}
       />
-      {aggregation.operation !== "count" ?
+      {aggregation.operation !== "count" ? (
         <AggregationMeasureSelect
           layer={layer}
           dataSourceId={dataSourceId}
@@ -45,7 +46,7 @@ export function AreaAggregationControls({
           operation={aggregation.operation}
           onLayerChange={onLayerChange}
         />
-      : null}
+      ) : null}
     </>
   );
 }

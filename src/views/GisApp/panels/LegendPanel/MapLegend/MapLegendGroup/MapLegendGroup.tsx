@@ -1,8 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
-import { LayerLegendContent } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LayerLegendContent";
-import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+
+import { LayerLegendContent } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LayerLegendContent";
+import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 
 type Props = { layer: MapLayer.T };
 
@@ -13,9 +15,9 @@ export function MapLegendGroup({ layer }: Props): ReactNode {
   return (
     <div className={css.mapLegendGroup}>
       <h3 className={css.mapLegendGroupTitle}>{title}</h3>
-      {layer.legend.units ?
+      {layer.legend.units ? (
         <div className={css.mapLegendGroupUnits}>{layer.legend.units}</div>
-      : null}
+      ) : null}
       <LayerLegendContent layer={layer} />
     </div>
   );

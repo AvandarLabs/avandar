@@ -17,44 +17,44 @@
 
 **Create (shared, pure logic):**
 
-| Path | Responsibility |
-|---|---|
-| `shared/models/queries/StructuredQuery/QueryFilterOperator.ts` | The operator catalog: spec per operator (arity, which `AvaDataType`s it applies to, whether `Match case` applies, whether it is legacy), plus `operatorsForDataType` and `operatorSpec` lookups |
-| `shared/models/queries/StructuredQuery/QueryFilterValue.ts` | Tolerant value accessors (`filterValueAsScalar`, `filterValueAsList`, `filterValueAsPair`) and literal coercion by data type |
-| `shared/models/queries/StructuredQuery/QueryFilterValidation.ts` | `isFilterRuleComplete`, `validateFilterRule`, and the `QueryFilterValidationReason` union |
-| `shared/models/queries/StructuredQuery/renderFilterRule.ts` | The single rule-to-SQL renderer, returning `{ sql, bindings }` |
-| `shared/copy/queryFilterOperatorLabel.ts` | Localized operator labels, type-aware (`=` reads "on" for dates) |
-| `shared/copy/queryFilterValidationLabel.ts` | Localized validation messages |
+| Path                                                             | Responsibility                                                                                                                                                                                  |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shared/models/queries/StructuredQuery/QueryFilterOperator.ts`   | The operator catalog: spec per operator (arity, which `AvaDataType`s it applies to, whether `Match case` applies, whether it is legacy), plus `operatorsForDataType` and `operatorSpec` lookups |
+| `shared/models/queries/StructuredQuery/QueryFilterValue.ts`      | Tolerant value accessors (`filterValueAsScalar`, `filterValueAsList`, `filterValueAsPair`) and literal coercion by data type                                                                    |
+| `shared/models/queries/StructuredQuery/QueryFilterValidation.ts` | `isFilterRuleComplete`, `validateFilterRule`, and the `QueryFilterValidationReason` union                                                                                                       |
+| `shared/models/queries/StructuredQuery/renderFilterRule.ts`      | The single rule-to-SQL renderer, returning `{ sql, bindings }`                                                                                                                                  |
+| `shared/copy/queryFilterOperatorLabel.ts`                        | Localized operator labels, type-aware (`=` reads "on" for dates)                                                                                                                                |
+| `shared/copy/queryFilterValidationLabel.ts`                      | Localized validation messages                                                                                                                                                                   |
 
 **Create (web):**
 
-| Path | Responsibility |
-|---|---|
-| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion.ts` | Conversion between our `QueryFilterGroup` and the library tree, preserving node ids |
-| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState.ts` | Local library-tree state, debounced commit, external resync |
-| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRuleRow.tsx` | Custom rule renderer: one row, labels, match-case toggle, remove |
-| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx` | Typed value editors: text, number, date, boolean, chip list, bound pair |
-| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary.tsx` | "N applied, M not applied" line with reasons |
-| `src/views/DataExplorerApp/useQueryColumnsForDataSource.ts` | Extracted hook loading every column for a data source |
-| `src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx` | Query error surface for the results area |
+| Path                                                                             | Responsibility                                                                      |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion.ts`  | Conversion between our `QueryFilterGroup` and the library tree, preserving node ids |
+| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState.ts`    | Local library-tree state, debounced commit, external resync                         |
+| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRuleRow.tsx`        | Custom rule renderer: one row, labels, match-case toggle, remove                    |
+| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx`    | Typed value editors: text, number, date, boolean, chip list, bound pair             |
+| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary.tsx` | "N applied, M not applied" line with reasons                                        |
+| `src/views/DataExplorerApp/useQueryColumnsForDataSource.ts`                      | Extracted hook loading every column for a data source                               |
+| `src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx`              | Query error surface for the results area                                            |
 
 **Modify:**
 
-| Path | Change |
-|---|---|
-| `shared/models/queries/StructuredQuery/QueryFilter.types.ts` | Extend the operator union; add `id`, `columnDataType`, `matchCase`; add `makeQueryFilterNodeId` |
-| `shared/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts` | Delegate to `renderFilterRule`; skip incomplete rules |
-| `shared/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.ts` | Delegate to `renderFilterRule` |
-| `shared/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts` | Accept an optional `columnTypes` override |
-| `shared/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts` | Recognize the new AST shapes |
-| `shared/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts` | Parse function-form predicates, `IS TRUE/FALSE`, `NOT BETWEEN`, `lower()` wrappers |
-| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx` | Rewire to the catalog, local state, custom controls |
-| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.module.css` | Row layout, hierarchy rails, scroll area |
-| `src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx` | Un-gate the filters group; pass dataset columns; render the applied summary |
-| `src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx` | Consume the extracted column hook |
-| `src/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange.ts` | Reconcile filters when the data source changes |
-| `src/views/DataExplorerApp/DataExplorerApp.tsx` | Render `QueryResultsError` |
-| `src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx` | Render `QueryResultsError` in the dashboard host |
+| Path                                                                                 | Change                                                                                          |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `shared/models/queries/StructuredQuery/QueryFilter.types.ts`                         | Extend the operator union; add `id`, `columnDataType`, `matchCase`; add `makeQueryFilterNodeId` |
+| `shared/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts`         | Delegate to `renderFilterRule`; skip incomplete rules                                           |
+| `shared/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.ts`          | Delegate to `renderFilterRule`                                                                  |
+| `shared/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts` | Accept an optional `columnTypes` override                                                       |
+| `shared/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts`        | Recognize the new AST shapes                                                                    |
+| `shared/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts`   | Parse function-form predicates, `IS TRUE/FALSE`, `NOT BETWEEN`, `lower()` wrappers              |
+| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx`        | Rewire to the catalog, local state, custom controls                                             |
+| `src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.module.css` | Row layout, hierarchy rails, scroll area                                                        |
+| `src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx`            | Un-gate the filters group; pass dataset columns; render the applied summary                     |
+| `src/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect.tsx`        | Consume the extracted column hook                                                               |
+| `src/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange.ts`              | Reconcile filters when the data source changes                                                  |
+| `src/views/DataExplorerApp/DataExplorerApp.tsx`                                      | Render `QueryResultsError`                                                                      |
+| `src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx`             | Render `QueryResultsError` in the dashboard host                                                |
 
 **Test files:**
 
@@ -72,6 +72,7 @@
 ## Task 1: Operator catalog
 
 **Files:**
+
 - Modify: `shared/models/queries/StructuredQuery/QueryFilter.types.ts`
 - Create: `shared/models/queries/StructuredQuery/QueryFilterOperator.ts`
 - Test: `shared/models/queries/StructuredQuery/QueryFilterOperator.test.ts`
@@ -120,12 +121,20 @@ describe("operatorsForDataType", () => {
   });
 
   it("offers null checks for every type", () => {
-    (["varchar", "bigint", "double", "date", "timestamp", "time", "boolean"] as const).forEach(
-      (dataType) => {
-        expect(operatorsForDataType(dataType)).toContain("is_null");
-        expect(operatorsForDataType(dataType)).toContain("is_not_null");
-      },
-    );
+    (
+      [
+        "varchar",
+        "bigint",
+        "double",
+        "date",
+        "timestamp",
+        "time",
+        "boolean",
+      ] as const
+    ).forEach((dataType) => {
+      expect(operatorsForDataType(dataType)).toContain("is_null");
+      expect(operatorsForDataType(dataType)).toContain("is_not_null");
+    });
   });
 
   it("never offers legacy operators", () => {
@@ -306,29 +315,144 @@ function _isBoolean(dataType: AvaDataTypeNs.T): boolean {
  * an operator cannot be added in one place and forgotten in another.
  */
 export const QUERY_FILTER_OPERATOR_SPECS: readonly QueryFilterOperatorSpec[] = [
-  { operator: "=", arity: "scalar", appliesTo: _always, supportsMatchCase: true },
-  { operator: "!=", arity: "scalar", appliesTo: _always, supportsMatchCase: true },
-  { operator: ">", arity: "scalar", appliesTo: _isOrderable, supportsMatchCase: false },
-  { operator: ">=", arity: "scalar", appliesTo: _isOrderable, supportsMatchCase: false },
-  { operator: "<", arity: "scalar", appliesTo: _isOrderable, supportsMatchCase: false },
-  { operator: "<=", arity: "scalar", appliesTo: _isOrderable, supportsMatchCase: false },
-  { operator: "contains", arity: "scalar", appliesTo: _isText, supportsMatchCase: true },
-  { operator: "not_contains", arity: "scalar", appliesTo: _isText, supportsMatchCase: true },
-  { operator: "starts_with", arity: "scalar", appliesTo: _isText, supportsMatchCase: true },
-  { operator: "not_starts_with", arity: "scalar", appliesTo: _isText, supportsMatchCase: true },
-  { operator: "ends_with", arity: "scalar", appliesTo: _isText, supportsMatchCase: true },
-  { operator: "not_ends_with", arity: "scalar", appliesTo: _isText, supportsMatchCase: true },
-  { operator: "in", arity: "list", appliesTo: _always, supportsMatchCase: true },
-  { operator: "not_in", arity: "list", appliesTo: _always, supportsMatchCase: true },
-  { operator: "between", arity: "pair", appliesTo: _isOrderable, supportsMatchCase: false },
-  { operator: "not_between", arity: "pair", appliesTo: _isOrderable, supportsMatchCase: false },
-  { operator: "is_null", arity: "none", appliesTo: _always, supportsMatchCase: false },
-  { operator: "is_not_null", arity: "none", appliesTo: _always, supportsMatchCase: false },
-  { operator: "is_blank", arity: "none", appliesTo: _isText, supportsMatchCase: false },
-  { operator: "is_not_blank", arity: "none", appliesTo: _isText, supportsMatchCase: false },
-  { operator: "is_true", arity: "none", appliesTo: _isBoolean, supportsMatchCase: false },
-  { operator: "is_false", arity: "none", appliesTo: _isBoolean, supportsMatchCase: false },
-  { operator: "matches_regex", arity: "scalar", appliesTo: _isText, supportsMatchCase: false },
+  {
+    operator: "=",
+    arity: "scalar",
+    appliesTo: _always,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "!=",
+    arity: "scalar",
+    appliesTo: _always,
+    supportsMatchCase: true,
+  },
+  {
+    operator: ">",
+    arity: "scalar",
+    appliesTo: _isOrderable,
+    supportsMatchCase: false,
+  },
+  {
+    operator: ">=",
+    arity: "scalar",
+    appliesTo: _isOrderable,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "<",
+    arity: "scalar",
+    appliesTo: _isOrderable,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "<=",
+    arity: "scalar",
+    appliesTo: _isOrderable,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "contains",
+    arity: "scalar",
+    appliesTo: _isText,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "not_contains",
+    arity: "scalar",
+    appliesTo: _isText,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "starts_with",
+    arity: "scalar",
+    appliesTo: _isText,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "not_starts_with",
+    arity: "scalar",
+    appliesTo: _isText,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "ends_with",
+    arity: "scalar",
+    appliesTo: _isText,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "not_ends_with",
+    arity: "scalar",
+    appliesTo: _isText,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "in",
+    arity: "list",
+    appliesTo: _always,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "not_in",
+    arity: "list",
+    appliesTo: _always,
+    supportsMatchCase: true,
+  },
+  {
+    operator: "between",
+    arity: "pair",
+    appliesTo: _isOrderable,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "not_between",
+    arity: "pair",
+    appliesTo: _isOrderable,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "is_null",
+    arity: "none",
+    appliesTo: _always,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "is_not_null",
+    arity: "none",
+    appliesTo: _always,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "is_blank",
+    arity: "none",
+    appliesTo: _isText,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "is_not_blank",
+    arity: "none",
+    appliesTo: _isText,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "is_true",
+    arity: "none",
+    appliesTo: _isBoolean,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "is_false",
+    arity: "none",
+    appliesTo: _isBoolean,
+    supportsMatchCase: false,
+  },
+  {
+    operator: "matches_regex",
+    arity: "scalar",
+    appliesTo: _isText,
+    supportsMatchCase: false,
+  },
   {
     operator: "not_matches_regex",
     arity: "scalar",
@@ -414,6 +538,7 @@ git commit -m "feat(filters): add type-aware operator catalog"
 ## Task 2: Value accessors
 
 **Files:**
+
 - Create: `shared/models/queries/StructuredQuery/QueryFilterValue.ts`
 - Test: `shared/models/queries/StructuredQuery/QueryFilterValue.test.ts`
 
@@ -557,16 +682,17 @@ export function filterValueAsList(
   options: { dropEmpty?: boolean } = {},
 ): ReadonlyArray<string | number> {
   const dropEmpty = options.dropEmpty ?? true;
-  const items =
-    Array.isArray(value) ? [...value]
-    : _isBlank(value) ? []
-    : String(value)
-        .split(",")
-        .map((part) => {
-          return part.trim();
-        });
-  return dropEmpty ?
-      items.filter((item) => {
+  const items = Array.isArray(value)
+    ? [...value]
+    : _isBlank(value)
+      ? []
+      : String(value)
+          .split(",")
+          .map((part) => {
+            return part.trim();
+          });
+  return dropEmpty
+    ? items.filter((item) => {
         return !_isBlank(item);
       })
     : items;
@@ -605,8 +731,8 @@ export function coerceFilterLiteral(
       return value;
     }
     const parsed = Number(value);
-    return Number.isFinite(parsed) && String(value).trim() !== "" ?
-        parsed
+    return Number.isFinite(parsed) && String(value).trim() !== ""
+      ? parsed
       : value;
   }
   if (typeof value === "boolean") {
@@ -634,6 +760,7 @@ git commit -m "feat(filters): add tolerant filter value accessors"
 ## Task 3: Completeness and validation
 
 **Files:**
+
 - Create: `shared/models/queries/StructuredQuery/QueryFilterValidation.ts`
 - Test: `shared/models/queries/StructuredQuery/QueryFilterValidation.test.ts`
 
@@ -908,7 +1035,10 @@ export function validateFilterRule(
   if (!isFilterRuleComplete(rule)) {
     return undefined;
   }
-  if (rule.operator === "matches_regex" || rule.operator === "not_matches_regex") {
+  if (
+    rule.operator === "matches_regex" ||
+    rule.operator === "not_matches_regex"
+  ) {
     const pattern = String(filterValueAsScalar(rule.value));
     try {
       new RegExp(pattern);
@@ -923,8 +1053,8 @@ export function validateFilterRule(
     })
     .with("scalar", () => {
       const value = filterValueAsScalar(rule.value);
-      return value === undefined ?
-          undefined
+      return value === undefined
+        ? undefined
         : _validateLiteral(value, rule.columnDataType);
     })
     .with("list", () => {
@@ -948,11 +1078,11 @@ export function validateFilterRule(
       }
       const comparable =
         rule.columnDataType !== undefined &&
-        AvaDataType.isNumeric(rule.columnDataType) ?
-          [Number(lower), Number(upper)]
-        : [String(lower), String(upper)];
-      return comparable[0]! > comparable[1]! ?
-          ({ code: "betweenBoundsReversed" } as const)
+        AvaDataType.isNumeric(rule.columnDataType)
+          ? [Number(lower), Number(upper)]
+          : [String(lower), String(upper)];
+      return comparable[0]! > comparable[1]!
+        ? ({ code: "betweenBoundsReversed" } as const)
         : undefined;
     })
     .exhaustive();
@@ -980,6 +1110,7 @@ This is the heart of the change. Every operator's SQL is defined here once, and
 both `WHERE` (Task 5) and `HAVING` (Task 6) consume it.
 
 **Files:**
+
 - Create: `shared/models/queries/StructuredQuery/renderFilterRule.ts`
 - Test: `shared/models/queries/StructuredQuery/renderFilterRule.test.ts`
 
@@ -1024,7 +1155,9 @@ describe("renderFilterRule, text comparison", () => {
   });
 
   it("renders inequality", () => {
-    expect(_render({ operator: "!=" })?.sql).toBe('lower("Admin2") <> lower(?)');
+    expect(_render({ operator: "!=" })?.sql).toBe(
+      'lower("Admin2") <> lower(?)',
+    );
   });
 });
 
@@ -1098,7 +1231,12 @@ describe("renderFilterRule, numeric and temporal literals", () => {
   it("prefers a live columnTypes override over the stored type", () => {
     expect(
       _render(
-        { columnName: "cases", columnDataType: "varchar", operator: ">", value: "5" },
+        {
+          columnName: "cases",
+          columnDataType: "varchar",
+          operator: ">",
+          value: "5",
+        },
         { columnTypes: { cases: "bigint" } },
       ),
     ).toEqual({ sql: '"cases" > ?', bindings: [5] });
@@ -1130,9 +1268,12 @@ describe("renderFilterRule, list and range operators", () => {
       columnName: "daily_new_cases",
       columnDataType: "bigint",
     } as const;
-    expect(_render({ ...numeric, operator: "between", value: [100, 200] })).toEqual(
-      { sql: '"daily_new_cases" BETWEEN ? AND ?', bindings: [100, 200] },
-    );
+    expect(
+      _render({ ...numeric, operator: "between", value: [100, 200] }),
+    ).toEqual({
+      sql: '"daily_new_cases" BETWEEN ? AND ?',
+      bindings: [100, 200],
+    });
     expect(
       _render({ ...numeric, operator: "not_between", value: [100, 200] })?.sql,
     ).toBe('"daily_new_cases" NOT BETWEEN ? AND ?');
@@ -1209,9 +1350,9 @@ describe("renderFilterRule, exclusions", () => {
   });
 
   it("quotes identifiers that contain punctuation", () => {
-    expect(
-      _render({ columnName: "Country/Region", value: "Chad" })?.sql,
-    ).toBe('lower("Country/Region") = lower(?)');
+    expect(_render({ columnName: "Country/Region", value: "Chad" })?.sql).toBe(
+      'lower("Country/Region") = lower(?)',
+    );
   });
 });
 ```
@@ -1290,18 +1431,19 @@ export function renderFilterRule(
     return undefined;
   }
 
-  const dataType = options.columnTypes?.[rule.columnName] ?? rule.columnDataType;
+  const dataType =
+    options.columnTypes?.[rule.columnName] ?? rule.columnDataType;
   const column = quoteSqlIdentifier(rule.columnName);
   const isTextColumn = dataType === undefined || AvaDataType.isText(dataType);
   const foldCase =
     spec.supportsMatchCase && isTextColumn && rule.matchCase !== true;
   const lhs = foldCase ? `lower(${column})` : column;
-  const isTemporal =
-    dataType !== undefined && AvaDataType.isTemporal(dataType);
-  const placeholder =
-    isTemporal ? `CAST(? AS ${_castTarget(dataType)})`
-    : foldCase ? "lower(?)"
-    : "?";
+  const isTemporal = dataType !== undefined && AvaDataType.isTemporal(dataType);
+  const placeholder = isTemporal
+    ? `CAST(? AS ${_castTarget(dataType)})`
+    : foldCase
+      ? "lower(?)"
+      : "?";
 
   function literal(value: string | number | boolean): unknown {
     return coerceFilterLiteral(value, dataType);
@@ -1452,6 +1594,7 @@ Replaces `applyFilters`'s hand-built knex callback nesting with one group
 renderer that both `WHERE` and `HAVING` use, so the two clauses cannot drift.
 
 **Files:**
+
 - Create: `shared/models/queries/StructuredQuery/renderFilterGroup.ts`
 - Create: `shared/models/queries/StructuredQuery/renderFilterGroup.test.ts`
 - Modify: `shared/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts` (replace the whole file)
@@ -1499,18 +1642,19 @@ describe("renderFilterGroup", () => {
   });
 
   it("joins rules with the group combinator", () => {
-    expect(
-      renderFilterGroup(_group({ rules: [TEXT_RULE, NUM_RULE] })),
-    ).toEqual({
-      sql: '"Admin2" = ? and "cases" > ?',
-      bindings: ["Alameda", 100],
-    });
+    expect(renderFilterGroup(_group({ rules: [TEXT_RULE, NUM_RULE] }))).toEqual(
+      {
+        sql: '"Admin2" = ? and "cases" > ?',
+        bindings: ["Alameda", 100],
+      },
+    );
   });
 
   it("joins with OR when the combinator is OR", () => {
     expect(
-      renderFilterGroup(_group({ combinator: "OR", rules: [TEXT_RULE, NUM_RULE] }))
-        ?.sql,
+      renderFilterGroup(
+        _group({ combinator: "OR", rules: [TEXT_RULE, NUM_RULE] }),
+      )?.sql,
     ).toBe('"Admin2" = ? or "cases" > ?');
   });
 
@@ -1520,7 +1664,10 @@ describe("renderFilterGroup", () => {
         combinator: "AND",
         rules: [
           NUM_RULE,
-          _group({ combinator: "OR", rules: [TEXT_RULE, { ...TEXT_RULE, value: "Butte" }] }),
+          _group({
+            combinator: "OR",
+            rules: [TEXT_RULE, { ...TEXT_RULE, value: "Butte" }],
+          }),
         ],
       }),
     );
@@ -1580,8 +1727,8 @@ function _renderNode(
     return renderFilterRule(node, options);
   }
   const nested = renderFilterGroup(node, options);
-  return nested ?
-      { sql: `(${nested.sql})`, bindings: nested.bindings }
+  return nested
+    ? { sql: `(${nested.sql})`, bindings: nested.bindings }
     : undefined;
 }
 
@@ -1687,6 +1834,7 @@ git commit -m "refactor(filters): render WHERE through the shared group renderer
 ## Task 6: HAVING through the same renderer
 
 **Files:**
+
 - Modify: `shared/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.ts` (replace the whole file)
 - Test: `shared/models/queries/StructuredQuery/structuredQueryToSql/applyHaving.test.ts`
 
@@ -1834,6 +1982,7 @@ The AST shapes below were verified against the installed `node-sql-parser` 5.x
 with `database: "postgresql"`; see spec section 5.1.1.
 
 **Files:**
+
 - Modify: `shared/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts`
 - Modify: `shared/models/queries/StructuredQuery/sqlToStructuredQuery/parseFilterClauses.ts`
 - Test: `shared/models/queries/StructuredQuery/filterRoundTrip.test.ts`
@@ -1941,32 +2090,188 @@ function _query(rule: QueryFilterRule): PartialStructuredQuery {
  * valid for the operator being exercised.
  */
 const RULES: Readonly<Record<QueryFilterOperator, QueryFilterRule>> = {
-  "=": { type: "rule", columnName: "label", columnDataType: "varchar", operator: "=", value: "a" },
-  "!=": { type: "rule", columnName: "label", columnDataType: "varchar", operator: "!=", value: "a" },
-  ">": { type: "rule", columnName: "total", columnDataType: "bigint", operator: ">", value: 1 },
-  ">=": { type: "rule", columnName: "total", columnDataType: "bigint", operator: ">=", value: 1 },
-  "<": { type: "rule", columnName: "total", columnDataType: "bigint", operator: "<", value: 1 },
-  "<=": { type: "rule", columnName: "total", columnDataType: "bigint", operator: "<=", value: 1 },
-  contains: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "contains", value: "a" },
-  not_contains: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "not_contains", value: "a" },
-  starts_with: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "starts_with", value: "a" },
-  not_starts_with: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "not_starts_with", value: "a" },
-  ends_with: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "ends_with", value: "a" },
-  not_ends_with: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "not_ends_with", value: "a" },
-  in: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "in", value: ["a", "b"] },
-  not_in: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "not_in", value: ["a", "b"] },
-  between: { type: "rule", columnName: "total", columnDataType: "bigint", operator: "between", value: [1, 2] },
-  not_between: { type: "rule", columnName: "total", columnDataType: "bigint", operator: "not_between", value: [1, 2] },
-  is_null: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "is_null", value: null },
-  is_not_null: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "is_not_null", value: null },
-  is_blank: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "is_blank", value: null },
-  is_not_blank: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "is_not_blank", value: null },
-  is_true: { type: "rule", columnName: "is_active", columnDataType: "boolean", operator: "is_true", value: null },
-  is_false: { type: "rule", columnName: "is_active", columnDataType: "boolean", operator: "is_false", value: null },
-  matches_regex: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "matches_regex", value: "^a" },
-  not_matches_regex: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "not_matches_regex", value: "^a" },
-  like: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "like", value: "a%" },
-  not_like: { type: "rule", columnName: "label", columnDataType: "varchar", operator: "not_like", value: "a%" },
+  "=": {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "=",
+    value: "a",
+  },
+  "!=": {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "!=",
+    value: "a",
+  },
+  ">": {
+    type: "rule",
+    columnName: "total",
+    columnDataType: "bigint",
+    operator: ">",
+    value: 1,
+  },
+  ">=": {
+    type: "rule",
+    columnName: "total",
+    columnDataType: "bigint",
+    operator: ">=",
+    value: 1,
+  },
+  "<": {
+    type: "rule",
+    columnName: "total",
+    columnDataType: "bigint",
+    operator: "<",
+    value: 1,
+  },
+  "<=": {
+    type: "rule",
+    columnName: "total",
+    columnDataType: "bigint",
+    operator: "<=",
+    value: 1,
+  },
+  contains: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "contains",
+    value: "a",
+  },
+  not_contains: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "not_contains",
+    value: "a",
+  },
+  starts_with: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "starts_with",
+    value: "a",
+  },
+  not_starts_with: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "not_starts_with",
+    value: "a",
+  },
+  ends_with: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "ends_with",
+    value: "a",
+  },
+  not_ends_with: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "not_ends_with",
+    value: "a",
+  },
+  in: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "in",
+    value: ["a", "b"],
+  },
+  not_in: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "not_in",
+    value: ["a", "b"],
+  },
+  between: {
+    type: "rule",
+    columnName: "total",
+    columnDataType: "bigint",
+    operator: "between",
+    value: [1, 2],
+  },
+  not_between: {
+    type: "rule",
+    columnName: "total",
+    columnDataType: "bigint",
+    operator: "not_between",
+    value: [1, 2],
+  },
+  is_null: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "is_null",
+    value: null,
+  },
+  is_not_null: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "is_not_null",
+    value: null,
+  },
+  is_blank: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "is_blank",
+    value: null,
+  },
+  is_not_blank: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "is_not_blank",
+    value: null,
+  },
+  is_true: {
+    type: "rule",
+    columnName: "is_active",
+    columnDataType: "boolean",
+    operator: "is_true",
+    value: null,
+  },
+  is_false: {
+    type: "rule",
+    columnName: "is_active",
+    columnDataType: "boolean",
+    operator: "is_false",
+    value: null,
+  },
+  matches_regex: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "matches_regex",
+    value: "^a",
+  },
+  not_matches_regex: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "not_matches_regex",
+    value: "^a",
+  },
+  like: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "like",
+    value: "a%",
+  },
+  not_like: {
+    type: "rule",
+    columnName: "label",
+    columnDataType: "varchar",
+    operator: "not_like",
+    value: "a%",
+  },
 };
 
 describe("filter round trip", () => {
@@ -2077,8 +2382,7 @@ export function functionArgs(node: unknown): readonly unknown[] {
     return [];
   }
   const args = (node as Record<string, unknown>).args as
-    | { value?: unknown[] }
-    | undefined;
+    { value?: unknown[] } | undefined;
   return Array.isArray(args?.value) ? args.value : [];
 }
 
@@ -2108,8 +2412,8 @@ export function boolLiteral(node: unknown): boolean | undefined {
     return undefined;
   }
   const obj = node as Record<string, unknown>;
-  return obj.type === "bool" && typeof obj.value === "boolean" ?
-      obj.value
+  return obj.type === "bool" && typeof obj.value === "boolean"
+    ? obj.value
     : undefined;
 }
 
@@ -2148,10 +2452,10 @@ the top of `literalValue`, immediately after the `typeof node !== "object"`
 guard, insert:
 
 ```ts
-  const castObj = node as Record<string, unknown>;
-  if (castObj.type === "cast") {
-    return literalValue(castObj.expr);
-  }
+const castObj = node as Record<string, unknown>;
+if (castObj.type === "cast") {
+  return literalValue(castObj.expr);
+}
 ```
 
 - [ ] **Step 4: Teach `parseWhereNode` the new shapes**
@@ -2179,41 +2483,44 @@ Then, inside `parseWhereNode`, replace the early `obj.type !== "binary_expr"`
 rejection with a dispatch that tries the new shapes first:
 
 ```ts
-  const obj = node as Record<string, unknown>;
+const obj = node as Record<string, unknown>;
 
-  // `NOT <predicate>`: the shape every negated function-form operator takes.
-  if (obj.type === "unary_expr" && String(obj.operator ?? "").toUpperCase() === "NOT") {
-    const inner = _parseFunctionPredicate(obj.expr);
-    if (inner) {
-      return { ...inner, operator: _negateOperator(inner.operator) };
-    }
-    unmappedReasons.push({
-      code: "whereUnsupportedNode",
-      nodeType: "unary_expr",
-    });
-    return undefined;
+// `NOT <predicate>`: the shape every negated function-form operator takes.
+if (
+  obj.type === "unary_expr" &&
+  String(obj.operator ?? "").toUpperCase() === "NOT"
+) {
+  const inner = _parseFunctionPredicate(obj.expr);
+  if (inner) {
+    return { ...inner, operator: _negateOperator(inner.operator) };
   }
+  unmappedReasons.push({
+    code: "whereUnsupportedNode",
+    nodeType: "unary_expr",
+  });
+  return undefined;
+}
 
-  // `contains(...)`, `starts_with(...)`, `ends_with(...)`, `regexp_matches(...)`
-  if (obj.type === "function") {
-    const rule = _parseFunctionPredicate(obj);
-    if (rule) {
-      return rule;
-    }
-    unmappedReasons.push({
-      code: "whereUnsupportedNode",
-      nodeType: `function:${functionName(obj) ?? "unknown"}`,
-    });
-    return undefined;
+// `contains(...)`, `starts_with(...)`, `ends_with(...)`, `regexp_matches(...)`
+if (obj.type === "function") {
+  const rule = _parseFunctionPredicate(obj);
+  if (rule) {
+    return rule;
   }
+  unmappedReasons.push({
+    code: "whereUnsupportedNode",
+    nodeType: `function:${functionName(obj) ?? "unknown"}`,
+  });
+  return undefined;
+}
 
-  if (obj.type !== "binary_expr") {
-    unmappedReasons.push({
-      code: "whereUnsupportedNode",
-      nodeType: String(obj.type),
-    });
-    return undefined;
-  }
+if (obj.type !== "binary_expr") {
+  unmappedReasons.push({
+    code: "whereUnsupportedNode",
+    nodeType: String(obj.type),
+  });
+  return undefined;
+}
 ```
 
 Add these two module-level helpers above `parseWhereNode`:
@@ -2259,10 +2566,13 @@ function _parseFunctionPredicate(node: unknown): QueryFilterRule | undefined {
   }
 
   const operator =
-    name === "contains" ? "contains"
-    : name === "starts_with" ? "starts_with"
-    : name === "ends_with" ? "ends_with"
-    : undefined;
+    name === "contains"
+      ? "contains"
+      : name === "starts_with"
+        ? "starts_with"
+        : name === "ends_with"
+          ? "ends_with"
+          : undefined;
   if (!operator) {
     return undefined;
   }
@@ -2289,65 +2599,65 @@ Next, in the leaf-comparison part of `parseWhereNode`, handle the remaining
 shapes. Replace the existing `IS` / `IS NOT` block with:
 
 ```ts
-  // IS NULL / IS NOT NULL / IS TRUE / IS FALSE
-  if (operator === "IS" || operator === "IS NOT") {
-    const rightType = (obj.right as { type?: string } | null)?.type;
-    if (rightType === "null") {
-      const rule: QueryFilterRule = {
-        type: "rule",
-        columnName: columnName!,
-        operator: operator === "IS" ? "is_null" : "is_not_null",
-        value: null,
-      };
-      return rule;
-    }
-    const bool = boolLiteral(obj.right);
-    if (bool !== undefined) {
-      const isTrue = operator === "IS" ? bool : !bool;
-      const rule: QueryFilterRule = {
-        type: "rule",
-        columnName: columnName!,
-        operator: isTrue ? "is_true" : "is_false",
-        value: null,
-      };
-      return rule;
-    }
-    unmappedReasons.push({ code: "whereNonNullRightSide", operator });
-    return undefined;
+// IS NULL / IS NOT NULL / IS TRUE / IS FALSE
+if (operator === "IS" || operator === "IS NOT") {
+  const rightType = (obj.right as { type?: string } | null)?.type;
+  if (rightType === "null") {
+    const rule: QueryFilterRule = {
+      type: "rule",
+      columnName: columnName!,
+      operator: operator === "IS" ? "is_null" : "is_not_null",
+      value: null,
+    };
+    return rule;
   }
+  const bool = boolLiteral(obj.right);
+  if (bool !== undefined) {
+    const isTrue = operator === "IS" ? bool : !bool;
+    const rule: QueryFilterRule = {
+      type: "rule",
+      columnName: columnName!,
+      operator: isTrue ? "is_true" : "is_false",
+      value: null,
+    };
+    return rule;
+  }
+  unmappedReasons.push({ code: "whereNonNullRightSide", operator });
+  return undefined;
+}
 ```
 
 Immediately before the `const columnName = columnRefName(obj.left);` line that
 starts the leaf handling, insert the blank-check and `lower()` handling:
 
 ```ts
-  // coalesce(trim(col), '') = '' / <> ''  ->  is_blank / is_not_blank
-  const blankColumn = blankCheckColumnName(obj.left);
-  if (blankColumn !== undefined && isEmptyStringLiteral(obj.right)) {
-    if (operator === "=" || operator === "<>" || operator === "!=") {
-      const rule: QueryFilterRule = {
-        type: "rule",
-        columnName: blankColumn,
-        operator: operator === "=" ? "is_blank" : "is_not_blank",
-        value: null,
-      };
-      return rule;
-    }
+// coalesce(trim(col), '') = '' / <> ''  ->  is_blank / is_not_blank
+const blankColumn = blankCheckColumnName(obj.left);
+if (blankColumn !== undefined && isEmptyStringLiteral(obj.right)) {
+  if (operator === "=" || operator === "<>" || operator === "!=") {
+    const rule: QueryFilterRule = {
+      type: "rule",
+      columnName: blankColumn,
+      operator: operator === "=" ? "is_blank" : "is_not_blank",
+      value: null,
+    };
+    return rule;
   }
+}
 ```
 
 And make the leaf handling see through `lower()` on the left side by replacing:
 
 ```ts
-  const columnName = columnRefName(obj.left);
+const columnName = columnRefName(obj.left);
 ```
 
 with:
 
 ```ts
-  const unwrappedLeft = unwrapLowerCall(obj.left);
-  const columnName = columnRefName(unwrappedLeft.inner);
-  const isCaseFolded = unwrappedLeft.wasLowered;
+const unwrappedLeft = unwrapLowerCall(obj.left);
+const columnName = columnRefName(unwrappedLeft.inner);
+const isCaseFolded = unwrappedLeft.wasLowered;
 ```
 
 Then, at the two places that build a leaf rule (the `IN` / `NOT IN` branch and
@@ -2356,42 +2666,43 @@ the final generic comparison branch), unwrap `lower()` from the values and set
 construction with:
 
 ```ts
-    const rawList = extractValueList(obj.right);
-    const valueList = rawList?.map((item) => {
-      return item;
-    });
-    if (!valueList) {
-      unmappedReasons.push({
-        code: "whereNonLiteralList",
-        operator,
-        columnName,
-      });
-      return undefined;
-    }
-    const rule: QueryFilterRule = {
-      type: "rule",
-      columnName,
-      operator: operator === "IN" ? "in" : "not_in",
-      value: valueList,
-      ...(isCaseFolded ? {} : { matchCase: true }),
-    };
-    return rule;
+const rawList = extractValueList(obj.right);
+const valueList = rawList?.map((item) => {
+  return item;
+});
+if (!valueList) {
+  unmappedReasons.push({
+    code: "whereNonLiteralList",
+    operator,
+    columnName,
+  });
+  return undefined;
+}
+const rule: QueryFilterRule = {
+  type: "rule",
+  columnName,
+  operator: operator === "IN" ? "in" : "not_in",
+  value: valueList,
+  ...(isCaseFolded ? {} : { matchCase: true }),
+};
+return rule;
 ```
 
 In the final generic comparison branch, replace the rule construction with:
 
 ```ts
-  const rule: QueryFilterRule = {
-    type: "rule",
-    columnName,
-    operator: filterOp,
-    value: literal,
-    ...(isCaseFolded && (filterOp === "=" || filterOp === "!=") ?
-      {}
-    : filterOp === "=" || filterOp === "!=" ? { matchCase: true }
-    : {}),
-  };
-  return rule;
+const rule: QueryFilterRule = {
+  type: "rule",
+  columnName,
+  operator: filterOp,
+  value: literal,
+  ...(isCaseFolded && (filterOp === "=" || filterOp === "!=")
+    ? {}
+    : filterOp === "=" || filterOp === "!="
+      ? { matchCase: true }
+      : {}),
+};
+return rule;
 ```
 
 - [ ] **Step 5: Make `extractValueList` see through `lower()`**
@@ -2402,7 +2713,7 @@ In `sqlAstReaders.ts`, find `extractValueList` and map each element through
 element is read:
 
 ```ts
-    const literal = literalValue(unwrapLowerCall(element).inner);
+const literal = literalValue(unwrapLowerCall(element).inner);
 ```
 
 - [ ] **Step 6: Run the round-trip test**
@@ -2437,6 +2748,7 @@ so a live map has to be able to win. `structuredQueryToSql` derives that map
 from the columns it already has.
 
 **Files:**
+
 - Modify: `shared/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts`
 - Modify: `shared/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts`
 - Test: `shared/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.test.ts` (add cases)
@@ -2448,43 +2760,43 @@ Append to
 inside the existing top-level `describe("structuredQueryToSql", ...)`:
 
 ```ts
-  it("binds numeric filter values as numbers using the query's column types", () => {
-    const sql = structuredQueryToSql(
-      _makeQuery({
-        type: "group",
-        combinator: "AND",
-        rules: [
-          {
-            type: "rule",
-            columnName: "age",
-            operator: ">",
-            value: "30",
-          },
-        ],
-      }),
-    );
-    expect(sql).toContain('"age" > 30');
-    expect(sql).not.toContain(`'30'`);
-  });
+it("binds numeric filter values as numbers using the query's column types", () => {
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      type: "group",
+      combinator: "AND",
+      rules: [
+        {
+          type: "rule",
+          columnName: "age",
+          operator: ">",
+          value: "30",
+        },
+      ],
+    }),
+  );
+  expect(sql).toContain('"age" > 30');
+  expect(sql).not.toContain(`'30'`);
+});
 
-  it("lets an explicit columnTypes option override the query's columns", () => {
-    const sql = structuredQueryToSql(
-      _makeQuery({
-        type: "group",
-        combinator: "AND",
-        rules: [
-          {
-            type: "rule",
-            columnName: "name",
-            operator: "=",
-            value: "5",
-          },
-        ],
-      }),
-      { columnTypes: { name: "bigint" } },
-    );
-    expect(sql).toContain('"name" = 5');
-  });
+it("lets an explicit columnTypes option override the query's columns", () => {
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      type: "group",
+      combinator: "AND",
+      rules: [
+        {
+          type: "rule",
+          columnName: "name",
+          operator: "=",
+          value: "5",
+        },
+      ],
+    }),
+    { columnTypes: { name: "bigint" } },
+  );
+  expect(sql).toContain('"name" = 5');
+});
 ```
 
 Note the first test needs the `age` column to have a real `AvaDataType`. In the
@@ -2536,18 +2848,18 @@ After the `sortedQueryColumns` computation, derive the effective map, preferring
 the caller's entries:
 
 ```ts
-  /**
-   * Column types the filter renderer uses for typed literals. Built from the
-   * query's own columns and overlaid with any caller-supplied types.
-   */
-  const effectiveColumnTypes: Record<string, AvaDataType.T> = {
-    ...Object.fromEntries(
-      queryColumns.map((column) => {
-        return [column.baseColumn.name, column.baseColumn.dataType];
-      }),
-    ),
-    ...(columnTypes ?? {}),
-  };
+/**
+ * Column types the filter renderer uses for typed literals. Built from the
+ * query's own columns and overlaid with any caller-supplied types.
+ */
+const effectiveColumnTypes: Record<string, AvaDataType.T> = {
+  ...Object.fromEntries(
+    queryColumns.map((column) => {
+      return [column.baseColumn.name, column.baseColumn.dataType];
+    }),
+  ),
+  ...(columnTypes ?? {}),
+};
 ```
 
 Add the value import at the top if it is not already present:
@@ -2559,15 +2871,15 @@ import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 Then pass it to both appliers, replacing lines 143 and 153:
 
 ```ts
-    sqlQuery = applyFilters(sqlQuery, filters, {
-      columnTypes: effectiveColumnTypes,
-    });
+sqlQuery = applyFilters(sqlQuery, filters, {
+  columnTypes: effectiveColumnTypes,
+});
 ```
 
 ```ts
-    sqlQuery = applyHaving(sqlQuery, having, {
-      columnTypes: effectiveColumnTypes,
-    });
+sqlQuery = applyHaving(sqlQuery, having, {
+  columnTypes: effectiveColumnTypes,
+});
 ```
 
 - [ ] **Step 5: Run the tests**
@@ -2588,6 +2900,7 @@ git commit -m "feat(filters): use live column types for typed filter literals"
 ## Task 9: Localized operator and validation copy
 
 **Files:**
+
 - Create: `shared/copy/queryFilterOperatorLabel.ts`
 - Create: `shared/copy/queryFilterValidationLabel.ts`
 - Test: `shared/copy/queryFilterOperatorLabel.test.ts`
@@ -2810,6 +3123,7 @@ two hand-written tables (R3, F15). Both go away: our internal operator ids and
 structural only.
 
 **Files:**
+
 - Create: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion.ts`
 - Test: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion.test.ts`
 
@@ -2941,7 +3255,9 @@ describe("toInternalFilterGroup", () => {
       {
         id: "g1",
         combinator: "AND",
-        rules: [{ id: "r1", field: "Admin2", operator: "contains", value: "s" }],
+        rules: [
+          { id: "r1", field: "Admin2", operator: "contains", value: "s" },
+        ],
       },
       { columnTypes: COLUMN_TYPES, matchCaseById: { r1: true } },
     );
@@ -3003,7 +3319,9 @@ export type ToInternalOptions = {
   matchCaseById: Readonly<Record<string, boolean>>;
 };
 
-function _isLibraryGroup(node: LibraryGroup | LibraryRule): node is LibraryGroup {
+function _isLibraryGroup(
+  node: LibraryGroup | LibraryRule,
+): node is LibraryGroup {
   return "rules" in node && "combinator" in node;
 }
 
@@ -3071,8 +3389,8 @@ export function collectMatchCaseById(
     if (child.type === "group") {
       return { ...accumulator, ...collectMatchCaseById(child) };
     }
-    return child.id !== undefined && child.matchCase === true ?
-        { ...accumulator, [child.id]: true }
+    return child.id !== undefined && child.matchCase === true
+      ? { ...accumulator, [child.id]: true }
       : accumulator;
   }, {});
 }
@@ -3096,6 +3414,7 @@ git commit -m "feat(filters): convert the filter tree with stable node ids"
 ## Task 11: Local tree state with debounced commit
 
 **Files:**
+
 - Create: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState.ts`
 - Test: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState.test.tsx`
 
@@ -3221,9 +3540,9 @@ describe("useFilterTreeState", () => {
     });
 
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(
-      (onChange.mock.calls[0]![0] as QueryFilterGroup).combinator,
-    ).toBe("OR");
+    expect((onChange.mock.calls[0]![0] as QueryFilterGroup).combinator).toBe(
+      "OR",
+    );
   });
 
   it("treats a combinator change as structural, without waiting for the debounce", () => {
@@ -3382,9 +3701,7 @@ import {
 } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type {
-  LibraryGroup,
-} from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
+import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion";
 
 /** Milliseconds of quiet before a typed value is committed upward. */
 const COMMIT_DEBOUNCE_MS = 300;
@@ -3558,6 +3875,7 @@ git commit -m "feat(filters): own the filter tree locally with debounced commits
 ## Task 12: Typed value editors
 
 **Files:**
+
 - Create: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.tsx`
 - Test: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor.test.tsx`
 
@@ -3818,9 +4136,9 @@ export function FilterValueEditor({
     testId: isTemporal ? "filter-value-date" : "filter-value-scalar",
     current: scalarValue as string | number,
     placeholder:
-      operator === "matches_regex" || operator === "not_matches_regex" ?
-        t`Regular expression`
-      : t`Value`,
+      operator === "matches_regex" || operator === "not_matches_regex"
+        ? t`Regular expression`
+        : t`Value`,
     onValue: onChange,
   });
 }
@@ -3876,6 +4194,7 @@ components receive `rule: RuleType`, `value`, `handleOnChange(value)`,
 object passed to `QueryBuilder`.
 
 **Files:**
+
 - Create: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControls.tsx`
 - Modify: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.module.css`
 - Test: covered by Task 14's component tests (these controls have no behavior of their own beyond forwarding)
@@ -3945,9 +4264,16 @@ export function FilterFieldSelector(props: FieldSelectorProps): ReactNode {
           props.handleOnChange(next ?? "");
         }}
         searchable
-        comboboxProps={{ withinPortal: true, width: "target", position: "bottom-start" }}
+        comboboxProps={{
+          withinPortal: true,
+          width: "target",
+          position: "bottom-start",
+        }}
         className={classes.fieldControl}
-        classNames={{ input: classes.truncatedInput, option: classes.wrappingOption }}
+        classNames={{
+          input: classes.truncatedInput,
+          option: classes.wrappingOption,
+        }}
       />
     </Tooltip>
   );
@@ -3967,7 +4293,10 @@ export function FilterOperatorSelector(
         const name = "name" in option ? String(option.name) : "";
         return {
           value: name,
-          label: queryFilterOperatorLabel(name as QueryFilterOperator, dataType),
+          label: queryFilterOperatorLabel(
+            name as QueryFilterOperator,
+            dataType,
+          ),
         };
       })}
       value={String(props.value ?? "")}
@@ -4109,8 +4438,7 @@ export function MatchCaseToggle({
 }: Props): ReactNode {
   const { t } = useLingui();
   const spec = operatorSpec(operator);
-  const isTextColumn =
-    dataType === undefined || AvaDataType.isText(dataType);
+  const isTextColumn = dataType === undefined || AvaDataType.isText(dataType);
   if (!spec?.supportsMatchCase || !isTextColumn) {
     return null;
   }
@@ -4305,6 +4633,7 @@ git commit -m "feat(filters): add custom filter controls and one-row layout"
 ## Task 14: Rewire `QueryFiltersField`
 
 **Files:**
+
 - Modify: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversion.ts` (add `normalizeLibraryTree`)
 - Modify: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState.ts` (normalize on change)
 - Modify: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx` (replace the whole file)
@@ -4322,7 +4651,9 @@ describe("normalizeLibraryTree", () => {
       {
         id: "g1",
         combinator: "AND",
-        rules: [{ id: "r1", field: "Admin2", operator: "contains", value: "s" }],
+        rules: [
+          { id: "r1", field: "Admin2", operator: "contains", value: "s" },
+        ],
       },
       { Admin2: "varchar", other: "varchar" },
     );
@@ -4360,7 +4691,9 @@ describe("normalizeLibraryTree", () => {
           {
             id: "g2",
             combinator: "OR",
-            rules: [{ id: "r1", field: "cases", operator: "is_blank", value: null }],
+            rules: [
+              { id: "r1", field: "cases", operator: "is_blank", value: null },
+            ],
           },
         ],
       },
@@ -4463,8 +4796,8 @@ Then normalize at the top of both `onQueryChange` and `commitNow`, replacing
 their first line (`setQuery(next);`) with:
 
 ```ts
-      const normalized = normalizeLibraryTree(next, columnTypes);
-      setQuery(normalized);
+const normalized = normalizeLibraryTree(next, columnTypes);
+setQuery(normalized);
 ```
 
 and use `normalized` in place of `next` for the rest of each function body. Add
@@ -4552,7 +4885,9 @@ describe("QueryFiltersField", () => {
     expect(document.activeElement).toBe(input);
 
     fireEvent.change(input, { target: { value: "s" } });
-    expect(document.activeElement).toBe(screen.getByTestId("filter-value-scalar"));
+    expect(document.activeElement).toBe(
+      screen.getByTestId("filter-value-scalar"),
+    );
 
     fireEvent.change(screen.getByTestId("filter-value-scalar"), {
       target: { value: "sa" },
@@ -4562,7 +4897,9 @@ describe("QueryFiltersField", () => {
     });
 
     expect(screen.getByTestId("filter-value-scalar")).toHaveValue("san");
-    expect(document.activeElement).toBe(screen.getByTestId("filter-value-scalar"));
+    expect(document.activeElement).toBe(
+      screen.getByTestId("filter-value-scalar"),
+    );
   });
 
   it("shows the combinator as And and can switch it to Or", async () => {
@@ -4612,7 +4949,9 @@ describe("QueryFiltersField", () => {
     });
 
     fireEvent.click(screen.getByLabelText("Condition"));
-    expect(await screen.findByRole("option", { name: "is between" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("option", { name: "is between" }),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "contains" })).toBeNull();
   });
 
@@ -4629,7 +4968,11 @@ describe("QueryFiltersField", () => {
   it("prompts for a data source when there are no columns", () => {
     render(
       <AvandarAppProvider>
-        <QueryFiltersField columns={[]} value={ONE_TEXT_RULE} onChange={vi.fn()} />
+        <QueryFiltersField
+          columns={[]}
+          value={ONE_TEXT_RULE}
+          onChange={vi.fn()}
+        />
       </AvandarAppProvider>,
     );
     expect(screen.getByText(/select a data source/i)).toBeInTheDocument();
@@ -4840,6 +5183,7 @@ the SELECT list. That is the cause of the orphaned rule that keeps filtering
 invisibly and of the stale tree after a data source switch.
 
 **Files:**
+
 - Create: `shared/models/queries/StructuredQuery/pruneFilterColumns.ts`
 - Create: `shared/models/queries/StructuredQuery/pruneFilterColumns.test.ts`
 - Create: `src/views/DataExplorerApp/useQueryColumnsForDataSource.ts`
@@ -4866,8 +5210,20 @@ const TREE: QueryFilterGroup = {
       id: "g2",
       combinator: "OR",
       rules: [
-        { type: "rule", id: "r2", columnName: "gone", operator: "=", value: "b" },
-        { type: "rule", id: "r3", columnName: "cases", operator: ">", value: 1 },
+        {
+          type: "rule",
+          id: "r2",
+          columnName: "gone",
+          operator: "=",
+          value: "b",
+        },
+        {
+          type: "rule",
+          id: "r3",
+          columnName: "cases",
+          operator: ">",
+          value: 1,
+        },
       ],
     },
   ],
@@ -5058,8 +5414,8 @@ Then in `QueryColumnMultiSelect.tsx`, delete its two client calls and the
 `columns` `useMemo` that builds `queryColumns`, and replace them with:
 
 ```ts
-  const { columns: queryColumns, isLoading } =
-    useQueryColumnsForDataSource(dataSourceId);
+const { columns: queryColumns, isLoading } =
+  useQueryColumnsForDataSource(dataSourceId);
 ```
 
 keeping the existing `selectableOptions` / `queryColumnLookup` memo, now derived
@@ -5073,54 +5429,54 @@ In `ManualQueryForm.tsx`, inside `ManualQueryFormView`, after the existing
 `useManualQueryDataSourceChange` call, add:
 
 ```tsx
-  const { columns: dataSourceColumns } = useQueryColumnsForDataSource(
-    dataSource ? Model.getTypedId(dataSource) : undefined,
-  );
+const { columns: dataSourceColumns } = useQueryColumnsForDataSource(
+  dataSource ? Model.getTypedId(dataSource) : undefined,
+);
 
-  const dataSourceColumnNames = useMemo(() => {
-    return dataSourceColumns.map((column) => {
-      return column.baseColumn.name;
-    });
-  }, [dataSourceColumns]);
+const dataSourceColumnNames = useMemo(() => {
+  return dataSourceColumns.map((column) => {
+    return column.baseColumn.name;
+  });
+}, [dataSourceColumns]);
 
-  const [droppedFilterColumns, setDroppedFilterColumns] = useState<
-    readonly string[]
-  >([]);
+const [droppedFilterColumns, setDroppedFilterColumns] = useState<
+  readonly string[]
+>([]);
 
-  useEffect(
-    function pruneFiltersWhenColumnsChange() {
-      if (dataSourceColumnNames.length === 0) {
-        return;
-      }
-      const result = pruneFilterColumns(filters, dataSourceColumnNames);
-      if (result.removedColumnNames.length === 0) {
-        setDroppedFilterColumns([]);
-        return;
-      }
-      setDroppedFilterColumns(result.removedColumnNames);
-      handlers.onSetFilters(result.filters);
-    },
-    [dataSourceColumnNames, filters, handlers],
-  );
+useEffect(
+  function pruneFiltersWhenColumnsChange() {
+    if (dataSourceColumnNames.length === 0) {
+      return;
+    }
+    const result = pruneFilterColumns(filters, dataSourceColumnNames);
+    if (result.removedColumnNames.length === 0) {
+      setDroppedFilterColumns([]);
+      return;
+    }
+    setDroppedFilterColumns(result.removedColumnNames);
+    handlers.onSetFilters(result.filters);
+  },
+  [dataSourceColumnNames, filters, handlers],
+);
 ```
 
 Change the `filterFields` element to pass the dataset's columns and the notice:
 
 ```tsx
-  const filterFields = (
-    <Stack gap="xs">
-      {droppedFilterColumns.length > 0 ?
-        <Text size="xs" c="neutral.6">
-          {t`Removed ${droppedFilterColumns.length} filter(s) that referenced columns this data source does not have: ${droppedFilterColumns.join(", ")}`}
-        </Text>
-      : null}
-      <QueryFiltersField
-        columns={dataSourceColumns}
-        value={filters}
-        onChange={onFiltersChange}
-      />
-    </Stack>
-  );
+const filterFields = (
+  <Stack gap="xs">
+    {droppedFilterColumns.length > 0 ? (
+      <Text size="xs" c="neutral.6">
+        {t`Removed ${droppedFilterColumns.length} filter(s) that referenced columns this data source does not have: ${droppedFilterColumns.join(", ")}`}
+      </Text>
+    ) : null}
+    <QueryFiltersField
+      columns={dataSourceColumns}
+      value={filters}
+      onChange={onFiltersChange}
+    />
+  </Stack>
+);
 ```
 
 And un-gate the group: the `filters` entry in `groups` stays unconditional (it
@@ -5192,6 +5548,7 @@ D9: a rule that is not in the query must be visible as such. Two surfaces, one
 counter.
 
 **Files:**
+
 - Create: `shared/models/queries/StructuredQuery/countFilterRules.ts`
 - Create: `shared/models/queries/StructuredQuery/countFilterRules.test.ts`
 - Create: `src/views/DataExplorerApp/QueryForm/QueryFiltersField/AppliedFilterSummary.tsx`
@@ -5380,10 +5737,14 @@ export function AppliedFilterSummary({ filters }: Props): ReactNode {
   }
 
   return (
-    <Text size="xs" c={ignored > 0 ? "orange.7" : "neutral.6"} data-testid="applied-filter-summary">
-      {ignored > 0 ?
-        t`${applied} filter(s) applied, ${ignored} not applied`
-      : t`${applied} filter(s) applied`}
+    <Text
+      size="xs"
+      c={ignored > 0 ? "orange.7" : "neutral.6"}
+      data-testid="applied-filter-summary"
+    >
+      {ignored > 0
+        ? t`${applied} filter(s) applied, ${ignored} not applied`
+        : t`${applied} filter(s) applied`}
     </Text>
   );
 }
@@ -5414,7 +5775,10 @@ export function FilterValueEditorControl(props: ValueEditorProps): ReactNode {
   return (
     <>
       <div
-        className={clsx(classes.valueSlot, isUnfinished && classes.ruleNotApplied)}
+        className={clsx(
+          classes.valueSlot,
+          isUnfinished && classes.ruleNotApplied,
+        )}
       >
         <FilterValueEditor
           operator={rule.operator}
@@ -5434,11 +5798,11 @@ export function FilterValueEditorControl(props: ValueEditorProps): ReactNode {
           }}
         />
       </div>
-      {reason ?
+      {reason ? (
         <Text size="xs" c="orange.7" className={classes.ruleMessage}>
           {queryFilterValidationLabel(reason)}
         </Text>
-      : null}
+      ) : null}
     </>
   );
 }
@@ -5466,7 +5830,7 @@ In `ManualQueryForm.tsx`, add the summary to the `filterFields` stack, above the
 builder and below the dropped-columns notice:
 
 ```tsx
-      <AppliedFilterSummary filters={filters} />
+<AppliedFilterSummary filters={filters} />
 ```
 
 with the import from
@@ -5477,24 +5841,24 @@ with the import from
 Append to `QueryFiltersField.test.tsx`:
 
 ```tsx
-  it("explains why a rule is not applied", () => {
-    _renderField({
-      type: "group",
-      id: "g1",
-      combinator: "AND",
-      rules: [
-        {
-          type: "rule",
-          id: "r1",
-          columnName: "daily_new_cases",
-          columnDataType: "bigint",
-          operator: ">",
-          value: "abc",
-        },
-      ],
-    });
-    expect(screen.getByText(/"abc" is not a number/)).toBeInTheDocument();
+it("explains why a rule is not applied", () => {
+  _renderField({
+    type: "group",
+    id: "g1",
+    combinator: "AND",
+    rules: [
+      {
+        type: "rule",
+        id: "r1",
+        columnName: "daily_new_cases",
+        columnDataType: "bigint",
+        operator: ">",
+        value: "abc",
+      },
+    ],
   });
+  expect(screen.getByText(/"abc" is not a number/)).toBeInTheDocument();
+});
 ```
 
 - [ ] **Step 8: Put the summary next to the row count**
@@ -5504,7 +5868,7 @@ grid is all the user can see. In `DataExplorerApp.tsx`, render the same componen
 beside the grid's paging summary:
 
 ```tsx
-        <AppliedFilterSummary filters={state.query.filters} />
+<AppliedFilterSummary filters={state.query.filters} />
 ```
 
 Place it in the same row as the paging controls, before the page-size selector,
@@ -5534,6 +5898,7 @@ git commit -m "feat(filters): report which filters are applied and why others ar
 AI chat panel, so with the chat closed a failing query reads as zero rows.
 
 **Files:**
+
 - Create: `src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx`
 - Create: `src/views/DataExplorerApp/QueryResultsError/QueryResultsError.test.tsx`
 - Modify: `src/views/DataExplorerApp/DataExplorerApp.tsx`
@@ -5632,18 +5997,21 @@ export function QueryResultsError({ message, sql }: Props): ReactNode {
     >
       <Stack gap="xs">
         <span>{message}</span>
-        {sql ?
+        {sql ? (
           <>
-            <Anchor component="button" type="button" size="sm" onClick={toggleSql}>
-              {isSqlOpen ?
-                <Trans>Hide SQL</Trans>
-              : <Trans>Show SQL</Trans>}
+            <Anchor
+              component="button"
+              type="button"
+              size="sm"
+              onClick={toggleSql}
+            >
+              {isSqlOpen ? <Trans>Hide SQL</Trans> : <Trans>Show SQL</Trans>}
             </Anchor>
             <Collapse in={isSqlOpen}>
               <Code block>{sql}</Code>
             </Collapse>
           </>
-        : null}
+        ) : null}
       </Stack>
     </Alert>
   );
@@ -5656,10 +6024,7 @@ In `DataExplorerApp.tsx`, render the alert directly above the results grid,
 reading from the state the app already maintains:
 
 ```tsx
-        <QueryResultsError
-          message={state.lastQueryError}
-          sql={state.rawSql}
-        />
+<QueryResultsError message={state.lastQueryError} sql={state.rawSql} />
 ```
 
 Place it inside the same container that holds the grid, before the grid element,
@@ -5673,20 +6038,17 @@ In `NLQueryPField.tsx`, inside the `"manual-query"` branch, wrap the existing
 `ManualQueryForm` so the same message appears in the dashboard host:
 
 ```tsx
-          return (
-            <Stack gap="xs">
-              <QueryResultsError
-                message={manualState.lastQueryError}
-                sql={rawSql}
-              />
-              <ManualQueryForm
-                query={manualState.query}
-                isStructuredQueryInSync={manualState.isStructuredQueryInSync}
-                handlers={manualState.handlers}
-                withinPortal
-              />
-            </Stack>
-          );
+return (
+  <Stack gap="xs">
+    <QueryResultsError message={manualState.lastQueryError} sql={rawSql} />
+    <ManualQueryForm
+      query={manualState.query}
+      isStructuredQueryInSync={manualState.isStructuredQueryInSync}
+      handlers={manualState.handlers}
+      withinPortal
+    />
+  </Stack>
+);
 ```
 
 If `useDashboardManualQueryState` does not expose `lastQueryError`, add it there
@@ -5719,6 +6081,7 @@ that would have caught the broken `contains`, because every unit test in the
 stack agreed with itself.
 
 **Files:**
+
 - Create: `tests/e2e/data-explorer-filters.spec.ts`
 
 - [ ] **Step 1: Write the spec**
@@ -5754,34 +6117,146 @@ type FilterCase = {
 };
 
 const CASES: readonly FilterCase[] = [
-  { name: "text equals", where: `lower("Admin2") = lower('Alameda')`, expectedRows: 245 },
-  { name: "text not equals", where: `lower("Admin2") <> lower('Alameda')`, expectedRows: 14455 },
-  { name: "contains, case insensitive", where: `contains(lower("Admin2"), lower('san'))`, expectedRows: 2450 },
-  { name: "contains, case sensitive misses", where: `contains("Admin2", 'san')`, expectedRows: 0 },
-  { name: "does not contain", where: `NOT contains(lower("Admin2"), lower('san'))`, expectedRows: 12250 },
-  { name: "starts with", where: `starts_with(lower("Admin2"), lower('San'))`, expectedRows: 2450 },
-  { name: "in list", where: `lower("Admin2") IN (lower('Alameda'), lower('Butte'), lower('Kern'))`, expectedRows: 735 },
-  { name: "not in list", where: `lower("Admin2") NOT IN (lower('Alameda'), lower('Butte'), lower('Kern'))`, expectedRows: 13965 },
-  { name: "numeric greater than", where: `"daily_new_cases" > 0`, expectedRows: 11444 },
-  { name: "numeric at least", where: `"daily_new_cases" >= 0`, expectedRows: 14510 },
-  { name: "numeric less than", where: `"daily_new_cases" < 0`, expectedRows: 190 },
-  { name: "numeric at most", where: `"daily_new_cases" <= 0`, expectedRows: 3256 },
-  { name: "numeric equals", where: `"daily_new_cases" = 0`, expectedRows: 3066 },
-  { name: "numeric in list", where: `"daily_new_cases" IN (0, 1, 2)`, expectedRows: 4391 },
-  { name: "between", where: `"daily_new_cases" BETWEEN 100 AND 200`, expectedRows: 1385 },
-  { name: "not between", where: `"daily_new_cases" NOT BETWEEN 100 AND 200`, expectedRows: 13315 },
-  { name: "is null on a full column", where: `"Admin2" IS NULL`, expectedRows: 0 },
-  { name: "is not null on a full column", where: `"Admin2" IS NOT NULL`, expectedRows: 14700 },
-  { name: "is blank on a full column", where: `coalesce(trim("Admin2"), '') = ''`, expectedRows: 0 },
-  { name: "regex match", where: `regexp_matches("Admin2", '^San')`, expectedRows: 2450 },
-  { name: "epoch date greater than", where: `"date" > 1600000000000`, expectedRows: 6540 },
-  { name: "AND of two rules", where: `lower("Admin2") = lower('Alameda') and "daily_new_cases" > 100`, expectedRows: 150 },
-  { name: "OR of two rules", where: `lower("Admin2") = lower('Alameda') or "daily_new_cases" > 100`, expectedRows: 3472 },
-  { name: "nested OR inside AND", where: `"daily_new_cases" > 100 and (lower("Admin2") = lower('Alameda') or lower("Admin2") = lower('Butte'))`, expectedRows: 175 },
-  { name: "nested AND inside OR", where: `"daily_new_cases" > 100 or (lower("Admin2") = lower('Alameda') and lower("Admin2") = lower('Butte'))`, expectedRows: 3377 },
-  { name: "two sibling groups", where: `(lower("Admin2") = lower('Alameda') and "daily_new_cases" > 100) or (lower("Admin2") = lower('Butte') and "daily_new_cases" < 0)`, expectedRows: 154 },
-  { name: "value containing a comma", where: `lower("Admin2") IN (lower('Contra Costa'), lower('Del Norte'))`, expectedRows: 490 },
-  { name: "literal percent is not a wildcard", where: `contains(lower("Admin2"), lower('%'))`, expectedRows: 0 },
+  {
+    name: "text equals",
+    where: `lower("Admin2") = lower('Alameda')`,
+    expectedRows: 245,
+  },
+  {
+    name: "text not equals",
+    where: `lower("Admin2") <> lower('Alameda')`,
+    expectedRows: 14455,
+  },
+  {
+    name: "contains, case insensitive",
+    where: `contains(lower("Admin2"), lower('san'))`,
+    expectedRows: 2450,
+  },
+  {
+    name: "contains, case sensitive misses",
+    where: `contains("Admin2", 'san')`,
+    expectedRows: 0,
+  },
+  {
+    name: "does not contain",
+    where: `NOT contains(lower("Admin2"), lower('san'))`,
+    expectedRows: 12250,
+  },
+  {
+    name: "starts with",
+    where: `starts_with(lower("Admin2"), lower('San'))`,
+    expectedRows: 2450,
+  },
+  {
+    name: "in list",
+    where: `lower("Admin2") IN (lower('Alameda'), lower('Butte'), lower('Kern'))`,
+    expectedRows: 735,
+  },
+  {
+    name: "not in list",
+    where: `lower("Admin2") NOT IN (lower('Alameda'), lower('Butte'), lower('Kern'))`,
+    expectedRows: 13965,
+  },
+  {
+    name: "numeric greater than",
+    where: `"daily_new_cases" > 0`,
+    expectedRows: 11444,
+  },
+  {
+    name: "numeric at least",
+    where: `"daily_new_cases" >= 0`,
+    expectedRows: 14510,
+  },
+  {
+    name: "numeric less than",
+    where: `"daily_new_cases" < 0`,
+    expectedRows: 190,
+  },
+  {
+    name: "numeric at most",
+    where: `"daily_new_cases" <= 0`,
+    expectedRows: 3256,
+  },
+  {
+    name: "numeric equals",
+    where: `"daily_new_cases" = 0`,
+    expectedRows: 3066,
+  },
+  {
+    name: "numeric in list",
+    where: `"daily_new_cases" IN (0, 1, 2)`,
+    expectedRows: 4391,
+  },
+  {
+    name: "between",
+    where: `"daily_new_cases" BETWEEN 100 AND 200`,
+    expectedRows: 1385,
+  },
+  {
+    name: "not between",
+    where: `"daily_new_cases" NOT BETWEEN 100 AND 200`,
+    expectedRows: 13315,
+  },
+  {
+    name: "is null on a full column",
+    where: `"Admin2" IS NULL`,
+    expectedRows: 0,
+  },
+  {
+    name: "is not null on a full column",
+    where: `"Admin2" IS NOT NULL`,
+    expectedRows: 14700,
+  },
+  {
+    name: "is blank on a full column",
+    where: `coalesce(trim("Admin2"), '') = ''`,
+    expectedRows: 0,
+  },
+  {
+    name: "regex match",
+    where: `regexp_matches("Admin2", '^San')`,
+    expectedRows: 2450,
+  },
+  {
+    name: "epoch date greater than",
+    where: `"date" > 1600000000000`,
+    expectedRows: 6540,
+  },
+  {
+    name: "AND of two rules",
+    where: `lower("Admin2") = lower('Alameda') and "daily_new_cases" > 100`,
+    expectedRows: 150,
+  },
+  {
+    name: "OR of two rules",
+    where: `lower("Admin2") = lower('Alameda') or "daily_new_cases" > 100`,
+    expectedRows: 3472,
+  },
+  {
+    name: "nested OR inside AND",
+    where: `"daily_new_cases" > 100 and (lower("Admin2") = lower('Alameda') or lower("Admin2") = lower('Butte'))`,
+    expectedRows: 175,
+  },
+  {
+    name: "nested AND inside OR",
+    where: `"daily_new_cases" > 100 or (lower("Admin2") = lower('Alameda') and lower("Admin2") = lower('Butte'))`,
+    expectedRows: 3377,
+  },
+  {
+    name: "two sibling groups",
+    where: `(lower("Admin2") = lower('Alameda') and "daily_new_cases" > 100) or (lower("Admin2") = lower('Butte') and "daily_new_cases" < 0)`,
+    expectedRows: 154,
+  },
+  {
+    name: "value containing a comma",
+    where: `lower("Admin2") IN (lower('Contra Costa'), lower('Del Norte'))`,
+    expectedRows: 490,
+  },
+  {
+    name: "literal percent is not a wildcard",
+    where: `contains(lower("Admin2"), lower('%'))`,
+    expectedRows: 0,
+  },
 ];
 
 async function _importCaliforniaCsv(options: {
@@ -5977,49 +6452,48 @@ document stays the index of what was wrong and what closed it.
 
 Every finding in the review, and where it is addressed.
 
-| Finding | Task |
-|---|---|
-| F1 broken `contains` / `does not contain` | 1, 4, 18 |
-| F2 focus loss per keystroke | 10, 11, 14 |
-| F3 blank AND/OR selector | 13, 14 |
-| F4 comma-split list values | 2, 14 (`listsAsArrays`) |
-| F5 silent query errors | 17 |
-| F6 stale filters after data source switch | 15 |
-| F7 invisible filter on a removed column | 15 |
-| F8 inconsistent empty-value handling | 3, 5, 16 |
-| F9 epoch-millisecond date columns | deferred (spec 1.2), covered by an e2e case so the current behavior is pinned |
-| F10 no HAVING surface | deferred (spec 1.2); renderer already shared, Task 6 |
-| F11 stringified literals | 2, 4, 8 |
-| F12 query per keystroke | 11 |
-| F13 rule defaults and silent resets | 1, 14 |
-| F14 arbitrary result column order | out of scope |
-| F15 latent operator mappings | 1, 7, 10 (both mapping tables deleted) |
-| F16 competing grid filters | deferred (spec 13) |
-| U1 clipped column name | 13 |
-| U2 clipped dropdown options | 13 |
-| U3 12.6px control text | 13 |
-| U4 no visible labels, axe violation | 13 (aria-labels on every control) |
-| U5 stacked rule layout | 13 |
-| U6 rules visually merge, no combinator | 13, 14 |
-| U7 invisible nesting | 13 |
-| U8 visual weight inversion | 13 |
-| U9 remove buttons and no confirmation | 13 |
-| U10 unlabelled `between` bounds | 12 |
-| U11 no format guidance | 12 |
-| U12 unreadable long values | 12 (chips) |
-| U13 clipped filter tree, shared scroll | 13 |
-| U14 dropdown overflows the drawer | 13 |
-| U15 four-panel grid imbalance | 13, 15 |
-| U16 oversized overwrite banner | 13 |
-| U17 inconsistent empty state | 14, 15 |
-| U18 truncated grid dates | out of scope |
-| U19 duplicate `Upload` labels | out of scope |
-| M1 to M5, M8, M9 new operators | 1, 4 |
-| M6 regex | 1, 4 |
-| M7 glob | dropped: `node-sql-parser` cannot read `GLOB` (spec 5.1.1) |
-| M10 date-aware labels | 9 |
-| M11 relative dates | deferred (spec 1.2) |
-| M12 distinct-value picker | deferred (spec 1.2) |
-| M13 length predicates | deferred (spec 13) |
-| M14 HAVING | deferred (spec 1.2) |
-
+| Finding                                   | Task                                                                          |
+| ----------------------------------------- | ----------------------------------------------------------------------------- |
+| F1 broken `contains` / `does not contain` | 1, 4, 18                                                                      |
+| F2 focus loss per keystroke               | 10, 11, 14                                                                    |
+| F3 blank AND/OR selector                  | 13, 14                                                                        |
+| F4 comma-split list values                | 2, 14 (`listsAsArrays`)                                                       |
+| F5 silent query errors                    | 17                                                                            |
+| F6 stale filters after data source switch | 15                                                                            |
+| F7 invisible filter on a removed column   | 15                                                                            |
+| F8 inconsistent empty-value handling      | 3, 5, 16                                                                      |
+| F9 epoch-millisecond date columns         | deferred (spec 1.2), covered by an e2e case so the current behavior is pinned |
+| F10 no HAVING surface                     | deferred (spec 1.2); renderer already shared, Task 6                          |
+| F11 stringified literals                  | 2, 4, 8                                                                       |
+| F12 query per keystroke                   | 11                                                                            |
+| F13 rule defaults and silent resets       | 1, 14                                                                         |
+| F14 arbitrary result column order         | out of scope                                                                  |
+| F15 latent operator mappings              | 1, 7, 10 (both mapping tables deleted)                                        |
+| F16 competing grid filters                | deferred (spec 13)                                                            |
+| U1 clipped column name                    | 13                                                                            |
+| U2 clipped dropdown options               | 13                                                                            |
+| U3 12.6px control text                    | 13                                                                            |
+| U4 no visible labels, axe violation       | 13 (aria-labels on every control)                                             |
+| U5 stacked rule layout                    | 13                                                                            |
+| U6 rules visually merge, no combinator    | 13, 14                                                                        |
+| U7 invisible nesting                      | 13                                                                            |
+| U8 visual weight inversion                | 13                                                                            |
+| U9 remove buttons and no confirmation     | 13                                                                            |
+| U10 unlabelled `between` bounds           | 12                                                                            |
+| U11 no format guidance                    | 12                                                                            |
+| U12 unreadable long values                | 12 (chips)                                                                    |
+| U13 clipped filter tree, shared scroll    | 13                                                                            |
+| U14 dropdown overflows the drawer         | 13                                                                            |
+| U15 four-panel grid imbalance             | 13, 15                                                                        |
+| U16 oversized overwrite banner            | 13                                                                            |
+| U17 inconsistent empty state              | 14, 15                                                                        |
+| U18 truncated grid dates                  | out of scope                                                                  |
+| U19 duplicate `Upload` labels             | out of scope                                                                  |
+| M1 to M5, M8, M9 new operators            | 1, 4                                                                          |
+| M6 regex                                  | 1, 4                                                                          |
+| M7 glob                                   | dropped: `node-sql-parser` cannot read `GLOB` (spec 5.1.1)                    |
+| M10 date-aware labels                     | 9                                                                             |
+| M11 relative dates                        | deferred (spec 1.2)                                                           |
+| M12 distinct-value picker                 | deferred (spec 1.2)                                                           |
+| M13 length predicates                     | deferred (spec 13)                                                            |
+| M14 HAVING                                | deferred (spec 1.2)                                                           |

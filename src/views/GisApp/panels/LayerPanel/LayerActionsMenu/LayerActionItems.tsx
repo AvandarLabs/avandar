@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Menu } from "@mantine/core";
 import {
@@ -6,7 +8,6 @@ import {
   IconTrash,
   IconZoomScan,
 } from "@tabler/icons-react";
-import type { ReactNode } from "react";
 
 type Props = {
   onRename: () => void;

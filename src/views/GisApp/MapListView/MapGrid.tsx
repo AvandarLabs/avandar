@@ -1,7 +1,9 @@
-import { SimpleGrid } from "@mantine/core";
-import { MapCard } from "@/views/GisApp/MapListView/MapCard";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { ReactNode } from "react";
+
+import { SimpleGrid } from "@mantine/core";
+
+import { MapCard } from "@/views/GisApp/MapListView/MapCard";
 
 type Props = { avaMaps: readonly AvaMap.T[]; workspaceSlug: string };
 

@@ -1,7 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@/test-utils";
-import { DashboardAccessDeniedView } from "./DashboardAccessDeniedView";
 import type { ReactNode } from "react";
+
+import { describe, expect, it, vi } from "vitest";
+
+import { render, screen } from "@/test-utils";
+
+import { DashboardAccessDeniedView } from "./DashboardAccessDeniedView";
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const { createElement } = await import("react");

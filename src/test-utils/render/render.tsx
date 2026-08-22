@@ -1,7 +1,9 @@
-import { render as renderReact } from "@testing-library/react";
-import { TestProviders } from "../TestProviders";
 import type { RenderOptions, RenderResult } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
+
+import { render as renderReact } from "@testing-library/react";
+
+import { TestProviders } from "../TestProviders";
 
 /**
  * Renders `ui` wrapped with {@link TestProviders}, the project's standard
@@ -23,19 +25,19 @@ export function render(
 ): RenderResult {
   const { wrapper: ExtraWrapper, ...rest } = options;
   const Wrapper =
-    ExtraWrapper === undefined ? TestProviders : (
-      function ComposedWrapper({
-        children,
-      }: {
-        children: ReactNode;
-      }): JSX.Element {
-        return (
-          <TestProviders>
-            <ExtraWrapper>{children}</ExtraWrapper>
-          </TestProviders>
-        );
-      }
-    );
+    ExtraWrapper === undefined
+      ? TestProviders
+      : function ComposedWrapper({
+          children,
+        }: {
+          children: ReactNode;
+        }): JSX.Element {
+          return (
+            <TestProviders>
+              <ExtraWrapper>{children}</ExtraWrapper>
+            </TestProviders>
+          );
+        };
   return renderReact(ui, {
     wrapper: Wrapper,
     ...rest,

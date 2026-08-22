@@ -1,10 +1,12 @@
-import { uuid } from "$/lib/uuid";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+
 import { describe, expect, it } from "vitest";
+
+import { uuid } from "$/lib/uuid";
 import { makeExportMapSpec } from "@/views/GisApp/export/makeExportMapSpec/makeExportMapSpec";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { MapChromeOverlayIds } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /** The layer id shared by every screen-spec fixture's one data layer. */
 function _dataLayerId(): string {

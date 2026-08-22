@@ -1,5 +1,6 @@
-import { matchLiteral } from "@avandar/utils";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
+
+import { matchLiteral } from "@avandar/utils";
 
 /**
  * The single stack id every area shares when its layout stacks. Named

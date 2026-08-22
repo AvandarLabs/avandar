@@ -1,7 +1,8 @@
-import { Trans } from "@lingui/react/macro";
-import { Badge, Checkbox, Group, Text } from "@mantine/core";
 import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
+
+import { Trans } from "@lingui/react/macro";
+import { Badge, Checkbox, Group, Text } from "@mantine/core";
 
 type Props = {
   column: PublishSliceDataset["columns"][number];
@@ -27,11 +28,11 @@ export function ColumnCheckbox({
           <Badge size="xs" variant="outline" color="neutral">
             {column.dataType}
           </Badge>
-          {isQueried ?
+          {isQueried ? (
             <Badge size="xs" variant="light" color="teal">
               <Trans>queried</Trans>
             </Badge>
-          : null}
+          ) : null}
         </Group>
       }
       checked={isSelected}

@@ -1,9 +1,10 @@
-import { Permissions } from "$/models/Permissions/Permissions.ts";
 import type {
   AppType,
   RoleLevel,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions.types.ts";
+
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 
 export type InviteRoleGroupRef = {
   id: string;

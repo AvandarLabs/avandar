@@ -1,7 +1,8 @@
-import { Trans } from "@lingui/react/macro";
-import { Group, NumberInput, Text } from "@mantine/core";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { ReactNode } from "react";
+
+import { Trans } from "@lingui/react/macro";
+import { Group, NumberInput, Text } from "@mantine/core";
 
 type Props = {
   rowFilter: Extract<PublishSliceConfig.RowFilter, { kind: "range_number" }>;

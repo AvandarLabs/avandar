@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+
+import { describe, expect, it } from "vitest";
+
+import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
 
 describe("resolveDataVizPBlockProps", () => {
   it("converts vizConfig to match the new vizType when vizType changes", () => {

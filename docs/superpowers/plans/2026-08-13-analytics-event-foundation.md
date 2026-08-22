@@ -52,31 +52,31 @@ version.
 
 **Created:**
 
-| Path | Responsibility |
-| --- | --- |
-| `supabase/schemas/00.enum.usage_analytics_events__category.sql` | The funnel-stage enum type, alone in its file per the declarative-schema skill |
-| `supabase/schemas/00.enum.usage_analytics_events__client.sql` | The emitting-runtime enum type |
-| `supabase/tests/database/analytics/usage_analytics_events_columns.test.sql` | pgTAP: the three columns and the index exist with the right nullability |
-| `supabase/tests/database/analytics/analytics_event_category.test.sql` | pgTAP: the mapping function and the category trigger, including the override |
-| `supabase/tests/database/analytics/log_analytics_event.test.sql` | pgTAP: the helper inserts, swallows errors, and is not executable by `authenticated` |
-| `shared/analytics/analyticsEvents.ts` | The canonical event registry: names split by emitting runtime, the payload type map, and the derived union types |
-| `shared/analytics/analyticsEvents.test.ts` | Vitest: drift guard proving every registered name is categorised in SQL |
-| `supabase/functions/_shared/analytics/logAnalyticsEvent.ts` | Edge-function emitter, sets `client = 'server'` and swallows failures |
-| `supabase/functions/_shared/analytics/logAnalyticsEvent.test.ts` | Vitest: row shape and error swallowing |
-| `src/lib/analytics/AnalyticsClient.test.ts` | Vitest: row shape, `web` vs `desktop`, error swallowing |
+| Path                                                                        | Responsibility                                                                                                   |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `supabase/schemas/00.enum.usage_analytics_events__category.sql`             | The funnel-stage enum type, alone in its file per the declarative-schema skill                                   |
+| `supabase/schemas/00.enum.usage_analytics_events__client.sql`               | The emitting-runtime enum type                                                                                   |
+| `supabase/tests/database/analytics/usage_analytics_events_columns.test.sql` | pgTAP: the three columns and the index exist with the right nullability                                          |
+| `supabase/tests/database/analytics/analytics_event_category.test.sql`       | pgTAP: the mapping function and the category trigger, including the override                                     |
+| `supabase/tests/database/analytics/log_analytics_event.test.sql`            | pgTAP: the helper inserts, swallows errors, and is not executable by `authenticated`                             |
+| `shared/analytics/analyticsEvents.ts`                                       | The canonical event registry: names split by emitting runtime, the payload type map, and the derived union types |
+| `shared/analytics/analyticsEvents.test.ts`                                  | Vitest: drift guard proving every registered name is categorised in SQL                                          |
+| `supabase/functions/_shared/analytics/logAnalyticsEvent.ts`                 | Edge-function emitter, sets `client = 'server'` and swallows failures                                            |
+| `supabase/functions/_shared/analytics/logAnalyticsEvent.test.ts`            | Vitest: row shape and error swallowing                                                                           |
+| `src/lib/analytics/AnalyticsClient.test.ts`                                 | Vitest: row shape, `web` vs `desktop`, error swallowing                                                          |
 
 **Modified:**
 
-| Path | Change |
-| --- | --- |
+| Path                                             | Change                                                                                                            |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | `supabase/schemas/30.usage_analytics_events.sql` | Three columns, one index, the mapping function, the category trigger, the log helper, the corrected table comment |
-| `src/lib/analytics/AnalyticsClient.ts` | Typed discriminated-union `logEvent`, sends `client` and `app_version`, dev-only warn |
-| `vite.config.ts` | `define` exposing `import.meta.env.VITE_APP_VERSION` from `package.json` |
+| `src/lib/analytics/AnalyticsClient.ts`           | Typed discriminated-union `logEvent`, sends `client` and `app_version`, dev-only warn                             |
+| `vite.config.ts`                                 | `define` exposing `import.meta.env.VITE_APP_VERSION` from `package.json`                                          |
 
 **Deleted:**
 
-| Path | Reason |
-| --- | --- |
+| Path                                       | Reason                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------- |
 | `src/lib/analytics/analyticsEventTypes.ts` | Superseded by `shared/analytics/analyticsEvents.ts`, which the edge runtime can also import |
 
 ## Background The Engineer Needs
@@ -107,6 +107,7 @@ Vite tolerates it). Every edge function's `deno.json` already maps `$/` to
 ## Task 1: Add the enum types and the three columns
 
 **Files:**
+
 - Create: `supabase/schemas/00.enum.usage_analytics_events__category.sql`
 - Create: `supabase/schemas/00.enum.usage_analytics_events__client.sql`
 - Create: `supabase/tests/database/analytics/usage_analytics_events_columns.test.sql`
@@ -342,6 +343,7 @@ git commit -m "feat(analytics): add event_category, client, and app_version colu
 ## Task 2: Category mapping function and enforcing trigger
 
 **Files:**
+
 - Create: `supabase/tests/database/analytics/analytics_event_category.test.sql`
 - Modify: `supabase/schemas/30.usage_analytics_events.sql`
 
@@ -560,6 +562,7 @@ migration. That is the documented exception in the declarative-schema skill, not
 a violation of it.
 
 **Files:**
+
 - Create: `supabase/migrations/<timestamp>_backfill_usage_analytics_event_category.sql`
 
 Every command in this task targets the local database only. `pnpm db:sql-cmd`
@@ -657,6 +660,7 @@ mandatory: without it, any authenticated user could call it through PostgREST
 and forge events attributed to other users and workspaces.
 
 **Files:**
+
 - Create: `supabase/tests/database/analytics/log_analytics_event.test.sql`
 - Modify: `supabase/schemas/30.usage_analytics_events.sql`
 
@@ -892,6 +896,7 @@ git commit -m "feat(analytics): add util__log_analytics_event for trigger emitte
 ## Task 5: Expose the build version to the client
 
 **Files:**
+
 - Modify: `vite.config.ts`
 
 - [ ] **Step 1: Write the failing test**
@@ -992,6 +997,7 @@ final shapes in the spec. Phase 1B tightens each one as it enriches its call
 site, so the tree stays green at every commit.
 
 **Files:**
+
 - Create: `shared/analytics/analyticsEvents.ts`
 - Create: `shared/analytics/analyticsEvents.test.ts`
 - Delete: `src/lib/analytics/analyticsEventTypes.ts`
@@ -1145,15 +1151,17 @@ export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
  * chat content.
  */
 export type AnalyticsEventPayloads = {
-  [K in AnalyticsEventName]: K extends "dataset.imported" ?
-    { datasetId: string; sourceType: string }
-  : K extends "dashboard.published" ?
-    { dashboardId: string; wasPreviouslyPublic: boolean }
-  : K extends "dashboard.block_added_via_chat" ?
-    { blockKind: string; vizType?: string; dashboardId?: string }
-  : K extends "dashboard.filter_changed" ? { filterId: string; mode: string }
-  : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
-  : undefined;
+  [K in AnalyticsEventName]: K extends "dataset.imported"
+    ? { datasetId: string; sourceType: string }
+    : K extends "dashboard.published"
+      ? { dashboardId: string; wasPreviouslyPublic: boolean }
+      : K extends "dashboard.block_added_via_chat"
+        ? { blockKind: string; vizType?: string; dashboardId?: string }
+        : K extends "dashboard.filter_changed"
+          ? { filterId: string; mode: string }
+          : K extends "dashboard.pdf_export_opened"
+            ? { dashboardId: string }
+            : undefined;
 };
 
 /**
@@ -1214,6 +1222,7 @@ git commit -m "feat(analytics): move the event registry to shared with typed pay
 ## Task 7: Type `AnalyticsClient` and send the new columns
 
 **Files:**
+
 - Create: `src/lib/analytics/AnalyticsClient.test.ts`
 - Modify: `src/lib/analytics/AnalyticsClient.ts`
 
@@ -1467,6 +1476,7 @@ the client explicitly rather than importing `SupabaseAdmin`, so it is testable
 without a Deno runtime or environment variables.
 
 **Files:**
+
 - Create: `supabase/functions/_shared/analytics/logAnalyticsEvent.ts`
 - Create: `supabase/functions/_shared/analytics/logAnalyticsEvent.test.ts`
 

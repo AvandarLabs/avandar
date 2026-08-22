@@ -4,8 +4,10 @@ import { useForceUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { useCallback, useEffect } from "react";
+
 import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
+
 import { createOfflineChatModelSettingsModalChildren } from "./OfflineChatModelSettingsModalContents";
 
 type Props = {
@@ -60,11 +62,11 @@ export function OfflineChatDownloadControl({
     });
   }, [t, forceUpdate]);
 
-  const tooltipLabel =
-    !hasAnyDownloaded ? t`Download offline chat model (WebLLM)`
-    : isSelectedDownloaded ?
-      t`Offline chat model ready. Click to switch or re-download.`
-    : t`Download a different offline chat model`;
+  const tooltipLabel = !hasAnyDownloaded
+    ? t`Download offline chat model (WebLLM)`
+    : isSelectedDownloaded
+      ? t`Offline chat model ready. Click to switch or re-download.`
+      : t`Download a different offline chat model`;
 
   return (
     <Tooltip label={tooltipLabel}>

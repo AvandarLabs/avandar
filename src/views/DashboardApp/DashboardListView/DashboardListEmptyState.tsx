@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
+
 import { Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Button, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
+
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
-import type { ReactNode } from "react";
 
 type Props = {
   isCreatePending: boolean;

@@ -1,12 +1,14 @@
+import type { NavLinkProps } from "./NavLink";
+import type { BoxProps } from "@mantine/core";
+
 import { objectEntries } from "@avandar/utils";
 import { Box, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import { Key, ReactNode } from "react";
+
 import { TruncatedText } from "../text/TruncatedText";
 import { NavLink } from "./NavLink";
-import type { NavLinkProps } from "./NavLink";
-import type { BoxProps } from "@mantine/core";
 
 type Props = {
   links: ReadonlyArray<
@@ -88,11 +90,13 @@ export function NavLinkList({
         }
         py={gap}
         label={
-          typeof label === "string" ?
+          typeof label === "string" ? (
             <TruncatedText withFullTextTooltip fw={500} size="sm">
               {label}
             </TruncatedText>
-          : label
+          ) : (
+            label
+          )
         }
       />
     );

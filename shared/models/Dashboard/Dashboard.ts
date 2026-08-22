@@ -1,14 +1,15 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-import {
-  DASHBOARD_SNAPSHOT_TRANSITION_KINDS,
-  DASHBOARD_VISIBILITIES,
-} from "$/models/Dashboard/Dashboard.constants.ts";
 import type {
   DashboardId,
   DashboardModel,
   DashboardSnapshotTransitionKind,
   DashboardVisibility,
 } from "$/models/Dashboard/Dashboard.types.ts";
+
+/* eslint-disable @typescript-eslint/no-namespace */
+import {
+  DASHBOARD_SNAPSHOT_TRANSITION_KINDS,
+  DASHBOARD_VISIBILITIES,
+} from "$/models/Dashboard/Dashboard.constants.ts";
 
 export { DashboardParsers } from "$/models/Dashboard/DashboardParsers.ts";
 

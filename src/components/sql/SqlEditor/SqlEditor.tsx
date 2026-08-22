@@ -1,15 +1,18 @@
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { ReactNode } from "react";
+
 import { sql } from "@codemirror/lang-sql";
 import { Compartment, EditorState, Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
+
 import { createSqlDisplayCodeMirrorExtension } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import { createSqlMentionExtension } from "@/components/sql/sql-helpers/createSqlMentionExtension";
+
 import css from "./SqlEditor.module.css";
-import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
-import type { ReactNode } from "react";
 
 /** Matches `line-height: 1.55` on `.cm-line` at `font-size-sm` (~14px). */
 const LINE_HEIGHT_PX = 22;

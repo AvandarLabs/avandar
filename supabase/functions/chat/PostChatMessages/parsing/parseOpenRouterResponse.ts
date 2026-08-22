@@ -1,14 +1,3 @@
-import { parseClarify } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
-import { parseCreateCaseTypes } from "@sbfn/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts";
-import { parseDashboardBlock } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
-import { parseProposeCaseType } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
-import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
-import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssistantText/extractSqlFromAssistantText.ts";
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
-import type {
-  OpenRouterMessage,
-  OpenRouterToolCall,
-} from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type {
   ChatClarifyRequest,
@@ -16,6 +5,19 @@ import type {
   ChatGeneratedDashboardBlock,
   ChatProposedCaseType,
 } from "$/types/chat.types.ts";
+import type {
+  OpenRouterMessage,
+  OpenRouterToolCall,
+} from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
+
+import { parseClarify } from "@sbfn/chat/PostChatMessages/parsing/parseClarify.ts";
+import { parseCreateCaseTypes } from "@sbfn/chat/PostChatMessages/parsing/parseCreateCaseTypes.ts";
+import { parseDashboardBlock } from "@sbfn/chat/PostChatMessages/parsing/parseDashboardBlock.ts";
+import { parseProposeCaseType } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
+import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
+import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssistantText/extractSqlFromAssistantText.ts";
+
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
 export type ParsedAttempt = {
   text: string;
@@ -142,9 +144,8 @@ function applySqlTableAliasesToParsedAttempt(
     return parsed;
   }
   const aliases = SqlTableAlias.fromSchema({ datasets, concepts });
-  const generatedSql =
-    parsed.generatedSql ?
-      {
+  const generatedSql = parsed.generatedSql
+    ? {
         ...parsed.generatedSql,
         sql: SqlTableAlias.applyToSql(parsed.generatedSql.sql, aliases),
       }

@@ -51,20 +51,22 @@
  * nothing.
  */
 
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
-import path from "node:path";
-import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
-import {
-  getLocalDatabaseConfigFromRepoRoot,
-  makeSqlRunner,
-} from "../lib/PsqlUtils/PsqlUtils";
-import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 import type {
   CreateViewStatement,
   Decision,
   NoopVerdict,
   Statement,
 } from "./NoopViewRecreations/NoopViewRecreations";
+
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import path from "node:path";
+
+import {
+  getLocalDatabaseConfigFromRepoRoot,
+  makeSqlRunner,
+} from "../lib/PsqlUtils/PsqlUtils";
+import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 
 const PROBE_SCHEMA = "_noop_view_check";
 
@@ -129,8 +131,8 @@ function _getNoopVerdictFromCreate(
 
   try {
     const isIdentical = _getBooleanFromPsqlOutput(runSql(sql));
-    return isIdentical === true ?
-        { isNoop: true, reason: "definition is identical to the live view" }
+    return isIdentical === true
+      ? { isNoop: true, reason: "definition is identical to the live view" }
       : { isNoop: false, reason: "definition differs from the live view" };
   } catch (error) {
     return {

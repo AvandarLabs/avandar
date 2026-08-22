@@ -1,8 +1,9 @@
+import type { Subscription } from "$/models/Subscription/Subscription";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { Plural, Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
-import type { Subscription } from "$/models/Subscription/Subscription";
-import type { ReactNode } from "react";
 
 type Props = {
   subscription: Subscription.T | undefined;

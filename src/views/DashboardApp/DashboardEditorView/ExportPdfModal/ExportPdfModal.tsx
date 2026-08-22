@@ -1,5 +1,11 @@
+import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useMemo, useRef, useState } from "react";
+
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
@@ -12,10 +18,6 @@ import { PdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfMod
 import { PdfExportChoice } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfExportChoice";
 import { runTimedExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/runTimedExport/runTimedExport";
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -217,25 +219,27 @@ export function ExportPdfModal({
     />
   );
 
-  return step === "choose" ?
-      <PdfExportChoice
-        hiddenRender={hiddenRender}
-        isExporting={isExporting}
-        onAnnotate={() => {
-          setStep("annotate");
-        }}
-        onClose={onClose}
-        onDirectExport={onDirectExport}
-      />
-    : <PdfAnnotationStep
-        filename={render.filename}
-        hiddenRender={hiddenRender}
-        onBack={() => {
-          setStep("choose");
-        }}
-        onClose={onClose}
-        onExported={onAnnotatedExported}
-        sourceElement={renderContainerRef.current ?? undefined}
-        title={dashboard.name || t`Untitled dashboard`}
-      />;
+  return step === "choose" ? (
+    <PdfExportChoice
+      hiddenRender={hiddenRender}
+      isExporting={isExporting}
+      onAnnotate={() => {
+        setStep("annotate");
+      }}
+      onClose={onClose}
+      onDirectExport={onDirectExport}
+    />
+  ) : (
+    <PdfAnnotationStep
+      filename={render.filename}
+      hiddenRender={hiddenRender}
+      onBack={() => {
+        setStep("choose");
+      }}
+      onClose={onClose}
+      onExported={onAnnotatedExported}
+      sourceElement={renderContainerRef.current ?? undefined}
+      title={dashboard.name || t`Untitled dashboard`}
+    />
+  );
 }

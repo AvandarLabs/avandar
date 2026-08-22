@@ -1,9 +1,11 @@
+import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+
+import { match } from "ts-pattern";
+
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue.ts";
-import { match } from "ts-pattern";
-import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 /**
  * Why a rule cannot be applied. Structured codes rather than sentences: this
@@ -62,14 +64,13 @@ function _validateLiteral(
   value: string | number | boolean,
   dataType: AvaDataTypeNs.T | undefined,
 ): QueryFilterValidationReason | undefined {
-  return (
-    dataType === undefined ? undefined
-    : AvaDataType.isNumeric(dataType) && !_isNumericText(value) ?
-      { code: "valueNotANumber", value: String(value) }
-    : AvaDataType.isTemporal(dataType) && !_isDateText(value) ?
-      { code: "valueNotADate", value: String(value) }
-    : undefined
-  );
+  return dataType === undefined
+    ? undefined
+    : AvaDataType.isNumeric(dataType) && !_isNumericText(value)
+      ? { code: "valueNotANumber", value: String(value) }
+      : AvaDataType.isTemporal(dataType) && !_isDateText(value)
+        ? { code: "valueNotADate", value: String(value) }
+        : undefined;
 }
 
 function _validateRule(
@@ -110,9 +111,9 @@ function _validateRule(
     })
     .with("scalar", () => {
       const value = QueryFilterValue.getScalar(rule.value);
-      return value === undefined ? undefined : (
-          _validateLiteral(value, rule.columnDataType)
-        );
+      return value === undefined
+        ? undefined
+        : _validateLiteral(value, rule.columnDataType);
     })
     .with("list", () => {
       return QueryFilterValue.getList({ value: rule.value }).reduce<
@@ -134,14 +135,12 @@ function _validateRule(
         return literalReason;
       }
       const comparable =
-        (
-          rule.columnDataType !== undefined &&
-          AvaDataType.isNumeric(rule.columnDataType)
-        ) ?
-          [Number(lower), Number(upper)]
-        : [String(lower), String(upper)];
-      return comparable[0]! > comparable[1]! ?
-          ({ code: "betweenBoundsReversed" } as const)
+        rule.columnDataType !== undefined &&
+        AvaDataType.isNumeric(rule.columnDataType)
+          ? [Number(lower), Number(upper)]
+          : [String(lower), String(upper)];
+      return comparable[0]! > comparable[1]!
+        ? ({ code: "betweenBoundsReversed" } as const)
         : undefined;
     })
     .exhaustive();

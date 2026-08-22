@@ -1,16 +1,18 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { ReactNode, RefObject } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Button, Stack } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
+
 import { CanvasDrawer } from "@/components/CanvasDrawer/CanvasDrawer";
 import { ClusterFeatureTable } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable";
 import { FeatureAction } from "@/views/GisApp/panels/FeatureInspector/FeatureAction";
 import { FeatureFields } from "@/views/GisApp/panels/FeatureInspector/FeatureFields";
 import css from "@/views/GisApp/panels/FeatureInspector/FeatureInspector.module.css";
 import { FeatureInspectorHeader } from "@/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader";
-import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Map as MapLibreMap } from "maplibre-gl";
-import type { ReactNode, RefObject } from "react";
 
 const FEATURE_DRAWER_REGION_ID = "gis-feature-drawer-region";
 const FEATURE_DRAWER_TITLE_ID = "gis-feature-drawer-title";
@@ -53,8 +55,9 @@ export function FeatureInspector({
   const properties: Record<string, unknown> = feature?.properties ?? {};
   const showTable = cluster !== undefined && feature === undefined;
   const showBackToTable = cluster !== undefined && feature !== undefined;
-  const title =
-    showTable ? t`Features in cluster (${cluster.pointCount})` : t`Feature`;
+  const title = showTable
+    ? t`Features in cluster (${cluster.pointCount})`
+    : t`Feature`;
 
   return (
     <CanvasDrawer opened={opened} canvasRef={canvasRef}>
@@ -66,15 +69,16 @@ export function FeatureInspector({
             titleId={FEATURE_DRAWER_TITLE_ID}
             title={title}
           />
-          {showTable && cluster ?
+          {showTable && cluster ? (
             <ClusterFeatureTable
               cluster={cluster}
               layer={layer}
               mapRef={mapRef}
               onRowClick={onRowClick}
             />
-          : <Stack className={css.featureInspectorBody} gap="sm">
-              {showBackToTable ?
+          ) : (
+            <Stack className={css.featureInspectorBody} gap="sm">
+              {showBackToTable ? (
                 <Button
                   variant="subtle"
                   size="xs"
@@ -84,11 +88,11 @@ export function FeatureInspector({
                 >
                   {t`Back to results`}
                 </Button>
-              : null}
+              ) : null}
               <FeatureFields properties={properties} />
               <FeatureAction action={popup?.action} properties={properties} />
             </Stack>
-          }
+          )}
         </div>
       </CanvasDrawer.Body>
     </CanvasDrawer>

@@ -1,11 +1,3 @@
-// These are placeholder "existence" tests — they only verify that each
-// interface declares its expected member names and that a few branded /
-// discriminated-union types keep their shape. They will be removed once
-// the corresponding interface has real concrete adapters whose behavior
-// can be tested directly. Until then, treat any failure here as a signal
-// that an interface was renamed/widened/narrowed unintentionally, not as
-// a meaningful behavioral test.
-import { expectTypeOf, test } from "vitest";
 import type {
   AuthProvider,
   Session,
@@ -25,6 +17,15 @@ import type {
   SyncEngine,
   SyncStatus,
 } from "$/platform/types/SyncEngine.types.ts";
+
+// These are placeholder "existence" tests — they only verify that each
+// interface declares its expected member names and that a few branded /
+// discriminated-union types keep their shape. They will be removed once
+// the corresponding interface has real concrete adapters whose behavior
+// can be tested directly. Until then, treat any failure here as a signal
+// that an interface was renamed/widened/narrowed unintentionally, not as
+// a meaningful behavioral test.
+import { expectTypeOf, test } from "vitest";
 
 test("Platform is the closed 'web' | 'desktop' union", () => {
   expectTypeOf<Platform>().toEqualTypeOf<"web" | "desktop">();

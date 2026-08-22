@@ -1,3 +1,5 @@
+import type { Simplify } from "type-fest";
+
 import { isDevBuild } from "@query-hooks/isDevBuild";
 import { useAvaQueryErrorReporter } from "@query-hooks/useAvaQueryErrorReporter";
 import {
@@ -10,7 +12,6 @@ import {
   UseMutationResult as TanstackUseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
-import type { Simplify } from "type-fest";
 
 export type UseMutationResult<
   TData = unknown,

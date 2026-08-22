@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { restartFirstDashboardTutorial } from "@/components/Nux/NuxRoot/restartFirstDashboardTutorial/restartFirstDashboardTutorial";
 
 describe("restartFirstDashboardTutorial", () => {

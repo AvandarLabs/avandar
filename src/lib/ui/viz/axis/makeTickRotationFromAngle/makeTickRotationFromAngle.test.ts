@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
 
 const LABELS = ["1/2014", "2/2014", "3/2014"];

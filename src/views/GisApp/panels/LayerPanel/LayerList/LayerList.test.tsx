@@ -1,13 +1,15 @@
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ComponentProps, ReactNode } from "react";
+
 import { assertIsDefined } from "@avandar/utils";
 import { move } from "@dnd-kit/helpers";
 import { DragDropProvider } from "@dnd-kit/react";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it, vi } from "vitest";
+
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";
 import { makeStackOrderFromLayerMove } from "@/views/GisApp/panels/LayerPanel/makeStackOrderFromLayerMove/makeStackOrderFromLayerMove";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { ComponentProps, ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

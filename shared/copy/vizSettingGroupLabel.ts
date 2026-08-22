@@ -1,6 +1,7 @@
+import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor.ts";
+
 import { matchLiteral } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor.ts";
 
 /**
  * Returns the human-readable heading for a viz setting group.

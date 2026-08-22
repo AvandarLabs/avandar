@@ -1,10 +1,12 @@
-import { Trans } from "@lingui/react/macro";
-import { Button, Stack, Text } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
-import { LocalFilterEditor } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor";
 import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ReactElement } from "react";
+
+import { Trans } from "@lingui/react/macro";
+import { Button, Stack, Text } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
+
+import { LocalFilterEditor } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor";
 
 type Props = AvaPageFieldProps<readonly LocalFilter[]>;
 
@@ -53,14 +55,15 @@ export function LocalFiltersPField({ value, onChange }: Props): ReactElement {
 
   return (
     <Stack gap="xs">
-      {filters.length === 0 ?
+      {filters.length === 0 ? (
         <Text size="xs" c="dimmed">
           <Trans>
             No filters yet. Add one to let viewers refine this chart without
             affecting any others.
           </Trans>
         </Text>
-      : <Stack gap="xs">
+      ) : (
+        <Stack gap="xs">
           {filters.map((filter, filterIndex) => {
             return (
               <LocalFilterEditor
@@ -76,7 +79,7 @@ export function LocalFiltersPField({ value, onChange }: Props): ReactElement {
             );
           })}
         </Stack>
-      }
+      )}
       <Button
         size="compact-xs"
         leftSection={<IconPlus size={12} />}

@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -13,7 +15,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 const DATASET_NAME = "swapped-lat-lng-points.csv";
 const MAP_NAME = "E2E GIS coordinate validation";
@@ -30,8 +31,8 @@ async function _readRenderedCoordinates(
       }
       const data = source.data as GeoJSON.FeatureCollection;
       return data.features.flatMap((feature) => {
-        return feature.geometry.type === "Point" ?
-            [
+        return feature.geometry.type === "Point"
+          ? [
               [
                 Math.round(feature.geometry.coordinates[0]! * 10) / 10,
                 Math.round(feature.geometry.coordinates[1]! * 10) / 10,

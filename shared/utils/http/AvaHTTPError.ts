@@ -1,8 +1,10 @@
+import type { ErrorResponse as ResendError } from "resend";
+
 import { PostgrestError } from "@supabase/supabase-js";
+import { z } from "zod";
+
 import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig.ts";
 import { HTTPResponseCodes } from "$/utils/http/HTTPResponseCodes.ts";
-import { z } from "zod";
-import type { ErrorResponse as ResendError } from "resend";
 
 /**
  * This is our custom error class that extends the built-in Error class.
@@ -46,9 +48,9 @@ export class AvaHTTPError extends Error {
   ): AvaHTTPError {
     return new AvaHTTPError(
       errorDict[error.code] || defaultErrorMessage,
-      error.code in errorDict ?
-        HTTPResponseCodes.BAD_REQUEST
-      : HTTPResponseCodes.INTERNAL_SERVER_ERROR,
+      error.code in errorDict
+        ? HTTPResponseCodes.BAD_REQUEST
+        : HTTPResponseCodes.INTERNAL_SERVER_ERROR,
     );
   }
 

@@ -58,9 +58,7 @@ pnpm i18n:extract    # Task 4 only, after new copy lands
 
 ```ts
 export type NuxTourCloseEventType =
-  | "error:target_not_found"
-  | "error"
-  | "tour:end";
+  "error:target_not_found" | "error" | "tour:end";
 
 export function shouldCloseTourOnTargetNotFound(options: {
   eventType: NuxTourCloseEventType;
@@ -172,9 +170,7 @@ Replace `src/components/Nux/NuxTour/shouldCloseTourOnTargetNotFound/shouldCloseT
  * string values so `NuxTour` can pass `data.type` through without mapping.
  */
 export type NuxTourCloseEventType =
-  | "error:target_not_found"
-  | "error"
-  | "tour:end";
+  "error:target_not_found" | "error" | "tour:end";
 
 /**
  * Whether a Joyride close-class event should collapse the tutorial.
@@ -523,8 +519,7 @@ Add this `describe` **inside** the existing `describe("NuxChecklistPanel", ...)`
 ```tsx
 describe("dismiss confirm", () => {
   let confirmModalOptions:
-    | Parameters<typeof modals.openConfirmModal>[0]
-    | undefined;
+    Parameters<typeof modals.openConfirmModal>[0] | undefined;
 
   beforeEach(() => {
     confirmModalOptions = undefined;

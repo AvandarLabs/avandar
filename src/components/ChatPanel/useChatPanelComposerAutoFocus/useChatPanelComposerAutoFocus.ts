@@ -1,7 +1,9 @@
+import type { RefObject } from "react";
+
 import { useLayoutEffect, useRef } from "react";
+
 import { shouldAutoFocusPanelOnOpen } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/shouldAutoFocusPanelOnOpen";
 import { AnimationTheme } from "@/config/Theme";
-import type { RefObject } from "react";
 
 const APP_SHELL_ASIDE_TRANSITION_FALLBACK_MS =
   AnimationTheme.durationMs.normal + 40;

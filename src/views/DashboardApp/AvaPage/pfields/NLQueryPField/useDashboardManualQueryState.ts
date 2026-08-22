@@ -1,13 +1,15 @@
-import { makeObject, prop } from "@avandar/utils";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { useCallback, useMemo } from "react";
-import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
+import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
+
+import { makeObject, prop } from "@avandar/utils";
+import { useCallback, useMemo } from "react";
+
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
+import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 
 export type DashboardManualQueryState = {
   query: StructuredQuery.Partial;
@@ -72,9 +74,9 @@ export function useDashboardManualQueryState(
       applyQueryChange({
         ...query,
         dataSource,
-        ...(changeOptions?.limit !== undefined ?
-          { limit: changeOptions.limit }
-        : {}),
+        ...(changeOptions?.limit !== undefined
+          ? { limit: changeOptions.limit }
+          : {}),
       } as StructuredQuery.Partial);
     },
     onSetColumns: (columns: readonly QueryColumn.T[]) => {

@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
+
 import { objectEntries } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Group, Text } from "@mantine/core";
-import type { ReactNode } from "react";
 
 type Props = { properties: Readonly<Record<string, unknown>> };
 

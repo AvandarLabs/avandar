@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { render, screen } from "@/test-utils";
 import { HeatmapLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend";
 

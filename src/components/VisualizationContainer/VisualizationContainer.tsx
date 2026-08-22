@@ -1,3 +1,6 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+
 import { DangerText } from "@avandar/ui";
 import { prop, UnknownDataFrame } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
@@ -5,6 +8,7 @@ import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
+
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -17,8 +21,6 @@ import { LineChart } from "@/lib/ui/viz/LineChart";
 import { PieChart } from "@/lib/ui/viz/PieChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   columns: readonly QueryResultColumn[];
@@ -49,22 +51,22 @@ function useVizConfigSchemas() {
   return useMemo(() => {
     const XAxisKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen an X axis`
+        return issue.input === undefined
+          ? t`You haven't chosen an X axis`
           : t`Invalid X axis selected`;
       },
     });
     const NameKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a name column`
+        return issue.input === undefined
+          ? t`You haven't chosen a name column`
           : t`Invalid name column selected`;
       },
     });
     const ValueKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a value column`
+        return issue.input === undefined
+          ? t`You haven't chosen a value column`
           : t`Invalid value column selected`;
       },
     });

@@ -1,17 +1,19 @@
+import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactNode } from "react";
+
 /**
  * End-to-end for one query: a real React Query cycle through `useDataQuery`
  * has to produce exactly one `query.ran` with the duration and shape of the
  * run that actually happened.
  */
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { renderHook, waitFor } from "@/test-utils";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
-import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactNode } from "react";
 
 const TEST_WORKSPACE_ID =
   "00000000-0000-4000-8000-000000000001" as Workspace.Id;

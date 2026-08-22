@@ -1,7 +1,8 @@
-import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ChatModelRunResult } from "@assistant-ui/react";
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+
+import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 
 export type ApplyChatTurnResponseOptions = {
   response: ChatResponse.T;
@@ -106,8 +107,8 @@ export async function applyChatTurnResponse(
         }),
       },
     ],
-    ...(isDiscoveryContinuation ?
-      { metadata: DiscoveryContinuationMessage.metadata }
-    : {}),
+    ...(isDiscoveryContinuation
+      ? { metadata: DiscoveryContinuationMessage.metadata }
+      : {}),
   };
 }

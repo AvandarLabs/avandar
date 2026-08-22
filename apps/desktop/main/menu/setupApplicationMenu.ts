@@ -1,5 +1,6 @@
-import { ApplicationMenu } from "electrobun";
 import type { ApplicationMenuItemConfig, BrowserWindow } from "electrobun";
+
+import { ApplicationMenu } from "electrobun";
 
 const RELOAD_ACTION = "view:reload";
 const TOGGLE_DEVTOOLS_ACTION = "view:toggleDevTools";

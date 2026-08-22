@@ -1,3 +1,8 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
+
 import {
   normalizeColumns,
   unionColumnSets,
@@ -10,10 +15,6 @@ import {
   getSqlTokens,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
-import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type ColumnSet = readonly string[] | "all";
 type ColumnSetByDatasetId = Record<string, ColumnSet>;
@@ -164,8 +165,8 @@ function _getColumnRefAtIndex(
   const tableName =
     identifier.parts.length >= 2 ? identifier.parts[0] : undefined;
   if (tableName !== undefined) {
-    return options.sqlDatasetIds.includes(tableName) ?
-        { columnName, datasetId: tableName, endIndex: identifier.endIndex }
+    return options.sqlDatasetIds.includes(tableName)
+      ? { columnName, datasetId: tableName, endIndex: identifier.endIndex }
       : undefined;
   }
   if (

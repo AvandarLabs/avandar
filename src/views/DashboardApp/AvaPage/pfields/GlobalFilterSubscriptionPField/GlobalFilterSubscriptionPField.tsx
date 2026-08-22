@@ -1,3 +1,10 @@
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type {
+  GlobalFilterSubscription,
+  GlobalFilterSubscriptionMode,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { ReactElement } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -8,14 +15,9 @@ import {
   Text,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
+
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type {
-  GlobalFilterSubscription,
-  GlobalFilterSubscriptionMode,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { ReactElement } from "react";
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
 
@@ -90,8 +92,8 @@ export function GlobalFilterSubscriptionPField({
         {modeDescriptions[subscription.mode]}
       </Text>
 
-      {subscription.mode === "selected" ?
-        registeredFilters.length === 0 ?
+      {subscription.mode === "selected" ? (
+        registeredFilters.length === 0 ? (
           <Alert
             color="blue"
             variant="light"
@@ -104,7 +106,8 @@ export function GlobalFilterSubscriptionPField({
               </Trans>
             </Text>
           </Alert>
-        : <ScrollArea.Autosize mah={200}>
+        ) : (
+          <ScrollArea.Autosize mah={200}>
             <Stack gap={4}>
               {registeredFilters.map((f) => {
                 return (
@@ -128,8 +131,8 @@ export function GlobalFilterSubscriptionPField({
               })}
             </Stack>
           </ScrollArea.Autosize>
-
-      : null}
+        )
+      ) : null}
     </Stack>
   );
 }

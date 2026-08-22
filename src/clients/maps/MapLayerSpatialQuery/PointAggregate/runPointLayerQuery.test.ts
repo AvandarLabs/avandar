@@ -1,9 +1,13 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+
 /**
  * Load-strategy selection for a lat/lng point layer: when the browser may
  * receive rows directly, when DuckDB must aggregate them first, and how the
  * grid is coarsened so the row count handed over stays bounded.
  */
 import { describe, expect, it, vi } from "vitest";
+
 import { getPointAggregateCellsAcross } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/getPointAggregateCellsAcross";
 import {
   POINT_AGGREGATE_MAX_CELLS,
@@ -13,8 +17,6 @@ import {
   POINT_AGGREGATE_CELL_COUNT_COLUMN,
   runPointLayerQuery,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 const SOURCE_SQL = 'SELECT * FROM "cases"';
 
@@ -160,8 +162,8 @@ describe("runPointLayerQuery", () => {
       distinctCoordinateCount: POINT_AGGREGATE_MAX_CELLS * 10,
       // Only resolutions well below the requested one fit under the ceiling.
       cellCountByCellsAcross: (cellsAcross) => {
-        return cellsAcross > requested / 8 ?
-            POINT_AGGREGATE_MAX_CELLS + 1
+        return cellsAcross > requested / 8
+          ? POINT_AGGREGATE_MAX_CELLS + 1
           : POINT_AGGREGATE_MAX_CELLS - 1;
       },
     });

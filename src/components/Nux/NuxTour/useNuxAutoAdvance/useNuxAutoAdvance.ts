@@ -1,9 +1,11 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+
 import { useEffect, useState } from "react";
+
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { getAutoAdvanceStepIndex } from "@/components/Nux/NuxTour/getAutoAdvanceStepIndex/getAutoAdvanceStepIndex";
 import { useNuxAnchorPresent } from "@/components/Nux/NuxTour/useNuxAnchorPresent";
 import { useVisibleNuxSteps } from "@/components/Nux/NuxTour/useVisibleNuxSteps/useVisibleNuxSteps";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 /**
  * The furthest tooltip shown on this milestone visit. Resets when the

@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { resolveOutputMode } from "./resolveOutputMode";
 import type { ExtractedTable, PdfRegionShape } from "../pdfSniff.types";
+
+import { describe, expect, it } from "vitest";
+
+import { resolveOutputMode } from "./resolveOutputMode";
 
 function _table(regionId: string, cells: readonly string[][]): ExtractedTable {
   return {

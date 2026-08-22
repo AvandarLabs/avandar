@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
+
 import { ChatSyntaxHighlighterRouter } from "./MarkdownTextPart";
 
 vi.mock("@/components/sql/sql-helpers/useSqlDisplayCatalog", () => {

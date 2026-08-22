@@ -1,6 +1,3 @@
-import { transformProps } from "@puckeditor/core";
-import { match } from "ts-pattern";
-import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import type {
   V2_AvaPageData,
   V2_AvaPageRootProps,
@@ -10,6 +7,11 @@ import type {
   V3_PBlockPropsRegistry,
   V3_VizConfig,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
+
+import { transformProps } from "@puckeditor/core";
+import { match } from "ts-pattern";
+
+import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 
 const SCHEMA_VERSION = 3;
 
@@ -115,9 +117,9 @@ function _upgradeVizConfig(v2: V2_VizConfig): V3_VizConfig {
         vizType: "bar",
         xAxisKey: bar.xAxisKey,
         series:
-          bar.yAxisKey === undefined ?
-            []
-          : [{ renderAs: "bar", key: bar.yAxisKey, color: bar.color }],
+          bar.yAxisKey === undefined
+            ? []
+            : [{ renderAs: "bar", key: bar.yAxisKey, color: bar.color }],
         layout: "group",
         withLegend: bar.withLegend,
       };
@@ -127,16 +129,16 @@ function _upgradeVizConfig(v2: V2_VizConfig): V3_VizConfig {
         vizType: "line",
         xAxisKey: line.xAxisKey,
         series:
-          line.yAxisKey === undefined ?
-            []
-          : [
-              {
-                renderAs: "line",
-                key: line.yAxisKey,
-                color: line.color,
-                curveType: line.curveType,
-              },
-            ],
+          line.yAxisKey === undefined
+            ? []
+            : [
+                {
+                  renderAs: "line",
+                  key: line.yAxisKey,
+                  color: line.color,
+                  curveType: line.curveType,
+                },
+              ],
         withLegend: line.withLegend,
       };
     })
@@ -145,17 +147,17 @@ function _upgradeVizConfig(v2: V2_VizConfig): V3_VizConfig {
         vizType: "area",
         xAxisKey: area.xAxisKey,
         series:
-          area.yAxisKey === undefined ?
-            []
-          : [
-              {
-                renderAs: "area",
-                key: area.yAxisKey,
-                color: area.color,
-                curveType: area.curveType,
-                fillOpacity: 0.6,
-              },
-            ],
+          area.yAxisKey === undefined
+            ? []
+            : [
+                {
+                  renderAs: "area",
+                  key: area.yAxisKey,
+                  color: area.color,
+                  curveType: area.curveType,
+                  fillOpacity: 0.6,
+                },
+              ],
         layout: "default",
         withLegend: area.withLegend,
       };
@@ -164,9 +166,9 @@ function _upgradeVizConfig(v2: V2_VizConfig): V3_VizConfig {
       return {
         vizType: "scatter",
         series:
-          scatter.xAxisKey !== undefined && scatter.yAxisKey !== undefined ?
-            [{ xKey: scatter.xAxisKey, key: scatter.yAxisKey }]
-          : [],
+          scatter.xAxisKey !== undefined && scatter.yAxisKey !== undefined
+            ? [{ xKey: scatter.xAxisKey, key: scatter.yAxisKey }]
+            : [],
       };
     })
     .with({ vizType: "pie" }, (pie) => {
@@ -193,9 +195,9 @@ function _upgradeVizConfig(v2: V2_VizConfig): V3_VizConfig {
         vizType: "radar",
         nameKey: radar.nameKey,
         series:
-          radar.valueKey === undefined ?
-            []
-          : [{ key: radar.valueKey, color: radar.color }],
+          radar.valueKey === undefined
+            ? []
+            : [{ key: radar.valueKey, color: radar.color }],
         withLegend: true,
       };
     })
@@ -203,15 +205,15 @@ function _upgradeVizConfig(v2: V2_VizConfig): V3_VizConfig {
       return {
         vizType: "bubble",
         series:
-          bubble.xAxisKey !== undefined && bubble.yAxisKey !== undefined ?
-            [
-              {
-                xKey: bubble.xAxisKey,
-                key: bubble.yAxisKey,
-                sizeKey: bubble.sizeKey ?? bubble.yAxisKey,
-              },
-            ]
-          : [],
+          bubble.xAxisKey !== undefined && bubble.yAxisKey !== undefined
+            ? [
+                {
+                  xKey: bubble.xAxisKey,
+                  key: bubble.yAxisKey,
+                  sizeKey: bubble.sizeKey ?? bubble.yAxisKey,
+                },
+              ]
+            : [],
       };
     })
     .exhaustive();
@@ -241,9 +243,9 @@ function _downgradeVizConfig(curr: V3_VizConfig): V2_VizConfig {
         yAxisKey: first?.key,
         withLegend: line.withLegend,
         curveType:
-          first?.renderAs === "line" ?
-            (first.curveType ?? "monotone")
-          : "monotone",
+          first?.renderAs === "line"
+            ? (first.curveType ?? "monotone")
+            : "monotone",
         color: first?.color,
       };
     })
@@ -255,9 +257,9 @@ function _downgradeVizConfig(curr: V3_VizConfig): V2_VizConfig {
         yAxisKey: first?.key,
         withLegend: area.withLegend,
         curveType:
-          first?.renderAs === "area" ?
-            (first.curveType ?? "monotone")
-          : "monotone",
+          first?.renderAs === "area"
+            ? (first.curveType ?? "monotone")
+            : "monotone",
         color: first?.color,
       };
     })

@@ -1,6 +1,7 @@
+import { describe, expect, it } from "vitest";
+
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it } from "vitest";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 
 function _createBufferLayer(): MapLayer.T {

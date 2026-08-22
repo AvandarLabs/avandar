@@ -1,11 +1,13 @@
-import { Trans } from "@lingui/react/macro";
-import { Accordion, Divider, Stack } from "@mantine/core";
-import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus";
-import { PublishSliceSection } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection";
-import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
 import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { ReactNode } from "react";
+
+import { Trans } from "@lingui/react/macro";
+import { Accordion, Divider, Stack } from "@mantine/core";
+
+import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus";
+import { PublishSliceSection } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection";
+import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 
 type Props = {
   publishing: ReturnType<typeof useDashboardPublishingControl>;

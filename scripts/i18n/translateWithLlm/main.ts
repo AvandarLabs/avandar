@@ -3,9 +3,10 @@
  * target locales, and translate each one in turn.
  */
 
+import { prop } from "@avandar/utils";
 import { promises as fs } from "node:fs";
 import process from "node:process";
-import { prop } from "@avandar/utils";
+
 import { CatalogTranslator } from "./catalogTranslator";
 import { DEFAULT_MODEL, LOCALES_DIR, SOURCE_LOCALE } from "./config";
 import { TranslationCli } from "./translationCli";
@@ -80,9 +81,9 @@ export async function main(): Promise<void> {
     options.locales.length > 0 ? options.locales : allLocales;
 
   const scopeNote =
-    options.scopes.length > 0 ?
-      ` scoped to [${options.scopes.join(", ")}]`
-    : "";
+    options.scopes.length > 0
+      ? ` scoped to [${options.scopes.join(", ")}]`
+      : "";
   console.log(
     `Translating into: ${targetLocales.join(", ")} via model ${model}${scopeNote}` +
       (options.dryRun ? " (dry-run)" : ""),

@@ -1,6 +1,7 @@
 import { getCurrentUrl, navigateToExternalUrl } from "@avandar/browser-utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

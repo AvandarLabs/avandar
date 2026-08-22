@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
 
 describe("BasemapStyle.toKey", () => {

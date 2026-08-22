@@ -1,8 +1,9 @@
+import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
+
 import { Permissions } from "$/models/Permissions/Permissions";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
 
 /**
  * Loads per-app roles for the signed-in user in the current workspace.
@@ -26,10 +27,11 @@ export function useUserAppRoles(): readonly [
     },
   });
 
-  const roles =
-    !workspaceAndUserLoaded ? undefined
-    : isLoading ? undefined
-    : (data ?? Permissions.RolesMatrix.Builtins.EmptyMatrix);
+  const roles = !workspaceAndUserLoaded
+    ? undefined
+    : isLoading
+      ? undefined
+      : (data ?? Permissions.RolesMatrix.Builtins.EmptyMatrix);
 
   return [roles, workspaceAndUserLoaded && isLoading] as const;
 }

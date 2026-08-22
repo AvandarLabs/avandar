@@ -1,5 +1,6 @@
-import { useMemo } from "react";
 import type { UnknownDataFrame } from "@avandar/utils";
+
+import { useMemo } from "react";
 
 /** Returns formatted X tick labels when rotation needs them for axis sizing. */
 export function useXTickLabels({
@@ -19,8 +20,8 @@ export function useXTickLabels({
     }
     return data.map((row) => {
       const value = row[xAxisKey];
-      return tickFormatter !== undefined ?
-          tickFormatter(value)
+      return tickFormatter !== undefined
+        ? tickFormatter(value)
         : String(value ?? "");
     });
   }, [data, xAxisKey, tickAngle, tickFormatter]);

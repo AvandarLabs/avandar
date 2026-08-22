@@ -1,9 +1,3 @@
-import { isDefined } from "@avandar/utils";
-import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
-import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
-import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult/shouldHydrateVizFromQueryResult.ts";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
-import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type {
@@ -13,6 +7,14 @@ import type {
   XYSeries,
 } from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+
+import { isDefined } from "@avandar/utils";
+import { match } from "ts-pattern";
+
+import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
+import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
+import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult/shouldHydrateVizFromQueryResult.ts";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 
 type ApplyVizConfigFromQueryResultInput = {
   vizConfig: VizConfig;
@@ -242,13 +244,13 @@ function _resolveOrClearAxisKeys(
           if (xKey === undefined || yKey === undefined) {
             return undefined;
           }
-          return xKey === s.xKey && yKey === s.key ?
-              s
+          return xKey === s.xKey && yKey === s.key
+            ? s
             : { ...s, xKey, key: yKey };
         },
       );
-      return didChange ?
-          { config: { ...config, series: remapped }, didChange: true }
+      return didChange
+        ? { config: { ...config, series: remapped }, didChange: true }
         : { config, didChange: false };
     })
     .with({ vizType: "bubble" }, (config) => {
@@ -265,13 +267,13 @@ function _resolveOrClearAxisKeys(
           ) {
             return undefined;
           }
-          return xKey === s.xKey && yKey === s.key && sizeKey === s.sizeKey ?
-              s
+          return xKey === s.xKey && yKey === s.key && sizeKey === s.sizeKey
+            ? s
             : { ...s, xKey, key: yKey, sizeKey };
         },
       );
-      return didChange ?
-          { config: { ...config, series: remapped }, didChange: true }
+      return didChange
+        ? { config: { ...config, series: remapped }, didChange: true }
         : { config, didChange: false };
     })
     .exhaustive();

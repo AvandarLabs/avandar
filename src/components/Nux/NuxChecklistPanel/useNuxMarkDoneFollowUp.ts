@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
-import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type {
   Dispatch,
   MutableRefObject,
   RefObject,
   SetStateAction,
 } from "react";
+
+import { useEffect, useRef, useState } from "react";
+
+import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
+import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 
 /**
  * How long the filled check stays visible before the tour closes or the

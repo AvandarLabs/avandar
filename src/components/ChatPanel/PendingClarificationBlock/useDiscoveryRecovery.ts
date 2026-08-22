@@ -1,10 +1,12 @@
+import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+
 import { useThreadRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
+
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
-import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 
 /**
  * Builds an action that abandons a failed query and requests another lookup.

@@ -1,3 +1,5 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { propNotEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -14,11 +16,12 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { notifyError } from "@/utils/notifications/notify";
+
 import styles from "./WorkspaceSettingsPage.module.css";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   workspace: Workspace.WithSubscription;

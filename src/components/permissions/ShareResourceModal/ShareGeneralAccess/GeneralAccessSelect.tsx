@@ -1,10 +1,12 @@
-import { Tooltip } from "@avandar/ui";
-import { Select } from "@mantine/core";
-import { IconBuilding } from "@tabler/icons-react";
-import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
 import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
 import type { ComboboxData } from "@mantine/core";
 import type { ReactNode } from "react";
+
+import { Tooltip } from "@avandar/ui";
+import { Select } from "@mantine/core";
+import { IconBuilding } from "@tabler/icons-react";
+
+import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
 
 type Props = {
   value: GeneralAccessValue;

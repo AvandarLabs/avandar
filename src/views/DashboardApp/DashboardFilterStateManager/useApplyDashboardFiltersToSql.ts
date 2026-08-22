@@ -1,14 +1,16 @@
-import { objectValues } from "@avandar/utils";
-import { useMemo } from "react";
-import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type {
   DataVizFilterProps,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { LocalFilterStateApi } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+
+import { objectValues } from "@avandar/utils";
+import { useMemo } from "react";
+
+import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
+import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
 type Options = {
   rawSql: string;
@@ -38,9 +40,8 @@ export function useApplyDashboardFiltersToSql(
   const { filtersById } = DashboardFilterStateManager.useState();
   return useMemo(() => {
     const globalFilters = objectValues(filtersById);
-    const subscribedFilterIds =
-      options.filterProps ?
-        DataVizFilters.resolveSubscribedFilterIds({
+    const subscribedFilterIds = options.filterProps
+      ? DataVizFilters.resolveSubscribedFilterIds({
           subscription: options.filterProps.globalFilterSubscription,
           registeredFilters: globalFilters,
         })
@@ -51,8 +52,8 @@ export function useApplyDashboardFiltersToSql(
       ...(subscribedFilterIds !== undefined ? { subscribedFilterIds } : {}),
     });
     const localFilterRecords = _buildLocalFilterRecords(options);
-    return localFilterRecords.length > 0 ?
-        applyDashboardFiltersToSql({
+    return localFilterRecords.length > 0
+      ? applyDashboardFiltersToSql({
           sql: globallyFilteredSql,
           filters: localFilterRecords,
         })

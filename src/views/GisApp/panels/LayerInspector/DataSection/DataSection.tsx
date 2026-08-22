@@ -1,5 +1,11 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
+
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { DataSectionBindingControls } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSectionBindingControls";
@@ -9,10 +15,6 @@ import { TimeColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataSecti
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -56,9 +58,8 @@ export function DataSection({
 }: Props): ReactNode {
   const { t } = useLingui();
   const isBufferOfLayer = layer.geoBinding?.type === "bufferOfLayer";
-  const sourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const sourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(sourceId);
   const boundarySources = useBoundarySourceOptions(

@@ -1,11 +1,21 @@
+import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
+import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
+import type {
+  DocumentMetadata,
+  ExtractedTable,
+  PageGeometry,
+  PdfRegion,
+} from "@/workers/pdfSniff/pdfSniff.types";
+
 import { useMutation, UseMutationResultTuple } from "@avandar/query-hooks";
 import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+import { useState } from "react";
+import { match } from "ts-pattern";
+
 import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { UserId } from "$/models/User/User.types";
-import { useState } from "react";
-import { match } from "ts-pattern";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
 import { extractPdfRegions } from "@/clients/datasets/pdfSniff";
@@ -18,6 +28,7 @@ import {
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError } from "@/utils/notifications/notify";
+
 import {
   BaseLoadResult,
   ManualUploadDataSourceMetadata,
@@ -27,14 +38,6 @@ import {
   PdfParseOptions,
   XlsxParseOptions,
 } from "../../DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
-import type {
-  DocumentMetadata,
-  ExtractedTable,
-  PageGeometry,
-  PdfRegion,
-} from "@/workers/pdfSniff/pdfSniff.types";
-import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 
 type FileLoadOptions = {
   file: File;
@@ -160,9 +163,9 @@ function _buildDataSourceMetadataFromLoadResult({
   return match(loadResult)
     .with({ type: "csv" }, (csvLoadResult): ManualUploadDataSourceMetadata => {
       const csvParseRequest =
-        loadAndParseOptions?.type === "csv_file" ?
-          loadAndParseOptions
-        : undefined;
+        loadAndParseOptions?.type === "csv_file"
+          ? loadAndParseOptions
+          : undefined;
       return {
         sourceType: "csv_file",
         onlineStorageAllowed: true,
@@ -181,13 +184,13 @@ function _buildDataSourceMetadataFromLoadResult({
       { type: "xlsx" },
       (xlsxLoadResult): ManualUploadDataSourceMetadata => {
         const xlsxRequest =
-          loadAndParseOptions?.type === "xlsx_file" ?
-            loadAndParseOptions
-          : undefined;
+          loadAndParseOptions?.type === "xlsx_file"
+            ? loadAndParseOptions
+            : undefined;
         const defaultSheetName =
-          xlsxLoadResult.availableSheetNames.length === 1 ?
-            xlsxLoadResult.availableSheetNames[0]
-          : xlsxLoadResult.sheet;
+          xlsxLoadResult.availableSheetNames.length === 1
+            ? xlsxLoadResult.availableSheetNames[0]
+            : xlsxLoadResult.sheet;
         return {
           sourceType: "xlsx_file",
           onlineStorageAllowed: true,
@@ -206,9 +209,9 @@ function _buildDataSourceMetadataFromLoadResult({
     )
     .with({ type: "pdf" }, (pdfLoadResult): ManualUploadDataSourceMetadata => {
       const pdfRequest =
-        loadAndParseOptions?.type === "pdf_file" ?
-          loadAndParseOptions
-        : undefined;
+        loadAndParseOptions?.type === "pdf_file"
+          ? loadAndParseOptions
+          : undefined;
       return {
         sourceType: "pdf_file",
         // A PDF is retained in full, so the cloud-storage toggle is the
@@ -403,8 +406,8 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           // place for the two to disagree.
           const readRegions = regions.map((region): PdfRegion => {
             const shape = extracted.resolvedShapes[region.id];
-            return shape === undefined || shape === region.shape ?
-                region
+            return shape === undefined || shape === region.shape
+              ? region
               : { ...region, shape };
           });
 

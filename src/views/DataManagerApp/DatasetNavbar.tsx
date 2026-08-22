@@ -1,3 +1,5 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
 import { NavLinkList } from "@avandar/ui";
 import { makeBucketMap, prop } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
@@ -13,8 +15,9 @@ import {
   Tooltip,
   useMantineTheme,
 } from "@mantine/core";
-import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
+
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -22,7 +25,6 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
   datasets: Dataset.T[];
@@ -56,13 +58,13 @@ function makeDatasetLink(options: {
     style,
     label:
       label ??
-      (isOfflineUnavailable ?
+      (isOfflineUnavailable ? (
         <Tooltip label={<OfflineUnavailableTooltipLabel />}>
           <Text size="sm" lineClamp={1} component="span" display="block">
             {datasetName}
           </Text>
         </Tooltip>
-      : showOfflineBadge ?
+      ) : showOfflineBadge ? (
         <Group gap="xs" wrap="nowrap" justify="space-between">
           <Text size="sm" lineClamp={1}>
             {datasetName}
@@ -75,7 +77,9 @@ function makeDatasetLink(options: {
             </Badge>
           </Tooltip>
         </Group>
-      : datasetName),
+      ) : (
+        datasetName
+      )),
     // Surface the async-import lifecycle on each dataset entry. The
     // indicator self-hides when the row is `parseStatus === "ready"`.
     rightSection: <DatasetParseStatusIndicator datasetId={datasetId} />,
@@ -171,12 +175,10 @@ export function DatasetNavbar({
       {...boxProps}
     >
       <ScrollArea h="100%" w="100%">
-        {isLoading ?
-          <Loader />
-        : null}
-        {uploadedDatasetLinks.length === 0 ?
-          elements.emptyList()
-        : elements.mainContent()}
+        {isLoading ? <Loader /> : null}
+        {uploadedDatasetLinks.length === 0
+          ? elements.emptyList()
+          : elements.mainContent()}
       </ScrollArea>
     </Box>
   );

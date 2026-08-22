@@ -1,9 +1,10 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
-import { buildWebLlmChatOpts } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/offlineChatContextWindow";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
 } from "$/types/offlineChat.types";
+
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
+import { buildWebLlmChatOpts } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/offlineChatContextWindow";
 
 type MlcEngine = {
   chat: {

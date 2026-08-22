@@ -1,9 +1,11 @@
-import { where } from "@avandar/utils";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { where } from "@avandar/utils";
+
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 
 /** One workspace dataset and the columns available for boundary roles. */
 export type BoundarySourceOption = {

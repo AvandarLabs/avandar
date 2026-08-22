@@ -1,9 +1,11 @@
+import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
+import type { ReactNode } from "react";
+
 import { formatNumber } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
+
 import { NumberColumnStat } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnStat";
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
-import type { ReactNode } from "react";
 
 type Props = {
   summary: ColumnSummary & { type: "number" };
@@ -35,17 +37,17 @@ export function NumberColumnSummary({ summary, dataType }: Props): ReactNode {
   const { minValue, maxValue, averageValue, stdDev } = summary;
   const range = maxValue - minValue;
   const avgPct =
-    range > 0 ?
-      Math.max(0, Math.min(1, (averageValue - minValue) / range))
-    : 0.5;
+    range > 0
+      ? Math.max(0, Math.min(1, (averageValue - minValue) / range))
+      : 0.5;
   const stdLeftPct =
-    range > 0 ?
-      Math.max(0, ((averageValue - stdDev - minValue) / range) * 100)
-    : 0;
+    range > 0
+      ? Math.max(0, ((averageValue - stdDev - minValue) / range) * 100)
+      : 0;
   const stdRightPct =
-    range > 0 ?
-      Math.min(100, ((averageValue + stdDev - minValue) / range) * 100)
-    : 100;
+    range > 0
+      ? Math.min(100, ((averageValue + stdDev - minValue) / range) * 100)
+      : 100;
 
   return (
     <Stack gap="sm">
@@ -63,7 +65,7 @@ export function NumberColumnSummary({ summary, dataType }: Props): ReactNode {
           bg="neutral.1"
           style={{ borderRadius: 2 }}
         />
-        {Number.isFinite(stdDev) && stdDev > 0 ?
+        {Number.isFinite(stdDev) && stdDev > 0 ? (
           <Box
             pos="absolute"
             top={18}
@@ -76,7 +78,7 @@ export function NumberColumnSummary({ summary, dataType }: Props): ReactNode {
             }}
             aria-label={t`One standard deviation around the mean`}
           />
-        : null}
+        ) : null}
         <Box
           pos="absolute"
           top={14}
@@ -121,12 +123,12 @@ export function NumberColumnSummary({ summary, dataType }: Props): ReactNode {
           label={t`max`}
           value={_formatCompactNumber(maxValue)}
         />
-        {Number.isFinite(stdDev) ?
+        {Number.isFinite(stdDev) ? (
           <NumberColumnStat
             label={t`stddev`}
             value={_formatCompactNumber(stdDev)}
           />
-        : null}
+        ) : null}
         <NumberColumnStat
           label={t`kind`}
           value={dataType === "bigint" ? t`integer` : t`decimal`}

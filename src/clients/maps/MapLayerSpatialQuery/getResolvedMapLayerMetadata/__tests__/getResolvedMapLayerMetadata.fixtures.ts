@@ -1,12 +1,14 @@
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { Model } from "@avandar/models";
+
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /** A dataset shell, named for use as either a source or boundary dataset. */
 export function createDataset(name = "Boundaries"): Dataset.T {
@@ -59,9 +61,8 @@ export function createBoundaryLayer(options: {
   measureColumn?: QueryColumn.T;
 }): MapLayer.T {
   const layer = MapLayer.createArea("Cases by district");
-  const aggregation: MapLayer.AreaAggregation =
-    options.measureColumn ?
-      {
+  const aggregation: MapLayer.AreaAggregation = options.measureColumn
+    ? {
         operation: "sum",
         measureColumn: options.measureColumn.id,
         outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),

@@ -1000,20 +1000,19 @@ export function SharePrincipalRow({
 
   return (
     <Group wrap="nowrap" align="center" gap="sm">
-      {isGroup ?
-        <IconTag size={16} />
-      : <IconUser size={16} />}
+      {isGroup ? <IconTag size={16} /> : <IconUser size={16} />}
       <Stack gap={0} flex={1}>
         <Text size="sm">{displayName}</Text>
       </Stack>
 
-      {isOwnerRow ?
+      {isOwnerRow ? (
         <Tooltip label={SHARE_COPY.ownerBadgeTooltip(resourceType)}>
           <Badge variant="light" color="gray">
             Owner
           </Badge>
         </Tooltip>
-      : <Tooltip label={SHARE_COPY.roleSelectTooltip}>
+      ) : (
+        <Tooltip label={SHARE_COPY.roleSelectTooltip}>
           <Select
             w={120}
             data={ROLE_OPTIONS}
@@ -1024,9 +1023,9 @@ export function SharePrincipalRow({
             aria-label={`Role for ${displayName}`}
           />
         </Tooltip>
-      }
+      )}
 
-      {isGroup && onToggleRequiresAppAccess ?
+      {isGroup && onToggleRequiresAppAccess ? (
         <Tooltip
           label={SHARE_COPY.limitToAppAccessTooltip(app)}
           multiline
@@ -1039,7 +1038,7 @@ export function SharePrincipalRow({
             size="sm"
           />
         </Tooltip>
-      : null}
+      ) : null}
 
       {!isOwnerRow && (
         <Tooltip label={SHARE_COPY.removeTooltip(displayName)}>
@@ -1332,9 +1331,9 @@ export function ShareGeneralAccess(props: Props): JSX.Element {
       <Group wrap="nowrap" align="flex-end">
         <Tooltip
           label={
-            generalValue === "restricted" ?
-              SHARE_COPY.restrictedOptionTooltip(resource)
-            : SHARE_COPY.workspaceOptionTooltip(resource, app)
+            generalValue === "restricted"
+              ? SHARE_COPY.restrictedOptionTooltip(resource)
+              : SHARE_COPY.workspaceOptionTooltip(resource, app)
           }
         >
           <Select
@@ -1357,7 +1356,7 @@ export function ShareGeneralAccess(props: Props): JSX.Element {
             }}
           />
         </Tooltip>
-        {generalValue === "workspace" ?
+        {generalValue === "workspace" ? (
           <Select
             w={120}
             data={[
@@ -1370,7 +1369,7 @@ export function ShareGeneralAccess(props: Props): JSX.Element {
               v && props.onChange({ isRestricted: false, role: v as RoleLevel })
             }
           />
-        : null}
+        ) : null}
       </Group>
       <Text size="xs" c="dimmed">
         {SHARE_COPY.generalAccessHelper}
@@ -1539,9 +1538,9 @@ function ShareResourceModalV2(props: Props): JSX.Element {
   const displayShares = directShares.map((s) => ({
     ...s,
     displayName:
-      s.principalType === "user" ?
-        (userById[s.principalId!] ?? "Unknown user")
-      : (groupById[s.principalId!] ?? "Unknown group"),
+      s.principalType === "user"
+        ? (userById[s.principalId!] ?? "Unknown user")
+        : (groupById[s.principalId!] ?? "Unknown group"),
   }));
 
   const spans = buildShareSummary({

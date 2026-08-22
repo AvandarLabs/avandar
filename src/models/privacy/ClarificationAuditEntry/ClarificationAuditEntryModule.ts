@@ -1,11 +1,12 @@
-import {
-  ClarificationOutcomes,
-  ClarificationResponseShapeLabels,
-} from "./ClarificationAuditEntry.constants";
 import type {
   ClarificationOutcome,
   ClarificationResponseShapeLabel,
 } from "./ClarificationAuditEntry.types";
+
+import {
+  ClarificationOutcomes,
+  ClarificationResponseShapeLabels,
+} from "./ClarificationAuditEntry.constants";
 
 export const ClarificationAuditEntryModule = {
   /** Checks whether a string is a persisted clarification outcome. */

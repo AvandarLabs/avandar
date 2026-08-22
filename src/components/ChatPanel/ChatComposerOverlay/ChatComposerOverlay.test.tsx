@@ -1,6 +1,8 @@
 /** Behavioral tests for the expanded-chat canvas overlay. */
 import { describe, expect, it, vi } from "vitest";
+
 import { fireEvent, render, screen } from "@/test-utils";
+
 import { ChatComposerOverlay } from "./ChatComposerOverlay";
 
 describe("ChatComposerOverlay", () => {

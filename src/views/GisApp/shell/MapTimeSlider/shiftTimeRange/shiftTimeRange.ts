@@ -1,5 +1,6 @@
-import { clampTimeRangeToExtent } from "@/views/GisApp/shell/MapTimeSlider/clampTimeRangeToExtent/clampTimeRangeToExtent";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
+import { clampTimeRangeToExtent } from "@/views/GisApp/shell/MapTimeSlider/clampTimeRangeToExtent/clampTimeRangeToExtent";
 
 /**
  * Translates a clock window forward by its duration, or by `collapsedStepMs`

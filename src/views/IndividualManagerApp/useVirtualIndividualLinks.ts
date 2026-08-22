@@ -1,13 +1,15 @@
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { Individual } from "$/models/ontology/Individual/Individual";
+import type { NavLinkProps } from "@avandar/ui";
+import type { CSSProperties, RefObject } from "react";
+
 import { constant } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef } from "react";
+
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { NavLinkProps } from "@avandar/ui";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { Individual } from "$/models/ontology/Individual/Individual";
-import type { CSSProperties, RefObject } from "react";
 
 const ROW_HEIGHT_PX = 50;
 
@@ -42,8 +44,9 @@ export function useVirtualIndividualLinks({
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const parentRef = useRef<HTMLDivElement | null>(null);
-  const rowCount =
-    hasNextPage ? allIndividuals.length + 1 : allIndividuals.length;
+  const rowCount = hasNextPage
+    ? allIndividuals.length + 1
+    : allIndividuals.length;
 
   const rowVirtualizer = useVirtualizer({
     count: rowCount,

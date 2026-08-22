@@ -1,16 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
-import { Radio, Stack, Text } from "@mantine/core";
-import { useState } from "react";
-import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { getOutputModeCopy } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy";
-import { PdfRegionPicker } from "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker";
-import { PdfReviewGrid } from "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid";
-import {
-  combineRegions,
-  OBSERVATION_HEADER,
-} from "@/workers/pdfSniff/combineRegions/combineRegions";
-import { resolveOutputMode } from "@/workers/pdfSniff/resolveOutputMode/resolveOutputMode";
+import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 import type {
   DataSourceMetadata,
   PdfDataSourceMetadata,
@@ -21,8 +9,22 @@ import type {
   ExtractedTable,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
-import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Radio, Stack, Text } from "@mantine/core";
+import { useState } from "react";
+
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { getOutputModeCopy } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy";
+import { PdfRegionPicker } from "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker";
+import { PdfReviewGrid } from "@/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid";
+import {
+  combineRegions,
+  OBSERVATION_HEADER,
+} from "@/workers/pdfSniff/combineRegions/combineRegions";
+import { resolveOutputMode } from "@/workers/pdfSniff/resolveOutputMode/resolveOutputMode";
 
 type Props = {
   /** The uploaded PDF, needed to render the page the user draws on. */
@@ -159,9 +161,9 @@ export function PdfParseControls({
       }),
     ),
     chosenMode:
-      metadata.parseOptions.isOutputModeUserChosen === true ?
-        metadata.parseOptions.outputMode
-      : undefined,
+      metadata.parseOptions.isOutputModeUserChosen === true
+        ? metadata.parseOptions.outputMode
+        : undefined,
   });
   const copy = getOutputModeCopy({
     i18n,
@@ -205,11 +207,11 @@ export function PdfParseControls({
             />
           </Stack>
         </Radio.Group>
-        {copy.note ?
+        {copy.note ? (
           <Text size="xs" c="dimmed">
             {copy.note}
           </Text>
-        : null}
+        ) : null}
       </Stack>
       <PdfRegionPicker
         file={sourceFile}
@@ -228,13 +230,13 @@ export function PdfParseControls({
           applyReviewedTable(table, { llmModel });
         }}
       />
-      {activeTable ?
+      {activeTable ? (
         <PdfReviewGrid
           table={activeTable}
           onTableChange={applyReviewedTable}
           onRowFocus={setFocusedProvenance}
         />
-      : null}
+      ) : null}
     </Stack>
   );
 }

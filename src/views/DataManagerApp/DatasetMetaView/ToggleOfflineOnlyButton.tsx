@@ -1,9 +1,15 @@
+import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
+import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
+
 import { useMutation } from "@avandar/query-hooks";
 import { ActionIcon } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
+
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
@@ -15,10 +21,6 @@ import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
-import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 
 type Props = {
   isInCloudStorage: boolean;
@@ -75,9 +77,9 @@ export function ToggleOfflineOnlyButton({
     onSuccess: (dataset) => {
       if (DatasetSource.canBeOfflineOnly(dataset)) {
         notifySuccess(
-          dataset.isInCloudStorage ?
-            t`Dataset is now synced online`
-          : t`Dataset is now offline-only`,
+          dataset.isInCloudStorage
+            ? t`Dataset is now synced online`
+            : t`Dataset is now offline-only`,
         );
       }
     },
@@ -112,22 +114,23 @@ export function ToggleOfflineOnlyButton({
         color: isInCloudStorage ? "danger" : undefined,
         loading: isPending,
       },
-      children:
-        isInCloudStorage ?
-          <Text c="red.8">
-            <Trans>
-              This dataset will no longer be stored online and can only be
-              accessed as long as it is on your personal computer. Nobody on
-              your team will be able to access this data. This is recommended
-              only for very sensitive data.
-            </Trans>
-          </Text>
-        : <Text>
-            <Trans>
-              This will allow the dataset to be stored online so it can be
-              accessed in other devices.
-            </Trans>
-          </Text>,
+      children: isInCloudStorage ? (
+        <Text c="red.8">
+          <Trans>
+            This dataset will no longer be stored online and can only be
+            accessed as long as it is on your personal computer. Nobody on your
+            team will be able to access this data. This is recommended only for
+            very sensitive data.
+          </Trans>
+        </Text>
+      ) : (
+        <Text>
+          <Trans>
+            This will allow the dataset to be stored online so it can be
+            accessed in other devices.
+          </Trans>
+        </Text>
+      ),
       onConfirm: () => {
         if (isInCloudStorage) {
           return makeOfflineOnly(dataSource.datasetId);
@@ -149,10 +152,11 @@ export function ToggleOfflineOnlyButton({
       <OfflineGated isBlocked={offline.isBlocked}>
         <ActionIcon
           tooltip={
-            isUploadPending ? t`Syncing dataset online...`
-            : isInCloudStorage ?
-              t`This dataset is synced online. Click to make offline-only.`
-            : t`This dataset is offline-only. Click to allow online syncing.`
+            isUploadPending
+              ? t`Syncing dataset online...`
+              : isInCloudStorage
+                ? t`This dataset is synced online. Click to make offline-only.`
+                : t`This dataset is offline-only. Click to allow online syncing.`
           }
           variant="default"
           color="neutral"
@@ -163,22 +167,23 @@ export function ToggleOfflineOnlyButton({
           aria-disabled={isPending || offline.isBlocked}
           onClick={onClick}
         >
-          {isUploadPending ?
+          {isUploadPending ? (
             <Loader size={20} />
-          : isInCloudStorage ?
+          ) : isInCloudStorage ? (
             <ThemeIcon variant="transparent" c="blue">
               <IconWorld size={20} />
             </ThemeIcon>
-          : <ThemeIcon variant="transparent" c="neutral.4">
+          ) : (
+            <ThemeIcon variant="transparent" c="neutral.4">
               <IconWorldOff size={20} />
             </ThemeIcon>
-          }
+          )}
         </ActionIcon>
       </OfflineGated>
 
-      {isUploadPending && uploadPercent !== undefined ?
+      {isUploadPending && uploadPercent !== undefined ? (
         <Progress value={uploadPercent} w={80} size={4} />
-      : null}
+      ) : null}
     </Stack>
   );
 }

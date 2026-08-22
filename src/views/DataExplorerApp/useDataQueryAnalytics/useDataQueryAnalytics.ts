@@ -1,17 +1,19 @@
-import { matchLiteral } from "@avandar/utils";
-import { useEffect, useRef } from "react";
-import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
-import { QueryAnalyticsPayloads } from "@/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
-import type { UseQueryResult } from "@tanstack/react-query";
 import type {
   AnalyticsApp,
   QueryAnalyticsSurface,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
+import type { UseQueryResult } from "@tanstack/react-query";
 import type { RefObject } from "react";
+
+import { matchLiteral } from "@avandar/utils";
+import { useEffect, useRef } from "react";
+
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { QueryAnalyticsPayloads } from "@/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads";
 
 /**
  * The parts of the query observer the emitter reads.

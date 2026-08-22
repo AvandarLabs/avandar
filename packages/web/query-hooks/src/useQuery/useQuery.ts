@@ -87,9 +87,8 @@ export function useQuery<
         throw error;
       }
     },
-    placeholderData:
-      options.usePreviousDataAsPlaceholder ?
-        (prevValue) => {
+    placeholderData: options.usePreviousDataAsPlaceholder
+      ? (prevValue) => {
           return prevValue;
         }
       : undefined,

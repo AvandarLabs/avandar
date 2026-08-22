@@ -1,11 +1,11 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
 import type {
   ChatClarifyRequest,
   ChatCreatedCaseType,
   ChatGeneratedDashboardBlock,
   ChatProposedCaseType,
 } from "$/types/chat.types.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 
 type ModelType = "ChatResponse";
 

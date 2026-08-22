@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
+
 import { useCheckTruncatedText } from "./useCheckTruncatedText";
 
 function mockElementWidths(
@@ -70,11 +71,11 @@ function UnmountRefHarness() {
         data-testid="truncation-flag"
         data-truncated={String(isTruncated)}
       />
-      {showTarget ?
+      {showTarget ? (
         <div data-testid="inner" ref={setRef}>
           inner
         </div>
-      : null}
+      ) : null}
       <button
         type="button"
         onClick={() => {

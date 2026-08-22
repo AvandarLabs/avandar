@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { ShareResourceModal } from "@/components/permissions/ShareResourceModal/ShareResourceModal";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { render, screen, waitFor } from "@/test-utils";
+
 import { renderShareResourceModal } from "./ShareResourceModal.testHelpers";
 import { ShareResourceModalTestMocks } from "./ShareResourceModal.testMocks";
 

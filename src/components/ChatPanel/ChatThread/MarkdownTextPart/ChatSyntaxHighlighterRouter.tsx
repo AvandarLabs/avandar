@@ -11,11 +11,13 @@ export function ChatSyntaxHighlighterRouter({
   code,
   ...syntaxHighlighterProps
 }: Readonly<Props>): React.ReactNode {
-  return SqlLanguages.has(language.toLowerCase()) ?
-      <AvaSqlBlock value={code} readOnly />
-    : <ChatSyntaxHighlighter
-        {...syntaxHighlighterProps}
-        language={language}
-        code={code}
-      />;
+  return SqlLanguages.has(language.toLowerCase()) ? (
+    <AvaSqlBlock value={code} readOnly />
+  ) : (
+    <ChatSyntaxHighlighter
+      {...syntaxHighlighterProps}
+      language={language}
+      code={code}
+    />
+  );
 }

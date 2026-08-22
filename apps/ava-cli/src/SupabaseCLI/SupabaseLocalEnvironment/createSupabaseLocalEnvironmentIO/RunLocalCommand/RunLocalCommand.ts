@@ -1,11 +1,12 @@
-import { execFile, spawn } from "node:child_process";
-import * as net from "node:net";
-import { promisify } from "node:util";
-import { promiseMapSequential } from "@avandar/utils";
 import type {
   CommandOutputMode,
   CommandResult,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
+import { promiseMapSequential } from "@avandar/utils";
+import { execFile, spawn } from "node:child_process";
+import * as net from "node:net";
+import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 

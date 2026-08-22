@@ -1,5 +1,6 @@
-import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import type { DropReason } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 
 /** Result column names the audit query returns, one row of them. */
 export const PointCoordinateAuditColumns = {

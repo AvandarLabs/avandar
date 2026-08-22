@@ -1,14 +1,17 @@
+import type { ClarificationAuditEntry } from "./ClarificationAuditEntry";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
+
 import { makeParserRegistry } from "@avandar/clients";
 import { identity } from "@avandar/utils";
-import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
+
+import { uuidType } from "$/lib/zodHelpers";
+
 import {
   ClarificationOutcomes,
   ClarificationResponseShapeLabels,
 } from "./ClarificationAuditEntry";
-import type { ClarificationAuditEntry } from "./ClarificationAuditEntry";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@avandar/utils/zod";
 
 const DBReadSchema = z.object({
   id: uuidType<ClarificationAuditEntry.Id>(),

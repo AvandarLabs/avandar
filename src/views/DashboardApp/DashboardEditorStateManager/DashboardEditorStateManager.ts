@@ -1,6 +1,8 @@
-import { propEq } from "@avandar/utils";
-import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+
+import { propEq } from "@avandar/utils";
+
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 
 export type DashboardEditorPendingBlock = {
   /**
@@ -285,9 +287,9 @@ export const DashboardEditorStateManager = createAppStateManager({
       const pendingUnchanged =
         remainingPending.length === state.pendingBlocks.length;
       if (_areJsonValuesEqual(state.editorData, editorData)) {
-        return pendingUnchanged ? state : (
-            { ...state, pendingBlocks: remainingPending }
-          );
+        return pendingUnchanged
+          ? state
+          : { ...state, pendingBlocks: remainingPending };
       }
       return {
         ...state,

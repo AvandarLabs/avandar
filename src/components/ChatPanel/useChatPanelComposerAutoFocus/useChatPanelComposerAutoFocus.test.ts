@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { act, renderHook } from "@/test-utils";
+
 import { useChatPanelComposerAutoFocus } from "./useChatPanelComposerAutoFocus";
 
 function _createAsideWithTransition(): HTMLElement {

@@ -1,11 +1,13 @@
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { CreateMapButton } from "@/views/GisApp/MapListView/CreateMapButton";
 import { EmptyMapList } from "@/views/GisApp/MapListView/EmptyMapList";
 import { MapGrid } from "@/views/GisApp/MapListView/MapGrid";
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { ReactNode } from "react";
 
 type Props = { avaMaps: readonly AvaMap.T[]; workspaceSlug: string };
 
@@ -22,9 +24,11 @@ export function MapListView({ avaMaps, workspaceSlug }: Props): ReactNode {
       }
       containerProps={{ p: "md" }}
     >
-      {avaMaps.length === 0 ?
+      {avaMaps.length === 0 ? (
         <EmptyMapList />
-      : <MapGrid avaMaps={avaMaps} workspaceSlug={workspaceSlug} />}
+      ) : (
+        <MapGrid avaMaps={avaMaps} workspaceSlug={workspaceSlug} />
+      )}
     </AppLayout>
   );
 }

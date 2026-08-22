@@ -1,5 +1,6 @@
-import path from "node:path";
 import { config } from "dotenv";
+import path from "node:path";
+
 import { ensureE2EViteFeatureFlags } from "./ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 
 /**

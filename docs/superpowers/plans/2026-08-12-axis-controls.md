@@ -39,7 +39,7 @@ pnpm vitest run path/to/file.test.ts -t "name"  # one test
 
 **Private helper naming.** A module-level function that is not exported is prefixed with an underscore: `_formatYAxisTick` in `src/lib/ui/viz/applyChartStyle.ts`, `_bucketKeyFor`, `_clamp`. This is widespread established practice in this repo (about half of all module-level functions), not an optional flourish. Exported functions never take the prefix.
 
-**A trap.** Mantine spreads `...xAxisProps` *after* its own defaults, so anything you pass wins. Its default X tick object is `{ transform: "translate(0, 10)", fontSize: 12, fill: "currentColor" }`. Passing your own `tick` **replaces** it wholesale rather than merging. Task 5 fixes this.
+**A trap.** Mantine spreads `...xAxisProps` _after_ its own defaults, so anything you pass wins. Its default X tick object is `{ transform: "translate(0, 10)", fontSize: 12, fill: "currentColor" }`. Passing your own `tick` **replaces** it wholesale rather than merging. Task 5 fixes this.
 
 ---
 
@@ -47,53 +47,54 @@ pnpm vitest run path/to/file.test.ts -t "name"  # one test
 
 **New files**
 
-| File | Responsibility |
-| --- | --- |
-| `shared/models/vizs/getAxisRoles/getAxisRoles.ts` | `AxisRole` type and `getAxisRoles(vizType)` lookup |
-| `shared/models/vizs/getAxisRoles/getAxisRoles.test.ts` | Tests for the above |
-| `shared/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts` | `makeAxisDescriptors` factory |
-| `shared/models/vizs/makeAxisDescriptors/makeAxisDescriptors.test.ts` | Tests for the above |
-| `src/lib/ui/viz/axis/computeValueExtent/computeValueExtent.ts` | Stacking-aware data range |
-| `src/lib/ui/viz/axis/computeValueExtent/computeValueExtent.test.ts` | Tests |
-| `src/lib/ui/viz/axis/needsValueExtent/needsValueExtent.ts` | Predicate: does this axis need an extent at all |
-| `src/lib/ui/viz/axis/needsValueExtent/needsValueExtent.test.ts` | Tests |
-| `src/lib/ui/viz/axis/toExtentSeries/toExtentSeries.ts` | Resolve each series' stacking bucket |
-| `src/lib/ui/viz/axis/toExtentSeries/toExtentSeries.test.ts` | Tests |
-| `src/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale.ts` | Bounds + interval → `domain`, `ticks` |
-| `src/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale.test.ts` | Tests |
-| `src/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation.ts` | Angle → `tick`, `interval`, `height` |
-| `src/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation.test.ts` | Tests |
-| `src/lib/ui/viz/applyChartStyle.test.ts` | Unit tests for the composed translator |
-| `src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets.tsx` | Renders one `<Fieldset>` per descriptor group |
-| `src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/readSetting.ts` | Moved from `SeriesAwareVizForm/` |
-| `src/components/VisualizationContainer/VizSettingsForm/PairChartForms.test.tsx` | Scatter/bubble form tests |
-| `src/lib/ui/viz/axis/getAreaStacking/getAreaStacking.test.ts` | Area's layout-to-stacking rule |
-| `src/lib/ui/viz/SeriesRenderer.props.test.tsx` | Scatter axis prop assertions |
+| File                                                                                                      | Responsibility                                     |
+| --------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `shared/models/vizs/getAxisRoles/getAxisRoles.ts`                                                         | `AxisRole` type and `getAxisRoles(vizType)` lookup |
+| `shared/models/vizs/getAxisRoles/getAxisRoles.test.ts`                                                    | Tests for the above                                |
+| `shared/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts`                                           | `makeAxisDescriptors` factory                      |
+| `shared/models/vizs/makeAxisDescriptors/makeAxisDescriptors.test.ts`                                      | Tests for the above                                |
+| `src/lib/ui/viz/axis/computeValueExtent/computeValueExtent.ts`                                            | Stacking-aware data range                          |
+| `src/lib/ui/viz/axis/computeValueExtent/computeValueExtent.test.ts`                                       | Tests                                              |
+| `src/lib/ui/viz/axis/needsValueExtent/needsValueExtent.ts`                                                | Predicate: does this axis need an extent at all    |
+| `src/lib/ui/viz/axis/needsValueExtent/needsValueExtent.test.ts`                                           | Tests                                              |
+| `src/lib/ui/viz/axis/toExtentSeries/toExtentSeries.ts`                                                    | Resolve each series' stacking bucket               |
+| `src/lib/ui/viz/axis/toExtentSeries/toExtentSeries.test.ts`                                               | Tests                                              |
+| `src/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale.ts`                                                | Bounds + interval → `domain`, `ticks`              |
+| `src/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale.test.ts`                                           | Tests                                              |
+| `src/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation.ts`                                          | Angle → `tick`, `interval`, `height`               |
+| `src/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation.test.ts`                                     | Tests                                              |
+| `src/lib/ui/viz/applyChartStyle.test.ts`                                                                  | Unit tests for the composed translator             |
+| `src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets.tsx` | Renders one `<Fieldset>` per descriptor group      |
+| `src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/readSetting.ts`             | Moved from `SeriesAwareVizForm/`                   |
+| `src/components/VisualizationContainer/VizSettingsForm/PairChartForms.test.tsx`                           | Scatter/bubble form tests                          |
+| `src/lib/ui/viz/axis/getAreaStacking/getAreaStacking.test.ts`                                             | Area's layout-to-stacking rule                     |
+| `src/lib/ui/viz/SeriesRenderer.props.test.tsx`                                                            | Scatter axis prop assertions                       |
 
 **A note on renderer test coverage.** `BarChart`, `LineChart`, and `ScatterChart` use Mantine wrappers, so the established prop-mock pattern works and they get renderer-level tests. `AreaChart` and `BubbleChart` render Recharts primitives directly. Recharts reads axis children as declarative config via `findAllByType` rather than rendering them as ordinary components, and `ResponsiveContainer` collapses to zero size under jsdom, so a spy component is not reliably invoked — and no test in this repo mocks Recharts today. `SeriesRenderer.props.test.tsx` already documents `AreaChart` as deliberately exempt for this reason. Their correctness rides on the unit-tested pure modules plus the manual verification at the end. Do not add Recharts mocking to this plan.
 
 **Modified files**
 
-| File | Change |
-| --- | --- |
-| `shared/models/vizs/ChartStyle.types.ts` | Four new `AxisStyle` fields |
-| `shared/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts` | Add `chartStyle` |
-| `shared/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types.ts` | Add `chartStyle` |
-| `shared/models/vizs/{Bar,Line,Area}ChartVizConfig/*VizConfigs.ts` | Use `makeAxisDescriptors` |
-| `shared/models/vizs/{ScatterPlot,BubbleChart}VizConfig/*VizConfigs.ts` | Real descriptors, carry `chartStyle` on convert |
-| `src/lib/ui/viz/applyChartStyle.ts` | Options object, compose resolvers, tick-defaults merge |
-| `src/lib/ui/viz/{BarChart,LineChart,AreaChart,ScatterChart,BubbleChart}.tsx` | Compute extent, pass options |
-| `src/components/VisualizationContainer/VisualizationContainer.tsx` | Pass `chartStyle` to scatter and bubble |
-| `src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx` | Use `ChartSettingsFieldsets` |
-| `src/components/VisualizationContainer/VizSettingsForm/{ScatterChartForm,BubbleChartForm}.tsx` | Render `ChartSettingsFieldsets` |
-| `src/lib/ui/viz/SeriesRenderer.props.test.tsx` | New axis prop assertions |
-| `docs/dashboards-and-visualizations-inventory.md` | Sections 2.2 and 3.3 |
+| File                                                                                              | Change                                                 |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `shared/models/vizs/ChartStyle.types.ts`                                                          | Four new `AxisStyle` fields                            |
+| `shared/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts`                           | Add `chartStyle`                                       |
+| `shared/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types.ts`                           | Add `chartStyle`                                       |
+| `shared/models/vizs/{Bar,Line,Area}ChartVizConfig/*VizConfigs.ts`                                 | Use `makeAxisDescriptors`                              |
+| `shared/models/vizs/{ScatterPlot,BubbleChart}VizConfig/*VizConfigs.ts`                            | Real descriptors, carry `chartStyle` on convert        |
+| `src/lib/ui/viz/applyChartStyle.ts`                                                               | Options object, compose resolvers, tick-defaults merge |
+| `src/lib/ui/viz/{BarChart,LineChart,AreaChart,ScatterChart,BubbleChart}.tsx`                      | Compute extent, pass options                           |
+| `src/components/VisualizationContainer/VisualizationContainer.tsx`                                | Pass `chartStyle` to scatter and bubble                |
+| `src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx` | Use `ChartSettingsFieldsets`                           |
+| `src/components/VisualizationContainer/VizSettingsForm/{ScatterChartForm,BubbleChartForm}.tsx`    | Render `ChartSettingsFieldsets`                        |
+| `src/lib/ui/viz/SeriesRenderer.props.test.tsx`                                                    | New axis prop assertions                               |
+| `docs/dashboards-and-visualizations-inventory.md`                                                 | Sections 2.2 and 3.3                                   |
 
 ---
 
 ## Task 1: `AxisStyle` fields and `getAxisRoles`
 
 **Files:**
+
 - Modify: `shared/models/vizs/ChartStyle.types.ts`
 - Create: `shared/models/vizs/getAxisRoles/getAxisRoles.ts`
 - Test: `shared/models/vizs/getAxisRoles/getAxisRoles.test.ts`
@@ -249,6 +250,7 @@ git commit -m "feat(viz): add axis scale and rotation fields to AxisStyle"
 The extent is the numeric range a value axis must cover. It is stacking-aware because a stacked bar chart's visual maximum is a row-wise sum, not a per-column maximum.
 
 **Files:**
+
 - Create: `src/lib/ui/viz/axis/computeValueExtent/computeValueExtent.ts`
 - Test: `src/lib/ui/viz/axis/computeValueExtent/computeValueExtent.test.ts`
 
@@ -516,6 +518,7 @@ Two small modules the wrappers share.
 `toExtentSeries` turns a chart's series plus its stacking decision into `ExtentSeries[]`. It exists so the layout-to-stacking rule — the only genuinely tricky per-wrapper logic — is unit-testable without rendering a chart. `AreaChart` and `BubbleChart` render Recharts primitives directly and the codebase already documents them as exempt from renderer-level prop tests, so this module is where their correctness is actually proven.
 
 **Files:**
+
 - Create: `src/lib/ui/viz/axis/needsValueExtent/needsValueExtent.ts`
 - Test: `src/lib/ui/viz/axis/needsValueExtent/needsValueExtent.test.ts`
 - Create: `src/lib/ui/viz/axis/toExtentSeries/toExtentSeries.ts`
@@ -690,6 +693,7 @@ git commit -m "feat(viz): add extent helpers for wrapper stacking decisions"
 Turns `{ min, max, tickInterval }` plus an extent into Recharts `domain`, `ticks`, and `allowDataOverflow`.
 
 **Files:**
+
 - Create: `src/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale.ts`
 - Test: `src/lib/ui/viz/axis/resolveAxisScale/resolveAxisScale.test.ts`
 
@@ -772,7 +776,10 @@ describe("resolveAxisScale — tick interval", () => {
 
   it("anchors the tick lattice at an explicit non-aligned minimum", () => {
     expect(
-      resolveAxisScale({ min: 1000, tickInterval: 24000 }, { min: 0, max: 50000 }),
+      resolveAxisScale(
+        { min: 1000, tickInterval: 24000 },
+        { min: 0, max: 50000 },
+      ),
     ).toEqual({
       domain: [1000, 73000],
       ticks: [1000, 25000, 49000, 73000],
@@ -809,8 +816,10 @@ describe("resolveAxisScale — tick interval", () => {
 
   it("survives a fractional interval without floating point drift", () => {
     expect(
-      resolveAxisScale({ min: 0, max: 1, tickInterval: 0.1 }, { min: 0, max: 1 })
-        .ticks,
+      resolveAxisScale(
+        { min: 0, max: 1, tickInterval: 0.1 },
+        { min: 0, max: 1 },
+      ).ticks,
     ).toHaveLength(11);
   });
 
@@ -841,14 +850,17 @@ describe("resolveAxisScale — guards", () => {
   });
 
   it("ignores a negative interval but honors the bounds beside it", () => {
-    expect(resolveAxisScale({ min: 0, max: 50, tickInterval: -5 }, EXTENT)).toEqual(
-      { domain: [0, 50], allowDataOverflow: true },
-    );
+    expect(
+      resolveAxisScale({ min: 0, max: 50, tickInterval: -5 }, EXTENT),
+    ).toEqual({ domain: [0, 50], allowDataOverflow: true });
   });
 
   it("ignores non-finite values", () => {
     expect(
-      resolveAxisScale({ min: Number.NaN, max: Number.POSITIVE_INFINITY }, EXTENT),
+      resolveAxisScale(
+        { min: Number.NaN, max: Number.POSITIVE_INFINITY },
+        EXTENT,
+      ),
     ).toEqual({});
   });
 });
@@ -891,7 +903,9 @@ export type AxisScaleProps = {
 type AxisScaleStyle = Pick<AxisStyle, "min" | "max" | "tickInterval">;
 
 function _finiteOrUndefined(value: number | undefined): number | undefined {
-  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+  return typeof value === "number" && Number.isFinite(value)
+    ? value
+    : undefined;
 }
 
 /**
@@ -913,10 +927,15 @@ export function resolveAxisScale(
   const explicitMin = _finiteOrUndefined(axis?.min);
   const explicitMax = _finiteOrUndefined(axis?.max);
   const rawInterval = _finiteOrUndefined(axis?.tickInterval);
-  const interval = rawInterval !== undefined && rawInterval > 0 ? rawInterval : undefined;
+  const interval =
+    rawInterval !== undefined && rawInterval > 0 ? rawInterval : undefined;
 
   // Nothing configured: leave the axis exactly as it renders today.
-  if (explicitMin === undefined && explicitMax === undefined && interval === undefined) {
+  if (
+    explicitMin === undefined &&
+    explicitMax === undefined &&
+    interval === undefined
+  ) {
     return {};
   }
 
@@ -929,7 +948,8 @@ export function resolveAxisScale(
     return {};
   }
 
-  const hasExplicitBound = explicitMin !== undefined || explicitMax !== undefined;
+  const hasExplicitBound =
+    explicitMin !== undefined || explicitMax !== undefined;
   // `allowDataOverflow` is what makes Recharts honor a bound that cuts
   // into the data instead of silently widening back out. Derived bounds
   // always contain the data, so they never need it.
@@ -938,16 +958,17 @@ export function resolveAxisScale(
   // A derived low bound anchors at zero for non-negative data, because a
   // value axis floating off zero misrepresents the marks it scales.
   const derivedLow =
-    extent === undefined ? undefined
-    : extent.min >= 0 ? 0
-    : extent.min;
+    extent === undefined ? undefined : extent.min >= 0 ? 0 : extent.min;
   const low = explicitMin ?? derivedLow;
   const high = explicitMax ?? extent?.max;
 
   // Without two concrete numbers we cannot build a lattice, so hand the
   // unset side back to Recharts.
   if (low === undefined || high === undefined || low >= high) {
-    return { domain: [explicitMin ?? "auto", explicitMax ?? "auto"], ...overflow };
+    return {
+      domain: [explicitMin ?? "auto", explicitMax ?? "auto"],
+      ...overflow,
+    };
   }
 
   if (interval === undefined) {
@@ -959,9 +980,9 @@ export function resolveAxisScale(
   // extended outward onto that lattice so the domain ends on a tick; an
   // explicit high is never moved, so it may truncate the last tick.
   const resolvedHigh =
-    explicitMax !== undefined ?
-      high
-    : low + Math.ceil((high - low) / interval) * interval;
+    explicitMax !== undefined
+      ? high
+      : low + Math.ceil((high - low) / interval) * interval;
 
   const tickCount =
     Math.floor((resolvedHigh - low) / interval + TICK_COUNT_EPSILON) + 1;
@@ -985,14 +1006,14 @@ Expected: PASS, 20 tests.
 
 Two notes on the fractional cases. First, `low + index * interval` can produce `0.30000000000000004`; both tests assert only length, which is deliberate — Recharts renders values through a tick formatter, so do **not** add rounding. Second, the `0`-to-`1` case does not actually exercise `TICK_COUNT_EPSILON` (`1 / 0.1` is exactly `10` in IEEE754); the `0`-to-`0.3` case is the one that does, and it fails without the epsilon.
 
-One more thing the plan's own test text gets wrong: `resolveAxisScale({ label: "Revenue" }, EXTENT)` does not type-check. `AxisScaleStyle` is a `Pick` of three fields, and TypeScript's excess-property check rejects `label` on a fresh object *literal* — even though a real caller passing a value already typed `AxisStyle` is structurally fine. Hoist it instead of weakening the parameter type:
+One more thing the plan's own test text gets wrong: `resolveAxisScale({ label: "Revenue" }, EXTENT)` does not type-check. `AxisScaleStyle` is a `Pick` of three fields, and TypeScript's excess-property check rejects `label` on a fresh object _literal_ — even though a real caller passing a value already typed `AxisStyle` is structurally fine. Hoist it instead of weakening the parameter type:
 
 ```ts
-    // Excess-property checking only bites on fresh literals; in practice
-    // the scale resolver only reads the scale fields, but the object it
-    // receives carries the cosmetic ones too.
-    const cosmeticOnly: AxisStyle = { label: "Revenue" };
-    expect(resolveAxisScale(cosmeticOnly, EXTENT)).toEqual({});
+// Excess-property checking only bites on fresh literals; in practice
+// the scale resolver only reads the scale fields, but the object it
+// receives carries the cosmetic ones too.
+const cosmeticOnly: AxisStyle = { label: "Revenue" };
+expect(resolveAxisScale(cosmeticOnly, EXTENT)).toEqual({});
 ```
 
 - [ ] **Step 5: Commit**
@@ -1008,6 +1029,7 @@ git commit -m "feat(viz): add resolveAxisScale for axis bounds and tick interval
 ## Task 5: `resolveTickRotation`
 
 **Files:**
+
 - Create: `src/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation.ts`
 - Test: `src/lib/ui/viz/axis/resolveTickRotation/resolveTickRotation.test.ts`
 
@@ -1151,9 +1173,14 @@ export function resolveTickRotation(
     AXIS_HEIGHT_PADDING;
 
   return {
-    tick: { angle: clampedAngle, textAnchor: clampedAngle < 0 ? "end" : "start" },
+    tick: {
+      angle: clampedAngle,
+      textAnchor: clampedAngle < 0 ? "end" : "start",
+    },
     interval: 0,
-    height: Math.round(_clamp(estimatedHeight, MIN_AXIS_HEIGHT, MAX_AXIS_HEIGHT)),
+    height: Math.round(
+      _clamp(estimatedHeight, MIN_AXIS_HEIGHT, MAX_AXIS_HEIGHT),
+    ),
   };
 }
 ```
@@ -1175,9 +1202,10 @@ git commit -m "feat(viz): add resolveTickRotation with auto axis height"
 
 ## Task 6: Compose the resolvers in `applyChartStyle`
 
-This changes `applyChartStyle`'s signature from `(style, baseXAxisProps)` to `(style, options)`. All four existing call sites are updated in this task so the build stays green; the wrappers start *using* the new options in Tasks 7 to 10.
+This changes `applyChartStyle`'s signature from `(style, baseXAxisProps)` to `(style, options)`. All four existing call sites are updated in this task so the build stays green; the wrappers start _using_ the new options in Tasks 7 to 10.
 
 **Files:**
+
 - Modify: `src/lib/ui/viz/applyChartStyle.ts`
 - Modify: `src/lib/ui/viz/BarChart.tsx:69`, `src/lib/ui/viz/LineChart.tsx:52`, `src/lib/ui/viz/AreaChart.tsx:84`
 - Test: `src/lib/ui/viz/applyChartStyle.test.ts`
@@ -1232,7 +1260,10 @@ describe("applyChartStyle — axis roles gate the value settings", () => {
   it("resolves a value Y axis", () => {
     const result = applyChartStyle(
       { yAxis: { min: 0, max: 100, tickInterval: 25 } },
-      { yExtent: { min: 0, max: 100 }, axisRoles: { x: "category", y: "value" } },
+      {
+        yExtent: { min: 0, max: 100 },
+        axisRoles: { x: "category", y: "value" },
+      },
     );
     expect(result.yAxisProps?.domain).toEqual([0, 100]);
     expect(result.yAxisProps?.ticks).toEqual([0, 25, 50, 75, 100]);
@@ -1241,7 +1272,10 @@ describe("applyChartStyle — axis roles gate the value settings", () => {
   it("ignores value settings on a category X axis", () => {
     const result = applyChartStyle(
       { xAxis: { min: 0, max: 100 } },
-      { xExtent: { min: 0, max: 100 }, axisRoles: { x: "category", y: "value" } },
+      {
+        xExtent: { min: 0, max: 100 },
+        axisRoles: { x: "category", y: "value" },
+      },
     );
     expect(result.xAxisProps?.domain).toBeUndefined();
   });
@@ -1389,28 +1423,30 @@ export function applyChartStyle(
   // Only emit a tick object when something actually customizes it, so
   // an unstyled chart keeps whichever defaults its renderer supplies.
   const xTick =
-    xAxisStyle?.tickColor !== undefined || xRotation.tick !== undefined ?
-      {
-        ...TICK_DEFAULTS,
-        ...(xAxisStyle?.tickColor !== undefined ?
-          { fill: xAxisStyle.tickColor }
-        : {}),
-        ...(xRotation.tick ?? {}),
-      }
-    : undefined;
+    xAxisStyle?.tickColor !== undefined || xRotation.tick !== undefined
+      ? {
+          ...TICK_DEFAULTS,
+          ...(xAxisStyle?.tickColor !== undefined
+            ? { fill: xAxisStyle.tickColor }
+            : {}),
+          ...(xRotation.tick ?? {}),
+        }
+      : undefined;
 
   const xAxisProps: Omit<XAxisProps, "ref"> = {
     ...baseXAxisProps,
     ...(xTick !== undefined ? { tick: xTick } : {}),
-    ...(xRotation.interval !== undefined ? { interval: xRotation.interval } : {}),
+    ...(xRotation.interval !== undefined
+      ? { interval: xRotation.interval }
+      : {}),
     ...(xRotation.height !== undefined ? { height: xRotation.height } : {}),
     ...xScale,
   };
 
   const yTick =
-    yAxisStyle?.tickColor !== undefined ?
-      { ...TICK_DEFAULTS, fill: yAxisStyle.tickColor }
-    : undefined;
+    yAxisStyle?.tickColor !== undefined
+      ? { ...TICK_DEFAULTS, fill: yAxisStyle.tickColor }
+      : undefined;
 
   const yAxisProps: Omit<YAxisProps, "ref"> = {
     tickFormatter: _formatYAxisTick,
@@ -1455,6 +1491,7 @@ git commit -m "feat(viz): compose axis scale and rotation into applyChartStyle"
 ## Task 7: Wire `BarChart`
 
 **Files:**
+
 - Modify: `src/lib/ui/viz/BarChart.tsx`
 - Test: `src/lib/ui/viz/SeriesRenderer.props.test.tsx`
 
@@ -1568,54 +1605,54 @@ import { getAxisRoles } from "$/models/vizs/getAxisRoles/getAxisRoles";
 Move the `allBars` check above the memos (it is a plain expression, not a hook, so it can move freely), then add the extent and tick label memos and update the `applyChartStyle` call:
 
 ```ts
-  const allBars = series.every(propEq("renderAs", "bar"));
+const allBars = series.every(propEq("renderAs", "bar"));
 
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    // Percent layout sets Recharts `stackOffset: "expand"`, which
-    // normalizes each column to sum to 1 and only formats the ticks as
-    // percentages. The real domain is 0 to 1.
-    if (allBars && layout === "percent") {
-      return { min: 0, max: 1 };
-    }
-    // The composite renderer always groups, so a layout-implied stack
-    // only applies when every series really is a bar.
-    const layoutStacks = allBars && layout === "stack";
-    return computeValueExtent(
-      data,
-      toExtentSeries(
-        series.map((s) => {
-          // `stackId` only exists on bar series, and `series` is a union.
-          return { key: s.key, stackId: "stackId" in s ? s.stackId : undefined };
-        }),
-        layoutStacks ? "stack" : undefined,
-      ),
-    );
-  }, [data, series, layout, allBars, chartStyle?.yAxis]);
+const yExtent = useMemo(() => {
+  if (!needsValueExtent(chartStyle?.yAxis)) {
+    return undefined;
+  }
+  // Percent layout sets Recharts `stackOffset: "expand"`, which
+  // normalizes each column to sum to 1 and only formats the ticks as
+  // percentages. The real domain is 0 to 1.
+  if (allBars && layout === "percent") {
+    return { min: 0, max: 1 };
+  }
+  // The composite renderer always groups, so a layout-implied stack
+  // only applies when every series really is a bar.
+  const layoutStacks = allBars && layout === "stack";
+  return computeValueExtent(
+    data,
+    toExtentSeries(
+      series.map((s) => {
+        // `stackId` only exists on bar series, and `series` is a union.
+        return { key: s.key, stackId: "stackId" in s ? s.stackId : undefined };
+      }),
+      layoutStacks ? "stack" : undefined,
+    ),
+  );
+}, [data, series, layout, allBars, chartStyle?.yAxis]);
 
-  const xTickLabels = useMemo(() => {
-    if (chartStyle?.xAxis?.tickAngle === undefined) {
-      return undefined;
-    }
-    const format = baseXAxisProps.tickFormatter;
-    return data.map((row) => {
-      const value = row[xAxisKey];
-      // `baseXAxisProps.tickFormatter` is locally typed as
-      // `(value: unknown) => string` — one parameter, no cast needed.
-      return format !== undefined ? format(value) : String(value ?? "");
-    });
-  }, [data, xAxisKey, baseXAxisProps, chartStyle?.xAxis?.tickAngle]);
+const xTickLabels = useMemo(() => {
+  if (chartStyle?.xAxis?.tickAngle === undefined) {
+    return undefined;
+  }
+  const format = baseXAxisProps.tickFormatter;
+  return data.map((row) => {
+    const value = row[xAxisKey];
+    // `baseXAxisProps.tickFormatter` is locally typed as
+    // `(value: unknown) => string` — one parameter, no cast needed.
+    return format !== undefined ? format(value) : String(value ?? "");
+  });
+}, [data, xAxisKey, baseXAxisProps, chartStyle?.xAxis?.tickAngle]);
 
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      baseXAxisProps,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("bar"),
-    });
-  }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
+const styleProps = useMemo(() => {
+  return applyChartStyle(chartStyle, {
+    baseXAxisProps,
+    yExtent,
+    xTickLabels,
+    axisRoles: getAxisRoles("bar"),
+  });
+}, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
 ```
 
 Delete the now-duplicated `const allBars = ...` line further down the file.
@@ -1640,6 +1677,7 @@ git commit -m "feat(viz): wire axis scale and rotation into BarChart"
 Line charts never stack, so every series is its own bucket.
 
 **Files:**
+
 - Modify: `src/lib/ui/viz/LineChart.tsx`
 - Test: `src/lib/ui/viz/SeriesRenderer.props.test.tsx`
 
@@ -1701,39 +1739,39 @@ Expected: FAIL — no domain is passed.
 In `src/lib/ui/viz/LineChart.tsx`, add the same three imports as Task 7, then insert before the existing `styleProps` memo and replace that memo:
 
 ```ts
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.key };
-      }),
-    );
-  }, [data, series, chartStyle?.yAxis]);
+const yExtent = useMemo(() => {
+  if (!needsValueExtent(chartStyle?.yAxis)) {
+    return undefined;
+  }
+  return computeValueExtent(
+    data,
+    series.map((s) => {
+      return { key: s.key };
+    }),
+  );
+}, [data, series, chartStyle?.yAxis]);
 
-  const xTickLabels = useMemo(() => {
-    if (chartStyle?.xAxis?.tickAngle === undefined) {
-      return undefined;
-    }
-    const format = baseXAxisProps.tickFormatter;
-    return data.map((row) => {
-      const value = row[xAxisKey];
-      // `baseXAxisProps.tickFormatter` is locally typed as
-      // `(value: unknown) => string` — one parameter, no cast needed.
-      return format !== undefined ? format(value) : String(value ?? "");
-    });
-  }, [data, xAxisKey, baseXAxisProps, chartStyle?.xAxis?.tickAngle]);
+const xTickLabels = useMemo(() => {
+  if (chartStyle?.xAxis?.tickAngle === undefined) {
+    return undefined;
+  }
+  const format = baseXAxisProps.tickFormatter;
+  return data.map((row) => {
+    const value = row[xAxisKey];
+    // `baseXAxisProps.tickFormatter` is locally typed as
+    // `(value: unknown) => string` — one parameter, no cast needed.
+    return format !== undefined ? format(value) : String(value ?? "");
+  });
+}, [data, xAxisKey, baseXAxisProps, chartStyle?.xAxis?.tickAngle]);
 
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      baseXAxisProps,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("line"),
-    });
-  }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
+const styleProps = useMemo(() => {
+  return applyChartStyle(chartStyle, {
+    baseXAxisProps,
+    yExtent,
+    xTickLabels,
+    axisRoles: getAxisRoles("line"),
+  });
+}, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
 ```
 
 - [ ] **Step 4: Run the tests to verify they pass**
@@ -1790,8 +1828,8 @@ export function useXTickLabels(
     }
     return data.map((row) => {
       const value = row[xAxisKey];
-      return tickFormatter !== undefined ?
-          tickFormatter(value)
+      return tickFormatter !== undefined
+        ? tickFormatter(value)
         : String(value ?? "");
     });
   }, [data, xAxisKey, tickAngle, tickFormatter]);
@@ -1801,12 +1839,12 @@ export function useXTickLabels(
 Then replace the inline memo in `BarChart.tsx` and `LineChart.tsx` with:
 
 ```ts
-  const xTickLabels = useXTickLabels(
-    data,
-    xAxisKey,
-    chartStyle?.xAxis?.tickAngle,
-    baseXAxisProps.tickFormatter,
-  );
+const xTickLabels = useXTickLabels(
+  data,
+  xAxisKey,
+  chartStyle?.xAxis?.tickAngle,
+  baseXAxisProps.tickFormatter,
+);
 ```
 
 Note this narrows the dependency from the whole `baseXAxisProps` object to just its `tickFormatter`, which is a small improvement. `SeriesRenderer.props.test.tsx` must stay green and unedited — it is the proof this refactor changed nothing. Commit as `refactor(viz): extract useXTickLabels from the chart wrappers`.
@@ -1818,6 +1856,7 @@ Note this narrows the dependency from the whole `baseXAxisProps` object to just 
 Instead the logic is already covered: the layout-to-bucket rule is unit-tested through `toExtentSeries` and the map added below, `resolveAxisScale` and `resolveTickRotation` are unit-tested directly, and `applyChartStyle` is unit-tested. What remains is a two-line spread that is visible in review and confirmed by the manual verification section at the end of this plan.
 
 **Files:**
+
 - Modify: `src/lib/ui/viz/AreaChart.tsx`
 - Create: `src/lib/ui/viz/axis/getAreaStacking/getAreaStacking.ts`
 - Test: `src/lib/ui/viz/axis/getAreaStacking/getAreaStacking.test.ts`
@@ -1921,44 +1960,44 @@ Update the `<Area>` element further down to use the constant, replacing `stackId
 Then add the memos and update the `styleProps` memo. `allAreas` and `tickFormatter` both move above them: `allAreas` is a plain expression and `tickFormatter` is a `useMemo` currently declared below `styleProps`, so it must move up for the reference to resolve.
 
 ```ts
-  const allAreas = series.every(propEq("renderAs", "area"));
+const allAreas = series.every(propEq("renderAs", "area"));
 
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    const { isPercent, sharedStackId } = getAreaStacking(layout);
-    if (allAreas && isPercent) {
-      return { min: 0, max: 1 };
-    }
-    return computeValueExtent(
-      data,
-      // The composite renderer always groups, so a layout-implied stack
-      // only applies when every series really is an area.
-      toExtentSeries(
-        series.map((s) => {
-          return { key: s.key };
-        }),
-        allAreas ? sharedStackId : undefined,
-      ),
-    );
-  }, [data, series, layout, allAreas, chartStyle?.yAxis]);
-
-  const xTickLabels = useXTickLabels(
+const yExtent = useMemo(() => {
+  if (!needsValueExtent(chartStyle?.yAxis)) {
+    return undefined;
+  }
+  const { isPercent, sharedStackId } = getAreaStacking(layout);
+  if (allAreas && isPercent) {
+    return { min: 0, max: 1 };
+  }
+  return computeValueExtent(
     data,
-    xAxisKey,
-    chartStyle?.xAxis?.tickAngle,
-    tickFormatter,
+    // The composite renderer always groups, so a layout-implied stack
+    // only applies when every series really is an area.
+    toExtentSeries(
+      series.map((s) => {
+        return { key: s.key };
+      }),
+      allAreas ? sharedStackId : undefined,
+    ),
   );
+}, [data, series, layout, allAreas, chartStyle?.yAxis]);
 
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      baseXAxisProps,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("area"),
-    });
-  }, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
+const xTickLabels = useXTickLabels(
+  data,
+  xAxisKey,
+  chartStyle?.xAxis?.tickAngle,
+  tickFormatter,
+);
+
+const styleProps = useMemo(() => {
+  return applyChartStyle(chartStyle, {
+    baseXAxisProps,
+    yExtent,
+    xTickLabels,
+    axisRoles: getAxisRoles("area"),
+  });
+}, [chartStyle, baseXAxisProps, yExtent, xTickLabels]);
 ```
 
 Delete the now-duplicated `const allAreas = ...` line further down the file.
@@ -1990,6 +2029,7 @@ Config types, container threading, and renderer wiring. Both axes are value axes
 **On testing.** `ScatterChart` uses Mantine's wrapper, so it takes the proven prop-mock pattern. `BubbleChart` renders Recharts primitives directly, exactly like `AreaChart`, so it gets the same treatment as Task 9: no Recharts mocking, correctness carried by the unit-tested `computeValueExtent`, `resolveAxisScale`, `resolveTickRotation`, and `applyChartStyle`, plus the manual verification at the end of this plan.
 
 **Files:**
+
 - Modify: `shared/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts`
 - Modify: `shared/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types.ts`
 - Modify: `shared/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfigs.ts`
@@ -2022,7 +2062,7 @@ const mantineScatterChartMock = vi.fn();
 and clear it in the existing `beforeEach`:
 
 ```ts
-  mantineScatterChartMock.mockClear();
+mantineScatterChartMock.mockClear();
 ```
 
 **(c)** Append the render helper and the describe block. Note these reuse the file's existing `DATA` fixture (`[{x:"a",v:1,w:5},{x:"b",v:2,w:4},{x:"c",v:3,w:3}]`) via its two numeric columns, so `v` runs 1-to-3 on X and `w` runs 3-to-5 on Y:
@@ -2150,10 +2190,10 @@ export type BubbleChartVizConfig = {
 Axis styling should survive a chart-type switch. In `ScatterPlotVizConfigs.ts`, destructure `chartStyle` alongside the existing locals in `convertVizConfig`:
 
 ```ts
-    const firstSeries = vizConfig.series[0];
-    const xAxisKey = firstSeries?.xKey;
-    const yAxisKey = firstSeries?.key;
-    const { chartStyle } = vizConfig;
+const firstSeries = vizConfig.series[0];
+const xAxisKey = firstSeries?.xKey;
+const yAxisKey = firstSeries?.key;
+const { chartStyle } = vizConfig;
 ```
 
 Then add `chartStyle` to each branch whose target config accepts it, which is bar, line, area, radar, and bubble. Table, pie, and funnel have no `chartStyle` field and stay untouched:
@@ -2239,114 +2279,114 @@ While you are here, add `chartStyle` to the scatter and bubble branches of the *
 In `src/lib/ui/viz/ScatterChart.tsx`, add `chartStyle?: ChartStyle` to `Props`, add the imports from Task 7 plus `applyChartStyle`, and replace the axis prop construction:
 
 ```ts
-  const xExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.xAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.xKey };
-      }),
-    );
-  }, [data, series, chartStyle?.xAxis]);
+const xExtent = useMemo(() => {
+  if (!needsValueExtent(chartStyle?.xAxis)) {
+    return undefined;
+  }
+  return computeValueExtent(
+    data,
+    series.map((s) => {
+      return { key: s.xKey };
+    }),
+  );
+}, [data, series, chartStyle?.xAxis]);
 
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.key };
-      }),
-    );
-  }, [data, series, chartStyle?.yAxis]);
+const yExtent = useMemo(() => {
+  if (!needsValueExtent(chartStyle?.yAxis)) {
+    return undefined;
+  }
+  return computeValueExtent(
+    data,
+    series.map((s) => {
+      return { key: s.key };
+    }),
+  );
+}, [data, series, chartStyle?.yAxis]);
 
-  const xTickLabels = useMemo(() => {
-    if (chartStyle?.xAxis?.tickAngle === undefined) {
-      return undefined;
-    }
-    return scatterSeries.flatMap((s) => {
-      return s.data.map((point) => {
-        return formatChartNumber(point.x);
-      });
+const xTickLabels = useMemo(() => {
+  if (chartStyle?.xAxis?.tickAngle === undefined) {
+    return undefined;
+  }
+  return scatterSeries.flatMap((s) => {
+    return s.data.map((point) => {
+      return formatChartNumber(point.x);
     });
-  }, [scatterSeries, chartStyle?.xAxis?.tickAngle]);
+  });
+}, [scatterSeries, chartStyle?.xAxis?.tickAngle]);
 
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      xExtent,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("scatter"),
-    });
-  }, [chartStyle, xExtent, yExtent, xTickLabels]);
+const styleProps = useMemo(() => {
+  return applyChartStyle(chartStyle, {
+    xExtent,
+    yExtent,
+    xTickLabels,
+    axisRoles: getAxisRoles("scatter"),
+  });
+}, [chartStyle, xExtent, yExtent, xTickLabels]);
 ```
 
 Then let a configured label win over the derived one. Replace the existing `xLabel` / `yLabel` declarations:
 
 ```ts
-  const isSingleSeries = series.length === 1;
-  const firstSeries = series[0];
-  const derivedXLabel =
-    isSingleSeries && firstSeries !== undefined ? firstSeries.xKey : undefined;
-  const derivedYLabel =
-    isSingleSeries && firstSeries !== undefined ? firstSeries.key : undefined;
-  const xLabel = chartStyle?.xAxis?.label ?? derivedXLabel;
-  const yLabel = chartStyle?.yAxis?.label ?? derivedYLabel;
+const isSingleSeries = series.length === 1;
+const firstSeries = series[0];
+const derivedXLabel =
+  isSingleSeries && firstSeries !== undefined ? firstSeries.xKey : undefined;
+const derivedYLabel =
+  isSingleSeries && firstSeries !== undefined ? firstSeries.key : undefined;
+const xLabel = chartStyle?.xAxis?.label ?? derivedXLabel;
+const yLabel = chartStyle?.yAxis?.label ?? derivedYLabel;
 ```
 
 Then replace the whole `<MantineScatterChart>` element. `styleProps` spreads first so the label objects layer on top of `styleProps.xAxisProps` / `styleProps.yAxisProps` rather than replacing them. Mantine's `ScatterChart` accepts the full `ChartStyleProps` surface (`withXAxis`, `withYAxis`, `xAxisProps`, `yAxisProps`, `gridProps`, `gridColor`, `legendProps`, `xAxisLabel`, `yAxisLabel`, `styles`), so spreading `styleProps` is safe:
 
 ```tsx
-    <MantineScatterChart
-      h={height}
-      data={scatterSeries}
-      dataKey={{ x: "x", y: "y" }}
-      withLegend
-      valueFormatter={formatChartNumber}
-      {...styleProps}
-      xAxisProps={{
-        ...styleProps.xAxisProps,
-        ...(xLabel !== undefined ?
-          {
-            label: {
-              value: xLabel,
-              position: "insideBottom",
-              offset: -15,
-              fontSize: 12,
-            },
-          }
-        : {}),
-      }}
-      yAxisProps={{
-        ...styleProps.yAxisProps,
-        ...(yLabel !== undefined ?
-          {
-            width: 80,
-            label: {
-              value: yLabel,
-              angle: -90,
-              position: "insideLeft",
-              offset: -15,
-              fontSize: 12,
-            },
-          }
-        : {}),
-      }}
-      scatterChartProps={
-        xLabel !== undefined || yLabel !== undefined ?
-          {
-            margin: {
-              bottom: xLabel !== undefined ? 40 : undefined,
-              left: yLabel !== undefined ? 30 : undefined,
-              right: yLabel !== undefined ? 5 : undefined,
-            },
-          }
-        : undefined
-      }
-    />
+<MantineScatterChart
+  h={height}
+  data={scatterSeries}
+  dataKey={{ x: "x", y: "y" }}
+  withLegend
+  valueFormatter={formatChartNumber}
+  {...styleProps}
+  xAxisProps={{
+    ...styleProps.xAxisProps,
+    ...(xLabel !== undefined
+      ? {
+          label: {
+            value: xLabel,
+            position: "insideBottom",
+            offset: -15,
+            fontSize: 12,
+          },
+        }
+      : {}),
+  }}
+  yAxisProps={{
+    ...styleProps.yAxisProps,
+    ...(yLabel !== undefined
+      ? {
+          width: 80,
+          label: {
+            value: yLabel,
+            angle: -90,
+            position: "insideLeft",
+            offset: -15,
+            fontSize: 12,
+          },
+        }
+      : {}),
+  }}
+  scatterChartProps={
+    xLabel !== undefined || yLabel !== undefined
+      ? {
+          margin: {
+            bottom: xLabel !== undefined ? 40 : undefined,
+            left: yLabel !== undefined ? 30 : undefined,
+            right: yLabel !== undefined ? 5 : undefined,
+          },
+        }
+      : undefined
+  }
+/>
 ```
 
 - [ ] **Step 6: Wire `BubbleChart`**
@@ -2354,49 +2394,49 @@ Then replace the whole `<MantineScatterChart>` element. `styleProps` spreads fir
 In `src/lib/ui/viz/BubbleChart.tsx`, add `chartStyle?: ChartStyle` to `Props`, destructure it in the component signature, and add the same imports as Step 5. Its `seriesData` memo already builds `{ x, y, z }` point arrays from `xKey` / `key` / `sizeKey`, so the extents read the same columns scatter's do:
 
 ```ts
-  const xExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.xAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.xKey };
-      }),
-    );
-  }, [data, series, chartStyle?.xAxis]);
+const xExtent = useMemo(() => {
+  if (!needsValueExtent(chartStyle?.xAxis)) {
+    return undefined;
+  }
+  return computeValueExtent(
+    data,
+    series.map((s) => {
+      return { key: s.xKey };
+    }),
+  );
+}, [data, series, chartStyle?.xAxis]);
 
-  const yExtent = useMemo(() => {
-    if (!needsValueExtent(chartStyle?.yAxis)) {
-      return undefined;
-    }
-    return computeValueExtent(
-      data,
-      series.map((s) => {
-        return { key: s.key };
-      }),
-    );
-  }, [data, series, chartStyle?.yAxis]);
+const yExtent = useMemo(() => {
+  if (!needsValueExtent(chartStyle?.yAxis)) {
+    return undefined;
+  }
+  return computeValueExtent(
+    data,
+    series.map((s) => {
+      return { key: s.key };
+    }),
+  );
+}, [data, series, chartStyle?.yAxis]);
 
-  const xTickLabels = useMemo(() => {
-    if (chartStyle?.xAxis?.tickAngle === undefined) {
-      return undefined;
-    }
-    return seriesData.flatMap((entry) => {
-      return entry.points.map((point) => {
-        return formatChartNumber(point.x, { compact: true });
-      });
+const xTickLabels = useMemo(() => {
+  if (chartStyle?.xAxis?.tickAngle === undefined) {
+    return undefined;
+  }
+  return seriesData.flatMap((entry) => {
+    return entry.points.map((point) => {
+      return formatChartNumber(point.x, { compact: true });
     });
-  }, [seriesData, chartStyle?.xAxis?.tickAngle]);
+  });
+}, [seriesData, chartStyle?.xAxis?.tickAngle]);
 
-  const styleProps = useMemo(() => {
-    return applyChartStyle(chartStyle, {
-      xExtent,
-      yExtent,
-      xTickLabels,
-      axisRoles: getAxisRoles("bubble"),
-    });
-  }, [chartStyle, xExtent, yExtent, xTickLabels]);
+const styleProps = useMemo(() => {
+  return applyChartStyle(chartStyle, {
+    xExtent,
+    yExtent,
+    xTickLabels,
+    axisRoles: getAxisRoles("bubble"),
+  });
+}, [chartStyle, xExtent, yExtent, xTickLabels]);
 ```
 
 Spread the resolved props onto its hand-rolled axes, keeping the existing compact formatters as defaults so `styleProps` can override them:
@@ -2454,6 +2494,7 @@ git commit -m "feat(viz): add axis styling to scatter and bubble charts"
 Bar, line, and area currently repeat near-identical eight-descriptor axis blocks. This replaces them with one factory and adds the new settings in a single place.
 
 **Files:**
+
 - Create: `shared/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts`
 - Test: `shared/models/vizs/makeAxisDescriptors/makeAxisDescriptors.test.ts`
 - Modify: `shared/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts`
@@ -2519,7 +2560,11 @@ describe("makeAxisDescriptors", () => {
     const rotation = makeAxisDescriptors("xAxis", "category", {
       rotation: true,
     }).at(-1);
-    expect(rotation?.control).toMatchObject({ kind: "number", min: -90, max: 90 });
+    expect(rotation?.control).toMatchObject({
+      kind: "number",
+      min: -90,
+      max: 90,
+    });
   });
 });
 
@@ -2648,38 +2693,38 @@ export function makeAxisDescriptors<
       group,
       control: { kind: "switch" },
     },
-    ...(role === "value" ?
-      [
-        {
-          key: `chartStyle.${axis}.min`,
-          label: `${noun} minimum`,
-          group,
-          control: { kind: "number" },
-        },
-        {
-          key: `chartStyle.${axis}.max`,
-          label: `${noun} maximum`,
-          group,
-          control: { kind: "number" },
-        },
-        {
-          key: `chartStyle.${axis}.tickInterval`,
-          label: `${noun} tick interval`,
-          group,
-          control: { kind: "number", min: 0 },
-        },
-      ]
-    : []),
-    ...(options.rotation === true ?
-      [
-        {
-          key: `chartStyle.${axis}.tickAngle`,
-          label: `${noun} label rotation`,
-          group,
-          control: { kind: "number", min: -90, max: 90, step: 15, unit: "°" },
-        },
-      ]
-    : []),
+    ...(role === "value"
+      ? [
+          {
+            key: `chartStyle.${axis}.min`,
+            label: `${noun} minimum`,
+            group,
+            control: { kind: "number" },
+          },
+          {
+            key: `chartStyle.${axis}.max`,
+            label: `${noun} maximum`,
+            group,
+            control: { kind: "number" },
+          },
+          {
+            key: `chartStyle.${axis}.tickInterval`,
+            label: `${noun} tick interval`,
+            group,
+            control: { kind: "number", min: 0 },
+          },
+        ]
+      : []),
+    ...(options.rotation === true
+      ? [
+          {
+            key: `chartStyle.${axis}.tickAngle`,
+            label: `${noun} label rotation`,
+            group,
+            control: { kind: "number", min: -90, max: 90, step: 15, unit: "°" },
+          },
+        ]
+      : []),
   ];
 
   return descriptors as unknown as ReadonlyArray<
@@ -2825,6 +2870,7 @@ git commit -m "refactor(viz): generate axis descriptors from a shared factory"
 ## Task 12: `ChartSettingsFieldsets` and the scatter/bubble forms
 
 **Files:**
+
 - Create: `src/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets/ChartSettingsFieldsets.tsx`
 - Move: `src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/readSetting.ts` → `.../ChartSettingsFieldsets/readSetting.ts`
 - Modify: `src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx`
@@ -3058,17 +3104,17 @@ export function ChartSettingsFieldsets({
 In `SeriesAwareVizForm.tsx`, update the `readSetting` import path to the new location, delete the `groupedChartDescriptors` / `otherGroupedDescriptors` block and the trailing `otherGroupedDescriptors.map(...)` JSX, and replace that JSX with:
 
 ```tsx
-      <ChartSettingsFieldsets
-        descriptors={chartDescriptors}
-        config={config}
-        onSettingChange={updateChartPath}
-        excludeGroups={[axisLegend]}
-      />
+<ChartSettingsFieldsets
+  descriptors={chartDescriptors}
+  config={config}
+  onSettingChange={updateChartPath}
+  excludeGroups={[axisLegend]}
+/>
 ```
 
 Keep the axis `<Fieldset>` exactly as it is, but fix a latent i18n bug while you are in here.
 
-**The bug.** `axisLegend` is currently `isRadar ? t\`Category axis\` : t\`X axis\`` — a *translated* string — and it is used for two different jobs: as the display legend on the axis fieldset, and as the key to look up which descriptors belong to the axis group. But `descriptor.group` is the *untranslated* literal `"X axis"` emitted by `makeAxisDescriptors`. So the match only succeeds in English; under any other locale the axis settings fall out of the merged fieldset and appear as a second one. Separate the two jobs:
+**The bug.** `axisLegend` is currently `isRadar ? t\`Category axis\` : t\`X axis\``— a *translated* string — and it is used for two different jobs: as the display legend on the axis fieldset, and as the key to look up which descriptors belong to the axis group. But`descriptor.group`is the *untranslated* literal`"X axis"`emitted by`makeAxisDescriptors`. So the match only succeeds in English; under any other locale the axis settings fall out of the merged fieldset and appear as a second one. Separate the two jobs:
 
 ```ts
   /**
@@ -3100,15 +3146,16 @@ Note the remaining group legends (`"Y axis"`, `"Legend"`, `"Grid"`, `"Layout"`) 
 In `shared/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfigs.ts`, replace `descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS` with a real registry:
 
 ```ts
-const descriptors: VizSettingDescriptors<ScatterPlotVizConfig, ScatterSeries> = {
-  chart: [
-    ...makeAxisDescriptors<ScatterPlotVizConfig>("xAxis", "value", {
-      rotation: true,
-    }),
-    ...makeAxisDescriptors<ScatterPlotVizConfig>("yAxis", "value"),
-  ],
-  series: [],
-};
+const descriptors: VizSettingDescriptors<ScatterPlotVizConfig, ScatterSeries> =
+  {
+    chart: [
+      ...makeAxisDescriptors<ScatterPlotVizConfig>("xAxis", "value", {
+        rotation: true,
+      }),
+      ...makeAxisDescriptors<ScatterPlotVizConfig>("yAxis", "value"),
+    ],
+    series: [],
+  };
 ```
 
 and change the module's field from `descriptors: EMPTY_VIZ_SETTING_DESCRIPTORS` to `descriptors: descriptors as unknown as AnyVizSettingDescriptors`, matching `BarChartVizConfigs`. Drop the now-unused `EMPTY_VIZ_SETTING_DESCRIPTORS` import and add imports for `makeAxisDescriptors`, `ScatterSeries`, and the `AnyVizSettingDescriptors` / `VizSettingDescriptors` types. `series` stays empty because `PairSeriesFieldset` still owns per-series editing.
@@ -3142,7 +3189,11 @@ export function ScatterChartForm({
   const updateChartPath = useCallback(
     (path: string, value: unknown) => {
       onConfigChange(
-        setValue(config as never, path as never, value as never) as ScatterPlotVizConfig,
+        setValue(
+          config as never,
+          path as never,
+          value as never,
+        ) as ScatterPlotVizConfig,
       );
     },
     [config, onConfigChange],
@@ -3229,6 +3280,7 @@ git commit -m "feat(viz): render axis settings in the scatter and bubble forms"
 ## Task 13: Update the inventory doc and run the full suite
 
 **Files:**
+
 - Modify: `docs/dashboards-and-visualizations-inventory.md`
 
 - [ ] **Step 1: Update section 2.2**
@@ -3236,8 +3288,8 @@ git commit -m "feat(viz): render axis settings in the scatter and bubble forms"
 Replace the `ChartStyle` bullet list so the axis line reads:
 
 ```markdown
-  - `xAxis` / `yAxis`: `label`, `labelColor`, `tickColor`, `hide`, plus
-    `min`, `max`, `tickInterval` on value axes and `tickAngle` on the X axis
+- `xAxis` / `yAxis`: `label`, `labelColor`, `tickColor`, `hide`, plus
+  `min`, `max`, `tickInterval` on value axes and `tickAngle` on the X axis
 ```
 
 and add after the `applyChartStyle` bullet:
@@ -3256,15 +3308,15 @@ and add after the `applyChartStyle` bullet:
 Replace the descriptor coverage table:
 
 ```markdown
-| Viz | Chart descriptors | Series descriptors |
-| --- | --- | --- |
-| bar | `layout`, `withLegend`, `chartStyle.legend.position`, 5× X axis, 7× Y axis, 3× grid (18) | `color`, `label`, `fillOpacity`, `stackId` |
-| line | same minus `layout` (17) | `color`, `label`, `curveType`, `strokeWidth` (Line width), `withDots` |
-| area | same as bar, `layout` = Area layout (18) | `color`, `label`, `curveType`, `strokeWidth`, `fillOpacity`, `withDots` |
-| scatter | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset | — |
-| bubble | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset | — |
-| radar | `withLegend`, `chartStyle.legend.position` (2) | `color`, `label`, `strokeWidth`, `fillOpacity` |
-| table, pie, funnel | `EMPTY_VIZ_SETTING_DESCRIPTORS`, hand-coded forms | — |
+| Viz                | Chart descriptors                                                                        | Series descriptors                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| bar                | `layout`, `withLegend`, `chartStyle.legend.position`, 5× X axis, 7× Y axis, 3× grid (18) | `color`, `label`, `fillOpacity`, `stackId`                              |
+| line               | same minus `layout` (17)                                                                 | `color`, `label`, `curveType`, `strokeWidth` (Line width), `withDots`   |
+| area               | same as bar, `layout` = Area layout (18)                                                 | `color`, `label`, `curveType`, `strokeWidth`, `fillOpacity`, `withDots` |
+| scatter            | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset                 | —                                                                       |
+| bubble             | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset                 | —                                                                       |
+| radar              | `withLegend`, `chartStyle.legend.position` (2)                                           | `color`, `label`, `strokeWidth`, `fillOpacity`                          |
+| table, pie, funnel | `EMPTY_VIZ_SETTING_DESCRIPTORS`, hand-coded forms                                        | —                                                                       |
 
 Axis descriptors are generated by `makeAxisDescriptors`
 (`shared/models/vizs/makeAxisDescriptors/`) rather than repeated per module. A
@@ -3304,5 +3356,5 @@ Automated tests prove the props reach the Mantine-wrapped charts and prove the m
 - [ ] **Check bounds:** set Y axis minimum `0`, maximum `120000`, tick interval `24000`. Ticks should read 0, 24K, 48K, 72K, 96K, 120K. Then set the maximum below the tallest bar and confirm the bars clip rather than the axis silently widening.
 - [ ] **Check the theme:** set a tick color, then toggle light and dark mode. Ticks without an explicit color must still follow the theme, which is the `fill: "currentColor"` fix from Task 6.
 - [ ] **Check area, which has no renderer test:** switch the chart to area, set a Y minimum, maximum, and tick interval, and confirm the ticks land where asked. Then switch the area layout to Stacked and confirm the derived domain covers the summed stack rather than the tallest single series. Then switch to 100% stacked and confirm a tick interval of `0.25` gives four bands (its domain is 0 to 1, not 0 to 100).
-- [ ] **Check bubble, which has no renderer test:** switch to a bubble chart and confirm both the X and Y axis bounds and tick intervals apply, since bubble is the only chart where the X axis is numeric *and* rendered through raw Recharts.
+- [ ] **Check bubble, which has no renderer test:** switch to a bubble chart and confirm both the X and Y axis bounds and tick intervals apply, since bubble is the only chart where the X axis is numeric _and_ rendered through raw Recharts.
 - [ ] **Check the composite path:** on a bar chart, set one series' "Render as" to Line so the chart falls back to `CompositeChart`, then confirm a Y tick interval still applies. This is the branch where the layout-implied stack must be ignored.

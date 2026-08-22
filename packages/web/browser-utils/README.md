@@ -18,31 +18,31 @@ All functions are named exports from the package root.
 
 ### OPFS (Origin Private File System)
 
-| Function                        | Description                                              |
-| ------------------------------- | -------------------------------------------------------- |
-| `clearOpfs()`                   | Removes every entry from the origin private file system   |
-| `removeOpfsFile(name)`          | Removes a single file, ignoring a missing file            |
-| `ensureOpfsWritePermission()`   | Resolves once OPFS is writable, rejecting if it is not    |
+| Function                      | Description                                             |
+| ----------------------------- | ------------------------------------------------------- |
+| `clearOpfs()`                 | Removes every entry from the origin private file system |
+| `removeOpfsFile(name)`        | Removes a single file, ignoring a missing file          |
+| `ensureOpfsWritePermission()` | Resolves once OPFS is writable, rejecting if it is not  |
 
 ### Storage persistence
 
-| Function                          | Description                                                    |
-| --------------------------------- | -------------------------------------------------------------- |
+| Function                          | Description                                                      |
+| --------------------------------- | ---------------------------------------------------------------- |
 | `ensureLocalStoragePersistence()` | Asks the browser to mark storage persistent so it is not evicted |
 
 ### URL and navigation
 
-| Function                     | Description                                        |
-| ---------------------------- | -------------------------------------------------- |
-| `getCurrentUrl()`            | The current page URL                                |
-| `navigateToExternalUrl(url)` | Navigates the top-level window to an external URL   |
+| Function                     | Description                                       |
+| ---------------------------- | ------------------------------------------------- |
+| `getCurrentUrl()`            | The current page URL                              |
+| `navigateToExternalUrl(url)` | Navigates the top-level window to an external URL |
 
 ### Platform and connectivity
 
-| Function              | Description                                  |
-| --------------------- | -------------------------------------------- |
-| `getIsOnline()`       | Whether the browser reports network access    |
-| `getIsMacPlatform()`  | Whether the current platform is macOS         |
+| Function             | Description                                |
+| -------------------- | ------------------------------------------ |
+| `getIsOnline()`      | Whether the browser reports network access |
+| `getIsMacPlatform()` | Whether the current platform is macOS      |
 
 These wrap browser APIs that are awkward to call directly, are inconsistently
 supported, or need a guard for non-browser environments (server-side rendering,

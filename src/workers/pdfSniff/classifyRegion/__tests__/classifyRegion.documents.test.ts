@@ -1,10 +1,12 @@
+import type { BBox, PageGeometry } from "../../pdfSniff.types";
+
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
+
 import { clipToRegion } from "../../clipToRegion/clipToRegion";
 import { extractPageGeometry } from "../../extractPageGeometry/extractPageGeometry";
 import { loadPdfDocument } from "../../loadPdfDocument/loadPdfDocument";
 import { classifyRegion } from "../classifyRegion";
-import type { BBox, PageGeometry } from "../../pdfSniff.types";
 
 /*
  * The classifier, run on real documents rather than on hand-built geometry.

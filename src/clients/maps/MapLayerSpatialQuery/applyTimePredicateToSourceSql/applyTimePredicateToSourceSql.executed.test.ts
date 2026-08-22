@@ -1,3 +1,5 @@
+import type { DuckDBConnection } from "@duckdb/node-api";
+
 /**
  * Row-level tests that the time filter selects the same rows whichever
  * comparison it emits.
@@ -8,9 +10,9 @@
  * which rows a map shows.
  */
 import { describe, expect, it } from "vitest";
+
 import { applyTimePredicateToSourceSql } from "@/clients/maps/MapLayerSpatialQuery/applyTimePredicateToSourceSql/applyTimePredicateToSourceSql";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { DuckDBConnection } from "@duckdb/node-api";
 
 const JUNE = {
   start: "2021-06-01T00:00:00.000Z",

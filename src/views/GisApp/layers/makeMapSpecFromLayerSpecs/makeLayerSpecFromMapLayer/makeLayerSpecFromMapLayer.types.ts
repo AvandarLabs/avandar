@@ -1,6 +1,6 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
 import type { ClusterCountSource } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /** Inputs shared by MapLibre paint-layer builders. */
 export type CreateMapLayerSpecInput = {

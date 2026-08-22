@@ -1,9 +1,12 @@
+import type { ReactNode } from "react";
+
 /** Behavioral tests for user transcript message visibility. */
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { render } from "@/test-utils";
+
 import { UserMessage } from "./UserMessage";
-import type { ReactNode } from "react";
 
 const { messageState } = vi.hoisted(() => {
   return {

@@ -1,12 +1,14 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { useQuery } from "@avandar/query-hooks";
+
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { getMapTimeExtentSql } from "@/clients/maps/MapLayerTimeExtent/getMapTimeExtentSql/getMapTimeExtentSql";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { getIsoInstantFromValue } from "@/views/GisApp/shell/MapTimeSlider/getIsoInstantFromValue/getIsoInstantFromValue";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type TimeExtentLayer = {
   sourceSql: string;

@@ -1,8 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
-import { Popover } from "@mantine/core";
-import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Popover } from "@mantine/core";
+
+import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 
 type Props = { onSourceSelected: (source: QueryDataSource.T) => void };
 

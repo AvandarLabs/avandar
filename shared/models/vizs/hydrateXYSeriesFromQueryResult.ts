@@ -1,10 +1,11 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
+
 import {
   columnNameSet,
   pickCategoryColumnName,
   pickFirstNumericColumnName,
 } from "$/models/vizs/hydrateColumnPicking.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type XYSeriesConfig = {
   xAxisKey: string | undefined;
@@ -49,9 +50,9 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
   }
 
   let nextXAxisKey =
-    currVizConfig.xAxisKey && colNames.has(currVizConfig.xAxisKey) ?
-      currVizConfig.xAxisKey
-    : undefined;
+    currVizConfig.xAxisKey && colNames.has(currVizConfig.xAxisKey)
+      ? currVizConfig.xAxisKey
+      : undefined;
   if (nextXAxisKey === undefined && nextSeries.length > 0) {
     const seriesKeys = new Set(
       nextSeries.map((s) => {

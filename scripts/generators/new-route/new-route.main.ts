@@ -1,12 +1,13 @@
+import type { FormatConfig } from "oxfmt";
+
+import { toPascalCase } from "@avandar/utils";
+import { program } from "commander";
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { toPascalCase } from "@avandar/utils";
-import { program } from "commander";
 import { format } from "oxfmt";
 import { z } from "zod";
-import type { FormatConfig } from "oxfmt";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -218,9 +219,8 @@ async function main() {
     const [route] = CLIArgumentsSchema.parse(program.args);
 
     const projectRoot = getProjectRoot();
-    const baseDir =
-      auth ?
-        join(projectRoot, "src", "routes", "_auth")
+    const baseDir = auth
+      ? join(projectRoot, "src", "routes", "_auth")
       : join(projectRoot, "src", "routes");
 
     // Ensure base directory exists
@@ -250,8 +250,9 @@ async function main() {
 
       // Always use .tsx extension (replace .ts or .tsx with .tsx)
       fileNameToCreate = lastPart.replace(/\.(tsx|ts)$/, ".tsx");
-      tanstackRouterPath =
-        auth ? `/_auth/${routeWithoutExt}` : `/${routeWithoutExt}`;
+      tanstackRouterPath = auth
+        ? `/_auth/${routeWithoutExt}`
+        : `/${routeWithoutExt}`;
     } else {
       directoryPathToCreate = route;
       fileNameToCreate = "route.tsx";

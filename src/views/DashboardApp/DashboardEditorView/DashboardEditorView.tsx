@@ -1,4 +1,10 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { notifySuccess } from "@/utils/notifications/notify";
@@ -6,16 +12,13 @@ import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migratio
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import "@puckeditor/core/puck.css";
+
 import { DashboardEditorContent } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorContent";
 import {
   getDashboardTitleFromPuckData,
   useDashboardPuckConfig,
 } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import "@puckeditor/core/puck.css";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { ReactElement } from "react";
 
 type Props = {
   dashboard: Dashboard.T;

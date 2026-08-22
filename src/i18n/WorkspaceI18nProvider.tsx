@@ -1,10 +1,12 @@
+import type { SupportedLocale } from "./locales";
+import type { ReactNode } from "react";
+
 import { I18nProvider } from "@lingui/react";
 import { DirectionProvider } from "@mantine/core";
 import { useEffect, useState } from "react";
+
 import { activateLocale, i18n } from "./i18n";
 import { DEFAULT_LOCALE, getLocaleDirection } from "./locales";
-import type { SupportedLocale } from "./locales";
-import type { ReactNode } from "react";
 
 type Props = {
   locale: SupportedLocale;

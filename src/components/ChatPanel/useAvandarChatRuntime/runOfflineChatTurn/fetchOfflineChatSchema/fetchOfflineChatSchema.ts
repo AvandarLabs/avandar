@@ -1,14 +1,16 @@
-import { where } from "@avandar/utils";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
-import { ConceptClient } from "@/clients/ontology/ConceptClient";
-import { OfflineChatSchemaCache } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/OfflineChatSchemaCache";
-import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { OfflineChatSchema } from "$/types/offlineChat.types";
+
+import { where } from "@avandar/utils";
+
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { ConceptClient } from "@/clients/ontology/ConceptClient";
+import { OfflineChatSchemaCache } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/OfflineChatSchemaCache";
+import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 
 const EMPTY_SCHEMA: OfflineChatSchema = {
   datasets: [],
@@ -71,11 +73,11 @@ export async function fetchOfflineChatSchema(
         ConceptClient.getAll(where("workspace_id", "eq", args.workspace.id)),
       ]);
       const attributes =
-        concepts.length === 0 ?
-          []
-        : await ConceptAttributeClient.getAll(
-            where("workspace_id", "eq", args.workspace.id),
-          );
+        concepts.length === 0
+          ? []
+          : await ConceptAttributeClient.getAll(
+              where("workspace_id", "eq", args.workspace.id),
+            );
       const schema: OfflineChatSchema = {
         ..._mapDatasets(datasetRows),
         ..._mapConcepts(concepts, attributes),

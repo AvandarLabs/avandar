@@ -1,7 +1,9 @@
+import type { QueryFilterValidationReason } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation";
+
 import { t } from "@lingui/core/macro";
 import { match } from "ts-pattern";
+
 import { avaDataTypeLabel } from "@/views/DataExplorerApp/copy/avaDataTypeLabel";
-import type { QueryFilterValidationReason } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation";
 
 /**
  * The sentence shown under a filter rule that cannot be applied.

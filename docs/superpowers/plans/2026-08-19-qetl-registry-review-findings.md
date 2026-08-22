@@ -35,9 +35,9 @@ This is the highest-consequence rot in the set, because of what that docstring
 carries. It is the module comment holding the rule that `authorize()` is a
 **principal-level** check only, and that the per-relation check lives in
 `getDiceFromSql`, so a cache probe wired ahead of source dispatch must carry its
-own per-relation workspace check. The phase-1 handoff says explicitly: *"This
+own per-relation workspace check. The phase-1 handoff says explicitly: _"This
 rule is also in the `assertWorkspaceMembership` module doc comment. If you
-change one, change both."*
+change one, change both."_
 
 The rename changed one and not the other. A future session following that
 pointer finds nothing, on the single seam whose documented failure mode is that
@@ -50,15 +50,15 @@ it **looks guarded when it is not**.
 
 `src/clients/qetl/RelationRegistry/RelationRegistry.ts:41,44,178,180`
 
-`docs/rules/typescript.md:272`: *"Never name a conversion `resolve...`. It names
+`docs/rules/typescript.md:272`: _"Never name a conversion `resolve...`. It names
 neither side, so the reader learns nothing about what went in or what comes
-out."* and *"This rule covers exported functions that convert, derive, or look up
-a value."* A registry lookup is exactly that.
+out."_ and _"This rule covers exported functions that convert, derive, or look up
+a value."_ A registry lookup is exactly that.
 
 This is not a newly discovered rule. `COORDINATION.md` section 6 already recorded
-it as owed: *"The registry session's shipped `RelationRegistry` still exports
+it as owed: _"The registry session's shipped `RelationRegistry` still exports
 `resolve` / `resolveAll` and must be renamed to match; that is Task 13 work and
-is not done yet."* The registry handoff nonetheless states **"Task 13 detail.
+is not done yet."_ The registry handoff nonetheless states **"Task 13 detail.
 Renames done."** That claim is false on this point.
 
 Also carrying the word: the types `ResolvedRelation` and `ResolvedRelations`, and
@@ -84,11 +84,11 @@ nothing else may be a probe**, and this function is to be called
 
 The subsystem now has three unrelated "probe" concepts:
 
-| Name | What it actually is |
-| --- | --- |
-| `RelationCachePort.probe` | storage tier; returns hits and misses, a miss may carry `growFrom` |
-| `probeRelationCache` | in-memory DuckDB tier; returns ids not currently loaded |
-| `_PROBE_ID` / `_PROBE_REF_BY_KIND` / `probeRef` (`RelationRegistry.ts:76-117`) | a sentinel ref used to interrogate which kinds a wrapper claims |
+| Name                                                                           | What it actually is                                                |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `RelationCachePort.probe`                                                      | storage tier; returns hits and misses, a miss may carry `growFrom` |
+| `probeRelationCache`                                                           | in-memory DuckDB tier; returns ids not currently loaded            |
+| `_PROBE_ID` / `_PROBE_REF_BY_KIND` / `probeRef` (`RelationRegistry.ts:76-117`) | a sentinel ref used to interrogate which kinds a wrapper claims    |
 
 The third is a use of the word nobody had noticed. The collision matters most
 because the cache probe wiring is the next task on this path, and it is the task
@@ -103,12 +103,12 @@ pre-existing and unrelated to QETL, so it is out of scope here.
 Task 13's claim does not hold, and the leftovers now disagree with the types they
 describe:
 
-| Location | Leftover |
-| --- | --- |
-| `queryRunner.ts:33,34` | `const missingDice = await probeRelationCache(...)` |
-| `relationLoading.ts:213,217` | `storedFacts` |
-| `relationLoading.ts:216` | `factsToCache` |
-| `relationLoading.ts:96` | comment cites `_downloadStoredDatasetFact` |
+| Location                       | Leftover                                                                                                                                                                                                                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `queryRunner.ts:33,34`         | `const missingDice = await probeRelationCache(...)`                                                                                                                                                                            |
+| `relationLoading.ts:213,217`   | `storedFacts`                                                                                                                                                                                                                  |
+| `relationLoading.ts:216`       | `factsToCache`                                                                                                                                                                                                                 |
+| `relationLoading.ts:96`        | comment cites `_downloadStoredDatasetFact`                                                                                                                                                                                     |
 | `getRelationSources.ts:49-154` | the whole `Extractor` family: `_getCsvExtractors`, `_getXlsxExtractors`, `_getVirtualExtractors`, `_getOpenDataExtractors`, `_refuseGoogleSheetsExtractors`, `_EXTRACTOR_READER_BY_SOURCE_TYPE`, `_getExtractorsForSourceType` |
 
 The `Extractor` family is the notable one: every one of those functions returns

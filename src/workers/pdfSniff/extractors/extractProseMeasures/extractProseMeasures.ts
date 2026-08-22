@@ -1,5 +1,3 @@
-import { extractMeasurements } from "../../extractMeasurements/extractMeasurements";
-import { groupLines } from "../../groupLines/groupLines";
 import type {
   BBox,
   ExtractedTable,
@@ -7,6 +5,9 @@ import type {
   RegionGeometry,
   TextLine,
 } from "../../pdfSniff.types";
+
+import { extractMeasurements } from "../../extractMeasurements/extractMeasurements";
+import { groupLines } from "../../groupLines/groupLines";
 
 /**
  * Below this fraction of the region's numerals appearing in extracted rows,
@@ -36,8 +37,8 @@ function _joinLines(lines: readonly TextLine[]): string {
       if (index === 0) {
         return line.text;
       }
-      return text.endsWith("-") ?
-          `${text.slice(0, -1)}${line.text}`
+      return text.endsWith("-")
+        ? `${text.slice(0, -1)}${line.text}`
         : `${text} ${line.text}`;
     }, "")
     .replace(/\s+/gu, " ")

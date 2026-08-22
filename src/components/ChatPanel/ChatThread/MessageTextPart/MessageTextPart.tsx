@@ -1,4 +1,5 @@
 import { MessagePartPrimitive } from "@assistant-ui/react";
+
 import css from "./MessageTextPart.module.css";
 
 /**

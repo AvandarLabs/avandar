@@ -1,3 +1,5 @@
+import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
+
 import { capitalize } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -15,8 +17,9 @@ import {
 import { modals } from "@mantine/modals";
 import { IconEdit, IconLock, IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
+
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
@@ -28,8 +31,8 @@ import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGat
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { WorkspaceUserPermissionsDrawer } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
 import { useWorkspaceInviteModal } from "@/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
+
 import { usePrivateResourceRemovalState } from "./usePrivateResourceRemovalState/usePrivateResourceRemovalState";
-import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
 /**
  * Members and pending invites table with invite and per-member permissions.
@@ -78,8 +81,9 @@ export function WorkspaceUsersTab(): JSX.Element | null {
   const loadingSeats = pendingInvitesLoading || workspaceUsersLoading;
   const offline = useOfflineGate();
   const openInviteModal = useWorkspaceInviteModal({
-    numberOfSeats:
-      loadingSeats ? undefined : pendingInvites.length + workspaceUsers.length,
+    numberOfSeats: loadingSeats
+      ? undefined
+      : pendingInvites.length + workspaceUsers.length,
     roleGroups,
   });
 
@@ -101,26 +105,26 @@ export function WorkspaceUsersTab(): JSX.Element | null {
         <Table.Td>
           <Group gap="xs">
             <Text size="sm">{roleLabel}</Text>
-            {user.tags.length > 0 ?
-              user.tags.map((tag) => {
-                return (
-                  <Badge
-                    key={tag.id}
-                    size="sm"
-                    color={tag.color}
-                    variant="light"
-                  >
-                    {tag.name}
-                  </Badge>
-                );
-              })
-            : null}
+            {user.tags.length > 0
+              ? user.tags.map((tag) => {
+                  return (
+                    <Badge
+                      key={tag.id}
+                      size="sm"
+                      color={tag.color}
+                      variant="light"
+                    >
+                      {tag.name}
+                    </Badge>
+                  );
+                })
+              : null}
           </Group>
         </Table.Td>
-        {isAdmin ?
+        {isAdmin ? (
           <Table.Td>
             <Group gap="xs">
-              {!isWorkspaceOwner(user.userId) ?
+              {!isWorkspaceOwner(user.userId) ? (
                 <>
                   <IconEdit
                     size={18}
@@ -192,13 +196,14 @@ export function WorkspaceUsersTab(): JSX.Element | null {
                     }}
                   />
                 </>
-              : <Text size="xs" c="dimmed">
+              ) : (
+                <Text size="xs" c="dimmed">
                   <Trans>Owner</Trans>
                 </Text>
-              }
+              )}
             </Group>
           </Table.Td>
-        : null}
+        ) : null}
       </Table.Tr>
     );
   });
@@ -211,13 +216,13 @@ export function WorkspaceUsersTab(): JSX.Element | null {
         <Table.Td>
           <Text size="sm">{roleLabel}</Text>
         </Table.Td>
-        {isAdmin ?
+        {isAdmin ? (
           <Table.Td>
             <Text size="sm" c="dimmed">
               {invite.inviteStatus}
             </Text>
           </Table.Td>
-        : null}
+        ) : null}
       </Table.Tr>
     );
   });
@@ -244,21 +249,24 @@ export function WorkspaceUsersTab(): JSX.Element | null {
       />
       <Card withBorder p="lg" w="100%" maw="1000px">
         <Flex justify="space-between" align="center" mb="md">
-          {!loadingSeats && maxSeats != null ?
+          {!loadingSeats && maxSeats != null ? (
             <Text size="sm" c="dimmed">
-              {maxSeats === 1 ?
+              {maxSeats === 1 ? (
                 <Trans>
                   {usedSeats} of {maxSeats} seat used · {remainingSeats}{" "}
                   remaining
                 </Trans>
-              : <Trans>
+              ) : (
+                <Trans>
                   {usedSeats} of {maxSeats} seats used · {remainingSeats}{" "}
                   remaining
                 </Trans>
-              }
+              )}
             </Text>
-          : <Box />}
-          {isAdmin ?
+          ) : (
+            <Box />
+          )}
+          {isAdmin ? (
             <OfflineGated isBlocked={offline.isBlocked}>
               <Button
                 data-disabled={loadingSeats || offline.isBlocked || undefined}
@@ -269,7 +277,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
                 <Trans>Invite member</Trans>
               </Button>
             </OfflineGated>
-          : null}
+          ) : null}
         </Flex>
         <Table>
           <Table.Thead>
@@ -280,9 +288,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
               <Table.Th>
                 <Trans>Role & user groups</Trans>
               </Table.Th>
-              {isAdmin ?
-                <Table.Th w="120px" />
-              : null}
+              {isAdmin ? <Table.Th w="120px" /> : null}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -9,8 +11,8 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconBlocks, IconTrash } from "@tabler/icons-react";
+
 import css from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.module.css";
-import type { ReactNode } from "react";
 
 type CaseTypeCardModel = {
   id: string;
@@ -68,7 +70,7 @@ export function CaseTypeCard({
           </span>
         </div>
       </button>
-      {onDelete ?
+      {onDelete ? (
         <Tooltip label={t`Delete case type`} position="left">
           <ActionIcon
             className={css.cardDeleteButton}
@@ -80,7 +82,7 @@ export function CaseTypeCard({
             <IconTrash size={18} stroke={1.5} />
           </ActionIcon>
         </Tooltip>
-      : null}
+      ) : null}
     </div>
   );
 }

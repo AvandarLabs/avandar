@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { buildXlsxPreviewRange } from "@/workers/xlsxSniff/buildXlsxPreviewRange/buildXlsxPreviewRange";
 
 describe("buildXlsxPreviewRange", () => {

@@ -1,12 +1,15 @@
+import type { ReplyEnvelope, RequestEnvelope } from "$/platform/ipc/envelopes";
+
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
 import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts";
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+
 import { openSqliteDatabase } from "../../services/SqliteService/Sqlite";
 import { createIpcServer } from "../createIpcServer/createIpcServer";
 import { registerRdbHandlers } from "./registerRdbHandlers";
-import type { ReplyEnvelope, RequestEnvelope } from "$/platform/ipc/envelopes";
 
 type FakeTransport = {
   on: (channel: string, callback: (message: unknown) => void) => void;

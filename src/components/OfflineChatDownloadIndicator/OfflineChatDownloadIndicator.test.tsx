@@ -1,10 +1,13 @@
+import type { OfflineChatManagerStatus } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
+
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
+
 import { OfflineChatDownloadIndicator } from "./OfflineChatDownloadIndicator";
-import type { OfflineChatManagerStatus } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 
 let mockStatus: OfflineChatManagerStatus = { kind: "idle" };
 

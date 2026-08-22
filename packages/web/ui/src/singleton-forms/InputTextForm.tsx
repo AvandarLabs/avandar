@@ -120,22 +120,20 @@ export function InputTextForm({
           placeholder={placeholder}
           style={{ width: inputWidth }}
         />
-        {showSubmitButton ?
+        {showSubmitButton ? (
           <Button
             type="submit"
             disabled={isSubmitting || (validateOnChange && !form.isValid())}
           >
             {resolvedSubmitLabel}
-            {isSubmitting ?
-              <Loader />
-            : null}
+            {isSubmitting ? <Loader /> : null}
           </Button>
-        : null}
-        {showCancelButton ?
+        ) : null}
+        {showCancelButton ? (
           <Button variant="default" onClick={onCancel}>
             {resolvedCancelLabel}
           </Button>
-        : null}
+        ) : null}
       </Group>
     </form>
   );

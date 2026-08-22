@@ -4,6 +4,7 @@ import { Alert, Button, Group, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
@@ -70,11 +71,11 @@ function ForgotPasswordPage() {
     >
       <form onSubmit={onFormSubmit}>
         <Stack>
-          {!isOnline ?
+          {!isOnline ? (
             <Alert color="yellow" variant="light">
               <Trans>Password reset requires an internet connection.</Trans>
             </Alert>
-          : null}
+          ) : null}
           <TextInput
             label={t`Email`}
             name="email"

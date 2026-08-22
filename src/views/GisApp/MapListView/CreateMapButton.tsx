@@ -1,14 +1,16 @@
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { AvaMapClient } from "@/clients/maps/AvaMapClient/AvaMapClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { ReactNode } from "react";
 
 type Props = { workspaceSlug: string };
 

@@ -1,7 +1,7 @@
 # Migration upgrade tests
 
 These verify that a migration **preserves existing data** when it runs against
-a database shaped the way production is shaped *before* the migration. That is
+a database shaped the way production is shaped _before_ the migration. That is
 a different question from the one `pnpm db:reset` answers, which is only
 whether migrations apply cleanly to an empty database.
 
@@ -16,7 +16,7 @@ alone, so being globbed made the suite report `FAIL` on a healthy branch:
 
 - a `.prelude.sql` opens a transaction and never commits, so run alone it does
   nothing and reports zero tests;
-- an `.assertions.sql` then runs in a *separate* psql process against the
+- an `.assertions.sql` then runs in a _separate_ psql process against the
   normal migrated database, where the prelude's fixtures do not exist, so its
   assertions fire against empty rows.
 

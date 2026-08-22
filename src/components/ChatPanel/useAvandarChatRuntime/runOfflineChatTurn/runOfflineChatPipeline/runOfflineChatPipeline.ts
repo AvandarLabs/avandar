@@ -1,3 +1,8 @@
+import type {
+  OfflineChatPipelineArgs,
+  OfflineChatPipelineResult,
+} from "$/types/offlineChat.types";
+
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { getOfflineDatasetFromPrompt } from "@/components/ChatPanel/offlineChatHelpers/getOfflineDatasetFromPrompt/getOfflineDatasetFromPrompt";
 import { repairOfflineGeneratedSql } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql";
@@ -8,10 +13,6 @@ import {
 } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/buildOfflinePrompts/buildOfflinePrompts";
 import { narrowOfflineSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/narrowOfflineSchema";
 import { OfflineLlmOutput } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/OfflineLlmOutput/OfflineLlmOutput";
-import type {
-  OfflineChatPipelineArgs,
-  OfflineChatPipelineResult,
-} from "$/types/offlineChat.types";
 
 const ANALYZE_MAX_TOKENS = 220;
 const SQL_MAX_TOKENS = 450;
@@ -113,9 +114,9 @@ export async function runOfflineChatPipeline(
       clarification: {
         question: analyze.clarifyQuestion,
         responseShape:
-          options && options.length >= 2 ?
-            { kind: "fixed_options", options, multi: false }
-          : { kind: "free_text" },
+          options && options.length >= 2
+            ? { kind: "fixed_options", options, multi: false }
+            : { kind: "free_text" },
         turnNumber: 1,
       },
       phaseLabels,
@@ -136,9 +137,8 @@ export async function runOfflineChatPipeline(
     lastUserPrompt: args.lastUserPrompt,
   });
 
-  const sqlPromptSchema =
-    resolvedDataset ?
-      narrowOfflineSchema(args.schema, resolvedDataset.id)
+  const sqlPromptSchema = resolvedDataset
+    ? narrowOfflineSchema(args.schema, resolvedDataset.id)
     : args.schema;
 
   appendPhase(phaseLabels, args.copy.writingQuery, args.onPhase);
@@ -159,9 +159,8 @@ export async function runOfflineChatPipeline(
       { role: "user", content: args.lastUserPrompt },
     ],
     maxTokens: SQL_MAX_TOKENS,
-    onToken:
-      args.onPhase ?
-        (delta) => {
+    onToken: args.onPhase
+      ? (delta) => {
           if (
             delta.length > 0 &&
             !phaseLabels.includes(args.copy.generatingSql)

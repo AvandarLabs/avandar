@@ -1,9 +1,11 @@
 /** Pins that both cache tiers are probed ahead of source-type dispatch. */
 
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
-import type { QueryMediatorFactory as QueryMediatorFactoryType } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { QueryMediatorFactory as QueryMediatorFactoryType } from "@/clients/qetl/QueryMediator/QueryMediator";
+
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 
 const CACHED_DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 const SHEETS_DATASET_ID = "33333333-3333-4333-8333-333333333333" as Dataset.Id;

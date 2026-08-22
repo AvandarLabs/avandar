@@ -1,6 +1,7 @@
+import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
+
 import { makeObject } from "@utils/objects/makeObject/makeObject.ts";
 import { describe, expect, it, vi } from "vitest";
-import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
 
 describe("makeObject", () => {
   it("uses structural keys over functions and keeps the last duplicate entry", () => {

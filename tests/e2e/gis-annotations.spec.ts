@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
@@ -7,7 +9,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 const MAP_NAME = "E2E GIS annotations";
 const ANNOTATION_TEXT = "E2E note";
@@ -102,9 +103,9 @@ async function _readAnnotationSnapshot(
     const map = window.__avandarE2EMap;
     const source = map?.getStyle()?.sources["ava-map-annotations"];
     const data =
-      source && source.type === "geojson" && typeof source.data === "object" ?
-        (source.data as GeoJSON.FeatureCollection)
-      : { type: "FeatureCollection" as const, features: [] };
+      source && source.type === "geojson" && typeof source.data === "object"
+        ? (source.data as GeoJSON.FeatureCollection)
+        : { type: "FeatureCollection" as const, features: [] };
     return {
       featureCount: data.features.length,
       kinds: data.features.map((feature) => {

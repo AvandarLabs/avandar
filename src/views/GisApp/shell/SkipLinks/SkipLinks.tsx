@@ -1,7 +1,9 @@
+import type { MouseEvent, ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import css from "@/views/GisApp/shell/SkipLinks/SkipLinks.module.css";
-import type { MouseEvent, ReactNode } from "react";
 
 type Props = { isChromeHidden: boolean };
 

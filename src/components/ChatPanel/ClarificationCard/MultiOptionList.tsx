@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Checkbox, Stack } from "@mantine/core";
+
 import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
@@ -36,11 +37,11 @@ export function MultiOptionList({
           />
         </Stack>
       </Checkbox.Group>
-      {options.length > 2 ?
+      {options.length > 2 ? (
         <Button variant="subtle" size="xs" onClick={onSelectAll}>
           <Trans>Select all</Trans>
         </Button>
-      : null}
+      ) : null}
     </>
   );
 }

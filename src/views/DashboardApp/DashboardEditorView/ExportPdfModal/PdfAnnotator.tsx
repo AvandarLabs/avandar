@@ -1,18 +1,20 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Group, Loader, Stack, Text } from "@mantine/core";
-import { IconFileExport } from "@tabler/icons-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import rough from "roughjs";
-import { drawPdfAnnotationStroke } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/drawPdfAnnotationStroke";
-import { PdfAnnotationCanvas } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas";
-import { PdfAnnotationToolbar } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar";
-import { useAnnotatedPdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport";
-import { usePdfDashboardCapture } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture";
 import type {
   PdfAnnotationStroke,
   PdfAnnotationTool,
 } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotation";
 import type { ReactNode } from "react";
+
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Button, Group, Loader, Stack, Text } from "@mantine/core";
+import { IconFileExport } from "@tabler/icons-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import rough from "roughjs";
+
+import { drawPdfAnnotationStroke } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/drawPdfAnnotationStroke";
+import { PdfAnnotationCanvas } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationCanvas/PdfAnnotationCanvas";
+import { PdfAnnotationToolbar } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar";
+import { useAnnotatedPdfExport } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport";
+import { usePdfDashboardCapture } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture";
 
 type Props = {
   sourceElement: HTMLElement | undefined;
@@ -57,8 +59,9 @@ export function PdfAnnotator({
   });
 
   // Derive display dimensions from the captured canvas.
-  const displayWidth =
-    baseCanvas ? Math.min(MAX_DISPLAY_WIDTH, baseCanvas.width / 2) : 800;
+  const displayWidth = baseCanvas
+    ? Math.min(MAX_DISPLAY_WIDTH, baseCanvas.width / 2)
+    : 800;
   const displayScale = baseCanvas ? displayWidth / baseCanvas.width : 1;
   const displayHeight = baseCanvas ? baseCanvas.height * displayScale : 600;
 

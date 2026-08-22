@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { OfflineSqlHallucinationSubstitutions } from "@/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/OfflineSqlHallucinationSubstitutions/OfflineSqlHallucinationSubstitutions";
 
 describe("OfflineSqlHallucinationSubstitutions.normalizeSelectTopToLimit", () => {

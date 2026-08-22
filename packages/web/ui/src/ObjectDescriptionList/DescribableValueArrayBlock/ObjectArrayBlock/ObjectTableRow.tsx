@@ -1,10 +1,3 @@
-import { useBoolean } from "@avandar/hooks";
-import { StringKeyOf } from "@avandar/utils";
-import { Button, Group, Table } from "@mantine/core";
-import { useI18nMessages } from "@ui/i18n/useI18nMessages";
-import { useState } from "react";
-import { EditButton } from "../../../buttons/EditButton";
-import { ValueItemContainer } from "../../ValueItemContainer";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -12,6 +5,15 @@ import type {
   GetChildObjects,
   ObjectRowRenderOptions,
 } from "../../ObjectDescriptionList.types";
+
+import { useBoolean } from "@avandar/hooks";
+import { StringKeyOf } from "@avandar/utils";
+import { Button, Group, Table } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
+import { useState } from "react";
+
+import { EditButton } from "../../../buttons/EditButton";
+import { ValueItemContainer } from "../../ValueItemContainer";
 
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
 

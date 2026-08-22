@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { isAppLinkAvailableOffline } from "@/lib/offline/isAppLinkAvailableOffline/isAppLinkAvailableOffline";
 

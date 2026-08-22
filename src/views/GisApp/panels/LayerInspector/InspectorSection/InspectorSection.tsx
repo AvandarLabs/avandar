@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 import { IconChevronDown } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
+
 import css from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection.module.css";
-import type { ReactNode } from "react";
 
 type Props = {
   title: string;
@@ -70,9 +72,7 @@ export function InspectorSection({
           stroke={2}
         />
         {title}
-        {note ?
-          <span className={css.inspectorSectionNote}>{note}</span>
-        : null}
+        {note ? <span className={css.inspectorSectionNote}>{note}</span> : null}
       </button>
       <div className={css.inspectorSectionContent}>{children}</div>
     </div>

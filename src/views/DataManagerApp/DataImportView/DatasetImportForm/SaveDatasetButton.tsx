@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
+
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
-import type { ReactNode } from "react";
 
 export type SaveDatasetButtonProps = {
   disableSubmit: boolean | undefined;

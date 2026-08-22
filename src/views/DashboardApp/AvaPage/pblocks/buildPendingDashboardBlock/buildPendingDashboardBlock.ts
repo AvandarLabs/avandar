@@ -1,7 +1,8 @@
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 
 type PuckContentItem = AvaPageData["content"][number];
 

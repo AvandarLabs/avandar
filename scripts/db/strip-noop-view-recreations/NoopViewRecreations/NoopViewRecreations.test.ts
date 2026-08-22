@@ -1,7 +1,9 @@
+import type { CreateViewStatement, NoopVerdict } from "./NoopViewRecreations";
+
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
+
 import { NoopViewRecreations } from "./NoopViewRecreations";
-import type { CreateViewStatement, NoopVerdict } from "./NoopViewRecreations";
 
 const {
   getStatementsFromSql,
@@ -20,8 +22,8 @@ function _noopOnly(
   name: string,
 ): (create: Readonly<CreateViewStatement>) => NoopVerdict {
   return (create) => {
-    return create.view.name === name ?
-        { isNoop: true, reason: "test stub" }
+    return create.view.name === name
+      ? { isNoop: true, reason: "test stub" }
       : { isNoop: false, reason: "test stub" };
   };
 }

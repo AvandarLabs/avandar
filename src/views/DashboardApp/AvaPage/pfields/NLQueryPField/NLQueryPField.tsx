@@ -1,14 +1,16 @@
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ReactElement } from "react";
+
 import { Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
+
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { PromptTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel";
 import { SqlTabPanel } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel";
 import { useDashboardManualQueryState } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useDashboardManualQueryState";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type { ReactElement } from "react";
 
 export type NLQuery = {
   /**

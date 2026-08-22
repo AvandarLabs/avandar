@@ -1,23 +1,3 @@
-import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
-import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
-import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
-import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
-import { useCallback, useMemo } from "react";
-import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
-import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
-import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
-import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
-import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
-import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
-import type {
-  SettingsColumnGroup,
-  SettingsColumnsLayout,
-} from "@/components/SettingsColumns/SettingsColumns";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
@@ -25,7 +5,29 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig";
 import type { VizSettingGroup } from "$/models/vizs/SettingDescriptor";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
 import type { ReactNode } from "react";
+
+import { propEq, propPasses, removeAtIndex } from "@avandar/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Button, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
+import { useCallback, useMemo } from "react";
+
+import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
+import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
+import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
+import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
+import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
+import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
+import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
+import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
 
 type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
 type RadarHostConfig = RadarChartVizConfig;
@@ -142,9 +144,8 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
     }
   }, [config, isRadar, numericFields, onConfigChange]);
 
-  const axisKeyValue: string | undefined =
-    isRadar ?
-      (config as RadarHostConfig).nameKey
+  const axisKeyValue: string | undefined = isRadar
+    ? (config as RadarHostConfig).nameKey
     : (config as XYHostConfig).xAxisKey;
 
   const axisGroup: VizSettingGroup = isRadar ? "Category axis" : "X axis";
@@ -175,15 +176,13 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
                 multiline
                 w={280}
                 label={
-                  isRadar ?
-                    axisKeyValue ?
-                      t`Each series is a numeric column plotted on the radial value. Values are grouped by the category axis ("${axisKeyValue}").`
-                    : t`Each series is a numeric column plotted on the radial value. Pick the category axis below.`
-
-                  : axisKeyValue ?
-                    t`Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis ("${axisKeyValue}").`
-                  : t`Each series is a numeric column plotted on the Y axis. Pick the X axis below.`
-
+                  isRadar
+                    ? axisKeyValue
+                      ? t`Each series is a numeric column plotted on the radial value. Values are grouped by the category axis ("${axisKeyValue}").`
+                      : t`Each series is a numeric column plotted on the radial value. Pick the category axis below.`
+                    : axisKeyValue
+                      ? t`Each series is a numeric column plotted on the Y axis. Values are grouped by the X axis ("${axisKeyValue}").`
+                      : t`Each series is a numeric column plotted on the Y axis. Pick the X axis below.`
                 }
               >
                 <IconInfoCircle
@@ -204,13 +203,13 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
             </Button>
           </Group>
 
-          {config.series.length === 0 ?
+          {config.series.length === 0 ? (
             <Text size="xs" c="dimmed">
               <Trans>
                 Add a series to choose which numeric column drives the chart.
               </Trans>
             </Text>
-          : null}
+          ) : null}
 
           {config.series.map((s, idx) => {
             return (

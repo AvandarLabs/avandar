@@ -1,8 +1,10 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { fireEvent, render, screen } from "@/test-utils";
 import { PublishingSection } from "@/views/DashboardApp/DashboardShareModal/PublishingSection";
-import type { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 vi.mock(
   "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus",

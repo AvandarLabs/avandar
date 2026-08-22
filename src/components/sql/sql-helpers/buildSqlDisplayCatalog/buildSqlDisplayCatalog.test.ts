@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { buildSqlDisplayCatalog } from "@/components/sql/sql-helpers/buildSqlDisplayCatalog/buildSqlDisplayCatalog";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+
+import { describe, expect, it } from "vitest";
+
+import { buildSqlDisplayCatalog } from "@/components/sql/sql-helpers/buildSqlDisplayCatalog/buildSqlDisplayCatalog";
 
 const DS_ID = "00000000-0000-4000-8000-000000000001" as DatasetId;
 

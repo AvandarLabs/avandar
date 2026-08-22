@@ -1,10 +1,11 @@
+import type { TextareaProps } from "@mantine/core";
+
 import { getIsMacPlatform } from "@avandar/browser-utils";
 import { Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { useForm } from "@ui/hooks/useForm/useForm";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useId, useRef } from "react";
-import type { TextareaProps } from "@mantine/core";
 
 type Props = {
   /**
@@ -153,17 +154,17 @@ export function TextareaForm({
         ])}
         {...moreTextareaProps}
       />
-      {showSubmitButton ?
+      {showSubmitButton ? (
         <Button
           type="submit"
           form={formId}
           loading={isSubmitting}
           onClick={
-            asField ?
-              () => {
-                onFormSubmit();
-              }
-            : undefined
+            asField
+              ? () => {
+                  onFormSubmit();
+                }
+              : undefined
           }
           disabled={
             isSubmitting ||
@@ -176,12 +177,12 @@ export function TextareaForm({
             {shortcutText}
           </Text>
         </Button>
-      : null}
-      {showCancelButton ?
+      ) : null}
+      {showCancelButton ? (
         <Button variant="default" onClick={onCancel}>
           {resolvedCancelLabel}
         </Button>
-      : null}
+      ) : null}
     </Group>
   );
 

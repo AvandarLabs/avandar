@@ -1,5 +1,18 @@
+import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ConsentAck } from "$/types/chat.types";
+import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
+import type { MutableRefObject } from "react";
+
 import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
+
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -27,17 +40,6 @@ import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
-import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
-import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ConsentAck } from "$/types/chat.types";
-import type { MutableRefObject } from "react";
 
 type LastCompletedTurn = {
   messagesKey: string;
@@ -180,8 +182,8 @@ export function createChatModelAdapter(
               const ackToken = await PendingAcks.consumeAckForText(
                 message.content,
               );
-              return ackToken ?
-                  {
+              return ackToken
+                ? {
                     ackToken,
                     scope: {
                       kind: "message_index" as const,
@@ -218,10 +220,13 @@ export function createChatModelAdapter(
           event: "chat.message_sent",
           workspaceId,
           app:
-            currentPageContext.app === "data-explorer" ? "data_explorer"
-            : currentPageContext.app === "dashboards" ? "dashboards"
-            : currentPageContext.app === "data-sources" ? "data_sources"
-            : undefined,
+            currentPageContext.app === "data-explorer"
+              ? "data_explorer"
+              : currentPageContext.app === "dashboards"
+                ? "dashboards"
+                : currentPageContext.app === "data-sources"
+                  ? "data_sources"
+                  : undefined,
           payload: ChatAnalyticsPayloads.fromMessage({
             content: lastUserMessage.content,
             pageContext: currentPageContext,
@@ -284,22 +289,22 @@ export function createChatModelAdapter(
             localChatModelId,
             copy: copyRef.current,
             executeSql:
-              currentPageContext.app === "data-explorer" ?
-                createGenerationAwareExecuteSql(
-                  tryExecuteOfflineSql,
-                  isGenerationStale,
-                )
-              : undefined,
+              currentPageContext.app === "data-explorer"
+                ? createGenerationAwareExecuteSql(
+                    tryExecuteOfflineSql,
+                    isGenerationStale,
+                  )
+                : undefined,
           });
           return applyResponseIfCurrent(
             Model.make("ChatResponse", {
               assistantText: offlineResult.assistantText,
-              ...(offlineResult.generatedSql ?
-                { generatedSql: offlineResult.generatedSql }
-              : {}),
-              ...(offlineResult.clarification ?
-                { clarification: offlineResult.clarification }
-              : {}),
+              ...(offlineResult.generatedSql
+                ? { generatedSql: offlineResult.generatedSql }
+                : {}),
+              ...(offlineResult.clarification
+                ? { clarification: offlineResult.clarification }
+                : {}),
             }),
           );
         } catch (error) {
@@ -321,16 +326,16 @@ export function createChatModelAdapter(
       }
 
       const cloudModelId =
-        model && !OfflineChatPickerModels.parseModelId(model) ?
-          model
-        : undefined;
+        model && !OfflineChatPickerModels.parseModelId(model)
+          ? model
+          : undefined;
 
       const currentMessagesKey = chatMessagesKey(apiMessages);
       const cachedTurn = lastTurnRef.current;
       const retryContext =
-        cachedTurn && cachedTurn.messagesKey === currentMessagesKey ?
-          buildRetryContext(cachedTurn.response)
-        : undefined;
+        cachedTurn && cachedTurn.messagesKey === currentMessagesKey
+          ? buildRetryContext(cachedTurn.response)
+          : undefined;
 
       try {
         const response = await APIClient.post({
@@ -370,8 +375,9 @@ export function createChatModelAdapter(
             return { content: [] };
           }
           if (accepted) {
-            const pickerLocalId =
-              model ? OfflineChatPickerModels.parseModelId(model) : undefined;
+            const pickerLocalId = model
+              ? OfflineChatPickerModels.parseModelId(model)
+              : undefined;
             return runOfflineTurn(pickerLocalId);
           }
         }

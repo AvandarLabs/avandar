@@ -1,3 +1,6 @@
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { Individual } from "$/models/ontology/Individual/Individual";
+
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
@@ -6,14 +9,13 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
-import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
+
+import { uuid } from "$/lib/uuid";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { Logger } from "@/utils/Logger";
 import { SingleIndividualView } from "@/views/IndividualManagerApp/SingleIndividualView";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { Individual } from "$/models/ontology/Individual/Individual";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId",

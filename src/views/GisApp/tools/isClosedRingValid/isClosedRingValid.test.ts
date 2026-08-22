@@ -2,6 +2,7 @@
  * Closed-ring validity: closed, no consecutive duplicates, no crossings.
  */
 import { describe, expect, it } from "vitest";
+
 import { isClosedRingValid } from "@/views/GisApp/tools/isClosedRingValid/isClosedRingValid";
 
 const UNIT_SQUARE: ReadonlyArray<[number, number]> = [

@@ -1,14 +1,16 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
+
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { AreaAggregationControls } from "@/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AreaAggregationControls";
 import { PointBoundaryControls } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls";
 import { PointGeometryTypeSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect";
 import { PointInputControls } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointInputControls";
-import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -30,9 +32,8 @@ export function PointAggregationControls({
   if (binding?.type !== "aggregatePointsToBoundaries") {
     return null;
   }
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const updatePoints = (points: MapLayer.PointBinding): void => {
     onLayerChange((current) => {

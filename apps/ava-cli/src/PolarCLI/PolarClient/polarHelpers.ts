@@ -1,5 +1,6 @@
-import { getItemsFromListPage } from "@ava-cli/PolarCLI/PolarClient/listUtils";
 import type { Polar } from "@polar-sh/sdk";
+
+import { getItemsFromListPage } from "@ava-cli/PolarCLI/PolarClient/listUtils";
 
 export type PolarCustomer = Readonly<{
   id: string;
@@ -162,9 +163,11 @@ function _getSubscribedProductIds(state: unknown): readonly string[] {
   return subscriptions
     .map((sub) => {
       const productId =
-        typeof sub.productId === "string" ? sub.productId
-        : typeof sub.product?.id === "string" ? sub.product.id
-        : undefined;
+        typeof sub.productId === "string"
+          ? sub.productId
+          : typeof sub.product?.id === "string"
+            ? sub.product.id
+            : undefined;
       return productId;
     })
     .filter((id): id is string => {

@@ -229,7 +229,7 @@ capture.
 
 Read `supabase/schemas/30.usage_analytics_events.sql` before writing the table
 file. It is the closest analogue: same broad layer, same privacy posture, same
-comment density. Note in particular that it documents *why* each column exists,
+comment density. Note in particular that it documents _why_ each column exists,
 not just what it holds.
 
 `supabase/tests/database/analytics/analytics_event_insert_policy.test.sql` is
@@ -255,48 +255,48 @@ must carry a `.ts` extension**. Files under `src/` omit it. Files under
 
 **Created:**
 
-| Path | Responsibility |
-| --- | --- |
-| `shared/utils/privacy/detectPii/detectPii.ts` | The detector, moved from `src/` so Deno can import it, plus the matched-span field |
-| `shared/utils/privacy/detectPii/detectPii.test.ts` | The existing suite, moved, plus span coverage |
-| `shared/utils/privacy/surrogates/createSeededRandom.ts` | Deterministic PRNG so one turn is internally consistent |
-| `shared/utils/privacy/surrogates/createSeededRandom.test.ts` | Vitest: same seed gives the same stream, different seeds diverge |
-| `shared/utils/privacy/surrogates/buildSurrogateMap.ts` | Maps every matched span to a same-type fake |
-| `shared/utils/privacy/surrogates/buildSurrogateMap.test.ts` | Vitest: per-label shapes, determinism, discard-category skip |
-| `shared/utils/privacy/surrogates/applySurrogates.ts` | Replaces every mapped span in a string |
-| `shared/utils/privacy/surrogates/applySurrogates.test.ts` | Vitest: overlapping keys, repeated spans, no-op cases |
-| `shared/utils/privacy/redactChatTurn/redactChatTurn.ts` | The whole-turn decision: discard or redact, with one map across all fields |
-| `shared/utils/privacy/redactChatTurn/redactChatTurn.test.ts` | Vitest: discard categories, cross-field consistency, residual severity |
-| `supabase/schemas/00.enum.chat_samples__pii_severity.sql` | The two-value enum that makes `critical` unstorable |
-| `supabase/schemas/30.chat_samples.sql` | The table, indexes, RLS, grants, and the retention function |
-| `supabase/migrations/<timestamp>_schedule_chat_sample_retention.sql` | Hand-written: the guarded pg_cron schedule |
-| `supabase/tests/database/analytics/chat_samples_rls.test.sql` | pgTAP: the negative RLS cases and the severity enum guarantee |
-| `supabase/tests/database/analytics/chat_samples_retention.test.sql` | pgTAP: the deletion function's window and its privileges |
-| `supabase/functions/chat/PostChatMessages/samples/captureChatSample.ts` | The edge side: switch, plan gate, redaction, insert |
-| `supabase/functions/chat/PostChatMessages/samples/captureChatSample.test.ts` | Vitest: every skip path and the happy path |
-| `docs/chat-sample-retention.md` | What is retained, for how long, and how to enable the schedule |
+| Path                                                                         | Responsibility                                                                     |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `shared/utils/privacy/detectPii/detectPii.ts`                                | The detector, moved from `src/` so Deno can import it, plus the matched-span field |
+| `shared/utils/privacy/detectPii/detectPii.test.ts`                           | The existing suite, moved, plus span coverage                                      |
+| `shared/utils/privacy/surrogates/createSeededRandom.ts`                      | Deterministic PRNG so one turn is internally consistent                            |
+| `shared/utils/privacy/surrogates/createSeededRandom.test.ts`                 | Vitest: same seed gives the same stream, different seeds diverge                   |
+| `shared/utils/privacy/surrogates/buildSurrogateMap.ts`                       | Maps every matched span to a same-type fake                                        |
+| `shared/utils/privacy/surrogates/buildSurrogateMap.test.ts`                  | Vitest: per-label shapes, determinism, discard-category skip                       |
+| `shared/utils/privacy/surrogates/applySurrogates.ts`                         | Replaces every mapped span in a string                                             |
+| `shared/utils/privacy/surrogates/applySurrogates.test.ts`                    | Vitest: overlapping keys, repeated spans, no-op cases                              |
+| `shared/utils/privacy/redactChatTurn/redactChatTurn.ts`                      | The whole-turn decision: discard or redact, with one map across all fields         |
+| `shared/utils/privacy/redactChatTurn/redactChatTurn.test.ts`                 | Vitest: discard categories, cross-field consistency, residual severity             |
+| `supabase/schemas/00.enum.chat_samples__pii_severity.sql`                    | The two-value enum that makes `critical` unstorable                                |
+| `supabase/schemas/30.chat_samples.sql`                                       | The table, indexes, RLS, grants, and the retention function                        |
+| `supabase/migrations/<timestamp>_schedule_chat_sample_retention.sql`         | Hand-written: the guarded pg_cron schedule                                         |
+| `supabase/tests/database/analytics/chat_samples_rls.test.sql`                | pgTAP: the negative RLS cases and the severity enum guarantee                      |
+| `supabase/tests/database/analytics/chat_samples_retention.test.sql`          | pgTAP: the deletion function's window and its privileges                           |
+| `supabase/functions/chat/PostChatMessages/samples/captureChatSample.ts`      | The edge side: switch, plan gate, redaction, insert                                |
+| `supabase/functions/chat/PostChatMessages/samples/captureChatSample.test.ts` | Vitest: every skip path and the happy path                                         |
+| `docs/chat-sample-retention.md`                                              | What is retained, for how long, and how to enable the schedule                     |
 
 **Modified:**
 
-| Path | Change |
-| --- | --- |
-| `src/components/privacy/ConsentModal/CompositePanel.tsx` | Import path only |
-| `src/components/privacy/ConsentModal/MedicalStrictPanel.tsx` | Import path only |
-| `src/components/privacy/ConsentModal/PiiHitBadges.tsx` | Import path only |
-| `src/components/privacy/ConsentModal/ConsentModal.tsx` | Import path only |
-| `src/components/privacy/ConsentModal/PiiWarningPanel.tsx` | Import path only |
-| `src/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions.ts` | Import path only |
-| `src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx` | Import path only |
-| `supabase/functions/chat/PostChatMessages/analytics/ChatTurnAnalyticsPayloads.ts` | Accepts the capture result instead of hardcoding `wasSampled: false` |
-| `supabase/functions/chat/PostChatMessages/analytics/emitChatTurnAnalytics.ts` | Threads the capture result through |
-| `supabase/functions/chat/PostChatMessages/PostChatMessages.ts` | Calls capture before emitting |
-| `docs/superpowers/specs/2026-08-13-usage-analytics-events-design.md` | Phase status, the three resolved conflicts, the capture switch |
+| Path                                                                                        | Change                                                               |
+| ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `src/components/privacy/ConsentModal/CompositePanel.tsx`                                    | Import path only                                                     |
+| `src/components/privacy/ConsentModal/MedicalStrictPanel.tsx`                                | Import path only                                                     |
+| `src/components/privacy/ConsentModal/PiiHitBadges.tsx`                                      | Import path only                                                     |
+| `src/components/privacy/ConsentModal/ConsentModal.tsx`                                      | Import path only                                                     |
+| `src/components/privacy/ConsentModal/PiiWarningPanel.tsx`                                   | Import path only                                                     |
+| `src/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions.ts` | Import path only                                                     |
+| `src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx`                   | Import path only                                                     |
+| `supabase/functions/chat/PostChatMessages/analytics/ChatTurnAnalyticsPayloads.ts`           | Accepts the capture result instead of hardcoding `wasSampled: false` |
+| `supabase/functions/chat/PostChatMessages/analytics/emitChatTurnAnalytics.ts`               | Threads the capture result through                                   |
+| `supabase/functions/chat/PostChatMessages/PostChatMessages.ts`                              | Calls capture before emitting                                        |
+| `docs/superpowers/specs/2026-08-13-usage-analytics-events-design.md`                        | Phase status, the three resolved conflicts, the capture switch       |
 
 **Deleted:**
 
-| Path | Reason |
-| --- | --- |
-| `src/components/privacy/privacy-helpers/detectPii/detectPii.ts` | Moved to `shared/` |
+| Path                                                                 | Reason             |
+| -------------------------------------------------------------------- | ------------------ |
+| `src/components/privacy/privacy-helpers/detectPii/detectPii.ts`      | Moved to `shared/` |
 | `src/components/privacy/privacy-helpers/detectPii/detectPii.test.ts` | Moved to `shared/` |
 
 ---
@@ -688,32 +688,32 @@ the previous behaviour.
 In `_detectFromColumnName`, add `matches: []` to both hit constructions:
 
 ```ts
-  const hits: PiiPatternHit[] = COLUMN_NAME_KEYWORDS.filter((entry) => {
-    return entry.keywords.some((kw) => {
-      return normalized.includes(kw);
-    });
-  }).map((entry) => {
-    return {
-      layer: "column_name" as const,
-      category: entry.category,
-      label: entry.label,
-      matches: [],
-    };
+const hits: PiiPatternHit[] = COLUMN_NAME_KEYWORDS.filter((entry) => {
+  return entry.keywords.some((kw) => {
+    return normalized.includes(kw);
   });
+}).map((entry) => {
+  return {
+    layer: "column_name" as const,
+    category: entry.category,
+    label: entry.label,
+    matches: [],
+  };
+});
 
-  if (STANDALONE_NAME_PATTERN.test(normalized)) {
-    const alreadyHasName = hits.some((h) => {
-      return h.label === "Name";
+if (STANDALONE_NAME_PATTERN.test(normalized)) {
+  const alreadyHasName = hits.some((h) => {
+    return h.label === "Name";
+  });
+  if (!alreadyHasName) {
+    hits.push({
+      layer: "column_name",
+      category: "direct_identifier",
+      label: "Name",
+      matches: [],
     });
-    if (!alreadyHasName) {
-      hits.push({
-        layer: "column_name",
-        category: "direct_identifier",
-        label: "Name",
-        matches: [],
-      });
-    }
   }
+}
 ```
 
 - [ ] **Step 6: Run the tests to verify they pass**
@@ -764,11 +764,7 @@ describe("createSeededRandom", () => {
     const first = createSeededRandom(12345);
     const second = createSeededRandom(12345);
 
-    expect([first(), first(), first()]).toEqual([
-      second(),
-      second(),
-      second(),
-    ]);
+    expect([first(), first(), first()]).toEqual([second(), second(), second()]);
   });
 
   it("produces a different stream for a different seed", () => {
@@ -1016,9 +1012,9 @@ describe("buildSurrogateMap", () => {
     expect(buildSurrogateMap({ hits, seed: 7 }).get("jane@acme.com")).toBe(
       buildSurrogateMap({ hits, seed: 7 }).get("jane@acme.com"),
     );
-    expect(
-      buildSurrogateMap({ hits, seed: 7 }).get("jane@acme.com"),
-    ).not.toBe(buildSurrogateMap({ hits, seed: 8 }).get("jane@acme.com"));
+    expect(buildSurrogateMap({ hits, seed: 7 }).get("jane@acme.com")).not.toBe(
+      buildSurrogateMap({ hits, seed: 8 }).get("jane@acme.com"),
+    );
   });
 
   it("never invents a fake for a discard category", () => {
@@ -1097,27 +1093,65 @@ const DISCARD_CATEGORIES: ReadonlySet<PiiCategory> = new Set([
 ]);
 
 const FIRST_NAMES = [
-  "avery", "casey", "devon", "harper", "jordan", "logan", "morgan", "quinn",
-  "reese", "sydney",
+  "avery",
+  "casey",
+  "devon",
+  "harper",
+  "jordan",
+  "logan",
+  "morgan",
+  "quinn",
+  "reese",
+  "sydney",
 ] as const;
 
 const LAST_NAMES = [
-  "alvarez", "bennett", "cortez", "delgado", "ellis", "foster", "grant",
-  "hayes", "iverson", "jenkins",
+  "alvarez",
+  "bennett",
+  "cortez",
+  "delgado",
+  "ellis",
+  "foster",
+  "grant",
+  "hayes",
+  "iverson",
+  "jenkins",
 ] as const;
 
 const DOMAIN_WORDS = [
-  "brightlane", "castlepoint", "duneside", "elmgrove", "fernhill", "goldbay",
-  "harborline", "ivyfield",
+  "brightlane",
+  "castlepoint",
+  "duneside",
+  "elmgrove",
+  "fernhill",
+  "goldbay",
+  "harborline",
+  "ivyfield",
 ] as const;
 
 const TLDS = ["com", "org", "net"] as const;
 
 const STREET_WORDS = [
-  "Alder", "Birch", "Cedar", "Dogwood", "Elm", "Fir", "Grove", "Hawthorn",
+  "Alder",
+  "Birch",
+  "Cedar",
+  "Dogwood",
+  "Elm",
+  "Fir",
+  "Grove",
+  "Hawthorn",
 ] as const;
 
-const STREET_SUFFIXES = ["St", "Ave", "Rd", "Blvd", "Dr", "Ln", "Way", "Ct"] as const;
+const STREET_SUFFIXES = [
+  "St",
+  "Ave",
+  "Rd",
+  "Blvd",
+  "Dr",
+  "Ln",
+  "Way",
+  "Ct",
+] as const;
 
 function _pick<T>(items: readonly T[], random: () => number): T {
   return items[Math.floor(random() * items.length)]!;
@@ -1419,9 +1453,7 @@ describe("redactChatTurn", () => {
   it("gives the same real value the same fake in every field", () => {
     const outcome = redactChatTurn({
       ...CLEAN_TURN,
-      messages: [
-        { role: "user", content: "what did jane@acme.com order?" },
-      ],
+      messages: [{ role: "user", content: "what did jane@acme.com order?" }],
       assistantText: "Filtering on jane@acme.com.",
       generatedSql: "select * from orders where email = 'jane@acme.com'",
     });
@@ -1460,7 +1492,10 @@ describe("redactChatTurn", () => {
       messages: [{ role: "user", content: "look up ssn 123-45-6789" }],
     });
 
-    expect(outcome).toEqual({ kind: "discarded", detectedSeverity: "critical" });
+    expect(outcome).toEqual({
+      kind: "discarded",
+      detectedSeverity: "critical",
+    });
   });
 
   it("discards a turn containing a card number", () => {
@@ -1636,19 +1671,15 @@ function _detectAcrossTurn(
       return result.isMedical;
     });
   const severity =
-    (
-      columnResults.some((result) => {
-        return result.severity === "critical";
-      }) || contentResult.severity === "critical"
-    ) ?
-      "critical"
-    : (
-      columnResults.some((result) => {
-        return result.severity === "warning";
-      }) || contentResult.severity === "warning"
-    ) ?
-      "warning"
-    : "clean";
+    columnResults.some((result) => {
+      return result.severity === "critical";
+    }) || contentResult.severity === "critical"
+      ? "critical"
+      : columnResults.some((result) => {
+            return result.severity === "warning";
+          }) || contentResult.severity === "warning"
+        ? "warning"
+        : "clean";
 
   return { hits, severity, isMedical };
 }
@@ -1723,9 +1754,9 @@ export function redactChatTurn(
     }),
     assistantText: applySurrogates(assistantText, surrogates),
     generatedSql:
-      generatedSql === undefined ?
-        undefined
-      : applySurrogates(generatedSql, surrogates),
+      generatedSql === undefined
+        ? undefined
+        : applySurrogates(generatedSql, surrogates),
     schemaSnapshot,
     // Residual rather than detected. Everything that could make this critical
     // has either sent the turn down the discard branch above or been replaced
@@ -2317,7 +2348,7 @@ because of a missing extension.
 
 Fill in the placeholder section of `docs/chat-sample-retention.md`:
 
-```markdown
+````markdown
 ## Enabling the pg_cron schedule on a hosted project
 
 The retention migration creates the extension only if it can. On a hosted
@@ -2335,6 +2366,7 @@ Supabase project it may need enabling first, which is a dashboard action:
      $$select public.chat_samples__delete_expired();$$
    );
    ```
+````
 
 5. Verify it registered:
 
@@ -2345,7 +2377,8 @@ Supabase project it may need enabling first, which is a dashboard action:
 
 Until that job exists, nothing deletes expired samples. Check for it whenever a
 new environment is provisioned.
-```
+
+````
 
 - [ ] **Step 7: Review checkpoint**
 
@@ -2575,7 +2608,7 @@ describe("captureChatSample", () => {
     expect(console.error).toHaveBeenCalled();
   });
 });
-```
+````
 
 - [ ] **Step 2: Run the test to verify it fails**
 
@@ -2762,8 +2795,8 @@ module rather than changing the test:
 
 ```ts
 function _readCaptureFlag(): string | undefined {
-  return typeof Deno === "undefined" ?
-      (globalThis as { process?: { env?: Record<string, string> } }).process
+  return typeof Deno === "undefined"
+    ? (globalThis as { process?: { env?: Record<string, string> } }).process
         ?.env?.CHAT_SAMPLE_CAPTURE_ENABLED
     : Deno.env.get("CHAT_SAMPLE_CAPTURE_ENABLED");
 }
@@ -2884,9 +2917,9 @@ function _fromCompletedTurn(
     // The *detected* severity, which can be critical, unlike the residual
     // severity stored on a retained sample. This is what makes "how many turns
     // are we throwing away, and why" answerable.
-    ...(options.capture.piiSeverity === undefined ?
-      {}
-    : { piiSeverity: options.capture.piiSeverity }),
+    ...(options.capture.piiSeverity === undefined
+      ? {}
+      : { piiSeverity: options.capture.piiSeverity }),
   };
 }
 ```
@@ -2948,45 +2981,48 @@ Then, between the `result` construction and the existing
 result through:
 
 ```ts
-    const capture = await captureChatSample({
-      supabaseAdminClient,
-      workspaceId,
-      userId: user.id,
-      modelId: model,
-      pageApp: context.app,
-      outcome:
-        generatedSql ? "sql"
-        : clarification ? "clarification"
-        : dashboardBlock ? "dashboard_block"
-        : text ? "text"
-        : "empty",
-      attemptCount,
-      hadConsentAck: (consentAcks ?? []).length > 0,
-      messages,
-      assistantText,
-      generatedSql: generatedSql?.sql,
-      schemaSnapshot: schema,
-    });
+const capture = await captureChatSample({
+  supabaseAdminClient,
+  workspaceId,
+  userId: user.id,
+  modelId: model,
+  pageApp: context.app,
+  outcome: generatedSql
+    ? "sql"
+    : clarification
+      ? "clarification"
+      : dashboardBlock
+        ? "dashboard_block"
+        : text
+          ? "text"
+          : "empty",
+  attemptCount,
+  hadConsentAck: (consentAcks ?? []).length > 0,
+  messages,
+  assistantText,
+  generatedSql: generatedSql?.sql,
+  schemaSnapshot: schema,
+});
 
-    await emitChatTurnAnalytics({
-      supabaseAdminClient,
-      workspaceId,
-      userId: user.id,
-      pageApp: context.app,
-      outcome: {
-        kind: "completed",
-        modelId: model,
-        latencyMs: performance.now() - turnStartedAt,
-        attemptCount,
-        promptChars: lastUserPrompt.length,
-        schemaDatasetCount: schema.datasets.length,
-        assistantText,
-        capture,
-        parsed: { text, generatedSql, clarification, dashboardBlock },
-      },
-    });
+await emitChatTurnAnalytics({
+  supabaseAdminClient,
+  workspaceId,
+  userId: user.id,
+  pageApp: context.app,
+  outcome: {
+    kind: "completed",
+    modelId: model,
+    latencyMs: performance.now() - turnStartedAt,
+    attemptCount,
+    promptChars: lastUserPrompt.length,
+    schemaDatasetCount: schema.datasets.length,
+    assistantText,
+    capture,
+    parsed: { text, generatedSql, clarification, dashboardBlock },
+  },
+});
 
-    return result;
+return result;
 ```
 
 The outcome expression duplicates `_classifyOutcome`'s ordering. That is

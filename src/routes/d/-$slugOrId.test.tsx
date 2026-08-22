@@ -1,14 +1,16 @@
-/** Route-adapter coverage for the public dashboard slug-or-ID viewer. */
-import { Model } from "@avandar/models";
-import { QueryClient } from "@tanstack/react-query";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@/test-utils";
-import type { DashboardRouteOutcome } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { DashboardRouteOutcome } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 import type { ComponentType } from "react";
+
+/** Route-adapter coverage for the public dashboard slug-or-ID viewer. */
+import { Model } from "@avandar/models";
+import { QueryClient } from "@tanstack/react-query";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { render, screen } from "@/test-utils";
 
 const { makeDashboardRouteOutcomeFromPublicRouteMock, routeDepsSentinel } =
   vi.hoisted(() => {

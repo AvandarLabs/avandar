@@ -1,12 +1,14 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
+
 import { noop, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import css from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList.module.css";
 import { makeLayerPanelItemsFromRows } from "@/views/GisApp/panels/LayerPanel/LayerList/makeLayerPanelItemsFromRows";
 import { OrderedLayerRows } from "@/views/GisApp/panels/LayerPanel/LayerList/OrderedLayerRows";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   /** Layers in panel row order, with the topmost layer first. */

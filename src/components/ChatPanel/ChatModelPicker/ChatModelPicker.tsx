@@ -1,7 +1,10 @@
+import type { ReactNode } from "react";
+
 import { useAui } from "@assistant-ui/react";
 import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
+
 import { ChatModelPickerView } from "@/components/ChatPanel/ChatModelPicker/ChatModelPickerView/ChatModelPickerView";
 import { useChatModelCombobox } from "@/components/ChatPanel/ChatModelPicker/useChatModelCombobox";
 import { usePersistSelectedOfflineModel } from "@/components/ChatPanel/ChatModelPicker/usePersistSelectedOfflineModel";
@@ -9,7 +12,6 @@ import { useRegisterResolvedModelId } from "@/components/ChatPanel/ChatModelPick
 import { useWriteResolvedModelIdToStorage } from "@/components/ChatPanel/ChatModelPicker/useWriteResolvedModelIdToStorage";
 import { ChatModelStorage } from "@/components/ChatPanel/ChatModelStorage/ChatModelStorage";
 import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog/useChatModelCatalog";
-import type { ReactNode } from "react";
 
 type Props = {
   disabled?: boolean;
@@ -36,8 +38,9 @@ export function ChatModelPicker({
   useRegisterResolvedModelId({ assistantClient, resolvedModelId });
 
   const selectedModel = models.find(propEq("id", resolvedModelId));
-  const tooltipLabel =
-    selectedModel ? t`Using ${selectedModel.name}` : t`Choose a model`;
+  const tooltipLabel = selectedModel
+    ? t`Using ${selectedModel.name}`
+    : t`Choose a model`;
 
   return (
     <ChatModelPickerView

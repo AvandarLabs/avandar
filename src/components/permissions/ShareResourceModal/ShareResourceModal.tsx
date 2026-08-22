@@ -1,5 +1,10 @@
+import type { ShareResourcePublishing } from "./ShareResourceModal.types";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
+
 import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRow";
 import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
@@ -7,9 +12,6 @@ import { ShareResourceModalFooter } from "./ShareResourceModalFooter";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
 import { SharingSettingsLoading } from "./SharingSettingsLoading";
 import { useShareResourceModalState } from "./useShareResourceModalState/useShareResourceModalState";
-import type { ShareResourcePublishing } from "./ShareResourceModal.types";
-import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { ReactNode } from "react";
 
 type Props = {
   resourceName: string;

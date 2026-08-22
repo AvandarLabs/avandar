@@ -1,13 +1,15 @@
+import type {
+  ServerApiClient,
+  ServerApiFunctionRequest,
+} from "$/platform/types/ServerApiClient.types.ts";
+
 import { FunctionsHttpError } from "@supabase/supabase-js";
+
 import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import {
   ServerApiSessionRefresher,
   SessionExpiredError,
 } from "$/ServerApiClient/ServerApiSessionRefresher.ts";
-import type {
-  ServerApiClient,
-  ServerApiFunctionRequest,
-} from "$/platform/types/ServerApiClient.types.ts";
 
 /**
  * Build the relative URL `supabase.functions.invoke` is called with.
@@ -19,17 +21,17 @@ function buildRelativeFunctionUrl(request: ServerApiFunctionRequest): string {
   const { route, pathParams, queryParams } = request;
 
   const interpolated =
-    pathParams === undefined ? route : (
-      route.replace(/:([a-zA-Z0-9_]+)/g, (_, name: string) => {
-        const value = pathParams[name];
-        if (value === undefined || value === null) {
-          throw new Error(
-            `serverApi.invokeFunction: missing path param '${name}' for route '${route}'`,
-          );
-        }
-        return encodeURIComponent(String(value));
-      })
-    );
+    pathParams === undefined
+      ? route
+      : route.replace(/:([a-zA-Z0-9_]+)/g, (_, name: string) => {
+          const value = pathParams[name];
+          if (value === undefined || value === null) {
+            throw new Error(
+              `serverApi.invokeFunction: missing path param '${name}' for route '${route}'`,
+            );
+          }
+          return encodeURIComponent(String(value));
+        });
 
   if (interpolated.includes(":")) {
     throw new Error(

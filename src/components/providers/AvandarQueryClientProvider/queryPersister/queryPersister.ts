@@ -1,6 +1,7 @@
+import type { User } from "$/models/User/User";
+
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { del, get, set } from "idb-keyval";
-import type { User } from "$/models/User/User";
 
 const STORE_KEY = "avandar-react-query-cache";
 

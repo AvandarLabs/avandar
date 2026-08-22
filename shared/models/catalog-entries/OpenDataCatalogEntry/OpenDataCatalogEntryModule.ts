@@ -1,8 +1,9 @@
-import { match } from "ts-pattern";
 import type {
   OpenDataAccess,
   OpenDataCatalogEntryRead,
 } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+
+import { match } from "ts-pattern";
 
 /**
  * Builds the pipeline access shape, or undefined when the entry does not carry

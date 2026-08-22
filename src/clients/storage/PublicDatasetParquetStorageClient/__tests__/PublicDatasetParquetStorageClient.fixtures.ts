@@ -1,11 +1,12 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
 /**
  * Shared Supabase storage mocks for the PublicDatasetParquetStorageClient
  * tests. Scenario files import this first so its `vi.mock` call is
  * registered before the client module loads.
  */
 import { vi } from "vitest";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const { downloadMock, fromMock, listMock, removeMock, uploadMock } = vi.hoisted(
   () => {

@@ -1,3 +1,13 @@
+import type {
+  DatasetId,
+  DatasetModel,
+} from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
+
 import { makeParserRegistry } from "@avandar/clients";
 import { Model } from "@avandar/models";
 import {
@@ -8,17 +18,9 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
-import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
-import type {
-  DatasetId,
-  DatasetModel,
-} from "$/models/datasets/Dataset/Dataset.types.ts";
-import type { UserId } from "$/models/User/User.types.ts";
-import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
-import type { Workspace } from "$/models/Workspace/Workspace.ts";
+
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),

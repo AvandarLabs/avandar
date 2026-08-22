@@ -1,4 +1,11 @@
+import type {
+  PartialStructuredQuery,
+  StructuredQueryId,
+  StructuredQueryRead,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+
 import { Model } from "@avandar/models";
+
 import { uuid } from "$/lib/uuid.ts";
 import { makeQueryFilterNodeId } from "$/models/queries/StructuredQuery/makeQueryFilterNodeId.ts";
 import {
@@ -6,11 +13,6 @@ import {
   isEmptyQueryFilter,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { toRawDuckDbQuery } from "$/models/queries/StructuredQuery/toRawDuckDbQuery.ts";
-import type {
-  PartialStructuredQuery,
-  StructuredQueryId,
-  StructuredQueryRead,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 export const StructuredQueryModule = {
   /** An empty filter tree, for a query that filters nothing. */

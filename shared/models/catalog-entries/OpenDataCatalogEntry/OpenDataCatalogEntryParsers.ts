@@ -1,3 +1,12 @@
+import type {
+  OpenDataCatalogEntryId,
+  OpenDataCatalogEntryModel,
+  OpenDataCatalogEntryRead,
+} from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+import type { Json } from "$/types/database.types.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
+
 import { makeParserRegistry } from "@avandar/clients";
 import {
   camelCaseKeysDeep,
@@ -5,16 +14,9 @@ import {
   pipe,
   snakeCaseKeysDeep,
 } from "@avandar/utils";
-import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
-import type {
-  OpenDataCatalogEntryId,
-  OpenDataCatalogEntryModel,
-  OpenDataCatalogEntryRead,
-} from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
-import type { Json } from "$/types/database.types.ts";
+
+import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 
 const DBReadSchema = z.object({
   id: z.uuid(),

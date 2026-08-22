@@ -1,7 +1,9 @@
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { render, screen } from "@/test-utils";
 import { LayerStatusBadge } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 
 function _makeViewState(
   overrides: Partial<MapLayerViewState>,

@@ -1,3 +1,6 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownDataFrame } from "@avandar/utils";
+
 /**
  * Behavioral tests for the Data Explorer drawer: that it opens shut, the two
  * ways it can be opened and which tab each lands on, and what the rail shows
@@ -11,12 +14,11 @@
  */
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 // The query editors need the router and dataset clients, and both are covered
 // by their own tests. Stub them so these tests stay about the drawer.

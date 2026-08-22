@@ -1,12 +1,14 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 /**
  * Buffer tool: spatial and selection gating, default confirm payload.
  */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { BufferMapTool } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 const spatialAvailability = vi.hoisted(() => {
   return {

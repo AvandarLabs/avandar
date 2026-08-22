@@ -1,11 +1,13 @@
 /** Tests that a virtual dataset is acquired by running its defining SQL. */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
-import type { ILogger } from "@avandar/logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ILogger } from "@avandar/logger";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 
 const DATASET_ID = "33333333-3333-4333-8333-333333333333" as Dataset.Id;
 

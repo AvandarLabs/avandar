@@ -1,6 +1,7 @@
+import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
+
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { describe, expect, it } from "vitest";
-import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
 
 /**
  * Every code the failure union carries. Listed rather than derived, so adding a

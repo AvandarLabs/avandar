@@ -1,8 +1,9 @@
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
 import type {
   CkanPackage,
   CkanResource,
 } from "$/open-data/CkanClient/CkanClient.types.ts";
+
+import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
 
 /**
  * The resource formats that can be read as a table. Compared case

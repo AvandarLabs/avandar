@@ -1,7 +1,8 @@
+import type { IDashboardRouteUtils } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
+
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import type { IDashboardRouteUtils } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 
 /** Binds dashboard viewer-route reads to authenticated application clients. */
 export const DashboardRouteUtils: IDashboardRouteUtils = {
@@ -13,9 +14,9 @@ export const DashboardRouteUtils: IDashboardRouteUtils = {
       where: {
         slug: { eq: slug },
         visibility: { eq: visibility },
-        ...(workspaceId === undefined ?
-          {}
-        : { workspace_id: { eq: workspaceId } }),
+        ...(workspaceId === undefined
+          ? {}
+          : { workspace_id: { eq: workspaceId } }),
       },
     });
   },

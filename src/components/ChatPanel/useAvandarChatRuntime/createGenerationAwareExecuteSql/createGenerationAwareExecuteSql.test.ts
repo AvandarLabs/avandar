@@ -1,5 +1,6 @@
 /** Stale generations must not run offline SQL validation. */
 import { describe, expect, it, vi } from "vitest";
+
 import { createGenerationAwareExecuteSql } from "./createGenerationAwareExecuteSql";
 
 describe("createGenerationAwareExecuteSql", () => {

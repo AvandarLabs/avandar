@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { createKeychain, KEYCHAIN_NOT_FOUND_EXIT } from "./createKeychain";
 import type { KeychainSpawner } from "./createKeychain";
+
+import { describe, expect, it } from "vitest";
+
+import { createKeychain, KEYCHAIN_NOT_FOUND_EXIT } from "./createKeychain";
 
 /*
  * G2.13: Keychain pure-layer unit suite.

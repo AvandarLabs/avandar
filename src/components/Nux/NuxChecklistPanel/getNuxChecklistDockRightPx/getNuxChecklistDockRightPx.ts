@@ -11,7 +11,7 @@ export function getNuxChecklistDockRightPx(options: {
   isProductModalOpen?: boolean;
 }): number {
   const dockGapPx = options.dockGapPx ?? NUX_CHECKLIST_DOCK_GAP_PX;
-  return options.isProductModalOpen === true ?
-      dockGapPx
+  return options.isProductModalOpen === true
+    ? dockGapPx
     : dockGapPx + options.visibleAsideWidthPx;
 }

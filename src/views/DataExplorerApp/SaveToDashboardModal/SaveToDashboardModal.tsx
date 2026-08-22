@@ -1,10 +1,18 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type {
+  VizConfig,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types";
+
 import { Model } from "@avandar/models";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Anchor, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useMemo, useState } from "react";
+
+import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
@@ -15,12 +23,6 @@ import { notifyError } from "@/utils/notifications/notify";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode";
 import { SaveToDashboardListMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import type {
-  VizConfig,
-  VizType,
-} from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   rawSql: string;
@@ -67,9 +69,8 @@ export function SaveToDashboardModal({
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
   const navigate = useNavigate();
 
-  const dashboardsWhere =
-    userProfile ?
-      {
+  const dashboardsWhere = userProfile
+    ? {
         workspace_id: { eq: workspace.id },
         owner_id: { eq: userProfile.userId },
       }
@@ -120,9 +121,9 @@ export function SaveToDashboardModal({
     action: "added" | "created",
   ): void => {
     const title =
-      action === "added" ?
-        t`Added to "${dashboardName}"`
-      : t`Created "${dashboardName}"`;
+      action === "added"
+        ? t`Added to "${dashboardName}"`
+        : t`Created "${dashboardName}"`;
     notifications.show({
       color: "green",
       title,
@@ -254,9 +255,9 @@ export function SaveToDashboardModal({
   };
 
   const subtitle =
-    mode === "list" ?
-      t`Pick a dashboard, or create a new one.`
-    : t`We'll add this visualization to your new dashboard.`;
+    mode === "list"
+      ? t`Pick a dashboard, or create a new one.`
+      : t`We'll add this visualization to your new dashboard.`;
 
   return (
     <Stack
@@ -272,7 +273,7 @@ export function SaveToDashboardModal({
         </Text>
       </Stack>
 
-      {mode === "list" ?
+      {mode === "list" ? (
         <SaveToDashboardListMode
           dashboards={dashboardList}
           isLoading={isInitialLoading}
@@ -285,23 +286,24 @@ export function SaveToDashboardModal({
           onCancel={onClose}
           onSelectAndSave={onSaveToExisting}
         />
-      : <SaveToDashboardCreateMode
+      ) : (
+        <SaveToDashboardCreateMode
           defaultName={defaultNewDashboardName}
           isCreating={isInsertingDashboard}
           isDisabled={isMutating}
           showEmptyStateBanner={!enteredFromList && !hasDashboards}
           onBack={
-            !forceCreateMode && enteredFromList ?
-              () => {
-                setEnteredFromList(false);
-                setMode("list");
-              }
-            : undefined
+            !forceCreateMode && enteredFromList
+              ? () => {
+                  setEnteredFromList(false);
+                  setMode("list");
+                }
+              : undefined
           }
           onCancel={onClose}
           onSubmit={onCreateAndSave}
         />
-      }
+      )}
     </Stack>
   );
 }

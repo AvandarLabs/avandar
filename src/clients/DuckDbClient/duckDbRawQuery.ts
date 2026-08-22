@@ -1,6 +1,16 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { PublicSnapshotDuckDbOwner } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type {
+  DuckDbClientOperations,
+  RawQueryOptions,
+} from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as duckdb from "@duckdb/duckdb-wasm";
+
 import { MIMEType } from "@avandar/utils";
-import { uuid } from "$/lib/uuid";
 import * as arrow from "apache-arrow";
+
+import { uuid } from "$/lib/uuid";
 import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
@@ -10,14 +20,6 @@ import {
   mergeDuckDbDatasetIds,
 } from "@/clients/DuckDbClient/duckDbSqlText";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-import type { PublicSnapshotDuckDbOwner } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type {
-  DuckDbClientOperations,
-  RawQueryOptions,
-} from "@/clients/DuckDbClient/duckDbClientOperations";
-import type * as duckdb from "@duckdb/duckdb-wasm";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 type RawQueryExecutionPlan = {
   datasetIds: string[];
@@ -53,12 +55,13 @@ function _getRawQueryExecutionPlan(
   // A read analysis names relations of every kind, so only the datasets among
   // them are dataset tables this plan has to prepare.
   const readDatasetIds =
-    analysis.kind === "mutating" ? analysis.readDatasetIds
-    : analysis.kind === "read" ?
-      analysis.relations.flatMap((relation) => {
-        return relation.kind === "dataset" ? [relation.id] : [];
-      })
-    : analysis.datasetIds;
+    analysis.kind === "mutating"
+      ? analysis.readDatasetIds
+      : analysis.kind === "read"
+        ? analysis.relations.flatMap((relation) => {
+            return relation.kind === "dataset" ? [relation.id] : [];
+          })
+        : analysis.datasetIds;
   const mutatedDatasetIds =
     analysis.kind === "mutating" ? analysis.mutatedDatasetIds : [];
   const datasetIds = mergeDuckDbDatasetIds(readDatasetIds, mutatedDatasetIds);
@@ -102,9 +105,8 @@ async function _executeRawQuery<RowObject extends UnknownRow>(
 ): Promise<Blob | QueryResult.T<RowObject>> {
   const { client, options, queryString, queryStringToUse } = input;
   const conn = options.conn ?? (await client.connect());
-  const removeAbortListener =
-    options.signal ?
-      abortDuckDbQuery({ signal: options.signal, connection: conn })
+  const removeAbortListener = options.signal
+    ? abortDuckDbQuery({ signal: options.signal, connection: conn })
     : () => {
         return undefined;
       };

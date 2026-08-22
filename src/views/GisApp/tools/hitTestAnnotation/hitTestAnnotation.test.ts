@@ -1,7 +1,9 @@
-import { uuid } from "$/lib/uuid";
-import { describe, expect, it } from "vitest";
-import { hitTestAnnotation } from "@/views/GisApp/tools/hitTestAnnotation/hitTestAnnotation";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
+import { describe, expect, it } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { hitTestAnnotation } from "@/views/GisApp/tools/hitTestAnnotation/hitTestAnnotation";
 
 function _identityProject(vertex: readonly [number, number]): {
   x: number;

@@ -1,6 +1,7 @@
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { ExcludeDeep } from "@utils/types/utilities.types.ts";
+
+import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 
 /**
  * Drop all keys that have a value of the specified guard type. This is

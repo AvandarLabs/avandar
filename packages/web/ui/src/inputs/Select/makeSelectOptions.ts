@@ -1,7 +1,8 @@
-import { identity } from "@avandar/utils";
 import type { SelectOption } from "./Select";
 import type { UnknownObject } from "@avandar/utils";
 import type { ConditionalKeys } from "type-fest";
+
+import { identity } from "@avandar/utils";
 
 /**
  * Given a list of objects, conver this to a list of objects with `value`
@@ -22,12 +23,12 @@ import type { ConditionalKeys } from "type-fest";
 export function makeSelectOptions<
   T extends UnknownObject,
   ValueKey extends ConditionalKeys<T, PropertyKey> | undefined,
-  Value extends undefined extends ValueKey ? string
-  : Extract<T[Extract<ValueKey, PropertyKey>], string> = undefined extends (
-    ValueKey
-  ) ?
-    string
-  : Extract<T[Extract<ValueKey, PropertyKey>], string>,
+  Value extends (undefined extends ValueKey
+    ? string
+    : Extract<T[Extract<ValueKey, PropertyKey>], string>) =
+    undefined extends ValueKey
+      ? string
+      : Extract<T[Extract<ValueKey, PropertyKey>], string>,
 >(
   list: readonly T[],
   options: {
@@ -48,9 +49,8 @@ export function makeSelectOptions<
   const selectOptions = list.map((item: T) => {
     const optionValue = (valueKey ? item[valueKey] : valueFn(item)) as Value;
     const optionLabel = (
-      labelKey ? item[labelKey]
-      : labelFn ? labelFn(item)
-      : optionValue) as string;
+      labelKey ? item[labelKey] : labelFn ? labelFn(item) : optionValue
+    ) as string;
     const isDisabled = isDisabledFn ? isDisabledFn(item) : false;
     return {
       value: optionValue,

@@ -1,13 +1,15 @@
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
+
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import {
   getMatchCaseByIdFromFilterGroup,
   makeLibraryFilterGroupFromQueryFilterGroup,
   normalizeLibraryTree,
 } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
 import { useDebouncedFilterCommit } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/useFilterTreeState/useDebouncedFilterCommit";
-import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
-import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 /**
  * Everything about a tree except the values typed into it. Two trees with the

@@ -2,6 +2,7 @@
  * Go-to query parse: coordinates vs P-code vs invalid.
  */
 import { describe, expect, it } from "vitest";
+
 import { parseMapGoToQuery } from "@/views/GisApp/tools/parseMapGoToQuery/parseMapGoToQuery";
 
 describe("parseMapGoToQuery", () => {

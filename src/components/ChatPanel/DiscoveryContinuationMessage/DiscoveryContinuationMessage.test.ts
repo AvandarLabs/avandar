@@ -1,5 +1,6 @@
 /** Behavioral tests for internal discovery continuation metadata. */
 import { describe, expect, it } from "vitest";
+
 import { DiscoveryContinuationMessage } from "./DiscoveryContinuationMessage";
 
 describe("DiscoveryContinuationMessage", () => {

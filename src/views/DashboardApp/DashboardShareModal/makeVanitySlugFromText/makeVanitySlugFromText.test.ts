@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { makeVanitySlugFromText } from "@/views/DashboardApp/DashboardShareModal/makeVanitySlugFromText/makeVanitySlugFromText";
 
 describe("makeVanitySlugFromText", () => {

@@ -1,6 +1,5 @@
-import { propEq } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import { hasPrincipalId } from "../buildShareSummary/buildShareSummary";
+import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import type { DisplayShare } from "../SharePrincipalList";
 import type {
   ResourceShareRow,
@@ -8,8 +7,11 @@ import type {
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
 import type { I18n } from "@lingui/core";
-import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+
+import { propEq } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+
+import { hasPrincipalId } from "../buildShareSummary/buildShareSummary";
 
 /**
  * Resolves the display name for the resource owner from the available

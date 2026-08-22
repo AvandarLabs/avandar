@@ -1,5 +1,6 @@
-import { LoadingOverlay as MantineLoadingOverlay } from "@mantine/core";
 import type { LoadingOverlayProps } from "@mantine/core";
+
+import { LoadingOverlay as MantineLoadingOverlay } from "@mantine/core";
 
 type Props = LoadingOverlayProps;
 

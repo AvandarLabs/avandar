@@ -39,11 +39,13 @@ export function BetaBadge({
     </Badge>
   );
 
-  return withTooltip ?
-      <Tooltip
-        label={t`Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product.`}
-      >
-        {badge}
-      </Tooltip>
-    : badge;
+  return withTooltip ? (
+    <Tooltip
+      label={t`Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product.`}
+    >
+      {badge}
+    </Tooltip>
+  ) : (
+    badge
+  );
 }

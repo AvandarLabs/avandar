@@ -1,6 +1,7 @@
-import { getBlockCountFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getBlockCountFromDashboard";
 import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
+import { getBlockCountFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getBlockCountFromDashboard";
 
 /** Privacy-safe payload builders for dashboard PDF export analytics. */
 export const DashboardPdfAnalyticsPayloads = {

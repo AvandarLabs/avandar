@@ -11,9 +11,9 @@ type GenericActionRegistry<State> = Record<
 type ActionFunctionRecord<ActionRegistry extends GenericActionRegistry<any>> = {
   [ActionType in keyof ActionRegistry]: Parameters<
     ActionRegistry[ActionType]
-  >["length"] extends 0 | 1 ?
-    () => void
-  : (payload: Parameters<ActionRegistry[ActionType]>[1]) => void;
+  >["length"] extends 0 | 1
+    ? () => void
+    : (payload: Parameters<ActionRegistry[ActionType]>[1]) => void;
 };
 
 type AppStateContextTuple<
@@ -247,15 +247,15 @@ export function createAppStateManager<
 
     Provider: ({ children, initialStateOverrides, initArgOverrides }) => {
       const reducerInitialState =
-        initialState !== undefined ?
-          {
-            ...initialState,
-            ...initialStateOverrides,
-          }
-        : {
-            ...initArg,
-            ...initArgOverrides,
-          };
+        initialState !== undefined
+          ? {
+              ...initialState,
+              ...initialStateOverrides,
+            }
+          : {
+              ...initArg,
+              ...initArgOverrides,
+            };
       const reducerInitFn = initialState !== undefined ? undefined : initFn;
 
       const [state, dispatch] = useReducer(

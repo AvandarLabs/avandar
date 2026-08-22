@@ -1,3 +1,10 @@
+import type {
+  BBox,
+  ExtractedTable,
+  PdfCellFlag,
+} from "@/workers/pdfSniff/pdfSniff.types";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -9,13 +16,8 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+
 import css from "./PdfReviewGrid.module.css";
-import type {
-  BBox,
-  ExtractedTable,
-  PdfCellFlag,
-} from "@/workers/pdfSniff/pdfSniff.types";
-import type { ReactNode } from "react";
 
 type Props = {
   table: ExtractedTable;
@@ -105,16 +107,15 @@ export function PdfReviewGrid({
 
   return (
     <Stack gap="sm">
-      {flaggedRowCount > 0 ?
+      {flaggedRowCount > 0 ? (
         <Alert variant="light" color="yellow" icon={<IconAlertTriangle />}>
           <Text size="sm">
-            {flaggedRowCount === 1 ?
-              t`${flaggedRowCount} of ${dataRows.length} rows needs review. We matched these values to their labels by position, and these were close calls. Check them against the page.`
-            : t`${flaggedRowCount} of ${dataRows.length} rows need review. We matched these values to their labels by position, and these were close calls. Check them against the page.`
-            }
+            {flaggedRowCount === 1
+              ? t`${flaggedRowCount} of ${dataRows.length} rows needs review. We matched these values to their labels by position, and these were close calls. Check them against the page.`
+              : t`${flaggedRowCount} of ${dataRows.length} rows need review. We matched these values to their labels by position, and these were close calls. Check them against the page.`}
           </Text>
         </Alert>
-      : null}
+      ) : null}
 
       {/*
        * The index here is a tiebreaker, not the identity. A flag carries no
@@ -179,11 +180,13 @@ export function PdfReviewGrid({
                     );
                     return (
                       <Table.Td key={columnIndex}>
-                        {flag ?
+                        {flag ? (
                           <Tooltip label={flag} multiline w={260}>
                             <div>{input}</div>
                           </Tooltip>
-                        : input}
+                        ) : (
+                          input
+                        )}
                       </Table.Td>
                     );
                   })}

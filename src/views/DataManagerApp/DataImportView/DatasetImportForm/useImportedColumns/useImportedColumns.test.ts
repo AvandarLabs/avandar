@@ -1,14 +1,17 @@
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
-import { describe, expect, it } from "vitest";
-import { renderHook } from "@/test-utils";
-import { useImportedColumns } from "./useImportedColumns";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type {
   CsvFileLoadResult,
   XlsxFileLoadResult,
 } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type { DataSourceMetadata } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+
+import { describe, expect, it } from "vitest";
+
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import { renderHook } from "@/test-utils";
+
+import { useImportedColumns } from "./useImportedColumns";
 
 const DATASET_ID = "11111111-1111-1111-1111-111111111111" as Dataset.Id;
 

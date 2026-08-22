@@ -1,18 +1,20 @@
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  DataExplorerAppState,
+  OpenDatasetInfo,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+
 import {
   isNonNullish,
   makeObjectFromEntries,
   prop,
   propEq,
 } from "@avandar/utils";
-import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import { z } from "zod";
-import type {
-  DataExplorerAppState,
-  OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+
+import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 
 /**
  * Zod schema for the Data Explorer URL search params.
@@ -132,9 +134,8 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
           datasetId: raw.did as OpenDatasetInfo["datasetId"],
           name: raw.name,
           sourceType,
-          virtualDatasetId:
-            raw.vid ?
-              (raw.vid as NonNullable<OpenDatasetInfo["virtualDatasetId"]>)
+          virtualDatasetId: raw.vid
+            ? (raw.vid as NonNullable<OpenDatasetInfo["virtualDatasetId"]>)
             : undefined,
         };
       }

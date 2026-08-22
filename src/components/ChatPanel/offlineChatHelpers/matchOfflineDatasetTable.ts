@@ -1,9 +1,12 @@
+import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
+
 import { propEq } from "@avandar/utils";
+
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+
 import { fuzzyMatchOfflineDatasetByName } from "./fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
 import { OfflineDatasetLabelMatch } from "./OfflineDatasetLabelMatch";
-import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
 
 /** DuckDB/Postgres catalog names small models hallucinate on errors. */
 export const FORBIDDEN_TABLE_NAMES = new Set([

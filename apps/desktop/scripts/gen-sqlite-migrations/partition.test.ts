@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { extractStatements } from "./parse";
 import { partitionStatements } from "./partition";
 

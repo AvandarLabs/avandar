@@ -1,9 +1,10 @@
-import { runMigrationChecks } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks";
-import { describe, expect, it } from "vitest";
 import type {
   MigrationCheckResult,
   MigrationsSnapshot,
 } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks.types";
+
+import { runMigrationChecks } from "@ava-cli/SupabaseCLI/SupabaseMigrationsCLI/runMigrationChecks/runMigrationChecks";
+import { describe, expect, it } from "vitest";
 
 const NOW = new Date("2026-08-14T12:00:00Z");
 

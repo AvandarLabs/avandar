@@ -1,8 +1,10 @@
-import { Trans } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
-import { TextFrequencyBar } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextFrequencyBar";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { ReactNode } from "react";
+
+import { Trans } from "@lingui/react/macro";
+import { Stack, Text } from "@mantine/core";
+
+import { TextFrequencyBar } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextFrequencyBar";
 
 type Props = {
   summary: ColumnSummary & { type: "text" };
@@ -45,14 +47,14 @@ export function TextColumnSummary({ summary, totalRows }: Props): ReactNode {
             />
           );
         })}
-        {top.value.length > 5 ?
+        {top.value.length > 5 ? (
           <Text size="xs" c="dimmed" mt={4}>
             <Trans>
               +{top.value.length - 5} more values tied at{" "}
               {top.count.toLocaleString()} rows
             </Trans>
           </Text>
-        : null}
+        ) : null}
       </Stack>
     </Stack>
   );

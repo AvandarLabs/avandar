@@ -1,6 +1,7 @@
-import { Radio, Stack } from "@mantine/core";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { ReactNode } from "react";
+
+import { Radio, Stack } from "@mantine/core";
 
 type Props = {
   mode: PublishSliceConfig.T["mode"];

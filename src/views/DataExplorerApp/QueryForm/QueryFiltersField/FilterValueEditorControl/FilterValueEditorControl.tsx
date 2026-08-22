@@ -1,16 +1,19 @@
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { ReactNode } from "react";
+import type { ValueEditorProps } from "react-querybuilder";
+
 import { Group, Text } from "@mantine/core";
+import clsx from "clsx";
+
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { QueryFilterValidation } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation";
-import clsx from "clsx";
 import { queryFilterValidationLabel } from "@/views/DataExplorerApp/copy/queryFilterValidationLabel";
 import { getFilterControlsContext } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
 import { getFilterValueFromLibraryValue } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
 import { FilterValueEditor } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor";
 import { MatchCaseToggle } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle";
+
 import classes from "./FilterValueEditorControl.module.css";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import type { ReactNode } from "react";
-import type { ValueEditorProps } from "react-querybuilder";
 
 type Props = ValueEditorProps;
 
@@ -39,9 +42,9 @@ export function FilterValueEditorControl({
     ...(dataType === undefined ? {} : { columnDataType: dataType }),
     operator: QueryFilterOperator.isOperator(operator) ? operator : "=",
     value: filterValue,
-    ...(filterContext.matchCaseById[ruleId] === true ?
-      { matchCase: true }
-    : {}),
+    ...(filterContext.matchCaseById[ruleId] === true
+      ? { matchCase: true }
+      : {}),
   };
   const reason = QueryFilterValidation.validateRule(filterRule);
   const isUnfinished = !QueryFilterValidation.isRuleComplete(filterRule);
@@ -74,7 +77,7 @@ export function FilterValueEditorControl({
           }}
         />
       </Group>
-      {reason ?
+      {reason ? (
         <Text
           size="xs"
           c="orange.7"
@@ -82,7 +85,7 @@ export function FilterValueEditorControl({
         >
           {queryFilterValidationLabel(reason)}
         </Text>
-      : null}
+      ) : null}
     </>
   );
 }

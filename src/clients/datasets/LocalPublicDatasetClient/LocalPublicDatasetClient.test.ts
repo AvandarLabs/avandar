@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const DASHBOARD_A_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 const DASHBOARD_B_ID = "33333333-3333-4333-8333-333333333333" as Dashboard.Id;

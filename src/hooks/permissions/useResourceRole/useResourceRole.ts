@@ -1,6 +1,7 @@
+import type { Database } from "$/types/database.types";
+
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import type { Database } from "$/types/database.types";
 
 export type ResourceTypeForRole = Database["public"]["Enums"]["resource_type"];
 

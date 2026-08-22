@@ -1,42 +1,48 @@
+import type { UnknownArray, UnknownObject } from "@utils/types/common.types.ts";
+import type { CamelCase } from "@utils/types/utilities.types.ts";
+
 import { isArray } from "@utils/guards/isArray/isArray.ts";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { toCamelCase } from "@utils/strings/toCamelCase/toCamelCase.ts";
-import type { UnknownArray, UnknownObject } from "@utils/types/common.types.ts";
-import type { CamelCase } from "@utils/types/utilities.types.ts";
 
-export type CamelCaseKeys<T, IsDeep extends boolean | undefined = false> =
-  T extends UnknownArray ?
-    IsDeep extends true ?
-      T extends readonly [infer ItemType] ? [CamelCaseKeys<ItemType, true>]
-      : T extends readonly [infer ItemType, infer Rest extends unknown[]] ?
-        [CamelCaseKeys<ItemType, true>, ...CamelCaseKeys<Rest, true>]
-      : T extends Array<infer ItemType> ?
-        Array<
-          ItemType extends UnknownObject | UnknownArray ?
-            CamelCaseKeys<ItemType, true>
-          : ItemType
-        >
-      : T extends ReadonlyArray<infer ItemType> ?
-        ReadonlyArray<
-          ItemType extends UnknownObject | UnknownArray ?
-            CamelCaseKeys<ItemType, true>
-          : ItemType
-        >
-      : never
+export type CamelCaseKeys<
+  T,
+  IsDeep extends boolean | undefined = false,
+> = T extends UnknownArray
+  ? IsDeep extends true
+    ? T extends readonly [infer ItemType]
+      ? [CamelCaseKeys<ItemType, true>]
+      : T extends readonly [infer ItemType, infer Rest extends unknown[]]
+        ? [CamelCaseKeys<ItemType, true>, ...CamelCaseKeys<Rest, true>]
+        : T extends Array<infer ItemType>
+          ? Array<
+              ItemType extends UnknownObject | UnknownArray
+                ? CamelCaseKeys<ItemType, true>
+                : ItemType
+            >
+          : T extends ReadonlyArray<infer ItemType>
+            ? ReadonlyArray<
+                ItemType extends UnknownObject | UnknownArray
+                  ? CamelCaseKeys<ItemType, true>
+                  : ItemType
+              >
+            : never
     : // if not deep, then we return the array as is
       T
-  : T extends UnknownObject ?
-    IsDeep extends true ?
-      {
-        [K in keyof T as K extends keyof T & string ? CamelCase<K>
-        : never]: CamelCaseKeys<T[K], true>;
-      }
-    : {
-        [K in keyof T as K extends keyof T & string ? CamelCase<K>
-        : never]: T[K];
-      }
-  : T;
+  : T extends UnknownObject
+    ? IsDeep extends true
+      ? {
+          [
+            K in keyof T as K extends keyof T & string ? CamelCase<K> : never
+          ]: CamelCaseKeys<T[K], true>;
+        }
+      : {
+          [
+            K in keyof T as K extends keyof T & string ? CamelCase<K> : never
+          ]: T[K];
+        }
+    : T;
 
 /**
  * Create a new object with all keys camelCased.

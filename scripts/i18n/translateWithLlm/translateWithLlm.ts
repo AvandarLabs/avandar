@@ -31,6 +31,7 @@
  */
 
 import process from "node:process";
+
 import { main } from "./main";
 
 export { CatalogTranslator } from "./catalogTranslator";

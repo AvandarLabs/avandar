@@ -1,7 +1,9 @@
 /** Behavioral tests for the toolbar Chat toggle. */
 import { describe, expect, it } from "vitest";
+
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { fireEvent, render, screen } from "@/test-utils";
+
 import { ChatAsideToggle } from "./ChatAsideToggle";
 
 describe("ChatAsideToggle", () => {

@@ -1,6 +1,7 @@
-import { prop } from "@avandar/utils";
-import type { ThreadMessageLike } from "@assistant-ui/react";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { ThreadMessageLike } from "@assistant-ui/react";
+
+import { prop } from "@avandar/utils";
 
 /** Route-scoped view snapshot for hidden chat view-change messages. */
 export type ChatViewSnapshot = {
@@ -68,12 +69,12 @@ export const ChatViewEvent = {
     return {
       app: pageContext.app,
       route,
-      ...(pageContext.openDatasetId ?
-        { openDatasetId: pageContext.openDatasetId }
-      : {}),
-      ...(pageContext.dashboardId ?
-        { dashboardId: pageContext.dashboardId }
-      : {}),
+      ...(pageContext.openDatasetId
+        ? { openDatasetId: pageContext.openDatasetId }
+        : {}),
+      ...(pageContext.dashboardId
+        ? { dashboardId: pageContext.dashboardId }
+        : {}),
     };
   },
 

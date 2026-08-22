@@ -1,5 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { formatNumber as FormatNumberFn } from "@utils/numbers/formatNumber/formatNumber.ts";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Re-import before each test so every test gets a fresh formatterCache.
 // Without this, a test that mocks Intl.NumberFormat would poison the cache

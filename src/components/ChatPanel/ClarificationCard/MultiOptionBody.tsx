@@ -1,11 +1,14 @@
+import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
+
 import { Stack } from "@mantine/core";
+
 import { noneOfAboveLabel } from "$/copy/noneOfAboveLabel";
 import { somethingElseLabel } from "$/copy/somethingElseLabel";
+
 import { ClarificationAnswerActions } from "./ClarificationAnswerActions";
 import { ClarificationCustomTextInput } from "./ClarificationCustomTextInput";
 import { MultiOptionList } from "./MultiOptionList";
 import { useMultiOptionAnswer } from "./useMultiOptionAnswer";
-import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   options: readonly string[];
@@ -27,12 +30,12 @@ export function MultiOptionBody({
         onChange={answer.onOptionsChange}
         onSelectAll={answer.onSelectAll}
       />
-      {answer.isCustomSelected ?
+      {answer.isCustomSelected ? (
         <ClarificationCustomTextInput
           value={answer.customText}
           onChange={answer.onCustomTextChange}
         />
-      : null}
+      ) : null}
       <ClarificationAnswerActions
         canSubmit={answer.canSubmit}
         onConfirm={answer.onSubmitAnswer}

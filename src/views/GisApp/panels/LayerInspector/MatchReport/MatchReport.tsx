@@ -1,9 +1,12 @@
-import { useLingui } from "@lingui/react/macro";
-import { Button } from "@mantine/core";
-import { DiagnosticSample } from "@/views/GisApp/panels/LayerInspector/MatchReport/DiagnosticSample/DiagnosticSample";
-import css from "./MatchReport.module.css";
 import type { MapLayerSpatialDiagnostics } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.types";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Button } from "@mantine/core";
+
+import { DiagnosticSample } from "@/views/GisApp/panels/LayerInspector/MatchReport/DiagnosticSample/DiagnosticSample";
+
+import css from "./MatchReport.module.css";
 
 type Props = {
   diagnostics: MapLayerSpatialDiagnostics;

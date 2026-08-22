@@ -1,11 +1,3 @@
-import { Model } from "@avandar/models";
-import { prop, sortObjList } from "@avandar/utils";
-import { uuid } from "$/lib/uuid";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
-import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -13,6 +5,16 @@ import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/Concep
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { Model } from "@avandar/models";
+import { prop, sortObjList } from "@avandar/utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
+import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 
 const SNAPSHOT_REVISION = "2026-08-14T01:00:00.000Z";
 

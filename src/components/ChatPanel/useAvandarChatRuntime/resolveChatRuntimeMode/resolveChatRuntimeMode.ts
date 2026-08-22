@@ -1,6 +1,7 @@
+import type { ChatRuntimeMode } from "$/types/offlineChat.types";
+
 import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
-import type { ChatRuntimeMode } from "$/types/offlineChat.types";
 
 export function resolveChatRuntimeMode(args: {
   navigatorOnLine: boolean;
@@ -9,9 +10,8 @@ export function resolveChatRuntimeMode(args: {
   selectedChatModelId?: string;
 }): ChatRuntimeMode {
   const hasDownloaded = LocalChatModelStore.hasAnyDownloaded();
-  const pickerLocalId =
-    args.selectedChatModelId ?
-      OfflineChatPickerModels.parseModelId(args.selectedChatModelId)
+  const pickerLocalId = args.selectedChatModelId
+    ? OfflineChatPickerModels.parseModelId(args.selectedChatModelId)
     : undefined;
 
   if (pickerLocalId && LocalChatModelStore.isDownloaded(pickerLocalId)) {

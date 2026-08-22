@@ -1,8 +1,10 @@
+import type { CSSProperties, ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { Fieldset, Stack } from "@mantine/core";
 import clsx from "clsx";
+
 import css from "@/components/SettingsColumns/SettingsColumns.module.css";
-import type { CSSProperties, ReactNode } from "react";
 
 /** One labelled group of settings controls. */
 export type SettingsColumnGroup = {
@@ -69,9 +71,9 @@ export function SettingsColumns({
   // Left undefined so the grid falls through to the theme's floor; only a
   // caller that wants a different one writes the property.
   const gridStyle: CSSProperties | undefined =
-    minColumnWidth === undefined ? undefined : (
-      { ["--settings-columns-min-width" as string]: `${minColumnWidth}px` }
-    );
+    minColumnWidth === undefined
+      ? undefined
+      : { ["--settings-columns-min-width" as string]: `${minColumnWidth}px` };
 
   return matchLiteral(layout, {
     stacked: () => {
@@ -99,9 +101,9 @@ export function SettingsColumns({
                 key={group.id}
                 className={css.settingsColumnsColumn}
                 style={
-                  group.span !== undefined && group.span > 1 ?
-                    { gridColumn: `span ${group.span}` }
-                  : undefined
+                  group.span !== undefined && group.span > 1
+                    ? { gridColumn: `span ${group.span}` }
+                    : undefined
                 }
               >
                 <Fieldset

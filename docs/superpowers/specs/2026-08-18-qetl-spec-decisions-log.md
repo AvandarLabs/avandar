@@ -33,8 +33,8 @@ the existing attribute mapping to the identifier attribute. Value pickers then
 fill one Individual from several datasets, which is exactly the merge this key
 supports.
 
-**Consequence.** "Materialize Parquet sorted by the entity key" is *formalizing
-existing functionality and connecting it to QETL*, not a new data-model request.
+**Consequence.** "Materialize Parquet sorted by the entity key" is _formalizing
+existing functionality and connecting it to QETL_, not a new data-model request.
 Pablo has asked for the work to be **scheduled, not dropped**.
 
 - Rewrite spec 2 section 1.6's fourth bullet and open question 3.
@@ -69,7 +69,7 @@ error. **At least one concept in the demo has an array attribute** (Pablo,
 2026-08-18), so rejection is not viable.
 
 **Resolution, and it needs no new machinery:** the spec already establishes a
-*total* order for `first` in section 4.6, namely contributing dataset id then
+_total_ order for `first` in section 4.6, namely contributing dataset id then
 `file_row_number` from the `ava_rows_<datasetId>` view. An array attribute
 aggregates over that same order:
 

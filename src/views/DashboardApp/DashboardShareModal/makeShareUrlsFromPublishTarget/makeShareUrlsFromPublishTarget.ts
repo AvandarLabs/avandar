@@ -1,5 +1,6 @@
-import { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { PublishedVisibility } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
+
+import { Dashboard } from "$/models/Dashboard/Dashboard";
 
 /**
  * The dashboardId-based URL is always valid for any published dashboard.
@@ -48,9 +49,9 @@ export function makeShareUrlsFromPublishTarget(
 ): ShareUrls {
   const base = _origin().replace(/\/$/, "");
   const prefix =
-    args.visibility === "public" ?
-      `${base}/d`
-    : `${base}/${args.workspaceSlug}/d`;
+    args.visibility === "public"
+      ? `${base}/d`
+      : `${base}/${args.workspaceSlug}/d`;
   const pathPrefix = `${prefix}/`;
   return {
     canonical: `${pathPrefix}${args.dashboardId}`,

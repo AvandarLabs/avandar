@@ -1,7 +1,7 @@
-import type { UUID } from "@avandar/utils";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { UUID } from "@avandar/utils";
 import type { SetOptional, Simplify } from "type-fest";
 
 export type ManualEntryMappingId = UUID<"ManualEntryMapping">;

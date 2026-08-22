@@ -1,9 +1,10 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Alert, Text } from "@mantine/core";
 import { IconBuilding, IconInfoCircle, IconWorld } from "@tabler/icons-react";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
 
 type Props = {
   visibility: Dashboard.Visibility;

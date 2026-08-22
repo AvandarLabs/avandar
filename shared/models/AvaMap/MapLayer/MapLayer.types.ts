@@ -1,5 +1,3 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
 import type {
   DisputedStatusRef,
   DisputedStatusValues,
@@ -26,6 +24,8 @@ import type {
 import type {
   StructuredQuery, // prettier-ignore
 } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 
 type ModelType = "MapLayer";
 type CurrentMapLayerVersion = 1;

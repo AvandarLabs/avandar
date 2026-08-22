@@ -1,6 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
-import { dismissNuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/dismissNuxChecklistPanel/dismissNuxChecklistPanel";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+
+import { describe, expect, it, vi } from "vitest";
+
+import { dismissNuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/dismissNuxChecklistPanel/dismissNuxChecklistPanel";
 
 const ALL_MILESTONES: readonly NuxProgress.MilestoneKey[] = [
   "add_dataset",

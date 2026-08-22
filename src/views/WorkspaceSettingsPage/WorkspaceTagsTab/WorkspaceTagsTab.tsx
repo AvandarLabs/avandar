@@ -1,3 +1,5 @@
+import type { UserGroupRow } from "@/clients/permissions/PermissionsClient";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
@@ -14,11 +16,11 @@ import {
 import { modals } from "@mantine/modals";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import type { UserGroupRow } from "@/clients/permissions/PermissionsClient";
 
 /**
  * CRUD for workspace user-group tags (names + colors).

@@ -1,9 +1,17 @@
+import type { DatasetImportFeedbackProps } from "./DatasetImportFeedback/DatasetImportFeedback";
+import type { DatasetImportFieldsProps } from "./DatasetImportFields";
+import type { DatasetImportFormProps } from "./DatasetImportForm.types";
+import type { SaveDatasetButtonProps } from "./SaveDatasetButton";
+import type { FormEventHandler, ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useMemo } from "react";
+
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+
 import { DatasetImportFeedback } from "./DatasetImportFeedback/DatasetImportFeedback";
 import { DatasetImportFields } from "./DatasetImportFields";
 import { isPdfAwaitingSelection } from "./isPdfAwaitingSelection";
@@ -12,11 +20,6 @@ import { useDatasetImportCopy } from "./useDatasetImportCopy";
 import { useDatasetImportValidation } from "./useDatasetImportValidation";
 import { useImportedColumns } from "./useImportedColumns/useImportedColumns";
 import { useSaveDataset } from "./useSaveDataset/useSaveDataset";
-import type { DatasetImportFeedbackProps } from "./DatasetImportFeedback/DatasetImportFeedback";
-import type { DatasetImportFieldsProps } from "./DatasetImportFields";
-import type { DatasetImportFormProps } from "./DatasetImportForm.types";
-import type { SaveDatasetButtonProps } from "./SaveDatasetButton";
-import type { FormEventHandler, ReactNode } from "react";
 
 /**
  * Everything `DatasetImportForm` needs from its props. The two props it never

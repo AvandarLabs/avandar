@@ -1,12 +1,14 @@
-import { Permissions } from "$/models/Permissions/Permissions.ts";
-import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
-import { Constants } from "$/types/database.types.ts";
-import { z } from "zod";
 import type {
   AppType,
   RoleLevel,
 } from "$/models/Permissions/Permissions.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+
+import { z } from "zod";
+
+import { Permissions } from "$/models/Permissions/Permissions.ts";
+import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
+import { Constants } from "$/types/database.types.ts";
 
 /** Validates one app-role override stored on a workspace invite. */
 export const WorkspaceInviteRoleOverrideSchema = z.object({
@@ -68,9 +70,12 @@ export async function makeRoleGroupIdFromAcceptedInvite(
 
   const overrides = RoleOverridesSchema.parse(invite.role_overrides);
   const merged =
-    overrides.length === 0 ?
-      baseMatrix
-    : Permissions.RolesMatrix.applyRoleOverridesToMatrix(baseMatrix, overrides);
+    overrides.length === 0
+      ? baseMatrix
+      : Permissions.RolesMatrix.applyRoleOverridesToMatrix(
+          baseMatrix,
+          overrides,
+        );
 
   if (Permissions.RolesMatrix.areRoleMatricesEqual(merged, baseMatrix)) {
     return baseGroupId;

@@ -1,7 +1,9 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { renderHook } from "@/test-utils";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 const useGetPrivateResourceCounts = vi.fn();
 

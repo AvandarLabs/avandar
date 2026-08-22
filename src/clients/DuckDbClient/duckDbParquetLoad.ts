@@ -1,3 +1,11 @@
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { DuckDbLoadParquetResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type {
+  DuckDbClientOperations,
+  DuckDbLoadParquetOptions,
+} from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as duckdb from "@duckdb/duckdb-wasm";
+
 import { uuid } from "$/lib/uuid";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
@@ -6,13 +14,6 @@ import {
   getParquetProjectionClauses,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { DuckDbLoadParquetResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type {
-  DuckDbClientOperations,
-  DuckDbLoadParquetOptions,
-} from "@/clients/DuckDbClient/duckDbClientOperations";
-import type * as duckdb from "@duckdb/duckdb-wasm";
 
 async function _createParquetView(
   options: Readonly<{

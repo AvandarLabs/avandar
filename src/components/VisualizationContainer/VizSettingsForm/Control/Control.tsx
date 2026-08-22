@@ -1,3 +1,7 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { ControlSpec } from "$/models/vizs/SettingDescriptor";
+import type { ReactNode } from "react";
+
 import { Select } from "@avandar/ui";
 import {
   ColorInput,
@@ -6,12 +10,10 @@ import {
   Switch,
   TextInput,
 } from "@mantine/core";
+
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { ColumnPickerControl } from "@/components/VisualizationContainer/VizSettingsForm/Control/ColumnPickerControl";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { ControlSpec } from "$/models/vizs/SettingDescriptor";
-import type { ReactNode } from "react";
 
 type Props = {
   /** Display label for the control. */

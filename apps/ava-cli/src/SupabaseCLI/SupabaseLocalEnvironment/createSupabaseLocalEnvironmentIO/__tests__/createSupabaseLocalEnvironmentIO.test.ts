@@ -1,7 +1,7 @@
-import { rm } from "node:fs/promises";
-import path from "node:path";
 import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { promiseMap } from "@avandar/utils";
+import { rm } from "node:fs/promises";
+import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const commandMocks = vi.hoisted(() => {

@@ -3,22 +3,22 @@
 A complete inventory of what the dashboards and visualizations product does
 today, as of branch `feat/dash2` (AvaPage schema version 4).
 
-This is a *descriptive* inventory of shipped behavior, not a roadmap. Every
+This is a _descriptive_ inventory of shipped behavior, not a roadmap. Every
 entry below is backed by code in the repo; paths are repo-relative.
 
 ---
 
 ## 1. Product surfaces
 
-| Surface | Route | Auth | Component |
-| --- | --- | --- | --- |
-| Dashboard list | `/$workspaceSlug/dashboards` | authenticated + `dashboards__can_view_dashboard` | `DashboardListView` |
-| Dashboard editor | `/$workspaceSlug/dashboards/edit/$dashboardId` | authenticated | `DashboardEditorView` |
-| Owner preview | `/$workspaceSlug/dashboards/preview/$dashboardId` | authenticated (bypasses `isPublic`) | `DashboardViewerView` (`mode="preview"`) |
-| Public canonical viewer | `/public/dashboards/$workspaceSlug/$dashboardId` | anonymous; gated on `isPublic` | `DashboardViewerView` (`mode="public"`) |
-| Public vanity viewer | `/d/$slug` | anonymous; gated on `isPublic` | `DashboardViewerView` (`mode="public"`) |
-| Data Explorer (viz authoring) | `/$workspaceSlug/data-explorer` | authenticated | `DataExplorerApp` + `VisualizationContainer` + `VizSettingsForm` |
-| Slug validation API | `POST dashboards/validate-slug` | edge function (admin client) | `supabase/functions/dashboards` |
+| Surface                       | Route                                             | Auth                                             | Component                                                        |
+| ----------------------------- | ------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------- |
+| Dashboard list                | `/$workspaceSlug/dashboards`                      | authenticated + `dashboards__can_view_dashboard` | `DashboardListView`                                              |
+| Dashboard editor              | `/$workspaceSlug/dashboards/edit/$dashboardId`    | authenticated                                    | `DashboardEditorView`                                            |
+| Owner preview                 | `/$workspaceSlug/dashboards/preview/$dashboardId` | authenticated (bypasses `isPublic`)              | `DashboardViewerView` (`mode="preview"`)                         |
+| Public canonical viewer       | `/public/dashboards/$workspaceSlug/$dashboardId`  | anonymous; gated on `isPublic`                   | `DashboardViewerView` (`mode="public"`)                          |
+| Public vanity viewer          | `/d/$slug`                                        | anonymous; gated on `isPublic`                   | `DashboardViewerView` (`mode="public"`)                          |
+| Data Explorer (viz authoring) | `/$workspaceSlug/data-explorer`                   | authenticated                                    | `DataExplorerApp` + `VisualizationContainer` + `VizSettingsForm` |
+| Slug validation API           | `POST dashboards/validate-slug`                   | edge function (admin client)                     | `supabase/functions/dashboards`                                  |
 
 Route guard: `src/routes/_auth/$workspaceSlug/dashboards/route.tsx` enforces
 the `dashboards__can_view_dashboard` permission with a resource-share
@@ -34,17 +34,17 @@ implements `IVizConfigModule`: `displayName`, `descriptors`,
 `makeEmptyConfig`, `hydrateFromQuery`, `hydrateFromQueryResult`,
 `convertVizConfig`.
 
-| Type | Config | Renderer | Library |
-| --- | --- | --- | --- |
-| `table` | `TableVizConfig` (no settings) | `DataGrid` | AG Grid (`themeMaterial`, Avandar-themed) |
-| `bar` | `BarChartVizConfig` | `BarChart` | Mantine Charts `BarChart` |
-| `line` | `LineChartVizConfig` | `LineChart` | Mantine Charts `LineChart` |
-| `area` | `AreaChartVizConfig` | `AreaChart` | Recharts directly (documented Mantine wrapper bug) |
-| `scatter` | `ScatterPlotVizConfig` | `ScatterChart` | Mantine Charts `ScatterChart` |
-| `pie` | `PieChartVizConfig` | `PieChart` / `DonutChart` | Mantine Charts |
-| `funnel` | `FunnelChartVizConfig` | `FunnelChart` | Mantine Charts |
-| `radar` | `RadarChartVizConfig` | `RadarChart` | Mantine Charts |
-| `bubble` | `BubbleChartVizConfig` | `BubbleChart` | Recharts directly (multi-series, Excel parity) |
+| Type      | Config                         | Renderer                  | Library                                            |
+| --------- | ------------------------------ | ------------------------- | -------------------------------------------------- |
+| `table`   | `TableVizConfig` (no settings) | `DataGrid`                | AG Grid (`themeMaterial`, Avandar-themed)          |
+| `bar`     | `BarChartVizConfig`            | `BarChart`                | Mantine Charts `BarChart`                          |
+| `line`    | `LineChartVizConfig`           | `LineChart`               | Mantine Charts `LineChart`                         |
+| `area`    | `AreaChartVizConfig`           | `AreaChart`               | Recharts directly (documented Mantine wrapper bug) |
+| `scatter` | `ScatterPlotVizConfig`         | `ScatterChart`            | Mantine Charts `ScatterChart`                      |
+| `pie`     | `PieChartVizConfig`            | `PieChart` / `DonutChart` | Mantine Charts                                     |
+| `funnel`  | `FunnelChartVizConfig`         | `FunnelChart`             | Mantine Charts                                     |
+| `radar`   | `RadarChartVizConfig`          | `RadarChart`              | Mantine Charts                                     |
+| `bubble`  | `BubbleChartVizConfig`         | `BubbleChart`             | Recharts directly (multi-series, Excel parity)     |
 
 ### 2.1 Multi-series model
 
@@ -135,17 +135,17 @@ formatter in the table.
 client-side and a one-shot warning toast fires on the transition from
 "within limit" to "over limit" (not on every re-render).
 
-| Viz | Max rows | Noun |
-| --- | --- | --- |
-| table | *(uncapped)* | — |
-| bar | 200 | bars |
-| line | 500 | points |
-| area | 500 | points |
-| scatter | 1000 | points |
-| bubble | 500 | bubbles |
-| pie | 50 | slices |
-| funnel | 50 | steps |
-| radar | 50 | axes |
+| Viz     | Max rows     | Noun    |
+| ------- | ------------ | ------- |
+| table   | _(uncapped)_ | —       |
+| bar     | 200          | bars    |
+| line    | 500          | points  |
+| area    | 500          | points  |
+| scatter | 1000         | points  |
+| bubble  | 500          | bubbles |
+| pie     | 50           | slices  |
+| funnel  | 50           | steps   |
+| radar   | 50           | axes    |
 
 ### 2.6 Render-time validation
 
@@ -196,15 +196,15 @@ Rendered by `Control` (`src/components/VisualizationContainer/VizSettingsForm/Co
 
 ### 3.3 Descriptor coverage
 
-| Viz | Chart descriptors | Series descriptors |
-| --- | --- | --- |
-| bar | `layout`, `withLegend`, `chartStyle.legend.position`, 5× X axis, 7× Y axis, 3× grid (18) | `color`, `label`, `fillOpacity`, `stackId` |
-| line | same minus `layout` (17) | `color`, `label`, `curveType`, `strokeWidth` (Line width), `withDots` |
-| area | same as bar, `layout` = Area layout (18) | `color`, `label`, `curveType`, `strokeWidth`, `fillOpacity`, `withDots` |
-| scatter | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset | — |
-| bubble | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset | — |
-| radar | `withLegend`, `chartStyle.legend.position` (2) | `color`, `label`, `strokeWidth`, `fillOpacity` |
-| table, pie, funnel | `EMPTY_VIZ_SETTING_DESCRIPTORS`, hand-coded forms | — |
+| Viz                | Chart descriptors                                                                        | Series descriptors                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| bar                | `layout`, `withLegend`, `chartStyle.legend.position`, 5× X axis, 7× Y axis, 3× grid (18) | `color`, `label`, `fillOpacity`, `stackId`                              |
+| line               | same minus `layout` (17)                                                                 | `color`, `label`, `curveType`, `strokeWidth` (Line width), `withDots`   |
+| area               | same as bar, `layout` = Area layout (18)                                                 | `color`, `label`, `curveType`, `strokeWidth`, `fillOpacity`, `withDots` |
+| scatter            | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset                 | —                                                                       |
+| bubble             | 8× X axis, 7× Y axis (15), rendered below the hand-coded series fieldset                 | —                                                                       |
+| radar              | `withLegend`, `chartStyle.legend.position` (2)                                           | `color`, `label`, `strokeWidth`, `fillOpacity`                          |
+| table, pie, funnel | `EMPTY_VIZ_SETTING_DESCRIPTORS`, hand-coded forms                                        | —                                                                       |
 
 Axis descriptors are generated by `makeAxisDescriptors`
 (`shared/models/vizs/makeAxisDescriptors/`) rather than repeated per module. A
@@ -272,7 +272,7 @@ the Data Explorer sidebar and in the dashboard editor's Puck side panel.
   `shouldHydrateVizFromQueryResult` says so.
 - **`shouldHydrateVizFromQueryResult`** — the gate that preserves manual axis
   choices across refetches. Returns `false` when the config has all
-  minimum-required keys *and* every key resolves in the result; returns
+  minimum-required keys _and_ every key resolves in the result; returns
   `true` for raw-SQL paths, empty structured queries, missing keys, or when
   no structured derived column name appears in the result.
 - **`isVizConfigEqualForQueryResultSync`** — per-type structural comparison
@@ -291,18 +291,18 @@ and side-panel custom fields **P-fields** (pfields).
 `AvaPageRootProps` (`src/views/DashboardApp/AvaPage/AvaPage.types.ts`) and
 its Puck field config:
 
-| Prop | Control | Values |
-| --- | --- | --- |
-| `title` | text | — |
-| `subtitle` | text | — |
-| `author` | text | — |
-| `publishedAt` | text | — |
-| `isTitleHidden` / `isSubtitleHidden` / `isAuthorHidden` / `isPublishedAtHidden` | radio (No/Yes) | — |
-| `theme` | select | `default`, `ocean`, `forest`, `rose`, `amber`, `graphite` |
-| `typography` | select | `system`, `serif`, `mono` |
-| `containerMaxWidth` | custom (`ContainerMaxWidthPField`) | `%` (clamped 20–100) or `px` (non-negative int; default 860) |
-| `horizontalPadding` / `verticalPadding` | select | `none`, `xs`, `sm`, `md`, `lg`, `xl` |
-| `schemaVersion` | custom, `visible: false` | debug-only readout |
+| Prop                                                                            | Control                            | Values                                                       |
+| ------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------ |
+| `title`                                                                         | text                               | —                                                            |
+| `subtitle`                                                                      | text                               | —                                                            |
+| `author`                                                                        | text                               | —                                                            |
+| `publishedAt`                                                                   | text                               | —                                                            |
+| `isTitleHidden` / `isSubtitleHidden` / `isAuthorHidden` / `isPublishedAtHidden` | radio (No/Yes)                     | —                                                            |
+| `theme`                                                                         | select                             | `default`, `ocean`, `forest`, `rose`, `amber`, `graphite`    |
+| `typography`                                                                    | select                             | `system`, `serif`, `mono`                                    |
+| `containerMaxWidth`                                                             | custom (`ContainerMaxWidthPField`) | `%` (clamped 20–100) or `px` (non-negative int; default 860) |
+| `horizontalPadding` / `verticalPadding`                                         | select                             | `none`, `xs`, `sm`, `md`, `lg`, `xl`                         |
+| `schemaVersion`                                                                 | custom, `visible: false`           | debug-only readout                                           |
 
 ### 4.2 Design tokens
 
@@ -319,35 +319,35 @@ Grouped into three editor categories.
 
 **Layout** (`layout`, default-expanded)
 
-| Block | Fields |
-| --- | --- |
-| `Section` | `maxWidth` (narrow/normal/wide/full), `padding` (sm/md/lg), `background` (none/subtle), `content` slot |
-| `Columns` | `numColumns` (up to 12 slots `col1`…`col12`), `leftSpan`, `rightSpan`, `gap` (xs–lg), `collapseAt` (sm/md/lg) |
-| `Grid` | `numColumns`, `numRows`, `gap`; generates `r{row}c{col}` slots dynamically |
-| `SidebarLayout` | `sidebarPosition` (left/right radio), `sidebarSpan`, `gap`, `collapseAt`, `sidebar` slot, `main` slot |
+| Block           | Fields                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| `Section`       | `maxWidth` (narrow/normal/wide/full), `padding` (sm/md/lg), `background` (none/subtle), `content` slot        |
+| `Columns`       | `numColumns` (up to 12 slots `col1`…`col12`), `leftSpan`, `rightSpan`, `gap` (xs–lg), `collapseAt` (sm/md/lg) |
+| `Grid`          | `numColumns`, `numRows`, `gap`; generates `r{row}c{col}` slots dynamically                                    |
+| `SidebarLayout` | `sidebarPosition` (left/right radio), `sidebarSpan`, `gap`, `collapseAt`, `sidebar` slot, `main` slot         |
 
 **Content** (`content`, default-expanded)
 
-| Block | Fields |
-| --- | --- |
-| `DataViz` | `nlQuery` (custom), `vizType` (select, all 9), `vizConfig` (custom), `globalFilterSubscription` (custom), `localFilters` (custom) |
-| `Filter` | `filterId`, `label`, `columnName`, `mode` (single/multi/contains), `optionsRaw`, `defaultValue` |
-| `Card` | `title`, `content` slot |
-| `CalloutBlock` | `tone` (info/warning/neutral), `title`, `body` |
-| `CodeBlock` | `language`, `code` |
-| `HeadingBlock` | `text`, `level` (1–4), `align` (left/center/right) |
-| `ParagraphBlock` | `text` (textarea), `align` |
-| `ListBlock` | `type` (ordered/unordered), `items` (Puck array field) |
-| `QuoteBlock` | `quote`, `cite` |
-| `TableBlock` | `delimiter` (comma/tab/pipe), `hasHeader`, `data` (textarea, parsed client-side) |
-| `DividerBlock` | *(none)* |
+| Block            | Fields                                                                                                                            |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `DataViz`        | `nlQuery` (custom), `vizType` (select, all 9), `vizConfig` (custom), `globalFilterSubscription` (custom), `localFilters` (custom) |
+| `Filter`         | `filterId`, `label`, `columnName`, `mode` (single/multi/contains), `optionsRaw`, `defaultValue`                                   |
+| `Card`           | `title`, `content` slot                                                                                                           |
+| `CalloutBlock`   | `tone` (info/warning/neutral), `title`, `body`                                                                                    |
+| `CodeBlock`      | `language`, `code`                                                                                                                |
+| `HeadingBlock`   | `text`, `level` (1–4), `align` (left/center/right)                                                                                |
+| `ParagraphBlock` | `text` (textarea), `align`                                                                                                        |
+| `ListBlock`      | `type` (ordered/unordered), `items` (Puck array field)                                                                            |
+| `QuoteBlock`     | `quote`, `cite`                                                                                                                   |
+| `TableBlock`     | `delimiter` (comma/tab/pipe), `hasHeader`, `data` (textarea, parsed client-side)                                                  |
+| `DividerBlock`   | _(none)_                                                                                                                          |
 
 **Media** (`media`)
 
-| Block | Fields |
-| --- | --- |
-| `FigureBlock` | `src`, `alt`, `caption` |
-| `EmbedBlock` | `title`, `url`, `height` (clamped 200–1200, default 420) |
+| Block         | Fields                                                   |
+| ------------- | -------------------------------------------------------- |
+| `FigureBlock` | `src`, `alt`, `caption`                                  |
+| `EmbedBlock`  | `title`, `url`, `height` (clamped 200–1200, default 420) |
 
 ### 4.4 P-fields (5 custom Puck fields)
 
@@ -736,12 +736,12 @@ leaving explicit shares functional.
 registry keyed by version, upgrading in a loop until current and supporting
 single-step downgrades.
 
-| Migration | Change |
-| --- | --- |
-| V0 → V1 | `DataViz` gains an `nlQuery` object (`prompt`, `rawSql`, `generations`), replacing loose `prompt` / `sql` / `sqlError` / `generateSqlRequestId` props |
-| V1 → V2 | `DataViz` gains `vizType` + `vizConfig`, both defaulting to `table` |
-| V2 → V3 | Single-key viz configs (`yAxisKey`, `color`) become series arrays; radar gains `series`; pie / funnel / scatter / bubble unchanged |
-| V3 → V4 | `DataViz` gains `globalFilterSubscription` (default `all`) and `localFilters` (default `[]`) |
+| Migration | Change                                                                                                                                                |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| V0 → V1   | `DataViz` gains an `nlQuery` object (`prompt`, `rawSql`, `generations`), replacing loose `prompt` / `sql` / `sqlError` / `generateSqlRequestId` props |
+| V1 → V2   | `DataViz` gains `vizType` + `vizConfig`, both defaulting to `table`                                                                                   |
+| V2 → V3   | Single-key viz configs (`yAxisKey`, `color`) become series arrays; radar gains `series`; pie / funnel / scatter / bubble unchanged                    |
+| V3 → V4   | `DataViz` gains `globalFilterSubscription` (default `all`) and `localFilters` (default `[]`)                                                          |
 
 Each migration lives in its own module with **frozen** type snapshots and an
 explicit rule against importing live app types (only the newest migration may

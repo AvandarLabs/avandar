@@ -1,25 +1,3 @@
-/**
- * Row-level tests for {@link structuredQueryToSql}. Every case builds a
- * structured query, runs the emitted SQL against a real in-memory DuckDB,
- * and asserts the rows that come back.
- *
- * Asserting rows rather than SQL text is the point of this suite: a
- * snapshot of emitted SQL stays green when the SQL is subtly wrong, while
- * executing it does not.
- *
- * The suite lives under `src/` rather than beside its module because the
- * DuckDB harness it needs is browser-side code, and `deno check shared`
- * type-checks every file under `shared/`. A `shared/` test importing `@/`
- * fails that check, and mapping `@/` for Deno would let Deno-reachable code
- * import browser code, which is the boundary the rule exists to protect.
- */
-import { Model } from "@avandar/models";
-import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-import { describe, expect, it } from "vitest";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { DuckDBConnection } from "@duckdb/node-api";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptModel } from "$/models/ontology/Concept/Concept.types";
@@ -36,6 +14,30 @@ import type {
   PartialStructuredQuery,
   StructuredQueryId,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { DuckDBConnection } from "@duckdb/node-api";
+
+/**
+ * Row-level tests for {@link structuredQueryToSql}. Every case builds a
+ * structured query, runs the emitted SQL against a real in-memory DuckDB,
+ * and asserts the rows that come back.
+ *
+ * Asserting rows rather than SQL text is the point of this suite: a
+ * snapshot of emitted SQL stays green when the SQL is subtly wrong, while
+ * executing it does not.
+ *
+ * The suite lives under `src/` rather than beside its module because the
+ * DuckDB harness it needs is browser-side code, and `deno check shared`
+ * type-checks every file under `shared/`. A `shared/` test importing `@/`
+ * fails that check, and mapping `@/` for Deno would let Deno-reachable code
+ * import browser code, which is the boundary the rule exists to protect.
+ */
+import { Model } from "@avandar/models";
+import { describe, expect, it } from "vitest";
+
+import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 
 /**
  * A concept, and the table name the emitter has to derive for it.

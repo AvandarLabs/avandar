@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { canKeepPrintedColumns, combineRegions } from "./combineRegions";
 import type { ExtractedTable } from "../pdfSniff.types";
 import type { CombinedTable } from "./combineRegions";
+
+import { describe, expect, it } from "vitest";
+
+import { canKeepPrintedColumns, combineRegions } from "./combineRegions";
 
 function table(
   regionId: string,

@@ -29,12 +29,12 @@ Read these before Task 1. They are not negotiable and reviewers enforce them.
 
 ## Commands
 
-| Purpose | Command |
-| --- | --- |
-| Run one test file | `pnpm test:frontend <path-substring>` |
-| Run all frontend + model tests | `pnpm test:frontend` |
-| Type check | `pnpm type-check` |
-| Lint | `pnpm lint` |
+| Purpose                        | Command                               |
+| ------------------------------ | ------------------------------------- |
+| Run one test file              | `pnpm test:frontend <path-substring>` |
+| Run all frontend + model tests | `pnpm test:frontend`                  |
+| Type check                     | `pnpm type-check`                     |
+| Lint                           | `pnpm lint`                           |
 
 ## Deviations from the spec (deliberate, with rationale)
 
@@ -49,34 +49,34 @@ Read these before Task 1. They are not negotiable and reviewers enforce them.
 
 **Created**
 
-| File | Responsibility |
-| --- | --- |
-| `shared/models/AvaMap/AvaMap.types.ts` | `AvaMapRead`, `AvaMapId`, `MapViewState`, `BasemapConfig`, `BasemapStyleKey` |
-| `shared/models/AvaMap/AvaMap.ts` | `AvaMap` namespace entry |
-| `shared/models/AvaMap/AvaMapModule.ts` | `makeEmpty` |
-| `shared/models/AvaMap/AvaMapModule.test.ts` | defaults behavior |
-| `shared/models/AvaMap/MapLayer/MapLayer.types.ts` | `MapLayerRead`, `MapLayerId`, `PopupConfig` |
-| `shared/models/AvaMap/MapLayer/GeoBinding.types.ts` | `GeoBinding`, `ResolvedGeoBinding` |
-| `shared/models/AvaMap/MapLayer/LayerSymbology.types.ts` | `LayerSymbology`, `ColorSpec`, `StrokeSpec` |
-| `shared/models/AvaMap/MapLayer/SensitivityPolicy.types.ts` | `SensitivityPolicy` |
-| `shared/models/AvaMap/MapLayer/LegendConfig.types.ts` | `LegendConfig`, `LegendPosition` |
-| `shared/models/AvaMap/MapLayer/MapLayer.ts` | `MapLayer` namespace entry |
-| `shared/models/AvaMap/MapLayer/MapLayerModule.ts` | `makeEmpty`, `toGeoBinding` |
-| `shared/models/AvaMap/MapLayer/MapLayerModule.test.ts` | defaults, binding resolution |
-| `src/views/GISApp/layers/jitterCoordinate/jitterCoordinate.ts` | deterministic seeded point displacement |
-| `src/views/GISApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows.ts` | rows -> GeoJSON + drop report |
-| `src/views/GISApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection.ts` | bounds for every geometry type |
-| `src/views/GISApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection.ts` | value domain for data-driven paint |
-| `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.ts` | one layer -> MapLibre JSON |
-| `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs.ts` | ordered layers -> merged `MapSpec` |
-| `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types.ts` | `MapSpec`, `MapSourceSpec`, `MapLayerSpec` |
-| `src/views/GISApp/layers/useMapLayerData/useMapLayerData.ts` | per-layer cached query |
-| `src/views/GISApp/MapCanvas/syncMap.ts` | the only imperative MapLibre caller |
-| `src/views/GISApp/MapCanvas/MapCanvas.tsx` | map lifecycle, one click handler, overlays |
-| `src/views/GISApp/MapCanvas/MapCanvas.module.css` | canvas + overlay styles |
-| `src/views/GISApp/MapCanvas/MapStatusOverlay.tsx` | loading / empty / error / dropped-rows states |
-| `src/clients/queries/runStructuredQuery/runStructuredQuery.ts` | shared executor extracted from `useDataQuery` |
-| `src/clients/queries/runStructuredQuery/runStructuredQuery.test.ts` | dataset + raw-SQL routing |
+| File                                                                                                       | Responsibility                                                               |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `shared/models/AvaMap/AvaMap.types.ts`                                                                     | `AvaMapRead`, `AvaMapId`, `MapViewState`, `BasemapConfig`, `BasemapStyleKey` |
+| `shared/models/AvaMap/AvaMap.ts`                                                                           | `AvaMap` namespace entry                                                     |
+| `shared/models/AvaMap/AvaMapModule.ts`                                                                     | `makeEmpty`                                                                  |
+| `shared/models/AvaMap/AvaMapModule.test.ts`                                                                | defaults behavior                                                            |
+| `shared/models/AvaMap/MapLayer/MapLayer.types.ts`                                                          | `MapLayerRead`, `MapLayerId`, `PopupConfig`                                  |
+| `shared/models/AvaMap/MapLayer/GeoBinding.types.ts`                                                        | `GeoBinding`, `ResolvedGeoBinding`                                           |
+| `shared/models/AvaMap/MapLayer/LayerSymbology.types.ts`                                                    | `LayerSymbology`, `ColorSpec`, `StrokeSpec`                                  |
+| `shared/models/AvaMap/MapLayer/SensitivityPolicy.types.ts`                                                 | `SensitivityPolicy`                                                          |
+| `shared/models/AvaMap/MapLayer/LegendConfig.types.ts`                                                      | `LegendConfig`, `LegendPosition`                                             |
+| `shared/models/AvaMap/MapLayer/MapLayer.ts`                                                                | `MapLayer` namespace entry                                                   |
+| `shared/models/AvaMap/MapLayer/MapLayerModule.ts`                                                          | `makeEmpty`, `toGeoBinding`                                                  |
+| `shared/models/AvaMap/MapLayer/MapLayerModule.test.ts`                                                     | defaults, binding resolution                                                 |
+| `src/views/GISApp/layers/jitterCoordinate/jitterCoordinate.ts`                                             | deterministic seeded point displacement                                      |
+| `src/views/GISApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows.ts`                   | rows -> GeoJSON + drop report                                                |
+| `src/views/GISApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection.ts`                 | bounds for every geometry type                                               |
+| `src/views/GISApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection.ts`         | value domain for data-driven paint                                           |
+| `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.ts` | one layer -> MapLibre JSON                                                   |
+| `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs.ts`                           | ordered layers -> merged `MapSpec`                                           |
+| `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types.ts`                                       | `MapSpec`, `MapSourceSpec`, `MapLayerSpec`                                   |
+| `src/views/GISApp/layers/useMapLayerData/useMapLayerData.ts`                                               | per-layer cached query                                                       |
+| `src/views/GISApp/MapCanvas/syncMap.ts`                                                                    | the only imperative MapLibre caller                                          |
+| `src/views/GISApp/MapCanvas/MapCanvas.tsx`                                                                 | map lifecycle, one click handler, overlays                                   |
+| `src/views/GISApp/MapCanvas/MapCanvas.module.css`                                                          | canvas + overlay styles                                                      |
+| `src/views/GISApp/MapCanvas/MapStatusOverlay.tsx`                                                          | loading / empty / error / dropped-rows states                                |
+| `src/clients/queries/runStructuredQuery/runStructuredQuery.ts`                                             | shared executor extracted from `useDataQuery`                                |
+| `src/clients/queries/runStructuredQuery/runStructuredQuery.test.ts`                                        | dataset + raw-SQL routing                                                    |
 
 **Moved** (Task 1): `src/components/GISApp/**` -> `src/views/GISApp/**`.
 
@@ -91,6 +91,7 @@ Read these before Task 1. They are not negotiable and reviewers enforce them.
 Pure relocation so every later path is final. No behavior change.
 
 **Files:**
+
 - Move: `src/components/GISApp/` -> `src/views/GISApp/`
 - Modify: `src/routes/_auth/$workspaceSlug/map.tsx`, and the four files that self-import via `@/components/GISApp`
 
@@ -130,6 +131,7 @@ git commit -m "refactor(gis): move GISApp under src/views for app parity"
 ## Task 2: `AvaMap` and `MapLayer` config models
 
 **Files:**
+
 - Create: `shared/models/AvaMap/AvaMap.types.ts`, `AvaMap.ts`, `AvaMapModule.ts`
 - Create: `shared/models/AvaMap/MapLayer/{MapLayer.types.ts,GeoBinding.types.ts,LayerSymbology.types.ts,SensitivityPolicy.types.ts,LegendConfig.types.ts,MapLayer.ts,MapLayerModule.ts}`
 - Test: `shared/models/AvaMap/AvaMapModule.test.ts`, `shared/models/AvaMap/MapLayer/MapLayerModule.test.ts`
@@ -210,8 +212,12 @@ describe("MapLayer.makeEmpty", () => {
 
 describe("MapLayer.toGeoBinding", () => {
   it("maps column ids to the names rows are keyed by", () => {
-    const latitude = QueryColumn.makeFromDatasetColumn(createNumericColumn("lat"));
-    const longitude = QueryColumn.makeFromDatasetColumn(createNumericColumn("lon"));
+    const latitude = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("lat"),
+    );
+    const longitude = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("lon"),
+    );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
       source: {
@@ -233,7 +239,9 @@ describe("MapLayer.toGeoBinding", () => {
   });
 
   it("returns undefined when a bound column is not in the query", () => {
-    const latitude = QueryColumn.makeFromDatasetColumn(createNumericColumn("lat"));
+    const latitude = QueryColumn.makeFromDatasetColumn(
+      createNumericColumn("lat"),
+    );
     const layer = {
       ...MapLayer.makeEmpty("Cases"),
       geoBinding: {
@@ -344,10 +352,7 @@ export type SensitivityPolicy =
 ```ts
 /** Where a layer's legend sits over the map, or `hidden` to omit it. */
 export type LegendPosition =
-  | "bottomLeft"
-  | "bottomRight"
-  | "topRight"
-  | "hidden";
+  "bottomLeft" | "bottomRight" | "topRight" | "hidden";
 
 /**
  * A layer's legend. Persisted rather than derived at render time so that the
@@ -469,9 +474,7 @@ export const MapLayerModule = {
    * @returns The resolved binding, or `undefined` when the layer has no
    * binding or a bound column is absent from the layer's query.
    */
-  toGeoBinding: (
-    layer: MapLayerRead,
-  ): ResolvedGeoBinding | undefined => {
+  toGeoBinding: (layer: MapLayerRead): ResolvedGeoBinding | undefined => {
     const { geoBinding, source } = layer;
     if (!geoBinding) {
       return undefined;
@@ -532,12 +535,7 @@ export type MapViewState = {
 
 /** Keys of the basemap styles the app ships. Style URLs live in the GIS app. */
 export type BasemapStyleKey =
-  | "avandar"
-  | "positron"
-  | "bright"
-  | "liberty"
-  | "dark"
-  | "fiord";
+  "avandar" | "positron" | "bright" | "liberty" | "dark" | "fiord";
 
 /**
  * The map's backdrop. `none` renders a flat background instead of tiles, which
@@ -641,6 +639,7 @@ git commit -m "feat(gis): add AvaMap and MapLayer config models"
 Deterministic displacement. A `Math.random` implementation would move points on every repaint, so the offset is derived from a seed string instead.
 
 **Files:**
+
 - Create: `src/views/GISApp/layers/jitterCoordinate/jitterCoordinate.ts`
 - Test: `src/views/GISApp/layers/jitterCoordinate/jitterCoordinate.test.ts`
 
@@ -654,14 +653,30 @@ const kinshasa = { longitude: 15.2663, latitude: -4.4419 };
 
 describe("jitterCoordinate", () => {
   it("returns the same displacement for the same seed", () => {
-    const first = jitterCoordinate({ ...kinshasa, radiusMeters: 500, seed: "row-7" });
-    const second = jitterCoordinate({ ...kinshasa, radiusMeters: 500, seed: "row-7" });
+    const first = jitterCoordinate({
+      ...kinshasa,
+      radiusMeters: 500,
+      seed: "row-7",
+    });
+    const second = jitterCoordinate({
+      ...kinshasa,
+      radiusMeters: 500,
+      seed: "row-7",
+    });
     expect(first).toEqual(second);
   });
 
   it("returns different displacements for different seeds", () => {
-    const first = jitterCoordinate({ ...kinshasa, radiusMeters: 500, seed: "row-7" });
-    const second = jitterCoordinate({ ...kinshasa, radiusMeters: 500, seed: "row-8" });
+    const first = jitterCoordinate({
+      ...kinshasa,
+      radiusMeters: 500,
+      seed: "row-7",
+    });
+    const second = jitterCoordinate({
+      ...kinshasa,
+      radiusMeters: 500,
+      seed: "row-8",
+    });
     expect(first).not.toEqual(second);
   });
 
@@ -680,13 +695,20 @@ describe("jitterCoordinate", () => {
         (jittered.longitude - kinshasa.longitude) *
         metersPerDegreeLatitude *
         Math.cos((kinshasa.latitude * Math.PI) / 180);
-      const distanceMeters = Math.hypot(deltaLatitudeMeters, deltaLongitudeMeters);
+      const distanceMeters = Math.hypot(
+        deltaLatitudeMeters,
+        deltaLongitudeMeters,
+      );
       expect(distanceMeters).toBeLessThanOrEqual(radiusMeters + 1);
     }
   });
 
   it("does not move the point when the radius is zero", () => {
-    const jittered = jitterCoordinate({ ...kinshasa, radiusMeters: 0, seed: "row-7" });
+    const jittered = jitterCoordinate({
+      ...kinshasa,
+      radiusMeters: 0,
+      seed: "row-7",
+    });
     expect(jittered).toEqual(kinshasa);
   });
 });
@@ -801,6 +823,7 @@ Code review added two things, and later tasks can rely on them:
 Replaces the inline row loop and the silent `WHERE ... IS NOT NULL` filter. Every dropped row is reported with a reason.
 
 **Files:**
+
 - Create: `src/views/GISApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows.ts`
 - Test: `src/views/GISApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows.test.ts`
 
@@ -846,12 +869,17 @@ describe("makeFeatureCollectionFromRows", () => {
       sensitivity: exact,
       layerId: "layer-1",
     });
-    expect(result.featureCollection.features[0]?.properties).toEqual({ cases: 3 });
+    expect(result.featureCollection.features[0]?.properties).toEqual({
+      cases: 3,
+    });
   });
 
   it("reports null coordinates instead of dropping them silently", () => {
     const result = makeFeatureCollectionFromRows({
-      rows: [{ lat: null, lon: 2 }, { lat: 1, lon: undefined }],
+      rows: [
+        { lat: null, lon: 2 },
+        { lat: 1, lon: undefined },
+      ],
       binding,
       sensitivity: exact,
       layerId: "layer-1",
@@ -956,7 +984,11 @@ describe("makeFeatureCollectionFromRows", () => {
       return makeFeatureCollectionFromRows({
         rows: [{ lat: -4.44, lon: 15.27 }],
         binding,
-        sensitivity: { mode: "aggregateOnly", minCellCount: 5, minGeoLevel: "admin2" },
+        sensitivity: {
+          mode: "aggregateOnly",
+          minCellCount: 5,
+          minGeoLevel: "admin2",
+        },
         layerId: "layer-1",
       });
     }).toThrow(/aggregate/i);
@@ -1109,14 +1141,14 @@ export function makeFeatureCollectionFromRows({
     }
 
     const placed =
-      sensitivity.mode === "jitter" ?
-        jitterCoordinate({
-          longitude,
-          latitude,
-          radiusMeters: sensitivity.radiusMeters,
-          seed: `${layerId}:${rowIndex}`,
-        })
-      : { longitude, latitude };
+      sensitivity.mode === "jitter"
+        ? jitterCoordinate({
+            longitude,
+            latitude,
+            radiusMeters: sensitivity.radiusMeters,
+            seed: `${layerId}:${rowIndex}`,
+          })
+        : { longitude, latitude };
 
     const properties: GeoJSON.GeoJsonProperties = { ...row };
     delete properties[latitudeColumnName];
@@ -1125,7 +1157,10 @@ export function makeFeatureCollectionFromRows({
     features.push({
       type: "Feature",
       id: rowIndex,
-      geometry: { type: "Point", coordinates: [placed.longitude, placed.latitude] },
+      geometry: {
+        type: "Point",
+        coordinates: [placed.longitude, placed.latitude],
+      },
       properties,
     });
   });
@@ -1164,6 +1199,7 @@ git commit -m "feat(gis): convert rows to GeoJSON with a drop report"
 The current `calculateBounds` only reads `Point`, so any other geometry yields `Infinity`. This handles every geometry type by walking coordinates generically.
 
 **Files:**
+
 - Create: `src/views/GISApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection.ts`
 - Test: `src/views/GISApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection.test.ts`
 
@@ -1184,7 +1220,10 @@ function createPoint(longitude: number, latitude: number): GeoJSON.Feature {
 describe("getBoundsFromFeatureCollection", () => {
   it("returns undefined for an empty collection", () => {
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [],
+      }),
     ).toBeUndefined();
   });
 
@@ -1230,7 +1269,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [polygon] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [polygon],
+      }),
     ).toEqual([
       [0, 0],
       [10, 5],
@@ -1250,7 +1292,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [line] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [line],
+      }),
     ).toEqual([
       [-3, 40],
       [2, 48],
@@ -1270,7 +1315,10 @@ describe("getBoundsFromFeatureCollection", () => {
       properties: {},
     };
     expect(
-      getBoundsFromFeatureCollection({ type: "FeatureCollection", features: [collection] }),
+      getBoundsFromFeatureCollection({
+        type: "FeatureCollection",
+        features: [collection],
+      }),
     ).toEqual([
       [1, 1],
       [4, 9],
@@ -1341,7 +1389,10 @@ function extendBoxWithCoordinates(box: MutableBox, coordinates: unknown): void {
   });
 }
 
-function extendBoxWithGeometry(box: MutableBox, geometry: GeoJSON.Geometry): void {
+function extendBoxWithGeometry(
+  box: MutableBox,
+  geometry: GeoJSON.Geometry,
+): void {
   if (geometry.type === "GeometryCollection") {
     geometry.geometries.forEach((nested) => {
       extendBoxWithGeometry(box, nested);
@@ -1404,6 +1455,7 @@ git commit -m "feat(gis): compute bounds for every geometry type"
 Supplies the value domain that data-driven paint needs. Kept separate from `makeLayerSpecFromMapLayer` so break and domain math is tested without MapLibre JSON in the way.
 
 **Files:**
+
 - Create: `src/views/GISApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection.ts`
 - Test: `src/views/GISApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection.test.ts`
 
@@ -1525,7 +1577,9 @@ export function getLayerStatsFromFeatureCollection({
   let hasValue = false;
 
   featureCollection.features.forEach((feature) => {
-    const value = getFiniteNumberFromValue(feature.properties?.[valueColumnName]);
+    const value = getFiniteNumberFromValue(
+      feature.properties?.[valueColumnName],
+    );
     if (value === undefined) {
       return;
     }
@@ -1557,6 +1611,7 @@ git commit -m "feat(gis): summarize layer value domains for data-driven paint"
 This is where the three duplicated paint blocks collapse into one pure function.
 
 **Files:**
+
 - Create: `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types.ts`
 - Create: `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.ts`
 - Test: `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.test.ts`
@@ -1797,13 +1852,13 @@ function buildCircleRadius({
   }
   const [minimum, maximum] = valueDomain;
   const scaleValue =
-    symbology.scale === "sqrt" ?
-      (span: number) => {
-        return Math.sqrt(span);
-      }
-    : (span: number) => {
-        return span;
-      };
+    symbology.scale === "sqrt"
+      ? (span: number) => {
+          return Math.sqrt(span);
+        }
+      : (span: number) => {
+          return span;
+        };
   const normalized = [
     "max",
     0,
@@ -1896,6 +1951,7 @@ git commit -m "feat(gis): build MapLibre layer specs as pure data"
 Merges per-layer specs in draw order. Trivial today with one layer, and it is what makes the multi-layer wave additive.
 
 **Files:**
+
 - Create: `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs.ts`
 - Test: `src/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs.test.ts`
 
@@ -1909,9 +1965,14 @@ import type { MapSpec } from "@/views/GISApp/layers/makeMapSpecFromLayerSpecs/Ma
 function createSingleLayerSpec(id: string): MapSpec {
   return {
     sources: {
-      [`source-${id}`]: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
+      [`source-${id}`]: {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      },
     },
-    layers: [{ id: `layer-${id}`, type: "circle", source: `source-${id}`, paint: {} }],
+    layers: [
+      { id: `layer-${id}`, type: "circle", source: `source-${id}`, paint: {} },
+    ],
   };
 }
 
@@ -1951,7 +2012,9 @@ import type { MapSpec } from "@/views/GISApp/layers/makeMapSpecFromLayerSpecs/Ma
  * Merges per-layer specs into one map spec, preserving the given order as
  * draw order (first entry is drawn at the bottom).
  */
-export function makeMapSpecFromLayerSpecs(layerSpecs: readonly MapSpec[]): MapSpec {
+export function makeMapSpecFromLayerSpecs(
+  layerSpecs: readonly MapSpec[],
+): MapSpec {
   return layerSpecs.reduce<MapSpec>(
     (merged, layerSpec) => {
       return {
@@ -1983,6 +2046,7 @@ git commit -m "feat(gis): merge layer specs into an ordered map spec"
 The only imperative MapLibre caller. It registers no event listeners at all, which is how the leaked `load` handler stops being possible.
 
 **Files:**
+
 - Create: `src/views/GISApp/MapCanvas/syncMap.ts`
 - Test: `src/views/GISApp/MapCanvas/syncMap.test.ts`
 
@@ -2046,7 +2110,10 @@ function createSpec(layerIds: readonly string[]): MapSpec {
   return {
     sources: Object.fromEntries(
       layerIds.map((id) => {
-        return [`source-${id}`, { type: "geojson" as const, data: emptyCollection }];
+        return [
+          `source-${id}`,
+          { type: "geojson" as const, data: emptyCollection },
+        ];
       }),
     ),
     layers: layerIds.map((id) => {
@@ -2065,7 +2132,11 @@ const emptySpec: MapSpec = { sources: {}, layers: [] };
 describe("syncMap", () => {
   it("adds sources before the layers that use them", () => {
     const map = createFakeMap();
-    syncMap({ map: map as never, previousSpec: emptySpec, nextSpec: createSpec(["a"]) });
+    syncMap({
+      map: map as never,
+      previousSpec: emptySpec,
+      nextSpec: createSpec(["a"]),
+    });
     expect(map.calls.indexOf("addSource:source-a")).toBeLessThan(
       map.calls.indexOf("addLayer:layer-a"),
     );
@@ -2106,7 +2177,10 @@ describe("syncMap", () => {
     const map = createFakeMap();
     const spec = createSpec(["a", "b"]);
     syncMap({ map: map as never, previousSpec: emptySpec, nextSpec: spec });
-    const reordered: MapSpec = { ...spec, layers: [spec.layers[1]!, spec.layers[0]!] };
+    const reordered: MapSpec = {
+      ...spec,
+      layers: [spec.layers[1]!, spec.layers[0]!],
+    };
     map.calls.length = 0;
     syncMap({ map: map as never, previousSpec: spec, nextSpec: reordered });
     expect(map.calls).toEqual(["moveLayer:layer-b", "moveLayer:layer-a"]);
@@ -2114,7 +2188,11 @@ describe("syncMap", () => {
 
   it("registers no event listeners", () => {
     const map = createFakeMap() as Record<string, unknown>;
-    syncMap({ map: map as never, previousSpec: emptySpec, nextSpec: createSpec(["a"]) });
+    syncMap({
+      map: map as never,
+      previousSpec: emptySpec,
+      nextSpec: createSpec(["a"]),
+    });
     expect(map.on).toBeUndefined();
   });
 });
@@ -2310,6 +2388,7 @@ calls, guarding against overcorrecting into an unconditional reorder).
 `useDataQuery` currently holds the executor inline. Extracting it means GIS reuses one implementation instead of copying the Dataset/EntityConfig branch.
 
 **Files:**
+
 - Create: `src/clients/queries/runStructuredQuery/runStructuredQuery.ts`
 - Test: `src/clients/queries/runStructuredQuery/runStructuredQuery.test.ts`
 - Modify: `src/views/DataExplorerApp/useDataQuery.tsx`
@@ -2332,16 +2411,19 @@ vi.mock("@/clients/qetl/PublicQETLClient", () => {
   return { PublicQETLClient: { runQuery: vi.fn() } };
 });
 
-const { runStructuredQuery } = await import(
-  "@/clients/queries/runStructuredQuery/runStructuredQuery"
-);
-const { StructuredQuery } = await import(
-  "$/models/queries/StructuredQuery/StructuredQuery.ts"
-);
+const { runStructuredQuery } =
+  await import("@/clients/queries/runStructuredQuery/runStructuredQuery");
+const { StructuredQuery } =
+  await import("$/models/queries/StructuredQuery/StructuredQuery.ts");
 
 describe("runStructuredQuery", () => {
   it("runs caller-supplied raw SQL verbatim", async () => {
-    runQueryMock.mockResolvedValue({ id: "r1", data: [], columns: [], numRows: 0 });
+    runQueryMock.mockResolvedValue({
+      id: "r1",
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
     await runStructuredQuery({
       auth: "workspace",
       workspaceId: "workspace-1" as never,
@@ -2441,12 +2523,12 @@ export async function runStructuredQuery(
   const sortedQueryColumns = sortObjList(queryColumns, { sortBy: prop("id") });
 
   const resolved =
-    rawSql === undefined && params.auth === "workspace" ?
-      await resolveManualQueryForExecution({
-        query,
-        workspaceId: params.workspaceId,
-      })
-    : { query, didAutoLimit: false as const };
+    rawSql === undefined && params.auth === "workspace"
+      ? await resolveManualQueryForExecution({
+          query,
+          workspaceId: params.workspaceId,
+        })
+      : { query, didAutoLimit: false as const };
 
   const sqlToRun = selectSqlToExecute({
     rawSql,
@@ -2578,6 +2660,7 @@ git commit -m "refactor(queries): extract runStructuredQuery from useDataQuery"
 Caches per layer, keyed on source and binding only, so editing symbology repaints without refetching. This replaces the imperative load in `useSelectedMapDataSource` and drops its Dataset-only gate.
 
 **Files:**
+
 - Create: `src/views/GISApp/layers/useMapLayerData/useMapLayerData.ts`
 - Test: `src/views/GISApp/layers/useMapLayerData/useMapLayerData.test.ts`
 
@@ -2586,7 +2669,10 @@ Caches per layer, keyed on source and binding only, so editing symbology repaint
 ```ts
 import { describe, expect, it, vi } from "vitest";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { makeQueryKeyFromMapLayer, isMapLayerQueryable } from "@/views/GISApp/layers/useMapLayerData/useMapLayerData";
+import {
+  makeQueryKeyFromMapLayer,
+  isMapLayerQueryable,
+} from "@/views/GISApp/layers/useMapLayerData/useMapLayerData";
 
 describe("isMapLayerQueryable", () => {
   it("is false until the layer has a data source", () => {
@@ -2659,7 +2745,9 @@ export function isMapLayerQueryable(layer: MapLayer.T): boolean {
  * Cache key for a layer's rows. Deliberately excludes symbology, legend, and
  * popup config so restyling a layer repaints from cache instead of refetching.
  */
-export function makeQueryKeyFromMapLayer(layer: MapLayer.T): readonly unknown[] {
+export function makeQueryKeyFromMapLayer(
+  layer: MapLayer.T,
+): readonly unknown[] {
   return ["mapLayerData", layer.id, layer.source, layer.geoBinding];
 }
 
@@ -2703,12 +2791,10 @@ Append to `src/views/GISApp/layers/useMapLayerData/useMapLayerData.test.ts`. Thi
 ```ts
 describe("compiled SQL for a lat/lng layer", () => {
   it("uses no spatial function", async () => {
-    const { StructuredQuery } = await import(
-      "$/models/queries/StructuredQuery/StructuredQuery.ts"
-    );
-    const { QueryColumn } = await import(
-      "$/models/queries/QueryColumn/QueryColumn.ts"
-    );
+    const { StructuredQuery } =
+      await import("$/models/queries/StructuredQuery/StructuredQuery.ts");
+    const { QueryColumn } =
+      await import("$/models/queries/QueryColumn/QueryColumn.ts");
     const { uuid } = await import("$/lib/uuid.ts");
 
     // Same honest fixture as the MapLayer model tests: no cast, real
@@ -2762,6 +2848,7 @@ git commit -m "feat(gis): load layer rows through the shared query executor"
 Fixes the double style path that made the style picker unsafe, and attaches exactly one click handler for all layers.
 
 **Files:**
+
 - Create: `src/views/GISApp/MapCanvas/MapCanvas.tsx`, `MapCanvas.module.css`
 - Move: `src/views/GISApp/DataMap/{mapStyles.ts,mapColors.ts,applyMapStyles.ts,MapStylePicker.tsx}` -> `src/views/GISApp/basemap/`
 - Modify: `src/views/GISApp/basemap/mapStyles.ts` (key it by the model's `BasemapStyleKey`)
@@ -2812,10 +2899,7 @@ export const mapStyles = {
     url: "https://tiles.openfreemap.org/styles/bright",
     name: "Avandar",
   },
-} as const satisfies Record<
-  AvaMap.BasemapStyle,
-  { url: string; name: string }
->;
+} as const satisfies Record<AvaMap.BasemapStyle, { url: string; name: string }>;
 
 export type MapStyleKey = AvaMap.BasemapStyle;
 
@@ -2910,8 +2994,8 @@ function buildStyle(basemap: AvaMap.Basemap): string | StyleSpecification {
 
 /** Identity of a basemap, used to skip redundant `setStyle` calls. */
 function buildStyleKey(basemap: AvaMap.Basemap): string {
-  return basemap.type === "builtIn" ?
-      `builtIn:${basemap.style}`
+  return basemap.type === "builtIn"
+    ? `builtIn:${basemap.style}`
     : `none:${basemap.background}`;
 }
 
@@ -2976,15 +3060,20 @@ export function MapCanvas({
     });
     appliedStyleKeyRef.current = buildStyleKey(initialBasemap);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
-    map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
+    map.addControl(
+      new maplibregl.ScaleControl({ unit: "metric" }),
+      "bottom-right",
+    );
     mapRef.current = map;
 
     // One map-level click handler covers every layer, present or future, so
     // adding and removing layers cannot accumulate listeners.
     const handleClick = (event: maplibregl.MapMouseEvent): void => {
-      const existingLayerIds = interactiveLayerIdsRef.current.filter((layerId) => {
-        return map.getLayer(layerId);
-      });
+      const existingLayerIds = interactiveLayerIdsRef.current.filter(
+        (layerId) => {
+          return map.getLayer(layerId);
+        },
+      );
       if (existingLayerIds.length === 0) {
         return;
       }
@@ -3002,7 +3091,10 @@ export function MapCanvas({
       // from an empty baseline.
       appliedSpecRef.current = EMPTY_MAP_SPEC;
       const currentBasemap = basemapRef.current;
-      if (currentBasemap.type === "builtIn" && currentBasemap.style === "avandar") {
+      if (
+        currentBasemap.type === "builtIn" &&
+        currentBasemap.style === "avandar"
+      ) {
         applyMapStyles(map);
       }
       setIsStyleReady(true);
@@ -3100,6 +3192,7 @@ git commit -m "refactor(gis): own the map lifecycle in MapCanvas"
 ## Task 13: Wire the pipeline into the app and delete the prototype
 
 **Files:**
+
 - Create: `src/views/GISApp/MapCanvas/MapStatusOverlay.tsx`
 - Create: `src/views/GISApp/panels/FeatureInspector/FeatureInspector.tsx`
 - Modify: `src/views/GISApp/GISApp.tsx`
@@ -3224,7 +3317,10 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { getBoundsFromFeatureCollection } from "@/views/GISApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import { getLayerStatsFromFeatureCollection } from "@/views/GISApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
-import { buildLayerId, makeLayerSpecFromMapLayer } from "@/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
+import {
+  buildLayerId,
+  makeLayerSpecFromMapLayer,
+} from "@/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { makeMapSpecFromLayerSpecs } from "@/views/GISApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
 import { makeFeatureCollectionFromRows } from "@/views/GISApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import { useMapLayerData } from "@/views/GISApp/layers/useMapLayerData/useMapLayerData";
@@ -3255,9 +3351,8 @@ export function GISApp({ workspaceId }: Props): JSX.Element {
       layers: [MapLayer.makeEmpty(t`Layer 1`)],
     };
   });
-  const [selectedFeature, setSelectedFeature] = useState<GeoJSON.Feature | null>(
-    null,
-  );
+  const [selectedFeature, setSelectedFeature] =
+    useState<GeoJSON.Feature | null>(null);
   const [isInspectorOpen, { open: openInspector, close: closeInspector }] =
     useDisclosure(false);
 
@@ -3310,7 +3405,10 @@ export function GISApp({ workspaceId }: Props): JSX.Element {
       makeLayerSpecFromMapLayer({
         layer,
         featureCollection,
-        stats: getLayerStatsFromFeatureCollection({ featureCollection, valueColumnName }),
+        stats: getLayerStatsFromFeatureCollection({
+          featureCollection,
+          valueColumnName,
+        }),
         valueColumnName,
       }),
     ]);
@@ -3441,12 +3539,12 @@ onLayerChange((current) => {
 });
 ```
 
-  Seeding the other axis with the same id keeps the binding well-formed while
-  only one column is chosen; `toGeoBinding` still succeeds, and the map
-  simply plots on the diagonal until the second column is picked. If that
-  reads wrong in use, make `geoBinding` hold optional axes instead and resolve
-  only when both are set. Do not leave a half-built binding that resolves to
-  `undefined` without telling the user why.
+Seeding the other axis with the same id keeps the binding well-formed while
+only one column is chosen; `toGeoBinding` still succeeds, and the map
+simply plots on the diagonal until the second column is picked. If that
+reads wrong in use, make `geoBinding` hold optional axes instead and resolve
+only when both are set. Do not leave a half-built binding that resolves to
+`undefined` without telling the user why.
 
 - **Symbol size select.** Keep the existing `notifyError` guard for non-numeric
   columns.
@@ -3538,6 +3636,7 @@ Expected: no output, `exit=1`.
 
 Run: `pnpm dev`, open `/<workspaceSlug>/map`.
 Expected, in order:
+
 1. With nothing selected, the overlay reads "Pick a data source and its latitude and longitude columns to plot it."
 2. After picking a dataset and both coordinate columns, points render and the camera fits them.
 3. Clicking a point opens the feature inspector.
@@ -3572,6 +3671,7 @@ Expected: no errors.
 ```bash
 git ls-files src/views/GISApp
 ```
+
 Expected: no `DataMap` directory, no `useSelectedMapDataSource.ts`, no `GeometryDrawer.tsx`.
 
 - [ ] **Step 4: Confirm the i18n catalog is current**

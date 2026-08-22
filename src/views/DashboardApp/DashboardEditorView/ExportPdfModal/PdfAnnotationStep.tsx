@@ -1,6 +1,8 @@
-import { Stack } from "@mantine/core";
-import { PdfAnnotator } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator";
 import type { ReactNode } from "react";
+
+import { Stack } from "@mantine/core";
+
+import { PdfAnnotator } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator";
 
 type Props = {
   filename: string;

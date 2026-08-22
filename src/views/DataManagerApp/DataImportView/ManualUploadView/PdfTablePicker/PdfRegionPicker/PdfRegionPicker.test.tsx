@@ -1,15 +1,18 @@
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
-import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
-import { runRegionModelAssist } from "../runRegionModelAssist/runRegionModelAssist";
-import { PdfRegionPicker } from "./PdfRegionPicker";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
 import type {
   ExtractedTable,
   PageGeometry,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { describe, expect, it, vi } from "vitest";
+
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
+
+import { runRegionModelAssist } from "../runRegionModelAssist/runRegionModelAssist";
+import { PdfRegionPicker } from "./PdfRegionPicker";
 
 vi.mock(
   "../runRegionModelAssist/runRegionModelAssist",

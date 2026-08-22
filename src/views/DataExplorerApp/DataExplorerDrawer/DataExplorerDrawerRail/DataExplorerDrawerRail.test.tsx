@@ -1,12 +1,14 @@
+import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
+
 /**
  * Tests for the drawer rail's trailing section: which control belongs to the
  * active tab, what survives collapsing, and the chevron's reported state.
  */
 import { describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { DataExplorerDrawerRail } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail";
-import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 
 type Overrides = {
   activeTab?: DrawerTab;

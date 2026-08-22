@@ -1,16 +1,17 @@
-import { ClearAoiButton } from "@/views/GisApp/shell/ClearAoiButton/ClearAoiButton";
-import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
+
+import { ClearAoiButton } from "@/views/GisApp/shell/ClearAoiButton/ClearAoiButton";
+import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
 
 /** Map-tool cluster, AOI clear control, and invalid-ring status. */
 export function GisAppMapToolCluster({ app }: { app: GisAppState }): ReactNode {
   return (
     <>
       <ClearAoiButton aoi={app.mapConfig.aoi} updateConfig={app.updateConfig} />
-      {app.invalidRingStatus ?
+      {app.invalidRingStatus ? (
         <div role="status">{app.invalidRingStatus}</div>
-      : null}
+      ) : null}
       <MapToolCluster
         mapToolMode={app.mapToolMode}
         onMapToolModeChange={app.setMapToolMode}

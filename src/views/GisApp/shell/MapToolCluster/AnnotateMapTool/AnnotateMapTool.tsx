@@ -1,11 +1,13 @@
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { ReactNode } from "react";
+
 import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { IconPencil } from "@tabler/icons-react";
 import { useState } from "react";
+
 import { AnnotateMapToolSubCluster } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster";
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { ReactNode } from "react";
 
 type Props = {
   mapToolMode: MapToolMode;
@@ -39,12 +41,12 @@ export function AnnotateMapTool({
           <IconPencil size={17} stroke={1.6} />
         </button>
       </Tooltip>
-      {isExpanded ?
+      {isExpanded ? (
         <AnnotateMapToolSubCluster
           mapToolMode={mapToolMode}
           onMapToolModeChange={onMapToolModeChange}
         />
-      : null}
+      ) : null}
     </>
   );
 }

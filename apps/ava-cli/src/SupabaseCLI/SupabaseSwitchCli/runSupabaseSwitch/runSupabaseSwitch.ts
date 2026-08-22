@@ -1,13 +1,14 @@
+import type {
+  SupabaseLocalEnvironmentIO,
+  SupabaseSwitchResult,
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
 import {
   readExistingSwitchProjectId,
   startExistingSwitch,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/startExistingSwitch/startExistingSwitch";
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import { makeSwitchRequestResolutionFromOptions } from "@ava-cli/SupabaseCLI/SupabaseSwitchCli/makeSwitchRequestResolutionFromOptions/makeSwitchRequestResolutionFromOptions";
-import type {
-  SupabaseLocalEnvironmentIO,
-  SupabaseSwitchResult,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type RunSupabaseSwitchOptions = {
   io: SupabaseLocalEnvironmentIO;

@@ -1,12 +1,14 @@
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Box, Group, SegmentedControl, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
+
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DateRangeFilterInput } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/DateRangeFilterInput";
 import { EnumFilterInput } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/EnumFilterInput";
 import { NumberRangeFilterInput } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/NumberRangeFilterInput";
-import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { ReactNode } from "react";
 
 type Props = {
   rowFilter: PublishSliceConfig.RowFilter;
@@ -72,12 +74,12 @@ export function PublishSliceRowFilter({
             value={rowFilter.kind}
             data={[
               { value: "enum", label: t`Values` },
-              ...(AvaDataType.isNumeric(columnType) ?
-                [{ value: "range_number", label: t`Number range` }]
-              : []),
-              ...(AvaDataType.isTemporal(columnType) ?
-                [{ value: "range_date", label: t`Date range` }]
-              : []),
+              ...(AvaDataType.isNumeric(columnType)
+                ? [{ value: "range_number", label: t`Number range` }]
+                : []),
+              ...(AvaDataType.isTemporal(columnType)
+                ? [{ value: "range_date", label: t`Date range` }]
+                : []),
             ]}
             onChange={(kind) => {
               const nextRowFilter = _getRowFilterForKind({ kind, rowFilter });
@@ -97,26 +99,27 @@ export function PublishSliceRowFilter({
           <IconTrash size={14} />
         </ActionIcon>
       </Group>
-      {rowFilter.kind === "enum" ?
+      {rowFilter.kind === "enum" ? (
         <EnumFilterInput
           rowFilter={rowFilter}
           valuesPlaceholder={t`Enter values; press Enter after each`}
           onChange={onChange}
         />
-      : rowFilter.kind === "range_number" ?
+      ) : rowFilter.kind === "range_number" ? (
         <NumberRangeFilterInput
           rowFilter={rowFilter}
           minPlaceholder={t`Min`}
           maxPlaceholder={t`Max`}
           onChange={onChange}
         />
-      : <DateRangeFilterInput
+      ) : (
+        <DateRangeFilterInput
           rowFilter={rowFilter}
           startPlaceholder={t`Start (e.g. 2024-01-01)`}
           endPlaceholder={t`End (e.g. 2024-12-31)`}
           onChange={onChange}
         />
-      }
+      )}
     </Box>
   );
 }

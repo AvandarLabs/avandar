@@ -1,8 +1,10 @@
-import { IconPencil } from "@tabler/icons-react";
-import { useI18nMessages } from "@ui/i18n/useI18nMessages";
-import { ActionIcon } from "../ActionIcon/ActionIcon";
 import type { ActionIconProps } from "@mantine/core";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
+
+import { IconPencil } from "@tabler/icons-react";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
+
+import { ActionIcon } from "../ActionIcon/ActionIcon";
 
 type HTMLButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 type HTMLAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
@@ -58,24 +60,24 @@ export function EditButton({
   };
 
   const passThroughProps =
-    as === "button" ?
-      {
-        ...defaultButtonProps,
-        ...props,
-      }
-    : {
-        ...defaultAnchorProps,
-        ...props,
-      };
+    as === "button"
+      ? {
+          ...defaultButtonProps,
+          ...props,
+        }
+      : {
+          ...defaultAnchorProps,
+          ...props,
+        };
 
   return (
     <ActionIcon
       tooltip={
-        withTooltip ?
-          props.name ?
-            i18n.editNamed(props.name)
-          : i18n.edit
-        : undefined
+        withTooltip
+          ? props.name
+            ? i18n.editNamed(props.name)
+            : i18n.edit
+          : undefined
       }
       {...passThroughProps}
     >

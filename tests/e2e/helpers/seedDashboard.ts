@@ -1,6 +1,7 @@
-import { DashboardSeedHelpers } from "./DashboardSeedHelpers";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { DashboardSeedHelpers } from "./DashboardSeedHelpers";
 
 type SeedDashboardOptions = {
   admin: SupabaseClient;

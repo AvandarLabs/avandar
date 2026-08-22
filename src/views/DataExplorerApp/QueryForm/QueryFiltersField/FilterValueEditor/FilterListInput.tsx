@@ -1,9 +1,12 @@
-import { useLingui } from "@lingui/react/macro";
-import { TagsInput } from "@mantine/core";
-import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue";
-import classes from "./FilterValueEditor.module.css";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { TagsInput } from "@mantine/core";
+
+import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue";
+
+import classes from "./FilterValueEditor.module.css";
 
 type Props = {
   value: StructuredQuery.FilterRule["value"];

@@ -40,15 +40,15 @@ neither one can express "published, but only for us".
 
 ### 1.1 What already exists
 
-| Concern | Where | State |
-| --- | --- | --- |
-| Drive-style share UI | `src/components/permissions/ShareResourceModal/` | Complete, mounted in the dashboard editor toolbar via `ShareResourceButton` |
-| Share persistence | `resource_shares`, `dashboards.is_restricted` | Complete |
-| Effective-role resolution | `util__resource_effective_role` | Complete |
-| Publish flow | `PublishDashboardModal`, `DashboardClient.publishDashboard` | Public-only |
-| Data snapshot | `published` bucket, `PublicDatasetParquetStorageClient` | Public-only, world-readable |
-| Public viewer routes | `/d/$slug`, `/public/dashboards/$workspaceSlug/$dashboardId` | Hard-require `is_public` |
-| Plan limit storage | `subscriptions.max_shareable_dashboards_allowed` | Column exists, value correct, **never enforced** |
+| Concern                   | Where                                                        | State                                                                       |
+| ------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Drive-style share UI      | `src/components/permissions/ShareResourceModal/`             | Complete, mounted in the dashboard editor toolbar via `ShareResourceButton` |
+| Share persistence         | `resource_shares`, `dashboards.is_restricted`                | Complete                                                                    |
+| Effective-role resolution | `util__resource_effective_role`                              | Complete                                                                    |
+| Publish flow              | `PublishDashboardModal`, `DashboardClient.publishDashboard`  | Public-only                                                                 |
+| Data snapshot             | `published` bucket, `PublicDatasetParquetStorageClient`      | Public-only, world-readable                                                 |
+| Public viewer routes      | `/d/$slug`, `/public/dashboards/$workspaceSlug/$dashboardId` | Hard-require `is_public`                                                    |
+| Plan limit storage        | `subscriptions.max_shareable_dashboards_allowed`             | Column exists, value correct, **never enforced**                            |
 
 ### 1.2 Defects found during design
 
@@ -107,7 +107,7 @@ or acute.
 
 - No new `role_level` values. `viewer` / `editor` / `admin` combined with
   `resource_shares` and `is_restricted` already expresses everything private
-  dashboards need. One new *permission key* is added (§7.G); the role tiers
+  dashboards need. One new _permission key_ is added (§7.G); the role tiers
   are untouched.
 - No cross-workspace sharing.
 - No per-column ACLs.
@@ -125,18 +125,18 @@ or acute.
 Each row was decided explicitly during brainstorming. Alternatives considered
 are recorded so a future reader does not have to re-litigate them.
 
-| # | Decision | Rejected alternative and why |
-| --- | --- | --- |
-| D1 | Merge publish into the share modal. One `Share` button; General access grows a third option; slug and slice controls move inline under a "Published data" section. | Keeping two buttons: users would manage access in two places and the two could contradict each other. |
-| D2 | Private snapshots go to a **new** private bucket, `published-private`, gated by `util__auth_user_may_select_dashboard`. | Reusing the `workspaces` bucket with a gated prefix works (existing policies all require `foldername[2] = 'datasets'`, so a `dashboards` prefix would not match them), but it puts two security models in one bucket separated only by a path segment, where storage RLS is permissive-OR and any future looser policy silently widens snapshot access. Reading live workspace data instead of snapshotting was also rejected: it would make `PublishSliceConfig` row filters and column projections stop protecting anything. |
-| D3 | Add a `visibility` enum; keep `is_public` as a **stored generated column** equal to `visibility = 'public'`. | Dropping `is_public` outright is a cleaner end state but rewrites the anon RLS policy, the partial unique index, the validate-slug edge function, ~15 TS call sites, the pgTAP tests, and the desktop `.gen.sql` mirror in one change, for identical product behavior. A `published_at` timestamp instead of an enum leaves the state machine implicit across two columns. |
-| D4 | One URL for every published dashboard: `/d/<slug>`. Anon hitting a workspace-only slug is bounced to sign-in and returned; an authenticated user without access gets "You need access". | A separate auth-gated in-app route is a smaller diff but changes a dashboard's URL when its audience changes, breaking links already pasted in Slack. |
-| D5 | Publish stays an explicit button press. General access writes share state immediately; `visibility` flips only when Publish succeeds. | Auto-publishing on audience change removes the review step before data goes out, and the snapshot build is slow and per-dataset fallible, so a dropdown change could half-fail and leave a dashboard marked published with missing datasets. |
-| D6 | Super-users lose visibility into resources that are private to their owner, for **both** dashboards and datasets. | Dashboards only: an admin blocked from a private dashboard could usually still read the underlying private dataset and reconstruct it, making the dashboard restriction theatre. |
-| D7 | Admins get a per-member **count** of private resources plus an ownership-transfer RPC that grants no read access. | Counts with no action leaves offboarding deadlocked (see §5.2). Allowing delete-without-read is a poor audit story and reassignment already unblocks the foreign key. |
-| D8 | Enforce the plan limit with Postgres triggers as the backstop, on `dashboards` **and** `resource_shares`. | Client plus edge-function checks (the existing precedent for `can_add_datasets`) cover only one of the two ways the limit is crossed; see §5.3. |
-| D9 | Audit ownership transfers into `usage_analytics_events` as `resource.ownership_transferred`. | A dedicated audit table: the existing one already has `workspace_id`, `user_id`, `event_name`, `app`, and `payload jsonb`, and is insert-only by design. |
-| D10 | Ship in four phases, permissions hardening first. | One big change would put storage policies, RLS truth tables, billing enforcement, and a UI rebuild in a single review. Shipping the visible feature first would mean private dashboards launch while admins can still read every one of them. |
+| #   | Decision                                                                                                                                                                                | Rejected alternative and why                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | Merge publish into the share modal. One `Share` button; General access grows a third option; slug and slice controls move inline under a "Published data" section.                      | Keeping two buttons: users would manage access in two places and the two could contradict each other.                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| D2  | Private snapshots go to a **new** private bucket, `published-private`, gated by `util__auth_user_may_select_dashboard`.                                                                 | Reusing the `workspaces` bucket with a gated prefix works (existing policies all require `foldername[2] = 'datasets'`, so a `dashboards` prefix would not match them), but it puts two security models in one bucket separated only by a path segment, where storage RLS is permissive-OR and any future looser policy silently widens snapshot access. Reading live workspace data instead of snapshotting was also rejected: it would make `PublishSliceConfig` row filters and column projections stop protecting anything. |
+| D3  | Add a `visibility` enum; keep `is_public` as a **stored generated column** equal to `visibility = 'public'`.                                                                            | Dropping `is_public` outright is a cleaner end state but rewrites the anon RLS policy, the partial unique index, the validate-slug edge function, ~15 TS call sites, the pgTAP tests, and the desktop `.gen.sql` mirror in one change, for identical product behavior. A `published_at` timestamp instead of an enum leaves the state machine implicit across two columns.                                                                                                                                                     |
+| D4  | One URL for every published dashboard: `/d/<slug>`. Anon hitting a workspace-only slug is bounced to sign-in and returned; an authenticated user without access gets "You need access". | A separate auth-gated in-app route is a smaller diff but changes a dashboard's URL when its audience changes, breaking links already pasted in Slack.                                                                                                                                                                                                                                                                                                                                                                          |
+| D5  | Publish stays an explicit button press. General access writes share state immediately; `visibility` flips only when Publish succeeds.                                                   | Auto-publishing on audience change removes the review step before data goes out, and the snapshot build is slow and per-dataset fallible, so a dropdown change could half-fail and leave a dashboard marked published with missing datasets.                                                                                                                                                                                                                                                                                   |
+| D6  | Super-users lose visibility into resources that are private to their owner, for **both** dashboards and datasets.                                                                       | Dashboards only: an admin blocked from a private dashboard could usually still read the underlying private dataset and reconstruct it, making the dashboard restriction theatre.                                                                                                                                                                                                                                                                                                                                               |
+| D7  | Admins get a per-member **count** of private resources plus an ownership-transfer RPC that grants no read access.                                                                       | Counts with no action leaves offboarding deadlocked (see §5.2). Allowing delete-without-read is a poor audit story and reassignment already unblocks the foreign key.                                                                                                                                                                                                                                                                                                                                                          |
+| D8  | Enforce the plan limit with Postgres triggers as the backstop, on `dashboards` **and** `resource_shares`.                                                                               | Client plus edge-function checks (the existing precedent for `can_add_datasets`) cover only one of the two ways the limit is crossed; see §5.3.                                                                                                                                                                                                                                                                                                                                                                                |
+| D9  | Audit ownership transfers into `usage_analytics_events` as `resource.ownership_transferred`.                                                                                            | A dedicated audit table: the existing one already has `workspace_id`, `user_id`, `event_name`, `app`, and `payload jsonb`, and is insert-only by design.                                                                                                                                                                                                                                                                                                                                                                       |
+| D10 | Ship in four phases, permissions hardening first.                                                                                                                                       | One big change would put storage policies, RLS truth tables, billing enforcement, and a UI rebuild in a single review. Shipping the visible feature first would mean private dashboards launch while admins can still read every one of them.                                                                                                                                                                                                                                                                                  |
 
 ---
 
@@ -176,11 +176,11 @@ about restriction and shares. It says nothing about publication, because
 `datasets` have no `visibility` column. Each consumer therefore composes it with
 the visibility condition it needs (§4.2).
 
-| Consumer | Condition |
-| --- | --- |
+| Consumer       | Condition                                                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Phase 1 (§7.F) | Gates the Settings-Admin short-circuit in `util__resource_effective_role` on `not private_to_owner`. That single edit is sufficient; see §4.3. |
-| Phase 1 (§7.I) | Counts, per `owner_id`: `private_to_owner and visibility <> 'public'` for dashboards; `private_to_owner` for datasets. |
-| Phase 4 (§7.H) | Counts dashboards where `visibility <> 'draft' and (visibility = 'public' or not private_to_owner)`. |
+| Phase 1 (§7.I) | Counts, per `owner_id`: `private_to_owner and visibility <> 'public'` for dashboards; `private_to_owner` for datasets.                         |
+| Phase 4 (§7.H) | Counts dashboards where `visibility <> 'draft' and (visibility = 'public' or not private_to_owner)`.                                           |
 
 This is also why Phase 1 ships first. The plan limit in Phase 4 is defined as
 "published and visible to someone other than the owner". While workspace owners
@@ -198,7 +198,7 @@ reading something its owner opted into sharing workspace-wide, which is exactly
 what Drive permits. The only case that violates Drive semantics is a restricted
 resource with no shares, which is precisely `private_to_owner`.
 
-Removing the bypass wholesale would also hide other members' *unrestricted*
+Removing the bypass wholesale would also hide other members' _unrestricted_
 resources from admins, which is a much larger behavior change and not what was
 asked for.
 
@@ -220,8 +220,8 @@ The one place needing no correction is `util__auth_user_may_select_dashboard`
 itself, whose `is_public` short-circuit already fires before the narrowed
 bypass. `util__resource_effective_role` has no such short-circuit, so it must
 add `and not is_public` when gating the Settings-Admin bypass. The consequence
-there is defensible and intended: an admin retains public *read* access through
-the anon policy while losing *edit* rights on a public-but-restricted dashboard
+there is defensible and intended: an admin retains public _read_ access through
+the anon policy while losing _edit_ rights on a public-but-restricted dashboard
 its owner never shared with them.
 
 ### 4.3 One short-circuit, not three
@@ -246,7 +246,7 @@ short-circuit lives. Narrow that short-circuit and `effective_role` returns
 helpers bail at line 487, never reaching their own bypass.
 
 The two `util__can_manage_workspace_settings` lines therefore stay **untouched**.
-They remain reachable only for resources that are *not* private to their owner,
+They remain reachable only for resources that are _not_ private to their owner,
 where letting an admin through (specifically, past the editor-block that
 follows) is the existing and correct behavior.
 
@@ -278,7 +278,7 @@ alter table public.dashboards
     generated always as (visibility = 'public') stored;
 ```
 
-Because `is_public` becomes derived rather than removed, everything that *reads*
+Because `is_public` becomes derived rather than removed, everything that _reads_
 it keeps working with no edit: the "Anon can read public dashboards" policy, the
 `is_public` short-circuit inside `util__auth_user_may_select_dashboard`, and
 every read-side TS call site. (P1 does edit that same function, but a different
@@ -359,11 +359,11 @@ a comment cross-referencing the TS source.
 Both buckets use the same object path, `dashboards/<dashboardId>/datasets/<datasetId>.parquet`,
 selected by target visibility:
 
-| Visibility | Bucket | SELECT gate |
-| --- | --- | --- |
-| `public` | `published` (existing, `public: true`) | anon and authenticated, unconditional |
+| Visibility  | Bucket                                     | SELECT gate                                                                 |
+| ----------- | ------------------------------------------ | --------------------------------------------------------------------------- |
+| `public`    | `published` (existing, `public: true`)     | anon and authenticated, unconditional                                       |
 | `workspace` | `published-private` (new, `public: false`) | `util__auth_user_may_select_dashboard((storage.foldername(name))[2]::uuid)` |
-| `draft` | none (objects removed) | n/a |
+| `draft`     | none (objects removed)                     | n/a                                                                         |
 
 **DELETE policies are added to both buckets**, fixing defect §1.2.1, and
 dashboard deletion cleans up both.
@@ -461,7 +461,7 @@ work.
 ```
 
 Two axes, deliberately separated (D5): General access writes share state
-immediately and selects the *target* visibility; Publish materializes the
+immediately and selects the _target_ visibility; Publish materializes the
 snapshot and flips `visibility` from `draft`.
 
 "Anyone with the link" is gated twice: by the new
@@ -565,13 +565,13 @@ Applies to datasets as well as dashboards: `ShareResourceModal` is shared, and
 
 ## 8. Phasing
 
-| Phase | Contents | Status | Ships independently because |
-| --- | --- | --- | --- |
-| **P1** Permissions hardening | F, I | Landed. `2026-08-13-private-resource-permissions-hardening-design.md` | It is a self-contained correctness change with no new product surface, and it makes "private" true before anything invites users to rely on it. Also makes P4's predicate exact (§4). |
-| **P1.5** The "Only me" control | J | Landed. `2026-08-13-private-dashboards-only-me-control-design.md` | Gives users a way to *ask for* the guarantee P1 enforces. Needs nothing from the visibility model, so it does not have to wait for P2. |
-| **P2** Private publishing core | A, B, D | Landed. `2026-08-14-private-dashboards-publishing-core-design.md` | Behind a feature flag. Delivers the visibility model, the private bucket, the viewer routes, and the bucket cleanup fix without touching the share modal. |
-| **P3** Merged share surface | C, E, G | Landed. `2026-08-15-private-dashboards-merged-share-surface-design.md` | Flips the flag on. The Drive-style modal is the only way to *set* workspace visibility, so it lands after P2. |
-| **P4** Entitlements | H | Landed. `2026-08-16-private-dashboards-entitlement-enforcement-design.md` | Enforcement is orthogonal to the feature mechanics and carries its own risk (a wrong trigger blocks paying customers). |
+| Phase                          | Contents | Status                                                                    | Ships independently because                                                                                                                                                           |
+| ------------------------------ | -------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **P1** Permissions hardening   | F, I     | Landed. `2026-08-13-private-resource-permissions-hardening-design.md`     | It is a self-contained correctness change with no new product surface, and it makes "private" true before anything invites users to rely on it. Also makes P4's predicate exact (§4). |
+| **P1.5** The "Only me" control | J        | Landed. `2026-08-13-private-dashboards-only-me-control-design.md`         | Gives users a way to _ask for_ the guarantee P1 enforces. Needs nothing from the visibility model, so it does not have to wait for P2.                                                |
+| **P2** Private publishing core | A, B, D  | Landed. `2026-08-14-private-dashboards-publishing-core-design.md`         | Behind a feature flag. Delivers the visibility model, the private bucket, the viewer routes, and the bucket cleanup fix without touching the share modal.                             |
+| **P3** Merged share surface    | C, E, G  | Landed. `2026-08-15-private-dashboards-merged-share-surface-design.md`    | Flips the flag on. The Drive-style modal is the only way to _set_ workspace visibility, so it lands after P2.                                                                         |
+| **P4** Entitlements            | H        | Landed. `2026-08-16-private-dashboards-entitlement-enforcement-design.md` | Enforcement is orthogonal to the feature mechanics and carries its own risk (a wrong trigger blocks paying customers).                                                                |
 
 Each phase gets its own spec, plan, and implementation cycle. Phase specs live
 in `docs/superpowers/specs/`; where a phase spec and this document disagree,
@@ -581,15 +581,15 @@ the phase spec is authoritative for the phase that landed it.
 
 P1 makes private-to-owner a real guarantee, and P1's admin surface (I) reports
 on it: Settings Admins can see per-member counts of private resources. But
-nothing in P1 through P4 as originally written gives an *owner* a control that
+nothing in P1 through P4 as originally written gives an _owner_ a control that
 says "make this private". Today the only route is to set Restricted and then
 remember to remove every share by hand, and nothing in the UI confirms you
 landed on private rather than restricted-with-one-share-left.
 
 That gap is worth its own phase rather than folding it into a neighbour:
 
-- **Not P1.** §8's whole argument for shipping P1 first is that it carries *no
-  new product surface*. Adding a destructive control and a new RPC to it
+- **Not P1.** §8's whole argument for shipping P1 first is that it carries _no
+  new product surface_. Adding a destructive control and a new RPC to it
   forfeits that property and reopens a finished review.
 - **Not P2.** P2 is explicitly the phase that ships machinery "without touching
   the share modal". This is share-modal work.
@@ -635,7 +635,7 @@ not a follow-up.
 
 - `util__is_resource_private_to_owner` truth table, including the
   workspace-principal (`principal_id is null`) case and a share whose principal
-  *is* the owner.
+  _is_ the owner.
 - The §4.2 case explicitly: a dashboard with `visibility = 'public'` and
   `is_restricted = true` and no shares must count against the plan limit and
   must **not** appear in the admin private-resource counts.

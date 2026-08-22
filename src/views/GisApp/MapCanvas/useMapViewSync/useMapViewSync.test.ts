@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { act, renderHook } from "@/test-utils";
 import { useMapViewSync } from "@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync";
 

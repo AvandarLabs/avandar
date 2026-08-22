@@ -1,9 +1,11 @@
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
 import { AvaMapParsers } from "$/models/AvaMap/AvaMapParsers";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+
 import { MapSaveConflictError } from "./MapSaveConflictError";
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 type SaveMapConfigInput = {
   mapId: AvaMap.Id;

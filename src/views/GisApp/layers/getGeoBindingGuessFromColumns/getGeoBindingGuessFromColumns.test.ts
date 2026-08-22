@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { getGeoBindingGuessFromColumns } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeoBindingGuessFromColumns";
 
 /** A column as the guesser sees it: a name and whether it holds numbers. */

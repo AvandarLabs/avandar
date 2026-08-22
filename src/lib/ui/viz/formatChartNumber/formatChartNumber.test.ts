@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 
 describe("formatChartNumber", () => {

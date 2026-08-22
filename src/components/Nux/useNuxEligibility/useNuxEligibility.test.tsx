@@ -1,7 +1,8 @@
 import { useMediaQuery } from "@mantine/hooks";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { User } from "$/models/User/User";
 import { isDesktop } from "$/platform/isDesktop";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxEligibility";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";

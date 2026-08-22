@@ -1,15 +1,3 @@
-/**
- * Every operator the catalog offers must survive a trip through
- * `structuredQueryToSql` and back through `sqlToStructuredQuery`. Without this,
- * adding an operator silently turns SQL mode's "form is an approximation"
- * warning on for queries the form itself produced.
- */
-import { Model } from "@avandar/models";
-import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
-import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.ts";
-import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts";
-import { describe, expect, it } from "vitest";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
@@ -19,6 +7,20 @@ import type {
   PartialStructuredQuery,
   StructuredQueryId,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+
+/**
+ * Every operator the catalog offers must survive a trip through
+ * `structuredQueryToSql` and back through `sqlToStructuredQuery`. Without this,
+ * adding an operator silently turns SQL mode's "form is an approximation"
+ * warning on for queries the form itself produced.
+ */
+import { Model } from "@avandar/models";
+import { describe, expect, it } from "vitest";
+
+import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
+import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.ts";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts";
 
 const DATASET_ID = "dataset_round_trip";
 

@@ -1,8 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { hydrateNuxProgressForWorkspace } from "@/components/Nux/NuxRoot/hydrateNuxProgressForWorkspace/hydrateNuxProgressForWorkspace";
-import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { hydrateNuxProgressForWorkspace } from "@/components/Nux/NuxRoot/hydrateNuxProgressForWorkspace/hydrateNuxProgressForWorkspace";
 
 const WORKSPACE_ID = "33333333-3333-4333-8333-333333333333" as Workspace.Id;
 const PROGRESS_ID = "11111111-1111-4111-8111-111111111111" as NuxProgress.Id;

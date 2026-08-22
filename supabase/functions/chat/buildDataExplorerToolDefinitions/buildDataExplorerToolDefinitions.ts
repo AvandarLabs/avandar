@@ -2,6 +2,7 @@ import {
   MAX_DISCOVERY_CANDIDATE_CHARS,
   MAX_DISCOVERY_CANDIDATE_VALUES,
 } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
+
 import { MAX_DISCOVERY_QUERY_CHARS } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 
 type DataExplorerToolDefinition = {
@@ -124,7 +125,7 @@ const CLARIFY_TOOL = {
 export function buildDataExplorerToolDefinitions(
   clarificationCapReached = false,
 ): DataExplorerToolDefinition[] {
-  return clarificationCapReached ?
-      [GENERATE_SQL_TOOL]
+  return clarificationCapReached
+    ? [GENERATE_SQL_TOOL]
     : [GENERATE_SQL_TOOL, CLARIFY_TOOL];
 }

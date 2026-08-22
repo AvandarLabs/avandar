@@ -1,8 +1,10 @@
-import { Model } from "@avandar/models";
-import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
-import { describe, expect, it } from "vitest";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { ConceptModel } from "$/models/ontology/Concept/Concept.types.ts";
+
+import { Model } from "@avandar/models";
+import { describe, expect, it } from "vitest";
+
+import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 
 const DATASET_ID = "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6";
 const CONCEPT_ID = "9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1";

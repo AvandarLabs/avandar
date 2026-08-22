@@ -1,3 +1,12 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type {
+  FreePlanVariants,
+  FreeSubscriptionPlanGroup,
+  PaidPlanVariants,
+  PaidSubscriptionPlanGroup,
+  SubscriptionPlan,
+} from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+
 import { getCurrentUrl } from "@avandar/browser-utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -11,10 +20,11 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useRouter } from "@tanstack/react-router";
-import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useState } from "react";
 import { match } from "ts-pattern";
+
+import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { UserClient } from "@/clients/UserClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
@@ -32,14 +42,6 @@ import {
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
-import type {
-  FreePlanVariants,
-  FreeSubscriptionPlanGroup,
-  PaidPlanVariants,
-  PaidSubscriptionPlanGroup,
-  SubscriptionPlan,
-} from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   workspaceId: Workspace.Id;
@@ -79,12 +81,11 @@ function _getInitialSelectedVariant(
     }
 
     const currentSubscribedPolarProductId = currentSubscription.polarProductId;
-    return (
-      planGroup.freePlan.polarProductId === currentSubscribedPolarProductId ?
-        "free"
-      : planGroup.payWhatYouWantPlan ? "custom"
-      : "free"
-    );
+    return planGroup.freePlan.polarProductId === currentSubscribedPolarProductId
+      ? "free"
+      : planGroup.payWhatYouWantPlan
+        ? "custom"
+        : "free";
   }
 
   const currentSubscribedPolarProductId = currentSubscription.polarProductId;
@@ -127,12 +128,13 @@ export function PlanCard(props: Props): JSX.Element {
       queriesToInvalidate: getPlanChangeQueriesToInvalidate(),
     });
   const selectedPlan =
-    type === "free" ?
-      selectedVariant === "custom" ?
-        (planGroup.payWhatYouWantPlan ?? planGroup.freePlan)
-      : planGroup.freePlan
-    : selectedVariant === "month" ? planGroup.monthlyPlan
-    : planGroup.annualPlan;
+    type === "free"
+      ? selectedVariant === "custom"
+        ? (planGroup.payWhatYouWantPlan ?? planGroup.freePlan)
+        : planGroup.freePlan
+      : selectedVariant === "month"
+        ? planGroup.monthlyPlan
+        : planGroup.annualPlan;
   const { featurePlan } = selectedPlan;
   const [isLoadingCheckoutPage, setIsLoadingCheckoutPage] = useState(false);
   const isCurrentSubscribedPlan = _isCurrentSubscribedPlan({
@@ -142,13 +144,14 @@ export function PlanCard(props: Props): JSX.Element {
   });
 
   const paidPlanDiscount =
-    type === "paid" ?
-      calculateYearlyDiscount({
-        monthlyPlanPrice: planGroup.monthlyPlan.normalizedPricePerSeatPerMonth,
-        annualPlanPricePerMonth:
-          planGroup.annualPlan.normalizedPricePerSeatPerMonth,
-      })
-    : undefined;
+    type === "paid"
+      ? calculateYearlyDiscount({
+          monthlyPlanPrice:
+            planGroup.monthlyPlan.normalizedPricePerSeatPerMonth,
+          annualPlanPricePerMonth:
+            planGroup.annualPlan.normalizedPricePerSeatPerMonth,
+        })
+      : undefined;
 
   const isRecommended = planGroup.featurePlan.metadata.isRecommendedPlan;
 
@@ -290,12 +293,12 @@ export function PlanCard(props: Props): JSX.Element {
               <Text fw={600} size="lg">
                 {featurePlan.metadata.featurePlanName}
               </Text>
-              {isRecommended ?
+              {isRecommended ? (
                 <Badge color="violet" variant="light" size="lg">
                   <Trans>Recommended</Trans>
                 </Badge>
-              : null}
-              {isCurrentSubscribedPlan ?
+              ) : null}
+              {isCurrentSubscribedPlan ? (
                 <Tooltip
                   color="neutral.8"
                   label={t`You are currently subscribed to this plan.`}
@@ -312,7 +315,7 @@ export function PlanCard(props: Props): JSX.Element {
                     <Trans>Current Plan</Trans>
                   </Badge>
                 </Tooltip>
-              : null}
+              ) : null}
             </Group>
             <Text size="sm" c="dimmed">
               {selectedPlan.description}

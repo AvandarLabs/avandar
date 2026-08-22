@@ -1,3 +1,12 @@
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type {
+  PdfFileDatasetId,
+  PdfFileDatasetModel,
+} from "$/models/datasets/PdfFileDataset/PdfFileDataset.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
+
 import { makeParserRegistry } from "@avandar/clients";
 import { Model } from "@avandar/models";
 import {
@@ -6,16 +15,9 @@ import {
   pipe,
   snakeCaseKeysDeep,
 } from "@avandar/utils";
-import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type {
-  PdfFileDatasetId,
-  PdfFileDatasetModel,
-} from "$/models/datasets/PdfFileDataset/PdfFileDataset.types.ts";
-import type { Workspace } from "$/models/Workspace/Workspace.ts";
+
+import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),

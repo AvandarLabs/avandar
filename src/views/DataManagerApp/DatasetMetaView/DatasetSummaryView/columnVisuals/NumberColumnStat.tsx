@@ -1,5 +1,6 @@
-import { Stack, Text } from "@mantine/core";
 import type { ReactElement } from "react";
+
+import { Stack, Text } from "@mantine/core";
 
 type Props = {
   label: string;

@@ -55,12 +55,14 @@
 ### Task 1: SqlTableAlias concepts
 
 **Files:**
+
 - Modify: `shared/models/chat/SqlTableAlias/SqlTableAlias.types.ts`
 - Modify: `shared/models/chat/SqlTableAlias/SqlTableAlias.ts`
 - Modify: `shared/models/chat/SqlTableAlias/SqlTableAliasModule.ts`
 - Test: `shared/models/chat/SqlTableAlias/SqlTableAlias.test.ts`
 
 **Interfaces:**
+
 - Consumes: `RelationRef.toTableName(ref: RelationRef.T): string`
 - Produces: `SqlTableAlias.fromConcepts`, `SqlTableAlias.fromSchema`, concept rewrite via `applyToSql`
 
@@ -131,10 +133,7 @@ describe("SqlTableAlias.formatSchemaBlock", () => {
 describe("SqlTableAlias.applyToSql", () => {
   it("rewrites concept aliases to concept table names", () => {
     const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
-    const sql = SqlTableAlias.applyToSql(
-      'SELECT c0.status FROM "c0"',
-      aliases,
-    );
+    const sql = SqlTableAlias.applyToSql('SELECT c0.status FROM "c0"', aliases);
     expect(sql).toBe(
       `SELECT "concept_${CONCEPT_B.id}".status FROM "concept_${CONCEPT_B.id}"`,
     );
@@ -155,7 +154,9 @@ describe("SqlTableAlias.applyToSql", () => {
     })[10]!.id;
     expect(sql).toBe(`SELECT 1 FROM "concept_${concept10Id}"`);
     expect(sql).not.toContain('"c1"');
-    expect(sql).not.toContain(`concept_${concepts.sort((left, right) => left.id.localeCompare(right.id))[1]!.id}`);
+    expect(sql).not.toContain(
+      `concept_${concepts.sort((left, right) => left.id.localeCompare(right.id))[1]!.id}`,
+    );
   });
 });
 ```
@@ -258,10 +259,12 @@ git commit -m "feat: assign cN concept aliases in SqlTableAlias"
 ### Task 2: fetchWorkspaceSchema loads concepts
 
 **Files:**
+
 - Modify: `supabase/functions/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts`
 - Test: `supabase/functions/chat/PostChatMessages/schema/fetchWorkspaceSchema.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1 types (`SqlTableAlias.Concept` shape `{ id, name }`)
 - Produces: `{ datasets, columns, concepts, conceptAttributes }`
 
@@ -326,6 +329,7 @@ git commit -m "feat: load concept names into the chat schema fetch"
 ### Task 3: Cloud prompt and rewrite
 
 **Files:**
+
 - Modify: `supabase/functions/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts`
 - Modify: `supabase/functions/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.test.ts`
 - Modify: `supabase/functions/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts`
@@ -335,6 +339,7 @@ git commit -m "feat: load concept names into the chat schema fetch"
 - Modify: `supabase/functions/chat/PostChatMessages/PostChatMessages.ts`
 
 **Interfaces:**
+
 - Consumes: `fetchWorkspaceSchema` concepts + `SqlTableAlias.fromSchema`
 - Produces: system prompt listing `cN`; parsed SQL using `concept_<uuid>`
 
@@ -435,9 +440,11 @@ git commit -m "feat: rewrite chat concept aliases before SQL leaves the edge"
 ### Task 4: Leftover generate-SQL route
 
 **Files:**
+
 - Modify: `supabase/functions/queries/QueriesRoutes.ts`
 
 **Interfaces:**
+
 - Consumes: `fetchWorkspaceSchema`, `SqlTableAlias.fromSchema`
 - Produces: generate route SQL with concept table names
 
@@ -502,6 +509,7 @@ git commit -m "feat: rewrite concept aliases on the leftover generate-SQL route"
 ### Task 5: Offline prompts and repair
 
 **Files:**
+
 - Modify: `shared/types/offlineChat.types.ts`
 - Modify: `src/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/fetchOfflineChatSchema.ts`
 - Modify: `src/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/OfflineChatSchemaCache.ts`
@@ -514,6 +522,7 @@ git commit -m "feat: rewrite concept aliases on the leftover generate-SQL route"
 - Modify: `src/components/ChatPanel/offlineChatHelpers/repairOfflineGeneratedSql/repairOfflineGeneratedSql.ts`
 
 **Interfaces:**
+
 - Consumes: `SqlTableAlias.fromSchema`, `RelationRef.toTableName`, ConceptClient
 - Produces: offline schema block with `cN`; repair that does not smash `concept_<uuid>`
 
@@ -587,6 +596,7 @@ git commit -m "feat: include concept aliases in offline chat prompts"
 ### Task 6: STATUS.md
 
 **Files:**
+
 - Create: `STATUS.md`
 
 - [ ] **Step 1: Write STATUS.md** summarizing what shipped, how to demo (`FROM "c0"` becomes `concept_<uuid>`), and files touched.

@@ -1,7 +1,8 @@
+import type { UserProfile } from "$/models/User/UserProfile";
+import type { UseQueryResult } from "@avandar/query-hooks";
+
 import { UserClient } from "@/clients/UserClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { UseQueryResult } from "@avandar/query-hooks";
-import type { UserProfile } from "$/models/User/UserProfile";
 
 /**
  * Get the current user profile for the current workspace.

@@ -1,12 +1,14 @@
-import { propEq } from "@avandar/utils";
-import { beforeAll, describe, expect, it } from "vitest";
-import { AvaPageDataMigrationV3 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3";
-import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
-import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import type {
   V2_AvaPageData,
   V3_AvaPageData,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
+
+import { propEq } from "@avandar/utils";
+import { beforeAll, describe, expect, it } from "vitest";
+
+import { AvaPageDataMigrationV3 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3";
+import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
+import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 
 const TEST_PROMPT = "Find me data";
 const TEST_SQL = "SELECT * FROM t;";
@@ -33,16 +35,16 @@ const V2_ROOT_PROPS = {
 };
 
 function v2Dashboard(
-  vizConfig: V2_AvaPageData["content"][number]["props"] extends infer P ?
-    P extends { vizConfig: infer V } ?
-      V
-    : never
-  : never,
-  vizType: V2_AvaPageData["content"][number]["props"] extends infer P ?
-    P extends { vizType: infer T } ?
-      T
-    : never
-  : never,
+  vizConfig: V2_AvaPageData["content"][number]["props"] extends infer P
+    ? P extends { vizConfig: infer V }
+      ? V
+      : never
+    : never,
+  vizType: V2_AvaPageData["content"][number]["props"] extends infer P
+    ? P extends { vizType: infer T }
+      ? T
+      : never
+    : never,
 ): V2_AvaPageData {
   return {
     root: { props: { ...V2_ROOT_PROPS, schemaVersion: 2 } },

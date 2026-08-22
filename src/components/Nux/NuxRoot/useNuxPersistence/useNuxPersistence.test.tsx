@@ -1,11 +1,13 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
+
 import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useNuxPersistence } from "@/components/Nux/NuxRoot/useNuxPersistence/useNuxPersistence";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { render, screen } from "@/test-utils";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { ReactNode } from "react";
 
 const { updateProgressMock } = vi.hoisted(() => {
   return {

@@ -1,11 +1,13 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
+
 import { mantineColorVar } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
+
 import { BadgeRow } from "@/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
 
 /** How much of a dashboard is readable with no network. */
 export type DashboardOfflineStatus = "full" | "partial" | "none";
@@ -48,9 +50,8 @@ export function DashboardCard({
         root: {
           cursor: onClick ? "pointer" : "default",
           transform: isHovered ? "translateY(-2px)" : "translateY(0)",
-          borderColor:
-            isHovered ?
-              mantineColorVar("primary.3")
+          borderColor: isHovered
+            ? mantineColorVar("primary.3")
             : mantineColorVar("gray.3"),
           transition:
             "transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease",

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { ShareSummaryLine } from "@/components/permissions/ShareResourceModal/ShareSummaryLine/ShareSummaryLine";
 import { render, screen } from "@/test-utils";
 

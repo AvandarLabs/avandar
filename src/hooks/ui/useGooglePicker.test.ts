@@ -1,7 +1,3 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Component, createElement } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { renderHook, waitFor } from "@/test-utils";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type {
   GooglePickerAPI,
@@ -9,6 +5,12 @@ import type {
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
 import type { ReactNode } from "react";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Component, createElement } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { renderHook, waitFor } from "@/test-utils";
 
 /**
  * The Cloud project number, read off the numeric prefix of `GOOGLE_CLIENT_ID`

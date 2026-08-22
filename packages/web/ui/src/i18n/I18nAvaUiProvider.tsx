@@ -1,8 +1,9 @@
+import type { I18nMessages } from "@ui/i18n/i18nMessages";
+import type { ReactElement, ReactNode } from "react";
+
 import { defaultI18nMessages } from "@ui/i18n/i18nMessages";
 import { I18nMessagesContext } from "@ui/i18n/I18nMessagesContext";
 import { useMemo } from "react";
-import type { I18nMessages } from "@ui/i18n/i18nMessages";
-import type { ReactElement, ReactNode } from "react";
 
 /**
  * Supplies translated strings to AvaUI components.
@@ -30,8 +31,8 @@ export function I18nAvaUiProvider(props: {
   const { children, i18nMessages } = props;
 
   const messages = useMemo(() => {
-    return i18nMessages ?
-        { ...defaultI18nMessages, ...i18nMessages }
+    return i18nMessages
+      ? { ...defaultI18nMessages, ...i18nMessages }
       : defaultI18nMessages;
   }, [i18nMessages]);
 

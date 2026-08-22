@@ -1,3 +1,5 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { mantineColorVar, Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -12,11 +14,11 @@ import {
 } from "@mantine/core";
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   workspace: Workspace.WithSubscription;
@@ -42,14 +44,16 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
         <Stack gap="xl">
           <Stack gap="xs">
             <Title order={1}>
-              {isLoadingUserProfile ?
+              {isLoadingUserProfile ? (
                 <>
                   <Trans>Welcome back</Trans>
                   <Loader ml="sm" size="sm" />
                 </>
-              : userProfile ?
+              ) : userProfile ? (
                 <Trans>Welcome back, {userProfile.displayName}</Trans>
-              : <Trans>Welcome back</Trans>}
+              ) : (
+                <Trans>Welcome back</Trans>
+              )}
             </Title>
             <Text size="lg" c="dimmed">
               <Trans>

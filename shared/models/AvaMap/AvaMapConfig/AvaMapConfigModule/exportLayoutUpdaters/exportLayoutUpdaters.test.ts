@@ -1,5 +1,6 @@
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import { describe, expect, it } from "vitest";
+
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 
 describe("exportLayoutUpdaters", () => {
   it("defaults a new map to A4 landscape with no disclaimer", () => {

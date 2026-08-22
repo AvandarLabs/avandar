@@ -1,9 +1,11 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { ColorInput, TextInput } from "@mantine/core";
+
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
@@ -21,8 +23,8 @@ export function NoDataControls({ layer, onLayerChange }: Props): ReactNode {
         return current;
       }
       const currentColor = current.symbology.color;
-      return currentColor.type === "single" ?
-          current
+      return currentColor.type === "single"
+        ? current
         : MapLayerUpdates.withLayerColor({
             layer: current,
             color: { ...currentColor, noData },

@@ -1,9 +1,11 @@
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
+
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
 
 type Props = {
   scale: "sqrt" | "linear";
@@ -38,11 +40,11 @@ export function ProportionalScaleSelect({
           });
         }}
       />
-      {scale === "sqrt" ?
+      {scale === "sqrt" ? (
         <Callout>
           {t`Symbol area is proportional to the value, not radius, so a value ten times larger draws a symbol about three times wider.`}
         </Callout>
-      : null}
+      ) : null}
     </>
   );
 }

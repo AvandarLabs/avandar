@@ -1,8 +1,10 @@
+import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
+
 import { GlobalFilterSubscriptionPField } from "@/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField";
-import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 /**
  * React hook that returns the Puck `CustomField` config for the global filter

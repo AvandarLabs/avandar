@@ -1,12 +1,14 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Button, Menu } from "@mantine/core";
 import { IconStack2 } from "@tabler/icons-react";
 import { useState } from "react";
+
 import css from "@/views/GisApp/shell/MapTopBar/BasemapControl/BasemapControl.module.css";
 import { BasemapMenuDropdown } from "@/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown";
 import { CustomBasemapForm } from "@/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
 
 type Props = {
   basemap: AvaMapConfig.Basemap;

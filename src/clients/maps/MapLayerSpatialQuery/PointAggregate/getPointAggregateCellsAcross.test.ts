@@ -2,6 +2,7 @@
  * Zoom-to-grid-resolution mapping for SQL-side point aggregation.
  */
 import { describe, expect, it } from "vitest";
+
 import { getPointAggregateCellsAcross } from "./getPointAggregateCellsAcross";
 
 describe("getPointAggregateCellsAcross", () => {

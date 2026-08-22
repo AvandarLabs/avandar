@@ -1,5 +1,5 @@
-import path from "node:path";
 import dotenv from "dotenv";
+import path from "node:path";
 import { expect } from "vitest";
 
 // Executed tests run under `environment: "node"`, so this setup file omits

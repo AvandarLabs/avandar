@@ -1,3 +1,9 @@
+import type {
+  LocalFilter,
+  LocalFilterStateApi,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+import type { ReactNode } from "react";
+
 /**
  * Inline local-filter strip rendered above a DataViz chart. These are the
  * viz-scoped filter controls: the viewer-editable counterpart to the
@@ -10,13 +16,10 @@
 import { Trans } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { IconAdjustmentsHorizontal, IconRefresh } from "@tabler/icons-react";
+
 import { DataVizLocalFilterInput } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters/DataVizLocalFilterInput";
+
 import css from "./DataVizLocalFilters.module.css";
-import type {
-  LocalFilter,
-  LocalFilterStateApi,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
-import type { ReactNode } from "react";
 
 type Props = {
   localFilters: readonly LocalFilter[];
@@ -52,7 +55,7 @@ export function DataVizLocalFilters({ localFilters, state }: Props): ReactNode {
             <Trans>Filters for this chart</Trans>
           </Text>
         </Group>
-        {hasActiveValue ?
+        {hasActiveValue ? (
           <Button
             variant="subtle"
             size="compact-xs"
@@ -61,7 +64,7 @@ export function DataVizLocalFilters({ localFilters, state }: Props): ReactNode {
           >
             <Trans>Reset</Trans>
           </Button>
-        : null}
+        ) : null}
       </Group>
       <Group gap="xs" align="end" wrap="wrap">
         {localFilters.map((localFilter) => {

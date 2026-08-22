@@ -1,11 +1,13 @@
+import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
+import type { ReactNode } from "react";
+
 import { Tooltip } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Box, Button, Group } from "@mantine/core";
 import { IconWorld } from "@tabler/icons-react";
+
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { PrimaryActionLabel } from "@/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel";
-import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
-import type { ReactNode } from "react";
 
 type Props = {
   actionKind: PublishActionKind;
@@ -39,11 +41,11 @@ export function PublishingActions({
     actionKind === "disabled_no_audience" || isBlockedReason !== undefined;
   return (
     <Group justify="flex-end">
-      {onUpgrade ?
+      {onUpgrade ? (
         <Button variant="light" onClick={onUpgrade}>
           <Trans>Upgrade plan</Trans>
         </Button>
-      : null}
+      ) : null}
       <Tooltip label={isBlockedReason ?? ""} disabled={!isBlockedReason}>
         <Box {...NuxAnchors.props(NuxAnchors.ids.dashboardPublishButton)}>
           <Button

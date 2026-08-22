@@ -1,9 +1,11 @@
-import { SimpleGrid, Stack } from "@mantine/core";
-import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
-import type { DashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { UserId } from "$/models/User/User.types";
+import type { DashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 import type { ReactNode } from "react";
+
+import { SimpleGrid, Stack } from "@mantine/core";
+
+import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 
 type Props = {
   dashboards: readonly Dashboard.T[];

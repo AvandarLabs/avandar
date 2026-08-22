@@ -1,6 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
-import { getMapLayerOperationalState } from "./getMapLayerOperationalState";
 import type { MapLayerViewState } from "../MapLayerViewState.types";
+
+import { describe, expect, it, vi } from "vitest";
+
+import { getMapLayerOperationalState } from "./getMapLayerOperationalState";
 
 function _state(overrides: Partial<MapLayerViewState>): MapLayerViewState {
   return {

@@ -1,3 +1,5 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -16,7 +18,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Locator, Page } from "@playwright/test";
 
 /**
  * Final settings hard-coded so the save assertion can verify that the column

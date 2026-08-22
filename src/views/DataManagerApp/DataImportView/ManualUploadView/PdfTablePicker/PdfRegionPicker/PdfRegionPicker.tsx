@@ -1,14 +1,4 @@
-import { makeMap } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Alert, Box, Group, Pagination, Stack, Text } from "@mantine/core";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { match } from "ts-pattern";
-import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import { PdfPagePreview } from "../PdfPagePreview";
-import { PdfRegionCard } from "../PdfRegionCard";
-import { PdfRegionOverlay } from "../PdfRegionOverlay/PdfRegionOverlay";
-import { runRegionModelAssist } from "../runRegionModelAssist/runRegionModelAssist";
-import { usePdfAxisCalibration } from "../usePdfAxisCalibration";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Highlight } from "../PdfPagePreview";
 import type { AssistStatus } from "../PdfRegionCard";
 import type { RegionAssistSkipReason } from "../runRegionModelAssist/runRegionModelAssist";
@@ -20,8 +10,21 @@ import type {
   PageGeometry,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
+
+import { makeMap } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Alert, Box, Group, Pagination, Stack, Text } from "@mantine/core";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { match } from "ts-pattern";
+
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
+
+import { PdfPagePreview } from "../PdfPagePreview";
+import { PdfRegionCard } from "../PdfRegionCard";
+import { PdfRegionOverlay } from "../PdfRegionOverlay/PdfRegionOverlay";
+import { runRegionModelAssist } from "../runRegionModelAssist/runRegionModelAssist";
+import { usePdfAxisCalibration } from "../usePdfAxisCalibration";
 
 const PREVIEW_WIDTH = 420;
 
@@ -217,10 +220,9 @@ export function PdfRegionPicker({
           };
         });
     });
-    return (
-        focusedProvenance !== undefined && focusedProvenance.page === pageIndex
-      ) ?
-        [...regionHighlights, { bbox: focusedProvenance.bbox, isActive: true }]
+    return focusedProvenance !== undefined &&
+      focusedProvenance.page === pageIndex
+      ? [...regionHighlights, { bbox: focusedProvenance.bbox, isActive: true }]
       : regionHighlights;
   }, [regions, pageIndex, activeRegionId, focusedProvenance]);
 
@@ -269,7 +271,7 @@ export function PdfRegionPicker({
             onPointPicked={calibration.pick}
           />
         </Box>
-        {pageCount > 1 ?
+        {pageCount > 1 ? (
           <Pagination
             total={pageCount}
             value={pageIndex + 1}
@@ -278,17 +280,17 @@ export function PdfRegionPicker({
             }}
             size="sm"
           />
-        : null}
+        ) : null}
       </Stack>
 
       <Stack gap="sm" flex={1}>
-        {regions.length === 0 ?
+        {regions.length === 0 ? (
           <Alert variant="light" color="blue" title={t`Nothing selected yet`}>
             <Text size="sm">
               {t`Draw a box around a table, chart, map or block of text to extract it.`}
             </Text>
           </Alert>
-        : null}
+        ) : null}
 
         {regions.map((region) => {
           const table = tablesByRegionId.get(region.id);

@@ -1,6 +1,8 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
+
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+
 import { createBoundLayer } from "./MapLayerUpdates.fixtures";
 
 /** A polygon layer eligible for a disputed-status bind. */

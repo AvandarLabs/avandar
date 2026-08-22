@@ -1,7 +1,8 @@
+import type { ReactElement } from "react";
+
 import { TextareaForm } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
-import type { ReactElement } from "react";
 
 type Props = {
   prompt: string;

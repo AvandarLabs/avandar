@@ -1,10 +1,12 @@
-import { useLingui } from "@lingui/react/macro";
-import { Select } from "@mantine/core";
-import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
-import type { Model } from "@avandar/models";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { Model } from "@avandar/models";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Select } from "@mantine/core";
+
+import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 
 type Props = {
   dataSourceId: Model.TypedId<QueryDataSource.T> | undefined;

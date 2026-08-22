@@ -1,10 +1,11 @@
 import "maplibre-gl/dist/maplibre-gl.css";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { ReactNode } from "react";
+
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import css from "@/views/GisApp/GisApp.module.css";
 import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
 import { useGisApp } from "@/views/GisApp/useGisApp/useGisApp";
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { ReactNode } from "react";
 
 type Props = { avaMap: AvaMap.T };
 

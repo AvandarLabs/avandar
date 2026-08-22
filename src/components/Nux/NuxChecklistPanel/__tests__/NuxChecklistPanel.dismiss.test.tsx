@@ -1,7 +1,12 @@
+import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
+
 import { Modal } from "@mantine/core";
 import { modals, ModalsProvider } from "@mantine/modals";
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { NuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel";
 import { NuxCompletionModal } from "@/components/Nux/NuxCompletionModal/NuxCompletionModal";
@@ -13,9 +18,6 @@ import {
 } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
-import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { ReactNode } from "react";
 
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001";
 
@@ -86,11 +88,11 @@ function _renderPanel(
             onDecline={vi.fn()}
           />
           <NuxCompletionModal isOpen={false} onClose={vi.fn()} />
-          {extras.withOpenProductModal === true ?
+          {extras.withOpenProductModal === true ? (
             <Modal opened onClose={vi.fn()} title="Share">
               Publish
             </Modal>
-          : null}
+          ) : null}
           {children}
           <NuxChecklistStateProbe />
         </NuxStateManager.Provider>

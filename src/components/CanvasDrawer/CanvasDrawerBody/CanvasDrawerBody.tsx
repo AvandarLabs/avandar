@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 import { Box, Collapse } from "@mantine/core";
+
 import css from "@/components/CanvasDrawer/CanvasDrawerBody/CanvasDrawerBody.module.css";
 import { useCanvasDrawerContext } from "@/components/CanvasDrawer/CanvasDrawerContext";
-import type { ReactNode } from "react";
 
 /** Duration of the collapse and expand animation, in milliseconds. */
 const COLLAPSE_DURATION_MS = 240;

@@ -1,7 +1,8 @@
-import { MapFurnitureBar } from "@/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar";
-import { useBasemapAttribution } from "@/views/GisApp/useBasemapAttribution";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
+
+import { MapFurnitureBar } from "@/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar";
+import { useBasemapAttribution } from "@/views/GisApp/useBasemapAttribution";
 
 type Props = { app: GisAppState };
 

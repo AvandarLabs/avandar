@@ -1,8 +1,9 @@
-import { prop } from "@avandar/utils";
 import type {
   OfflineChatCompletionRequest,
   OfflineChatEngine,
 } from "$/types/offlineChat.types";
+
+import { prop } from "@avandar/utils";
 
 export type MockOfflineChatResponse = {
   match: RegExp | string;
@@ -41,8 +42,8 @@ export function createMockOfflineChatEngine(
     async complete(request: OfflineChatCompletionRequest): Promise<string> {
       const blob = request.messages.map(prop("content")).join("\n");
       const matchingEntry = resolveMockScript(scripted).find((entry) => {
-        return typeof entry.match === "string" ?
-            blob.includes(entry.match)
+        return typeof entry.match === "string"
+          ? blob.includes(entry.match)
           : entry.match.test(blob);
       });
       if (matchingEntry) {

@@ -1,17 +1,19 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+
 import { prop, propEq } from "@avandar/utils";
+
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { disputedStatusUpdates } from "@/views/GisApp/layers/MapLayerUpdates/disputedStatusUpdates";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 function _getQueryColumnFromLayer(options: {
   layer: MapLayer.T;
   columnId: QueryColumn.Id | undefined;
 }): QueryColumn.T | undefined {
   const { layer, columnId } = options;
-  return columnId ?
-      layer.source.queryColumns.find(propEq("id", columnId))
+  return columnId
+    ? layer.source.queryColumns.find(propEq("id", columnId))
     : undefined;
 }
 
@@ -50,9 +52,9 @@ function _withGeoBindingAxis(options: {
     source: {
       ...layer.source,
       queryColumns:
-        hasColumn && column ?
-          [...layer.source.queryColumns, column]
-        : layer.source.queryColumns,
+        hasColumn && column
+          ? [...layer.source.queryColumns, column]
+          : layer.source.queryColumns,
     },
     geoBinding: {
       type: "latLngColumns",
@@ -138,13 +140,13 @@ function _withBoundaryJoin(options: {
 
 function _withGridBin(layer: MapLayer.T): MapLayer.T {
   const points =
-    layer.geoBinding?.type === "latLngColumns" ?
-      layer.geoBinding
-    : {
-        type: "latLngColumns" as const,
-        latitude: undefined,
-        longitude: undefined,
-      };
+    layer.geoBinding?.type === "latLngColumns"
+      ? layer.geoBinding
+      : {
+          type: "latLngColumns" as const,
+          latitude: undefined,
+          longitude: undefined,
+        };
   return {
     ...layer,
     geoBinding: {

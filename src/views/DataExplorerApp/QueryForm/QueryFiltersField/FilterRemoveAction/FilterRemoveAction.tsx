@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
+import type { ActionProps } from "react-querybuilder";
+
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
+
 import classes from "./FilterRemoveAction.module.css";
-import type { ReactNode } from "react";
-import type { ActionProps } from "react-querybuilder";
 
 type Props = ActionProps;
 

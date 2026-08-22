@@ -1,8 +1,9 @@
+import type { FastifyInstance } from "fastify";
+
 import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import Fastify from "fastify";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { FastifyInstance } from "fastify";
 
 vi.mock("@pipeline-server/routes/pipeline-name/run/run", () => {
   return {

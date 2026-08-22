@@ -1,7 +1,9 @@
-import { isMapTimeColumn } from "@/views/GisApp/layers/isMapTimeColumn/isMapTimeColumn";
-import { hasQueryColumn } from "./hasQueryColumn";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
+import { isMapTimeColumn } from "@/views/GisApp/layers/isMapTimeColumn/isMapTimeColumn";
+
+import { hasQueryColumn } from "./hasQueryColumn";
 
 /** Binds a query column as the layer's time filter, or clears it. */
 function _withTimeColumn(
@@ -12,8 +14,8 @@ function _withTimeColumn(
 ): MapLayer.T {
   const { layer, column } = options;
   if (column === undefined) {
-    return layer.timeColumn === undefined ?
-        layer
+    return layer.timeColumn === undefined
+      ? layer
       : { ...layer, timeColumn: undefined };
   }
   if (!isMapTimeColumn(column) || !hasQueryColumn({ layer, column })) {

@@ -1,3 +1,10 @@
+import type {
+  AppType,
+  PermissionKey,
+  RoleLevel,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types.ts";
+
 import { buildInitialCustomRoleGroupName } from "$/models/Permissions/PermissionsModule/buildInitialCustomRoleGroupName/buildInitialCustomRoleGroupName.ts";
 import { PermissionRegistry } from "$/models/Permissions/PermissionsModule/PermissionRegistry.ts";
 import {
@@ -5,12 +12,6 @@ import {
   RESTRICTABLE_APPS,
 } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
 import { RolesMatrixModule } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/RolesMatrixModule.ts";
-import type {
-  AppType,
-  PermissionKey,
-  RoleLevel,
-  UserAppRolesMatrix,
-} from "$/models/Permissions/Permissions.types.ts";
 
 /**
  * Workspace permissions: UI catalog plus workspace role-matrix helpers.

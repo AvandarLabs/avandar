@@ -1,13 +1,3 @@
-/**
- * Shared mocks and factories for DataSection tests. Each scenario file
- * imports this first so its `vi.mock` calls register before the module graph.
- */
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
-import { vi } from "vitest";
-import { createDataSectionMapLayerUpdatesMock } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.mapLayerUpdatesMock";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -16,6 +6,18 @@ import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
+
+/**
+ * Shared mocks and factories for DataSection tests. Each scenario file
+ * imports this first so its `vi.mock` calls register before the module graph.
+ */
+import { Model } from "@avandar/models";
+import { vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
+import { createDataSectionMapLayerUpdatesMock } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.mapLayerUpdatesMock";
 
 type Fixtures = {
   dataSource: QueryDataSource.T;
@@ -199,9 +201,11 @@ vi.mock(
             aria-label={label}
             onClick={() => {
               onChange(
-                label === "Latitude" ? fixtures.latitudeColumn
-                : label === "Longitude" ? fixtures.longitudeColumn
-                : fixtures.geometryColumn,
+                label === "Latitude"
+                  ? fixtures.latitudeColumn
+                  : label === "Longitude"
+                    ? fixtures.longitudeColumn
+                    : fixtures.geometryColumn,
               );
             }}
           >

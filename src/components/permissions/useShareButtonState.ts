@@ -1,8 +1,10 @@
+import type { RoleLevel } from "$/models/Permissions/Permissions";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
-import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions";
 
 const _ROLE_RANK = {
   viewer: 1,
@@ -65,12 +67,12 @@ export function useShareButtonState(
     }),
     isLoadingRole,
     tooltip:
-      isAllowed || isLoadingRole ?
-        minRole === "admin" ?
-          t`Share this ${resourceLabel}`
-        : t`Share or publish this ${resourceLabel}`
-      : minRole === "admin" ?
-        t`You need admin access on this resource to manage sharing.`
-      : t`You need edit access on this resource to share or publish it.`,
+      isAllowed || isLoadingRole
+        ? minRole === "admin"
+          ? t`Share this ${resourceLabel}`
+          : t`Share or publish this ${resourceLabel}`
+        : minRole === "admin"
+          ? t`You need admin access on this resource to manage sharing.`
+          : t`You need edit access on this resource to share or publish it.`,
   };
 }

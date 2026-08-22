@@ -1,5 +1,3 @@
-import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
-import { assembleWords } from "../assembleWords/assembleWords";
 import type {
   BBox,
   PageGeometry,
@@ -9,6 +7,10 @@ import type {
   TextItem,
 } from "../pdfSniff.types";
 import type { PDFPageProxy } from "pdfjs-dist";
+
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
+
+import { assembleWords } from "../assembleWords/assembleWords";
 
 /**
  * A rule thinner than this many points is treated as a line rather than a

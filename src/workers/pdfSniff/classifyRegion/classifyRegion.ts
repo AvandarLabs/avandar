@@ -1,9 +1,10 @@
+import type { GraphicType } from "../detectGraphicType/detectGraphicType";
+import type { PdfRegionShape, RegionGeometry } from "../pdfSniff.types";
+
 import { deriveColumns } from "../deriveColumns";
 import { detectGraphicType } from "../detectGraphicType/detectGraphicType";
 import { groupLines } from "../groupLines/groupLines";
 import { parseRunInLabels } from "../parseRunInLabels/parseRunInLabels";
-import type { GraphicType } from "../detectGraphicType/detectGraphicType";
-import type { PdfRegionShape, RegionGeometry } from "../pdfSniff.types";
 
 export type RegionClassification = {
   shape: PdfRegionShape;

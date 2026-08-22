@@ -1,8 +1,10 @@
-import { makeObjectFromEntries, pickProps } from "@avandar/utils";
-import { uuid } from "$/lib/uuid";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+
+import { makeObjectFromEntries, pickProps } from "@avandar/utils";
+
+import { uuid } from "$/lib/uuid";
 
 /**
  * Builds a {@link QueryResult} out of the raw rows `AttributeAssertionClient`

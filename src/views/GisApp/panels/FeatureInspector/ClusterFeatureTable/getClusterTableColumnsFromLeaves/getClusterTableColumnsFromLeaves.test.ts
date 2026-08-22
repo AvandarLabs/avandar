@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { getClusterTableColumnsFromLeaves } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumnsFromLeaves/getClusterTableColumnsFromLeaves";
 
 function _makeFeature(properties: Record<string, unknown>): GeoJSON.Feature {

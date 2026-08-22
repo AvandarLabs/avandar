@@ -1,17 +1,19 @@
-/**
- * useGisApp expands the inspector when an annotation is created or selected.
- */
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, renderHook } from "@/test-utils";
-import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import { makeTextAnnotationFeature } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+/**
+ * useGisApp expands the inspector when an annotation is created or selected.
+ */
+import { Model } from "@avandar/models";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { act, renderHook } from "@/test-utils";
+import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+import { makeTextAnnotationFeature } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
 
 const { expandPanelMock, mapCanvasState } = vi.hoisted(() => {
   return {

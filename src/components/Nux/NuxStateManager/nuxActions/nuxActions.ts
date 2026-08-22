@@ -1,4 +1,9 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+
 import { propEq } from "@avandar/utils";
+
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import {
   completeAlreadyRecordedMilestone,
@@ -9,9 +14,6 @@ import {
 } from "@/components/Nux/NuxStateManager/nuxActions/nuxActionHelpers";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
-import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 /**
  * Every transition the tutorial can make, as pure functions.
@@ -206,13 +208,13 @@ export const nuxActions = {
       ...state,
       recentDashboardId: undefined,
       activeMilestoneKey:
-        state.activeMilestoneKey === "share_dashboard" ?
-          undefined
-        : state.activeMilestoneKey,
+        state.activeMilestoneKey === "share_dashboard"
+          ? undefined
+          : state.activeMilestoneKey,
       activeStepIndex:
-        state.activeMilestoneKey === "share_dashboard" ?
-          0
-        : state.activeStepIndex,
+        state.activeMilestoneKey === "share_dashboard"
+          ? 0
+          : state.activeStepIndex,
     };
   },
 
@@ -296,9 +298,8 @@ export const nuxActions = {
       state.completedMilestones,
       key,
     );
-    const userUnmarkedMilestones =
-      state.userUnmarkedMilestones.includes(key) ?
-        state.userUnmarkedMilestones
+    const userUnmarkedMilestones = state.userUnmarkedMilestones.includes(key)
+      ? state.userUnmarkedMilestones
       : [...state.userUnmarkedMilestones, key];
     return {
       ...state,

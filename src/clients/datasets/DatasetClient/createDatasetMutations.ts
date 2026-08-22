@@ -1,3 +1,11 @@
+import type { CompositeTypes } from "$/types/database.types";
+import type {
+  DatasetColumnInput,
+  DatasetDBRead,
+  DatasetMutationConfig,
+  DatasetMutationRecord,
+} from "@/clients/datasets/DatasetClient/DatasetClient.types";
+
 import {
   getOriginalFileExtensionFromSourceType,
   requiresOriginalFileRetention,
@@ -7,13 +15,6 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalD
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import type {
-  DatasetColumnInput,
-  DatasetDBRead,
-  DatasetMutationConfig,
-  DatasetMutationRecord,
-} from "@/clients/datasets/DatasetClient/DatasetClient.types";
-import type { CompositeTypes } from "$/types/database.types";
 
 // Platform-aware server API client; reads the Supabase client registered by
 // AvaSupabase for the web-backed adapter.

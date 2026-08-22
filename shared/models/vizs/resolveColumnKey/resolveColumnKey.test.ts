@@ -1,6 +1,8 @@
-import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
-import { describe, expect, it } from "vitest";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+
+import { describe, expect, it } from "vitest";
+
+import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
 
 const columns: readonly QueryResultColumn[] = [
   { name: "count", dataType: "bigint" } as QueryResultColumn,

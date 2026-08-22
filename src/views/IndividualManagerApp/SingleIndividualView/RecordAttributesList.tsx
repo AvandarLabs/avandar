@@ -1,9 +1,11 @@
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { ReactNode } from "react";
+
 import { unknownToString } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
+
 import css from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList.module.css";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { ReactNode } from "react";
 
 export type RecordAttributeRow = {
   name: string;
@@ -35,9 +37,9 @@ export function RecordAttributesList({ attributes }: Props): ReactNode {
           <div key={attribute.name} role="listitem" className={css.field}>
             <Text size="xs" c="dimmed">
               {attribute.name}
-              {attribute.sourceName ?
+              {attribute.sourceName ? (
                 <span className={css.source}> · {attribute.sourceName}</span>
-              : null}
+              ) : null}
             </Text>
             <Text className={css.value}>
               {unknownToString(attribute.value)}

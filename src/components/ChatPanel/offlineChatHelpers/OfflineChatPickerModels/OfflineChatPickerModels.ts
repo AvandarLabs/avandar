@@ -1,7 +1,9 @@
+import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
+
 import { Model } from "@avandar/models";
+
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
-import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 /** Prefix for offline model ids in the shared chat model picker. */
 const ID_PREFIX = "offline:" as const;

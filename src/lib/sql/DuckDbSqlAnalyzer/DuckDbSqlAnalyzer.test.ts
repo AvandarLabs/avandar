@@ -1,6 +1,7 @@
 /** Tests dataset dependency extraction from SQL table references. */
 
 import { describe, expect, it } from "vitest";
+
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 
 const DATASET_ID = "22222222-2222-4222-8222-222222222222";

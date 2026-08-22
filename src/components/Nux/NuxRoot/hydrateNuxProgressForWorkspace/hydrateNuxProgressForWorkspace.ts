@@ -1,9 +1,10 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { FIRST_DASHBOARD_PREREQUISITES } from "@/components/Nux/NuxPrerequisites/firstDashboard/firstDashboardPrerequisites/firstDashboardPrerequisites";
 import { NuxPrerequisiteJudge } from "@/components/Nux/NuxPrerequisites/NuxPrerequisiteJudge/NuxPrerequisiteJudge";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** What first-paint hydration hands back to the state manager. */
 export type HydrationResult = {
@@ -55,10 +56,9 @@ export async function hydrateNuxProgressForWorkspace(
   }
 
   const completedMilestones = [...progress.completedMilestones, ...keys];
-  const status =
-    nuxSelectors.areAllMilestonesComplete(completedMilestones) ? "completed" : (
-      progress.status
-    );
+  const status = nuxSelectors.areAllMilestonesComplete(completedMilestones)
+    ? "completed"
+    : progress.status;
 
   await NuxProgressClient.updateProgress({
     progressId: progress.progressId,

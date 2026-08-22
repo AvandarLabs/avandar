@@ -1,8 +1,9 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxStepFacts } from "@/components/Nux/tutorials/NuxTutorial.types";
+
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import { getVisibleNuxSteps } from "@/components/Nux/tutorials/getVisibleNuxSteps/getVisibleNuxSteps";
-import type { NuxStepFacts } from "@/components/Nux/tutorials/NuxTutorial.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 /**
  * Data Explorer Save-menu flags the NUX tour needs during `build_dashboard`.

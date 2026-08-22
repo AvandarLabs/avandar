@@ -1,3 +1,6 @@
+import type { ServiceClient } from "@avandar/clients";
+import type { UseMutationOptions } from "@query-hooks/useMutation/useMutation";
+
 import {
   AnyFunction,
   capitalize,
@@ -23,8 +26,6 @@ import {
   UseQueryFunctionsRecord,
   WithQueryHooks,
 } from "@query-hooks/withQueryHooks/withQueryHooks.types";
-import type { ServiceClient } from "@avandar/clients";
-import type { UseMutationOptions } from "@query-hooks/useMutation/useMutation";
 
 function isSingletonObject(arg: unknown): arg is { arg: unknown } {
   return isPlainObject(arg) && "arg" in arg && objectKeys(arg).length === 1;
@@ -112,16 +113,17 @@ export function withQueryHooks<
       const useClientQuery = (
         options: UseClientQueryArg<Client, UseQueryFnName>,
       ) => {
-        const { useQueryOptions, ...clientFnParamsObj } =
-          isPlainObject(options) ? options : { useQueryOptions: undefined };
+        const { useQueryOptions, ...clientFnParamsObj } = isPlainObject(options)
+          ? options
+          : { useQueryOptions: undefined };
         const clientFnParam = (
-          isSingletonObject(clientFnParamsObj) ? clientFnParamsObj.arg
-            // treat an empty object as undefined
-          : objectKeys(clientFnParamsObj).length === 0 ? undefined
-          : clientFnParamsObj) as ClientFnFirstParameter<
-          Client,
-          UseQueryFnName
-        >;
+          isSingletonObject(clientFnParamsObj)
+            ? clientFnParamsObj.arg
+            : // treat an empty object as undefined
+              objectKeys(clientFnParamsObj).length === 0
+              ? undefined
+              : clientFnParamsObj
+        ) as ClientFnFirstParameter<Client, UseQueryFnName>;
 
         return useQuery({
           queryKey: queryKeyBuilder(clientFnParam),
@@ -177,8 +179,9 @@ export function withQueryHooks<
           } = useMutationOptions ?? {};
 
           // get the query keys to invalidate
-          const singletonQueryToInvalidate =
-            queryToInvalidate ? [queryToInvalidate] : undefined;
+          const singletonQueryToInvalidate = queryToInvalidate
+            ? [queryToInvalidate]
+            : undefined;
           // if `queriesToInvalidate` is set, it takes precedence over the
           // singleton `queryToInvalidate` parameter
           let newQueriesToInvalidate =

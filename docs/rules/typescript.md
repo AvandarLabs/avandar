@@ -813,6 +813,7 @@
       | normalizeLayerValue.ts
       | normalizeLayerValue.test.ts
   ```
+
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.
@@ -1050,6 +1051,7 @@ type AuditLogEntry = Readonly<{
   A top-level function that returns a value other than JSX is not covered by
   this rule, and neither is a hook (`useX`), which returns data rather than a
   JSX block.
+
 - Use our internal UI library in `src/lib/ui` or Mantine components.
 - Do not build new core UI elements from scratch unless specifically asked to.
 - Define functional components with the function keyword instead of arrow

@@ -1,6 +1,7 @@
 import { mantineColorVar } from "@avandar/ui";
 import { Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
+
 import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
 import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -31,36 +32,34 @@ export function AppToolbar({
       // it stays transparent and lets the surface behind it show through.
       bg={floatingToolbar ? "transparent" : "white"}
       style={
-        floatingToolbar ?
-          {
-            position: "absolute",
-            zIndex: APP_CHROME_Z_INDEX,
-            top: 0,
-            left: 0,
-            width: "fit-content",
-          }
-        : {
-            width: "100%",
-            position: "relative",
-            borderBottom: `1px solid ${mantineColorVar("neutral.2")}`,
-          }
+        floatingToolbar
+          ? {
+              position: "absolute",
+              zIndex: APP_CHROME_Z_INDEX,
+              top: 0,
+              left: 0,
+              width: "fit-content",
+            }
+          : {
+              width: "100%",
+              position: "relative",
+              borderBottom: `1px solid ${mantineColorVar("neutral.2")}`,
+            }
       }
     >
       <NavbarSidebarToggle />
-      {title ?
+      {title ? (
         <Title order={2} size="sm" fw={500}>
           {title}
         </Title>
-      : null}
+      ) : null}
       <Group ml="auto" mr="xxs" gap="sm" wrap="nowrap">
         {children}
         <OfflineIndicator />
-        {isFlagEnabled(FeatureFlag.EnableUserFeedback) ?
+        {isFlagEnabled(FeatureFlag.EnableUserFeedback) ? (
           <FeedbackButton />
-        : null}
-        {isChatPanelAvailable ?
-          <ChatAsideToggle />
-        : null}
+        ) : null}
+        {isChatPanelAvailable ? <ChatAsideToggle /> : null}
       </Group>
     </Group>
   );

@@ -1,19 +1,22 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
+
 import { match } from "ts-pattern";
+
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+
 import { hasQueryColumn } from "./hasQueryColumn";
 import { withQueryColumn } from "./withQueryColumn";
-import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 function _getStroke(layer: MapLayer.T): MapLayer.ClusterSymbology["stroke"] {
-  return layer.symbology.type === "heatmap" ?
-      MapLayer.createDefaultFillSymbology().stroke
+  return layer.symbology.type === "heatmap"
+    ? MapLayer.createDefaultFillSymbology().stroke
     : layer.symbology.stroke;
 }
 
 function _getCompatibleColor(layer: MapLayer.T): MapLayer.Color {
-  return layer.symbology.type === "heatmap" ?
-      { type: "single", color: MapLayer.defaultSymbolColor }
+  return layer.symbology.type === "heatmap"
+    ? { type: "single", color: MapLayer.defaultSymbolColor }
     : layer.symbology.color;
 }
 
@@ -37,9 +40,9 @@ function _withCircleSymbology(layer: MapLayer.T): MapLayer.T {
     return layer;
   }
   const radius =
-    layer.symbology.type === "proportionalSymbol" ?
-      layer.symbology.maxRadius
-    : MapLayer.defaultSymbolRadius;
+    layer.symbology.type === "proportionalSymbol"
+      ? layer.symbology.maxRadius
+      : MapLayer.defaultSymbolRadius;
   return {
     ...layer,
     symbology: {
@@ -62,9 +65,9 @@ function _withProportionalSymbology(
     return layer;
   }
   const maxRadius =
-    layer.symbology.type === "circle" ?
-      layer.symbology.radius
-    : MapLayer.defaultMaxSymbolRadius;
+    layer.symbology.type === "circle"
+      ? layer.symbology.radius
+      : MapLayer.defaultMaxSymbolRadius;
   const withColumn = withQueryColumn({ layer, column: valueColumn });
   return {
     ...withColumn,
@@ -154,13 +157,13 @@ function _withSizedValueColumn(
       type: "proportionalSymbol",
       value: column.id,
       minRadius:
-        symbology.type === "proportionalSymbol" ?
-          symbology.minRadius
-        : MapLayer.defaultMinSymbolRadius,
+        symbology.type === "proportionalSymbol"
+          ? symbology.minRadius
+          : MapLayer.defaultMinSymbolRadius,
       maxRadius:
-        symbology.type === "proportionalSymbol" ?
-          symbology.maxRadius
-        : MapLayer.defaultMaxSymbolRadius,
+        symbology.type === "proportionalSymbol"
+          ? symbology.maxRadius
+          : MapLayer.defaultMaxSymbolRadius,
       scale: symbology.type === "proportionalSymbol" ? symbology.scale : "sqrt",
       color: _getCompatibleColor(layer),
       stroke: _getStroke(layer),

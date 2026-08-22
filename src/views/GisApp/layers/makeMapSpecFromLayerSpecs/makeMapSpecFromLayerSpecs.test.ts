@@ -1,7 +1,9 @@
+import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+
 import { objectKeys, prop, sortStrings } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
+
 import { makeMapSpecFromLayerSpecs } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeMapSpecFromLayerSpecs";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 
 function _createSingleLayerSpec(id: string): MapSpec {
   return {

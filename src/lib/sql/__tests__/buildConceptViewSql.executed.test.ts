@@ -1,3 +1,6 @@
+import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
+import type { DuckDBConnection } from "@duckdb/node-api";
+
 /**
  * Executed tests for the concept relation view.
  *
@@ -15,12 +18,11 @@
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+
 import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
-import type { DuckDBConnection } from "@duckdb/node-api";
 
 const DATASET_A = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa";
 const DATASET_B = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb";

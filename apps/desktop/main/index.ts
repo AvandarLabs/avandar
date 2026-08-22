@@ -1,5 +1,6 @@
-import { join } from "node:path";
 import { app, BrowserWindow, PATHS } from "electrobun";
+import { join } from "node:path";
+
 import { SYNCABLE_TABLES } from "../sync/syncable-tables";
 import { resolveMigrationsDir } from "./config/resolveMigrationsDir/resolveMigrationsDir";
 import { resolveWebviewUrl } from "./config/url";

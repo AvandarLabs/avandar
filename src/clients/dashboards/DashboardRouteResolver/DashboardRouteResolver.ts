@@ -1,6 +1,7 @@
-import { matchLiteral, propEq } from "@avandar/utils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { matchLiteral, propEq } from "@avandar/utils";
 
 const UUID_SHAPED =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
@@ -58,8 +59,8 @@ async function _buildWorkspaceRedirect(
   );
 
   if (workspace === undefined) {
-    return (await deps.isAuthenticated()) ?
-        { kind: "denied" }
+    return (await deps.isAuthenticated())
+      ? { kind: "denied" }
       : { kind: "signIn" };
   }
 
@@ -91,9 +92,9 @@ async function _buildPublicMissOutcome(
     visibility: "workspace",
   });
   const onlyMatchingWorkspaceDashboard =
-    matchingWorkspaceDashboards.length === 1 ?
-      matchingWorkspaceDashboards[0]
-    : undefined;
+    matchingWorkspaceDashboards.length === 1
+      ? matchingWorkspaceDashboards[0]
+      : undefined;
 
   if (onlyMatchingWorkspaceDashboard === undefined) {
     return { kind: "denied" };
@@ -110,9 +111,8 @@ async function _makeDashboardRouteOutcomeFromPublicRoute(
   params: Readonly<{ slugOrId: string; deps: IDashboardRouteUtils }>,
 ): Promise<DashboardRouteOutcome> {
   const { slugOrId, deps } = params;
-  const candidate =
-    _isUuidShaped(slugOrId) ?
-      await deps.getById(_getDashboardIdFromSlugOrId(slugOrId))
+  const candidate = _isUuidShaped(slugOrId)
+    ? await deps.getById(_getDashboardIdFromSlugOrId(slugOrId))
     : (await deps.findBySlug({ slug: slugOrId, visibility: "public" }))[0];
 
   if (candidate === undefined) {

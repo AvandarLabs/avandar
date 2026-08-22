@@ -1,15 +1,17 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactElement } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactElement } from "react";
 
 type Props = {
   workspaceSlug: string;
@@ -32,9 +34,8 @@ function useDeleteDashboard(
 } {
   const navigate = useNavigate();
   const [deleteDashboard, isDeleting] = DashboardClient.useFullDelete({
-    queriesToInvalidate:
-      options.dashboardId ?
-        [
+    queriesToInvalidate: options.dashboardId
+      ? [
           DashboardClient.QueryKeys.getAll(),
           DashboardClient.QueryKeys.getById({ id: options.dashboardId }),
           getNuxWorkspaceArtifactsQueryKey(),

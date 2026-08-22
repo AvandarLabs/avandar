@@ -99,9 +99,9 @@ separator.
 
 ### 4.1 Pan policy
 
-| Mode | Unmodified pointer | Alt held |
-| --- | --- | --- |
-| Select (`pan`) | MapLibre drag-pan | drag-pan (same) |
+| Mode           | Unmodified pointer               | Alt held                                    |
+| -------------- | -------------------------------- | ------------------------------------------- |
+| Select (`pan`) | MapLibre drag-pan                | drag-pan (same)                             |
 | Any other tool | Tool gesture; `dragPan` disabled | `dragPan` enabled; tool ignores the pointer |
 
 Alt is live: keydown enables pan even mid-tool; keyup restores the tool and
@@ -119,14 +119,14 @@ does its own hit tests and does not use the data-layer click path.
 Set `canvas.style.cursor` from the active tool, overridden to `grab` /
 `grabbing` while Alt-pan is active.
 
-| Tool | Cursor |
-| --- | --- |
-| Select | `grab` at rest, `grabbing` while dragging |
-| Area, annotate area, measure | `crosshair` |
-| Arrow | `crosshair` |
-| Pencil | `crosshair` |
-| Text | `text` |
-| Eraser | `cell` |
+| Tool                         | Cursor                                    |
+| ---------------------------- | ----------------------------------------- |
+| Select                       | `grab` at rest, `grabbing` while dragging |
+| Area, annotate area, measure | `crosshair`                               |
+| Arrow                        | `crosshair`                               |
+| Pencil                       | `crosshair`                               |
+| Text                         | `text`                                    |
+| Eraser                       | `cell`                                    |
 
 No custom PNG cursors in this pass. The CSS keyword is enough to show the
 tool is armed.

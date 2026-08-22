@@ -1,5 +1,6 @@
 import { I18nProvider } from "@lingui/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { i18n } from "@/i18n/i18n";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
 import { renderHook } from "@/test-utils";

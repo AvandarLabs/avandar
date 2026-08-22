@@ -1,11 +1,12 @@
-import { groupLines } from "../../groupLines/groupLines";
-import { parseRunInLabels } from "../../parseRunInLabels/parseRunInLabels";
 import type {
   BBox,
   ExtractedTable,
   PdfCellFlag,
   RegionGeometry,
 } from "../../pdfSniff.types";
+
+import { groupLines } from "../../groupLines/groupLines";
+import { parseRunInLabels } from "../../parseRunInLabels/parseRunInLabels";
 
 /**
  * Reads numbered sections with run-in labels into one row per section.

@@ -1,7 +1,8 @@
+import type { RefCallback } from "react";
+
 import { isArray } from "@avandar/utils";
 import { useIsomorphicEffect } from "@mantine/hooks";
 import { DependencyList, useCallback, useState } from "react";
-import type { RefCallback } from "react";
 
 /**
  * Tracks whether text in a truncating element is visually clipped.
@@ -16,8 +17,9 @@ export function useCheckTruncatedText<T extends HTMLElement = HTMLElement>(
   const [element, setElement] = useState<T | null>(null);
   const [isTextTruncated, setIsTextTruncated] = useState(false);
 
-  const dependencyList: DependencyList =
-    isArray(dependencies) ? dependencies : [dependencies];
+  const dependencyList: DependencyList = isArray(dependencies)
+    ? dependencies
+    : [dependencies];
 
   const setTextNodeRef = useCallback((node: T | null) => {
     setElement((previous) => {

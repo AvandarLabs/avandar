@@ -1,6 +1,8 @@
-import { useSyncExternalStore } from "react";
-import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+
+import { useSyncExternalStore } from "react";
+
+import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 
 /**
  * A hook that returns true when the dataset's Parquet upload is in-flight.

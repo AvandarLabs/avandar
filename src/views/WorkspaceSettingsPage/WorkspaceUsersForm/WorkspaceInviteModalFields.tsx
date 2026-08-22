@@ -1,7 +1,11 @@
+import type {
+  BuiltinPresetType,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { Permissions } from "$/models/Permissions/Permissions";
 import {
   ForwardedRef,
   forwardRef,
@@ -9,14 +13,12 @@ import {
   useRef,
   useState,
 } from "react";
+
+import { Permissions } from "$/models/Permissions/Permissions";
 import { AvaField } from "@/components/forms/AvaForm/AvaField";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AvaFormRef } from "@/components/forms/AvaForm/AvaForm.types";
 import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
-import type {
-  BuiltinPresetType,
-  UserAppRolesMatrix,
-} from "$/models/Permissions/Permissions.types";
 
 export type WorkspaceInviteModalFieldsRef = {
   getState: () => {
@@ -78,12 +80,14 @@ export const WorkspaceInviteModalFields = forwardRef<
   return (
     <Stack>
       <Text size="sm" c="dimmed">
-        {featurePlanType !== "free" ?
+        {featurePlanType !== "free" ? (
           <Trans>
             Type or paste an email below. Your workspace will be billed per
             member.
           </Trans>
-        : <Trans>Type or paste an email below.</Trans>}
+        ) : (
+          <Trans>Type or paste an email below.</Trans>
+        )}
       </Text>
       <AvaForm
         ref={innerFormRef}

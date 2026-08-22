@@ -1,11 +1,13 @@
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import css from "@/views/GisApp/GisAppLayerInspector/GisAppLayerInspector.module.css";
 import { AnnotationFeatureInspector } from "@/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
-import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
-import type { ReactNode } from "react";
 
 type Props = {
   app: GisAppState;
@@ -64,7 +66,7 @@ export function AnnotationInspectorPanel({ app }: Readonly<Props>): ReactNode {
       collapseLabel={t`Collapse the inspector`}
       expandLabel={t`Expand the inspector`}
     >
-      {showFeatureEditor ?
+      {showFeatureEditor ? (
         <AnnotationFeatureInspector
           feature={feature}
           onFeatureChange={(nextFeature) => {
@@ -74,10 +76,11 @@ export function AnnotationInspectorPanel({ app }: Readonly<Props>): ReactNode {
             _deleteAnnotationFeature(app);
           }}
         />
-      : <div className={css.gisAppLayerInspectorEmptyState}>
+      ) : (
+        <div className={css.gisAppLayerInspectorEmptyState}>
           {t`Select an annotation on the map to edit it.`}
         </div>
-      }
+      )}
     </MapChromePanel>
   );
 }

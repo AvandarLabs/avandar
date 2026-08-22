@@ -1,8 +1,10 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapOverlay } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+
 import { makeSourceAoiPredicateSql } from "../AoiPredicateSqlHelpers/AoiPredicateSqlHelpers";
 import { applyTimePredicateToSourceSql } from "../applyTimePredicateToSourceSql/applyTimePredicateToSourceSql";
-import type { MapOverlay } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 type CompileLatLngOverlayOptions = {
   sourceSql: string;

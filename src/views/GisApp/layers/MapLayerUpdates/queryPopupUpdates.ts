@@ -1,8 +1,10 @@
-import { makeMap, makeSet, prop, propEq, propPasses } from "@avandar/utils";
-import { getRequiredColumnIds } from "./getRequiredColumnIds";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+
+import { makeMap, makeSet, prop, propEq, propPasses } from "@avandar/utils";
+
+import { getRequiredColumnIds } from "./getRequiredColumnIds";
 
 /** How many source columns the default popup selects. */
 const DEFAULT_POPUP_COLUMN_LIMIT = 12;
@@ -15,8 +17,8 @@ function getQueryColumnFromLayer(
   }>,
 ): QueryColumn.T | undefined {
   const { layer, columnId } = options;
-  return columnId ?
-      layer.source.queryColumns.find(propEq("id", columnId))
+  return columnId
+    ? layer.source.queryColumns.find(propEq("id", columnId))
     : undefined;
 }
 

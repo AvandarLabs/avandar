@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { getAutoAdvanceStepIndex } from "@/components/Nux/NuxTour/getAutoAdvanceStepIndex/getAutoAdvanceStepIndex";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 

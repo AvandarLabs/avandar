@@ -1,7 +1,9 @@
-import { Link } from "@react-email/components";
-import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
-import { CSSProperties, ReactNode } from "react";
 import type { AvaRoutePaths } from "$/config/AvaRoutePaths.types.ts";
+
+import { Link } from "@react-email/components";
+import { CSSProperties, ReactNode } from "react";
+
+import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
 
 type Props = {
   children: ReactNode;

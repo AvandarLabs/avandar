@@ -31,7 +31,7 @@ can and cannot do.
 - `src/clients/qetl/QetlClient/qetlFactLoading.ts:132`, which throws for
   `google_sheets`
 
-Adding a source means editing both. Adding a *kind* of source that is not a row
+Adding a source means editing both. Adding a _kind_ of source that is not a row
 in `datasets` at all, which is what a concept is, means editing neither, because
 neither can express it: the type is `datasets.source_type`.
 
@@ -82,13 +82,13 @@ and the correction matters because it deletes most of a task.
 tokenizer. It already does everything this spec was going to ask for, and two
 things it was not:
 
-| Concern | Status |
-|---|---|
-| UUID inside a string literal must not count | Done: *"extracts UUID tables while ignoring UUID string literals"* |
-| CTE names must not count | Done: *"ignores a UUID-shaped CTE alias"*, *"scopes CTE aliases without suppressing qualified real tables"* |
-| DDL and mutation targets must not count as reads | Done: *"distinguishes mutation targets from read sources"*, *"rejects mutating statements"*, plus `COPY` direction and `DELETE`/`MERGE USING` handling |
-| Fail closed, never return a partial answer | Done: *"rejects dynamic table and query sources without returning partial IDs"*; the public entry point **throws** on `unsafe` or `mutating` |
-| DuckDB-only syntax must not break analysis | Done, and better than proposed: *"supports DuckDB EXCLUDE, QUALIFY, and PIVOT syntax"*. It uses **its own tokenizer, not `node-sql-parser`**, so the PostgreSQL-dialect throw that `sqlToStructuredQuery.ts:118` suffers does not apply here at all |
+| Concern                                          | Status                                                                                                                                                                                                                                              |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UUID inside a string literal must not count      | Done: _"extracts UUID tables while ignoring UUID string literals"_                                                                                                                                                                                  |
+| CTE names must not count                         | Done: _"ignores a UUID-shaped CTE alias"_, _"scopes CTE aliases without suppressing qualified real tables"_                                                                                                                                         |
+| DDL and mutation targets must not count as reads | Done: _"distinguishes mutation targets from read sources"_, _"rejects mutating statements"_, plus `COPY` direction and `DELETE`/`MERGE USING` handling                                                                                              |
+| Fail closed, never return a partial answer       | Done: _"rejects dynamic table and query sources without returning partial IDs"_; the public entry point **throws** on `unsafe` or `mutating`                                                                                                        |
+| DuckDB-only syntax must not break analysis       | Done, and better than proposed: _"supports DuckDB EXCLUDE, QUALIFY, and PIVOT syntax"_. It uses **its own tokenizer, not `node-sql-parser`**, so the PostgreSQL-dialect throw that `sqlToStructuredQuery.ts:118` suffers does not apply here at all |
 
 **So the only real gap is the return type.** It returns `string[]` of dataset
 UUIDs, so it cannot see a concept, which means it cannot answer "which relations
@@ -151,16 +151,16 @@ yet. That is what makes it safe to land first.
 
 ## 3. Decisions (resolved)
 
-| Decision | Resolution | Why |
-|---|---|---|
-| Name of the per-source abstraction | **`SourceWrapper`** | Proposal section 6.1 adopts Wiederhold's *wrapper*. Bare `Wrapper` is unusable in a React and Vitest codebase, and `Provider` collides with React context. The prefix keeps the literature's word and disambiguates |
-| Name of the coordinating layer | **`QueryMediator`**, replacing `QetlClient` | Wiederhold's *mediator*, not the GoF pattern. Proposal section 6.1 |
-| Do wrappers know about caching? | **No.** A wrapper acquires or pushes down; it never consults a cache | Keeps spec 2 free to change cache policy without touching wrappers |
-| Do wrappers know about authorization? | **No.** Authorization stays in the query session (spec 2) | Proposal section 12: exactly one authorization home |
-| Are capabilities data or behaviour? | **Data**: a plain typed value per wrapper | Proposal question 37. A value can be asserted in tests, narrowed at the type level, and diffed in review; a method cannot be read without running it |
-| Does this spec add a Concept wrapper? | **Yes, declaring capabilities; no, not implementing acquisition.** It wraps the existing `AttributeAssertionClient` call path unchanged | Proves the abstraction covers concepts without pulling spec 3's work forward |
-| Where does the contract live? | `shared/models/relations/` | Proposal section 11 said `shared/models/datasets/`. It is no longer dataset-specific |
-| Test runtime | A **second vitest project** with `environment: "node"` and `@duckdb/node-api` | Proposal section 17. duckdb-wasm cannot run under jsdom |
+| Decision                              | Resolution                                                                                                                              | Why                                                                                                                                                                                                                 |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Name of the per-source abstraction    | **`SourceWrapper`**                                                                                                                     | Proposal section 6.1 adopts Wiederhold's _wrapper_. Bare `Wrapper` is unusable in a React and Vitest codebase, and `Provider` collides with React context. The prefix keeps the literature's word and disambiguates |
+| Name of the coordinating layer        | **`QueryMediator`**, replacing `QetlClient`                                                                                             | Wiederhold's _mediator_, not the GoF pattern. Proposal section 6.1                                                                                                                                                  |
+| Do wrappers know about caching?       | **No.** A wrapper acquires or pushes down; it never consults a cache                                                                    | Keeps spec 2 free to change cache policy without touching wrappers                                                                                                                                                  |
+| Do wrappers know about authorization? | **No.** Authorization stays in the query session (spec 2)                                                                               | Proposal section 12: exactly one authorization home                                                                                                                                                                 |
+| Are capabilities data or behaviour?   | **Data**: a plain typed value per wrapper                                                                                               | Proposal question 37. A value can be asserted in tests, narrowed at the type level, and diffed in review; a method cannot be read without running it                                                                |
+| Does this spec add a Concept wrapper? | **Yes, declaring capabilities; no, not implementing acquisition.** It wraps the existing `AttributeAssertionClient` call path unchanged | Proves the abstraction covers concepts without pulling spec 3's work forward                                                                                                                                        |
+| Where does the contract live?         | `shared/models/relations/`                                                                                                              | Proposal section 11 said `shared/models/datasets/`. It is no longer dataset-specific                                                                                                                                |
+| Test runtime                          | A **second vitest project** with `environment: "node"` and `@duckdb/node-api`                                                           | Proposal section 17. duckdb-wasm cannot run under jsdom                                                                                                                                                             |
 
 ---
 
@@ -193,8 +193,7 @@ name. That cannot name a concept, and it is why 1.4's scan exists.
 ```ts
 /** A reference to something queryable, independent of what backs it. */
 export type RelationRef =
-  | { kind: "dataset"; id: Dataset.Id }
-  | { kind: "concept"; id: Concept.Id };
+  { kind: "dataset"; id: Dataset.Id } | { kind: "concept"; id: Concept.Id };
 ```
 
 `kind` is the discriminant the registry dispatches on, and it is open for
@@ -235,10 +234,16 @@ export type SourceWrapper<TRef extends RelationRef = RelationRef> = {
   readFreshness?(ref: TRef, ctx: WrapperContext): Promise<SourceVersion>;
 
   /** Fetch rows. Present only when acquisition is declared. */
-  acquire?(req: AcquireRequest<TRef>, ctx: WrapperContext): Promise<AcquiredRelation>;
+  acquire?(
+    req: AcquireRequest<TRef>,
+    ctx: WrapperContext,
+  ): Promise<AcquiredRelation>;
 
   /** Ask the source to answer. Present only when pushdown is declared. */
-  pushDown?(req: PushDownRequest<TRef>, ctx: WrapperContext): Promise<QueryResult.T<UnknownRow>>;
+  pushDown?(
+    req: PushDownRequest<TRef>,
+    ctx: WrapperContext,
+  ): Promise<QueryResult.T<UnknownRow>>;
 };
 ```
 
@@ -334,18 +339,18 @@ union provably unsound there, by declaration rather than by argument.
 
 The five wrappers this spec ships declare, verified against each source:
 
-| Field | `dataset` (local Parquet) | `google_sheets` | `open_data` (blob) | `virtual` | `concept` |
-|---|---|---|---|---|---|
-| `relations` | `single` | `named-tabs` | `single` | `single` | `single` |
-| `predicatePushdown` | `none` | `none` | `none` | `none` | **`full`** |
-| `aggregatePushdown` | `false` | `false` | `false` | `false` | **`true`** |
-| `wholeRelationAcquirable` | `yes` | `yes` | `yes` | `yes` | `yes` |
-| `maxRowsPerCall` | `unbounded` | `unbounded` | `unbounded` | `unbounded` | `unbounded` |
-| `maxBytesPerCall` | `unbounded` | **~10 MB** | `unbounded` | `unbounded` | `unbounded` |
-| `freshnessSignal` | `none` | `version-token` | `modified-time` | `none` | `modified-time` |
-| `rowIdentity` | `positional` | `none` | `positional` | `none` | **`stable-key`** |
-| `multiCallAtomicity` | `true` | `false` | `true` | `true` | `true` |
-| `quotaScope` | none | **project-global, 300/min** | per-host | none | none |
+| Field                     | `dataset` (local Parquet) | `google_sheets`             | `open_data` (blob) | `virtual`   | `concept`        |
+| ------------------------- | ------------------------- | --------------------------- | ------------------ | ----------- | ---------------- |
+| `relations`               | `single`                  | `named-tabs`                | `single`           | `single`    | `single`         |
+| `predicatePushdown`       | `none`                    | `none`                      | `none`             | `none`      | **`full`**       |
+| `aggregatePushdown`       | `false`                   | `false`                     | `false`            | `false`     | **`true`**       |
+| `wholeRelationAcquirable` | `yes`                     | `yes`                       | `yes`              | `yes`       | `yes`            |
+| `maxRowsPerCall`          | `unbounded`               | `unbounded`                 | `unbounded`        | `unbounded` | `unbounded`      |
+| `maxBytesPerCall`         | `unbounded`               | **~10 MB**                  | `unbounded`        | `unbounded` | `unbounded`      |
+| `freshnessSignal`         | `none`                    | `version-token`             | `modified-time`    | `none`      | `modified-time`  |
+| `rowIdentity`             | `positional`              | `none`                      | `positional`       | `none`      | **`stable-key`** |
+| `multiCallAtomicity`      | `true`                    | `false`                     | `true`             | `true`      | `true`           |
+| `quotaScope`              | none                      | **project-global, 300/min** | per-host           | none        | none             |
 
 Two entries deserve attention. **A concept is the most capable source in the
 table**, because it is backed by Postgres online and local stores offline, and it
@@ -406,7 +411,7 @@ RelationRegistry            keyed by kind
 ```
 
 The inner dispatch is a `Record<sourceType, acquire>`, not a `match`, so adding
-a source type is a map entry. **Consequence for spec 5:** an open data *API* is
+a source type is a map entry. **Consequence for spec 5:** an open data _API_ is
 still `kind: "dataset"`, so it is another entry in that map rather than a new
 kind, and it inherits dataset authorization unchanged. A new kind is warranted
 only when the thing is not a `datasets` row at all, as a concept is not, and as
@@ -446,8 +451,8 @@ Unchanged in effect, restructured in shape. Numbered to match proposal section 9
    `extractReferencedRelations` (section 6).
 2. **Look up.** `registry.resolveAll` maps refs to wrappers. Unresolved refs
    return `needs_clarification`.
-3. *(Spec 2 inserts `authorize` here, before any probe.)*
-4. *(Spec 2 inserts the cache probe here.)*
+3. _(Spec 2 inserts `authorize` here, before any probe.)_
+4. _(Spec 2 inserts the cache probe here.)_
 5. **Acquire or push down.** Per capability, per section 4.5.
 6. **Execute** locally and record telemetry.
 
@@ -515,18 +520,18 @@ Proposal section 6.2, applied to the names as they exist after the GIS merge.
 Mechanical, and it lands as **one commit, after the characterization tests in
 section 9 exist**.
 
-| Now | Becomes |
-|---|---|
-| `QetlClient` | `QueryMediator` |
-| `WorkspaceQetlClient`, `PublicQetlClient` | `WorkspaceQuerySession`, `PublicQuerySession` |
-| `getDiceExtractors` (`qetlDiceExtractors.ts:138`) | `getRelationSources` |
-| `getMissingDice` (`qetlDiceExtractors.ts:31`) | `getRelationsNotInMemory` |
-| `qetlDiceExtractors.ts` | `getRelationSources.ts` |
-| `qetlFactLoading.ts` | `relationLoading.ts` |
-| `EtlService.prepareFacts` | deleted (identity function) |
-| "facts" | "rows" |
-| "memory cube" | `QueryableRelationCache` (spec 2 builds it) |
-| "storage cube" | `StorageRelationCache` (spec 2 builds it) |
+| Now                                               | Becomes                                       |
+| ------------------------------------------------- | --------------------------------------------- |
+| `QetlClient`                                      | `QueryMediator`                               |
+| `WorkspaceQetlClient`, `PublicQetlClient`         | `WorkspaceQuerySession`, `PublicQuerySession` |
+| `getDiceExtractors` (`qetlDiceExtractors.ts:138`) | `getRelationSources`                          |
+| `getMissingDice` (`qetlDiceExtractors.ts:31`)     | `getRelationsNotInMemory`                     |
+| `qetlDiceExtractors.ts`                           | `getRelationSources.ts`                       |
+| `qetlFactLoading.ts`                              | `relationLoading.ts`                          |
+| `EtlService.prepareFacts`                         | deleted (identity function)                   |
+| "facts"                                           | "rows"                                        |
+| "memory cube"                                     | `QueryableRelationCache` (spec 2 builds it)   |
+| "storage cube"                                    | `StorageRelationCache` (spec 2 builds it)     |
 
 **`probe` is reserved for `RelationCachePort`. Nothing else may be a probe.**
 The first pass at this table renamed `getMissingDice` to `probeRelationCache`,
@@ -538,7 +543,7 @@ without borrowing the word. This is the same collision as `getDiceFromSql`, whic
 became `getQueryDependencies` rather than `extractReferencedRelations` for the
 same reason.
 
-Why the vocabulary goes, in one sentence: a *dice* is a multidimensional interval
+Why the vocabulary goes, in one sentence: a _dice_ is a multidimensional interval
 of coordinates, and `getDiceFromSql` returns dataset ids found by substring
 scanning SQL text. Keeping the word is what made an extraction optimizer look
 applicable, and it cost the review weeks.
@@ -629,15 +634,15 @@ types, including `google_sheets` throwing. A characterization test records what
 the code does now, including what is wrong, so that a refactor changing behaviour
 fails loudly.
 
-| Area | Test |
-|---|---|
-| `RelationRef` | Round-trip for each kind. A bare UUID resolves to `dataset`. A prefixed name resolves to its kind. Output is a valid quoted DuckDB identifier |
+| Area                         | Test                                                                                                                                                                                                                                                                                                           |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RelationRef`                | Round-trip for each kind. A bare UUID resolves to `dataset`. A prefixed name resolves to its kind. Output is a valid quoted DuckDB identifier                                                                                                                                                                  |
 | `extractReferencedRelations` | The analyzer's own 22 tests already cover CTE aliases, string literals, mutation targets and DuckDB syntax; **do not duplicate them**. Test only the adapter: a bare UUID becomes a `dataset` ref, a prefixed name becomes its kind, and an analyzer `throw` becomes `unsupported` and **never an empty list** |
-| `RelationCapabilities` | A declaration exists for every registered wrapper, iterated from the registry so a new wrapper cannot omit one. `grantedScope` matches what `getAuthURL.ts` actually requests |
-| `SourceWrapper` narrowing | Type-level: a wrapper declaring `predicatePushdown: "none"` has no `pushDown`; calling it fails to compile |
-| `RelationRegistry` | Resolves each kind. Unknown ref returns undefined, not a throw. Duplicate `kind` registration throws in development |
-| Each wrapper | Behaviour identical to the pre-refactor branch, asserted against the characterization tests |
-| `structuredQueryToSql` | Executed, row-level, against real DuckDB |
+| `RelationCapabilities`       | A declaration exists for every registered wrapper, iterated from the registry so a new wrapper cannot omit one. `grantedScope` matches what `getAuthURL.ts` actually requests                                                                                                                                  |
+| `SourceWrapper` narrowing    | Type-level: a wrapper declaring `predicatePushdown: "none"` has no `pushDown`; calling it fails to compile                                                                                                                                                                                                     |
+| `RelationRegistry`           | Resolves each kind. Unknown ref returns undefined, not a throw. Duplicate `kind` registration throws in development                                                                                                                                                                                            |
+| Each wrapper                 | Behaviour identical to the pre-refactor branch, asserted against the characterization tests                                                                                                                                                                                                                    |
+| `structuredQueryToSql`       | Executed, row-level, against real DuckDB                                                                                                                                                                                                                                                                       |
 
 **Regression guard for the whole spec:** raw SQL behaviour is unchanged. A
 bookmarked `?sql=` URL, including one containing a CTE, returns what it returned
@@ -671,10 +676,10 @@ Recorded so the next spec's author does not read silence as an answer.
 
 ## 12. Risks
 
-| Risk | Mitigation |
-|---|---|
-| A rename wave over code with thin tests introduces a silent regression | Characterization tests before renames (section 10). One mechanical commit, no behaviour edits in it |
-| Three things in this tree are called "structured query", and this spec adds `RelationRef` next to `QueryDataSource` | `RelationRef` is a **reference**, `QueryDataSource` is a **model row**. Stated in the types' doc comments. `DuckDbClient.runStructuredQuery` has no application caller and is out of scope |
-| The capability record drifts from reality, especially `grantedScope` and `quotaScope`, which describe external systems | A test asserts declared scopes equal requested scopes. The others are reviewed when a wrapper changes |
-| `RelationRef` encoding breaks a stored dashboard or a bookmarked URL | Datasets keep their bare UUID, so every existing name is unchanged. Only new kinds take a prefix |
-| The abstraction is wrong because it was designed against five similar sources | Deliberately includes `ConceptWrapper`, the least dataset-like source, precisely to test that. If concepts do not fit, this spec is wrong and it is cheaper to know now than after spec 3 |
+| Risk                                                                                                                   | Mitigation                                                                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A rename wave over code with thin tests introduces a silent regression                                                 | Characterization tests before renames (section 10). One mechanical commit, no behaviour edits in it                                                                                        |
+| Three things in this tree are called "structured query", and this spec adds `RelationRef` next to `QueryDataSource`    | `RelationRef` is a **reference**, `QueryDataSource` is a **model row**. Stated in the types' doc comments. `DuckDbClient.runStructuredQuery` has no application caller and is out of scope |
+| The capability record drifts from reality, especially `grantedScope` and `quotaScope`, which describe external systems | A test asserts declared scopes equal requested scopes. The others are reviewed when a wrapper changes                                                                                      |
+| `RelationRef` encoding breaks a stored dashboard or a bookmarked URL                                                   | Datasets keep their bare UUID, so every existing name is unchanged. Only new kinds take a prefix                                                                                           |
+| The abstraction is wrong because it was designed against five similar sources                                          | Deliberately includes `ConceptWrapper`, the least dataset-like source, precisely to test that. If concepts do not fit, this spec is wrong and it is cheaper to know now than after spec 3  |

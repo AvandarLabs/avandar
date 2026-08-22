@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { NuxWelcomeModal } from "@/components/Nux/NuxWelcomeModal/NuxWelcomeModal";
 import { fireEvent, render, screen } from "@/test-utils";
 

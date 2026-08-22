@@ -1,9 +1,11 @@
+import type { ErrorResponse } from "resend";
+
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { Resend } from "resend";
+
 import { getResendFullAccessAPIKey } from "$/env/getResendFullAccessAPIKey.ts";
 import { getResendSendingAPIKey } from "$/env/getResendSendingAPIKey.ts";
-import { Resend } from "resend";
-import type { ErrorResponse } from "resend";
 
 type IResendClient = {
   sendEmail: Resend["emails"]["send"];

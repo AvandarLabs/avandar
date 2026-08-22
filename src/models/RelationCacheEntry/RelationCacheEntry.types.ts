@@ -1,5 +1,5 @@
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 import type { RelationCacheEntry } from "$/models/relations/RelationCachePort/RelationCachePort.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 
 /**
  * The metadata-only row for one cached relation. Never carries the payload

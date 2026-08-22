@@ -1,4 +1,3 @@
-import { ValueItemContainer } from "./ValueItemContainer";
 import type { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock/index";
 import type {
   AnyDescribableValueRenderOptions,
@@ -6,6 +5,8 @@ import type {
   GenericRootData,
 } from "./ObjectDescriptionList.types";
 import type { ObjectDescriptionListBlockProps } from "./ObjectDescriptionListBlock";
+
+import { ValueItemContainer } from "./ValueItemContainer";
 
 type DescribableObjectProps<
   T extends DescribableObject,
@@ -17,10 +18,11 @@ type DescribableValueArrayProps<T, RootData extends GenericRootData> = Omit<
   "rootData"
 >;
 
-type Props<T extends GenericRootData> =
-  T extends DescribableObject ? DescribableObjectProps<T, T>
-  : T extends ReadonlyArray<infer U> ? DescribableValueArrayProps<U, T>
-  : never;
+type Props<T extends GenericRootData> = T extends DescribableObject
+  ? DescribableObjectProps<T, T>
+  : T extends ReadonlyArray<infer U>
+    ? DescribableValueArrayProps<U, T>
+    : never;
 
 /**
  * This is the root component for an `ObjectDescriptionList`. It allows

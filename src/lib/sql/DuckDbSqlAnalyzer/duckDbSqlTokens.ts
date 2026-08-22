@@ -1,5 +1,6 @@
-import { isDefined, propEq } from "@avandar/utils";
 import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
+
+import { isDefined, propEq } from "@avandar/utils";
 
 type KeywordIndexOptions = {
   depth?: number;
@@ -109,8 +110,8 @@ export function getStatementEndIndex(
   const relativeEndIndex = tokens.slice(statementIndex).findIndex((token) => {
     return token.value === ";";
   });
-  return relativeEndIndex === -1 ?
-      tokens.length
+  return relativeEndIndex === -1
+    ? tokens.length
     : statementIndex + relativeEndIndex;
 }
 

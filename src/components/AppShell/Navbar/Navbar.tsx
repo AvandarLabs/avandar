@@ -1,3 +1,7 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+
 import { useBoolean } from "@avandar/hooks";
 import { useMutation } from "@avandar/query-hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -23,6 +27,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
+
 import { APP_NAME } from "$/config/GlobalAppConfig";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
@@ -34,9 +39,6 @@ import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import type { AppLink } from "@/config/AppLinks/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   isMobileNavbarOpened: boolean;
@@ -167,7 +169,7 @@ export function Navbar({
               </UnstyledButton>
             </Menu.Target>
             <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
-              {profileLink ?
+              {profileLink ? (
                 <>
                   <Menu.Item
                     leftSection={
@@ -189,7 +191,7 @@ export function Navbar({
                       <Trans>Create Workspace</Trans>
                     </Menu.Item>
                   </OfflineGated>
-                  {userWorkspaces && userWorkspaces?.length > 1 ?
+                  {userWorkspaces && userWorkspaces?.length > 1 ? (
                     <Menu.Sub>
                       <Menu.Sub.Target>
                         <Menu.Sub.Item
@@ -220,9 +222,9 @@ export function Navbar({
                         })}
                       </Menu.Sub.Dropdown>
                     </Menu.Sub>
-                  : null}
+                  ) : null}
                 </>
-              : null}
+              ) : null}
 
               <Menu.Item
                 leftSection={<IconLogout size={16} stroke={1.5} aria-hidden />}

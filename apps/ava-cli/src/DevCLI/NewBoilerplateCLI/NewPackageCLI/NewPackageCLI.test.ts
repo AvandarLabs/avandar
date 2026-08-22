@@ -1,5 +1,5 @@
-import * as fs from "node:fs";
 import { Acclimate } from "@avandar/acclimate";
+import * as fs from "node:fs";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../../utils/writeFileFromTemplate/writeFileFromTemplate", () => {

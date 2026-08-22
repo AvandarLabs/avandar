@@ -1,7 +1,9 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
 import { describe, expect, it } from "vitest";
+
 import { render, screen } from "@/test-utils";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 function makeDashboard(visibility: Dashboard.Visibility): Dashboard.T {
   return {

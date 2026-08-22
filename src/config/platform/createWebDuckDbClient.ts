@@ -1,4 +1,3 @@
-import { DuckDbClient as LegacyDuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   DatasetImportOptions,
   DatasetImportResult,
@@ -6,6 +5,8 @@ import type {
   StructuredQuery,
   UploadSource,
 } from "$/platform/types/DuckDbClient.types";
+
+import { DuckDbClient as LegacyDuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 
 function _safeTableName(datasetId: string): string {
   // Mirrors the desktop-side scrub in

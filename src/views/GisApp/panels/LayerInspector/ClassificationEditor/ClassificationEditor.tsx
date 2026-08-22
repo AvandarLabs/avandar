@@ -1,3 +1,7 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { CategoricalControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/CategoricalControls";
 import { ClassificationColorModeSelect } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect";
 import css from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.module.css";
@@ -5,9 +9,6 @@ import { ClassificationEditorHeader } from "@/views/GisApp/panels/LayerInspector
 import { ClassificationHistogram } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationHistogram/ClassificationHistogram";
 import { GraduatedControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls";
 import { NoDataControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -47,16 +48,16 @@ export function ClassificationEditor({
         colorType={color.type}
         onLayerChange={onLayerChange}
       />
-      {color.type === "graduated" ?
+      {color.type === "graduated" ? (
         <GraduatedControls
           layer={layer}
           color={color}
           manualBreaks={_getManualBreaks(layer, color)}
           onLayerChange={onLayerChange}
         />
-      : color.type === "categorical" ?
+      ) : color.type === "categorical" ? (
         <CategoricalControls layer={layer} onLayerChange={onLayerChange} />
-      : null}
+      ) : null}
       <NoDataControls layer={layer} onLayerChange={onLayerChange} />
       <ClassificationHistogram entries={layer.legend.entries} />
     </div>

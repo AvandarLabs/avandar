@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
+
 import { NuxRootContents } from "@/components/Nux/NuxRoot/NuxRootContents";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxEligibility";
-import type { ReactNode } from "react";
 
 /**
  * The onboarding tutorial's entry point.

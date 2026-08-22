@@ -1,8 +1,10 @@
+import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
+
 import { LocalFiltersPField } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField";
-import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 /**
  * React hook that returns the Puck `CustomField` config for the local-filters

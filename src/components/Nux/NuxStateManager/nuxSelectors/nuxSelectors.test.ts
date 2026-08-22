@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 
 describe("getFirstUnfinishedMilestoneKey", () => {

@@ -1,5 +1,14 @@
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { Dispatch, SetStateAction } from "react";
+
 import { useHotkeys } from "@mantine/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
 import { annotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
@@ -8,13 +17,6 @@ import { useGisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 import { useGisAppLayerSelection } from "@/views/GisApp/useGisApp/useGisAppLayerSelection";
 import { useGisAppMapCallbacks } from "@/views/GisApp/useGisApp/useGisAppMapCallbacks";
 import { useGisAppRendering } from "@/views/GisApp/useGisApp/useGisAppRendering";
-import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Dispatch, SetStateAction } from "react";
 
 /** Opens the inspector and increments its Filter focus request. */
 function useGisAppInspectorFocus(expandPanel: (panel: "inspector") => void): {

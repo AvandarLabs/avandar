@@ -1,3 +1,5 @@
+import type { ChatProposedCaseType } from "$/types/chat.types";
+
 /**
  * The editor holds every tweak the user makes to a proposed draft, so these
  * cover the edits that change what gets persisted: inclusion, naming, value
@@ -5,8 +7,8 @@
  */
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
 import { useCaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
-import type { ChatProposedCaseType } from "$/types/chat.types";
 
 const DATASET_ID = "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_DATASET_ID = "0f2c9f3e-bbbb-4bbb-8ccc-ddddeeeeffff";

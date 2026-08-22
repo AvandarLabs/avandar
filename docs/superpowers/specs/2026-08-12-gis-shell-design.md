@@ -425,14 +425,14 @@ The Style section's segmented control writes `LayerSymbology.type`.
 **What carries over.** The rule is that shared visual properties carry, and
 anything naming a column or a scale does not.
 
-| Property | Carries | Why |
-| --- | --- | --- |
-| `color` when it is `{ type: "single" }` | Always | The user picked that color for this layer, not for that symbology |
-| `color` when categorical or graduated | Between types that support per-feature color (`circle`, `proportionalSymbol`, `fill`, `line`) | Cluster and heatmap have no per-feature color to carry it to |
-| `stroke` | Wherever the target has one | |
-| `radius` and `maxRadius` | Yes, mapped across: `circle.radius` becomes `proportionalSymbol.maxRadius` | Preserves the visual scale the user tuned |
-| `proportionalSymbol.value`, `heatmap.weight`, `cluster.aggregate` | Restored within the session, not carried across types | They name a column that may not apply to the new type |
-| Popup, filter, legend, sensitivity | Always | They are separate `MapLayer` fields, not symbology |
+| Property                                                          | Carries                                                                                       | Why                                                               |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `color` when it is `{ type: "single" }`                           | Always                                                                                        | The user picked that color for this layer, not for that symbology |
+| `color` when categorical or graduated                             | Between types that support per-feature color (`circle`, `proportionalSymbol`, `fill`, `line`) | Cluster and heatmap have no per-feature color to carry it to      |
+| `stroke`                                                          | Wherever the target has one                                                                   |                                                                   |
+| `radius` and `maxRadius`                                          | Yes, mapped across: `circle.radius` becomes `proportionalSymbol.maxRadius`                    | Preserves the visual scale the user tuned                         |
+| `proportionalSymbol.value`, `heatmap.weight`, `cluster.aggregate` | Restored within the session, not carried across types                                         | They name a column that may not apply to the new type             |
+| Popup, filter, legend, sensitivity                                | Always                                                                                        | They are separate `MapLayer` fields, not symbology                |
 
 **Switching is not destructive within a session.** The inspector keeps the
 last-used settings per symbology type in component state, so Point to Cluster
@@ -443,11 +443,11 @@ exploration expensive, and users who pay for exploration stop exploring.
 
 **Three reasons a type can be unavailable, and they must read differently.**
 
-| Reason | Copy | Recoverable |
-| --- | --- | --- |
-| Not built yet | "Heat is unavailable: it arrives in a later release." | No |
-| Needs the spatial extension, which did not load | "Binning needs the map's spatial tools, which could not be loaded. Check your connection and reload to try again." with a Reload action | Yes, by the user |
-| Forbidden by the layer's sensitivity policy | "Point and Sized are unavailable while this layer is set to Aggregate only, because they would place an individual on the map." with a Change Sensitivity action | Yes, but deliberately |
+| Reason                                          | Copy                                                                                                                                                             | Recoverable           |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| Not built yet                                   | "Heat is unavailable: it arrives in a later release."                                                                                                            | No                    |
+| Needs the spatial extension, which did not load | "Binning needs the map's spatial tools, which could not be loaded. Check your connection and reload to try again." with a Reload action                          | Yes, by the user      |
+| Forbidden by the layer's sensitivity policy     | "Point and Sized are unavailable while this layer is set to Aggregate only, because they would place an individual on the map." with a Change Sensitivity action | Yes, but deliberately |
 
 Collapsing these into one "unavailable" treatment teaches users to ignore all
 three. The third is the one that matters most: its affordance points at the
@@ -514,14 +514,14 @@ than merely enforcing it in types.
 **Degenerate inputs.** Each has a designed answer, and each corresponds to a
 case in the spec's unit tests (§12).
 
-| Input | What the editor shows |
-| --- | --- |
-| All values equal | One bar. Method and Classes are disabled. "Every area has the same value, 42. A graduated ramp cannot separate them. Use a single color instead." with a Use single color action. |
-| One row | The same, with "Only one area has a value." |
-| All values null | Empty histogram, no break rows at all rather than empty ones. "No area has a value for this column. Every area will render as Not reported." The no-data row stays. |
-| Fewer distinct values than classes | Classes clamps and says why: "Reduced to 3 classes: the data has only 3 distinct values." |
-| Jenks over a large domain | Runs on a sample and labels itself: "Natural breaks computed from a 5,000 value sample." |
-| Normalize denominator zero or null | Those rows are no-data, never infinity. "6 areas have no population and are shown as Not reported." |
+| Input                              | What the editor shows                                                                                                                                                             |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All values equal                   | One bar. Method and Classes are disabled. "Every area has the same value, 42. A graduated ramp cannot separate them. Use a single color instead." with a Use single color action. |
+| One row                            | The same, with "Only one area has a value."                                                                                                                                       |
+| All values null                    | Empty histogram, no break rows at all rather than empty ones. "No area has a value for this column. Every area will render as Not reported." The no-data row stays.               |
+| Fewer distinct values than classes | Classes clamps and says why: "Reduced to 3 classes: the data has only 3 distinct values."                                                                                         |
+| Jenks over a large domain          | Runs on a sample and labels itself: "Natural breaks computed from a 5,000 value sample."                                                                                          |
+| Normalize denominator zero or null | Those rows are no-data, never infinity. "6 areas have no population and are shown as Not reported."                                                                               |
 
 **Applying.** Changes apply to the map live as they are made. The map is the
 preview, and a separate preview is a second thing to keep in sync. There is no
@@ -621,12 +621,12 @@ It lists **only the reasons that actually occurred**, using exactly the five
 `DropReason` values the code produces today
 (`makeFeatureCollectionFromRows.ts:15`). Enum names never reach the screen:
 
-| `DropReason` | Shown as |
-| --- | --- |
-| `suspectedLatLngSwap` | Latitude and longitude look swapped |
-| `nullIsland` | Coordinate is 0, 0 |
-| `outOfRange` | Coordinate is outside the valid range |
-| `nullCoordinate` | Latitude or longitude is empty |
+| `DropReason`           | Shown as                              |
+| ---------------------- | ------------------------------------- |
+| `suspectedLatLngSwap`  | Latitude and longitude look swapped   |
+| `nullIsland`           | Coordinate is 0, 0                    |
+| `outOfRange`           | Coordinate is outside the valid range |
+| `nullCoordinate`       | Latitude or longitude is empty        |
 | `nonNumericCoordinate` | Latitude or longitude is not a number |
 
 Each reason shows its count, the sample row numbers the code already returns in
@@ -687,11 +687,11 @@ reason teaches the rule.
 **Suppressed cells must read as neither zero nor no-data.** Three distinct
 treatments, and the legend carries all three whenever any of them is drawn:
 
-| Meaning | Fill | Legend entry |
-| --- | --- | --- |
-| A real zero | The lowest step of the layer's ramp | "0 services" |
-| Count suppressed, below the minimum | `#989898` under a 45 degree hatch | "Fewer than 5, suppressed" |
-| Nothing was reported | `#d1d1d1` under a fine stipple | "Not reported" |
+| Meaning                             | Fill                                | Legend entry               |
+| ----------------------------------- | ----------------------------------- | -------------------------- |
+| A real zero                         | The lowest step of the layer's ramp | "0 services"               |
+| Count suppressed, below the minimum | `#989898` under a 45 degree hatch   | "Fewer than 5, suppressed" |
+| Nothing was reported                | `#d1d1d1` under a fine stipple      | "Not reported"             |
 
 A fourth neutral, `#696969` flat, carries the "Other" bucket that categorical
 layers fold their tail into (§6.4). It is a true neutral like the two absence
@@ -777,35 +777,35 @@ one.
 
 **Ochre** (default)
 
-| Classes | Steps |
-| --- | --- |
-| 5 | `#ffd4af` `#daa475` `#b97c44` `#9b5802` `#7e3500` |
-| 6 | `#ffd4af` `#e1ac7f` `#c68c57` `#ad6e2f` `#955100` `#7e3500` |
-| 7 | `#ffd4af` `#e5b286` `#cf9664` `#b97c44` `#a56420` `#914c00` `#7e3500` |
+| Classes | Steps                                                                 |
+| ------- | --------------------------------------------------------------------- |
+| 5       | `#ffd4af` `#daa475` `#b97c44` `#9b5802` `#7e3500`                     |
+| 6       | `#ffd4af` `#e1ac7f` `#c68c57` `#ad6e2f` `#955100` `#7e3500`           |
+| 7       | `#ffd4af` `#e5b286` `#cf9664` `#b97c44` `#a56420` `#914c00` `#7e3500` |
 
 **Magenta**
 
-| Classes | Steps |
-| --- | --- |
-| 5 | `#ffcee0` `#dc98b1` `#bd6b8c` `#9f406a` `#810d4c` |
-| 6 | `#ffcee0` `#e2a1ba` `#c97c9a` `#b15a7e` `#993764` `#810d4c` |
-| 7 | `#ffcee0` `#e7a8bf` `#d188a4` `#bd6b8c` `#a94e75` `#953160` `#810d4c` |
+| Classes | Steps                                                                 |
+| ------- | --------------------------------------------------------------------- |
+| 5       | `#ffcee0` `#dc98b1` `#bd6b8c` `#9f406a` `#810d4c`                     |
+| 6       | `#ffcee0` `#e2a1ba` `#c97c9a` `#b15a7e` `#993764` `#810d4c`           |
+| 7       | `#ffcee0` `#e7a8bf` `#d188a4` `#bd6b8c` `#a94e75` `#953160` `#810d4c` |
 
 **Violet**
 
-| Classes | Steps |
-| --- | --- |
-| 5 | `#e3d6fe` `#b6a3dc` `#9379c0` `#7352a5` `#562c8b` |
-| 6 | `#e3d6fe` `#beace2` `#a089cb` `#8569b5` `#6d4b9f` `#562c8b` |
-| 7 | `#e3d6fe` `#c4b2e6` `#aa95d2` `#9379c0` `#7d5fad` `#69469c` `#562c8b` |
+| Classes | Steps                                                                 |
+| ------- | --------------------------------------------------------------------- |
+| 5       | `#e3d6fe` `#b6a3dc` `#9379c0` `#7352a5` `#562c8b`                     |
+| 6       | `#e3d6fe` `#beace2` `#a089cb` `#8569b5` `#6d4b9f` `#562c8b`           |
+| 7       | `#e3d6fe` `#c4b2e6` `#aa95d2` `#9379c0` `#7d5fad` `#69469c` `#562c8b` |
 
 **Teal** (alternate, avoid over vegetated basemaps)
 
-| Classes | Steps |
-| --- | --- |
-| 5 | `#b0ebea` `#71bebe` `#379a99` `#007879` `#00595b` |
-| 6 | `#b0ebea` `#7dc6c5` `#4fa8a7` `#158c8c` `#007273` `#00595b` |
-| 7 | `#b0ebea` `#84cccb` `#5fb1b1` `#379a99` `#008383` `#006d6e` `#00595b` |
+| Classes | Steps                                                                 |
+| ------- | --------------------------------------------------------------------- |
+| 5       | `#b0ebea` `#71bebe` `#379a99` `#007879` `#00595b`                     |
+| 6       | `#b0ebea` `#7dc6c5` `#4fa8a7` `#158c8c` `#007273` `#00595b`           |
+| 7       | `#b0ebea` `#84cccb` `#5fb1b1` `#379a99` `#008383` `#006d6e` `#00595b` |
 
 **Measured, across all twelve ramps:** lightness is monotone in every one; the
 worst adjacent lightness separation is ΔL 0.064 (teal at 7 classes), above the
@@ -818,10 +818,10 @@ clears 10.57:1, so a label can sit on any class.
 
 **Violet to ochre**, with a neutral grey midpoint.
 
-| Classes | Steps |
-| --- | --- |
-| 5 | `#562c8b` `#9c88c1` `#e8e8e5` `#ba8c65` `#7e3500` |
-| 7 | `#562c8b` `#836aaf` `#b5a6d2` `#e8e8e5` `#cda98b` `#a66f3c` `#7e3500` |
+| Classes | Steps                                                                 |
+| ------- | --------------------------------------------------------------------- |
+| 5       | `#562c8b` `#9c88c1` `#e8e8e5` `#ba8c65` `#7e3500`                     |
+| 7       | `#562c8b` `#836aaf` `#b5a6d2` `#e8e8e5` `#cda98b` `#a66f3c` `#7e3500` |
 
 Warm against cool, so the two arms read as opposite. The method's default pair
 is blue against red; on a map blue is water, so the cool pole moves to violet.
@@ -835,16 +835,16 @@ The eight slots are the `dataviz` reference order with slot 1 re-stepped to
 Avandar's brand blue, which the validator accepts with no change to any other
 result:
 
-| Slot | Hue | Hex |
-| --- | --- | --- |
-| 1 | blue | `#1563fe` |
-| 2 | orange | `#eb6834` |
-| 3 | aqua | `#1baf7a` |
-| 4 | yellow | `#eda100` |
-| 5 | magenta | `#e87ba4` |
-| 6 | green | `#008300` |
-| 7 | violet | `#4a3aa7` |
-| 8 | red | `#e34948` |
+| Slot | Hue     | Hex       |
+| ---- | ------- | --------- |
+| 1    | blue    | `#1563fe` |
+| 2    | orange  | `#eb6834` |
+| 3    | aqua    | `#1baf7a` |
+| 4    | yellow  | `#eda100` |
+| 5    | magenta | `#e87ba4` |
+| 6    | green   | `#008300` |
+| 7    | violet  | `#4a3aa7` |
+| 8    | red     | `#e34948` |
 
 On the adjacent pairlist against the map's light surface this passes every
 gate: worst CVD ΔE 9.1, worst normal-vision ΔE 19.6.
@@ -867,10 +867,10 @@ which §6.6 requires anyway.
 
 ### 6.5 Absence values: not reported, and suppressed
 
-| Meaning | Light fill | Light texture ink | Dark fill | Dark texture ink |
-| --- | --- | --- | --- | --- |
-| Not reported | `#d1d1d1` | `#868686`, fine stipple | `#484848` | `#808080`, fine stipple |
-| Suppressed | `#989898` | `#555555`, 45&deg; hatch | `#717171` | `#b7b7b7`, 45&deg; hatch |
+| Meaning      | Light fill | Light texture ink        | Dark fill | Dark texture ink         |
+| ------------ | ---------- | ------------------------ | --------- | ------------------------ |
+| Not reported | `#d1d1d1`  | `#868686`, fine stipple  | `#484848` | `#808080`, fine stipple  |
+| Suppressed   | `#989898`  | `#555555`, 45&deg; hatch | `#717171` | `#b7b7b7`, 45&deg; hatch |
 
 Three properties, each doing one job:
 
@@ -885,7 +885,7 @@ Three properties, each doing one job:
   no-data is not sufficient at any point in the pipeline. Making the texture
   permanent rather than print-only also means the screen and the export agree.
 - **Suppressed is darker and hatched.** It carries more visual weight than
-  "not reported" because it means the opposite thing: there *is* a value here,
+  "not reported" because it means the opposite thing: there _is_ a value here,
   and it is being withheld. The two greys are separated by ΔL 0.181, so they
   also hold apart in greyscale.
 
@@ -925,14 +925,14 @@ order is the persisted order, never a re-sort. A no-data entry appears whenever
 any feature is unclassified and cannot be switched off, and a suppressed entry
 appears whenever any cell is suppressed.
 
-| Symbology | Legend form |
-| --- | --- |
-| `circle`, single color | Title, one key, one label. No units row: there is nothing to scale. |
-| `circle` or `fill`, categorical | Title, one key per category in persisted order, "Other" last, then no-data. Capped at three named categories (§6.4). |
-| `fill`, graduated | Title, units, the frozen break rows in order, then suppressed if present, then no-data. |
-| `proportionalSymbol` | Title, units, and **nested circles sharing a bottom edge** with leader lines to three values (minimum, mid, maximum). Never a color bar: the encoding is area, so the legend must show area. |
-| `heatmap` | Title and a continuous gradient bar labelled only **Low** and **High**. No numbers: a kernel density is not in the data's units, and printing a number invites a reader to quote it. |
-| `line` | Title, one key per width or color class, drawn as a line segment rather than a square. |
+| Symbology                       | Legend form                                                                                                                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `circle`, single color          | Title, one key, one label. No units row: there is nothing to scale.                                                                                                                          |
+| `circle` or `fill`, categorical | Title, one key per category in persisted order, "Other" last, then no-data. Capped at three named categories (§6.4).                                                                         |
+| `fill`, graduated               | Title, units, the frozen break rows in order, then suppressed if present, then no-data.                                                                                                      |
+| `proportionalSymbol`            | Title, units, and **nested circles sharing a bottom edge** with leader lines to three values (minimum, mid, maximum). Never a color bar: the encoding is area, so the legend must show area. |
+| `heatmap`                       | Title and a continuous gradient bar labelled only **Low** and **High**. No numbers: a kernel density is not in the data's units, and printing a number invites a reader to quote it.         |
+| `line`                          | Title, one key per width or color class, drawn as a line segment rather than a square.                                                                                                       |
 
 **When the legend is taller than the map.** At more than 45% of the map's
 height it reflows into two columns before it scrolls, because a scrolled legend
@@ -987,17 +987,17 @@ Margins are 12mm on every page.
 
 ### 7.2 What is mandatory and what is not
 
-| Element | Status | Note |
-| --- | --- | --- |
-| Map frame | Mandatory | |
-| Source attribution | **Mandatory, not switchable** | Shown checked and disabled in the export sheet, labelled "Always included" |
-| Boundary disclaimer | **Mandatory, not switchable** | Same treatment |
-| Production date | **Mandatory, not switchable** | See below |
-| Legend | Mandatory whenever any visible layer uses categorical color, graduated color, or proportional symbols. Optional only when every visible layer is a single flat color | A choropleth without a legend is unreadable, so this is conditional rather than a preference |
-| Title | Optional, on by default | |
-| Subtitle | Optional, on by default | Defaults to the top layer's legend title |
-| North arrow | Optional, on by default | |
-| Scale bar | Optional, on by default, auto-suppressed below zoom 4 | See below |
+| Element             | Status                                                                                                                                                               | Note                                                                                         |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Map frame           | Mandatory                                                                                                                                                            |                                                                                              |
+| Source attribution  | **Mandatory, not switchable**                                                                                                                                        | Shown checked and disabled in the export sheet, labelled "Always included"                   |
+| Boundary disclaimer | **Mandatory, not switchable**                                                                                                                                        | Same treatment                                                                               |
+| Production date     | **Mandatory, not switchable**                                                                                                                                        | See below                                                                                    |
+| Legend              | Mandatory whenever any visible layer uses categorical color, graduated color, or proportional symbols. Optional only when every visible layer is a single flat color | A choropleth without a legend is unreadable, so this is conditional rather than a preference |
+| Title               | Optional, on by default                                                                                                                                              |                                                                                              |
+| Subtitle            | Optional, on by default                                                                                                                                              | Defaults to the top layer's legend title                                                     |
+| North arrow         | Optional, on by default                                                                                                                                              |                                                                                              |
+| Scale bar           | Optional, on by default, auto-suppressed below zoom 4                                                                                                                | See below                                                                                    |
 
 **Production date is mandatory** rather than optional. A sitrep map is
 time-sensitive and gets forwarded; an undated map circulating three weeks later
@@ -1050,12 +1050,12 @@ The workspace nav rail takes a fixed 200px off every viewport width, so the
 panels respond to the canvas. Implemented with a container query on the canvas
 element rather than a media query on the viewport.
 
-| Canvas width | Roughly | Behavior |
-| --- | --- | --- |
-| Above 1000px | Viewport above `lg`, 1200px | Layer stack and inspector both expanded. The design as drawn. |
-| 792 to 1000px | Viewport `md` to `lg` | Panels narrow (240px and 300px) and the **inspector starts collapsed**. |
-| 520 to 792px | Tablet | Everything starts collapsed. Opening a panel gives a full-height edge sheet at 288px. Touch targets go to 44px. |
-| Below 520px | Narrower than a tablet in portrait | Read-only. |
+| Canvas width  | Roughly                            | Behavior                                                                                                        |
+| ------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Above 1000px  | Viewport above `lg`, 1200px        | Layer stack and inspector both expanded. The design as drawn.                                                   |
+| 792 to 1000px | Viewport `md` to `lg`              | Panels narrow (240px and 300px) and the **inspector starts collapsed**.                                         |
+| 520 to 792px  | Tablet                             | Everything starts collapsed. Opening a panel gives a full-height edge sheet at 288px. Touch targets go to 44px. |
+| Below 520px   | Narrower than a tablet in portrait | Read-only.                                                                                                      |
 
 **The inspector yields first, not the stack.** The stack is how you navigate a
 map; the inspector is how you edit one layer. Losing the way you navigate costs
@@ -1130,7 +1130,7 @@ the reason.
 
 **One inherited inconsistency, flagged not fixed.** The nav rail is a fixed
 `NEUTRAL[6]` in both themes (`theme.other.navbar`), so in dark mode it is
-*lighter* than the app body. The map surfaces this more than other apps because
+_lighter_ than the app body. The map surfaces this more than other apps because
 it is full-bleed right next to the rail. It is an app-wide issue rather than a
 GIS one, so it is recorded here and not changed by this design.
 
@@ -1171,16 +1171,16 @@ for a screen reader and solve nothing for a sighted keyboard user.
 
 ### 9.3 Landmarks
 
-| Landmark | Name |
-| --- | --- |
-| `nav` | Workspace |
-| `role="application"` | "Map of {map name}. Use the layer panel to change what is shown." |
-| `region` (the layers panel) | Layers |
-| `region` (the inspector) | Layer |
-| `region` (the legend) | Legend |
-| `region` (classification editor) | Classify {column} |
-| `region` (validation report) | Rows that could not be mapped |
-| `role="toolbar"` | Map tools |
+| Landmark                         | Name                                                              |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `nav`                            | Workspace                                                         |
+| `role="application"`             | "Map of {map name}. Use the layer panel to change what is shown." |
+| `region` (the layers panel)      | Layers                                                            |
+| `region` (the inspector)         | Layer                                                             |
+| `region` (the legend)            | Legend                                                            |
+| `region` (classification editor) | Classify {column}                                                 |
+| `region` (validation report)     | Rows that could not be mapped                                     |
+| `role="toolbar"`                 | Map tools                                                         |
 
 Each panel is a `<section>` with `aria-labelledby` pointing at its own heading,
 which is what promotes it to a region.
@@ -1245,14 +1245,14 @@ Because panels are opaque (§3.4), **no chrome text sits over the basemap at
 all**, which is what makes contrast computable rather than a function of what
 the map happens to be showing. Measured against the actual surfaces:
 
-| Pairing | Light | Dark |
-| --- | --- | --- |
-| Body text on a panel | 14.64:1 | 7.82:1 |
-| Dimmed text on a panel | 6.08:1 | 5.27:1 |
-| Dimmed text on a panel header | 4.64:1 | 5.27:1 |
-| Badge text on the warning fill | 6.77:1 | 8.40:1 |
-| Furniture strip text | 6.08:1 | 7.02:1 |
-| Primary button label | 4.94:1 | 4.94:1 |
+| Pairing                        | Light   | Dark   |
+| ------------------------------ | ------- | ------ |
+| Body text on a panel           | 14.64:1 | 7.82:1 |
+| Dimmed text on a panel         | 6.08:1  | 5.27:1 |
+| Dimmed text on a panel header  | 4.64:1  | 5.27:1 |
+| Badge text on the warning fill | 6.77:1  | 8.40:1 |
+| Furniture strip text           | 6.08:1  | 7.02:1 |
+| Primary button label           | 4.94:1  | 4.94:1 |
 
 Every pairing clears WCAG AA for body text at 4.5:1, not merely the 3:1 large
 text bar.
@@ -1285,99 +1285,99 @@ straight from a row to a type.
 
 ### 10.1 Shell
 
-| Component | Mantine primitive | Model field | Wave |
-| --- | --- | --- | --- |
-| `MapShell` (the chrome grid) | `Box` plus CSS grid | none | A |
-| `MapChromePanel` (collapsible floating panel) | `Paper` + `Collapse` | none, panel state is per user | A |
-| `MapFurnitureBar` | `Group` | none | A |
-| `MapTopBar` | `Group` + `Paper` | `AvaMap.name` | A |
-| `MapTitleInput` | `TextInput` (unstyled variant) | `AvaMap.name` | A |
-| `SaveStateIndicator` | `Text` + icon | none | A |
-| `BasemapControl` | `Menu` | `AvaMap.basemap` (`BasemapConfig`) | A |
-| `ViewsMenu` (bookmarks) | `Menu` | new `AvaMap.bookmarks` field, see §10.4 | A |
-| `ShareButton` | reuses `ShareResourceModal` | none | A |
-| `ExportSheet` | `Modal` | none | E |
-| `SkipLinks` | `Anchor` | none | A |
+| Component                                     | Mantine primitive              | Model field                             | Wave |
+| --------------------------------------------- | ------------------------------ | --------------------------------------- | ---- |
+| `MapShell` (the chrome grid)                  | `Box` plus CSS grid            | none                                    | A    |
+| `MapChromePanel` (collapsible floating panel) | `Paper` + `Collapse`           | none, panel state is per user           | A    |
+| `MapFurnitureBar`                             | `Group`                        | none                                    | A    |
+| `MapTopBar`                                   | `Group` + `Paper`              | `AvaMap.name`                           | A    |
+| `MapTitleInput`                               | `TextInput` (unstyled variant) | `AvaMap.name`                           | A    |
+| `SaveStateIndicator`                          | `Text` + icon                  | none                                    | A    |
+| `BasemapControl`                              | `Menu`                         | `AvaMap.basemap` (`BasemapConfig`)      | A    |
+| `ViewsMenu` (bookmarks)                       | `Menu`                         | new `AvaMap.bookmarks` field, see §10.4 | A    |
+| `ShareButton`                                 | reuses `ShareResourceModal`    | none                                    | A    |
+| `ExportSheet`                                 | `Modal`                        | none                                    | E    |
+| `SkipLinks`                                   | `Anchor`                       | none                                    | A    |
 
 ### 10.2 Layer stack
 
-| Component | Mantine primitive | Model field | Wave |
-| --- | --- | --- | --- |
-| `LayerList` | `Stack` | `AvaMap.layers` (order is z-order) | A |
-| `LayerRow` | `Group` | `MapLayer.name`, `MapLayer.isVisible` | A |
-| `LayerVisibilityToggle` | `ActionIcon` | `MapLayer.isVisible` | A |
-| `LayerSelectButton` | `UnstyledButton` | none, selection is view state | A |
-| `LayerReorderHandle` | **custom**, `@dnd-kit` | `AvaMap.layers` order | A |
-| `LayerActionsMenu` | `Menu` | `MapLayer.name`, list membership | A |
-| `LayerStatusBadge` | `Badge` | derived from the layer's query state | A |
-| `SensitivityBadge` | `Badge` + `Tooltip` | `MapLayer.sensitivity.mode` | B |
-| `MatchReportBadge` | `Badge` | derived from the boundary join result | B |
+| Component               | Mantine primitive      | Model field                           | Wave |
+| ----------------------- | ---------------------- | ------------------------------------- | ---- |
+| `LayerList`             | `Stack`                | `AvaMap.layers` (order is z-order)    | A    |
+| `LayerRow`              | `Group`                | `MapLayer.name`, `MapLayer.isVisible` | A    |
+| `LayerVisibilityToggle` | `ActionIcon`           | `MapLayer.isVisible`                  | A    |
+| `LayerSelectButton`     | `UnstyledButton`       | none, selection is view state         | A    |
+| `LayerReorderHandle`    | **custom**, `@dnd-kit` | `AvaMap.layers` order                 | A    |
+| `LayerActionsMenu`      | `Menu`                 | `MapLayer.name`, list membership      | A    |
+| `LayerStatusBadge`      | `Badge`                | derived from the layer's query state  | A    |
+| `SensitivityBadge`      | `Badge` + `Tooltip`    | `MapLayer.sensitivity.mode`           | B    |
+| `MatchReportBadge`      | `Badge`                | derived from the boundary join result | B    |
 
 ### 10.3 Layer inspector
 
-| Component | Mantine primitive | Model field | Wave |
-| --- | --- | --- | --- |
-| `InspectorSection` | `Accordion` | none | A |
-| `LayerSourceSelect` | reuses `QueryDataSourceSelect` | `MapLayer.source.dataSource` | A |
-| `GeoBindingTypeSelect` | `Select` | `MapLayer.geoBinding.type` | A |
-| `LatLngColumnFields` | `Select` x2 | `geoBinding.latitude`, `geoBinding.longitude` | A |
-| `GeometryColumnFields` | `Select` + `SegmentedControl` | `geoBinding.column`, `geoBinding.encoding` | B |
-| `BoundaryJoinFields` | `Select` x3 | `geoBinding.boundary`, `.dataKey`, `.boundaryKey`, `.matching` | B |
-| `BinningFields` | `SegmentedControl` + `NumberInput` | `geoBinding.grid`, `geoBinding.sizeMeters` | C |
-| `CrsOverrideField` | `Select` | new field, see §10.4 | C |
-| `SimplificationField` | `Slider` | new field, see §10.4 | B |
-| `SymbologyTypeControl` | `SegmentedControl` | `MapLayer.symbology.type` | A |
-| `SingleColorField` | `ColorInput` | `symbology.color` (`{ type: "single" }`) | A |
-| `PalettePicker` | **custom** over `Combobox` | `symbology.color` categorical or graduated. Enforces the three-category cap from §6.4 by folding the tail into "Other" | B |
-| `SymbolSizeFields` | `NumberInput` x2 + `SegmentedControl` | `symbology.minRadius`, `.maxRadius`, `.scale`, `.value` | C |
-| `StrokeFields` | `ColorInput` + `NumberInput` | `symbology.stroke` | A |
-| `LineFields` | `ColorInput` + `NumberInput` | `symbology.color`, `symbology.width` | B |
-| `ClusterFields` | `NumberInput` + `Select` | `symbology.radiusPx`, `.aggregate` | C |
-| `HeatmapFields` | `NumberInput` + ramp picker | `symbology.radiusPx`, `.weight`, `.ramp` | C |
-| `SensitivityFields` | `Select` + `NumberInput` | `MapLayer.sensitivity` (all three modes) | B |
-| `LayerFilterSection` | reuses the Data Explorer filter row | `MapLayer.source` filter clauses | A |
-| `PopupFieldsSelect` | `MultiSelect` | `MapLayer.popup.columnIds` | A |
-| `LegendFields` | `TextInput` x2 + `Select` + `Switch` | `MapLayer.legend.title`, `.units`, `.position`, `.showNoData` | A |
+| Component              | Mantine primitive                     | Model field                                                                                                            | Wave |
+| ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---- |
+| `InspectorSection`     | `Accordion`                           | none                                                                                                                   | A    |
+| `LayerSourceSelect`    | reuses `QueryDataSourceSelect`        | `MapLayer.source.dataSource`                                                                                           | A    |
+| `GeoBindingTypeSelect` | `Select`                              | `MapLayer.geoBinding.type`                                                                                             | A    |
+| `LatLngColumnFields`   | `Select` x2                           | `geoBinding.latitude`, `geoBinding.longitude`                                                                          | A    |
+| `GeometryColumnFields` | `Select` + `SegmentedControl`         | `geoBinding.column`, `geoBinding.encoding`                                                                             | B    |
+| `BoundaryJoinFields`   | `Select` x3                           | `geoBinding.boundary`, `.dataKey`, `.boundaryKey`, `.matching`                                                         | B    |
+| `BinningFields`        | `SegmentedControl` + `NumberInput`    | `geoBinding.grid`, `geoBinding.sizeMeters`                                                                             | C    |
+| `CrsOverrideField`     | `Select`                              | new field, see §10.4                                                                                                   | C    |
+| `SimplificationField`  | `Slider`                              | new field, see §10.4                                                                                                   | B    |
+| `SymbologyTypeControl` | `SegmentedControl`                    | `MapLayer.symbology.type`                                                                                              | A    |
+| `SingleColorField`     | `ColorInput`                          | `symbology.color` (`{ type: "single" }`)                                                                               | A    |
+| `PalettePicker`        | **custom** over `Combobox`            | `symbology.color` categorical or graduated. Enforces the three-category cap from §6.4 by folding the tail into "Other" | B    |
+| `SymbolSizeFields`     | `NumberInput` x2 + `SegmentedControl` | `symbology.minRadius`, `.maxRadius`, `.scale`, `.value`                                                                | C    |
+| `StrokeFields`         | `ColorInput` + `NumberInput`          | `symbology.stroke`                                                                                                     | A    |
+| `LineFields`           | `ColorInput` + `NumberInput`          | `symbology.color`, `symbology.width`                                                                                   | B    |
+| `ClusterFields`        | `NumberInput` + `Select`              | `symbology.radiusPx`, `.aggregate`                                                                                     | C    |
+| `HeatmapFields`        | `NumberInput` + ramp picker           | `symbology.radiusPx`, `.weight`, `.ramp`                                                                               | C    |
+| `SensitivityFields`    | `Select` + `NumberInput`              | `MapLayer.sensitivity` (all three modes)                                                                               | B    |
+| `LayerFilterSection`   | reuses the Data Explorer filter row   | `MapLayer.source` filter clauses                                                                                       | A    |
+| `PopupFieldsSelect`    | `MultiSelect`                         | `MapLayer.popup.columnIds`                                                                                             | A    |
+| `LegendFields`         | `TextInput` x2 + `Select` + `Switch`  | `MapLayer.legend.title`, `.units`, `.position`, `.showNoData`                                                          | A    |
 
 ### 10.4 Classification editor
 
-| Component | Mantine primitive | Model field | Wave |
-| --- | --- | --- | --- |
-| `ClassifyPanel` | `Paper` | `symbology.color` graduated | B |
-| `ValueSelect` | `Select` | `color.column` | B |
-| `NormalizeFields` | `Select` + `SegmentedControl` | `color.normalizeBy.column`, `.per` | B |
-| `ClassificationHistogram` | **custom SVG** | reads the layer's values | B |
-| `BreakHandles` | **custom**, pointer plus keyboard | `color.classification.breaks` | B |
-| `MethodSelect` | `Select` | `color.classification.method` | B |
-| `ClassCountStepper` | `NumberInput` | `color.classification.classes` | B |
-| `BreakList` | `Stack` + `NumberInput` | `color.classification.breaks` | B |
-| `NoDataRow` | `ColorInput` + `TextInput` | `color.noData` (`NoDataStyle`) | B |
+| Component                 | Mantine primitive                 | Model field                        | Wave |
+| ------------------------- | --------------------------------- | ---------------------------------- | ---- |
+| `ClassifyPanel`           | `Paper`                           | `symbology.color` graduated        | B    |
+| `ValueSelect`             | `Select`                          | `color.column`                     | B    |
+| `NormalizeFields`         | `Select` + `SegmentedControl`     | `color.normalizeBy.column`, `.per` | B    |
+| `ClassificationHistogram` | **custom SVG**                    | reads the layer's values           | B    |
+| `BreakHandles`            | **custom**, pointer plus keyboard | `color.classification.breaks`      | B    |
+| `MethodSelect`            | `Select`                          | `color.classification.method`      | B    |
+| `ClassCountStepper`       | `NumberInput`                     | `color.classification.classes`     | B    |
+| `BreakList`               | `Stack` + `NumberInput`           | `color.classification.breaks`      | B    |
+| `NoDataRow`               | `ColorInput` + `TextInput`        | `color.noData` (`NoDataStyle`)     | B    |
 
 ### 10.5 Over-map
 
-| Component | Mantine primitive | Model field | Wave |
-| --- | --- | --- | --- |
-| `MapLegend` | `Paper` | `MapLayer.legend` | A |
-| `SizeLegend` (nested circles) | **custom SVG** | `symbology.minRadius`, `.maxRadius`, `.scale` | C |
-| `MapStatusCard` | `Paper` + `Alert` | derived from query state and drops | A (built) |
-| `ValidationReport` | `Paper` + `Table` | `DropReason` counts and `sampleRowIndexes` | C |
-| `FeatureInspector` | `Drawer` | `MapLayer.popup` | A (built, empty until popup config lands) |
-| `MapToolCluster` | `Paper` + `ActionIcon` | none | A shell, D tools |
-| `TimeSlider` | `Slider` | new field, see below | D |
+| Component                     | Mantine primitive      | Model field                                   | Wave                                      |
+| ----------------------------- | ---------------------- | --------------------------------------------- | ----------------------------------------- |
+| `MapLegend`                   | `Paper`                | `MapLayer.legend`                             | A                                         |
+| `SizeLegend` (nested circles) | **custom SVG**         | `symbology.minRadius`, `.maxRadius`, `.scale` | C                                         |
+| `MapStatusCard`               | `Paper` + `Alert`      | derived from query state and drops            | A (built)                                 |
+| `ValidationReport`            | `Paper` + `Table`      | `DropReason` counts and `sampleRowIndexes`    | C                                         |
+| `FeatureInspector`            | `Drawer`               | `MapLayer.popup`                              | A (built, empty until popup config lands) |
+| `MapToolCluster`              | `Paper` + `ActionIcon` | none                                          | A shell, D tools                          |
+| `TimeSlider`                  | `Slider`               | new field, see below                          | D                                         |
 
 ### 10.6 Model gaps this design depends on
 
 Six things the design needs that the model does not have yet. Each is small,
 and naming them now is cheaper than discovering them mid-wave.
 
-| Gap | Needed for | Wave |
-| --- | --- | --- |
-| `LegendConfig.breaks` | §4.3 and spec §4.4 require breaks frozen at save time so the map, the embed and the PDF cannot disagree. `LegendConfig` currently has `title`, `units`, `showNoData`, `position` and no `breaks`. | B |
-| `AvaMap.bookmarks` | The Views menu | A |
-| `PopupConfig` action field | "Click through to case record" (§10 of the GIS spec) has no model field | A |
-| CRS override on `GeoBinding` | Inspector Data, advanced | C |
-| Simplification tolerance on `GeoBinding` | Inspector Data, advanced | B |
-| Time field on `MapLayer` | Time slider | D |
+| Gap                                      | Needed for                                                                                                                                                                                        | Wave |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| `LegendConfig.breaks`                    | §4.3 and spec §4.4 require breaks frozen at save time so the map, the embed and the PDF cannot disagree. `LegendConfig` currently has `title`, `units`, `showNoData`, `position` and no `breaks`. | B    |
+| `AvaMap.bookmarks`                       | The Views menu                                                                                                                                                                                    | A    |
+| `PopupConfig` action field               | "Click through to case record" (§10 of the GIS spec) has no model field                                                                                                                           | A    |
+| CRS override on `GeoBinding`             | Inspector Data, advanced                                                                                                                                                                          | C    |
+| Simplification tolerance on `GeoBinding` | Inspector Data, advanced                                                                                                                                                                          | B    |
+| Time field on `MapLayer`                 | Time slider                                                                                                                                                                                       | D    |
 
 And one capability gap outside the model: **`hasSpatial()` does not exist**
 (§4.2). It must return `"loading" | "available" | "unavailable"`, not a boolean,

@@ -1,11 +1,13 @@
+import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxChecklistMilestoneRow } from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
-import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
-import type { ReactNode } from "react";
 
 type Props = {
   artifacts: NuxWorkspaceArtifacts | undefined;
@@ -44,9 +46,9 @@ export function NuxChecklistMilestoneList({
             isDone={isDone}
             isLocked={isLocked}
             lockedTooltip={
-              shareDashboardBlocked ?
-                t`You can't go to this step until you create a new dashboard.`
-              : undefined
+              shareDashboardBlocked
+                ? t`You can't go to this step until you create a new dashboard.`
+                : undefined
             }
             onOpen={() => {
               onOpenMilestone(milestone.key);

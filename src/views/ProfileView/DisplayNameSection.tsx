@@ -1,10 +1,12 @@
+import type { UserProfile } from "$/models/User/UserProfile";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, TextInput } from "@mantine/core";
 import { useState } from "react";
+
 import { UserClient } from "@/clients/UserClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import type { UserProfile } from "$/models/User/UserProfile";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   profileId: UserProfile.Id;
@@ -83,14 +85,14 @@ export function DisplayNameSection({
           </Button>
         </Group>
       </form>
-      {isInMultipleWorkspaces ?
+      {isInMultipleWorkspaces ? (
         <Text c="dimmed" size="xs">
           <Trans>
             This name only applies in {workspaceName}. Your other workspaces
             keep their own.
           </Trans>
         </Text>
-      : null}
+      ) : null}
     </Stack>
   );
 }

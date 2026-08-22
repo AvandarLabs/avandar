@@ -2,10 +2,12 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { ModalsProvider } from "@mantine/modals";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
+
 import { OfflineChatDownloadControl } from "./OfflineChatDownloadControl";
 
 const { deleteModelMock } = vi.hoisted(() => {

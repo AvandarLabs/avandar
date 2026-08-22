@@ -1,3 +1,8 @@
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AppLink, AppLinkKey } from "@/config/AppLinks/AppLinks";
+import type { ReactNode } from "react";
+
 import { t } from "@lingui/core/macro";
 import {
   IconBlocks,
@@ -8,12 +13,9 @@ import {
   IconSettings,
   IconTable,
 } from "@tabler/icons-react";
+
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import type { AppLink, AppLinkKey } from "@/config/AppLinks/AppLinks";
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactNode } from "react";
 
 export type NavbarLink = {
   link: AppLink;

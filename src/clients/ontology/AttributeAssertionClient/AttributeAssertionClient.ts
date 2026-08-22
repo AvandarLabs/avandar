@@ -1,3 +1,14 @@
+import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
+import type { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
+import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ServiceClient } from "@avandar/clients";
+import type { ILogger, WithLogger } from "@avandar/logger";
+import type { WithQueryHooks } from "@avandar/query-hooks";
+import type { RegistryOfArrays } from "@avandar/utils";
+
 import { createServiceClient } from "@avandar/clients";
 import { withLogger } from "@avandar/logger";
 import { withQueryHooks } from "@avandar/query-hooks";
@@ -15,6 +26,8 @@ import {
   sqlTemplate,
   where,
 } from "@avandar/utils";
+import { match } from "ts-pattern";
+
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
 import { AttributeAssertionRead } from "$/models/ontology/AttributeAssertion/AttributeAssertion.types";
@@ -22,7 +35,6 @@ import {
   ConceptAttributeId,
   ConceptAttributeModel,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
-import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { singleton } from "@/clients/DuckDbClient/queryResultHelpers";
@@ -31,16 +43,6 @@ import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClien
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
-import type { ServiceClient } from "@avandar/clients";
-import type { ILogger, WithLogger } from "@avandar/logger";
-import type { WithQueryHooks } from "@avandar/query-hooks";
-import type { RegistryOfArrays } from "@avandar/utils";
-import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
-import type { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type AttributeAssertionClientQueries = {
   getConceptExtension: (params: {
@@ -146,8 +148,8 @@ function createAttributeAssertionClient(): WithLogger<
                 const identifierMappings = identifierAttributes
                   .map((attribute) => {
                     const mapping = mappingsByAttributeId[attribute.id];
-                    return mapping?.type === "dataset_column" ?
-                        mapping
+                    return mapping?.type === "dataset_column"
+                      ? mapping
                       : undefined;
                   })
                   .filter(isDefined);

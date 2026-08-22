@@ -1,6 +1,7 @@
+import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
+
 import { MultiOptionBody } from "./MultiOptionBody";
 import { SingleOptionBody } from "./SingleOptionBody";
-import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   options: readonly string[];
@@ -14,7 +15,9 @@ export function FixedOptionsBody({
   multi,
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
-  return multi ?
-      <MultiOptionBody options={options} onSubmit={onSubmit} />
-    : <SingleOptionBody options={options} onSubmit={onSubmit} />;
+  return multi ? (
+    <MultiOptionBody options={options} onSubmit={onSubmit} />
+  ) : (
+    <SingleOptionBody options={options} onSubmit={onSubmit} />
+  );
 }

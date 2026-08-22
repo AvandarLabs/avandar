@@ -1,12 +1,14 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
+
 import { MapEmptyStatus } from "@/views/GisApp/panels/MapStatusCard/MapEmptyStatus";
 import { MapErrorStatus } from "@/views/GisApp/panels/MapStatusCard/MapErrorStatus";
 import { MapLoadingStatus } from "@/views/GisApp/panels/MapStatusCard/MapLoadingStatus";
 import { MapReadyPartialStatus } from "@/views/GisApp/panels/MapStatusCard/MapReadyPartialStatus";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { I18n } from "@lingui/core";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

@@ -1,12 +1,14 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+import type { ILogger } from "@avandar/logger";
+
 import { createServiceClient, withSupabaseClient } from "@avandar/clients";
 import { withLogger } from "@avandar/logger";
 import { withNewMembers } from "@avandar/modules";
 import { withQueryHooks } from "@avandar/query-hooks";
+
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { ILogger } from "@avandar/logger";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 /** Per-member counts of resources private to that member. */
 export type PrivateResourceCount = {

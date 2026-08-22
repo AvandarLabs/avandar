@@ -1,10 +1,3 @@
-import { mantineColorVar, mantineVar } from "@avandar/ui";
-import { formatDate, FormattableTimezone } from "@avandar/utils";
-import { Box } from "@mantine/core";
-import { themeMaterial } from "ag-grid-community";
-import { AgGridReact } from "ag-grid-react";
-import { useMemo } from "react";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type {
   GridReadyEvent,
@@ -12,6 +5,15 @@ import type {
   RowDataUpdatedEvent,
 } from "ag-grid-community";
 import type { Writable } from "type-fest";
+
+import { mantineColorVar, mantineVar } from "@avandar/ui";
+import { formatDate, FormattableTimezone } from "@avandar/utils";
+import { Box } from "@mantine/core";
+import { themeMaterial } from "ag-grid-community";
+import { AgGridReact } from "ag-grid-react";
+import { useMemo } from "react";
+
+import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 
 type Props = {
   columnNames: readonly string[];
@@ -62,20 +64,19 @@ export function DataGrid({
         field: field,
         headerName: field,
         filter: true,
-        valueFormatter:
-          isDate ?
-            (p: { value: unknown }) => {
+        valueFormatter: isDate
+          ? (p: { value: unknown }) => {
               return formatDate(p.value, {
                 format: dateFormat,
                 zone: timezone,
               });
             }
           : (p: { value: unknown }) => {
-              return (
-                typeof p.value === "number" ? formatChartNumber(p.value)
-                : p.value == null ? ""
-                : String(p.value)
-              );
+              return typeof p.value === "number"
+                ? formatChartNumber(p.value)
+                : p.value == null
+                  ? ""
+                  : String(p.value);
             },
       };
     });

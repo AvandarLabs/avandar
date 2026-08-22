@@ -1,7 +1,3 @@
-import {
-  buildFilteredDexieCollection,
-  findFirstConflictingRowByIndexedColumns,
-} from "@/clients/dexie/dexieFilteredCollection";
 import type {
   DexieCrudOperationContext,
   DexieKey,
@@ -10,6 +6,11 @@ import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCr
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type { FiltersByColumn } from "@avandar/utils";
 import type { Collection, IndexableType, IndexSpec, Table } from "dexie";
+
+import {
+  buildFilteredDexieCollection,
+  findFirstConflictingRowByIndexedColumns,
+} from "@/clients/dexie/dexieFilteredCollection";
 
 /**
  * Reads the IndexedDB primary key value from a row using the table key path.

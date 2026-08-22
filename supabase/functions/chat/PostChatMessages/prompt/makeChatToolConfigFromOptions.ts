@@ -1,6 +1,7 @@
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
+
 import { propEq } from "@avandar/utils";
 import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
 const DASHBOARD_TOOL_DEFINITIONS = [
   {

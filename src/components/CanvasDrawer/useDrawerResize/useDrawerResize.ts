@@ -1,8 +1,10 @@
+import type { KeyboardEvent, PointerEvent, RefObject } from "react";
+
 import { useEffect, useRef, useState } from "react";
+
 import { DrawerHeight } from "@/components/CanvasDrawer/DrawerHeight/DrawerHeight";
 import { useCanvasAreaHeight } from "@/components/CanvasDrawer/useDrawerResize/useCanvasAreaHeight";
 import { useDrawerResizeCallbacks } from "@/components/CanvasDrawer/useDrawerResize/useDrawerResizeCallbacks";
-import type { KeyboardEvent, PointerEvent, RefObject } from "react";
 
 type Options = {
   /**

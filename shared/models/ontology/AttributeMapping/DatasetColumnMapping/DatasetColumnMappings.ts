@@ -1,5 +1,6 @@
-import { registry } from "@avandar/utils";
 import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types.ts";
+
+import { registry } from "@avandar/utils";
 
 export const DatasetColumnMappings = {
   ValuePickerTypes: registry<ValuePickerRuleType>().keys(

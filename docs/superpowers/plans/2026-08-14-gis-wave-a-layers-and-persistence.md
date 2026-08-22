@@ -243,12 +243,7 @@ export type MapViewState = {
 
 /** Keys of the basemap styles the app ships. Style URLs live in the GIS app. */
 export type BasemapStyleKey =
-  | "avandar"
-  | "positron"
-  | "bright"
-  | "liberty"
-  | "dark"
-  | "fiord";
+  "avandar" | "positron" | "bright" | "liberty" | "dark" | "fiord";
 
 /**
  * The map's backdrop. `none` renders a flat background instead of tiles, which
@@ -744,8 +739,8 @@ export const AvaMapConfigModule = {
     const nextLayers = config.layers.filter((layer) => {
       return layer.id !== layerId;
     });
-    return nextLayers.length === config.layers.length ?
-        config
+    return nextLayers.length === config.layers.length
+      ? config
       : { ...config, layers: nextLayers };
   },
 
@@ -831,8 +826,8 @@ export const AvaMapConfigModule = {
     const nextBookmarks = config.bookmarks.filter((bookmark) => {
       return bookmark.id !== bookmarkId;
     });
-    return nextBookmarks.length === config.bookmarks.length ?
-        config
+    return nextBookmarks.length === config.bookmarks.length
+      ? config
       : { ...config, bookmarks: nextBookmarks };
   },
 };
@@ -3069,14 +3064,15 @@ export function MapListView({ avaMaps, workspaceSlug }: Props): ReactNode {
         >
           {t`New map`}
         </Button>
-        {avaMaps.length === 0 ?
+        {avaMaps.length === 0 ? (
           <Stack gap="xs">
             <Title order={4}>{t`No maps yet`}</Title>
             <Text c="dimmed" size="sm">
               {t`A map plots your datasets, derived datasets, and profiles as layers you can style, save, and share.`}
             </Text>
           </Stack>
-        : <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
+        ) : (
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
             {avaMaps.map((avaMap) => {
               return (
                 <MapCard
@@ -3087,7 +3083,7 @@ export function MapListView({ avaMaps, workspaceSlug }: Props): ReactNode {
               );
             })}
           </SimpleGrid>
-        }
+        )}
       </Stack>
     </AppLayout>
   );
@@ -3545,9 +3541,9 @@ export function MapShell({
               <div className={css.topBar} ref={topBarRef}>
                 {topBar}
               </div>
-              {firstRunCard ?
+              {firstRunCard ? (
                 <div className={css.firstRun}>{firstRunCard}</div>
-              : null}
+              ) : null}
               <div className={css.leftColumn} ref={leftColumnRef}>
                 {layerPanel}
               </div>
@@ -4121,8 +4117,7 @@ import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
  * lie.
  */
 export type MapScale =
-  | { kind: "bar"; widthPx: number; meters: number }
-  | { kind: "varies" };
+  { kind: "bar"; widthPx: number; meters: number } | { kind: "varies" };
 
 /** Zoom at or below which a single scale bar stops being truthful. */
 const SCALE_VARIES_BELOW_ZOOM = 4;
@@ -4420,20 +4415,20 @@ export function MapFurnitureBar({
   return (
     <div className={css.furnitureBar}>
       <span className={css.coordinates}>
-        {coordinates ?
-          `${_formatDegrees(coordinates.latitude, "lat")}, ${_formatDegrees(
-            coordinates.longitude,
-            "lng",
-          )}`
-        : t`Move the pointer over the map to read a coordinate`}
+        {coordinates
+          ? `${_formatDegrees(coordinates.latitude, "lat")}, ${_formatDegrees(
+              coordinates.longitude,
+              "lng",
+            )}`
+          : t`Move the pointer over the map to read a coordinate`}
       </span>
       <span className={css.spacer} />
-      {scale?.kind === "bar" ?
+      {scale?.kind === "bar" ? (
         <span className={css.scale}>
           <span>
-            {scale.meters >= 1000 ?
-              t`${scale.meters / 1000} km`
-            : t`${scale.meters} m`}
+            {scale.meters >= 1000
+              ? t`${scale.meters / 1000} km`
+              : t`${scale.meters} m`}
           </span>
           <span
             aria-hidden
@@ -4441,10 +4436,10 @@ export function MapFurnitureBar({
             style={{ width: scale.widthPx }}
           />
         </span>
-      : null}
-      {scale?.kind === "varies" ?
+      ) : null}
+      {scale?.kind === "varies" ? (
         <span className={css.scale}>{t`Scale varies across this map`}</span>
-      : null}
+      ) : null}
       <span className={css.attribution}>{attribution}</span>
       <span className={css.disclaimer}>{mapDisclaimer()}</span>
     </div>
@@ -4865,9 +4860,9 @@ export function CustomBasemapForm({
         <TextInput
           label={t`URL template`}
           description={
-            kind === "wms" ?
-              t`Include {bbox-epsg-3857} where the server expects the bounding box.`
-            : t`Include {z}, {x} and {y} where the server expects the tile index.`
+            kind === "wms"
+              ? t`Include {bbox-epsg-3857} where the server expects the bounding box.`
+              : t`Include {z}, {x} and {y} where the server expects the tile index.`
           }
           value={url}
           onChange={(event) => {
@@ -5392,7 +5387,7 @@ export function LayerStatusBadge({ viewState }: Props): ReactNode {
       </Badge>
     ),
     ready:
-      droppedRowCount > 0 ?
+      droppedRowCount > 0 ? (
         <Badge
           color="warning"
           variant="light"
@@ -5401,7 +5396,9 @@ export function LayerStatusBadge({ viewState }: Props): ReactNode {
         >
           {t`${droppedRowCount} rows unmapped`}
         </Badge>
-      : <>{featureCount === 1 ? t`1 point` : t`${featureCount} points`}</>,
+      ) : (
+        <>{featureCount === 1 ? t`1 point` : t`${featureCount} points`}</>
+      ),
   });
 
   return statusContent;
@@ -5497,15 +5494,17 @@ export function LayerRow({
           size="sm"
           aria-pressed={layer.isVisible}
           aria-label={
-            layer.isVisible ?
-              t`Hide the layer ${layer.name}`
-            : t`Show the layer ${layer.name}`
+            layer.isVisible
+              ? t`Hide the layer ${layer.name}`
+              : t`Show the layer ${layer.name}`
           }
           onClick={onToggleVisible}
         >
-          {layer.isVisible ?
+          {layer.isVisible ? (
             <IconEye size={15} stroke={1.5} />
-          : <IconEyeOff size={15} stroke={1.5} />}
+          ) : (
+            <IconEyeOff size={15} stroke={1.5} />
+          )}
         </ActionIcon>
         <button
           type="button"
@@ -6131,8 +6130,8 @@ export function getGeoBindingGuessFromColumns(
   const longitudeColumn = numericColumns.find((column) => {
     return LONGITUDE_NAMES.has(_normalizeColumnName(column.name));
   });
-  return latitudeColumn && longitudeColumn ?
-      {
+  return latitudeColumn && longitudeColumn
+    ? {
         latitudeColumnName: latitudeColumn.name,
         longitudeColumnName: longitudeColumn.name,
       }
@@ -6886,9 +6885,7 @@ export function InspectorSection({
       >
         <IconChevronDown className={css.sectionChevron} size={14} stroke={2} />
         {title}
-        {note ?
-          <span className={css.sectionNote}>{note}</span>
-        : null}
+        {note ? <span className={css.sectionNote}>{note}</span> : null}
       </button>
       <div className={css.sectionContent}>{children}</div>
     </div>
@@ -6976,11 +6973,12 @@ export function LayerInspector({
       collapseLabel={t`Collapse the layer panel`}
       expandLabel={t`Expand the layer panel`}
     >
-      {!layer ?
+      {!layer ? (
         <div className={css.emptyState}>
           {t`Select a layer to edit how it is queried and drawn.`}
         </div>
-      : <>
+      ) : (
+        <>
           <div className={css.lead}>
             <h3 className={css.leadName}>{layer.name}</h3>
             <div className={css.leadStatus}>{leadStatus}</div>
@@ -6992,7 +6990,7 @@ export function LayerInspector({
           <PopupSection layer={layer} onLayerChange={onLayerChange} />
           <LegendSection layer={layer} onLayerChange={onLayerChange} />
         </>
-      }
+      )}
     </MapChromePanel>
   );
 }
@@ -7058,9 +7056,8 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
  */
 export function DataSection({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(dataSourceId);
 
@@ -7144,7 +7141,7 @@ export function DataSection({ layer, onLayerChange }: Props): ReactNode {
         readOnly
         description={t`Geometry columns, boundary joins, and grid binning arrive in a later release.`}
       />
-      {hasCoordinateCandidates || isBound ?
+      {hasCoordinateCandidates || isBound ? (
         <>
           <QueryColumnSingleSelect
             label={t`Latitude`}
@@ -7176,19 +7173,19 @@ export function DataSection({ layer, onLayerChange }: Props): ReactNode {
               });
             }}
           />
-          {isBound && guess ?
+          {isBound && guess ? (
             <Callout>
               {t`Latitude and longitude were matched from the column names ${guess.latitudeColumnName} and ${guess.longitudeColumnName}. Change them above if that is wrong.`}
             </Callout>
-          : null}
-          {!isBound ?
+          ) : null}
+          {!isBound ? (
             <Callout color="warning">
               {t`Pick both a latitude and a longitude column. One on its own plots every point on a diagonal line, which looks like a result and is not.`}
             </Callout>
-          : null}
+          ) : null}
         </>
-      : null}
-      {!hasCoordinateCandidates && !isBound && layer.source.dataSource ?
+      ) : null}
+      {!hasCoordinateCandidates && !isBound && layer.source.dataSource ? (
         <Callout color="warning">
           <Stack gap="xs">
             <span>
@@ -7196,7 +7193,7 @@ export function DataSection({ layer, onLayerChange }: Props): ReactNode {
             </span>
           </Stack>
         </Callout>
-      : null}
+      ) : null}
     </InspectorSection>
   );
 }
@@ -7342,9 +7339,8 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 export function StyleSection({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
   const { symbology } = layer;
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
 
   // Switching is not destructive within a session: the last settings for each
@@ -7357,9 +7353,9 @@ export function StyleSection({ layer, onLayerChange }: Props): ReactNode {
   rememberedRef.current[symbology.type] = symbology;
 
   const sizeColumn =
-    symbology.type === "proportionalSymbol" ?
-      MapLayerUpdates.findQueryColumn(layer, symbology.value)
-    : undefined;
+    symbology.type === "proportionalSymbol"
+      ? MapLayerUpdates.findQueryColumn(layer, symbology.value)
+      : undefined;
 
   const labelFor = (
     type: (typeof SYMBOLOGY_OPTIONS)[number]["type"],
@@ -7426,7 +7422,7 @@ export function StyleSection({ layer, onLayerChange }: Props): ReactNode {
           });
         }}
       />
-      {symbology.type === "circle" ?
+      {symbology.type === "circle" ? (
         <NumberInput
           label={t`Radius`}
           suffix=" px"
@@ -7442,7 +7438,8 @@ export function StyleSection({ layer, onLayerChange }: Props): ReactNode {
             });
           }}
         />
-      : <>
+      ) : (
+        <>
           <QueryColumnSingleSelect
             label={t`Size by`}
             placeholder={t`Select a column`}
@@ -7476,7 +7473,7 @@ export function StyleSection({ layer, onLayerChange }: Props): ReactNode {
             {t`Symbol area is proportional to the value, not radius, so a value ten times larger draws a symbol about three times wider.`}
           </Callout>
         </>
-      }
+      )}
       <Group grow align="flex-start">
         <ColorInput
           label={t`Outline`}
@@ -7703,7 +7700,7 @@ export function SensitivitySection({ layer, onLayerChange }: Props): ReactNode {
         description={t`Choose Displace or Aggregate only when the layer holds protection or health data that must not be mapped to a household.`}
         onChange={onModeChange}
       />
-      {sensitivity.mode === "jitter" ?
+      {sensitivity.mode === "jitter" ? (
         <NumberInput
           label={t`Displace within`}
           suffix=" m"
@@ -7723,8 +7720,8 @@ export function SensitivitySection({ layer, onLayerChange }: Props): ReactNode {
             });
           }}
         />
-      : null}
-      {sensitivity.mode === "aggregateOnly" ?
+      ) : null}
+      {sensitivity.mode === "aggregateOnly" ? (
         <>
           <NumberInput
             label={t`Suppress areas below`}
@@ -7750,7 +7747,7 @@ export function SensitivitySection({ layer, onLayerChange }: Props): ReactNode {
             {t`This layer cannot be drawn yet. Aggregate only needs an area to aggregate into, and boundary joins arrive in a later release.`}
           </Callout>
         </>
-      : null}
+      ) : null}
     </InspectorSection>
   );
 }
@@ -7794,10 +7791,11 @@ export function FilterSection({ layer, onLayerChange }: Props): ReactNode {
     <InspectorSection
       title={t`Filter`}
       note={
-        filterCount === 0 ? undefined
-        : filterCount === 1 ?
-          t`1 filter`
-        : t`${filterCount} filters`
+        filterCount === 0
+          ? undefined
+          : filterCount === 1
+            ? t`1 filter`
+            : t`${filterCount} filters`
       }
     >
       <QueryFiltersField
@@ -7941,9 +7939,9 @@ function _createPointFeature({
   rowIndex: number;
 }): GeoJSON.Feature {
   const properties: GeoJSON.GeoJsonProperties =
-    propertyColumnNames === "all" ?
-      omit(row, [binding.latitudeColumnName, binding.longitudeColumnName])
-    : pick(row, propertyColumnNames);
+    propertyColumnNames === "all"
+      ? omit(row, [binding.latitudeColumnName, binding.longitudeColumnName])
+      : pick(row, propertyColumnNames);
   return {
     type: "Feature",
     id: rowIndex,
@@ -7999,9 +7997,8 @@ type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
  */
 export function PopupSection({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(dataSourceId);
   const { columnIds, action } = layer.popup;
@@ -8012,20 +8009,21 @@ export function PopupSection({ layer, onLayerChange }: Props): ReactNode {
   // `QueryColumnMultiSelect` remaps the value onto its options by base column,
   // which is what makes passing the layer's columns work.
   const selectedColumns =
-    columnIds === "all" ? sourceColumns : (
-      layer.source.queryColumns.filter((column) => {
-        return columnIds.includes(column.id);
-      })
-    );
+    columnIds === "all"
+      ? sourceColumns
+      : layer.source.queryColumns.filter((column) => {
+          return columnIds.includes(column.id);
+        });
 
   return (
     <InspectorSection
       title={t`Popup`}
       note={
-        columnIds === "all" ? t`All fields`
-        : columnIds.length === 1 ?
-          t`1 field`
-        : t`${columnIds.length} fields`
+        columnIds === "all"
+          ? t`All fields`
+          : columnIds.length === 1
+            ? t`1 field`
+            : t`${columnIds.length} fields`
       }
     >
       <QueryColumnMultiSelect
@@ -8053,7 +8051,7 @@ export function PopupSection({ layer, onLayerChange }: Props): ReactNode {
           });
         }}
       />
-      {action ?
+      {action ? (
         <>
           <TextInput
             label={t`Link label`}
@@ -8083,7 +8081,7 @@ export function PopupSection({ layer, onLayerChange }: Props): ReactNode {
             }}
           />
         </>
-      : null}
+      ) : null}
     </InspectorSection>
   );
 }
@@ -8151,11 +8149,12 @@ export function FeatureInspector({
       size="xs"
     >
       <Stack gap="sm">
-        {entries.length === 0 ?
+        {entries.length === 0 ? (
           <Text c="dimmed" size="sm">
             {t`This layer's popup shows no fields. Choose some in the layer's Popup section.`}
           </Text>
-        : entries.map(([key, value]) => {
+        ) : (
+          entries.map(([key, value]) => {
             return (
               <Group
                 key={key}
@@ -8172,8 +8171,8 @@ export function FeatureInspector({
               </Group>
             );
           })
-        }
-        {action && action.urlTemplate !== "" ?
+        )}
+        {action && action.urlTemplate !== "" ? (
           <Anchor
             href={_buildActionUrl(action.urlTemplate, properties)}
             target="_blank"
@@ -8182,7 +8181,7 @@ export function FeatureInspector({
           >
             {action.label === "" ? t`Open the record` : action.label}
           </Anchor>
-        : null}
+        ) : null}
       </Stack>
     </Drawer>
   );
@@ -8438,9 +8437,9 @@ export function MapLegend({
           return (
             <div className={css.legendGroup} key={layer.id}>
               <h3 className={css.title}>{layer.legend.title}</h3>
-              {layer.legend.units ?
+              {layer.legend.units ? (
                 <div className={css.units}>{layer.legend.units}</div>
-              : null}
+              ) : null}
               <ul className={css.list}>
                 <li className={css.item}>
                   <span
@@ -8449,7 +8448,7 @@ export function MapLegend({
                   />
                   {entryLabel}
                 </li>
-                {layer.legend.showNoData ?
+                {layer.legend.showNoData ? (
                   <li className={css.item}>
                     <span
                       className={css.key}
@@ -8457,7 +8456,7 @@ export function MapLegend({
                     />
                     {t`Not reported`}
                   </li>
-                : null}
+                ) : null}
               </ul>
             </div>
           );
@@ -8964,16 +8963,16 @@ export function useAvaMapRender({
         return total + drop.count;
       }, 0);
       const error = queryState?.error ?? geometry.error;
-      const status =
-        !binding ? "unbound"
-        : error ? "error"
-        : queryState?.isLoading ? "loading"
-        : (
-          geometry.featureCollection.features.length === 0 &&
-          droppedRowCount === 0
-        ) ?
-          "empty"
-        : "ready";
+      const status = !binding
+        ? "unbound"
+        : error
+          ? "error"
+          : queryState?.isLoading
+            ? "loading"
+            : geometry.featureCollection.features.length === 0 &&
+                droppedRowCount === 0
+              ? "empty"
+              : "ready";
 
       layerViewStates.set(layer.id, {
         status,
@@ -8999,11 +8998,12 @@ export function useAvaMapRender({
       }
 
       const valueColumn =
-        layer.symbology.type === "proportionalSymbol" ?
-          layer.source.queryColumns.find(propEq("id", layer.symbology.value))
+        layer.symbology.type === "proportionalSymbol"
+          ? layer.source.queryColumns.find(propEq("id", layer.symbology.value))
+          : undefined;
+      const valueColumnName = valueColumn
+        ? QueryColumn.getDerivedColumnName(valueColumn)
         : undefined;
-      const valueColumnName =
-        valueColumn ? QueryColumn.getDerivedColumnName(valueColumn) : undefined;
 
       layerSpecs.push(
         makeLayerSpecFromMapLayer({
@@ -9267,22 +9267,24 @@ export function MapStatusCard({
       role={status === "error" ? "alert" : "status"}
     >
       <span className={`${css.icon} ${toneClassName}`} aria-hidden>
-        {status === "loading" ?
+        {status === "loading" ? (
           <Loader size={14} />
-        : status === "error" ?
+        ) : status === "error" ? (
           <IconCircleX size={15} stroke={1.8} />
-        : hasPartialMapping ?
+        ) : hasPartialMapping ? (
           <IconAlertTriangle size={15} stroke={1.8} />
-        : <IconInfoCircle size={15} stroke={1.8} />}
+        ) : (
+          <IconInfoCircle size={15} stroke={1.8} />
+        )}
       </span>
       <span>
-        {status === "loading" ?
+        {status === "loading" ? (
           <>
             <span className={css.title}>{t`Loading ${layer.name}`}</span>
             <span className={css.body}>{t`Running the layer's query.`}</span>
           </>
-        : null}
-        {status === "error" ?
+        ) : null}
+        {status === "error" ? (
           <>
             <span className={css.title}>{t`Could not load ${layer.name}`}</span>
             <span className={css.body}>
@@ -9320,21 +9322,20 @@ export function MapStatusCard({
               </Text>
             </Collapse>
           </>
-        : null}
-        {status === "empty" ?
+        ) : null}
+        {status === "empty" ? (
           <>
             <span className={css.title}>
               {t`${layer.name} returned no rows`}
             </span>
             <span className={css.body}>
-              {filterCount === 0 ?
-                t`The source has no rows.`
-              : filterCount === 1 ?
-                t`One filter is active on this layer. It may be excluding everything.`
-              : t`${filterCount} filters are active on this layer. They may be excluding everything.`
-              }
+              {filterCount === 0
+                ? t`The source has no rows.`
+                : filterCount === 1
+                  ? t`One filter is active on this layer. It may be excluding everything.`
+                  : t`${filterCount} filters are active on this layer. They may be excluding everything.`}
             </span>
-            {filterCount > 0 ?
+            {filterCount > 0 ? (
               <span className={css.actions}>
                 <Button
                   size="compact-xs"
@@ -9344,10 +9345,10 @@ export function MapStatusCard({
                   {t`Review filter`}
                 </Button>
               </span>
-            : null}
+            ) : null}
           </>
-        : null}
-        {hasPartialMapping ?
+        ) : null}
+        {hasPartialMapping ? (
           <>
             <span className={css.title}>
               {t`${droppedRowCount} of ${totalRowCount} rows could not be mapped`}
@@ -9362,7 +9363,7 @@ export function MapStatusCard({
               })}
             </span>
           </>
-        : null}
+        ) : null}
       </span>
     </div>
   );
@@ -10112,7 +10113,7 @@ export function GisApp({ avaMap }: Props): ReactNode {
         }
         toolCluster={<MapToolCluster />}
         firstRunCard={
-          mapConfig.layers.length === 0 ?
+          mapConfig.layers.length === 0 ? (
             <MapFirstRunCard
               onAddLayerFromSource={(dataSource) => {
                 const layer = MapLayer.makeFromDataSource({
@@ -10125,19 +10126,19 @@ export function GisApp({ avaMap }: Props): ReactNode {
                 setSelectedLayerId(layer.id);
               }}
             />
-          : null
+          ) : null
         }
         furnitureBar={
-          mapInstanceRef.current ?
+          mapInstanceRef.current ? (
             <MapFurnitureBar
               mapInstance={mapInstanceRef.current}
               attribution={
-                mapConfig.basemap.type === "custom" ?
-                  mapConfig.basemap.attribution
-                : t`MapLibre, OpenStreetMap contributors`
+                mapConfig.basemap.type === "custom"
+                  ? mapConfig.basemap.attribution
+                  : t`MapLibre, OpenStreetMap contributors`
               }
             />
-          : null
+          ) : null
         }
       />
       <FeatureInspector

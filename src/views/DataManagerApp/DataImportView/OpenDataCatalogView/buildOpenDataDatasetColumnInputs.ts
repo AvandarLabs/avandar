@@ -1,8 +1,9 @@
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import type { ExcludeNullsIn } from "@avandar/utils";
 import type { CatalogDatasetColumnRead } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types";
 import type { CompositeTypes, Json } from "$/types/database.types";
+import type { ExcludeNullsIn } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
+
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 
 type DatasetColumnInput = SetOptional<
   ExcludeNullsIn<CompositeTypes<"dataset_column_input">>,

@@ -1,4 +1,5 @@
 import { useLayoutEffect } from "react";
+
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useVisibleNuxSteps } from "@/components/Nux/NuxTour/useVisibleNuxSteps/useVisibleNuxSteps";

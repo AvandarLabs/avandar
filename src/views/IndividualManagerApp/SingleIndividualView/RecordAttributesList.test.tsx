@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { render, screen } from "@/test-utils";
 import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
 

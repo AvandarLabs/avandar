@@ -1,20 +1,23 @@
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
+
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { usePublishNuxGeneralAccessFact } from "@/components/Nux/NuxTour/usePublishNuxGeneralAccessFact/usePublishNuxGeneralAccessFact";
+
 import { GeneralAccessModule } from "../GeneralAccessModule/GeneralAccessModule";
 import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { GeneralAccessSelect } from "./GeneralAccessSelect";
 import { ShareWorkspaceRoleSelect } from "./ShareWorkspaceRoleSelect";
-import type { GeneralAccessValue } from "../GeneralAccessModule/GeneralAccessModule";
-import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { I18n } from "@lingui/core";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-import type { ReactNode } from "react";
 
 // Only one `ShareGeneralAccess` renders per modal, so a static id is safe:
 // there is no risk of two instances colliding in the same document.
@@ -55,8 +58,8 @@ function _getGeneralAccessTooltip(
   const { value, isOwner, app, resource, i18n } = options;
   return matchLiteral(value, {
     private: () => {
-      return isOwner ?
-          i18n._(
+      return isOwner
+        ? i18n._(
             msg`Only you can access this ${resource}. Everyone else loses access, including workspace admins.`,
           )
         : i18n._(msg`Only the owner can make this ${resource} private.`);
@@ -135,14 +138,14 @@ export function ShareGeneralAccess({
             })}
             ariaLabel={t`General access`}
             describedById={
-              showPublicOptionDisabledReason ?
-                _PUBLIC_OPTION_DISABLED_REASON_ID
-              : undefined
+              showPublicOptionDisabledReason
+                ? _PUBLIC_OPTION_DISABLED_REASON_ID
+                : undefined
             }
             onChange={onChange}
           />
         </Box>
-        {value === "workspace" ?
+        {value === "workspace" ? (
           <Box {...NuxAnchors.props(NuxAnchors.ids.shareRoleSelect)}>
             <ShareWorkspaceRoleSelect
               role={workspaceShareRole}
@@ -150,13 +153,13 @@ export function ShareGeneralAccess({
               onChange={onWorkspaceRoleChange}
             />
           </Box>
-        : null}
+        ) : null}
       </Group>
-      {showPublicOptionDisabledReason ?
+      {showPublicOptionDisabledReason ? (
         <Text id={_PUBLIC_OPTION_DISABLED_REASON_ID} size="xs" c="dimmed">
           {publicOptionDisabledReason}
         </Text>
-      : null}
+      ) : null}
       <Text size="xs" c="dimmed">
         <Trans>
           Controls the default for the rest of the workspace. People without app

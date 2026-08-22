@@ -1,4 +1,8 @@
+import type { UserId } from "$/models/User/User.types";
+import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
+
 import { isDefined, prop } from "@avandar/utils";
+
 import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";
@@ -8,8 +12,6 @@ import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { UserId } from "$/models/User/User.types";
-import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
 // Platform-aware server API client; lazy-readable from any mutation/query.
 const serverApi = createServerApiClient();
@@ -54,9 +56,8 @@ export const WorkspaceClient = createUsableServiceClient(
             // Subscription
             return {
               ...workspaceModel,
-              subscription:
-                workspace.subscription ?
-                  SubscriptionParsers.fromDBReadToModelRead(
+              subscription: workspace.subscription
+                ? SubscriptionParsers.fromDBReadToModelRead(
                     workspace.subscription,
                   )
                 : undefined,
@@ -130,9 +131,9 @@ export const WorkspaceClient = createUsableServiceClient(
               }
 
               const rowEmail =
-                membership.user_profile.user_id === session.user.id ?
-                  (session.user.email ?? "")
-                : "";
+                membership.user_profile.user_id === session.user.id
+                  ? (session.user.email ?? "")
+                  : "";
               const profile = UserProfileDBReadToModelReadSchema.parse({
                 ...membership.user_profile,
                 email: rowEmail,

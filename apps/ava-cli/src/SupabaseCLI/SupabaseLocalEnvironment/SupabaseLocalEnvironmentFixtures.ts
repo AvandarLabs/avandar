@@ -1,4 +1,6 @@
-import path from "node:path";
+import type { SupabaseBackupManifest } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { FakeHarness } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+
 import {
   BRANCH,
   CONFIG_PATH,
@@ -9,8 +11,7 @@ import {
   ORIGINAL_ENV,
   PROJECT_ROOT,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
-import type { SupabaseBackupManifest } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-import type { FakeHarness } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+import path from "node:path";
 
 function _makeBackupDirectory(
   options: Readonly<{ branch?: string; worktreePath?: string }> = {},

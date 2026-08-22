@@ -1,6 +1,7 @@
+import type { SqliteTransport } from "@avandar/clients";
+
 import { callIpc } from "$/platform/ipc/client.ts";
 import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
-import type { SqliteTransport } from "@avandar/clients";
 
 /**
  * Avandar's SQLite transport: the typed Electrobun IPC bridge to the Bun main

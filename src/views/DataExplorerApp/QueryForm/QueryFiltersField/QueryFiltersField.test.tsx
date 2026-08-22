@@ -1,16 +1,18 @@
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+
 /**
  * The value input must stay mounted across keystrokes. Unmounting drops focus
  * to body and only the first character lands.
  */
 import { Model } from "@avandar/models";
+import { describe, expect, it, vi } from "vitest";
+
 import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { describe, expect, it, vi } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 function _column(name: string, dataType: AvaDataType.T): QueryColumn.T {
   return Model.make("QueryColumn", {

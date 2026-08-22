@@ -1,8 +1,10 @@
+import type { ThreadMessageLike } from "@assistant-ui/react";
+
 import { prop } from "@avandar/utils";
+
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
-import type { ThreadMessageLike } from "@assistant-ui/react";
 
 type ThreadMessageSource = {
   content?: ThreadMessageLike["content"];

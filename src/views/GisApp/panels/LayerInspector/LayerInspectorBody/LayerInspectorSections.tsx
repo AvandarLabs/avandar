@@ -1,3 +1,8 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
 import { FilterSection } from "@/views/GisApp/panels/LayerInspector/FilterSection/FilterSection";
 import css from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.module.css";
@@ -6,10 +11,6 @@ import { LegendSection } from "@/views/GisApp/panels/LayerInspector/LegendSectio
 import { PopupSection } from "@/views/GisApp/panels/LayerInspector/PopupSection/PopupSection";
 import { SensitivitySection } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection";
 import { StyleSection } from "@/views/GisApp/panels/LayerInspector/StyleSection/StyleSection";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

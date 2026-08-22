@@ -1,14 +1,16 @@
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { useState } from "react";
+
 import { BiasNudgePanel } from "./BiasNudgePanel";
 import { CleanPanel } from "./CleanPanel";
 import { CompositePanel } from "./CompositePanel";
 import { ConsentActions } from "./ConsentActions";
 import { MedicalStrictPanel } from "./MedicalStrictPanel";
 import { PiiWarningPanel } from "./PiiWarningPanel";
-import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 /** Consent modal state selected by the privacy boundary. */
 export type ConsentModalMode =
@@ -66,8 +68,9 @@ export function ConsentModal({
   const [piiAcknowledged, setPiiAcknowledged] = useState(false);
   const [confirmationPhrase, setConfirmationPhrase] = useState("");
 
-  const previewValues =
-    sampleValues ? sampleValues.slice(0, MAX_PREVIEW_VALUES) : [];
+  const previewValues = sampleValues
+    ? sampleValues.slice(0, MAX_PREVIEW_VALUES)
+    : [];
 
   const medicalPhraseOk =
     confirmationPhrase.trim().toUpperCase() === MEDICAL_CONFIRMATION_PHRASE;
@@ -80,16 +83,16 @@ export function ConsentModal({
 
   return (
     <Stack gap="md">
-      {mode === "clean" ?
+      {mode === "clean" ? (
         <CleanPanel
           totalCount={totalCount}
           sampleValues={sampleValues}
           columnName={columnName}
           previewValues={previewValues}
         />
-      : null}
+      ) : null}
 
-      {mode === "pii_warning" && pii ?
+      {mode === "pii_warning" && pii ? (
         <PiiWarningPanel
           pii={pii}
           columnName={columnName}
@@ -99,9 +102,9 @@ export function ConsentModal({
           alertTitle={t`Personal data detected`}
           acknowledgeLabel={t`I understand this data will be sent to the AI provider`}
         />
-      : null}
+      ) : null}
 
-      {mode === "medical_strict" && pii ?
+      {mode === "medical_strict" && pii ? (
         <MedicalStrictPanel
           pii={pii}
           columnName={columnName}
@@ -115,9 +118,9 @@ export function ConsentModal({
           phraseAriaLabel={t`Type the confirmation phrase`}
           acknowledgeLabel={t`I have legal authority to share this data with the AI provider`}
         />
-      : null}
+      ) : null}
 
-      {mode === "composite" && pii && bias && bias.length > 0 ?
+      {mode === "composite" && pii && bias && bias.length > 0 ? (
         <CompositePanel
           pii={pii}
           bias={bias}
@@ -128,15 +131,15 @@ export function ConsentModal({
           alertTitle={t`Personal data + biased framing detected`}
           acknowledgeLabel={t`I understand this data will be sent to the AI provider`}
         />
-      : null}
+      ) : null}
 
-      {mode === "bias_nudge" && bias && bias.length > 0 ?
+      {mode === "bias_nudge" && bias && bias.length > 0 ? (
         <BiasNudgePanel
           bias={bias}
           userText={userText}
           alertTitle={t`Consider rephrasing`}
         />
-      : null}
+      ) : null}
 
       <ConsentActions
         mode={mode}

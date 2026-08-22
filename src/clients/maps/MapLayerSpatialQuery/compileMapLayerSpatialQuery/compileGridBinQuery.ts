@@ -1,4 +1,13 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
+import type {
+  CompileOptions,
+  CompileSourceOptions,
+} from "./compileMapLayerSpatialQuery.types";
+
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+
 import {
   makeOutputAoiPredicateSql,
   makeSourceAoiPredicateSql,
@@ -23,13 +32,6 @@ import {
   makeSpatialQueryPlan,
   makeSuppressedAreaFeatureSql,
 } from "./compileMapLayerSpatialQueryHelpers";
-import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
-import type {
-  CompileOptions,
-  CompileSourceOptions,
-} from "./compileMapLayerSpatialQuery.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 function _buildGridDenominatorSelect(
   metadata: CompileOptions["metadata"],
@@ -41,8 +43,8 @@ function _buildGridDenominatorSelect(
   const alias = quoteSqlIdentifier(
     MapLayerSpatialFeatureProperties.denominator,
   );
-  return denominator ?
-      `,\n    sum(${quoteSqlIdentifier(denominator.columnName)}) AS ${alias}`
+  return denominator
+    ? `,\n    sum(${quoteSqlIdentifier(denominator.columnName)}) AS ${alias}`
     : "";
 }
 
@@ -53,8 +55,9 @@ function _buildGridPointCtes(options: {
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const { sourceSql, pointParser, family, aoi } = options;
-  const sourceAoiWhere =
-    aoi ? ` AND ${makeSourceAoiPredicateSql("point_geometry", aoi)}` : "";
+  const sourceAoiWhere = aoi
+    ? ` AND ${makeSourceAoiPredicateSql("point_geometry", aoi)}`
+    : "";
   return `source_rows AS (${sourceSql}),
 parsed_points AS (
   SELECT source_rows.*, ${pointParser} AS point_geometry FROM source_rows
@@ -143,8 +146,8 @@ ${_buildGridBinningCtes({
 }
 
 function _getMinimumContributorCount(layer: MapLayer.T): number {
-  return layer.sensitivity.mode === "aggregateOnly" ?
-      layer.sensitivity.minCellCount
+  return layer.sensitivity.mode === "aggregateOnly"
+    ? layer.sensitivity.minCellCount
     : 0;
 }
 
@@ -181,9 +184,8 @@ function _buildGridFeatureRowsCte(options: {
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const geometry = quoteSqlIdentifier(GEOMETRY_COLUMN);
-  const outputAoiWhere =
-    options.aoi ?
-      `\n  WHERE ${makeOutputAoiPredicateSql(geometry, options.aoi)}`
+  const outputAoiWhere = options.aoi
+    ? `\n  WHERE ${makeOutputAoiPredicateSql(geometry, options.aoi)}`
     : "";
   return `feature_rows AS (
   SELECT ${makeSuppressedAreaFeatureSql({

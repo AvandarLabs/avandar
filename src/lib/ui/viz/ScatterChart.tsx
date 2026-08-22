@@ -1,12 +1,14 @@
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { ScatterChartSeries } from "@mantine/charts";
+
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
 import { useMemo } from "react";
+
 import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { ScatterChartSeries } from "@mantine/charts";
-import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   data: UnknownDataFrame;
@@ -87,15 +89,15 @@ export function ScatterChart({
         ...(yLabel !== undefined ? { width: 80 } : {}),
       }}
       scatterChartProps={
-        xLabel !== undefined || yLabel !== undefined ?
-          {
-            margin: {
-              bottom: xLabel !== undefined ? 40 : undefined,
-              left: yLabel !== undefined ? 30 : undefined,
-              right: yLabel !== undefined ? 5 : undefined,
-            },
-          }
-        : undefined
+        xLabel !== undefined || yLabel !== undefined
+          ? {
+              margin: {
+                bottom: xLabel !== undefined ? 40 : undefined,
+                left: yLabel !== undefined ? 30 : undefined,
+                right: yLabel !== undefined ? 5 : undefined,
+              },
+            }
+          : undefined
       }
     />
   );

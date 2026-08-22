@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { makeCacheBuster } from "@/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister";
 import type { User } from "$/models/User/User";
+
+import { describe, expect, it } from "vitest";
+
+import { makeCacheBuster } from "@/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister";
 
 describe("makeCacheBuster", () => {
   it("includes user id in the buster", () => {

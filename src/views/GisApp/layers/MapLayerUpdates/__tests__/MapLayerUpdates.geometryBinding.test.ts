@@ -1,6 +1,8 @@
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { describe, expect, it } from "vitest";
+
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+
 import {
   createBoundLayer,
   createNumericColumn,

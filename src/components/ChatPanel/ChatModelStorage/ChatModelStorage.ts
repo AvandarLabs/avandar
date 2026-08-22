@@ -1,4 +1,5 @@
 import { propEq } from "@avandar/utils";
+
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 
 export const CHAT_MODEL_LOCAL_STORAGE_KEY = "ava.chat.selectedModel" as const;
@@ -57,10 +58,10 @@ export const ChatModelStorage = {
       propEq("id", defaultModelId),
     );
 
-    return (
-      isCandidateAvailable ? candidateModelId
-      : isDefaultAvailable ? defaultModelId
-      : (availableModels[0]?.id ?? defaultModelId)
-    );
+    return isCandidateAvailable
+      ? candidateModelId
+      : isDefaultAvailable
+        ? defaultModelId
+        : (availableModels[0]?.id ?? defaultModelId);
   },
 };

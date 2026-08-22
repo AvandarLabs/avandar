@@ -1,10 +1,12 @@
+import type { ChatClarifyRequest } from "$/types/chat.types";
+import type { ClarificationAnswerHandler } from "./ClarificationAnswerModule/ClarificationAnswer";
+import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
+
 import { Paper, Stack } from "@mantine/core";
+
 import css from "./ClarificationCard.module.css";
 import { ClarificationCardBody } from "./ClarificationCardBody";
 import { ClarificationCardHeader } from "./ClarificationCardHeader";
-import type { ClarificationAnswerHandler } from "./ClarificationAnswerModule/ClarificationAnswer";
-import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
-import type { ChatClarifyRequest } from "$/types/chat.types";
 
 export type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/ClarificationAnswer";
 
@@ -43,9 +45,10 @@ export function ClarificationCard({
   return (
     <Paper withBorder shadow="xs" radius="md" p="md" bg="blue.0">
       <Stack gap="sm">
-        {responseShape.kind === "discovery" ?
+        {responseShape.kind === "discovery" ? (
           body
-        : <>
+        ) : (
+          <>
             {header}
             <div
               className={css.clarificationCardBody}
@@ -54,7 +57,7 @@ export function ClarificationCard({
               {body}
             </div>
           </>
-        }
+        )}
       </Stack>
     </Paper>
   );

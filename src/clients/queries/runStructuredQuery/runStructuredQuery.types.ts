@@ -1,8 +1,8 @@
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 /** Who is asking, which decides which QETL client answers. */
 export type StructuredQueryAuth =

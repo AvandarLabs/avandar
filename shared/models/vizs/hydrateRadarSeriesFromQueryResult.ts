@@ -1,10 +1,11 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
+
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import {
   columnNameSet,
   pickFirstNumericColumnName,
 } from "$/models/vizs/hydrateColumnPicking.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type RadarSeriesConfig = {
   nameKey: string | undefined;
@@ -40,9 +41,9 @@ export function hydrateRadarSeriesFromQueryResult<
   }
 
   let nextNameKey =
-    currVizConfig.nameKey && colNames.has(currVizConfig.nameKey) ?
-      currVizConfig.nameKey
-    : undefined;
+    currVizConfig.nameKey && colNames.has(currVizConfig.nameKey)
+      ? currVizConfig.nameKey
+      : undefined;
   if (nextNameKey === undefined && nextSeries.length > 0) {
     const seriesKeys = new Set(
       nextSeries.map((s) => {

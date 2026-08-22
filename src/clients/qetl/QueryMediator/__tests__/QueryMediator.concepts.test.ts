@@ -1,3 +1,9 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
+import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediator.types";
+
 /**
  * Tests the mediator's concept-relation wiring: expansion, leasing and order.
  *
@@ -9,12 +15,8 @@
  * over missing tables.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
-import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Concept } from "$/models/ontology/Concept/Concept";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;
@@ -180,8 +182,8 @@ beforeEach(() => {
   // whatever it was asked would load it even when nothing named it.
   datasetGetAllMock.mockImplementation(async (filters?: DatasetIdFilter) => {
     const requestedIds = filters?.where?.id?.in ?? [];
-    return requestedIds.includes(DATASET_ID) ?
-        [
+    return requestedIds.includes(DATASET_ID)
+      ? [
           {
             id: DATASET_ID,
             name: "people",

@@ -1,6 +1,7 @@
 import { matchLiteral } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Modal, Stack, Text } from "@mantine/core";
+
 import { Subscription } from "$/models/Subscription/Subscription";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 
@@ -24,7 +25,7 @@ export function DatasetLimitReachedModal({
   const { t } = useLingui();
 
   const messageElement =
-    subscription === undefined ?
+    subscription === undefined ? (
       <Text>
         <Trans>
           Your workspace is on the Free plan, which supports up to 5 datasets.
@@ -32,7 +33,8 @@ export function DatasetLimitReachedModal({
           datasets you can add to your workspace.
         </Trans>
       </Text>
-    : matchLiteral(subscription.featurePlanType, {
+    ) : (
+      matchLiteral(subscription.featurePlanType, {
         free: () => {
           return (
             <Text>
@@ -70,7 +72,8 @@ export function DatasetLimitReachedModal({
             </Text>
           );
         },
-      });
+      })
+    );
 
   return (
     <Modal

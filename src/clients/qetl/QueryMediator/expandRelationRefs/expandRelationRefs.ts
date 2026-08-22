@@ -1,5 +1,6 @@
-import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 
 /**
  * Expands each relation reference to every relation the engine must reach to

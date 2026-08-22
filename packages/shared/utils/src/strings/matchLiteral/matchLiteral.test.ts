@@ -1,6 +1,7 @@
+import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
+
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import type { Expect, IsEqual } from "@utils/types/testUtilities.types.ts";
 
 describe("matchLiteral", () => {
   it("returns the value for a matching string key", () => {

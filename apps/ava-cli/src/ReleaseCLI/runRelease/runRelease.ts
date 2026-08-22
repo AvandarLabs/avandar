@@ -1,3 +1,7 @@
+import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
+import type { PreflightResult } from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
+import type { ReleasePlan } from "@ava-cli/ReleaseCLI/runRelease/releaseStageHelpers";
+
 import { createReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
 import { readVersionAtRevision } from "@ava-cli/ReleaseCLI/releaseGitHelpers";
 import {
@@ -29,9 +33,6 @@ import {
 } from "@ava-cli/ReleaseCLI/runRelease/resolveVersionHelpers";
 import { printSuccess, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
-import type { ReleaseCommands } from "@ava-cli/ReleaseCLI/createReleaseCommands";
-import type { PreflightResult } from "@ava-cli/ReleaseCLI/runPreflight/runPreflight";
-import type { ReleasePlan } from "@ava-cli/ReleaseCLI/runRelease/releaseStageHelpers";
 
 /** Everything `ava release` accepts, already parsed. */
 export type ReleaseOptions = {

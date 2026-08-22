@@ -1,14 +1,16 @@
+import type { LineSeries } from "$/models/vizs/SeriesConfig";
+import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
+import type { LineChartSeries } from "@mantine/charts";
+import type { LineProps } from "recharts";
+
 import { formatDate, propEq } from "@avandar/utils";
 import { LineChart as MantineLineChart } from "@mantine/charts";
 import { useMemo } from "react";
+
 import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
-import type { LineChartSeries } from "@mantine/charts";
-import type { LineSeries } from "$/models/vizs/SeriesConfig";
-import type { LineProps } from "recharts";
 
 type Props = XYChartProps;
 
@@ -95,9 +97,9 @@ export function LineChart({
           return {};
         }
         return {
-          ...(found.strokeWidth !== undefined ?
-            { strokeWidth: found.strokeWidth }
-          : {}),
+          ...(found.strokeWidth !== undefined
+            ? { strokeWidth: found.strokeWidth }
+            : {}),
           ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
         };
       }}

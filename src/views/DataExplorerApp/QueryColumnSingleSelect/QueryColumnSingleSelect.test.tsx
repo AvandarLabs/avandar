@@ -1,12 +1,14 @@
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { beforeEach, expect, it, vi } from "vitest";
-import { render, waitFor } from "@/test-utils";
-import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { Model } from "@avandar/models";
+import { beforeEach, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { render, waitFor } from "@/test-utils";
+import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 
 const clientState = vi.hoisted(() => {
   return { datasetColumns: [] as unknown[] };

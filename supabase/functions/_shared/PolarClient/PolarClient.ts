@@ -1,10 +1,11 @@
+import type { Checkout } from "npm:@polar-sh/sdk@0.41.5/models/components/checkout.js";
+import type { Product } from "npm:@polar-sh/sdk@0.41.5/models/components/product.js";
+import type { Subscription } from "npm:@polar-sh/sdk@0.41.5/models/components/subscription.js";
+
 import { getPolarAccessToken } from "@sbfn/_shared/PolarClient/getPolarAccessToken.ts";
 import { getPolarServerType } from "@sbfn/_shared/PolarClient/getPolarServerType.ts";
 import { Polar } from "npm:@polar-sh/sdk@0.41.5";
 import { CustomerSession } from "npm:@polar-sh/sdk@0.41.5/models/components/customersession.js";
-import type { Checkout } from "npm:@polar-sh/sdk@0.41.5/models/components/checkout.js";
-import type { Product } from "npm:@polar-sh/sdk@0.41.5/models/components/product.js";
-import type { Subscription } from "npm:@polar-sh/sdk@0.41.5/models/components/subscription.js";
 
 export type PolarClient = {
   getCheckout: (options: { checkoutId: string }) => Promise<Checkout>;
@@ -308,11 +309,11 @@ function createPolarClient(): PolarClient {
 
     createCustomerSessions: async (options) => {
       const { customerId, avandarUserId, returnURL } = options;
-      const customerSessionOptions =
-        customerId ? { customerId, returnUrl: returnURL }
-        : avandarUserId ?
-          { externalCustomerId: avandarUserId, returnUrl: returnURL }
-        : undefined;
+      const customerSessionOptions = customerId
+        ? { customerId, returnUrl: returnURL }
+        : avandarUserId
+          ? { externalCustomerId: avandarUserId, returnUrl: returnURL }
+          : undefined;
       if (!customerSessionOptions) {
         throw new Error("No customer session options provided");
       }

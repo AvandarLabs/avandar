@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { subscribeToChatAsideLayout } from "@/components/Nux/subscribeToChatAsideLayout/subscribeToChatAsideLayout";
 import { CHAT_PANEL_ASIDE_SELECTOR } from "@/config/AppShellLayout.constants";
 

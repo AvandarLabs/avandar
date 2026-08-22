@@ -1,8 +1,9 @@
-import { REJECTED_ROW_STORAGE_LIMIT } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
 import type {
   CsvParseResolvedOptions,
   CsvReadCsvMode,
 } from "@/clients/DuckDbClient/csvParse/csvParse.types";
+
+import { REJECTED_ROW_STORAGE_LIMIT } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
 
 function _escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");
@@ -35,40 +36,40 @@ export function buildReadCsvArgList(options: {
     useAutoDetect ? "auto_detect=true" : "auto_detect=false",
     "encoding='utf-8'",
     `delim='${_escapeSqlSingleQuotedLiteral(delimiter)}'`,
-    quoteChar != null ?
-      `quote='${_escapeSqlSingleQuotedLiteral(quoteChar)}'`
-    : "",
-    escapeChar != null ?
-      `escape='${_escapeSqlSingleQuotedLiteral(escapeChar)}'`
-    : "",
-    newlineDelimiter != null ?
-      `new_line='${_escapeSqlSingleQuotedLiteral(newlineDelimiter)}'`
-    : "",
-    commentChar != null ?
-      `comment='${_escapeSqlSingleQuotedLiteral(commentChar)}'`
-    : "",
+    quoteChar != null
+      ? `quote='${_escapeSqlSingleQuotedLiteral(quoteChar)}'`
+      : "",
+    escapeChar != null
+      ? `escape='${_escapeSqlSingleQuotedLiteral(escapeChar)}'`
+      : "",
+    newlineDelimiter != null
+      ? `new_line='${_escapeSqlSingleQuotedLiteral(newlineDelimiter)}'`
+      : "",
+    commentChar != null
+      ? `comment='${_escapeSqlSingleQuotedLiteral(commentChar)}'`
+      : "",
     `skip=${numRowsToSkip}`,
     `header=${hasHeader}`,
-    dateFormat ?
-      `dateformat='${_escapeSqlSingleQuotedLiteral(dateFormat)}'`
-    : "",
-    timestampFormat ?
-      `timestampformat='${_escapeSqlSingleQuotedLiteral(timestampFormat)}'`
-    : "",
-    columns.length > 0 ?
-      `columns={${columns
-        .map(([name, type]) => {
-          return `'${_escapeSqlSingleQuotedLiteral(name)}': '${type}'`;
-        })
-        .join(",")}}`
-    : "",
+    dateFormat
+      ? `dateformat='${_escapeSqlSingleQuotedLiteral(dateFormat)}'`
+      : "",
+    timestampFormat
+      ? `timestampformat='${_escapeSqlSingleQuotedLiteral(timestampFormat)}'`
+      : "",
+    columns.length > 0
+      ? `columns={${columns
+          .map(([name, type]) => {
+            return `'${_escapeSqlSingleQuotedLiteral(name)}': '${type}'`;
+          })
+          .join(",")}}`
+      : "",
     "store_rejects=true",
     "rejects_scan='reject_scans'",
     "rejects_table='reject_errors'",
     `rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
-    mode === "load" ?
-      `strict_mode=${parseOptions.strictMode ? "true" : "false"}`
-    : "strict_mode=false",
+    mode === "load"
+      ? `strict_mode=${parseOptions.strictMode ? "true" : "false"}`
+      : "strict_mode=false",
   ];
 
   return args.filter((arg) => {

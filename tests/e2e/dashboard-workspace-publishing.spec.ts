@@ -1,3 +1,6 @@
+import type { Page } from "@playwright/test";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import {
   assignE2ESecondaryMemberBuiltinRoleGroup,
@@ -7,8 +10,6 @@ import { signInWithEmailPassword, switchToWorkspaceUser } from "./helpers/auth";
 import { deleteDashboardsByIds, seedDashboard } from "./helpers/seedDashboard";
 import { openShareModal, setGeneralAccess } from "./helpers/shareModalFlow";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 type AdminClient = SupabaseClient;
 

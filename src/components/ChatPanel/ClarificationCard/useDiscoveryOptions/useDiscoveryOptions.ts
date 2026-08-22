@@ -1,7 +1,9 @@
+import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
+
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
+
 import { useStartDiscovery } from "./useStartDiscovery";
-import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 const EMPTY_CANDIDATE_VALUES: readonly string[] = [];
 

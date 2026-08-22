@@ -1,11 +1,13 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { makeDashboardPublishAnalyticsEventFromDashboards } from "@/views/DashboardApp/DashboardShareModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 /**
  * The publish mutation plus everything the user hears about it: the toast, the
@@ -32,9 +34,9 @@ export function usePublishDashboardMutation(
   return DashboardClient.usePublishDashboard({
     onSuccess: (updatedDashboard) => {
       notifySuccess(
-        currentDashboard.visibility === "draft" ?
-          t`Dashboard published!`
-        : t`Dashboard share settings updated.`,
+        currentDashboard.visibility === "draft"
+          ? t`Dashboard published!`
+          : t`Dashboard share settings updated.`,
       );
       void AnalyticsClient.logEvent({
         ...makeDashboardPublishAnalyticsEventFromDashboards({

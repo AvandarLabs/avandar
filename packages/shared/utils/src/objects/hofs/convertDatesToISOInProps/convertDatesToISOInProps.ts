@@ -1,6 +1,7 @@
-import { convertDatesToISOIn } from "@utils/objects/convertDatesToISOIn/convertDatesToISOIn.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { ConditionalKeys } from "type-fest";
+
+import { convertDatesToISOIn } from "@utils/objects/convertDatesToISOIn/convertDatesToISOIn.ts";
 
 /**
  * Returns a function that converts the specified keys into ISO strings.
@@ -14,11 +15,11 @@ export function convertDatesToISOInProps<
 >(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      string | undefined
-    : string
-  : T[Key];
+  [Key in keyof T]: Key extends K
+    ? undefined extends T[Key]
+      ? string | undefined
+      : string
+    : T[Key];
 } {
   return (obj: T) => {
     return convertDatesToISOIn(obj, keys);

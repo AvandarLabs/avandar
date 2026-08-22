@@ -1,7 +1,8 @@
-import { MapPartialMappingStatus } from "@/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
+
+import { MapPartialMappingStatus } from "@/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus";
 
 type Props = {
   viewState: MapLayerViewState;

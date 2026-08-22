@@ -521,15 +521,16 @@ return (
     subtitle={t`Start your journey with us`}
     footer={<AuthFooter />}
   >
-    {IS_REGISTRATION_DISABLED ?
+    {IS_REGISTRATION_DISABLED ? (
       elements.disabledRegistrationNotice()
-    : <form onSubmit={onFormSubmit}>
+    ) : (
+      <form onSubmit={onFormSubmit}>
         <Stack>
-          {!isOnline ?
+          {!isOnline ? (
             <Alert color="yellow" variant="light">
               <Trans>Registration requires an internet connection.</Trans>
             </Alert>
-          : null}
+          ) : null}
           <TextInput
             key={registrationForm.key("email")}
             label={t`Email`}
@@ -572,17 +573,17 @@ return (
               <Trans>Register</Trans>
             </Button>
           </Group>
-          {isRegistrationSuccess ?
+          {isRegistrationSuccess ? (
             <Text mt="lg" c="green">
               <Trans>
                 Please check your email for a confirmation link. It may take a
                 few minutes to arrive.
               </Trans>
             </Text>
-          : null}
+          ) : null}
         </Stack>
       </form>
-    }
+    )}
   </AuthLayout>
 );
 ```
@@ -2424,31 +2425,47 @@ new branches sit before the trailing `: undefined`. The full replacement:
 
 ```ts
 export type AnalyticsEventPayloads = {
-  [K in AnalyticsEventName]: K extends "dataset.imported" ?
-    DatasetImportedPayload
-  : K extends "dashboard.published" ?
-    { dashboardId: string; blockCount: number; hasVanitySlug: boolean }
-  : K extends "dashboard.share_settings_updated" ?
-    { dashboardId: string; slugAction: "set" | "clear" | "unchanged" }
-  : K extends "dashboard.block_added_via_chat" ?
-    DashboardBlockAddedViaChatPayload
-  : K extends "dashboard.filter_changed" ? DashboardFilterChangedPayload
-  : K extends "dashboard.pdf_export_opened" ? { dashboardId: string }
-  : K extends "dataset.deleted" ? DatasetDeletedPayload
-  : K extends "dashboard.deleted" ? DashboardDeletedPayload
-  : K extends "chat.message_sent" ? ChatMessageSentPayload
-  : K extends "chat.sql_generated" ? { sqlChars: number }
-  : K extends "user.registered" ? UserRegisteredPayload
-  : K extends "user.email_confirmed" ? UserEmailConfirmedPayload
-  : K extends "user.signed_in" ? UserSignedInPayload
-  : K extends "workspace.created" ? WorkspaceCreatedPayload
-  : K extends "workspace.invite_sent" ? WorkspaceInviteSentPayload
-  : K extends "workspace.invite_accepted" ? WorkspaceInviteAcceptedPayload
-  : K extends "member.removed" ? { memberCountAfter: number }
-  : K extends "subscription.created" ? SubscriptionCreatedPayload
-  : K extends "subscription.plan_changed" ? SubscriptionPlanChangedPayload
-  : K extends "subscription.status_changed" ? SubscriptionStatusChangedPayload
-  : undefined;
+  [K in AnalyticsEventName]: K extends "dataset.imported"
+    ? DatasetImportedPayload
+    : K extends "dashboard.published"
+      ? { dashboardId: string; blockCount: number; hasVanitySlug: boolean }
+      : K extends "dashboard.share_settings_updated"
+        ? { dashboardId: string; slugAction: "set" | "clear" | "unchanged" }
+        : K extends "dashboard.block_added_via_chat"
+          ? DashboardBlockAddedViaChatPayload
+          : K extends "dashboard.filter_changed"
+            ? DashboardFilterChangedPayload
+            : K extends "dashboard.pdf_export_opened"
+              ? { dashboardId: string }
+              : K extends "dataset.deleted"
+                ? DatasetDeletedPayload
+                : K extends "dashboard.deleted"
+                  ? DashboardDeletedPayload
+                  : K extends "chat.message_sent"
+                    ? ChatMessageSentPayload
+                    : K extends "chat.sql_generated"
+                      ? { sqlChars: number }
+                      : K extends "user.registered"
+                        ? UserRegisteredPayload
+                        : K extends "user.email_confirmed"
+                          ? UserEmailConfirmedPayload
+                          : K extends "user.signed_in"
+                            ? UserSignedInPayload
+                            : K extends "workspace.created"
+                              ? WorkspaceCreatedPayload
+                              : K extends "workspace.invite_sent"
+                                ? WorkspaceInviteSentPayload
+                                : K extends "workspace.invite_accepted"
+                                  ? WorkspaceInviteAcceptedPayload
+                                  : K extends "member.removed"
+                                    ? { memberCountAfter: number }
+                                    : K extends "subscription.created"
+                                      ? SubscriptionCreatedPayload
+                                      : K extends "subscription.plan_changed"
+                                        ? SubscriptionPlanChangedPayload
+                                        : K extends "subscription.status_changed"
+                                          ? SubscriptionStatusChangedPayload
+                                          : undefined;
 };
 ```
 

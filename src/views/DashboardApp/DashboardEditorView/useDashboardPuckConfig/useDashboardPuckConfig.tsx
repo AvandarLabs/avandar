@@ -1,26 +1,3 @@
-import { Paper } from "@avandar/ui";
-import { makeArrayWithLength } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import {
-  Blockquote,
-  Box,
-  Divider,
-  Image,
-  List,
-  Table as MantineTable,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { Workspace } from "$/models/Workspace/Workspace";
-import { useMemo } from "react";
-import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
-import { useDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig";
-import { useFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig";
-import { useContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig";
-import { DashboardDesignTokens } from "@/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens";
-import puckConfigCss from "./useDashboardPuckConfig.module.css";
 import type {
   AvaPageConfig,
   AvaPageData,
@@ -42,6 +19,32 @@ import type {
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
+
+import { Paper } from "@avandar/ui";
+import { makeArrayWithLength } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import {
+  Blockquote,
+  Box,
+  Divider,
+  Image,
+  List,
+  Table as MantineTable,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { useMemo } from "react";
+
+import { Dashboard } from "$/models/Dashboard/Dashboard";
+import { Workspace } from "$/models/Workspace/Workspace";
+import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
+import { useDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig";
+import { useFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig";
+import { useContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig";
+import { DashboardDesignTokens } from "@/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens";
+
+import puckConfigCss from "./useDashboardPuckConfig.module.css";
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -70,8 +73,8 @@ export function getDashboardTitleFromPuckData(
 
   const title: unknown = (data.root.props as Partial<AvaPageRootProps>).title;
 
-  return typeof title === "string" && title.trim().length > 0 ?
-      title
+  return typeof title === "string" && title.trim().length > 0
+    ? title
     : undefined;
 }
 
@@ -85,8 +88,8 @@ function _getStringProp(options: {
 
   const value: unknown = options.props[options.key];
 
-  return typeof value === "string" && value.trim().length > 0 ?
-      value
+  return typeof value === "string" && value.trim().length > 0
+    ? value
     : undefined;
 }
 
@@ -122,8 +125,8 @@ function _getRootPaddingProp(options: {
 
   const value: unknown = options.props[options.key];
 
-  return ROOT_PADDING_OPTIONS.includes(value as RootPadding) ?
-      (value as RootPadding)
+  return ROOT_PADDING_OPTIONS.includes(value as RootPadding)
+    ? (value as RootPadding)
     : undefined;
 }
 
@@ -153,8 +156,8 @@ function _getThemeProp(props: unknown): AvaPageThemeName {
     return "default";
   }
   const value: unknown = props.theme;
-  return _THEME_VALUES.has(value as AvaPageThemeName) ?
-      (value as AvaPageThemeName)
+  return _THEME_VALUES.has(value as AvaPageThemeName)
+    ? (value as AvaPageThemeName)
     : "default";
 }
 
@@ -163,8 +166,8 @@ function _getTypographyProp(props: unknown): AvaPageTypographyName {
     return "system";
   }
   const value: unknown = props.typography;
-  return _TYPOGRAPHY_VALUES.has(value as AvaPageTypographyName) ?
-      (value as AvaPageTypographyName)
+  return _TYPOGRAPHY_VALUES.has(value as AvaPageTypographyName)
+    ? (value as AvaPageTypographyName)
     : "system";
 }
 
@@ -191,23 +194,25 @@ function _getIframeHeight(height: number): number {
 }
 
 function _getSpacingValue(spacing: string): string {
-  return (
-    spacing === "xs" ? "0.5rem"
-    : spacing === "sm" ? "0.75rem"
-    : spacing === "lg" ? "1.5rem"
-    : "1rem"
-  );
+  return spacing === "xs"
+    ? "0.5rem"
+    : spacing === "sm"
+      ? "0.75rem"
+      : spacing === "lg"
+        ? "1.5rem"
+        : "1rem";
 }
 
 function _getMaxWidthValue(
   maxWidth: SectionProps["maxWidth"],
 ): number | string {
-  return (
-    maxWidth === "narrow" ? 640
-    : maxWidth === "wide" ? 1200
-    : maxWidth === "full" ? "100%"
-    : 860
-  );
+  return maxWidth === "narrow"
+    ? 640
+    : maxWidth === "wide"
+      ? 1200
+      : maxWidth === "full"
+        ? "100%"
+        : 860;
 }
 
 function _clampSpan(span: number): number {
@@ -340,9 +345,11 @@ function _parseTableRows(options: {
   delimiter: TableBlockProps["delimiter"];
 }): ReadonlyArray<readonly string[]> {
   const delimiterValue: string =
-    options.delimiter === "tab" ? "\t"
-    : options.delimiter === "pipe" ? "|"
-    : ",";
+    options.delimiter === "tab"
+      ? "\t"
+      : options.delimiter === "pipe"
+        ? "|"
+        : ",";
 
   return options.data
     .split("\n")
@@ -524,18 +531,16 @@ export function useDashboardPuckConfig(options: {
           const containerMaxWidth:
             | { unit: "%" | "px"; value: number }
             | undefined =
-            (
-              _isRecord(containerMaxWidthRaw) &&
-              (containerMaxWidthRaw.unit === "%" ||
-                containerMaxWidthRaw.unit === "px") &&
-              typeof containerMaxWidthRaw.value === "number" &&
-              Number.isFinite(containerMaxWidthRaw.value)
-            ) ?
-              {
-                unit: containerMaxWidthRaw.unit,
-                value: Math.round(containerMaxWidthRaw.value),
-              }
-            : undefined;
+            _isRecord(containerMaxWidthRaw) &&
+            (containerMaxWidthRaw.unit === "%" ||
+              containerMaxWidthRaw.unit === "px") &&
+            typeof containerMaxWidthRaw.value === "number" &&
+            Number.isFinite(containerMaxWidthRaw.value)
+              ? {
+                  unit: containerMaxWidthRaw.unit,
+                  value: Math.round(containerMaxWidthRaw.value),
+                }
+              : undefined;
 
           const effectiveContainerMaxWidth = containerMaxWidth ?? {
             unit: "%",
@@ -562,12 +567,15 @@ export function useDashboardPuckConfig(options: {
             key: "publishedAt",
           });
 
-          const visibleSubtitle: string | undefined =
-            isSubtitleHidden ? undefined : subtitle;
-          const visibleAuthor: string | undefined =
-            isAuthorHidden ? undefined : author;
-          const visiblePublishedAt: string | undefined =
-            isPublishedAtHidden ? undefined : publishedAt;
+          const visibleSubtitle: string | undefined = isSubtitleHidden
+            ? undefined
+            : subtitle;
+          const visibleAuthor: string | undefined = isAuthorHidden
+            ? undefined
+            : author;
+          const visiblePublishedAt: string | undefined = isPublishedAtHidden
+            ? undefined
+            : publishedAt;
 
           const tokens = DashboardDesignTokens.get({
             theme: _getThemeProp(props),
@@ -607,20 +615,20 @@ export function useDashboardPuckConfig(options: {
                 className={puckConfigCss.dashboardBlockStack}
                 mx="auto"
                 w={
-                  effectiveContainerMaxWidth.unit === "%" ?
-                    `${effectiveContainerMaxWidth.value}%`
-                  : "100%"
+                  effectiveContainerMaxWidth.unit === "%"
+                    ? `${effectiveContainerMaxWidth.value}%`
+                    : "100%"
                 }
                 maw={
-                  effectiveContainerMaxWidth.unit === "px" ?
-                    effectiveContainerMaxWidth.value
-                  : undefined
+                  effectiveContainerMaxWidth.unit === "px"
+                    ? effectiveContainerMaxWidth.value
+                    : undefined
                 }
                 py={_getRootPaddingValue(verticalPadding)}
                 px={_getRootPaddingValue(horizontalPadding)}
                 gap="xl"
               >
-                {hasHeader ?
+                {hasHeader ? (
                   <Box
                     style={{
                       borderLeft: `4px solid ${tokens.accentColor}`,
@@ -641,7 +649,7 @@ export function useDashboardPuckConfig(options: {
                           {title}
                         </Title>
                       )}
-                      {visibleSubtitle ?
+                      {visibleSubtitle ? (
                         <Text
                           fz="lg"
                           style={{
@@ -653,8 +661,8 @@ export function useDashboardPuckConfig(options: {
                         >
                           {visibleSubtitle}
                         </Text>
-                      : null}
-                      {byline ?
+                      ) : null}
+                      {byline ? (
                         <Text
                           fz="sm"
                           style={{
@@ -666,10 +674,10 @@ export function useDashboardPuckConfig(options: {
                         >
                           {byline}
                         </Text>
-                      : null}
+                      ) : null}
                     </Stack>
                   </Box>
-                : null}
+                ) : null}
                 {children}
               </Stack>
             </Box>
@@ -922,10 +930,13 @@ export function useDashboardPuckConfig(options: {
               >
                 {columnsToRender.map((col, idx) => {
                   const span: number =
-                    numVisibleColumns === 1 ? numColumns
-                    : idx === 0 ? leftSpan
-                    : idx === numVisibleColumns - 1 ? rightSpan
-                    : 1;
+                    numVisibleColumns === 1
+                      ? numColumns
+                      : idx === 0
+                        ? leftSpan
+                        : idx === numVisibleColumns - 1
+                          ? rightSpan
+                          : 1;
 
                   return (
                     <Stack
@@ -1003,16 +1014,16 @@ export function useDashboardPuckConfig(options: {
             const first:
               | { content: unknown; key: "sidebar" | "main" }
               | { content: unknown; key: "sidebar" | "main" } =
-              props.sidebarPosition === "left" ?
-                { key: "sidebar", content: props.sidebar }
-              : { key: "main", content: props.main };
+              props.sidebarPosition === "left"
+                ? { key: "sidebar", content: props.sidebar }
+                : { key: "main", content: props.main };
 
             const second:
               | { content: unknown; key: "sidebar" | "main" }
               | { content: unknown; key: "sidebar" | "main" } =
-              props.sidebarPosition === "left" ?
-                { key: "main", content: props.main }
-              : { key: "sidebar", content: props.sidebar };
+              props.sidebarPosition === "left"
+                ? { key: "main", content: props.main }
+                : { key: "sidebar", content: props.sidebar };
 
             return (
               <>
@@ -1021,15 +1032,15 @@ export function useDashboardPuckConfig(options: {
                   style={{
                     gap,
                     gridTemplateColumns:
-                      props.sidebarPosition === "left" ?
-                        _getGridTemplateColumns({
-                          leftSpan: sidebarSpan,
-                          rightSpan: mainSpan,
-                        })
-                      : _getGridTemplateColumns({
-                          leftSpan: mainSpan,
-                          rightSpan: sidebarSpan,
-                        }),
+                      props.sidebarPosition === "left"
+                        ? _getGridTemplateColumns({
+                            leftSpan: sidebarSpan,
+                            rightSpan: mainSpan,
+                          })
+                        : _getGridTemplateColumns({
+                            leftSpan: mainSpan,
+                            rightSpan: sidebarSpan,
+                          }),
                   }}
                   visibleFrom={props.collapseAt}
                 >
@@ -1144,9 +1155,9 @@ export function useDashboardPuckConfig(options: {
             return (
               <Paper p="md">
                 <Stack gap="sm">
-                  {props.title.trim().length > 0 ?
+                  {props.title.trim().length > 0 ? (
                     <Text fw={600}>{props.title}</Text>
-                  : null}
+                  ) : null}
                   {_renderSlot(props.content)}
                 </Stack>
               </Paper>
@@ -1279,17 +1290,18 @@ export function useDashboardPuckConfig(options: {
           render: (props: FigureBlockProps) => {
             return (
               <Stack gap={6}>
-                {props.src.trim().length > 0 ?
+                {props.src.trim().length > 0 ? (
                   <Image src={props.src} alt={props.alt} radius="sm" />
-                : <Text c="dimmed" fz="sm">
+                ) : (
+                  <Text c="dimmed" fz="sm">
                     {i18n._(msg`Add an image URL to render a figure.`)}
                   </Text>
-                }
-                {props.caption.trim().length > 0 ?
+                )}
+                {props.caption.trim().length > 0 ? (
                   <Text c="dimmed" fz="sm">
                     {props.caption}
                   </Text>
-                : null}
+                ) : null}
               </Stack>
             );
           },
@@ -1322,16 +1334,18 @@ export function useDashboardPuckConfig(options: {
           },
           render: (props: CalloutBlockProps) => {
             const borderColor: string =
-              props.tone === "warning" ? "yellow"
-              : props.tone === "info" ? "blue"
-              : "gray";
+              props.tone === "warning"
+                ? "yellow"
+                : props.tone === "info"
+                  ? "blue"
+                  : "gray";
 
             return (
               <Paper withBorder p="md" style={{ borderColor }}>
                 <Stack gap={6}>
-                  {props.title.trim().length > 0 ?
+                  {props.title.trim().length > 0 ? (
                     <Text fw={600}>{props.title}</Text>
-                  : null}
+                  ) : null}
                   <Text component="p">{props.body}</Text>
                 </Stack>
               </Paper>
@@ -1361,8 +1375,8 @@ export function useDashboardPuckConfig(options: {
               getItemSummary: (item) => {
                 const text: unknown = (item as { text?: unknown }).text;
 
-                return typeof text === "string" && text.trim().length > 0 ?
-                    text
+                return typeof text === "string" && text.trim().length > 0
+                  ? text
                   : i18n._(msg`List item`);
               },
             },
@@ -1413,11 +1427,11 @@ export function useDashboardPuckConfig(options: {
             return (
               <Paper withBorder p="md">
                 <Stack gap={6}>
-                  {title ?
+                  {title ? (
                     <Text c="dimmed" fz="sm">
                       {title}
                     </Text>
-                  : null}
+                  ) : null}
                   <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
                     <code>{props.code}</code>
                   </pre>
@@ -1468,9 +1482,9 @@ export function useDashboardPuckConfig(options: {
                 <iframe
                   src={url}
                   title={
-                    props.title.trim().length > 0 ?
-                      props.title
-                    : i18n._(msg`Embed`)
+                    props.title.trim().length > 0
+                      ? props.title
+                      : i18n._(msg`Embed`)
                   }
                   loading="lazy"
                   sandbox="allow-scripts allow-presentation"
@@ -1529,14 +1543,16 @@ export function useDashboardPuckConfig(options: {
               );
             }
 
-            const headerRow: readonly string[] | undefined =
-              props.hasHeader ? rows[0] : undefined;
-            const bodyRows: ReadonlyArray<readonly string[]> =
-              props.hasHeader ? rows.slice(1) : rows;
+            const headerRow: readonly string[] | undefined = props.hasHeader
+              ? rows[0]
+              : undefined;
+            const bodyRows: ReadonlyArray<readonly string[]> = props.hasHeader
+              ? rows.slice(1)
+              : rows;
 
             return (
               <MantineTable withTableBorder withColumnBorders withRowBorders>
-                {headerRow ?
+                {headerRow ? (
                   <MantineTable.Thead>
                     <MantineTable.Tr>
                       {headerRow.map((cell, idx) => {
@@ -1546,7 +1562,7 @@ export function useDashboardPuckConfig(options: {
                       })}
                     </MantineTable.Tr>
                   </MantineTable.Thead>
-                : null}
+                ) : null}
                 <MantineTable.Tbody>
                   {bodyRows.map((row, rowIdx) => {
                     return (

@@ -1,6 +1,7 @@
-import { match } from "ts-pattern";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types.ts";
 import type { RelationRefT } from "$/models/relations/RelationRef/RelationRef.types.ts";
+
+import { match } from "ts-pattern";
 
 /**
  * Converts the data source a structured query was built against into the

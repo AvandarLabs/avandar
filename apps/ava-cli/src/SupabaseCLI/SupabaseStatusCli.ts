@@ -1,12 +1,13 @@
-import path from "node:path";
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
-import { SupabaseStatus } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
-import { printError, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
-import { Acclimate } from "@avandar/acclimate";
 import type {
   SupabaseStatusEntry,
   SupabaseStatusReport,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
+import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
+import { SupabaseStatus } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
+import { printError, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
+import { Acclimate } from "@avandar/acclimate";
+import path from "node:path";
 
 /** Describes the current stack, in the words that fit this branch. */
 function _makeHeadlineDescription(
@@ -14,12 +15,12 @@ function _makeHeadlineDescription(
 ): string {
   const { report, color } = options;
   if (report.isSwitched) {
-    return report.isExpectedForBranch ?
-        `This worktree runs its own local Supabase: |${color}|$projectId$|reset| (branch $branch$).`
+    return report.isExpectedForBranch
+      ? `This worktree runs its own local Supabase: |${color}|$projectId$|reset| (branch $branch$).`
       : `Branch $branch$ is on an isolated local Supabase: |${color}|$projectId$|reset|, not the stack it shares with everyone else.`;
   }
-  return report.isExpectedForBranch ?
-      `This worktree uses the shared local Supabase: |${color}|$projectId$|reset|, which is where branch $branch$ belongs.`
+  return report.isExpectedForBranch
+    ? `This worktree uses the shared local Supabase: |${color}|$projectId$|reset|, which is where branch $branch$ belongs.`
     : `This worktree uses the |${color}|shared|reset| local Supabase: |${color}|$projectId$|reset| (branch $branch$).`;
 }
 
@@ -27,12 +28,11 @@ function _makeHeadlineDescription(
 function _makeHeadlineAdvice(
   report: Readonly<SupabaseStatusReport>,
 ): string | undefined {
-  return (
-    report.isExpectedForBranch ? undefined
-    : report.isSwitched ?
-      "   Run `ava supabase restore` to put $branch$ back on the shared stack."
-    : "   Every unswitched worktree writes to this database. Run `ava supabase switch` to isolate this branch."
-  );
+  return report.isExpectedForBranch
+    ? undefined
+    : report.isSwitched
+      ? "   Run `ava supabase restore` to put $branch$ back on the shared stack."
+      : "   Every unswitched worktree writes to this database. Run `ava supabase switch` to isolate this branch.";
 }
 
 function _printHeadline(report: Readonly<SupabaseStatusReport>): void {
@@ -79,9 +79,9 @@ function _printEnvironmentDrift(report: Readonly<SupabaseStatusReport>): void {
   report.environmentDrift.forEach(({ filePath, staleKeys }) => {
     const fileName = path.basename(filePath);
     Acclimate.log(
-      staleKeys.length === 0 ?
-        `|green|  ✅ ${fileName} matches the running stack`
-      : `|bright_yellow|  ⚠️  ${fileName} is stale: ${staleKeys.join(", ")}`,
+      staleKeys.length === 0
+        ? `|green|  ✅ ${fileName} matches the running stack`
+        : `|bright_yellow|  ⚠️  ${fileName} is stale: ${staleKeys.join(", ")}`,
     );
   });
 }

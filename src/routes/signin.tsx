@@ -10,6 +10,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { z } from "zod";
+
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AuthLayout } from "@/components/layouts/AuthLayout";
 import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
@@ -108,9 +109,7 @@ function SignInPage() {
           />
           <Button type="submit" disabled={isSignInPending}>
             <Trans>Sign in</Trans>
-            {isSignInPending ?
-              <Loader />
-            : null}
+            {isSignInPending ? <Loader /> : null}
           </Button>
           <Link to="/forgot-password">
             <Trans>Forgot your password?</Trans>

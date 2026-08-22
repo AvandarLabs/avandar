@@ -1,7 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
-import css from "./ClassificationHistogram.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+
+import css from "./ClassificationHistogram.module.css";
 
 type Props = { entries: readonly MapLayer.LegendEntry[] };
 

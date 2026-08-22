@@ -1,12 +1,14 @@
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { ComponentProps, ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";
 import css from "@/views/GisApp/panels/LayerPanel/LayerPanel.module.css";
 import { LayerSourcePicker } from "@/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePicker";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { ComponentProps, ReactNode } from "react";
 
 type Props = ComponentProps<typeof LayerList> & {
   isCollapsed: boolean;

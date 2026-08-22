@@ -1,12 +1,14 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { ActionIcon, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
-import { IconDatabase, IconTrash } from "@tabler/icons-react";
-import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow";
-import css from "./CaseTypeDraftCard.module.css";
 import type {
   CaseTypeDraftEditor,
   CaseTypeDraftSourceGroup,
 } from "./useCaseTypeDraftEditor";
+
+import { Trans, useLingui } from "@lingui/react/macro";
+import { ActionIcon, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
+import { IconDatabase, IconTrash } from "@tabler/icons-react";
+
+import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow";
+import css from "./CaseTypeDraftCard.module.css";
 
 type Props = {
   group: CaseTypeDraftSourceGroup;
@@ -48,7 +50,7 @@ export function CaseTypeDraftSourceSection({
         <Text size="xs" fw={600} flex={1} className={css.columnHint}>
           {datasetName}
         </Text>
-        {canRemove ?
+        {canRemove ? (
           <Tooltip label={t`Remove this dataset`}>
             <ActionIcon
               size="sm"
@@ -62,7 +64,7 @@ export function CaseTypeDraftSourceSection({
               <IconTrash size={14} />
             </ActionIcon>
           </Tooltip>
-        : null}
+        ) : null}
       </Group>
 
       <Select
@@ -80,11 +82,12 @@ export function CaseTypeDraftSourceSection({
         }}
       />
 
-      {group.attributes.length === 0 ?
+      {group.attributes.length === 0 ? (
         <Text size="xs" c="dimmed">
           <Trans>No columns from this dataset.</Trans>
         </Text>
-      : group.attributes.map((attribute) => {
+      ) : (
+        group.attributes.map((attribute) => {
           return (
             <CaseTypeDraftAttributeRow
               key={attribute.columnId}
@@ -99,7 +102,7 @@ export function CaseTypeDraftSourceSection({
             />
           );
         })
-      }
+      )}
     </Stack>
   );
 }

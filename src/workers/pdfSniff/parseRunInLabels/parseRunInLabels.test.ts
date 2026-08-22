@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { parseRunInLabels } from "./parseRunInLabels";
 import type { TextLine } from "../pdfSniff.types";
+
+import { describe, expect, it } from "vitest";
+
+import { parseRunInLabels } from "./parseRunInLabels";
 
 function line(text: string, y: number, fontName = "body"): TextLine {
   return {

@@ -1,3 +1,6 @@
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { Loader } from "@mantine/core";
 import {
@@ -5,8 +8,6 @@ import {
   IconCircleX,
   IconInfoCircle,
 } from "@tabler/icons-react";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { ReactNode } from "react";
 
 type Props = {
   status: MapLayerViewState["status"];
@@ -16,9 +17,11 @@ type Props = {
 /** Renders the icon for the selected layer's status. */
 export function MapStatusIcon({ status, hasPartialMapping }: Props): ReactNode {
   const informationIcon = (): ReactNode => {
-    return hasPartialMapping ?
-        <IconAlertTriangle size={15} stroke={1.8} />
-      : <IconInfoCircle size={15} stroke={1.8} />;
+    return hasPartialMapping ? (
+      <IconAlertTriangle size={15} stroke={1.8} />
+    ) : (
+      <IconInfoCircle size={15} stroke={1.8} />
+    );
   };
   return matchLiteral(status, {
     unbound: informationIcon,

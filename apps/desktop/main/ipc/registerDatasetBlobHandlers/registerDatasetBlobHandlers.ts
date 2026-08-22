@@ -1,10 +1,11 @@
+import type { FileSystemDatasetBlobStore } from "../../services/createFileSystemDatasetBlobStore/createFileSystemDatasetBlobStore";
+import type { IpcServer } from "../createIpcServer/createIpcServer";
+
 import {
   base64ToUint8,
   uint8ToBase64,
 } from "../../../../../packages/shared/utils/src/encoding";
 import { DatasetBlobContracts } from "../../../../../shared/platform/ipc/contracts/DatasetBlobContracts";
-import type { FileSystemDatasetBlobStore } from "../../services/createFileSystemDatasetBlobStore/createFileSystemDatasetBlobStore";
-import type { IpcServer } from "../createIpcServer/createIpcServer";
 
 /**
  * Registers the `datasetBlob.*` IPC handlers (`put`, `get`, `delete`,

@@ -1,6 +1,8 @@
-import { useEffect, useSyncExternalStore } from "react";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+
+import { useEffect, useSyncExternalStore } from "react";
+
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 
 function _subscribe(listener: () => void): () => void {
   return DuckDbClient.subscribeSpatialAvailability(listener);

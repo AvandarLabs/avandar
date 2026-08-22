@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Flex, Stack, Title } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
@@ -6,8 +8,8 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+
 import { notifyNotImplemented } from "@/utils/notifications/notifyNotImplemented";
-import type { ReactNode } from "react";
 
 /**
  * Comment composer on a record. Notes are not saved yet.

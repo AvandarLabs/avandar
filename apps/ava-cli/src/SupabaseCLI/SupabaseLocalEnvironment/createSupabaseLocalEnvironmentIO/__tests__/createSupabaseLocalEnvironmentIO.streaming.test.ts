@@ -1,7 +1,7 @@
+import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { EventEmitter } from "node:events";
 import path from "node:path";
 import { PassThrough } from "node:stream";
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const commandMocks = vi.hoisted(() => {

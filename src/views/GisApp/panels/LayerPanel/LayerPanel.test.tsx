@@ -1,15 +1,17 @@
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
-import { LayerPanel } from "@/views/GisApp/panels/LayerPanel/LayerPanel";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+
+import { Model } from "@avandar/models";
+import { describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import { LayerPanel } from "@/views/GisApp/panels/LayerPanel/LayerPanel";
 
 type Props = {
   label?: string;

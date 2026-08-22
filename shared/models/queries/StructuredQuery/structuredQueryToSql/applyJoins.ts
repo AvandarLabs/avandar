@@ -1,10 +1,11 @@
-import { quoteSqlIdentifier } from "@utils/sql/index.ts";
-import { match } from "ts-pattern";
 import type {
   QueryJoin,
   QueryJoinOnEquality,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 import type { Knex } from "knex";
+
+import { quoteSqlIdentifier } from "@utils/sql/index.ts";
+import { match } from "ts-pattern";
 
 /**
  * Apply each join in order to the knex query builder. Subquery joins use
@@ -60,14 +61,12 @@ function _buildJoinOnClause(
 ): string {
   return predicates
     .map((p) => {
-      const left =
-        p.leftTable ?
-          `${quoteSqlIdentifier(p.leftTable)}.` +
+      const left = p.leftTable
+        ? `${quoteSqlIdentifier(p.leftTable)}.` +
           `${quoteSqlIdentifier(p.leftColumn)}`
         : quoteSqlIdentifier(p.leftColumn);
-      const right =
-        p.rightTable ?
-          `${quoteSqlIdentifier(p.rightTable)}.` +
+      const right = p.rightTable
+        ? `${quoteSqlIdentifier(p.rightTable)}.` +
           `${quoteSqlIdentifier(p.rightColumn)}`
         : quoteSqlIdentifier(p.rightColumn);
       return `${left} = ${right}`;

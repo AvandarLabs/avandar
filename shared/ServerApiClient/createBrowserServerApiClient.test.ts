@@ -1,10 +1,11 @@
 import { FunctionsHttpError } from "@supabase/supabase-js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { createBrowserServerApiClient } from "$/ServerApiClient/createBrowserServerApiClient.ts";
 import {
   ServerApiSessionRefresher,
   SessionExpiredError,
 } from "$/ServerApiClient/ServerApiSessionRefresher.ts";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { fakeDbClient } = vi.hoisted(() => {
   return {

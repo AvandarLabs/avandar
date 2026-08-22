@@ -1,7 +1,9 @@
+import type { TextProps, TooltipProps } from "@mantine/core";
+
 import { Text } from "@mantine/core";
+
 import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { Tooltip } from "../Tooltip/Tooltip";
-import type { TextProps, TooltipProps } from "@mantine/core";
 
 type TooltipPassthroughProps = Omit<
   TooltipProps,
@@ -30,15 +32,17 @@ export function TruncatedText({
     </Text>
   );
 
-  return withFullTextTooltip ?
-      <Tooltip
-        position="left"
-        withArrow
-        {...tooltipProps}
-        label={children}
-        disabled={!isTextTruncated}
-      >
-        {textContents}
-      </Tooltip>
-    : textContents;
+  return withFullTextTooltip ? (
+    <Tooltip
+      position="left"
+      withArrow
+      {...tooltipProps}
+      label={children}
+      disabled={!isTextTruncated}
+    >
+      {textContents}
+    </Tooltip>
+  ) : (
+    textContents
+  );
 }

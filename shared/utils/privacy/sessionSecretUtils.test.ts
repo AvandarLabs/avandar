@@ -1,10 +1,11 @@
+import { describe, expect, it } from "vitest";
+
 import {
   base64UrlDecode,
   base64UrlEncode,
   hashTextPayload,
   toHex,
 } from "$/utils/privacy/sessionSecretUtils.ts";
-import { describe, expect, it } from "vitest";
 
 describe("toHex", () => {
   it("encodes every byte as two lowercase hexadecimal characters", () => {

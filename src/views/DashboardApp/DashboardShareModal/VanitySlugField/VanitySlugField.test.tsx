@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { render, screen } from "@/test-utils";
 import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 

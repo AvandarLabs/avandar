@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { makePrivateConfirmCopy } from "@/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy";
 
 describe("makePrivateConfirmCopy", () => {

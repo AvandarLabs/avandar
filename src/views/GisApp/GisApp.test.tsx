@@ -1,17 +1,19 @@
-/**
- * GisApp must sit inside AppLayout so the map uses the shared canvas Paper.
- */
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@/test-utils";
-import { GisApp } from "@/views/GisApp/GisApp";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
+
+/**
+ * GisApp must sit inside AppLayout so the map uses the shared canvas Paper.
+ */
+import { Model } from "@avandar/models";
+import { describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { render, screen } from "@/test-utils";
+import { GisApp } from "@/views/GisApp/GisApp";
 
 vi.mock("@/views/GisApp/useGisApp/useGisApp", () => {
   return {

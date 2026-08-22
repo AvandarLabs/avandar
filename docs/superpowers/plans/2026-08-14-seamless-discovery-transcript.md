@@ -33,12 +33,14 @@ Testing Library, Playwright.
 ### Task 1: Mark internal discovery continuation messages
 
 **Files:**
+
 - Create: `src/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage.ts`
 - Create: `src/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage.test.ts`
 - Modify: `src/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse.ts`
 - Test: `src/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse.test.ts`
 
 **Interfaces:**
+
 - Produces: `DiscoveryContinuationMessage.metadata`, a readonly assistant-ui
   metadata object with `custom.isDiscoveryContinuation: true`.
 - Produces: `DiscoveryContinuationMessage.isInternal(metadata): boolean`.
@@ -176,9 +178,9 @@ const isDiscoveryContinuation =
 
 return {
   content: assistantParts,
-  ...(isDiscoveryContinuation ?
-    { metadata: DiscoveryContinuationMessage.metadata }
-  : {}),
+  ...(isDiscoveryContinuation
+    ? { metadata: DiscoveryContinuationMessage.metadata }
+    : {}),
 };
 ```
 
@@ -193,6 +195,7 @@ Expected: both test files PASS with no warnings.
 ### Task 2: Hide only automatic discovery answers
 
 **Files:**
+
 - Modify: `src/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer.ts`
 - Modify: `src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryBody.tsx`
 - Modify: `src/components/ChatPanel/PendingClarificationBlock/useClarificationSubmission.ts`
@@ -200,6 +203,7 @@ Expected: both test files PASS with no warnings.
 - Test: `src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.test.tsx`
 
 **Interfaces:**
+
 - Produces: `ClarificationSubmissionOptions` with optional
   `isInternalDiscovery: boolean`.
 - Changes: `ClarificationAnswerHandler(answer, options?)` accepts the submission
@@ -352,12 +356,14 @@ returns `false` and does not append a message.
 ### Task 3: Omit internal messages from both transcript renderers
 
 **Files:**
+
 - Modify: `src/components/ChatPanel/ChatThread/UserMessage/UserMessage.tsx`
 - Create: `src/components/ChatPanel/ChatThread/UserMessage/UserMessage.test.tsx`
 - Modify: `src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx`
 - Create: `src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `DiscoveryContinuationMessage.isInternal(metadata)` from Task 1.
 - Consumes: assistant-ui `useMessage` selectors.
 
@@ -536,6 +542,7 @@ Expected: all four renderer cases PASS with no React warnings.
 ### Task 4: Show neutral progress and defer the question header
 
 **Files:**
+
 - Modify: `src/components/ChatPanel/ClarificationCard/ClarificationCard.tsx`
 - Modify: `src/components/ChatPanel/ClarificationCard/ClarificationCardBody.tsx`
 - Modify: `src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryBody.tsx`
@@ -545,6 +552,7 @@ Expected: all four renderer cases PASS with no React warnings.
 - Regenerate: `src/i18n/locales/*/messages.po`
 
 **Interfaces:**
+
 - Adds: `discoveryHeader?: React.ReactNode` on `ClarificationCardBody`.
 - Adds: `header: React.ReactNode` on `DiscoveryBody` and
   `DiscoveryStateBody`.
@@ -628,9 +636,10 @@ const body = (
 return (
   <Paper shadow="xs" radius="md" p="md" bg="blue.0">
     <Stack gap="sm">
-      {responseShape.kind === "discovery" ?
+      {responseShape.kind === "discovery" ? (
         body
-      : <>
+      ) : (
+        <>
           {header}
           <div
             className={css.clarificationCardBody}
@@ -638,7 +647,8 @@ return (
           >
             {body}
           </div>
-        </>}
+        </>
+      )}
     </Stack>
   </Paper>
 );
@@ -731,11 +741,7 @@ export function DiscoveryStateBody({
     })
     .with({ kind: "ready" }, ({ values }) => {
       return (
-        <FixedOptionsBody
-          options={values}
-          multi={multi}
-          onSubmit={onSubmit}
-        />
+        <FixedOptionsBody options={values} multi={multi} onSubmit={onSubmit} />
       );
     })
     .with({ kind: "error" }, ({ error, retry }) => {
@@ -813,9 +819,11 @@ PASSes. Do not edit compiled `messages.ts` files.
 ### Task 5: Verify the seamless user flow
 
 **Files:**
+
 - Modify: `tests/e2e/chat-interactive-workflows.spec.ts`
 
 **Interfaces:**
+
 - Verifies: internal messages still reach the mock backend but never appear in
   the rendered transcript.
 

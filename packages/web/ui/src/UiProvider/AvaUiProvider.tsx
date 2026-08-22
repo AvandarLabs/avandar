@@ -1,11 +1,12 @@
-import { MantineProvider } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
-import { I18nAvaUiProvider } from "@ui/i18n/I18nAvaUiProvider";
-import { useMemo } from "react";
 import type { CSSVariablesResolver, MantineThemeOverride } from "@mantine/core";
 import type { NotificationsProps } from "@mantine/notifications";
 import type { I18nMessages } from "@ui/i18n/i18nMessages";
 import type { ReactElement, ReactNode } from "react";
+
+import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
+import { I18nAvaUiProvider } from "@ui/i18n/I18nAvaUiProvider";
+import { useMemo } from "react";
 
 type NotificationsStyles = NonNullable<NotificationsProps["styles"]>;
 

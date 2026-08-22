@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { IconRoute } from "@tabler/icons-react";
+
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
-import type { ReactNode } from "react";
 
 /** Renders the isochrone map tool slot reserved for a later release. */
 export function IsochroneMapTool(): ReactNode {

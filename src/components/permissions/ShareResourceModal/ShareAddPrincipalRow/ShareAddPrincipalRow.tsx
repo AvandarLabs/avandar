@@ -1,7 +1,8 @@
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select } from "@mantine/core";
 import { useMemo, useState } from "react";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 type Option = { value: string; label: string };
 
@@ -89,9 +90,9 @@ export function ShareAddPrincipalRow({
         onChange={setTarget}
         searchable
         nothingFoundMessage={
-          isEmptySource ?
-            t`No members or user groups yet. Invite members or create user groups in Workspace settings.`
-          : t`No matches`
+          isEmptySource
+            ? t`No members or user groups yet. Invite members or create user groups in Workspace settings.`
+            : t`No matches`
         }
         aria-label={t`Add people or user groups`}
       />

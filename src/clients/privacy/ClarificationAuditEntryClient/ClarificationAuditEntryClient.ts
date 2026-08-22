@@ -1,10 +1,11 @@
+import type { ChatClarifyRequest } from "$/types/chat.types";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+
 import { uuid } from "$/lib/uuid";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { ClarificationAuditEntryParsers } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntryParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-import type { ChatClarifyRequest } from "$/types/chat.types";
 
 type PendingClarification = {
   id: ClarificationAuditEntry.Id;
@@ -22,8 +23,8 @@ function _responseShape(
   if (request.responseShape.kind === "discovery") {
     return request.responseShape.multi ? "discovery_multi" : "discovery_single";
   }
-  return request.responseShape.multi ?
-      "fixed_options_multi"
+  return request.responseShape.multi
+    ? "fixed_options_multi"
     : "fixed_options_single";
 }
 
@@ -62,9 +63,9 @@ const clarificationAuditEntryClient = createDexieCrudClient({
         const id = uuid() as ClarificationAuditEntry.Id;
         const askedAtMs = Date.now();
         const optionsCount =
-          options.request.responseShape.kind === "fixed_options" ?
-            options.request.responseShape.options.length
-          : null;
+          options.request.responseShape.kind === "fixed_options"
+            ? options.request.responseShape.options.length
+            : null;
         PENDING.set(id, { id, askedAtMs });
         try {
           const entry: ClarificationAuditEntry.T = {

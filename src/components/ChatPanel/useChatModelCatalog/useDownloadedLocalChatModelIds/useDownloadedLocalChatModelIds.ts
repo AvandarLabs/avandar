@@ -1,5 +1,6 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useSyncExternalStore } from "react";
+
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 
 const EMPTY_DOWNLOADED_IDS: readonly LocalChatModel.Id[] = [];

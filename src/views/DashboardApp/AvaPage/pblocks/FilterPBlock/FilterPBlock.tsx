@@ -1,11 +1,13 @@
+import type { WithPuckProps } from "@puckeditor/core";
+import type { ReactElement } from "react";
+
 import { Paper } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
 import { useEffect, useMemo } from "react";
+
 import { useFilterPBlockAnalytics } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockAnalytics";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import type { WithPuckProps } from "@puckeditor/core";
-import type { ReactElement } from "react";
 
 export type FilterPBlockMode = "select_single" | "select_multi" | "contains";
 
@@ -70,9 +72,11 @@ export function FilterPBlock({
     useFilterPBlockAnalytics({ filterId, mode, puck });
 
   const operator: "equals" | "in" | "contains" =
-    mode === "select_multi" ? "in"
-    : mode === "contains" ? "contains"
-    : "equals";
+    mode === "select_multi"
+      ? "in"
+      : mode === "contains"
+        ? "contains"
+        : "equals";
 
   const initialValue = useMemo(() => {
     if (mode === "select_multi") {
@@ -126,7 +130,7 @@ export function FilterPBlock({
         <Text size="sm" fw={600} c="neutral.9">
           {label}
         </Text>
-        {mode === "select_multi" ?
+        {mode === "select_multi" ? (
           <MultiSelect
             placeholder={t`All`}
             data={options}
@@ -138,7 +142,7 @@ export function FilterPBlock({
               logFilterChanged(value.length === 0);
             }}
           />
-        : mode === "contains" ?
+        ) : mode === "contains" ? (
           <TextInput
             placeholder={t`Contains…`}
             value={(filterState?.value as string) ?? ""}
@@ -150,7 +154,8 @@ export function FilterPBlock({
               scheduleContainsAnalytics(event.currentTarget.value);
             }}
           />
-        : <Select
+        ) : (
+          <Select
             placeholder={t`All`}
             data={options}
             clearable
@@ -164,7 +169,7 @@ export function FilterPBlock({
               logFilterChanged(value === null);
             }}
           />
-        }
+        )}
       </Stack>
     </Paper>
   );

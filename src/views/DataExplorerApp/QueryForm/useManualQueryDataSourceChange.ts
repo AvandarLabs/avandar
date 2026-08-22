@@ -1,12 +1,14 @@
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
+
 import { Model } from "@avandar/models";
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { shouldAutoLimitLargeDataset } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import { LARGE_DATASET_LIMIT_HINT_VISIBLE_MS } from "@/views/DataExplorerApp/QueryForm/ManualQueryLargeDatasetLimitHint/ManualQueryLargeDatasetLimitHint";
 import { buildDataSourceCommitOptions } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
-import type { ManualQueryFormHandlers } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 
 type Result = {
   onDataSourceChange: (dataSource: QueryDataSource | null) => void;

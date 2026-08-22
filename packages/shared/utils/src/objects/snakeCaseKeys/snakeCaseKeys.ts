@@ -1,42 +1,48 @@
+import type { UnknownArray, UnknownObject } from "@utils/types/common.types.ts";
+import type { SnakeCase } from "@utils/types/utilities.types.ts";
+
 import { isArray } from "@utils/guards/isArray/isArray.ts";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { toSnakeCase } from "@utils/strings/toSnakeCase/toSnakeCase.ts";
-import type { UnknownArray, UnknownObject } from "@utils/types/common.types.ts";
-import type { SnakeCase } from "@utils/types/utilities.types.ts";
 
-export type SnakeCaseKeys<T, IsDeep extends boolean | undefined> =
-  T extends UnknownArray ?
-    IsDeep extends true ?
-      T extends readonly [infer ItemType] ? [SnakeCaseKeys<ItemType, true>]
-      : T extends readonly [infer ItemType, infer Rest extends unknown[]] ?
-        [SnakeCaseKeys<ItemType, true>, ...SnakeCaseKeys<Rest, true>]
-      : T extends Array<infer ItemType> ?
-        Array<
-          ItemType extends UnknownObject | UnknownArray ?
-            SnakeCaseKeys<ItemType, true>
-          : ItemType
-        >
-      : T extends ReadonlyArray<infer ItemType> ?
-        ReadonlyArray<
-          ItemType extends UnknownObject | UnknownArray ?
-            SnakeCaseKeys<ItemType, true>
-          : ItemType
-        >
-      : never
+export type SnakeCaseKeys<
+  T,
+  IsDeep extends boolean | undefined,
+> = T extends UnknownArray
+  ? IsDeep extends true
+    ? T extends readonly [infer ItemType]
+      ? [SnakeCaseKeys<ItemType, true>]
+      : T extends readonly [infer ItemType, infer Rest extends unknown[]]
+        ? [SnakeCaseKeys<ItemType, true>, ...SnakeCaseKeys<Rest, true>]
+        : T extends Array<infer ItemType>
+          ? Array<
+              ItemType extends UnknownObject | UnknownArray
+                ? SnakeCaseKeys<ItemType, true>
+                : ItemType
+            >
+          : T extends ReadonlyArray<infer ItemType>
+            ? ReadonlyArray<
+                ItemType extends UnknownObject | UnknownArray
+                  ? SnakeCaseKeys<ItemType, true>
+                  : ItemType
+              >
+            : never
     : // if not deep, then we return the array as is
       T
-  : T extends UnknownObject ?
-    IsDeep extends true ?
-      {
-        [K in keyof T as K extends keyof T & string ? SnakeCase<K>
-        : never]: SnakeCaseKeys<T[K], true>;
-      }
-    : {
-        [K in keyof T as K extends keyof T & string ? SnakeCase<K>
-        : never]: T[K];
-      }
-  : T;
+  : T extends UnknownObject
+    ? IsDeep extends true
+      ? {
+          [
+            K in keyof T as K extends keyof T & string ? SnakeCase<K> : never
+          ]: SnakeCaseKeys<T[K], true>;
+        }
+      : {
+          [
+            K in keyof T as K extends keyof T & string ? SnakeCase<K> : never
+          ]: T[K];
+        }
+    : T;
 
 /**
  * Create a new object with all keys snake_cased.

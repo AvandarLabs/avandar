@@ -1,11 +1,13 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useEffectEvent, useRef } from "react";
+
 import { LayerInspectorBody } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 /** An immutable update applied to the selected layer. */
 export type LayerChangeHandler = (

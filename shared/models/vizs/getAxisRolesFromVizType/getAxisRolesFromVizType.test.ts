@@ -1,5 +1,6 @@
-import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType.ts";
 import { describe, expect, it } from "vitest";
+
+import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType.ts";
 
 describe("getAxisRolesFromVizType", () => {
   it("gives bar, line, and area a category X and a value Y", () => {

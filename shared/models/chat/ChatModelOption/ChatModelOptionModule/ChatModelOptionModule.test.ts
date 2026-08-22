@@ -1,6 +1,7 @@
 import { prop, propEq } from "@avandar/utils";
-import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 import { describe, expect, it } from "vitest";
+
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
 const { Catalog } = ChatModelOption;
 

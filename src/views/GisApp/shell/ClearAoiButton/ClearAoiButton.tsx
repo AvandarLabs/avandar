@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
+
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import css from "@/views/GisApp/shell/ClearAoiButton/ClearAoiButton.module.css";
-import type { ReactNode } from "react";
 
 type Props = {
   aoi: AvaMapConfig.AoiPolygon | undefined;

@@ -1,6 +1,8 @@
-import { ColorInput, Stack } from "@mantine/core";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { ReactNode } from "react";
+
+import { ColorInput, Stack } from "@mantine/core";
+
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 
 type Props = {
   /** Distinct slice names found in the query result, in first-seen order. */
@@ -40,9 +42,9 @@ export function SliceColorFields({
               const { [sliceName]: _clearedColor, ...keptColors } =
                 seriesColors ?? {};
               onSeriesColorsChange(
-                nextColor === "" ? keptColors : (
-                  { ...keptColors, [sliceName]: nextColor }
-                ),
+                nextColor === ""
+                  ? keptColors
+                  : { ...keptColors, [sliceName]: nextColor },
               );
             }}
           />

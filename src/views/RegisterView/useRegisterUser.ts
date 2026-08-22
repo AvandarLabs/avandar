@@ -1,12 +1,14 @@
-import { useMutation } from "@avandar/query-hooks";
-import { useLingui } from "@lingui/react/macro";
-import { useState } from "react";
-import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { notifySuccess } from "@/utils/notifications/notify";
 import type {
   RegistrationFormValues,
   RegistrationMutationController,
 } from "@/views/RegisterView/RegisterView.types";
+
+import { useMutation } from "@avandar/query-hooks";
+import { useLingui } from "@lingui/react/macro";
+import { useState } from "react";
+
+import { AuthClient } from "@/clients/AuthClient/AuthClient";
+import { notifySuccess } from "@/utils/notifications/notify";
 
 /** Submits registration credentials and exposes the resulting UI state. */
 export function useRegisterUser(

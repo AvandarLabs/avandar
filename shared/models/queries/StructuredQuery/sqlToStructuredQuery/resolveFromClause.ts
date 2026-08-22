@@ -1,6 +1,3 @@
-import { uuid } from "$/lib/uuid.ts";
-import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
-import { Parser } from "node-sql-parser";
 import type { QueryFilterCombinator } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type {
   NestedSubquerySource,
@@ -10,6 +7,11 @@ import type {
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 import type { DatasetWithColumns } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
+
+import { Parser } from "node-sql-parser";
+
+import { uuid } from "$/lib/uuid.ts";
+import { columnRefName } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
 
 export type FromResolution = {
   base?: DatasetWithColumns;
@@ -138,19 +140,17 @@ export function resolveFrom(
   fromList.forEach((rawItem, idx) => {
     const item = rawItem as Record<string, unknown>;
     const joinKeyword =
-      typeof item.join === "string" && item.join.length > 0 ?
-        (item.join as string)
-      : undefined;
+      typeof item.join === "string" && item.join.length > 0
+        ? (item.join as string)
+        : undefined;
     const tableName = typeof item.table === "string" ? item.table : undefined;
     const alias = typeof item.as === "string" ? item.as : undefined;
     const subqueryExpr =
-      (
-        item.expr &&
-        typeof item.expr === "object" &&
-        "ast" in (item.expr as Record<string, unknown>)
-      ) ?
-        (item.expr as { ast: unknown }).ast
-      : undefined;
+      item.expr &&
+      typeof item.expr === "object" &&
+      "ast" in (item.expr as Record<string, unknown>)
+        ? (item.expr as { ast: unknown }).ast
+        : undefined;
 
     if (idx === 0) {
       // Base table

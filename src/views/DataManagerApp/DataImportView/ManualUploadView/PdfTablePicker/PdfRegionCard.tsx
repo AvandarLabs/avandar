@@ -1,3 +1,13 @@
+import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
+import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
+import type {
+  ChartAxisFit,
+  ExtractedTable,
+  PdfRegion,
+  PdfRegionShape,
+} from "@/workers/pdfSniff/pdfSniff.types";
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -12,18 +22,10 @@ import {
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import clsx from "clsx";
+
 import { PdfAxisCalibration } from "./PdfAxisCalibration/PdfAxisCalibration";
 import css from "./PdfRegionCard.module.css";
 import { getCoverageFlagFromTable } from "./runRegionModelAssist/runRegionModelAssist";
-import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
-import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
-import type {
-  ChartAxisFit,
-  ExtractedTable,
-  PdfRegion,
-  PdfRegionShape,
-} from "@/workers/pdfSniff/pdfSniff.types";
-import type { ReactNode } from "react";
 
 function ChartAxisNote({ axis }: { axis: ChartAxisFit }): ReactNode {
   const { t } = useLingui();
@@ -159,15 +161,16 @@ export function PdfRegionCard({
           }}
         />
 
-        {classification ?
+        {classification ? (
           <Group gap="xs" align="flex-start" wrap="nowrap">
             <Badge
               size="xs"
               color={
-                classification.confidence === "high" ? "green"
-                : classification.confidence === "medium" ?
-                  "yellow"
-                : "gray"
+                classification.confidence === "high"
+                  ? "green"
+                  : classification.confidence === "medium"
+                    ? "yellow"
+                    : "gray"
               }
             >
               {classification.confidence}
@@ -176,9 +179,9 @@ export function PdfRegionCard({
               {classification.evidence.join(" ")}
             </Text>
           </Group>
-        : null}
+        ) : null}
 
-        {coverageFlag ?
+        {coverageFlag ? (
           <Stack gap={4}>
             <Text size="xs" c="dimmed">
               {coverageFlag.detail}
@@ -195,20 +198,20 @@ export function PdfRegionCard({
             >
               <Trans>Extract with the assistant</Trans>
             </Button>
-            {!isOnline ?
+            {!isOnline ? (
               <Text size="xs" c="dimmed">
                 {t`You are offline, so nothing can be sent. Kept the rule-based results.`}
               </Text>
-            : null}
-            {assistStatus?.message !== undefined ?
+            ) : null}
+            {assistStatus?.message !== undefined ? (
               <Text size="xs" c="dimmed">
                 {assistStatus.message}
               </Text>
-            : null}
+            ) : null}
           </Stack>
-        : null}
+        ) : null}
 
-        {region.shape === "labelled_graphic" ?
+        {region.shape === "labelled_graphic" ? (
           <PdfAxisCalibration
             isPicking={isCalibrating}
             points={calibrationPoints}
@@ -216,11 +219,9 @@ export function PdfRegionCard({
             onApply={onApplyCalibration}
             onCancel={onCancelCalibration}
           />
-        : null}
+        ) : null}
 
-        {table?.chartAxis ?
-          <ChartAxisNote axis={table.chartAxis} />
-        : null}
+        {table?.chartAxis ? <ChartAxisNote axis={table.chartAxis} /> : null}
       </Stack>
     </Paper>
   );

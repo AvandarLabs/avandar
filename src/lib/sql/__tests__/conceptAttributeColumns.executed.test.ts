@@ -1,3 +1,10 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ConceptRelationMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
+import type { DuckDBConnection } from "@duckdb/node-api";
+
 /**
  * Executed tests for the step that turns a concept's ontology rows into the
  * columns its DuckDB view emits.
@@ -19,16 +26,11 @@
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+
 import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { ConceptRelationMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
-import type { DuckDBConnection } from "@duckdb/node-api";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
 const DATASET_A = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const DATASET_B = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb" as Dataset.Id;

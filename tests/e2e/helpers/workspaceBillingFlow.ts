@@ -1,7 +1,9 @@
+import type { Frame, Page, Response } from "@playwright/test";
+
 import { expect } from "@playwright/test";
+
 import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./constants";
 import { LONG_WAIT, SHORT_WAIT } from "./timeouts";
-import type { Frame, Page, Response } from "@playwright/test";
 
 type CreateWorkspaceViaNavbarOptions = {
   page: Page;

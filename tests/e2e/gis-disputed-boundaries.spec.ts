@@ -1,3 +1,5 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -13,7 +15,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
-import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "disputed-boundaries.csv";
 const MAP_NAME = "E2E GIS disputed boundaries";
@@ -58,8 +59,8 @@ async function _readLayerPaint(
     const layer = style?.layers?.find((candidate) => {
       return candidate.id.endsWith(suffix);
     });
-    return layer && "paint" in layer ?
-        (layer.paint as Record<string, unknown>)
+    return layer && "paint" in layer
+      ? (layer.paint as Record<string, unknown>)
       : undefined;
   }, layerIdSuffix);
 }

@@ -1,10 +1,11 @@
+import { describe, expect, it } from "vitest";
+
 /**
  * SqlTableAlias assigns workspace-scoped short names and formats the
  * model-facing schema block. DuckDB still uses dataset UUIDs and
  * concept_<uuid> table names; aliases never appear there.
  */
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
-import { describe, expect, it } from "vitest";
 
 const DATASET_A = {
   id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",

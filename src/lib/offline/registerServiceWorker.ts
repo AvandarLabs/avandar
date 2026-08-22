@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { registerSW } from "virtual:pwa-register";
+
 import { notifyWarning } from "@/utils/notifications/notify";
 
 /**

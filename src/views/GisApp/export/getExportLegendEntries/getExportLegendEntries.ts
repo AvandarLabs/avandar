@@ -1,6 +1,7 @@
-import { matchLiteral } from "@avandar/utils";
-import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
+
+import { matchLiteral } from "@avandar/utils";
 
 /** The swatch shape that matches a layer's active symbology. */
 type SwatchShape = ExportLegendEntry["swatch"]["type"];
@@ -101,8 +102,8 @@ function _getLayerEntries(
     return entry.type !== "noData" || layer.legend.showNoData;
   });
   if (entries.length === 0) {
-    return flatColor === undefined ?
-        []
+    return flatColor === undefined
+      ? []
       : [
           {
             label: layer.name,
@@ -132,9 +133,11 @@ function _getHeatmapEntries(
   const lastIndex = ramp.length - 1;
   return ramp.map((color, index) => {
     const label =
-      index === 0 ? labels.heatmapLowLabel
-      : index === lastIndex ? labels.heatmapHighLabel
-      : "";
+      index === 0
+        ? labels.heatmapLowLabel
+        : index === lastIndex
+          ? labels.heatmapHighLabel
+          : "";
     return { label, swatch: { type: "fill", color } };
   });
 }

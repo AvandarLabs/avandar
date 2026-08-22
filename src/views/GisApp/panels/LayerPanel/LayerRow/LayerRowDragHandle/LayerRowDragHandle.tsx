@@ -1,7 +1,9 @@
+import type { ReactNode, Ref } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { IconGripVertical } from "@tabler/icons-react";
+
 import css from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle.module.css";
-import type { ReactNode, Ref } from "react";
 
 type Props = {
   layerName: string;

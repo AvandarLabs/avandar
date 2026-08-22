@@ -1,11 +1,13 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
+
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { ProportionalSizeControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -20,9 +22,8 @@ export function ProportionalSymbolControls({
   onLayerChange,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   return (
     <>

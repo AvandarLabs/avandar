@@ -1,12 +1,14 @@
+import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Card, Portal, Stack, Text } from "@mantine/core";
+
 import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxChecklistExpandedHeader } from "@/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader";
 import { NuxChecklistMilestoneList } from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList";
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel.module.css";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
-import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
-import type { ReactNode } from "react";
 
 type Props = {
   artifacts: NuxWorkspaceArtifacts | undefined;
@@ -53,7 +55,7 @@ export function NuxChecklistExpandedCard({
             onOpenMilestone={onOpenMilestone}
             unmarkDone={unmarkDone}
           />
-          {state.blockedReason ?
+          {state.blockedReason ? (
             <Stack gap={4}>
               <Text size="xs" c="dimmed">
                 {state.blockedReason}
@@ -68,7 +70,7 @@ export function NuxChecklistExpandedCard({
                 <Trans>Skip this step</Trans>
               </Button>
             </Stack>
-          : null}
+          ) : null}
         </Stack>
       </Card>
     </Portal>

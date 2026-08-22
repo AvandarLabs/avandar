@@ -1,15 +1,17 @@
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
+
 import { Tooltip } from "@avandar/ui";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { IconVector } from "@tabler/icons-react";
 import { useSyncExternalStore } from "react";
+
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
 import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
-import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
 
 type Props = {
   mapToolMode: MapToolMode;

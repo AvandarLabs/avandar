@@ -1,13 +1,16 @@
-import { EditorView } from "@codemirror/view";
-import clsx from "clsx";
-import { useMemo, useRef, useState } from "react";
-import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
-import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
-import css from "./AvaSqlBlock.module.css";
-import { PillEditPopover } from "./PillEditPopover/PillEditPopover";
 import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { ReactNode } from "react";
+
+import { EditorView } from "@codemirror/view";
+import clsx from "clsx";
+import { useMemo, useRef, useState } from "react";
+
+import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
+import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
+
+import css from "./AvaSqlBlock.module.css";
+import { PillEditPopover } from "./PillEditPopover/PillEditPopover";
 
 type EditableProps = {
   value: string;
@@ -67,14 +70,13 @@ export function AvaSqlBlockEditable({
           editorViewRef.current = view;
         }}
       />
-      {scope.outOfScopeColumnTokens.length > 0 ?
+      {scope.outOfScopeColumnTokens.length > 0 ? (
         <div className={css.errorNotice} data-testid="ava-sql-out-of-scope">
-          {scope.outOfScopeColumnTokens.length === 1 ?
-            `1 column is not in the current dataset scope.`
-          : `${scope.outOfScopeColumnTokens.length} columns are not in the current dataset scope.`
-          }
+          {scope.outOfScopeColumnTokens.length === 1
+            ? `1 column is not in the current dataset scope.`
+            : `${scope.outOfScopeColumnTokens.length} columns are not in the current dataset scope.`}
         </div>
-      : null}
+      ) : null}
       <PillEditPopover
         pill={activePill}
         catalog={catalog}

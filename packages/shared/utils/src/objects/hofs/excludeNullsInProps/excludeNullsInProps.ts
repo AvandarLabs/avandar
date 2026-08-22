@@ -1,6 +1,7 @@
-import { excludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
 import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
+
+import { excludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
 
 /**
  * Returns a function that excludes nulls from the specified keys.

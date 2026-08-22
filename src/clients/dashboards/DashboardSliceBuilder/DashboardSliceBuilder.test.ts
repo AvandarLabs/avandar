@@ -1,5 +1,6 @@
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { describe, expect, it } from "vitest";
+
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 
 const DS_A = "00000000-0000-4000-8000-000000000001" as Dataset.Id;

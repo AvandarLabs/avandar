@@ -1,11 +1,13 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
+
 import { I18nProvider } from "@lingui/react";
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { i18n } from "@/i18n/i18n";
 import { usePublishDashboardMutation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
 
 const { logEventMock } = vi.hoisted(() => {
   return { logEventMock: vi.fn() };

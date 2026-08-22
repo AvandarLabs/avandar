@@ -1,11 +1,13 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+
 import { matchLiteral } from "@avandar/utils";
+
 import { FIRST_DASHBOARD_PREREQUISITES } from "@/components/Nux/NuxPrerequisites/firstDashboard/firstDashboardPrerequisites/firstDashboardPrerequisites";
 import { NuxPrerequisiteJudge } from "@/components/Nux/NuxPrerequisites/NuxPrerequisiteJudge/NuxPrerequisiteJudge";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
-import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Options = {
   dispatch: ReturnType<typeof NuxStateManager.useDispatch>;
@@ -26,16 +28,14 @@ function _completePrerequisiteFromEvent(
   options.dispatch.completeMilestone({
     key: options.prerequisite.milestoneKey,
     datasetId:
-      options.event.name === "dataset.saved" ?
-        options.event.payload.datasetId
-      : undefined,
+      options.event.name === "dataset.saved"
+        ? options.event.payload.datasetId
+        : undefined,
     dashboardId:
-      (
-        options.event.name === "dashboard.created" ||
-        options.event.name === "dashboard.published"
-      ) ?
-        options.event.payload.dashboardId
-      : undefined,
+      options.event.name === "dashboard.created" ||
+      options.event.name === "dashboard.published"
+        ? options.event.payload.dashboardId
+        : undefined,
   });
   if (isAlreadyComplete) {
     return;

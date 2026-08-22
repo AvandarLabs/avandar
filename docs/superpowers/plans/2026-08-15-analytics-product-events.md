@@ -189,11 +189,11 @@ Those two facts pin the design:
 
 `src/views/DataExplorerApp/useDataQuery.tsx` is called from:
 
-| Caller | File | Auth | Gets `query.ran`? |
-| --- | --- | --- | --- |
-| `DataExplorerApp` | `src/views/DataExplorerApp/DataExplorerApp.tsx:107` | always `workspace` | yes |
-| `DataVizPBlock` | `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx:81` | `workspace` or `public` | no |
-| `VizConfigPField` | `src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx:60` | `workspace` or `public` | no |
+| Caller            | File                                                                                      | Auth                    | Gets `query.ran`? |
+| ----------------- | ----------------------------------------------------------------------------------------- | ----------------------- | ----------------- |
+| `DataExplorerApp` | `src/views/DataExplorerApp/DataExplorerApp.tsx:107`                                       | always `workspace`      | yes               |
+| `DataVizPBlock`   | `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx:81` | `workspace` or `public` | no                |
+| `VizConfigPField` | `src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx:60`           | `workspace` or `public` | no                |
 
 `query.ran` is Data Explorer only because a dashboard with twelve blocks would
 otherwise emit twelve "queries" per page view and drown the activation signal.
@@ -284,42 +284,42 @@ production until `HIDE_EXPORT_AS_PDF` is removed.**
 
 **Created:**
 
-| Path | Responsibility |
-| --- | --- |
-| `src/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads.ts` | Pure builders for the `query.ran` and `query.failed` payloads, including error classification and message sanitisation |
-| `src/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads.test.ts` | Vitest: classification table, sanitiser rules, payload shapes |
-| `src/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMeta.types.ts` | The record one query-function invocation leaves behind |
-| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder.ts` | Hook owning the run ref and the `beginRun` timer |
-| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder.test.ts` | Vitest: run ids increment, durations are recorded, retries overwrite |
-| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics.ts` | Hook emitting once per settled run |
-| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics.test.ts` | Vitest: cache hits, retries, surface asymmetry, public skip |
-| `src/views/DashboardApp/DashboardEditorView/DashboardPdfAnalyticsPayloads/DashboardPdfAnalyticsPayloads.ts` | Pure builders for the two PDF export payloads |
-| `src/views/DashboardApp/DashboardEditorView/DashboardPdfAnalyticsPayloads/DashboardPdfAnalyticsPayloads.test.ts` | Vitest: block counts and durations |
-| `supabase/functions/chat/PostChatMessages/analytics/ChatTurnAnalyticsPayloads.ts` | Pure builders and classifiers for the two chat turn payloads |
-| `supabase/functions/chat/PostChatMessages/analytics/ChatTurnAnalyticsPayloads.test.ts` | Vitest: outcome classification, error classification, char counts |
+| Path                                                                                                             | Responsibility                                                                                                         |
+| ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `src/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads.ts`               | Pure builders for the `query.ran` and `query.failed` payloads, including error classification and message sanitisation |
+| `src/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads.test.ts`          | Vitest: classification table, sanitiser rules, payload shapes                                                          |
+| `src/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMeta.types.ts`                                      | The record one query-function invocation leaves behind                                                                 |
+| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder.ts`             | Hook owning the run ref and the `beginRun` timer                                                                       |
+| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder.test.ts`        | Vitest: run ids increment, durations are recorded, retries overwrite                                                   |
+| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics.ts`                                       | Hook emitting once per settled run                                                                                     |
+| `src/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics.test.ts`                                  | Vitest: cache hits, retries, surface asymmetry, public skip                                                            |
+| `src/views/DashboardApp/DashboardEditorView/DashboardPdfAnalyticsPayloads/DashboardPdfAnalyticsPayloads.ts`      | Pure builders for the two PDF export payloads                                                                          |
+| `src/views/DashboardApp/DashboardEditorView/DashboardPdfAnalyticsPayloads/DashboardPdfAnalyticsPayloads.test.ts` | Vitest: block counts and durations                                                                                     |
+| `supabase/functions/chat/PostChatMessages/analytics/ChatTurnAnalyticsPayloads.ts`                                | Pure builders and classifiers for the two chat turn payloads                                                           |
+| `supabase/functions/chat/PostChatMessages/analytics/ChatTurnAnalyticsPayloads.test.ts`                           | Vitest: outcome classification, error classification, char counts                                                      |
 
 **Modified:**
 
-| Path | Change |
-| --- | --- |
-| `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | Payload types for the five events, plus the surface, trigger, and error-class unions |
-| `shared/analytics/AnalyticsEvents/AnalyticsEvents.test.ts` | Extends the documented-shape guard to the five product events |
-| `src/clients/queries/runStructuredQuery/runStructuredQuery.ts` | Adds `runStructuredQueryWithMetadata` returning `didAutoLimit` |
-| `src/views/DataExplorerApp/useDataQuery.tsx` | Required `analyticsSurface`, optional `analyticsTrigger`, run recording, analytics hook |
-| `src/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types.ts` | Adds `queryTrigger` to the state |
-| `src/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager.tsx` | `_applyQueryChange` stamps `structured_change`; adds `setQueryTrigger` |
-| `src/views/DataExplorerApp/DataExplorerApp.tsx` | Passes the surface and trigger; stamps `dataset_opened` |
-| `src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx` | Stamps `sql_submit` |
-| `src/views/DataExplorerApp/useDataExplorerUrlSync.ts` | Stamps `url_hydration` |
-| `src/components/ChatPanel/useAvandarChatRuntime.ts` | Stamps `chat_generated` |
-| `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx` | Passes `analyticsSurface: "dashboard_block"` |
-| `src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx` | Passes `analyticsSurface: "viz_config"` |
-| `src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx` | Adds `blockCount` to the opened event |
-| `src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx` | Times and emits `dashboard.pdf_exported` for both export paths |
-| `src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx` | Threads the `onExported` callback |
-| `src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts` | Times the annotated export and reports the duration |
-| `supabase/functions/chat/PostChatMessages/PostChatMessages.ts` | Counts attempts, times the turn, emits both chat events |
-| `docs/superpowers/specs/2026-08-13-usage-analytics-events-design.md` | Phase status update and the two corrections |
+| Path                                                                                   | Change                                                                                  |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts`                            | Payload types for the five events, plus the surface, trigger, and error-class unions    |
+| `shared/analytics/AnalyticsEvents/AnalyticsEvents.test.ts`                             | Extends the documented-shape guard to the five product events                           |
+| `src/clients/queries/runStructuredQuery/runStructuredQuery.ts`                         | Adds `runStructuredQueryWithMetadata` returning `didAutoLimit`                          |
+| `src/views/DataExplorerApp/useDataQuery.tsx`                                           | Required `analyticsSurface`, optional `analyticsTrigger`, run recording, analytics hook |
+| `src/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types.ts`     | Adds `queryTrigger` to the state                                                        |
+| `src/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager.tsx`      | `_applyQueryChange` stamps `structured_change`; adds `setQueryTrigger`                  |
+| `src/views/DataExplorerApp/DataExplorerApp.tsx`                                        | Passes the surface and trigger; stamps `dataset_opened`                                 |
+| `src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx`                              | Stamps `sql_submit`                                                                     |
+| `src/views/DataExplorerApp/useDataExplorerUrlSync.ts`                                  | Stamps `url_hydration`                                                                  |
+| `src/components/ChatPanel/useAvandarChatRuntime.ts`                                    | Stamps `chat_generated`                                                                 |
+| `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx` | Passes `analyticsSurface: "dashboard_block"`                                            |
+| `src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx`           | Passes `analyticsSurface: "viz_config"`                                                 |
+| `src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx`                       | Adds `blockCount` to the opened event                                                   |
+| `src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx`         | Times and emits `dashboard.pdf_exported` for both export paths                          |
+| `src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx`           | Threads the `onExported` callback                                                       |
+| `src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts`   | Times the annotated export and reports the duration                                     |
+| `supabase/functions/chat/PostChatMessages/PostChatMessages.ts`                         | Counts attempts, times the turn, emits both chat events                                 |
+| `docs/superpowers/specs/2026-08-13-usage-analytics-events-design.md`                   | Phase status update and the two corrections                                             |
 
 ---
 
@@ -391,15 +391,15 @@ describe("analytics product event payloads", () => {
     // `analytics.chat_health` reads these three keys out of `payload` with
     // `->>`. A rename here produces an empty report rather than an error, so
     // the view's contract is pinned in a test.
-    expectTypeOf<AnalyticsEventPayloads["chat.turn_completed"]>().toHaveProperty(
-      "attemptCount",
-    );
-    expectTypeOf<AnalyticsEventPayloads["chat.turn_completed"]>().toHaveProperty(
-      "latencyMs",
-    );
-    expectTypeOf<AnalyticsEventPayloads["chat.turn_completed"]>().toHaveProperty(
-      "outcome",
-    );
+    expectTypeOf<
+      AnalyticsEventPayloads["chat.turn_completed"]
+    >().toHaveProperty("attemptCount");
+    expectTypeOf<
+      AnalyticsEventPayloads["chat.turn_completed"]
+    >().toHaveProperty("latencyMs");
+    expectTypeOf<
+      AnalyticsEventPayloads["chat.turn_completed"]
+    >().toHaveProperty("outcome");
   });
 });
 ```
@@ -439,9 +439,7 @@ exported unions directly below the existing `AnalyticsApp` type:
 ```ts
 /** Which surface executed a query. Decides whether `query.ran` is recorded. */
 export type QueryAnalyticsSurface =
-  | "data_explorer"
-  | "dashboard_block"
-  | "viz_config";
+  "data_explorer" | "dashboard_block" | "viz_config";
 
 /**
  * What caused a query to run.
@@ -476,18 +474,11 @@ export type QueryErrorClass =
 
 /** What a completed chat turn produced. */
 export type ChatTurnOutcome =
-  | "sql"
-  | "clarification"
-  | "dashboard_block"
-  | "text"
-  | "empty";
+  "sql" | "clarification" | "dashboard_block" | "text" | "empty";
 
 /** Coarse classification of a chat turn that never produced a response. */
 export type ChatTurnErrorClass =
-  | "upstream_error"
-  | "network"
-  | "parse"
-  | "unknown";
+  "upstream_error" | "network" | "parse" | "unknown";
 ```
 
 Then add the payload type aliases beside the existing ones (above the
@@ -623,7 +614,7 @@ Do not commit. Record the type-check output showing exactly one expected error.
 > - `missing_table` must not match a bare `catalog error` or `does not exist`,
 >   or a missing function lands in the missing-table bucket.
 > - DuckDB reports a missing **view** as `Table with name v_nope does not
->   exist!`. The word "View" never appears, and real missing-table messages
+exist!`. The word "View" never appears, and real missing-table messages
 >   carry **no quotes** around the name.
 >
 > `_classifyError` is named `_getErrorClassFromMessage` in the shipped code.
@@ -725,7 +716,9 @@ describe("QueryAnalyticsPayloads.fromError", () => {
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "dashboard_block",
       trigger: "block_render",
-      error: new Error('Catalog Error: Table with name "orders" does not exist!'),
+      error: new Error(
+        'Catalog Error: Table with name "orders" does not exist!',
+      ),
     });
 
     expect(payload.errorClass).toBe("missing_table");
@@ -808,7 +801,9 @@ describe("QueryAnalyticsPayloads.fromError", () => {
     const payload = QueryAnalyticsPayloads.fromError({
       surface: "data_explorer",
       trigger: "sql_submit",
-      error: new Error("Parser Error: bad token LINE 1: SELECT ssn FROM people"),
+      error: new Error(
+        "Parser Error: bad token LINE 1: SELECT ssn FROM people",
+      ),
     });
 
     expect(payload.errorMessage).toBe("Parser Error: bad token");
@@ -934,12 +929,25 @@ const ERROR_CLASS_PATTERNS: ReadonlyArray<{
   errorClass: QueryErrorClass;
   pattern: RegExp;
 }> = [
-  { errorClass: "missing_column", pattern: /referenced column|column .* not found|binder error: .*column/i },
-  { errorClass: "missing_table", pattern: /catalog error|does not exist|not found in from clause|no such table/i },
+  {
+    errorClass: "missing_column",
+    pattern: /referenced column|column .* not found|binder error: .*column/i,
+  },
+  {
+    errorClass: "missing_table",
+    pattern:
+      /catalog error|does not exist|not found in from clause|no such table/i,
+  },
   { errorClass: "syntax", pattern: /parser error|syntax error/i },
-  { errorClass: "permission", pattern: /permission denied|row-level security|not authorized|forbidden/i },
+  {
+    errorClass: "permission",
+    pattern: /permission denied|row-level security|not authorized|forbidden/i,
+  },
   { errorClass: "timeout", pattern: /timeout|timed out/i },
-  { errorClass: "network", pattern: /failed to fetch|networkerror|network error|load failed/i },
+  {
+    errorClass: "network",
+    pattern: /failed to fetch|networkerror|network error|load failed/i,
+  },
 ];
 
 function _errorToText(error: unknown): string {
@@ -1155,12 +1163,12 @@ async function _selectSqlForExecution(
   const { query, rawSql, isStructuredQueryInSync = true } = params;
 
   const resolved =
-    rawSql === undefined && params.auth === "workspace" ?
-      await resolveManualQueryForExecution({
-        query,
-        workspaceId: params.workspaceId,
-      })
-    : { query, didAutoLimit: false as const };
+    rawSql === undefined && params.auth === "workspace"
+      ? await resolveManualQueryForExecution({
+          query,
+          workspaceId: params.workspaceId,
+        })
+      : { query, didAutoLimit: false as const };
 
   const sqlToRun = selectSqlToExecute({
     rawSql,
@@ -1837,7 +1845,16 @@ export function useDataQueryAnalytics(
         }),
       });
     },
-    [status, isFetching, data, error, workspaceId, surface, trigger, runMetaRef],
+    [
+      status,
+      isFetching,
+      data,
+      error,
+      workspaceId,
+      surface,
+      trigger,
+      runMetaRef,
+    ],
   );
 }
 ```
@@ -1966,18 +1983,18 @@ import type { QueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/Analytic
 Add this to `DataExplorerAppState`, after `lastResultColumns`:
 
 ```ts
-  /**
-   * What caused the query that is about to run, recorded on `query.ran` and
-   * `query.failed`. The explorer re-runs on every pill and limit change, so
-   * this is what separates a deliberate run from an incidental one in
-   * reporting.
-   *
-   * Manual-form actions stamp `structured_change` themselves. Every other
-   * origin dispatches `setQueryTrigger` immediately before the dispatch that
-   * changes the query, so the trigger is already correct by the time the new
-   * query key exists.
-   */
-  queryTrigger: QueryAnalyticsTrigger;
+/**
+ * What caused the query that is about to run, recorded on `query.ran` and
+ * `query.failed`. The explorer re-runs on every pill and limit change, so
+ * this is what separates a deliberate run from an incidental one in
+ * reporting.
+ *
+ * Manual-form actions stamp `structured_change` themselves. Every other
+ * origin dispatches `setQueryTrigger` immediately before the dispatch that
+ * changes the query, so the trigger is already correct by the time the new
+ * query key exists.
+ */
+queryTrigger: QueryAnalyticsTrigger;
 ```
 
 Add the initial value to `INITIAL_DATA_EXPLORER_STATE`, after
@@ -2090,21 +2107,21 @@ Do not commit. Record both Vitest outputs.
 > It pins the mechanism directly, without needing the full URL-sync harness:
 >
 > ```tsx
->   it("lets a stamp dispatched after manual-form actions in the same render win", () => {
->     const { result } = _renderStateManager();
+> it("lets a stamp dispatched after manual-form actions in the same render win", () => {
+>   const { result } = _renderStateManager();
 >
->     // URL hydration restores the structured query first, and each of those
->     // restores stamps `structured_change`. It stamps its own origin last,
->     // inside the same synchronous block, so React coalesces the whole set
->     // into one render and no query ever observes an intermediate value.
->     act(() => {
->       result.current[1].setLimit(100);
->       result.current[1].setQueryTrigger("url_hydration");
->     });
->
->     expect(result.current[0].queryTrigger).toBe("url_hydration");
->     expect(result.current[0].query.limit).toBe(100);
+>   // URL hydration restores the structured query first, and each of those
+>   // restores stamps `structured_change`. It stamps its own origin last,
+>   // inside the same synchronous block, so React coalesces the whole set
+>   // into one render and no query ever observes an intermediate value.
+>   act(() => {
+>     result.current[1].setLimit(100);
+>     result.current[1].setQueryTrigger("url_hydration");
 >   });
+>
+>   expect(result.current[0].queryTrigger).toBe("url_hydration");
+>   expect(result.current[0].query.limit).toBe(100);
+> });
 > ```
 >
 > **Known coverage gap, accepted.** Of the four origins this task stamps, only
@@ -2213,18 +2230,18 @@ In `src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx`, change
 `onSubmitSql`:
 
 ```ts
-  const onSubmitSql = (rawValue: string): void => {
-    const trimmedValue = rawValue.trim();
-    dispatch.setQueryTrigger("sql_submit");
-    dispatch.setRawSql(trimmedValue);
-    const mapping = parseSql(trimmedValue);
-    dispatch.applySqlMapping({
-      query: mapping.query,
-      isFullyMapped: mapping.isFullyMapped,
-      unmappedReasons: mapping.unmappedReasons,
-    });
-    setIsEditMode(false);
-  };
+const onSubmitSql = (rawValue: string): void => {
+  const trimmedValue = rawValue.trim();
+  dispatch.setQueryTrigger("sql_submit");
+  dispatch.setRawSql(trimmedValue);
+  const mapping = parseSql(trimmedValue);
+  dispatch.applySqlMapping({
+    query: mapping.query,
+    isFullyMapped: mapping.isFullyMapped,
+    unmappedReasons: mapping.unmappedReasons,
+  });
+  setIsEditMode(false);
+};
 ```
 
 - [ ] **Step 4: Stamp `chat_generated`**
@@ -2234,9 +2251,9 @@ In `src/components/ChatPanel/useAvandarChatRuntime.ts`, inside
 `setRawSql` call at line 353:
 
 ```ts
-          dataExplorerDispatch.setQueryTrigger("chat_generated");
-          dataExplorerDispatch.setRawSql(sql);
-          dataExplorerDispatch.setNlPrompt(prompt);
+dataExplorerDispatch.setQueryTrigger("chat_generated");
+dataExplorerDispatch.setRawSql(sql);
+dataExplorerDispatch.setNlPrompt(prompt);
 ```
 
 - [ ] **Step 5: Stamp `dataset_opened`**
@@ -2260,27 +2277,27 @@ In `src/views/DataExplorerApp/useDataExplorerUrlSync.ts`, add the stamp as the
 `setIsHydrated(true)` at line 254:
 
 ```ts
-        // Restore viz config last: may overwrite the result of
-        // hydrateFromQuery that setColumns triggered above.
-        if (urlState.vizConfig) {
-          dispatch.setVizConfig(urlState.vizConfig);
-        }
+// Restore viz config last: may overwrite the result of
+// hydrateFromQuery that setColumns triggered above.
+if (urlState.vizConfig) {
+  dispatch.setVizConfig(urlState.vizConfig);
+}
 
-        // Stamped last on purpose. Stamping earlier would not survive: the
-        // structured restores above route through the manual-form reducer,
-        // which stamps `structured_change` itself.
-        //
-        // This works only because every dispatch above runs synchronously in
-        // this block, so React coalesces them into one render and no query
-        // observes an intermediate trigger. Do not introduce an `await`
-        // between the first dispatch and this line. A render could then commit
-        // mid-hydration, and every hydrated query would silently report
-        // `structured_change` instead. If suspending here ever becomes
-        // necessary, the trigger has to move into the query-changing action
-        // payloads rather than being stamped separately.
-        dispatch.setQueryTrigger("url_hydration");
+// Stamped last on purpose. Stamping earlier would not survive: the
+// structured restores above route through the manual-form reducer,
+// which stamps `structured_change` itself.
+//
+// This works only because every dispatch above runs synchronously in
+// this block, so React coalesces them into one render and no query
+// observes an intermediate trigger. Do not introduce an `await`
+// between the first dispatch and this line. A render could then commit
+// mid-hydration, and every hydrated query would silently report
+// `structured_change` instead. If suspending here ever becomes
+// necessary, the trigger has to move into the query-changing action
+// payloads rather than being stamped separately.
+dispatch.setQueryTrigger("url_hydration");
 
-        setIsHydrated(true);
+setIsHydrated(true);
 ```
 
 - [ ] **Step 7: Run the tests to verify they pass**
@@ -2566,9 +2583,11 @@ function _describeQuerySource(
   return {
     source: rawSql ? "rawSql" : "structured",
     dataSourceType:
-      dataSource === undefined ? "none"
-      : Model.isOfModelType(dataSource, "Dataset") ? "dataset"
-      : "entity",
+      dataSource === undefined
+        ? "none"
+        : Model.isOfModelType(dataSource, "Dataset")
+          ? "dataset"
+          : "entity",
   };
 }
 
@@ -2671,26 +2690,26 @@ export function useDataQuery(
 `src/views/DataExplorerApp/DataExplorerApp.tsx:107`:
 
 ```tsx
-  const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
-    query: state.query,
-    rawSql: state.rawSql,
-    isStructuredQueryInSync: state.isStructuredQueryInSync,
-    auth: "workspace",
-    workspaceId: workspace.id,
-    analyticsSurface: "data_explorer",
-    analyticsTrigger: state.queryTrigger,
-  });
+const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
+  query: state.query,
+  rawSql: state.rawSql,
+  isStructuredQueryInSync: state.isStructuredQueryInSync,
+  auth: "workspace",
+  workspaceId: workspace.id,
+  analyticsSurface: "data_explorer",
+  analyticsTrigger: state.queryTrigger,
+});
 ```
 
 `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx:81`:
 
 ```tsx
-  const [queryResults, isLoadingResults] = useDataQuery({
-    query: emptyStructuredQuery,
-    rawSql: filteredSql,
-    analyticsSurface: "dashboard_block",
-    ...(metadata.auth === "workspace" ?
-      {
+const [queryResults, isLoadingResults] = useDataQuery({
+  query: emptyStructuredQuery,
+  rawSql: filteredSql,
+  analyticsSurface: "dashboard_block",
+  ...(metadata.auth === "workspace"
+    ? {
         auth: "workspace" as const,
         workspaceId: metadata.workspaceId,
       }
@@ -2698,18 +2717,18 @@ export function useDataQuery(
         auth: "public" as const,
         publicAvaPageId: metadata.dashboardId,
       }),
-  });
+});
 ```
 
 `src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField.tsx:60`:
 
 ```tsx
-  const [queryResults] = useDataQuery({
-    query: emptyStructuredQuery,
-    rawSql: rawSql,
-    analyticsSurface: "viz_config",
-    ...(workspaceId !== undefined ?
-      {
+const [queryResults] = useDataQuery({
+  query: emptyStructuredQuery,
+  rawSql: rawSql,
+  analyticsSurface: "viz_config",
+  ...(workspaceId !== undefined
+    ? {
         auth: "workspace" as const,
         workspaceId,
       }
@@ -2717,7 +2736,7 @@ export function useDataQuery(
         auth: "public" as const,
         publicAvaPageId: dashboardId,
       }),
-  });
+});
 ```
 
 - [ ] **Step 5: Run the tests to verify they pass**
@@ -2883,12 +2902,12 @@ import { DashboardPdfAnalyticsPayloads } from "@/views/DashboardApp/DashboardEdi
 ```
 
 ```tsx
-          void AnalyticsClient.logEvent({
-            event: "dashboard.pdf_export_opened",
-            workspaceId: dashboard.workspaceId,
-            app: "dashboards",
-            payload: DashboardPdfAnalyticsPayloads.fromOpen({ dashboard }),
-          });
+void AnalyticsClient.logEvent({
+  event: "dashboard.pdf_export_opened",
+  workspaceId: dashboard.workspaceId,
+  app: "dashboards",
+  payload: DashboardPdfAnalyticsPayloads.fromOpen({ dashboard }),
+});
 ```
 
 - [ ] **Step 5: Time and record the direct export**
@@ -2904,51 +2923,51 @@ import { DashboardPdfAnalyticsPayloads } from "@/views/DashboardApp/DashboardEdi
 Add a shared emitter above `onDirectExport`, inside the component:
 
 ```tsx
-  const logPdfExported = useCallback(
-    (durationMs: number): void => {
-      void AnalyticsClient.logEvent({
-        event: "dashboard.pdf_exported",
-        workspaceId: dashboard.workspaceId,
-        app: "dashboards",
-        payload: DashboardPdfAnalyticsPayloads.fromExport({
-          dashboard,
-          durationMs,
-        }),
-      });
-    },
-    [dashboard],
-  );
+const logPdfExported = useCallback(
+  (durationMs: number): void => {
+    void AnalyticsClient.logEvent({
+      event: "dashboard.pdf_exported",
+      workspaceId: dashboard.workspaceId,
+      app: "dashboards",
+      payload: DashboardPdfAnalyticsPayloads.fromExport({
+        dashboard,
+        durationMs,
+      }),
+    });
+  },
+  [dashboard],
+);
 ```
 
 Then time the direct path:
 
 ```tsx
-  const onDirectExport = useCallback(async (): Promise<void> => {
-    if (!renderContainerRef.current) {
-      notifyError({ title: t`Dashboard not ready`, message: t`Try again.` });
-      return;
-    }
-    setIsExporting(true);
-    const startedAt = performance.now();
-    try {
-      await PdfExport.captureAndDownloadPdf({
-        element: renderContainerRef.current,
-        filename,
-        title: dashboard.name || t`Untitled dashboard`,
-      });
-      logPdfExported(performance.now() - startedAt);
-      notifySuccess(t`PDF downloaded.`);
-      onClose();
-    } catch (error: unknown) {
-      console.error(error);
-      notifyError({
-        title: t`Couldn't export PDF`,
-        message: t`Please try again. The PDF was not created.`,
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  }, [filename, dashboard.name, onClose, t, logPdfExported]);
+const onDirectExport = useCallback(async (): Promise<void> => {
+  if (!renderContainerRef.current) {
+    notifyError({ title: t`Dashboard not ready`, message: t`Try again.` });
+    return;
+  }
+  setIsExporting(true);
+  const startedAt = performance.now();
+  try {
+    await PdfExport.captureAndDownloadPdf({
+      element: renderContainerRef.current,
+      filename,
+      title: dashboard.name || t`Untitled dashboard`,
+    });
+    logPdfExported(performance.now() - startedAt);
+    notifySuccess(t`PDF downloaded.`);
+    onClose();
+  } catch (error: unknown) {
+    console.error(error);
+    notifyError({
+      title: t`Couldn't export PDF`,
+      message: t`Please try again. The PDF was not created.`,
+    });
+  } finally {
+    setIsExporting(false);
+  }
+}, [filename, dashboard.name, onClose, t, logPdfExported]);
 ```
 
 Note the emission sits **before** `onClose()` and inside the `try`, so a failed
@@ -2972,42 +2991,34 @@ type UseAnnotatedPdfExportOptions = {
 ```
 
 ```ts
-  const { filename, onClose, onExported, overlayRef, sourceElement, title } =
-    options;
-  const [isExporting, setIsExporting] = useState(false);
-  const exportPdf = useCallback(async (): Promise<void> => {
-    if (!sourceElement || !overlayRef.current) {
-      return;
-    }
-    setIsExporting(true);
-    const startedAt = performance.now();
-    try {
-      await PdfExport.captureAndDownloadPdf({
-        element: sourceElement,
-        annotationCanvas: overlayRef.current,
-        filename,
-        title,
-      });
-      onExported(performance.now() - startedAt);
-      onClose();
-    } catch (error: unknown) {
-      console.error(error);
-      notifyError({
-        title: t`Couldn't export PDF`,
-        message: t`Please try again. The PDF was not created.`,
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  }, [
-    filename,
-    onClose,
-    onExported,
-    overlayRef,
-    sourceElement,
-    t,
-    title,
-  ]);
+const { filename, onClose, onExported, overlayRef, sourceElement, title } =
+  options;
+const [isExporting, setIsExporting] = useState(false);
+const exportPdf = useCallback(async (): Promise<void> => {
+  if (!sourceElement || !overlayRef.current) {
+    return;
+  }
+  setIsExporting(true);
+  const startedAt = performance.now();
+  try {
+    await PdfExport.captureAndDownloadPdf({
+      element: sourceElement,
+      annotationCanvas: overlayRef.current,
+      filename,
+      title,
+    });
+    onExported(performance.now() - startedAt);
+    onClose();
+  } catch (error: unknown) {
+    console.error(error);
+    notifyError({
+      title: t`Couldn't export PDF`,
+      message: t`Please try again. The PDF was not created.`,
+    });
+  } finally {
+    setIsExporting(false);
+  }
+}, [filename, onClose, onExported, overlayRef, sourceElement, t, title]);
 ```
 
 In `src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx`,
@@ -3037,14 +3048,14 @@ export function PdfAnnotator({
 ```
 
 ```tsx
-  const { isExporting, exportPdf } = useAnnotatedPdfExport({
-    sourceElement,
-    overlayRef,
-    filename,
-    title,
-    onClose,
-    onExported,
-  });
+const { isExporting, exportPdf } = useAnnotatedPdfExport({
+  sourceElement,
+  overlayRef,
+  filename,
+  title,
+  onClose,
+  onExported,
+});
 ```
 
 Back in `ExportPdfModal.tsx`, pass the emitter to the annotator at line 189:
@@ -3212,7 +3223,7 @@ describe("ChatTurnAnalyticsPayloads.fromFailedTurn", () => {
     const payload = ChatTurnAnalyticsPayloads.fromFailedTurn({
       modelId: "openai/gpt-4o-mini",
       latencyMs: 10,
-      error: new Error("OpenRouter API error: {\"prompt\":\"my secret data\"}"),
+      error: new Error('OpenRouter API error: {"prompt":"my secret data"}'),
     });
 
     expect(JSON.stringify(payload)).not.toContain("secret");
@@ -3278,7 +3289,10 @@ function _classifyError(error: unknown): ChatTurnErrorClass {
   if (/OpenRouter API error/i.test(message)) {
     return "upstream_error";
   }
-  if (error instanceof TypeError || /fetch|network|sending request/i.test(message)) {
+  if (
+    error instanceof TypeError ||
+    /fetch|network|sending request/i.test(message)
+  ) {
     return "network";
   }
   return "unknown";
@@ -3616,22 +3630,22 @@ Change the action signature at line 97 to destructure the admin client:
 Replace the `runAttempt` helper at lines 205-211 so it counts:
 
 ```ts
-    const turnStartedAt = performance.now();
-    let attemptCount = 0;
+const turnStartedAt = performance.now();
+let attemptCount = 0;
 
-    // Single OpenRouter attempt, wrapped in a helper so the
-    // retry-on-empty escalation below can re-call it with different
-    // params. Throws on non-2xx so the outer handler surfaces it.
-    // The counter is what `analytics.chat_health` reports as
-    // `avg_attempt_count`, which is how often the escalation below fires.
-    const runAttempt = (attemptRequestBody: Record<string, unknown>) => {
-      attemptCount += 1;
-      return sendOpenRouterRequest({
-        requestBody: attemptRequestBody,
-        apiKey: openRouterApiKey,
-        referer: openRouterReferer,
-      });
-    };
+// Single OpenRouter attempt, wrapped in a helper so the
+// retry-on-empty escalation below can re-call it with different
+// params. Throws on non-2xx so the outer handler surfaces it.
+// The counter is what `analytics.chat_health` reports as
+// `avg_attempt_count`, which is how often the escalation below fires.
+const runAttempt = (attemptRequestBody: Record<string, unknown>) => {
+  attemptCount += 1;
+  return sendOpenRouterRequest({
+    requestBody: attemptRequestBody,
+    apiKey: openRouterApiKey,
+    referer: openRouterReferer,
+  });
+};
 ```
 
 - [ ] **Step 6: Wrap the attempts and emit**
@@ -3646,101 +3660,101 @@ after the block reads it. `attempt` stays inside, since nothing below the block
 uses it.
 
 ```ts
-    let parsed: ReturnType<typeof parseOpenRouterResponse>;
-    try {
-      // Attempt 1: normal call.
-      let attempt = await runAttempt(requestBody);
-      parsed = parseOpenRouterResponse({
-        message: attempt.message,
-        attemptText: attempt.text,
-        isDataExplorer,
-        isDashboards,
-        lastUserPrompt,
-        priorClarifications,
-      });
+let parsed: ReturnType<typeof parseOpenRouterResponse>;
+try {
+  // Attempt 1: normal call.
+  let attempt = await runAttempt(requestBody);
+  parsed = parseOpenRouterResponse({
+    message: attempt.message,
+    attemptText: attempt.text,
+    isDataExplorer,
+    isDashboards,
+    lastUserPrompt,
+    priorClarifications,
+  });
 
-      // Attempt 2 (only when attempt 1 returned nothing): literal repeat
-      // with a bumped temperature so we get a meaningfully different
-      // draw rather than the same emptiness twice.
-      if (isEmptyParsedAttempt(parsed)) {
-        attempt = await runAttempt({ ...requestBody, temperature: 0.5 });
-        parsed = parseOpenRouterResponse({
-          message: attempt.message,
-          attemptText: attempt.text,
-          isDataExplorer,
-          isDashboards,
-          lastUserPrompt,
-          priorClarifications,
-        });
-      }
+  // Attempt 2 (only when attempt 1 returned nothing): literal repeat
+  // with a bumped temperature so we get a meaningfully different
+  // draw rather than the same emptiness twice.
+  if (isEmptyParsedAttempt(parsed)) {
+    attempt = await runAttempt({ ...requestBody, temperature: 0.5 });
+    parsed = parseOpenRouterResponse({
+      message: attempt.message,
+      attemptText: attempt.text,
+      isDataExplorer,
+      isDashboards,
+      lastUserPrompt,
+      priorClarifications,
+    });
+  }
 
-      // Attempt 3 (only when attempts 1 and 2 returned nothing): force
-      // the model into one of the registered tools. Skipped on the
-      // generic surface where the request has no tools to pick from.
-      const hasTools =
-        Array.isArray(requestBody.tools) &&
-        (requestBody.tools as unknown[]).length > 0;
-      if (isEmptyParsedAttempt(parsed) && hasTools) {
-        attempt = await runAttempt({
-          ...requestBody,
-          temperature: 0.5,
-          tool_choice: "required",
-        });
-        parsed = parseOpenRouterResponse({
-          message: attempt.message,
-          attemptText: attempt.text,
-          isDataExplorer,
-          isDashboards,
-          lastUserPrompt,
-          priorClarifications,
-        });
-      }
-    } catch (error) {
-      await emitChatTurnAnalytics({
-        supabaseAdminClient,
-        workspaceId,
-        userId: user.id,
-        pageApp: context.app,
-        outcome: {
-          kind: "failed",
-          modelId: model,
-          latencyMs: performance.now() - turnStartedAt,
-          error,
-        },
-      });
-      throw error;
-    }
+  // Attempt 3 (only when attempts 1 and 2 returned nothing): force
+  // the model into one of the registered tools. Skipped on the
+  // generic surface where the request has no tools to pick from.
+  const hasTools =
+    Array.isArray(requestBody.tools) &&
+    (requestBody.tools as unknown[]).length > 0;
+  if (isEmptyParsedAttempt(parsed) && hasTools) {
+    attempt = await runAttempt({
+      ...requestBody,
+      temperature: 0.5,
+      tool_choice: "required",
+    });
+    parsed = parseOpenRouterResponse({
+      message: attempt.message,
+      attemptText: attempt.text,
+      isDataExplorer,
+      isDashboards,
+      lastUserPrompt,
+      priorClarifications,
+    });
+  }
+} catch (error) {
+  await emitChatTurnAnalytics({
+    supabaseAdminClient,
+    workspaceId,
+    userId: user.id,
+    pageApp: context.app,
+    outcome: {
+      kind: "failed",
+      modelId: model,
+      latencyMs: performance.now() - turnStartedAt,
+      error,
+    },
+  });
+  throw error;
+}
 ```
 
 Then record the completed turn immediately before the `return result;` at the
 end of the action:
 
 ```ts
-    const result: ChatResponse.T = Model.make("ChatResponse", {
-      assistantText,
-      ...(generatedSql ? { generatedSql: generatedSql } : {}),
-      ...(clarification ? { clarification } : {}),
-      ...(dashboardBlock ? { dashboardBlock } : {}),
-    });
+const result: ChatResponse.T = Model.make("ChatResponse", {
+  assistantText,
+  ...(generatedSql ? { generatedSql: generatedSql } : {}),
+  ...(clarification ? { clarification } : {}),
+  ...(dashboardBlock ? { dashboardBlock } : {}),
+});
 
-    await emitChatTurnAnalytics({
-      supabaseAdminClient,
-      workspaceId,
-      userId: user.id,
-      pageApp: context.app,
-      outcome: {
-        kind: "completed",
-        modelId: model,
-        latencyMs: performance.now() - turnStartedAt,
-        attemptCount,
-        promptChars: lastUserPrompt.length,
-        schemaDatasetCount: schema.datasets.length,
-        assistantText,
-        parsed: { text, generatedSql, clarification, dashboardBlock },
-      },
-    });
+await emitChatTurnAnalytics({
+  supabaseAdminClient,
+  workspaceId,
+  userId: user.id,
+  pageApp: context.app,
+  outcome: {
+    kind: "completed",
+    modelId: model,
+    latencyMs: performance.now() - turnStartedAt,
+    attemptCount,
+    promptChars: lastUserPrompt.length,
+    schemaDatasetCount: schema.datasets.length,
+    assistantText,
+    parsed: { text, generatedSql, clarification, dashboardBlock },
+  },
+});
 
-    return result;
+return result;
 ```
 
 - [ ] **Step 7: Verify the whole chat function still type-checks and tests green**
@@ -3985,6 +3999,7 @@ migrating inside the `try`.
   that hook ever gets a test harness, a test rendering it with a URL carrying
   both `colNames` and `rawSql` and asserting `url_hydration` is what would
   actually close this.
+
 - **`chat_generated` and `dataset_opened` are also untested**, for the same
   reason: each is a one-line dispatch whose call site would need the chat
   runtime or the dataset drawer stood up. Both are verified by inspection and

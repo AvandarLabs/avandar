@@ -1,11 +1,13 @@
+import type { MouseEvent, ReactElement, ReactNode } from "react";
+
 import { Tooltip } from "@avandar/ui";
 import { Box } from "@mantine/core";
 import clsx from "clsx";
 import { Children, cloneElement, isValidElement } from "react";
+
 import css from "@/components/offline/OfflineGated/OfflineGated.module.css";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
-import type { MouseEvent, ReactElement, ReactNode } from "react";
 
 type Props = {
   /** Overrides the browser-derived blocked state when already known. */

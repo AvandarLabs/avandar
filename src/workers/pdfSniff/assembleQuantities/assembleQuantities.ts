@@ -1,9 +1,10 @@
+import type { BBox, PdfValueUnit, TextItem } from "../pdfSniff.types";
+
 import {
   getLineSpanFromTextItem,
   isSameLineRun,
 } from "../assembleLabels/assembleLabels";
 import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
-import type { BBox, PdfValueUnit, TextItem } from "../pdfSniff.types";
 
 /**
  * A text item that is entirely numeric, and so can head a quantity.
@@ -220,9 +221,9 @@ export function assembleQuantities(items: readonly TextItem[]): QuantitySplit {
         })
         .join(" "),
       value:
-        factor !== 1 && NUMERIC.test(normalized) ?
-          _scaled(normalized, factor)
-        : normalized,
+        factor !== 1 && NUMERIC.test(normalized)
+          ? _scaled(normalized, factor)
+          : normalized,
       unit,
       item: head,
       bbox: _runBBox(run),

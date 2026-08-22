@@ -1,6 +1,7 @@
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
-import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
+import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 
 export type BillingAction =
   | { type: "create_native_free" }

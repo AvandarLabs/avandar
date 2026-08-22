@@ -1,7 +1,8 @@
-import { matchModel } from "@models/Model/matchModel/matchModel.ts";
 import type { MatchModelFn } from "@models/Model/matchModel/matchModel.ts";
 import type { ModelBase, ModelTypedId } from "@models/Model/Model.types.ts";
 import type { EmptyObject, Simplify } from "type-fest";
+
+import { matchModel } from "@models/Model/matchModel/matchModel.ts";
 
 export type IModelModule = {
   /**

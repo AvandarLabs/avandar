@@ -82,27 +82,27 @@ enforced by each caller rather than by the predicate itself: see §2.1.
 Use these three words for a dashboard's **audience**, and only these. They are
 the product-facing names; the paragraphs above are the mechanisms behind them.
 
-| Term | Also called | Audience | Determined by |
-| --- | --- | --- | --- |
-| **Private** | "Only me" | The owner alone | `is_restricted = true` **and** no non-owner share, **and** not public |
-| **Internal** | "Workspace only" | Workspace members whose permissions reach it | Anything short of private that is not public |
-| **Public** | "Anyone with the link" | The general public, no account needed | `dashboards.is_public = true` |
+| Term         | Also called            | Audience                                     | Determined by                                                         |
+| ------------ | ---------------------- | -------------------------------------------- | --------------------------------------------------------------------- |
+| **Private**  | "Only me"              | The owner alone                              | `is_restricted = true` **and** no non-owner share, **and** not public |
+| **Internal** | "Workspace only"       | Workspace members whose permissions reach it | Anything short of private that is not public                          |
+| **Public**   | "Anyone with the link" | The general public, no account needed        | `dashboards.is_public = true`                                         |
 
 Three points this table exists to prevent people from getting wrong.
 
 **Private is derived, not stored.** There is no `is_private` column. Privacy is
 recomputed from the current share rows every time it is asked, so a dashboard
 stops being private the moment anyone adds one share to it, with no write to
-the dashboard row. `is_restricted` is the stored column, and it is *necessary
-but not sufficient*: a restricted dashboard shared with one colleague is
+the dashboard row. `is_restricted` is the stored column, and it is _necessary
+but not sufficient_: a restricted dashboard shared with one colleague is
 internal, not private.
 
 **Internal is not one setting, it is the whole middle of the range.** It covers
 both "every member of the workspace can see this" (`is_restricted = false`) and
 "only the three people I shared it with can see this" (`is_restricted = true`
 plus shares). Both are internal because the audience is bounded by workspace
-membership. When precision matters, say *unrestricted internal* or *restricted
-internal* rather than stretching "private" to cover the second one.
+membership. When precision matters, say _unrestricted internal_ or _restricted
+internal_ rather than stretching "private" to cover the second one.
 
 **Public is a different axis from the other two, and callers must compose
 them.** Private and internal are decided by restriction and shares; public is
@@ -112,7 +112,7 @@ the `anon` RLS policy in `supabase/schemas/17.rls.dashboards.sql` reads. The two
 disagree, and at the product level **public wins**: a world-readable dashboard
 is public, never private, whatever its share rows say.
 
-That resolution is *not* built into `util__is_resource_private_to_owner`. That
+That resolution is _not_ built into `util__is_resource_private_to_owner`. That
 function is resource-type generic and knows nothing about publication, so for a
 restricted, unshared, `is_public` dashboard it returns **true**. Every caller
 that cares has to `and` in its own publication condition, and the two that
@@ -135,8 +135,8 @@ Datasets have no public state at all. `datasets` has `is_restricted` but no
 `dashboard_visibility` enum (`draft` | `workspace` | `public`) has shipped:
 `dashboards.visibility` is the stored column and `is_public` is a generated
 column that is true only for `visibility = 'public'`. Two meanings are
-therefore worth disambiguating in review: *internal shared* (reachable in-app
-through shares and app roles, the older meaning) versus *internal published*
+therefore worth disambiguating in review: _internal shared_ (reachable in-app
+through shares and app roles, the older meaning) versus _internal published_
 (`visibility = 'workspace'`, a snapshot in the `published-private` bucket
 behind a real URL). See
 `docs/superpowers/specs/2026-08-13-private-dashboards-design.md` §5.1 for the
@@ -183,7 +183,7 @@ except where a path **short-circuits** (resource owner, Settings Admin).
 **Intuitive precedence (strongest signal first):**
 
 1. **Resource owner** (`owner_id`) → always `admin` (short-circuit). The
-   *workspace* owner is not short-circuited here; they reach resources via
+   _workspace_ owner is not short-circuited here; they reach resources via
    `util__can_manage_workspace_settings` in the `may_select_*` helpers (see §4
    step 1), and that path is also excluded from resources **private to their
    owner**.
@@ -223,7 +223,7 @@ p_resource_id)` (security definer, stable), called by RLS. Role ordering:
 `admin (3) > editor (2) > viewer (1)`. Compute `effective_role := max(candidates)`.
 
 1. If the user is the **resource owner** (`owner_id`) → `admin` (short-circuit).
-   Note: the **workspace** owner is *not* short-circuited here. They reach
+   Note: the **workspace** owner is _not_ short-circuited here. They reach
    resources via `util__can_manage_workspace_settings` in the
    `util__auth_user_may_select_*` helpers, and via
    `util__auth_user_meets_min_app_role` for INSERT. Because the `may_select_*`
@@ -348,16 +348,16 @@ flowchart LR
 **Functions (permission helpers, `supabase/schemas/16.utils.resource-permissions.sql`
 unless noted)**
 
-| Function                                        | Purpose                                                                                                                 |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| `util__resource_effective_role`                  | The resolution algorithm in §4; owner and Settings-Admin short-circuits, then merged shares/app-role.                    |
-| `util__auth_user_can_access_resource`             | Effective role at or above a minimum, used by RLS policies.                                                              |
-| `util__has_non_owner_share`                       | True when any `resource_shares` row grants a principal other than the owner passed in. No row lookup; RLS-hot.          |
-| `util__is_resource_private_to_owner`              | True when a resource is restricted with no non-owner share. Looks the row up by id; not for RLS-hot paths.               |
-| `rpc_workspaces__private_resource_counts`         | Per-member counts of private resources for a workspace, for Settings Admins (`supabase/schemas/70.rpc_workspaces__private_resource_counts.sql`). |
-| `rpc_resources__transfer_ownership`               | Reassigns one resource's `owner_id` (`supabase/schemas/70.rpc_resources__transfer_ownership.sql`).                       |
-| `rpc_workspaces__transfer_all_owned_resources`     | Bulk wrapper over the above, by owner (`supabase/schemas/71.rpc_workspaces__transfer_all_owned_resources.sql`).          |
-| `rpc_resources__make_private`                     | Clears every non-owner share and sets `is_restricted` in one transaction (`supabase/schemas/70.rpc_resources__make_private.sql`); see §5.1. |
+| Function                                       | Purpose                                                                                                                                          |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `util__resource_effective_role`                | The resolution algorithm in §4; owner and Settings-Admin short-circuits, then merged shares/app-role.                                            |
+| `util__auth_user_can_access_resource`          | Effective role at or above a minimum, used by RLS policies.                                                                                      |
+| `util__has_non_owner_share`                    | True when any `resource_shares` row grants a principal other than the owner passed in. No row lookup; RLS-hot.                                   |
+| `util__is_resource_private_to_owner`           | True when a resource is restricted with no non-owner share. Looks the row up by id; not for RLS-hot paths.                                       |
+| `rpc_workspaces__private_resource_counts`      | Per-member counts of private resources for a workspace, for Settings Admins (`supabase/schemas/70.rpc_workspaces__private_resource_counts.sql`). |
+| `rpc_resources__transfer_ownership`            | Reassigns one resource's `owner_id` (`supabase/schemas/70.rpc_resources__transfer_ownership.sql`).                                               |
+| `rpc_workspaces__transfer_all_owned_resources` | Bulk wrapper over the above, by owner (`supabase/schemas/71.rpc_workspaces__transfer_all_owned_resources.sql`).                                  |
+| `rpc_resources__make_private`                  | Clears every non-owner share and sets `is_restricted` in one transaction (`supabase/schemas/70.rpc_resources__make_private.sql`); see §5.1.      |
 
 ```mermaid
 erDiagram
@@ -513,7 +513,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
   receives no role.
 
   As of the private-resource hardening this is a real guarantee: Settings
-  Admins and the workspace owner are excluded too. An admin can see a *count*
+  Admins and the workspace owner are excluded too. An admin can see a _count_
   of your private resources in Workspace settings → Privacy log, and can
   reassign ownership, but can never read them.
 

@@ -1,4 +1,5 @@
 import { useLayoutEffect, useState } from "react";
+
 import { getNuxChecklistDockRightPx } from "@/components/Nux/NuxChecklistPanel/getNuxChecklistDockRightPx/getNuxChecklistDockRightPx";
 import { getVisibleAsideWidthPx } from "@/components/Nux/NuxChecklistPanel/getVisibleAsideWidthPx/getVisibleAsideWidthPx";
 import { ProductModalPresence } from "@/components/Nux/NuxChecklistPanel/ProductModalPresence/ProductModalPresence";

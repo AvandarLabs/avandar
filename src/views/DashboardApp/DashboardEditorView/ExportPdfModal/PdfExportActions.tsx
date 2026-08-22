@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Stack } from "@mantine/core";
 import {
@@ -5,7 +7,6 @@ import {
   IconFileExport,
   IconPencil,
 } from "@tabler/icons-react";
-import type { ReactNode } from "react";
 
 type Props = {
   isExporting: boolean;

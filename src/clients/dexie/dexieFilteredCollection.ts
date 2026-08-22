@@ -1,3 +1,10 @@
+import type {
+  FilterOperatorRecord,
+  FiltersByColumn,
+  UnknownObject,
+} from "@avandar/utils";
+import type { Collection, IndexableType, IndexSpec, Table } from "dexie";
+
 import {
   assertIsDefined,
   doesRowPassFilters,
@@ -6,13 +13,8 @@ import {
   isFiltersByOperatorObject,
   objectKeys,
 } from "@avandar/utils";
+
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
-import type {
-  FilterOperatorRecord,
-  FiltersByColumn,
-  UnknownObject,
-} from "@avandar/utils";
-import type { Collection, IndexableType, IndexSpec, Table } from "dexie";
 
 /**
  * Returns the Dexie `orderBy` index name for the table primary key.

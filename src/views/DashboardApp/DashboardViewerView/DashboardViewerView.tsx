@@ -1,7 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
-import { useEffect, useMemo } from "react";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
 import "@puckeditor/core/puck.css";
+import { useEffect, useMemo } from "react";
+
 import { notifyError } from "@/utils/notifications/notify";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
@@ -10,7 +13,6 @@ import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAv
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { DashboardViewerContent } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerContent";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets/useEnsurePublishedDashboardDatasets";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -136,9 +138,9 @@ function useDashboardViewerState(
     isLoadingDatasets,
     loadingDatasetsError,
     metadata:
-      mode === "published" && dashboard.visibility === "draft" ?
-        undefined
-      : metadata,
+      mode === "published" && dashboard.visibility === "draft"
+        ? undefined
+        : metadata,
   };
 }
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { ConsentAuditEntry } from "./ConsentAuditEntry";
 import { ConsentAuditEntryParsers } from "./ConsentAuditEntryParsers";
 

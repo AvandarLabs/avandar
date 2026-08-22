@@ -1,5 +1,6 @@
-import { prop, propEq } from "@avandar/utils";
 import type { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
+
+import { prop, propEq } from "@avandar/utils";
 
 const LOCAL_CHAT_MODELS: readonly LocalChatModel.T[] = [
   {

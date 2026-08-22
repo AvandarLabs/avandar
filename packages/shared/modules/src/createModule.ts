@@ -1,3 +1,11 @@
+import type {
+  EmptyObject,
+  ObjectPaths,
+  PathValue,
+  UnknownObject,
+} from "@avandar/utils";
+import type { Simplify } from "type-fest";
+
 import {
   getValue,
   isFunction,
@@ -6,13 +14,6 @@ import {
   objectValuesMap,
   setValue,
 } from "@avandar/utils";
-import type {
-  EmptyObject,
-  ObjectPaths,
-  PathValue,
-  UnknownObject,
-} from "@avandar/utils";
-import type { Simplify } from "type-fest";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type AnyModule = Module<any, any, any>;
@@ -30,17 +31,18 @@ export type MembersOfModule<M extends AnyModule> =
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 type Getters<State extends UnknownObject | EmptyObject> =
-  State extends EmptyObject ? EmptyObject
-  : {
-      [K in keyof State]: () => State[K];
-    };
+  State extends EmptyObject
+    ? EmptyObject
+    : {
+        [K in keyof State]: () => State[K];
+      };
 
 type Setters<
   ModuleName extends string,
   State extends UnknownObject | EmptyObject,
   Members extends UnknownObject | EmptyObject,
-> =
-  State extends EmptyObject ? EmptyObject
+> = State extends EmptyObject
+  ? EmptyObject
   : {
       [K in keyof State]: (
         newValue: ((currentValue: State[K]) => State[K]) | State[K],
@@ -96,11 +98,14 @@ export type Accessors<
      * value.
      */
     set<
-      P extends [ObjectPaths<State>] extends [never] ? keyof State
-      : ObjectPaths<State>,
-      V extends P extends keyof State ? State[P]
-      : P extends ObjectPaths<State> ? PathValue<State, P>
-      : never,
+      P extends ([ObjectPaths<State>] extends [never]
+        ? keyof State
+        : ObjectPaths<State>),
+      V extends (P extends keyof State
+        ? State[P]
+        : P extends ObjectPaths<State>
+          ? PathValue<State, P>
+          : never),
     >(
       keyPath: P,
       value: ((currentValue: V) => V) | V,
@@ -220,11 +225,14 @@ export function createModule<
       });
     },
     set: <
-      P extends [ObjectPaths<State>] extends [never] ? keyof State
-      : ObjectPaths<State>,
-      V extends P extends keyof State ? State[P]
-      : P extends ObjectPaths<State> ? PathValue<State, P>
-      : never,
+      P extends ([ObjectPaths<State>] extends [never]
+        ? keyof State
+        : ObjectPaths<State>),
+      V extends (P extends keyof State
+        ? State[P]
+        : P extends ObjectPaths<State>
+          ? PathValue<State, P>
+          : never),
     >(
       keyPath: P,
       value: V | ((currentValue: V) => V),

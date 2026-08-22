@@ -1,11 +1,13 @@
-import { assertIsDefined } from "@avandar/utils";
-import { modals } from "@mantine/modals";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
-import { SensitivitySection } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
+
+import { assertIsDefined } from "@avandar/utils";
+import { modals } from "@mantine/modals";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { fireEvent, render, screen } from "@/test-utils";
+import { SensitivitySection } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection";
 
 type Props = {
   label: string;
@@ -100,9 +102,7 @@ vi.mock(
         return (
           <section aria-label={title}>
             <h2>{title}</h2>
-            {note ?
-              <span data-testid="section-note">{note}</span>
-            : null}
+            {note ? <span data-testid="section-note">{note}</span> : null}
             {children}
           </section>
         );

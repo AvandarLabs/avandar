@@ -1,4 +1,9 @@
+import type { AppLinks } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+import type { ReactNode } from "react";
+
 import { ModalsProvider } from "@mantine/modals";
+
 import { AppDropzone } from "@/components/AppDropzone/AppDropzone";
 import { AppShell } from "@/components/AppShell/AppShell";
 import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
@@ -10,9 +15,6 @@ import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { AppLinks } from "@/config/AppLinks/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
-import type { ReactNode } from "react";
 
 type Props = {
   workspace: ReturnType<typeof useCurrentWorkspace>;

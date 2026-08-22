@@ -1,3 +1,13 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type {
+  RadarSeries,
+  RenderAs,
+  XYSeries,
+} from "$/models/vizs/SeriesConfig";
+import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
+import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
+import type { ReactNode } from "react";
+
 import { makeBucketMap, setValue } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -10,22 +20,14 @@ import {
   Text,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
+import { useCallback, useMemo } from "react";
+
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
-import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
-import type { HostConfig } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type {
-  RadarSeries,
-  RenderAs,
-  XYSeries,
-} from "$/models/vizs/SeriesConfig";
-import type { AnySeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
-import type { ReactNode } from "react";
 
 /**
  * Build the localized render-as options. Labels stay in sync with the active
@@ -63,8 +65,9 @@ export function SeriesCard({
 }: SeriesCardProps): ReactNode {
   const { t } = useLingui();
   const renderAsOptions = useRenderAsOptions();
-  const seriesRenderAs: RenderAs | "radar" =
-    isRadarHost ? "radar" : (series as XYSeries).renderAs;
+  const seriesRenderAs: RenderAs | "radar" = isRadarHost
+    ? "radar"
+    : (series as XYSeries).renderAs;
 
   const descriptors = useMemo(() => {
     const sourceModuleVizType: HostConfig["vizType"] =
@@ -75,9 +78,8 @@ export function SeriesCard({
   }, [seriesRenderAs]);
 
   const isComposed = !isRadarHost && seriesRenderAs !== hostVizType;
-  const filtered: readonly AnySeriesSettingDescriptor[] =
-    isComposed ?
-      descriptors.filter((d) => {
+  const filtered: readonly AnySeriesSettingDescriptor[] = isComposed
+    ? descriptors.filter((d) => {
         return d.composable;
       })
     : descriptors;
@@ -131,9 +133,9 @@ export function SeriesCard({
         color: xySeries.color,
       };
       const updatedSeries: XYSeries =
-        renderAs === "area" ?
-          { renderAs, ...sharedSeriesProps, fillOpacity: 0.6 }
-        : { renderAs, ...sharedSeriesProps };
+        renderAs === "area"
+          ? { renderAs, ...sharedSeriesProps, fillOpacity: 0.6 }
+          : { renderAs, ...sharedSeriesProps };
       onSeriesChange(updatedSeries);
     },
     [isRadarHost, series, onSeriesChange],
@@ -165,7 +167,7 @@ export function SeriesCard({
           </ActionIcon>
         </Group>
 
-        {!isRadarHost ?
+        {!isRadarHost ? (
           <Box>
             <Text size="xs" c="dimmed" mb={4}>
               <Trans>Render as</Trans>
@@ -180,7 +182,7 @@ export function SeriesCard({
               onChange={setRenderAs}
             />
           </Box>
-        : null}
+        ) : null}
 
         {Array.from(groupedDescriptors.entries()).map(([group, descs]) => {
           return (
@@ -209,11 +211,11 @@ export function SeriesCard({
           );
         })}
 
-        {numericOptions.length === 0 ?
+        {numericOptions.length === 0 ? (
           <Text size="xs" c="dimmed">
             <Trans>No numeric columns available to add to this series.</Trans>
           </Text>
-        : null}
+        ) : null}
       </Stack>
     </Card>
   );

@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 
 describe("projectParquetBlob row-order contract", () => {

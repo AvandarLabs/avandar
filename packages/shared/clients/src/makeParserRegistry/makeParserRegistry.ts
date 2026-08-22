@@ -1,7 +1,8 @@
-import { excludeUndefinedDeep, objectKeys, pick } from "@avandar/utils";
 import type { UnknownObject } from "@avandar/utils";
 import type { CrudModelSpec } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { z } from "zod";
+
+import { excludeUndefinedDeep, objectKeys, pick } from "@avandar/utils";
 
 type ObjectDBReadSchema<M extends CrudModelSpec> = z.ZodObject<{
   [K in keyof M["DBRead"]]: z.ZodType<M["DBRead"][K], M["DBRead"][K]>;
@@ -145,9 +146,8 @@ export function getErrorMap({
 }): z.ZodErrorMap {
   return (issue) => {
     return {
-      message:
-        issue.message ?
-          `[${modelName}:${schemaName}] (${issue.code}) ${issue.message}`
+      message: issue.message
+        ? `[${modelName}:${schemaName}] (${issue.code}) ${issue.message}`
         : `[${modelName}:${schemaName}] (${issue.code})Error parsing schema.`,
     };
   };

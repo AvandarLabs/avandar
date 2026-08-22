@@ -1,6 +1,8 @@
-import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
-import { describe, expect, it } from "vitest";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+
+import { describe, expect, it } from "vitest";
+
+import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
 
 function cols(
   pairs: ReadonlyArray<{

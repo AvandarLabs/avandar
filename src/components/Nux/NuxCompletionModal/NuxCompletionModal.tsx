@@ -1,11 +1,13 @@
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Modal, Stack, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import clsx from "clsx";
+
 import { NuxCompletionBurst } from "@/components/Nux/NuxCompletionModal/NuxCompletionBurst/NuxCompletionBurst";
 import css from "@/components/Nux/NuxCompletionModal/NuxCompletionModal.module.css";
 import { ANIMATION_PRESET, MODAL_ABOVE_NUX_TOUR_Z_INDEX } from "@/config/Theme";
-import type { ReactNode } from "react";
 
 type Props = {
   isOpen: boolean;

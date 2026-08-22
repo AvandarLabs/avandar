@@ -40,83 +40,83 @@ pnpm i18n:check          # fails if extraction is stale
 
 **New — database**
 
-| File | Responsibility |
-| --- | --- |
-| `supabase/schemas/00.enum.nux_status.sql` | the `nux_status` enum |
+| File                                        | Responsibility                         |
+| ------------------------------------------- | -------------------------------------- |
+| `supabase/schemas/00.enum.nux_status.sql`   | the `nux_status` enum                  |
 | `supabase/schemas/01.user_nux_progress.sql` | the table, its trigger, index, and RLS |
 
 `01` because the table depends only on `auth.users` and the enum. It is a peer of `01.workspaces.sql`, not a dependent, and peers share an index.
 
 **New — shared model**
 
-| File | Responsibility |
-| --- | --- |
+| File                                         | Responsibility                           |
+| -------------------------------------------- | ---------------------------------------- |
 | `shared/models/Nux/NuxProgress.constants.ts` | milestone key order and the tutorial key |
-| `shared/models/Nux/NuxProgress.types.ts` | the read model and its branded id |
-| `shared/models/Nux/NuxProgress.ts` | the `NuxProgress` namespace |
+| `shared/models/Nux/NuxProgress.types.ts`     | the read model and its branded id        |
+| `shared/models/Nux/NuxProgress.ts`           | the `NuxProgress` namespace              |
 
 **New — client**
 
-| File | Responsibility |
-| --- | --- |
+| File                               | Responsibility                                          |
+| ---------------------------------- | ------------------------------------------------------- |
 | `src/clients/NuxProgressClient.ts` | read, ensure, update the row; count workspace artifacts |
 
 **New — pure tutorial logic (no React)**
 
-| File | Responsibility |
-| --- | --- |
-| `src/components/Nux/nuxAnchors.ts` | every `data-nux` value and its selector |
-| `src/components/Nux/nuxEvents.ts` | the completion-event bus |
-| `src/components/Nux/tutorials/NuxTutorial.types.ts` | milestone and step shapes |
-| `src/components/Nux/tutorials/firstDashboard.ts` | the four milestones and ten steps |
-| `src/components/Nux/NuxStateManager/nuxSelectors.ts` | derived reads over milestone state |
-| `src/components/Nux/NuxStateManager/resolveAutoCheckedMilestones.ts` | artifacts to already-done milestones |
-| `src/components/Nux/NuxStateManager/nuxActions.ts` | the pure reducer actions |
-| `src/components/Nux/NuxStateManager/NuxStateManager.ts` | the manager built from those actions |
+| File                                                                 | Responsibility                          |
+| -------------------------------------------------------------------- | --------------------------------------- |
+| `src/components/Nux/nuxAnchors.ts`                                   | every `data-nux` value and its selector |
+| `src/components/Nux/nuxEvents.ts`                                    | the completion-event bus                |
+| `src/components/Nux/tutorials/NuxTutorial.types.ts`                  | milestone and step shapes               |
+| `src/components/Nux/tutorials/firstDashboard.ts`                     | the four milestones and ten steps       |
+| `src/components/Nux/NuxStateManager/nuxSelectors.ts`                 | derived reads over milestone state      |
+| `src/components/Nux/NuxStateManager/resolveAutoCheckedMilestones.ts` | artifacts to already-done milestones    |
+| `src/components/Nux/NuxStateManager/nuxActions.ts`                   | the pure reducer actions                |
+| `src/components/Nux/NuxStateManager/NuxStateManager.ts`              | the manager built from those actions    |
 
 **New — React**
 
-| File | Responsibility |
-| --- | --- |
-| `src/components/Nux/useNuxEligibility.ts` | owner-or-admin, desktop width, web only |
-| `src/components/Nux/NuxTour/NuxTooltip.tsx` | the Mantine-themed tooltip body |
-| `src/components/Nux/NuxTour/buildJoyrideSteps.ts` | milestone steps to Joyride steps |
-| `src/components/Nux/NuxTour/NuxTour.tsx` | the Joyride wrapper |
-| `src/components/Nux/NuxTour/NuxTourLazy.tsx` | the `React.lazy` boundary |
-| `src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx` | the panel and its collapsed pill |
-| `src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx` | the one-time invite |
-| `src/components/Nux/NuxRoot/useNuxHydration.ts` | load the row, auto-check, hydrate |
-| `src/components/Nux/NuxRoot/useNuxPersistence.ts` | write milestone and status changes back |
-| `src/components/Nux/NuxRoot/useNuxCompletionEvents.ts` | bus subscription to milestone completion |
-| `src/components/Nux/NuxRoot/useNuxNavigation.ts` | route when a milestone opens |
-| `src/components/Nux/NuxRoot/NuxRoot.tsx` | composition behind the eligibility gate |
-| `src/views/ProfileView/TutorialSection.tsx` | the restart control |
+| File                                                         | Responsibility                           |
+| ------------------------------------------------------------ | ---------------------------------------- |
+| `src/components/Nux/useNuxEligibility.ts`                    | owner-or-admin, desktop width, web only  |
+| `src/components/Nux/NuxTour/NuxTooltip.tsx`                  | the Mantine-themed tooltip body          |
+| `src/components/Nux/NuxTour/buildJoyrideSteps.ts`            | milestone steps to Joyride steps         |
+| `src/components/Nux/NuxTour/NuxTour.tsx`                     | the Joyride wrapper                      |
+| `src/components/Nux/NuxTour/NuxTourLazy.tsx`                 | the `React.lazy` boundary                |
+| `src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx` | the panel and its collapsed pill         |
+| `src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx`     | the one-time invite                      |
+| `src/components/Nux/NuxRoot/useNuxHydration.ts`              | load the row, auto-check, hydrate        |
+| `src/components/Nux/NuxRoot/useNuxPersistence.ts`            | write milestone and status changes back  |
+| `src/components/Nux/NuxRoot/useNuxCompletionEvents.ts`       | bus subscription to milestone completion |
+| `src/components/Nux/NuxRoot/useNuxNavigation.ts`             | route when a milestone opens             |
+| `src/components/Nux/NuxRoot/NuxRoot.tsx`                     | composition behind the eligibility gate  |
+| `src/views/ProfileView/TutorialSection.tsx`                  | the restart control                      |
 
 **New — assets and tests**
 
-| File | Responsibility |
-| --- | --- |
-| `public/samples/avandar-sample-sales.csv` | the sample dataset |
-| `tests/e2e/nux-first-milestone.spec.ts` | milestone 1 end to end |
+| File                                      | Responsibility         |
+| ----------------------------------------- | ---------------------- |
+| `public/samples/avandar-sample-sales.csv` | the sample dataset     |
+| `tests/e2e/nux-first-milestone.spec.ts`   | milestone 1 end to end |
 
 **Modified**
 
-| File | Change |
-| --- | --- |
-| `package.json` | add `react-joyride` |
-| `shared/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts` | five client event names |
-| `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | their payloads |
-| `supabase/schemas/30.usage_analytics_events.sql` | RLS allowlist and category map |
-| `src/components/layouts/RootLayout/WorkspaceLayoutContents.tsx` | mount `NuxRoot` |
-| `src/views/ProfileView/ProfileView.tsx` | render `TutorialSection` |
-| `src/views/DataExplorerApp/DataExplorerApp.tsx` | anchors, the builder fix, the query event |
-| `src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx` | upload and import anchors, save event |
-| `src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx` | summary anchor |
-| `src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx` | viz tab anchor |
-| `src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx` | dashboard-created event |
-| `src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx` | share button anchor |
-| `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx` | access and role anchors, shared event |
-| `src/components/ChatPanel/ChatThread/Composer/Composer.tsx` | chat composer anchor |
+| File                                                                                      | Change                                    |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `package.json`                                                                            | add `react-joyride`                       |
+| `shared/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts`                           | five client event names                   |
+| `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts`                               | their payloads                            |
+| `supabase/schemas/30.usage_analytics_events.sql`                                          | RLS allowlist and category map            |
+| `src/components/layouts/RootLayout/WorkspaceLayoutContents.tsx`                           | mount `NuxRoot`                           |
+| `src/views/ProfileView/ProfileView.tsx`                                                   | render `TutorialSection`                  |
+| `src/views/DataExplorerApp/DataExplorerApp.tsx`                                           | anchors, the builder fix, the query event |
+| `src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx`           | upload and import anchors, save event     |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx`      | summary anchor                            |
+| `src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx`                     | viz tab anchor                            |
+| `src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx`                 | dashboard-created event                   |
+| `src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx`                     | share button anchor                       |
+| `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx` | access and role anchors, shared event     |
+| `src/components/ChatPanel/ChatThread/Composer/Composer.tsx`                               | chat composer anchor                      |
 
 ---
 
@@ -125,6 +125,7 @@ pnpm i18n:check          # fails if extraction is stale
 ## Task 1: Add the react-joyride dependency
 
 **Files:**
+
 - Modify: `package.json`
 
 - [ ] **Step 1: Install**
@@ -162,6 +163,7 @@ git commit -m "feat(nux): add react-joyride 3 dependency"
 ## Task 2: Create the nux_status enum and user_nux_progress table
 
 **Files:**
+
 - Create: `supabase/schemas/00.enum.nux_status.sql`
 - Create: `supabase/schemas/01.user_nux_progress.sql`
 
@@ -324,6 +326,7 @@ git commit -m "feat(nux): add user_nux_progress table and nux_status enum"
 ## Task 3: Add the NuxProgress model
 
 **Files:**
+
 - Create: `shared/models/Nux/NuxProgress.constants.ts`
 - Create: `shared/models/Nux/NuxProgress.types.ts`
 - Create: `shared/models/Nux/NuxProgress.ts`
@@ -465,6 +468,7 @@ git commit -m "feat(nux): add NuxProgress model types and constants"
 ## Task 4: Add the NuxProgressClient
 
 **Files:**
+
 - Create: `src/clients/NuxProgressClient.ts`
 - Test: `src/clients/NuxProgressClient.test.ts`
 
@@ -762,9 +766,9 @@ function createNuxProgressClient(): WithLogger<
             .from("user_nux_progress")
             .update({
               ...(data.status !== undefined ? { status: data.status } : {}),
-              ...(data.completedMilestones !== undefined ?
-                { completed_milestones: [...data.completedMilestones] }
-              : {}),
+              ...(data.completedMilestones !== undefined
+                ? { completed_milestones: [...data.completedMilestones] }
+                : {}),
             })
             .eq("id", progressId)
             .select("*")
@@ -807,6 +811,7 @@ git commit -m "feat(nux): add NuxProgressClient"
 ## Task 5: Register the five analytics events
 
 **Files:**
+
 - Modify: `shared/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts`
 - Modify: `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts`
 - Modify: `supabase/schemas/30.usage_analytics_events.sql`
@@ -948,6 +953,7 @@ git commit -m "feat(nux): register the five nux analytics events"
 ## Task 6: Define the anchors
 
 **Files:**
+
 - Create: `src/components/Nux/nuxAnchors.ts`
 - Test: `src/components/Nux/nuxAnchors.test.ts`
 
@@ -1054,6 +1060,7 @@ git commit -m "feat(nux): add the tutorial anchor registry"
 ## Task 7: Define the tutorial
 
 **Files:**
+
 - Create: `src/components/Nux/tutorials/NuxTutorial.types.ts`
 - Create: `src/components/Nux/tutorials/firstDashboard.ts`
 - Test: `src/components/Nux/tutorials/firstDashboard.test.ts`
@@ -1317,6 +1324,7 @@ git commit -m "feat(nux): declare the first-dashboard tutorial"
 ## Task 8: Add the completion-event bus
 
 **Files:**
+
 - Create: `src/components/Nux/nuxEvents.ts`
 - Test: `src/components/Nux/nuxEvents.test.ts`
 
@@ -1446,6 +1454,7 @@ git commit -m "feat(nux): add the tutorial completion-event bus"
 ## Task 9: Resolve already-satisfied milestones
 
 **Files:**
+
 - Create: `src/components/Nux/NuxStateManager/resolveAutoCheckedMilestones.ts`
 - Test: `src/components/Nux/NuxStateManager/resolveAutoCheckedMilestones.test.ts`
 
@@ -1548,11 +1557,13 @@ import type { NuxMilestoneKey } from "$/models/Nux/NuxProgress.types";
 export function resolveAutoCheckedMilestones(
   artifacts: Readonly<NuxWorkspaceArtifacts>,
 ): readonly NuxMilestoneKey[] {
-  const completedThrough =
-    artifacts.hasWorkspaceSharedDashboard ? 4
-    : artifacts.hasDashboard ? 3
-    : artifacts.hasDataset ? 1
-    : 0;
+  const completedThrough = artifacts.hasWorkspaceSharedDashboard
+    ? 4
+    : artifacts.hasDashboard
+      ? 3
+      : artifacts.hasDataset
+        ? 1
+        : 0;
   return NUX_MILESTONE_KEYS.slice(0, completedThrough);
 }
 ```
@@ -1574,6 +1585,7 @@ git commit -m "feat(nux): resolve already-satisfied milestones from workspace ar
 ## Task 10: Add the state selectors
 
 **Files:**
+
 - Create: `src/components/Nux/NuxStateManager/nuxSelectors.ts`
 - Test: `src/components/Nux/NuxStateManager/nuxSelectors.test.ts`
 
@@ -1685,6 +1697,7 @@ git commit -m "feat(nux): add milestone-ordering selectors"
 ## Task 11: Add the state machine
 
 **Files:**
+
 - Create: `src/components/Nux/NuxStateManager/NuxAppState.types.ts`
 - Create: `src/components/Nux/NuxStateManager/nuxActions.ts`
 - Create: `src/components/Nux/NuxStateManager/NuxStateManager.ts`
@@ -1705,7 +1718,8 @@ import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.t
 // `progressId` is a branded UUID, so a plain string needs the double cast.
 const HYDRATED: NuxAppState = {
   ...INITIAL_NUX_STATE,
-  progressId: "11111111-1111-4111-8111-111111111111" as unknown as NuxAppState["progressId"],
+  progressId:
+    "11111111-1111-4111-8111-111111111111" as unknown as NuxAppState["progressId"],
   status: "not_started",
   isHydrated: true,
 };
@@ -1944,10 +1958,7 @@ export const nuxActions = {
   },
 
   /** Clicking a milestone row in the checklist. */
-  openMilestone: (
-    state: NuxAppState,
-    key: NuxMilestoneKey,
-  ): NuxAppState => {
+  openMilestone: (state: NuxAppState, key: NuxMilestoneKey): NuxAppState => {
     return {
       ...state,
       status: state.status === "not_started" ? "in_progress" : state.status,
@@ -1992,9 +2003,8 @@ export const nuxActions = {
     return {
       ...state,
       completedMilestones,
-      status:
-        areAllMilestonesComplete(completedMilestones) ?
-          "completed"
+      status: areAllMilestonesComplete(completedMilestones)
+        ? "completed"
         : "in_progress",
       activeMilestoneKey: isActive ? undefined : state.activeMilestoneKey,
       activeStepIndex: isActive ? 0 : state.activeStepIndex,
@@ -2092,6 +2102,7 @@ git commit -m "feat(nux): add the tutorial state machine"
 ## Task 12: Add the eligibility hook
 
 **Files:**
+
 - Create: `src/components/Nux/useNuxEligibility.ts`
 - Test: `src/components/Nux/useNuxEligibility.test.tsx`
 
@@ -2129,7 +2140,9 @@ const OWNER_ID = "11111111-1111-4111-8111-111111111111";
 
 beforeEach(() => {
   vi.mocked(useCurrentUser).mockReturnValue({ id: OWNER_ID } as never);
-  vi.mocked(useCurrentWorkspace).mockReturnValue({ ownerId: OWNER_ID } as never);
+  vi.mocked(useCurrentWorkspace).mockReturnValue({
+    ownerId: OWNER_ID,
+  } as never);
   vi.mocked(useIsGlobalAdmin).mockReturnValue(false);
   vi.mocked(isDesktop).mockReturnValue(false);
 });
@@ -2140,13 +2153,17 @@ describe("useNuxEligibility", () => {
   });
 
   it("is eligible for a global admin who does not own the workspace", () => {
-    vi.mocked(useCurrentWorkspace).mockReturnValue({ ownerId: "other" } as never);
+    vi.mocked(useCurrentWorkspace).mockReturnValue({
+      ownerId: "other",
+    } as never);
     vi.mocked(useIsGlobalAdmin).mockReturnValue(true);
     expect(renderHook(() => useNuxEligibility()).result.current).toBe(true);
   });
 
   it("is not eligible for a plain member", () => {
-    vi.mocked(useCurrentWorkspace).mockReturnValue({ ownerId: "other" } as never);
+    vi.mocked(useCurrentWorkspace).mockReturnValue({
+      ownerId: "other",
+    } as never);
     expect(renderHook(() => useNuxEligibility()).result.current).toBe(false);
   });
 
@@ -2230,6 +2247,7 @@ git commit -m "feat(nux): gate the tutorial on owner-or-admin, desktop, web"
 ## Task 13: Build the tour renderer
 
 **Files:**
+
 - Create: `src/components/Nux/NuxTour/buildJoyrideSteps.ts`
 - Create: `src/components/Nux/NuxTour/NuxTooltip.tsx`
 - Create: `src/components/Nux/NuxTour/NuxTour.tsx`
@@ -2310,9 +2328,9 @@ export function buildJoyrideSteps(options: {
       skipBeacon: true,
       // Steps whose target only appears after the user acts declare their own
       // timeout; the rest keep Joyride's 1000ms default.
-      ...(step.targetWaitTimeoutMs !== undefined ?
-        { targetWaitTimeout: step.targetWaitTimeoutMs }
-      : {}),
+      ...(step.targetWaitTimeoutMs !== undefined
+        ? { targetWaitTimeout: step.targetWaitTimeoutMs }
+        : {}),
       data: { showSampleDownload: step.showSampleDownload === true },
     };
   });
@@ -2361,13 +2379,13 @@ export function NuxTooltip({
   return (
     <Card {...tooltipProps} withBorder shadow="md" padding="md" maw={380}>
       <Stack gap="xs">
-        {step.title ?
+        {step.title ? (
           <Title order={4} size="h5">
             {step.title}
           </Title>
-        : null}
+        ) : null}
         <Text size="sm">{step.content}</Text>
-        {showSampleDownload ?
+        {showSampleDownload ? (
           <Text size="sm" c="dimmed">
             <Trans>
               No spreadsheet handy?{" "}
@@ -2377,21 +2395,19 @@ export function NuxTooltip({
               and use that.
             </Trans>
           </Text>
-        : null}
+        ) : null}
         <Group justify="space-between" mt="xs">
           <Button {...closeProps} variant="subtle" color="neutral" size="xs">
             <Trans>Close</Trans>
           </Button>
           <Group gap="xs">
-            {index > 0 ?
+            {index > 0 ? (
               <Button {...backProps} variant="default" size="xs">
                 <Trans>Back</Trans>
               </Button>
-            : null}
+            ) : null}
             <Button {...primaryProps} size="xs">
-              {isLastStep ?
-                <Trans>Done</Trans>
-              : <Trans>Next</Trans>}
+              {isLastStep ? <Trans>Done</Trans> : <Trans>Next</Trans>}
             </Button>
           </Group>
         </Group>
@@ -2540,6 +2556,7 @@ git commit -m "feat(nux): add the Joyride tour renderer and Mantine tooltip"
 ## Task 14: Build the checklist panel
 
 **Files:**
+
 - Create: `src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx`
 - Test: `src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.test.tsx`
 
@@ -2586,7 +2603,9 @@ describe("NuxChecklistPanel", () => {
   it("lists all four milestones when expanded", () => {
     renderPanel({});
     expect(screen.getByText("Add your first dataset")).toBeInTheDocument();
-    expect(screen.getByText("Share it with your workspace")).toBeInTheDocument();
+    expect(
+      screen.getByText("Share it with your workspace"),
+    ).toBeInTheDocument();
     expect(screen.getByText("0 / 4")).toBeInTheDocument();
   });
 
@@ -2597,7 +2616,9 @@ describe("NuxChecklistPanel", () => {
 
   it("collapses to a pill", () => {
     renderPanel({ isPanelExpanded: false });
-    expect(screen.queryByText("Add your first dataset")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Add your first dataset"),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Get started/ }),
     ).toBeInTheDocument();
@@ -2681,7 +2702,9 @@ type Props = {
  * milestone, which is why no tooltip has to be spent telling the user where
  * to click next.
  */
-export function NuxChecklistPanel({ onOpenMilestone }: Readonly<Props>): ReactNode {
+export function NuxChecklistPanel({
+  onOpenMilestone,
+}: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
   const [state, dispatch] = NuxStateManager.useContext();
 
@@ -2769,31 +2792,32 @@ export function NuxChecklistPanel({ onOpenMilestone }: Readonly<Props>): ReactNo
                   variant={isDone ? "filled" : "light"}
                   color={isDone ? "green" : "neutral"}
                 >
-                  {isDone ?
-                    <IconCheck size={12} />
-                  : null}
+                  {isDone ? <IconCheck size={12} /> : null}
                 </ThemeIcon>
                 <Stack gap={0}>
-                  <Text size="sm" fw={isDone ? 400 : 600} td={isDone ? "line-through" : undefined}>
+                  <Text
+                    size="sm"
+                    fw={isDone ? 400 : 600}
+                    td={isDone ? "line-through" : undefined}
+                  >
                     {i18n._(milestone.title)}
                   </Text>
-                  {isDone ?
-                    null
-                  : <Text size="xs" c="dimmed">
+                  {isDone ? null : (
+                    <Text size="xs" c="dimmed">
                       {i18n._(milestone.summary)}
                     </Text>
-                  }
+                  )}
                 </Stack>
               </Group>
             </UnstyledButton>
           );
         })}
 
-        {state.blockedReason ?
+        {state.blockedReason ? (
           <Text size="xs" c="dimmed">
             {state.blockedReason}
           </Text>
-        : null}
+        ) : null}
       </Stack>
     </Card>
   );
@@ -2817,6 +2841,7 @@ git commit -m "feat(nux): add the get-started checklist panel"
 ## Task 15: Build the welcome modal
 
 **Files:**
+
 - Create: `src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx`
 - Test: `src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.test.tsx`
 
@@ -2831,9 +2856,7 @@ import { fireEvent, render, screen } from "@/test-utils";
 
 describe("NuxWelcomeModal", () => {
   it("sets expectations without promising anything about the team", () => {
-    render(
-      <NuxWelcomeModal isOpen onStart={vi.fn()} onDecline={vi.fn()} />,
-    );
+    render(<NuxWelcomeModal isOpen onStart={vi.fn()} onDecline={vi.fn()} />);
     expect(screen.getByText("Welcome to Avandar")).toBeInTheDocument();
     expect(
       screen.getByText(/spreadsheet to your first dashboard/),
@@ -2945,6 +2968,7 @@ git commit -m "feat(nux): add the tutorial welcome invite"
 ## Task 16: Wire hydration, persistence, events, and navigation
 
 **Files:**
+
 - Create: `src/components/Nux/NuxRoot/useNuxHydration.ts`
 - Create: `src/components/Nux/NuxRoot/useNuxPersistence.ts`
 - Create: `src/components/Nux/NuxRoot/useNuxCompletionEvents.ts`
@@ -3142,11 +3166,13 @@ export function useNuxCompletionEvents(): void {
         dispatch.completeMilestone({
           key: milestone.key,
           datasetId:
-            event.name === "dataset.saved" ? event.payload.datasetId : undefined,
+            event.name === "dataset.saved"
+              ? event.payload.datasetId
+              : undefined,
           dashboardId:
-            event.name === "dashboard.created" ?
-              event.payload.dashboardId
-            : undefined,
+            event.name === "dashboard.created"
+              ? event.payload.dashboardId
+              : undefined,
         });
         void AnalyticsClient.logEvent({
           event: "nux.milestone_completed",
@@ -3213,8 +3239,7 @@ export function useNuxNavigation(): (key: NuxMilestoneKey) => void {
           params: explorerLink.params,
           // Preselects the dataset from milestone 1 through the explorer's
           // own `ds` search param, so the user does not have to find it again.
-          search:
-            state.recentDatasetId ? { ds: state.recentDatasetId } : {},
+          search: state.recentDatasetId ? { ds: state.recentDatasetId } : {},
         });
         return;
       }
@@ -3304,9 +3329,7 @@ function NuxRootContents(): ReactNode {
         }}
       />
       <NuxChecklistPanel onOpenMilestone={openMilestone} />
-      {state.activeMilestoneKey ?
-        <NuxTourLazy />
-      : null}
+      {state.activeMilestoneKey ? <NuxTourLazy /> : null}
     </>
   );
 }
@@ -3413,6 +3436,7 @@ git commit -m "feat(nux): wire hydration, persistence, events, and navigation"
 ## Task 17: Add the sample dataset
 
 **Files:**
+
 - Create: `public/samples/avandar-sample-sales.csv`
 
 - [ ] **Step 1: Generate the file**
@@ -3441,7 +3465,9 @@ function pick(items) {
   return items[Math.floor(random() * items.length)];
 }
 
-const rows = [["order_date", "region", "product_category", "units_sold", "revenue_usd"]];
+const rows = [
+  ["order_date", "region", "product_category", "units_sold", "revenue_usd"],
+];
 for (let index = 0; index < 200; index += 1) {
   const day = new Date(Date.UTC(2025, 0, 1));
   day.setUTCDate(day.getUTCDate() + Math.floor(random() * 365));
@@ -3500,6 +3526,7 @@ git commit -m "feat(nux): add the sample sales dataset"
 ## Task 18: Add the milestone 1 anchors and event
 
 **Files:**
+
 - Modify: `src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx`
 - Modify: `src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx`
 
@@ -3621,7 +3648,9 @@ three grey rectangles, which is the opposite of the point.
 Run `pnpm dev`, sign in, go to Import, upload `public/samples/avandar-sample-sales.csv`, save it. At each stage run this in the browser console:
 
 ```js
-document.querySelectorAll("[data-nux]").forEach((el) => console.log(el.dataset.nux));
+document
+  .querySelectorAll("[data-nux]")
+  .forEach((el) => console.log(el.dataset.nux));
 ```
 
 Expected: `dataset-upload-form` on the import page; `dataset-import-form` after the file parses; `dataset-summary` on the dataset page.
@@ -3643,6 +3672,7 @@ git commit -m "feat(nux): anchor the dataset import flow and emit dataset.saved"
 ## Task 19: Add the explorer anchors, the builder fix, and the query event
 
 **Files:**
+
 - Modify: `src/views/DataExplorerApp/DataExplorerApp.tsx`
 - Modify: `src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx`
 - Modify: `src/components/ChatPanel/ChatThread/Composer/Composer.tsx`
@@ -3660,20 +3690,20 @@ import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/s
 Then, just after the `queryResultColumns` assignment, add:
 
 ```ts
-  /**
-   * The SQL behind whatever is currently on screen, whether it came from the
-   * chat panel, the SQL editor, or the guided query builder.
-   *
-   * `state.rawSql` alone is not enough: the builder generates its SQL inside
-   * `selectSqlToExecute` at execution time and never stores it, so gating the
-   * save actions on `rawSql` left a chart the user had just built with no way
-   * to keep it.
-   */
-  const savableSql = selectSqlToExecute({
-    rawSql: state.rawSql,
-    isStructuredQueryInSync: state.isStructuredQueryInSync,
-    executionQuery: state.query,
-  });
+/**
+ * The SQL behind whatever is currently on screen, whether it came from the
+ * chat panel, the SQL editor, or the guided query builder.
+ *
+ * `state.rawSql` alone is not enough: the builder generates its SQL inside
+ * `selectSqlToExecute` at execution time and never stores it, so gating the
+ * save actions on `rawSql` left a chart the user had just built with no way
+ * to keep it.
+ */
+const savableSql = selectSqlToExecute({
+  rawSql: state.rawSql,
+  isStructuredQueryInSync: state.isStructuredQueryInSync,
+  executionQuery: state.query,
+});
 ```
 
 Then replace every use of `state.rawSql` in the two Menu.Item guards and their handlers. For the "Save as new dataset" item, replace:
@@ -3738,20 +3768,20 @@ Spread `{...nuxAnchorProps(NuxAnchors.explorerSaveMenu)}` onto the `<Button>` in
 Still in `DataExplorerApp.tsx`, add this effect after the existing `syncLastQueryError` effect:
 
 ```ts
-  useEffect(
-    function announceSuccessfulQueryToNux() {
-      if (isLoadingResults || dataQuery.isError) {
-        return;
-      }
-      if ((queryResults?.data?.length ?? 0) === 0) {
-        return;
-      }
-      // Advances the onboarding tutorial's second milestone. Rows, not just a
-      // successful request: an empty result is not an answer.
-      NuxEvents.emit("query.succeeded", {});
-    },
-    [isLoadingResults, dataQuery.isError, queryResults],
-  );
+useEffect(
+  function announceSuccessfulQueryToNux() {
+    if (isLoadingResults || dataQuery.isError) {
+      return;
+    }
+    if ((queryResults?.data?.length ?? 0) === 0) {
+      return;
+    }
+    // Advances the onboarding tutorial's second milestone. Rows, not just a
+    // successful request: an empty result is not an answer.
+    NuxEvents.emit("query.succeeded", {});
+  },
+  [isLoadingResults, dataQuery.isError, queryResults],
+);
 ```
 
 - [ ] **Step 4: Anchor the visualizations tab**
@@ -3789,6 +3819,7 @@ git commit -m "feat(nux): let builder queries save to a dashboard, and anchor th
 ## Task 20: Add the dashboard and share anchors and events
 
 **Files:**
+
 - Modify: `src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx`
 - Modify: `src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx`
 - Modify: `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx`
@@ -3891,27 +3922,31 @@ with:
 closing the `Box` after `onChange={onChange}` `/>`, and replace:
 
 ```tsx
-        {value === "workspace" ?
-          <ShareWorkspaceRoleSelect
-            role={workspaceShareRole}
-            isDisabled={isBusy}
-            onChange={onWorkspaceRoleChange}
-          />
-        : null}
+{
+  value === "workspace" ? (
+    <ShareWorkspaceRoleSelect
+      role={workspaceShareRole}
+      isDisabled={isBusy}
+      onChange={onWorkspaceRoleChange}
+    />
+  ) : null;
+}
 ```
 
 with:
 
 ```tsx
-        {value === "workspace" ?
-          <Box {...nuxAnchorProps(NuxAnchors.shareRoleSelect)}>
-            <ShareWorkspaceRoleSelect
-              role={workspaceShareRole}
-              isDisabled={isBusy}
-              onChange={onWorkspaceRoleChange}
-            />
-          </Box>
-        : null}
+{
+  value === "workspace" ? (
+    <Box {...nuxAnchorProps(NuxAnchors.shareRoleSelect)}>
+      <ShareWorkspaceRoleSelect
+        role={workspaceShareRole}
+        isDisabled={isBusy}
+        onChange={onWorkspaceRoleChange}
+      />
+    </Box>
+  ) : null;
+}
 ```
 
 Add `Box` to the existing `@mantine/core` import. `ShareWorkspaceRoleSelect` only mounts once access is `workspace`, which is exactly why milestone 4's role tooltip comes after its access tooltip: the target does not exist until the user has made the choice the previous tooltip asked for.
@@ -3985,6 +4020,7 @@ git commit -m "feat(nux): anchor the share modal and emit the dashboard mileston
 ## Task 21: Handle a blocked final milestone
 
 **Files:**
+
 - Modify: `src/components/Nux/NuxStateManager/nuxActions.ts`
 - Modify: `src/components/Nux/NuxStateManager/nuxActions.test.ts`
 - Modify: `src/components/Nux/NuxChecklistPanel/NuxChecklistPanel.tsx`
@@ -4056,32 +4092,36 @@ Expected: PASS, 12 tests.
 In `NuxChecklistPanel.tsx`, replace:
 
 ```tsx
-        {state.blockedReason ?
-          <Text size="xs" c="dimmed">
-            {state.blockedReason}
-          </Text>
-        : null}
+{
+  state.blockedReason ? (
+    <Text size="xs" c="dimmed">
+      {state.blockedReason}
+    </Text>
+  ) : null;
+}
 ```
 
 with:
 
 ```tsx
-        {state.blockedReason ?
-          <Stack gap={4}>
-            <Text size="xs" c="dimmed">
-              {state.blockedReason}
-            </Text>
-            <Button
-              variant="subtle"
-              size="compact-xs"
-              onClick={() => {
-                dispatch.skipActiveMilestone();
-              }}
-            >
-              <Trans>Skip this step</Trans>
-            </Button>
-          </Stack>
-        : null}
+{
+  state.blockedReason ? (
+    <Stack gap={4}>
+      <Text size="xs" c="dimmed">
+        {state.blockedReason}
+      </Text>
+      <Button
+        variant="subtle"
+        size="compact-xs"
+        onClick={() => {
+          dispatch.skipActiveMilestone();
+        }}
+      >
+        <Trans>Skip this step</Trans>
+      </Button>
+    </Stack>
+  ) : null;
+}
 ```
 
 - [ ] **Step 6: Set the reason when the plan refuses**
@@ -4089,13 +4129,13 @@ with:
 In `useResourceShareMutations.ts`, inside the `onError` you edited in Task 20, add to the `isShareableDashboardLimitError(error)` branch, before its `return`:
 
 ```ts
-          // Tells the tutorial its final milestone cannot be finished on this
-          // plan, so the checklist can offer a way out instead of parking on
-          // a step the user is not allowed to complete.
-          NuxEvents.emit("dashboard.shareBlocked", {
-            reason:
-              "Your plan does not allow sharing another dashboard. You can upgrade, or unshare another dashboard, and come back to this.",
-          });
+// Tells the tutorial its final milestone cannot be finished on this
+// plan, so the checklist can offer a way out instead of parking on
+// a step the user is not allowed to complete.
+NuxEvents.emit("dashboard.shareBlocked", {
+  reason:
+    "Your plan does not allow sharing another dashboard. You can upgrade, or unshare another dashboard, and come back to this.",
+});
 ```
 
 Then extend `src/components/Nux/nuxEvents.ts` with the new name and payload:
@@ -4127,10 +4167,10 @@ Wrap it as t`...` using that existing binding so it reaches the catalogs.
 In `useNuxCompletionEvents.ts`, add this before the milestone lookup:
 
 ```ts
-        if (event.name === "dashboard.shareBlocked") {
-          dispatch.setBlockedReason(event.payload.reason);
-          return;
-        }
+if (event.name === "dashboard.shareBlocked") {
+  dispatch.setBlockedReason(event.payload.reason);
+  return;
+}
 ```
 
 `FIRST_DASHBOARD_MILESTONES.find` would return `undefined` for this event
@@ -4156,6 +4196,7 @@ git commit -m "feat(nux): let a plan-blocked final milestone be skipped"
 ## Task 22: Add the restart control to the profile page
 
 **Files:**
+
 - Create: `src/views/ProfileView/TutorialSection.tsx`
 - Modify: `src/views/ProfileView/ProfileView.tsx`
 - Test: `src/views/ProfileView/TutorialSection.test.tsx`
@@ -4258,7 +4299,7 @@ import { TutorialSection } from "@/views/ProfileView/TutorialSection";
 Add this inside the component, above the early return:
 
 ```ts
-  const nuxDispatch = NuxStateManager.useDispatch();
+const nuxDispatch = NuxStateManager.useDispatch();
 ```
 
 Then replace:
@@ -4324,6 +4365,7 @@ git commit -m "feat(nux): add the restart control to the profile page"
 ## Task 23: Log dismissal and completion
 
 **Files:**
+
 - Modify: `src/components/Nux/NuxRoot/NuxRoot.tsx`
 
 The remaining two analytics events have no home yet. Without them the funnel has a start and a middle but no ends.
@@ -4339,43 +4381,43 @@ import { useEffect, useRef } from "react";
 and inside the component, after the existing hook calls:
 
 ```ts
-  const loggedTerminalStatusRef = useRef<string | undefined>(undefined);
-  useEffect(
-    function logTerminalNuxStatus() {
-      if (!state.isHydrated || !state.status) {
-        return;
-      }
-      if (state.status !== "completed" && state.status !== "dismissed") {
-        return;
-      }
-      if (loggedTerminalStatusRef.current === state.status) {
-        return;
-      }
-      loggedTerminalStatusRef.current = state.status;
-      if (state.status === "completed") {
-        void AnalyticsClient.logEvent({
-          event: "nux.completed",
-          workspaceId: workspace.id,
-        });
-        return;
-      }
+const loggedTerminalStatusRef = useRef<string | undefined>(undefined);
+useEffect(
+  function logTerminalNuxStatus() {
+    if (!state.isHydrated || !state.status) {
+      return;
+    }
+    if (state.status !== "completed" && state.status !== "dismissed") {
+      return;
+    }
+    if (loggedTerminalStatusRef.current === state.status) {
+      return;
+    }
+    loggedTerminalStatusRef.current = state.status;
+    if (state.status === "completed") {
       void AnalyticsClient.logEvent({
-        event: "nux.dismissed",
+        event: "nux.completed",
         workspaceId: workspace.id,
-        payload: {
-          milestoneKey: state.activeMilestoneKey ?? null,
-          completedCount: state.completedMilestones.length,
-        },
       });
-    },
-    [
-      state.isHydrated,
-      state.status,
-      state.activeMilestoneKey,
-      state.completedMilestones.length,
-      workspace.id,
-    ],
-  );
+      return;
+    }
+    void AnalyticsClient.logEvent({
+      event: "nux.dismissed",
+      workspaceId: workspace.id,
+      payload: {
+        milestoneKey: state.activeMilestoneKey ?? null,
+        completedCount: state.completedMilestones.length,
+      },
+    });
+  },
+  [
+    state.isHydrated,
+    state.status,
+    state.activeMilestoneKey,
+    state.completedMilestones.length,
+    workspace.id,
+  ],
+);
 ```
 
 The ref guard matters: hydration on a later page load reads `completed` from the database and would otherwise log a completion every time the user opens the app.
@@ -4402,6 +4444,7 @@ git commit -m "feat(nux): log tutorial completion and dismissal"
 ## Task 24: End-to-end test for milestone 1
 
 **Files:**
+
 - Create: `tests/e2e/nux-first-milestone.spec.ts`
 
 Milestone 1 is where abandonment costs the most and where the async-target risk is highest, so it gets the one e2e. Milestones 2 through 4 stay at the component level for now.
@@ -4540,14 +4583,14 @@ Expected: one or more chunk files, none of which is the entry chunk named in `di
 
 Run `pnpm dev` with a brand-new owner account and complete all four milestones with the sample CSV. Confirm at each step:
 
-| Check | Why |
-| --- | --- |
-| The invite appears once, and never again after either button | the `in_progress`-on-both-paths rule |
-| Tooltips in milestones 3 and 4 sit above the modal, not behind it | `NUX_TOUR_Z_INDEX` |
-| Clicking the overlay does not end the tour | `overlayClickAction: false` |
-| The role tooltip appears only after choosing workspace access | `ShareWorkspaceRoleSelect` mounts conditionally |
-| The panel does not cover the Data Explorer drawer | the open item in spec §12 |
-| The panel disappears after 4/4 | the completion state |
+| Check                                                             | Why                                             |
+| ----------------------------------------------------------------- | ----------------------------------------------- |
+| The invite appears once, and never again after either button      | the `in_progress`-on-both-paths rule            |
+| Tooltips in milestones 3 and 4 sit above the modal, not behind it | `NUX_TOUR_Z_INDEX`                              |
+| Clicking the overlay does not end the tour                        | `overlayClickAction: false`                     |
+| The role tooltip appears only after choosing workspace access     | `ShareWorkspaceRoleSelect` mounts conditionally |
+| The panel does not cover the Data Explorer drawer                 | the open item in spec §12                       |
+| The panel disappears after 4/4                                    | the completion state                            |
 
 - [ ] **Step 6: Commit anything the checks changed**
 

@@ -1,11 +1,13 @@
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+
 import { describe, expect, it } from "vitest";
+
 import {
   makeLibraryFilterGroupFromQueryFilterGroup,
   makeQueryFilterGroupFromLibraryGroup,
   normalizeLibraryTree,
 } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 const COLUMN_TYPES: Record<string, AvaDataType.T> = {
   Admin2: "varchar",

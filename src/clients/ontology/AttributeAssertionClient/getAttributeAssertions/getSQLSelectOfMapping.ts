@@ -1,9 +1,11 @@
+import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+
 import { match } from "ts-pattern";
+
 import {
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 
 /**
  * Generate the nested SQL 'SELECT' statement to extract values using

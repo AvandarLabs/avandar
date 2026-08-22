@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef } from "react";
-import { DrawerHeight } from "@/components/CanvasDrawer/DrawerHeight/DrawerHeight";
-import { startDrawerResizeDrag } from "@/components/CanvasDrawer/useDrawerResize/startDrawerResizeDrag";
 import type { DrawerResizeDragState } from "@/components/CanvasDrawer/useDrawerResize/startDrawerResizeDrag";
 import type { KeyboardEvent, PointerEvent, RefObject } from "react";
+
+import { useCallback, useEffect, useRef } from "react";
+
+import { DrawerHeight } from "@/components/CanvasDrawer/DrawerHeight/DrawerHeight";
+import { startDrawerResizeDrag } from "@/components/CanvasDrawer/useDrawerResize/startDrawerResizeDrag";
 
 type Options = {
   heightRef: RefObject<number>;

@@ -15,6 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { z } from "zod";
+
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
@@ -88,7 +89,7 @@ function CheckoutPage() {
   }, [subscriptions, workspace.id, workspace.slug, navigate, queryClient]);
 
   const contents =
-    success === true ?
+    success === true ? (
       <>
         <ThemeIcon size={64} radius="xl" variant="light" color="green">
           <IconCheck size={32} stroke={2.5} />
@@ -116,7 +117,7 @@ function CheckoutPage() {
           <Trans>Continue to your workspace</Trans>
         </Button>
       </>
-    : null;
+    ) : null;
 
   // This shouldn't be reached due to beforeLoad redirect
   return (

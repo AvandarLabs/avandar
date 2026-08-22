@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 /**
  * The Data Explorer canvas is the payoff target for the run_query tutorial
  * step. Completing that milestone jumps Joyride onto `explorer-canvas-tooltip`;
@@ -5,13 +7,13 @@
  * with a center spinner.
  */
 import { describe, expect, it, vi } from "vitest";
+
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render } from "@/test-utils";
 import { DataExplorerApp } from "@/views/DataExplorerApp/DataExplorerApp";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
-import type { ReactNode } from "react";
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {

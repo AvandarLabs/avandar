@@ -1,6 +1,7 @@
-import { hasQueryColumn } from "./hasQueryColumn";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
+import { hasQueryColumn } from "./hasQueryColumn";
 
 /**
  * Adds `column` to the layer's query if it is not already selected. Columns a

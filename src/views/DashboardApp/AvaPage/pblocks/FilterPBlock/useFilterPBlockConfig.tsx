@@ -1,7 +1,9 @@
+import type { Props as FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
+
 import { useLingui } from "@lingui/react/macro";
 import { ComponentConfig } from "@puckeditor/core";
+
 import { FilterPBlock } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
-import type { Props as FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 
 /**
  * Build the Puck component config for the dashboard's Filter block. Reads the
@@ -61,9 +63,9 @@ export function useFilterPBlockConfig(): ComponentConfig<FilterPBlockProps> {
         ...data.props,
         // Auto-assign a stable id if missing so newly dropped filters work.
         filterId:
-          data.props.filterId && data.props.filterId.length > 0 ?
-            data.props.filterId
-          : `filter-${data.props.id ?? crypto.randomUUID()}`,
+          data.props.filterId && data.props.filterId.length > 0
+            ? data.props.filterId
+            : `filter-${data.props.id ?? crypto.randomUUID()}`,
       };
       return { props };
     },

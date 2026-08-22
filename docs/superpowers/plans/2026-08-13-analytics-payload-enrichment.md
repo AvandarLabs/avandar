@@ -225,8 +225,7 @@ type GoogleSheetsImportAnalyticsSource = {
 };
 
 type DatasetImportAnalyticsSource =
-  | FileImportAnalyticsSource
-  | GoogleSheetsImportAnalyticsSource;
+  FileImportAnalyticsSource | GoogleSheetsImportAnalyticsSource;
 
 /** Derives privacy-safe analytics dimensions from a successful dataset save. */
 export function makeDatasetImportedPayloadFromSaveResult(options: {
@@ -236,9 +235,9 @@ export function makeDatasetImportedPayloadFromSaveResult(options: {
 }): AnalyticsEventPayloads["dataset.imported"] {
   const { source } = options;
   const columnCount =
-    source.sourceType === "google_sheets" ?
-      source.datasetLoadResult.sheetLoadMetadata.columns.length
-    : source.datasetLoadResult.columns.length;
+    source.sourceType === "google_sheets"
+      ? source.datasetLoadResult.sheetLoadMetadata.columns.length
+      : source.datasetLoadResult.columns.length;
 
   return {
     datasetId: options.datasetId,
@@ -864,17 +863,18 @@ function _fromDashboardBlock(options: {
 }): AnalyticsEventPayloads["dashboard.block_added_via_chat"] {
   const dashboardId = options.pageContext.dashboardId;
   const editorData =
-    dashboardId === options.editorState.activeDashboardId ?
-      options.editorState.editorData
+    dashboardId === options.editorState.activeDashboardId
+      ? options.editorState.editorData
+      : undefined;
+  const blockCountAfter = editorData
+    ? editorData.content.length + 1
     : undefined;
-  const blockCountAfter =
-    editorData ? editorData.content.length + 1 : undefined;
 
   return {
     blockKind: options.block.kind,
-    ...(options.block.kind === "DataViz" ?
-      { vizType: options.block.vizType }
-    : {}),
+    ...(options.block.kind === "DataViz"
+      ? { vizType: options.block.vizType }
+      : {}),
     ...(dashboardId ? { dashboardId } : {}),
     ...(blockCountAfter !== undefined ? { blockCountAfter } : {}),
   };
@@ -927,10 +927,13 @@ if (lastUserMsg && !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)) {
     event: "chat.message_sent",
     workspaceId,
     app:
-      currentPageContext.app === "data-explorer" ? "data_explorer"
-      : currentPageContext.app === "dashboards" ? "dashboards"
-      : currentPageContext.app === "data-sources" ? "data_sources"
-      : undefined,
+      currentPageContext.app === "data-explorer"
+        ? "data_explorer"
+        : currentPageContext.app === "dashboards"
+          ? "dashboards"
+          : currentPageContext.app === "data-sources"
+            ? "data_sources"
+            : undefined,
     payload: ChatAnalyticsPayloads.fromMessage({
       content: lastUserMsg.content,
       pageContext: currentPageContext,
@@ -1269,9 +1272,9 @@ Add:
 
 ```ts
 type AnalyticsEventWithPayload<K extends AnalyticsEventName> =
-  AnalyticsEventPayloads[K] extends undefined ?
-    { event: K; payload?: undefined }
-  : { event: K; payload: AnalyticsEventPayloads[K] };
+  AnalyticsEventPayloads[K] extends undefined
+    ? { event: K; payload?: undefined }
+    : { event: K; payload: AnalyticsEventPayloads[K] };
 ```
 
 Replace unions:

@@ -1,8 +1,9 @@
-import {
-  HDX_API_BASE_URL, // prettier-ignore
-} from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 import type {
   SudanCholeraCatalogEntry, // prettier-ignore
+} from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
+
+import {
+  HDX_API_BASE_URL, // prettier-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 
 /** One `catalog_entries__open_data` row for an API-backed resource. */

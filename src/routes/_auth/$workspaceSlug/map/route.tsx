@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+
 import { appLabel } from "$/copy/appLabel";
 import { RouteMiddleware } from "@/utils/RouteMiddleware";
-import type { ReactNode } from "react";
 
 /** Guards and renders the authenticated GIS route subtree. */
 export const Route = createFileRoute("/_auth/$workspaceSlug/map")({

@@ -1,10 +1,12 @@
+import type { ReactNode } from "react";
+
 import { afterEach, describe, expect, it } from "vitest";
+
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 import { useVisibleNuxSteps } from "@/components/Nux/NuxTour/useVisibleNuxSteps/useVisibleNuxSteps";
 import { act, render, screen } from "@/test-utils";
-import type { ReactNode } from "react";
 
 function Harness(): ReactNode {
   const steps = useVisibleNuxSteps();

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { createCsvParseOptionsFromUserHints } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
 import { buildReadCsvArgList } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
 

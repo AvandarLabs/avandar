@@ -1,10 +1,13 @@
+import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+
 import { isDefined, propEq } from "@avandar/utils";
 import { Combobox, useCombobox } from "@mantine/core";
 import { useEffect, useRef } from "react";
+
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
+
 import css from "./PillEditPopover.module.css";
-import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 type PillEditPopoverProps = {
   pill: SqlPillClickInfo | null;
@@ -101,9 +104,9 @@ export function PillEditPopover({
   }
 
   const options: Option[] =
-    pill.kind === "dataset" ?
-      _buildDatasetOptions(catalog)
-    : _buildColumnOptions(catalog, sql);
+    pill.kind === "dataset"
+      ? _buildDatasetOptions(catalog)
+      : _buildColumnOptions(catalog, sql);
 
   const ungrouped = options.filter((opt) => {
     return opt.group === undefined;

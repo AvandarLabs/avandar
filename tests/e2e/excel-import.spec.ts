@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -19,7 +21,6 @@ import {
   isDatasetParquetInStorage,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 /**
  * Asserts Excel manual-upload preview: parse callout, row count, preview grid,

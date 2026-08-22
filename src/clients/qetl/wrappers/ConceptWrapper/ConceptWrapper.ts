@@ -1,8 +1,3 @@
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
-import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -19,6 +14,12 @@ import type {
   WrapperContext,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
 
 /**
  * The two reads a concept relation is built from, injected so a test needs no

@@ -1,8 +1,9 @@
-import { camelToTitleCase } from "@avandar/utils";
 import type {
   BaseFormFieldSchema,
   ValidBaseValueType,
 } from "@/components/forms/AvaForm/AvaForm.types";
+
+import { camelToTitleCase } from "@avandar/utils";
 
 export function getFieldLabel<
   FieldKey extends string,

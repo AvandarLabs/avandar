@@ -1,16 +1,18 @@
+import type { CaseTypeHomeItem } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome";
+import type { ReactNode } from "react";
+
 import { where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { CaseTypeHome } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome";
-import type { CaseTypeHomeItem } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome";
-import type { ReactNode } from "react";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/ontology-designer/",

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { getNuxTourStepAfterTransition } from "@/components/Nux/NuxTour/getNuxTourStepAfterTransition/getNuxTourStepAfterTransition";
 
 describe("getNuxTourStepAfterTransition", () => {

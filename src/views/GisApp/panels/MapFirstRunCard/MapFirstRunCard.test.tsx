@@ -1,13 +1,15 @@
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
-import { MapFirstRunCard } from "@/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { Model } from "@avandar/models";
+import { describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { fireEvent, render, screen } from "@/test-utils";
+import { MapFirstRunCard } from "@/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard";
 
 type Props = {
   children: (props: {

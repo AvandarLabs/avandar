@@ -1,7 +1,9 @@
-import { navigateToExternalUrl } from "@avandar/browser-utils";
-import { APIClient } from "@/clients/APIClient";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { navigateToExternalUrl } from "@avandar/browser-utils";
+
+import { APIClient } from "@/clients/APIClient";
 
 export async function goToPolarCheckout({
   returnURL,

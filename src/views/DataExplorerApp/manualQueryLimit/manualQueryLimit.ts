@@ -1,5 +1,6 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
 /** Default LIMIT shown for a brand-new manual query. */
 export const DEFAULT_MANUAL_QUERY_LIMIT = 100;
@@ -52,8 +53,8 @@ export function getManualQueryLimitValue(
   if (query.limit !== undefined) {
     return query.limit;
   }
-  return shouldDefaultManualQueryLimit(query) ?
-      DEFAULT_MANUAL_QUERY_LIMIT
+  return shouldDefaultManualQueryLimit(query)
+    ? DEFAULT_MANUAL_QUERY_LIMIT
     : undefined;
 }
 
@@ -92,7 +93,7 @@ export function applyDefaultManualQueryLimit(
 export function largeDatasetAutoLimitFromRowCount(
   rowCount: number,
 ): number | undefined {
-  return rowCount > LARGE_DATASET_ROW_THRESHOLD ?
-      LARGE_DATASET_AUTO_LIMIT
+  return rowCount > LARGE_DATASET_ROW_THRESHOLD
+    ? LARGE_DATASET_AUTO_LIMIT
     : undefined;
 }

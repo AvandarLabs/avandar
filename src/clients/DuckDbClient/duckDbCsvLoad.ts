@@ -1,3 +1,13 @@
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { CsvParseUserHints } from "@/clients/DuckDbClient/csvParse/csvParse.types";
+import type {
+  CsvDialectHints,
+  CsvParseAttemptState,
+} from "@/clients/DuckDbClient/csvParse/csvSniff";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+
 import { uuid } from "$/lib/uuid";
 import { runCsvParseAttempts } from "@/clients/DuckDbClient/csvParse/csvParseAttempts";
 import {
@@ -9,15 +19,6 @@ import {
   registerCsvFile,
 } from "@/clients/DuckDbClient/duckDbFileRegistry";
 import { Logger } from "@/utils/Logger";
-import type { CsvParseUserHints } from "@/clients/DuckDbClient/csvParse/csvParse.types";
-import type {
-  CsvDialectHints,
-  CsvParseAttemptState,
-} from "@/clients/DuckDbClient/csvParse/csvSniff";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
-import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 
 type BaseDuckDbLoadCsvOptions = CsvDialectHints & {
   tableName: string;
@@ -110,9 +111,9 @@ export async function loadCsvIntoDuckDb(
     });
     const db = await client.getDb();
     await registerCsvFile(
-      "file" in options ?
-        { db, tableName: csvStagingFile, file: options.file }
-      : { db, tableName: csvStagingFile, fileText: options.fileText },
+      "file" in options
+        ? { db, tableName: csvStagingFile, file: options.file }
+        : { db, tableName: csvStagingFile, fileText: options.fileText },
     );
     const parseState = await runCsvParseAttempts({
       client,

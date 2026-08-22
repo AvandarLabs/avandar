@@ -1,12 +1,14 @@
-import { useLingui } from "@lingui/react/macro";
-import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
-import clsx from "clsx";
-import css from "./CaseTypeDraftCard.module.css";
-import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 import type {
   ChatCaseValuePickerRuleType,
   ChatProposedCaseAttribute,
 } from "$/types/chat.types";
+import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
+
+import { useLingui } from "@lingui/react/macro";
+import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
+import clsx from "clsx";
+
+import css from "./CaseTypeDraftCard.module.css";
 
 type Props = {
   attribute: ChatProposedCaseAttribute;
@@ -61,16 +63,16 @@ export function CaseTypeDraftAttributeRow({
           <Text size="xs" c="dimmed" className={css.columnHint}>
             {columnLabel}
           </Text>
-          {isPrimaryKey ?
+          {isPrimaryKey ? (
             <Text size="xs" c="blue.7">
               {t`join key`}
             </Text>
-          : null}
-          {isLabelColumn ?
+          ) : null}
+          {isLabelColumn ? (
             <Text size="xs" c="blue.7">
               {t`label`}
             </Text>
-          : null}
+          ) : null}
         </Group>
       </div>
       <Select

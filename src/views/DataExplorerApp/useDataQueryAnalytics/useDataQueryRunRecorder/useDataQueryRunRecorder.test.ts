@@ -1,3 +1,5 @@
+import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
+
 /**
  * The recorder is what lets the emitter tell "a new run finished" from "React
  * re-rendered". React Query retries once by default, so two invocations can
@@ -6,9 +8,9 @@
  * which is the run whose data the consumer is looking at.
  */
 import { describe, expect, it, vi } from "vitest";
+
 import { act, renderHook } from "@/test-utils";
 import { useDataQueryRunRecorder } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder";
-import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 
 describe("useDataQueryRunRecorder", () => {
   it("records nothing until a run finishes", () => {

@@ -1,12 +1,14 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { ReactNode } from "react";
+
 import { noop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapToolClusterToolbar } from "@/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar";
 import { MeasureReadout } from "@/views/GisApp/shell/MapToolCluster/MeasureReadout";
-import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   mapToolMode: MapToolMode;

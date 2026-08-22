@@ -1,11 +1,3 @@
-import path from "node:path";
-import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
-import { EnvFileLine } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
-import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
-import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
-import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
-import { promiseMap, prop } from "@avandar/utils";
 import type {
   DevelopmentEnvFile,
   SupabaseBackupManifest,
@@ -15,6 +7,15 @@ import type {
   SupabaseStatusEntry,
   SupabaseStatusReport,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
+import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
+import { EnvFileLine } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/EnvFileLine/EnvFileLine";
+import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
+import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
+import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
+import { promiseMap, prop } from "@avandar/utils";
+import path from "node:path";
 
 type MakeStatusReportOptions = {
   branch: string;
@@ -83,8 +84,8 @@ function _makeStaleKeys(
     SupabaseConfig.makeDevelopmentEnvFromStatus(options).split("\n");
   return options.envContents.split("\n").flatMap((line, lineIndex) => {
     const assignment = EnvFileLine.getAssignment(line);
-    return assignment !== undefined && line !== expectedLines[lineIndex] ?
-        [assignment.key]
+    return assignment !== undefined && line !== expectedLines[lineIndex]
+      ? [assignment.key]
       : [];
   });
 }
@@ -139,9 +140,9 @@ function _makeStatusReport(
     environmentValues:
       status === undefined ? [] : _makeEnvironmentValues(status),
     endpoints:
-      status === undefined || statusJson === undefined ?
-        []
-      : _makeEndpoints(statusJson),
+      status === undefined || statusJson === undefined
+        ? []
+        : _makeEndpoints(statusJson),
     environmentDrift:
       status === undefined ? [] : _makeEnvironmentDrift({ envFiles, status }),
   };

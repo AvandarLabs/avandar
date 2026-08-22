@@ -1,7 +1,9 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it } from "vitest";
-import { getExportLegendEntries } from "@/views/GisApp/export/getExportLegendEntries/getExportLegendEntries";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
+import { describe, expect, it } from "vitest";
+
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { getExportLegendEntries } from "@/views/GisApp/export/getExportLegendEntries/getExportLegendEntries";
 
 const HEATMAP_LABELS = { heatmapLowLabel: "Low", heatmapHighLabel: "High" };
 

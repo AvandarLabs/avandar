@@ -1,5 +1,9 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
+
 import { Box } from "@mantine/core";
 import { Render as PuckPageRender } from "@puckeditor/core";
+
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
@@ -8,8 +12,6 @@ import { DashboardAccessDeniedView } from "@/views/DashboardApp/DashboardViewerV
 import { DashboardLoadErrorState } from "@/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState";
 import { DashboardLoadingState } from "@/views/DashboardApp/DashboardViewerView/DashboardLoadingState";
 import { DashboardPreviewBanner } from "@/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -53,13 +55,13 @@ export function DashboardViewerContent({
   return (
     <DashboardFilterStateManager.Provider>
       <Box>
-        {mode === "preview" && workspaceSlug ?
+        {mode === "preview" && workspaceSlug ? (
           <DashboardPreviewBanner
             dashboard={dashboard}
             workspaceSlug={workspaceSlug}
             canEdit={canEdit}
           />
-        : null}
+        ) : null}
         <PuckPageRender config={config} data={data} metadata={metadata} />
       </Box>
     </DashboardFilterStateManager.Provider>

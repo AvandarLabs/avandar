@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
+
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.module.css";
 
@@ -52,7 +53,7 @@ export function SaveToDashboardCreateMode({
 
   return (
     <>
-      {showEmptyStateBanner ?
+      {showEmptyStateBanner ? (
         <div className={css.createBanner}>
           <ThemeIcon size={48} radius="xl" variant="light">
             <IconLayoutDashboard size={26} stroke={1.5} />
@@ -61,7 +62,7 @@ export function SaveToDashboardCreateMode({
             <Trans>You don&apos;t have any dashboards yet.</Trans>
           </Text>
         </div>
-      : null}
+      ) : null}
 
       <TextInput
         label={t`Dashboard name`}
@@ -78,7 +79,7 @@ export function SaveToDashboardCreateMode({
       />
 
       <Group justify="space-between" mt="xs">
-        {onBack ?
+        {onBack ? (
           <Anchor component="button" type="button" size="sm" onClick={onBack}>
             <Group gap={4} wrap="nowrap">
               <IconArrowLeft size={14} />
@@ -87,7 +88,9 @@ export function SaveToDashboardCreateMode({
               </span>
             </Group>
           </Anchor>
-        : <span />}
+        ) : (
+          <span />
+        )}
         <Group gap="sm">
           <Button variant="subtle" color="neutral" onClick={onCancel}>
             <Trans>Cancel</Trans>

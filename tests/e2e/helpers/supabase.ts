@@ -1,9 +1,11 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+
 import { createClient } from "@supabase/supabase-js";
+
 import {
   getSupabaseAnonKeyFromEnv,
   getSupabaseUrlFromEnv,
 } from "./supabaseEnv";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 export {
   getSupabaseAnonKeyFromEnv,

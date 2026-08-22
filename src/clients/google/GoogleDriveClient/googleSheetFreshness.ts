@@ -1,8 +1,9 @@
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
-import { getGoogleSheetVersion } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
-import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
+
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { getGoogleSheetVersion } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 
 /** One dataset's last known version and when it was read. */
 type FreshnessEntry = { checkedAt: number; version: SourceVersion };

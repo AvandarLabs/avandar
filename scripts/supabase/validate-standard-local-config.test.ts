@@ -1,6 +1,7 @@
+import type { SpawnSyncReturns } from "node:child_process";
+
 import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
-import type { SpawnSyncReturns } from "node:child_process";
 
 const VALIDATOR_PATH = "scripts/supabase/validate-standard-local-config.sh";
 

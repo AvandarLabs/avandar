@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Group, Stack, Text } from "@mantine/core";
 import { IconHelp } from "@tabler/icons-react";
+
 import css from "./ClarificationCard.module.css";
 
 type Props = {
@@ -26,11 +27,11 @@ export function ClarificationCardHeader({
         <Text size="sm" fw={600}>
           {question}
         </Text>
-        {rationale ?
+        {rationale ? (
           <Text size="xs" c="dimmed">
             {rationale}
           </Text>
-        : null}
+        ) : null}
         <Text size="xs" c="dimmed">
           <Trans>Clarification {turnNumber} of 3</Trans>
         </Text>

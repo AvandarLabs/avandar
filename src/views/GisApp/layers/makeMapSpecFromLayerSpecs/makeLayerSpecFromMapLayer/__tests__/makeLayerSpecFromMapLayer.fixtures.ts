@@ -1,7 +1,8 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
  * Shared fixtures for `makeLayerSpecFromMapLayer` paint tests.

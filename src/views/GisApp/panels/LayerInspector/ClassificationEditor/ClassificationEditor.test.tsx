@@ -1,13 +1,16 @@
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
-import { ClassificationEditor } from "./ClassificationEditor";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { Model } from "@avandar/models";
+import { describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { fireEvent, render, screen } from "@/test-utils";
+
+import { ClassificationEditor } from "./ClassificationEditor";
 
 const boundarySourceState = vi.hoisted(() => {
   return { options: [] as unknown[] };

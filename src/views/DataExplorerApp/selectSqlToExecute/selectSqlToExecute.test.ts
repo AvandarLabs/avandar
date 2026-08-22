@@ -1,8 +1,10 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { describe, expect, it } from "vitest";
-import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+
+import { describe, expect, it } from "vitest";
+
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
 
 const datasetId = "dataset_large" as DatasetId;
 

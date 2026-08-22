@@ -1,5 +1,6 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 import { describe, expect, it } from "vitest";
+
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 
 describe("LocalChatModel.Catalog", () => {
   it("lists models in ascending RAM tier", () => {

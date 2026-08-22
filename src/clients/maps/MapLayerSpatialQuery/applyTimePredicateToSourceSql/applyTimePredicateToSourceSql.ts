@@ -1,5 +1,6 @@
-import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 
 /**
  * Column types the time predicate can compare against without casting the

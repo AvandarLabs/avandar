@@ -1,9 +1,11 @@
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { ReactNode } from "react";
+
 import { Tooltip } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
+
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-import type { ReactNode } from "react";
 
 type Props = {
   /** `null` while the workspace-wide share row carries no role yet. */

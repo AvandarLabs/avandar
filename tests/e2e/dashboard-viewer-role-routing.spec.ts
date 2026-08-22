@@ -1,9 +1,10 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { deleteDashboardsByIds, seedDashboard } from "./helpers/seedDashboard";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 type AdminClient = ReturnType<typeof createSupabaseAdminClient>;
 

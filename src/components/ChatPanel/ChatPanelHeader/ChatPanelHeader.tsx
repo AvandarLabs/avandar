@@ -2,6 +2,7 @@ import { mantineColorVar, Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Button, Group, Text } from "@mantine/core";
 import { IconSparkles, IconX } from "@tabler/icons-react";
+
 import css from "./ChatPanelHeader.module.css";
 
 type Props = {

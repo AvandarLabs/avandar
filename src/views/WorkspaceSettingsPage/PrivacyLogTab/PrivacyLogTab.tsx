@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Tabs } from "@mantine/core";
+
 import { ClarificationLogPanel } from "./ClarificationLogPanel";
 import { ConsentLogPanel } from "./ConsentLogPanel";
 import { PrivateResourcesPanel } from "./PrivateResourcesPanel/PrivateResourcesPanel";

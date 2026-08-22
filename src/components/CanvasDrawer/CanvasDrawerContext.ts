@@ -1,5 +1,6 @@
-import { createContext, useContext } from "react";
 import type { KeyboardEvent, PointerEvent } from "react";
+
+import { createContext, useContext } from "react";
 
 /** Shared resize and open state for canvas-drawer compound children. */
 export type CanvasDrawerContextValue = {

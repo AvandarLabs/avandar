@@ -29,7 +29,7 @@ export function validateDashboardSlug(
   if (slug.length < SLUG_MIN_LENGTH) {
     return { isValid: false, reason: "too_short", limit: SLUG_MIN_LENGTH };
   }
-  return slug.length > SLUG_MAX_LENGTH ?
-      { isValid: false, reason: "too_long", limit: SLUG_MAX_LENGTH }
+  return slug.length > SLUG_MAX_LENGTH
+    ? { isValid: false, reason: "too_long", limit: SLUG_MAX_LENGTH }
     : undefined;
 }

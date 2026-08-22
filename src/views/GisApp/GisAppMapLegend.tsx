@@ -1,7 +1,9 @@
-import { prop } from "@avandar/utils";
-import { MapLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegend";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
+
+import { prop } from "@avandar/utils";
+
+import { MapLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegend";
 
 type Props = { app: GisAppState };
 

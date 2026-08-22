@@ -1,21 +1,22 @@
-import { matchLiteral } from "@avandar/utils";
 import type {
   NuxStep,
   NuxStepFacts,
 } from "@/components/Nux/tutorials/NuxTutorial.types";
+
+import { matchLiteral } from "@avandar/utils";
 
 function _isNuxStepVisible(options: {
   step: NuxStep;
   facts: NuxStepFacts;
 }): boolean {
   const { when } = options.step;
-  return when === undefined ? true : (
-      matchLiteral(when, {
+  return when === undefined
+    ? true
+    : matchLiteral(when, {
         explorerHasQueryResults: options.facts.explorerHasQueryResults,
         explorerHasNoQueryResults: !options.facts.explorerHasQueryResults,
         generalAccessIsWorkspace: options.facts.generalAccessIsWorkspace,
-      })
-    );
+      });
 }
 
 /**

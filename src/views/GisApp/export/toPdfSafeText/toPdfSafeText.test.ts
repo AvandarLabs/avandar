@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { toPdfSafeText } from "@/views/GisApp/export/toPdfSafeText/toPdfSafeText";
 
 describe("toPdfSafeText", () => {

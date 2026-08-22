@@ -1,13 +1,15 @@
+import type { ReactElement } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
+
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { Logger } from "@/utils/Logger";
-import type { ReactElement } from "react";
 
 const searchSchema = z.object({
   redirectReason: z.string().optional(),

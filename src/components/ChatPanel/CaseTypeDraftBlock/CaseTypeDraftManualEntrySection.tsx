@@ -1,3 +1,5 @@
+import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -9,7 +11,6 @@ import {
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
-import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
   editor: CaseTypeDraftEditor;

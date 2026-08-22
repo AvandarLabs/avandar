@@ -1,7 +1,8 @@
-import { useLingui } from "@lingui/react/macro";
-import { Select, TextInput } from "@mantine/core";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Select, TextInput } from "@mantine/core";
 
 type Props = {
   kind: AvaMapConfig.CustomBasemapKind;
@@ -42,9 +43,9 @@ export function CustomBasemapFields({
       <TextInput
         label={t`URL template`}
         description={
-          kind === "wms" ?
-            t`Include the bbox-epsg-3857 placeholder where the server expects the bounding box.`
-          : t`Include the z, x and y placeholders where the server expects the tile index.`
+          kind === "wms"
+            ? t`Include the bbox-epsg-3857 placeholder where the server expects the bounding box.`
+            : t`Include the z, x and y placeholders where the server expects the tile index.`
         }
         value={url}
         onChange={(event) => {

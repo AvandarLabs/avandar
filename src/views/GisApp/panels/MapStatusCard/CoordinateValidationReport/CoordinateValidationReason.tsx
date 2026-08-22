@@ -1,14 +1,15 @@
-import { matchLiteral } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import { Plural, useLingui } from "@lingui/react/macro";
-import { Button } from "@mantine/core";
-import { useMemo } from "react";
 import type {
   DropReason,
   GeometryDropReport,
 } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MessageDescriptor } from "@lingui/core";
 import type { ReactNode } from "react";
+
+import { matchLiteral } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import { Plural, useLingui } from "@lingui/react/macro";
+import { Button } from "@mantine/core";
+import { useMemo } from "react";
 
 type Props = {
   drop: GeometryDropReport;
@@ -52,16 +53,16 @@ export function CoordinateValidationReason({
         <Plural value={drop.count} one="# row" other="# rows" />
       </div>
       <p>
-        {drop.sampleRowIndexes.length === 1 ?
-          t`Row ${rowIndexes}.`
-        : t`Rows ${rowIndexes}.`}{" "}
+        {drop.sampleRowIndexes.length === 1
+          ? t`Row ${rowIndexes}.`
+          : t`Rows ${rowIndexes}.`}{" "}
         {i18n._(_explanation(drop.reason))}
       </p>
-      {drop.reason === "suspectedLatLngSwap" ?
+      {drop.reason === "suspectedLatLngSwap" ? (
         <Button size="compact-xs" variant="default" onClick={onSwapLatLng}>
           {t`Swap latitude and longitude`}
         </Button>
-      : null}
+      ) : null}
     </li>
   );
 }

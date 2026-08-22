@@ -1,7 +1,3 @@
-import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
-import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
-import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
-import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -19,6 +15,12 @@ import type {
   VizConfigType,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+
+import { match } from "ts-pattern";
+
+import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
+import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
+import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
 
 export const PieChartVizConfigs = {
   vizType: "pie",
@@ -100,9 +102,9 @@ export const PieChartVizConfigs = {
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
         const scatterSeries =
-          nameKey !== undefined && valueKey !== undefined ?
-            [{ xKey: nameKey, key: valueKey }]
-          : [];
+          nameKey !== undefined && valueKey !== undefined
+            ? [{ xKey: nameKey, key: valueKey }]
+            : [];
         return { vizType, series: scatterSeries };
       })
       .with("pie", (): PieChartVizConfig => {
@@ -118,9 +120,9 @@ export const PieChartVizConfigs = {
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
-          nameKey !== undefined && valueKey !== undefined ?
-            [{ xKey: nameKey, key: valueKey, sizeKey: valueKey }]
-          : [];
+          nameKey !== undefined && valueKey !== undefined
+            ? [{ xKey: nameKey, key: valueKey, sizeKey: valueKey }]
+            : [];
         return { vizType, series: bubbleSeries };
       })
       .exhaustive(() => {

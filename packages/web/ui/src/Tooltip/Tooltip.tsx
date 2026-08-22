@@ -1,5 +1,6 @@
-import { Tooltip as MantineTooltip } from "@mantine/core";
 import type { TooltipProps } from "@mantine/core";
+
+import { Tooltip as MantineTooltip } from "@mantine/core";
 
 type Props = TooltipProps;
 
@@ -33,9 +34,9 @@ function _mergeTooltipStyles(
     return (theme, ...args) => {
       const resolved = stylesProp(theme, ...args);
       const prior =
-        typeof resolved?.tooltip === "object" && resolved.tooltip !== null ?
-          resolved.tooltip
-        : {};
+        typeof resolved?.tooltip === "object" && resolved.tooltip !== null
+          ? resolved.tooltip
+          : {};
 
       return {
         ...resolved,
@@ -45,9 +46,9 @@ function _mergeTooltipStyles(
   }
 
   const prior =
-    typeof stylesProp.tooltip === "object" && stylesProp.tooltip !== null ?
-      stylesProp.tooltip
-    : {};
+    typeof stylesProp.tooltip === "object" && stylesProp.tooltip !== null
+      ? stylesProp.tooltip
+      : {};
 
   return {
     ...stylesProp,

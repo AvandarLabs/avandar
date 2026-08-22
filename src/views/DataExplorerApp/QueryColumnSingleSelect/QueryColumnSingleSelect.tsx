@@ -1,19 +1,21 @@
-import { Model } from "@avandar/models";
-import { makeSelectOptions, Select } from "@avandar/ui";
-import { makeIdLookupMap, prop, where } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { useUncontrolled } from "@mantine/hooks";
-import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
-import { useEffect, useMemo } from "react";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
-import type { SelectProps } from "@avandar/ui";
 import type {
   QueryColumnId,
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { SelectProps } from "@avandar/ui";
 import type { ReactNode } from "react";
+
+import { Model } from "@avandar/models";
+import { makeSelectOptions, Select } from "@avandar/ui";
+import { makeIdLookupMap, prop, where } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { useUncontrolled } from "@mantine/hooks";
+import { useEffect, useMemo } from "react";
+
+import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 
 type Props = {
   label: ReactNode;
@@ -116,9 +118,8 @@ export function QueryColumnSingleSelect({
       value={selectedColumnId}
       onChange={(newColumnId) => {
         // convert the column id back to column by looking it up
-        const newSelectedColumn =
-          newColumnId ?
-            (queryColumnLookup.get(newColumnId as QueryColumnId) ?? null)
+        const newSelectedColumn = newColumnId
+          ? (queryColumnLookup.get(newColumnId as QueryColumnId) ?? null)
           : null;
         setCurrentSelectedColumn(newSelectedColumn);
       }}

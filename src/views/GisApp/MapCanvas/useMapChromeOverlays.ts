@@ -1,10 +1,12 @@
-import { isDefined } from "@avandar/utils";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { useEffect } from "react";
-import { isClosedRingValid } from "@/views/GisApp/tools/isClosedRingValid/isClosedRingValid";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
+
+import { isDefined } from "@avandar/utils";
+import { useEffect } from "react";
+
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { isClosedRingValid } from "@/views/GisApp/tools/isClosedRingValid/isClosedRingValid";
 
 /** MapLibre source and layer ids reserved for canvas chrome, never MapSpec. */
 export const MapChromeOverlayIds = {
@@ -89,12 +91,12 @@ function _makeAoiOutlineCollection(options: {
 }): GeoJSON.FeatureCollection {
   const committedRing = options.aoi?.coordinates[0];
   const features = [
-    committedRing && committedRing.length >= 2 ?
-      _lineFeature(committedRing)
-    : undefined,
-    options.inProgressVertices.length >= 2 ?
-      _lineFeature(options.inProgressVertices)
-    : undefined,
+    committedRing && committedRing.length >= 2
+      ? _lineFeature(committedRing)
+      : undefined,
+    options.inProgressVertices.length >= 2
+      ? _lineFeature(options.inProgressVertices)
+      : undefined,
   ].filter(isDefined);
   return { type: "FeatureCollection", features };
 }

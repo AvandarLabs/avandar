@@ -1,14 +1,16 @@
+import type { ReactNode } from "react";
+
 /**
  * Re-running edited SQL is the most deliberate query a user can make, and
  * `query.ran` has to be able to say so.
  */
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
+
 import { fireEvent, render, screen } from "@/test-utils";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView";
-import type { ReactNode } from "react";
 
 // The read-only SQL block resolves a workspace dataset/column catalog for
 // display pills, which needs router context and a QueryClient this test does

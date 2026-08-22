@@ -1,5 +1,6 @@
 import { DuckDbSpatialExtensionDocumentation } from "@sbfn/queries/DuckDbSpatialExtensionDocumentation.ts";
 import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
+
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
 const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
@@ -28,8 +29,8 @@ function isSpatialPrompt(prompt: string): boolean {
  * prompt has no spatial keywords.
  */
 export function makeSpatialSqlDocumentationFromPrompt(prompt: string): string {
-  return isSpatialPrompt(prompt) ?
-      `Reference documentation:
+  return isSpatialPrompt(prompt)
+    ? `Reference documentation:
 If the query requires any geospatial operations, refer to the following document:
 ${DuckDbSpatialExtensionDocumentation}`
     : "";
@@ -72,9 +73,8 @@ export function buildSqlSystemPrompt(
     columns,
     conceptAttributes,
   });
-  const spatialDocs =
-    includeSpatialDocumentation ?
-      makeSpatialSqlDocumentationFromPrompt(prompt)
+  const spatialDocs = includeSpatialDocumentation
+    ? makeSpatialSqlDocumentationFromPrompt(prompt)
     : "";
 
   return `You are a DuckDB SQL query generator. Given a natural language prompt and database schema, generate a valid DuckDB SQL SELECT query.

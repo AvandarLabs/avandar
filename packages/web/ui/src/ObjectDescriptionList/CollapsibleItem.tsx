@@ -1,8 +1,9 @@
+import type { ReactNode } from "react";
+
 import { useToggleBoolean } from "@avandar/hooks";
 import { Box, Collapse, Group, Text, UnstyledButton } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import { clsx } from "clsx";
-import type { ReactNode } from "react";
 
 type Props = {
   children: ReactNode;

@@ -1,6 +1,7 @@
+import type { Database } from "$/types/database.types.ts";
+
 import { matchLiteral } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-import type { Database } from "$/types/database.types.ts";
 
 /**
  * Returns the human-readable label for a resource type. Shared copy used in

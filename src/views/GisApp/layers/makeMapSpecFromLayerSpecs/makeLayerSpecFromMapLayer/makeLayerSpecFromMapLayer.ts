@@ -1,4 +1,15 @@
+import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
+import type { ClusterCountSource } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
+import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
+import type {
+  CircleRadiusValue,
+  MapLayerSpec,
+  MapSpec,
+} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { ExpressionSpecification } from "maplibre-gl";
+
 import { matchLiteral } from "@avandar/utils";
+
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { makeClusterLayerSpecsFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
 import { makeColorExpressionFromColor } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeColorExpressionFromColor";
@@ -11,15 +22,6 @@ import {
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
-import type { LayerStats } from "@/views/GisApp/layers/getLayerStatsFromFeatureCollection/getLayerStatsFromFeatureCollection";
-import type { ClusterCountSource } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeClusterLayerSpecsFromMapLayer";
-import type { CreateMapLayerSpecInput } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.types";
-import type {
-  CircleRadiusValue,
-  MapLayerSpec,
-  MapSpec,
-} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { ExpressionSpecification } from "maplibre-gl";
 
 type ProportionalSymbol = Extract<
   MapLayer.Symbology,
@@ -345,34 +347,35 @@ export function makeLayerSpecFromMapLayer({
   }
 
   const { symbology } = layer;
-  const countSource: ClusterCountSource =
-    isAggregated ? "aggregatedRows" : "maplibre";
+  const countSource: ClusterCountSource = isAggregated
+    ? "aggregatedRows"
+    : "maplibre";
   const paintsAsClusters = _shouldPaintAsClusters({
     symbology,
     featureCount: featureCollection.features.length,
     isAggregated,
   });
   const autoClusterPaint =
-    paintsAsClusters && _isAutoClusterableSymbology(symbology) ?
-      _getAutoClusterPaint(symbology)
-    : undefined;
+    paintsAsClusters && _isAutoClusterableSymbology(symbology)
+      ? _getAutoClusterPaint(symbology)
+      : undefined;
 
   const sourceId = MapLayerIds.toSourceId(layer.id);
   const layerSpecs =
-    autoClusterPaint !== undefined ?
-      makeClusterLayerSpecsFromMapLayer({
-        layer,
-        sourceId,
-        countSource,
-        paint: autoClusterPaint,
-      })
-    : _makeMapLayerSpecs({
-        layer,
-        stats,
-        valueColumnName,
-        sourceId,
-        countSource,
-      });
+    autoClusterPaint !== undefined
+      ? makeClusterLayerSpecsFromMapLayer({
+          layer,
+          sourceId,
+          countSource,
+          paint: autoClusterPaint,
+        })
+      : _makeMapLayerSpecs({
+          layer,
+          stats,
+          valueColumnName,
+          sourceId,
+          countSource,
+        });
   const casingSpecs = makeDisputedCasingLayerSpecFromMapLayer({
     layer,
     sourceId,
@@ -382,18 +385,18 @@ export function makeLayerSpecFromMapLayer({
   return {
     sources: {
       [sourceId]:
-        paintsAsClusters && !isAggregated ?
-          {
-            type: "geojson",
-            data: featureCollection,
-            cluster: true,
-            clusterRadius:
-              symbology.type === "cluster" ?
-                symbology.radiusPx
-              : MapLayer.defaultClusterRadiusPx,
-            clusterMaxZoom: 14,
-          }
-        : { type: "geojson", data: featureCollection },
+        paintsAsClusters && !isAggregated
+          ? {
+              type: "geojson",
+              data: featureCollection,
+              cluster: true,
+              clusterRadius:
+                symbology.type === "cluster"
+                  ? symbology.radiusPx
+                  : MapLayer.defaultClusterRadiusPx,
+              clusterMaxZoom: 14,
+            }
+          : { type: "geojson", data: featureCollection },
     },
     layers: [...layerSpecs, ...casingSpecs],
   };

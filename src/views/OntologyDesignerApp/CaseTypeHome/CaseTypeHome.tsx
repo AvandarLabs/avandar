@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Loader, Text, Title } from "@mantine/core";
+
 import { CaseTypeCard } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard";
 import css from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeHome.module.css";
 import { NewCaseTypeCard } from "@/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard";
-import type { ReactNode } from "react";
 
 export type CaseTypeHomeItem = {
   id: string;
@@ -40,9 +42,10 @@ export function CaseTypeHome({
           <Trans>Each case type is a kind of record you manage.</Trans>
         </Text>
       </header>
-      {isLoading ?
+      {isLoading ? (
         <Loader m="md" size="sm" />
-      : <div className={css.grid}>
+      ) : (
+        <div className={css.grid}>
           {caseTypes.map((caseType) => {
             return (
               <CaseTypeCard
@@ -52,18 +55,18 @@ export function CaseTypeHome({
                   onOpenCaseType(caseType);
                 }}
                 onDelete={
-                  onDeleteCaseType ?
-                    () => {
-                      onDeleteCaseType(caseType);
-                    }
-                  : undefined
+                  onDeleteCaseType
+                    ? () => {
+                        onDeleteCaseType(caseType);
+                      }
+                    : undefined
                 }
               />
             );
           })}
           <NewCaseTypeCard onCreate={onCreate} />
         </div>
-      }
+      )}
     </div>
   );
 }

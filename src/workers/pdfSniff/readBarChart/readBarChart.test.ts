@@ -1,9 +1,3 @@
-import { readFile } from "node:fs/promises";
-import { describe, expect, it } from "vitest";
-import { clipToRegion } from "../clipToRegion/clipToRegion";
-import { extractPageGeometry } from "../extractPageGeometry/extractPageGeometry";
-import { loadPdfDocument } from "../loadPdfDocument/loadPdfDocument";
-import { readBarChart } from "./readBarChart";
 import type {
   BBox,
   ExtractedTable,
@@ -13,6 +7,14 @@ import type {
   RuleSegment,
   TextItem,
 } from "../pdfSniff.types";
+
+import { readFile } from "node:fs/promises";
+import { describe, expect, it } from "vitest";
+
+import { clipToRegion } from "../clipToRegion/clipToRegion";
+import { extractPageGeometry } from "../extractPageGeometry/extractPageGeometry";
+import { loadPdfDocument } from "../loadPdfDocument/loadPdfDocument";
+import { readBarChart } from "./readBarChart";
 
 const OCHA =
   "public/test-data/pdf/gate/ocha-sudan-cholera-update-2025-07-03.pdf";

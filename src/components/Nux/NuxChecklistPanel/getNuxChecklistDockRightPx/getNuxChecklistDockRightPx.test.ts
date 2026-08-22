@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { getNuxChecklistDockRightPx } from "@/components/Nux/NuxChecklistPanel/getNuxChecklistDockRightPx/getNuxChecklistDockRightPx";
 
 describe("getNuxChecklistDockRightPx", () => {

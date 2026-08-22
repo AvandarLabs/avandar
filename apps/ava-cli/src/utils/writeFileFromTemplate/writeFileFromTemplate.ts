@@ -1,8 +1,9 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
-import { parseTemplate } from "@ava-cli/utils/writeFileFromTemplate/parseTemplate/parseTemplate";
 import type { TemplateParams } from "@ava-cli/utils/writeFileFromTemplate/parseTemplate/parseTemplate";
 import type { FormatConfig } from "oxfmt";
+
+import { parseTemplate } from "@ava-cli/utils/writeFileFromTemplate/parseTemplate/parseTemplate";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 // TODO(jpsyx): we need a better way to get the project root. This is not
 // accurate.

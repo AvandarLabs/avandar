@@ -1,3 +1,13 @@
+import type {
+  QueryFilter,
+  QueryFilterColumnTypes,
+  QueryFilterCombinator,
+  QueryFilterGroup,
+  QueryFilterOperator,
+  QueryFilterRule,
+} from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
+
 import {
   columnRefName,
   extractValueList,
@@ -10,15 +20,6 @@ import {
   toFilterOperator,
   unwrapLowerCall,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
-import type {
-  QueryFilter,
-  QueryFilterColumnTypes,
-  QueryFilterCombinator,
-  QueryFilterGroup,
-  QueryFilterOperator,
-  QueryFilterRule,
-} from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
 
 const _NEGATED_OPERATOR: Partial<
   Record<QueryFilterOperator, QueryFilterOperator>
@@ -56,10 +57,13 @@ function _parseFunctionPredicate(node: unknown): QueryFilterRule | undefined {
   }
 
   const operator =
-    name === "contains" ? "contains"
-    : name === "starts_with" ? "starts_with"
-    : name === "ends_with" ? "ends_with"
-    : undefined;
+    name === "contains"
+      ? "contains"
+      : name === "starts_with"
+        ? "starts_with"
+        : name === "ends_with"
+          ? "ends_with"
+          : undefined;
   if (!operator) {
     return undefined;
   }

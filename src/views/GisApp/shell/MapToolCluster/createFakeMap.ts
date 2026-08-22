@@ -1,8 +1,9 @@
+import type { Map as MapLibreMap } from "maplibre-gl";
+
 /**
  * Shared map-tool fake for MapToolCluster and annotation gesture tests.
  */
 import { vi } from "vitest";
-import type { Map as MapLibreMap } from "maplibre-gl";
 
 type MapPointerHandler = (event: {
   lngLat: { lng: number; lat: number };

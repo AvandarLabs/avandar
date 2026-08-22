@@ -1,8 +1,8 @@
+import { Acclimate } from "@avandar/acclimate";
+import { template } from "@avandar/utils";
 import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { Acclimate } from "@avandar/acclimate";
-import { template } from "@avandar/utils";
 
 const EDGE_TEMPLATES_DIR = "scripts/edge-functions/newEdgeFunction/templates";
 
@@ -190,9 +190,8 @@ export function formatGeneratedFile(options: {
   projectRoot: string;
   filePath: string;
 }): void {
-  const formatter =
-    options.filePath.endsWith(".sql") ?
-      `pnpm exec prettier --write "${options.filePath}"`
+  const formatter = options.filePath.endsWith(".sql")
+    ? `pnpm exec prettier --write "${options.filePath}"`
     : `pnpm exec oxfmt --ignore-path .oxfmtignore "${options.filePath}"`;
   execSync(formatter, {
     cwd: options.projectRoot,
@@ -248,18 +247,18 @@ export function setEdgeFunctionVerifyJWTInConfigTOML(options: {
     _isTOMLSectionHeaderLine,
   );
   const sectionEnd =
-    nextSectionRelativeIndex === -1 ?
-      lines.length
-    : sectionStart + 1 + nextSectionRelativeIndex;
+    nextSectionRelativeIndex === -1
+      ? lines.length
+      : sectionStart + 1 + nextSectionRelativeIndex;
 
   const sectionBody = lines.slice(sectionStart + 1, sectionEnd);
   const verifyJWTRelativeIndex = sectionBody.findIndex((line) => {
     return /^\s*verify_jwt\s*=/.test(line);
   });
   const verifyJWTLineIndex =
-    verifyJWTRelativeIndex === -1 ? -1 : (
-      sectionStart + 1 + verifyJWTRelativeIndex
-    );
+    verifyJWTRelativeIndex === -1
+      ? -1
+      : sectionStart + 1 + verifyJWTRelativeIndex;
 
   if (verifyJWTLineIndex !== -1) {
     lines[verifyJWTLineIndex] = lines[verifyJWTLineIndex]!.replace(
@@ -271,9 +270,9 @@ export function setEdgeFunctionVerifyJWTInConfigTOML(options: {
       return /^\s*enabled\s*=/.test(line);
     });
     const insertAt =
-      enabledRelativeIndex === -1 ?
-        sectionStart + 1
-      : sectionStart + 1 + enabledRelativeIndex + 1;
+      enabledRelativeIndex === -1
+        ? sectionStart + 1
+        : sectionStart + 1 + enabledRelativeIndex + 1;
 
     lines.splice(insertAt, 0, "verify_jwt = false");
   }

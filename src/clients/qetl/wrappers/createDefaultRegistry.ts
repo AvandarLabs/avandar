@@ -1,5 +1,18 @@
+import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import type {
+  AcquiredRelation,
+  SourceWrapper,
+} from "$/models/relations/SourceWrapper/SourceWrapper.types";
+import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
+import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
+
 import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
+
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
@@ -10,17 +23,6 @@ import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsW
 import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
-import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
-import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
-import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-import type {
-  AcquiredRelation,
-  SourceWrapper,
-} from "$/models/relations/SourceWrapper/SourceWrapper.types";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 

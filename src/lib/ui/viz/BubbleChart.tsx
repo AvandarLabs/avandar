@@ -1,3 +1,7 @@
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { UnknownDataFrame } from "@avandar/utils";
+
 /**
  * NOTE: This component uses Recharts directly instead of Mantine's
  * `BubbleChart` wrapper. Mantine's BubbleChart is single-series only
@@ -18,15 +22,13 @@ import {
   YAxis,
   ZAxis,
 } from "recharts";
+
 import { useBubbleChartStyleProps } from "@/lib/ui/viz/axis/useBubbleChartStyleProps";
 import {
   BUBBLE_SIZE_RANGE,
   CHART_COLOR_SWATCHES,
 } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   data: UnknownDataFrame;
@@ -95,7 +97,7 @@ export function BubbleChart({
           }}
         >
           <CartesianGrid {...styleProps.gridProps} />
-          {styleProps.withXAxis !== false ?
+          {styleProps.withXAxis !== false ? (
             <XAxis
               dataKey="x"
               type="number"
@@ -105,18 +107,18 @@ export function BubbleChart({
               }}
               {...styleProps.xAxisProps}
               label={
-                hasXLabel ?
-                  {
-                    value: xLabelText,
-                    position: "insideBottom",
-                    offset: -10,
-                    fill: chartStyle?.xAxis?.labelColor,
-                  }
-                : undefined
+                hasXLabel
+                  ? {
+                      value: xLabelText,
+                      position: "insideBottom",
+                      offset: -10,
+                      fill: chartStyle?.xAxis?.labelColor,
+                    }
+                  : undefined
               }
             />
-          : null}
-          {styleProps.withYAxis !== false ?
+          ) : null}
+          {styleProps.withYAxis !== false ? (
             <YAxis
               dataKey="y"
               type="number"
@@ -127,17 +129,17 @@ export function BubbleChart({
               }}
               {...styleProps.yAxisProps}
               label={
-                hasYLabel ?
-                  {
-                    value: yLabelText,
-                    angle: -90,
-                    position: "insideLeft",
-                    fill: chartStyle?.yAxis?.labelColor,
-                  }
-                : undefined
+                hasYLabel
+                  ? {
+                      value: yLabelText,
+                      angle: -90,
+                      position: "insideLeft",
+                      fill: chartStyle?.yAxis?.labelColor,
+                    }
+                  : undefined
               }
             />
-          : null}
+          ) : null}
           <ZAxis dataKey="z" type="number" range={BUBBLE_SIZE_RANGE} />
           <Tooltip
             cursor={{ strokeDasharray: "3 3" }}
@@ -145,9 +147,7 @@ export function BubbleChart({
               return formatChartNumber(value);
             }}
           />
-          {showLegend ?
-            <Legend {...styleProps.legendProps} />
-          : null}
+          {showLegend ? <Legend {...styleProps.legendProps} /> : null}
           {seriesData.map(({ series: s, points }, idx) => {
             const color =
               s.color ??

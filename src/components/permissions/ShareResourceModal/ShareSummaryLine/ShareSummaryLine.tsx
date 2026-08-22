@@ -1,6 +1,7 @@
+import type { SummarySpan } from "../buildShareSummary/buildShareSummary";
+
 import { useLingui } from "@lingui/react/macro";
 import { Badge, Text } from "@mantine/core";
-import type { SummarySpan } from "../buildShareSummary/buildShareSummary";
 
 const VARIANT_COLOR: Record<
   Extract<SummarySpan, { kind: "pill" }>["variant"],

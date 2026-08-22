@@ -1,3 +1,6 @@
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
+import type { ReactElement } from "react";
+
 import { mantineColorVar } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -11,13 +14,12 @@ import {
   Text,
 } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+import { useState } from "react";
+
 import { sqlFailedMappingReasonLabel } from "$/copy/sqlFailedMappingReasonLabel";
 import { sqlFailedMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import { useState } from "react";
 import { AvaSqlBlock } from "@/components/sql/AvaSqlBlock/AvaSqlBlock";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
-import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
-import type { ReactElement } from "react";
 
 type Props = {
   rawSql: string;
@@ -38,7 +40,7 @@ export function SqlTabPanel({
 
   return (
     <Stack gap="sm" px="sm">
-      {!isStructuredQueryInSync && sqlSyncWarnings.length > 0 ?
+      {!isStructuredQueryInSync && sqlSyncWarnings.length > 0 ? (
         <Alert
           icon={<IconAlertTriangle size={16} />}
           color="yellow"
@@ -63,7 +65,7 @@ export function SqlTabPanel({
             })}
           </List>
         </Alert>
-      : null}
+      ) : null}
       <Fieldset
         legend={
           <Group justify="space-between" style={{ width: "100%" }}>
@@ -86,7 +88,7 @@ export function SqlTabPanel({
         style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
       >
         <Stack gap="sm">
-          {isEditSQLMode ?
+          {isEditSQLMode ? (
             <SqlQueryEditPanel
               initialSql={rawSql}
               submitButtonLabel={t`Save and re-run query`}
@@ -99,7 +101,8 @@ export function SqlTabPanel({
                 setIsEditSQLMode(false);
               }}
             />
-          : <Paper
+          ) : (
+            <Paper
               p="sm"
               style={{
                 backgroundColor: mantineColorVar("gray.0"),
@@ -108,7 +111,7 @@ export function SqlTabPanel({
             >
               <AvaSqlBlock value={rawSql} readOnly minRows={6} />
             </Paper>
-          }
+          )}
         </Stack>
       </Fieldset>
     </Stack>

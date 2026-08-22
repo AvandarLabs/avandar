@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import {
   configureSuccessfulRemove,
   DASHBOARD_ID,
@@ -71,17 +72,16 @@ describe("PublicDatasetParquetStorageClient cleanup", () => {
       if (folderPath === `dashboards/${DASHBOARD_ID}/revisions`) {
         return {
           data:
-            options.offset === 1000 ?
-              [{ name: finalRevision }]
-            : firstPageRevisions,
+            options.offset === 1000
+              ? [{ name: finalRevision }]
+              : firstPageRevisions,
           error: null,
         };
       }
 
       return {
-        data:
-          folderPath.includes(finalRevision) ?
-            [{ name: `${STALE_DATASET_ID}.parquet` }]
+        data: folderPath.includes(finalRevision)
+          ? [{ name: `${STALE_DATASET_ID}.parquet` }]
           : [],
         error: null,
       };

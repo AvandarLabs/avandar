@@ -1,14 +1,16 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
+
 import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { useNuxPrerequisiteJudge } from "@/components/Nux/NuxPrerequisites/useNuxPrerequisiteJudge/useNuxPrerequisiteJudge";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render, screen } from "@/test-utils";
-import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import type { ReactNode } from "react";
 
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001";
 

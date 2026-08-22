@@ -1,7 +1,9 @@
+import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+
 import { makeObject } from "@avandar/utils";
 import { useCallback, useMemo, useState } from "react";
+
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 export type {
   DataVizFilterProps,
@@ -46,8 +48,8 @@ export function useLocalFilterState(
     return makeObject(localFilters, {
       key: "id",
       valueFn: (localFilter) => {
-        return localFilter.id in overrides ?
-            overrides[localFilter.id]
+        return localFilter.id in overrides
+          ? overrides[localFilter.id]
           : initialValues[localFilter.id];
       },
     });

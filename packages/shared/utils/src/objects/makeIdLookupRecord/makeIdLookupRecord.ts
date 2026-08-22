@@ -1,5 +1,6 @@
-import { makeObject } from "@utils/objects/makeObject/makeObject.ts";
 import type { ConditionalKeys } from "type-fest";
+
+import { makeObject } from "@utils/objects/makeObject/makeObject.ts";
 
 /**
  * Creates a lookup from a list of objects, indexed by an object's id field.
@@ -32,12 +33,13 @@ export function makeIdLookupRecord<
 ): Record<Extract<T[IdKey], PropertyKey>, T>;
 export function makeIdLookupRecord<
   T extends object,
-  IdKey extends ConditionalKeys<T, PropertyKey> = "id" extends (
-    ConditionalKeys<T, PropertyKey>
-  ) ?
-    "id"
-  : never,
-  OutKey extends T[IdKey] extends PropertyKey ? T[IdKey] : never =
+  IdKey extends ConditionalKeys<T, PropertyKey> = "id" extends ConditionalKeys<
+    T,
+    PropertyKey
+  >
+    ? "id"
+    : never,
+  OutKey extends (T[IdKey] extends PropertyKey ? T[IdKey] : never) =
     T[IdKey] extends PropertyKey ? T[IdKey] : never,
 >(
   list: readonly T[],

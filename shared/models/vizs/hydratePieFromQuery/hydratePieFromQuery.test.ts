@@ -1,9 +1,11 @@
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
+import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
+
+import { describe, expect, it } from "vitest";
+
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
-import { describe, expect, it } from "vitest";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
-import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 
 function makePieConfig(
   overrides: Partial<PieChartVizConfig> = {},

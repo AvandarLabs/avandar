@@ -1,6 +1,7 @@
-import { matchLiteral } from "@avandar/utils";
-import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { AppType } from "$/models/Permissions/Permissions";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
+
+import { matchLiteral } from "@avandar/utils";
 
 /**
  * Maps a `ResourceType` to the workspace app that owns it. Datasets live

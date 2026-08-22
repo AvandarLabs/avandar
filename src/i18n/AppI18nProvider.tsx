@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import { I18nProvider } from "@lingui/react";
 import { useEffect, useState } from "react";
+
 import { activateLocale, i18n } from "./i18n";
 import { DEFAULT_LOCALE } from "./locales";
-import type { ReactNode } from "react";
 
 type Props = {
   children: ReactNode;

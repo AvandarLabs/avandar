@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { NuxTourCaret } from "@/components/Nux/NuxTour/NuxTourCaret/NuxTourCaret";
 import { render } from "@/test-utils";
 

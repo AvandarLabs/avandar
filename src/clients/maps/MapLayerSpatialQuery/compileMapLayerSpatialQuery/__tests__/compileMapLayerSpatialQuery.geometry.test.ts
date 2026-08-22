@@ -1,7 +1,10 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+
 /**
  * Direct geometry-column compilation for compileMapLayerSpatialQuery.
  */
 import { describe, expect, it } from "vitest";
+
 import { MapLayerSpatialQueryColumns } from "../../MapLayerSpatialQuery.constants";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";
 import {
@@ -10,7 +13,6 @@ import {
   withAoiOverlay,
   withEmptyOverlay,
 } from "./compileMapLayerSpatialQuery.fixtures";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 describe("compileMapLayerSpatialQuery geometry column", () => {
   it("wraps source SQL and emits the stable one-row envelope", () => {

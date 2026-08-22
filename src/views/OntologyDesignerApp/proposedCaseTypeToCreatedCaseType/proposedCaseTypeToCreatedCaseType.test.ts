@@ -1,3 +1,5 @@
+import type { ChatProposedCaseType } from "$/types/chat.types";
+
 /**
  * The draft card hands its edited state straight to the concept insert path, so
  * this conversion decides what actually gets persisted: which attributes
@@ -7,8 +9,8 @@
  * source is matched on are covered here too.
  */
 import { describe, expect, it } from "vitest";
+
 import { proposedCaseTypeToCreatedCaseType } from "@/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType";
-import type { ChatProposedCaseType } from "$/types/chat.types";
 
 const DEATHS_DATASET_ID = "0f2c9f3e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_DATASET_ID = "0f2c9f3e-bbbb-4bbb-8ccc-ddddeeeeffff";
@@ -175,8 +177,8 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
     const created = proposedCaseTypeToCreatedCaseType({
       ...draft,
       attributes: draft.attributes.map((attribute) => {
-        return attribute.columnId === STATE_COLUMN_ID ?
-            { ...attribute, isIncluded: false }
+        return attribute.columnId === STATE_COLUMN_ID
+          ? { ...attribute, isIncluded: false }
           : attribute;
       }),
     });
@@ -196,8 +198,8 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
     const created = proposedCaseTypeToCreatedCaseType({
       ...draft,
       attributes: draft.attributes.map((attribute) => {
-        return attribute.columnId === CENSUS_KEY_COLUMN_ID ?
-            { ...attribute, isIncluded: false }
+        return attribute.columnId === CENSUS_KEY_COLUMN_ID
+          ? { ...attribute, isIncluded: false }
           : attribute;
       }),
     });

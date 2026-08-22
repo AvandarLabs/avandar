@@ -1,11 +1,13 @@
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Menu } from "@mantine/core";
+
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDeleteDatasetMenuItem } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { ReactNode } from "react";
 
 /** Save-over and delete items for the dataset currently open in Explorer. */
 export function DataExplorerOpenDatasetMenuItems(): ReactNode {
@@ -38,7 +40,7 @@ export function DataExplorerOpenDatasetMenuItems(): ReactNode {
   }
   return (
     <>
-      {state.openDataset.virtualDatasetId ?
+      {state.openDataset.virtualDatasetId ? (
         <Menu.Item
           disabled={!state.rawSql || isSavingOver}
           onClick={() => {
@@ -54,7 +56,7 @@ export function DataExplorerOpenDatasetMenuItems(): ReactNode {
         >
           <Trans>Save: {state.openDataset.name}</Trans>
         </Menu.Item>
-      : null}
+      ) : null}
       <DataExplorerDeleteDatasetMenuItem
         isDeletingDataset={isDeletingDataset}
         onDelete={(datasetId) => {

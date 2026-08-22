@@ -1,7 +1,8 @@
+import type { Dirent } from "node:fs";
+
+import { isDefined } from "@avandar/utils";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
-import { isDefined } from "@avandar/utils";
-import type { Dirent } from "node:fs";
 
 /** Whether the running `ava` matches the source, and why not if it does not. */
 export type CLIUpToDateResult =

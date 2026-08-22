@@ -1,5 +1,6 @@
 import { defaultVariantColorsResolver } from "@mantine/core";
 import { describe, expect, it } from "vitest";
+
 import {
   ANIMATION_PRESET,
   AnimationTheme,
@@ -15,6 +16,7 @@ import {
   PRODUCT_MODAL_ROOT_CLASSNAME,
   Theme,
 } from "@/config/Theme";
+
 import { NEUTRAL_SHADES } from "../../../shared/config/Theme";
 
 describe("Theme modal stacking", () => {

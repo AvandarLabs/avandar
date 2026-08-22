@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
-import { ModelModule } from "@models/Model/ModelModule/ModelModule.ts";
 import type {
   ModelBase,
   ModelType,
@@ -7,6 +5,9 @@ import type {
   ModelVersioned,
 } from "@models/Model/Model.types.ts";
 import type { EmptyObject } from "type-fest";
+
+/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+import { ModelModule } from "@models/Model/ModelModule/ModelModule.ts";
 
 export const Model = ModelModule;
 

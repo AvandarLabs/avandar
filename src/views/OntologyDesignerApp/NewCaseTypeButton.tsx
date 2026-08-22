@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import type { ReactNode } from "react";
 
 /**
  * Opens chat in the case-type designer session.

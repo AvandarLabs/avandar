@@ -1,9 +1,10 @@
-import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
-import { match } from "ts-pattern";
 import type {
   ChatDashboardVizType,
   ChatGeneratedDashboardBlock,
 } from "$/types/chat.types.ts";
+
+import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
+import { match } from "ts-pattern";
 
 const ALLOWED_DASHBOARD_VIZ_TYPES = new Set<ChatDashboardVizType>([
   "table",
@@ -104,17 +105,15 @@ export function parseDashboardBlock(
         return undefined;
       }
       const level =
-        (
-          typeof parsed.level === "number" &&
-          ALLOWED_HEADING_LEVELS.has(parsed.level)
-        ) ?
-          (parsed.level as 1 | 2 | 3 | 4)
-        : undefined;
+        typeof parsed.level === "number" &&
+        ALLOWED_HEADING_LEVELS.has(parsed.level)
+          ? (parsed.level as 1 | 2 | 3 | 4)
+          : undefined;
       const alignRaw = _trimString(parsed.align);
       const align =
-        alignRaw && ALLOWED_BLOCK_ALIGN.has(alignRaw) ?
-          (alignRaw as "left" | "center" | "right")
-        : undefined;
+        alignRaw && ALLOWED_BLOCK_ALIGN.has(alignRaw)
+          ? (alignRaw as "left" | "center" | "right")
+          : undefined;
       return {
         kind: "HeadingBlock",
         text,
@@ -129,9 +128,9 @@ export function parseDashboardBlock(
       }
       const alignRaw = _trimString(parsed.align);
       const align =
-        alignRaw && ALLOWED_BLOCK_ALIGN.has(alignRaw) ?
-          (alignRaw as "left" | "center" | "right")
-        : undefined;
+        alignRaw && ALLOWED_BLOCK_ALIGN.has(alignRaw)
+          ? (alignRaw as "left" | "center" | "right")
+          : undefined;
       return { kind: "ParagraphBlock", text, ...(align ? { align } : {}) };
     })
     .with("QuoteBlock", (): ChatGeneratedDashboardBlock | undefined => {
@@ -153,9 +152,9 @@ export function parseDashboardBlock(
       }
       const toneRaw = _trimString(parsed.tone);
       const tone =
-        toneRaw && ALLOWED_CALLOUT_TONES.has(toneRaw) ?
-          (toneRaw as "info" | "warning" | "neutral")
-        : undefined;
+        toneRaw && ALLOWED_CALLOUT_TONES.has(toneRaw)
+          ? (toneRaw as "info" | "warning" | "neutral")
+          : undefined;
       return { kind: "CalloutBlock", title, body, ...(tone ? { tone } : {}) };
     })
     .with("ListBlock", (): ChatGeneratedDashboardBlock | undefined => {
@@ -174,9 +173,9 @@ export function parseDashboardBlock(
       }
       const listTypeRaw = _trimString(parsed.listType);
       const listType =
-        listTypeRaw && ALLOWED_LIST_TYPES.has(listTypeRaw) ?
-          (listTypeRaw as "ordered" | "unordered")
-        : undefined;
+        listTypeRaw && ALLOWED_LIST_TYPES.has(listTypeRaw)
+          ? (listTypeRaw as "ordered" | "unordered")
+          : undefined;
       return { kind: "ListBlock", items, ...(listType ? { listType } : {}) };
     })
     .with("CodeBlock", (): ChatGeneratedDashboardBlock | undefined => {
@@ -194,9 +193,9 @@ export function parseDashboardBlock(
       }
       const delimiterRaw = _trimString(parsed.delimiter);
       const delimiter =
-        delimiterRaw && ALLOWED_TABLE_DELIMITERS.has(delimiterRaw) ?
-          (delimiterRaw as "comma" | "tab" | "pipe")
-        : undefined;
+        delimiterRaw && ALLOWED_TABLE_DELIMITERS.has(delimiterRaw)
+          ? (delimiterRaw as "comma" | "tab" | "pipe")
+          : undefined;
       const hasHeader =
         typeof parsed.hasHeader === "boolean" ? parsed.hasHeader : undefined;
       return {

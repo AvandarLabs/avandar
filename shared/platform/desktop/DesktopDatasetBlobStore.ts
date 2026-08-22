@@ -1,11 +1,13 @@
-import { base64ToUint8, uint8ToBase64 } from "@utils/encoding/index.ts";
-import { callIpc } from "$/platform/ipc/client.ts";
-import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts.ts";
 import type {
   DatasetBlobKey,
   DatasetBlobStat,
   DatasetBlobStore,
 } from "$/platform/types/DatasetBlobStore.types.ts";
+
+import { base64ToUint8, uint8ToBase64 } from "@utils/encoding/index.ts";
+
+import { callIpc } from "$/platform/ipc/client.ts";
+import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts.ts";
 
 /** Drains a byte stream to completion and concatenates it into one array. */
 async function _readStreamToUint8Array(

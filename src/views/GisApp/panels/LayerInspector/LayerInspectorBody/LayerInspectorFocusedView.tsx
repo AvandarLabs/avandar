@@ -1,14 +1,15 @@
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { ClassificationEditor } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor";
-import { MatchReport } from "@/views/GisApp/panels/LayerInspector/MatchReport/MatchReport";
-import { CoordinateValidationReport } from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type {
   LayerChangeHandler,
   LayerInspectorView,
 } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
+
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { ClassificationEditor } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor";
+import { MatchReport } from "@/views/GisApp/panels/LayerInspector/MatchReport/MatchReport";
+import { CoordinateValidationReport } from "@/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport";
 
 type Props = {
   layer: MapLayer.T;

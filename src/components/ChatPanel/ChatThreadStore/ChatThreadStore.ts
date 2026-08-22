@@ -1,6 +1,8 @@
-import { prop } from "@avandar/utils";
-import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import type { ThreadMessageLike } from "@assistant-ui/react";
+
+import { prop } from "@avandar/utils";
+
+import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 
 type StoredThread = {
   messages: ThreadMessageLike[];
@@ -36,8 +38,8 @@ function _stripTrailingViewEvents(
   const lastCommittedIndex = messages.findLastIndex((message) => {
     return !_isViewChangeMessage(message);
   });
-  return lastCommittedIndex < 0 ?
-      []
+  return lastCommittedIndex < 0
+    ? []
     : [...messages.slice(0, lastCommittedIndex + 1)];
 }
 

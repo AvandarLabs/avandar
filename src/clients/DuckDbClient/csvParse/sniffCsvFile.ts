@@ -1,3 +1,11 @@
+import type { CsvDialectHints } from "@/clients/DuckDbClient/csvParse/csvSniff";
+import type {
+  DuckDbColumnSchema,
+  DuckDbCsvSniffResult,
+  UnknownRow,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+
 import { uuid } from "$/lib/uuid";
 import { createCsvParseOptionsFromUserHints } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
 import {
@@ -9,13 +17,6 @@ import {
   sniffCsvWithDuckDb,
 } from "@/clients/DuckDbClient/csvParse/csvSniff";
 import { registerCsvFile } from "@/clients/DuckDbClient/duckDbFileRegistry";
-import type { CsvDialectHints } from "@/clients/DuckDbClient/csvParse/csvSniff";
-import type {
-  DuckDbColumnSchema,
-  DuckDbCsvSniffResult,
-  UnknownRow,
-} from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** Options for `DuckDbClient.sniffCsv`. */
 export type SniffCsvOptions = CsvDialectHints & {

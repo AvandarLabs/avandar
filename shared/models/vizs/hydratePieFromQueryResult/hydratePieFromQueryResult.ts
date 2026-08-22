@@ -1,9 +1,10 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import {
   columnNameSet,
   pickFirstNumericColumnName,
 } from "$/models/vizs/hydrateColumnPicking.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 type PieAxesConfig = {
   nameKey: string | undefined;
@@ -39,13 +40,13 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
   let nextConfig: VConfig = {
     ...currVizConfig,
     valueKey:
-      currVizConfig.valueKey && colNames.has(currVizConfig.valueKey) ?
-        currVizConfig.valueKey
-      : undefined,
+      currVizConfig.valueKey && colNames.has(currVizConfig.valueKey)
+        ? currVizConfig.valueKey
+        : undefined,
     nameKey:
-      currVizConfig.nameKey && colNames.has(currVizConfig.nameKey) ?
-        currVizConfig.nameKey
-      : undefined,
+      currVizConfig.nameKey && colNames.has(currVizConfig.nameKey)
+        ? currVizConfig.nameKey
+        : undefined,
   };
 
   if (nextConfig.valueKey === undefined) {

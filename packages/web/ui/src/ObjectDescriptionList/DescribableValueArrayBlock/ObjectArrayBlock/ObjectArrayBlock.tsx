@@ -1,12 +1,3 @@
-import { objectKeys, StringKeyOf } from "@avandar/utils";
-import { List, Table, Text } from "@mantine/core";
-import { useI18nMessages } from "@ui/i18n/useI18nMessages";
-import { useMemo } from "react";
-import { CollapsibleItem } from "../../CollapsibleItem";
-import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
-import { getObjectKeyTransformFn } from "../../getObjectKeyTransformFn";
-import { ValueItemContainer } from "../../ValueItemContainer";
-import { ObjectTableRow } from "./ObjectTableRow";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -15,6 +6,17 @@ import type {
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
 } from "../../ObjectDescriptionList.types";
+
+import { objectKeys, StringKeyOf } from "@avandar/utils";
+import { List, Table, Text } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
+import { useMemo } from "react";
+
+import { CollapsibleItem } from "../../CollapsibleItem";
+import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
+import { getObjectKeyTransformFn } from "../../getObjectKeyTransformFn";
+import { ValueItemContainer } from "../../ValueItemContainer";
+import { ObjectTableRow } from "./ObjectTableRow";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
@@ -45,9 +47,9 @@ export function ObjectArrayBlock<
 }: Props<T, RootData>): JSX.Element | null {
   const i18n = useI18nMessages();
   const valuesToRender = useMemo(() => {
-    return maxItemsCount === undefined ? values : (
-        values.slice(0, maxItemsCount)
-      );
+    return maxItemsCount === undefined
+      ? values
+      : values.slice(0, maxItemsCount);
   }, [values, maxItemsCount]);
 
   if (valuesToRender.length === 0) {
@@ -90,8 +92,9 @@ export function ObjectArrayBlock<
     > = editable ? [...headerKeys, ACTION_COLUMN_HEADER_KEY] : headerKeys;
 
     const headers = headerKeysToRender.map((headerKey) => {
-      const customRenderedHeader =
-        renderTableHeader ? renderTableHeader(headerKey, rootData) : undefined;
+      const customRenderedHeader = renderTableHeader
+        ? renderTableHeader(headerKey, rootData)
+        : undefined;
 
       if (headerKey === ACTION_COLUMN_HEADER_KEY) {
         return <Table.Th key={headerKey} />;
@@ -99,9 +102,9 @@ export function ObjectArrayBlock<
 
       return (
         <Table.Th key={headerKey}>
-          {customRenderedHeader !== undefined ?
-            customRenderedHeader
-          : getObjectKeyTransformFn(renderObjectKeyTransform)(headerKey)}
+          {customRenderedHeader !== undefined
+            ? customRenderedHeader
+            : getObjectKeyTransformFn(renderObjectKeyTransform)(headerKey)}
         </Table.Th>
       );
     });
@@ -175,9 +178,9 @@ export function ObjectArrayBlock<
 
   const remainingCount = values.length - valuesToRender.length;
   const moreText =
-    valuesToRender.length < values.length ?
+    valuesToRender.length < values.length ? (
       <Text>{i18n.andMore(remainingCount)}</Text>
-    : null;
+    ) : null;
 
   return (
     <>

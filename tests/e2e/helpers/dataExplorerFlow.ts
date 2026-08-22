@@ -1,6 +1,8 @@
-import { expect } from "@playwright/test";
-import { MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Locator, Page } from "@playwright/test";
+
+import { expect } from "@playwright/test";
+
+import { MEDIUM_WAIT, SHORT_WAIT } from "./timeouts";
 
 /** Tabs of the Data Explorer's bottom drawer. */
 type DataExplorerDrawerTab = "query" | "visualizations";

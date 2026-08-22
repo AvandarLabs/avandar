@@ -49,10 +49,10 @@ are stuck following the tour.
 
 Each row has two targets.
 
-| Target | Undone | Done |
-| --- | --- | --- |
-| Circle | Empty. Tooltip: "Mark done". Always enabled. | Filled green with a check. Tooltip: "Mark not done". Always enabled while the panel is up. |
-| Rest of the row | Starts the tour, unless prerequisites are unmet (locked, same as today). | Does not start the tour. |
+| Target          | Undone                                                                   | Done                                                                                       |
+| --------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Circle          | Empty. Tooltip: "Mark done". Always enabled.                             | Filled green with a check. Tooltip: "Mark not done". Always enabled while the panel is up. |
+| Rest of the row | Starts the tour, unless prerequisites are unmet (locked, same as today). | Does not start the tour.                                                                   |
 
 Locked (prerequisite-unmet) rows can still be marked done. Clicking the circle
 does not start the tour (`stopPropagation`). Visual treatment stays option A:
@@ -86,7 +86,7 @@ The checklist then schedules one **400ms** follow-up
    expanded).
 2. If every milestone is still done, drop the hold and unmount as today.
 
-Checking a *different* milestone than the open tour leaves that tour alone.
+Checking a _different_ milestone than the open tour leaves that tour alone.
 A live completion still uses `completeMilestone` and still jumps to the
 payoff.
 
@@ -120,12 +120,12 @@ a guard, unmark would flash and the circle would fill again.
 `userUnmarkedMilestones` is an in-memory list on `NuxAppState`. The judge
 must not catch-up those keys. It is not persisted.
 
-| Event | Effect on the list |
-| --- | --- |
-| `unmarkMilestoneDone(key)` | add `key` |
-| `markMilestoneDone(key)` | remove `key` |
-| `completeMilestone` / live event | remove `key` |
-| `restart` | clear the list (restart already suppresses catch-up globally) |
+| Event                            | Effect on the list                                            |
+| -------------------------------- | ------------------------------------------------------------- |
+| `unmarkMilestoneDone(key)`       | add `key`                                                     |
+| `markMilestoneDone(key)`         | remove `key`                                                  |
+| `completeMilestone` / live event | remove `key`                                                  |
+| `restart`                        | clear the list (restart already suppresses catch-up globally) |
 
 Refresh: persisted `completed_milestones` omit the unmarked key, then
 hydration + catch-up may check it off again from artifacts. That is

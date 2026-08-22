@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";
 
 describe("isValidRedirectPath", () => {

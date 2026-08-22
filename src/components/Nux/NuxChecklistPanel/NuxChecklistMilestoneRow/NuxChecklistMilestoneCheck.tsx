@@ -1,7 +1,8 @@
-import { ActionIcon, Tooltip } from "@mantine/core";
-import { IconCheck } from "@tabler/icons-react";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { ReactNode } from "react";
+
+import { ActionIcon, Tooltip } from "@mantine/core";
+import { IconCheck } from "@tabler/icons-react";
 
 type Props = {
   milestoneKey: NuxProgress.MilestoneKey;
@@ -28,9 +29,7 @@ export function NuxChecklistMilestoneCheck({
         data-testid={`nux-milestone-check-${milestoneKey}`}
         onClick={onToggleDone}
       >
-        {isDone ?
-          <IconCheck size={12} />
-        : null}
+        {isDone ? <IconCheck size={12} /> : null}
       </ActionIcon>
     </Tooltip>
   );

@@ -1,4 +1,5 @@
 import { capitalize } from "@avandar/utils";
+
 import { EmailParagraph } from "$/emails/lib/EmailParagraph.tsx";
 
 type Props = {
@@ -19,12 +20,12 @@ export function EmailSignature({
       {capitalize(signOff)},
       <br />
       {name}
-      {title ?
+      {title ? (
         <>
           <br />
           {title}
         </>
-      : null}
+      ) : null}
       <br />
       {appName}
     </EmailParagraph>

@@ -1,7 +1,9 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { fireEvent, render, screen } from "@/test-utils";
 import { ViewsMenu } from "@/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 const BOOKMARK = {
   id: "00000000-0000-4000-8000-000000000001" as AvaMapConfig.BookmarkId,

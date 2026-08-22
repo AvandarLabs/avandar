@@ -1,3 +1,5 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -13,7 +15,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
-import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "geometry-formats.csv";
 const MAP_NAME = "E2E GIS geometry columns";

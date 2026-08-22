@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MutableRefObject, RefObject } from "react";
+
+import { useEffect, useRef } from "react";
 
 type MapViewSyncMap = {
   getCenter: () => { lng: number; lat: number };

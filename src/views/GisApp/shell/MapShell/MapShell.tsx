@@ -1,7 +1,9 @@
+import type { ReactNode, RefCallback, RefObject } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+
 import css from "./MapShell.module.css";
 import { MapShellChrome } from "./MapShellChrome";
-import type { ReactNode, RefCallback, RefObject } from "react";
 
 type Props = {
   /** The map itself, rendered as the substrate under every panel. */

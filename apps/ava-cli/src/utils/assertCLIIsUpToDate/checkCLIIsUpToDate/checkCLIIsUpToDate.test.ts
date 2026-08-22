@@ -1,3 +1,4 @@
+import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate/checkCLIIsUpToDate";
 import {
   mkdirSync,
   mkdtempSync,
@@ -7,7 +8,6 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate/checkCLIIsUpToDate";
 import { afterEach, describe, expect, it } from "vitest";
 
 /**

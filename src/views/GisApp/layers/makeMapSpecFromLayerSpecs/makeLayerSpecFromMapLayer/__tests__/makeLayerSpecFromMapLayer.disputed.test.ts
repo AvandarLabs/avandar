@@ -1,13 +1,16 @@
-import { uuid } from "$/lib/uuid";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
 import { describe, expect, it } from "vitest";
+
+import { uuid } from "$/lib/uuid";
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+
 import {
   EMPTY_STATS,
   makeFillLayerFixture,
 } from "./makeLayerSpecFromMapLayer.fixtures";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 function _boundLayer() {
   return {

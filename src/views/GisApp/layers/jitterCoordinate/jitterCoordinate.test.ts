@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 
 const kinshasa = { longitude: 15.2663, latitude: -4.4419 };

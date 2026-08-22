@@ -12,9 +12,11 @@
 export function makeSet<
   T,
   HashKey extends keyof T | undefined,
-  HashV extends undefined extends HashKey ? unknown
-  : T[Extract<HashKey, PropertyKey>] = undefined extends HashKey ? T
-  : T[Extract<HashKey, PropertyKey>],
+  HashV extends (undefined extends HashKey
+    ? unknown
+    : T[Extract<HashKey, PropertyKey>]) = undefined extends HashKey
+    ? T
+    : T[Extract<HashKey, PropertyKey>],
 >(
   list: readonly T[],
   options: { key?: HashKey; hashFn?: (item: T) => HashV } = {},
@@ -25,10 +27,11 @@ export function makeSet<
   }
   const outputSet = new Set<HashV>();
   for (const item of list) {
-    const hashValue =
-      key ? (item[key] as HashV)
-      : hashFn ? hashFn(item)
-      : (item as unknown as HashV);
+    const hashValue = key
+      ? (item[key] as HashV)
+      : hashFn
+        ? hashFn(item)
+        : (item as unknown as HashV);
     outputSet.add(hashValue);
   }
   return outputSet;

@@ -1,12 +1,14 @@
+import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+
 import { Trans } from "@lingui/react/macro";
 import { Alert, Checkbox, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+
 import { BiasHitBadges } from "./BiasHitBadges";
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
-import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 type Props = {
   /** PII findings driving the warning. */
@@ -68,14 +70,14 @@ export function CompositePanel({
 
       <RowValueList values={previewValues} />
 
-      {bias[0]?.suggestion ?
+      {bias[0]?.suggestion ? (
         <Stack gap={4}>
           <Text size="xs" c="dimmed">
             <Trans>Suggested rewrite:</Trans>
           </Text>
           <Text size="sm">{bias[0].suggestion}</Text>
         </Stack>
-      : null}
+      ) : null}
 
       <Checkbox
         label={acknowledgeLabel}

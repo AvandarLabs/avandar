@@ -130,13 +130,13 @@ earlier reintroduces the torn read the guard exists to prevent.
 
 Recorded so a reader does not trust the older text over the tree.
 
-| Proposal says | Merged tree | Effect on this spec |
-|---|---|---|
-| The incidental access check lives in `determineExtractions` | That function does not exist; the reads are in `WorkspaceQetlClient.getDiceFromSql` and `qetlDiceExtractors.getDiceExtractors` | None on the design; the census of what breaks when the probe moves is unchanged |
-| Relation extraction uses `node-sql-parser`, whose `tableList` returns CTE names and DDL targets | `DuckDbSqlAnalyzer` already filters both and fails closed; spec 1 section 6 extends its return type only | Proposal section 12 item 4 is **already satisfied** by spec 1. This spec consumes `extractReferencedRelations` and adds no filtering of its own |
-| "Materialize Parquet sorted by the entity key" | **No dataset-level key designation exists.** The only entity key in the tree is a concept's identifier attribute, resolved to a dataset column at `getDatasetColumnAssertions.ts:165`, plus `individuals.external_id` | The `ORDER BY` fires for relations with a resolvable key and is a documented no-op elsewhere. Section 10.3 |
-| The cache is "a new Dexie version" | The current version is **9**; `CURRENT_AVA_DEXIE_VERSION = "v9"` | The new tables land in **v10**. Section 6 |
-| `LocalDataset.parquetData` is a cache | It is also the resumable-upload staging slot | v10 is non-destructive. Section 6.3 |
+| Proposal says                                                                                   | Merged tree                                                                                                                                                                                                           | Effect on this spec                                                                                                                             |
+| ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| The incidental access check lives in `determineExtractions`                                     | That function does not exist; the reads are in `WorkspaceQetlClient.getDiceFromSql` and `qetlDiceExtractors.getDiceExtractors`                                                                                        | None on the design; the census of what breaks when the probe moves is unchanged                                                                 |
+| Relation extraction uses `node-sql-parser`, whose `tableList` returns CTE names and DDL targets | `DuckDbSqlAnalyzer` already filters both and fails closed; spec 1 section 6 extends its return type only                                                                                                              | Proposal section 12 item 4 is **already satisfied** by spec 1. This spec consumes `extractReferencedRelations` and adds no filtering of its own |
+| "Materialize Parquet sorted by the entity key"                                                  | **No dataset-level key designation exists.** The only entity key in the tree is a concept's identifier attribute, resolved to a dataset column at `getDatasetColumnAssertions.ts:165`, plus `individuals.external_id` | The `ORDER BY` fires for relations with a resolvable key and is a documented no-op elsewhere. Section 10.3                                      |
+| The cache is "a new Dexie version"                                                              | The current version is **9**; `CURRENT_AVA_DEXIE_VERSION = "v9"`                                                                                                                                                      | The new tables land in **v10**. Section 6                                                                                                       |
+| `LocalDataset.parquetData` is a cache                                                           | It is also the resumable-upload staging slot                                                                                                                                                                          | v10 is non-destructive. Section 6.3                                                                                                             |
 
 ---
 
@@ -181,20 +181,20 @@ observably identical, and section 15 pins that.
 
 ## 3. Decisions (resolved)
 
-| Decision | Resolution | Why |
-|---|---|---|
-| One cache or two? | **Two tiers, one port.** `QueryableRelationCache` (DuckDB tables) and `StorageRelationCache` (IndexedDB), both behind `RelationCachePort` | Spec 1 section 7 fixed the names. One port is what lets the public session keep its own store (below) without a second probe path |
-| Does the public session move to the new Dexie tables? | **No.** `LocalPublicDataset` stays, behind a second `RelationCachePort` implementation | A published snapshot is immutable, so its identity is already exact (`dashboardId`, `snapshotRevision`, `datasetId`): no freshness, no definition, no projection. Moving it would be blast radius with no benefit, and the port removes the shared-probe leak of 1.3 anyway |
-| How is "authorize before probe" enforced? | A **branded `AuthorizedRelations` receipt**, produced only by `authorize()` and **required by `QueryMediator.runQuery`** | The tree already uses exactly this idiom for `DatasetDuckDbLease`. It makes "probed without authorizing" fail to compile, and it makes the compiler list every caller |
-| Where does the principal come from? | **From the receipt**, not from ambient state | One value carries the identity that was checked and the identity the key is built from, so they cannot disagree |
-| Is the source version part of the lookup? | **No. It is recorded and compared on recheck.** Lookup matches on principal, relation and definition | A version token generally requires a network call (`readFreshness`). Putting it in the lookup would make every hit block on the network, which defeats the cache and breaks offline |
-| Is the logical definition part of the lookup? | **Yes, always, synchronously** | It is read from local state (the virtual dataset's `raw_sql` is already in the warm TanStack cache), so it costs nothing and fixes the invalidation bug deterministically rather than eventually |
-| How are ambiguities resolved? | **Always toward a miss.** Case-sensitive column comparison, verbatim (unnormalized) definition text, unknown freshness treated as stale on recheck | A false miss costs a refetch. A false hit serves wrong or unauthorized rows. This is the single rule behind most of the details below |
-| Column reuse rule | **Hit when `cachedColumns ⊇ neededColumns`**, plus **monotone growth**: a partial miss acquires the union and replaces the narrower entry | Set containment on strings is linear and exact, unlike predicate containment (proposal section 12.1). Monotone growth means at most one live entry per relation and principal, so the probe never scans a family of projections |
-| Where do needed columns come from? | **`StructuredQuery` only in Phase 1**; raw SQL uses `"all"` | A `StructuredQuery` names its dataset and its columns. Attributing a bare column reference in raw SQL to one relation needs resolution the analyzer does not do, and `"all"` is always sound. The motivating ontology path is structured |
-| Pushdown result cache persistence | **In-memory, per session, bounded entry count** | Persisting third-party API responses raises retention questions nobody has answered. The key is fixed now so spec 5 can promote it to Dexie without changing it |
-| Cross-tab mechanism | **`navigator.locks` behind the existing lease**, single acquisition point | Proposal section 12: do not introduce a second locking mechanism beside the branded lease |
-| Dexie migration shape | **v10 adds two tables and deletes nothing** | `LocalDataset.parquetData` is also upload staging (1.4). Bytes are reclaimed lazily, and only after a download proved a remote copy exists |
+| Decision                                              | Resolution                                                                                                                                         | Why                                                                                                                                                                                                                                                                         |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| One cache or two?                                     | **Two tiers, one port.** `QueryableRelationCache` (DuckDB tables) and `StorageRelationCache` (IndexedDB), both behind `RelationCachePort`          | Spec 1 section 7 fixed the names. One port is what lets the public session keep its own store (below) without a second probe path                                                                                                                                           |
+| Does the public session move to the new Dexie tables? | **No.** `LocalPublicDataset` stays, behind a second `RelationCachePort` implementation                                                             | A published snapshot is immutable, so its identity is already exact (`dashboardId`, `snapshotRevision`, `datasetId`): no freshness, no definition, no projection. Moving it would be blast radius with no benefit, and the port removes the shared-probe leak of 1.3 anyway |
+| How is "authorize before probe" enforced?             | A **branded `AuthorizedRelations` receipt**, produced only by `authorize()` and **required by `QueryMediator.runQuery`**                           | The tree already uses exactly this idiom for `DatasetDuckDbLease`. It makes "probed without authorizing" fail to compile, and it makes the compiler list every caller                                                                                                       |
+| Where does the principal come from?                   | **From the receipt**, not from ambient state                                                                                                       | One value carries the identity that was checked and the identity the key is built from, so they cannot disagree                                                                                                                                                             |
+| Is the source version part of the lookup?             | **No. It is recorded and compared on recheck.** Lookup matches on principal, relation and definition                                               | A version token generally requires a network call (`readFreshness`). Putting it in the lookup would make every hit block on the network, which defeats the cache and breaks offline                                                                                         |
+| Is the logical definition part of the lookup?         | **Yes, always, synchronously**                                                                                                                     | It is read from local state (the virtual dataset's `raw_sql` is already in the warm TanStack cache), so it costs nothing and fixes the invalidation bug deterministically rather than eventually                                                                            |
+| How are ambiguities resolved?                         | **Always toward a miss.** Case-sensitive column comparison, verbatim (unnormalized) definition text, unknown freshness treated as stale on recheck | A false miss costs a refetch. A false hit serves wrong or unauthorized rows. This is the single rule behind most of the details below                                                                                                                                       |
+| Column reuse rule                                     | **Hit when `cachedColumns ⊇ neededColumns`**, plus **monotone growth**: a partial miss acquires the union and replaces the narrower entry          | Set containment on strings is linear and exact, unlike predicate containment (proposal section 12.1). Monotone growth means at most one live entry per relation and principal, so the probe never scans a family of projections                                             |
+| Where do needed columns come from?                    | **`StructuredQuery` only in Phase 1**; raw SQL uses `"all"`                                                                                        | A `StructuredQuery` names its dataset and its columns. Attributing a bare column reference in raw SQL to one relation needs resolution the analyzer does not do, and `"all"` is always sound. The motivating ontology path is structured                                    |
+| Pushdown result cache persistence                     | **In-memory, per session, bounded entry count**                                                                                                    | Persisting third-party API responses raises retention questions nobody has answered. The key is fixed now so spec 5 can promote it to Dexie without changing it                                                                                                             |
+| Cross-tab mechanism                                   | **`navigator.locks` behind the existing lease**, single acquisition point                                                                          | Proposal section 12: do not introduce a second locking mechanism beside the branded lease                                                                                                                                                                                   |
+| Dexie migration shape                                 | **v10 adds two tables and deletes nothing**                                                                                                        | `LocalDataset.parquetData` is also upload staging (1.4). Bytes are reclaimed lazily, and only after a download proved a remote copy exists                                                                                                                                  |
 
 ---
 
@@ -206,11 +206,11 @@ redesign it. Every other section is a consequence of it.
 A cache key has three kinds of component, and conflating them is what makes
 cache designs wrong:
 
-| Component | Matched by | Cost of getting it wrong |
-|---|---|---|
-| principal, relation, definition | **exact equality** | a false hit serves unauthorized or stale rows |
-| column set | **containment** (`cached ⊇ needed`) | a false hit serves rows missing a column, which surfaces as a SQL error, not silence |
-| source version | **not matched at lookup**; compared during a freshness recheck | matching it at lookup makes every hit block on the network |
+| Component                       | Matched by                                                     | Cost of getting it wrong                                                             |
+| ------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| principal, relation, definition | **exact equality**                                             | a false hit serves unauthorized or stale rows                                        |
+| column set                      | **containment** (`cached ⊇ needed`)                            | a false hit serves rows missing a column, which surfaces as a SQL error, not silence |
+| source version                  | **not matched at lookup**; compared during a freshness recheck | matching it at lookup makes every hit block on the network                           |
 
 ### 4.1 The type
 
@@ -293,13 +293,13 @@ rematerialization. That is the correct trade.
 
 ### 4.4 What the logical definition is, per relation
 
-| Relation | `kind` | `text` |
-|---|---|---|
-| dataset, `csv_file` / `xlsx_file` | `parquet-object` | storage object path, then the column-replacement signature |
-| dataset, `open_data` blob | `parquet-url` | the resolved Parquet URL from the catalog entry, then the column-replacement signature |
-| dataset, `virtual` | `virtual-sql` | `raw_sql` verbatim, then the column-replacement signature |
-| dataset, `google_sheets` | `sheet-tab` | spreadsheet id, then tab name. Spec 4 fills this in; spec 2 ships the entry with the tab absent |
-| concept | `concept-extension` | **Spec 3 owns this.** It must include the contributor dataset ids, the identifier attribute, and the requested attribute mappings, because any of those changing changes the rows |
+| Relation                          | `kind`              | `text`                                                                                                                                                                            |
+| --------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| dataset, `csv_file` / `xlsx_file` | `parquet-object`    | storage object path, then the column-replacement signature                                                                                                                        |
+| dataset, `open_data` blob         | `parquet-url`       | the resolved Parquet URL from the catalog entry, then the column-replacement signature                                                                                            |
+| dataset, `virtual`                | `virtual-sql`       | `raw_sql` verbatim, then the column-replacement signature                                                                                                                         |
+| dataset, `google_sheets`          | `sheet-tab`         | spreadsheet id, then tab name. Spec 4 fills this in; spec 2 ships the entry with the tab absent                                                                                   |
+| concept                           | `concept-extension` | **Spec 3 owns this.** It must include the contributor dataset ids, the identifier attribute, and the requested attribute mappings, because any of those changing changes the rows |
 
 The **column-replacement signature** is the sorted list of
 `originalName>alias:dataType` triples that `_getColumnReplacements`
@@ -347,7 +347,7 @@ function coversColumns(
 ): boolean {
   if (cached === "all") return true;
   if (needed === "all") return false;
-  const cachedSet = new Set(cached);          // case-sensitive, by decision
+  const cachedSet = new Set(cached); // case-sensitive, by decision
   return needed.every((column) => cachedSet.has(column));
 }
 ```
@@ -431,10 +431,7 @@ export type RelationCachePort = {
   /** Stores one relation. Never throws into the query. Section 9.3. */
   put(write: RelationCacheWrite): Promise<void>;
   /** Forgets every entry for these relations and this principal. */
-  evict(
-    refs: readonly RelationRef.T[],
-    principal: PrincipalKey,
-  ): Promise<void>;
+  evict(refs: readonly RelationRef.T[], principal: PrincipalKey): Promise<void>;
 };
 ```
 
@@ -988,10 +985,10 @@ records the consequence if that harness is not available in Phase 1.
 Proposal section 11.2, with the cache columns filled in. **Selected by declared
 capability, never by source type.**
 
-| Condition on `capabilities` | Mode | What is cached | Key | Reuse |
-|---|---|---|---|---|
+| Condition on `capabilities`                                           | Mode                     | What is cached                                  | Key                             | Reuse                              |
+| --------------------------------------------------------------------- | ------------------------ | ----------------------------------------------- | ------------------------------- | ---------------------------------- |
 | `predicatePushdown === "none"` and `wholeRelationAcquirable !== "no"` | **Relation acquisition** | the whole relation, optionally column-projected | section 4.3 plus the column set | exact identity, column containment |
-| `predicatePushdown !== "none"` and `wholeRelationAcquirable === "no"` | **Pushdown** | the **result** | section 4.6 | exact query identity only |
+| `predicatePushdown !== "none"` and `wholeRelationAcquirable === "no"` | **Pushdown**             | the **result**                                  | section 4.6                     | exact query identity only          |
 
 ```text
 const wrapper = registry.resolve(ref);
@@ -1074,20 +1071,20 @@ Characterization first, as in spec 1: the behaviours listed in section 2's
 change budget are the only ones allowed to move, and the rest are pinned before
 any reordering lands.
 
-| Area | Test |
-|---|---|
-| `identityKey` | Deterministic for the same inputs. Changes when any of principal, relation, definition or version changes. A definition differing only in whitespace produces a different token, asserted, because that is a deliberate choice |
-| `serves` | Exact match on principal, relation and definition. `cached ⊇ needed` hits; `needed ⊄ cached` misses; `"all"` covers everything; `needed === "all"` misses an enumerated entry. Case difference misses |
-| Probe ordering | With a wrapper whose `acquire` throws, a query for a relation present in the storage tier returns rows. This is the reordering, tested directly |
-| Poisoned table | With the table marked invalid, the queryable probe reports a miss, drops the table, and the storage tier reloads it. The mutation-poisoning suite is extended, not duplicated |
-| `authorize` | Each outcome. Two call sites only, asserted by a test that greps the module graph for producers of `AuthorizedRelations`. Concept refs return `unsupported` |
-| Revocation | Section 8.4, including the eviction that makes it sticky |
-| Eviction | Section 9.4, including the zero-payload-read assertion |
-| Projection | Section 10.4, on real rows through the executed harness |
-| Invalidation | Section 11.3, including the Sheets-cache criterion |
-| Cross-tab | Section 12.1 |
-| Dexie v10 | Opening a v9 database yields a v10 database with both new tables, all four pre-existing stores intact, and every `LocalDataset.parquetData` still present. The migration is asserted to be non-destructive |
-| Mode selection | Every registered wrapper's capability record selects exactly one mode; the unsatisfiable combination is asserted absent |
+| Area           | Test                                                                                                                                                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `identityKey`  | Deterministic for the same inputs. Changes when any of principal, relation, definition or version changes. A definition differing only in whitespace produces a different token, asserted, because that is a deliberate choice |
+| `serves`       | Exact match on principal, relation and definition. `cached ⊇ needed` hits; `needed ⊄ cached` misses; `"all"` covers everything; `needed === "all"` misses an enumerated entry. Case difference misses                          |
+| Probe ordering | With a wrapper whose `acquire` throws, a query for a relation present in the storage tier returns rows. This is the reordering, tested directly                                                                                |
+| Poisoned table | With the table marked invalid, the queryable probe reports a miss, drops the table, and the storage tier reloads it. The mutation-poisoning suite is extended, not duplicated                                                  |
+| `authorize`    | Each outcome. Two call sites only, asserted by a test that greps the module graph for producers of `AuthorizedRelations`. Concept refs return `unsupported`                                                                    |
+| Revocation     | Section 8.4, including the eviction that makes it sticky                                                                                                                                                                       |
+| Eviction       | Section 9.4, including the zero-payload-read assertion                                                                                                                                                                         |
+| Projection     | Section 10.4, on real rows through the executed harness                                                                                                                                                                        |
+| Invalidation   | Section 11.3, including the Sheets-cache criterion                                                                                                                                                                             |
+| Cross-tab      | Section 12.1                                                                                                                                                                                                                   |
+| Dexie v10      | Opening a v9 database yields a v10 database with both new tables, all four pre-existing stores intact, and every `LocalDataset.parquetData` still present. The migration is asserted to be non-destructive                     |
+| Mode selection | Every registered wrapper's capability record selects exactly one mode; the unsatisfiable combination is asserted absent                                                                                                        |
 
 **Regression guard for the whole spec:** a bookmarked `?sql=` URL, including one
 containing a CTE, returns what it returned before, for a user who is authorized.
@@ -1154,15 +1151,15 @@ Recorded so the next author does not read silence as an answer.
 
 ## 18. Risks
 
-| Risk | Mitigation |
-|---|---|
-| Moving the probe ahead of dispatch removes the incidental access check, which is the exact hole this spec exists to close | `authorize` and the reordering land in **one** change, and the `AuthorizedRelations` receipt makes the ordering a compile-time fact rather than a review outcome. The probe cannot be reached without a receipt |
-| The probe becomes hot, promoting 1.3's latent cross-visibility leak to a live one | The port is chosen by the session, so the public session physically cannot read the workspace store. Tested |
-| A definition token that is computed inconsistently produces false hits, which is the worst failure mode available | The definition is opaque text hashed verbatim, computed in one pure function with its own test suite, and every ambiguity in the design resolves toward a miss |
-| The column set makes the cache key harder to reason about, and a superset rule invites a "close enough" reuse tier later | Containment is on a small set of strings, is exact and linear, and is bounded by the single-live-entry and monotone-growth rules so only one row is ever a candidate. Predicate containment stays out, by decision and by the absence of any predicate in the key |
-| A projection silently changes row multiplicity | No `DISTINCT` in a projection COPY, stated as a rule and asserted on real rows through the executed harness |
-| A Dexie migration that moves Parquet blobs can strand a resumable upload or brick the database if the upgrade transaction fails midway | v10 adds tables and deletes nothing. Bytes are reclaimed lazily, and only after a download proved a remote copy exists |
-| The cache is filled by a background transcoding path and read by the query path, so the two can disagree about what "ready" means | The write-through hand-off in 6.3 means the upload path and the query path share one entry, written once, with one identity |
-| `navigator.locks` is unavailable and last-writer-wins corrupts a payload | Entry and payload are written in a single Dexie transaction, so the failure mode of last-writer-wins is a superseded entry, never a torn one. The fallback logs |
-| The offline authorization window is up to 14 days, and someone will read that as a security bug | Stated explicitly as accepted policy in 8.3, with the online criterion tested and the eviction making revocation sticky once seen |
-| The budget interacts with the existing 1 GiB source-bytes cache and a device quota that neither knows about | The quota-fraction term in 9.1, plus 9.3's rule that a cache write failure never fails a query |
+| Risk                                                                                                                                   | Mitigation                                                                                                                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Moving the probe ahead of dispatch removes the incidental access check, which is the exact hole this spec exists to close              | `authorize` and the reordering land in **one** change, and the `AuthorizedRelations` receipt makes the ordering a compile-time fact rather than a review outcome. The probe cannot be reached without a receipt                                                   |
+| The probe becomes hot, promoting 1.3's latent cross-visibility leak to a live one                                                      | The port is chosen by the session, so the public session physically cannot read the workspace store. Tested                                                                                                                                                       |
+| A definition token that is computed inconsistently produces false hits, which is the worst failure mode available                      | The definition is opaque text hashed verbatim, computed in one pure function with its own test suite, and every ambiguity in the design resolves toward a miss                                                                                                    |
+| The column set makes the cache key harder to reason about, and a superset rule invites a "close enough" reuse tier later               | Containment is on a small set of strings, is exact and linear, and is bounded by the single-live-entry and monotone-growth rules so only one row is ever a candidate. Predicate containment stays out, by decision and by the absence of any predicate in the key |
+| A projection silently changes row multiplicity                                                                                         | No `DISTINCT` in a projection COPY, stated as a rule and asserted on real rows through the executed harness                                                                                                                                                       |
+| A Dexie migration that moves Parquet blobs can strand a resumable upload or brick the database if the upgrade transaction fails midway | v10 adds tables and deletes nothing. Bytes are reclaimed lazily, and only after a download proved a remote copy exists                                                                                                                                            |
+| The cache is filled by a background transcoding path and read by the query path, so the two can disagree about what "ready" means      | The write-through hand-off in 6.3 means the upload path and the query path share one entry, written once, with one identity                                                                                                                                       |
+| `navigator.locks` is unavailable and last-writer-wins corrupts a payload                                                               | Entry and payload are written in a single Dexie transaction, so the failure mode of last-writer-wins is a superseded entry, never a torn one. The fallback logs                                                                                                   |
+| The offline authorization window is up to 14 days, and someone will read that as a security bug                                        | Stated explicitly as accepted policy in 8.3, with the online criterion tested and the eviction making revocation sticky once seen                                                                                                                                 |
+| The budget interacts with the existing 1 GiB source-bytes cache and a device quota that neither knows about                            | The quota-fraction term in 9.1, plus 9.3's rule that a cache write failure never fails a query                                                                                                                                                                    |

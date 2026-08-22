@@ -37,6 +37,7 @@ Functions, Vitest, Playwright.
 ### Task 1: Extend and validate the discovery tool contract
 
 **Files:**
+
 - Modify: `shared/types/chat.types.ts`
 - Modify: `supabase/functions/chat/PostChatMessages/prompt/buildSystemPrompts.ts`
 - Modify: `supabase/functions/chat/PostChatMessages/prompt/buildChatToolConfig.ts`
@@ -46,6 +47,7 @@ Functions, Vitest, Playwright.
 - Test: `supabase/functions/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.test.ts`
 
 **Interfaces:**
+
 - Produces: discovery response shape field `candidateValues: string[]`.
 - Produces: `makeDiscoveryCandidateValuesFromModelOutput(values: unknown): string[]`.
 
@@ -61,10 +63,12 @@ Functions, Vitest, Playwright.
 ### Task 2: Add local candidate matching
 
 **Files:**
+
 - Create: `src/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues.ts`
 - Create: `src/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues.test.ts`
 
 **Interfaces:**
+
 - Consumes: prompt-derived `candidateValues` and local `discoveredValues`.
 - Produces: `DiscoveryCandidateValues.getUniqueMatch(...)` returning one stored
   value or `undefined`.
@@ -79,6 +83,7 @@ Functions, Vitest, Playwright.
 ### Task 3: Retry discovery and auto-submit unique matches
 
 **Files:**
+
 - Modify: `src/components/ChatPanel/ClarificationCard/useDiscoveryOptions.ts`
 - Modify: `src/components/ChatPanel/ClarificationCard/DiscoveryBody.tsx`
 - Modify: `src/components/ChatPanel/ClarificationCard/ClarificationCardBody.tsx`
@@ -87,6 +92,7 @@ Functions, Vitest, Playwright.
 - Test: `src/components/ChatPanel/ClarificationCard/DiscoveryBody.test.tsx`
 
 **Interfaces:**
+
 - Produces: loading state with attempt number, ready state, terminal error state,
   and a `retry` callback.
 - Calls: existing `onSubmit({ kind: "preset", value })` for one unique match,
@@ -104,12 +110,14 @@ Functions, Vitest, Playwright.
 ### Task 4: Add terminal recovery actions
 
 **Files:**
+
 - Modify: `src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody.tsx`
 - Modify: `src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.tsx`
 - Create: `src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts`
 - Test: `src/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock.test.tsx`
 
 **Interfaces:**
+
 - Produces: retry action for the same query and a different-lookup action.
 - Different-lookup action clears pending clarification, records cancellation,
   and appends a non-clarification instruction asking the model for another
@@ -124,9 +132,11 @@ Functions, Vitest, Playwright.
 ### Task 5: Verify the user-facing flows
 
 **Files:**
+
 - Modify: `tests/e2e/chat-interactive-workflows.spec.ts`
 
 **Interfaces:**
+
 - Verifies: local auto-resolution, terminal recovery, and the existing
   scrollable 50-option catalog.
 

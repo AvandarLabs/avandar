@@ -1,11 +1,12 @@
-import path from "node:path";
-import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
-import { makeSet, promiseMap, propPasses } from "@avandar/utils";
 import type {
   RestorePaths,
   SupabaseBackupManifest,
   SupabaseLocalEnvironmentIO,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
+import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
+import { makeSet, promiseMap, propPasses } from "@avandar/utils";
+import path from "node:path";
 
 type CanonicalFilePaths = {
   sourcePath: string;

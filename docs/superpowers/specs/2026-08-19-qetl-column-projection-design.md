@@ -21,7 +21,7 @@ The mediator never uses them.
 `src/clients/qetl/QueryMediator/relationLoading.ts` builds every storage key
 and every `acquire` / `write` with `columns: "all"` (`_toWholeDatasetCacheKey`,
 the acquire around line 315, the write around line 388). The queryable-tier
-probe (`probeRelationCache`) only asks whether a DuckDB table *exists*, not
+probe (`probeRelationCache`) only asks whether a DuckDB table _exists_, not
 whether it holds the columns this query needs.
 
 So every query pays for whole-relation Parquet, and if we ever did store a
@@ -56,7 +56,7 @@ and must not strip the entity-key column the correlated subquery joins on.
 - Case Manager / ChatPanel / OntologyDesigner UI.
 - Forcing Sheets or HDX wrappers to project at the source. They may keep
   ignoring `AcquireRequest.columns`. The mediator still records and serves
-  what it *holds*.
+  what it _holds_.
 - Entity-key `ORDER BY` at materialization. Include the key columns; do not
   sort. Physical file order plus `ava_rows_` is enough for `first`.
 - Column attribution for arbitrary raw SQL. Unanalyzable SQL, `SELECT *`,
@@ -68,7 +68,7 @@ and must not strip the entity-key column the correlated subquery joins on.
 **A. Mediator projects after acquire (recommended).** Wrappers keep today's
 contract: they may ignore `columns` and return every column. After a miss, the
 mediator copies the acquired blob down to the needed set (no `DISTINCT`, no
-`ORDER BY`) and writes *that* to the storage tier. Wrappers still receive the
+`ORDER BY`) and writes _that_ to the storage tier. Wrappers still receive the
 requested columns so a later Parquet-at-source COPY is a local change.
 
 - Plus: one path for every wrapper; cache holds the subset; demo works even
@@ -78,7 +78,7 @@ requested columns so a later Parquet-at-source COPY is a local change.
 **B. Push projection into `DatasetParquetWrapper` via `COPY (SELECT ...)`.**
 Closer to spec 2 section 10.2, and DuckDB can skip unread Parquet column
 chunks on a file-backed blob. Sheets/HDX still ignore `columns`, so the
-mediator must still know what was *held*, and still project those wrappers.
+mediator must still know what was _held_, and still project those wrappers.
 
 - Plus: byte savings on the Parquet path.
 - Minus: two projection sites; wrappers that ignore `columns` still need A.
@@ -251,7 +251,7 @@ implementation drops it.
    unprojected file. Executed DuckDB, not a mock.
 
 Positive controls sit beside every `not.toHaveBeenCalled`: a query that
-*should* miss must still call `acquire`.
+_should_ miss must still call `acquire`.
 
 ## 10. Exit criteria
 

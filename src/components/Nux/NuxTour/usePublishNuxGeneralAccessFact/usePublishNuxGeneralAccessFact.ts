@@ -1,7 +1,9 @@
-import { useLayoutEffect } from "react";
-import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
+
+import { useLayoutEffect } from "react";
+
+import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 
 type Options = {
   resourceType: ResourceType;

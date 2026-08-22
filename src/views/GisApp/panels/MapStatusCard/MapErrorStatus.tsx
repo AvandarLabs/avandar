@@ -1,11 +1,13 @@
-import { matchLiteral } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
-import { Button, Text } from "@mantine/core";
-import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
-import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
+
+import { matchLiteral } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import { Button, Text } from "@mantine/core";
+
+import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
+import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
 
 type Props = {
   layerName: string;
@@ -20,8 +22,8 @@ function _errorDetails(
   options: Readonly<{ error: Error | undefined; i18n: I18n }>,
 ): string {
   const { error, i18n } = options;
-  return error instanceof SensitivityViolationError ?
-      matchLiteral(error.code, {
+  return error instanceof SensitivityViolationError
+    ? matchLiteral(error.code, {
         aggregateOnly: i18n._(
           msg`Aggregate-only layers cannot be drawn from individual coordinates.`,
         ),
@@ -63,11 +65,11 @@ export function MapErrorStatus({
           {i18n._(msg`Show details`)}
         </Button>
       </span>
-      {areDetailsOpen ?
+      {areDetailsOpen ? (
         <Text className={css.mapStatusCardDetails} size="xs" c="dimmed" mt="xs">
           {_errorDetails({ error: viewState.error, i18n })}
         </Text>
-      : null}
+      ) : null}
     </>
   );
 }

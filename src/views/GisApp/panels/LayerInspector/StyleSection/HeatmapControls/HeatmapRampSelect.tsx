@@ -1,10 +1,12 @@
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
+
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { HEATMAP_RAMPS } from "@/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapControls.constants";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
 
 type Props = {
   ramp: readonly string[];

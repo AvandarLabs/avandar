@@ -1,10 +1,12 @@
+import type { ChromePanelId } from "@/views/GisApp/shell/ChromePanelState/ChromePanelState";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { Collapse, Paper } from "@mantine/core";
 import clsx from "clsx";
+
 import css from "@/views/GisApp/shell/MapChromePanel/MapChromePanel.module.css";
 import { MapChromePanelHeader } from "@/views/GisApp/shell/MapChromePanel/MapChromePanelHeader";
-import type { ChromePanelId } from "@/views/GisApp/shell/ChromePanelState/ChromePanelState";
-import type { ReactNode } from "react";
 
 type Props = {
   /** Which panel this is, which also picks its width. */

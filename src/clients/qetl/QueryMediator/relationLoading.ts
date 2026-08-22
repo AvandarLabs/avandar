@@ -1,30 +1,3 @@
-import {
-  isDefined,
-  makeBucketRecord,
-  makeIdLookupRecord,
-  promiseMap,
-  prop,
-  where,
-} from "@avandar/utils";
-import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { rememberQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
-import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
-import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { Logger } from "@/utils/Logger";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type {
-  AcquiredRelationBytes,
-  ColumnReplacement,
-  NeededColumnsByDatasetId,
-  QetlRunQuery,
-  RelationSource,
-} from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import type { ILogger } from "@avandar/logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -37,6 +10,35 @@ import type {
   RelationCacheProbeHit,
   RelationCacheProbeMiss,
 } from "$/models/relations/RelationCachePort/RelationCachePort.types";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type {
+  AcquiredRelationBytes,
+  ColumnReplacement,
+  NeededColumnsByDatasetId,
+  QetlRunQuery,
+  RelationSource,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import type { ILogger } from "@avandar/logger";
+
+import {
+  isDefined,
+  makeBucketRecord,
+  makeIdLookupRecord,
+  promiseMap,
+  prop,
+  where,
+} from "@avandar/utils";
+
+import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { rememberQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { Logger } from "@/utils/Logger";
 
 type FetchRelationSourceOptions = {
   relationSource: RelationSource;
@@ -80,13 +82,12 @@ function _getColumnReplacements(
       const hasChangedDataType =
         column.dataType !==
         DuckDbDataTypeUtils.toAvaDataType(column.detectedDataType);
-      return hasChangedName || hasChangedDataType ?
-          {
+      return hasChangedName || hasChangedDataType
+        ? {
             originalName: column.originalName,
             alias: hasChangedName ? column.name : undefined,
-            dataType:
-              hasChangedDataType ?
-                DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType)
+            dataType: hasChangedDataType
+              ? DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType)
               : undefined,
           }
         : undefined;
@@ -262,8 +263,8 @@ function _toGrowFromColumnsByDatasetId(
 ): Record<string, readonly string[] | "all"> {
   return Object.fromEntries(
     misses.flatMap((miss) => {
-      return miss.growFrom === undefined ?
-          []
+      return miss.growFrom === undefined
+        ? []
         : [[miss.key.relation.id, miss.growFrom.columns]];
     }),
   );

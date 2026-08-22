@@ -4,12 +4,14 @@
  * source record, including `google_sheets` now that acquisition is wired.
  */
 
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
   clearQueryableRelationColumns,
   rememberQueryableColumns,
 } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const CSV_ID = "11111111-1111-4111-8111-111111111111" as Dataset.Id;
 const XLSX_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;

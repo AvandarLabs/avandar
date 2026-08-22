@@ -1,17 +1,19 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { TextInput } from "@mantine/core";
 import { useState } from "react";
 import { match } from "ts-pattern";
+
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import css from "@/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.module.css";
 import { findBoundaryFeatureByPcode } from "@/views/GisApp/tools/findBoundaryFeatureByPcode/findBoundaryFeatureByPcode";
 import { parseMapGoToQuery } from "@/views/GisApp/tools/parseMapGoToQuery/parseMapGoToQuery";
-import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import type { I18n } from "@lingui/core";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layers?: readonly MapLayer.T[];
@@ -76,9 +78,8 @@ function _getPcodeSubmitResult(options: {
     return { type: "error", reason: "noBoundaryLayer" };
   }
   const feature = findBoundaryFeatureByPcode(options);
-  const bounds =
-    feature ?
-      getBoundsFromFeatureCollection({
+  const bounds = feature
+    ? getBoundsFromFeatureCollection({
         type: "FeatureCollection",
         features: [feature],
       })
@@ -97,8 +98,8 @@ function _getGoToSubmitResult(options: {
   const parsed = parseMapGoToQuery(options.query);
   return match(parsed)
     .with({ type: "invalid" }, (invalid) => {
-      return invalid.reason === "unparsed" ?
-          undefined
+      return invalid.reason === "unparsed"
+        ? undefined
         : { type: "error" as const, reason: "outOfRange" as const };
     })
     .with({ type: "coordinate" }, (coordinate) => {

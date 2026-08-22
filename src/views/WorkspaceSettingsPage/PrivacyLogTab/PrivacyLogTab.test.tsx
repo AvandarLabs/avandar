@@ -1,13 +1,16 @@
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
+
 import { modals } from "@mantine/modals";
 import { fireEvent } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv/buildConsentAuditCsv";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render, screen } from "@/test-utils";
+
 import { PrivacyLogTab } from "./PrivacyLogTab";
-import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 const {
   clearConsentLogMock,

@@ -1,6 +1,7 @@
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
-import type { ReactNode } from "react";
 
 type Props = {
   isSubmittable: boolean;

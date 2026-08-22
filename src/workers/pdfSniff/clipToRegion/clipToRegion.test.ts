@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { clipToRegion } from "./clipToRegion";
 import type { PageGeometry, TextItem } from "../pdfSniff.types";
+
+import { describe, expect, it } from "vitest";
+
+import { clipToRegion } from "./clipToRegion";
 
 function textItem(text: string, x: number, y: number, width = 30): TextItem {
   return {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+
 import { isHiddenChatThreadMessage } from "@/components/ChatPanel/ChatThread/isHiddenChatThreadMessage";
+
 import { CaseDesignKickoff } from "./CaseDesignKickoff";
 
 describe("CaseDesignKickoff", () => {

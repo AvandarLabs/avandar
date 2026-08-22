@@ -1,11 +1,14 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Group, Text } from "@mantine/core";
 import { IconArrowLeft, IconEye } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+
 import { DashboardPreviewVisibilitySummary } from "@/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary";
+
 import classes from "./DashboardPreviewBanner.module.css";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -35,7 +38,7 @@ export function DashboardPreviewBanner({
         </Text>
         <DashboardPreviewVisibilitySummary visibility={dashboard.visibility} />
       </Group>
-      {canEdit ?
+      {canEdit ? (
         <Button
           size="compact-sm"
           variant="outline"
@@ -50,7 +53,7 @@ export function DashboardPreviewBanner({
         >
           <Trans>Back to editor</Trans>
         </Button>
-      : null}
+      ) : null}
     </Group>
   );
 }

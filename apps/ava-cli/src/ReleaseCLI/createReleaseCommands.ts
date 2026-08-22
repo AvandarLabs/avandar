@@ -1,5 +1,5 @@
-import { spawnSync } from "node:child_process";
 import { Acclimate } from "@avandar/acclimate";
+import { spawnSync } from "node:child_process";
 
 /** The outcome of one command: whether it succeeded, and what it printed. */
 export type CommandResult = {

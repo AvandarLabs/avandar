@@ -1,3 +1,9 @@
+import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
+import type { Knex } from "knex";
+
 /**
  * Convert a {@link PartialStructuredQuery} into a raw SQL string using knex.
  *
@@ -19,6 +25,8 @@ import {
   valNotEq,
 } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@utils/sql/index.ts";
+import { match } from "ts-pattern";
+
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
@@ -29,12 +37,6 @@ import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSq
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
-import { match } from "ts-pattern";
-import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
-import type { Knex } from "knex";
 
 export type { StructuredQueryToSqlOptions } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.types.ts";
 
@@ -113,9 +115,9 @@ export function structuredQueryToSql(
   // view. `RelationRef` owns both spellings, so this emitter never builds a
   // table name itself.
   const tableName =
-    nestedSubquery || dataSource === undefined ?
-      undefined
-    : RelationRef.toTableName(makeRelationRefFromQueryDataSource(dataSource));
+    nestedSubquery || dataSource === undefined
+      ? undefined
+      : RelationRef.toTableName(makeRelationRefFromQueryDataSource(dataSource));
 
   const groupByColumnNames = [] as string[];
   const atLeastOneColumnHasAggregation = objectValues(aggregations).some(
@@ -145,9 +147,12 @@ export function structuredQueryToSql(
 
   const selectColumnNames = sortedQueryColumns.map(prop("baseColumn.name"));
   const orderByColumnName =
-    orderByColumn && queryColumnLookup.has(orderByColumn) ?
-      _getOrderByColumnName(queryColumnLookup.get(orderByColumn)!, aggregations)
-    : undefined;
+    orderByColumn && queryColumnLookup.has(orderByColumn)
+      ? _getOrderByColumnName(
+          queryColumnLookup.get(orderByColumn)!,
+          aggregations,
+        )
+      : undefined;
 
   const timestampColumnNames = queryColumns
     .filter((column) => {
@@ -162,8 +167,8 @@ export function structuredQueryToSql(
   const adjustedColumnNames = columnNamesWithoutAggregations.map((colName) => {
     const quotedColName = quoteSqlIdentifier(colName);
     if (castTimestampsToISO) {
-      return timestampColumnNames.includes(colName) ?
-          sqlBuilder.raw(
+      return timestampColumnNames.includes(colName)
+        ? sqlBuilder.raw(
             `strftime(${quotedColName}::TIMESTAMP, "'%Y-%m-%dT%H:%M:%S.%fZ') as ${quotedColName}`,
           )
         : sqlBuilder.raw(quotedColName);

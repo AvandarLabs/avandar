@@ -1,6 +1,8 @@
-import { where } from "@avandar/utils";
-import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+
+import { where } from "@avandar/utils";
+
+import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 
 /**
  * Downloads an open dataset Parquet blob from the catalog canonical URL.

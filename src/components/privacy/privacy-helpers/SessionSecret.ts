@@ -1,11 +1,13 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { base64ToUint8 } from "@avandar/utils/encoding";
+
 import {
   base64UrlEncode,
   hashTextPayload,
   toHex,
 } from "$/utils/privacy/sessionSecretUtils";
 import { APIClient } from "@/clients/APIClient";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type CachedSecret = {
   key: CryptoKey;

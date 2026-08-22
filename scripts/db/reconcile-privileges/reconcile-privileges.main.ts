@@ -83,18 +83,20 @@
  * `supabase test db`, which is exactly that.
  */
 
-import { appendFileSync, readdirSync, readFileSync, statSync } from "node:fs";
-import path from "node:path";
-import {
-  getLocalDatabaseConfigFromRepoRoot,
-  makeSqlRunner,
-} from "../lib/PsqlUtils/PsqlUtils";
-import { PrivilegeReconciliation } from "./PrivilegeReconciliation/PrivilegeReconciliation";
 import type {
   AclEntry,
   AclKind,
   Declarations,
 } from "./PrivilegeReconciliation/PrivilegeReconciliation";
+
+import { appendFileSync, readdirSync, readFileSync, statSync } from "node:fs";
+import path from "node:path";
+
+import {
+  getLocalDatabaseConfigFromRepoRoot,
+  makeSqlRunner,
+} from "../lib/PsqlUtils/PsqlUtils";
+import { PrivilegeReconciliation } from "./PrivilegeReconciliation/PrivilegeReconciliation";
 
 // ASCII unit separator. Object names can contain dots, quotes, and
 // parentheses, so the delimiter has to be something an identifier cannot hold.
@@ -382,13 +384,15 @@ function _getUndeclaredFunctionsSql(
 ): string {
   const { scope, declaredSignatures } = options;
   const declared =
-    declaredSignatures.length === 0 ?
-      "select null::oid where false"
-    : `select to_regprocedure(sig)::oid as oid_ from (values ${declaredSignatures
-        .map((signature) => {
-          return `(${_quoteSqlLiteral(signature)})`;
-        })
-        .join(",")}) as declared (sig) where to_regprocedure(sig) is not null`;
+    declaredSignatures.length === 0
+      ? "select null::oid where false"
+      : `select to_regprocedure(sig)::oid as oid_ from (values ${declaredSignatures
+          .map((signature) => {
+            return `(${_quoteSqlLiteral(signature)})`;
+          })
+          .join(
+            ",",
+          )}) as declared (sig) where to_regprocedure(sig) is not null`;
   return `
 select format('%I.%I(%s)', n.nspname, p.proname,
               pg_get_function_identity_arguments(p.oid))

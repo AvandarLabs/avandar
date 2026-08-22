@@ -1,3 +1,10 @@
+import type {
+  MapLayerSpec,
+  MapSourceSpec,
+  MapSpec,
+} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
+
 import {
   makeSet,
   objectEntries,
@@ -6,13 +13,8 @@ import {
   propEq,
   propPasses,
 } from "@avandar/utils";
+
 import { MapChromeOverlayIds } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
-import type {
-  MapLayerSpec,
-  MapSourceSpec,
-  MapSpec,
-} from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
 
 function _isChromeOverlayId(id: string): boolean {
   return (

@@ -1,5 +1,6 @@
 /** Persist only on a clean idle edge for the same chat generation. */
 import { describe, expect, it } from "vitest";
+
 import { shouldPersistThreadOnRunEnd } from "./shouldPersistThreadOnRunEnd";
 
 describe("shouldPersistThreadOnRunEnd", () => {

@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -12,7 +14,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 /**
  * E2E coverage for unified chat sessions

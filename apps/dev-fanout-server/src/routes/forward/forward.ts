@@ -1,6 +1,7 @@
+import type { FastifyReply, FastifyRequest } from "fastify";
+
 import { isArray, isDefined, objectValuesMap } from "@avandar/utils";
 import { NgrokDevURLsManager } from "@fanout-server/NgrokDevURLsManager";
-import type { FastifyReply, FastifyRequest } from "fastify";
 
 type FanoutResult = Readonly<{
   devURL: string;

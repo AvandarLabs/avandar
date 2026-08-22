@@ -1,5 +1,6 @@
-import { getEffectiveEntitlementLimits } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/getEffectiveEntitlementLimits.ts";
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types.ts";
+
+import { getEffectiveEntitlementLimits } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/getEffectiveEntitlementLimits.ts";
 
 /**
  * Whether the workspace may make one MORE dashboard shareable.

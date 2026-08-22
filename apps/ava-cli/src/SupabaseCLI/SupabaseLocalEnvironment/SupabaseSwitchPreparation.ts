@@ -1,4 +1,9 @@
-import path from "node:path";
+import type {
+  SupabaseConfigState,
+  SupabaseLocalEnvironmentIO,
+  SwitchPreparation,
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
 import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupHierarchy";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupPaths";
@@ -7,11 +12,7 @@ import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/Su
 import { PROJECT_ID_PATTERN } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabasePorts } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabasePorts/SupabasePorts";
 import { promiseMap } from "@avandar/utils";
-import type {
-  SupabaseConfigState,
-  SupabaseLocalEnvironmentIO,
-  SwitchPreparation,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import path from "node:path";
 
 type SwitchSource = {
   config: SupabaseConfigState;
@@ -94,8 +95,9 @@ async function _requireSwitchSourceFiles(
     const isFile =
       (await options.io.pathExists(sourcePath)) &&
       (await options.io.isFile(sourcePath));
-    const canonicalSourcePath =
-      isFile ? await options.io.realPath(sourcePath) : "";
+    const canonicalSourcePath = isFile
+      ? await options.io.realPath(sourcePath)
+      : "";
     const expectedSourcePath = path.join(
       canonicalWorktreePath,
       path.relative(options.worktreePath, sourcePath),

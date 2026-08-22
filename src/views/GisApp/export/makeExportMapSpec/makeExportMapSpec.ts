@@ -1,12 +1,14 @@
-import { prop } from "@avandar/utils";
-import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import { MapChromeOverlayIds } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type {
   MapLayerSpec,
   MapSourceSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
+import { prop } from "@avandar/utils";
+
+import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+import { MapChromeOverlayIds } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
 
 /** Chrome source and layer ids: every layer id below begins with one. */
 const CHROME_ID_PREFIXES: readonly string[] =

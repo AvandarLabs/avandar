@@ -1,14 +1,16 @@
+import type { PoEntry } from "./translateWithLlm";
+import type { Mock } from "vitest";
+
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
+
 import { LOCALES_DIR, PROJECT_ROOT, SOURCE_LOCALE } from "./config";
 import {
   CatalogTranslator,
   PoCatalog,
   TranslationCli,
 } from "./translateWithLlm";
-import type { PoEntry } from "./translateWithLlm";
-import type { Mock } from "vitest";
 
 /**
  * vi.fn() doesn't include the static `preconnect` property that lives on

@@ -1,5 +1,3 @@
-import { isEmptyFiltersObject } from "@avandar/utils";
-import { getFilteredDexieCollection } from "@/clients/dexie/createDexieCrudClient/dexieCrudRowAccess";
 import type {
   DexieCrudOperationContext,
   DexieKey,
@@ -9,6 +7,10 @@ import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCr
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type { ILogger } from "@avandar/logger";
 import type { FiltersByColumn } from "@avandar/utils";
+
+import { isEmptyFiltersObject } from "@avandar/utils";
+
+import { getFilteredDexieCollection } from "@/clients/dexie/createDexieCrudClient/dexieCrudRowAccess";
 
 function _createGetByIdOperation<
   M extends DexieCrudModelSpec,
@@ -37,8 +39,8 @@ function _createGetCountOperation<
       logger: ILogger;
     }>,
   ): Promise<number> => {
-    return !params.where || isEmptyFiltersObject(params.where) ?
-        context.table.count()
+    return !params.where || isEmptyFiltersObject(params.where)
+      ? context.table.count()
       : getFilteredDexieCollection({ context, where: params.where }).count();
   };
 }
@@ -52,9 +54,9 @@ function _createGetPageOperation<
   ): Promise<Array<M["DBRead"]>> => {
     const startIndex = params.pageNum * params.pageSize;
     const collection =
-      !params.where || isEmptyFiltersObject(params.where) ?
-        context.table.toCollection()
-      : getFilteredDexieCollection({ context, where: params.where });
+      !params.where || isEmptyFiltersObject(params.where)
+        ? context.table.toCollection()
+        : getFilteredDexieCollection({ context, where: params.where });
     return collection.offset(startIndex).limit(params.pageSize).toArray();
   };
 }

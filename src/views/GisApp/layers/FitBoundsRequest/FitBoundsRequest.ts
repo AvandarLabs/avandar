@@ -1,10 +1,11 @@
-import { assertIsNonEmptyArray, isDefined } from "@avandar/utils";
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { FitBoundsRequest as CameraFitBoundsRequest } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
 import type { MapChromeInsets } from "@/views/GisApp/shell/useMapChromeInsets/useMapChromeInsets";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { RefObject } from "react";
+
+import { assertIsNonEmptyArray, isDefined } from "@avandar/utils";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /** Returns the bounds enclosing every supplied bounds value. */
 function _getUnionBounds(boundsList: readonly MapBounds[]): MapBounds {

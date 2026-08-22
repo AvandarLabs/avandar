@@ -1,14 +1,16 @@
-import { useLingui } from "@lingui/react/macro";
-import css from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.module.css";
-import { LayerInspectorFocusedView } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorFocusedView";
-import { LayerInspectorSections } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorSections";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type {
   LayerChangeHandler,
   LayerInspectorView,
 } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+
+import css from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.module.css";
+import { LayerInspectorFocusedView } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorFocusedView";
+import { LayerInspectorSections } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorSections";
 
 type Props = {
   layer: MapLayer.T | undefined;

@@ -1,6 +1,7 @@
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { SwapDeep } from "@utils/types/utilities.types.ts";
+
+import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 
 /**
  * Swaps a type in an object recursively. This is a deep transformation.

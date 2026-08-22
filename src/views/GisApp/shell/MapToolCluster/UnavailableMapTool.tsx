@@ -1,6 +1,8 @@
-import { Tooltip } from "@avandar/ui";
-import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
 import type { ReactNode } from "react";
+
+import { Tooltip } from "@avandar/ui";
+
+import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
 
 type Props = {
   icon: ReactNode;

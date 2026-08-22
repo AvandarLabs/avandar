@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
 import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
+
+import { useEffect, useState } from "react";
 
 /**
  * Leaves fetched per `getClusterLeaves` call. Kept small so a request

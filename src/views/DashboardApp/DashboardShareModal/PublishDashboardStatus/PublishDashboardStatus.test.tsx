@@ -1,11 +1,13 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactElement } from "react";
+
 import { ModalsProvider } from "@mantine/modals";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
+
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { fireEvent, render, screen } from "@/test-utils";
 import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactElement } from "react";
 
 const MANTINE_RED_6 = "#f03e3e";
 // Mantine darkens yellow for the light variant's foreground, so

@@ -1,10 +1,11 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
+import type { UnknownObject } from "@avandar/utils";
+
 import {
   assertIsNonEmptyArray,
   assertIsSingletonArray,
   objectKeys,
 } from "@avandar/utils";
-import type { UnknownObject } from "@avandar/utils";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 /**
  * Returns the singular scalar value from a single-column row.

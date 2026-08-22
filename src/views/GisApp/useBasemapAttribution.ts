@@ -1,5 +1,6 @@
-import { useLingui } from "@lingui/react/macro";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
+import { useLingui } from "@lingui/react/macro";
 
 /**
  * The attribution string shown on screen and on the exported PDF: a custom
@@ -8,7 +9,7 @@ import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
  */
 export function useBasemapAttribution(basemap: AvaMapConfig.Basemap): string {
   const { t } = useLingui();
-  return basemap.type === "custom" ?
-      basemap.attribution
+  return basemap.type === "custom"
+    ? basemap.attribution
     : t`MapLibre, OpenStreetMap contributors`;
 }

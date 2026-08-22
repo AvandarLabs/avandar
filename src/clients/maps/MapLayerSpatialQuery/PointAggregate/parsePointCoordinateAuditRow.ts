@@ -1,12 +1,13 @@
-import {
-  PointCoordinateAuditColumns,
-  PointCoordinateDropColumns,
-} from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointCoordinateAuditSql";
 import type {
   PointCoordinateAudit,
   PointCoordinateDrop,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
 import type { DropReason } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+
+import {
+  PointCoordinateAuditColumns,
+  PointCoordinateDropColumns,
+} from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointCoordinateAuditSql";
 
 /**
  * Reads one count off the audit row.

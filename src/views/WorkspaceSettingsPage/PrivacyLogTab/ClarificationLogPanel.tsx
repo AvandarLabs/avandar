@@ -1,3 +1,5 @@
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
@@ -9,9 +11,9 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 
 type ClarificationOutcome = ClarificationAuditEntry.T["outcome"];
 
@@ -78,7 +80,7 @@ export function ClarificationLogPanel(): React.ReactNode {
         </Text>
       </Stack>
 
-      {entries.length === 0 ?
+      {entries.length === 0 ? (
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
             <Trans>
@@ -87,7 +89,8 @@ export function ClarificationLogPanel(): React.ReactNode {
             </Trans>
           </Text>
         </Card>
-      : <Table striped withTableBorder>
+      ) : (
+        <Table striped withTableBorder>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>
@@ -142,23 +145,24 @@ export function ClarificationLogPanel(): React.ReactNode {
                     </Badge>
                   </Table.Td>
                   <Table.Td>
-                    {entry.timeToAnswerMs !== null ?
+                    {entry.timeToAnswerMs !== null ? (
                       <Text size="xs">
                         <Trans>
                           {Math.round(entry.timeToAnswerMs / 100) / 10}s
                         </Trans>
                       </Text>
-                    : <Text size="xs" c="dimmed">
+                    ) : (
+                      <Text size="xs" c="dimmed">
                         —
                       </Text>
-                    }
+                    )}
                   </Table.Td>
                 </Table.Tr>
               );
             })}
           </Table.Tbody>
         </Table>
-      }
+      )}
     </Stack>
   );
 }

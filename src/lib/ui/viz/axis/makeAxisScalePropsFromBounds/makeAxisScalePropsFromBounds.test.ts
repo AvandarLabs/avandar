@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
 import type { AxisStyle } from "$/models/vizs/ChartStyle.types";
+
+import { describe, expect, it } from "vitest";
+
+import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
 
 const EXTENT = { min: 0, max: 100 };
 

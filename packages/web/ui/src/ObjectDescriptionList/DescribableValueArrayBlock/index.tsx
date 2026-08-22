@@ -1,17 +1,3 @@
-import { pick } from "@avandar/utils";
-import { ScrollArea, Stack, Text } from "@mantine/core";
-import { useI18nMessages } from "@ui/i18n/useI18nMessages";
-import { useMemo } from "react";
-import {
-  isDescribableObject,
-  isDescribableValueArray,
-  isPrimitiveDescribableValue,
-  isStringOrNumber,
-} from "../guards";
-import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.types";
-import { NestedArraysBlock } from "./NestedArraysBlock";
-import { ObjectArrayBlock } from "./ObjectArrayBlock/ObjectArrayBlock";
-import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 import type {
   DescribableObject,
   DescribableValueArrayRenderOptions,
@@ -22,6 +8,22 @@ import type {
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "../ObjectDescriptionList.types";
+
+import { pick } from "@avandar/utils";
+import { ScrollArea, Stack, Text } from "@mantine/core";
+import { useI18nMessages } from "@ui/i18n/useI18nMessages";
+import { useMemo } from "react";
+
+import {
+  isDescribableObject,
+  isDescribableValueArray,
+  isPrimitiveDescribableValue,
+  isStringOrNumber,
+} from "../guards";
+import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.types";
+import { NestedArraysBlock } from "./NestedArraysBlock";
+import { ObjectArrayBlock } from "./ObjectArrayBlock/ObjectArrayBlock";
+import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];
@@ -98,11 +100,12 @@ export function DescribableValueArrayBlock<
     ...moreRenderOptions,
   };
 
-  const customRenderedArrayContent =
-    renderArray ? renderArray(data as readonly T[], rootData) : undefined;
+  const customRenderedArrayContent = renderArray
+    ? renderArray(data as readonly T[], rootData)
+    : undefined;
 
   const contentBlock =
-    customRenderedArrayContent === undefined ?
+    customRenderedArrayContent === undefined ? (
       <Stack>
         <PrimitiveFieldValueArrayBlock
           values={primitiveValues}
@@ -133,7 +136,9 @@ export function DescribableValueArrayBlock<
           >)}
         />
       </Stack>
-    : customRenderedArrayContent;
+    ) : (
+      customRenderedArrayContent
+    );
 
   if (maxHeight === undefined) {
     return <>{contentBlock}</>;

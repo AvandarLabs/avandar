@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { useNuxTourRelayoutOnChatAside } from "@/components/Nux/NuxTour/useNuxTourRelayoutOnChatAside/useNuxTourRelayoutOnChatAside";
 import { CHAT_PANEL_ASIDE_SELECTOR } from "@/config/AppShellLayout.constants";
 import { act, renderHook } from "@/test-utils";

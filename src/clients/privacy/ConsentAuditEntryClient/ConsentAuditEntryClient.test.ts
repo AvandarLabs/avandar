@@ -1,9 +1,12 @@
 import "fake-indexeddb/auto";
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { ConsentAuditEntryParsers } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntryParsers";
+
 import { ConsentAuditEntryClient } from "./ConsentAuditEntryClient";
-import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 const NOW = new Date("2026-07-27T12:00:00.000Z").getTime();
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;

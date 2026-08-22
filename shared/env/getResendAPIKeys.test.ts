@@ -1,6 +1,7 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { getResendFullAccessAPIKey } from "$/env/getResendFullAccessAPIKey.ts";
 import { getResendSendingAPIKey } from "$/env/getResendSendingAPIKey.ts";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("Resend API key accessors", () => {
   const originalEnvironment = { ...process.env };

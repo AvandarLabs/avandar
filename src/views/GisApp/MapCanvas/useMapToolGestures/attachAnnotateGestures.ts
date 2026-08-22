@@ -1,5 +1,10 @@
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { Map as MapLibreMap, MapMouseEvent } from "maplibre-gl";
+import type { Dispatch, SetStateAction } from "react";
+
 import { match } from "ts-pattern";
+
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { attachAreaDrawGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAreaDrawGestures";
 import {
   makeAreaAnnotationFeature,
@@ -8,9 +13,6 @@ import {
   makeTextAnnotationFeature,
 } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";
 import { MAP_TOOL_DRAG_THRESHOLD_PX } from "@/views/GisApp/tools/MapToolGesture.constants";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { Map as MapLibreMap, MapMouseEvent } from "maplibre-gl";
-import type { Dispatch, SetStateAction } from "react";
 
 type Vertex = [number, number];
 

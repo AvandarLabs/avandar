@@ -1,10 +1,12 @@
-import { Callout } from "@avandar/ui";
-import { Trans } from "@lingui/react/macro";
-import { Checkbox, Text } from "@mantine/core";
-import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { DatasetImportFeedbackProps } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetImportFeedback";
 import type { DataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import type { ReactNode } from "react";
+
+import { Callout } from "@avandar/ui";
+import { Trans } from "@lingui/react/macro";
+import { Checkbox, Text } from "@mantine/core";
+
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 
 type Props = {
   dataSourceMetadata: DataSourceMetadata;
@@ -31,7 +33,7 @@ export function OnlineStorageAllowedCheckbox({
           <Text span>
             <Trans>This dataset can be stored in the cloud. </Trans>
           </Text>
-          {!dataSourceMetadata.onlineStorageAllowed ?
+          {!dataSourceMetadata.onlineStorageAllowed ? (
             <Callout mt="sm" title={offlineOnlyTitle} titleSize="xl">
               <Text c="red.8">
                 <Trans>
@@ -42,7 +44,7 @@ export function OnlineStorageAllowedCheckbox({
                 </Trans>
               </Text>
             </Callout>
-          : null}
+          ) : null}
         </>
       }
       checked={dataSourceMetadata.onlineStorageAllowed}

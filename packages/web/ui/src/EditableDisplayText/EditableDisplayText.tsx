@@ -1,13 +1,15 @@
+import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
+
 import { getIsMacPlatform } from "@avandar/browser-utils";
 import { hasDefinedProps, isPlainObject } from "@avandar/utils";
 import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useEffect, useRef, useState } from "react";
+
 import { EditButton } from "../buttons/EditButton";
 import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { Tooltip } from "../Tooltip/Tooltip";
-import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
 
 type BaseProps = {
   /**
@@ -110,14 +112,14 @@ export function EditableDisplayText({
       hasDefinedProps(passThroughProps.style, "width"));
 
   const isMac = getIsMacPlatform();
-  const keyboardShortcut =
-    passThroughProps.textarea ?
-      isMac ? "⌘↵"
+  const keyboardShortcut = passThroughProps.textarea
+    ? isMac
+      ? "⌘↵"
       : "Ctrl↵"
     : "Enter";
-  const keyboardShortcutSymbol =
-    passThroughProps.textarea ?
-      isMac ? "⌘↵"
+  const keyboardShortcutSymbol = passThroughProps.textarea
+    ? isMac
+      ? "⌘↵"
       : "Ctrl↵"
     : "↵";
 

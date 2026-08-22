@@ -1,3 +1,10 @@
+import type {
+  SupabaseDockerResource,
+  SupabaseDockerResourceInspection,
+  SupabaseDockerResourceType,
+  SupabaseLocalEnvironmentIO,
+} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
 import { RunLocalCommand } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand/RunLocalCommand";
 import { DockerPublishedPorts } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DockerPublishedPorts/DockerPublishedPorts";
 import { SupabaseCommandOutput } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseCommandOutput/SupabaseCommandOutput";
@@ -9,12 +16,6 @@ import {
   propEq,
   valNotEq,
 } from "@avandar/utils";
-import type {
-  SupabaseDockerResource,
-  SupabaseDockerResourceInspection,
-  SupabaseDockerResourceType,
-  SupabaseLocalEnvironmentIO,
-} from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 const SUPABASE_PROJECT_LABEL = "com.supabase.cli.project";
 

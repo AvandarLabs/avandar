@@ -1,7 +1,11 @@
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+
+import { describe, expect, it } from "vitest";
+
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it } from "vitest";
+
 import { getResolvedMapLayerMetadata } from "../getResolvedMapLayerMetadata";
 import {
   createColumn,
@@ -9,7 +13,6 @@ import {
   createGridBinLayer,
   createResolvedFixture,
 } from "./getResolvedMapLayerMetadata.fixtures";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 describe("getResolvedMapLayerMetadata", () => {
   it("resolves stable boundary column ids to their current names", () => {

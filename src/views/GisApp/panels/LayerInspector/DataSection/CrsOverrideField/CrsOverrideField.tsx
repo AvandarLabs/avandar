@@ -1,8 +1,9 @@
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
+
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput, Select } from "@mantine/core";
-import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
 
 type Props = {
   sourceCrs: number | undefined;
@@ -52,9 +53,9 @@ function _getPresetData(i18n: I18n): Array<{ value: string; label: string }> {
 export function CrsOverrideField({ sourceCrs, onChange }: Props): ReactNode {
   const { i18n, t } = useLingui();
   const presetValue =
-    sourceCrs !== undefined && PRESET_CODES.includes(sourceCrs) ?
-      String(sourceCrs)
-    : null;
+    sourceCrs !== undefined && PRESET_CODES.includes(sourceCrs)
+      ? String(sourceCrs)
+      : null;
   return (
     <>
       <Select

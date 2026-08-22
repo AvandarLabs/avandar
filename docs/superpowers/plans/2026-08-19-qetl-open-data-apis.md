@@ -62,17 +62,17 @@ Enforced by `docs/rules/typescript.md`, `docs/rules/testing.md`,
 
 **Commands:**
 
-| Purpose | Command |
-|---|---|
-| Frontend tests (jsdom) | `pnpm test:frontend <pattern>` |
-| Executed tests (node, real DuckDB) | `pnpm test:executed <pattern>` |
-| Type check (includes `deno check shared`) | `pnpm type-check` |
-| Lint (eslint + stylelint + react-doctor) | `pnpm lint` |
-| Database tests (pgTAP + privileges) | `pnpm test:db` |
-| Reset local database | `pnpm db:reset` |
-| Generate a migration | `pnpm db:new-migration <name>` |
-| Regenerate DB types | `pnpm db:gen-types` |
-| Desktop SQLite migrations | `pnpm desktop:sqlite:gen-migrations` |
+| Purpose                                   | Command                              |
+| ----------------------------------------- | ------------------------------------ |
+| Frontend tests (jsdom)                    | `pnpm test:frontend <pattern>`       |
+| Executed tests (node, real DuckDB)        | `pnpm test:executed <pattern>`       |
+| Type check (includes `deno check shared`) | `pnpm type-check`                    |
+| Lint (eslint + stylelint + react-doctor)  | `pnpm lint`                          |
+| Database tests (pgTAP + privileges)       | `pnpm test:db`                       |
+| Reset local database                      | `pnpm db:reset`                      |
+| Generate a migration                      | `pnpm db:new-migration <name>`       |
+| Regenerate DB types                       | `pnpm db:gen-types`                  |
+| Desktop SQLite migrations                 | `pnpm desktop:sqlite:gen-migrations` |
 
 **All four of these must be green before Task 1 and after Task 12:**
 `pnpm test:frontend`, `pnpm test:executed`, `pnpm type-check`, `pnpm lint`.
@@ -89,21 +89,21 @@ This plan was executed in the same session that wrote it. Tasks 0 to 12 are done
 except where noted. Recorded here so a reader knows what was proved rather than
 only planned.
 
-| Task | Outcome |
-|---|---|
-| 0 | Switched to isolated Supabase project `feat-qetl-hdx` (API 55401, DB 55402) |
-| 1 | 17 pgTAP assertions written red. Test 4, the old-style insert, passed at that point and is the back-compat control |
-| 2 | Schema and generated migration land with no unintended drop; `unique_parquet_file_pipeline` untouched; CHECKs emitted `not valid` then validated, exactly as predicted |
-| 3 | Types and parsers updated, `pnpm db:gen-types` regenerated, `ZodConsistencyTests` compiles unmodified |
-| 4 | `toAccess` with 10 tests, including all eight refusal cases |
-| 5 | **Partly blocked.** Override body written and verified against real SQLite 3.51. The `.gen.sql` is not generated: the generator fails on a pre-existing migration. See spec 6.6 |
-| 6 | `CkanClient`, 11 tests |
-| 7 | `openDataErrors` and `getCkanResourceFromPackage`, 14 tests |
-| 8 | `buildCkanSourceVersion`, 9 tests |
-| 9 | `buildCsvFromDatastoreRecords`, 5 structural plus 11 DuckDB round-trip tests |
-| 10 | `acquireOpenDataResource`, 13 tests |
-| 11 | 24 mutations applied, all 24 caught, every file restored byte-identical |
-| 12 | All four green, plus `pnpm test:db` and `pnpm test:desktop` |
+| Task | Outcome                                                                                                                                                                         |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | Switched to isolated Supabase project `feat-qetl-hdx` (API 55401, DB 55402)                                                                                                     |
+| 1    | 17 pgTAP assertions written red. Test 4, the old-style insert, passed at that point and is the back-compat control                                                              |
+| 2    | Schema and generated migration land with no unintended drop; `unique_parquet_file_pipeline` untouched; CHECKs emitted `not valid` then validated, exactly as predicted          |
+| 3    | Types and parsers updated, `pnpm db:gen-types` regenerated, `ZodConsistencyTests` compiles unmodified                                                                           |
+| 4    | `toAccess` with 10 tests, including all eight refusal cases                                                                                                                     |
+| 5    | **Partly blocked.** Override body written and verified against real SQLite 3.51. The `.gen.sql` is not generated: the generator fails on a pre-existing migration. See spec 6.6 |
+| 6    | `CkanClient`, 11 tests                                                                                                                                                          |
+| 7    | `openDataErrors` and `getCkanResourceFromPackage`, 14 tests                                                                                                                     |
+| 8    | `buildCkanSourceVersion`, 9 tests                                                                                                                                               |
+| 9    | `buildCsvFromDatastoreRecords`, 5 structural plus 11 DuckDB round-trip tests                                                                                                    |
+| 10   | `acquireOpenDataResource`, 13 tests                                                                                                                                             |
+| 11   | 24 mutations applied, all 24 caught, every file restored byte-identical                                                                                                         |
+| 12   | All four green, plus `pnpm test:db` and `pnpm test:desktop`                                                                                                                     |
 
 **Three places the plan was wrong, and the code is right:**
 
@@ -124,13 +124,13 @@ only planned.
 
 **Work added after the first pass, at Pablo's direction (2026-08-19):**
 
-| Item | Outcome |
-|---|---|
-| The byte proxy | `supabase/functions/open-data/` serves the resource route and is verified live against HDX. `ValidReturnType` already allowed `Response`, so no base64 envelope was needed |
-| SSRF defense | `getCkanResourceFromPackage` now requires the resource URL's host to match the catalogued API host, exact match on `https`. 5 tests, 3 mutations |
-| Byte-bounded reads | `createOpenDataHttp` caps both the declared `Content-Length` and the streamed total. 12 tests |
-| Status mapping | `statusFromOpenDataFailure`, an exhaustive switch in its own module. 12 tests, 2 mutations |
-| Desktop | Deferred at Pablo's direction; the override body stays written and SQLite-verified |
+| Item               | Outcome                                                                                                                                                                    |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The byte proxy     | `supabase/functions/open-data/` serves the resource route and is verified live against HDX. `ValidReturnType` already allowed `Response`, so no base64 envelope was needed |
+| SSRF defense       | `getCkanResourceFromPackage` now requires the resource URL's host to match the catalogued API host, exact match on `https`. 5 tests, 3 mutations                           |
+| Byte-bounded reads | `createOpenDataHttp` caps both the declared `Content-Length` and the streamed total. 12 tests                                                                              |
+| Status mapping     | `statusFromOpenDataFailure`, an exhaustive switch in its own module. 12 tests, 2 mutations                                                                                 |
+| Desktop            | Deferred at Pablo's direction; the override body stays written and SQLite-verified                                                                                         |
 
 That pass also found a **real defect in this plan's own pgTAP test**: its fixtures
 used `series.parquet` / `world-bank__wdi`, which are exactly what the World Bank
@@ -152,24 +152,24 @@ commit steps in this plan**, deliberately, unlike the earlier QETL plans.
 
 ## File structure
 
-| File | Responsibility |
-|---|---|
-| `supabase/schemas/00.enum.catalog_entries__open_data__access_kind.sql` | The `access_kind` discriminant type |
-| `supabase/schemas/00.enum.catalog_entries__open_data__api_service.sql` | The API protocol type |
-| `supabase/schemas/10.catalog_entries__open_data.sql` | Nullability, five columns, three CHECKs, one partial index |
-| `supabase/tests/database/catalog_entries_open_data_access.test.sql` | pgTAP for every claim in spec 6.3 and 6.5 |
-| `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts` | Read shape and the `OpenDataAccess` union |
-| `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts` | Zod at the DB boundary |
-| `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryModule.ts` | `toAccess(entry)` |
-| `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts` | The SQLite override body |
-| `shared/CkanClient/CkanClient.types.ts` | `CkanPackage`, `CkanResource`, `OpenDataHttp` |
-| `shared/CkanClient/CkanClient.schemas.ts` | Zod for CKAN responses |
-| `shared/CkanClient/CkanClient.ts` | `package_show`, datastore page, resource bytes |
-| `shared/open-data/openDataErrors.ts` | The named error types |
-| `shared/open-data/getCkanResourceFromPackage.ts` | Pure resource selection and refusals |
-| `shared/open-data/buildCkanSourceVersion.ts` | Pure version token |
-| `shared/open-data/buildCsvFromDatastoreRecords.ts` | Pure records to CSV text |
-| `shared/open-data/acquireOpenDataResource.ts` | The integration seam |
+| File                                                                                 | Responsibility                                             |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `supabase/schemas/00.enum.catalog_entries__open_data__access_kind.sql`               | The `access_kind` discriminant type                        |
+| `supabase/schemas/00.enum.catalog_entries__open_data__api_service.sql`               | The API protocol type                                      |
+| `supabase/schemas/10.catalog_entries__open_data.sql`                                 | Nullability, five columns, three CHECKs, one partial index |
+| `supabase/tests/database/catalog_entries_open_data_access.test.sql`                  | pgTAP for every claim in spec 6.3 and 6.5                  |
+| `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts`   | Read shape and the `OpenDataAccess` union                  |
+| `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts`  | Zod at the DB boundary                                     |
+| `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryModule.ts`   | `toAccess(entry)`                                          |
+| `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts` | The SQLite override body                                   |
+| `shared/CkanClient/CkanClient.types.ts`                                              | `CkanPackage`, `CkanResource`, `OpenDataHttp`              |
+| `shared/CkanClient/CkanClient.schemas.ts`                                            | Zod for CKAN responses                                     |
+| `shared/CkanClient/CkanClient.ts`                                                    | `package_show`, datastore page, resource bytes             |
+| `shared/open-data/openDataErrors.ts`                                                 | The named error types                                      |
+| `shared/open-data/getCkanResourceFromPackage.ts`                                     | Pure resource selection and refusals                       |
+| `shared/open-data/buildCkanSourceVersion.ts`                                         | Pure version token                                         |
+| `shared/open-data/buildCsvFromDatastoreRecords.ts`                                   | Pure records to CSV text                                   |
+| `shared/open-data/acquireOpenDataResource.ts`                                        | The integration seam                                       |
 
 ---
 
@@ -209,6 +209,7 @@ Do not commit `supabase/config.toml` or the switch's `.env.development` edits;
 git hooks enforce this, and they must not be bypassed.
 
 **Acceptance criteria:**
+
 - `ava supabase status` reports project `feat-qetl-hdx` and a green first line.
 - `git status` shows no staged change to `supabase/config.toml`.
 
@@ -223,6 +224,7 @@ is the highest-value test in this plan, because breaking it breaks a running
 pipeline silently.
 
 **Files:**
+
 - Create: `supabase/tests/database/catalog_entries_open_data_access.test.sql`
 
 - [ ] **Step 1: Read an existing pgTAP test for the harness shape**
@@ -278,6 +280,7 @@ baseline they are there to protect.
 if any of them is red after Task 2 the task broke existing behaviour.
 
 **Acceptance criteria:**
+
 - The test file runs under `supabase test db`.
 - Every `access_kind`, `api_*` and CHECK case fails; the back-compat and upsert
   cases pass.
@@ -292,6 +295,7 @@ mandates it for any schema change and it takes precedence over this plan on sche
 matters.
 
 **Files:**
+
 - Create: `supabase/schemas/00.enum.catalog_entries__open_data__access_kind.sql`
 - Create: `supabase/schemas/00.enum.catalog_entries__open_data__api_service.sql`
 - Modify: `supabase/schemas/10.catalog_entries__open_data.sql`
@@ -327,7 +331,7 @@ In `10.catalog_entries__open_data.sql`, per spec 6.1:
 3. Add the three CHECK constraints from spec 6.1, both halves of each.
 4. Add the partial unique index from spec 6.3.
 5. **Leave `constraint unique_parquet_file_pipeline unique (parquet_file_name,
-   pipeline_name)` byte-identical.** Spec 6.3 explains why converting it to a
+pipeline_name)` byte-identical.** Spec 6.3 explains why converting it to a
    partial index breaks the pipeline upsert. Do not tidy it.
 6. **Add no `REVOKE`.** The existing `grant select ... to authenticated` and the
    `service_role` grants stay exactly as they are. Per the skill, schema files
@@ -378,6 +382,7 @@ case that is now red means this task broke existing behaviour, and the fix is in
 the schema, not in the test.
 
 **Acceptance criteria:**
+
 - `pnpm test:db` passes.
 - The generated migration drops nothing that was not intentionally changed.
 - `unique_parquet_file_pipeline` is unchanged in both the schema file and the
@@ -389,6 +394,7 @@ the schema, not in the test.
 ## Task 3: Model types and parsers
 
 **Files:**
+
 - Modify: `shared/types/database.types.ts` (regenerated, never hand-edited)
 - Modify: `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts`
 - Modify: `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts`
@@ -447,6 +453,7 @@ pnpm test:frontend OpenDataCatalogEntryParsers && pnpm type-check
 ```
 
 **Acceptance criteria:**
+
 - Both tests pass and `pnpm type-check` is clean, including `deno check shared`.
 - `ZodConsistencyTests` compiles without modification to its shape.
 - `database.types.ts` shows only generated changes.
@@ -458,6 +465,7 @@ pnpm test:frontend OpenDataCatalogEntryParsers && pnpm type-check
 The one place the null-checks live, so no consumer tests four fields (spec 6.4).
 
 **Files:**
+
 - Create: `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryModule.ts`
 - Create: `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryModule.test.ts`
 - Modify: `shared/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts` (re-export)
@@ -504,6 +512,7 @@ pnpm test:frontend OpenDataCatalogEntryModule && pnpm type-check
 ```
 
 **Acceptance criteria:**
+
 - Three tests pass; the `undefined` case is one of them.
 - `.exhaustive()` is used, so adding an enum value fails to compile here.
 - No consumer needs to import `OpenDataCatalogEntry.types.ts`.
@@ -520,6 +529,7 @@ Postgres, and the mirror still declares
 An API-kind row would fail to insert there.
 
 **Files:**
+
 - Modify: `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts`
 - Create (generated): `apps/desktop/migrations/<timestamp>_generalize_open_data_catalog_access.gen.sql`
 
@@ -575,6 +585,7 @@ pnpm test:desktop
 ```
 
 **Acceptance criteria:**
+
 - The generated `.gen.sql` has no `NOT NULL` on `parquet_file_name`,
   `pipeline_name` or `pipeline_run_id`.
 - All five new columns and the partial index are present.
@@ -591,6 +602,7 @@ Talks CKAN over an injected HTTP layer. No state, no singleton, no module-level
 is blocked.
 
 **Files:**
+
 - Create: `shared/CkanClient/CkanClient.types.ts`
 - Create: `shared/CkanClient/CkanClient.schemas.ts`
 - Create: `shared/CkanClient/CkanClient.ts`
@@ -647,6 +659,7 @@ pnpm test:frontend CkanClient && pnpm type-check
 will surface in `deno check shared`.
 
 **Acceptance criteria:**
+
 - Every test above passes.
 - No module-level `fetch` and no client singleton import anywhere in the folder.
 - `mimetype` is optional; `format` is required.
@@ -660,6 +673,7 @@ Pure resource selection and every refusal. This is where spec 1.3's readme-first
 hazard is defeated.
 
 **Files:**
+
 - Create: `shared/open-data/openDataErrors.ts`
 - Create: `shared/open-data/getCkanResourceFromPackage.ts`
 - Create: `shared/open-data/getCkanResourceFromPackage.test.ts`
@@ -714,6 +728,7 @@ pnpm test:frontend getCkanResourceFromPackage && pnpm type-check
 ```
 
 **Acceptance criteria:**
+
 - Every test passes, including the readme-first selection test.
 - No function is named `resolve...`, `_resolve...` or `probe`.
 - Nothing in this module imports a client.
@@ -723,6 +738,7 @@ pnpm test:frontend getCkanResourceFromPackage && pnpm type-check
 ## Task 8: `buildCkanSourceVersion`
 
 **Files:**
+
 - Create: `shared/open-data/buildCkanSourceVersion.ts`
 - Create: `shared/open-data/buildCkanSourceVersion.test.ts`
 
@@ -755,6 +771,7 @@ Import `SourceVersion` as a type from
 import is a read.
 
 **Acceptance criteria:**
+
 - Four tests pass, including the empty-string case and the collision case.
 - Nothing anywhere parses or splits the token.
 - `shared/models/relations/` is unmodified: confirm with
@@ -770,6 +787,7 @@ handoff records that this exact approach caught two bugs in an earlier CSV write
 that a string assertion passed.
 
 **Files:**
+
 - Create: `shared/open-data/buildCsvFromDatastoreRecords.ts`
 - Create: `shared/open-data/__tests__/buildCsvFromDatastoreRecords.test.ts`
 - Create: `shared/open-data/__tests__/buildCsvFromDatastoreRecords.executed.test.ts`
@@ -830,6 +848,7 @@ pnpm test:executed buildCsvFromDatastoreRecords && pnpm type-check
 ```
 
 **Acceptance criteria:**
+
 - Every assertion is on DuckDB's rows; **no test asserts on the CSV string**.
 - The missing-optional-key case passes.
 - The real HDX fixture parses to 13 columns and 1 row.
@@ -840,6 +859,7 @@ pnpm test:executed buildCsvFromDatastoreRecords && pnpm type-check
 ## Task 10: `acquireOpenDataResource`, the integration seam
 
 **Files:**
+
 - Create: `shared/open-data/acquireOpenDataResource.ts`
 - Create: `shared/open-data/acquireOpenDataResource.test.ts`
 
@@ -894,6 +914,7 @@ pnpm test:frontend acquireOpenDataResource && pnpm type-check
 ```
 
 **Acceptance criteria:**
+
 - Every test passes, with a positive control beside each `not.toHaveBeenCalled()`.
 - `getJson` is called once per acquisition.
 - The module imports no client singleton and no DuckDB.
@@ -905,7 +926,7 @@ pnpm test:frontend acquireOpenDataResource && pnpm type-check
 
 Handoff rule 1, and not optional. In this project a code-quality review found a
 real defect in **every single task** of the phase-1 session, and the recurring one
-was implementers writing spy or structural tests and *reasoning* they would fail
+was implementers writing spy or structural tests and _reasoning_ they would fail
 rather than proving it.
 
 **Files:** none in the repo. **Mutants live in the session scratch directory,
@@ -925,18 +946,18 @@ diff "$SCRATCH/original.ts" "$SRC" && echo "byte-identical"
 
 - [ ] **Step 2: The mutations, and which test must catch each**
 
-| # | Mutation | Must go red |
-|---|---|---|
-| 1 | Select the first resource instead of the named one | Task 7's readme-first selection test |
-| 2 | Column order from `Object.keys(records[0])` instead of `fields` | Task 9's missing-optional-key DuckDB test |
-| 3 | Remove the `size` pre-flight | Task 7 and Task 10 ceiling tests, **and the positive control stays green** |
-| 4 | Prefer `last_modified` over `hash` | Task 8's `ckan:hash:` test |
-| 5 | Drop the `ckan:hash:` / `ckan:mtime:` prefix | Task 8's collision test |
-| 6 | Return `result` without checking `success` | Task 6's `CkanActionFailed` test |
-| 7 | Make `mimetype` required in the Zod schema | Task 6's `mimetype: null` test |
-| 8 | Treat `hash: ""` as present | Task 8's empty-string fallback test |
-| 9 | Branch on `datastoreActive` and take a datastore path | Task 10's `datastoreActive` test |
-| 10 | Convert `unique_parquet_file_pipeline` to a partial index in `supabase/schemas/` | Task 1's pgTAP upsert test (via `pnpm db:reset && pnpm test:db`) |
+| #   | Mutation                                                                         | Must go red                                                                |
+| --- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 1   | Select the first resource instead of the named one                               | Task 7's readme-first selection test                                       |
+| 2   | Column order from `Object.keys(records[0])` instead of `fields`                  | Task 9's missing-optional-key DuckDB test                                  |
+| 3   | Remove the `size` pre-flight                                                     | Task 7 and Task 10 ceiling tests, **and the positive control stays green** |
+| 4   | Prefer `last_modified` over `hash`                                               | Task 8's `ckan:hash:` test                                                 |
+| 5   | Drop the `ckan:hash:` / `ckan:mtime:` prefix                                     | Task 8's collision test                                                    |
+| 6   | Return `result` without checking `success`                                       | Task 6's `CkanActionFailed` test                                           |
+| 7   | Make `mimetype` required in the Zod schema                                       | Task 6's `mimetype: null` test                                             |
+| 8   | Treat `hash: ""` as present                                                      | Task 8's empty-string fallback test                                        |
+| 9   | Branch on `datastoreActive` and take a datastore path                            | Task 10's `datastoreActive` test                                           |
+| 10  | Convert `unique_parquet_file_pipeline` to a partial index in `supabase/schemas/` | Task 1's pgTAP upsert test (via `pnpm db:reset && pnpm test:db`)           |
 
 Mutation 10 is worth the reset cost: it is exactly the "cleanup" spec 6.3 warns
 about, and a future reader will be tempted by it. Restore the schema file and
@@ -949,6 +970,7 @@ For each mutation: which test went red, and its name. A mutation that no test
 catches is a missing test, not an acceptable gap. Write the test and re-run.
 
 **Acceptance criteria:**
+
 - All ten mutations were applied and each was caught by a **named** test.
 - Every mutated file is byte-identical to its original, verified with `diff`.
 - No mutant file remains anywhere under the repo, and `git status` is clean of
@@ -1014,6 +1036,7 @@ defects in this work but blockers on it:
    The file path is not a fallback; it is the path.
 
 **Acceptance criteria:**
+
 - All four verification commands green, plus `pnpm test:db` and `pnpm test:desktop`.
 - `git diff --stat -- src/clients/qetl shared/models/relations` prints nothing.
 - Nothing committed, nothing pushed, no pull request.

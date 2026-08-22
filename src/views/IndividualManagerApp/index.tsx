@@ -1,9 +1,11 @@
+import type { Concept } from "$/models/ontology/Concept/Concept";
+
 import { Flex, ScrollArea } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
+
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { EditCaseTypeButton } from "@/views/IndividualManagerApp/EditCaseTypeButton";
 import { IndividualNavbar } from "@/views/IndividualManagerApp/IndividualNavbar";
-import type { Concept } from "$/models/ontology/Concept/Concept";
 
 type Props = {
   concept: Concept.T;

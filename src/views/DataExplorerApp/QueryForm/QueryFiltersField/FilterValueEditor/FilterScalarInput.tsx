@@ -1,8 +1,10 @@
-import { matchLiteral } from "@avandar/utils";
-import { TextInput } from "@mantine/core";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { ReactNode } from "react";
+
+import { matchLiteral } from "@avandar/utils";
+import { TextInput } from "@mantine/core";
+
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 type Props = {
   testId: string;
@@ -45,9 +47,9 @@ export function FilterScalarInput({
   // A date column gets a real date picker; a numeric column keeps a text field
   // but asks for the numeric keyboard on touch devices.
   const inputType =
-    dataType !== undefined && AvaDataType.isTemporal(dataType) ?
-      _getInputTypeFromTemporalDataType(dataType)
-    : undefined;
+    dataType !== undefined && AvaDataType.isTemporal(dataType)
+      ? _getInputTypeFromTemporalDataType(dataType)
+      : undefined;
   const isNumeric = dataType !== undefined && AvaDataType.isNumeric(dataType);
 
   return (

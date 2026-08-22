@@ -419,9 +419,8 @@ today.
 Rename to `formatGeneratedFile` and switch the `execSync` to:
 
 ```ts
-const formatter =
-  options.filePath.endsWith(".sql") ?
-    `pnpm exec prettier --write "${options.filePath}"`
+const formatter = options.filePath.endsWith(".sql")
+  ? `pnpm exec prettier --write "${options.filePath}"`
   : `pnpm exec oxfmt "${options.filePath}"`;
 execSync(formatter, { cwd: options.projectRoot, stdio: "pipe" });
 ```

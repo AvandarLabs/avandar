@@ -1,3 +1,5 @@
+import type { Locator, Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -15,7 +17,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
-import type { Locator, Page } from "@playwright/test";
 
 const POINT_DATASET_NAME = "dated-points.csv";
 const BOUNDARY_DATASET_NAME = "pcode-polygon.csv";

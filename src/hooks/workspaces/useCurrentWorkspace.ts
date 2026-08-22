@@ -1,11 +1,13 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { propEq } from "@avandar/utils";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
+
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";
 import { Logger } from "@/utils/Logger";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Get the current workspace.
@@ -33,8 +35,9 @@ export function useCurrentWorkspace(): Workspace.WithSubscription {
 
   // after a fetch, the query cache is the source of truth if
   // we find a workspace with the necessary slug
-  const workspaceFromCache =
-    isSuccess ? userWorkspaces?.find(propEq("slug", workspaceSlug)) : undefined;
+  const workspaceFromCache = isSuccess
+    ? userWorkspaces?.find(propEq("slug", workspaceSlug))
+    : undefined;
 
   // If the query is done and the workspace isn't found, the user
   // lost access to this workspace. Navigate in an effect to avoid

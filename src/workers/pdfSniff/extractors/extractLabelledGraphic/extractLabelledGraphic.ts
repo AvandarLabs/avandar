@@ -1,10 +1,3 @@
-import { assembleLabels } from "../../assembleLabels/assembleLabels";
-import { assembleQuantities } from "../../assembleQuantities/assembleQuantities";
-import { findPlotFrame } from "../../findPlotFrame/findPlotFrame";
-import { pairByProximity } from "../../pairByProximity/pairByProximity";
-import { partitionTextByFrame } from "../../partitionTextByFrame/partitionTextByFrame";
-import { readBarChart } from "../../readBarChart/readBarChart";
-import { readCartesianChart } from "../../readCartesianChart/readCartesianChart";
 import type { AxisTick } from "../../calibrateAxis/calibrateAxis";
 import type {
   BBox,
@@ -14,6 +7,14 @@ import type {
   RegionGeometry,
   TextItem,
 } from "../../pdfSniff.types";
+
+import { assembleLabels } from "../../assembleLabels/assembleLabels";
+import { assembleQuantities } from "../../assembleQuantities/assembleQuantities";
+import { findPlotFrame } from "../../findPlotFrame/findPlotFrame";
+import { pairByProximity } from "../../pairByProximity/pairByProximity";
+import { partitionTextByFrame } from "../../partitionTextByFrame/partitionTextByFrame";
+import { readBarChart } from "../../readBarChart/readBarChart";
+import { readCartesianChart } from "../../readCartesianChart/readCartesianChart";
 
 function _isAxisTick(entry: unknown): entry is AxisTick {
   return (

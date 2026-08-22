@@ -1,9 +1,11 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { CSSProperties, ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
+
 import { ExportPageLayout } from "@/views/GisApp/export/ExportPageLayout/ExportPageLayout";
 import css from "@/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview.module.css";
 import { getExportFurnitureText } from "@/views/GisApp/export/getExportFurnitureText/getExportFurnitureText";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   config: AvaMapConfig.T;
@@ -61,9 +63,9 @@ export function ExportSheetPreview({
         className={`${css.exportSheetPreviewBand} ${css.exportSheetPreviewHeader}`}
         style={_toStyle(page.headerMm, scale)}
       >
-        {text.title !== undefined ?
+        {text.title !== undefined ? (
           <span className={css.exportSheetPreviewText}>{text.title}</span>
-        : null}
+        ) : null}
       </div>
       <div
         className={`${css.exportSheetPreviewBand} ${css.exportSheetPreviewMapFrame}`}

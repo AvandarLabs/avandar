@@ -1,4 +1,9 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
+
 import { registry } from "@avandar/utils";
+
 import { AreaChartVizConfigs } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfigs.ts";
 import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts";
 import { BubbleChartVizConfigs } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfigs.ts";
@@ -14,9 +19,6 @@ import {
   VizConfigUtilRegistry,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 
 const VizConfigModulesRegistry = {
   table: TableVizConfigs,

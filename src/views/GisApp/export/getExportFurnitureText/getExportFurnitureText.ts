@@ -1,6 +1,7 @@
-import { prop } from "@avandar/utils";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+
+import { prop } from "@avandar/utils";
 
 /** Header and footer strings the page prints, with fallbacks resolved. */
 export type ExportFurnitureText = {
@@ -59,20 +60,22 @@ export function getExportFurnitureText(
   const { config, mapName, basemapAttribution } = options;
   const { exportLayout } = config;
 
-  const title =
-    !exportLayout.title.isVisible ? undefined
-    : exportLayout.title.text !== "" ? exportLayout.title.text
-    : mapName;
+  const title = !exportLayout.title.isVisible
+    ? undefined
+    : exportLayout.title.text !== ""
+      ? exportLayout.title.text
+      : mapName;
 
-  const subtitle =
-    !exportLayout.subtitle.isVisible ? undefined
-    : exportLayout.subtitle.text !== "" ? exportLayout.subtitle.text
-    : _topVisibleLayer(config.layers)?.legend.title;
+  const subtitle = !exportLayout.subtitle.isVisible
+    ? undefined
+    : exportLayout.subtitle.text !== ""
+      ? exportLayout.subtitle.text
+      : _topVisibleLayer(config.layers)?.legend.title;
 
   const sourceLine =
-    exportLayout.sourceLine !== "" ?
-      exportLayout.sourceLine
-    : _composeSourceLine({ layers: config.layers, basemapAttribution });
+    exportLayout.sourceLine !== ""
+      ? exportLayout.sourceLine
+      : _composeSourceLine({ layers: config.layers, basemapAttribution });
 
   return { title, subtitle, sourceLine };
 }

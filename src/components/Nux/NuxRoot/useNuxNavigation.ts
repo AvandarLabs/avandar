@@ -1,15 +1,17 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+
 import { propEq } from "@avandar/utils";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useCallback } from "react";
+
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { navigateToNuxMilestoneRoute } from "@/components/Nux/NuxRoot/navigateToNuxMilestoneRoute";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 function _openNuxMilestone(options: {
   artifacts: NuxWorkspaceArtifacts | undefined;

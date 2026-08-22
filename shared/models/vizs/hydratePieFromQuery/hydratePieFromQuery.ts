@@ -1,6 +1,8 @@
-import { isNonEmptyArray } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+
+import { isNonEmptyArray } from "@avandar/utils";
+
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 type PieAxesConfig = {
   nameKey: string | undefined;
@@ -45,9 +47,8 @@ export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
       const firstNumericCol = queryColumns.find(QueryColumn.isNumeric);
       next = {
         ...next,
-        valueKey:
-          firstNumericCol ?
-            QueryColumn.getDerivedColumnName(firstNumericCol)
+        valueKey: firstNumericCol
+          ? QueryColumn.getDerivedColumnName(firstNumericCol)
           : undefined,
       };
     }
@@ -66,8 +67,9 @@ export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
       const nameCol = firstNonNumericCol ?? fallbackCol;
       next = {
         ...next,
-        nameKey:
-          nameCol ? QueryColumn.getDerivedColumnName(nameCol) : undefined,
+        nameKey: nameCol
+          ? QueryColumn.getDerivedColumnName(nameCol)
+          : undefined,
       };
     }
   }

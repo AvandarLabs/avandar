@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+
 import { createCsvParseOptionsFromUserHints } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
 import { inferQuoteCharFromSniffAndProbeTexts } from "@/clients/DuckDbClient/csvParse/csvQuoteProbe";
 
@@ -52,13 +53,13 @@ describe("applyQuoteProbeToParseOptions", () => {
     expect(quoteChar).toBe('"');
 
     const next =
-      quoteChar == null ? base : (
-        {
-          ...base,
-          quoteChar,
-          escapeChar: base.escapeChar ?? '"',
-        }
-      );
+      quoteChar == null
+        ? base
+        : {
+            ...base,
+            quoteChar,
+            escapeChar: base.escapeChar ?? '"',
+          };
 
     expect(next.quoteChar).toBe('"');
     expect(next.escapeChar).toBe('"');

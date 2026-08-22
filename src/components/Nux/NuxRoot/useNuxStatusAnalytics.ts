@@ -1,8 +1,10 @@
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+
 import { useEffect, useRef } from "react";
+
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 
 /**
  * Logs `nux.completed` and `nux.dismissed` only on a live status transition.

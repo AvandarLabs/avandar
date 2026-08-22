@@ -1,7 +1,8 @@
-import { matchLiteral } from "@avandar/utils";
-import { Trans } from "@lingui/react/macro";
 import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
 import type { ReactNode } from "react";
+
+import { matchLiteral } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
 
 type Props = {
   actionKind: PublishActionKind;

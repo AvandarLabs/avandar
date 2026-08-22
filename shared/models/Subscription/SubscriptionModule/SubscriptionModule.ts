@@ -1,14 +1,3 @@
-import { registry } from "@avandar/utils";
-import {
-  BasicPlanLimitsConfig,
-  FreePlanLimitsConfig,
-  PremiumPlanLimitsConfig,
-} from "$/config/FeaturePlansConfig.ts";
-import { canAddDatasets } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canAddDatasets.ts";
-import { canInviteMembers } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canInviteMembers.ts";
-import { canPublishShareableDashboard } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canPublishShareableDashboard.ts";
-import { doesSubscriptionGrantEntitlements } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/doesSubscriptionGrantEntitlements.ts";
-import { getEffectiveEntitlementLimits } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/getEffectiveEntitlementLimits.ts";
 import type {
   FeaturePlanType,
   PolarCustomerId,
@@ -22,6 +11,19 @@ import type {
 } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Tables, TablesInsert } from "$/types/database.types.ts";
+
+import { registry } from "@avandar/utils";
+
+import {
+  BasicPlanLimitsConfig,
+  FreePlanLimitsConfig,
+  PremiumPlanLimitsConfig,
+} from "$/config/FeaturePlansConfig.ts";
+import { canAddDatasets } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canAddDatasets.ts";
+import { canInviteMembers } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canInviteMembers.ts";
+import { canPublishShareableDashboard } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/canPublishShareableDashboard.ts";
+import { doesSubscriptionGrantEntitlements } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/doesSubscriptionGrantEntitlements.ts";
+import { getEffectiveEntitlementLimits } from "$/models/Subscription/SubscriptionModule/subscriptionEntitlements/getEffectiveEntitlementLimits.ts";
 
 export const SubscriptionModule = {
   FeaturePlanTypes: registry<FeaturePlanType>().keys(
@@ -270,18 +272,18 @@ export const SubscriptionModule = {
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
       polarSubscriptionId:
-        row.polar_subscription_id != null ?
-          (row.polar_subscription_id as SubscriptionPolarId)
-        : undefined,
+        row.polar_subscription_id != null
+          ? (row.polar_subscription_id as SubscriptionPolarId)
+          : undefined,
       polarProductId:
-        row.polar_product_id != null ?
-          (row.polar_product_id as PolarProductId)
-        : undefined,
+        row.polar_product_id != null
+          ? (row.polar_product_id as PolarProductId)
+          : undefined,
       polarCustomerEmail: row.polar_customer_email ?? undefined,
       polarCustomerId:
-        row.polar_customer_id != null ?
-          (row.polar_customer_id as PolarCustomerId)
-        : undefined,
+        row.polar_customer_id != null
+          ? (row.polar_customer_id as PolarCustomerId)
+          : undefined,
       featurePlanType: row.feature_plan_type,
       subscriptionStatus: row.subscription_status,
       maxSeatsAllowed: row.max_seats_allowed,
@@ -293,13 +295,13 @@ export const SubscriptionModule = {
       endsAt: row.ends_at != null ? new Date(row.ends_at) : undefined,
       endedAt: row.ended_at != null ? new Date(row.ended_at) : undefined,
       currentPeriodStart:
-        row.current_period_start != null ?
-          new Date(row.current_period_start)
-        : undefined,
+        row.current_period_start != null
+          ? new Date(row.current_period_start)
+          : undefined,
       currentPeriodEnd:
-        row.current_period_end != null ?
-          new Date(row.current_period_end)
-        : undefined,
+        row.current_period_end != null
+          ? new Date(row.current_period_end)
+          : undefined,
     };
   },
 };

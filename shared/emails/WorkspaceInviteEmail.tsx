@@ -1,4 +1,5 @@
 import { Text } from "@react-email/components";
+
 import { EmailFullButton } from "$/emails/lib/EmailFullButton.tsx";
 import { EmailHeading } from "$/emails/lib/EmailHeading.tsx";
 import { EmailParagraph } from "$/emails/lib/EmailParagraph.tsx";

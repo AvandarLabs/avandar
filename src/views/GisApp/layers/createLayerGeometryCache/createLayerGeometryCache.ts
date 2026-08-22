@@ -1,8 +1,9 @@
-import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
-import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { GeometryDropReport } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+
+import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
+import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 
 /** Everything one layer's geometry depends on. */
 export type LayerGeometryInputs = {

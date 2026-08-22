@@ -1,14 +1,3 @@
-import { Model } from "@avandar/models";
-import { FloatingLoader, ObjectDescriptionList } from "@avandar/ui";
-import { assertIsDefined, matchLiteral, where } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { notifySuccess } from "@/utils/notifications/notify";
-import type { ObjectKeyRenderOptionsMap } from "@avandar/ui";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -16,7 +5,20 @@ import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenData
 import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
+import type { ObjectKeyRenderOptionsMap } from "@avandar/ui";
 import type { SetOptional } from "type-fest";
+
+import { Model } from "@avandar/models";
+import { FloatingLoader, ObjectDescriptionList } from "@avandar/ui";
+import { assertIsDefined, matchLiteral, where } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { notifySuccess } from "@/utils/notifications/notify";
 
 type DatasetWithColumnsAndSource = SetOptional<
   DatasetWithColumns,
@@ -144,20 +146,18 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
             assertIsDefined(prevDatasetColumn);
 
             const newColumnName =
-              datasetColumn.name !== prevDatasetColumn.name ?
-                datasetColumn.name
-              : undefined;
+              datasetColumn.name !== prevDatasetColumn.name
+                ? datasetColumn.name
+                : undefined;
             const newDataType =
-              (
-                (datasetColumn.dataType as string) !==
-                datasetColumn.detectedDataType
-              ) ?
-                datasetColumn.dataType
-              : undefined;
+              (datasetColumn.dataType as string) !==
+              datasetColumn.detectedDataType
+                ? datasetColumn.dataType
+                : undefined;
             const newDescription =
-              datasetColumn.description !== prevDatasetColumn.description ?
-                datasetColumn.description
-              : undefined;
+              datasetColumn.description !== prevDatasetColumn.description
+                ? datasetColumn.description
+                : undefined;
 
             // update the column metadata in the backend if any changes were
             // made to the description, data type, or name

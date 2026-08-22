@@ -1,7 +1,9 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
+
 import { makeDashboardPublishAnalyticsEventFromDashboards } from "./makeDashboardPublishAnalyticsEventFromDashboards";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 function _makeDashboard(
   options: Readonly<{

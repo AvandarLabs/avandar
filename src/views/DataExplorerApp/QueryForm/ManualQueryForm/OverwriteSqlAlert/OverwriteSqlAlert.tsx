@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Group, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+
 import css from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.module.css";
-import type { ReactNode } from "react";
 
 type Props = {
   onOverwrite: () => void;

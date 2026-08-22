@@ -1,3 +1,5 @@
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
@@ -14,11 +16,11 @@ import {
 import { modals } from "@mantine/modals";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
+
 import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv/buildConsentAuditCsv";
 import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
-import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 type FilterValue = "all" | ConsentAuditEntry.T["decision"];
 
@@ -174,7 +176,7 @@ export function ConsentLogPanel(): React.ReactNode {
         </Group>
       </Group>
 
-      {filtered.length === 0 ?
+      {filtered.length === 0 ? (
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
             <Trans>
@@ -183,7 +185,8 @@ export function ConsentLogPanel(): React.ReactNode {
             </Trans>
           </Text>
         </Card>
-      : <Table striped withTableBorder>
+      ) : (
+        <Table striped withTableBorder>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>
@@ -250,32 +253,31 @@ export function ConsentLogPanel(): React.ReactNode {
                           </Badge>
                         );
                       })}
-                      {(
-                        entry.detectedPii.length === 0 &&
-                        entry.detectedBias.length === 0
-                      ) ?
+                      {entry.detectedPii.length === 0 &&
+                      entry.detectedBias.length === 0 ? (
                         <Text size="xs" c="dimmed">
                           <Trans>(clean)</Trans>
                         </Text>
-                      : null}
+                      ) : null}
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                    {entry.sourceColumn ?
+                    {entry.sourceColumn ? (
                       <Text size="xs" ff="monospace">
                         {entry.sourceColumn}
                       </Text>
-                    : <Text size="xs" c="dimmed">
+                    ) : (
+                      <Text size="xs" c="dimmed">
                         —
                       </Text>
-                    }
+                    )}
                   </Table.Td>
                 </Table.Tr>
               );
             })}
           </Table.Tbody>
         </Table>
-      }
+      )}
     </Stack>
   );
 }

@@ -1,3 +1,13 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type {
+  DatasetImportFormValues,
+  DataSourceMetadata,
+} from "../DatasetImportForm.types";
+import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
+import type { UseMutationResultTuple } from "@avandar/query-hooks";
+
 import { useMutation } from "@avandar/query-hooks";
 import { MIMEType, snakeCaseKeysShallow, where } from "@avandar/utils";
 import { i18n } from "@lingui/core";
@@ -5,6 +15,7 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
+
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -16,17 +27,9 @@ import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+
 import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedPayloadFromSaveResult/makeDatasetImportedPayloadFromSaveResult";
 import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded/startOriginalFileUploadIfNeeded";
-import type {
-  DatasetImportFormValues,
-  DataSourceMetadata,
-} from "../DatasetImportForm.types";
-import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
-import type { UseMutationResultTuple } from "@avandar/query-hooks";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 export type CsvParseOptions = {
   type: "csv_file";
@@ -329,10 +332,12 @@ async function _savePdfDataset(
     llmModel: parseOptions.llmModel,
     // The form's range is inclusive and one-based; the stored one is
     // inclusive and zero-based, matching `PageGeometry.pageIndex`.
-    pageRangeStart:
-      parseOptions.pageRange ? parseOptions.pageRange[0] - 1 : undefined,
-    pageRangeEnd:
-      parseOptions.pageRange ? parseOptions.pageRange[1] - 1 : undefined,
+    pageRangeStart: parseOptions.pageRange
+      ? parseOptions.pageRange[0] - 1
+      : undefined,
+    pageRangeEnd: parseOptions.pageRange
+      ? parseOptions.pageRange[1] - 1
+      : undefined,
     // Fingerprinted from the combination rather than any single region,
     // because the combination is what the dataset's rows actually are.
     fingerprint: await makePdfTableFingerprintFromTable({
@@ -498,9 +503,9 @@ function _createSaveDatasetMutationOptions(
     onMutate: () => {
       return {
         isFirstInWorkspace:
-          options.workspaceDatasets === undefined ?
-            undefined
-          : options.workspaceDatasets.length === 0,
+          options.workspaceDatasets === undefined
+            ? undefined
+            : options.workspaceDatasets.length === 0,
       };
     },
     mutationFn: (values) => {

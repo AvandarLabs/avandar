@@ -1,8 +1,9 @@
-import { promiseMap } from "@avandar/utils";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { GenericSeedJob } from "scripts/SeedRunner";
 import type { TSeedData } from "seed/SeedData";
+
+import { promiseMap } from "@avandar/utils";
 
 export type SeedJob = GenericSeedJob<TSeedData>;
 

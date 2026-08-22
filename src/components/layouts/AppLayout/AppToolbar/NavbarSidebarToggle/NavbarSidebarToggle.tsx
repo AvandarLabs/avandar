@@ -5,6 +5,7 @@ import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
 } from "@tabler/icons-react";
+
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 
 /**
@@ -30,9 +31,11 @@ export function NavbarSidebarToggle(): JSX.Element {
         // only visible in sizes larger than mobile
         visibleFrom="sm"
       >
-        {isNavbarSidebarCollapsed ?
+        {isNavbarSidebarCollapsed ? (
           <IconLayoutSidebarLeftExpand size={18} />
-        : <IconLayoutSidebarLeftCollapse size={18} />}
+        ) : (
+          <IconLayoutSidebarLeftCollapse size={18} />
+        )}
       </ActionIcon>
     </Tooltip>
   );

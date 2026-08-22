@@ -1,9 +1,12 @@
-import { useLingui } from "@lingui/react/macro";
-import { Modal, Stack } from "@mantine/core";
-import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
-import { LimitMessage } from "./LimitMessage";
 import type { Subscription } from "$/models/Subscription/Subscription";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Modal, Stack } from "@mantine/core";
+
+import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+
+import { LimitMessage } from "./LimitMessage";
 
 type Props = {
   subscription: Subscription.T | undefined;

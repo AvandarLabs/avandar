@@ -1,14 +1,16 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
+
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { IconCircleDashed } from "@tabler/icons-react";
 import { useSyncExternalStore } from "react";
+
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { BufferMapToolPopover } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolPopover";
 import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
-import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
-import type { I18n } from "@lingui/core";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   selectedLayer: MapLayer.T | undefined;

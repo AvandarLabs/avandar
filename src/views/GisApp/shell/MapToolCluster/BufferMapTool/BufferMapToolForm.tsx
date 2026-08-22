@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
+
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Button, NumberInput, Stack, Switch } from "@mantine/core";
-import type { ReactNode } from "react";
 
 type Props = {
   distanceMeters: number;

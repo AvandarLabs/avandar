@@ -1,6 +1,7 @@
+import type { I18n } from "@lingui/core";
+
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
-import type { I18n } from "@lingui/core";
 
 /** Builds the compact data-type label used by the column outline. */
 export function buildShortDataTypeLabel(dataType: string, i18n: I18n): string {

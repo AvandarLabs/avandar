@@ -1,14 +1,16 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
-import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfileId } from "$/models/User/UserProfile.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement } from "react";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
+import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
+import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 
 const {
   insertMock,

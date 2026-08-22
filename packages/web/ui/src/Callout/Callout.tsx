@@ -1,6 +1,7 @@
+import type { AlertProps, TextProps } from "@mantine/core";
+
 import { Alert, Stack, Text, Title } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
-import type { AlertProps, TextProps } from "@mantine/core";
 
 type Props = {
   title?: string;
@@ -27,9 +28,7 @@ export function Callout({
 }: Props): JSX.Element {
   const contents = (
     <Stack gap="xxs">
-      {message ?
-        <Text size={messageSize}>{message}</Text>
-      : null}
+      {message ? <Text size={messageSize}>{message}</Text> : null}
       {children}
     </Stack>
   );
@@ -39,11 +38,11 @@ export function Callout({
       color={color}
       variant={variant}
       title={
-        title ?
+        title ? (
           <Title order={2} size={titleSize}>
             {title}
           </Title>
-        : null
+        ) : null
       }
       icon={icon}
       styles={{ icon: { width: "fit-content", height: "fit-content" } }}

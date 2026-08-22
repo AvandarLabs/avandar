@@ -63,21 +63,22 @@ always carry a visible caveat.
 
 ## File structure
 
-| File | Responsibility | Task |
-|---|---|---|
-| `src/workers/pdfSniff/detectLatticeTables.ts` | Signal B: ruling lines | 1 |
-| `src/workers/pdfSniff/detectTaggedTables.ts` | Signal A: structure tree | 2, 4 |
-| `src/workers/pdfSniff/detectStreamTables.ts` | Signal C: whitespace | 3 |
-| `src/workers/pdfSniff/dedupeCandidates.ts` | Cross-signal dedup | 5 |
-| `src/workers/pdfSniff/mergePageSpans.ts` | Multi-page joining | 6 |
-| `src/workers/pdfSniff/scoreCandidate.ts` | Confidence scoring | 7 |
-| `src/workers/pdfSniff/candidatesToRegions.ts` | Detections to regions | 8 |
+| File                                          | Responsibility           | Task |
+| --------------------------------------------- | ------------------------ | ---- |
+| `src/workers/pdfSniff/detectLatticeTables.ts` | Signal B: ruling lines   | 1    |
+| `src/workers/pdfSniff/detectTaggedTables.ts`  | Signal A: structure tree | 2, 4 |
+| `src/workers/pdfSniff/detectStreamTables.ts`  | Signal C: whitespace     | 3    |
+| `src/workers/pdfSniff/dedupeCandidates.ts`    | Cross-signal dedup       | 5    |
+| `src/workers/pdfSniff/mergePageSpans.ts`      | Multi-page joining       | 6    |
+| `src/workers/pdfSniff/scoreCandidate.ts`      | Confidence scoring       | 7    |
+| `src/workers/pdfSniff/candidatesToRegions.ts` | Detections to regions    | 8    |
 
 ---
 
 ## Task 1: Lattice detection from ruling lines
 
 **Files:**
+
 - Create: `src/workers/pdfSniff/detectLatticeTables.ts`
 - Create: `src/workers/pdfSniff/detectLatticeTables.test.ts`
 
@@ -456,6 +457,7 @@ git commit -m "feat: detect ruled pdf tables from content-stream geometry"
 ## Task 2: Tagged structure tree detection
 
 **Files:**
+
 - Create: `src/workers/pdfSniff/detectTaggedTables.ts`
 - Create: `src/workers/pdfSniff/detectTaggedTables.test.ts`
 
@@ -472,7 +474,12 @@ import { detectTaggedTables } from "./detectTaggedTables";
 import type { StructTreeNode } from "./detectTaggedTables";
 import type { PageGeometry, TextItem } from "./types";
 
-function textItem(text: string, x: number, y: number, id: string): TextItem & {
+function textItem(
+  text: string,
+  x: number,
+  y: number,
+  id: string,
+): TextItem & {
   id: string;
 } {
   return {
@@ -590,9 +597,7 @@ describe("detectTaggedTables", () => {
         },
         {
           role: "TR",
-          children: [
-            { role: "TD", children: [{ type: "content", id: "t3" }] },
-          ],
+          children: [{ role: "TD", children: [{ type: "content", id: "t3" }] }],
         },
       ],
     };
@@ -687,12 +692,7 @@ function _bboxOf(items: readonly TextItem[], page: PageGeometry): BBox {
   const ys = items.flatMap((i) => {
     return [i.y, i.y + i.height];
   });
-  return [
-    Math.min(...xs),
-    Math.min(...ys),
-    Math.max(...xs),
-    Math.max(...ys),
-  ];
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
 }
 
 /**
@@ -788,6 +788,7 @@ git commit -m "feat: read tables from tagged pdf structure trees"
 ## Task 3: Stream detection from whitespace
 
 **Files:**
+
 - Create: `src/workers/pdfSniff/detectStreamTables.ts`
 - Create: `src/workers/pdfSniff/detectStreamTables.test.ts`
 
@@ -931,9 +932,7 @@ const MIN_COLUMNS = 2;
  */
 const MIN_COLUMN_OCCUPANCY = 0.6;
 
-function _groupIntoRows(
-  items: readonly TextItem[],
-): TextItem[][] {
+function _groupIntoRows(items: readonly TextItem[]): TextItem[][] {
   const rows: TextItem[][] = [];
 
   for (const item of items) {
@@ -965,7 +964,9 @@ function _groupIntoRows(
  * This is the crux of stream detection and the reason it earns only medium
  * or low confidence: alignment is evidence of a column, not proof of one.
  */
-function _findColumnPositions(rows: ReadonlyArray<readonly TextItem[]>): number[] {
+function _findColumnPositions(
+  rows: ReadonlyArray<readonly TextItem[]>,
+): number[] {
   const clusters: { position: number; rowsSeen: Set<number> }[] = [];
 
   rows.forEach((row, rowIndex) => {
@@ -1079,6 +1080,7 @@ git commit -m "feat: detect borderless pdf tables from text alignment"
 ## Task 4: Wire marked content into tagged detection
 
 **Files:**
+
 - Modify: `src/workers/pdfSniff/extractPageGeometry.ts`
 - Modify: `src/workers/pdfSniff.worker.ts`
 - Create: `src/workers/pdfSniff/pdfSniff.fixtures.test.ts`
@@ -1208,9 +1210,9 @@ export async function extractPageGeometry(
 Replace the `getTextContent()` call with:
 
 ```ts
-  const textContent = await page.getTextContent({
-    includeMarkedContent: options.includeMarkedContent ?? false,
-  });
+const textContent = await page.getTextContent({
+  includeMarkedContent: options.includeMarkedContent ?? false,
+});
 ```
 
 When `includeMarkedContent` is true, pdf.js interleaves
@@ -1218,43 +1220,43 @@ When `includeMarkedContent` is true, pdf.js interleaves
 the most recent id and record it against each item:
 
 ```ts
-  const contentIndex: Record<string, TextItem> = {};
-  let currentMarkedContentId: string | undefined;
-  const rawItems: TextItem[] = [];
+const contentIndex: Record<string, TextItem> = {};
+let currentMarkedContentId: string | undefined;
+const rawItems: TextItem[] = [];
 
-  for (const rawItem of textContent.items) {
-    if (!("str" in rawItem)) {
-      // A marked-content boundary. `id` is present on begin markers and
-      // absent on end markers, so an absent id clears the current scope.
-      const markerId = (rawItem as { id?: string }).id;
-      currentMarkedContentId = markerId;
-      continue;
-    }
-    if (rawItem.str.length === 0) {
-      continue;
-    }
-    const item: TextItem = {
-      text: rawItem.str,
-      x: rawItem.transform[4] ?? 0,
-      y: rawItem.transform[5] ?? 0,
-      width: rawItem.width ?? 0,
-      height: rawItem.height ?? 0,
-      fontName: rawItem.fontName ?? "",
-      unmappedCharRatio: _unmappedCharRatio(rawItem.str),
-    };
-    rawItems.push(item);
-    if (currentMarkedContentId !== undefined) {
-      contentIndex[currentMarkedContentId] = item;
-    }
+for (const rawItem of textContent.items) {
+  if (!("str" in rawItem)) {
+    // A marked-content boundary. `id` is present on begin markers and
+    // absent on end markers, so an absent id clears the current scope.
+    const markerId = (rawItem as { id?: string }).id;
+    currentMarkedContentId = markerId;
+    continue;
   }
+  if (rawItem.str.length === 0) {
+    continue;
+  }
+  const item: TextItem = {
+    text: rawItem.str,
+    x: rawItem.transform[4] ?? 0,
+    y: rawItem.transform[5] ?? 0,
+    width: rawItem.width ?? 0,
+    height: rawItem.height ?? 0,
+    fontName: rawItem.fontName ?? "",
+    unmappedCharRatio: _unmappedCharRatio(rawItem.str),
+  };
+  rawItems.push(item);
+  if (currentMarkedContentId !== undefined) {
+    contentIndex[currentMarkedContentId] = item;
+  }
+}
 
-  const textItems = rawItems.sort((a, b) => {
-    const yDelta = b.y - a.y;
-    if (Math.abs(yDelta) > 1) {
-      return yDelta;
-    }
-    return a.x - b.x;
-  });
+const textItems = rawItems.sort((a, b) => {
+  const yDelta = b.y - a.y;
+  if (Math.abs(yDelta) > 1) {
+    return yDelta;
+  }
+  return a.x - b.x;
+});
 ```
 
 and return `{ geometry: { ... }, contentIndex }`.
@@ -1265,9 +1267,9 @@ and return `{ geometry: { ... }, contentIndex }`.
 helper to:
 
 ```ts
-  const { geometry } = await extractPageGeometry(page, pageNumber - 1);
-  await doc.destroy();
-  return geometry;
+const { geometry } = await extractPageGeometry(page, pageNumber - 1);
+await doc.destroy();
+return geometry;
 ```
 
 - [ ] **Step 5: Update the worker call site**
@@ -1275,11 +1277,11 @@ helper to:
 In `pdfSniff.worker.ts`, replace the geometry call with:
 
 ```ts
-      const { geometry, contentIndex } = await extractPageGeometry(
-        page,
-        pageNumber - 1,
-        { includeMarkedContent: true },
-      );
+const { geometry, contentIndex } = await extractPageGeometry(
+  page,
+  pageNumber - 1,
+  { includeMarkedContent: true },
+);
 ```
 
 and delete the `const contentIndex: ContentItemIndex = {};` line.
@@ -1312,6 +1314,7 @@ git commit -m "feat: map marked content to text items for tagged detection"
 ## Task 5: Deduplicate candidates across signals
 
 **Files:**
+
 - Create: `src/workers/pdfSniff/dedupeCandidates.ts`
 - Create: `src/workers/pdfSniff/dedupeCandidates.test.ts`
 
@@ -1443,10 +1446,7 @@ const MODE_RANK: Record<PdfDetectionMode, number> = {
 };
 
 function _intersectionOverUnion(a: BBox, b: BBox): number {
-  const overlapWidth = Math.max(
-    0,
-    Math.min(a[2], b[2]) - Math.max(a[0], b[0]),
-  );
+  const overlapWidth = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
   const overlapHeight = Math.max(
     0,
     Math.min(a[3], b[3]) - Math.max(a[1], b[1]),
@@ -1525,6 +1525,7 @@ git commit -m "feat: dedupe pdf table candidates across detection signals"
 ## Task 6: Merge tables that span pages
 
 **Files:**
+
 - Create: `src/workers/pdfSniff/mergePageSpans.ts`
 - Create: `src/workers/pdfSniff/mergePageSpans.test.ts`
 
@@ -1577,7 +1578,11 @@ describe("mergePageSpans", () => {
     expect(merged[0]!.fragments.map((f) => f.pageIndex)).toEqual([3, 4]);
     // The header appears once. The repeat on page 4 is page furniture, not
     // data, and leaving it in would inject a fake row mid-table.
-    expect(merged[0]!.cells).toEqual([HEADER, ["Gao", "1204"], ["Mopti", "987"]]);
+    expect(merged[0]!.cells).toEqual([
+      HEADER,
+      ["Gao", "1204"],
+      ["Mopti", "987"],
+    ]);
   });
 
   it("merges a continuation page that omits the header", () => {
@@ -1597,7 +1602,11 @@ describe("mergePageSpans", () => {
     ]);
 
     expect(merged).toHaveLength(1);
-    expect(merged[0]!.cells).toEqual([HEADER, ["Gao", "1204"], ["Mopti", "987"]]);
+    expect(merged[0]!.cells).toEqual([
+      HEADER,
+      ["Gao", "1204"],
+      ["Mopti", "987"],
+    ]);
   });
 
   it("does not merge across a gap in page numbers", () => {
@@ -1628,7 +1637,10 @@ describe("mergePageSpans", () => {
       fragment({
         pageIndex: 4,
         gridX: [100, 200, 300, 400],
-        cells: [["A", "B", "C"], ["1", "2", "3"]],
+        cells: [
+          ["A", "B", "C"],
+          ["1", "2", "3"],
+        ],
       }),
     ]);
 
@@ -1811,6 +1823,7 @@ git commit -m "feat: merge pdf table fragments across page spans"
 ## Task 7: Score confidence and detect headers
 
 **Files:**
+
 - Create: `src/workers/pdfSniff/scoreCandidate.ts`
 - Create: `src/workers/pdfSniff/scoreCandidate.test.ts`
 
@@ -2140,6 +2153,7 @@ git commit -m "feat: score pdf table confidence and resolve headers"
 ## Task 8: Surface detected tables as regions
 
 **Files:**
+
 - Create: `src/workers/pdfSniff/candidatesToRegions.ts`
 - Create: `src/workers/pdfSniff/candidatesToRegions.test.ts`
 - Modify: `src/workers/pdfSniff.worker.ts`
@@ -2186,7 +2200,9 @@ describe("candidatesToRegions", () => {
 
     expect(region!.shape).toBe("grid_table");
     expect(region!.detectionMode).toBe("lattice");
-    expect(region!.fragments).toEqual([{ page: 0, bbox: [100, 500, 400, 600] }]);
+    expect(region!.fragments).toEqual([
+      { page: 0, bbox: [100, 500, 400, 600] },
+    ]);
   });
 
   it("carries the grid and header count into region options", () => {
@@ -2212,7 +2228,9 @@ describe("candidatesToRegions", () => {
   it("disambiguates several tables on one page", () => {
     const regions = candidatesToRegions([
       scoredTable({ fragments: [{ pageIndex: 0, bbox: [50, 500, 250, 600] }] }),
-      scoredTable({ fragments: [{ pageIndex: 0, bbox: [300, 500, 500, 600] }] }),
+      scoredTable({
+        fragments: [{ pageIndex: 0, bbox: [300, 500, 500, 600] }],
+      }),
     ]);
 
     expect(regions.map((r) => r.label)).toEqual([
@@ -2242,7 +2260,10 @@ describe("candidatesToRegions", () => {
 
   it("passes the confidence notes through for the picker to show", () => {
     const [region] = candidatesToRegions([
-      scoredTable({ confidence: "low", confidenceNotes: ["Guessed from text alignment"] }),
+      scoredTable({
+        confidence: "low",
+        confidenceNotes: ["Guessed from text alignment"],
+      }),
     ]);
 
     expect(region!.options).toMatchObject({
@@ -2276,7 +2297,8 @@ function _horizontalHint(
   if (siblings.length < 2) {
     return "";
   }
-  const centre = (table.fragments[0]!.bbox[0] + table.fragments[0]!.bbox[2]) / 2;
+  const centre =
+    (table.fragments[0]!.bbox[0] + table.fragments[0]!.bbox[2]) / 2;
   const others = siblings.filter((s) => {
     return s !== table;
   });
@@ -2373,21 +2395,25 @@ Handle it by running the three detectors over the supplied geometry, then
 dedup, merge, score and convert:
 
 ```ts
-  if (request.type === "detect") {
-    const candidates = request.pages.flatMap((page) => {
-      return [
-        ...detectTaggedTables(page, page.structTree ?? null, page.contentIndex ?? {}),
-        ...detectLatticeTables(page),
-        ...detectStreamTables(page),
-      ];
-    });
-    const tables = mergePageSpans(dedupeCandidates(candidates)).map(
-      scoreCandidate,
-    );
-    _post({ type: "detect_result", regions: candidatesToRegions(tables) });
-    _close();
-    return;
-  }
+if (request.type === "detect") {
+  const candidates = request.pages.flatMap((page) => {
+    return [
+      ...detectTaggedTables(
+        page,
+        page.structTree ?? null,
+        page.contentIndex ?? {},
+      ),
+      ...detectLatticeTables(page),
+      ...detectStreamTables(page),
+    ];
+  });
+  const tables = mergePageSpans(dedupeCandidates(candidates)).map(
+    scoreCandidate,
+  );
+  _post({ type: "detect_result", regions: candidatesToRegions(tables) });
+  _close();
+  return;
+}
 ```
 
 Add the matching `detectPdfTables` driver in `src/clients/datasets/pdfSniff.ts`,
@@ -2417,6 +2443,7 @@ git commit -m "feat: offer automatically detected tables as regions"
 ## Task 9: Synthetic fixtures for the uncovered cases
 
 **Files:**
+
 - Create: `scripts/generate-pdf-test-fixtures/generate-pdf-test-fixtures.ts`
 - Create: `public/test-data/pdf/synthetic-scanned-no-text-layer.pdf`
 - Create: `public/test-data/pdf/synthetic-fully-ruled-statistics.pdf`
@@ -2641,7 +2668,7 @@ rule wins, because it is the one that also governs regions the user drew.
 
 **Known gaps carried forward, not silently dropped:**
 
-- Text rotated *within* an upright page is still unhandled; page-level rotation
+- Text rotated _within_ an upright page is still unhandled; page-level rotation
   is handled in Phase B1's `extractPageGeometry`.
 - Tables of contents with dot leaders are detected as tables by the stream
   signal. They score low, but they are not specifically excluded.

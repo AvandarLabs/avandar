@@ -1,8 +1,9 @@
+import type { UnknownObject } from "@utils/types/common.types.ts";
+import type { SwapDeep } from "@utils/types/utilities.types.ts";
+
 import { isNull } from "@utils/guards/isNull/isNull.ts";
 import { constant } from "@utils/misc/constant/constant.ts";
 import { swapDeep } from "@utils/objects/swapDeep/swapDeep.ts";
-import type { UnknownObject } from "@utils/types/common.types.ts";
-import type { SwapDeep } from "@utils/types/utilities.types.ts";
 
 /**
  * Swaps all `null` values to `undefined` in an object recursively.

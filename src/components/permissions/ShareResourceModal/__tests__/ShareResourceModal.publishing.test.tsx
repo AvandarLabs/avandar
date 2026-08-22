@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { screen, waitFor } from "@/test-utils";
+
 import {
   makeTestPublishing,
   renderShareResourceModal,

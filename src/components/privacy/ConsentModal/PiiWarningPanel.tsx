@@ -1,10 +1,12 @@
+import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+
 import { Trans } from "@lingui/react/macro";
 import { Alert, Checkbox, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+
 import { ColumnNameHint } from "./ColumnNameHint";
 import { PiiHitBadges } from "./PiiHitBadges";
 import { RowValueList } from "./RowValueList";
-import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 type Props = {
   /** PII findings driving the warning. */
@@ -57,10 +59,11 @@ export function PiiWarningPanel({
         label={<Trans>Detected:</Trans>}
         hits={pii.hits}
         color={
-          pii.severity === "critical" ? "red"
-          : pii.severity === "warning" ?
-            "yellow"
-          : "gray"
+          pii.severity === "critical"
+            ? "red"
+            : pii.severity === "warning"
+              ? "yellow"
+              : "gray"
         }
       />
 

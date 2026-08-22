@@ -1,8 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
-import clsx from "clsx";
-import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx";
+
+import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 
 type Props = {
   entries: readonly MapLayer.LegendEntry[];
@@ -28,9 +30,11 @@ export function LegendEntries({ entries, showNoData }: Props): ReactNode {
         }
         const label =
           entry.label.trim() ||
-          (entry.type === "suppressed" ? t`Suppressed`
-          : entry.type === "noData" ? t`Not reported`
-          : t`Other`);
+          (entry.type === "suppressed"
+            ? t`Suppressed`
+            : entry.type === "noData"
+              ? t`Not reported`
+              : t`Other`);
         return (
           <li className={css.mapLegendGroupItem} key={JSON.stringify(entry)}>
             <span

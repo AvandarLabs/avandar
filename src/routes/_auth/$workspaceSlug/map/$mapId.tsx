@@ -1,8 +1,10 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { AvaMapClient } from "@/clients/maps/AvaMapClient/AvaMapClient";
-import { GisApp } from "@/views/GisApp/GisApp";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { ReactNode } from "react";
+
+import { createFileRoute, notFound } from "@tanstack/react-router";
+
+import { AvaMapClient } from "@/clients/maps/AvaMapClient/AvaMapClient";
+import { GisApp } from "@/views/GisApp/GisApp";
 
 /** Loads and renders the selected persisted map. */
 export const Route = createFileRoute("/_auth/$workspaceSlug/map/$mapId")({

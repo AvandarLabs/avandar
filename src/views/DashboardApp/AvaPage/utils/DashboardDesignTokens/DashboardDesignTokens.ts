@@ -1,8 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
 import type {
   AvaPageThemeName,
   AvaPageTypographyName,
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+
+import { useLingui } from "@lingui/react/macro";
 
 export type DashboardDesignTokens = {
   /** CSS color for the page background. Defaults to the workspace neutral. */

@@ -1,12 +1,13 @@
-import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
-import { SELECTED_STROKE_COLOR } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
-import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type {
   CircleRadiusValue,
   MapLayerSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ExpressionSpecification } from "maplibre-gl";
+
+import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
+import { SELECTED_STROKE_COLOR } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
+import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 
 /**
  * Paint a clustered point source needs, independent of the symbology that
@@ -44,8 +45,8 @@ type ClusterLayerOptions = {
 function _buildGroupFilter(
   countSource: ClusterCountSource,
 ): ExpressionSpecification {
-  return countSource === "maplibre" ?
-      ["has", PointAggregateProperties.pointCount]
+  return countSource === "maplibre"
+    ? ["has", PointAggregateProperties.pointCount]
     : [">", ["get", PointAggregateProperties.pointCount], 1];
 }
 
@@ -53,8 +54,8 @@ function _buildGroupFilter(
 function _buildSingleFilter(
   countSource: ClusterCountSource,
 ): ExpressionSpecification {
-  return countSource === "maplibre" ?
-      ["!", ["has", PointAggregateProperties.pointCount]]
+  return countSource === "maplibre"
+    ? ["!", ["has", PointAggregateProperties.pointCount]]
     : ["<=", ["get", PointAggregateProperties.pointCount], 1];
 }
 

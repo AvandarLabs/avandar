@@ -320,12 +320,12 @@ be used.
 
 The report lists only `DropReason` values that actually occurred:
 
-| `DropReason` | Shown as |
-| --- | --- |
-| `suspectedLatLngSwap` | Latitude and longitude look swapped |
-| `nullIsland` | Coordinate is 0, 0 |
-| `outOfRange` | Coordinate is outside the valid range |
-| `nullCoordinate` | Latitude or longitude is empty |
+| `DropReason`           | Shown as                              |
+| ---------------------- | ------------------------------------- |
+| `suspectedLatLngSwap`  | Latitude and longitude look swapped   |
+| `nullIsland`           | Coordinate is 0, 0                    |
+| `outOfRange`           | Coordinate is outside the valid range |
+| `nullCoordinate`       | Latitude or longitude is empty        |
 | `nonNumericCoordinate` | Latitude or longitude is not a number |
 
 Each reason shows its count, the bounded `sampleRowIndexes` the drop report

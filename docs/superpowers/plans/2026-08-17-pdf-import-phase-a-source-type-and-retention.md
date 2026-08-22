@@ -106,36 +106,36 @@ chase and nothing to escalate. Tracked and closed as AVA-320.
 
 **Create:**
 
-| File | Responsibility |
-|---|---|
-| `supabase/schemas/00.enum.datasets__pdf_detection_mode.sql` | Detection mode enum |
-| `supabase/schemas/20.datasets__pdf_file.sql` | `datasets__pdf_file` table + RLS + trigger |
-| `supabase/schemas/70.rpc_datasets__add_pdf_file_dataset.sql` | Creation RPC |
-| `supabase/tests/database/permissions/storage_original_file_object_names.test.sql` | pgTAP: RLS accepts original-file names, still rejects junk |
-| `shared/models/datasets/PdfFileDataset/PdfFileDataset.types.ts` | Model types |
-| `shared/models/datasets/PdfFileDataset/PdfFileDatasetParsers.ts` | Zod schema + parsers |
-| `shared/models/datasets/PdfFileDataset/PdfFileDataset.ts` | Namespace export |
-| `src/clients/datasets/source-datasets/PdfFileDatasetClient.ts` | CRUD client |
-| `src/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient.ts` | Upload/download/delete originals |
-| `src/clients/storage/DatasetOriginalFileStorageClient/utils.ts` | Path helper |
-| `src/clients/storage/DatasetOriginalFileStorageClient/utils.test.ts` | Path helper tests |
-| `shared/models/datasets/DatasetSource/requiresOriginalFileRetention.ts` | The classification helper |
-| `shared/models/datasets/DatasetSource/requiresOriginalFileRetention.test.ts` | Its tests |
+| File                                                                                       | Responsibility                                             |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `supabase/schemas/00.enum.datasets__pdf_detection_mode.sql`                                | Detection mode enum                                        |
+| `supabase/schemas/20.datasets__pdf_file.sql`                                               | `datasets__pdf_file` table + RLS + trigger                 |
+| `supabase/schemas/70.rpc_datasets__add_pdf_file_dataset.sql`                               | Creation RPC                                               |
+| `supabase/tests/database/permissions/storage_original_file_object_names.test.sql`          | pgTAP: RLS accepts original-file names, still rejects junk |
+| `shared/models/datasets/PdfFileDataset/PdfFileDataset.types.ts`                            | Model types                                                |
+| `shared/models/datasets/PdfFileDataset/PdfFileDatasetParsers.ts`                           | Zod schema + parsers                                       |
+| `shared/models/datasets/PdfFileDataset/PdfFileDataset.ts`                                  | Namespace export                                           |
+| `src/clients/datasets/source-datasets/PdfFileDatasetClient.ts`                             | CRUD client                                                |
+| `src/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient.ts` | Upload/download/delete originals                           |
+| `src/clients/storage/DatasetOriginalFileStorageClient/utils.ts`                            | Path helper                                                |
+| `src/clients/storage/DatasetOriginalFileStorageClient/utils.test.ts`                       | Path helper tests                                          |
+| `shared/models/datasets/DatasetSource/requiresOriginalFileRetention.ts`                    | The classification helper                                  |
+| `shared/models/datasets/DatasetSource/requiresOriginalFileRetention.test.ts`               | Its tests                                                  |
 
 **Modify:**
 
-| File | Change |
-|---|---|
-| `supabase/schemas/10.datasets.sql:1-7` | Add `'pdf_file'` to the enum |
-| `supabase/schemas/16.utils.resource-permissions.sql:791-800` | Widen the object-name regex |
-| `shared/models/datasets/DatasetSource/DatasetSource.types.ts` | Add `pdf_file` to registries and the retention type |
-| `shared/models/datasets/DatasetSource/DatasetSource.ts` | Re-export the new helper |
-| `src/clients/datasets/SourceDatasetClient.ts:12-18` | Register `PdfFileDatasetClient` |
-| `src/models/LocalDataset/LocalDataset.types.ts` | Add `isSourcePinned` and `pdf` file type |
-| `src/clients/datasets/LocalDatasetClient/LocalDatasetClient.ts:49-87` | Evictor skips pinned rows |
-| `src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts:145-153` | Preserve pinned source bytes |
+| File                                                                                 | Change                                              |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| `supabase/schemas/10.datasets.sql:1-7`                                               | Add `'pdf_file'` to the enum                        |
+| `supabase/schemas/16.utils.resource-permissions.sql:791-800`                         | Widen the object-name regex                         |
+| `shared/models/datasets/DatasetSource/DatasetSource.types.ts`                        | Add `pdf_file` to registries and the retention type |
+| `shared/models/datasets/DatasetSource/DatasetSource.ts`                              | Re-export the new helper                            |
+| `src/clients/datasets/SourceDatasetClient.ts:12-18`                                  | Register `PdfFileDatasetClient`                     |
+| `src/models/LocalDataset/LocalDataset.types.ts`                                      | Add `isSourcePinned` and `pdf` file type            |
+| `src/clients/datasets/LocalDatasetClient/LocalDatasetClient.ts:49-87`                | Evictor skips pinned rows                           |
+| `src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts:145-153` | Preserve pinned source bytes                        |
 
-**No Dexie version bump is needed.** Dexie only declares *indexes* in its
+**No Dexie version bump is needed.** Dexie only declares _indexes_ in its
 schema, not fields. `isSourcePinned` is not indexed, so adding it to the
 TypeScript type is sufficient and existing rows read back `undefined`, which is
 correctly falsy. Do not add a v10 to `dexieVersions.ts`; doing so would force
@@ -146,6 +146,7 @@ an unnecessary upgrade transaction on every user.
 ## Task 1: The retention classification
 
 **Files:**
+
 - Create: `shared/models/datasets/DatasetSource/requiresOriginalFileRetention.ts`
 - Create: `shared/models/datasets/DatasetSource/requiresOriginalFileRetention.test.ts`
 - Modify: `shared/models/datasets/DatasetSource/DatasetSource.types.ts`
@@ -300,8 +301,7 @@ export { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/r
 and inside the `DatasetSource` namespace add:
 
 ```ts
-  export type NonReconstructableSourceType =
-    NonReconstructableDatasetSourceType;
+export type NonReconstructableSourceType = NonReconstructableDatasetSourceType;
 ```
 
 importing `NonReconstructableDatasetSourceType` from the types file next to
@@ -319,6 +319,7 @@ git commit -m "feat: classify dataset source types by original-file retention"
 ## Task 2: Add the `pdf_file` enum member and detection mode enum
 
 **Files:**
+
 - Modify: `supabase/schemas/10.datasets.sql:1-7`
 - Create: `supabase/schemas/00.enum.datasets__pdf_detection_mode.sql`
 
@@ -399,6 +400,7 @@ git commit -m "feat: add pdf_file source type and pdf detection mode enums"
 ## Task 3: Widen the storage object-name parser
 
 **Files:**
+
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql:791-800`
 - Create: `supabase/tests/database/permissions/storage_original_file_object_names.test.sql`
 
@@ -581,6 +583,7 @@ git commit -m "feat: allow retained original files in storage object names"
 ## Task 4: The `datasets__pdf_file` table and model
 
 **Files:**
+
 - Create: `supabase/schemas/20.datasets__pdf_file.sql`
 - Create: `shared/models/datasets/PdfFileDataset/PdfFileDataset.types.ts`
 - Create: `shared/models/datasets/PdfFileDataset/PdfFileDatasetParsers.ts`
@@ -965,6 +968,7 @@ git commit -m "feat: add datasets__pdf_file table and PdfFileDataset model"
 ## Task 5: The creation RPC and source client
 
 **Files:**
+
 - Create: `supabase/schemas/70.rpc_datasets__add_pdf_file_dataset.sql`
 - Create: `src/clients/datasets/source-datasets/PdfFileDatasetClient.ts`
 - Modify: `src/clients/datasets/SourceDatasetClient.ts:6-18`
@@ -1137,6 +1141,7 @@ git commit -m "feat: add pdf_file dataset creation RPC and source client"
 ## Task 6: Pin retained source bytes against LRU eviction
 
 **Files:**
+
 - Modify: `src/models/LocalDataset/LocalDataset.types.ts:24,90-113`
 - Modify: `src/clients/datasets/LocalDatasetClient/LocalDatasetClient.ts:43-87`
 - Create: `src/clients/datasets/LocalDatasetClient/LocalDatasetClient.eviction.test.ts`
@@ -1297,17 +1302,17 @@ export type LocalDatasetSourceFileType = "csv" | "xlsx" | "pdf";
 and add this field to `LocalDatasetDBRead`, after `lastSourceAccessedAt`:
 
 ```ts
-  /**
-   * When true, `sourceBytes` is the retained original file rather than a
-   * resume cache, and must survive both LRU eviction and the post-transcode
-   * cleanup.
-   *
-   * Set for source types where the original cannot be reconstructed from the
-   * parquet plus metadata; see `requiresOriginalFileRetention`. For an
-   * offline-only PDF these bytes are the only copy in existence, so dropping
-   * them is unrecoverable data loss rather than a cache miss.
-   */
-  isSourcePinned: boolean | undefined;
+/**
+ * When true, `sourceBytes` is the retained original file rather than a
+ * resume cache, and must survive both LRU eviction and the post-transcode
+ * cleanup.
+ *
+ * Set for source types where the original cannot be reconstructed from the
+ * parquet plus metadata; see `requiresOriginalFileRetention`. For an
+ * offline-only PDF these bytes are the only copy in existence, so dropping
+ * them is unrecoverable data loss rather than a cache miss.
+ */
+isSourcePinned: boolean | undefined;
 ```
 
 Also update the `sourceBytes` doc comment, which currently claims the bytes are
@@ -1401,6 +1406,7 @@ git commit -m "feat: exempt pinned source bytes from LRU eviction"
 ## Task 7: Preserve pinned source bytes after transcoding
 
 **Files:**
+
 - Modify: `src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts:145-153`
 - Create: `src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.retention.test.ts`
 
@@ -1549,14 +1555,14 @@ if it is not already imported.
 Replace the `AvaDexie.DB.LocalDataset.update` call at lines 145-153 with:
 
 ```ts
-    const existingRow = await AvaDexie.DB.LocalDataset.get(datasetId);
-    await AvaDexie.DB.LocalDataset.update(
-      datasetId,
-      buildTranscodeCompletionUpdate({
-        parquetData: result.parquetData,
-        isSourcePinned: existingRow?.isSourcePinned,
-      }),
-    );
+const existingRow = await AvaDexie.DB.LocalDataset.get(datasetId);
+await AvaDexie.DB.LocalDataset.update(
+  datasetId,
+  buildTranscodeCompletionUpdate({
+    parquetData: result.parquetData,
+    isSourcePinned: existingRow?.isSourcePinned,
+  }),
+);
 ```
 
 - [ ] **Step 5: Run test to verify it passes**
@@ -1583,6 +1589,7 @@ git commit -m "feat: keep retained originals after parquet transcoding"
 ## Task 8: The original-file storage path helper
 
 **Files:**
+
 - Create: `src/clients/storage/DatasetOriginalFileStorageClient/utils.ts`
 - Create: `src/clients/storage/DatasetOriginalFileStorageClient/utils.test.ts`
 
@@ -1723,6 +1730,7 @@ git commit -m "feat: add original-file storage path helper"
 ## Task 9: The original-file storage client
 
 **Files:**
+
 - Create: `src/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient.ts`
 
 Mirrors `DatasetParquetStorageClient`. Uploads go through the same
@@ -1871,9 +1879,7 @@ async function downloadOriginalFile(
 }
 
 /** Removes a dataset's retained original file from storage. */
-async function deleteOriginalFile(
-  options: OriginalFileLocator,
-): Promise<void> {
+async function deleteOriginalFile(options: OriginalFileLocator): Promise<void> {
   const objectPath = getDatasetOriginalFileStoragePath(options);
   const { error } = await AvaSupabase.db()
     .storage.from(WORKSPACES_BUCKET_NAME)
@@ -1908,6 +1914,7 @@ git commit -m "feat: add original-file storage client"
 ## Task 10: Upload the original alongside the parquet
 
 **Files:**
+
 - Modify: `src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset.ts:235-253`
 - Create: `src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/startOriginalFileUploadIfNeeded.ts`
 - Create: `src/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/startOriginalFileUploadIfNeeded.test.ts`
@@ -2136,9 +2143,9 @@ function _startDatasetUploadIfAllowed(
     notifyError({
       title: t`Original file not synced`,
       message:
-        error instanceof Error ? error.message : (
-          "The dataset was saved, but its original file could not be uploaded."
-        ),
+        error instanceof Error
+          ? error.message
+          : "The dataset was saved, but its original file could not be uploaded.",
     });
   });
 }
@@ -2169,6 +2176,7 @@ git commit -m "feat: upload retained original file on cloud-synced save"
 ## Task 11: Delete the original when the dataset is deleted
 
 **Files:**
+
 - Modify: `src/clients/datasets/DatasetClient/createDatasetMutations.ts` (the `_makeFullDelete` function)
 
 Leaving orphaned originals in the bucket would mean a user who deletes a
@@ -2186,20 +2194,20 @@ Identify where `DatasetParquetStorageClient.deleteDataset` is called.
 Immediately after the existing parquet deletion call, add:
 
 ```ts
-    // Retained originals live beside the parquet and are not covered by the
-    // database cascade, so they have to be removed explicitly. A missing
-    // object is not an error: most source types never retain one.
-    if (requiresOriginalFileRetention(params.sourceType)) {
-      await DatasetOriginalFileStorageClient.deleteOriginalFile({
-        workspaceId: params.workspaceId,
-        datasetId: params.datasetId,
-        fileExtension: "pdf",
-      }).catch(() => {
-        // Deletion of the metadata row already succeeded; a failure to
-        // remove the blob should not strand the user with an undeletable
-        // dataset. Storage lifecycle cleanup will reap it.
-      });
-    }
+// Retained originals live beside the parquet and are not covered by the
+// database cascade, so they have to be removed explicitly. A missing
+// object is not an error: most source types never retain one.
+if (requiresOriginalFileRetention(params.sourceType)) {
+  await DatasetOriginalFileStorageClient.deleteOriginalFile({
+    workspaceId: params.workspaceId,
+    datasetId: params.datasetId,
+    fileExtension: "pdf",
+  }).catch(() => {
+    // Deletion of the metadata row already succeeded; a failure to
+    // remove the blob should not strand the user with an undeletable
+    // dataset. Storage lifecycle cleanup will reap it.
+  });
+}
 ```
 
 with the imports:

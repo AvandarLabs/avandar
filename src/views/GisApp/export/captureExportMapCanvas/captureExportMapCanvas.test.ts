@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 /** How long the module under test waits before declaring the map stuck. */
 const IDLE_TIMEOUT_MS = 15_000;

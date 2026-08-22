@@ -1,11 +1,13 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
+
 import { Modal } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
+
 import { CustomBasemapActions } from "@/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions";
 import { CustomBasemapFields } from "@/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields";
 import { useCustomBasemapDraft } from "@/views/GisApp/shell/MapTopBar/BasemapControl/useCustomBasemapDraft";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
 
 type Props = {
   opened: boolean;

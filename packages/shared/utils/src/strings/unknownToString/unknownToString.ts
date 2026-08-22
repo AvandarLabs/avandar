@@ -1,3 +1,6 @@
+import type { UnknownObject } from "@utils/types/common.types.ts";
+import type { LiteralUnion } from "type-fest";
+
 import { formatDate } from "@utils/dates/formatDate/formatDate.ts";
 import { isArray } from "@utils/guards/isArray/isArray.ts";
 import { isDate } from "@utils/guards/isDate/isDate.ts";
@@ -6,8 +9,6 @@ import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 import { isValidDateValue } from "@utils/guards/isValidDateValue/isValidDateValue.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectToPrettyString } from "@utils/objects/objectToPrettyString/objectToPrettyString.ts";
-import type { UnknownObject } from "@utils/types/common.types.ts";
-import type { LiteralUnion } from "type-fest";
 
 export type UnknownToStringOptions = {
   /**

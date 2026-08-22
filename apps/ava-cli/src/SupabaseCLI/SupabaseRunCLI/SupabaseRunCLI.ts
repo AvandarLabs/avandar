@@ -1,8 +1,8 @@
-import { spawn } from "node:child_process";
-import * as path from "node:path";
 import { getSupabaseScriptsList } from "@ava-cli/SupabaseCLI/SupabaseRunCLI/getSupabaseScriptsList";
 import { Acclimate } from "@avandar/acclimate";
 import * as dotenv from "dotenv";
+import { spawn } from "node:child_process";
+import * as path from "node:path";
 
 const PROJECT_ROOT = path.join(process.cwd());
 
@@ -156,10 +156,7 @@ export const SupabaseRunCLI = Acclimate.createCLI("run")
       scriptName: scriptToRun,
     });
 
-    const dbLocation =
-      staging ? "staging"
-      : prod ? "production"
-      : "local";
+    const dbLocation = staging ? "staging" : prod ? "production" : "local";
 
     const scriptFilePath = path.join(
       PROJECT_ROOT,

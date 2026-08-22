@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { groupLines } from "./groupLines";
 import type { TextItem } from "../pdfSniff.types";
+
+import { describe, expect, it } from "vitest";
+
+import { groupLines } from "./groupLines";
 
 function textItem(text: string, x: number, y: number): TextItem {
   return {

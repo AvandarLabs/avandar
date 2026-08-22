@@ -1,11 +1,13 @@
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { RefObject } from "react";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { renderHook, waitFor } from "@/test-utils";
 import {
   CLUSTER_LEAVES_PAGE_SIZE,
   useClusterLeavesPage,
 } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/useClusterLeavesPage/useClusterLeavesPage";
-import type { Map as MapLibreMap } from "maplibre-gl";
-import type { RefObject } from "react";
 
 /** A promise plus the callbacks that settle it, for controlling order. */
 function _makeDeferred<T>(): {

@@ -1,21 +1,23 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, MultiSelect, Stack, Text } from "@mantine/core";
-import { Permissions } from "$/models/Permissions/Permissions";
-import { useState } from "react";
-import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
-import type {
-  RoleGroupWithMatrix,
-  UserGroupRow,
-} from "@/clients/permissions/PermissionsClient";
 import type {
   BuiltinPresetType,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions.types";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type {
+  RoleGroupWithMatrix,
+  UserGroupRow,
+} from "@/clients/permissions/PermissionsClient";
+
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Button, MultiSelect, Stack, Text } from "@mantine/core";
+import { useState } from "react";
+
+import { Permissions } from "$/models/Permissions/Permissions";
+import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 
 type Props = {
   member: WorkspaceMemberProfile;

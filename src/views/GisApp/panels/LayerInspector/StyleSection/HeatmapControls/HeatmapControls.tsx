@@ -1,13 +1,15 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput } from "@mantine/core";
+
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { HeatmapRampSelect } from "@/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect";
 import { HeatmapWeightSelect } from "@/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapWeightSelect";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;

@@ -1,8 +1,9 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { match } from "ts-pattern";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactNode } from "react";
 
 type Props = {
   visibility: Dashboard.Visibility;

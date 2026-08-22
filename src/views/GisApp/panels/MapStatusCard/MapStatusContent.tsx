@@ -1,12 +1,14 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { I18n } from "@lingui/core";
+import type { ReactNode } from "react";
+
 import { msg } from "@lingui/core/macro";
 import { Button } from "@mantine/core";
+
 import { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
 import { MapLoadStatusContent } from "@/views/GisApp/panels/MapStatusCard/MapLoadStatusContent";
 import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { I18n } from "@lingui/core";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -103,11 +105,11 @@ export function MapStatusContent({
     <>
       <span className={css.mapStatusCardTitle}>{copy.title}</span>
       <span className={css.mapStatusCardBody}>{copy.body}</span>
-      {copy.showRetry ?
+      {copy.showRetry ? (
         <Button size="compact-xs" variant="default" onClick={viewState.onRetry}>
           {i18n._(msg`Retry`)}
         </Button>
-      : null}
+      ) : null}
     </>
   );
 }

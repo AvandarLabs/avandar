@@ -1,5 +1,9 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import {
   clearDatasetRowCountCache,
@@ -14,8 +18,6 @@ import {
   fetchDatasetRowCount,
   resolveManualQueryForExecution,
 } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 vi.mock("@/clients/datasets/DatasetQueryClient", () => {
   return {

@@ -1,8 +1,10 @@
+import type { CSSProperties, ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Portal } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
+
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel.module.css";
-import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   completedCount: number;

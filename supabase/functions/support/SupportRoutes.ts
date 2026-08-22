@@ -1,8 +1,9 @@
+import type { SupportAPI } from "@sbfn/support/SupportRoutes.types.ts";
+import type { User } from "@supabase/supabase-js";
+
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { SignJWT } from "jsr:@panva/jose@6";
 import { z } from "zod";
-import type { SupportAPI } from "@sbfn/support/SupportRoutes.types.ts";
-import type { User } from "@supabase/supabase-js";
 
 const UserMetadataSchema = z.object({
   full_name: z.string().optional(),
@@ -68,9 +69,9 @@ export const SupportRoutes = defineRoutes<SupportAPI>("support", {
       const workspaces = memberships.map((row) => {
         const workspace = row.workspace;
         const plan =
-          workspace.subscription != null ?
-            workspace.subscription.feature_plan_type
-          : "free";
+          workspace.subscription != null
+            ? workspace.subscription.feature_plan_type
+            : "free";
 
         return {
           name: workspace.name,

@@ -1,9 +1,11 @@
-import { useLingui } from "@lingui/react/macro";
-import { Badge } from "@mantine/core";
-import { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
-import { LayerLoadStatus } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Badge } from "@mantine/core";
+
+import { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
+import { LayerLoadStatus } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus";
 
 type Props = { viewState: MapLayerViewState };
 

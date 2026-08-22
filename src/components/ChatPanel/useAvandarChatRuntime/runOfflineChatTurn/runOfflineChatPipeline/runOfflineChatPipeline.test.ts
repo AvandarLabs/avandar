@@ -1,5 +1,6 @@
-import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { describe, expect, it } from "vitest";
+
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
 import { createMockOfflineChatEngine } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/createMockOfflineChatEngine";
 

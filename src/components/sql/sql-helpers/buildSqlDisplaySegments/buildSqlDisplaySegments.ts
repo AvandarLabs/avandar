@@ -1,3 +1,9 @@
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type {
+  SqlDisplayCatalog,
+  SqlDisplaySegment,
+} from "@/components/sql/sql-helpers/sqlDisplay.types";
+
 /**
  * Splits raw SQL into display segments for pills: known datasets (by id or
  * name) and known column identifiers. The concatenation of each segment's
@@ -5,11 +11,6 @@
  */
 import { prop } from "@avandar/utils";
 import { Parser } from "node-sql-parser";
-import type {
-  SqlDisplayCatalog,
-  SqlDisplaySegment,
-} from "@/components/sql/sql-helpers/sqlDisplay.types";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type AnnotatedSpan = {
   kind: "dataset" | "column";
@@ -279,9 +280,9 @@ export function buildSqlDisplaySegments(options: {
   const datasetSpans = _collectQuotedDatasetSpans(sql, catalog);
   const parserColumnSpans = _collectParserColumnSpans(sql, catalog);
   const fallbackColumnSpans =
-    parserColumnSpans.length > 0 ?
-      parserColumnSpans
-    : _collectQuotedColumnSpans(sql, catalog);
+    parserColumnSpans.length > 0
+      ? parserColumnSpans
+      : _collectQuotedColumnSpans(sql, catalog);
 
   const merged = _mergeSpans([...datasetSpans, ...fallbackColumnSpans]);
   return _spansToSegments(sql, merged);

@@ -1,9 +1,24 @@
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
 import { isDefined, matchLiteral, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Fieldset, Stack } from "@mantine/core";
-import { pruneFilterColumns } from "$/models/queries/StructuredQuery/pruneFilterColumns/pruneFilterColumns";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import { pruneFilterColumns } from "$/models/queries/StructuredQuery/pruneFilterColumns/pruneFilterColumns";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { notifyWarning } from "@/utils/notifications/notify";
 import { AppliedFilterSummary } from "@/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary";
@@ -16,20 +31,8 @@ import { SourceFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
+
 import classes from "./ManualQueryForm.module.css";
-import type {
-  SettingsColumnGroup,
-  SettingsColumnsLayout,
-} from "@/components/SettingsColumns/SettingsColumns";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type {
-  QueryColumnId,
-  QueryColumnRead,
-} from "$/models/queries/QueryColumn/QueryColumn.types";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import type { ReactNode } from "react";
 
 /**
  * Callbacks invoked when the user changes the form. Mirrors the action set on
@@ -206,12 +209,12 @@ function ManualQueryFormView({
       // represent. That is the same overwrite `onFiltersChange` stops to
       // confirm, so it must not happen automatically.
       const result =
-        dataSourceColumnNames.length > 0 && isStructuredQueryInSync ?
-          pruneFilterColumns({
-            filters,
-            availableColumnNames: dataSourceColumnNames,
-          })
-        : undefined;
+        dataSourceColumnNames.length > 0 && isStructuredQueryInSync
+          ? pruneFilterColumns({
+              filters,
+              availableColumnNames: dataSourceColumnNames,
+            })
+          : undefined;
       const removedColumnNames = result?.removedColumnNames.join(", ") ?? "";
       if (
         result !== undefined &&
@@ -242,20 +245,19 @@ function ManualQueryFormView({
     }
   };
 
-  const overwriteAlert =
-    pendingChange ?
-      <OverwriteSqlAlert
-        onOverwrite={() => {
-          if (pendingChange.kind === "filter") {
-            handlers.onSetFilters(pendingChange.nextFilter);
-          }
-          setPendingChange(undefined);
-        }}
-        onDismiss={() => {
-          setPendingChange(undefined);
-        }}
-      />
-    : null;
+  const overwriteAlert = pendingChange ? (
+    <OverwriteSqlAlert
+      onOverwrite={() => {
+        if (pendingChange.kind === "filter") {
+          handlers.onSetFilters(pendingChange.nextFilter);
+        }
+        setPendingChange(undefined);
+      }}
+      onDismiss={() => {
+        setPendingChange(undefined);
+      }}
+    />
+  ) : null;
 
   const sourceFields = (
     <SourceFields
@@ -311,13 +313,13 @@ function ManualQueryFormView({
 
   const groups: SettingsColumnGroup[] = [
     { id: "source", title: t`Source`, content: sourceFields },
-    queryColumns.length > 0 ?
-      {
-        id: "aggregations",
-        title: t`Aggregations`,
-        content: aggregationFields,
-      }
-    : undefined,
+    queryColumns.length > 0
+      ? {
+          id: "aggregations",
+          title: t`Aggregations`,
+          content: aggregationFields,
+        }
+      : undefined,
     {
       id: "filters",
       title: t`Filters (Where)`,
@@ -352,14 +354,14 @@ function ManualQueryFormView({
             {overwriteAlert}
             {sourceFields}
 
-            {queryColumns.length > 0 ?
+            {queryColumns.length > 0 ? (
               <Fieldset
                 legend={t`Aggregations`}
                 className={classes.fieldsetTranslucent}
               >
                 {aggregationFields}
               </Fieldset>
-            : null}
+            ) : null}
 
             <Fieldset
               legend={t`Filters (Where)`}

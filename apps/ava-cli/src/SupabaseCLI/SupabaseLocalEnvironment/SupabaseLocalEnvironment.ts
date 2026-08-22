@@ -1,9 +1,3 @@
-import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
-import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
-import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
-import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseDockerCleanup";
-import { SupabaseRestorePreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseRestorePreparation";
-import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseSwitchPreparation";
 import type {
   CommandResult,
   RestorePreparation,
@@ -14,6 +8,13 @@ import type {
   SupabaseSwitchResult,
   SwitchPreparation,
 } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+
+import { DevServerPort } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
+import { SupabaseBackupStore } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseBackupStore";
+import { SupabaseConfig } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseDockerCleanup";
+import { SupabaseRestorePreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseRestorePreparation";
+import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseSwitchPreparation";
 
 type RollbackSwitchOptions = {
   io: SupabaseLocalEnvironmentIO;
@@ -68,8 +69,8 @@ function _errorsIncludingCleanup(
     lastError: unknown;
   }>,
 ): unknown[] {
-  return options.cleanupError ?
-      [options.firstError, options.cleanupError, options.lastError]
+  return options.cleanupError
+    ? [options.firstError, options.cleanupError, options.lastError]
     : [options.firstError, options.lastError];
 }
 
@@ -80,8 +81,8 @@ function _manualCleanupSuffix(
   }>,
 ): string {
   const { temporaryProjectId, cleanupError } = options;
-  return cleanupError ?
-      ` manual cleanup is required for ${temporaryProjectId}.`
+  return cleanupError
+    ? ` manual cleanup is required for ${temporaryProjectId}.`
     : "";
 }
 
@@ -263,9 +264,8 @@ async function _removeRestoredBackup(
   try {
     await options.io.removePath(options.preparation.backupDirectory);
   } catch (backupError) {
-    const errors =
-      options.cleanupError ?
-        [options.cleanupError, backupError]
+    const errors = options.cleanupError
+      ? [options.cleanupError, backupError]
       : [backupError];
     throw new AggregateError(
       errors,

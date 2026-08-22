@@ -1,8 +1,10 @@
-import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ReactNode } from "react";
+
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 
 function createEditorData(): AvaPageData {
   return {

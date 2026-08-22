@@ -1,9 +1,11 @@
-import { Trans } from "@lingui/react/macro";
-import { Badge, Group, Stack, Text } from "@mantine/core";
-import css from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.module.css";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ReactNode } from "react";
+
+import { Trans } from "@lingui/react/macro";
+import { Badge, Group, Stack, Text } from "@mantine/core";
+
+import css from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.module.css";
 
 type Attribute = NonNullable<Concept.T<"Full">["attributes"]>[number];
 
@@ -64,11 +66,11 @@ function AttributeRow({
         <Text fw={500} truncate>
           {attribute.name}
         </Text>
-        {attribute.description ?
+        {attribute.description ? (
           <Text size="sm" c="dimmed" lineClamp={2}>
             {attribute.description}
           </Text>
-        : null}
+        ) : null}
       </Stack>
       <AttributeChips attribute={attribute} sourceName={sourceName} />
     </Group>
@@ -84,28 +86,29 @@ function AttributeChips({
 }): ReactNode {
   return (
     <Group gap="xs" wrap="nowrap">
-      {attribute.isIdentifier ?
+      {attribute.isIdentifier ? (
         <Badge variant="light" color="neutral" size="sm">
           <Trans>ID</Trans>
         </Badge>
-      : null}
-      {attribute.isLabel ?
+      ) : null}
+      {attribute.isLabel ? (
         <Badge variant="light" color="primary" size="sm">
           <Trans>Name</Trans>
         </Badge>
-      : null}
-      {sourceName ?
+      ) : null}
+      {sourceName ? (
         <Text className={css.source} lineClamp={1}>
           {sourceName}
         </Text>
-      : attribute.mappingType === "dataset_column" ?
+      ) : attribute.mappingType === "dataset_column" ? (
         <Badge variant="light" color="neutral" size="sm">
           <Trans>Dataset</Trans>
         </Badge>
-      : <Badge variant="light" color="neutral" size="sm">
+      ) : (
+        <Badge variant="light" color="neutral" size="sm">
           <Trans>Entered manually</Trans>
         </Badge>
-      }
+      )}
     </Group>
   );
 }

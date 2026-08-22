@@ -1,9 +1,10 @@
-import { callIpc } from "$/platform/ipc/client.ts";
-import { ServerApiContracts } from "$/platform/ipc/contracts/ServerApiContracts.ts";
 import type {
   ServerApiClient,
   ServerApiFunctionRequest,
 } from "$/platform/types/ServerApiClient.types.ts";
+
+import { callIpc } from "$/platform/ipc/client.ts";
+import { ServerApiContracts } from "$/platform/ipc/contracts/ServerApiContracts.ts";
 
 /**
  * Desktop-side {@link ServerApiClient} that forwards every call to the

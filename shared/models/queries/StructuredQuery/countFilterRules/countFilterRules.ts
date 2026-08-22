@@ -1,5 +1,6 @@
-import { QueryFilterValidation } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+
+import { QueryFilterValidation } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation.ts";
 
 /** Counts of applied, unfinished, and invalid rules in a filter tree. */
 export type FilterRuleCounts = {

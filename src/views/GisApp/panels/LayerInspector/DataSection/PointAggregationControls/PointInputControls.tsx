@@ -1,11 +1,13 @@
-import { Model } from "@avandar/models";
-import { useLingui } from "@lingui/react/macro";
-import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { PointCoordinateSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ReactNode } from "react";
+
+import { Model } from "@avandar/models";
+import { useLingui } from "@lingui/react/macro";
+
+import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { PointCoordinateSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect";
 
 type PointAggregationBinding = Extract<
   MapLayer.GeoBinding,
@@ -32,9 +34,8 @@ export function PointInputControls({
   updatePoints,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const { points } = binding;
   if (points.type === "geometryColumn") {

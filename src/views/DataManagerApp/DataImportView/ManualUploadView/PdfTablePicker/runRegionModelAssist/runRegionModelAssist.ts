@@ -1,4 +1,15 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { Measurement } from "@/workers/pdfSniff/extractMeasurements/extractMeasurements";
+import type {
+  ExtractedTable,
+  PageGeometry,
+  PdfCellFlag,
+  PdfRegion,
+  RegionGeometry,
+} from "@/workers/pdfSniff/pdfSniff.types";
+
 import { Model } from "@avandar/models";
+
 import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
@@ -9,15 +20,6 @@ import { clipToRegion } from "@/workers/pdfSniff/clipToRegion/clipToRegion";
 import { joinRegionText } from "@/workers/pdfSniff/extractors/extractProseMeasures/extractProseMeasures";
 import { makeRegionPromptFromRegionText } from "@/workers/pdfSniff/llm/makeRegionPromptFromRegionText";
 import { parseRegionResponse } from "@/workers/pdfSniff/llm/parseRegionResponse/parseRegionResponse";
-import type { Measurement } from "@/workers/pdfSniff/extractMeasurements/extractMeasurements";
-import type {
-  ExtractedTable,
-  PageGeometry,
-  PdfCellFlag,
-  PdfRegion,
-  RegionGeometry,
-} from "@/workers/pdfSniff/pdfSniff.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Substring `extractProseMeasures` writes into its region-level coverage
@@ -147,9 +149,8 @@ export function mergeModelRows(options: {
   return {
     regionId: ruleTable.regionId,
     headerRows: hasRuleRows ? ruleTable.headerRows : modelTable.headerRows,
-    cells:
-      hasRuleRows ?
-        [...ruleTable.cells, ...modelTable.cells.slice(modelTable.headerRows)]
+    cells: hasRuleRows
+      ? [...ruleTable.cells, ...modelTable.cells.slice(modelTable.headerRows)]
       : modelTable.cells,
     extractedBy: "model",
     // The coverage note was the offer, and the offer has been taken.
@@ -172,11 +173,9 @@ export function mergeModelRows(options: {
  */
 function _getCloudModelId(): string {
   const storedModelId = ChatModelStorage.readStoredChatModelId();
-  return (
-      storedModelId !== undefined &&
-        ChatModelOption.Catalog.isValidId(storedModelId)
-    ) ?
-      storedModelId
+  return storedModelId !== undefined &&
+    ChatModelOption.Catalog.isValidId(storedModelId)
+    ? storedModelId
     : ChatModelOption.Catalog.defaultId;
 }
 
@@ -250,16 +249,16 @@ export async function runRegionModelAssist(
       ],
       context: ChatPageContext.createDataSourcesViewContext(),
       model: llmModel,
-      ...(ackToken ?
-        {
-          consentAcks: [
-            {
-              ackToken,
-              scope: { kind: "message_index" as const, index: 0 },
-            },
-          ],
-        }
-      : {}),
+      ...(ackToken
+        ? {
+            consentAcks: [
+              {
+                ackToken,
+                scope: { kind: "message_index" as const, index: 0 },
+              },
+            ],
+          }
+        : {}),
     },
   });
 

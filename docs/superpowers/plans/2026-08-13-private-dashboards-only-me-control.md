@@ -35,25 +35,25 @@ Consequences, which the tasks below already respect:
 
 ### File structure
 
-| File | Responsibility |
-| --- | --- |
-| `supabase/schemas/70.rpc_resources__make_private.sql` | **Create.** The RPC. |
-| `supabase/schemas/16.utils.resource-permissions.sql` | **Modify.** Grant `execute` on `util__has_non_owner_share` to `authenticated`. |
-| `supabase/tests/database/permissions/rpc_resources__make_private.test.sql` | **Create.** pgTAP truth table. |
-| `supabase/tests/database/permissions/rpc_resources__make_private_rollback.test.sql` | **Create.** Post-condition rollback proof. |
-| `src/clients/permissions/ResourceShareClient.ts` | **Modify.** Add `makeResourcePrivate`. |
-| `src/clients/permissions/ResourceShareClient.test.ts` | **Create.** Unit test for the new member. |
-| `.../ShareResourceModal/deriveGeneralAccess/deriveGeneralAccess.ts` | **Create.** Pure predicate, three-way value, option builder. |
-| `.../ShareResourceModal/deriveGeneralAccess/deriveGeneralAccess.test.ts` | **Create.** Truth table mirroring pgTAP, plus option-builder cases. |
-| `.../ShareResourceModal/shareCopy.ts` | **Modify.** New strings; drop the dead `emptyState.noShares`. |
-| `.../ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx` | **Modify.** Consume the built options; new props. |
-| `.../ShareResourceModal/openMakePrivateConfirmModal.tsx` | **Create.** Stacked confirm. |
-| `.../ShareResourceModal/ShareResourceModal.tsx` | **Modify.** Derivation, intent state, wiring. |
-| `.../ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx` | **Modify.** Accept `isDisabled`. |
-| `.../ShareResourceModal/buildShareSummary/buildShareSummary.ts` | **Modify.** Reword the private branch. |
-| `tests/e2e/helpers/shareModalFlow.ts` | **Modify.** Two new helpers. |
-| `tests/e2e/share-modal.spec.ts` | **Modify.** One new case. |
-| `docs/permissions-architecture.md` | **Modify.** Document the RPC. |
+| File                                                                                | Responsibility                                                                 |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `supabase/schemas/70.rpc_resources__make_private.sql`                               | **Create.** The RPC.                                                           |
+| `supabase/schemas/16.utils.resource-permissions.sql`                                | **Modify.** Grant `execute` on `util__has_non_owner_share` to `authenticated`. |
+| `supabase/tests/database/permissions/rpc_resources__make_private.test.sql`          | **Create.** pgTAP truth table.                                                 |
+| `supabase/tests/database/permissions/rpc_resources__make_private_rollback.test.sql` | **Create.** Post-condition rollback proof.                                     |
+| `src/clients/permissions/ResourceShareClient.ts`                                    | **Modify.** Add `makeResourcePrivate`.                                         |
+| `src/clients/permissions/ResourceShareClient.test.ts`                               | **Create.** Unit test for the new member.                                      |
+| `.../ShareResourceModal/deriveGeneralAccess/deriveGeneralAccess.ts`                 | **Create.** Pure predicate, three-way value, option builder.                   |
+| `.../ShareResourceModal/deriveGeneralAccess/deriveGeneralAccess.test.ts`            | **Create.** Truth table mirroring pgTAP, plus option-builder cases.            |
+| `.../ShareResourceModal/shareCopy.ts`                                               | **Modify.** New strings; drop the dead `emptyState.noShares`.                  |
+| `.../ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx`                  | **Modify.** Consume the built options; new props.                              |
+| `.../ShareResourceModal/openMakePrivateConfirmModal.tsx`                            | **Create.** Stacked confirm.                                                   |
+| `.../ShareResourceModal/ShareResourceModal.tsx`                                     | **Modify.** Derivation, intent state, wiring.                                  |
+| `.../ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx`              | **Modify.** Accept `isDisabled`.                                               |
+| `.../ShareResourceModal/buildShareSummary/buildShareSummary.ts`                     | **Modify.** Reword the private branch.                                         |
+| `tests/e2e/helpers/shareModalFlow.ts`                                               | **Modify.** Two new helpers.                                                   |
+| `tests/e2e/share-modal.spec.ts`                                                     | **Modify.** One new case.                                                      |
+| `docs/permissions-architecture.md`                                                  | **Modify.** Document the RPC.                                                  |
 
 Paths beginning `.../ShareResourceModal/` are under `src/components/permissions/`.
 
@@ -62,6 +62,7 @@ Paths beginning `.../ShareResourceModal/` are under `src/components/permissions/
 ## Task 1: The `rpc_resources__make_private` function
 
 **Files:**
+
 - Create: `supabase/schemas/70.rpc_resources__make_private.sql`
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql`
 - Test: `supabase/tests/database/permissions/rpc_resources__make_private.test.sql`
@@ -439,6 +440,7 @@ git commit -m "feat(db): add owner-only atomic make-private RPC"
 Spec §9 requires the partial-failure case be asserted as a **real rollback**, not just an error message. The post-condition cannot fire naturally, so the test forces it by temporarily replacing the predicate it calls. Separate file because it is a separate idea, and because the stub would otherwise contaminate Task 1's assertions.
 
 **Files:**
+
 - Test: `supabase/tests/database/permissions/rpc_resources__make_private_rollback.test.sql`
 
 - [ ] **Step 1: Write the test**
@@ -572,6 +574,7 @@ git commit -m "test(db): prove make_private rolls back on a surviving share"
 ## Task 3: `ResourceShareClient.makeResourcePrivate`
 
 **Files:**
+
 - Modify: `src/clients/permissions/ResourceShareClient.ts`
 - Test: `src/clients/permissions/ResourceShareClient.test.ts` (create)
 
@@ -698,6 +701,7 @@ git commit -m "feat(clients): add makeResourcePrivate to ResourceShareClient"
 Three pure functions: the client twin of `util__has_non_owner_share`, the three-way value, and the dropdown's option list. The option list lives here rather than inline in the component precisely because jsdom cannot open the dropdown, so a pure builder is the only way to unit-test which options exist and which are disabled.
 
 **Files:**
+
 - Create: `src/components/permissions/ShareResourceModal/deriveGeneralAccess/deriveGeneralAccess.ts`
 - Test: `src/components/permissions/ShareResourceModal/deriveGeneralAccess/deriveGeneralAccess.test.ts`
 
@@ -816,7 +820,10 @@ describe("deriveGeneralAccessValue", () => {
 
 describe("buildGeneralAccessOptions", () => {
   it("lists Only me first, then Restricted, then the workspace option", () => {
-    const options = buildGeneralAccessOptions({ isOwner: true, labels: LABELS });
+    const options = buildGeneralAccessOptions({
+      isOwner: true,
+      labels: LABELS,
+    });
     expect(
       options.map((option) => {
         return option.value;
@@ -825,7 +832,10 @@ describe("buildGeneralAccessOptions", () => {
   });
 
   it("enables Only me for the owner", () => {
-    const options = buildGeneralAccessOptions({ isOwner: true, labels: LABELS });
+    const options = buildGeneralAccessOptions({
+      isOwner: true,
+      labels: LABELS,
+    });
     expect(options[0]?.disabled).toBe(false);
   });
 
@@ -906,8 +916,8 @@ export function deriveGeneralAccessValue(
   if (!options.isRestricted) {
     return "workspace";
   }
-  return hasNonOwnerShare(options.shares, options.ownerId) ?
-      "restricted"
+  return hasNonOwnerShare(options.shares, options.ownerId)
+    ? "restricted"
     : "private";
 }
 
@@ -961,6 +971,7 @@ git commit -m "feat(permissions): derive the three-way general-access value"
 Copy lands before its consumers so those tasks build and test in one pass.
 
 **Files:**
+
 - Modify: `src/components/permissions/ShareResourceModal/shareCopy.ts`
 
 - [ ] **Step 1: Extend the `ShareCopy` type**
@@ -968,17 +979,21 @@ Copy lands before its consumers so those tasks build and test in one pass.
 Add these members after `workspaceOptionTooltip`:
 
 ```ts
-  cancelLabel: string;
-  privateOptionLabel: string;
-  privateOptionTooltip: (resource: string) => string;
-  privateOptionDisabledTooltip: (resource: string) => string;
-  makePrivateConfirm: (options: {
-    resourceName: string;
-    numUsers: number;
-    numGroups: number;
-    losesWorkspaceAccess: boolean;
-    app: string;
-  }) => { title: string; body: string; confirmLabel: string };
+cancelLabel: string;
+privateOptionLabel: string;
+privateOptionTooltip: (resource: string) => string;
+privateOptionDisabledTooltip: (resource: string) => string;
+makePrivateConfirm: (options: {
+  resourceName: string;
+  numUsers: number;
+  numGroups: number;
+  losesWorkspaceAccess: boolean;
+  app: string;
+}) => {
+  title: string;
+  body: string;
+  confirmLabel: string;
+};
 ```
 
 - [ ] **Step 2: Implement them**
@@ -1063,6 +1078,7 @@ git commit -m "feat(permissions): add Only me and make-private copy"
 The component's props change: it stops taking `isRestricted` and starts taking the derived `value`, because the orchestrator now owns the derivation (Task 4) and the intent state (Task 8).
 
 **Files:**
+
 - Modify: `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx`
 - Test: `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.test.tsx`
 
@@ -1240,11 +1256,13 @@ export function ShareGeneralAccess({
   });
 
   const selectTooltip =
-    value === "private" ?
-      isOwner ? shareCopy.privateOptionTooltip(resource)
-      : shareCopy.privateOptionDisabledTooltip(resource)
-    : value === "restricted" ? shareCopy.restrictedOptionTooltip(resource)
-    : shareCopy.workspaceOptionTooltip(resource, app);
+    value === "private"
+      ? isOwner
+        ? shareCopy.privateOptionTooltip(resource)
+        : shareCopy.privateOptionDisabledTooltip(resource)
+      : value === "restricted"
+        ? shareCopy.restrictedOptionTooltip(resource)
+        : shareCopy.workspaceOptionTooltip(resource, app);
 
   return (
     <Stack gap="xs">
@@ -1272,7 +1290,7 @@ export function ShareGeneralAccess({
             aria-label={t`General access`}
           />
         </Tooltip>
-        {value === "workspace" ?
+        {value === "workspace" ? (
           <Tooltip label={shareCopy.roleSelectTooltip}>
             <Select
               w={120}
@@ -1292,7 +1310,7 @@ export function ShareGeneralAccess({
               aria-label={t`Role for everyone in the workspace`}
             />
           </Tooltip>
-        : null}
+        ) : null}
       </Group>
       <Text size="xs" c="dimmed">
         {shareCopy.generalAccessHelper}
@@ -1322,6 +1340,7 @@ git commit -m "feat(permissions): add the Only me option to general access"
 ## Task 7: The confirmation modal
 
 **Files:**
+
 - Create: `src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx`
 
 No test of its own: its only logic is the copy assembly already covered in Task 5, and Task 10 exercises it in a real browser.
@@ -1394,6 +1413,7 @@ git commit -m "feat(permissions): add the make-private confirmation modal"
 ## Task 8: Wire it up in `ShareResourceModal`
 
 **Files:**
+
 - Modify: `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx`
 - Modify: `src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx`
 - Test: `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx`
@@ -1444,99 +1464,99 @@ vi.mock("@/hooks/users/useCurrentUser", () => {
 In the existing `beforeEach`, reset the new state so cases cannot leak:
 
 ```ts
-    mocks.sharingState = {
-      isRestricted: false,
-      ownerId: "user-owner",
-      shares: [],
-    };
-    mocks.makeResourcePrivate.mockClear();
+mocks.sharingState = {
+  isRestricted: false,
+  ownerId: "user-owner",
+  shares: [],
+};
+mocks.makeResourcePrivate.mockClear();
 ```
 
 Add these cases:
 
 ```tsx
-  it("shows Only me when restricted with no non-owner share", async () => {
-    mocks.sharingState = {
-      isRestricted: true,
-      ownerId: "user-owner",
-      shares: [],
-    };
-    render(
-      <ShareResourceModal
-        resourceName="Q3 Revenue"
-        resourceType="dashboard"
-        resourceId="dash-1"
-        onClose={vi.fn()}
-      />,
-    );
-    await waitFor(() => {
-      expect(
-        screen.getAllByRole("combobox").find((el) => {
-          return el.getAttribute("aria-label") === "General access";
-        }),
-      ).toHaveValue("Only me");
-    });
+it("shows Only me when restricted with no non-owner share", async () => {
+  mocks.sharingState = {
+    isRestricted: true,
+    ownerId: "user-owner",
+    shares: [],
+  };
+  render(
+    <ShareResourceModal
+      resourceName="Q3 Revenue"
+      resourceType="dashboard"
+      resourceId="dash-1"
+      onClose={vi.fn()}
+    />,
+  );
+  await waitFor(() => {
+    expect(
+      screen.getAllByRole("combobox").find((el) => {
+        return el.getAttribute("aria-label") === "General access";
+      }),
+    ).toHaveValue("Only me");
   });
+});
 
-  // The workspace principal is the row a naive derivation drops. If this case
-  // reads "Only me", the modal is calling a resource private that the entire
-  // workspace can open.
-  it("shows Restricted when restricted with a workspace share", async () => {
-    mocks.sharingState = {
-      isRestricted: true,
-      ownerId: "user-owner",
-      shares: [
-        {
-          id: "s-1",
-          workspaceId: "workspace-id-1",
-          resourceType: "dashboard",
-          resourceId: "dash-1",
-          principalType: "workspace",
-          principalId: null,
-          role: "viewer",
-          requiresAppAccess: false,
-        },
-      ],
-    };
-    render(
-      <ShareResourceModal
-        resourceName="Q3 Revenue"
-        resourceType="dashboard"
-        resourceId="dash-1"
-        onClose={vi.fn()}
-      />,
-    );
-    await waitFor(() => {
-      expect(
-        screen.getAllByRole("combobox").find((el) => {
-          return el.getAttribute("aria-label") === "General access";
-        }),
-      ).toHaveValue("Restricted");
-    });
+// The workspace principal is the row a naive derivation drops. If this case
+// reads "Only me", the modal is calling a resource private that the entire
+// workspace can open.
+it("shows Restricted when restricted with a workspace share", async () => {
+  mocks.sharingState = {
+    isRestricted: true,
+    ownerId: "user-owner",
+    shares: [
+      {
+        id: "s-1",
+        workspaceId: "workspace-id-1",
+        resourceType: "dashboard",
+        resourceId: "dash-1",
+        principalType: "workspace",
+        principalId: null,
+        role: "viewer",
+        requiresAppAccess: false,
+      },
+    ],
+  };
+  render(
+    <ShareResourceModal
+      resourceName="Q3 Revenue"
+      resourceType="dashboard"
+      resourceId="dash-1"
+      onClose={vi.fn()}
+    />,
+  );
+  await waitFor(() => {
+    expect(
+      screen.getAllByRole("combobox").find((el) => {
+        return el.getAttribute("aria-label") === "General access";
+      }),
+    ).toHaveValue("Restricted");
   });
+});
 
-  it("disables the add-principal row when the resource is private", async () => {
-    mocks.sharingState = {
-      isRestricted: true,
-      ownerId: "user-owner",
-      shares: [],
-    };
-    render(
-      <ShareResourceModal
-        resourceName="Q3 Revenue"
-        resourceType="dashboard"
-        resourceId="dash-1"
-        onClose={vi.fn()}
-      />,
-    );
-    await waitFor(() => {
-      expect(
-        screen.getAllByRole("combobox").find((el) => {
-          return el.getAttribute("aria-label") === "Add people or user groups";
-        }),
-      ).toBeDisabled();
-    });
+it("disables the add-principal row when the resource is private", async () => {
+  mocks.sharingState = {
+    isRestricted: true,
+    ownerId: "user-owner",
+    shares: [],
+  };
+  render(
+    <ShareResourceModal
+      resourceName="Q3 Revenue"
+      resourceType="dashboard"
+      resourceId="dash-1"
+      onClose={vi.fn()}
+    />,
+  );
+  await waitFor(() => {
+    expect(
+      screen.getAllByRole("combobox").find((el) => {
+        return el.getAttribute("aria-label") === "Add people or user groups";
+      }),
+    ).toBeDisabled();
   });
+});
 ```
 
 `"Add people or user groups"` is the combobox's real `aria-label`, set in `ShareAddPrincipalRow.tsx` and already relied on by the e2e helpers.
@@ -1572,139 +1592,139 @@ import type { GeneralAccessValue } from "./deriveGeneralAccess/deriveGeneralAcce
 Add this with the other hooks, **above** the early loading `return`, since hooks cannot run conditionally:
 
 ```ts
-  const currentUser = useCurrentUser();
-  const shareCopy = useShareCopy();
+const currentUser = useCurrentUser();
+const shareCopy = useShareCopy();
 
-  // "I intend to add people", not a stored state. Selecting `Restricted` while
-  // private writes nothing, so without this the dropdown would snap straight
-  // back to "Only me". Lost on unmount, which is why reopening the modal on a
-  // still-empty resource correctly shows "Only me" again.
-  const [wantsRestricted, setWantsRestricted] = useState(false);
+// "I intend to add people", not a stored state. Selecting `Restricted` while
+// private writes nothing, so without this the dropdown would snap straight
+// back to "Only me". Lost on unmount, which is why reopening the modal on a
+// still-empty resource correctly shows "Only me" again.
+const [wantsRestricted, setWantsRestricted] = useState(false);
 
-  const [makeResourcePrivate, isMakingPrivate] =
-    ResourceShareClient.useMakeResourcePrivate({
-      queriesToInvalidate: invalidateKeys,
-      onError: (error: Error) => {
-        notifyError({
-          title: t`Could not make private`,
-          message: error.message,
-        });
-      },
-      onSuccess: () => {
-        setWantsRestricted(false);
-      },
-    });
+const [makeResourcePrivate, isMakingPrivate] =
+  ResourceShareClient.useMakeResourcePrivate({
+    queriesToInvalidate: invalidateKeys,
+    onError: (error: Error) => {
+      notifyError({
+        title: t`Could not make private`,
+        message: error.message,
+      });
+    },
+    onSuccess: () => {
+      setWantsRestricted(false);
+    },
+  });
 ```
 
 After `const workspaceShare = ...` and `const directShares = ...`, add:
 
 ```ts
-  // Fails closed. useCurrentUser reads the _auth route context and this modal
-  // only ever mounts inside it, so undefined is unreachable in practice;
-  // treating it as "not the owner" is still the right default for a control
-  // that deletes shares.
-  const isOwner = sharingState.ownerId === currentUser?.id;
+// Fails closed. useCurrentUser reads the _auth route context and this modal
+// only ever mounts inside it, so undefined is unreachable in practice;
+// treating it as "not the owner" is still the right default for a control
+// that deletes shares.
+const isOwner = sharingState.ownerId === currentUser?.id;
 
-  const derivedGeneralAccess = deriveGeneralAccessValue({
-    isRestricted: sharingState.isRestricted,
-    shares: sharingState.shares,
-    ownerId: sharingState.ownerId,
-  });
+const derivedGeneralAccess = deriveGeneralAccessValue({
+  isRestricted: sharingState.isRestricted,
+  shares: sharingState.shares,
+  ownerId: sharingState.ownerId,
+});
 
-  const displayedGeneralAccess: GeneralAccessValue =
-    derivedGeneralAccess === "private" && wantsRestricted ?
-      "restricted"
+const displayedGeneralAccess: GeneralAccessValue =
+  derivedGeneralAccess === "private" && wantsRestricted
+    ? "restricted"
     : derivedGeneralAccess;
 ```
 
 Replace the whole `onGeneralAccessChange` function with the two below. Place them after `userShares` and `groupShares` are defined, since the confirm counts read from them.
 
 ```ts
-  const onGeneralAccessChange = (next: GeneralAccessValue): void => {
-    if (next === displayedGeneralAccess) {
-      return;
-    }
+const onGeneralAccessChange = (next: GeneralAccessValue): void => {
+  if (next === displayedGeneralAccess) {
+    return;
+  }
 
-    if (next === "private") {
-      setWantsRestricted(false);
-      const numUsers = userShares.length;
-      const numGroups = groupShares.length;
-      // Keyed off `isRestricted`, NOT off the presence of a workspace-principal
-      // share row. An unrestricted resource with no such row still grants
-      // access through workspace app roles, so keying off the row would drop
-      // the warning in the case that matters most.
-      const losesWorkspaceAccess = !sharingState.isRestricted;
-
-      if (numUsers + numGroups === 0 && !losesWorkspaceAccess) {
-        makeResourcePrivate({ resourceType, resourceId });
-        return;
-      }
-
-      openMakePrivateConfirmModal({
-        shareCopy,
-        resourceName,
-        app: appLabel(appForResource(resourceType)),
-        numUsers,
-        numGroups,
-        losesWorkspaceAccess,
-        onConfirm: () => {
-          makeResourcePrivate({ resourceType, resourceId });
-        },
-      });
-      return;
-    }
-
-    if (next === "restricted") {
-      // From private this is a pure intent change: the resource is already
-      // restricted with no shares, so there is nothing to write.
-      setWantsRestricted(derivedGeneralAccess === "private");
-      if (!sharingState.isRestricted) {
-        setRestricted({
-          workspaceId,
-          resourceType,
-          resourceId,
-          isRestricted: true,
-        });
-        if (workspaceShare) {
-          deleteShare({ shareId: workspaceShare.id });
-        }
-      }
-      return;
-    }
-
-    // next === "workspace"
+  if (next === "private") {
     setWantsRestricted(false);
-    if (sharingState.isRestricted) {
+    const numUsers = userShares.length;
+    const numGroups = groupShares.length;
+    // Keyed off `isRestricted`, NOT off the presence of a workspace-principal
+    // share row. An unrestricted resource with no such row still grants
+    // access through workspace app roles, so keying off the row would drop
+    // the warning in the case that matters most.
+    const losesWorkspaceAccess = !sharingState.isRestricted;
+
+    if (numUsers + numGroups === 0 && !losesWorkspaceAccess) {
+      makeResourcePrivate({ resourceType, resourceId });
+      return;
+    }
+
+    openMakePrivateConfirmModal({
+      shareCopy,
+      resourceName,
+      app: appLabel(appForResource(resourceType)),
+      numUsers,
+      numGroups,
+      losesWorkspaceAccess,
+      onConfirm: () => {
+        makeResourcePrivate({ resourceType, resourceId });
+      },
+    });
+    return;
+  }
+
+  if (next === "restricted") {
+    // From private this is a pure intent change: the resource is already
+    // restricted with no shares, so there is nothing to write.
+    setWantsRestricted(derivedGeneralAccess === "private");
+    if (!sharingState.isRestricted) {
       setRestricted({
         workspaceId,
         resourceType,
         resourceId,
-        isRestricted: false,
+        isRestricted: true,
       });
+      if (workspaceShare) {
+        deleteShare({ shareId: workspaceShare.id });
+      }
     }
-    upsertShare({
-      workspaceId,
-      resourceType,
-      resourceId,
-      principalType: "workspace",
-      principalId: null,
-      role: workspaceShare?.role ?? "viewer",
-    });
-  };
+    return;
+  }
 
-  const onWorkspaceRoleChange = (role: RoleLevel): void => {
-    if (role === (workspaceShare?.role ?? null)) {
-      return;
-    }
-    upsertShare({
+  // next === "workspace"
+  setWantsRestricted(false);
+  if (sharingState.isRestricted) {
+    setRestricted({
       workspaceId,
       resourceType,
       resourceId,
-      principalType: "workspace",
-      principalId: null,
-      role,
+      isRestricted: false,
     });
-  };
+  }
+  upsertShare({
+    workspaceId,
+    resourceType,
+    resourceId,
+    principalType: "workspace",
+    principalId: null,
+    role: workspaceShare?.role ?? "viewer",
+  });
+};
+
+const onWorkspaceRoleChange = (role: RoleLevel): void => {
+  if (role === (workspaceShare?.role ?? null)) {
+    return;
+  }
+  upsertShare({
+    workspaceId,
+    resourceType,
+    resourceId,
+    principalType: "workspace",
+    principalId: null,
+    role,
+  });
+};
 ```
 
 Update the JSX. `ShareAddPrincipalRow` gains one prop:
@@ -1717,15 +1737,15 @@ Update the JSX. `ShareAddPrincipalRow` gains one prop:
 And `ShareGeneralAccess` takes the new shape:
 
 ```tsx
-      <ShareGeneralAccess
-        resourceType={resourceType}
-        value={displayedGeneralAccess}
-        isOwner={isOwner}
-        isBusy={isMakingPrivate}
-        workspaceShareRole={workspaceShare?.role ?? null}
-        onChange={onGeneralAccessChange}
-        onWorkspaceRoleChange={onWorkspaceRoleChange}
-      />
+<ShareGeneralAccess
+  resourceType={resourceType}
+  value={displayedGeneralAccess}
+  isOwner={isOwner}
+  isBusy={isMakingPrivate}
+  workspaceShareRole={workspaceShare?.role ?? null}
+  onChange={onGeneralAccessChange}
+  onWorkspaceRoleChange={onWorkspaceRoleChange}
+/>
 ```
 
 - [ ] **Step 5: Run to verify it passes**
@@ -1748,6 +1768,7 @@ git commit -m "feat(permissions): wire the Only me control into the share modal"
 ## Task 9: Reword the private summary line
 
 **Files:**
+
 - Modify: `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts`
 - Test: `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.test.ts`
 
@@ -1758,13 +1779,13 @@ No new test is needed. `buildShareSummary.test.ts` already covers this branch fo
 At roughly line 78, in the dataset case:
 
 ```ts
-    expect(flat(spans)).toBe("Only you have access to this dataset.");
+expect(flat(spans)).toBe("Only you have access to this dataset.");
 ```
 
 At roughly line 186, in the dashboard case:
 
 ```ts
-    expect(flat(spans)).toBe("Only you have access to this dashboard.");
+expect(flat(spans)).toBe("Only you have access to this dashboard.");
 ```
 
 Leave everything else in both cases alone, including their `baseLookups` spread and their `isRestricted: true, shares: []` setup. Those are already the private state.
@@ -1782,20 +1803,20 @@ Expected: FAIL, receiving `"This dashboard is currently only accessible to its o
 In `buildShareSummary.ts`, replace the no-shares restricted branch:
 
 ```ts
-    // Second person is correct without an isOwner parameter, and that is an
-    // invariant rather than an assumption. If this branch renders, the viewer
-    // is necessarily the owner: the owner short-circuits to admin in
-    // util__resource_effective_role; a Settings Admin resolves to null on a
-    // private resource under P1's narrowing; an explicit admin share would
-    // itself be a non-owner share, so the resource would not be private; and a
-    // workspace share implies is_restricted = false. If that narrowing is ever
-    // widened, this copy starts lying.
-    return [
-      {
-        kind: "text",
-        text: t`Only you have access to this ${resource}.`,
-      },
-    ];
+// Second person is correct without an isOwner parameter, and that is an
+// invariant rather than an assumption. If this branch renders, the viewer
+// is necessarily the owner: the owner short-circuits to admin in
+// util__resource_effective_role; a Settings Admin resolves to null on a
+// private resource under P1's narrowing; an explicit admin share would
+// itself be a non-owner share, so the resource would not be private; and a
+// workspace share implies is_restricted = false. If that narrowing is ever
+// widened, this copy starts lying.
+return [
+  {
+    kind: "text",
+    text: t`Only you have access to this ${resource}.`,
+  },
+];
 ```
 
 - [ ] **Step 4: Run to verify it passes**
@@ -1820,6 +1841,7 @@ git commit -m "feat(permissions): address the owner directly in the private summ
 This is the only place the dropdown is actually clicked, so it carries the interaction coverage Vitest cannot.
 
 **Files:**
+
 - Modify: `tests/e2e/helpers/shareModalFlow.ts`
 - Modify: `tests/e2e/share-modal.spec.ts`
 
@@ -1871,81 +1893,81 @@ export async function expectRestrictedIsIntentOnly(page: Page): Promise<void> {
 In `tests/e2e/share-modal.spec.ts`, add `expectRestrictedIsIntentOnly` and `setGeneralAccessToOnlyMe` to the existing import from `./helpers/shareModalFlow`, then add this case inside `test.describe("Share modal", ...)`. Every other identifier it uses is already imported by that file.
 
 ```ts
-  test("Only me revokes every share in one action", async ({
-    page,
-    e2eWorkerDb,
-    e2eViewerMembership,
-  }) => {
-    const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
-    const { admin } = e2eViewerMembership;
-    const datasetName = "E2E only me";
+test("Only me revokes every share in one action", async ({
+  page,
+  e2eWorkerDb,
+  e2eViewerMembership,
+}) => {
+  const { workspaceSlug, primaryUser, secondaryUser } = e2eWorkerDb;
+  const { admin } = e2eViewerMembership;
+  const datasetName = "E2E only me";
 
-    let datasetId = "";
-    try {
-      await signInWithEmailPassword(page, {
-        email: primaryUser.email,
-        password: primaryUser.password,
-        workspaceSlug,
-      });
+  let datasetId = "";
+  try {
+    await signInWithEmailPassword(page, {
+      email: primaryUser.email,
+      password: primaryUser.password,
+      workspaceSlug,
+    });
 
-      ({ datasetId } = await uploadCaliforniaCsvDataset({
-        page,
-        workspaceSlug,
-        datasetName,
-      }));
+    ({ datasetId } = await uploadCaliforniaCsvDataset({
+      page,
+      workspaceSlug,
+      datasetName,
+    }));
 
-      await openShareModal(page);
-      await setGeneralAccess(page, "Restricted");
-      await addShare({
-        page,
-        principalLabel: E2E_SECONDARY_MEMBER_DISPLAY_NAME,
-        role: "editor",
-      });
-      await closeShareModal(page);
+    await openShareModal(page);
+    await setGeneralAccess(page, "Restricted");
+    await addShare({
+      page,
+      principalLabel: E2E_SECONDARY_MEMBER_DISPLAY_NAME,
+      role: "editor",
+    });
+    await closeShareModal(page);
 
-      // Prove the share works before taking it away, so the assertion at the
-      // end reflects a change rather than a permanent absence.
-      await switchToWorkspaceUser(page, {
-        email: secondaryUser.email,
-        password: secondaryUser.password,
-        workspaceSlug,
-      });
-      await expectDatasetVisibleInDataManager(page, {
-        workspaceSlug,
-        datasetName,
-      });
+    // Prove the share works before taking it away, so the assertion at the
+    // end reflects a change rather than a permanent absence.
+    await switchToWorkspaceUser(page, {
+      email: secondaryUser.email,
+      password: secondaryUser.password,
+      workspaceSlug,
+    });
+    await expectDatasetVisibleInDataManager(page, {
+      workspaceSlug,
+      datasetName,
+    });
 
-      await switchToWorkspaceUser(page, {
-        email: primaryUser.email,
-        password: primaryUser.password,
-        workspaceSlug,
-      });
-      await page.goto(`/${workspaceSlug}/data-manager/dataset/${datasetId}`);
-      await openShareModal(page);
-      await setGeneralAccessToOnlyMe(page);
-      await expectShareSummaryText(page, ["Only you have access"]);
-      await expectRestrictedIsIntentOnly(page);
-      await closeShareModal(page);
+    await switchToWorkspaceUser(page, {
+      email: primaryUser.email,
+      password: primaryUser.password,
+      workspaceSlug,
+    });
+    await page.goto(`/${workspaceSlug}/data-manager/dataset/${datasetId}`);
+    await openShareModal(page);
+    await setGeneralAccessToOnlyMe(page);
+    await expectShareSummaryText(page, ["Only you have access"]);
+    await expectRestrictedIsIntentOnly(page);
+    await closeShareModal(page);
 
-      await switchToWorkspaceUser(page, {
-        email: secondaryUser.email,
-        password: secondaryUser.password,
-        workspaceSlug,
+    await switchToWorkspaceUser(page, {
+      email: secondaryUser.email,
+      password: secondaryUser.password,
+      workspaceSlug,
+    });
+    await expectDatasetHiddenInDataManager(page, {
+      workspaceSlug,
+      datasetName,
+    });
+    await expectDatasetMetaPageDenied(page, { workspaceSlug, datasetId });
+  } finally {
+    if (datasetId) {
+      await deleteDatasetAndShares({
+        supabaseAdminClient: admin,
+        datasetId,
       });
-      await expectDatasetHiddenInDataManager(page, {
-        workspaceSlug,
-        datasetName,
-      });
-      await expectDatasetMetaPageDenied(page, { workspaceSlug, datasetId });
-    } finally {
-      if (datasetId) {
-        await deleteDatasetAndShares({
-          supabaseAdminClient: admin,
-          datasetId,
-        });
-      }
     }
-  });
+  }
+});
 ```
 
 - [ ] **Step 3: Run the new case**
@@ -1968,6 +1990,7 @@ git commit -m "test(e2e): prove Only me revokes every share in one action"
 ## Task 11: Docs, i18n, and full verification
 
 **Files:**
+
 - Modify: `docs/permissions-architecture.md`
 
 - [ ] **Step 1: Document the RPC**

@@ -1,7 +1,3 @@
-import { createModelCrudClient } from "@avandar/clients";
-import { assertIsDefined } from "@avandar/utils";
-import { createDexieCrudMutationOperations } from "@/clients/dexie/createDexieCrudClient/createDexieCrudMutationOperations";
-import { createDexieCrudReadOperations } from "@/clients/dexie/createDexieCrudClient/createDexieCrudReadOperations";
 import type { DexieCrudOperationContext } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient.types";
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
@@ -12,6 +8,12 @@ import type {
 } from "@avandar/clients";
 import type { ILogger } from "@avandar/logger";
 import type { EmptyObject } from "@avandar/utils";
+
+import { createModelCrudClient } from "@avandar/clients";
+import { assertIsDefined } from "@avandar/utils";
+
+import { createDexieCrudMutationOperations } from "@/clients/dexie/createDexieCrudClient/createDexieCrudMutationOperations";
+import { createDexieCrudReadOperations } from "@/clients/dexie/createDexieCrudClient/createDexieCrudReadOperations";
 
 export type DexieCrudClient<
   M extends DexieCrudModelSpec,
@@ -112,9 +114,8 @@ function _getDexieCrudClientExtensions<
 } {
   const { db, queries, mutations } = options.clientOptions;
   return {
-    additionalQueries:
-      queries ?
-        ({ clientLogger }) => {
+    additionalQueries: queries
+      ? ({ clientLogger }) => {
           return queries({
             logger: clientLogger,
             db,
@@ -122,9 +123,8 @@ function _getDexieCrudClientExtensions<
           });
         }
       : undefined,
-    additionalMutations:
-      mutations ?
-        ({ clientLogger }) => {
+    additionalMutations: mutations
+      ? ({ clientLogger }) => {
           return mutations({
             logger: clientLogger,
             db,

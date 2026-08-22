@@ -1,17 +1,19 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { ManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
+import type { ReactNode } from "react";
+
 import { FileUploadForm } from "@avandar/ui";
 import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Stack } from "@mantine/core";
+
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { ManualUploadDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import { useManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { ReactNode } from "react";
 
 type Props = BoxProps & {
   /**
@@ -116,7 +118,7 @@ export function ManualUploadView({
             onSubmit={manualUpload.onFileSubmit}
           />
         </Box>
-        {previewRows && uploadedFile && dataSourceMetadata ?
+        {previewRows && uploadedFile && dataSourceMetadata ? (
           <_ManualUploadImportForm
             uploadedFile={uploadedFile}
             previewRows={previewRows}
@@ -127,7 +129,7 @@ export function ManualUploadView({
             onRequestDataReparse={manualUpload.onRequestDataReparse}
             setDataSourceMetadata={manualUpload.setDataSourceMetadata}
           />
-        : null}
+        ) : null}
       </Stack>
     </Box>
   );

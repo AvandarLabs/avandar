@@ -1,4 +1,11 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
+import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
+import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
+import type { SlugValidationState } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useSlugValidation.types";
+
 import { useCallback, useState } from "react";
+
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardPublishingModule } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
@@ -7,11 +14,6 @@ import { makeVanitySlugFromText } from "@/views/DashboardApp/DashboardShareModal
 import { usePublishDashboardMutation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation";
 import { useSlugValidation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useSlugValidation";
 import { useUnpublishDashboardMutation } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation";
-import type { GeneralAccessValue } from "@/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule";
-import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
-import type { PublishActionKind } from "@/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule";
-import type { SlugValidationState } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/useSlugValidation.types";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type DashboardPublishingControl = SlugValidationState & {
   currentDashboard: Dashboard.T;
@@ -120,10 +122,11 @@ export function useDashboardPublishingControl(
       return;
     }
     // Every remaining kind is a publish to the target; only the label differs.
-    const slugUpdate =
-      normalisedSlug ? { action: "set" as const, value: normalisedSlug }
-      : currentDashboard.slug ? { action: "clear" as const }
-      : undefined;
+    const slugUpdate = normalisedSlug
+      ? { action: "set" as const, value: normalisedSlug }
+      : currentDashboard.slug
+        ? { action: "clear" as const }
+        : undefined;
     publishDashboard({
       dashboardId: currentDashboard.id,
       visibility: targetVisibility,

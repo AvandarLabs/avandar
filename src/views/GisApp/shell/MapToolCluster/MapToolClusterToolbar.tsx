@@ -1,6 +1,12 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { ReactNode } from "react";
+
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { IconPointer } from "@tabler/icons-react";
+
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { AnnotateMapTool } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool";
 import { AreaMapTool } from "@/views/GisApp/shell/MapToolCluster/AreaMapTool";
@@ -12,10 +18,6 @@ import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
 import { MeasureMapTool } from "@/views/GisApp/shell/MapToolCluster/MeasureMapTool";
 import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
-import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   mapToolMode: MapToolMode;
@@ -70,9 +72,9 @@ export function MapToolClusterToolbar({
         selectedLayer={selectedLayer}
         onBufferConfirm={onBufferConfirm}
       />
-      {isFlagEnabled(FeatureFlag.EnableGisIsochrone) ?
+      {isFlagEnabled(FeatureFlag.EnableGisIsochrone) ? (
         <IsochroneMapTool />
-      : null}
+      ) : null}
       <AnnotateMapTool
         mapToolMode={mapToolMode}
         onMapToolModeChange={onMapToolModeChange}

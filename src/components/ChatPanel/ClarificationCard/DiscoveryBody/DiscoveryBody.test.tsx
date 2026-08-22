@@ -1,9 +1,12 @@
+import type { ComponentProps } from "react";
+
 /** Behavioral tests for automatic discovery candidate resolution. */
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+
 import { render } from "@/test-utils";
+
 import { DiscoveryBody } from "./DiscoveryBody";
-import type { ComponentProps } from "react";
 
 vi.mock("../DiscoveryUnavailableBody/DiscoveryCustomFallback", () => {
   return {

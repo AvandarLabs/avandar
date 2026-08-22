@@ -19,10 +19,10 @@ Read this before Task 1. It will save you hours.
 
 ### The permission model in one paragraph
 
-A workspace member gets a role (`viewer` < `editor` < `admin`) per *app*
+A workspace member gets a role (`viewer` < `editor` < `admin`) per _app_
 (`dashboards`, `data_sources`, `data_explorer`, `settings`) through a **role
 group**. On top of that, individual resources (a dashboard or a dataset) can
-carry **shares** in `resource_shares`, granting a role to a *principal*: one
+carry **shares** in `resource_shares`, granting a role to a _principal_: one
 user, one user group, or the whole workspace. `util__resource_effective_role`
 merges all applicable grants by `max(rank)`. A resource flagged
 `is_restricted = true` turns **off** the workspace-wide app-role default, so
@@ -113,48 +113,48 @@ re-fetch the row. That is why there are two predicate functions and not one.
 
 **SQL, declarative (`supabase/schemas/`)**
 
-| File | Change | Responsibility |
-| --- | --- | --- |
-| `16.utils.resource-permissions.sql` | Modify | Add both predicates; add `v_is_public` to `util__resource_effective_role`; narrow its Settings-Admin short-circuit |
-| `17.rls.resource_shares.sql` | Modify | Narrow the admin disjunct on INSERT and UPDATE |
-| `30.usage_analytics_events.sql` | Modify | Widen SELECT to Settings Admins |
-| `70.rpc_workspaces__private_resource_counts.sql` | Create | Per-member private counts RPC |
-| `70.rpc_resources__transfer_ownership.sql` | Create | Per-resource ownership transfer RPC (the primitive) |
+| File                                                  | Change | Responsibility                                                                                                                            |
+| ----------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `16.utils.resource-permissions.sql`                   | Modify | Add both predicates; add `v_is_public` to `util__resource_effective_role`; narrow its Settings-Admin short-circuit                        |
+| `17.rls.resource_shares.sql`                          | Modify | Narrow the admin disjunct on INSERT and UPDATE                                                                                            |
+| `30.usage_analytics_events.sql`                       | Modify | Widen SELECT to Settings Admins                                                                                                           |
+| `70.rpc_workspaces__private_resource_counts.sql`      | Create | Per-member private counts RPC                                                                                                             |
+| `70.rpc_resources__transfer_ownership.sql`            | Create | Per-resource ownership transfer RPC (the primitive)                                                                                       |
 | `71.rpc_workspaces__transfer_all_owned_resources.sql` | Create | Bulk-by-owner wrapper for offboarding. Numbered `71` because it calls the `70` RPC and `supabase/schemas/` applies in lexicographic order |
 
 **pgTAP (`supabase/tests/database/permissions/`)**
 
-| File | Change |
-| --- | --- |
-| `util_has_non_owner_share.test.sql` | Create |
-| `util_is_resource_private_to_owner.test.sql` | Create |
-| `util_resource_effective_role.test.sql` | Modify (append cases) |
-| `may_select_private_resource.test.sql` | Create |
-| `resource_shares_private_resource_guard.test.sql` | Create |
-| `rpc_workspaces__private_resource_counts.test.sql` | Create |
-| `rpc_resources__transfer_ownership.test.sql` | Create |
-| `rpc_workspaces__transfer_all_owned_resources.test.sql` | Create |
-| `resource_rls_role_matrix.test.sql` | Modify (flip admin expectations) |
-| `rls_datasets_dashboards_manager_writes.test.sql` | Modify (flip admin expectations) |
-| `rls_phase3_policies.test.sql` | Modify (flip admin expectations) |
+| File                                                    | Change                           |
+| ------------------------------------------------------- | -------------------------------- |
+| `util_has_non_owner_share.test.sql`                     | Create                           |
+| `util_is_resource_private_to_owner.test.sql`            | Create                           |
+| `util_resource_effective_role.test.sql`                 | Modify (append cases)            |
+| `may_select_private_resource.test.sql`                  | Create                           |
+| `resource_shares_private_resource_guard.test.sql`       | Create                           |
+| `rpc_workspaces__private_resource_counts.test.sql`      | Create                           |
+| `rpc_resources__transfer_ownership.test.sql`            | Create                           |
+| `rpc_workspaces__transfer_all_owned_resources.test.sql` | Create                           |
+| `resource_rls_role_matrix.test.sql`                     | Modify (flip admin expectations) |
+| `rls_datasets_dashboards_manager_writes.test.sql`       | Modify (flip admin expectations) |
+| `rls_phase3_policies.test.sql`                          | Modify (flip admin expectations) |
 
 **TypeScript**
 
-| File | Change | Responsibility |
-| --- | --- | --- |
-| `src/clients/permissions/PrivateResourceAdminClient.ts` | Create | The two RPC calls plus query hooks. A dedicated client, matching `ResourceShareClient` / `SubscriptionPermissionsClient`, rather than growing `PermissionsClient` |
-| `src/clients/permissions/PrivateResourceAdminClient.test.ts` | Create | Client unit tests |
-| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx` | Create | Counts table |
-| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.test.tsx` | Create | Panel tests |
-| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx` | Create | Target-member picker |
-| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx` | Modify | Third sub-tab |
-| `src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx` | Modify | Blocked-removal hint |
-| `tests/e2e/private-resource-admin-cannot-read.spec.ts` | Create | End-to-end proof of the phase's guarantee |
+| File                                                                                                 | Change | Responsibility                                                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/clients/permissions/PrivateResourceAdminClient.ts`                                              | Create | The two RPC calls plus query hooks. A dedicated client, matching `ResourceShareClient` / `SubscriptionPermissionsClient`, rather than growing `PermissionsClient` |
+| `src/clients/permissions/PrivateResourceAdminClient.test.ts`                                         | Create | Client unit tests                                                                                                                                                 |
+| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx`      | Create | Counts table                                                                                                                                                      |
+| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.test.tsx` | Create | Panel tests                                                                                                                                                       |
+| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx`         | Create | Target-member picker                                                                                                                                              |
+| `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx`                                    | Modify | Third sub-tab                                                                                                                                                     |
+| `src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx`                            | Modify | Blocked-removal hint                                                                                                                                              |
+| `tests/e2e/private-resource-admin-cannot-read.spec.ts`                                               | Create | End-to-end proof of the phase's guarantee                                                                                                                         |
 
 **Docs**
 
-| File | Change |
-| --- | --- |
+| File                               | Change                       |
+| ---------------------------------- | ---------------------------- |
 | `docs/permissions-architecture.md` | Modify (§2, §3, §4, §9, §10) |
 
 ---
@@ -165,6 +165,7 @@ The share-existence half of the predicate. Takes `p_owner_id` from the caller so
 hot RLS paths do not re-fetch a row they already hold.
 
 **Files:**
+
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql` (append after `util__get_auth_user_user_group_ids`, before `util__resource_effective_role`)
 - Test: `supabase/tests/database/permissions/util_has_non_owner_share.test.sql` (create)
 
@@ -373,6 +374,7 @@ The id-only entry point, for callers that hold no row: the counts RPC, the
 `resource_shares` policies, and (in phase 4) the entitlement trigger.
 
 **Files:**
+
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql` (append directly after `util__has_non_owner_share`)
 - Test: `supabase/tests/database/permissions/util_is_resource_private_to_owner.test.sql` (create)
 
@@ -600,6 +602,7 @@ git commit -m "feat(db): add util__is_resource_private_to_owner predicate"
 The core behavior change.
 
 **Files:**
+
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql` (`util__resource_effective_role`)
 - Test: `supabase/tests/database/permissions/util_resource_effective_role.test.sql` (append)
 
@@ -878,6 +881,7 @@ load-bearing and depends on statement order inside those functions, so it needs
 its own test. No production change in this task.
 
 **Files:**
+
 - Test: `supabase/tests/database/permissions/may_select_private_resource.test.sql` (create)
 
 - [ ] **Step 1: Write the test**
@@ -1004,7 +1008,7 @@ supabase test db supabase/tests/database/permissions/may_select_private_resource
 ```
 
 Expected: `All 5 subtests passed`. It passes because Task 3 already narrowed
-`effective_role`; this test exists to *lock* that inheritance so a future edit
+`effective_role`; this test exists to _lock_ that inheritance so a future edit
 to either helper cannot silently reopen the hole.
 
 If it FAILS, the statement order in the helper has changed and spec §4.3 no
@@ -1026,6 +1030,7 @@ themselves `admin` on a private resource, which makes it non-private and
 readable. This is the task that actually makes P1's guarantee hold.
 
 **Files:**
+
 - Modify: `supabase/schemas/17.rls.resource_shares.sql`
 - Create: `supabase/migrations/<timestamp>_guard_resource_shares_on_private_resources.sql` (hand-written)
 - Test: `supabase/tests/database/permissions/resource_shares_private_resource_guard.test.sql` (create)
@@ -1400,6 +1405,7 @@ git commit -m "fix(db): stop settings admins self-granting shares on private res
 > if Step 1 unexpectedly finds failures.
 
 **Files:**
+
 - Modify: `supabase/tests/database/permissions/resource_rls_role_matrix.test.sql`
 - Modify: `supabase/tests/database/permissions/rls_datasets_dashboards_manager_writes.test.sql`
 - Modify: `supabase/tests/database/permissions/rls_phase3_policies.test.sql`
@@ -1463,6 +1469,7 @@ git commit -m "test(db): flip admin expectations for owner-private resources"
 ## Task 7: Private-resource counts RPC
 
 **Files:**
+
 - Create: `supabase/schemas/70.rpc_workspaces__private_resource_counts.sql`
 - Test: `supabase/tests/database/permissions/rpc_workspaces__private_resource_counts.test.sql` (create)
 
@@ -1709,6 +1716,7 @@ Without this, closing the hole deadlocks offboarding: `owner_id` is
 `on delete no action`, so a member who owns private resources cannot be removed.
 
 **Files:**
+
 - Create: `supabase/schemas/70.rpc_resources__transfer_ownership.sql`
 - Test: `supabase/tests/database/permissions/rpc_resources__transfer_ownership.test.sql` (create)
 
@@ -2071,6 +2079,7 @@ addition in the spec when the phase lands; the "Deliberate deviations" section a
 the end of this plan flags it for the reviewer.
 
 **Files:**
+
 - Create: `supabase/schemas/71.rpc_workspaces__transfer_all_owned_resources.sql`
 - Test: `supabase/tests/database/permissions/rpc_workspaces__transfer_all_owned_resources.test.sql` (create)
 
@@ -2307,6 +2316,7 @@ A Settings Admin who is not the workspace owner can currently write a transfer
 audit row and then be unable to read it.
 
 **Files:**
+
 - Modify: `supabase/schemas/30.usage_analytics_events.sql`
 - Create: `supabase/migrations/<timestamp>_widen_usage_analytics_events_select.sql` (hand-written)
 - Test: `supabase/tests/database/permissions/rpc_resources__transfer_ownership.test.sql` (append)
@@ -2440,6 +2450,7 @@ git commit -m "feat(db): let settings admins read the workspace audit log"
 ## Task 10: Regenerate database types and verify the desktop mirror
 
 **Files:**
+
 - Modify: `shared/types/database.types.ts`
 - Verify: `apps/desktop/migrations/`
 
@@ -2492,6 +2503,7 @@ A dedicated client for the two RPCs, matching the shape of
 `src/clients/permissions/ResourceShareClient.ts`.
 
 **Files:**
+
 - Create: `src/clients/permissions/PrivateResourceAdminClient.ts`
 - Test: `src/clients/permissions/PrivateResourceAdminClient.test.ts` (create)
 
@@ -2514,9 +2526,8 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
   };
 });
 
-const { PrivateResourceAdminClient } = await import(
-  "@/clients/permissions/PrivateResourceAdminClient"
-);
+const { PrivateResourceAdminClient } =
+  await import("@/clients/permissions/PrivateResourceAdminClient");
 
 describe("PrivateResourceAdminClient", () => {
   it("maps count rows to camelCase", async () => {
@@ -2566,14 +2577,11 @@ describe("PrivateResourceAdminClient", () => {
       newOwnerId: "user-2",
     });
 
-    expect(rpcMock).toHaveBeenCalledWith(
-      "rpc_resources__transfer_ownership",
-      {
-        p_resource_type: "dashboard",
-        p_resource_id: "dash-1",
-        p_new_owner_id: "user-2",
-      },
-    );
+    expect(rpcMock).toHaveBeenCalledWith("rpc_resources__transfer_ownership", {
+      p_resource_type: "dashboard",
+      p_resource_id: "dash-1",
+      p_new_owner_id: "user-2",
+    });
   });
 
   it("returns the moved count from a bulk transfer", async () => {
@@ -2785,6 +2793,7 @@ git commit -m "feat(clients): add PrivateResourceAdminClient"
 ## Task 12: `PrivateResourcesPanel` and the reassign modal
 
 **Files:**
+
 - Create: `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx`
 - Create: `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx`
 - Create: `src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.test.tsx`
@@ -2868,7 +2877,9 @@ describe("PrivateResourcesPanel", () => {
 
     render(<PrivateResourcesPanel />);
 
-    expect(screen.getByText(/not visible to workspace admins/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/not visible to workspace admins/i),
+    ).toBeInTheDocument();
   });
 
   it("offers no reassign action for a member with nothing private", () => {
@@ -2882,7 +2893,9 @@ describe("PrivateResourcesPanel", () => {
 
     render(<PrivateResourcesPanel />);
 
-    expect(screen.getAllByRole("button", { name: /reassign/i })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: /reassign/i })).toHaveLength(
+      1,
+    );
   });
 });
 ```
@@ -2960,7 +2973,7 @@ export function PrivateResourcesPanel(): React.ReactNode {
         <Table.Td>{row.privateDashboardCount}</Table.Td>
         <Table.Td>{row.privateDatasetCount}</Table.Td>
         <Table.Td>
-          {hasAnything ?
+          {hasAnything ? (
             <Button
               size="compact-sm"
               variant="subtle"
@@ -2970,7 +2983,7 @@ export function PrivateResourcesPanel(): React.ReactNode {
             >
               <Trans>Reassign</Trans>
             </Button>
-          : null}
+          ) : null}
         </Table.Td>
       </Table.Tr>
     );
@@ -3009,14 +3022,14 @@ export function PrivateResourcesPanel(): React.ReactNode {
         <Table.Tbody>{rows}</Table.Tbody>
       </Table>
 
-      {reassignUserId ?
+      {reassignUserId ? (
         <ReassignOwnerModal
           fromUserId={reassignUserId}
           onClose={() => {
             setReassignUserId(undefined);
           }}
         />
-      : null}
+      ) : null}
     </Stack>
   );
 }
@@ -3150,17 +3163,17 @@ import { PrivateResourcesPanel } from "./PrivateResourcesPanel/PrivateResourcesP
 Add inside `<Tabs.List>`, after the `clarifications` tab:
 
 ```tsx
-        <Tabs.Tab value="private-resources">
-          <Trans>Private resources</Trans>
-        </Tabs.Tab>
+<Tabs.Tab value="private-resources">
+  <Trans>Private resources</Trans>
+</Tabs.Tab>
 ```
 
 And after the `clarifications` panel:
 
 ```tsx
-      <Tabs.Panel value="private-resources" pt="md">
-        <PrivateResourcesPanel />
-      </Tabs.Panel>
+<Tabs.Panel value="private-resources" pt="md">
+  <PrivateResourcesPanel />
+</Tabs.Panel>
 ```
 
 - [ ] **Step 6: Run the tests and type-check**
@@ -3192,6 +3205,7 @@ Offboarding starts on the Members tab, so that is where an admin meets the
 deadlock. Point them at the fix instead of showing a raw database error.
 
 **Files:**
+
 - Modify: `src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx`
 
 - [ ] **Step 1: Load the counts in the tab**
@@ -3206,20 +3220,17 @@ import { IconLock } from "@tabler/icons-react";
 Add after the existing `roleGroups` query (around line 53):
 
 ```tsx
-  const [privateCounts = []] =
-    PrivateResourceAdminClient.useGetPrivateResourceCounts({
-      workspaceId: workspace.id,
-    });
+const [privateCounts = []] =
+  PrivateResourceAdminClient.useGetPrivateResourceCounts({
+    workspaceId: workspace.id,
+  });
 
-  const privateResourceTotalByUserId = useMemo((): Record<string, number> => {
-    const entries = privateCounts.map((row): [string, number] => {
-      return [
-        row.userId,
-        row.privateDashboardCount + row.privateDatasetCount,
-      ];
-    });
-    return Object.fromEntries(entries);
-  }, [privateCounts]);
+const privateResourceTotalByUserId = useMemo((): Record<string, number> => {
+  const entries = privateCounts.map((row): [string, number] => {
+    return [row.userId, row.privateDashboardCount + row.privateDatasetCount];
+  });
+  return Object.fromEntries(entries);
+}, [privateCounts]);
 ```
 
 Add `useMemo` to the existing `react` import if it is not already there.
@@ -3333,9 +3344,10 @@ git commit -m "feat(settings): explain blocked member removal and link to reassi
 
 Spec §7.3. The pgTAP tests prove the predicate and the policies; this proves the
 whole stack, including that no client-side list or route leaks a private
-resource. Worth its cost because it is *the* guarantee of the phase.
+resource. Worth its cost because it is _the_ guarantee of the phase.
 
 **Files:**
+
 - Create: `tests/e2e/private-resource-admin-cannot-read.spec.ts`
 - Reference: `tests/e2e/helpers/seedDashboard.ts`, `tests/e2e/helpers/createDashboardWithDataVizBlock.ts`
 
@@ -3350,7 +3362,7 @@ Reuse the established auth and seeding fixtures. Do not invent a new
 multi-user harness; find how existing specs obtain a second authenticated user
 and follow it. If no such helper exists, seed the second member and their
 dashboard through admin or Postgres writes, which is the sanctioned use of
-direct-DB setup for pre-UI state, and drive every *assertion* through the UI.
+direct-DB setup for pre-UI state, and drive every _assertion_ through the UI.
 
 - [ ] **Step 2: Write the spec**
 
@@ -3394,7 +3406,9 @@ test.describe("private resources are hidden from workspace admins", () => {
     await page.goto(`/${workspaceSlug}/settings/privacy`);
     await page.getByRole("tab", { name: "Private resources" }).click();
 
-    const memberRow = page.getByRole("row", { name: new RegExp(memberDisplayName) });
+    const memberRow = page.getByRole("row", {
+      name: new RegExp(memberDisplayName),
+    });
     await expect(memberRow).toContainText("1");
     await expect(
       page.getByText(/never visible to workspace admins/i),
@@ -3442,6 +3456,7 @@ The canonical permissions reference. It is currently wrong in one place
 independently of this change, and this change makes it wrong in three more.
 
 **Files:**
+
 - Modify: `docs/permissions-architecture.md`
 
 - [ ] **Step 1: Fix the pre-existing divergence in §4**
@@ -3534,6 +3549,7 @@ git commit -m "docs: record private-resource semantics in permissions architectu
 ## Task 15: Extract i18n messages and run full verification
 
 **Files:**
+
 - Modify: `src/i18n/locales/*/messages.po`
 
 - [ ] **Step 1: Extract new messages**
@@ -3585,6 +3601,7 @@ Spec §6.2 makes this a hard requirement, not a nicety: the change is retroactiv
 and will look like data loss.
 
 **Files:**
+
 - Create: `docs/release-notes/2026-08-13-private-resource-hardening.md`
 
 - [ ] **Step 1: Check where release notes live**

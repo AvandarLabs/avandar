@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import { uuid } from "$/lib/uuid.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import {
@@ -8,7 +10,6 @@ import {
 import {
   QueryColumn, // prettier-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import { describe, expect, it } from "vitest";
 
 /** An exact layer whose points are aggregated into fixed hexagonal cells. */
 function _makeGridBinLayer(): MapLayer.T {

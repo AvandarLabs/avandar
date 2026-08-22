@@ -1,9 +1,11 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
 /**
  * Intersection of a saved map clock window with a queried extent.
  */
 import { describe, expect, it } from "vitest";
+
 import { clampTimeRangeToExtent } from "./clampTimeRangeToExtent";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 const JANUARY: AvaMapConfig.TimeRange = {
   start: "2026-01-01T00:00:00.000Z",

@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { pairByProximity } from "./pairByProximity";
 import type { AssembledLabel, TextItem } from "../pdfSniff.types";
+
+import { describe, expect, it } from "vitest";
+
+import { pairByProximity } from "./pairByProximity";
 
 function label(text: string, cx: number, cy: number): AssembledLabel {
   return {

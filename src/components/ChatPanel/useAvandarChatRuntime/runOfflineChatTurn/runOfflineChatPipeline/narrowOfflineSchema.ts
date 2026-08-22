@@ -1,5 +1,6 @@
-import { propEq } from "@avandar/utils";
 import type { OfflineChatSchema } from "$/types/offlineChat.types";
+
+import { propEq } from "@avandar/utils";
 
 /**
  * Restricts schema sent to the SQL pass so the model sees one dataset.

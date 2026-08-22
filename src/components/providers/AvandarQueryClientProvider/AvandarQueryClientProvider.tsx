@@ -1,11 +1,13 @@
+import type { User } from "$/models/User/User";
+import type { ReactNode } from "react";
+
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+
 import {
   makeCacheBuster,
   queryPersister,
 } from "@/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import type { User } from "$/models/User/User";
-import type { ReactNode } from "react";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

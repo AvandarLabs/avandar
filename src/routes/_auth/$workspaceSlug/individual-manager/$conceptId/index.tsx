@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Center } from "@mantine/core";
 import {
@@ -5,11 +7,11 @@ import {
   getRouteApi,
   useNavigate,
 } from "@tanstack/react-router";
+
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { IndividualSelectionEmptyState } from "@/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState";
 import { useConceptIndividuals } from "@/views/IndividualManagerApp/useConceptIndividuals";
-import type { ReactNode } from "react";
 
 const conceptRoute = getRouteApi(
   "/_auth/$workspaceSlug/individual-manager/$conceptId",

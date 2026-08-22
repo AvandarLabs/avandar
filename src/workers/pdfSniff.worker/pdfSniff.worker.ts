@@ -1,3 +1,14 @@
+import type { RegionClassification } from "../pdfSniff/classifyRegion/classifyRegion";
+import type { CombinedTable } from "../pdfSniff/combineRegions/combineRegions";
+import type {
+  DocumentMetadata,
+  ExtractedTable,
+  PageGeometry,
+  PdfRegion,
+  PdfRegionShape,
+  RegionGeometry,
+} from "../pdfSniff/pdfSniff.types";
+
 /**
  * Worker that reads a PDF's page geometry, and extracts the regions a user
  * has selected, without blocking the main thread.
@@ -16,6 +27,7 @@
  * then reading it is real work.
  */
 import { match } from "ts-pattern";
+
 import { classifyRegion } from "../pdfSniff/classifyRegion/classifyRegion";
 import { clipToRegion } from "../pdfSniff/clipToRegion/clipToRegion";
 import { combineRegions } from "../pdfSniff/combineRegions/combineRegions";
@@ -28,16 +40,6 @@ import { extractRepeatingBlocks } from "../pdfSniff/extractors/extractRepeatingB
 import { extractPageGeometry } from "../pdfSniff/extractPageGeometry/extractPageGeometry";
 import { loadPdfDocument } from "../pdfSniff/loadPdfDocument/loadPdfDocument";
 import { resolveOutputMode } from "../pdfSniff/resolveOutputMode/resolveOutputMode";
-import type { RegionClassification } from "../pdfSniff/classifyRegion/classifyRegion";
-import type { CombinedTable } from "../pdfSniff/combineRegions/combineRegions";
-import type {
-  DocumentMetadata,
-  ExtractedTable,
-  PageGeometry,
-  PdfRegion,
-  PdfRegionShape,
-  RegionGeometry,
-} from "../pdfSniff/pdfSniff.types";
 
 /**
  * Hard cap on pages read when the user has not chosen a range. Beyond this we
@@ -340,9 +342,8 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
     // user is looking at.
     const { info } = await doc.getMetadata();
     const firstReadPage = pages[0];
-    const documentMetadata =
-      firstReadPage ?
-        extractDocumentMetadata({
+    const documentMetadata = firstReadPage
+      ? extractDocumentMetadata({
           page: firstReadPage,
           info: (info ?? {}) as Record<string, unknown>,
         })
@@ -360,9 +361,8 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
     _post({
       type: "error",
       reason: isPasswordError ? "password_required" : "unknown",
-      message:
-        isPasswordError ?
-          "This PDF is password protected. Enter its password to continue."
+      message: isPasswordError
+        ? "This PDF is password protected. Enter its password to continue."
         : message,
     });
   } finally {

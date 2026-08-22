@@ -1,11 +1,13 @@
-import { propEq } from "@avandar/utils";
-import { Trans } from "@lingui/react/macro";
-import { Group, Stack, Text } from "@mantine/core";
-import { AddRowFilterMenu } from "@/views/DashboardApp/DashboardShareModal/AddRowFilterMenu";
-import { PublishSliceRowFilter } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { FilterableColumn } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
+
+import { propEq } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
+import { Group, Stack, Text } from "@mantine/core";
+
+import { AddRowFilterMenu } from "@/views/DashboardApp/DashboardShareModal/AddRowFilterMenu";
+import { PublishSliceRowFilter } from "@/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter";
 
 type Props = {
   filterableColumns: readonly FilterableColumn[];
@@ -32,14 +34,15 @@ export function RowFilterEditor({
           }}
         />
       </Group>
-      {rowFilters.length === 0 ?
+      {rowFilters.length === 0 ? (
         <Text size="xs" c="dimmed">
           <Trans>
             No row filters. The slice will include every row in the dataset (for
             the selected columns).
           </Trans>
         </Text>
-      : <Stack gap="xs">
+      ) : (
+        <Stack gap="xs">
           {rowFilters.map((rowFilter, rowFilterIndex) => {
             return (
               <PublishSliceRowFilter
@@ -67,7 +70,7 @@ export function RowFilterEditor({
             );
           })}
         </Stack>
-      }
+      )}
     </Stack>
   );
 }

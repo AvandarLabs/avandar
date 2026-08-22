@@ -1,7 +1,9 @@
-import { render } from "@react-email/render";
-import { ResendClient } from "$/EmailClient/ResendClient.ts";
-import { SendBroadcastResponseSuccess } from "resend";
 import type { ReactNode } from "react";
+
+import { render } from "@react-email/render";
+import { SendBroadcastResponseSuccess } from "resend";
+
+import { ResendClient } from "$/EmailClient/ResendClient.ts";
 
 export type SendBroadcastEmailOptions = {
   subject: string;
@@ -35,8 +37,9 @@ export async function sendBroadcastEmail({
     await ResendClient.createBroadcast({
       audienceId,
       from: `${from.name} <${from.email}>`,
-      name:
-        broadcastNamePrefix ? `${broadcastNamePrefix} - ${subject}` : subject,
+      name: broadcastNamePrefix
+        ? `${broadcastNamePrefix} - ${subject}`
+        : subject,
       subject,
       topicId,
       replyTo,

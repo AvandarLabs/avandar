@@ -18,8 +18,8 @@ rejected during selection.
 > Espinola-Sánchez, M., Campaña-Acuña, A., Urrunaga-Pastor, D., Maguiña, J. L.,
 > Jumpa, M., & Ugarte-Ubillus, O. (2025). Impact of Comprehensive Health
 > Insurance affiliation on mortality in children under one year: an analysis of
-> the Demographic and Health Survey 2010–2022 in Peru. *Frontiers in Public
-> Health*, 12, 1405244. https://doi.org/10.3389/fpubh.2024.1405244
+> the Demographic and Health Survey 2010–2022 in Peru. _Frontiers in Public
+> Health_, 12, 1405244. https://doi.org/10.3389/fpubh.2024.1405244
 >
 > © 2025 the authors. Licensed under CC BY.
 
@@ -44,7 +44,7 @@ What it covers:
 
 > Douglas, B. D., Ewell, P. J., & Brauer, M. (2023). Data quality in online
 > human-subjects research: Comparisons between MTurk, Prolific, CloudResearch,
-> Qualtrics, and SONA. *PLOS ONE*, 18(3), e0279720.
+> Qualtrics, and SONA. _PLOS ONE_, 18(3), e0279720.
 > https://doi.org/10.1371/journal.pone.0279720
 >
 > © 2023 Douglas et al. Licensed under CC BY.
@@ -64,7 +64,7 @@ What it covers:
 > Labrique, A., Nagarajan, M., Kibria, G. M. A., Vecino-Ortiz, A., Pariyo,
 > G. W., Ali, J., & Gibson, D. (2023). Improving success of non-communicable
 > diseases mobile phone surveys: Results of two randomized trials testing
-> interviewer gender and message valence in Bangladesh and Uganda. *PLOS ONE*,
+> interviewer gender and message valence in Bangladesh and Uganda. _PLOS ONE_,
 > 18(5), e0285155. https://doi.org/10.1371/journal.pone.0285155
 >
 > © 2023 Labrique et al. Licensed under CC BY.
@@ -92,6 +92,7 @@ What it covers:
   the densest and is what `extractPageGeometry.test.ts` reads. A test that
   points at an early page will pass its parse and find nothing to warn about,
   which looks identical to the detector being broken.
+
 - **Dashes as nulls.** Empty cells contain `-` rather than being empty.
 - **Shading as the only cell delimiter.** Table 4 uses shaded cells to mark
   significance (`Shaded cells = p<0.05`) with no ruling lines, so shading

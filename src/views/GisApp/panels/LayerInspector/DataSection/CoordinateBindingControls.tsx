@@ -1,11 +1,13 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
+
 import { CoordinateBindingStatus } from "@/views/GisApp/panels/LayerInspector/DataSection/CoordinateBindingStatus";
 import { CoordinateColumnSelects } from "@/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects";
 import { useCoordinateBindingGuess } from "@/views/GisApp/panels/LayerInspector/DataSection/useCoordinateBindingGuess";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
@@ -14,9 +16,8 @@ export function CoordinateBindingControls({
   layer,
   onLayerChange,
 }: Props): ReactNode {
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(dataSourceId);
   const guess = useCoordinateBindingGuess({

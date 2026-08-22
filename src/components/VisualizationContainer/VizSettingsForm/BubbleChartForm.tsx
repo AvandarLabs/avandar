@@ -1,12 +1,14 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
+import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
+import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
+
 import { Stack } from "@mantine/core";
+
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { BubbleSeriesFieldset } from "@/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset";
 import { ChartSettingsFieldsets } from "@/components/VisualizationContainer/VizSettingsForm/ChartSettingsFieldsets";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
-import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];

@@ -1,8 +1,10 @@
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
+
 import { createModule } from "@avandar/modules";
 import { createClient } from "@supabase/supabase-js";
+
 import { getSupabaseApiKey } from "$/env/getSupabaseApiKey.ts";
 import { getSupabaseApiUrl } from "$/env/getSupabaseApiUrl.ts";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
 
 let cachedClient: AvaSupabaseDBClient | undefined;
 

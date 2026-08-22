@@ -1,5 +1,10 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { renderHook, waitFor } from "@/test-utils";
 import {
   clearDatasetRowCountCache,
@@ -10,9 +15,6 @@ import {
   LARGE_DATASET_ROW_THRESHOLD,
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 const workspaceId = "workspace_test" as Workspace.Id;
 const datasetId = "dataset_large" as DatasetId;

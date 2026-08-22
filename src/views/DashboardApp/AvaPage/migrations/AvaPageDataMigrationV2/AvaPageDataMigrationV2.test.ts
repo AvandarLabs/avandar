@@ -1,12 +1,14 @@
-import { propEq } from "@avandar/utils";
-import { beforeAll, describe, expect, it } from "vitest";
-import { AvaPageDataMigrationV2 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2";
-import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
-import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import type {
   V1_AvaPageData,
   V2_AvaPageData,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2.types";
+
+import { propEq } from "@avandar/utils";
+import { beforeAll, describe, expect, it } from "vitest";
+
+import { AvaPageDataMigrationV2 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2";
+import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
+import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 
 const TEST_PROMPT = "Find all covid data";
 const TEST_SQL = "SELECT * FROM some_covid_table;";

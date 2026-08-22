@@ -197,8 +197,8 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 
 ### Individual Manager (dataset-backed fields)
 
-| File / area                                                  | Why                                                              |
-| ------------------------------------------------------------ | ---------------------------------------------------------------- |
+| File / area                                                     | Why                                                              |
+| --------------------------------------------------------------- | ---------------------------------------------------------------- |
 | `src/views/IndividualManagerApp/SingleIndividualView/index.tsx` | `SourceBadge` for provenance — badge list must support new type. |
 
 ### Tests & fixtures

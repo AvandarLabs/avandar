@@ -1,7 +1,8 @@
-import { Trans } from "@lingui/react/macro";
-import { Button, Group } from "@mantine/core";
 import type { MouseEvent, ReactNode } from "react";
 import type { TooltipRenderProps } from "react-joyride";
+
+import { Trans } from "@lingui/react/macro";
+import { Button, Group } from "@mantine/core";
 
 type Props = {
   backProps: TooltipRenderProps["backProps"];
@@ -47,18 +48,16 @@ export function NuxTooltipFooter({
         <Trans>Close</Trans>
       </Button>
       <Group gap="xs" wrap="nowrap">
-        {hasBack ?
+        {hasBack ? (
           <Button {...backProps} variant="default" size="xs">
             <Trans>Back</Trans>
           </Button>
-        : null}
-        {hasNext ?
+        ) : null}
+        {hasNext ? (
           <Button {...primaryProps} size="xs">
-            {isLastStep ?
-              <Trans>Done</Trans>
-            : <Trans>Next</Trans>}
+            {isLastStep ? <Trans>Done</Trans> : <Trans>Next</Trans>}
           </Button>
-        : null}
+        ) : null}
       </Group>
     </Group>
   );

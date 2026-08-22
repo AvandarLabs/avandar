@@ -1,8 +1,9 @@
+import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, NumberInput, Stack, Text } from "@mantine/core";
 import { useState } from "react";
-import type { AxisTick } from "@/workers/pdfSniff/calibrateAxis/calibrateAxis";
-import type { ReactNode } from "react";
 
 type PdfPoint = { x: number; y: number };
 
@@ -60,22 +61,22 @@ export function PdfAxisCalibration({
 
   return (
     <Stack gap={4} onClick={stopCardSelect} onKeyDown={stopCardSelect}>
-      {!isPicking ?
+      {!isPicking ? (
         <Button size="xs" variant="light" onClick={onStart}>
           <Trans>Calibrate manually</Trans>
         </Button>
-      : null}
-      {isPicking && points.length === 0 ?
+      ) : null}
+      {isPicking && points.length === 0 ? (
         <Text size="xs" c="dimmed">
           {t`Click a labelled tick on the y-axis.`}
         </Text>
-      : null}
-      {isPicking && points.length === 1 ?
+      ) : null}
+      {isPicking && points.length === 1 ? (
         <Text size="xs" c="dimmed">
           {t`Click a second labelled tick on the y-axis.`}
         </Text>
-      : null}
-      {isPicking && points.length >= 2 ?
+      ) : null}
+      {isPicking && points.length >= 2 ? (
         <>
           <NumberInput
             size="xs"
@@ -101,12 +102,12 @@ export function PdfAxisCalibration({
             <Trans>Apply calibration</Trans>
           </Button>
         </>
-      : null}
-      {isPicking ?
+      ) : null}
+      {isPicking ? (
         <Button size="xs" variant="subtle" onClick={onCancel}>
           <Trans>Cancel</Trans>
         </Button>
-      : null}
+      ) : null}
     </Stack>
   );
 }

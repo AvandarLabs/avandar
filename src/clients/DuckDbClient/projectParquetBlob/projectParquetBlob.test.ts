@@ -1,9 +1,11 @@
 /** Pins projection SQL: selected columns, no DISTINCT, parquet return. */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 const registerParquetFileMock = vi.hoisted(() => {
   return vi.fn();

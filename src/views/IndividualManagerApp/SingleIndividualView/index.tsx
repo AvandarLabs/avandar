@@ -1,3 +1,10 @@
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { Individual } from "$/models/ontology/Individual/Individual";
+import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
+
 import { Paper } from "@avandar/ui";
 import {
   isNonNullish,
@@ -11,17 +18,12 @@ import {
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Loader, Stack, Title } from "@mantine/core";
 import { useMemo } from "react";
+
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ActivityBlock } from "@/views/IndividualManagerApp/SingleIndividualView/ActivityBlock";
 import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
-import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type { Individual } from "$/models/ontology/Individual/Individual";
 
 type HydratedIndividual = Individual.T & {
   identifierAttribute?: ConceptAttribute.T;
@@ -99,9 +101,8 @@ function useHydratedIndividual({
         keyFn: prop("conceptAttributeId"),
         valueFn: (assertion) => {
           const config = attributesById?.get(assertion.conceptAttributeId);
-          const dataset =
-            assertion.datasetId ?
-              datasetsMap?.get(assertion.datasetId)
+          const dataset = assertion.datasetId
+            ? datasetsMap?.get(assertion.datasetId)
             : undefined;
           return {
             ...assertion,
@@ -116,9 +117,8 @@ function useHydratedIndividual({
 
       assertionsInfo = {
         assertions: [...assertionsByAttributeId.values()],
-        labelValue:
-          labelAttributeId ?
-            assertionsByAttributeId.get(labelAttributeId)
+        labelValue: labelAttributeId
+          ? assertionsByAttributeId.get(labelAttributeId)
           : undefined,
       };
     }
@@ -170,18 +170,22 @@ export function SingleIndividualView({
     <Container py="md">
       <Stack gap="lg" maw={720}>
         <Title order={2} fw={650}>
-          {isLoadingHydratedIndividual ?
+          {isLoadingHydratedIndividual ? (
             <Loader size="sm" />
-          : unknownToString(hydratedIndividual.name)}
+          ) : (
+            unknownToString(hydratedIndividual.name)
+          )}
         </Title>
         <Paper p="lg">
           <Stack gap="lg">
             <Title order={4}>
               <Trans>Details</Trans>
             </Title>
-            {attributeRows === undefined ?
+            {attributeRows === undefined ? (
               <Loader />
-            : <RecordAttributesList attributes={attributeRows} />}
+            ) : (
+              <RecordAttributesList attributes={attributeRows} />
+            )}
           </Stack>
         </Paper>
         <Paper p="lg">

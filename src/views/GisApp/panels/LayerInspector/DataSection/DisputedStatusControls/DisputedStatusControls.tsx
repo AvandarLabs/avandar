@@ -1,5 +1,11 @@
+import type { ColumnOption } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnOption.types";
+import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
+
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -7,10 +13,6 @@ import { DisputedColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataS
 import { DisputedStatusValueFields } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
-import type { ColumnOption } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnOption.types";
-import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -54,12 +56,10 @@ function _boundaryColumnOptions(
 ): ColumnOption[] {
   const binding = layer.geoBinding;
   const datasetId =
-    (
-      binding?.type === "joinToBoundaries" ||
-      binding?.type === "aggregatePointsToBoundaries"
-    ) ?
-      binding.boundary.datasetId
-    : undefined;
+    binding?.type === "joinToBoundaries" ||
+    binding?.type === "aggregatePointsToBoundaries"
+      ? binding.boundary.datasetId
+      : undefined;
   // `datasetId` is optional, so this stays a lambda: `propEq` requires a
   // defined comparison value and would need a cast to accept `undefined`.
   const selected = boundaryOptions.find((option) => {
@@ -101,9 +101,8 @@ export function DisputedStatusControls({
   onLayerChange,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const sourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const sourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(sourceId);
   const boundarySources = useBoundarySourceOptions(
@@ -114,18 +113,16 @@ export function DisputedStatusControls({
   }
 
   const options =
-    layer.geoBinding?.type === "geometryColumn" ?
-      _queryColumnOptions(sourceColumns)
-    : _boundaryColumnOptions(layer, boundarySources.options);
+    layer.geoBinding?.type === "geometryColumn"
+      ? _queryColumnOptions(sourceColumns)
+      : _boundaryColumnOptions(layer, boundarySources.options);
   const description =
-    layer.disputedStatusColumn === undefined ?
-      t`No disputed-status column. Outlines render as settled.`
-    : (
-      layer.disputedStatusValues.disputed.length === 0 &&
-      layer.disputedStatusValues.undetermined.length === 0
-    ) ?
-      t`Column bound. No values assigned; outlines render as settled.`
-    : undefined;
+    layer.disputedStatusColumn === undefined
+      ? t`No disputed-status column. Outlines render as settled.`
+      : layer.disputedStatusValues.disputed.length === 0 &&
+          layer.disputedStatusValues.undetermined.length === 0
+        ? t`Column bound. No values assigned; outlines render as settled.`
+        : undefined;
 
   return (
     <>

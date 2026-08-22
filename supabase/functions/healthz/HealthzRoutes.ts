@@ -1,5 +1,6 @@
-import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import type { HealthzAPI } from "@sbfn/healthz/HealthzRoutes.types.ts";
+
+import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 
 /**
  * This is the route handler for all healthz endpoints.

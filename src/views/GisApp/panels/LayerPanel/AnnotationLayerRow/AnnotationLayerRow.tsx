@@ -1,8 +1,10 @@
+import type { KeyboardEvent, ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { IconPencil } from "@tabler/icons-react";
+
 import css from "@/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.module.css";
 import { LayerVisibilityButton } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton";
-import type { KeyboardEvent, ReactNode } from "react";
 
 type Props = {
   isVisible: boolean;

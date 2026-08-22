@@ -3,6 +3,7 @@
  * each type and reports the picked type back as a `VizType`.
  */
 import { describe, expect, it, vi } from "vitest";
+
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { VizTypeSelect } from "@/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect";
 import { render, screen } from "@/test-utils";

@@ -6,6 +6,7 @@
  * drawer split between them, so 900 below stands for that combined region.
  */
 import { describe, expect, it } from "vitest";
+
 import { DrawerHeight } from "@/components/CanvasDrawer/DrawerHeight/DrawerHeight";
 
 describe("DrawerHeight.clamp", () => {

@@ -1,6 +1,7 @@
-import { isPlainObject } from "@avandar/utils";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+
+import { isPlainObject } from "@avandar/utils";
 
 /**
  * Maps the AST's aggregation function name onto our QueryAggregationType.
@@ -199,12 +200,10 @@ export function isEmptyStringLiteral(node: unknown): boolean {
 
 /** The boolean a `bool` literal node carries, if it is one. */
 export function getBoolFromAstNode(node: unknown): boolean | undefined {
-  return (
-      isPlainObject(node) &&
-        node.type === "bool" &&
-        typeof node.value === "boolean"
-    ) ?
-      node.value
+  return isPlainObject(node) &&
+    node.type === "bool" &&
+    typeof node.value === "boolean"
+    ? node.value
     : undefined;
 }
 

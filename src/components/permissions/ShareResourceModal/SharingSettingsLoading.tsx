@@ -1,6 +1,7 @@
+import type { ReactNode } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
-import type { ReactNode } from "react";
 
 /**
  * What the share modal shows while it is still finding out who can reach the

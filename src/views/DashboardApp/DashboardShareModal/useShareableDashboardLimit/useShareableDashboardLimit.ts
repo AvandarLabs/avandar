@@ -1,12 +1,13 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ResourceSharingState } from "@/clients/permissions/ResourceShareClient";
+
 import { countShareableDashboards } from "$/models/Dashboard/Dashboard";
 import { Subscription } from "$/models/Subscription/Subscription";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { ResourceSharingState } from "@/clients/permissions/ResourceShareClient";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * The plan's verdict on making one more dashboard shareable, plus the numbers
@@ -127,9 +128,8 @@ export function useShareableDashboardLimit(
       !sharingStateQuery.isFetching &&
       wouldConsumeAllowance &&
       permission?.allowed === false,
-    maxAllowed:
-      subscription ?
-        Subscription.getEffectiveEntitlementLimits(subscription)
+    maxAllowed: subscription
+      ? Subscription.getEffectiveEntitlementLimits(subscription)
           .maxShareableDashboardsAllowed
       : undefined,
     subscription,

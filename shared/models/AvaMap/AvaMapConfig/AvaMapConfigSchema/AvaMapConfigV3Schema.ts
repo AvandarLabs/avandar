@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { uuidType } from "$/lib/zodHelpers.ts";
 import {
   AggregateOnlySensitivitySchema,
@@ -21,7 +23,6 @@ import {
   PointGeometryBindingSchema,
   ProportionalSymbolSchema,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV2Schema.ts";
-import { z } from "zod";
 
 const V3GeometryColumnBindingSchema = GeometryColumnBindingSchema.extend({
   sourceCrs: z.number().int().positive().optional(),

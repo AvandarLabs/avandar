@@ -1,7 +1,9 @@
-import { isNonNullish, propEq } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+
+import { isNonNullish, propEq } from "@avandar/utils";
+
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
  * Resolves the column names carried in the URL back to real query columns.

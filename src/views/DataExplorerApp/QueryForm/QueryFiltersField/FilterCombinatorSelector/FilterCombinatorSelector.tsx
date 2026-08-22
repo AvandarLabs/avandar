@@ -1,10 +1,13 @@
+import type { ReactNode } from "react";
+import type { CombinatorSelectorProps } from "react-querybuilder";
+
 import { isPlainObject } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
+
 import { getOptionNameFromUnknown } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
+
 import classes from "./FilterCombinatorSelector.module.css";
-import type { ReactNode } from "react";
-import type { CombinatorSelectorProps } from "react-querybuilder";
 
 type Props = CombinatorSelectorProps;
 
@@ -25,9 +28,9 @@ export function FilterCombinatorSelector({
       data={options.map((option) => {
         const name = getOptionNameFromUnknown(option);
         const label =
-          isPlainObject(option) && "label" in option ?
-            String(option.label)
-          : name;
+          isPlainObject(option) && "label" in option
+            ? String(option.label)
+            : name;
         return { value: name, label };
       })}
       value={String(value ?? "AND")}

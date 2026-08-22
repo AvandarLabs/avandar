@@ -1,11 +1,13 @@
+import type { User } from "$/models/User/User.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { CONFLICT, FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
+
 import { uuidType } from "$/lib/zodHelpers.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
-import type { User } from "$/models/User/User.ts";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 /**
  * Creates a native free subscription for a workspace without involving Polar.

@@ -1,6 +1,7 @@
+import type { ReactNode, RefCallback } from "react";
+
 import css from "@/views/GisApp/shell/MapShell/MapShell.module.css";
 import { SkipLinks } from "@/views/GisApp/shell/SkipLinks/SkipLinks";
-import type { ReactNode, RefCallback } from "react";
 
 type Props = {
   topBar: ReactNode;
@@ -49,9 +50,9 @@ export function MapShellChrome({
           <div className={css.mapShellTopBar} ref={topBarRef}>
             {topBar}
           </div>
-          {firstRunCard ?
+          {firstRunCard ? (
             <div className={css.mapShellFirstRun}>{firstRunCard}</div>
-          : null}
+          ) : null}
           <div className={css.mapShellLeftColumn} ref={leftColumnRef}>
             {layerPanel}
           </div>

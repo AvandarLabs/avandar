@@ -1,7 +1,9 @@
+import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
+
 import { propEq } from "@avandar/utils";
 import Fuse from "fuse.js";
+
 import { OfflineDatasetLabelMatch } from "../OfflineDatasetLabelMatch";
-import type { OfflineChatSchemaDataset } from "$/types/offlineChat.types";
 
 /**
  * Fuse.js score at or below this value is treated as a confident name match.

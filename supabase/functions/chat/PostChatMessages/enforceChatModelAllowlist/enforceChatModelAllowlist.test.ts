@@ -1,6 +1,7 @@
 import { enforceChatModelAllowlist } from "@sbfn/chat/PostChatMessages/enforceChatModelAllowlist/enforceChatModelAllowlist.ts";
-import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 import { describe, expect, it } from "vitest";
+
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption.ts";
 
 describe("enforceChatModelAllowlist", () => {
   it("keeps a model that is in the catalog", () => {

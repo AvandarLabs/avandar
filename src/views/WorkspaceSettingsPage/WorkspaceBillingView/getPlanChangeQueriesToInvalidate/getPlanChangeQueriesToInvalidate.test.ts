@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/getPlanChangeQueriesToInvalidate/getPlanChangeQueriesToInvalidate";

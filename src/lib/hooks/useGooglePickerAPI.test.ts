@@ -1,6 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderHook, waitFor } from "@/test-utils";
 import type { GooglePickerAPI } from "@/lib/types/google-picker";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { renderHook, waitFor } from "@/test-utils";
 
 const GAPI_SCRIPT_SRC = "https://apis.google.com/js/api.js";
 

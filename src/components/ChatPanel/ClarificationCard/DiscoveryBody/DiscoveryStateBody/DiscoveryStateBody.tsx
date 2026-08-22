@@ -1,13 +1,15 @@
-import { match } from "ts-pattern";
-import { DiscoveryUnavailableBody } from "../../DiscoveryUnavailableBody/DiscoveryUnavailableBody";
-import { FixedOptionsBody } from "../../FixedOptionsBody";
-import { DiscoveryLoadingBody } from "../DiscoveryLoadingBody";
-import css from "./DiscoveryStateBody.module.css";
 import type {
   ClarificationAnswerHandler,
   ClarificationSubmitAnswer,
 } from "../../ClarificationAnswerModule/ClarificationAnswer";
 import type { DiscoveryResolution } from "../../useDiscoveryOptions/useDiscoveryOptions";
+
+import { match } from "ts-pattern";
+
+import { DiscoveryUnavailableBody } from "../../DiscoveryUnavailableBody/DiscoveryUnavailableBody";
+import { FixedOptionsBody } from "../../FixedOptionsBody";
+import { DiscoveryLoadingBody } from "../DiscoveryLoadingBody";
+import css from "./DiscoveryStateBody.module.css";
 
 type Props = {
   discoveryState: DiscoveryResolution;

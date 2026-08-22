@@ -1,9 +1,11 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
 import { isDefined } from "@avandar/utils";
+
 import { hasQueryColumn } from "./hasQueryColumn";
 import { withGeometryFamilySymbology } from "./withGeometryFamilySymbology";
 import { withQueryColumn } from "./withQueryColumn";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 type GeometryBindingType = "latLngColumns" | "geometryColumn";
 

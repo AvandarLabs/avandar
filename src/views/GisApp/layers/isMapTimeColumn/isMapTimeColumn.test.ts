@@ -1,13 +1,15 @@
-import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it } from "vitest";
-import { isMapTimeColumn } from "@/views/GisApp/layers/isMapTimeColumn/isMapTimeColumn";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { Workspace } from "$/models/Workspace/Workspace";
+
+import { Model } from "@avandar/models";
+import { describe, expect, it } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { isMapTimeColumn } from "@/views/GisApp/layers/isMapTimeColumn/isMapTimeColumn";
 
 function _column(dataType: AvaDataType.T): QueryColumn.T {
   const now = new Date().toISOString();

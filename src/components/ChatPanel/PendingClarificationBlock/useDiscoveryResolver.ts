@@ -1,8 +1,10 @@
+import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
+
 import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback } from "react";
+
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 /**
  * Creates the callback that turns a discovery query into clarification
@@ -21,8 +23,8 @@ export function useDiscoveryResolver(): DiscoveryResolver {
           .map((row) => {
             const rowKeys = Object.keys(row);
             const value = rowKeys.length > 0 ? row[rowKeys[0]!] : undefined;
-            return value === null || value === undefined ?
-                undefined
+            return value === null || value === undefined
+              ? undefined
               : String(value);
           })
           .filter(isDefined)

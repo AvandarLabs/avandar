@@ -1,7 +1,9 @@
+import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
+
 import { useEffect, useRef, useState } from "react";
+
 import { nextNuxJoyrideTargetEpoch } from "@/components/Nux/NuxTour/nextNuxJoyrideTargetEpoch/nextNuxJoyrideTargetEpoch";
 import { useNuxLaidOutTarget } from "@/components/Nux/NuxTour/useNuxLaidOutTarget/useNuxLaidOutTarget";
-import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
 
 const LAID_OUT_TARGET_SETTLE_MS = 50;
 

@@ -1,6 +1,8 @@
-import { isDefined } from "@avandar/utils";
-import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+
+import { isDefined } from "@avandar/utils";
+
+import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 
 type MakeMainNavbarLinksInput = {
   workspaceSlug: string;

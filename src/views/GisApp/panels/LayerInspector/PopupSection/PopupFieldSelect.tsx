@@ -1,29 +1,30 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { Model } from "@avandar/models";
 import { propIsInArray } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
 /** Selects the fields fetched and displayed for a clicked feature. */
 export function PopupFieldSelect({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(dataSourceId);
   const selectedColumns =
-    layer.popup.columnIds === "all" ?
-      sourceColumns
-    : layer.source.queryColumns.filter(
-        propIsInArray("id", layer.popup.columnIds),
-      );
+    layer.popup.columnIds === "all"
+      ? sourceColumns
+      : layer.source.queryColumns.filter(
+          propIsInArray("id", layer.popup.columnIds),
+        );
   return (
     <QueryColumnMultiSelect
       label={t`Fields`}

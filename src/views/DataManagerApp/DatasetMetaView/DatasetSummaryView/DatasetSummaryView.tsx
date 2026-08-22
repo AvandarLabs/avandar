@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Anchor,
@@ -8,16 +10,17 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
+
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { ColumnSection } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection";
 import { buildShortDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
+
 import css from "./DatasetSummaryView.module.css";
-import type { ReactNode } from "react";
 
 type Props = {
   datasetId: Dataset.Id;
@@ -110,9 +113,8 @@ export function DatasetSummaryView({ datasetId }: Props): ReactNode {
                       width: 3,
                       height: 14,
                       borderRadius: 2,
-                      backgroundColor:
-                        isActive ?
-                          "var(--mantine-color-primary-6)"
+                      backgroundColor: isActive
+                        ? "var(--mantine-color-primary-6)"
                         : "transparent",
                       flexShrink: 0,
                     }}

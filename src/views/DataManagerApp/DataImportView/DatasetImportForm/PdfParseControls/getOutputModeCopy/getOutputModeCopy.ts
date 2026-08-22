@@ -1,9 +1,10 @@
-import { msg } from "@lingui/core/macro";
-import { match } from "ts-pattern";
 import type { GraphicType } from "@/workers/pdfSniff/detectGraphicType/detectGraphicType";
 import type { PdfRegionShape } from "@/workers/pdfSniff/pdfSniff.types";
 import type { PdfOutputModeResolution } from "@/workers/pdfSniff/resolveOutputMode/resolveOutputMode";
 import type { I18n } from "@lingui/core";
+
+import { msg } from "@lingui/core/macro";
+import { match } from "ts-pattern";
 
 export type OutputModeCopy = {
   /** Heading for the group, naming what was detected. */
@@ -61,8 +62,8 @@ function _getGroupLabel(options: {
       return i18n._(msg`Rows from this table`);
     })
     .with("labelled_graphic", () => {
-      return _isChart(graphicKind) ?
-          i18n._(msg`Rows from this chart`)
+      return _isChart(graphicKind)
+        ? i18n._(msg`Rows from this chart`)
         : i18n._(msg`Rows from this graphic`);
     })
     .with("repeating_blocks", () => {
@@ -105,8 +106,8 @@ function _getNormaliseLabel(
   i18n: I18n,
   shape: PdfRegionShape | undefined,
 ): string {
-  return shape === "labelled_graphic" ?
-      i18n._(msg`Readings with source columns`)
+  return shape === "labelled_graphic"
+    ? i18n._(msg`Readings with source columns`)
     : i18n._(msg`One row per number`);
 }
 
@@ -127,9 +128,9 @@ function _getNote(options: {
       msg`${_columnList(regionNames)} print different columns, so there is no shared set of columns to keep and every number goes on its own row. Remove a region, or change what one is read as, to get the choice back.`,
     );
   }
-  return isUserChosen ? "" : (
-      i18n._(msg`Chosen from what we detected. Switch it if that reads wrong.`)
-    );
+  return isUserChosen
+    ? ""
+    : i18n._(msg`Chosen from what we detected. Switch it if that reads wrong.`);
 }
 
 /**
@@ -166,16 +167,16 @@ export function getOutputModeCopy(options: {
     }),
     keepLabel: _getKeepLabel(i18n, shape),
     keepDescription:
-      resolution.keepColumns.length > 0 ?
-        _columnList(resolution.keepColumns)
-      : i18n._(msg`No columns yet`),
+      resolution.keepColumns.length > 0
+        ? _columnList(resolution.keepColumns)
+        : i18n._(msg`No columns yet`),
     normaliseLabel: _getNormaliseLabel(i18n, shape),
     normaliseDescription:
-      remainingCount > 0 ?
-        i18n._(
-          msg`${_columnList(namedColumns)}, and ${remainingCount} more naming the page and the document`,
-        )
-      : _columnList(namedColumns),
+      remainingCount > 0
+        ? i18n._(
+            msg`${_columnList(namedColumns)}, and ${remainingCount} more naming the page and the document`,
+          )
+        : _columnList(namedColumns),
     note: _getNote({
       i18n,
       resolution,

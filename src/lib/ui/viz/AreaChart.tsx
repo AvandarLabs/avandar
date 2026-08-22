@@ -1,3 +1,7 @@
+import type { AreaSeries } from "$/models/vizs/SeriesConfig";
+import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
+import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
+
 /**
  * NOTE: This component uses Recharts directly instead of Mantine's
  * `AreaChart` wrapper. Mantine's wrapper wraps each series' gradient
@@ -29,14 +33,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
 import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
 import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
-import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
-import type { AreaSeries } from "$/models/vizs/SeriesConfig";
 
 const DEFAULT_AREA_COLOR = "var(--mantine-color-blue-6)";
 const DEFAULT_AREA_FILL_OPACITY = 0.6;
@@ -171,10 +173,10 @@ export function AreaChart({
               );
             })}
           </defs>
-          {styleProps.gridProps !== undefined ?
+          {styleProps.gridProps !== undefined ? (
             <CartesianGrid {...styleProps.gridProps} />
-          : null}
-          {styleProps.withXAxis !== false ?
+          ) : null}
+          {styleProps.withXAxis !== false ? (
             <XAxis
               dataKey={xAxisKey}
               padding={X_AXIS_PADDING}
@@ -186,38 +188,38 @@ export function AreaChart({
               minTickGap={5}
               {...styleProps.xAxisProps}
               label={
-                hasXLabel ?
-                  {
-                    value: xLabelText,
-                    position: "insideBottom",
-                    offset: -10,
-                    fill: chartStyle?.xAxis?.labelColor,
-                  }
-                : undefined
+                hasXLabel
+                  ? {
+                      value: xLabelText,
+                      position: "insideBottom",
+                      offset: -10,
+                      fill: chartStyle?.xAxis?.labelColor,
+                    }
+                  : undefined
               }
             />
-          : null}
-          {styleProps.withYAxis !== false ?
+          ) : null}
+          {styleProps.withYAxis !== false ? (
             <YAxis
               tick={{ fontSize: 12, fill: "currentColor" }}
               stroke=""
               tickLine={false}
               {...styleProps.yAxisProps}
               label={
-                hasYLabel ?
-                  {
-                    value: yLabelText,
-                    angle: -90,
-                    position: "insideLeft",
-                    fill: chartStyle?.yAxis?.labelColor,
-                  }
-                : undefined
+                hasYLabel
+                  ? {
+                      value: yLabelText,
+                      angle: -90,
+                      position: "insideLeft",
+                      fill: chartStyle?.yAxis?.labelColor,
+                    }
+                  : undefined
               }
             />
-          : null}
-          {withLegend ?
+          ) : null}
+          {withLegend ? (
             <Legend {...styleProps.legendProps} verticalAlign="top" />
-          : null}
+          ) : null}
           <Tooltip
             labelFormatter={labelFormatter}
             formatter={(value: unknown) => {
@@ -241,13 +243,13 @@ export function AreaChart({
                   fill={`url(#${id})`}
                   stackId={sharedStackId}
                   dot={
-                    showDots ?
-                      {
-                        r: DEFAULT_AREA_DOT_RADIUS,
-                        fill: color,
-                        strokeWidth: 0,
-                      }
-                    : false
+                    showDots
+                      ? {
+                          r: DEFAULT_AREA_DOT_RADIUS,
+                          fill: color,
+                          strokeWidth: 0,
+                        }
+                      : false
                   }
                   activeDot={{
                     r: 5,

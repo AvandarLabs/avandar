@@ -1,7 +1,9 @@
-import { makeDiscoveryCandidateValuesFromModelOutput } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
-import { isReadOnlyDiscoveryQuery } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
-import { match } from "ts-pattern";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
+
+import { makeDiscoveryCandidateValuesFromModelOutput } from "@sbfn/chat/PostChatMessages/parsing/makeDiscoveryCandidateValuesFromModelOutput.ts";
+import { match } from "ts-pattern";
+
+import { isReadOnlyDiscoveryQuery } from "$/utils/privacy/isReadOnlyDiscoveryQuery.ts";
 
 export const MAX_CLARIFICATIONS_PER_QUESTION = 3;
 const CLARIFICATION_MARKER_RE = /^\[Clarification answer:/m;
@@ -59,9 +61,9 @@ export function parseClarify(
 
   const question = parsed.question.trim();
   const rationale =
-    typeof parsed.rationale === "string" ?
-      parsed.rationale.trim() || undefined
-    : undefined;
+    typeof parsed.rationale === "string"
+      ? parsed.rationale.trim() || undefined
+      : undefined;
   const shape = parsed.responseShape;
   if (!shape || typeof shape !== "object") {
     return undefined;
@@ -75,9 +77,9 @@ export function parseClarify(
         rationale,
         responseShape: {
           kind: "free_text",
-          ...(typeof shape.placeholder === "string" ?
-            { placeholder: shape.placeholder.slice(0, 80) }
-          : {}),
+          ...(typeof shape.placeholder === "string"
+            ? { placeholder: shape.placeholder.slice(0, 80) }
+            : {}),
         },
         turnNumber,
       };

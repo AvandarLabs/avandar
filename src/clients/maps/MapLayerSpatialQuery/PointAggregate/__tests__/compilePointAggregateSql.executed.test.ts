@@ -1,3 +1,5 @@
+import type { DuckDBConnection } from "@duckdb/node-api";
+
 /**
  * Row-level tests for {@link compilePointAggregateSql}. Every case runs the
  * emitted SQL against a real in-memory DuckDB and asserts the rows returned.
@@ -8,11 +10,11 @@
  * math, the grouping, and the per-cell sums actually agree.
  */
 import { describe, expect, it } from "vitest";
+
 import { compilePointAggregateSql } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/compilePointAggregateSql";
 import { getPointAggregateCellsAcross } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/getPointAggregateCellsAcross";
 import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { DuckDBConnection } from "@duckdb/node-api";
 
 /**
  * Two tight pairs about 11m apart within each pair, and a third point on

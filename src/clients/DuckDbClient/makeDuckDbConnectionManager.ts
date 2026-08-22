@@ -1,9 +1,11 @@
+import type { DuckDbSpatialAvailabilityStore } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+import type { ILogger } from "@avandar/logger";
+
 import * as duckdb from "@duckdb/duckdb-wasm";
+
 import { buildManualDuckDbBundles } from "@/clients/DuckDbClient/duckDbManualBundles";
 import { shouldLoadDuckDbNetworkExtensions } from "@/clients/DuckDbClient/shouldLoadDuckDbNetworkExtensions";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import type { DuckDbSpatialAvailabilityStore } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
-import type { ILogger } from "@avandar/logger";
 
 /** Lazily starts DuckDB-WASM and tracks the connections handed out. */
 export type DuckDbConnectionManager = {

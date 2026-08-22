@@ -48,13 +48,13 @@ default theme and English copy. Data-layer providers are deliberately not
 included: pass them through as `children` so this package stays presentation
 only.
 
-| Prop | Purpose |
-| ---------------------- | -------------------------------------------------- |
-| `theme` | Mantine theme override |
-| `cssVariablesResolver` | Maps theme values onto CSS variables |
-| `i18nMessages` | Translated strings (see below) |
-| `notificationsProps` | Forwarded to Mantine's `Notifications` |
-| `notificationsStyles` | Merged over AvaUI's notification styles |
+| Prop                   | Purpose                                 |
+| ---------------------- | --------------------------------------- |
+| `theme`                | Mantine theme override                  |
+| `cssVariablesResolver` | Maps theme values onto CSS variables    |
+| `i18nMessages`         | Translated strings (see below)          |
+| `notificationsProps`   | Forwarded to Mantine's `Notifications`  |
+| `notificationsStyles`  | Merged over AvaUI's notification styles |
 
 `notificationsStyles` merges per selector rather than replacing, so restyling
 `notification` keeps the click-through behaviour AvaUI sets on `root`. Mantine's
@@ -62,11 +62,11 @@ callback form works too; its result is merged the same way.
 
 ## Entry points
 
-| Entry                   | Contents                                  |
-| ----------------------- | ----------------------------------------- |
-| `@avandar/ui`           | Components, helpers, and the UI provider  |
-| `@avandar/ui/hooks`     | React hooks, including the form hook      |
-| `@avandar/ui/styles.css`| The extracted stylesheet (import once)    |
+| Entry                    | Contents                                 |
+| ------------------------ | ---------------------------------------- |
+| `@avandar/ui`            | Components, helpers, and the UI provider |
+| `@avandar/ui/hooks`      | React hooks, including the form hook     |
+| `@avandar/ui/styles.css` | The extracted stylesheet (import once)   |
 
 ## Usage
 
@@ -90,7 +90,7 @@ them to `AvaUiProvider`:
 ```tsx
 <AvaUiProvider i18nMessages={{ cancel: t`Cancel`, save: t`Save` }}>
   <App />
-</AvaUiProvider>;
+</AvaUiProvider>
 ```
 
 If your app already owns its Mantine setup and wants nothing from AvaUI but the
@@ -105,13 +105,13 @@ fieldMinLength: ({ fieldName, minLength }) =>
   `${fieldName} doit contenir au moins ${minLength} caractères`;
 ```
 
-| Export                 | Description                                        |
-| ---------------------- | -------------------------------------------------- |
-| `AvaUiProvider`        | Theme, notifications, and `i18nMessages` in one     |
-| `I18nAvaUiProvider`    | Supplies `i18nMessages` alone                       |
-| `useI18nMessages()`    | Reads the active messages (falls back to English)   |
-| `defaultI18nMessages`  | The English defaults                                |
-| `I18nMessages`         | The full message contract                           |
+| Export                | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `AvaUiProvider`       | Theme, notifications, and `i18nMessages` in one   |
+| `I18nAvaUiProvider`   | Supplies `i18nMessages` alone                     |
+| `useI18nMessages()`   | Reads the active messages (falls back to English) |
+| `defaultI18nMessages` | The English defaults                              |
+| `I18nMessages`        | The full message contract                         |
 
 ---
 
@@ -141,11 +141,11 @@ are accepted and overridable.
 Pencil-icon action button for edit flows. Renders as a `<button>` (default) or
 `<a>`.
 
-| Prop          | Default    | Description                                    |
-| ------------- | ---------- | ---------------------------------------------- |
-| `as`          | `"button"` | Render as `"button"` or `"a"`                  |
+| Prop          | Default    | Description                                       |
+| ------------- | ---------- | ------------------------------------------------- |
+| `as`          | `"button"` | Render as `"button"` or `"a"`                     |
 | `name`        | —          | Item name; populates the tooltip as `Edit {name}` |
-| `withTooltip` | `true`     | Show the tooltip                               |
+| `withTooltip` | `true`     | Show the tooltip                                  |
 
 ### `EditableDisplayText`
 
@@ -153,19 +153,19 @@ Inline-editable text. Shows truncated text with a tooltip when overflowing;
 clicking the edit affordance reveals an input or textarea. Controlled
 (`value`, `onChange`) with explicit `onSave` / `onCancel`.
 
-| Prop                 | Description                                         |
-| -------------------- | --------------------------------------------------- |
-| `value`              | Current text (controlled)                           |
-| `onChange`           | Called as the user types in edit mode               |
-| `onSave`             | Called when the user confirms the edit              |
-| `onCancel`           | Called when the user cancels                        |
-| `isSaving`           | Disables saving while a save is in flight           |
-| `disabled`           | Disables the edit affordance                        |
-| `name`               | Item name; populates the edit tooltip               |
-| `emptyDisplayText`   | Placeholder shown when `value` is empty             |
-| `isSaveDisabled`     | Disables the save button                            |
-| `displayTextProps`   | Mantine `TextProps` for the display variant         |
-| `textarea`           | Render as a multi-line textarea                     |
+| Prop               | Description                                 |
+| ------------------ | ------------------------------------------- |
+| `value`            | Current text (controlled)                   |
+| `onChange`         | Called as the user types in edit mode       |
+| `onSave`           | Called when the user confirms the edit      |
+| `onCancel`         | Called when the user cancels                |
+| `isSaving`         | Disables saving while a save is in flight   |
+| `disabled`         | Disables the edit affordance                |
+| `name`             | Item name; populates the edit tooltip       |
+| `emptyDisplayText` | Placeholder shown when `value` is empty     |
+| `isSaveDisabled`   | Disables the save button                    |
+| `displayTextProps` | Mantine `TextProps` for the display variant |
+| `textarea`         | Render as a multi-line textarea             |
 
 ### `ObjectDescriptionList`
 
@@ -179,11 +179,11 @@ leaf values via `ObjectKeyRenderOptionsMap`.
 Mantine `Select` with stricter generics for `value` / `defaultValue` /
 `onChange`, and a typed `data` prop.
 
-| Type                   | Description                                                       |
-| ---------------------- | ----------------------------------------------------------------- |
-| `SelectOption<T>`      | `{ value, label, disabled? }`                                      |
-| `SelectOptionGroup<T>` | `{ group: string, items: ReadonlyArray<T \| SelectOption<T>> }`    |
-| `SelectData<T>`        | `ReadonlyArray<T \| SelectOption<T> \| SelectOptionGroup<T>>`      |
+| Type                   | Description                                                     |
+| ---------------------- | --------------------------------------------------------------- |
+| `SelectOption<T>`      | `{ value, label, disabled? }`                                   |
+| `SelectOptionGroup<T>` | `{ group: string, items: ReadonlyArray<T \| SelectOption<T>> }` |
+| `SelectData<T>`        | `ReadonlyArray<T \| SelectOption<T> \| SelectOptionGroup<T>>`   |
 
 `makeSelectOptions(list, options)` converts a list of objects into
 `SelectOption[]`, picking `value` / `label` by key (`valueKey`, `labelKey`) or

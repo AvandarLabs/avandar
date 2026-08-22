@@ -1,7 +1,9 @@
-import { match } from "ts-pattern";
-import { MapStyles } from "@/views/GisApp/basemap/MapStyles";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { StyleSpecification } from "maplibre-gl";
+
+import { match } from "ts-pattern";
+
+import { MapStyles } from "@/views/GisApp/basemap/MapStyles";
 
 /** Source id for a workspace-supplied tile service. */
 const CUSTOM_BASEMAP_SOURCE_ID = "ava-custom-basemap";

@@ -1,5 +1,6 @@
-import { coerceDatesIn } from "@utils/objects/coerceDatesIn/coerceDatesIn.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
+
+import { coerceDatesIn } from "@utils/objects/coerceDatesIn/coerceDatesIn.ts";
 
 /**
  * Returns a function that coerces the specified keys into dates.
@@ -13,11 +14,11 @@ import type { UnknownObject } from "@utils/types/common.types.ts";
 export function coerceDatesInProps<T extends UnknownObject, K extends keyof T>(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      Date | undefined
-    : Date
-  : T[Key];
+  [Key in keyof T]: Key extends K
+    ? undefined extends T[Key]
+      ? Date | undefined
+      : Date
+    : T[Key];
 } {
   return (obj: T) => {
     return coerceDatesIn(obj, keys);

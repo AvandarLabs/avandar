@@ -1,3 +1,14 @@
+import type {
+  BulkInsertParams,
+  DexieCrudOperationContext,
+  DexieKey,
+  InsertParams,
+} from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
+import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
+import type { ILogger } from "@avandar/logger";
+import type { UpdateSpec } from "dexie";
+
 import {
   addAndGet,
   getRequiredRow,
@@ -13,16 +24,6 @@ import {
   upsertRowsByPrimaryKey,
 } from "@/clients/dexie/createDexieCrudClient/dexieCrudUpsertOperations";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
-import type {
-  BulkInsertParams,
-  DexieCrudOperationContext,
-  DexieKey,
-  InsertParams,
-} from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient.types";
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
-import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
-import type { ILogger } from "@avandar/logger";
-import type { UpdateSpec } from "dexie";
 
 function _createInsertOperation<
   M extends DexieCrudModelSpec,
@@ -48,10 +49,11 @@ function _createInsertOperation<
       columnNames,
       ignoreDuplicates: onConflict?.ignoreDuplicates ?? false,
     };
-    return (
-        isPrimaryKeyConflictColumns(columnNames, context.table.schema.primKey)
-      ) ?
-        upsertRowByPrimaryKey(upsertOptions)
+    return isPrimaryKeyConflictColumns(
+      columnNames,
+      context.table.schema.primKey,
+    )
+      ? upsertRowByPrimaryKey(upsertOptions)
       : upsertRowByIndexedConflict(upsertOptions);
   };
 }
@@ -82,10 +84,11 @@ function _createBulkInsertOperation<
       columnNames,
       ignoreDuplicates: onConflict?.ignoreDuplicates ?? false,
     };
-    return (
-        isPrimaryKeyConflictColumns(columnNames, context.table.schema.primKey)
-      ) ?
-        upsertRowsByPrimaryKey(upsertOptions)
+    return isPrimaryKeyConflictColumns(
+      columnNames,
+      context.table.schema.primKey,
+    )
+      ? upsertRowsByPrimaryKey(upsertOptions)
       : upsertRowsByIndexedConflict(upsertOptions);
   };
 }

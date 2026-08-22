@@ -1,16 +1,3 @@
-import { CSV_SNIFF_SAMPLE_SIZE } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
-import { mergeSniffCsvRowIntoParseOptions } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
-import { applyQuoteProbeToParseOptions } from "@/clients/DuckDbClient/csvParse/csvQuoteProbe";
-import {
-  buildReadCsvArgList,
-  buildSniffCsvConstraintArgs,
-} from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
-import {
-  buildDuckDbCsvSniffResultFromRejectScan,
-  buildDuckDbCsvSniffResultFromResolved,
-  buildDuckDbCsvSniffResultFromSniffRow,
-} from "@/clients/DuckDbClient/csvParse/duckDbCsvSniffResult";
-import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type {
   CsvParseResolvedOptions,
   CsvParseUserHints,
@@ -24,6 +11,20 @@ import type {
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbRunRawQuery } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type * as duckdb from "@duckdb/duckdb-wasm";
+
+import { CSV_SNIFF_SAMPLE_SIZE } from "@/clients/DuckDbClient/csvParse/csvParse.constants";
+import { mergeSniffCsvRowIntoParseOptions } from "@/clients/DuckDbClient/csvParse/csvParseOptions";
+import { applyQuoteProbeToParseOptions } from "@/clients/DuckDbClient/csvParse/csvQuoteProbe";
+import {
+  buildReadCsvArgList,
+  buildSniffCsvConstraintArgs,
+} from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
+import {
+  buildDuckDbCsvSniffResultFromRejectScan,
+  buildDuckDbCsvSniffResultFromResolved,
+  buildDuckDbCsvSniffResultFromSniffRow,
+} from "@/clients/DuckDbClient/csvParse/duckDbCsvSniffResult";
+import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** The state carried between attempts of the CSV parse retry loop. */
 export type CsvParseAttemptState = {
@@ -109,9 +110,8 @@ export async function sniffCsvWithDuckDb(
     userHints,
   });
   return {
-    parseOptions:
-      file ?
-        await applyQuoteProbeToParseOptions({
+    parseOptions: file
+      ? await applyQuoteProbeToParseOptions({
           file,
           sniffQuoteToken: sniffRow.Quote,
           parseOptions: mergedParseOptions,
@@ -133,28 +133,27 @@ export function getCsvSniffResult(
   const { lastSniffRow, parseOptions, rejectedScans, tableColumns, tableName } =
     options;
   const scan = rejectedScans[0];
-  return (
-    scan ?
-      buildDuckDbCsvSniffResultFromRejectScan({
+  return scan
+    ? buildDuckDbCsvSniffResultFromRejectScan({
         tableName,
         scan,
         commentChar: parseOptions.commentChar,
       })
-    : lastSniffRow ?
-      buildDuckDbCsvSniffResultFromSniffRow({
-        tableName,
-        sniffRow: lastSniffRow,
-        parseOptions,
-      })
-    : buildDuckDbCsvSniffResultFromResolved({
-        tableName,
-        parseOptions,
-        columns: tableColumns.map((column) => {
-          return { name: column.column_name, type: column.column_type };
-        }),
-        userArguments: buildReadCsvArgList({ parseOptions, mode: "load" }).join(
-          ", ",
-        ),
-      })
-  );
+    : lastSniffRow
+      ? buildDuckDbCsvSniffResultFromSniffRow({
+          tableName,
+          sniffRow: lastSniffRow,
+          parseOptions,
+        })
+      : buildDuckDbCsvSniffResultFromResolved({
+          tableName,
+          parseOptions,
+          columns: tableColumns.map((column) => {
+            return { name: column.column_name, type: column.column_type };
+          }),
+          userArguments: buildReadCsvArgList({
+            parseOptions,
+            mode: "load",
+          }).join(", "),
+        });
 }

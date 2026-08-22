@@ -1,5 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
+
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * An admin client for interacting with Supabase. This should only be used

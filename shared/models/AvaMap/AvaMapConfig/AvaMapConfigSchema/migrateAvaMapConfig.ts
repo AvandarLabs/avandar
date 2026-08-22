@@ -1,3 +1,8 @@
+// eslint-disable-next-line no-restricted-imports
+import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
+
+import { z } from "zod";
+
 import {
   DEFAULT_EXPORT_LAYOUT, // prettier-ignore
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts";
@@ -16,9 +21,6 @@ import {
 import { AvaMapConfigV4Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV4Schema.ts";
 import { AvaMapConfigV5Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-import { z } from "zod";
-// eslint-disable-next-line no-restricted-imports
-import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
 
 type ConfigV1 = z.infer<typeof AvaMapConfigV1Schema>;
 type ConfigV1Layer = z.infer<typeof AvaMapConfigV1LayerSchema>;

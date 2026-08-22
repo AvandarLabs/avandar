@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useResourceRole } from "@/hooks/permissions/useResourceRole/useResourceRole";
 import { renderHook, waitFor } from "@/test-utils";
-import type { ReactNode } from "react";
 
 const DASHBOARD_ID = "cccccccc-cccc-cccc-cccc-cccccccccccc";
 

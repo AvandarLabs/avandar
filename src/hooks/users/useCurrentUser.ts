@@ -1,6 +1,8 @@
-import { hasDefinedProps } from "@avandar/utils";
-import { Route as AuthRoute } from "@/routes/_auth/route";
 import type { User } from "$/models/User/User";
+
+import { hasDefinedProps } from "@avandar/utils";
+
+import { Route as AuthRoute } from "@/routes/_auth/route";
 
 /**
  * Get the current authenticated user.

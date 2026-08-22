@@ -1,5 +1,6 @@
-import { Modal as MantineModal } from "@mantine/core";
 import type { ModalProps } from "@mantine/core";
+
+import { Modal as MantineModal } from "@mantine/core";
 
 /**
  * Modal with Avandar overlay and spring pop-in defaults.

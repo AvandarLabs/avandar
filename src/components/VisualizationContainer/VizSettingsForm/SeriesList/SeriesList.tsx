@@ -1,7 +1,9 @@
-import clsx from "clsx";
-import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList.module.css";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { ReactNode } from "react";
+
+import clsx from "clsx";
+
+import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList.module.css";
 
 type Props = {
   /** How the owning form arranges its groups. */

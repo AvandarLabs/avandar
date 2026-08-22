@@ -1,3 +1,9 @@
+import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type {
+  RenderFilterRuleOptions,
+  SqlFragment,
+} from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.types.ts";
+
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 import { QueryFilterValidation } from "$/models/queries/StructuredQuery/QueryFilterValidation/QueryFilterValidation.ts";
@@ -12,11 +18,6 @@ import {
   isValuelessFilterOperator,
 } from "$/models/queries/StructuredQuery/renderFilterRule/getValuelessPredicateSql.ts";
 import { renderMultiValuePredicate } from "$/models/queries/StructuredQuery/renderFilterRule/renderMultiValuePredicate.ts";
-import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type {
-  RenderFilterRuleOptions,
-  SqlFragment,
-} from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.types.ts";
 
 export type {
   FilterPredicateParts,
@@ -51,9 +52,9 @@ export function renderFilterRule(
   // error and lose the results of every other rule. Validation runs against the
   // effective type so a live `columnTypes` override is honoured.
   const effectiveRule =
-    dataType === rule.columnDataType ?
-      rule
-    : { ...rule, columnDataType: dataType };
+    dataType === rule.columnDataType
+      ? rule
+      : { ...rule, columnDataType: dataType };
   if (QueryFilterValidation.validateRule(effectiveRule) !== undefined) {
     return undefined;
   }

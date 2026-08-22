@@ -1,5 +1,6 @@
 import { Loader } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
+
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceHomeView } from "@/views/WorkspaceHomeView/WorkspaceHomeView";
 

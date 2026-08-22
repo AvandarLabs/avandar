@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from "vitest";
+
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
+
 import { PersistedLayerLegends } from "./PersistedLayerLegends";
 
 describe("PersistedLayerLegends.usePersistedLayerLegends", () => {

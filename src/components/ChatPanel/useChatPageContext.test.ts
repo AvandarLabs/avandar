@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { makeChatPageContextFromPathname } from "@/components/ChatPanel/makeChatPageContextFromPathname/makeChatPageContextFromPathname";
 
 describe("makeChatPageContextFromPathname", () => {

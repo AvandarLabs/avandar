@@ -1,5 +1,10 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Button, ColorInput } from "@mantine/core";
+
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import { CircleRadiusControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl";
@@ -8,9 +13,6 @@ import { HeatmapControls } from "@/views/GisApp/panels/LayerInspector/StyleSecti
 import { ProportionalSymbolControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSymbolControls";
 import { StrokeControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls";
 import { SymbologyTypeControl } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -86,10 +88,10 @@ export function StyleSection({
   const { symbology } = layer;
   return (
     <InspectorSection title={t`Style`} defaultOpen>
-      {_isPointSymbology(symbology) ?
+      {_isPointSymbology(symbology) ? (
         <SymbologyTypeControl layer={layer} onLayerChange={onLayerChange} />
-      : null}
-      {symbology.type !== "heatmap" && symbology.color.type === "single" ?
+      ) : null}
+      {symbology.type !== "heatmap" && symbology.color.type === "single" ? (
         <ColorInput
           label={t`Color`}
           format="hex"
@@ -103,19 +105,19 @@ export function StyleSection({
             });
           }}
         />
-      : null}
-      {onOpenClassification && _canClassify(symbology) ?
+      ) : null}
+      {onOpenClassification && _canClassify(symbology) ? (
         <Button variant="subtle" onClick={onOpenClassification}>
           {t`Edit classification`}
         </Button>
-      : null}
+      ) : null}
       {_getStyleTypeControls({ layer, symbology, onLayerChange })}
-      {symbology.type !== "heatmap" ?
+      {symbology.type !== "heatmap" ? (
         <StrokeControls
           stroke={symbology.stroke}
           onLayerChange={onLayerChange}
         />
-      : null}
+      ) : null}
     </InspectorSection>
   );
 }

@@ -1,12 +1,14 @@
+import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
+
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
+import { string } from "zod";
+
 import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
 import { acquireOpenDataResource } from "$/open-data/acquireOpenDataResource.ts";
 import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
 import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
-import { string } from "zod";
-import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 
 /**
  * The largest resource this route will relay. Kept well under the response size
@@ -88,9 +90,9 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
             "Access-Control-Expose-Headers": EXPOSED_HEADERS,
             "Content-Type": "application/octet-stream",
             "X-Ava-Content-Kind": acquisition.contentKind,
-            ...(acquisition.sourceVersion === undefined ?
-              {}
-            : { "X-Ava-Source-Version": acquisition.sourceVersion }),
+            ...(acquisition.sourceVersion === undefined
+              ? {}
+              : { "X-Ava-Source-Version": acquisition.sourceVersion }),
           },
         });
       } catch (caught) {

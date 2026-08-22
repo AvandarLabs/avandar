@@ -1,4 +1,7 @@
+import type { Page } from "@playwright/test";
+
 import { propEq } from "@avandar/utils";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -7,7 +10,6 @@ import {
 } from "./helpers/chatPanelFlow";
 import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 /**
  * E2E coverage for the chat-interactive-workflows feature
@@ -418,8 +420,8 @@ test.describe("chat interactive workflows", () => {
     await mountMockChat({
       page,
       responder: (turnIndex) => {
-        return turnIndex > 0 ?
-            { assistantText: "State selected." }
+        return turnIndex > 0
+          ? { assistantText: "State selected." }
           : {
               assistantText: "Which state do you mean?",
               clarification: {

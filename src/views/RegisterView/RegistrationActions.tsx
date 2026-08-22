@@ -1,7 +1,9 @@
+import type { ReactElement } from "react";
+
 import { Trans } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
+
 import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
-import type { ReactElement } from "react";
 
 type Props = {
   isOnline: boolean;

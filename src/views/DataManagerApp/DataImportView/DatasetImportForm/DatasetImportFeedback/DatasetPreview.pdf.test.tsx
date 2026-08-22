@@ -1,9 +1,12 @@
-import { uuid } from "$/lib/uuid";
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@/test-utils";
-import { DatasetPreview } from "./DatasetPreview";
-import type { PdfDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PdfDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
+
+import { describe, expect, it, vi } from "vitest";
+
+import { uuid } from "$/lib/uuid";
+import { render, screen } from "@/test-utils";
+
+import { DatasetPreview } from "./DatasetPreview";
 
 const PDF_DATASET_ID = "33333333-3333-3333-3333-333333333333" as Dataset.Id;
 

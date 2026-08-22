@@ -1,7 +1,9 @@
-import { isArray, isNullish } from "@avandar/utils";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+
+import { isArray, isNullish } from "@avandar/utils";
+
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 
 type FilterValue = QueryFilterRule["value"];
 
@@ -20,8 +22,8 @@ function _isBlank(value: unknown): boolean {
 
 function _getScalar(value: FilterValue): string | number | boolean | undefined {
   const candidate = isArray(value) ? value[0] : value;
-  return _isBlank(candidate) || !_isBindableScalar(candidate) ?
-      undefined
+  return _isBlank(candidate) || !_isBindableScalar(candidate)
+    ? undefined
     : candidate;
 }
 
@@ -29,19 +31,19 @@ function _getList(
   options: Readonly<{ value: FilterValue; dropEmpty?: boolean }>,
 ): Array<string | number> {
   const dropEmpty = options.dropEmpty ?? true;
-  const items =
-    isArray(options.value) ?
-      options.value.filter((item): item is string | number => {
+  const items = isArray(options.value)
+    ? options.value.filter((item): item is string | number => {
         return typeof item === "string" || typeof item === "number";
       })
-    : _isBlank(options.value) ? []
-    : String(options.value)
-        .split(",")
-        .map((part) => {
-          return part.trim();
-        });
-  return dropEmpty ?
-      items.filter((item) => {
+    : _isBlank(options.value)
+      ? []
+      : String(options.value)
+          .split(",")
+          .map((part) => {
+            return part.trim();
+          });
+  return dropEmpty
+    ? items.filter((item) => {
         return !_isBlank(item);
       })
     : [...items];
@@ -51,13 +53,11 @@ function _getPair(
   value: FilterValue,
 ): [string | number, string | number] | undefined {
   const [lower, upper] = _getList({ value, dropEmpty: false });
-  return (
-      lower === undefined ||
-        upper === undefined ||
-        _isBlank(lower) ||
-        _isBlank(upper)
-    ) ?
-      undefined
+  return lower === undefined ||
+    upper === undefined ||
+    _isBlank(lower) ||
+    _isBlank(upper)
+    ? undefined
     : [lower, upper];
 }
 
@@ -72,19 +72,19 @@ function _makeLiteral(
   // anything else is reported by `validateFilterRule` rather than mangled here.
   const asNumber = (() => {
     const parsed = Number(value);
-    return Number.isFinite(parsed) && String(value).trim() !== "" ?
-        parsed
+    return Number.isFinite(parsed) && String(value).trim() !== ""
+      ? parsed
       : value;
   })();
-  return (
-    dataType === undefined ? value
-    : AvaDataType.isNumeric(dataType) ?
-      typeof value === "number" ?
-        value
-      : asNumber
-    : typeof value === "boolean" ? value
-    : String(value)
-  );
+  return dataType === undefined
+    ? value
+    : AvaDataType.isNumeric(dataType)
+      ? typeof value === "number"
+        ? value
+        : asNumber
+      : typeof value === "boolean"
+        ? value
+        : String(value);
 }
 
 /** Reads a filter rule's `value` in the shape a given operator needs. */

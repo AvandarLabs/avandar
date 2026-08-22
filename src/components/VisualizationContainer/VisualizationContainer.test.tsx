@@ -1,10 +1,12 @@
-import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { UnknownDataFrame } from "@avandar/utils";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { render, screen } from "@/test-utils";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 const { notifyWarningMock } = vi.hoisted(() => {
   return { notifyWarningMock: vi.fn() };

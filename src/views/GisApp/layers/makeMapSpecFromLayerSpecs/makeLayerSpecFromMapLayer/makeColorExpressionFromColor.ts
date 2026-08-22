@@ -1,6 +1,7 @@
+import type { ExpressionSpecification } from "maplibre-gl";
+
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
-import type { ExpressionSpecification } from "maplibre-gl";
 
 /** Makes color paint from flat or preclassified feature properties. */
 export function makeColorExpressionFromColor(
@@ -10,11 +11,11 @@ export function makeColorExpressionFromColor(
     return color.color;
   }
   const classColors =
-    color.type === "graduated" ?
-      color.ramp
-    : color.categories.map(({ color: categoryColor }) => {
-        return categoryColor;
-      });
+    color.type === "graduated"
+      ? color.ramp
+      : color.categories.map(({ color: categoryColor }) => {
+          return categoryColor;
+        });
   const noDataColor = color.noData.color;
   const classMatch = [
     "match",

@@ -1,6 +1,8 @@
-import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
-import { describe, expect, it, vi } from "vitest";
 import type { FetchLike } from "$/open-data/createOpenDataHttp.ts";
+
+import { describe, expect, it, vi } from "vitest";
+
+import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
 
 const URL_UNDER_TEST =
   "https://data.humdata.org/api/3/action/package_show?id=x";

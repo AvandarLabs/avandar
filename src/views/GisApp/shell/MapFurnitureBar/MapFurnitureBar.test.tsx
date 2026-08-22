@@ -1,9 +1,11 @@
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
+
 import { describe, expect, it, vi } from "vitest";
+
 import { render, screen } from "@/test-utils";
 import { MapFurnitureBar } from "@/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar";
 import { MapScale } from "@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale";
 import { useMapPointerCoordinates } from "@/views/GisApp/shell/MapFurnitureBar/useMapPointerCoordinates/useMapPointerCoordinates";
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 
 vi.mock(
   "@/views/GisApp/shell/MapFurnitureBar/useMapPointerCoordinates/useMapPointerCoordinates",

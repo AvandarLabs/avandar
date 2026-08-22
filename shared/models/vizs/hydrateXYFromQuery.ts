@@ -1,6 +1,8 @@
-import { isNonEmptyArray } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+
+import { isNonEmptyArray } from "@avandar/utils";
+
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 type XYAxesConfig = {
   xAxisKey: string | undefined;
@@ -46,9 +48,8 @@ export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
       const firstNumericColumn = queryColumns.find(QueryColumn.isNumeric);
       newVizConfig = {
         ...newVizConfig,
-        yAxisKey:
-          firstNumericColumn ?
-            QueryColumn.getDerivedColumnName(firstNumericColumn)
+        yAxisKey: firstNumericColumn
+          ? QueryColumn.getDerivedColumnName(firstNumericColumn)
           : undefined,
       };
     }
@@ -64,9 +65,8 @@ export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
 
       newVizConfig = {
         ...newVizConfig,
-        xAxisKey:
-          firstColumn ?
-            QueryColumn.getDerivedColumnName(firstColumn)
+        xAxisKey: firstColumn
+          ? QueryColumn.getDerivedColumnName(firstColumn)
           : undefined,
       };
     }

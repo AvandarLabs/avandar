@@ -1,9 +1,11 @@
-import { mkdirSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { DuckDbContracts } from "../../../../../shared/platform/ipc/contracts/DuckDbContracts";
-import { getUserDataDir } from "../../platform/getUserDataDir";
 import type { DuckDbService } from "../../services/createDuckDbService/createDuckDbService";
 import type { IpcServer } from "../createIpcServer/createIpcServer";
+
+import { mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+
+import { DuckDbContracts } from "../../../../../shared/platform/ipc/contracts/DuckDbContracts";
+import { getUserDataDir } from "../../platform/getUserDataDir";
 
 /*
  * Path layout in `loadFromSourcePath` / `loadParquetFromDatasetBlobStore`

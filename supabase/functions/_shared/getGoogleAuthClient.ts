@@ -1,5 +1,6 @@
-import { OAuth2Client } from "npm:google-auth-library@10";
 import type { DBGoogleToken } from "@sbfn/_shared/types/models.types.ts";
+
+import { OAuth2Client } from "npm:google-auth-library@10";
 
 const NOT_FOUND = "NOT_FOUND";
 

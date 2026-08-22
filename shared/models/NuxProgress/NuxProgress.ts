@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-namespace */
-import {
-  FIRST_DASHBOARD_TUTORIAL_KEY,
-  NUX_MILESTONE_KEYS,
-  NUX_STATUSES,
-} from "$/models/NuxProgress/NuxProgress.constants.ts";
 import type {
   NuxMilestoneKey,
   NuxProgressId,
@@ -11,6 +5,13 @@ import type {
   NuxStatus,
   NuxTutorialKey,
 } from "$/models/NuxProgress/NuxProgress.types.ts";
+
+/* eslint-disable @typescript-eslint/no-namespace */
+import {
+  FIRST_DASHBOARD_TUTORIAL_KEY,
+  NUX_MILESTONE_KEYS,
+  NUX_STATUSES,
+} from "$/models/NuxProgress/NuxProgress.constants.ts";
 
 /** A user's progress through one onboarding tutorial. */
 export namespace NuxProgress {

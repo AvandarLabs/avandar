@@ -1,6 +1,7 @@
-import { propEq } from "@avandar/utils";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+
+import { propEq } from "@avandar/utils";
 
 /** True when `column` is already in the layer's selected query columns. */
 export function hasQueryColumn(

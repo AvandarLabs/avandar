@@ -1,9 +1,11 @@
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+
 import { createClient } from "@supabase/supabase-js";
+
 import {
   getSupabaseServiceRoleKeyFromEnv,
   getSupabaseUrlFromEnv,
 } from "./supabaseEnv";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 /** Supabase Storage bucket for workspace-scoped dataset files. */
 export const WORKSPACES_STORAGE_BUCKET = "workspaces" as const;

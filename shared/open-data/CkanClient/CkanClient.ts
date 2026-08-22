@@ -1,8 +1,3 @@
-import {
-  CkanEnvelopeSchema,
-  CkanPackageSchema,
-} from "$/open-data/CkanClient/CkanClient.schemas.ts";
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
 import type {
   CkanClient,
   CkanPackage,
@@ -10,6 +5,12 @@ import type {
   OpenDataHttp,
 } from "$/open-data/CkanClient/CkanClient.types.ts";
 import type { z } from "zod";
+
+import {
+  CkanEnvelopeSchema,
+  CkanPackageSchema,
+} from "$/open-data/CkanClient/CkanClient.schemas.ts";
+import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
 
 /** CKAN's action API path, the same on every deployment. */
 const ACTION_PATH = "/api/3/action";

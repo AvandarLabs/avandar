@@ -29,13 +29,13 @@ private dashboards become a product rather than a set of tested primitives.
 
 ### 1.1 What P3 delivers
 
-| Item | Summary |
-| --- | --- |
-| C | One Share surface per dashboard: `ShareResourceModal` grows an optional publishing section, General access grows a fourth value, `PublishDashboardButton` and `PublishDashboardModal` are deleted |
-| E | The dashboards index stops filtering on `owner_id` and lets RLS decide; `DashboardCard` grows audience badges |
-| G | `dashboards__can_publish_publicly` at the `admin` tier, gated in the UI and enforced by a Postgres trigger on the transition into `public` |
-| P2 deferral | Viewer-role access requires a published dashboard, which is what finally gives `draft` its product meaning |
-| P2 deferral | `unpublishDashboard` gets its first caller, closing D-P2-2 |
+| Item        | Summary                                                                                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C           | One Share surface per dashboard: `ShareResourceModal` grows an optional publishing section, General access grows a fourth value, `PublishDashboardButton` and `PublishDashboardModal` are deleted |
+| E           | The dashboards index stops filtering on `owner_id` and lets RLS decide; `DashboardCard` grows audience badges                                                                                     |
+| G           | `dashboards__can_publish_publicly` at the `admin` tier, gated in the UI and enforced by a Postgres trigger on the transition into `public`                                                        |
+| P2 deferral | Viewer-role access requires a published dashboard, which is what finally gives `draft` its product meaning                                                                                        |
+| P2 deferral | `unpublishDashboard` gets its first caller, closing D-P2-2                                                                                                                                        |
 
 ### 1.2 What P3 deliberately does not deliver
 
@@ -82,16 +82,16 @@ private dashboards become a product rather than a set of tested primitives.
 
 ## 3. Decisions
 
-| # | Decision | Rejected alternative and why |
-| --- | --- | --- |
-| D-P3-1 | `ShareResourceModal` stays resource-generic and grows one optional `publishing` prop. A new dashboard-only `DashboardShareModal` supplies it. | Making the modal dashboard-aware (branching on `resourceType === "dashboard"` inside it) puts dashboard publishing state into a component datasets also render, and every future resource type inherits the branch. A separate dashboard modal that duplicates the people list instead of reusing it was the other option, and it forks the exact code the umbrella merged the surfaces to stop forking. |
-| D-P3-2 | The General access dropdown never writes `visibility`. It writes share state immediately and sets a *target* visibility that only the Publish or Unpublish button applies. | Umbrella D5 already settled this for the three-option dropdown. Extending the dropdown to flip visibility directly would mean a slow, per-dataset, partially-fallible snapshot build fires from a select element, with no review step before data leaves the workspace. |
-| D-P3-3 | When `visibility = 'public'`, the dropdown displays "Anyone with the link" regardless of share state. | Displaying the derived share-state value would tell a user their dashboard is Restricted while the whole internet can read it. Umbrella §4.2 already establishes that public wins over restriction everywhere else; the UI must not be the one place that disagrees. |
-| D-P3-4 | "Only me" targets `draft`, so choosing it on a published dashboard turns the primary action into Unpublish. "Restricted" and "Anyone in <workspace>" both target `workspace`. | Letting "Only me" target `workspace` produces a published snapshot with an audience of one: storage, a live URL, and a bucket object that exist for nobody. "Restricted" targeting `draft` was also rejected: a restricted-but-published dashboard is exactly the internal-report-for-three-people shape this feature was requested for. |
-| D-P3-5 | The publish-publicly rule is enforced by a `before update` trigger on `dashboards`, not by an RLS `with check`. | The rule is about a *transition* into `public`, and `with check` cannot see `OLD`. A `with check` that fired on every row version would reject an admin-published dashboard being re-saved by the editor who owns it, which is a working flow today. |
-| D-P3-6 | Ship the merged modal unflagged; put the feature flag on the "Anyone in <workspace>" option alone. | P2 D-P2-1 promised P3 would introduce the flag. Flagging the whole modal recreates exactly what D-P2-1 rejected: two code paths for one surface, only one of which the tests drive. The merge itself is a refactor of a shipped public-publishing flow; the new *audience* is the thing worth being able to turn off. |
-| D-P3-7 | The dashboards index shows audience badges and orders the user's own dashboards first. No filter control, no tabs. | A "Shared with me" tab or filter is a real answer to a list that has gotten long, and there is no evidence yet that it has: the view has no search, no sort, and no pagination today, so a filter would be the first list affordance ever added, built for a volume nobody has reported. §6.3 records the tripwire that should reopen it. |
-| D-P3-8 | `buildShareUrls` returns the audience-correct pair of URLs, and the QR code encodes the id URL for the current target. | Keeping the legacy `/public/dashboards/…` path as the canonical QR payload would mint new QR codes pointing at a route P2 already reduced to a redirect and that §11 wants deleted. |
+| #      | Decision                                                                                                                                                                      | Rejected alternative and why                                                                                                                                                                                                                                                                                                                                                                             |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-P3-1 | `ShareResourceModal` stays resource-generic and grows one optional `publishing` prop. A new dashboard-only `DashboardShareModal` supplies it.                                 | Making the modal dashboard-aware (branching on `resourceType === "dashboard"` inside it) puts dashboard publishing state into a component datasets also render, and every future resource type inherits the branch. A separate dashboard modal that duplicates the people list instead of reusing it was the other option, and it forks the exact code the umbrella merged the surfaces to stop forking. |
+| D-P3-2 | The General access dropdown never writes `visibility`. It writes share state immediately and sets a _target_ visibility that only the Publish or Unpublish button applies.    | Umbrella D5 already settled this for the three-option dropdown. Extending the dropdown to flip visibility directly would mean a slow, per-dataset, partially-fallible snapshot build fires from a select element, with no review step before data leaves the workspace.                                                                                                                                  |
+| D-P3-3 | When `visibility = 'public'`, the dropdown displays "Anyone with the link" regardless of share state.                                                                         | Displaying the derived share-state value would tell a user their dashboard is Restricted while the whole internet can read it. Umbrella §4.2 already establishes that public wins over restriction everywhere else; the UI must not be the one place that disagrees.                                                                                                                                     |
+| D-P3-4 | "Only me" targets `draft`, so choosing it on a published dashboard turns the primary action into Unpublish. "Restricted" and "Anyone in <workspace>" both target `workspace`. | Letting "Only me" target `workspace` produces a published snapshot with an audience of one: storage, a live URL, and a bucket object that exist for nobody. "Restricted" targeting `draft` was also rejected: a restricted-but-published dashboard is exactly the internal-report-for-three-people shape this feature was requested for.                                                                 |
+| D-P3-5 | The publish-publicly rule is enforced by a `before update` trigger on `dashboards`, not by an RLS `with check`.                                                               | The rule is about a _transition_ into `public`, and `with check` cannot see `OLD`. A `with check` that fired on every row version would reject an admin-published dashboard being re-saved by the editor who owns it, which is a working flow today.                                                                                                                                                     |
+| D-P3-6 | Ship the merged modal unflagged; put the feature flag on the "Anyone in <workspace>" option alone.                                                                            | P2 D-P2-1 promised P3 would introduce the flag. Flagging the whole modal recreates exactly what D-P2-1 rejected: two code paths for one surface, only one of which the tests drive. The merge itself is a refactor of a shipped public-publishing flow; the new _audience_ is the thing worth being able to turn off.                                                                                    |
+| D-P3-7 | The dashboards index shows audience badges and orders the user's own dashboards first. No filter control, no tabs.                                                            | A "Shared with me" tab or filter is a real answer to a list that has gotten long, and there is no evidence yet that it has: the view has no search, no sort, and no pagination today, so a filter would be the first list affordance ever added, built for a volume nobody has reported. §6.3 records the tripwire that should reopen it.                                                                |
+| D-P3-8 | `buildShareUrls` returns the audience-correct pair of URLs, and the QR code encodes the id URL for the current target.                                                        | Keeping the legacy `/public/dashboards/…` path as the canonical QR payload would mint new QR codes pointing at a route P2 already reduced to a redirect and that §11 wants deleted.                                                                                                                                                                                                                      |
 
 ---
 
@@ -139,7 +139,7 @@ survives in a narrower form: the dropdown reads only `targetVisibility`, and
 nothing reasons about live exposure from it.
 
 **That refinement has a sharp edge, found in review, and the status line is
-what pays for it.** Because the dropdown reads the *target*, an owner who picks
+what pays for it.** Because the dropdown reads the _target_, an owner who picks
 "Restricted" on a live public dashboard sees "Restricted" immediately while
 `is_public` is still true and the anon policy still serves the whole internet.
 Left neutral, that is precisely the false reassurance §4.2 and
@@ -170,13 +170,13 @@ is what keeps the dataset surface unchanged and makes the existing
 
 New and moved files:
 
-| File | Fate |
-| --- | --- |
-| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx` | new; owns publishing state and renders `ShareResourceModal` |
-| `src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts` | new; the publish/unpublish/slug/slice state extracted from `PublishDashboardModal`'s hooks |
-| `src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx` | new; the toolbar entry point |
-| `VanitySlugField/`, `PublishSliceSection*`, `PublishedShareLinks`, `PublishDashboardStatus/`, `ShareUrlRow`, `buildShareUrls`, `toVanitySlug/`, the slice editors | moved under `DashboardShareModal/`, otherwise unchanged except where §4.4 and §4.5 say so |
-| `PublishDashboardModal.tsx`, `PublishDashboardModalContent.tsx`, `PublishDashboardButton.tsx` | deleted |
+| File                                                                                                                                                              | Fate                                                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx`                                                                                              | new; owns publishing state and renders `ShareResourceModal`                                |
+| `src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts`                                                                                     | new; the publish/unpublish/slug/slice state extracted from `PublishDashboardModal`'s hooks |
+| `src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx`                                                                                             | new; the toolbar entry point                                                               |
+| `VanitySlugField/`, `PublishSliceSection*`, `PublishedShareLinks`, `PublishDashboardStatus/`, `ShareUrlRow`, `buildShareUrls`, `toVanitySlug/`, the slice editors | moved under `DashboardShareModal/`, otherwise unchanged except where §4.4 and §4.5 say so  |
+| `PublishDashboardModal.tsx`, `PublishDashboardModalContent.tsx`, `PublishDashboardButton.tsx`                                                                     | deleted                                                                                    |
 
 `ShareResourceButton` hardcodes `<ShareResourceModal>` in its `onClick`. Its
 gate (the `useResourceRole` call, the disabled state, and the two tooltip
@@ -224,18 +224,18 @@ rule: `visibility === "public"` returns `"public"`, anything else defers to
 
 What each value writes, and what it targets:
 
-| Value | Share writes (immediate) | Target visibility |
-| --- | --- | --- |
-| Only me | `rpc_resources__make_private` (P1.5, unchanged) | `draft` |
-| Restricted | `is_restricted = true`, workspace share deleted | `workspace` |
-| Anyone in `<workspace>` | `is_restricted = false`, workspace share upserted | `workspace` |
-| Anyone with the link | none | `public` |
+| Value                   | Share writes (immediate)                          | Target visibility |
+| ----------------------- | ------------------------------------------------- | ----------------- |
+| Only me                 | `rpc_resources__make_private` (P1.5, unchanged)   | `draft`           |
+| Restricted              | `is_restricted = true`, workspace share deleted   | `workspace`       |
+| Anyone in `<workspace>` | `is_restricted = false`, workspace share upserted | `workspace`       |
+| Anyone with the link    | none                                              | `public`          |
 
 "Anyone with the link" writing no share rows is deliberate. Public reads do not
 go through `resource_shares` at all: the anon policy and the `is_public`
 short-circuit in `util__auth_user_may_select_dashboard` fire first. Rewriting
-share state on the way to public would silently widen *edit* access as a side
-effect of a *read* decision, and it would destroy the narrowing the user gets
+share state on the way to public would silently widen _edit_ access as a side
+effect of a _read_ decision, and it would destroy the narrowing the user gets
 back when they downgrade.
 
 The consequence has to be stated in the UI rather than hidden: while a
@@ -264,16 +264,16 @@ Three transitions need more than a dropdown change:
 The footer holds one primary button and, when the dashboard is published, one
 subtle Unpublish.
 
-| Persisted | Target | Primary label | Calls |
-| --- | --- | --- | --- |
-| `draft` | `workspace` | Publish to workspace | `publishDashboard({ visibility: "workspace" })` |
-| `draft` | `public` | Publish | `publishDashboard({ visibility: "public" })` |
-| `draft` | `draft` | Publish (disabled, needs an audience) | none |
-| `workspace` | `workspace` | Update & republish | `publishDashboard({ visibility: "workspace" })` |
-| `workspace` | `public` | Publish publicly | `publishDashboard({ visibility: "public" })` |
-| `public` | `workspace` | Make internal | `publishDashboard({ visibility: "workspace" })` |
-| `public` | `public` | Update & republish | `publishDashboard({ visibility: "public" })` |
-| any published | `draft` | (Unpublish is the action) | `unpublishDashboard({ dashboardId })` |
+| Persisted     | Target      | Primary label                         | Calls                                           |
+| ------------- | ----------- | ------------------------------------- | ----------------------------------------------- |
+| `draft`       | `workspace` | Publish to workspace                  | `publishDashboard({ visibility: "workspace" })` |
+| `draft`       | `public`    | Publish                               | `publishDashboard({ visibility: "public" })`    |
+| `draft`       | `draft`     | Publish (disabled, needs an audience) | none                                            |
+| `workspace`   | `workspace` | Update & republish                    | `publishDashboard({ visibility: "workspace" })` |
+| `workspace`   | `public`    | Publish publicly                      | `publishDashboard({ visibility: "public" })`    |
+| `public`      | `workspace` | Make internal                         | `publishDashboard({ visibility: "workspace" })` |
+| `public`      | `public`    | Update & republish                    | `publishDashboard({ visibility: "public" })`    |
+| any published | `draft`     | (Unpublish is the action)             | `unpublishDashboard({ dashboardId })`           |
 
 Every row calls P2's client as-is. P2 built both mutations, tested both, and
 left `unpublishDashboard` without a caller on purpose (D-P2-2); this table is
@@ -281,7 +281,7 @@ the caller.
 
 **The two gates the old Publish button carried come with it.**
 `PublishDashboardButton` disabled itself while the editor had unsaved changes
-(publishing copies the *persisted* config, so publishing dirty would ship the
+(publishing copies the _persisted_ config, so publishing dirty would ship the
 previous version without saying so) and while the browser was offline. Merging
 the surfaces moves both gates onto the publish actions rather than onto the
 Share button: sharing is still worth doing with unsaved edits in the buffer, and
@@ -300,7 +300,7 @@ step to write.
 
 P2 split the namespace: `/d/<slug>` is globally unique for `public`,
 `/<workspaceSlug>/d/<slug>` is unique per workspace for `workspace`. The slug
-field therefore depends on the *target*, not on the current row:
+field therefore depends on the _target_, not on the current row:
 
 - The prefix rendered next to the input switches between
   `avandar.app/d/` and `avandar.app/<workspaceSlug>/d/`.
@@ -313,9 +313,9 @@ field therefore depends on the *target*, not on the current row:
 
 `buildShareUrls` takes the target visibility and returns:
 
-| Target | `canonical` | `vanity` |
-| --- | --- | --- |
-| `public` | `/d/<dashboardId>` | `/d/<slug>` when set |
+| Target      | `canonical`                        | `vanity`                             |
+| ----------- | ---------------------------------- | ------------------------------------ |
+| `public`    | `/d/<dashboardId>`                 | `/d/<slug>` when set                 |
 | `workspace` | `/<workspaceSlug>/d/<dashboardId>` | `/<workspaceSlug>/d/<slug>` when set |
 
 Per D-P3-8 the QR code encodes `canonical`, which is now a P2 route rather than
@@ -429,11 +429,11 @@ the `enabled` guard and the `dashboardsWhere === undefined` dance go away.
 not a badge: in a workspace where most of your list is yours, it is noise on
 every card.
 
-| Condition | Badge |
-| --- | --- |
-| `dashboard.ownerId !== currentUserId` | Shared with you |
-| `visibility === "workspace"` | Published to `<workspace>` |
-| `visibility === "public"` | Public |
+| Condition                             | Badge                      |
+| ------------------------------------- | -------------------------- |
+| `dashboard.ownerId !== currentUserId` | Shared with you            |
+| `visibility === "workspace"`          | Published to `<workspace>` |
+| `visibility === "public"`             | Public                     |
 
 They compose: a colleague's public dashboard shows two. The existing offline
 badges keep their place and their color; the audience badges are visually
@@ -517,7 +517,7 @@ explicit shares. The reasoning is that a read-only viewer role is safe to hand
 the workspace's unrestricted content, whereas a blanket Global Editor is not,
 since reading is the first step to editing something nobody granted you.
 
-The finding stands only as an *observability* change: P3's index widening makes
+The finding stands only as an _observability_ change: P3's index widening makes
 a long-standing rule visible in the product for the first time. It is recorded
 in `docs/permissions-architecture.md` §4.1 with the rationale, so the next
 reader does not repeat this mistake. Widening it would give every Global Editor
@@ -544,7 +544,7 @@ after P3 is only `draft` rows belonging to another user.
 
 - An editor cannot update a dashboard from `draft` or `workspace` to `public`;
   an admin can; a workspace owner can.
-- An editor *can* update a `public` dashboard that is already public (the
+- An editor _can_ update a `public` dashboard that is already public (the
   transition-only property of D-P3-5), including changing its slug and config.
 - An editor can publish to `workspace` freely.
 - The trigger denies with an error rather than silently no-opping, so the
@@ -588,14 +588,14 @@ after P3 is only `draft` rows belonging to another user.
 
 ## 10. Risks
 
-| Risk | Mitigation |
-| --- | --- |
-| The merged modal drops an affordance the publish modal had (slices, QR, republish), and nobody notices until a user does. | The publish surface moves as whole components rather than being rewritten (§4.1); the moved files keep their tests. |
-| A user reads the dropdown as having already changed who can see the published dashboard. | The status line and summary line state the pending state explicitly (§4.2), and the primary action is the only thing that applies it. |
-| Widening the index floods a viewer's list with every non-restricted dashboard in the workspace. | Known and bounded by §8 D1; owner-first ordering keeps the user's own work at the top, and §6.3's tripwire is the signal to add search. |
-| The permission trigger blocks a legitimate re-save of a public dashboard. | It is transition-scoped by construction (D-P3-5) and pinned by the second pgTAP case in §9. |
-| P4's plan-limit trigger and P3's permission trigger interact badly. | Both are `before update` and neither reads the other's result; §5.2 records the naming requirement so the firing order is legible. |
-| Deleting `PublishDashboardModal` orphans translations and leaves stale `.po` references. | `pnpm i18n:extract` is part of the verification sweep, and `pnpm i18n:check` fails the build if the catalogs drift. |
+| Risk                                                                                                                      | Mitigation                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| The merged modal drops an affordance the publish modal had (slices, QR, republish), and nobody notices until a user does. | The publish surface moves as whole components rather than being rewritten (§4.1); the moved files keep their tests.                     |
+| A user reads the dropdown as having already changed who can see the published dashboard.                                  | The status line and summary line state the pending state explicitly (§4.2), and the primary action is the only thing that applies it.   |
+| Widening the index floods a viewer's list with every non-restricted dashboard in the workspace.                           | Known and bounded by §8 D1; owner-first ordering keeps the user's own work at the top, and §6.3's tripwire is the signal to add search. |
+| The permission trigger blocks a legitimate re-save of a public dashboard.                                                 | It is transition-scoped by construction (D-P3-5) and pinned by the second pgTAP case in §9.                                             |
+| P4's plan-limit trigger and P3's permission trigger interact badly.                                                       | Both are `before update` and neither reads the other's result; §5.2 records the naming requirement so the firing order is legible.      |
+| Deleting `PublishDashboardModal` orphans translations and leaves stale `.po` references.                                  | `pnpm i18n:extract` is part of the verification sweep, and `pnpm i18n:check` fails the build if the catalogs drift.                     |
 
 ---
 

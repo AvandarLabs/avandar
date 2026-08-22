@@ -1,10 +1,12 @@
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { TextInput } from "@mantine/core";
 import { useState } from "react";
+
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { ReactNode } from "react";
 
 type Props = {
   layer: MapLayer.T;
@@ -44,9 +46,9 @@ export function ClassificationBreakList({
       label={t`Manual breaks`}
       description={t`Enter strictly increasing values separated by commas.`}
       error={
-        _areBreaksValid(numbers) ? undefined : (
-          t`Breaks must be finite and strictly increasing.`
-        )
+        _areBreaksValid(numbers)
+          ? undefined
+          : t`Breaks must be finite and strictly increasing.`
       }
       value={text}
       onChange={(event) => {

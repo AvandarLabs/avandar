@@ -1,11 +1,12 @@
+import { ScriptsUtil } from "scripts/ScriptsUtil";
+import { z } from "zod";
+
 /**
  * CLI script to create a test user with Supabase Auth.
  * Expected usage is through the package.json script:
  *    pnpm db:create-user <email> <password>
  */
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import { ScriptsUtil } from "scripts/ScriptsUtil";
-import { z } from "zod";
 
 function printUsage() {
   console.log("Usage: pnpm db:create-user <email> <password>");

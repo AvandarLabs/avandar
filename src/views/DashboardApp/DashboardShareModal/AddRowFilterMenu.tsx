@@ -1,10 +1,12 @@
-import { propEq } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Select } from "@mantine/core";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { FilterableColumn } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
+
+import { propEq } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Select } from "@mantine/core";
+
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 type Props = {
   columns: readonly FilterableColumn[];
@@ -17,13 +19,11 @@ function _columnToRowFilter(
 ): PublishSliceConfig.RowFilter {
   const id = crypto.randomUUID();
   const columnName = column.name;
-  return (
-    AvaDataType.isNumeric(column.type) ?
-      { id, kind: "range_number", columnName }
-    : AvaDataType.isTemporal(column.type) ?
-      { id, kind: "range_date", columnName }
-    : { id, kind: "enum", columnName, values: [] }
-  );
+  return AvaDataType.isNumeric(column.type)
+    ? { id, kind: "range_number", columnName }
+    : AvaDataType.isTemporal(column.type)
+      ? { id, kind: "range_date", columnName }
+      : { id, kind: "enum", columnName, values: [] };
 }
 
 /** Creates a row filter matching the selected column's data type. */

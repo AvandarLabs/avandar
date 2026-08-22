@@ -1,12 +1,14 @@
+import type { ReactNode } from "react";
+
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconX } from "@tabler/icons-react";
+
 import { dismissNuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/dismissNuxChecklistPanel/dismissNuxChecklistPanel";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { MODAL_ABOVE_NUX_TOUR_Z_INDEX } from "@/config/Theme";
-import type { ReactNode } from "react";
 
 type Props = {
   completedCount: number;

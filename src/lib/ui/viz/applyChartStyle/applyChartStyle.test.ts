@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 
 describe("applyChartStyle: no axis scale settings", () => {

@@ -1,11 +1,13 @@
-import { Model } from "@avandar/models";
-import { where } from "@avandar/utils";
-import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
-import { useMemo } from "react";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+
+import { Model } from "@avandar/models";
+import { where } from "@avandar/utils";
+import { useMemo } from "react";
+
+import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 
 type Result = {
   /** Every column of the data source, as query columns. */

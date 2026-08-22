@@ -1,8 +1,10 @@
-import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+
 import { describe, expect, it } from "vitest";
+
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
-import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 
 const EDITOR_STATE_WITH_TWO_BLOCKS: DashboardEditorAppState = {
   activeDashboardId: "dashboard-1",

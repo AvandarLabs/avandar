@@ -1,13 +1,14 @@
+import { program } from "commander";
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
+import { z } from "zod";
+
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig";
 import { isDevOverrideEmail } from "$/EmailClient/isDevOverrideEmail";
 import { EmailMarkdown } from "$/emails/lib/EmailMarkdown";
 import { EmailTemplate } from "$/emails/lib/EmailTemplate";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail";
-import { program } from "commander";
-import { z } from "zod";
 
 const RED = "\x1b[31m";
 const BLUE = "\x1b[34m";

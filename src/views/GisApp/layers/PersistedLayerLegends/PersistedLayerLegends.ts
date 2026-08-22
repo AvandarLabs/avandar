@@ -1,6 +1,7 @@
-import { useEffect } from "react";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+
+import { useEffect } from "react";
 
 /** Persisted derived legend payload for one map layer. */
 export type LayerLegendUpdate = {

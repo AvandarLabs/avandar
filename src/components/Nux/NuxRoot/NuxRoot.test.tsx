@@ -1,11 +1,13 @@
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
+import type { ReactNode } from "react";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { NuxRoot } from "@/components/Nux/NuxRoot/NuxRoot";
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxEligibility";
 import { render, screen } from "@/test-utils";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { ReactNode } from "react";
 
 vi.mock("@/components/Nux/useNuxEligibility/useNuxEligibility", () => {
   return { useNuxEligibility: vi.fn() };

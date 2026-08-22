@@ -1,8 +1,9 @@
-import { registry } from "@avandar/utils";
 import type {
   AppType,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions.types.ts";
+
+import { registry } from "@avandar/utils";
 
 /** Apps shown in the workspace permissions matrix (order = UI rows). */
 export const RESTRICTABLE_APPS = registry<AppType>().keys(

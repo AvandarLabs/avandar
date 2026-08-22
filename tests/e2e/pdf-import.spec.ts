@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -15,7 +17,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 /**
  * Copy from `useDatasetImportCopy`, rendered by `ImportStatusCallout` whenever

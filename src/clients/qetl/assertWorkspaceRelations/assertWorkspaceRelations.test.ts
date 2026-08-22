@@ -1,12 +1,14 @@
 /** Tests per-relation workspace authorization for the QETL query path. */
 
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { QueryClient } from "@tanstack/react-query";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { assertWorkspaceRelations } from "@/clients/qetl/assertWorkspaceRelations/assertWorkspaceRelations";
 import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import type { QueryClient } from "@tanstack/react-query";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 const WORKSPACE_ID = "55555555-5555-4555-8555-555555555555" as Workspace.Id;
 const OWNED_DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;

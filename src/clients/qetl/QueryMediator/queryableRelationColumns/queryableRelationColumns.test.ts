@@ -1,13 +1,15 @@
 /** Pins the in-memory record of which columns DuckDB currently holds. */
 
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
 import { beforeEach, describe, expect, it } from "vitest";
+
 import {
   clearQueryableRelationColumns,
   forgetQueryableColumns,
   getQueryableColumns,
   rememberQueryableColumns,
 } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 

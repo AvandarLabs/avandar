@@ -1,3 +1,7 @@
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
+
 import { makeSelectOptions, Select } from "@avandar/ui";
 import { propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -12,16 +16,14 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useCallback, useMemo } from "react";
+
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.module.css";
 import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList";
 import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];
@@ -137,9 +139,9 @@ export function PairSeriesFieldset({
                       value={scatterSeries.xKey}
                       disabled={numericOptions.length === 0}
                       placeholder={
-                        numericOptions.length === 0 ?
-                          t`No numeric columns`
-                        : t`Select a column`
+                        numericOptions.length === 0
+                          ? t`No numeric columns`
+                          : t`Select a column`
                       }
                       onChange={(next) => {
                         if (next !== null) {
@@ -154,9 +156,9 @@ export function PairSeriesFieldset({
                       value={scatterSeries.key}
                       disabled={numericOptions.length === 0}
                       placeholder={
-                        numericOptions.length === 0 ?
-                          t`No numeric columns`
-                        : t`Select a column`
+                        numericOptions.length === 0
+                          ? t`No numeric columns`
+                          : t`Select a column`
                       }
                       onChange={(next) => {
                         if (next !== null) {

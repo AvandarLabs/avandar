@@ -1,3 +1,5 @@
+import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Button,
@@ -9,12 +11,12 @@ import {
   Text,
 } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
+
 import css from "./CaseTypeDraftCard.module.css";
 import { CaseTypeDraftIdentityFields } from "./CaseTypeDraftIdentityFields";
 import { CaseTypeDraftManualEntrySection } from "./CaseTypeDraftManualEntrySection";
 import { CaseTypeDraftSourceSection } from "./CaseTypeDraftSourceSection";
 import { useValuePickerOptions } from "./useValuePickerOptions";
-import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
   editor: CaseTypeDraftEditor;
@@ -57,9 +59,9 @@ export function CaseTypeDraftCard({
       };
     });
   const sourceCountLabel =
-    sourceGroups.length === 1 ?
-      t`1 dataset`
-    : t`${sourceGroups.length} datasets joined`;
+    sourceGroups.length === 1
+      ? t`1 dataset`
+      : t`${sourceGroups.length} datasets joined`;
 
   return (
     <Paper withBorder shadow="xs" radius="md" p="md" bg="blue.0">

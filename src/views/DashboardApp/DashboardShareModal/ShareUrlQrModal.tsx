@@ -1,10 +1,12 @@
+import type { ReactNode } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button, Image, Modal, Stack, Text } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
+
 import { notifyError } from "@/utils/notifications/notify";
-import type { ReactNode } from "react";
 
 type Props = {
   /** The URL the QR code encodes, also shown as the caption. */
@@ -80,14 +82,15 @@ export function ShareUrlQrModal({ url, isOpened, onClose }: Props): ReactNode {
       size="sm"
     >
       <Stack align="center" gap="md">
-        {qrDataUrl ?
+        {qrDataUrl ? (
           <Box>
             <Image src={qrDataUrl} alt={t`QR code`} w={256} h={256} />
           </Box>
-        : <Text size="sm" c="dimmed">
+        ) : (
+          <Text size="sm" c="dimmed">
             <Trans>Generating…</Trans>
           </Text>
-        }
+        )}
         <Button
           leftSection={<IconDownload size={14} />}
           variant="outline"

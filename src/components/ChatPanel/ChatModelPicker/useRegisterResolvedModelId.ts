@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import type { useAui } from "@assistant-ui/react";
+
+import { useEffect } from "react";
 
 /** Registers the resolved model id with assistant-ui for each chat run. */
 export function useRegisterResolvedModelId(

@@ -1,9 +1,11 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
+
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Menu } from "@mantine/core";
+
 import { MapStyleKeys } from "@/views/GisApp/basemap/MapStyles";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
 
 type Props = {
   basemap: AvaMapConfig.Basemap;

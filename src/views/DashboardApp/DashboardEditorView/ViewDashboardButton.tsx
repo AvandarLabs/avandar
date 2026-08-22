@@ -1,10 +1,12 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { ReactElement } from "react";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Tooltip } from "@mantine/core";
 import { IconEye } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+
 import { DASHBOARD_TOOLBAR_BUTTON_SIZE } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { ReactElement } from "react";
 
 type Props = {
   workspaceSlug: string;

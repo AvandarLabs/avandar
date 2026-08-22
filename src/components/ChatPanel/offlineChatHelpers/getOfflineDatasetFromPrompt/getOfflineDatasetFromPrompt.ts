@@ -1,11 +1,13 @@
-import { propEq } from "@avandar/utils";
-import { fuzzyMatchOfflineDatasetByName } from "@/components/ChatPanel/offlineChatHelpers/fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
-import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
-import { OfflineDatasetLabelMatch } from "@/components/ChatPanel/offlineChatHelpers/OfflineDatasetLabelMatch";
 import type {
   OfflineChatSchema,
   OfflineChatSchemaDataset,
 } from "$/types/offlineChat.types";
+
+import { propEq } from "@avandar/utils";
+
+import { fuzzyMatchOfflineDatasetByName } from "@/components/ChatPanel/offlineChatHelpers/fuzzyMatchOfflineDatasetByName/fuzzyMatchOfflineDatasetByName";
+import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";
+import { OfflineDatasetLabelMatch } from "@/components/ChatPanel/offlineChatHelpers/OfflineDatasetLabelMatch";
 
 /** Minimum score to prefer label match over fuzzy or open-dataset fallbacks. */
 const MIN_LABEL_MATCH_SCORE = 2;

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { resolveMigrationsDir } from "./resolveMigrationsDir";
 
 describe("resolveMigrationsDir", () => {

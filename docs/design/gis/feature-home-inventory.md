@@ -28,15 +28,15 @@ the ones that remain.
 The stack is the map's table of contents. It answers "what is on this map, in
 what order" and nothing else. Editing lives in the inspector.
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| Multi-layer stack, reorder, visibility | Layer list, drag handle, eye toggle | A |
-| Add layer (model axis) | Primary button at panel top, opens the add-layer flow | A |
-| Layer rename, duplicate, delete (model axis) | Row overflow menu | A |
-| Sensitivity badge | Inline badge on the layer row, readout only | B |
-| Boundary-join match report | Warning affordance on the layer row, opens the match detail | B |
-| Annotation layer row | A layer row of its own, pinned to the top of the stack | D |
-| Layer status (loading, error, zero rows, partial map) (model axis) | Inline state on the layer row | A |
+| Feature                                                            | Surface                                                     | Wave |
+| ------------------------------------------------------------------ | ----------------------------------------------------------- | ---- |
+| Multi-layer stack, reorder, visibility                             | Layer list, drag handle, eye toggle                         | A    |
+| Add layer (model axis)                                             | Primary button at panel top, opens the add-layer flow       | A    |
+| Layer rename, duplicate, delete (model axis)                       | Row overflow menu                                           | A    |
+| Sensitivity badge                                                  | Inline badge on the layer row, readout only                 | B    |
+| Boundary-join match report                                         | Warning affordance on the layer row, opens the match detail | B    |
+| Annotation layer row                                               | A layer row of its own, pinned to the top of the stack      | D    |
+| Layer status (loading, error, zero rows, partial map) (model axis) | Inline state on the layer row                               | A    |
 
 ### 1.2 Right panel: layer inspector
 
@@ -46,16 +46,16 @@ Popup, Legend.
 
 **Data** section, editing `MapLayer.source` and `MapLayer.geoBinding`:
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| ABox and HDX layer sources | Source picker, workspace sources and a library tab | client half in 1, full in E |
-| Geometry binding, lat/lng columns (model axis) | Binding type selector set to "Latitude and longitude columns" | A |
-| Geometry columns: WKT, WKB, GeoJSON | Same selector, "Geometry column" binding type, with an encoding control | B |
-| Boundary join binding | Same selector, "Join to boundaries" binding type, with a boundary source and key controls | B |
-| Spatial join, point-in-polygon aggregation | Same selector, "Aggregate points into areas" binding type | B |
-| Hex and grid binning | Same selector, "Bin into a grid" binding type, with grid shape and cell size | C |
-| CRS reprojection | Advanced disclosure at the foot of the section | C |
-| Zoom-based simplification | Advanced disclosure at the foot of the section | B |
+| Feature                                        | Surface                                                                                   | Wave                        |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------- | --------------------------- |
+| ABox and HDX layer sources                     | Source picker, workspace sources and a library tab                                        | client half in 1, full in E |
+| Geometry binding, lat/lng columns (model axis) | Binding type selector set to "Latitude and longitude columns"                             | A                           |
+| Geometry columns: WKT, WKB, GeoJSON            | Same selector, "Geometry column" binding type, with an encoding control                   | B                           |
+| Boundary join binding                          | Same selector, "Join to boundaries" binding type, with a boundary source and key controls | B                           |
+| Spatial join, point-in-polygon aggregation     | Same selector, "Aggregate points into areas" binding type                                 | B                           |
+| Hex and grid binning                           | Same selector, "Bin into a grid" binding type, with grid shape and cell size              | C                           |
+| CRS reprojection                               | Advanced disclosure at the foot of the section                                            | C                           |
+| Zoom-based simplification                      | Advanced disclosure at the foot of the section                                            | B                           |
 
 Putting all six geo-binding types behind one selector is the design decision
 that keeps `GeoBinding` and its editor isomorphic. Each type is one branch of
@@ -64,25 +64,25 @@ never a new panel.
 
 **Style** section, editing `MapLayer.symbology`:
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| Symbology type switch (model axis) | Segmented control at the top of the section | A |
-| Single color (model axis) | Color input | A |
-| Categorical palette | Palette picker plus per-category overrides | B |
-| Graduated ramp | Ramp picker, opens the classification editor | B |
-| Classification methods and normalization | Classification editor, opens from the ramp row | B |
-| Explicit no-data rendering | Classification editor, a permanent row that cannot be removed | B |
-| Proportional symbols, sqrt-scaled, with size legend | Size controls, value column plus min and max radius plus scale | C |
-| Clustering | Cluster controls, shown when the symbology type is Cluster | C |
-| Heatmap | Heatmap controls, shown when the symbology type is Heatmap | C |
-| Disputed-boundary styling and mandatory disclaimer | Boundary styling row on fill and line layers | E |
+| Feature                                             | Surface                                                        | Wave |
+| --------------------------------------------------- | -------------------------------------------------------------- | ---- |
+| Symbology type switch (model axis)                  | Segmented control at the top of the section                    | A    |
+| Single color (model axis)                           | Color input                                                    | A    |
+| Categorical palette                                 | Palette picker plus per-category overrides                     | B    |
+| Graduated ramp                                      | Ramp picker, opens the classification editor                   | B    |
+| Classification methods and normalization            | Classification editor, opens from the ramp row                 | B    |
+| Explicit no-data rendering                          | Classification editor, a permanent row that cannot be removed  | B    |
+| Proportional symbols, sqrt-scaled, with size legend | Size controls, value column plus min and max radius plus scale | C    |
+| Clustering                                          | Cluster controls, shown when the symbology type is Cluster     | C    |
+| Heatmap                                             | Heatmap controls, shown when the symbology type is Heatmap     | C    |
+| Disputed-boundary styling and mandatory disclaimer  | Boundary styling row on fill and line layers                   | E    |
 
 **Sensitivity** section, editing `MapLayer.sensitivity`:
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| Sensitive-layer mode, minimum-count suppression | Mode selector plus the minimum-count threshold | model in 1, enforced in B |
-| Point jitter and centroid displacement | Jitter radius control, shown when the mode is Jitter | B |
+| Feature                                         | Surface                                              | Wave                      |
+| ----------------------------------------------- | ---------------------------------------------------- | ------------------------- |
+| Sensitive-layer mode, minimum-count suppression | Mode selector plus the minimum-count threshold       | model in 1, enforced in B |
+| Point jitter and centroid displacement          | Jitter radius control, shown when the mode is Jitter | B                         |
 
 Sensitivity gets its own section rather than living inside Style because it
 **constrains** Style. A control that disables other controls cannot sit inside
@@ -90,47 +90,47 @@ the thing it disables without reading as a style option.
 
 **Filter**, **Popup**, and **Legend** sections:
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| Layer filters (model axis) | Filter section, editing `MapLayer.source`'s filter clauses | A |
-| Per-layer popup config, click through to case record | Popup section, column selection plus an optional record link action | A |
-| Legend title, units, position (model axis) | Legend section, editing `MapLayer.legend` | A |
+| Feature                                              | Surface                                                             | Wave |
+| ---------------------------------------------------- | ------------------------------------------------------------------- | ---- |
+| Layer filters (model axis)                           | Filter section, editing `MapLayer.source`'s filter clauses          | A    |
+| Per-layer popup config, click through to case record | Popup section, column selection plus an optional record link action | A    |
+| Legend title, units, position (model axis)           | Legend section, editing `MapLayer.legend`                           | A    |
 
 ### 1.3 Floating tool cluster
 
 Transient, map-surface interactions. Everything here starts a gesture on the
 map, which is what separates it from the inspector.
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| AOI draw-to-filter, wired to P8 filters | "Area" tool | D |
-| Measure distance and area, go to coordinate or P-code | "Measure" tool and the cluster's search field | D |
-| Buffer and distance analysis | "Buffer" tool, which writes a new layer into the stack | D |
-| Annotations, text, arrows, freehand, areas | "Annotate" tool, expanding into an annotation sub-cluster | D |
+| Feature                                               | Surface                                                   | Wave |
+| ----------------------------------------------------- | --------------------------------------------------------- | ---- |
+| AOI draw-to-filter, wired to P8 filters               | "Area" tool                                               | D    |
+| Measure distance and area, go to coordinate or P-code | "Measure" tool and the cluster's search field             | D    |
+| Buffer and distance analysis                          | "Buffer" tool, which writes a new layer into the stack    | D    |
+| Annotations, text, arrows, freehand, areas            | "Annotate" tool, expanding into an annotation sub-cluster | D    |
 
 ### 1.4 Top bar
 
 Map-level identity and output. Nothing layer-specific belongs here.
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| Map name, rename (model axis) | Editable title | A |
-| Persist map configuration | Save state indicator and save action in the title area | A |
-| Permissions on maps | Share button, reusing `ShareResourceModal` | A |
-| Custom XYZ, WMS, WMTS sources, satellite, no-basemap | Basemap control | A |
-| Style picker repaired, logs, error and empty states | Basemap control (the picker half) | 1 |
-| Offline basemap caching | Basemap control, per-basemap "Available offline" action | E |
-| Bookmarks and saved views | Views menu | A |
-| Print and PDF export with full map furniture | Export button, opens the export layout | E |
-| Map PBlock in a dashboard | "Add to dashboard" action in the export menu | E |
+| Feature                                              | Surface                                                 | Wave |
+| ---------------------------------------------------- | ------------------------------------------------------- | ---- |
+| Map name, rename (model axis)                        | Editable title                                          | A    |
+| Persist map configuration                            | Save state indicator and save action in the title area  | A    |
+| Permissions on maps                                  | Share button, reusing `ShareResourceModal`              | A    |
+| Custom XYZ, WMS, WMTS sources, satellite, no-basemap | Basemap control                                         | A    |
+| Style picker repaired, logs, error and empty states  | Basemap control (the picker half)                       | 1    |
+| Offline basemap caching                              | Basemap control, per-basemap "Available offline" action | E    |
+| Bookmarks and saved views                            | Views menu                                              | A    |
+| Print and PDF export with full map furniture         | Export button, opens the export layout                  | E    |
+| Map PBlock in a dashboard                            | "Add to dashboard" action in the export menu            | E    |
 
 ### 1.5 Bottom bar
 
 Persistent map furniture. Thin, always present, never a control surface.
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| Scale bar, coordinate readout, attribution | Coordinate readout at the left, scale bar and attribution at the right | A |
+| Feature                                    | Surface                                                                | Wave |
+| ------------------------------------------ | ---------------------------------------------------------------------- | ---- |
+| Scale bar, coordinate readout, attribution | Coordinate readout at the left, scale bar and attribution at the right | A    |
 
 The mandatory disclaimer sits beside the attribution and is not dismissible.
 The offline and degraded-basemap status chip sits beside the coordinate
@@ -138,13 +138,13 @@ readout.
 
 ### 1.6 Over-map overlays
 
-| Feature | Surface | Wave |
-| --- | --- | --- |
-| Legend (model axis) | Positioned per `LegendConfig.position` | A |
-| Time slider with animation | Bottom center, above the bottom bar | D |
-| Loading, empty, error, dropped-rows status (built) | Status overlay, bottom center | A |
-| Coordinate validation panel, swap, range, null island, DMS | Opens from the dropped-rows status | C |
-| Feature inspector (built) | Right drawer, taking over the inspector column while open | A |
+| Feature                                                    | Surface                                                   | Wave |
+| ---------------------------------------------------------- | --------------------------------------------------------- | ---- |
+| Legend (model axis)                                        | Positioned per `LegendConfig.position`                    | A    |
+| Time slider with animation                                 | Bottom center, above the bottom bar                       | D    |
+| Loading, empty, error, dropped-rows status (built)         | Status overlay, bottom center                             | A    |
+| Coordinate validation panel, swap, range, null island, DMS | Opens from the dropped-rows status                        | C    |
+| Feature inspector (built)                                  | Right drawer, taking over the inspector column while open | A    |
 
 ---
 
@@ -153,17 +153,17 @@ readout.
 Each of these is a single §10 row. The primary home is where the feature is
 configured; the secondary surface is where its effect is read.
 
-| Feature | Primary home | Secondary surface | Why the split |
-| --- | --- | --- | --- |
-| Sensitive-layer mode, minimum-count suppression | Inspector, Sensitivity section | Layer row badge, legend's suppressed-cell entry | The policy is a layer field, so it is edited with the layer. The badge exists so a reader of someone else's map sees the constraint without opening the inspector. |
-| Boundary join with P-code match diagnostics | Inspector, Data section, the join controls | Layer row warning that opens the match report | The join is configuration. The match report is a result of running it, so it belongs where the layer's health is shown. |
-| Annotations | Tool cluster, "Annotate" | Layer row for the annotation layer | Annotations are drawn on the map, so the tool is the home. The layer row exists because annotations are a layer in the model and need visibility and z-order like any other. |
-| Disputed-boundary styling and mandatory disclaimer | Inspector, Style section, boundary styling row | Bottom bar and export furniture for the disclaimer text | The styling is per layer. The disclaimer is per map and legally required on output, so it cannot depend on a layer being selected. |
-| Offline basemap caching | Basemap control, per-basemap action | Bottom bar status chip | Caching is an action taken once. Degraded state is a condition to be read at a glance. |
-| Print and PDF export with full map furniture | Export button and the export layout | Legend, scale bar, attribution, disclaimer are composed from their on-screen counterparts | The export inherits map furniture rather than redefining it, which is what makes an exported sitrep match the screen. |
-| Scale bar, coordinate readout, attribution | Bottom bar | Export layout | Same reason as above. |
-| Coordinate validation panel | Opens from the dropped-rows status overlay | Layer row partial-map state | The overlay is where row loss is noticed. The layer row is how you find which layer lost rows when several are loaded. |
-| Map PBlock in a dashboard | GIS export menu, "Add to dashboard" | The dashboard's own block chrome | Authoring happens in GIS. Rendering is dashboard-owned and shows map, legend, and attribution only, with no panels. |
+| Feature                                            | Primary home                                   | Secondary surface                                                                         | Why the split                                                                                                                                                                |
+| -------------------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sensitive-layer mode, minimum-count suppression    | Inspector, Sensitivity section                 | Layer row badge, legend's suppressed-cell entry                                           | The policy is a layer field, so it is edited with the layer. The badge exists so a reader of someone else's map sees the constraint without opening the inspector.           |
+| Boundary join with P-code match diagnostics        | Inspector, Data section, the join controls     | Layer row warning that opens the match report                                             | The join is configuration. The match report is a result of running it, so it belongs where the layer's health is shown.                                                      |
+| Annotations                                        | Tool cluster, "Annotate"                       | Layer row for the annotation layer                                                        | Annotations are drawn on the map, so the tool is the home. The layer row exists because annotations are a layer in the model and need visibility and z-order like any other. |
+| Disputed-boundary styling and mandatory disclaimer | Inspector, Style section, boundary styling row | Bottom bar and export furniture for the disclaimer text                                   | The styling is per layer. The disclaimer is per map and legally required on output, so it cannot depend on a layer being selected.                                           |
+| Offline basemap caching                            | Basemap control, per-basemap action            | Bottom bar status chip                                                                    | Caching is an action taken once. Degraded state is a condition to be read at a glance.                                                                                       |
+| Print and PDF export with full map furniture       | Export button and the export layout            | Legend, scale bar, attribution, disclaimer are composed from their on-screen counterparts | The export inherits map furniture rather than redefining it, which is what makes an exported sitrep match the screen.                                                        |
+| Scale bar, coordinate readout, attribution         | Bottom bar                                     | Export layout                                                                             | Same reason as above.                                                                                                                                                        |
+| Coordinate validation panel                        | Opens from the dropped-rows status overlay     | Layer row partial-map state                                                               | The overlay is where row loss is noticed. The layer row is how you find which layer lost rows when several are loaded.                                                       |
+| Map PBlock in a dashboard                          | GIS export menu, "Add to dashboard"            | The dashboard's own block chrome                                                          | Authoring happens in GIS. Rendering is dashboard-owned and shows map, legend, and attribution only, with no panels.                                                          |
 
 ---
 
@@ -200,67 +200,67 @@ layer §9 adds. Every row appears exactly once below.
 
 ### Tier 1, map types and math
 
-| §10 feature | Primary home | Wave |
-| --- | --- | --- |
-| Spatial join, point-in-polygon aggregation | Inspector, Data, binding type "Aggregate points into areas" | B |
-| Boundary join with P-code match diagnostics | Inspector, Data, binding type "Join to boundaries" | B |
-| Classification methods and normalization | Classification editor | B |
-| Explicit no-data rendering | Classification editor, permanent no-data row | B |
-| Proportional symbols, sqrt-scaled, with size legend | Inspector, Style, size controls | C |
-| Clustering | Inspector, Style, cluster controls | C |
-| Heatmap | Inspector, Style, heatmap controls | C |
+| §10 feature                                         | Primary home                                                | Wave |
+| --------------------------------------------------- | ----------------------------------------------------------- | ---- |
+| Spatial join, point-in-polygon aggregation          | Inspector, Data, binding type "Aggregate points into areas" | B    |
+| Boundary join with P-code match diagnostics         | Inspector, Data, binding type "Join to boundaries"          | B    |
+| Classification methods and normalization            | Classification editor                                       | B    |
+| Explicit no-data rendering                          | Classification editor, permanent no-data row                | B    |
+| Proportional symbols, sqrt-scaled, with size legend | Inspector, Style, size controls                             | C    |
+| Clustering                                          | Inspector, Style, cluster controls                          | C    |
+| Heatmap                                             | Inspector, Style, heatmap controls                          | C    |
 
 ### Tier 2, operational analysis
 
-| §10 feature | Primary home | Wave |
-| --- | --- | --- |
-| Buffer and distance analysis | Tool cluster, "Buffer" | D |
-| AOI draw-to-filter, wired to P8 filters | Tool cluster, "Area" | D |
-| Time slider with animation | Over-map, bottom center | D |
-| Hex and grid binning | Inspector, Data, binding type "Bin into a grid" | C |
-| Measure distance and area, go to coordinate or P-code | Tool cluster, "Measure" and the cluster search field | D |
-| Annotations, text, arrows, freehand, areas | Tool cluster, "Annotate" | D |
-| Isochrone travel-time access | Unplaced, see §5 | E, stretch |
+| §10 feature                                           | Primary home                                         | Wave       |
+| ----------------------------------------------------- | ---------------------------------------------------- | ---------- |
+| Buffer and distance analysis                          | Tool cluster, "Buffer"                               | D          |
+| AOI draw-to-filter, wired to P8 filters               | Tool cluster, "Area"                                 | D          |
+| Time slider with animation                            | Over-map, bottom center                              | D          |
+| Hex and grid binning                                  | Inspector, Data, binding type "Bin into a grid"      | C          |
+| Measure distance and area, go to coordinate or P-code | Tool cluster, "Measure" and the cluster search field | D          |
+| Annotations, text, arrows, freehand, areas            | Tool cluster, "Annotate"                             | D          |
+| Isochrone travel-time access                          | Unplaced, see §5                                     | E, stretch |
 
 ### Tier 3, do-no-harm
 
-| §10 feature | Primary home | Wave |
-| --- | --- | --- |
-| Sensitive-layer mode, minimum-count suppression | Inspector, Sensitivity section | model in 1, enforced in B |
-| Point jitter and centroid displacement | Inspector, Sensitivity, jitter radius | B |
-| Disputed-boundary styling and mandatory disclaimer | Inspector, Style, boundary styling row | E |
+| §10 feature                                        | Primary home                           | Wave                      |
+| -------------------------------------------------- | -------------------------------------- | ------------------------- |
+| Sensitive-layer mode, minimum-count suppression    | Inspector, Sensitivity section         | model in 1, enforced in B |
+| Point jitter and centroid displacement             | Inspector, Sensitivity, jitter radius  | B                         |
+| Disputed-boundary styling and mandatory disclaimer | Inspector, Style, boundary styling row | E                         |
 
 ### Tier 4, geospatial data quality
 
-| §10 feature | Primary home | Wave |
-| --- | --- | --- |
-| Coordinate validation panel, swap, range, null island, DMS | Opens from the dropped-rows status overlay | C |
-| Geometry columns, WKT, WKB, GeoJSON | Inspector, Data, binding type "Geometry column" | B |
-| CRS reprojection | Inspector, Data, advanced disclosure | C |
-| Zoom-based simplification | Inspector, Data, advanced disclosure | B |
+| §10 feature                                                | Primary home                                    | Wave |
+| ---------------------------------------------------------- | ----------------------------------------------- | ---- |
+| Coordinate validation panel, swap, range, null island, DMS | Opens from the dropped-rows status overlay      | C    |
+| Geometry columns, WKT, WKB, GeoJSON                        | Inspector, Data, binding type "Geometry column" | B    |
+| CRS reprojection                                           | Inspector, Data, advanced disclosure            | C    |
+| Zoom-based simplification                                  | Inspector, Data, advanced disclosure            | B    |
 
 ### Tier 5, output and field reality
 
-| §10 feature | Primary home | Wave |
-| --- | --- | --- |
-| Print and PDF export with full map furniture | Top bar, Export | E |
-| Offline basemap caching | Top bar, Basemap control, per-basemap action | E |
-| Custom XYZ, WMS, WMTS sources, satellite, no-basemap | Top bar, Basemap control | A |
-| Scale bar, coordinate readout, attribution | Bottom bar | A |
-| Per-layer popup config, click through to case record | Inspector, Popup section | A |
-| Bookmarks and saved views | Top bar, Views menu | A |
-| Multi-layer stack with reorder and visibility | Left panel, layer stack | A |
-| Persist map configuration | Top bar, save state and save action | A |
-| Map PBlock in a dashboard | Top bar, Export menu, "Add to dashboard" | E |
-| ABox and HDX layer sources | Inspector, Data, source picker | client half in 1, full in E |
-| Permissions on maps | Top bar, Share | 1 |
-| Style picker repaired, logs, error and empty states | Top bar, Basemap control, and the status overlay | 1 |
+| §10 feature                                          | Primary home                                     | Wave                        |
+| ---------------------------------------------------- | ------------------------------------------------ | --------------------------- |
+| Print and PDF export with full map furniture         | Top bar, Export                                  | E                           |
+| Offline basemap caching                              | Top bar, Basemap control, per-basemap action     | E                           |
+| Custom XYZ, WMS, WMTS sources, satellite, no-basemap | Top bar, Basemap control                         | A                           |
+| Scale bar, coordinate readout, attribution           | Bottom bar                                       | A                           |
+| Per-layer popup config, click through to case record | Inspector, Popup section                         | A                           |
+| Bookmarks and saved views                            | Top bar, Views menu                              | A                           |
+| Multi-layer stack with reorder and visibility        | Left panel, layer stack                          | A                           |
+| Persist map configuration                            | Top bar, save state and save action              | A                           |
+| Map PBlock in a dashboard                            | Top bar, Export menu, "Add to dashboard"         | E                           |
+| ABox and HDX layer sources                           | Inspector, Data, source picker                   | client half in 1, full in E |
+| Permissions on maps                                  | Top bar, Share                                   | 1                           |
+| Style picker repaired, logs, error and empty states  | Top bar, Basemap control, and the status overlay | 1                           |
 
 ### From §9
 
-| Feature | Primary home | Wave |
-| --- | --- | --- |
-| Annotation layer as a first-class layer type | Layer stack, pinned annotation row, edited from the tool cluster | D |
+| Feature                                      | Primary home                                                     | Wave |
+| -------------------------------------------- | ---------------------------------------------------------------- | ---- |
+| Annotation layer as a first-class layer type | Layer stack, pinned annotation row, edited from the tool cluster | D    |
 
 **Count check.** Tier 1: 7. Tier 2: 7. Tier 3: 3. Tier 4: 4. Tier 5: 12. Total
 33, matching §10. Plus one from §9.
@@ -276,8 +276,8 @@ time slider and the Map PBlock's authoring entry point, were drawn during the
 reconciliation: the time slider sits above the tool cluster in the same bottom
 centre stack, and "Add to dashboard" sits in the export sheet's footer.
 
-| Feature | Why unplaced | Decision needed |
-| --- | --- | --- |
+| Feature                      | Why unplaced                                                                                                                                                                                                                             | Decision needed                                                                                                                                                                                                                                                                                                                         |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Isochrone travel-time access | It needs an external routing service, and the spec marks it a Wave E stretch item. It is shaped like a tool (draw a start point) but its output is a polygon layer that must be styleable and savable, so it is shaped like a layer too. | Whether an isochrone is a tool-cluster tool that writes a layer, matching Buffer, or a geo-binding type. The Buffer precedent in §3.7 argues for a tool, but Buffer's input is an existing layer while an isochrone's input is a point the user places, which no other tool does. Resolve before Wave D fixes the tool cluster's shape. |
 
 Open questions that are not placement questions live in
@@ -385,4 +385,3 @@ link is guarded on the `disable-geo-explorer` feature flag
 app gates its nav link on the matching permission. This is worth resolving
 before Wave A, because a shareable map resource that has no nav entry is not
 findable.
-

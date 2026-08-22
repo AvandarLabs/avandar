@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 import { createFileRoute, Navigate } from "@tanstack/react-router";
+
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { ReactNode } from "react";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/individual-manager/",

@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 /** Route-adapter coverage for how the dashboards index queries. */
 import { describe, expect, it, vi } from "vitest";
+
 import { render } from "@/test-utils";
-import type { ReactNode } from "react";
 
 const { useGetAllMock, listViewMock } = vi.hoisted(() => {
   return { useGetAllMock: vi.fn(), listViewMock: vi.fn() };

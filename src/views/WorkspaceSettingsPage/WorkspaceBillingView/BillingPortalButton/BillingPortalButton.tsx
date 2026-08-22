@@ -1,6 +1,7 @@
 import { assertIsDefined } from "@avandar/utils";
 import { Button, Loader } from "@mantine/core";
 import { ReactNode, useState } from "react";
+
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
 
@@ -34,9 +35,7 @@ export function BillingPortalButton({ children }: Props): JSX.Element {
       }}
     >
       {children}
-      {isLoadingCustomerPortalURL ?
-        <Loader size="xs" ml="xs" />
-      : null}
+      {isLoadingCustomerPortalURL ? <Loader size="xs" ml="xs" /> : null}
     </Button>
   );
 }

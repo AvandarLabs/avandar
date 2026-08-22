@@ -1,5 +1,8 @@
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useMemo, useRef } from "react";
+
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { makeJoyrideStepsFromMilestone } from "@/components/Nux/NuxTour/makeJoyrideStepsFromMilestone/makeJoyrideStepsFromMilestone";
 import { NuxTourJoyride } from "@/components/Nux/NuxTour/NuxTourJoyride";
@@ -9,7 +12,6 @@ import { useNuxScrollParentToTop } from "@/components/Nux/NuxTour/useNuxScrollPa
 import { useNuxTourRelayoutOnChatAside } from "@/components/Nux/NuxTour/useNuxTourRelayoutOnChatAside/useNuxTourRelayoutOnChatAside";
 import { useVisibleNuxSteps } from "@/components/Nux/NuxTour/useVisibleNuxSteps/useVisibleNuxSteps";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
-import type { ReactNode } from "react";
 
 /**
  * Renders the active milestone's tooltips.
@@ -39,8 +41,8 @@ export function NuxTour(): ReactNode {
     visibleSteps[state.activeStepIndex]?.anchor,
   );
   const steps = useMemo(() => {
-    return milestone ?
-        makeJoyrideStepsFromMilestone({
+    return milestone
+      ? makeJoyrideStepsFromMilestone({
           milestone: { ...milestone, steps: visibleSteps },
           i18n,
         })

@@ -1,7 +1,8 @@
-import { NgrokDevURLsManager } from "@fanout-server/NgrokDevURLsManager";
-import z from "zod";
 import type { NgrokDevURLTarget } from "@fanout-server/NgrokDevURLsManager";
 import type { FastifyReply, FastifyRequest } from "fastify";
+
+import { NgrokDevURLsManager } from "@fanout-server/NgrokDevURLsManager";
+import z from "zod";
 
 const AddBodySchema = z.object({
   url: z.url(),

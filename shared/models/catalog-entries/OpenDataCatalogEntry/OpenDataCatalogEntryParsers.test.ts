@@ -1,6 +1,8 @@
-import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
-import { describe, expect, it } from "vitest";
 import type { OpenDataCatalogEntryModel } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+
+import { describe, expect, it } from "vitest";
+
+import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
 
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
 

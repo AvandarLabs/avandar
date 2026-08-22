@@ -1,6 +1,7 @@
+import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+
 import { matchLiteral } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 /**
  * Returns the human-readable label for a visualization type. Shared copy used

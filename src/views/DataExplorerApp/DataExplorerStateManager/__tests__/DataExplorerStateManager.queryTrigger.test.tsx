@@ -1,3 +1,6 @@
+import type { RenderHookResult } from "@testing-library/react";
+import type { ReactNode } from "react";
+
 /**
  * `query.ran` separates deliberate runs from incidental ones, and the whole
  * separation rests on the state manager stamping the right trigger. Manual
@@ -9,10 +12,9 @@
  * wiring is caught here.
  */
 import { describe, expect, it } from "vitest";
+
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { RenderHookResult } from "@testing-library/react";
-import type { ReactNode } from "react";
 
 function _wrapper({ children }: { children: ReactNode }): ReactNode {
   return (

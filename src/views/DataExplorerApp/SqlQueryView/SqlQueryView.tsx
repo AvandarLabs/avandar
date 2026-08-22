@@ -1,8 +1,15 @@
+import type {
+  SettingsColumnGroup,
+  SettingsColumnsLayout,
+} from "@/components/SettingsColumns/SettingsColumns";
+import type { ReactNode } from "react";
+
 import { isDefined, matchLiteral } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Alert, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
+
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { formatSqlForDisplay } from "@/components/sql/sql-helpers/formatSqlForDisplay/formatSqlForDisplay";
 import { SqlQueryEditPanel } from "@/components/sql/SqlEditor/SqlQueryEditPanel";
@@ -10,12 +17,8 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import { SqlReadOnlyBlock } from "@/views/DataExplorerApp/SqlQueryView/SqlReadOnlyBlock";
 import { SqlSyncWarningNotes } from "@/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes";
+
 import css from "./SqlQueryView.module.css";
-import type {
-  SettingsColumnGroup,
-  SettingsColumnsLayout,
-} from "@/components/SettingsColumns/SettingsColumns";
-import type { ReactNode } from "react";
 
 const SQL_EDITOR_MIN_ROWS = 10;
 
@@ -81,35 +84,36 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
     <SqlSyncWarningNotes syncWarnings={sqlSyncWarnings} />
   );
 
-  const editor =
-    isEditMode ?
-      <SqlQueryEditPanel
-        initialSql={rawSql}
-        submitButtonLabel={t`Re-run query`}
-        cancelButtonLabel={t`Cancel`}
-        minRows={SQL_EDITOR_MIN_ROWS}
-        onSubmit={onSubmitSql}
-        onCancel={() => {
-          setIsEditMode(false);
-        }}
-      />
-    : <SqlReadOnlyBlock
-        displaySql={displaySql}
-        minRows={SQL_EDITOR_MIN_ROWS}
-        onEdit={() => {
-          setIsEditMode(true);
-        }}
-      />;
+  const editor = isEditMode ? (
+    <SqlQueryEditPanel
+      initialSql={rawSql}
+      submitButtonLabel={t`Re-run query`}
+      cancelButtonLabel={t`Cancel`}
+      minRows={SQL_EDITOR_MIN_ROWS}
+      onSubmit={onSubmitSql}
+      onCancel={() => {
+        setIsEditMode(false);
+      }}
+    />
+  ) : (
+    <SqlReadOnlyBlock
+      displaySql={displaySql}
+      minRows={SQL_EDITOR_MIN_ROWS}
+      onEdit={() => {
+        setIsEditMode(true);
+      }}
+    />
+  );
 
   const groups: SettingsColumnGroup[] = [
     { id: "sql", title: "SQL", content: editor },
-    hasSyncWarnings ?
-      {
-        id: "sync-notes",
-        title: t`Manual form shows an approximation`,
-        content: syncWarningNotes,
-      }
-    : undefined,
+    hasSyncWarnings
+      ? {
+          id: "sync-notes",
+          title: t`Manual form shows an approximation`,
+          content: syncWarningNotes,
+        }
+      : undefined,
   ].filter(isDefined);
 
   return matchLiteral(layout, {
@@ -125,7 +129,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
     stacked: () => {
       return (
         <Stack gap="xs" px="sm" className={css.root}>
-          {hasSyncWarnings ?
+          {hasSyncWarnings ? (
             <Alert
               icon={<IconAlertTriangle size={16} />}
               color="yellow"
@@ -134,7 +138,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
             >
               {syncWarningNotes}
             </Alert>
-          : null}
+          ) : null}
           {editor}
         </Stack>
       );

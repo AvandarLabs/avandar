@@ -1,11 +1,12 @@
-import { getValue } from "@utils/objects/getValue/getValue.ts";
-import { describe, expect, it } from "vitest";
 import type {
   ObjectPaths,
   ObjectPathValue,
 } from "@utils/objects/ObjectPaths/ObjectPaths.types.ts";
 import type { Expect } from "@utils/types/testUtilities.types.ts";
 import type { IsEqual } from "type-fest";
+
+import { getValue } from "@utils/objects/getValue/getValue.ts";
+import { describe, expect, it } from "vitest";
 
 /**
  * Stands in for a DOM element. `@avandar/utils` compiles with `lib: ESNext`

@@ -3,6 +3,7 @@
  * onto one workspace dataset.
  */
 import { describe, expect, it } from "vitest";
+
 import { getOfflineDatasetFromPrompt } from "@/components/ChatPanel/offlineChatHelpers/getOfflineDatasetFromPrompt/getOfflineDatasetFromPrompt";
 
 const SCHEMA = {

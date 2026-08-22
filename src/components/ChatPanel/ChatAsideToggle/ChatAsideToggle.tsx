@@ -2,6 +2,7 @@ import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
+
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 
 /**

@@ -1,11 +1,14 @@
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { ReactNode } from "react";
+
 import clsx from "clsx";
+
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
 import { useSqlDisplayCatalog } from "@/components/sql/sql-helpers/useSqlDisplayCatalog";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
+
 import css from "./AvaSqlBlock.module.css";
 import { AvaSqlBlockEditable } from "./AvaSqlBlockEditable";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
-import type { ReactNode } from "react";
 
 export type AvaSqlBlockProps = {
   value: string;
@@ -126,14 +129,13 @@ function _AvaSqlBlockInner({
           );
         })}
       </code>
-      {outOfScopeSet.size > 0 ?
+      {outOfScopeSet.size > 0 ? (
         <div className={css.errorNotice} data-testid="ava-sql-out-of-scope">
-          {outOfScopeSet.size === 1 ?
-            `1 column is not in the current dataset scope.`
-          : `${outOfScopeSet.size} columns are not in the current dataset scope.`
-          }
+          {outOfScopeSet.size === 1
+            ? `1 column is not in the current dataset scope.`
+            : `${outOfScopeSet.size} columns are not in the current dataset scope.`}
         </div>
-      : null}
+      ) : null}
     </pre>
   );
 }

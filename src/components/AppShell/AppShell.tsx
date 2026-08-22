@@ -1,3 +1,8 @@
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AppLink } from "@/config/AppLinks/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+import type { CSSProperties, ReactNode } from "react";
+
 import { useToggleBoolean } from "@avandar/hooks";
 import { useLingui } from "@lingui/react/macro";
 import { AppShell as MantineAppShell } from "@mantine/core";
@@ -9,6 +14,7 @@ import {
 } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
+
 import css from "@/components/AppShell/AppShell.module.css";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 import { MobileHeader } from "@/components/AppShell/MobileHeader";
@@ -22,10 +28,6 @@ import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { ANIMATION_DURATION_MS } from "@/config/Theme/AnimationTheme/AnimationTheme";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
-import type { AppLink } from "@/config/AppLinks/AppLinks";
-import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { CSSProperties, ReactNode } from "react";
 
 // `-webkit-app-region: drag` is what Electrobun's preload detects on
 // mousedown to send `startWindowMove` to native. We render a real <div>
@@ -131,10 +133,11 @@ function AppShellComponent({
     [...APP_SHELL_HOTKEY_TAGS_TO_IGNORE],
   );
 
-  const headerHeight =
-    isMobileViewSize ? HEADER_MOBILE_DEFAULT_HEIGHT
-    : isDesktopPlatform ? HEADER_DESKTOP_TITLEBAR_HEIGHT
-    : 0;
+  const headerHeight = isMobileViewSize
+    ? HEADER_MOBILE_DEFAULT_HEIGHT
+    : isDesktopPlatform
+      ? HEADER_DESKTOP_TITLEBAR_HEIGHT
+      : 0;
 
   return (
     <>
@@ -167,28 +170,28 @@ function AppShellComponent({
         transitionDuration={ANIMATION_DURATION_MS.normal}
       >
         <MantineAppShell.Header bg="neutral" withBorder={false}>
-          {isDesktopPlatform && !isMobileViewSize ?
+          {isDesktopPlatform && !isMobileViewSize ? (
             <div
               aria-hidden
               className="electrobun-webkit-app-region-drag"
               style={DRAG_REGION_FILL_STYLE}
             />
-          : null}
-          {isMobileViewSize ?
+          ) : null}
+          {isMobileViewSize ? (
             <MobileHeader
               isMobileNavbarOpened={isMobileNavbarOpened}
               onToggleMobileNavbar={toggleMobileNavbar}
               title={title}
             />
-          : null}
+          ) : null}
         </MantineAppShell.Header>
 
         <MantineAppShell.Navbar
           withBorder={false}
           style={
-            isMobileViewSize ?
-              { zIndex: APP_CHROME_Z_INDEX, marginTop: -40, height: "100%" }
-            : undefined
+            isMobileViewSize
+              ? { zIndex: APP_CHROME_Z_INDEX, marginTop: -40, height: "100%" }
+              : undefined
           }
         >
           <Navbar
@@ -208,11 +211,11 @@ function AppShellComponent({
           mr={-16}
           mt={isMobileViewSize ? 30 : 0}
         >
-          {isChatPanelOpen && chatPanelLayout === "composer" ?
+          {isChatPanelOpen && chatPanelLayout === "composer" ? (
             <ChatComposerOverlay
               onDismiss={chatPanelDispatch.collapseComposer}
             />
-          : null}
+          ) : null}
           {children}
         </MantineAppShell.Main>
         <MantineAppShell.Aside
@@ -220,17 +223,15 @@ function AppShellComponent({
           p={0}
           bg="transparent"
           style={
-            isChatPanelOpen && chatPanelLayout === "composer" ?
-              {
-                width: ASIDE_COMPOSER_WIDTH,
-                zIndex: APP_CHROME_Z_INDEX + 1,
-              }
-            : undefined
+            isChatPanelOpen && chatPanelLayout === "composer"
+              ? {
+                  width: ASIDE_COMPOSER_WIDTH,
+                  zIndex: APP_CHROME_Z_INDEX + 1,
+                }
+              : undefined
           }
         >
-          {showChatPanel && isChatPanelAvailable ?
-            <ChatPanel />
-          : null}
+          {showChatPanel && isChatPanelAvailable ? <ChatPanel /> : null}
         </MantineAppShell.Aside>
       </MantineAppShell>
 

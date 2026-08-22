@@ -1,10 +1,12 @@
+import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
+
 import { isDefined } from "@avandar/utils";
+
 import { uuid } from "$/lib/uuid";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { ConsentAuditEntryParsers } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntryParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 const RETENTION_DAYS = 90;
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
@@ -102,9 +104,11 @@ const consentAuditEntryClient = createDexieCrudClient({
             warningDismissed:
               input.decision === "cancelled" ? warningShown : [],
             suggestionUsed:
-              input.decision === "used_suggestion" ? true
-              : warningShown.includes("bias") ? false
-              : null,
+              input.decision === "used_suggestion"
+                ? true
+                : warningShown.includes("bias")
+                  ? false
+                  : null,
             patternLocale: "en",
             detectorVersion: "1.0.0",
             medicalTierTriggeredBy: input.isMedical ? "column" : null,

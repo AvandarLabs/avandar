@@ -1,5 +1,3 @@
-import { makeBucketMap } from "@avandar/utils";
-import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type {
   SqlTableAliasConcept,
   SqlTableAliasConceptAttribute,
@@ -8,6 +6,10 @@ import type {
 } from "$/models/chat/SqlTableAlias/SqlTableAlias.types.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { Concept } from "$/models/ontology/Concept/Concept.ts";
+
+import { makeBucketMap } from "@avandar/utils";
+
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 
 /**
  * Character cap for the model-facing schema block. Qwen2.5 tokenizes a
@@ -129,9 +131,9 @@ function _formatSchemaBlock(
   return args.aliases
     .map((entry) => {
       const names =
-        entry.kind === "dataset" ?
-          (namesByDatasetId.get(entry.datasetId) ?? [])
-        : (namesByConceptId.get(entry.conceptId) ?? []);
+        entry.kind === "dataset"
+          ? (namesByDatasetId.get(entry.datasetId) ?? [])
+          : (namesByConceptId.get(entry.conceptId) ?? []);
       return _formatAliasLine(entry, names);
     })
     .join("\n");

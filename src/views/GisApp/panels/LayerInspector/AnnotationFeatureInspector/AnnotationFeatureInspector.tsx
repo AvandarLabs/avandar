@@ -1,3 +1,6 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { ReactNode } from "react";
+
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import {
@@ -9,9 +12,8 @@ import {
 } from "@mantine/core";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
+
 import css from "@/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.module.css";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { ReactNode } from "react";
 
 type Props = {
   feature: AvaMapConfig.AnnotationFeature;
@@ -135,7 +137,7 @@ function AnnotationFeatureFields({
   const { t } = useLingui();
   return (
     <>
-      {feature.kind === "text" ?
+      {feature.kind === "text" ? (
         <TextInput
           key={feature.id}
           label={t`Annotation text`}
@@ -144,7 +146,7 @@ function AnnotationFeatureFields({
             onFeatureChange({ ...feature, text: event.currentTarget.value });
           }}
         />
-      : null}
+      ) : null}
       <ColorInput
         label={t`Color`}
         format="hex"
@@ -153,13 +155,13 @@ function AnnotationFeatureFields({
           onFeatureChange(_withColor(feature, color));
         }}
       />
-      {feature.kind === "area" ?
+      {feature.kind === "area" ? (
         <AnnotationAreaOpacityField
           feature={feature}
           onFeatureChange={onFeatureChange}
           opacityLabel={t`Opacity`}
         />
-      : null}
+      ) : null}
       {feature.kind === "text" ? null : (
         <AnnotationStrokeWidthField
           feature={feature}

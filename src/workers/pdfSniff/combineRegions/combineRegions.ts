@@ -1,10 +1,11 @@
-import { extractMeasurements } from "../extractMeasurements/extractMeasurements";
-import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
 import type {
   DocumentMetadata,
   ExtractedTable,
   PdfCellFlag,
 } from "../pdfSniff.types";
+
+import { extractMeasurements } from "../extractMeasurements/extractMeasurements";
+import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
 
 export type CombinedTable = {
   outputMode: "natural" | "observations";
@@ -229,16 +230,17 @@ export function combineRegions(params: {
       const common = {
         page: provenance ? String(provenance.page + 1) : "",
         regionLabel: label,
-        confidence:
-          flagged.has(rowIndex) ? ("review" as const) : ("high" as const),
+        confidence: flagged.has(rowIndex)
+          ? ("review" as const)
+          : ("high" as const),
         extractedBy: table.extractedBy,
         doc,
       };
       const subject = row[subjectIndex] ?? "";
       const candidateValue =
-        valueIndex >= 0 ?
-          (row[valueIndex] ?? "")
-        : (row[fallbackValueIndex] ?? "");
+        valueIndex >= 0
+          ? (row[valueIndex] ?? "")
+          : (row[fallbackValueIndex] ?? "");
 
       if (_isNumericValue(candidateValue)) {
         rows.push(
@@ -252,9 +254,9 @@ export function combineRegions(params: {
             // beside the cells, and only a region that read none at all
             // falls back to a bare count.
             unit:
-              unitIndex >= 0 ?
-                (row[unitIndex] ?? "")
-              : (table.rowUnits?.[rowIndex] ?? "n"),
+              unitIndex >= 0
+                ? (row[unitIndex] ?? "")
+                : (table.rowUnits?.[rowIndex] ?? "n"),
             sourceText: sourceIndex >= 0 ? (row[sourceIndex] ?? "") : "",
           }),
         );

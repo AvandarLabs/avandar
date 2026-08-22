@@ -1,14 +1,3 @@
-import { assembleLabels } from "../assembleLabels/assembleLabels";
-import { assembleQuantities } from "../assembleQuantities/assembleQuantities";
-import {
-  applyCalibration,
-  calibrateAxis,
-  invertCalibration,
-} from "../calibrateAxis/calibrateAxis";
-import { findBarFamily } from "../findBarFamily/findBarFamily";
-import { findPlotFrame } from "../findPlotFrame/findPlotFrame";
-import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
-import { partitionTextByFrame } from "../partitionTextByFrame/partitionTextByFrame";
 import type { AssembledQuantity } from "../assembleQuantities/assembleQuantities";
 import type { AxisCalibration, AxisTick } from "../calibrateAxis/calibrateAxis";
 import type { Bar, BarFamily } from "../findBarFamily/findBarFamily";
@@ -22,6 +11,18 @@ import type {
   RegionGeometry,
   TextItem,
 } from "../pdfSniff.types";
+
+import { assembleLabels } from "../assembleLabels/assembleLabels";
+import { assembleQuantities } from "../assembleQuantities/assembleQuantities";
+import {
+  applyCalibration,
+  calibrateAxis,
+  invertCalibration,
+} from "../calibrateAxis/calibrateAxis";
+import { findBarFamily } from "../findBarFamily/findBarFamily";
+import { findPlotFrame } from "../findPlotFrame/findPlotFrame";
+import { normalizeCellValue } from "../normalizeCellValue/normalizeCellValue";
+import { partitionTextByFrame } from "../partitionTextByFrame/partitionTextByFrame";
 
 /**
  * How far a printed figure may sit from the length its own bar was drawn at
@@ -62,8 +63,8 @@ function _isNumeric(text: string): boolean {
 
 /** The coordinate the category axis runs along: y for bars, x for columns. */
 function _categoryOfItem(item: TextItem, family: BarFamily): number {
-  return family.orientation === "bar" ?
-      item.y + item.height / 2
+  return family.orientation === "bar"
+    ? item.y + item.height / 2
     : item.x + item.width / 2;
 }
 
@@ -72,8 +73,8 @@ function _categoryOfLabel(label: AssembledLabel, family: BarFamily): number {
 }
 
 function _categorySpan(bar: Bar, family: BarFamily): [number, number] {
-  return family.orientation === "bar" ?
-      [bar.bbox[1], bar.bbox[3]]
+  return family.orientation === "bar"
+    ? [bar.bbox[1], bar.bbox[3]]
     : [bar.bbox[0], bar.bbox[2]];
 }
 
@@ -159,8 +160,8 @@ function _rows(
   });
 
   return [...rowOf.values()].sort((left, right) => {
-    return family.orientation === "bar" ?
-        right.category - left.category
+    return family.orientation === "bar"
+      ? right.category - left.category
       : left.category - right.category;
   });
 }
@@ -176,9 +177,8 @@ function _axisScale(
   }
   const partition = partitionTextByFrame(region, frame);
   const items = (
-    family.orientation === "bar" ?
-      partition.xTicks
-    : partition.yTicks).filter((item) => {
+    family.orientation === "bar" ? partition.xTicks : partition.yTicks
+  ).filter((item) => {
     return _isNumeric(item.text);
   });
   return {
@@ -218,8 +218,8 @@ function _valueScale(
     consumed: [],
     ticks: rows.flatMap((row) => {
       const value = row.quantity && _numericValue(row.quantity);
-      return row.bar === undefined || value === undefined ?
-          []
+      return row.bar === undefined || value === undefined
+        ? []
         : [{ position: row.bar.freeEdge, value }];
     }),
   };
@@ -291,9 +291,9 @@ function _residualOf(
     return undefined;
   }
   const expected = invertCalibration(calibration, value);
-  return expected === undefined ? undefined : (
-      Math.abs(expected - row.bar.freeEdge)
-    );
+  return expected === undefined
+    ? undefined
+    : Math.abs(expected - row.bar.freeEdge);
 }
 
 function _flagsFor(
@@ -405,9 +405,9 @@ export function readBarChart(
   );
   const rows = _rows(family, labelItems, quantities);
   const scale =
-    scaleText.ticks.length >= 2 ?
-      scaleText
-    : _valueScale(region, family, rows, options.valueAxisHints ?? []);
+    scaleText.ticks.length >= 2
+      ? scaleText
+      : _valueScale(region, family, rows, options.valueAxisHints ?? []);
   const calibration = calibrateAxis(scale.ticks);
 
   const readable = rows.flatMap((row) => {
@@ -440,8 +440,8 @@ export function readBarChart(
     rowUnits: readable.map(({ reading }) => {
       return reading.unit;
     }),
-    ...(calibration === undefined ?
-      {}
-    : { chartAxis: _chartAxis(calibration, scale.ticks) }),
+    ...(calibration === undefined
+      ? {}
+      : { chartAxis: _chartAxis(calibration, scale.ticks) }),
   };
 }

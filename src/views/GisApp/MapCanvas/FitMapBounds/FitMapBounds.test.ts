@@ -1,5 +1,6 @@
 import { useReducedMotion } from "@mantine/hooks";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { renderHook, waitFor } from "@/test-utils";
 import { FitMapBounds } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
 

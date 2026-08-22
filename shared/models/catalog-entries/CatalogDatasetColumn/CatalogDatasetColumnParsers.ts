@@ -1,3 +1,12 @@
+import type {
+  CatalogDatasetColumnId,
+  CatalogDatasetColumnModel,
+  CatalogDatasetColumnRead,
+} from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types.ts";
+import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
+
 import { makeParserRegistry } from "@avandar/clients";
 import {
   camelCaseKeysDeep,
@@ -5,16 +14,9 @@ import {
   pipe,
   snakeCaseKeysDeep,
 } from "@avandar/utils";
-import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
-import type {
-  CatalogDatasetColumnId,
-  CatalogDatasetColumnModel,
-  CatalogDatasetColumnRead,
-} from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types.ts";
-import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+
+import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 
 const DBReadSchema = z.object({
   id: z.uuid(),

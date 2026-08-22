@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
+
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { UserClient } from "@/clients/UserClient";

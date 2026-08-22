@@ -1,13 +1,15 @@
+import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
+
 import { prop } from "@avandar/utils";
+import { describe, expect, it } from "vitest";
+
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it } from "vitest";
 import { renderHook } from "@/test-utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
-import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 
 /**
  * `useAvaMapRender` splices the annotation MapSpec at `annotationsZIndex`

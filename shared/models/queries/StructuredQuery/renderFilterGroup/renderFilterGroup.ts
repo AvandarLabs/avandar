@@ -1,5 +1,3 @@
-import { isDefined, matchLiteral, prop } from "@avandar/utils";
-import { renderFilterRule } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 import type {
   QueryFilter,
   QueryFilterGroup,
@@ -9,6 +7,10 @@ import type {
   SqlFragment,
 } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 
+import { isDefined, matchLiteral, prop } from "@avandar/utils";
+
+import { renderFilterRule } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
+
 function _renderNode(
   node: QueryFilter,
   options: RenderFilterRuleOptions,
@@ -17,8 +19,8 @@ function _renderNode(
     return renderFilterRule(node, options);
   }
   const nested = renderFilterGroup(node, options);
-  return nested ?
-      { sql: `(${nested.sql})`, bindings: nested.bindings }
+  return nested
+    ? { sql: `(${nested.sql})`, bindings: nested.bindings }
     : undefined;
 }
 

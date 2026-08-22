@@ -1,5 +1,6 @@
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import type { Session } from "@supabase/supabase-js";
+
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 
 /**
  * Thrown when a server call comes back `401 Unauthorized` and a session

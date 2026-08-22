@@ -1,10 +1,12 @@
-import { useDebouncedCallback } from "@mantine/hooks";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { AvaMapClient } from "@/clients/maps/AvaMapClient/AvaMapClient";
-import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Dispatch, RefObject, SetStateAction } from "react";
+
+import { useDebouncedCallback } from "@mantine/hooks";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { AvaMapClient } from "@/clients/maps/AvaMapClient/AvaMapClient";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
 
 /** What the top bar's indicator reports about persistence. */
 export type MapSaveState = "saved" | "saving" | "unsaved" | "failed";
@@ -86,11 +88,11 @@ async function _drainSaveQueue(options: DrainSaveQueueInput): Promise<void> {
   queue.isSaveRunning = false;
   if (queue.isMounted) {
     options.setSaveState(
-      didSaveSucceed ?
-        queue.editCount === revisionAtStart ?
-          "saved"
-        : "unsaved"
-      : "failed",
+      didSaveSucceed
+        ? queue.editCount === revisionAtStart
+          ? "saved"
+          : "unsaved"
+        : "failed",
     );
   }
 }

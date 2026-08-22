@@ -1,4 +1,9 @@
+import type { DexieCrudOperationContext } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
+import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
+
 import { isDefined, promiseMapSequential, promiseReduce } from "@avandar/utils";
+
 import {
   addAndGet,
   findConflictingRow,
@@ -7,9 +12,6 @@ import {
   putAndGet,
   rowsMatchOnConflictColumns,
 } from "@/clients/dexie/createDexieCrudClient/dexieCrudRowAccess";
-import type { DexieCrudOperationContext } from "@/clients/dexie/createDexieCrudClient/createDexieCrudClient.types";
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
-import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 
 type BulkAccumulator<M extends DexieCrudModelSpec> = {
   working: Array<M["DBRead"]>;
@@ -92,8 +94,8 @@ export async function upsertRowByPrimaryKey<
     message: "Could not extract primary key for upsert.",
   });
   const existing = await options.context.table.get(key);
-  return options.ignoreDuplicates && existing ?
-      existing
+  return options.ignoreDuplicates && existing
+    ? existing
     : putAndGet({
         context: options.context,
         data: options.data,
@@ -141,8 +143,8 @@ export async function upsertRowsByPrimaryKey<
   const existingRows = await options.context.table.bulkGet(keys);
   if (!options.ignoreDuplicates) {
     const mergedRows = options.data.map((row, index) => {
-      return existingRows[index] ?
-          ({ ...existingRows[index], ...row } as M["DBInsert"])
+      return existingRows[index]
+        ? ({ ...existingRows[index], ...row } as M["DBInsert"])
         : row;
     });
     return bulkPutAndGet({ context: options.context, data: mergedRows });

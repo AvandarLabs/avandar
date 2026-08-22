@@ -1,6 +1,7 @@
-import path from "node:path";
 import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 import type { FakeFactoryOptions } from "@ava-cli/SupabaseCLI/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+
+import path from "node:path";
 
 /** Creates the read-only filesystem portion of the local-environment fake. */
 export function createSupabaseLocalEnvironmentFakeReadIO(

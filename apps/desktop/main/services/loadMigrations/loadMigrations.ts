@@ -1,6 +1,7 @@
+import type { Migration } from "../SqliteService/Sqlite";
+
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import type { Migration } from "../SqliteService/Sqlite";
 
 /**
  * Suffix the migration generator stamps onto every emitted file. Picked

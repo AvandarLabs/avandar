@@ -1,6 +1,7 @@
-import { describe, expectTypeOf, it } from "vitest";
 import type { EmptyObject, UnknownObject } from "@utils/types/common.types.ts";
 import type { IsObjectWithShape } from "@utils/types/IsObjectWithShape/IsObjectWithShape.types.ts";
+
+import { describe, expectTypeOf, it } from "vitest";
 
 const TRUE = true as const;
 const FALSE = false as const;

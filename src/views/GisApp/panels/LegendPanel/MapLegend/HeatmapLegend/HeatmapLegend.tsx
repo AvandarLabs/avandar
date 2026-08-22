@@ -1,6 +1,8 @@
-import { useLingui } from "@lingui/react/macro";
-import css from "@/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.module.css";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+
+import css from "@/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.module.css";
 
 type Props = {
   ramp: readonly string[];

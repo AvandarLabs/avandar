@@ -1,7 +1,9 @@
-import * as arrow from "apache-arrow";
-import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+
+import * as arrow from "apache-arrow";
+
+import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 
 /** Reads the names of every base table or view in the `main` schema. */
 export async function getDuckDbRelationNames(

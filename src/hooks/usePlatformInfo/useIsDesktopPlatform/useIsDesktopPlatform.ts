@@ -1,5 +1,6 @@
-import { isDesktop } from "$/platform/isDesktop";
 import { useEffect, useState } from "react";
+
+import { isDesktop } from "$/platform/isDesktop";
 
 /**
  * Reactively tracks whether the page is running inside the Electrobun

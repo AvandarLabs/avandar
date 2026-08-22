@@ -1,5 +1,6 @@
 import { modals } from "@mantine/modals";
 import { describe, expect, it, vi } from "vitest";
+
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 

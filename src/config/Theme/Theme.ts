@@ -1,3 +1,8 @@
+import type {
+  VariantColorResolverResult,
+  VariantColorsResolverInput,
+} from "@mantine/core";
+
 import {
   ActionIcon,
   Autocomplete,
@@ -22,6 +27,7 @@ import {
   TagsInput,
   Tooltip,
 } from "@mantine/core";
+
 // Imported by direct path (not the `@ui` alias) because tailwind.config.js
 // loads this module through jiti, which does not resolve the Vite-only `@ui`
 // alias. Using `@ui` here breaks tailwind's CSS build.
@@ -35,10 +41,6 @@ import { AnimationTheme } from "./AnimationTheme/AnimationTheme";
 import { BorderTheme } from "./BorderTheme";
 import { ElevationTheme } from "./ElevationTheme";
 import { OverlayTheme } from "./OverlayTheme";
-import type {
-  VariantColorResolverResult,
-  VariantColorsResolverInput,
-} from "@mantine/core";
 
 /**
  * AppShell main z-index.
@@ -218,12 +220,12 @@ export const Theme = createTheme({
           root: {
             transition: interactiveTransition,
             fontWeight: 500,
-            ...(props.variant === "default" ?
-              {
-                borderColor: cssAvaVar("border-default"),
-                boxShadow: theme.shadows.xs,
-              }
-            : {}),
+            ...(props.variant === "default"
+              ? {
+                  borderColor: cssAvaVar("border-default"),
+                  boxShadow: theme.shadows.xs,
+                }
+              : {}),
           },
         };
       },

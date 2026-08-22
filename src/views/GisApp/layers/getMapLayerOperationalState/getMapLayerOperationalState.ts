@@ -30,16 +30,17 @@ export function getMapLayerOperationalState(
     (diagnostics?.invalidCount ?? 0) > 0 ||
     diagnostics?.hasMixedFamilies === true;
 
-  return (
-    errorMessage.includes("requires rebinding") ? { type: "rebindRequired" }
-    : errorMessage.includes("Spatial is unavailable") ?
-      { type: "spatialUnavailable" }
-    : viewState.status === "error" ? { type: "queryError" }
-    : suppressedFeatureCount > 0 ?
-      { type: "suppressed", featureCount: suppressedFeatureCount }
-    : noDataFeatureCount > 0 ?
-      { type: "noData", featureCount: noDataFeatureCount }
-    : hasPartialMatch ? { type: "partialMatch" }
-    : { type: viewState.status }
-  );
+  return errorMessage.includes("requires rebinding")
+    ? { type: "rebindRequired" }
+    : errorMessage.includes("Spatial is unavailable")
+      ? { type: "spatialUnavailable" }
+      : viewState.status === "error"
+        ? { type: "queryError" }
+        : suppressedFeatureCount > 0
+          ? { type: "suppressed", featureCount: suppressedFeatureCount }
+          : noDataFeatureCount > 0
+            ? { type: "noData", featureCount: noDataFeatureCount }
+            : hasPartialMatch
+              ? { type: "partialMatch" }
+              : { type: viewState.status };
 }

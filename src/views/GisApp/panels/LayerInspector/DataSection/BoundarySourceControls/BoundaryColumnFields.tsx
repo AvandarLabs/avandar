@@ -1,8 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
-import { Select } from "@mantine/core";
-import { BoundaryColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnSelect";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ReactNode } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Select } from "@mantine/core";
+
+import { BoundaryColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnSelect";
 
 type Props = {
   columnData: Array<{ value: DatasetColumn.Id; label: string }>;

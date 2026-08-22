@@ -1,5 +1,6 @@
-import { hasDefinedProps, objectKeys } from "@avandar/utils";
 import type { StringKeyOf, UnknownObject } from "@avandar/utils";
+
+import { hasDefinedProps, objectKeys } from "@avandar/utils";
 
 /**
  * Transforms an array of objects (rows) into an object where each key

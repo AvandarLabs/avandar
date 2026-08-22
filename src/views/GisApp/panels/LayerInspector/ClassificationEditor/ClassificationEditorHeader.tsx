@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Button, Title } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
+
 import css from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationEditor.module.css";
-import type { ReactNode } from "react";
 
 type Props = { onBack: () => void };
 

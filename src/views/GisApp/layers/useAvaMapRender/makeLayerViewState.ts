@@ -1,5 +1,4 @@
-import { noop, sortObjList } from "@avandar/utils";
-import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type {
   PointAggregation,
   PointCoordinateAudit,
@@ -11,7 +10,10 @@ import type {
 } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+
+import { noop, sortObjList } from "@avandar/utils";
+
+import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 
 type GetLayerStatusInput = {
   hasBinding: boolean;
@@ -65,13 +67,15 @@ function _getLayerStatus({
   featureCount,
   droppedRowCount,
 }: GetLayerStatusInput): MapLayerViewState["status"] {
-  return (
-    !hasBinding ? "unbound"
-    : error ? "error"
-    : isLoading ? "loading"
-    : featureCount === 0 && droppedRowCount === 0 ? "empty"
-    : "ready"
-  );
+  return !hasBinding
+    ? "unbound"
+    : error
+      ? "error"
+      : isLoading
+        ? "loading"
+        : featureCount === 0 && droppedRowCount === 0
+          ? "empty"
+          : "ready";
 }
 
 /** Counts aggregate feature states without exposing suppressed metrics. */
@@ -151,9 +155,9 @@ export function makeLayerViewState(
     drops: [...drops],
     largestDropReason: _getLargestDropReason(drops),
     spatialDiagnostics:
-      queryState?.data?.type === "spatial" ?
-        queryState.data.diagnostics
-      : undefined,
+      queryState?.data?.type === "spatial"
+        ? queryState.data.diagnostics
+        : undefined,
     ..._getAggregateFeatureCounts(geometry.featureCollection),
     filterCount: layer.source.filters.rules.length,
     onRetry: queryState?.refetch ?? noop,

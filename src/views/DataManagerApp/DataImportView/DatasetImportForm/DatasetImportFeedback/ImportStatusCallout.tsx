@@ -1,5 +1,6 @@
-import { Callout } from "@avandar/ui";
 import type { ReactNode } from "react";
+
+import { Callout } from "@avandar/ui";
 
 type Props = {
   numRows: number;
@@ -13,7 +14,7 @@ export function ImportStatusCallout({
   failureTitle,
   failureMessage,
 }: Readonly<Props>): ReactNode {
-  return numRows === 0 ?
-      <Callout title={failureTitle} color="error" message={failureMessage} />
-    : null;
+  return numRows === 0 ? (
+    <Callout title={failureTitle} color="error" message={failureMessage} />
+  ) : null;
 }

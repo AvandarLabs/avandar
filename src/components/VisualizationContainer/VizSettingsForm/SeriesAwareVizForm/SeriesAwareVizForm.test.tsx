@@ -1,12 +1,15 @@
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
-import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs";
-import { describe, expect, it } from "vitest";
-import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { render, screen } from "@/test-utils";
-import { SeriesAwareVizForm } from "./SeriesAwareVizForm";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+import { describe, expect, it } from "vitest";
+
+import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs";
+import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
+import { render, screen } from "@/test-utils";
+
+import { SeriesAwareVizForm } from "./SeriesAwareVizForm";
 
 i18n.load("en", {});
 i18n.activate("en");

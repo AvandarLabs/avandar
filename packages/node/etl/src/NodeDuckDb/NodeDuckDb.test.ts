@@ -1,8 +1,8 @@
+import { duckDbDescribeColumnTypeToSniffable } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
+import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { duckDbDescribeColumnTypeToSniffable } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
-import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("duckDbDescribeColumnTypeToSniffable", () => {

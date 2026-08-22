@@ -1,6 +1,7 @@
-import { isArray } from "@avandar/utils";
 import type { UnknownObject } from "@avandar/utils";
 import type { SetRequired } from "type-fest";
+
+import { isArray } from "@avandar/utils";
 
 /**
  * Returns a predicate that is true if any of the predicates are true.
@@ -14,8 +15,9 @@ export function or<T, Predicates extends Array<(value: any) => value is any>>(
   value: T,
   ...predicates: Predicates
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): value is Predicates[number] extends (value: any) => value is infer R ? T & R
-: never {
+): value is Predicates[number] extends ((value: any) => value is infer R)
+  ? T & R
+  : never {
   return predicates.some((predicate) => {
     return predicate(value);
   });

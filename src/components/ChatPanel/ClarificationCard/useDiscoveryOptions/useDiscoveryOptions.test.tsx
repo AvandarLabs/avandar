@@ -1,9 +1,12 @@
+import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
+
 /** Behavioral tests for discovery query retries. */
 import { act } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+
 import { renderHook, TestProviders, waitFor } from "@/test-utils";
+
 import { useDiscoveryOptions } from "./useDiscoveryOptions";
-import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
 
 const DISCOVERY_PARAMETERS = {
   query: 'SELECT DISTINCT "state" FROM "mortality"',

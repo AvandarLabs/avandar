@@ -1,9 +1,10 @@
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 /** Authorization coverage for the authenticated workspace ancestor route. */
 import { Model } from "@avandar/models";
 import { QueryClient } from "@tanstack/react-query";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 const WORKSPACES_QUERY_KEY = [
   "Workspace",

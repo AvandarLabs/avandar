@@ -1,3 +1,5 @@
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
+
 /**
  * The emitter is what makes `analytics.chat_health` non-empty. It must record
  * exactly one row per turn, must never let an analytics failure surface to the
@@ -5,7 +7,6 @@
  */
 import { emitChatTurnAnalytics } from "@sbfn/chat/PostChatMessages/analytics/emitChatTurnAnalytics/emitChatTurnAnalytics.ts";
 import { describe, expect, it, vi } from "vitest";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 function _createFakeClient(): {
   client: AvaSupabaseClient;

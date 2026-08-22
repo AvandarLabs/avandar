@@ -1,6 +1,7 @@
+import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+
 import { Trans } from "@lingui/react/macro";
 import { Paper, Stack, Text, UnstyledButton } from "@mantine/core";
-import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
 type Props = {
   /** Entries after optional fuzzy search. */

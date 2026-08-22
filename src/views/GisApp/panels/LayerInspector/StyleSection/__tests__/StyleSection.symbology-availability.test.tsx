@@ -1,6 +1,7 @@
+import { describe, expect, it, vi } from "vitest";
+
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import {
   createTextColumn,

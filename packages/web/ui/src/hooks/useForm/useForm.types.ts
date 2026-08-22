@@ -9,7 +9,7 @@ import type { Simplify } from "type-fest";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <
   P extends keyof FormValues,
-  ItemType extends FormValues[P] extends ReadonlyArray<infer V> ? V : never,
+  ItemType extends (FormValues[P] extends ReadonlyArray<infer V> ? V : never),
 >(
   path: P,
   item: ItemType,

@@ -1,4 +1,17 @@
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type {
+  MapLayerSpatialQueryPlan,
+  ResolvedBoundarySource,
+  ResolvedMapLayerMetadata,
+} from "../MapLayerSpatialQuery.types";
+import type {
+  CompileOptions,
+  CompileSourceOptions,
+} from "./compileMapLayerSpatialQuery.types";
+
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+
 import { makeOutputAoiPredicateSql } from "../AoiPredicateSqlHelpers/AoiPredicateSqlHelpers";
 import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression/makeGeometryExpressionFromValueExpression";
 import { makeNormalizedBoundaryKeyFromValueExpression } from "../makeNormalizedBoundaryKeyFromValueExpression/makeNormalizedBoundaryKeyFromValueExpression";
@@ -16,17 +29,6 @@ import {
   makeSimplifiedGeometrySql,
   makeSpatialQueryPlan,
 } from "./compileMapLayerSpatialQueryHelpers";
-import type {
-  MapLayerSpatialQueryPlan,
-  ResolvedBoundarySource,
-  ResolvedMapLayerMetadata,
-} from "../MapLayerSpatialQuery.types";
-import type {
-  CompileOptions,
-  CompileSourceOptions,
-} from "./compileMapLayerSpatialQuery.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 type BoundaryJoinBinding = Extract<
   MapLayer.GeoBinding,
@@ -55,8 +57,8 @@ function _buildMatchKey(options: {
   expression: string;
   matching: "exact" | "normalizedName";
 }): string {
-  return options.matching === "normalizedName" ?
-      makeNormalizedBoundaryKeyFromValueExpression(options.expression)
+  return options.matching === "normalizedName"
+    ? makeNormalizedBoundaryKeyFromValueExpression(options.expression)
     : options.expression;
 }
 
@@ -114,8 +116,8 @@ function _buildBoundaryDenominatorSql(
   const alias = quoteSqlIdentifier(
     MapLayerSpatialFeatureProperties.denominator,
   );
-  return denominator?.type === "boundaryColumn" ?
-      `, ${quoteSqlIdentifier(denominator.columnName)} AS ${alias}`
+  return denominator?.type === "boundaryColumn"
+    ? `, ${quoteSqlIdentifier(denominator.columnName)} AS ${alias}`
     : "";
 }
 
@@ -163,9 +165,8 @@ function _getBoundaryJoinSqlParts(
       simplificationReferenceLatitude: options.simplificationReferenceLatitude,
     }),
     boundaryKey,
-    displayName:
-      boundary.displayNameColumnName ?
-        quoteSqlIdentifier(boundary.displayNameColumnName)
+    displayName: boundary.displayNameColumnName
+      ? quoteSqlIdentifier(boundary.displayNameColumnName)
       : boundaryKey,
     geometryColumn: quoteSqlIdentifier(GEOMETRY_COLUMN),
     familyColumn: quoteSqlIdentifier(FAMILY_COLUMN),
@@ -246,10 +247,9 @@ ${_buildMatchedAreaCtes(parts)}`;
 
 /** Builds capped match diagnostics without inflating the result envelope. */
 function _buildMatchDiagnostics(isAggregateOnly: boolean): string {
-  const unmatchedSamples =
-    isAggregateOnly ? "[]" : (
-      "coalesce(list_slice(list(source_key) FILTER (WHERE boundary_feature_id IS NULL), 1, 20), [])"
-    );
+  const unmatchedSamples = isAggregateOnly
+    ? "[]"
+    : "coalesce(list_slice(list(source_key) FILTER (WHERE boundary_feature_id IS NULL), 1, 20), [])";
   return `match_diagnostics AS (
   SELECT
     (SELECT count(*) FROM matched_rows) AS matched_source_key_count,
@@ -275,9 +275,8 @@ function _buildBoundaryFeatureRowsCte(options: {
   aoi: AvaMapConfig.AoiPolygon | undefined;
 }): string {
   const properties = MapLayerSpatialFeatureProperties;
-  const outputAoiWhere =
-    options.aoi ?
-      `\n  WHERE ${makeOutputAoiPredicateSql(options.geometry, options.aoi)}`
+  const outputAoiWhere = options.aoi
+    ? `\n  WHERE ${makeOutputAoiPredicateSql(options.geometry, options.aoi)}`
     : "";
   return `feature_rows AS (
   SELECT json_object('type', 'Feature', 'geometry', json(ST_AsGeoJSON(${options.geometry})),
@@ -315,11 +314,11 @@ function _getJoinDenominatorSql(
   const alias = quoteSqlIdentifier(
     MapLayerSpatialFeatureProperties.denominator,
   );
-  return (
-    denominatorType === "queryColumn" ? `area_values.${alias}`
-    : denominatorType === "boundaryColumn" ? `boundary.${alias}`
-    : "NULL"
-  );
+  return denominatorType === "queryColumn"
+    ? `area_values.${alias}`
+    : denominatorType === "boundaryColumn"
+      ? `boundary.${alias}`
+      : "NULL";
 }
 
 /** Reads the boundary's disputed-status column when the layer binds one. */
@@ -347,8 +346,9 @@ function _buildBoundaryJoinOutput(options: {
   const diagnosticAlias = quoteSqlIdentifier(
     MapLayerSpatialQueryColumns.diagnostics,
   );
-  const samples =
-    isAggregateOnly ? "json('[]')" : "to_json(unmatched_source_key_samples)";
+  const samples = isAggregateOnly
+    ? "json('[]')"
+    : "to_json(unmatched_source_key_samples)";
   return `${_buildMatchDiagnostics(isAggregateOnly)},
 ${_buildBoundaryFeatureRowsCte({
   geometry,

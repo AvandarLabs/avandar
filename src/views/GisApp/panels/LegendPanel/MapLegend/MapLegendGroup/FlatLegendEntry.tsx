@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
+
 import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
-import type { ReactNode } from "react";
 
 type Props = {
   color: string | undefined;
@@ -25,14 +27,14 @@ export function FlatLegendEntry({
         />
         {entryLabel}
       </li>
-      {showNoData ?
+      {showNoData ? (
         <li className={css.mapLegendGroupItem}>
           <span
             className={clsx(css.mapLegendGroupKey, css.mapLegendGroupKeyNoData)}
           />
           {t`Not reported`}
         </li>
-      : null}
+      ) : null}
     </>
   );
 }

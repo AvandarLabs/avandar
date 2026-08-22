@@ -1,10 +1,11 @@
+import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types.ts";
+
 import { assertIsNonEmptyArray, isNonEmptyArray } from "@avandar/utils";
 import { getGoogleAuthClient } from "@sbfn/_shared/getGoogleAuthClient.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";
 import { google } from "googleapis";
 import { string } from "zod";
-import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types.ts";
 
 export const GoogleSheetsRoutes = defineRoutes<GoogleSheetsAPI>(
   "google-sheets",

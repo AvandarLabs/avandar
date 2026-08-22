@@ -3,11 +3,13 @@
  * growFrom.
  */
 
-import { describe, expect, it } from "vitest";
-import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { RelationCacheWrite } from "$/models/relations/RelationCachePort/RelationCachePort.types";
+
+import { describe, expect, it } from "vitest";
+
+import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";

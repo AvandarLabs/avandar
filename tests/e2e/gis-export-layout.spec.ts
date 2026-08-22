@@ -1,3 +1,5 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
@@ -7,7 +9,6 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Page } from "@playwright/test";
 
 const MAP_NAME = "E2E GIS export layout";
 const TITLE_TEXT = "Cholera sitrep, week 34";

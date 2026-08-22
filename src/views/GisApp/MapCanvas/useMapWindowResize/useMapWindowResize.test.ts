@@ -1,12 +1,14 @@
+import type { RefObject } from "react";
+
 /**
  * Behavioral tests for resizing a live MapLibre map when its viewport or
  * canvas container changes size, including when a docked drawer shrinks the
  * map without a window resize.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { act, renderHook } from "@/test-utils";
 import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapWindowResize/useMapWindowResize";
-import type { RefObject } from "react";
 
 class TestResizeObserver {
   static onResize: (() => void) | undefined;

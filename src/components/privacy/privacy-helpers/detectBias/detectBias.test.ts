@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 
 describe("detectBias", () => {

@@ -1,5 +1,6 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
+
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import {
   featureCollection,
   valueColumnId,
@@ -204,19 +205,19 @@ describe("makeLayerSpecFromMapLayer cluster and heatmap paint", () => {
       const unsafeLayer = {
         ...base,
         symbology:
-          symbologyType === "cluster" ?
-            {
-              type: "cluster" as const,
-              radiusPx: 50,
-              color: { type: "single" as const, color: "#123456" },
-              stroke: { width: 1, color: "#ffffff" },
-            }
-          : {
-              type: "heatmap" as const,
-              radiusPx: 30,
-              weight: undefined,
-              ramp: ["#111111", "#eeeeee"],
-            },
+          symbologyType === "cluster"
+            ? {
+                type: "cluster" as const,
+                radiusPx: 50,
+                color: { type: "single" as const, color: "#123456" },
+                stroke: { width: 1, color: "#ffffff" },
+              }
+            : {
+                type: "heatmap" as const,
+                radiusPx: 30,
+                weight: undefined,
+                ramp: ["#111111", "#eeeeee"],
+              },
       } as MapLayer.T;
 
       expect(() => {

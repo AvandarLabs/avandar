@@ -1,12 +1,14 @@
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+
+import { describe, expect, it, vi } from "vitest";
+
 /**
  * Buffer inspector fields: read-only source, clamped distance, dissolve.
  */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { BufferOfLayerFields } from "@/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 function _createBufferLayer(): MapLayer.T {
   return {

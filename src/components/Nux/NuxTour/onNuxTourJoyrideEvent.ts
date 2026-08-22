@@ -1,8 +1,10 @@
-import { EVENTS } from "react-joyride";
-import { getNuxTourStepAfterTransition } from "@/components/Nux/NuxTour/getNuxTourStepAfterTransition/getNuxTourStepAfterTransition";
-import { shouldCloseTourOnTargetNotFound } from "@/components/Nux/NuxTour/shouldCloseTourOnTargetNotFound/shouldCloseTourOnTargetNotFound";
 import type { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import type { EventData } from "react-joyride";
+
+import { EVENTS } from "react-joyride";
+
+import { getNuxTourStepAfterTransition } from "@/components/Nux/NuxTour/getNuxTourStepAfterTransition/getNuxTourStepAfterTransition";
+import { shouldCloseTourOnTargetNotFound } from "@/components/Nux/NuxTour/shouldCloseTourOnTargetNotFound/shouldCloseTourOnTargetNotFound";
 
 type Options = {
   activeStepIndex: number;

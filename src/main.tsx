@@ -6,6 +6,8 @@ import "@mantine/tiptap/styles.css";
 import "@mantine/charts/styles.css";
 import "@/index.css";
 import "@/config/Theme/animationPresets.css";
+import type { AvaRouterRootContext } from "@/config/AvaRouter";
+
 import { RouterProvider } from "@tanstack/react-router";
 import {
   ModuleRegistry as AGGridModuleRegistry,
@@ -13,6 +15,7 @@ import {
 } from "ag-grid-community";
 import { StrictMode, useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
+
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { AvandarQueryClientProvider } from "@/components/providers/AvandarQueryClientProvider/AvandarQueryClientProvider";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
@@ -21,7 +24,6 @@ import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { AvandarI18nProvider } from "@/i18n/AvandarI18nProvider";
 import { registerOfflineServiceWorker } from "@/lib/offline/registerServiceWorker";
-import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
 AGGridModuleRegistry.registerModules([AllCommunityModule]);
 

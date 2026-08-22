@@ -1,5 +1,6 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it, vi } from "vitest";
+
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import {
   getCircleSymbology,
@@ -15,17 +16,17 @@ describe("StyleSection classification", () => {
       const layer = MapLayer.makeEmpty("Cities");
       const circleSymbology = getCircleSymbology(layer);
       const symbology =
-        symbologyType === "circle" ? circleSymbology : (
-          {
-            type: "proportionalSymbol" as const,
-            value: queryColumn.id,
-            minRadius: 4,
-            maxRadius: 24,
-            scale: "sqrt" as const,
-            color: circleSymbology.color,
-            stroke: circleSymbology.stroke,
-          }
-        );
+        symbologyType === "circle"
+          ? circleSymbology
+          : {
+              type: "proportionalSymbol" as const,
+              value: queryColumn.id,
+              minRadius: 4,
+              maxRadius: 24,
+              scale: "sqrt" as const,
+              color: circleSymbology.color,
+              stroke: circleSymbology.stroke,
+            };
       render(
         <StyleSection
           layer={{ ...layer, symbology }}

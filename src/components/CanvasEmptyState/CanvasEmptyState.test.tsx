@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { CanvasEmptyState } from "@/components/CanvasEmptyState/CanvasEmptyState";
 import { render, screen } from "@/test-utils";
 

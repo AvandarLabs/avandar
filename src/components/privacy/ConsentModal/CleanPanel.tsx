@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
+
 import { ColumnNameHint } from "./ColumnNameHint";
 import { RowValueList } from "./RowValueList";
 

@@ -1,10 +1,11 @@
+import type { Page } from "@playwright/test";
+
 import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { deleteWorkspaceTagByName } from "./helpers/datasetSharingCleanup";
 import { E2E_SECONDARY_MEMBER_DISPLAY_NAME } from "./helpers/datasetSharingFlow";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import { createWorkspaceTagViaSettings } from "./helpers/workspaceTagsFlow";
-import type { Page } from "@playwright/test";
 
 /**
  * `idb-keyval` defaults, plus the persister key from `queryPersister.ts`.
@@ -48,9 +49,9 @@ async function _waitForPersistedQuery(options: {
                 };
                 getRequest.onsuccess = () => {
                   return resolve(
-                    typeof getRequest.result === "string" ?
-                      getRequest.result
-                    : "",
+                    typeof getRequest.result === "string"
+                      ? getRequest.result
+                      : "",
                   );
                 };
               };

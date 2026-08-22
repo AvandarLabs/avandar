@@ -1,11 +1,13 @@
+import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
+
 /**
  * The sanitiser here is a privacy control, not a formatting nicety. DuckDB
  * error messages embed both the submitted SQL and the offending customer
  * value, and `usage_analytics_events.payload` is barred from carrying either.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { QueryAnalyticsPayloads } from "@/views/DataExplorerApp/useDataQueryAnalytics/QueryAnalyticsPayloads/QueryAnalyticsPayloads";
-import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 
 /**
  * A failed run as the query function records it. `isOffline` is captured in

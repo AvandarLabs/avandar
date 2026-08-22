@@ -1,3 +1,21 @@
+import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
+import type {
+  SqlMappingInput,
+  SqlMappingResult,
+} from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
+import type {
+  PartialStructuredQuery,
+  StructuredQueryId,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+
 /**
  * Best-effort parser from a raw SQL string into a {@link
  * PartialStructuredQuery} that the manual query form can display.
@@ -16,6 +34,8 @@
  */
 import { Model } from "@avandar/models";
 import { makeObject, propEq } from "@avandar/utils";
+import { Parser } from "node-sql-parser";
+
 import { uuid } from "$/lib/uuid.ts";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import {
@@ -29,24 +49,6 @@ import {
   identifierToString,
   matchAggregation,
 } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlAstReaders.ts";
-import { Parser } from "node-sql-parser";
-import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
-import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type {
-  QueryColumnId,
-  QueryColumnRead,
-} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types.ts";
-import type {
-  SqlMappingInput,
-  SqlMappingResult,
-} from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.types.ts";
-import type {
-  PartialStructuredQuery,
-  StructuredQueryId,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 export type {
   SqlMappingInput,
@@ -140,13 +142,11 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     unmappedReasons.push({ code: "ctesUnsupported" });
   }
   const distinctType =
-    (
-      ast.distinct &&
-      typeof ast.distinct === "object" &&
-      "type" in (ast.distinct as Record<string, unknown>)
-    ) ?
-      (ast.distinct as { type: unknown }).type
-    : ast.distinct;
+    ast.distinct &&
+    typeof ast.distinct === "object" &&
+    "type" in (ast.distinct as Record<string, unknown>)
+      ? (ast.distinct as { type: unknown }).type
+      : ast.distinct;
   if (distinctType) {
     unmappedReasons.push({ code: "distinctUnsupported" });
   }
@@ -356,21 +356,21 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   if (ast.where) {
     const parsedRaw = parseWhereNode(ast.where, unmappedReasons);
     const parsed =
-      parsedRaw === undefined ? undefined : (
-        stampFilterColumnTypes({
-          node: parsedRaw,
-          columnTypes: filterColumnTypes,
-        })
-      );
+      parsedRaw === undefined
+        ? undefined
+        : stampFilterColumnTypes({
+            node: parsedRaw,
+            columnTypes: filterColumnTypes,
+          });
     if (parsed) {
       filters =
-        parsed.type === "group" ?
-          parsed
-        : ({
-            type: "group",
-            combinator: "AND",
-            rules: [parsed],
-          } as QueryFilterGroup);
+        parsed.type === "group"
+          ? parsed
+          : ({
+              type: "group",
+              combinator: "AND",
+              rules: [parsed],
+            } as QueryFilterGroup);
     }
   }
 
@@ -381,13 +381,13 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     const parsedHaving = parseHavingNode(ast.having, unmappedReasons);
     if (parsedHaving) {
       having =
-        parsedHaving.type === "group" ?
-          parsedHaving
-        : ({
-            type: "group",
-            combinator: "AND",
-            rules: [parsedHaving],
-          } as QueryFilterGroup);
+        parsedHaving.type === "group"
+          ? parsedHaving
+          : ({
+              type: "group",
+              combinator: "AND",
+              rules: [parsedHaving],
+            } as QueryFilterGroup);
     }
   }
 

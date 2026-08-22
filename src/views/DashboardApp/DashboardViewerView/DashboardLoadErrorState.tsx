@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
+
 import { Paper } from "@avandar/ui";
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text, Title } from "@mantine/core";
-import type { ReactNode } from "react";
 
 /** Shown when one or more published datasets failed to download. */
 export function DashboardLoadErrorState(): ReactNode {

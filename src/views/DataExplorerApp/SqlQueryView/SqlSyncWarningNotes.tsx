@@ -1,9 +1,11 @@
-import { Trans } from "@lingui/react/macro";
-import { List, Stack, Text } from "@mantine/core";
-import { sqlFailedMappingReasonLabel } from "$/copy/sqlFailedMappingReasonLabel";
-import { sqlFailedMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { ReactNode } from "react";
+
+import { Trans } from "@lingui/react/macro";
+import { List, Stack, Text } from "@mantine/core";
+
+import { sqlFailedMappingReasonLabel } from "$/copy/sqlFailedMappingReasonLabel";
+import { sqlFailedMappingReasonKey } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 
 type Props = {
   /** Reasons the manual form could not represent the current SQL. */

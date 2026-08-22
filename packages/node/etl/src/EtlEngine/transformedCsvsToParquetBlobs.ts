@@ -1,8 +1,9 @@
+import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
+
+import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
-import { NodeDuckDb } from "@etl/NodeDuckDb/NodeDuckDb";
-import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
 /**
  * Column metadata for CSV → Parquet conversion (DuckDB cast names).
@@ -50,17 +51,17 @@ export async function transformedCsvsToParquetBlobs(options: {
       // the schema. Otherwise every column type is pinned, so the Parquet
       // matches the transform's contract rather than whatever the CSV suggests.
       const readOptions =
-        columns.length === 0 ?
-          { csvPath, viewName, header: true, autoDetect: true }
-        : {
-            csvPath,
-            viewName,
-            header: true,
-            autoDetect: false,
-            columns: columns.map((column) => {
-              return { name: column.name, type: column.type };
-            }),
-          };
+        columns.length === 0
+          ? { csvPath, viewName, header: true, autoDetect: true }
+          : {
+              csvPath,
+              viewName,
+              header: true,
+              autoDetect: false,
+              columns: columns.map((column) => {
+                return { name: column.name, type: column.type };
+              }),
+            };
 
       // react-doctor-disable-next-line
       await db.readCsvIntoView(readOptions);

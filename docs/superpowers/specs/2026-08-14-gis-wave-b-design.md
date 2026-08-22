@@ -245,11 +245,11 @@ the exact count can be reconstructed.
 
 Real zero, suppressed, and no-data are distinct:
 
-| State | Meaning | Rendering |
-| --- | --- | --- |
-| Value zero | A reported value equals zero | Lowest applicable class |
-| Suppressed | Data exists below the permitted record threshold | Suppression hatch and neutral fill |
-| No-data | Nothing usable was reported or the denominator is invalid | No-data stipple and neutral fill |
+| State      | Meaning                                                   | Rendering                          |
+| ---------- | --------------------------------------------------------- | ---------------------------------- |
+| Value zero | A reported value equals zero                              | Lowest applicable class            |
+| Suppressed | Data exists below the permitted record threshold          | Suppression hatch and neutral fill |
+| No-data    | Nothing usable was reported or the denominator is invalid | No-data stipple and neutral fill   |
 
 ### 5.4 Zoom simplification
 

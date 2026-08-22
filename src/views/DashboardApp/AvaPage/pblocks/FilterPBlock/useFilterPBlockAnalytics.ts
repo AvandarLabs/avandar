@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
-import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
-import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import type { FilterPBlockMode } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import type { PuckContext } from "@puckeditor/core";
+
+import { useEffect, useRef } from "react";
+
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
+import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 
 function _clearTimeoutIfScheduled(timeoutId: number | undefined): void {
   if (timeoutId !== undefined) {

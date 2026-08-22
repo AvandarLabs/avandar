@@ -1,5 +1,6 @@
-import { prop } from "@avandar/utils";
 import type { DashboardVisibility } from "$/models/Dashboard/Dashboard.types.ts";
+
+import { prop } from "@avandar/utils";
 
 /** The minimum a dashboard row must carry for the count to judge it. */
 type ShareableDashboardCandidate = {

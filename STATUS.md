@@ -49,14 +49,14 @@ arrive at the explorer as `"concept_<uuid>"`.
 
 Mapped concept **County** (not seed `State`):
 
-| | |
-|---|---|
-| Concept | `County` (`a11c0001-c0a7-4000-8000-00000000c0a7`) |
-| Dataset | `long-us-deaths.csv` (`a4fd4718-1bd5-43e2-b4ae-7ec600d1845f`) |
-| Identifier | `UID` (`dataset_column`, `most_frequent`) |
-| Label | `Combined_Key` (`most_frequent`) |
-| Other attrs | `Province_State`, `Population` (`most_frequent`) |
-| Spine | 3342 individuals (distinct `UID`s from the parquet) |
+|             |                                                               |
+| ----------- | ------------------------------------------------------------- |
+| Concept     | `County` (`a11c0001-c0a7-4000-8000-00000000c0a7`)             |
+| Dataset     | `long-us-deaths.csv` (`a4fd4718-1bd5-43e2-b4ae-7ec600d1845f`) |
+| Identifier  | `UID` (`dataset_column`, `most_frequent`)                     |
+| Label       | `Combined_Key` (`most_frequent`)                              |
+| Other attrs | `Province_State`, `Population` (`most_frequent`)              |
+| Spine       | 3342 individuals (distinct `UID`s from the parquet)           |
 
 ```sql
 SELECT * FROM "concept_a11c0001-c0a7-4000-8000-00000000c0a7" LIMIT 5;

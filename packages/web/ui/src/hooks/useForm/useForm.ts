@@ -1,5 +1,3 @@
-import { formRootRule, useForm as mantineUseForm } from "@mantine/form";
-import { useKeysAndPropsCallback } from "@ui/hooks/useForm/useKeysAndPropsCallback";
 import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type {
   FormErrors,
@@ -7,6 +5,9 @@ import type {
 } from "@mantine/form";
 import type { FormType } from "@ui/hooks/useForm/useForm.types";
 import type { Merge } from "type-fest";
+
+import { formRootRule, useForm as mantineUseForm } from "@mantine/form";
+import { useKeysAndPropsCallback } from "@ui/hooks/useForm/useKeysAndPropsCallback";
 
 // Improved type safety for `path` argument in a Rule function
 export type RuleFn<
@@ -22,29 +23,35 @@ export type FormRule<
   FullFormValues,
   FormPath extends ObjectPaths<FullFormValues>,
 > =
-  NonNullable<Value> extends ReadonlyArray<infer ListElementType> ?
-    | ({
-        [K in keyof NonNullable<ListElementType>]?:
-          | RuleFn<NonNullable<ListElementType>[K], FullFormValues, FormPath>
-          | (NonNullable<ListElementType>[K] extends (
-              ReadonlyArray<infer NestedListItem>
-            ) ?
-              FormRulesRecord<NestedListItem, FullFormValues, FormPath>
-            : NonNullable<ListElementType>[K] extends UnknownObject ?
-              FormRulesRecord<
-                NonNullable<ListElementType>[K],
-                FullFormValues,
-                FormPath
-              >
-            : never);
-      } & {
-        [formRootRule]?: RuleFn<Value, FullFormValues, FormPath>;
-      })
-    | RuleFn<Value, FullFormValues, FormPath>
-  : NonNullable<Value> extends UnknownObject ?
-    | FormRulesRecord<Value, FullFormValues, FormPath>
-    | RuleFn<Value, FullFormValues, FormPath>
-  : RuleFn<Value, FullFormValues, FormPath>;
+  NonNullable<Value> extends ReadonlyArray<infer ListElementType>
+    ?
+        | ({
+            [K in keyof NonNullable<ListElementType>]?:
+              | RuleFn<
+                  NonNullable<ListElementType>[K],
+                  FullFormValues,
+                  FormPath
+                >
+              | (NonNullable<ListElementType>[K] extends ReadonlyArray<
+                  infer NestedListItem
+                >
+                  ? FormRulesRecord<NestedListItem, FullFormValues, FormPath>
+                  : NonNullable<ListElementType>[K] extends UnknownObject
+                    ? FormRulesRecord<
+                        NonNullable<ListElementType>[K],
+                        FullFormValues,
+                        FormPath
+                      >
+                    : never);
+          } & {
+            [formRootRule]?: RuleFn<Value, FullFormValues, FormPath>;
+          })
+        | RuleFn<Value, FullFormValues, FormPath>
+    : NonNullable<Value> extends UnknownObject
+      ?
+          | FormRulesRecord<Value, FullFormValues, FormPath>
+          | RuleFn<Value, FullFormValues, FormPath>
+      : RuleFn<Value, FullFormValues, FormPath>;
 
 // Improved type safety for a FormRules record in how it handles potentially
 // nullable types

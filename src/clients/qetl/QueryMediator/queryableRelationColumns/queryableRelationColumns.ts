@@ -1,5 +1,6 @@
-import { normalizeColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+import { normalizeColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 
 const loadedColumnsByDatasetId = new Map<string, readonly string[] | "all">();
 

@@ -1,10 +1,12 @@
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+
 import { makeSet } from "@avandar/utils";
+
 import {
   createSupabaseAdminClient,
   deleteWorkspaceTreeForE2EById,
 } from "../helpers/supabaseAdminClient";
 import { ensureWorkspaceSubscriptionForE2E } from "./ensureWorkspaceSubscriptionForE2E";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 const E2E_TEST_WORKSPACE_DISPLAY_NAME = "E2E Test Workspace";
 
@@ -343,9 +345,9 @@ export async function bestEffortPurgeE2EWorkspacesForOwners(options: {
           });
         } catch (cleanupError) {
           const message =
-            cleanupError instanceof Error ?
-              cleanupError.message
-            : String(cleanupError);
+            cleanupError instanceof Error
+              ? cleanupError.message
+              : String(cleanupError);
           console.warn(`[e2e] best-effort purge ${row.slug}: ${message}`);
         }
       }),

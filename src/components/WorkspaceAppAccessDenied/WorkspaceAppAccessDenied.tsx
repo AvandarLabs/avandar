@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
+
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 
 type Props = {
@@ -18,10 +19,9 @@ export function WorkspaceAppAccessDenied({ appLabel }: Props): JSX.Element {
           <Trans>Access denied</Trans>
         </Title>
         <Text mt="md" c="dimmed">
-          {appLabel ?
-            t`You do not have permission to open ${appLabel} in this workspace.`
-          : t`You do not have permission to open this part of the workspace.`
-          }{" "}
+          {appLabel
+            ? t`You do not have permission to open ${appLabel} in this workspace.`
+            : t`You do not have permission to open this part of the workspace.`}{" "}
           <Trans>
             Ask a workspace settings administrator to update your roles.
           </Trans>

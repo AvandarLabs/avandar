@@ -1,6 +1,8 @@
-import { expect } from "@playwright/test";
-import { MEDIUM_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
+
+import { expect } from "@playwright/test";
+
+import { MEDIUM_WAIT } from "./timeouts";
 
 /**
  * Closes the workspace billing gate when it blocks the UI. E2E workspaces

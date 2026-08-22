@@ -1,5 +1,6 @@
 /** Behavioral tests for local prompt-derived discovery candidate matching. */
 import { describe, expect, it } from "vitest";
+
 import { DiscoveryCandidateValues } from "./DiscoveryCandidateValues";
 
 describe("DiscoveryCandidateValues", () => {

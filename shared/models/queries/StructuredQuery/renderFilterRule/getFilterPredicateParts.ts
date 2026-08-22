@@ -1,8 +1,10 @@
-import { matchLiteral } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@utils/sql/index.ts";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { FilterPredicateParts } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.types.ts";
+
+import { matchLiteral } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@utils/sql/index.ts";
+
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 
 /**
  * The SQL type a temporal column's bindings are cast to. Takes only the
@@ -40,9 +42,10 @@ export function getFilterPredicateParts(
     column,
     leftSide: foldCase ? `lower(${column})` : column,
     placeholder:
-      dataType !== undefined && AvaDataType.isTemporal(dataType) ?
-        `CAST(? AS ${_getCastTargetFromDataType(dataType)})`
-      : foldCase ? "lower(?)"
-      : "?",
+      dataType !== undefined && AvaDataType.isTemporal(dataType)
+        ? `CAST(? AS ${_getCastTargetFromDataType(dataType)})`
+        : foldCase
+          ? "lower(?)"
+          : "?",
   };
 }

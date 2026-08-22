@@ -1,6 +1,8 @@
-import { DesktopAuthProvider } from "$/platform/desktop/DesktopAuthProvider";
 import { afterEach, describe, expect, it } from "vitest";
+
+import { DesktopAuthProvider } from "$/platform/desktop/DesktopAuthProvider";
 import { act, render, screen } from "@/test-utils";
+
 import { PlatformProvider, usePlatform } from "./PlatformProvider";
 
 function PlatformKindProbe(): JSX.Element {

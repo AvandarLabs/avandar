@@ -2,6 +2,7 @@
  * Measure readout unit bands: m/km and m²/km².
  */
 import { describe, expect, it } from "vitest";
+
 import { formatMapMeasureReadout } from "@/views/GisApp/tools/formatMapMeasureReadout/formatMapMeasureReadout";
 
 describe("formatMapMeasureReadout", () => {

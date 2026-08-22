@@ -1,9 +1,11 @@
+import type { FilterPBlockMode } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
+import type { PuckContext } from "@puckeditor/core";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { fireEvent, render, screen } from "@/test-utils";
 import { FilterPBlock } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import type { FilterPBlockMode } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
-import type { PuckContext } from "@puckeditor/core";
 
 /** Exercises analytics emitted by user changes to dashboard filters. */
 
@@ -28,17 +30,17 @@ function _fakePuckContext(auth: DashboardAuth): PuckContext {
       return null;
     },
     metadata:
-      auth === "workspace" ?
-        {
-          auth,
-          workspaceId: TEST_WORKSPACE_ID,
-          dashboardId: TEST_DASHBOARD_ID,
-        }
-      : {
-          auth,
-          dashboardId: TEST_DASHBOARD_ID,
-          snapshotRevision: "00000000-0000-4000-8000-000000000003",
-        },
+      auth === "workspace"
+        ? {
+            auth,
+            workspaceId: TEST_WORKSPACE_ID,
+            dashboardId: TEST_DASHBOARD_ID,
+          }
+        : {
+            auth,
+            dashboardId: TEST_DASHBOARD_ID,
+            snapshotRevision: "00000000-0000-4000-8000-000000000003",
+          },
     isEditing: true,
     dragRef: null,
   };

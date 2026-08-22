@@ -1,7 +1,8 @@
-import { renderFilterGroup } from "$/models/queries/StructuredQuery/renderFilterGroup/renderFilterGroup.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { RenderFilterRuleOptions } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 import type { Knex } from "knex";
+
+import { renderFilterGroup } from "$/models/queries/StructuredQuery/renderFilterGroup/renderFilterGroup.ts";
 
 /**
  * Applies a filter tree as the query's HAVING clause, rendered after GROUP BY.

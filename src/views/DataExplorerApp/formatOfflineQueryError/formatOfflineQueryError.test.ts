@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import {
   formatOfflineQueryError,
   OFFLINE_UNCACHED_MESSAGE,

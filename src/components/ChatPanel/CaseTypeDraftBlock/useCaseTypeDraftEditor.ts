@@ -1,9 +1,10 @@
-import { useState } from "react";
 import type {
   ChatCaseValuePickerRuleType,
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
 } from "$/types/chat.types";
+
+import { useState } from "react";
 
 /** One contributing dataset's attributes, for rendering the card per source. */
 export type CaseTypeDraftSourceGroup = {
@@ -113,8 +114,8 @@ export function useCaseTypeDraftEditor(
         return {
           ..._withIncludedColumn(current, columnId),
           sourceDatasets: current.sourceDatasets.map((sourceDataset) => {
-            return sourceDataset.datasetId === datasetId ?
-                { ...sourceDataset, primaryKeyColumnId: columnId }
+            return sourceDataset.datasetId === datasetId
+              ? { ...sourceDataset, primaryKeyColumnId: columnId }
               : sourceDataset;
           }),
         };
@@ -170,8 +171,8 @@ export function useCaseTypeDraftEditor(
           ...current,
           manualEntryAttributes: current.manualEntryAttributes.map(
             (attribute) => {
-              return attribute.name === name ?
-                  { ...attribute, isIncluded: !attribute.isIncluded }
+              return attribute.name === name
+                ? { ...attribute, isIncluded: !attribute.isIncluded }
                 : attribute;
             },
           ),
@@ -187,15 +188,15 @@ export function useCaseTypeDraftEditor(
         const isDuplicate = current.manualEntryAttributes.some((attribute) => {
           return attribute.name === trimmedName;
         });
-        return isDuplicate ? current : (
-            {
+        return isDuplicate
+          ? current
+          : {
               ...current,
               manualEntryAttributes: [
                 ...current.manualEntryAttributes,
                 { name: trimmedName, isIncluded: true },
               ],
-            }
-          );
+            };
       });
     },
   };

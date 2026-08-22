@@ -1,3 +1,6 @@
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
+import type { UserId } from "$/models/User/User.types";
+
 import { useMutation } from "@avandar/query-hooks";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -10,12 +13,11 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useState } from "react";
+
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
-import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
-import type { UserId } from "$/models/User/User.types";
 
 type Props = {
   subscription: SubscriptionRead;
@@ -66,16 +68,17 @@ export function PurchaseSeatsModalContents({
   return (
     <Stack>
       <Text size="sm">
-        {totalSeats === 1 ?
+        {totalSeats === 1 ? (
           <Trans>
             Your workspace has used all {currentSeatUsage} of its {totalSeats}{" "}
             seat.
           </Trans>
-        : <Trans>
+        ) : (
+          <Trans>
             Your workspace has used all {currentSeatUsage} of its {totalSeats}{" "}
             seats.
           </Trans>
-        }
+        )}
       </Text>
 
       <NumberInput
@@ -102,9 +105,11 @@ export function PurchaseSeatsModalContents({
             purchaseSeats({ seatsToAdd });
           }}
         >
-          {seatsToAdd === 1 ?
+          {seatsToAdd === 1 ? (
             <Trans>Purchase {seatsToAdd} seat</Trans>
-          : <Trans>Purchase {seatsToAdd} seats</Trans>}
+          ) : (
+            <Trans>Purchase {seatsToAdd} seats</Trans>
+          )}
         </Button>
       </Group>
 

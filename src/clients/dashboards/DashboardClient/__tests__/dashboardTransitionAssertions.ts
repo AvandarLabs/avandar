@@ -1,5 +1,8 @@
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
 /** Shared expectations about what a snapshot transition did. */
 import { expect } from "vitest";
+
 import {
   apiPostMock,
   dbEqMock,
@@ -19,7 +22,6 @@ import {
   PREVIOUS_REVISION,
   SNAPSHOT_REVISION,
 } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 /**
  * Mirrors the audience split enforced by the published bucket SELECT policies.

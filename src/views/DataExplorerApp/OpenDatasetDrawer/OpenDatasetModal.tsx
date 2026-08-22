@@ -1,14 +1,16 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+
 import { Modal, Tabs } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text, Title } from "@mantine/core";
 import { useState } from "react";
+
 import { MODAL_ROOT_Z_INDEX } from "@/config/Theme";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
 import { ImportDatasetView } from "@/views/DataExplorerApp/OpenDatasetDrawer/ImportDatasetView";
 import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
 import { SavedDatasetsView } from "@/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
   opened: boolean;

@@ -1,6 +1,12 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { ReactNode, RefObject } from "react";
+
 import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
+
 import { CanvasDrawer } from "@/components/CanvasDrawer/CanvasDrawer";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import css from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
@@ -9,10 +15,6 @@ import { QueryTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryT
 import { useDrawerDisclosure } from "@/views/DataExplorerApp/DataExplorerDrawer/useDrawerDisclosure";
 import { VizTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { ReactNode, RefObject } from "react";
 
 /** The drawer's two sections. */
 export type DrawerTab = "query" | "visualizations";

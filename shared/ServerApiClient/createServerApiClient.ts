@@ -1,7 +1,8 @@
+import type { ServerApiClient } from "$/platform/types/ServerApiClient.types.ts";
+
 import { isDesktop } from "$/platform/isDesktop.ts";
 import { createBrowserServerApiClient } from "$/ServerApiClient/createBrowserServerApiClient.ts";
 import { createIpcServerApiClient } from "$/ServerApiClient/createIpcServerApiClient.ts";
-import type { ServerApiClient } from "$/platform/types/ServerApiClient.types.ts";
 
 /**
  * Platform-aware {@link ServerApiClient} factory. On desktop the IPC

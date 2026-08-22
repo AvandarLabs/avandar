@@ -1,3 +1,12 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UserId } from "$/models/User/User.types";
+import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type {
+  GoogleSheetsDataSourceMetadata,
+  GoogleSheetsLoadResult,
+} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
+import type { GoogleSheetsParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
+
 import { getCurrentUrl, navigateToExternalUrl } from "@avandar/browser-utils";
 import { useMutation } from "@avandar/query-hooks";
 import { Callout } from "@avandar/ui";
@@ -12,9 +21,10 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
+import { useCallback, useState } from "react";
+
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { uuid } from "$/lib/uuid";
-import { useCallback, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -36,14 +46,6 @@ import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { getGoogleSheetImportErrorCopy } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy";
-import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type {
-  GoogleSheetsDataSourceMetadata,
-  GoogleSheetsLoadResult,
-} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
-import type { GoogleSheetsParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UserId } from "$/models/User/User.types";
 
 /**
  * The exported workbook, kept so a re-parse against a different tab does not
@@ -361,22 +363,23 @@ export function GoogleSheetsImportView({
           </Text>
         </Callout>
 
-        {isLoadingGoogleAuthState ?
+        {isLoadingGoogleAuthState ? (
           <Loader />
-        : isGoogleAuthenticated ?
+        ) : isGoogleAuthenticated ? (
           <>
-            {selectedGoogleAccount ?
+            {selectedGoogleAccount ? (
               <Text>
                 <Trans>
                   You have successfully connected to{" "}
                   {selectedGoogleAccount.google_email}
                 </Trans>
               </Text>
-            : null}
+            ) : null}
 
-            {isPreparingPicker ?
+            {isPreparingPicker ? (
               <Loader />
-            : <Button
+            ) : (
+              <Button
                 onClick={() => {
                   _openGooglePicker({
                     picker,
@@ -386,20 +389,19 @@ export function GoogleSheetsImportView({
               >
                 <Trans>Pick google sheet</Trans>
               </Button>
-            }
+            )}
 
-            {selectedDocument ?
+            {selectedDocument ? (
               <>
                 <Text>
                   <Trans>Selected document: {selectedDocument.name}</Trans>
                 </Text>
-                {isLoadingGoogleSheet ?
-                  <Loader />
-                : null}
+                {isLoadingGoogleSheet ? <Loader /> : null}
               </>
-            : null}
+            ) : null}
           </>
-        : <Button
+        ) : (
+          <Button
             fullWidth
             size="md"
             variant="filled"
@@ -426,9 +428,9 @@ export function GoogleSheetsImportView({
           >
             <Trans>Connect to Google Sheets</Trans>
           </Button>
-        }
+        )}
 
-        {previewRows && dataSourceMetadata && exportedWorkbook ?
+        {previewRows && dataSourceMetadata && exportedWorkbook ? (
           <DatasetImportForm
             key={dataSourceMetadata.datasetLoadResult.sheetLoadMetadata.id}
             dataSourceMetadata={dataSourceMetadata}
@@ -459,7 +461,7 @@ export function GoogleSheetsImportView({
             parseOptions={dataSourceMetadata.parseOptions}
             rows={previewRows}
           />
-        : null}
+        ) : null}
       </Stack>
     </Box>
   );

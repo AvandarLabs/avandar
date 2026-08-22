@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { fireEvent, render, screen } from "@/test-utils";
+
 import { MatchReport } from "./MatchReport";
 
 describe("MatchReport", () => {

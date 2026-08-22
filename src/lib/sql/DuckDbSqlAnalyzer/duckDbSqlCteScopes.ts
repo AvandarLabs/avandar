@@ -1,12 +1,13 @@
+import type {
+  CteAlias,
+  SqlToken,
+} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
+
 import {
   getClosingParenthesisIndex,
   getParenthesisDepths,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
-import type {
-  CteAlias,
-  SqlToken,
-} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 function _getIndexAfterCteColumns(
   options: Readonly<{ tokens: readonly SqlToken[]; aliasIndex: number }>,
@@ -66,9 +67,9 @@ export function getCteAliases(tokens: readonly SqlToken[]): CteAlias[] {
         name: token.value.toLowerCase(),
         scopeStart: aliasIndex,
         scopeEnd:
-          relativeEndIndex === -1 ?
-            tokens.length
-          : aliasIndex + relativeEndIndex,
+          relativeEndIndex === -1
+            ? tokens.length
+            : aliasIndex + relativeEndIndex,
       },
     ];
   });

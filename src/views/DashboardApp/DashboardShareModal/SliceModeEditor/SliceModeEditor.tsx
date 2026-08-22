@@ -1,12 +1,14 @@
-import { prop } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Stack } from "@mantine/core";
-import { CustomSliceEditor } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/CustomSliceEditor";
-import { QueriedSlicePreview } from "@/views/DashboardApp/DashboardShareModal/QueriedSlicePreview";
-import { SliceModeOptions } from "@/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeOptions";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
+
+import { prop } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Stack } from "@mantine/core";
+
+import { CustomSliceEditor } from "@/views/DashboardApp/DashboardShareModal/CustomSliceEditor/CustomSliceEditor";
+import { QueriedSlicePreview } from "@/views/DashboardApp/DashboardShareModal/QueriedSlicePreview";
+import { SliceModeOptions } from "@/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeOptions";
 
 type Props = {
   dataset: PublishSliceDataset;
@@ -30,10 +32,11 @@ function _getSliceFromMode(
   return {
     mode: "custom",
     columns:
-      options.slice.mode === "custom" ? [...options.slice.columns]
-      : options.dataset.queriedColumns.length > 0 ?
-        [...options.dataset.queriedColumns]
-      : options.dataset.columns.map(prop("name")),
+      options.slice.mode === "custom"
+        ? [...options.slice.columns]
+        : options.dataset.queriedColumns.length > 0
+          ? [...options.dataset.queriedColumns]
+          : options.dataset.columns.map(prop("name")),
     rowFilters:
       options.slice.mode === "custom" ? [...options.slice.rowFilters] : [],
   };
@@ -66,16 +69,16 @@ export function SliceModeEditor({
           onChange(_getSliceFromMode({ dataset, mode, slice }));
         }}
       />
-      {slice.mode === "queried" ?
+      {slice.mode === "queried" ? (
         <QueriedSlicePreview dataset={dataset} />
-      : null}
-      {slice.mode === "custom" ?
+      ) : null}
+      {slice.mode === "custom" ? (
         <CustomSliceEditor
           dataset={dataset}
           slice={slice}
           onChange={onChange}
         />
-      : null}
+      ) : null}
     </Stack>
   );
 }

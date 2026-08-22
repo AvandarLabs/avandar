@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef } from "react";
-import { makeQueryFilterGroupFromLibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
-import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
 import type { QueryFilterColumnTypes } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { LibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
+
+import { useCallback, useEffect, useRef } from "react";
+
+import { makeQueryFilterGroupFromLibraryGroup } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterTreeConversionHelpers/filterTreeConversionHelpers";
 
 /** Milliseconds of quiet before a typed value is committed upward. */
 const COMMIT_DEBOUNCE_MS = 300;

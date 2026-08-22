@@ -2,7 +2,9 @@ import { useAui } from "@assistant-ui/react";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
+
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+
 import css from "./RegenerateErrorBanner.module.css";
 
 /**

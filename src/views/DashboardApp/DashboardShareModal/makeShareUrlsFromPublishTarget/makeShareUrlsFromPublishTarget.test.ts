@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { makeShareUrlsFromPublishTarget } from "@/views/DashboardApp/DashboardShareModal/makeShareUrlsFromPublishTarget/makeShareUrlsFromPublishTarget";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+
+import { describe, expect, it } from "vitest";
+
+import { makeShareUrlsFromPublishTarget } from "@/views/DashboardApp/DashboardShareModal/makeShareUrlsFromPublishTarget/makeShareUrlsFromPublishTarget";
 
 const dashboardId = "11111111-2222-4333-8444-555555555555" as Dashboard.Id;
 

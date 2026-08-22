@@ -1,5 +1,6 @@
-import { mkdir, readdir } from "node:fs/promises";
-import { join } from "node:path";
+import type { TransformedDataDescriptionForParquet } from "@avandar/etl";
+import type { WdiTableParquetSummary } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
+
 import {
   EtlEngine,
   getEtlOutputDir,
@@ -12,8 +13,8 @@ import {
   getWdiYearCoverageFromParquet,
   upsertWorldBankWdiCatalogEntry,
 } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
-import type { TransformedDataDescriptionForParquet } from "@avandar/etl";
-import type { WdiTableParquetSummary } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
+import { mkdir, readdir } from "node:fs/promises";
+import { join } from "node:path";
 
 const PIPELINE_NAME = "world-bank__wdi" as const;
 

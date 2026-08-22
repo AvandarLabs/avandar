@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { detectTextLayer } from "./detectTextLayer";
 import type { PageGeometry } from "../pdfSniff.types";
+
+import { describe, expect, it } from "vitest";
+
+import { detectTextLayer } from "./detectTextLayer";
 
 function makePage(options: {
   pageIndex: number;

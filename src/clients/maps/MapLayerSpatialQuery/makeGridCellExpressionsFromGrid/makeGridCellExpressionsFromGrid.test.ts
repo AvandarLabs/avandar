@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { makeGridCellExpressionsFromGrid } from "./makeGridCellExpressionsFromGrid";
 
 describe("makeGridCellExpressionsFromGrid", () => {

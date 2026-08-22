@@ -1,7 +1,8 @@
-import { buildRetryContextNote } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
-import { makeSpatialSqlDocumentationFromPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatRetryContext } from "$/types/chat.types.ts";
+
+import { buildRetryContextNote } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
+import { makeSpatialSqlDocumentationFromPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 
 function formatPreviousSql(lastSql: string | undefined): string {
   return lastSql ? `Previous SQL:\n\`\`\`sql\n${lastSql}\n\`\`\`` : "";
@@ -19,8 +20,8 @@ function formatResultColumns(
       return `- ${column.name} (${column.dataType})`;
     })
     .join("\n");
-  return lines ?
-      `The user is currently looking at a result with these columns:\n${lines}`
+  return lines
+    ? `The user is currently looking at a result with these columns:\n${lines}`
     : "";
 }
 
@@ -46,7 +47,7 @@ export function makeChatTurnSuffixFromOptions(
   ].filter((section) => {
     return section.length > 0;
   });
-  return sections.length === 0 ?
-      ""
+  return sections.length === 0
+    ? ""
     : `[Turn context]\n${sections.join("\n\n")}`;
 }

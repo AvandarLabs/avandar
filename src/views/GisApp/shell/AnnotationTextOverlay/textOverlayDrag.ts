@@ -1,8 +1,9 @@
+import type { Map as MapLibreMap } from "maplibre-gl";
+
 import {
   MAP_TOOL_TEXT_SIZE_MAX_PX,
   MAP_TOOL_TEXT_SIZE_MIN_PX,
 } from "@/views/GisApp/tools/MapToolGesture.constants";
-import type { Map as MapLibreMap } from "maplibre-gl";
 
 export type TextOverlayDrag =
   | { type: "idle" }

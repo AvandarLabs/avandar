@@ -1,9 +1,11 @@
+import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
+
 import { Trans } from "@lingui/react/macro";
 import { Alert, Code, Stack, Text } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
+
 import { DiscoveryCustomFallback } from "./DiscoveryCustomFallback";
 import { DiscoveryRecoveryActions } from "./DiscoveryRecoveryActions";
-import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
 
 type Props = {
   column: string;
@@ -25,7 +27,7 @@ export function DiscoveryUnavailableBody({
 }: Readonly<Props>): React.ReactNode {
   return (
     <Stack gap="xs">
-      {error ?
+      {error ? (
         <Alert
           icon={<IconAlertCircle size={14} />}
           color="red"
@@ -38,19 +40,20 @@ export function DiscoveryUnavailableBody({
             {queryPreview}
           </Code>
         </Alert>
-      : <Text size="xs" c="dimmed">
+      ) : (
+        <Text size="xs" c="dimmed">
           <Trans>
             No values were returned from {column}. Describe what you need
             instead.
           </Trans>
         </Text>
-      }
-      {error && (onRetry || onRequestDifferentDiscovery) ?
+      )}
+      {error && (onRetry || onRequestDifferentDiscovery) ? (
         <DiscoveryRecoveryActions
           onRetry={onRetry}
           onRequestDifferentDiscovery={onRequestDifferentDiscovery}
         />
-      : null}
+      ) : null}
       <DiscoveryCustomFallback onSubmit={onSubmit} />
     </Stack>
   );

@@ -2,8 +2,9 @@ import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
-import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
+
+import { Subscription } from "$/models/Subscription/Subscription.ts";
 
 const STORAGE_PAGE_SIZE = 100;
 
@@ -109,8 +110,8 @@ export const DeleteWorkspace = POST({
       // Supabase returns id === null for folders, a string for files.
       const paths = await Promise.all(
         entries.map((entry) => {
-          return entry.id === null ?
-              listWorkspaceStorageFilePaths(`${prefix}/${entry.name}`)
+          return entry.id === null
+            ? listWorkspaceStorageFilePaths(`${prefix}/${entry.name}`)
             : Promise.resolve([`${prefix}/${entry.name}`]);
         }),
       );

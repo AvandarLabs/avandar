@@ -1,6 +1,3 @@
-import { createServerApiClient } from "$/ServerApiClient";
-import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
-import { Simplify } from "type-fest";
 import type {
   API,
   APIBody,
@@ -9,6 +6,11 @@ import type {
   APIReturnType,
 } from "@/types/http-api.types";
 import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
+
+import { Simplify } from "type-fest";
+
+import { createServerApiClient } from "$/ServerApiClient";
+import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 
 // Platform-aware server API client. On web this delegates to the registered
 // Supabase client's `functions.invoke`; on desktop it bridges
@@ -27,14 +29,15 @@ type HTTPRequestOptions<
     method: Method;
     route: Route;
     body?: APIBody<Route, Method>;
-  } & (APIPathParams<Route, Method> extends Record<string, string | number> ?
-    { pathParams: APIPathParams<Route, Method> }
-  : { pathParams?: undefined }) &
-    (APIQueryParams<Route, Method> extends (
-      Record<string, ValidURLQueryParamValue>
-    ) ?
-      { queryParams: APIQueryParams<Route, Method> }
-    : { queryParams?: undefined })
+  } & (APIPathParams<Route, Method> extends Record<string, string | number>
+    ? { pathParams: APIPathParams<Route, Method> }
+    : { pathParams?: undefined }) &
+    (APIQueryParams<Route, Method> extends Record<
+      string,
+      ValidURLQueryParamValue
+    >
+      ? { queryParams: APIQueryParams<Route, Method> }
+      : { queryParams?: undefined })
 >;
 
 async function sendHTTPRequest<

@@ -1,7 +1,10 @@
+import type { I18nMessages } from "@avandar/ui";
+
 import { AvaQueryProvider } from "@avandar/query-hooks";
 import { AvaUiProvider } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { ReactNode, useMemo } from "react";
+
 import {
   cssVariablesResolver,
   DEFAULT_NOTIFICATIONS_PROPS,
@@ -9,7 +12,6 @@ import {
   Theme,
 } from "@/config/Theme";
 import { notifyError } from "@/utils/notifications/notify";
-import type { I18nMessages } from "@avandar/ui";
 
 type Props = {
   children: ReactNode;

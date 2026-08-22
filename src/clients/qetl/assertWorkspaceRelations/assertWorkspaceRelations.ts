@@ -1,9 +1,11 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
 import { prop, where } from "@avandar/utils";
+
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Rejects a query that names a relation outside `workspaceId`, and returns the

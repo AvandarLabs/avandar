@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("$/env/getSupabaseApiUrl.ts", () => {
   return {

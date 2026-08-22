@@ -1,5 +1,6 @@
-import { DuckDBInstance } from "@duckdb/node-api";
 import type { DuckDBConnection } from "@duckdb/node-api";
+
+import { DuckDBInstance } from "@duckdb/node-api";
 
 /**
  * An in-memory DuckDB connection for executed tests, plus a `close` that

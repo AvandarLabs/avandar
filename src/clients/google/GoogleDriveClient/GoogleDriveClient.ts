@@ -1,10 +1,11 @@
-import { getGoogleDriveErrorFromResponse } from "@/clients/google/GoogleDriveClient/getGoogleDriveErrorFromResponse";
-import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type {
   AcquiredGoogleSheet,
   GoogleDriveFetch,
 } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
-import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+
+import { getGoogleDriveErrorFromResponse } from "@/clients/google/GoogleDriveClient/getGoogleDriveErrorFromResponse";
+import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
 
 const DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files";
 

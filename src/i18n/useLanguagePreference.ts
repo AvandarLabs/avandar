@@ -1,6 +1,8 @@
-import { useCallback, useSyncExternalStore } from "react";
-import { DEFAULT_LOCALE, isSupportedLocale } from "./locales";
 import type { SupportedLocale } from "./locales";
+
+import { useCallback, useSyncExternalStore } from "react";
+
+import { DEFAULT_LOCALE, isSupportedLocale } from "./locales";
 
 /**
  * Language preferences are scoped per workspace and persisted in

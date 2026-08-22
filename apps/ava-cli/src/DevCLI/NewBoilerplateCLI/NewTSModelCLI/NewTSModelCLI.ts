@@ -1,9 +1,9 @@
-import * as path from "node:path";
 import { getModelPathFromModelsRoot } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/getModelPathFromModelsRoot";
 import { writeBasicModelBoilerplate } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/writeBasicModelBoilerplate";
 import { writeSupabaseModelBoilerplate } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/writeSupabaseModelBoilerplate";
 import { isPascalCase } from "@ava-cli/utils/validators/isPascalCase/isPascalCase";
 import { Acclimate } from "@avandar/acclimate";
+import * as path from "node:path";
 
 const OUTPUT_MODELS_DIR_BASE = "shared/models";
 const OUTPUT_CLIENTS_DIR_BASE = "src/clients";

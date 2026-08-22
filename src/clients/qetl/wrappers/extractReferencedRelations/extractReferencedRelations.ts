@@ -1,5 +1,6 @@
-import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+
+import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 
 /**
  * The relations a statement reads, or `unsupported` when they cannot be

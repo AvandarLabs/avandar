@@ -1,8 +1,10 @@
-import { useLingui } from "@lingui/react/macro";
-import { Box, Paper } from "@mantine/core";
-import css from "./PdfAnnotationCanvas.module.css";
 import type { PdfAnnotationTool } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotation";
 import type { PointerEventHandler, ReactNode, RefObject } from "react";
+
+import { useLingui } from "@lingui/react/macro";
+import { Box, Paper } from "@mantine/core";
+
+import css from "./PdfAnnotationCanvas.module.css";
 
 type Props = {
   baseCanvas: HTMLCanvasElement;

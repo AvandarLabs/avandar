@@ -1,8 +1,10 @@
+import type { AppLink, AppLinkKey } from "@/config/AppLinks/AppLinks";
+
 import { IconPencilPlus, IconUpload, IconUser } from "@tabler/icons-react";
 import { ReactNode } from "react";
+
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
-import type { AppLink, AppLinkKey } from "@/config/AppLinks/AppLinks";
 
 /**
  * This is a link that shows up in the Spotlight (Cmd+K) and is used

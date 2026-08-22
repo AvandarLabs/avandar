@@ -1,9 +1,11 @@
+import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";
+import type { ReactNode, PointerEvent as ReactPointerEvent } from "react";
+
 import { useLingui } from "@lingui/react/macro";
 import { Box } from "@mantine/core";
 import { useRef, useState } from "react";
+
 import css from "./PdfRegionOverlay.module.css";
-import type { BBox } from "@/workers/pdfSniff/pdfSniff.types";
-import type { ReactNode, PointerEvent as ReactPointerEvent } from "react";
 
 /** A drag shorter than this in either axis is a click, not a selection. */
 const MIN_DRAG_PX = 4;
@@ -154,9 +156,9 @@ export function PdfRegionOverlay({
       h={height}
       className={css.surface}
       aria-label={
-        interaction === "pick" ?
-          t`Click a point on the axis`
-        : t`Draw a region on the page`
+        interaction === "pick"
+          ? t`Click a point on the axis`
+          : t`Draw a region on the page`
       }
       onPointerDown={(event) => {
         startRef.current = localPoint(event);
@@ -195,7 +197,7 @@ export function PdfRegionOverlay({
         onRegionDrawn(_bboxFromDrag(start, end, mapping()));
       }}
     >
-      {preview ?
+      {preview ? (
         <Box
           pos="absolute"
           left={preview.left}
@@ -204,7 +206,7 @@ export function PdfRegionOverlay({
           h={preview.height}
           className={css.preview}
         />
-      : null}
+      ) : null}
       {markers.map((point, index) => {
         const cssPoint = _pdfToCss(point, mapping());
         return (

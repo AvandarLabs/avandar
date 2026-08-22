@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+
 import { WebAppConfig } from "@/config/WebAppConfig";
 
 type Props = {

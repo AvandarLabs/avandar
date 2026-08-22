@@ -1,4 +1,12 @@
+import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import type {
+  DuckDbSqlAnalysis,
+  SourceAnalysis,
+  SqlToken,
+} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
+
 import { prop, propIsDefined } from "@avandar/utils";
+
 import {
   getDatasetIdsAtIndexes,
   getRelationRefFromTableName,
@@ -12,12 +20,6 @@ import {
   hasInvalidTokenStructure,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
-import type {
-  DuckDbSqlAnalysis,
-  SourceAnalysis,
-  SqlToken,
-} from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 
 export type {
   DuckDbSqlAnalysis,

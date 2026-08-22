@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { ClarificationAnswer } from "./ClarificationAnswer";
 
 describe("ClarificationAnswer.formatForThread", () => {

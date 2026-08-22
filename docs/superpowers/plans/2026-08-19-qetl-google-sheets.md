@@ -22,7 +22,7 @@ recorded, not when the code looks right.
    Supabase project. Without it, another worktree's `db diff` or `db reset`
    silently reverts this migration. `ava supabase status` confirms which project
    is active; `ava supabase migrations validate` checks ordering; `ava supabase
-   restore` tears it down when the lane closes.
+restore` tears it down when the lane closes.
 2. **Mutation-test every behavioural claim.** Break the implementation, watch the
    named test go red, restore, confirm the file is byte-identical, and record
    which mutation each test caught. Mutants live **outside the repo**, in the
@@ -100,11 +100,11 @@ in the frontend project:
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Restore `google_account_id: z.uuid()` | Test 1 |
-| Delete `google_document_id` from `DBReadSchema` | Test 3 |
-| Replace `DBReadSchema` with `z.looseObject({})` | Test 3 |
+| Mutation                                        | Test that must go red |
+| ----------------------------------------------- | --------------------- |
+| Restore `google_account_id: z.uuid()`           | Test 1                |
+| Delete `google_document_id` from `DBReadSchema` | Test 3                |
+| Replace `DBReadSchema` with `z.looseObject({})` | Test 3                |
 
 ### Acceptance
 
@@ -148,11 +148,11 @@ renders:
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Restore `disabled` on the connect button | Test 1 |
-| Drop the `onClick` that fetches the auth URL | Test 1 |
-| Restore the maintenance `Tooltip` | Test 2 |
+| Mutation                                     | Test that must go red |
+| -------------------------------------------- | --------------------- |
+| Restore `disabled` on the connect button     | Test 1                |
+| Drop the `onClick` that fetches the auth URL | Test 1                |
+| Restore the maintenance `Tooltip`            | Test 2                |
 
 ### Acceptance
 
@@ -204,14 +204,14 @@ Added to `GoogleSheetsImportView.test.tsx`:
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Remove `.setAppId(...)` | Test 1 |
-| Pass a literal `"0"` to `setAppId` | Test 1 |
-| Drop the `CANCEL` branch | Tests 3, 6 |
-| Route `CANCEL` to `onGoogleSheetPicked` | Test 3 |
-| Drop the `ERROR` branch | Test 4 |
-| Make `_getGooglePickerAppId` return `""` instead of throwing | Test 5 |
+| Mutation                                                     | Test that must go red |
+| ------------------------------------------------------------ | --------------------- |
+| Remove `.setAppId(...)`                                      | Test 1                |
+| Pass a literal `"0"` to `setAppId`                           | Test 1                |
+| Drop the `CANCEL` branch                                     | Tests 3, 6            |
+| Route `CANCEL` to `onGoogleSheetPicked`                      | Test 3                |
+| Drop the `ERROR` branch                                      | Test 4                |
+| Make `_getGooglePickerAppId` return `""` instead of throwing | Test 5                |
 
 ### Acceptance
 
@@ -294,17 +294,17 @@ new version (which would serve wrong rows).
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Drop the `mimeType` query param | Test 1 |
-| Send the token as `?access_token=` instead of a header | Test 1 |
-| Drop `fields=version` | Test 2 |
-| `Number(json.version)` instead of the string | Test 2 |
-| Swap the two calls so export precedes version | Test 3 |
-| Read the version a second time after the export | Test 4 |
-| Collapse 404 and 401 onto one error | Test 5 |
-| Map an unmapped 500 onto the size-limit error | Test 5 |
-| Return early on a non-2xx without throwing | Test 6 |
+| Mutation                                               | Test that must go red |
+| ------------------------------------------------------ | --------------------- |
+| Drop the `mimeType` query param                        | Test 1                |
+| Send the token as `?access_token=` instead of a header | Test 1                |
+| Drop `fields=version`                                  | Test 2                |
+| `Number(json.version)` instead of the string           | Test 2                |
+| Swap the two calls so export precedes version          | Test 3                |
+| Read the version a second time after the export        | Test 4                |
+| Collapse 404 and 401 onto one error                    | Test 5                |
+| Map an unmapped 500 onto the size-limit error          | Test 5                |
+| Return early on a non-2xx without throwing             | Test 6                |
 
 ### Acceptance
 
@@ -385,18 +385,18 @@ local Supabase, so it is run explicitly for this task and its result recorded:
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Drop `sheet_name` from `DBReadSchema` | Test 1 (and the type test fails to compile) |
-| `z.string()` instead of `z.string().nullable()` | Test 2 |
-| Pass `p_sheet_name: params.sheetName` unwrapped | Test 4 |
-| `params.sheetName ?? undefined` | Test 5 |
-| Remove the `drop function` from the migration | Test 7 |
+| Mutation                                        | Test that must go red                       |
+| ----------------------------------------------- | ------------------------------------------- |
+| Drop `sheet_name` from `DBReadSchema`           | Test 1 (and the type test fails to compile) |
+| `z.string()` instead of `z.string().nullable()` | Test 2                                      |
+| Pass `p_sheet_name: params.sheetName` unwrapped | Test 4                                      |
+| `params.sheetName ?? undefined`                 | Test 5                                      |
+| Remove the `drop function` from the migration   | Test 7                                      |
 
 ### Acceptance
 
 - `ava supabase status` confirms the isolated project; `ava supabase migrations
-  validate` passes.
+validate` passes.
 - The generated migration's diff was read and the two checks above recorded, with
   the actual statements quoted in the task notes.
 - `pnpm db:gen-types` produced a `sheet_name` in `database.types.ts`.
@@ -438,11 +438,11 @@ New `src/clients/google/GoogleDriveClient/googleSheetTabAcquisition.executed.tes
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Drop the `sheet` argument from the query | Test 1 |
-| Hard-code the first tab's name | Tests 1, 4 |
-| Swallow the unknown-sheet error and return zero rows | Test 3 |
+| Mutation                                             | Test that must go red |
+| ---------------------------------------------------- | --------------------- |
+| Drop the `sheet` argument from the query             | Test 1                |
+| Hard-code the first tab's name                       | Tests 1, 4            |
+| Swallow the unknown-sheet error and return zero rows | Test 3                |
 
 ### Acceptance
 
@@ -466,11 +466,12 @@ clock runs out. The exit criterion passes without it, on the first tab.
   2. `sniffXlsxFile` on the returned bytes for `sheets` and `defaultSheet`,
   3. a tab `Select` defaulting to `defaultSheet`,
   4. `LocalDatasetClient.startXlsxImport({ file, parseOptions: { sheet,
-     hasHeader } })`,
+hasHeader } })`,
   5. `sheetName` set to the chosen tab on save.
 
   The `csvCellValueSchema` array parse and the `unparseDataset` call are deleted,
   not left unused.
+
 - `DatasetImportForm.types.ts:59-63`: `GoogleSheetsLoadResult.sheetLoadMetadata`
   becomes `DuckDbLoadXlsxResult`; `rawText` becomes the workbook bytes.
 - `useImportedColumns.ts:37-41`: the `google_sheets` branch joins the
@@ -481,8 +482,8 @@ clock runs out. The exit criterion passes without it, on the first tab.
 - `DatasetParseControls.tsx:142-159`: the `google_sheets` branch swaps its
   rows-to-skip `NumberInput` for the tab `Select`.
 - Existing tests updated in the same change:
-  `useImportedColumns.test.ts:185` (*"maps google_sheets DuckDB columns using the
-  CSV load shape"*, rewritten to the xlsx shape, **not** deleted),
+  `useImportedColumns.test.ts:185` (_"maps google_sheets DuckDB columns using the
+  CSV load shape"_, rewritten to the xlsx shape, **not** deleted),
   `makeDatasetImportedPayloadFromSaveResult.test.ts:51`,
   `GoogleSheetsImportView.test.tsx`.
 
@@ -508,14 +509,14 @@ section 14 item 7.
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Hard-code `sheet: sheets[0]` | Test 2 |
-| Drop `sheetName` from the insert params | Test 2 |
-| Restore the `google-sheets/:id` fetch | Test 3 |
-| Read columns from the wrong result field | Test 4 |
-| Drop a field from the analytics payload | Test 5 |
-| Render the rows-to-skip control for every source type | Test 6 |
+| Mutation                                              | Test that must go red |
+| ----------------------------------------------------- | --------------------- |
+| Hard-code `sheet: sheets[0]`                          | Test 2                |
+| Drop `sheetName` from the insert params               | Test 2                |
+| Restore the `google-sheets/:id` fetch                 | Test 3                |
+| Read columns from the wrong result field              | Test 4                |
+| Drop a field from the analytics payload               | Test 5                |
+| Render the rows-to-skip control for every source type | Test 6                |
 
 ### Acceptance
 
@@ -563,15 +564,15 @@ cannot write the wrapper, and nothing about the policy is Sheets-specific.
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Remove the window check, always call | Test 1 |
-| Never call after the first check | Test 2 |
-| `<=` instead of `<` on the window comparison | Test 3 (one half of it) |
-| Make the clear a no-op | Test 4 |
-| Key the map on a constant instead of the dataset id | Test 5 |
-| Render the refresh button for every source type | Test 6 |
-| Reorder refresh so re-acquire precedes the drop | Test 6 |
+| Mutation                                            | Test that must go red   |
+| --------------------------------------------------- | ----------------------- |
+| Remove the window check, always call                | Test 1                  |
+| Never call after the first check                    | Test 2                  |
+| `<=` instead of `<` on the window comparison        | Test 3 (one half of it) |
+| Make the clear a no-op                              | Test 4                  |
+| Key the map on a constant instead of the dataset id | Test 5                  |
+| Render the refresh button for every source type     | Test 6                  |
+| Reorder refresh so re-acquire precedes the drop     | Test 6                  |
 
 ### Acceptance
 
@@ -617,12 +618,12 @@ is not a bug.
 
 ### Mutations to catch
 
-| Mutation | Test that must go red |
-|---|---|
-| Restore `auth/spreadsheets` | Test 2 |
-| Remove `drive.file` | Test 1 |
-| Remove `prompt: "consent"` | Test 3 |
-| Remove `access_type: "offline"` | Test 3 |
+| Mutation                        | Test that must go red |
+| ------------------------------- | --------------------- |
+| Restore `auth/spreadsheets`     | Test 2                |
+| Remove `drive.file`             | Test 1                |
+| Remove `prompt: "consent"`      | Test 3                |
+| Remove `access_type: "offline"` | Test 3                |
 
 ### Acceptance
 
@@ -684,9 +685,9 @@ and section 3.1 is what a real row would have caught.
    - `quotaScope` describes the Sheets pool, which this connector no longer
      touches;
    - `grantedScope`'s short strings will not equal `getAuthURL.ts`'s URLs.
-   Plus the two same-change constraints in spec section 8.2, and the fact that
-   `qetlDiceExtractors.characterization.test.ts` will not pass unchanged once
-   acquisition works.
+     Plus the two same-change constraints in spec section 8.2, and the fact that
+     `qetlDiceExtractors.characterization.test.ts` will not pass unchanged once
+     acquisition works.
 4. **The Vercel item**, which no agent may do: `VITE_GOOGLE_PICKER_APP_ID` =
    `323714789211`, in all three environments, with the click path in spec section
    16.1.
@@ -705,13 +706,13 @@ the work, and so the manual steps that remain are unambiguous.
 
 ### Verification, on the final tree
 
-| Command | Result |
-|---|---|
-| `pnpm test:frontend` | 442 files, 2,707 tests passed (baseline: 434 / 2,636) |
-| `pnpm test:executed` | 2 files, 6 tests passed (baseline: 1 / 2) |
-| `pnpm type-check` | clean, including `deno check shared` |
-| `pnpm lint` | clean, including stylelint and React Doctor |
-| `supabase test db` | the new tab-contract suite passes; see the pre-existing failure below |
+| Command              | Result                                                                |
+| -------------------- | --------------------------------------------------------------------- |
+| `pnpm test:frontend` | 442 files, 2,707 tests passed (baseline: 434 / 2,636)                 |
+| `pnpm test:executed` | 2 files, 6 tests passed (baseline: 1 / 2)                             |
+| `pnpm type-check`    | clean, including `deno check shared`                                  |
+| `pnpm lint`          | clean, including stylelint and React Doctor                           |
+| `supabase test db`   | the new tab-contract suite passes; see the pre-existing failure below |
 
 ### Mutation proofs
 
@@ -731,17 +732,17 @@ Two process notes worth carrying forward:
 
 ### Deviations from the plan
 
-| # | Plan said | What shipped, and why |
-|---|---|---|
-| 1 | Task 4 delivers two Drive functions | It also delivers `acquireGoogleSheetRelation`, an injectable seam that takes the file id, the tab, the token and a **reader**. It is the only place that translates a `NULL` tab into `read_xlsx`'s first-sheet default, and injecting the reader is what lets the executed test drive it against a real DuckDB. Spec section 8.1 has the shape |
-| 2 | Task 5's RPC takes the tab as the last parameter | Done, and the generated migration was checked against both of section 6.1's criteria. It emitted `drop function if exists` for the old eight-argument signature, and it left the four RLS policies and the `updated_at` trigger untouched. A pgTAP assertion now pins the one-signature invariant so a future regeneration cannot reintroduce an overload |
-| 3 | Task 7 keeps `useImportedColumns`'s `google_sheets` branch | No change was needed: `DuckDbLoadXlsxResult.columns` is the same `DuckDbColumnSchema[]` the CSV result carried, so only the fixture in its test changed |
-| 4 | Task 7 updates `makeDatasetImportedPayloadFromSaveResult` | No change was needed either: it already read `sheetLoadMetadata.columns`, which survives the shape change |
-| 5 | Task 7 stores `parseOptions.sheetName ?? sheet` | Ships `sheet`. A mutation that removed the preference survived every test; investigating why showed the surviving mutant was correct. Selecting a tab and saving without pressing "Process data again" would otherwise store a tab name that disagrees with the recorded columns. The new test's fixture makes the two values differ, which the original fixture could not |
-| 6 | Task 8's refresh lives inline in `DatasetMetaView` | Extracted to `useRefreshGoogleSheetDataset`, which takes the source dataset row the page has already loaded rather than re-reading it |
-| 7 | (not planned) | `getGoogleSheetImportErrorCopy` was first written with a threaded `t`, which `docs/rules/i18n.md:16` bans by name. Rewritten with `msg` + `i18n._`, and `pnpm i18n:extract` confirms every string now reaches the catalogs |
-| 8 | Task 2 gates the connect button behind `enable-google-sheets` | The flag was built, then removed on Pablo's instruction (2026-08-19): the connector is being enabled, so the hard disable is gone and no flag replaces it. `FeatureFlagConfig.ts` and both `.env` files are back to their baseline apart from `VITE_GOOGLE_PICKER_APP_ID` |
-| 9 | Task 9 documents the scope migration for existing tokens | Simplified. There are no existing users on the sensitive grant, because the connector shipped hard-disabled, so spec section 9.1 records that there is nothing to migrate rather than how to migrate it |
+| #   | Plan said                                                     | What shipped, and why                                                                                                                                                                                                                                                                                                                                                      |
+| --- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Task 4 delivers two Drive functions                           | It also delivers `acquireGoogleSheetRelation`, an injectable seam that takes the file id, the tab, the token and a **reader**. It is the only place that translates a `NULL` tab into `read_xlsx`'s first-sheet default, and injecting the reader is what lets the executed test drive it against a real DuckDB. Spec section 8.1 has the shape                            |
+| 2   | Task 5's RPC takes the tab as the last parameter              | Done, and the generated migration was checked against both of section 6.1's criteria. It emitted `drop function if exists` for the old eight-argument signature, and it left the four RLS policies and the `updated_at` trigger untouched. A pgTAP assertion now pins the one-signature invariant so a future regeneration cannot reintroduce an overload                  |
+| 3   | Task 7 keeps `useImportedColumns`'s `google_sheets` branch    | No change was needed: `DuckDbLoadXlsxResult.columns` is the same `DuckDbColumnSchema[]` the CSV result carried, so only the fixture in its test changed                                                                                                                                                                                                                    |
+| 4   | Task 7 updates `makeDatasetImportedPayloadFromSaveResult`     | No change was needed either: it already read `sheetLoadMetadata.columns`, which survives the shape change                                                                                                                                                                                                                                                                  |
+| 5   | Task 7 stores `parseOptions.sheetName ?? sheet`               | Ships `sheet`. A mutation that removed the preference survived every test; investigating why showed the surviving mutant was correct. Selecting a tab and saving without pressing "Process data again" would otherwise store a tab name that disagrees with the recorded columns. The new test's fixture makes the two values differ, which the original fixture could not |
+| 6   | Task 8's refresh lives inline in `DatasetMetaView`            | Extracted to `useRefreshGoogleSheetDataset`, which takes the source dataset row the page has already loaded rather than re-reading it                                                                                                                                                                                                                                      |
+| 7   | (not planned)                                                 | `getGoogleSheetImportErrorCopy` was first written with a threaded `t`, which `docs/rules/i18n.md:16` bans by name. Rewritten with `msg` + `i18n._`, and `pnpm i18n:extract` confirms every string now reaches the catalogs                                                                                                                                                 |
+| 8   | Task 2 gates the connect button behind `enable-google-sheets` | The flag was built, then removed on Pablo's instruction (2026-08-19): the connector is being enabled, so the hard disable is gone and no flag replaces it. `FeatureFlagConfig.ts` and both `.env` files are back to their baseline apart from `VITE_GOOGLE_PICKER_APP_ID`                                                                                                  |
+| 9   | Task 9 documents the scope migration for existing tokens      | Simplified. There are no existing users on the sensitive grant, because the connector shipped hard-disabled, so spec section 9.1 records that there is nothing to migrate rather than how to migrate it                                                                                                                                                                    |
 
 ### A pre-existing failure this lane did not cause
 

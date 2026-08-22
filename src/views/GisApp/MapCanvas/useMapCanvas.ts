@@ -1,12 +1,4 @@
-import { noop } from "@avandar/utils";
-import { useRef } from "react";
-import { FitMapBounds } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
-import { useMapChromeOverlays } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
-import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
-import { useMapSpecSync } from "@/views/GisApp/MapCanvas/useMapSpecSync";
-import { useMapStyleSync } from "@/views/GisApp/MapCanvas/useMapStyleSync";
-import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
-import { useMapViewSync } from "@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { FitBoundsRequest } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
 import type {
@@ -15,8 +7,18 @@ import type {
 } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { RefObject } from "react";
+
+import { noop } from "@avandar/utils";
+import { useRef } from "react";
+
+import { FitMapBounds } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
+import { useMapChromeOverlays } from "@/views/GisApp/MapCanvas/useMapChromeOverlays";
+import { useMapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
+import { useMapSpecSync } from "@/views/GisApp/MapCanvas/useMapSpecSync";
+import { useMapStyleSync } from "@/views/GisApp/MapCanvas/useMapStyleSync";
+import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
+import { useMapViewSync } from "@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync";
 
 /** Inputs used to synchronize map configuration with the live map canvas. */
 export type MapCanvasOptions = {

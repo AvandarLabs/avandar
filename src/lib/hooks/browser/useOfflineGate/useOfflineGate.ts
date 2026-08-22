@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { notifyError } from "@/utils/notifications/notify";
 

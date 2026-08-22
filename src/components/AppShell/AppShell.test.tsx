@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { AppShell } from "@/components/AppShell/AppShell";
 import { render, screen } from "@/test-utils";
 

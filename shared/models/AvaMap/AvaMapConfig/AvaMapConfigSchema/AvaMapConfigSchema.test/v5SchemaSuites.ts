@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import {
   createVersion4JsonWithLayer,
@@ -5,7 +7,6 @@ import {
   createVersion5OverlappingDisputedJson,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/schemaTestFixtures.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";
-import { describe, expect, it } from "vitest";
 
 describe("AvaMapConfigSchema v5 export layout", () => {
   it("migrates a version 4 config into the default export layout", () => {

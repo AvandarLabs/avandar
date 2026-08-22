@@ -1,5 +1,6 @@
-import { makeIdLookupMap } from "@avandar/utils";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+
+import { makeIdLookupMap } from "@avandar/utils";
 
 /**
  * Returns whether following `bufferOfLayer` links from `startLayerId`
@@ -19,9 +20,9 @@ export function hasBufferCycle(
     seen.add(currentId);
     const current = byId.get(currentId);
     currentId =
-      current?.geoBinding?.type === "bufferOfLayer" ?
-        current.geoBinding.layerId
-      : undefined;
+      current?.geoBinding?.type === "bufferOfLayer"
+        ? current.geoBinding.layerId
+        : undefined;
   }
   return false;
 }

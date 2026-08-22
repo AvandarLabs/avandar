@@ -1,8 +1,9 @@
-import { uuid } from "$/lib/uuid.ts";
 import type {
   QueryResult,
   QueryResultId,
 } from "$/models/queries/QueryResult/QueryResult.types.ts";
+
+import { uuid } from "$/lib/uuid.ts";
 
 type IQueryResultModule = {
   makeEmpty: () => QueryResult;

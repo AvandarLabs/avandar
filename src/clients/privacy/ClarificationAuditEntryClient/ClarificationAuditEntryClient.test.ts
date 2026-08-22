@@ -1,10 +1,13 @@
 import "fake-indexeddb/auto";
+import type { ChatClarifyRequest } from "$/types/chat.types";
+import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { ClarificationAuditEntryParsers } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntryParsers";
+
 import { ClarificationAuditEntryClient } from "./ClarificationAuditEntryClient";
-import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-import type { ChatClarifyRequest } from "$/types/chat.types";
 
 const NOW = new Date("2026-07-27T12:00:00.000Z").getTime();
 

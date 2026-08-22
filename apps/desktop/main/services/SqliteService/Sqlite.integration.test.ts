@@ -1,7 +1,8 @@
+import { afterEach, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "bun:test";
+
 import { openSqliteDatabase, runMigrations } from "./Sqlite";
 
 describe("Sqlite", () => {
@@ -69,18 +70,16 @@ describe("Sqlite", () => {
 
     db.run("insert into widgets (name, color) values ('a', 'red');");
     const rows = db
-      .query<
-        { name: string; color: string },
-        []
-      >("select name, color from widgets")
+      .query<{ name: string; color: string }, []>(
+        "select name, color from widgets",
+      )
       .all();
     expect(rows).toEqual([{ name: "a", color: "red" }]);
 
     const applied = db
-      .query<
-        { name: string },
-        []
-      >("select name from _schema_migrations order by name")
+      .query<{ name: string }, []>(
+        "select name from _schema_migrations order by name",
+      )
       .all();
     expect(applied).toEqual([
       { name: "001_init.sql" },
@@ -131,10 +130,9 @@ describe("Sqlite", () => {
     }).toThrow();
 
     const tables = db
-      .query<
-        { name: string },
-        []
-      >("select name from sqlite_master where type='table' and name='widgets'")
+      .query<{ name: string }, []>(
+        "select name from sqlite_master where type='table' and name='widgets'",
+      )
       .all();
     expect(tables).toEqual([]);
 
@@ -168,10 +166,9 @@ describe("Sqlite", () => {
     expect(rows).toEqual([{ id: 1 }]);
 
     const applied = db
-      .query<
-        { name: string },
-        []
-      >("select name from _schema_migrations order by name")
+      .query<{ name: string }, []>(
+        "select name from _schema_migrations order by name",
+      )
       .all();
     expect(applied).toEqual([
       { name: "001_pure_comment.gen.sql" },
@@ -188,10 +185,9 @@ describe("Sqlite", () => {
     runMigrations(db, []);
 
     const tables = db
-      .query<
-        { name: string },
-        []
-      >("select name from sqlite_master where type='table' and name='_schema_migrations'")
+      .query<{ name: string }, []>(
+        "select name from sqlite_master where type='table' and name='_schema_migrations'",
+      )
       .all();
     expect(tables).toEqual([{ name: "_schema_migrations" }]);
 

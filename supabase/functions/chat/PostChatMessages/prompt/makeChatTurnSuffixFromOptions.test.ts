@@ -4,8 +4,9 @@
 import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
 import { makeChatTurnSuffixFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatTurnSuffixFromOptions.ts";
-import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import { describe, expect, it } from "vitest";
+
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
 describe("makeChatTurnSuffixFromOptions", () => {
   it("puts live SQL and errors in the suffix, not the frozen prefix", () => {

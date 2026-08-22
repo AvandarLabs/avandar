@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+
+import { useEffect, useState } from "react";
 
 type Draft = {
   kind: AvaMapConfig.CustomBasemapKind;
