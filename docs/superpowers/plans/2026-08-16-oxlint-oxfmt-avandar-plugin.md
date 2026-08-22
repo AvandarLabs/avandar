@@ -112,11 +112,11 @@ the plan; Phase 2 has to work with the result, not the text.
    `agent-skills/` are deliberate IIFE fragments that no parser reads
    standalone, and vendored skill content should not be restyled.
 7. **Losing `experimentalTernaries` broke `max-len` in three files.** Two
-   needed comments rewrapped. `AnalyticsEventPayloads` is 29 conditionals
-   deep and its tail arms start past column 80 whatever they contain, so it
-   carries a scoped `eslint-disable max-len`. Flattening that chain into a
-   keyed payload map is open follow-up work, and Phase 4 should expect the
-   same class of problem wherever a deep ternary chain survives.
+   needed comments rewrapped. `AnalyticsEventPayloads` was 29 conditionals
+   deep, so its tail arms started past column 80 whatever they contained;
+   it is now keyed by event name instead. Phase 4 should expect the same
+   class of problem wherever a deep ternary chain survives: rewrap the
+   comment if that is all it is, otherwise flatten the chain.
 
 One judgement call left for review: the `groups` list combines
 `value-builtin` and `value-external` into one alphabetical group, exactly as
