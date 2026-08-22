@@ -13,11 +13,7 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
-  # The gate every expensive job hangs off. Lint and typecheck share one job,
-  # as in `staging.yaml` and `production.yaml`, because every job pays for its
-  # own checkout and `pnpm install` and neither check needs the other's
-  # output: one install is the cheapest way to have an answer before the heavy
-  # jobs start.
+  # ESLint and TypeScript checks.
   lint-typecheck:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -37,12 +33,6 @@ jobs:
       - run: pnpm type-check
 
   # Everything except end-to-end tests.
-  #
-  # This job used to run the e2e suite too, on the same 30-minute budget. The
-  # work is closer to an hour, so the run was cancelled at 30m19s every time
-  # and the PR check reported neither pass nor fail. That is how a
-  # deterministically failing test reached `develop`. Splitting mirrors
-  # `staging.yaml`, so each half gets a budget it can finish inside.
   test-quick:
     runs-on: ubuntu-latest
     needs: lint-typecheck
@@ -94,12 +84,7 @@ jobs:
           if-no-files-found: warn
 
   # End-to-end tests, on a budget sized for the whole suite at one worker.
-  # See the matching job in `staging.yaml` for where the number comes from.
-  #
-  # Gated on `lint-typecheck` rather than started in parallel with it: an hour
-  # of runner time proves nothing about a PR that does not compile, and the
-  # gate answers in minutes. It does not wait on `test-quick`, because a unit
-  # failure and an e2e failure are worth seeing in the same run.
+  # See `staging.yaml` for the explanation on the timeout threshold.
   pr-test-e2e:
     runs-on: ubuntu-latest
     needs: lint-typecheck

@@ -14,11 +14,7 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
-  # ESLint and TypeScript checks. One job rather than two, matching
-  # `pr-develop.yaml`: these were already chained, so nothing ran in parallel,
-  # and the second job spent ~35s on its own checkout, Node setup and
-  # `pnpm install` before reaching `pnpm type-check`. Neither check consumes
-  # the other's output, so a single install answers both.
+  # ESLint and TypeScript checks.
   lint-typecheck:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -88,15 +84,9 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-  # End-to-end tests. Intentionally NOT a dependency of `migrate`.
-  #
-  # 70 minutes because the suite is ~104 tests on the single worker
-  # `playwright.config.ts` pins, which took ~48 in the last run that got to
-  # finish, plus ~6 for setup (install, `supabase start`, `db:reset`, the
-  # Chromium download) and headroom for the one configured retry. At 30 the job
-  # was cancelled mid-suite on every push, which is also why no Playwright
-  # report was ever uploaded: the old `!cancelled()` guard skipped the upload
-  # exactly when a timeout made it worth having.
+  # End-to-end tests. Intentionally NOT a dependency for `migrate`.
+  # Timeout set to 70 minutes because the suite is large and runs on a single
+  # worker.
   test-e2e:
     runs-on: ubuntu-latest
     needs: lint-typecheck

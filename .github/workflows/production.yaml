@@ -14,11 +14,7 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
-  # ESLint and TypeScript checks. One job rather than two, matching
-  # `pr-develop.yaml`: these were already chained, so nothing ran in parallel,
-  # and the second job spent ~35s on its own checkout, Node setup and
-  # `pnpm install` before reaching `pnpm type-check`. Neither check consumes
-  # the other's output, so a single install answers both.
+  # ESLint and TypeScript checks.
   lint-typecheck:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -91,6 +87,7 @@ jobs:
           if-no-files-found: warn
 
   # End-to-end tests. Intentionally NOT a dependency of `migrate`.
+  # See `staging.yaml` for the explanation on the timeout threshold.
   test-e2e:
     runs-on: ubuntu-latest
     needs: lint-typecheck
