@@ -12,6 +12,7 @@ import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQ
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { PointLayerSource } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
@@ -52,7 +53,7 @@ function _layerNeedsSpatial(layer: MapLayer.T, overlay: MapOverlay): boolean {
 function _isWaitingForSpatial(
   layer: MapLayer.T,
   overlay: MapOverlay,
-  availability: string,
+  availability: DuckDbSpatialAvailability,
 ): boolean {
   return _layerNeedsSpatial(layer, overlay) && availability === "loading";
 }
@@ -61,7 +62,7 @@ function _isWaitingForSpatial(
 function _getCapabilityError(
   layer: MapLayer.T,
   overlay: MapOverlay,
-  availability: string,
+  availability: DuckDbSpatialAvailability,
 ): Error | undefined {
   return _layerNeedsSpatial(layer, overlay) && availability === "unavailable" ?
       new Error("DuckDB Spatial is unavailable for this geometry layer")
@@ -276,7 +277,7 @@ type LayerQueryContext = {
   datasets: readonly Dataset.T[];
   datasetColumns: readonly DatasetColumn.T[];
   overlay: MapOverlay;
-  spatialAvailability: string;
+  spatialAvailability: DuckDbSpatialAvailability;
 };
 
 function _createLayerQuery(
@@ -352,7 +353,7 @@ function _createLayerQuery(
 function _toLayerQueryStateMap(
   layers: readonly MapLayer.T[],
   overlay: MapOverlay,
-  spatialAvailability: string,
+  spatialAvailability: DuckDbSpatialAvailability,
   results: ReadonlyArray<{
     data: MapLayerDataResult | undefined;
     isLoading: boolean;
@@ -389,12 +390,8 @@ function _toLayerQueryStateMap(
 /**
  * Runs the independent structured query for every configured map layer.
  *
- * Reads the Spatial capability but never asks for the extension: `GisApp`
- * calls `useEnsuredSpatialAvailability` on mount, unconditionally and before
- * any layer exists, so by the time a spatial layer can be configured the
- * request is already in flight. Asking again from here would only re-request a
- * memoized promise, and would do it later and for a strict subset of the cases
- * the view root already covers.
+ * Reads the Spatial capability but assumes the extension is already
+ * available.
  */
 export function useMapLayersData({
   layers,
