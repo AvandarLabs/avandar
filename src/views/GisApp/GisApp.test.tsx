@@ -89,9 +89,10 @@ describe("GisApp", () => {
     );
   });
 
-  // Nothing downstream asks for Spatial: `useMapLayersData` and the Area and
-  // Buffer map tools all read the capability passively, so if this call stops
-  // happening they wait on "loading" for the life of the page.
+  // Nothing downstream asks for Spatial: `useMapLayersData`, the geometry
+  // picker and the Area and Buffer map tools all read the capability without
+  // asking, so if this stops happening they wait on "loading" for the life of
+  // the page.
   it("requests the Spatial extension on mount, before any layer exists", () => {
     render(<GisApp avaMap={_createAvaMap()} />);
 

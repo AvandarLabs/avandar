@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { useEnsuredSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
+import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
@@ -187,10 +187,10 @@ export function GeometryBindingTypeSelect({
   onLayerChange,
 }: Props): ReactNode {
   const { t, i18n } = useLingui();
-  // Reading the capability here also requests the extension: the spatial
-  // options below stay disabled until the request settles, and on a map with
-  // no spatial layer nothing else would ever ask.
-  const availability = useEnsuredSpatialAvailability();
+  // Read only: `GisApp` requests the extension when the map opens, which is
+  // always before this control can be reached, so the options below have the
+  // whole time the user spends opening the inspector to become selectable.
+  const availability = useDuckDbSpatialAvailability();
   return (
     <Select
       label={t`Geometry`}

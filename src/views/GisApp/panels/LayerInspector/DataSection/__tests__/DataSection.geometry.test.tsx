@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import { fireEvent, render, screen } from "@/test-utils";
 import {
   createBoundLayer,
   createGeometryLayer,
@@ -70,18 +70,12 @@ describe("DataSection geometry", () => {
     ).toBeInTheDocument();
   });
 
-  it("requests Spatial while the geometry picker waits on it", async () => {
+  // `GisApp` requests the extension on mount, before the inspector can be
+  // opened, so the picker only reports the capability. Asking again here would
+  // re-request a memoized promise for a strict subset of the cases the view
+  // root already covers.
+  it("does not request Spatial while the geometry picker waits on it", () => {
     spatialAvailability.value = "loading";
-
-    render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
-
-    await waitFor(() => {
-      expect(duckDbEnsureSpatial).toHaveBeenCalled();
-    });
-  });
-
-  it("does not request Spatial once the capability is known", () => {
-    spatialAvailability.value = "available";
 
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
 
