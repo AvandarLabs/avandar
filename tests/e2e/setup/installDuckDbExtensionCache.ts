@@ -9,6 +9,11 @@ const EXTENSION_URL_PATTERN = "**/extensions.duckdb.org/**";
  * Where fetched extensions are kept. Inside `node_modules/.cache` so it is
  * already ignored by git, already wiped by a clean install, and shared by
  * every worker of every run in this checkout.
+ *
+ * Decompressed / gzipped-on-the-wire, measured on DuckDB v1.4.4 `wasm_eh`:
+ * spatial 22.4 / 6.0MB, parquet 2.9 / 0.7MB, json 0.8 / 0.2MB, excel 0.6 /
+ * 0.2MB. Re-measure by listing this directory and piping each file to
+ * `gzip -c`.
  */
 const CACHE_DIR = path.resolve(
   process.cwd(),
@@ -27,6 +32,7 @@ function _getCacheFileName(url: string): string {
   return pathname.replace(/^\/+/, "").replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
+/** The cached body, or `undefined` on a miss or an unreadable file. */
 async function _readCached(fileName: string): Promise<Buffer | undefined> {
   try {
     return await fs.readFile(path.join(CACHE_DIR, fileName));
@@ -53,26 +59,15 @@ async function _writeCached(
 /**
  * Serves DuckDB's WASM extensions from a local cache, filling it on first use.
  *
- * DuckDB-WASM fetches `parquet`, `json`, `excel` and (for GIS) `spatial` from
- * `extensions.duckdb.org` on **every** fresh init, because it cannot persist
- * them across page loads, and the CDN sends no `cache-control`, so the browser
- * cannot help either. Each Playwright test gets a fresh context, so without a
- * cache every test refetches ~7.1MB over the wire (~27MB once decompressed)
- * and pays ~1.6s for it, twice for a spec that reloads. That puts a
- * third-party CDN in the critical path of the whole suite, which is both slow
- * and a source of timeouts nothing in the repo can fix.
+ * DuckDB-WASM cannot persist extensions across page loads and the CDN sends no
+ * `cache-control`, so every Playwright context refetches whatever it loads:
+ * `parquet` and `json` at startup, then `spatial` or `excel` when a screen asks
+ * for one. For a GIS spec that is ~6.9MB over the wire, twice if it reloads,
+ * with a third-party CDN in the suite's critical path.
  *
- * The first run to want a given file fetches it and writes it to disk; every
- * run after that is local, which also makes the suite work offline once
- * warmed. Requests come from DuckDB's Web Worker and are still routable,
- * which is what makes this possible at all.
- *
- * Sizes above are for DuckDB v1.4.4 `wasm_eh`, and every size in this repo's
- * DuckDB comments is quoted the same way: "over the wire" is the gzipped
- * transfer the CDN actually sends, "decompressed" is what lands in this cache
- * directory. Per extension, decompressed / wire: spatial 22.4 / 6.0MB,
- * parquet 2.9 / 0.7MB, json 0.8 / 0.2MB, excel 0.6 / 0.2MB. Re-measure by
- * listing this directory and piping each file through `gzip -c`.
+ * The first run to want a file fetches and stores it; every run after that is
+ * local, which also makes a warmed suite work offline. This is possible at all
+ * because the requests come from DuckDB's Web Worker and are still routable.
  */
 export async function installDuckDbExtensionCache(
   context: BrowserContext,

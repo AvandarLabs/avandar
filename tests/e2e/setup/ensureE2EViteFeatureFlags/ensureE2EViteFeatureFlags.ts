@@ -1,8 +1,4 @@
-/**
- * Appends a Vite feature flag to `VITE_FEATURE_FLAGS` when it is not
- * already present. E2E tests rely on flags that CI sets in
- * `.env.development` but local gitignored env files may omit.
- */
+/** Appends a Vite feature flag to a comma-separated list, if absent. */
 export function appendViteFeatureFlag(
   existing: string | undefined,
   flag: string,
@@ -37,43 +33,35 @@ function removeViteFeatureFlag(
 const E2E_REQUIRED_VITE_FEATURE_FLAGS = ["enable-shared-with-me"] as const;
 
 /**
- * The tag carried by a spec that cannot pass with the extensions offline mode
- * disables, which are the ones `shouldLoadDuckDbNetworkExtensions` gates:
- * `spatial` and `excel`. It is not "fetched from the CDN", since `parquet` is
- * fetched too and every dataset spec needs it.
+ * Marks a spec that cannot pass once `disable-duckdb-spatial` is set, which
+ * turns off `spatial` and `excel`. It does not mean "needs the CDN": `parquet`
+ * is fetched too, and every dataset spec needs that.
  *
  * Decide by running `pnpm test:e2e:offline <spec>`, not by reading the query
- * gate. `_layerNeedsSpatial` in `useMapLayersData` emits no `ST_` call for a
- * plain `latLngColumns` layer, which suggests a lat/lng map spec runs offline;
- * `gis-map-layers` is one and does not, because the layer inspector's geometry
- * binding controls need the capability before the query ever runs. Both
- * over-tagging and under-tagging are silent: an over-tagged spec is simply
- * skipped, and an under-tagged one times out on a control that never enables.
+ * gate, which under-reports. `gis-map-layers` builds a lat/lng layer that
+ * emits no `ST_` call and still fails offline, because the geometry binding
+ * controls need the capability before any query runs.
  */
 export const E2E_ONLINE_TAG = "@online";
 
 /**
- * True when the run was asked to work without network access.
- *
- * Off by default, so a bare `pnpm test:e2e` behaves like the product does:
- * DuckDB fetches the extensions a screen asks for and every spec runs. Opting
- * out is explicit (`pnpm test:e2e:offline`) because the failure mode of
- * guessing wrong is silent: with the extensions disabled the geometry controls
- * render but stay disabled and `read_xlsx` is simply missing, so the specs
- * that need them time out on a dead control instead of saying why.
+ * True when the run was told to work without network access. Opt in through
+ * `pnpm test:e2e:offline`, so a bare run behaves like the product does.
  */
 export function isE2EOfflineMode(): boolean {
   return process.env.PLAYWRIGHT_E2E_OFFLINE === "1";
 }
 
 /**
- * Ensures feature flags required by Playwright specs are enabled for the test
- * runner and the Vite dev server.
+ * Enables the feature flags Playwright specs need, for both the test runner
+ * and the Vite dev server, and sets `VITE_OFFLINE_CHAT_MOCK`.
  *
- * Offline runs additionally disable DuckDB Spatial, which is fetched from
- * `extensions.duckdb.org` and therefore cannot load without a network. The
- * specs that need it are tagged `@online` and skipped by the config in that
- * mode rather than left to time out.
+ * CI has these flags in `.env.development`, but a local gitignored env file
+ * may omit them, so the run sets them instead of trusting the environment. An
+ * offline run also sets `disable-duckdb-spatial`, which stops DuckDB fetching
+ * `spatial` and `excel` from `extensions.duckdb.org`. Specs needing either are
+ * tagged {@link E2E_ONLINE_TAG} and skipped by the config rather than left to
+ * time out.
  */
 export function ensureE2EViteFeatureFlags(): void {
   E2E_REQUIRED_VITE_FEATURE_FLAGS.forEach((flag) => {
