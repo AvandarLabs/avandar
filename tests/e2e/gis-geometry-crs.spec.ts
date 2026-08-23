@@ -124,26 +124,16 @@ test(
         page.getByRole("status", { name: "All changes saved" }),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-      // The reload earns its place: it is the only check that a saved source
-      // CRS comes back. The write lands in Postgres, the route loader's
-      // `AvaMapClient.getById` reads it on the next load, the config schema
-      // parses it, and the picker maps the stored number onto its option. A
-      // field that saves but does not read back in that shape, or that the
-      // control cannot match to an option, fails nowhere else: the schema's
-      // own round-trip tests cover a geometry binding only with `sourceCrs`
-      // unset. That bug class is narrow but real, and this is its only guard.
+      // The reload is deliberate: reading the saved source CRS back is the only
+      // check that it survives Postgres, the route loader and the config
+      // schema, whose own round-trip tests cover a geometry binding only with
+      // `sourceCrs` unset. The CRS options are a static preset list, so this
+      // assertion needs no query behind it.
       //
-      // The assertion below is a pure config fact, which is what makes it safe
-      // across a reload: the Source CRS options are a static preset list, and
-      // the value comes from the route loader, which refetches every load. Do
-      // not extend that reasoning to a control whose options come from a query.
-      //
-      // Do not add the mapped-row count or the projected coordinates here
-      // either. Those come from the dataset query and its DuckDB register, and
-      // a reload can restore that query's persisted snapshot as `fresh` while
-      // it is stale (see `docs/rules/e2e-testing.md`), which no retry inside a
-      // test recovers from. Both are already proven above, against the render
-      // this test drove.
+      // Do not assert the mapped-row count or the projected coordinates here.
+      // Both come from the dataset query, whose persisted snapshot a reload can
+      // restore as `fresh` while stale, and nothing inside a test recovers from
+      // that (see `docs/rules/e2e-testing.md`). Both are proven above.
       await page.reload();
       await expect(
         inspector.getByRole("combobox", { name: "Source CRS" }),

@@ -77,13 +77,11 @@ test(
       await inspector
         .getByRole("button", { name: "Filter", exact: true })
         .click();
-      // Narrow to row 3, the fixture's only polygon. Until then the layer
-      // reports "The source contains mixed geometry families", because `wkt`
-      // holds a point, a line, a polygon and a non-geometry.
-      //
-      // A new condition already defaults to the layer's first queried column,
-      // which is `id`. The column picker deselects on a click of the value it
-      // already holds, so this asserts the default rather than selecting it.
+      // Narrow to row 3, the fixture's only polygon: `wkt` also holds a point,
+      // a line and a non-geometry, so until then the layer reports "The source
+      // contains mixed geometry families". A new condition already defaults to
+      // the layer's first queried column, `id`, and the column picker
+      // deselects a click on the value it holds, so assert it rather than pick.
       const filters = inspector.getByTestId("query-filters-field");
       await filters.getByRole("button", { name: "+ Condition" }).click();
       await expect(
@@ -118,30 +116,16 @@ test(
         timeout: MEDIUM_WAIT,
       });
 
-      // The reload earns its place: it is the only check that a saved
-      // geometry column and encoding come back. The write lands in Postgres,
-      // the route loader's `AvaMapClient.getById` reads it on the next load,
-      // the config schema parses it, and both pickers map the stored values
-      // onto their options. A field that saves but does not read back in that
-      // shape fails nowhere else, and the schema rejects unknown config keys,
-      // so a reshaped write is exactly the kind of regression that lands
-      // here. That bug class is narrow but real.
+      // The reload is deliberate: reading the saved column and encoding back is
+      // the only check that they survive Postgres, the route loader and a
+      // config schema that rejects unknown keys.
       //
-      // Do not add the mapped-row count after the reload. It comes from the
-      // dataset query and its DuckDB register, and a reload can restore that
-      // query's persisted snapshot as `fresh` while it is stale (see
-      // `docs/rules/e2e-testing.md`), which no retry inside a test recovers
-      // from. The count is already asserted above for all three encodings.
-      //
-      // The two assertions below are not equally safe. `Encoding` is a pure
-      // config fact: a static option list, and a value the route loader
-      // refetches every load. `Geometry column` is a Mantine Select whose
-      // visible text is the *label* of an option supplied by the
-      // dataset-columns query (`QueryColumnSingleSelect`), so it needs that
-      // query as well as the config. It is kept because resolving the stored
-      // column id back to a column is worth proving, but it carries a smaller
-      // version of the same restore risk, so it is the first thing to look at
-      // if this spec ever fails right here.
+      // Do not assert the mapped-row count here. It comes from the dataset
+      // query, whose persisted snapshot a reload can restore as `fresh` while
+      // stale, and nothing inside a test recovers from that (see
+      // `docs/rules/e2e-testing.md`). It is asserted above for all three
+      // encodings. `Geometry column` carries a smaller version of that risk,
+      // since its option labels come from the dataset-columns query.
       await page.reload();
       await expect(
         inspector.getByRole("combobox", { name: "Geometry column" }),
