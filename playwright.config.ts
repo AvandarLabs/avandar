@@ -65,21 +65,14 @@ export default defineConfig({
   testDir: "tests/e2e",
   testMatch: "**/*.spec.ts",
 
-  // Stays at one worker, which `docs/rules/e2e-testing.md` treats as a given:
-  // the `freshBrowserPage` fixture exists to give a spec a cold process
-  // precisely because every other spec shares this worker's aging one, and the
-  // rule that heavy cold-render routes keep the shared `page` reads from the
-  // same premise. Raising it was measured and did not hold: at three workers
-  // `gis-geometry-crs` times out reproducibly while passing solo in 17s, and
-  // at two `gis-geometry-column` fails its post-reload assertion in most
-  // full-suite runs, again passing solo. Both are GIS specs driving MapLibre
-  // and a DuckDB-WASM worker, which a second concurrent browser starves.
-  //
-  // Raising this also needs work beyond the number. The two accounts in
-  // `e2e-credentials.ts` are shared by every worker, and `e2eWorkerDb`'s
-  // teardown deletes them and sweeps the `e2e-org-%` workspaces they own, both
-  // scoped by user rather than by the per-worker slug. Concurrent workers would
-  // therefore delete each other's user mid-test.
+  // Stays at one worker intentionally. The `freshBrowserPage` fixture exists
+  // if any spec needs a cold process.
+  // Making tests parallelizable would need work beyond just increasing worker
+  // number. The two accounts in `e2e-credentials.ts` are shared by every
+  // worker, and `e2eWorkerDb`'s teardown deletes them and sweeps the
+  // `e2e-org-%` workspaces they own, both scoped by user rather than by the
+  // per-worker slug. Concurrent workers would therefore delete each other's
+  // user mid-test.
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
