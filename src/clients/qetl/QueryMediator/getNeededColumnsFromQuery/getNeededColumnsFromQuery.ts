@@ -318,10 +318,11 @@ function _collectSqlColumns(
           })
         : [columnRef.columnName];
       const prior = columnsByDatasetId[columnRef.datasetId] ?? [];
-      return {
-        ...columnsByDatasetId,
-        [columnRef.datasetId]: unionColumnSets(prior, contributed),
-      };
+      columnsByDatasetId[columnRef.datasetId] = unionColumnSets(
+        prior,
+        contributed,
+      );
+      return columnsByDatasetId;
     },
     {},
   );
