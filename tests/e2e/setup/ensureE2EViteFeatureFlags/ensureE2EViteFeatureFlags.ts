@@ -1,34 +1,3 @@
-/** Appends a Vite feature flag to a comma-separated list, if absent. */
-export function appendViteFeatureFlag(
-  existing: string | undefined,
-  flag: string,
-): string {
-  const tokens = (existing ?? "")
-    .split(",")
-    .map((value) => {
-      return value.trim();
-    })
-    .filter(Boolean);
-  const tokensWithFlag = tokens.includes(flag) ? tokens : [...tokens, flag];
-  return tokensWithFlag.join(",");
-}
-
-/** Removes one Vite feature flag without disturbing the remaining order. */
-function removeViteFeatureFlag(
-  existing: string | undefined,
-  flag: string,
-): string {
-  return (existing ?? "")
-    .split(",")
-    .map((value) => {
-      return value.trim();
-    })
-    .filter((value) => {
-      return value !== "" && value !== flag;
-    })
-    .join(",");
-}
-
 /** Flags every E2E run needs, regardless of connectivity. */
 const E2E_REQUIRED_VITE_FEATURE_FLAGS = ["enable-shared-with-me"] as const;
 
@@ -43,6 +12,37 @@ const E2E_REQUIRED_VITE_FEATURE_FLAGS = ["enable-shared-with-me"] as const;
  * controls need the capability before any query runs.
  */
 export const E2E_ONLINE_TAG = "@online";
+
+/** Appends a Vite feature flag to a comma-separated list, if absent. */
+function _appendViteFeatureFlag(
+  existing: string | undefined,
+  flag: string,
+): string {
+  const tokens = (existing ?? "")
+    .split(",")
+    .map((value) => {
+      return value.trim();
+    })
+    .filter(Boolean);
+  const tokensWithFlag = tokens.includes(flag) ? tokens : [...tokens, flag];
+  return tokensWithFlag.join(",");
+}
+
+/** Removes one Vite feature flag without disturbing the remaining order. */
+function _removeViteFeatureFlag(
+  existing: string | undefined,
+  flag: string,
+): string {
+  return (existing ?? "")
+    .split(",")
+    .map((value) => {
+      return value.trim();
+    })
+    .filter((value) => {
+      return value !== "" && value !== flag;
+    })
+    .join(",");
+}
 
 /**
  * True when the run was told to work without network access. Opt in through
@@ -65,18 +65,18 @@ export function isE2EOfflineMode(): boolean {
  */
 export function ensureE2EViteFeatureFlags(): void {
   E2E_REQUIRED_VITE_FEATURE_FLAGS.forEach((flag) => {
-    process.env.VITE_FEATURE_FLAGS = appendViteFeatureFlag(
+    process.env.VITE_FEATURE_FLAGS = _appendViteFeatureFlag(
       process.env.VITE_FEATURE_FLAGS,
       flag,
     );
   });
   process.env.VITE_FEATURE_FLAGS =
     isE2EOfflineMode() ?
-      appendViteFeatureFlag(
+      _appendViteFeatureFlag(
         process.env.VITE_FEATURE_FLAGS,
         "disable-duckdb-spatial",
       )
-    : removeViteFeatureFlag(
+    : _removeViteFeatureFlag(
         process.env.VITE_FEATURE_FLAGS,
         "disable-duckdb-spatial",
       );
