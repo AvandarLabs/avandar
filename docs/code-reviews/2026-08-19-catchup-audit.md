@@ -254,3 +254,52 @@ crunch window:
   disabled, and `.prettierrc`'s `expressionWidth` 8 to 40 is formatting only.
 - Dependency additions are all explained by shipped features (`pdfjs-dist`,
   `@dnd-kit/*`, `react-joyride`, `@duckdb/node-api`) plus a Supabase CLI bump.
+
+### F-4 — five new RLS-protected tables have no pgTAP coverage at all (S3, open)
+
+**Where:** `supabase/schemas/10.concepts.sql`, `20.concept_attributes.sql`,
+`20.datasets__pdf_file.sql`, and the individuals/attribute-mapping schemas
+**Tier:** t1-sql
+
+39 `create policy` statements landed in the window across 10 tables. Coverage
+of them is uneven:
+
+| Table | Multi-workspace test | Any test at all |
+| --- | --- | --- |
+| `public.maps` | `rls_maps.test.sql` | yes |
+| `storage.objects` | 3 files, incl. `storage_private_dataset_guard` | yes |
+| `public.user_group_memberships` | none | 4 files |
+| `public.user_nux_progress` | none | 1 file |
+| `public.concepts` | none | **none** |
+| `public.concept_attributes` | none | **none** |
+| `public.individuals` | none | **none** |
+| `public.datasets__pdf_file` | none | **none** |
+| `public.attribute_mappings__dataset_column` | none | **none** |
+| `public.attribute_mappings__manual_entry` | none | **none** |
+
+The six tables with no tests are the description-logic/ontology surface plus
+PDF-file datasets, all introduced during the crunch.
+
+This is a missing regression lock, not a known leak. Read directly, the
+policies use the correct pattern:
+
+```sql
+create policy "User can SELECT concepts" on public.concepts for select
+  to authenticated using (
+    public.concepts.workspace_id = any (
+      array(select public.util__get_auth_user_workspaces ())
+```
+
+So they look right today. The problem is that nothing holds them there. The
+header of `may_select_private_resource.test.sql` makes the same argument about
+its own subject: without the test, "nothing else in the suite would notice" if
+the predicate were narrowed or dropped. These six tables are in that state now,
+and `test:db` gates `migrate`, so a test added here actually blocks a bad
+migration rather than just reporting one.
+
+**Proposed:** one cross-tenant pgTAP file per table, following the `rls_maps`
+shape: two workspaces, an outsider member of the second, then assert the
+outsider sees zero rows of the first workspace's data and that an insider
+still does. Six files, largely mechanical once the first is written.
+
+**Owner:** unassigned · **Status:** open
