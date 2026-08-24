@@ -519,3 +519,50 @@ been tested, not new code written under deadline. The rename migration itself
 is careful: `db diff` cannot detect a rename and generated a drop-and-recreate
 that would have emptied every workspace's ontology; the hand-written
 replacement is metadata-only and touches no row.
+
+### F-8 — `durable_snapshot_transitions.test.sql` borrowed its fixture from the seed (S3, fixed)
+
+**Where:** `supabase/tests/database/dashboards/durable_snapshot_transitions.test.sql`
+**Tier:** t1-sql
+
+The file's only fixture, and eight of its `throws_ok` bodies, read
+
+```sql
+select user_profiles.workspace_id, user_profiles.user_id, user_profiles.id, ...
+from public.user_profiles
+limit 1
+```
+
+with no predicate. Forty-three of the sixty-one files in this suite insert
+their own `auth.users` / `workspaces` / `workspace_memberships` /
+`user_profiles`; this one took whatever row happened to be there.
+
+**Failure scenario.** On a database with no `user_profiles` row, the fixture
+insert matches zero rows, so the dashboard under test never exists. Every
+later `update ... where id = 'f7004001-…'` then updates nothing and every later
+`insert ... select ... limit 1` inserts nothing, so no constraint can fire and
+eleven `throws_ok` assertions report `caught: no exception / wanted: 23514`.
+That is not a hypothetical database: a plain `supabase db reset` produces it
+(the repo's `[db.seed] sql_paths` replays only the two storage migrations), and
+so does the reset inside `pnpm db:new-migration`. It was hit for real while
+regenerating the F-5/F-6 migration through the sanctioned pipeline.
+
+CI is green today only because `pr-develop.yaml` runs `pnpm db:reset`, which
+calls `seedDatabaseScript.ts` after the reset. So the eleven assertions that
+cover both CHECK constraints on `dashboards` are currently coupled to the seed
+script rather than to the schema, in both directions: they fail loudly on an
+unseeded database for reasons unrelated to the schema, and `limit 1` with no
+`order by` means the arbitrary profile the seed leaves is what decides which
+workspace the fixture lands in.
+
+**Fixed.** The file now inserts its own user, workspace, membership and profile
+(`f7000001` / `f7001001` / `f7002001` / `f7003001`), and every source select is
+pinned to that profile id instead of `limit 1`.
+
+Verified on a freshly reset, unseeded database: the file failed 11/30 before
+and passes 30/30 after, and the whole suite is 61 files / 675 tests / exit 0
+with no seed present. **Mutation-tested**: dropping
+`dashboards__snapshot_transition_consistent` fails assertions 23-27, so the
+restored assertions test the constraint rather than passing vacuously.
+
+**Status:** fixed on `fix/audit-t1-sql`

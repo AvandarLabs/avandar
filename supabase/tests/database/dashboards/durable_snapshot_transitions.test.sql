@@ -6,6 +6,59 @@ set search_path to extensions, public;
 
 select plan(30);
 
+-- Own fixture, not a borrowed one.
+--
+-- Every insert below sources its workspace, owner and owner profile from
+-- `public.user_profiles`. That used to read `limit 1` with no predicate, which
+-- silently made all eleven CHECK-constraint assertions depend on the seed
+-- having left a profile row behind: on an unseeded database, which is what a
+-- plain `supabase db reset` and the reset inside `pnpm db:new-migration` both
+-- produce, the fixture insert matched zero rows, every later statement then
+-- updated or inserted nothing, and `throws_ok` reported "caught: no exception"
+-- eleven times with nothing wrong with the schema. Forty-three of the sixty-one
+-- files in this suite build their own rows; this one now does too, and the
+-- predicate below pins every source to it. See
+-- docs/audits/2026-08-19-catchup-audit.md, finding F-8.
+insert into auth.users (id, email, aud, role)
+values (
+  'f7000001-0000-4000-8000-000000000001'::uuid,
+  'transition_fence@test.dev',
+  'authenticated',
+  'authenticated'
+);
+
+insert into public.workspaces (id, owner_id, name, slug)
+values (
+  'f7001001-0000-4000-8000-000000000001'::uuid,
+  'f7000001-0000-4000-8000-000000000001'::uuid,
+  'transition fence ws',
+  'transition-fence-ws'
+);
+
+insert into public.workspace_memberships (id, workspace_id, user_id)
+values (
+  'f7002001-0000-4000-8000-000000000001'::uuid,
+  'f7001001-0000-4000-8000-000000000001'::uuid,
+  'f7000001-0000-4000-8000-000000000001'::uuid
+);
+
+insert into public.user_profiles (
+  id,
+  user_id,
+  workspace_id,
+  membership_id,
+  full_name,
+  display_name
+)
+values (
+  'f7003001-0000-4000-8000-000000000001'::uuid,
+  'f7000001-0000-4000-8000-000000000001'::uuid,
+  'f7001001-0000-4000-8000-000000000001'::uuid,
+  'f7002001-0000-4000-8000-000000000001'::uuid,
+  'Transition Fence',
+  'Transition Fence'
+);
+
 insert into public.dashboards (
   id,
   workspace_id,
@@ -22,7 +75,7 @@ select
   'transition fence fixture',
   '{}'::jsonb
 from public.user_profiles
-limit 1;
+where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid;
 
 -- The type, the five transition columns and the two CHECK constraints are not
 -- asserted structurally here. Every behavioural case below writes all five
@@ -403,7 +456,7 @@ select throws_ok(
       '{}'::jsonb,
       'publish'::public.dashboard_snapshot_transition_kind
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'partial transition states are rejected'
@@ -426,7 +479,7 @@ select throws_ok(
       gen_random_uuid(),
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'cleanup claims must revoke published visibility'
@@ -451,7 +504,7 @@ select throws_ok(
       'public'::public.dashboard_visibility,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'publish claims must preserve the prior audience boundary'
@@ -479,7 +532,7 @@ select throws_ok(
       'public'::public.dashboard_visibility,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'a transition revision cannot reuse the committed snapshot revision'
@@ -503,7 +556,7 @@ select throws_ok(
       'draft'::public.dashboard_visibility,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'a transition revision cannot use the reserved legacy sentinel'
@@ -523,7 +576,7 @@ select throws_ok(
       'draft'::public.dashboard_visibility,
       gen_random_uuid()
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__settled_snapshot_consistent"',
   'a settled draft cannot retain a snapshot revision'
@@ -541,7 +594,7 @@ select throws_ok(
       '{}'::jsonb,
       'workspace'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__settled_snapshot_consistent"',
   'a settled workspace dashboard requires a snapshot revision'
@@ -559,7 +612,7 @@ select throws_ok(
       '{}'::jsonb,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__settled_snapshot_consistent"',
   'a settled public dashboard requires a snapshot revision'
