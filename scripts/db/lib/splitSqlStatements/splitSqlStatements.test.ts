@@ -26,7 +26,11 @@ describe("splitSqlStatements", () => {
     const statements = splitSqlStatements(
       "grant select on table public.t to authenticated;\nrevoke insert on table public.t from anon;\n",
     );
-    expect(statements.map((statement) => {return statement.body})).toEqual([
+    expect(
+      statements.map((statement) => {
+        return statement.body;
+      }),
+    ).toEqual([
       "grant select on table public.t to authenticated",
       "revoke insert on table public.t from anon",
     ]);
@@ -43,10 +47,11 @@ describe("splitSqlStatements", () => {
     const statements = splitSqlStatements(
       "select 'a;b';\n-- a comment; with a semicolon\n/* another; one */\nselect 2;\n",
     );
-    expect(statements.map((statement) => {return statement.body})).toEqual([
-      "select 'a;b'",
-      "select 2",
-    ]);
+    expect(
+      statements.map((statement) => {
+        return statement.body;
+      }),
+    ).toEqual(["select 'a;b'", "select 2"]);
   });
 
   // A quoted identifier is not a string, and this repo writes policy and
@@ -72,12 +77,14 @@ describe("splitSqlStatements", () => {
   });
 
   it("handles a doubled quote inside a quoted identifier", () => {
-    const sql = 'create policy "say ""hi""" on public.t for select using (true);\nselect 1;\n';
+    const sql =
+      'create policy "say ""hi""" on public.t for select using (true);\nselect 1;\n';
     expect(splitSqlStatements(sql)).toHaveLength(2);
   });
 
   it("honours backslash escapes inside an E'' string", () => {
-    const sql = "select E'it\\'s';\ngrant select on table public.t to authenticated;\n";
+    const sql =
+      "select E'it\\'s';\ngrant select on table public.t to authenticated;\n";
     expect(splitSqlStatements(sql)).toHaveLength(2);
   });
 
@@ -95,7 +102,10 @@ describe("splitSqlStatements", () => {
             return name.endsWith(".sql");
           })
           .filter((name) => {
-            return getTrailingNoise(readFileSync(path.join(dir, name), "utf8")) !== "";
+            return (
+              getTrailingNoise(readFileSync(path.join(dir, name), "utf8")) !==
+              ""
+            );
           })
           .map((name) => {
             return `${dir}/${name}`;
