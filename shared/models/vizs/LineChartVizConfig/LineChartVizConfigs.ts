@@ -1,6 +1,7 @@
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -33,13 +34,6 @@ const CURVE_TYPE_OPTIONS = [
   { value: "step", label: "Step" },
 ] as const;
 
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const;
-
 const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
   chart: [
     {
@@ -48,12 +42,7 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
       group: "Legend",
       control: { kind: "switch" },
     },
-    {
-      key: "chartStyle.legend.position",
-      label: "Legend position",
-      group: "Legend",
-      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
-    },
+    makeLegendPositionDescriptor<LineChartVizConfig>(),
     ...makeAxisDescriptors<LineChartVizConfig>({
       axis: "xAxis",
       role: "category",
@@ -222,7 +211,13 @@ export const LineChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
+        return {
+          vizType,
+          nameKey: xAxisKey,
+          series: radarSeries,
+          withLegend,
+          chartStyle,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
