@@ -47,6 +47,16 @@ begin
 end;
 $$ language plpgsql;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.user_profiles__prevent_id_changes ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 /**
  * Trigger the `user_profiles__prevent_id_changes` function to make sure
  * that certain protected ids do not get changed.

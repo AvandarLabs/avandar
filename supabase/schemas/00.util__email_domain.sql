@@ -24,3 +24,13 @@ create or replace function public.util__email_domain (p_email text) returns text
 $$ language sql immutable
 set
   search_path = '';
+
+-- Reached only from inside SECURITY DEFINER bodies, which run as this
+-- function's owner, so no Data API role needs EXECUTE.
+revoke
+execute on function public.util__email_domain (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;

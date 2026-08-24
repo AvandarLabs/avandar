@@ -61,6 +61,16 @@ begin
 end;
 $$;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.maps__prevent_workspace_id_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 /** Ensures a map owner profile belongs to its owner and workspace. */
 create or replace function public.maps__validate_owner_profile () returns trigger language plpgsql security definer
 set

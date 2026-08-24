@@ -66,3 +66,15 @@ begin
   return v_workspace;
 end;
 $$ language plpgsql security invoker;
+
+-- `authenticated` only, the one role that calls this as an rpc.
+revoke
+execute on function public.rpc_workspaces__create_with_owner (text, text, text, text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_workspaces__create_with_owner (text, text, text, text) to authenticated;

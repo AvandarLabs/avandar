@@ -19,6 +19,19 @@ begin
 end;
 $$ language plpgsql security definer stable;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__get_auth_user_workspaces ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__get_auth_user_workspaces () to authenticated;
+
 /**
  * Get all workspaces that the auth user is an owner of
  * @returns: Array of workspace ids
@@ -32,6 +45,19 @@ begin
   );
 end;
 $$ language plpgsql security definer stable;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__get_auth_user_owned_workspaces ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__get_auth_user_owned_workspaces () to authenticated;
 
 /**
  * Whether a user belongs to a workspace.

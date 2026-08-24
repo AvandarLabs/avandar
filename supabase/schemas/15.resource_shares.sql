@@ -101,6 +101,16 @@ begin
 end;
 $$;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.resource_shares__validate_resource_workspace ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 /** Rejects user and user-group principals outside the resource workspace. */
 create or replace function public.resource_shares__validate_principal_workspace () returns trigger language plpgsql security definer
 set
@@ -136,6 +146,16 @@ begin
   return new;
 end;
 $$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.resource_shares__validate_principal_workspace ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 -- Enable row level security
 alter table public.resource_shares enable row level security;

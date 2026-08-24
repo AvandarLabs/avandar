@@ -44,6 +44,16 @@ $$ language plpgsql security definer
 set
   search_path = '';
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.datasets__log_deleted_analytics_event ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 create trigger tr__datasets__log_deleted_analytics_event
 after delete on public.datasets for each row
 execute function public.datasets__log_deleted_analytics_event ();
@@ -69,6 +79,16 @@ end;
 $$ language plpgsql security definer
 set
   search_path = '';
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.dashboards__log_deleted_analytics_event ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 create trigger tr__dashboards__log_deleted_analytics_event
 after delete on public.dashboards for each row

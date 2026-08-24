@@ -15,6 +15,17 @@ set
   where ugm.user_id = auth.uid () and ug.workspace_id = p_workspace_id;
 $$;
 
+-- No caller anywhere: no policy, no function body, no client. Revoked
+-- rather than dropped, because whether the helper is still wanted is a
+-- product question and this is a privilege fix.
+revoke
+execute on function public.util__get_auth_user_user_group_ids (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 /**
  * Whether any share on this resource grants a principal other than its owner.
  *
@@ -336,6 +347,18 @@ begin
 end;
 $$;
 
+-- `authenticated` only, the one role that calls this as an rpc.
+revoke
+execute on function public.util__resource_effective_role (public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__resource_effective_role (public.resource_type, uuid) to authenticated;
+
 /**
  * Whether the auth user meets at least the minimum role on a resource.
  *
@@ -364,6 +387,20 @@ begin
   return v_eff_rank >= v_min_rank;
 end;
 $$;
+
+-- `authenticated` only: named by `to authenticated` policies, which are
+-- evaluated as the calling role, and called directly as an rpc by the
+-- signed-in client.
+revoke
+execute on function public.util__auth_user_can_access_resource (public.resource_type, uuid, public.role_level)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_access_resource (public.resource_type, uuid, public.role_level) to authenticated;
 
 /**
  * Whether the auth user has the requested resource role in the given workspace.
@@ -408,6 +445,19 @@ begin
 end;
 $$;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_access_resource_in_workspace (public.resource_type, uuid, uuid, public.role_level)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_access_resource_in_workspace (public.resource_type, uuid, uuid, public.role_level) to authenticated;
+
 /**
  * App catalog entry for a resource type.
  */
@@ -420,6 +470,16 @@ set
     when 'map'::public.resource_type then 'gis'::public.app_type
   end;
 $$;
+
+-- Reached only from inside SECURITY DEFINER bodies, which run as this
+-- function's owner, so no Data API role needs EXECUTE.
+revoke
+execute on function public.util__resource_type_to_app_type (public.resource_type)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 /**
  * INSERT on `dashboards` / `datasets`: editor+ app role in workspace, caller
@@ -461,6 +521,19 @@ begin
 end;
 $$;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_insert_workspace_resource (uuid, public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_insert_workspace_resource (uuid, public.resource_type, uuid) to authenticated;
+
 /**
  * UPDATE on a dashboard or dataset: effective role is at least editor.
  */
@@ -477,6 +550,19 @@ set
   );
 $$;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_update_resource (public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_update_resource (public.resource_type, uuid) to authenticated;
+
 /**
  * DELETE on a dashboard or dataset: effective role is at least admin.
  */
@@ -492,6 +578,19 @@ set
     'admin'::public.role_level
   );
 $$;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_can_delete_resource (public.resource_type, uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_can_delete_resource (public.resource_type, uuid) to authenticated;
 
 /**
  * Whether the auth user may SELECT a dataset row under hardened RLS.
@@ -624,6 +723,19 @@ begin
   return false;
 end;
 $$;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_may_select_dataset (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_may_select_dataset (uuid) to authenticated;
 
 /**
  * Whether the auth user may SELECT a dashboard row under hardened RLS.
@@ -795,6 +907,19 @@ begin
   return false;
 end;
 $$;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__auth_user_may_select_dashboard (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_may_select_dashboard (uuid) to authenticated;
 
 /** Whether the auth user has a share that applies to a resource row. */
 create or replace function public.util__auth_user_has_resource_share (
@@ -1024,6 +1149,19 @@ set
   end;
 $$;
 
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__storage_object_dataset_id (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_dataset_id (text) to authenticated;
+
 /**
  * Extracts a workspace UUID from the first segment of a storage object path.
  *
@@ -1039,6 +1177,19 @@ set
     else null
   end;
 $$;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__storage_object_workspace_id (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_workspace_id (text) to authenticated;
 
 /**
  * Extracts a dashboard UUID from a published snapshot object path.
@@ -1069,6 +1220,23 @@ set
   end;
 $$;
 
+-- `anon` too, and that is load-bearing: the anon SELECT policy on the
+-- `published` bucket calls this to parse a public dashboard's snapshot
+-- path, and a policy is evaluated as the calling role.
+revoke
+execute on function public.util__storage_object_dashboard_id (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_dashboard_id (text) to anon;
+
+grant
+execute on function public.util__storage_object_dashboard_id (text) to authenticated;
+
 /**
  * Extracts a revision UUID from an exact published snapshot object path.
  *
@@ -1092,6 +1260,23 @@ set
     else null
   end;
 $$;
+
+-- `anon` too, and that is load-bearing: the anon SELECT policy on the
+-- `published` bucket calls this to parse a public dashboard's snapshot
+-- path, and a policy is evaluated as the calling role.
+revoke
+execute on function public.util__storage_object_snapshot_revision (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__storage_object_snapshot_revision (text) to anon;
+
+grant
+execute on function public.util__storage_object_snapshot_revision (text) to authenticated;
 
 /**
  * Whether the auth user may mutate an uncommitted dashboard snapshot object.

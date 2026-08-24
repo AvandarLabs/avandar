@@ -35,6 +35,16 @@ $$ language sql immutable
 set
   search_path = '';
 
+-- Reached only from inside SECURITY DEFINER bodies, which run as this
+-- function's owner, so no Data API role needs EXECUTE.
+revoke
+execute on function public.util__subscription_plan_rank (public.subscriptions__feature_plan_type)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 -- Records `subscription.created`.
 --
 -- `isPolarBacked` separates the native free subscriptions, which never touch

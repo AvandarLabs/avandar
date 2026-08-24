@@ -119,7 +119,7 @@ Ordered by blast radius per line, not by size.
 | Tier | Ref | Files | +Lines | Agent pass | Human pass | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1/F-2 accepted, F-3 open |
-| SQL + privileges | `review/t1-sql` | 156 | 21,054 | **done** | not started | F-5/F-6 fixed, F-7 open |
+| SQL + privileges | `review/t1-sql` | 156 | 21,054 | **done** | not started | F-5 to F-9 all fixed |
 | Edge functions | `review/t2-edge` | 73 | 4,697 | not started | not started | Untrusted input reaches SQL |
 | Core / clients | `review/t2-core` | 816 | 82,768 | not started | not started | |
 | UI | `review/t3-ui` | 1,329 | 95,084 | not started | not started | Spot-check, demo-driven |
@@ -498,7 +498,150 @@ and it is left for the human pass:
 2. Then flip the warning to a non-zero exit, so the next
    `util__get_workspace_members` cannot land.
 
-**Status:** open, needs a decision in the human pass
+**Resolved (2026-08-24).** Both halves done, in that order.
+
+*The 45 declarations.* Every one now has an explicit
+`revoke execute ... from public, anon, authenticated, service_role` in its
+schema file, followed by a `grant` for each role that genuinely needs it. What
+"needs" means was computed from the live catalogs rather than guessed, because
+three separate things confer a requirement and two of them are easy to miss:
+
+| Reason a role needs EXECUTE | How it was found | Count |
+| --- | --- | --- |
+| A policy names the function; a policy expression is evaluated as the CALLING role, not the policy owner | `pg_policy` expressions joined against `pg_proc` names, carrying each policy's `polroles` | 18 |
+| The client calls it as an rpc | every `.rpc(...)` call site in `src`, `shared`, `supabase/functions`, `apps`, `scripts` | 3 |
+| A SECURITY INVOKER function or trigger calls it, and runs as whoever ran the statement | `prosrc` edges from every `prosecdef = false` function in `public` and `private` | 2 |
+
+The last row is the one that would have broken production if it had been
+guessed. `usage_analytics_events__set_category` is a SECURITY INVOKER trigger,
+so `util__analytics_event_category` needs EXECUTE for `authenticated` (browser
+events) and `service_role` (the edge helper's `client = 'server'` events); and
+`private.dashboards__enforce_publish_publicly` is SECURITY INVOKER, so
+`util__auth_user_meets_min_app_role` needs it for `authenticated` or every
+dashboard visibility update fails. Both were verified by running the real
+statements, not by reading.
+
+The other 22 need nothing: 13 are trigger functions (the trigger machinery
+does not consult EXECUTE at all) and 7 are reached only from inside SECURITY
+DEFINER bodies, which run as the owner. `util__get_auth_user_user_group_ids`
+has no caller anywhere and was revoked rather than dropped, since whether the
+helper is still wanted is a product question.
+
+Two functions keep `anon`, and that is deliberate:
+`util__storage_object_dashboard_id` and
+`util__storage_object_snapshot_revision` are called by the anon SELECT policy
+on the `published` bucket to parse a public dashboard's snapshot path.
+
+**Measured before and after, on the `anon` role specifically:**
+
+| | Functions in `public` + `private` that `anon` may execute |
+| --- | --- |
+| Before | 46 |
+| After | 2 |
+
+*The guardrail.* `reconcile-privileges` printed the list as a `WARNING` and
+returned a count `main` never read, so the run exited 0. It now exits 1 in gate
+mode, which means `pnpm test:db` fails, which means `migrate` is blocked. It
+stays non-blocking under `--append`, because appending cannot fix it (a
+function with no declaration produces no statement to append) and
+`pnpm db:new-migration` ends with a gate run that catches it anyway. The
+message now also states the rule for deciding which roles need a grant.
+
+**Mutation-tested.** Creating `public.util__leaky_probe(uuid)` — a
+`security definer` function returning `uuid[]` of a workspace's members, i.e. a
+rebuild of F-5 — makes both `pnpm db:validate-privileges` and `pnpm test:db`
+exit 1 and name it. Dropping it returns both to exit 0.
+
+One test had to change with it. `publish_publicly_permission.test.sql` called
+`util__get_auth_user_app_role` directly while `set local role authenticated`,
+as an assertion about the fixture rather than about access. It now reads that
+value as `postgres`; `auth.uid()` comes from `request.jwt.claims`, a
+transaction-local GUC a `set role` does not disturb, so the assertion is
+unchanged.
+
+**Status:** resolved
+
+### F-9 — the SQL splitter both `db` tools parse with mis-scans quoted identifiers (S3, fixed)
+
+**Where:** `scripts/db/lib/splitSqlStatements.ts`
+**Tier:** t1-sql
+
+`splitSqlStatements` is the single parse behind both database tools: the
+privilege reconciler reads all of `supabase/schemas/` through it, and the view
+stripper decides which byte ranges to delete from a generated migration with
+it. It tracked strings, dollar-quoted bodies and comments, but not
+double-quoted identifiers.
+
+**Failure scenario.** Name a policy in English with an apostrophe in it, which
+is the natural way to write one:
+
+```sql
+create policy "Owner's rows" on public.t for select using (true);
+grant select on table public.t to authenticated;
+```
+
+The `'` in `Owner's` opens a string that runs to the next `'` in the file, or
+to end of file. Measured: the splitter returns **0** statements for that input
+instead of 2, and `getDeclarationsFromSchemaFiles` therefore finds 0 privilege
+statements and 0 revoked function signatures.
+
+That is silent, and both callers act on the result. The reconciler would treat
+every swallowed `grant` as undeclared, count the live privileges as surplus,
+and generate a migration that REVOKES them with nothing granting them back —
+`pnpm db:new-migration` would quietly write a migration that breaks the app's
+access to those tables. The stripper would report "No view recreations found"
+and leave the churn in place.
+
+A second, narrower gap: inside an `E'...'` escape string a backslash escapes
+the next character, so `E'it's'` did not close where the scanner thought it
+did.
+
+Latent rather than live. Every `.sql` file in `supabase/schemas/` and
+`supabase/migrations/` was run through the splitter and all of them parse to
+end of file with nothing left over; a test now asserts that over the whole
+directory on every run.
+
+**Fixed.** The scanner tracks double-quoted identifiers (including the doubled
+`""` escape) and `E'...'` escape strings, with the `E` prefix recognised only
+when it is not the tail of a longer identifier.
+
+Verified: `scripts/db/lib/splitSqlStatements.test.ts`, nine cases. Two of them
+fail against the old scanner and pass against the new one; the other seven pass
+against both, so they lock the existing behaviour rather than only the fix.
+
+**Status:** fixed on `fix/audit-t1-sql`
+
+### t1-sql: `scripts/db/` closing note
+
+The rest of the directory was read for defects and none were found that meet
+the bar. Recorded so the human pass does not repeat the search:
+
+- `NoopViewRecreations` is the one thing here that edits a migration in place,
+  and every path it can take fails closed. It removes a `create view` only when
+  Postgres itself confirms the proposed body renders identically to the live
+  one, in a single rolled-back transaction so both renderings share a
+  `search_path`; a parse failure, a connection failure, a view that does not
+  exist yet, and a definition that differs all keep the statement. A
+  `drop view` is removed only when its paired create was proven a no-op, and
+  the drop regex requires the statement to end at the view name, so
+  `drop view a.b cascade` and a multi-view drop are both kept. It refuses to
+  run at all against an already-applied migration, which is the case where the
+  comparison would call a real change a no-op.
+- `PrivilegeReconciliation` never interprets a `grant`; it replays the
+  declarations in a rolled-back transaction and reads the catalogs, so
+  `public.resource_type` and `resource_type` compare equal because Postgres
+  resolved both. It expands a NULL `proacl` through `acldefault`, which is what
+  makes the F-7 exposure visible at all, and leaves NULL `relacl` unexpanded,
+  which is correct for the opposite reason.
+- `PsqlUtils` reads the port out of `config.toml` per section, so it follows an
+  `ava supabase switch` rather than assuming 54322; that was exercised for real
+  throughout this pass on port 55342.
+
+One thing worth knowing but not worth a finding: with `--db-url`, the
+connection string is passed to `psql` as an argv element, so a staging or
+production password would be visible in `ps` for the length of the run. It is a
+developer tool run by hand and the URL is not committed, so this is a note
+rather than a defect.
 
 ### F-4 addendum — five of the six tables were renames, not new tables
 

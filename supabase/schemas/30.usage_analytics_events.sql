@@ -219,6 +219,23 @@ create or replace function public.util__analytics_event_category (p_event_name t
   )::public.usage_analytics_events__category;
 $$ language sql immutable;
 
+-- `authenticated` (and `service_role` where it writes) because the
+-- SECURITY INVOKER trigger that calls this runs as whoever ran the
+-- statement, so that role needs EXECUTE on the callee as well.
+revoke
+execute on function public.util__analytics_event_category (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__analytics_event_category (text) to authenticated;
+
+grant
+execute on function public.util__analytics_event_category (text) to service_role;
+
 -- Forces `event_category` to agree with `event_name`.
 --
 -- Runs BEFORE INSERT for two reasons: it satisfies the column's NOT NULL
@@ -233,6 +250,16 @@ begin
   return new;
 end;
 $$ language plpgsql;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.usage_analytics_events__set_category ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 create trigger tr__usage_analytics_events__set_category before insert on public.usage_analytics_events for each row
 execute function public.usage_analytics_events__set_category ();

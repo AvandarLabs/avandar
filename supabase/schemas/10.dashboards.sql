@@ -351,6 +351,16 @@ begin
 end;
 $$;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.dashboards__prevent_workspace_id_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 create trigger tr__dashboards__prevent_workspace_id_change before
 update of workspace_id on public.dashboards for each row
 execute function public.dashboards__prevent_workspace_id_change ();

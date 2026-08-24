@@ -132,3 +132,17 @@ end;
 $$ language plpgsql security definer
 set
   search_path = public;
+
+-- `authenticated` only. Nothing calls this directly; it is reached from
+-- the SECURITY INVOKER `rpc_datasets__add_*` wrappers, which run as the
+-- caller, so the caller needs EXECUTE here too.
+revoke
+execute on function public.rpc_datasets__add_dataset (uuid, uuid, text, text, public.datasets__source_type, public.dataset_column_input[])
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_datasets__add_dataset (uuid, uuid, text, text, public.datasets__source_type, public.dataset_column_input[]) to authenticated;

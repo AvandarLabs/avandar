@@ -59,12 +59,14 @@
  * - Managed for default privileges: only schemas named by an
  *   `alter default privileges` declaration.
  *
- * Anything undeclared is unmanaged, which is why the run also reports functions
- * that no schema file revokes. A function is the one object class Postgres will
- * not let you deny by default: it grants EXECUTE to `PUBLIC` on creation and
- * `alter default privileges` cannot suppress it, so a function nobody revoked
- * is
- * a function `anon` can call.
+ * Anything undeclared is unmanaged, which is why the run also FAILS on a
+ * function that no schema file revokes. A function is the one object class
+ * Postgres will not let you deny by default: it grants EXECUTE to `PUBLIC` on
+ * creation and `alter default privileges` cannot suppress it, so a function
+ * nobody revoked is a function `anon` can call. That was a non-blocking
+ * warning until the 2026-08 catch-up audit found `util__get_workspace_members`
+ * on the list, handing any holder of the publishable key the full member
+ * roster of any workspace; the check now exits 1 in gate mode.
  *
  * USAGE
  *
@@ -480,14 +482,32 @@ function _getNewestMigrationPath(repoRoot: string): string {
   return path.join(migrationsDir, newest);
 }
 
+/**
+ * Functions in scope that no schema file revokes, which is a gate failure.
+ *
+ * It used to print a `WARNING` and return a count nobody read, so the run
+ * exited 0 with the list on screen. That is what let
+ * `util__get_workspace_members` sit in the `anon` surface through the whole
+ * 2026-08 window with `test:db` green over it: a `security definer` function
+ * that took a workspace id and returned every member's `auth.users.id`, served
+ * to anyone holding the publishable key. See
+ * docs/audits/2026-08-19-catchup-audit.md, findings F-5 and F-7.
+ *
+ * Blocking only in gate mode. Under `--append` the list is printed and the run
+ * continues, because appending cannot fix it anyway: a function with no
+ * declaration produces no statement to append. `pnpm db:new-migration` ends
+ * with a gate run, so the same list stops the developer there, after the
+ * migration has been written and with the fix stated.
+ */
 function _reportUndeclaredFunctions(
   options: Readonly<{
     runSql: (sql: string) => string;
     scope: Scope;
     declarations: Readonly<Declarations>;
+    isBlocking: boolean;
   }>,
 ): number {
-  const { runSql, scope, declarations } = options;
+  const { runSql, scope, declarations, isBlocking } = options;
   const undeclared = runSql(
     _getUndeclaredFunctionsSql({
       scope,
@@ -502,12 +522,16 @@ function _reportUndeclaredFunctions(
       return line !== "";
     });
   if (undeclared.length > 0) {
+    const label = isBlocking ? "UNDECLARED FUNCTIONS" : "WARNING";
     console.log(
-      `\nWARNING: ${undeclared.length} function(s) are not revoked by any schema file, so PUBLIC keeps the EXECUTE that Postgres grants on creation:`,
+      `\n${label}: ${undeclared.length} function(s) are not revoked by any schema file, so PUBLIC keeps the EXECUTE that Postgres grants on creation, which means \`anon\` can call them:`,
     );
     undeclared.forEach((signature) => {
       console.log(`  ${signature}`);
     });
+    console.log(
+      "\nGive each one an explicit `revoke execute on function ... from public, anon, authenticated, service_role;` in its schema file, followed by a `grant` for every role that genuinely needs it. Roles that need it are: any role named by a policy that calls the function (a policy expression is evaluated as the calling role), any role that calls it as an rpc, and any role that runs a statement whose SECURITY INVOKER trigger calls it. A trigger function itself needs no grant.",
+    );
   }
   return undeclared.length;
 }
@@ -599,7 +623,15 @@ function main(): void {
     console.log(
       "The database's privileges match supabase/schemas/ exactly. Nothing to do.",
     );
-    _reportUndeclaredFunctions({ runSql, scope, declarations });
+    const undeclared = _reportUndeclaredFunctions({
+      runSql,
+      scope,
+      declarations,
+      isBlocking: !isAppend,
+    });
+    if (undeclared > 0 && !isAppend) {
+      process.exit(1);
+    }
     return;
   }
 
@@ -607,7 +639,12 @@ function main(): void {
   statements.forEach((statement) => {
     console.log(`  ${statement}`);
   });
-  _reportUndeclaredFunctions({ runSql, scope, declarations });
+  const undeclared = _reportUndeclaredFunctions({
+    runSql,
+    scope,
+    declarations,
+    isBlocking: !isAppend,
+  });
 
   if (!isAppend) {
     console.log(
@@ -620,6 +657,11 @@ function main(): void {
     migrationFile: explicitFile ?? _getNewestMigrationPath(repoRoot),
     statements,
   });
+  if (undeclared > 0) {
+    console.log(
+      "The append is complete, but the functions listed above still have no declaration. The verification step that follows will fail until they do.",
+    );
+  }
 }
 
 main();

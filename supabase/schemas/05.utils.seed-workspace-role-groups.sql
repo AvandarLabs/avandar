@@ -185,6 +185,16 @@ begin
 end;
 $$;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.tr_workspaces__seed_builtin_role_groups ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 create trigger tr_workspaces__seed_builtin_role_groups
 after insert on public.workspaces for each row
 execute function public.tr_workspaces__seed_builtin_role_groups ();

@@ -11,6 +11,16 @@ create or replace function public.util__role_level_rank (p_role public.role_leve
   end;
 $$;
 
+-- Reached only from inside SECURITY DEFINER bodies, which run as this
+-- function's owner, so no Data API role needs EXECUTE.
+revoke
+execute on function public.util__role_level_rank (public.role_level)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 /**
  * Maps a rank back to role_level for aggregate results.
  *
@@ -24,6 +34,16 @@ create or replace function public.util__rank_to_role_level (p_rank int) returns 
     else null::public.role_level
   end;
 $$;
+
+-- Reached only from inside SECURITY DEFINER bodies, which run as this
+-- function's owner, so no Data API role needs EXECUTE.
+revoke
+execute on function public.util__rank_to_role_level (integer)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 /**
  * Whether the auth user is a Settings admin (Global admin) in the workspace.
@@ -46,6 +66,20 @@ set
   );
 $$;
 
+-- `authenticated` only: named by `to authenticated` policies, which are
+-- evaluated as the calling role, and called directly as an rpc by the
+-- signed-in client.
+revoke
+execute on function public.util__is_settings_admin (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__is_settings_admin (uuid) to authenticated;
+
 /**
  * Auth user's role for one app in a workspace.
  *
@@ -67,6 +101,16 @@ set
     rgar.app = p_app
   limit 1;
 $$;
+
+-- Reached only from inside SECURITY DEFINER bodies, which run as this
+-- function's owner, so no Data API role needs EXECUTE.
+revoke
+execute on function public.util__get_auth_user_app_role (uuid, public.app_type)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 /**
  * Whether the auth user has at least p_min_role on p_app in the workspace.
@@ -110,6 +154,20 @@ begin
 end;
 $$;
 
+-- `authenticated` (and `service_role` where it writes) because the
+-- SECURITY INVOKER trigger that calls this runs as whoever ran the
+-- statement, so that role needs EXECUTE on the callee as well.
+revoke
+execute on function public.util__auth_user_meets_min_app_role (uuid, public.app_type, public.role_level)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__auth_user_meets_min_app_role (uuid, public.app_type, public.role_level) to authenticated;
+
 /**
  * Workspace owner or Settings (global) admin — membership and settings UI.
  *
@@ -127,3 +185,16 @@ set
   )
   or public.util__is_settings_admin (p_workspace_id);
 $$;
+
+-- `authenticated` only, because a policy expression is evaluated as the
+-- calling role and the policies that name this are `to authenticated`.
+revoke
+execute on function public.util__can_manage_workspace_settings (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__can_manage_workspace_settings (uuid) to authenticated;

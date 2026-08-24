@@ -90,6 +90,16 @@ begin
 end;
 $$;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.user_group_memberships__cleanup_on_workspace_member_removed ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 create trigger tr_workspace_memberships__cleanup_user_group_memberships
 after delete on public.workspace_memberships for each row
 execute function public.user_group_memberships__cleanup_on_workspace_member_removed ();

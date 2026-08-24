@@ -12,6 +12,14 @@ const LEADING_NOISE = /^(?:\s|--[^\n]*\n?|\/\*[\s\S]*?\*\/)+/;
 
 type ScanFlags = {
   inSingleQuote: boolean;
+  /**
+   * Whether the open single-quoted string is an `E'...'` escape string, in
+   * which a backslash escapes the next character. A plain string has no
+   * backslash escapes (`standard_conforming_strings` is on), so `\'` there is
+   * a backslash followed by the closing quote.
+   */
+  isEscapeString: boolean;
+  inDoubleQuote: boolean;
   inLineComment: boolean;
   inBlockComment: boolean;
   dollarTag: string | undefined;
@@ -26,6 +34,8 @@ type PushStatementOptions = Readonly<{
 
 const INITIAL_FLAGS: ScanFlags = {
   inSingleQuote: false,
+  isEscapeString: false,
+  inDoubleQuote: false,
   inLineComment: false,
   inBlockComment: false,
   dollarTag: undefined,
@@ -72,15 +82,36 @@ function _advanceInsideDelimiter(
       : { index: index + 1, flags };
   }
   if (flags.inSingleQuote) {
+    if (flags.isEscapeString && sql[index] === "\\") {
+      return { index: index + 2, flags };
+    }
     if (sql[index] === "'" && sql[index + 1] === "'") {
       return { index: index + 2, flags };
     }
     return {
       index: index + 1,
-      flags: sql[index] === "'" ? { ...flags, inSingleQuote: false } : flags,
+      flags:
+        sql[index] === "'" ?
+          { ...flags, inSingleQuote: false, isEscapeString: false }
+        : flags,
+    };
+  }
+  if (flags.inDoubleQuote) {
+    if (sql[index] === '"' && sql[index + 1] === '"') {
+      return { index: index + 2, flags };
+    }
+    return {
+      index: index + 1,
+      flags: sql[index] === '"' ? { ...flags, inDoubleQuote: false } : flags,
     };
   }
   return undefined;
+}
+
+/** Whether the character before `index` could end an identifier or number. */
+function _isWordCharacterBefore(sql: string, index: number): boolean {
+  const previous = index === 0 ? "" : sql[index - 1];
+  return previous !== undefined && /[A-Za-z_0-9$]/u.test(previous);
 }
 
 function _startDelimiterAt(
@@ -95,7 +126,32 @@ function _startDelimiterAt(
     return { index: index + 2, flags: { ...flags, inBlockComment: true } };
   }
   if (sql[index] === "'") {
-    return { index: index + 1, flags: { ...flags, inSingleQuote: true } };
+    return {
+      index: index + 1,
+      flags: { ...flags, inSingleQuote: true, isEscapeString: false },
+    };
+  }
+  // `E'...'` only introduces an escape string when the `E` stands alone; in
+  // `the'` it is the tail of an identifier and the quote is an ordinary one.
+  if (
+    (sql[index] === "E" || sql[index] === "e") &&
+    sql[index + 1] === "'" &&
+    !_isWordCharacterBefore(sql, index)
+  ) {
+    return {
+      index: index + 2,
+      flags: { ...flags, inSingleQuote: true, isEscapeString: true },
+    };
+  }
+  // A double-quoted identifier. Load-bearing rather than pedantic: policy and
+  // constraint names are quoted identifiers written in English, so one holding
+  // an apostrophe ("Owner's rows") used to flip the scanner into string mode
+  // and swallow every following statement in the file. That is silent, and
+  // both callers act on the result: the privilege reconciler would see the
+  // swallowed `grant`s as undeclared and generate a migration revoking them,
+  // and the view stripper would find nothing to strip.
+  if (sql[index] === '"') {
+    return { index: index + 1, flags: { ...flags, inDoubleQuote: true } };
   }
   const dollarOpen = /^\$[A-Za-z_0-9]*\$/.exec(sql.slice(index));
   if (dollarOpen) {

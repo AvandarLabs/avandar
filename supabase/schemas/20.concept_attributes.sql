@@ -132,6 +132,16 @@ begin
 end;
 $$ language plpgsql;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.concept_attributes__validate_label_and_identifiers ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 /**
  * Triggers the label and identifier validations for the attributes and
  * mappings.
