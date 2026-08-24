@@ -100,6 +100,48 @@ Tell it: findings go in this ledger, fixes go in the working tree, and it must
 never check out, commit to, or merge a `review/*` ref. Those are regenerated
 lenses, not branches.
 
+### Refreshing a tier after the adversarial pass
+
+Once the adversarial pass has committed fixes to `fix/audit-<tier>`, the
+`review/<tier>` ref is stale: it still shows the code as it landed. Refresh it
+so the human pass reads the hardened version.
+
+**Run it from the main checkout, `~/src/avandar`, on `develop`.**
+
+```sh
+cd ~/src/avandar
+bash scripts/review/build-audit-refs.sh --tier t1-sql --tip fix/audit-t1-sql
+```
+
+The script operates on refs and works from any worktree, but the main checkout
+is the one place the current version is always present. A `fix/audit-*` branch
+only has whatever version of the script it was cut with, and a `review/*`
+worktree is a synthetic tree that will drift from `develop` by design. Running
+it from `~/src/avandar` avoids having to think about which copy you are
+invoking.
+
+You do not need to check anything out, and you do not need to touch the read
+worktree. The script rewrites the ref and resets that worktree for you, so the
+files are updated on disk when the command returns.
+
+Afterwards you have two diffs:
+
+| Command | Shows |
+| --- | --- |
+| `git diff review/base review/<tier>` | The whole tier as it now stands, fixes included. Your main review. |
+| `git diff review/<tier>-prev review/<tier>` | Only what the adversarial pass changed. Review this too: those fixes are unreviewed agent code. |
+
+Two constraints:
+
+- **Refresh between review rounds, never mid-round.** Moving the ref
+  invalidates difit's reviewed state for that branch.
+- If the read worktree has uncommitted edits the script refuses to move it
+  rather than clobbering them. Tier worktrees are read-only lenses, so if that
+  happens, something was edited in the wrong place.
+
+To point a tier back at `develop` after the fixes have merged, re-run the full
+build with no arguments.
+
 ## Fix lanes
 
 | Lane | Branch | For | Ships |
