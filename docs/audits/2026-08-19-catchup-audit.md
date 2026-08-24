@@ -255,7 +255,7 @@ crunch window:
 - Dependency additions are all explained by shipped features (`pdfjs-dist`,
   `@dnd-kit/*`, `react-joyride`, `@duckdb/node-api`) plus a Supabase CLI bump.
 
-### F-4 — five new RLS-protected tables have no pgTAP coverage at all (S3, open)
+### F-4 — six new RLS-protected tables have no pgTAP coverage at all (S3, open)
 
 **Where:** `supabase/schemas/10.concepts.sql`, `20.concept_attributes.sql`,
 `20.datasets__pdf_file.sql`, and the individuals/attribute-mapping schemas
@@ -297,7 +297,9 @@ the predicate were narrowed or dropped. These six tables are in that state now,
 and `test:db` gates `migrate`, so a test added here actually blocks a bad
 migration rather than just reporting one.
 
-**Proposed:** one cross-tenant pgTAP file per table, following the `rls_maps`
+**Remedy (part of this finding, not a separate one).** Six new cross-tenant
+pgTAP files, one per uncovered table, landing on `fix/audit-t1-sql` with the
+rest of the t1 work. Follow the `rls_maps`
 shape: two workspaces, an outsider member of the second, then assert the
 outsider sees zero rows of the first workspace's data and that an insider
 still does. Six files, largely mechanical once the first is written.
