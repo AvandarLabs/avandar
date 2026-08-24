@@ -119,7 +119,7 @@ Ordered by blast radius per line, not by size.
 | Tier | Ref | Files | +Lines | Agent pass | Human pass | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1/F-2 accepted, F-3 open |
-| SQL + privileges | `review/t1-sql` | 156 | 21,054 | not started | not started | Highest risk |
+| SQL + privileges | `review/t1-sql` | 156 | 21,054 | **done** | not started | F-5/F-6 fixed, F-7 open |
 | Edge functions | `review/t2-edge` | 73 | 4,697 | not started | not started | Untrusted input reaches SQL |
 | Core / clients | `review/t2-core` | 816 | 82,768 | not started | not started | |
 | UI | `review/t3-ui` | 1,329 | 95,084 | not started | not started | Spot-check, demo-driven |
@@ -344,3 +344,178 @@ asymmetry (`using` but no `with check`) and is safe for the documented reason
 that `with check` defaults to the `using` expression.
 
 **Status:** resolved
+
+### F-5 — `anon` could enumerate any workspace's member list (S2, fixed)
+
+**Where:** `supabase/schemas/05.utils.workspace-auth.sql`
+**Tier:** t1-sql
+
+`public.util__get_workspace_members (workspace_id uuid) returns uuid[]` was
+`security definer`, checked nothing about its caller, and returned every
+`auth.users.id` in the named workspace. Postgres grants EXECUTE on a new
+function to `PUBLIC` and no schema file revoked it, so PostgREST served it to
+`anon`.
+
+**Failure scenario, run against the local stack rather than reasoned about.**
+With only the publishable key that ships in the browser bundle:
+
+```sh
+curl -s -X POST http://127.0.0.1:54321/rest/v1/rpc/util__get_workspace_members \
+  -H "apikey: sb_publishable_..." -H "Content-Type: application/json" \
+  -d '{"workspace_id": "8d4102ec-4bf9-4625-bffc-9d458e4ec18d"}'
+# ["2d6c6a3a-61f4-4860-8efb-f3d8dccc9e2e"]
+```
+
+The workspace id is not a secret an attacker has to guess. `dashboards` is the
+one table `anon` may read, the anon policy admits every `is_public` row, and
+the grant is table-level, so `workspace_id` comes back with any public
+dashboard. A public dashboard link is therefore enough to read the size and the
+stable identifiers of that tenant's roster, and to confirm whether a user id
+already known from one workspace also belongs to another.
+
+Not S1: what leaks is opaque identifiers and a count, never user content, a
+name, or an address. It is still an unauthenticated read of one tenant's data
+by another, which is what puts it above S3.
+
+Pre-existing rather than introduced in this window (the window changed only
+whitespace on those lines), but it is the concrete case behind the "roughly 33
+functions executable by `anon`" open item, and this tier is where it lives. The
+sibling `util__get_user_id_by_email` had exactly this hole closed on 08-15 by
+`20260815213000_revoke_public_execute_on_get_user_id_by_email.sql`, so the
+standard was already set; this function was missed.
+
+**Fixed.** The enumerator is deleted, not re-granted. All four callers are
+`with check` clauses asking one narrow question about a user id they already
+hold, so it is replaced by
+`public.util__is_workspace_member (p_workspace_id uuid, p_user_id uuid)
+returns boolean` — `security definer`, `search_path` pinned, EXECUTE revoked
+from `public`, `anon` and `service_role`, granted to `authenticated` only,
+which is required because a policy expression is evaluated as the calling role.
+Removing the array-returning shape means there is nothing left to grant around.
+
+Behaviour is unchanged: `x = any(array(select f(ws)))` and
+`exists(... where workspace_id = ws and user_id = x)` agree on every input,
+including a null `owner_id`, which fails a `with check` either way.
+
+Verified: the four UPDATE policies still reject handing a resource to a
+non-member and still accept handing it to a member
+(`workspace_member_lookup.test.sql`), the `anon` call above now returns
+`PGRST202` (no such function) and the replacement returns `42501` to `anon`.
+
+**Mutation-tested**, because a passing test written in the same pass as the fix
+is not evidence on its own. Three separate regressions were injected into the
+live database and each was caught by the assertion meant to catch it:
+
+| Mutation | Assertion that failed |
+| --- | --- |
+| `util__is_workspace_member` body replaced with `select true` | 7, 8, 9 |
+| EXECUTE granted back to `anon` | 4 |
+| `util__get_workspace_members` recreated | 2 |
+
+The database was restored after each and `db:validate-privileges` re-checked
+back to `surplus: 0 · missing: 0`.
+
+**Status:** fixed on `fix/audit-t1-sql`
+
+### F-6 — "make private" was broken for every map (S2, fixed)
+
+**Where:** `supabase/schemas/70.rpc_resources__make_private.sql`
+**Tier:** t1-sql
+
+`rpc_resources__make_private` branches on `p_resource_type` and handles
+`dashboard` and `dataset`; everything else falls into
+`raise exception 'unsupported resource type: %'`. `map` was added to
+`public.resource_type` on 08-17 and wired into `resource_shares`,
+`util__resource_effective_role`, `util__is_resource_private_to_owner`,
+`rpc_resources__transfer_ownership` and
+`rpc_workspaces__transfer_all_owned_resources` — every polymorphic site except
+this one.
+
+**Failure scenario.** `MapOutputActions.tsx` renders the same
+`ShareResourceButton` datasets use, with `resourceType="map"`. In the share
+modal, choosing General Access → Private calls
+`_requestMakePrivate` → `ResourceShareClient.makeResourcePrivate` →
+`rpc_resources__make_private('map', ...)`, which raises `P0001: unsupported
+resource type: map`. The map keeps every share it had; nothing is restricted;
+the owner sees a failed mutation. There is no other client path that clears
+non-owner shares atomically, so a map that has been shared cannot be made
+private at all.
+
+Its own pgTAP file was complicit rather than protective: it exercises
+`dashboard` and `dataset` and never names `map`, so a green suite said nothing
+about the case that was broken.
+
+**Fixed.** Added the `map` arm to both branches (the `for update` lookup and
+the `is_restricted` write). No new privilege surface: the function stays
+`security invoker`, and maps already carry the UPDATE policy and the owner
+short-circuit the other two types rely on.
+
+Verified: three assertions added to
+`rpc_resources__make_private.test.sql` fail before the change with
+`died: P0001: unsupported resource type: map` and pass after.
+
+**Status:** fixed on `fix/audit-t1-sql`
+
+### F-7 — the window widened the `anon`-executable function surface, and the check that reports it cannot fail (S3, open)
+
+**Where:** `scripts/db/reconcile-privileges/reconcile-privileges.main.ts`
+**Tier:** t1-sql
+
+The open item recorded as "roughly 33 functions executable by `anon` without a
+declared grant" now reads **46** (45 after F-5). Six of those are new in this
+window: `concept_attributes__validate_label_and_identifiers`,
+`maps__prevent_workspace_id_change`, `util__email_domain`,
+`util__storage_object_dashboard_id`, `util__storage_object_snapshot_revision`,
+and `util__subscription_plan_rank`.
+
+Each of the six was called as `anon` through PostgREST before this was
+written. **None is exploitable**, and that is stated as a measurement rather
+than an assumption: the two trigger functions return `trigger` and are not
+served as RPC at all, and the other four are `security invoker` pure
+functions over arguments the caller already supplies. Two of them,
+`util__storage_object_dashboard_id` and `util__storage_object_snapshot_revision`,
+are called by the anon storage policy for public dashboards and genuinely need
+the grant. So this finding is about the guardrail, not about six new holes.
+
+The guardrail is what needs the decision. `reconcile-privileges` prints these
+as a `WARNING` and returns them as a count that `main` never reads, so
+`pnpm db:validate-privileges` exits 0 with 46 undeclared functions listed. Every
+other class of privilege drift in that script fails the run. F-5 is what a
+warning-only check costs: a `security definer` roster dump sat in the
+`anon` surface across the whole window and `test:db` stayed green over it.
+
+Turning the warning into a failure today would fail CI on 45 pre-existing
+functions, so the remedy is a decision about sequencing, not a one-line change,
+and it is left for the human pass:
+
+1. Audit the 45 and give each an explicit `revoke`/`grant`, in batches. Most
+   are caller-scoped (`auth.uid()`-based) or pure, and were probed as `anon`
+   during this pass: `util__is_settings_admin`,
+   `util__can_manage_workspace_settings`, `util__get_auth_user_workspaces`,
+   `util__get_auth_user_owned_workspaces`, `util__get_auth_user_user_group_ids`
+   and `util__get_auth_user_app_role` all return `false`/`[]`/`null` to `anon`,
+   and `rpc_workspaces__create_with_owner` fails on the table grant.
+2. Then flip the warning to a non-zero exit, so the next
+   `util__get_workspace_members` cannot land.
+
+**Status:** open, needs a decision in the human pass
+
+### F-4 addendum — five of the six tables were renames, not new tables
+
+F-4 describes its six uncovered tables as "all introduced during the crunch".
+That is right about `datasets__pdf_file` and wrong about the other five.
+`20260817020322_Renamed entity domain to Description Logic nomenclature.sql` is
+a metadata-only rename: `entity_configs → concepts`,
+`entity_field_configs → concept_attributes`, `entities → individuals`,
+`value_extractors__dataset_column_value → attribute_mappings__dataset_column`,
+`value_extractors__manual_entry → attribute_mappings__manual_entry`. Their
+policies were carried across by `alter policy ... rename to` with the
+predicates untouched, and the diff against `review/base` confirms the
+predicates are byte-identical to the ones the old tables had.
+
+This does not change F-4's remedy — the coverage gap was real either way — but
+it changes the risk story. Those five predicates are old code that had never
+been tested, not new code written under deadline. The rename migration itself
+is careful: `db diff` cannot detect a rename and generated a drop-and-recreate
+that would have emptied every workspace's ontology; the hand-written
+replacement is metadata-only and touches no row.

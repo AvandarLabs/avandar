@@ -1,41 +1,36 @@
-/**
- * Makes a resource private to its owner in one transaction: deletes every
- * non-owner share and sets `is_restricted`.
- *
- * SECURITY INVOKER, deliberately, unlike every other permissions rpc_ function
- * (rpc_resources__transfer_ownership, rpc_workspaces__private_resource_counts
- * and rpc_workspaces__transfer_all_owned_resources are all security definer).
- * It never needs to touch a row the caller cannot already see: the
- * owner short-circuits to `admin` in util__resource_effective_role, which
- * satisfies both the resource_shares DELETE policy and the resource UPDATE
- * policy. Running as the caller keeps existing RLS as the backstop and adds no
- * new privilege surface. It also closes the existence oracle that
- * rpc_resources__transfer_ownership has to handle by hand: the lookup below is
- * subject to the resource SELECT policy, so a row the caller cannot see and a
- * row that does not exist both leave v_owner_id null and raise the same error.
- *
- * Owner-only. A non-owner resource admin who ran this would delete their own
- * share and lock themselves out on the spot, so they are refused, not warned.
- *
- * Handles every `resource_type`. Maps were added to the enum, to
- * `resource_shares`, to `util__resource_effective_role`, and to both ownership
- * rpcs during the 2026-08 window but not here, so the GIS app's General Access
- * -> Private choice, which reaches this rpc with 'map' from the same
- * `ShareResourceButton` datasets use, raised `unsupported resource type: map`.
- * See docs/audits/2026-08-19-catchup-audit.md, finding F-6.
- *
- * Does not touch `is_public`. For now, a published dashboard stays
- * world-readable after this runs, because the anon SELECT policy keys on
- * `is_public` alone; publishing is a separate control.
- *
- * @returns void. Nothing about a newly private resource is worth returning.
- */
-create or replace function public.rpc_resources__make_private (
-  p_resource_type public.resource_type,
-  p_resource_id uuid
-) returns void language plpgsql
-set
-  search_path = public as $$
+drop policy "Users with editor access can update dashboards" on "public"."dashboards";
+
+drop policy "Users with editor access can update datasets" on "public"."datasets";
+
+drop policy "Users with editor access can update maps" on "public"."maps";
+
+drop policy "User can UPDATE workspaces they admin" on "public"."workspaces";
+
+drop function if exists "public"."util__get_workspace_members"(workspace_id uuid);
+
+set check_function_bodies = off;
+
+CREATE OR REPLACE FUNCTION public.util__is_workspace_member(p_workspace_id uuid, p_user_id uuid)
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  select exists (
+    select 1
+    from public.workspace_memberships wm
+    where
+      wm.workspace_id = p_workspace_id and
+      wm.user_id = p_user_id
+  );
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.rpc_resources__make_private(p_resource_type public.resource_type, p_resource_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SET search_path TO 'public'
+AS $function$
 declare
   v_owner_id uuid;
   v_workspace_id uuid;
@@ -134,14 +129,53 @@ begin
     raise exception 'make_private_incomplete';
   end if;
 end;
-$$;
+$function$
+;
 
-revoke
-execute on function public.rpc_resources__make_private (public.resource_type, uuid)
-from
-  public,
-  anon,
-  service_role;
 
-grant
-execute on function public.rpc_resources__make_private (public.resource_type, uuid) to authenticated;
+  create policy "Users with editor access can update dashboards"
+  on "public"."dashboards"
+  as permissive
+  for update
+  to authenticated
+using ((public.util__auth_user_can_update_resource('dashboard'::public.resource_type, id) AND ((snapshot_transition_kind IS DISTINCT FROM 'delete'::public.dashboard_snapshot_transition_kind) OR public.util__auth_user_can_delete_resource('dashboard'::public.resource_type, id))))
+with check ((public.util__auth_user_can_update_resource('dashboard'::public.resource_type, id) AND ((snapshot_transition_kind IS DISTINCT FROM 'delete'::public.dashboard_snapshot_transition_kind) OR public.util__auth_user_can_delete_resource('dashboard'::public.resource_type, id)) AND public.util__is_workspace_member(workspace_id, owner_id)));
+
+
+
+  create policy "Users with editor access can update datasets"
+  on "public"."datasets"
+  as permissive
+  for update
+  to authenticated
+using (public.util__auth_user_can_update_resource('dataset'::public.resource_type, id))
+with check ((public.util__auth_user_can_update_resource('dataset'::public.resource_type, id) AND public.util__is_workspace_member(workspace_id, owner_id)));
+
+
+
+  create policy "Users with editor access can update maps"
+  on "public"."maps"
+  as permissive
+  for update
+  to authenticated
+using (public.util__auth_user_can_update_resource('map'::public.resource_type, id))
+with check ((public.util__auth_user_can_update_resource('map'::public.resource_type, id) AND public.maps__owner_id_matches_stored(id, owner_id) AND public.util__is_workspace_member(workspace_id, owner_id)));
+
+
+
+  create policy "User can UPDATE workspaces they admin"
+  on "public"."workspaces"
+  as permissive
+  for update
+  to authenticated
+using (public.util__can_manage_workspace_settings(id))
+with check (public.util__is_workspace_member(id, owner_id));
+
+
+
+
+-- Privileges that `supabase db diff` cannot see: default, schema, column,
+-- and view grants. Appended by `pnpm db:new-migration` from what
+-- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
+revoke all privileges on function public.util__is_workspace_member(p_workspace_id uuid, p_user_id uuid) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.util__is_workspace_member(p_workspace_id uuid, p_user_id uuid) to "authenticated";

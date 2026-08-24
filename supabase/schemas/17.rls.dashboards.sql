@@ -88,11 +88,9 @@ with
         public.dashboards.id
       )
     ) and
-    public.dashboards.owner_id = any (
-      array(
-        select
-          public.util__get_workspace_members (public.dashboards.workspace_id)
-      )
+    public.util__is_workspace_member (
+      public.dashboards.workspace_id,
+      public.dashboards.owner_id
     )
   );
 

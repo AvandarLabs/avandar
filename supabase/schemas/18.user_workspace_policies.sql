@@ -39,8 +39,9 @@ for update
 with
   check (
     -- The new owner must still be a workspace member
-    public.workspaces.owner_id = any (
-      public.util__get_workspace_members (public.workspaces.id)
+    public.util__is_workspace_member (
+      public.workspaces.id,
+      public.workspaces.owner_id
     )
   );
 

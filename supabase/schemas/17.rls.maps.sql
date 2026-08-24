@@ -74,11 +74,9 @@ with
       public.maps.id
     ) and
     public.maps__owner_id_matches_stored (public.maps.id, public.maps.owner_id) and
-    public.maps.owner_id = any (
-      array(
-        select
-          public.util__get_workspace_members (public.maps.workspace_id)
-      )
+    public.util__is_workspace_member (
+      public.maps.workspace_id,
+      public.maps.owner_id
     )
   );
 

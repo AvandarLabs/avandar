@@ -47,11 +47,9 @@ with
       'dataset'::public.resource_type,
       public.datasets.id
     ) and
-    public.datasets.owner_id = any (
-      array(
-        select
-          public.util__get_workspace_members (public.datasets.workspace_id)
-      )
+    public.util__is_workspace_member (
+      public.datasets.workspace_id,
+      public.datasets.owner_id
     )
   );
 
