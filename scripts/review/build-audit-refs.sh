@@ -19,11 +19,30 @@
 # refs when you need a state you can actually run.
 #
 # Idempotent. Never touches the working tree, the index, or HEAD.
+#
+# Refresh one tier from a fix branch, so the human pass reviews the state the
+# adversarial pass left behind:
+#
+#   bash scripts/review/build-audit-refs.sh --tier t1-sql --tip fix/audit-t1-sql
+#
+# That repoints review/t1-sql at BASE + the tier's paths taken from the fix
+# branch, and parks the tier's previous tip on review/<tier>-prev, so
+# `git diff review/t1-sql-prev review/t1-sql` is exactly what the fix branch
+# changed. Refresh between review rounds, not mid-round: moving the ref
+# invalidates difit's reviewed state for that branch.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 BASE=${AUDIT_BASE:-0ed6fb5adccc3ee9bd8f051bf4b23f1001edafd1}
 TIP=${AUDIT_TIP:-origin/develop}
+ONLY_TIER=""
+while [ $# -gt 0 ]; do
+  case $1 in
+    --tier) ONLY_TIER=$2; shift 2 ;;
+    --tip)  TIP=$2; shift 2 ;;
+    *) echo "unknown argument: $1" >&2; exit 2 ;;
+  esac
+done
 
 IDX=$(mktemp -t audit-idx.XXXXXX); rm -f "$IDX"
 trap 'rm -f "$IDX"' EXIT
@@ -62,13 +81,37 @@ T6=()
 while IFS= read -r _p; do T6+=("$_p"); done < <(
   git diff --name-only "$(build_tree "${ALL[@]}")" "$TIP")
 
+# Move a branch even when a worktree has it checked out. `git branch -f`
+# refuses in that case, so reset the owning worktree instead. A tier worktree is
+# a read-only lens and should never hold edits; refuse if it does.
+set_branch() {
+  local name=$1 sha=$2 wtpath
+  wtpath=$(git worktree list --porcelain | awk -v b="refs/heads/$name" '
+    /^worktree /{p=$2} /^branch /{if ($2==b) print p}')
+  if [ -n "$wtpath" ]; then
+    if [ -n "$(git -C "$wtpath" status --porcelain)" ]; then
+      echo "  REFUSING to move $name: $wtpath has uncommitted changes." >&2
+      echo "  Commit, stash, or discard them, then re-run." >&2
+      return 1
+    fi
+    git -C "$wtpath" reset --hard -q "$sha"
+  else
+    git branch -f "$name" "$sha" >/dev/null
+  fi
+}
+
 mk() {
   local name=$1; shift
+  if [ -n "$ONLY_TIER" ] && [ "$name" != "$ONLY_TIER" ]; then return; fi
   [ $# -eq 0 ] && { printf '  %-16s (empty)\n' "$name"; return; }
   local commit
   commit=$(git commit-tree "$(build_tree "$@")" -p "$BASE" \
     -m "audit slice: $name (cumulative ${BASE:0:9}..$TIP)")
-  git branch -f "review/$name" "$commit" >/dev/null
+  # Park the outgoing tip so the next diff can show just what changed.
+  if git rev-parse -q --verify "review/$name" >/dev/null; then
+    git branch -f "review/$name-prev" "review/$name" >/dev/null
+  fi
+  set_branch "review/$name" "$commit" || return 1
   printf '  %-16s %s\n' "$name" "$(git diff --shortstat review/base "review/$name")"
 }
 
@@ -81,6 +124,14 @@ mk t4-e2e        "${T4[@]}"
 mk t5-i18n       "${T5I[@]}"
 mk t5-docs       "${T5D[@]}"
 mk t6-guardrails "${T6[@]}"
+
+if [ -n "$ONLY_TIER" ]; then
+  echo
+  echo "Refreshed review/$ONLY_TIER from $TIP."
+  echo "  what the fix branch changed: git diff review/$ONLY_TIER-prev review/$ONLY_TIER"
+  echo "  the whole tier, as it now stands: git diff review/base review/$ONLY_TIER"
+  exit 0
+fi
 
 # --- Completeness assertion -------------------------------------------------
 # Applying every tier's paths at once must reproduce the tip's tree exactly.
