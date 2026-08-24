@@ -13,7 +13,7 @@ it. Run this first; run the convention checklists after, if at all.
 ## The prompt
 
 > You are doing an adversarial review of one tier of a catch-up audit. Read
-> `docs/code-reviews/2026-08-19-catchup-audit.md` first for context and ground
+> `docs/audits/2026-08-19-catchup-audit.md` first for context and ground
 > rules.
 >
 > **Tier:** `<t1-sql>`
@@ -45,7 +45,7 @@ it. Run this first; run the convention checklists after, if at all.
 > **Tier focus.** <see below>
 >
 > **What to do with what you find.**
-> 1. Append each finding to `docs/code-reviews/2026-08-19-catchup-audit.md`
+> 1. Append each finding to `docs/audits/2026-08-19-catchup-audit.md`
 >    under `## Findings`, in the existing F-N format, with the severity scale
 >    already defined there. Include the failure scenario.
 > 2. Fix what you are confident about, in this worktree. Where a fix is a
