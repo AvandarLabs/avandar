@@ -49,6 +49,57 @@ Two axes:
   history. They overlap: `qetl-registry`, `qetl-column-projection`, and
   `chat-concept-aliases` are all fully contained in `qetl-impl`.
 
+## Where work happens
+
+**Read on `review/*`. Change on `fix/audit-*`. Only `fix/audit-*` merges back
+to `develop`.**
+
+For every tier t1 through t6, and for every branch slice, the loop is the same:
+
+| Step | Where | What |
+| --- | --- | --- |
+| 1. Agent adversarial pass | `fix/audit-<tier>` worktree | Agent reads the scoped diff, records findings, applies fixes it is confident in |
+| 2. Human pass | `review/<tier>` worktree | You read the same scoped diff in difit and comment |
+| 3. Fixes | `fix/audit-<tier>` worktree | All edits, tests, and ledger updates |
+| 4. Merge | `fix/audit-<tier>` → `develop` | The only thing that ever merges |
+
+Set both worktrees up once per tier:
+
+```sh
+cd "$(wt go review/t1-sql)"       # read-only lens; run `pnpm diff-review review/base`
+cd "$(wt new fix audit-t1-sql)"   # cut from develop; builds, runs tests, gets merged
+```
+
+### Why the split
+
+A `review/t<N>` ref is a synthetic mixed-version tree: real git objects, but
+BASE with only one tier's paths advanced. It gives a perfectly scoped diff and
+it will not typecheck, boot, or run a test. So it can host a review but never a
+fix.
+
+A `fix/audit-<tier>` branch is cut from current `develop`, so it builds and
+tests normally.
+
+The two stay in sync because a tier ref takes its paths verbatim from the tip.
+`git diff review/t1-sql origin/develop -- supabase/…` is empty: the SQL files
+you read on `review/t1-sql` are byte-identical to the ones you edit on
+`fix/audit-t1-sql`. Read in one place, edit in the other, no drift.
+
+### Briefing an agent for the adversarial pass
+
+Start the agent session **in the `fix/audit-<tier>` worktree**, not the review
+one. Git refs are repository-wide, so from there the agent still reads the
+scoped diff:
+
+```sh
+git diff review/base review/t1-sql            # the tier's complete change
+git diff review/base review/t1-sql -- <path>  # one file
+```
+
+Tell it: findings go in this ledger, fixes go in the working tree, and it must
+never check out, commit to, or merge a `review/*` ref. Those are regenerated
+lenses, not branches.
+
 ## Fix lanes
 
 | Lane | Branch | For | Ships |
