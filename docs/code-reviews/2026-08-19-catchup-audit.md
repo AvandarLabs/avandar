@@ -67,7 +67,7 @@ Ordered by blast radius per line, not by size.
 
 | Tier | Ref | Files | +Lines | Agent pass | Human pass | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1, F-2, F-3; net posture stronger |
+| Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1/F-2 accepted, F-3 open |
 | SQL + privileges | `review/t1-sql` | 156 | 21,054 | not started | not started | Highest risk |
 | Edge functions | `review/t2-edge` | 73 | 4,697 | not started | not started | Untrusted input reaches SQL |
 | Core / clients | `review/t2-core` | 816 | 82,768 | not started | not started | |
@@ -126,11 +126,14 @@ That is what keeps this S3 rather than S1.
 
 This is a deliberate tradeoff, correctly commented, made under deadline
 pressure. It needs an explicit re-decision now the deadline has passed, not
-a silent revert. Options: restore `needs: [test-quick, test-e2e]` for
-production only; keep the split but make e2e a required check on `main`; or
-accept it and document why.
+a silent revert.
 
-**Owner:** Pablo (decision) · **Status:** open
+**Resolution (2026-08-23):** accepted as-is. Keep the current `develop`
+behaviour: `migrate` stays gated on `test-quick` only, in both staging and
+production. `test:db` continues to gate migrations, which is the part that
+matters for schema safety. No change.
+
+**Status:** accepted, closed
 
 ### F-2 — COOP/COEP dropped from `vercel.json`, COOP possibly over-removed (S3, open)
 
@@ -165,7 +168,12 @@ left off, and verify the Picker and Sheets import still work. If they do, the
 app gets most of the COOP protection back at no functional cost. Note that
 `vite.config.ts` sets no COOP/COEP either, so dev matches prod.
 
-**Owner:** Pablo (decision) · **Status:** open
+**Resolution (2026-08-23):** accepted as-is. Keep the current `develop`
+headers; Sheets import is worth more than the COOP hardening right now. The
+`same-origin-allow-popups` idea is recorded above if the tradeoff is ever
+revisited. No change.
+
+**Status:** accepted, closed
 
 ### F-3 — `.gitignore` no longer ignores `.cursor/plans` (S4, open)
 
