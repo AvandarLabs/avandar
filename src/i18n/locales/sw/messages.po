@@ -5214,6 +5214,10 @@ msgstr "Hakuna safu"
 msgid "Most common"
 msgstr "Ya kawaida zaidi"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
 msgstr "H3"
@@ -6981,6 +6985,10 @@ msgstr "Karibu kwenye kidhibiti chako cha chanzo cha data. Chagua faili la CSV "
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "Seti ya data ya mipaka"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -8868,6 +8876,10 @@ msgstr "HAVING inatumia opereta \"{operator}\" ambaye fomu haitumii."
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "Imehamishwa"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "

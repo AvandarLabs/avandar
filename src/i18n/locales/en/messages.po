@@ -5147,6 +5147,10 @@ msgstr "No rows"
 msgid "Most common"
 msgstr "Most common"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr "Shared drives"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
 msgstr "H3"
@@ -6901,6 +6905,10 @@ msgstr "Welcome to your data source manager. Pick a CSV or Excel file from your 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "Boundary dataset"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr "Shared with me"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -8773,6 +8781,10 @@ msgstr "HAVING uses operator \"{operator}\" which the form does not support."
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "Displaced"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr "My Drive"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "

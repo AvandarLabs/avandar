@@ -82,11 +82,34 @@ describe("getGoogleSheetVersion", () => {
 
     expect(requests).toHaveLength(1);
     expect(requests[0]!.url).toBe(
-      `https://www.googleapis.com/drive/v3/files/${FILE_ID}?fields=version`,
+      `https://www.googleapis.com/drive/v3/files/${FILE_ID}` +
+        "?fields=version&supportsAllDrives=true",
     );
   });
 
-  it("sends the token as a bearer Authorization header", async () => {
+  it("declares shared drive support on both requests", async () => {
+    // Drive v3 defaults `supportsAllDrives` to false, and a request that omits
+    // it answers 404 `notFound` for a file that lives in a shared drive. That
+    // is indistinguishable from a revoked per-file grant, so omitting it told
+    // the user to re-pick a sheet they had just picked.
+    const { driveFetch, requests } = _makeRecordingFetch([
+      _versionResponse("42"),
+      _workbookResponse(),
+    ]);
+
+    await getGoogleSheetXlsxExport({
+      fileId: FILE_ID,
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(requests).toHaveLength(2);
+    requests.forEach((request) => {
+      expect(request.url).toContain("supportsAllDrives=true");
+    });
+  });
+
+    it("sends the token as a bearer Authorization header", async () => {
     const { driveFetch, requests } = _makeRecordingFetch([
       _versionResponse("42"),
     ]);
@@ -153,7 +176,8 @@ describe("getGoogleSheetXlsxExport", () => {
 
     expect(requests[1]!.url).toBe(
       `https://www.googleapis.com/drive/v3/files/${FILE_ID}/export` +
-        "?mimeType=application%2Fvnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "?mimeType=application%2Fvnd.openxmlformats-officedocument.spreadsheetml.sheet" +
+        "&supportsAllDrives=true",
     );
     expect(requests[1]!.headers).toEqual({
       Authorization: `Bearer ${ACCESS_TOKEN}`,
@@ -229,7 +253,8 @@ describe("getGoogleSheetXlsxExport", () => {
     });
 
     expect(requests[0]!.url).toBe(
-      "https://www.googleapis.com/drive/v3/files/a%2F..%2Fb%3Fx%3D1?fields=version",
+      "https://www.googleapis.com/drive/v3/files/a%2F..%2Fb%3Fx%3D1" +
+        "?fields=version&supportsAllDrives=true",
     );
   });
 });

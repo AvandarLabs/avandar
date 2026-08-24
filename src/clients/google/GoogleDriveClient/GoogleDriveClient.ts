@@ -9,6 +9,24 @@ import type { SourceVersion } from "$/models/relations/RelationCapabilities/Rela
 const DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files";
 
 /**
+ * Declares that this client understands shared drives, and must be sent on
+ * every request.
+ *
+ * Drive v3 defaults it to `false`, and a request that omits it cannot see a
+ * shared drive item **at all**: `files.get` on a file whose `driveId` is set
+ * answers 404 `notFound`, exactly as it would for a file that never existed.
+ * Since a picked file 404s only when its per-file grant is missing, that
+ * indistinguishable 404 reads as a revoked grant, and the user is told to pick
+ * a sheet they just picked.
+ *
+ * Sent on the export too, even though `files.export` happens to tolerate its
+ * absence today. Nothing documents that exemption, and the two calls address
+ * the same file, so relying on one of them accepting narrower parameters than
+ * the other only sets up the next 404.
+ */
+const SUPPORTS_ALL_DRIVES_PARAM = "supportsAllDrives=true";
+
+/**
  * The MIME type Drive renders a Google Sheet into. This exact string is what
  * makes the export an `.xlsx` workbook that `read_xlsx` can read, so it is not
  * interchangeable with any of Drive's other spreadsheet export types.
@@ -65,7 +83,9 @@ export async function getGoogleSheetVersion(
   }>,
 ): Promise<SourceVersion> {
   const response = await _getDriveResponse({
-    url: `${DRIVE_FILES_URL}/${encodeURIComponent(params.fileId)}?fields=version`,
+    url:
+      `${DRIVE_FILES_URL}/${encodeURIComponent(params.fileId)}` +
+      `?fields=version&${SUPPORTS_ALL_DRIVES_PARAM}`,
     accessToken: params.accessToken,
     driveFetch: params.driveFetch ?? _fetchFromGoogle,
   });
@@ -124,7 +144,8 @@ export async function getGoogleSheetXlsxExport(
   const response = await _getDriveResponse({
     url:
       `${DRIVE_FILES_URL}/${encodeURIComponent(params.fileId)}/export` +
-      `?mimeType=${encodeURIComponent(XLSX_MIME_TYPE)}`,
+      `?mimeType=${encodeURIComponent(XLSX_MIME_TYPE)}` +
+      `&${SUPPORTS_ALL_DRIVES_PARAM}`,
     accessToken: params.accessToken,
     driveFetch,
   });

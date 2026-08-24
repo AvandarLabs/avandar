@@ -100,6 +100,7 @@ function _googleSheetsMetadata(
       numRows: 1,
       spreadsheetName: "sheet-name",
       availableSheetNames: ["Colombia", "Kenya"],
+      previewRows: [],
       sheetLoadMetadata: {
         type: "xlsx",
         id: "00000000-0000-4000-8000-000000000003" as XlsxFileLoadResult["id"],

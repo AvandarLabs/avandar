@@ -5017,6 +5017,10 @@ msgstr "无行"
 msgid "Most common"
 msgstr "最常见"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
 msgstr "H3"
@@ -6730,6 +6734,10 @@ msgstr "欢迎使用数据源管理器。从电脑中选择一个 CSV 或 Excel 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "边界数据集"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -8558,6 +8566,10 @@ msgstr "HAVING 使用了表单不支持的运算符“{operator}”。"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "已偏移"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "

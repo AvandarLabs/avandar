@@ -1,4 +1,5 @@
 import { uuid } from "$/lib/uuid";
+import { buildReadXlsxArgs } from "@/clients/DuckDbClient/buildReadXlsxArgs/buildReadXlsxArgs";
 import {
   buildXlsxReadRange,
   buildXlsxWidthProbeRange,
@@ -177,15 +178,14 @@ async function _transcodeXlsxToParquet(
         xlsxStagingFile: options.xlsxStagingFile,
       })
     : undefined;
-  const range = buildXlsxReadRange(options.rowsToSkip, lastColumn);
-  // Naming a range turns `stop_at_empty` off, which would pad the read out to
-  // the format's maximum row, so it is switched back on alongside the range.
-  const rangeClause = range ? `, range = '${range}', stop_at_empty = true` : "";
+  const readArgs = buildReadXlsxArgs({
+    hasHeader: options.hasHeader,
+    sheet: options.sheet,
+    range: buildXlsxReadRange(options.rowsToSkip, lastColumn),
+  });
   await options.client.runRawQuery(
     `COPY (
-        SELECT * FROM read_xlsx(
-          '$xlsxFile$', header = ${options.hasHeader} ${sheetClause}${rangeClause}
-        )
+        SELECT * FROM read_xlsx('$xlsxFile$', ${readArgs})
       ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
     {
       conn: options.conn,

@@ -5143,6 +5143,10 @@ msgstr "لا توجد صفوف"
 msgid "Most common"
 msgstr "الأكثر شيوعًا"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
 msgstr "H3"
@@ -6888,6 +6892,10 @@ msgstr "مرحبًا بك في مدير مصدر البيانات لديك. اخ
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "مجموعة بيانات الحدود"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -8758,6 +8766,10 @@ msgstr "يستخدم HAVING العامل \"{operator}\" الذي لا يدعمه
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "مُزاح"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "

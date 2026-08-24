@@ -5017,6 +5017,10 @@ msgstr "沒有資料列"
 msgid "Most common"
 msgstr "最常見"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
 msgstr "H3"
@@ -6731,6 +6735,10 @@ msgstr "歡迎使用資料來源管理員。請從電腦選取 CSV 或 Excel 檔
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "邊界資料集"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -8559,6 +8567,10 @@ msgstr "HAVING 使用運算子「{operator}」，表單不支援此運算子。"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "已位移"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "

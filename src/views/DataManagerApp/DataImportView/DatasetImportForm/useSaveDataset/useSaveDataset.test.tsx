@@ -97,6 +97,7 @@ const GOOGLE_SHEETS_PARAMS: DatasetImportFormValues &
     numRows: 7,
     spreadsheetName: "regional-population",
     availableSheetNames: ["Colombia", "Kenya"],
+    previewRows: [],
     sheetLoadMetadata: {
       type: "xlsx",
       id: "google-sheet-load-result" as DuckDbLoadXlsxResult["id"],

@@ -5215,6 +5215,10 @@ msgstr "Nenhuma linha"
 msgid "Most common"
 msgstr "Mais comum"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
 msgstr "H3"
@@ -6990,6 +6994,10 @@ msgstr "Boas-vindas ao gerenciador de fontes de dados. Escolha um arquivo CSV "
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "Conjunto de dados de limites"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -8881,6 +8889,10 @@ msgstr "HAVING usa o operador \"{operator}\", que não é compatível com o "
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "Deslocado"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "

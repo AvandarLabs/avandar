@@ -85,6 +85,19 @@ export type GoogleSheetsLoadResult = BaseLoadResult & {
 
   sheetLoadMetadata: DuckDbLoadXlsxResult;
   spreadsheetName: string;
+
+  /**
+   * The rows the sniff already read, carried through so the form has its
+   * preview without a second read.
+   *
+   * Querying the new table for them instead does not work: the sniff does not
+   * materialize it (the background parquet job does), so the select runs
+   * against a table that is not there yet and the form's gate never opens -
+   * leaving the user with a "parsed N rows" success and an empty panel. The
+   * manual upload path has always used its sniff's rows directly, and this
+   * matches it.
+   */
+  previewRows: UnknownObject[];
 };
 
 export type GoogleSheetsDataSourceMetadata = {

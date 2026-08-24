@@ -509,6 +509,41 @@ describe("GoogleSheetsImportView", () => {
     ).toEqual([FIRST_TAB, SECOND_TAB]);
   });
 
+  it("shows the preview from the sniff, not from a query of the new table", async () => {
+    // The sniff hands back the preview rows already. Asking DuckDB for them
+    // instead means selecting from a table named after a dataset the sniff has
+    // not materialized yet, so the form's gate never opens: the user is told
+    // the rows parsed and then shown nothing. `useGetPreviewData` returning
+    // `undefined` is what that looks like, and the form must render anyway.
+    useGetPreviewDataMock.mockReturnValue([undefined]);
+    startXlsxImportMock.mockImplementation(async (params) => {
+      return await _sniffWorkbook(params.file, params.parseOptions.sheet);
+    });
+
+    await _pickTheSheet();
+
+    expect(
+      await screen.findByText("These are the first", { exact: false }),
+    ).toBeInTheDocument();
+  });
+
+  it("names the workbook after the picked sheet", async () => {
+    // The name reaches the parser as the file name and the dataset's default
+    // name, so reading it from `selectedDocument` state made the very first
+    // import fall back to the placeholder: the export mutation closes over the
+    // render that ran *before* the pick was recorded. On a second pick the same
+    // closure supplies the previous sheet's name, which is worse than a
+    // placeholder because it looks correct.
+    await _pickTheSheet();
+
+    await waitFor(() => {
+      expect(startXlsxImportMock).toHaveBeenCalledTimes(1);
+    });
+    expect(startXlsxImportMock.mock.calls[0]![0].file.name).toBe(
+      "regional-population.xlsx",
+    );
+  });
+
   it("re-reads the chosen tab without exporting the workbook again", async () => {
     await _pickTheSheet();
     await waitFor(() => {

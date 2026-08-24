@@ -12,11 +12,9 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { uuid } from "$/lib/uuid";
 import { useCallback, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { getGoogleSheetXlsxExport } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import {
@@ -108,14 +106,6 @@ export function GoogleSheetsImportView({
   const [dataSourceMetadata, setDataSourceMetadata] = useState<
     GoogleSheetsDataSourceMetadata | undefined
   >();
-  const [previewRows] = DatasetQueryClient.useGetPreviewData({
-    datasetId: dataSourceMetadata?.datasetLoadResult.datasetId,
-    numRows: GlobalAppConfig.dataManagerApp.maxPreviewRows,
-    workspaceId: workspace.id,
-    useQueryOptions: {
-      enabled: !!dataSourceMetadata?.datasetLoadResult,
-    },
-  });
   const [exportedWorkbook, setExportedWorkbook] = useState<
     ExportedWorkbook | undefined
   >();
@@ -125,6 +115,11 @@ export function GoogleSheetsImportView({
       documentId: string;
       googleAccountId: string;
       accessToken: string;
+      // Carried as a parameter rather than read from `selectedDocument`. This
+      // mutation closes over the render that ran before the pick was recorded,
+      // so reading the state gave the first import the placeholder name and
+      // every later one the *previous* sheet's name.
+      spreadsheetName: string;
     }): Promise<ExportedWorkbook> => {
       // Drive's `files.export` returns the whole workbook, every tab, in one
       // call. The Sheets API is no longer involved: acquisition and import now
@@ -135,10 +130,7 @@ export function GoogleSheetsImportView({
         fileId: params.documentId,
         accessToken: params.accessToken,
       });
-      return {
-        xlsxBytes,
-        spreadsheetName: selectedDocument?.name ?? t`Google Sheet`,
-      };
+      return { xlsxBytes, spreadsheetName: params.spreadsheetName };
     },
     onSuccess: (workbook, inputParams) => {
       setExportedWorkbook(workbook);
@@ -177,6 +169,7 @@ export function GoogleSheetsImportView({
         numRows: sniff.previewRows.length,
         spreadsheetName,
         availableSheetNames: sniff.sheets,
+        previewRows: sniff.previewRows,
         sheetLoadMetadata: {
           id: uuid() as DuckDbLoadXlsxResult["id"],
           type: "xlsx",
@@ -283,9 +276,10 @@ export function GoogleSheetsImportView({
         documentId: document.id,
         googleAccountId: googleAccount.google_account_id,
         accessToken: googleAccount.access_token,
+        spreadsheetName: document.name ?? t`Google Sheet`,
       });
     },
-    [exportGoogleSheet],
+    [exportGoogleSheet, t],
   );
 
   const onPickerCancel = useCallback(() => {
@@ -428,7 +422,7 @@ export function GoogleSheetsImportView({
           </Button>
         }
 
-        {previewRows && dataSourceMetadata && exportedWorkbook ?
+        {dataSourceMetadata && exportedWorkbook ?
           <DatasetImportForm
             key={dataSourceMetadata.datasetLoadResult.sheetLoadMetadata.id}
             dataSourceMetadata={dataSourceMetadata}
@@ -457,7 +451,7 @@ export function GoogleSheetsImportView({
               });
             }}
             parseOptions={dataSourceMetadata.parseOptions}
-            rows={previewRows}
+            rows={dataSourceMetadata.datasetLoadResult.previewRows}
           />
         : null}
       </Stack>
