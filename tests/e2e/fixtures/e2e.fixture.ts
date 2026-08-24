@@ -13,6 +13,7 @@ import {
   purgeE2EWorkspacesForOwner,
 } from "../setup/e2eTestWorkspaceLifecycle";
 import { ensureAuthUserExists } from "../setup/ensureAuthUser";
+import { installDuckDbExtensionCache } from "../setup/installDuckDbExtensionCache";
 import type { Page, TestInfo } from "@playwright/test";
 
 export { expect } from "@playwright/test";
@@ -106,6 +107,13 @@ async function _attachFreshPageFailureArtifacts(options: {
  * workspace data plus auth users when the worker shuts down.
  */
 export const test = base.extend<E2ETestFixtures, E2EWorkerFixtures>({
+  // Every spec's `page` comes from this context, so the DuckDB extension
+  // cache is installed once here rather than per spec.
+  context: async ({ context }, use) => {
+    await installDuckDbExtensionCache(context);
+    await use(context);
+  },
+
   freshBrowserPage: async (
     {
       playwright,
@@ -133,6 +141,9 @@ export const test = base.extend<E2ETestFixtures, E2EWorkerFixtures>({
         // Matches playwright.config.ts `use.contextOptions.reducedMotion`.
         reducedMotion: "reduce",
       });
+      // This context is built by hand, so it does not inherit the `context`
+      // fixture's routing and needs the cache installed separately.
+      await installDuckDbExtensionCache(context);
 
       const page = await context.newPage();
       try {

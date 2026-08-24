@@ -4,6 +4,7 @@ import {
   doesValuePassFilters,
   isEmptyFiltersObject,
   isFiltersByOperatorObject,
+  objectFilter,
   objectKeys,
 } from "@avandar/utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
@@ -150,25 +151,9 @@ export function buildFilteredDexieCollection<T extends UnknownObject>(
 
   const collection = _applyFirstColumnWhere(dbTable, firstColumn, firstRecord);
 
-  const remainingFilters = objectKeys(where).reduce<FiltersByColumn<T>>(
-    (acc, column) => {
-      if (column === firstColumn) {
-        return acc;
-      }
-
-      const operatorRecord = where[column];
-
-      if (!operatorRecord) {
-        return acc;
-      }
-
-      return {
-        ...acc,
-        [column]: operatorRecord,
-      };
-    },
-    {},
-  );
+  const remainingFilters = objectFilter(where, (column, operatorRecord) => {
+    return column !== firstColumn && Boolean(operatorRecord);
+  });
 
   if (isEmptyFiltersObject(remainingFilters)) {
     return collection;

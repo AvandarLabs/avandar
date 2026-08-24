@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeGeometryExpressionFromValueExpression } from "./makeGeometryExpressionFromValueExpression";
+import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression";
 
 describe("makeGeometryExpressionFromValueExpression", () => {
   it("parses WKT without allowing a failed value to abort the query", () => {

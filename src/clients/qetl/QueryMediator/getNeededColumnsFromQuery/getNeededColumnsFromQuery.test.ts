@@ -76,4 +76,60 @@ describe("getNeededColumnsFromQuery", () => {
       })[DATASET_ID],
     ).toEqual(["age_years", "person_id", "status"]);
   });
+
+  it("reads past a cast's type name rather than treating it as a column", () => {
+    // `DOUBLE` sits where a column sits: an unquoted identifier that is not a
+    // function call and is not preceded by `AS`. Requesting it projected a
+    // column the Parquet does not have, which failed the whole query with a
+    // binder error rather than merely widening the fetch.
+    expect(
+      getNeededColumnsFromQuery({
+        rawSql: `SELECT SUM("cases")::DOUBLE AS total FROM "${DATASET_ID}"`,
+        datasetIds: [DATASET_ID],
+        conceptRelations: [],
+      }),
+    ).toEqual({ [DATASET_ID]: ["cases"] });
+  });
+
+  it("resolves an ORDER BY name to a select-list alias, not to a column", () => {
+    expect(
+      getNeededColumnsFromQuery({
+        rawSql:
+          `SELECT "Admin2", SUM("daily_new_cases")::DOUBLE AS total_cases ` +
+          `FROM "${DATASET_ID}" GROUP BY "Admin2" ORDER BY total_cases DESC`,
+        datasetIds: [DATASET_ID],
+        conceptRelations: [],
+      }),
+    ).toEqual({ [DATASET_ID]: ["Admin2", "daily_new_cases"] });
+  });
+
+  it("keeps a name that is both an alias and a real column reference", () => {
+    // The alias shadows a real column of the same name. The bare reference
+    // inside `SUM(...)` is the column, so dropping the name on sight would
+    // under-project and break the query.
+    expect(
+      getNeededColumnsFromQuery({
+        rawSql:
+          `SELECT SUM("cases") AS "cases" FROM "${DATASET_ID}" ` +
+          `ORDER BY "cases" DESC`,
+        datasetIds: [DATASET_ID],
+        conceptRelations: [],
+      }),
+    ).toEqual({ [DATASET_ID]: ["cases"] });
+  });
+
+  it("fails wide when an alias is referenced outside ORDER BY", () => {
+    // HAVING resolves aliases in DuckDB but not in every dialect this SQL can
+    // be written against, so the name is genuinely ambiguous here. Widening
+    // costs bytes; guessing wrong costs the query.
+    expect(
+      getNeededColumnsFromQuery({
+        rawSql:
+          `SELECT "a", SUM("b") AS total FROM "${DATASET_ID}" ` +
+          `GROUP BY "a" HAVING total > 5`,
+        datasetIds: [DATASET_ID],
+        conceptRelations: [],
+      }),
+    ).toEqual({ [DATASET_ID]: "all" });
+  });
 });

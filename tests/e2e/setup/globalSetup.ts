@@ -12,8 +12,12 @@ function _loadDevelopmentEnv(): void {
 }
 
 /**
- * Runs once before the Playwright webserver and tests. Auth users and the
- * shared workspace are created in the worker-scoped `e2eWorkerDb` fixture.
+ * Runs once before the tests. Auth users and the shared workspace are created
+ * in the worker-scoped `e2eWorkerDb` fixture.
+ *
+ * This runs *after* `webServer` has started, so it is not a place to check
+ * whether the port was already taken: see `E2EPreflight`, which runs while
+ * `playwright.config.ts` is still evaluating.
  */
 export default async function globalSetup(): Promise<void> {
   _loadDevelopmentEnv();

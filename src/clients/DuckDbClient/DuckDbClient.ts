@@ -68,6 +68,22 @@ class DuckDbClientImpl {
     await this.#connections.getDb();
   }
 
+  /**
+   * Loads DuckDB Spatial on demand and reports whether GIS queries can run.
+   *
+   * Callers are the code paths that actually need geometry functions, because
+   * the extension is a per-page-load fetch from `extensions.duckdb.org` that
+   * every other session would otherwise pay for nothing.
+   */
+  async ensureSpatial(): Promise<boolean> {
+    return this.#connections.ensureSpatial();
+  }
+
+  /** Loads the `excel` extension that `read_xlsx` needs, on demand. */
+  async ensureExcel(): Promise<boolean> {
+    return this.#connections.ensureExcel();
+  }
+
   /** Returns the current DuckDB Spatial capability state. */
   getSpatialAvailability(): DuckDbSpatialAvailability {
     return this.#spatialAvailability.getSnapshot();
@@ -87,6 +103,7 @@ class DuckDbClientImpl {
     return {
       closeConnection: this.#connections.closeConnection,
       connect: this.#connections.connect,
+      ensureExcel: this.#connections.ensureExcel,
       dropTableViewAndFile: this.dropTableViewAndFile.bind(this),
       exportTableAsParquet: this.exportTableAsParquet.bind(this),
       getDb: this.#connections.getDb,
