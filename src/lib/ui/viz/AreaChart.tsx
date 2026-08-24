@@ -216,7 +216,7 @@ export function AreaChart({
             />
           : null}
           {withLegend ?
-            <Legend {...styleProps.legendProps} verticalAlign="top" />
+            <Legend {...styleProps.legendProps} />
           : null}
           <Tooltip
             labelFormatter={labelFormatter}

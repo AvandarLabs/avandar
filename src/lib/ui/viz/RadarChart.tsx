@@ -1,5 +1,6 @@
 import { RadarChart as MantineRadarChart } from "@mantine/charts";
 import { useMemo } from "react";
+import { makeLegendPropsFromPosition } from "@/lib/ui/viz/legend/makeLegendPropsFromPosition/makeLegendPropsFromPosition";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig";
@@ -35,19 +36,7 @@ export function RadarChart({
     });
   }, [series]);
 
-  const legendProps = useMemo(() => {
-    const position = chartStyle?.legend?.position ?? "top";
-    return {
-      verticalAlign:
-        position === "bottom" ? "bottom"
-        : position === "top" ? "top"
-        : "middle",
-      align:
-        position === "left" ? "left"
-        : position === "right" ? "right"
-        : "center",
-    } as const;
-  }, [chartStyle?.legend?.position]);
+  const legendProps = makeLegendPropsFromPosition(chartStyle?.legend?.position);
 
   return (
     <MantineRadarChart
