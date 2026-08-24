@@ -83,13 +83,11 @@ function _getConceptColumnsByDatasetId(
       .filter(_isDatasetColumnAttribute)
       .reduce((nextColumnsByDatasetId, column) => {
         const prior = nextColumnsByDatasetId[column.datasetId] ?? [];
-        return {
-          ...nextColumnsByDatasetId,
-          [column.datasetId]: unionColumnSets(prior, [
-            column.selectColumnName,
-            column.primaryKeyColumnName,
-          ]),
-        };
+        nextColumnsByDatasetId[column.datasetId] = unionColumnSets(prior, [
+          column.selectColumnName,
+          column.primaryKeyColumnName,
+        ]);
+        return nextColumnsByDatasetId;
       }, columnsByDatasetId);
   }, {});
 }
