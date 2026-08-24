@@ -48,7 +48,14 @@ $$ language plpgsql security invoker;
 
 -- `authenticated` only, the one role that calls this as an rpc.
 revoke
-execute on function public.rpc_datasets__add_open_data_dataset (uuid, uuid, text, text, uuid, public.dataset_column_input[])
+execute on function public.rpc_datasets__add_open_data_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  uuid,
+  public.dataset_column_input[]
+)
 from
   public,
   anon,
@@ -56,4 +63,11 @@ from
   service_role;
 
 grant
-execute on function public.rpc_datasets__add_open_data_dataset (uuid, uuid, text, text, uuid, public.dataset_column_input[]) to authenticated;
+execute on function public.rpc_datasets__add_open_data_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  uuid,
+  public.dataset_column_input[]
+) to authenticated;

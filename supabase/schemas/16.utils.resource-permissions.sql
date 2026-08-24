@@ -17,7 +17,7 @@ $$;
 
 -- No caller anywhere: no policy, no function body, no client. Revoked
 -- rather than dropped, because whether the helper is still wanted is a
--- product question and this is a privilege fix.
+-- product question, not a privilege one.
 revoke
 execute on function public.util__get_auth_user_user_group_ids (uuid)
 from
@@ -392,7 +392,11 @@ $$;
 -- evaluated as the calling role, and called directly as an rpc by the
 -- signed-in client.
 revoke
-execute on function public.util__auth_user_can_access_resource (public.resource_type, uuid, public.role_level)
+execute on function public.util__auth_user_can_access_resource (
+  public.resource_type,
+  uuid,
+  public.role_level
+)
 from
   public,
   anon,
@@ -400,7 +404,11 @@ from
   service_role;
 
 grant
-execute on function public.util__auth_user_can_access_resource (public.resource_type, uuid, public.role_level) to authenticated;
+execute on function public.util__auth_user_can_access_resource (
+  public.resource_type,
+  uuid,
+  public.role_level
+) to authenticated;
 
 /**
  * Whether the auth user has the requested resource role in the given workspace.
@@ -448,7 +456,12 @@ $$;
 -- `authenticated` only, because a policy expression is evaluated as the
 -- calling role and the policies that name this are `to authenticated`.
 revoke
-execute on function public.util__auth_user_can_access_resource_in_workspace (public.resource_type, uuid, uuid, public.role_level)
+execute on function public.util__auth_user_can_access_resource_in_workspace (
+  public.resource_type,
+  uuid,
+  uuid,
+  public.role_level
+)
 from
   public,
   anon,
@@ -456,7 +469,12 @@ from
   service_role;
 
 grant
-execute on function public.util__auth_user_can_access_resource_in_workspace (public.resource_type, uuid, uuid, public.role_level) to authenticated;
+execute on function public.util__auth_user_can_access_resource_in_workspace (
+  public.resource_type,
+  uuid,
+  uuid,
+  public.role_level
+) to authenticated;
 
 /**
  * App catalog entry for a resource type.

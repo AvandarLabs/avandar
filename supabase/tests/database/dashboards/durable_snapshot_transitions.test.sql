@@ -9,15 +9,12 @@ select plan(30);
 -- Own fixture, not a borrowed one.
 --
 -- Every insert below sources its workspace, owner and owner profile from
--- `public.user_profiles`. That used to read `limit 1` with no predicate, which
--- silently made all eleven CHECK-constraint assertions depend on the seed
--- having left a profile row behind: on an unseeded database, which is what a
+-- `public.user_profiles`, pinned by id to the row this file creates. Do not
+-- relax that predicate to `limit 1`: on an unseeded database, which is what a
 -- plain `supabase db reset` and the reset inside `pnpm db:new-migration` both
--- produce, the fixture insert matched zero rows, every later statement then
--- updated or inserted nothing, and `throws_ok` reported "caught: no exception"
--- eleven times with nothing wrong with the schema. Forty-three of the sixty-one
--- files in this suite build their own rows; this one now does too, and the
--- predicate below pins every source to it. See
+-- produce, the fixture insert would match zero rows, every later statement
+-- would then update or insert nothing, and `throws_ok` would report "caught:
+-- no exception" eleven times with nothing wrong with the schema. See
 -- docs/audits/2026-08-19-catchup-audit.md, finding F-8.
 insert into auth.users (id, email, aud, role)
 values (

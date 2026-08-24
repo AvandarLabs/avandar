@@ -86,7 +86,23 @@ $$ language plpgsql security invoker;
 
 -- `authenticated` only, the one role that calls this as an rpc.
 revoke
-execute on function public.rpc_datasets__add_csv_file_dataset (uuid, uuid, text, text, public.dataset_column_input[], boolean, bigint, integer, public.util__nullable_text, public.util__nullable_text, text, text, public.util__nullable_text, boolean, public.datasets__csv_file__date_format)
+execute on function public.rpc_datasets__add_csv_file_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  boolean,
+  bigint,
+  integer,
+  public.util__nullable_text,
+  public.util__nullable_text,
+  text,
+  text,
+  public.util__nullable_text,
+  boolean,
+  public.datasets__csv_file__date_format
+)
 from
   public,
   anon,
@@ -94,4 +110,20 @@ from
   service_role;
 
 grant
-execute on function public.rpc_datasets__add_csv_file_dataset (uuid, uuid, text, text, public.dataset_column_input[], boolean, bigint, integer, public.util__nullable_text, public.util__nullable_text, text, text, public.util__nullable_text, boolean, public.datasets__csv_file__date_format) to authenticated;
+execute on function public.rpc_datasets__add_csv_file_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  boolean,
+  bigint,
+  integer,
+  public.util__nullable_text,
+  public.util__nullable_text,
+  text,
+  text,
+  public.util__nullable_text,
+  boolean,
+  public.datasets__csv_file__date_format
+) to authenticated;

@@ -3,8 +3,7 @@
 /**
  * Cross-tenant RLS for `concept_attributes`.
  *
- * Locks the four policies this table gained during the 2026-08 crunch: a
- * member of one workspace must not read, insert, update, or delete another
+ * Locks this table's four policies: a member of one workspace must not read, insert, update, or delete another
  * workspace's rows, and `anon` must not reach the table at all.
  *
  * Read directly the policies look correct, all four gating on

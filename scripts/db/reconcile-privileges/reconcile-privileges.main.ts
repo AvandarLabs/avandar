@@ -63,10 +63,10 @@
  * function that no schema file revokes. A function is the one object class
  * Postgres will not let you deny by default: it grants EXECUTE to `PUBLIC` on
  * creation and `alter default privileges` cannot suppress it, so a function
- * nobody revoked is a function `anon` can call. That was a non-blocking
- * warning until the 2026-08 catch-up audit found `util__get_workspace_members`
- * on the list, handing any holder of the publishable key the full member
- * roster of any workspace; the check now exits 1 in gate mode.
+ * nobody revoked is a function `anon` can call, so the check exits 1 in gate
+ * mode. Do not soften it back to a warning: a warning nothing reads lets a
+ * `security definer` helper that returns another tenant's member ids sit in
+ * the `anon` surface with `test:db` green over it.
  *
  * USAGE
  *
@@ -482,30 +482,26 @@ function _getNewestMigrationPath(repoRoot: string): string {
   return path.join(migrationsDir, newest);
 }
 
+type ReportUndeclaredFunctionsOptions = Readonly<{
+  runSql: (sql: string) => string;
+  scope: Scope;
+  declarations: Readonly<Declarations>;
+  /** Selects the wording only. The caller decides the exit code. */
+  isBlocking: boolean;
+}>;
+
 /**
- * Functions in scope that no schema file revokes, which is a gate failure.
+ * Reports every function in scope that no schema file revokes, and returns how
+ * many there are. A non-zero count is a gate failure: `PUBLIC` keeps the
+ * EXECUTE Postgres grants on creation, so `anon` can call each one.
  *
- * It used to print a `WARNING` and return a count nobody read, so the run
- * exited 0 with the list on screen. That is what let
- * `util__get_workspace_members` sit in the `anon` surface through the whole
- * 2026-08 window with `test:db` green over it: a `security definer` function
- * that took a workspace id and returned every member's `auth.users.id`, served
- * to anyone holding the publishable key. See
- * docs/audits/2026-08-19-catchup-audit.md, findings F-5 and F-7.
- *
- * Blocking only in gate mode. Under `--append` the list is printed and the run
- * continues, because appending cannot fix it anyway: a function with no
- * declaration produces no statement to append. `pnpm db:new-migration` ends
- * with a gate run, so the same list stops the developer there, after the
- * migration has been written and with the fix stated.
+ * Callers pass `isBlocking: false` under `--append`, because appending cannot
+ * close the gap: a function with no declaration produces no statement to
+ * append, and `pnpm db:new-migration` ends with a gate run that stops the
+ * developer there.
  */
 function _reportUndeclaredFunctions(
-  options: Readonly<{
-    runSql: (sql: string) => string;
-    scope: Scope;
-    declarations: Readonly<Declarations>;
-    isBlocking: boolean;
-  }>,
+  options: ReportUndeclaredFunctionsOptions,
 ): number {
   const { runSql, scope, declarations, isBlocking } = options;
   const undeclared = runSql(

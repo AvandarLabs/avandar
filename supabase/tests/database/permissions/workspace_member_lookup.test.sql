@@ -4,19 +4,18 @@
  * The workspace roster is not enumerable through the Data API.
  *
  * Four RLS policies need to answer one question: "is this user a member of
- * this workspace?" They used to answer it with
- * `public.util__get_workspace_members (workspace_id)`, a `security definer`
- * function that took a workspace id, checked nothing about the caller, and
- * returned every member's `auth.users.id`. Postgres grants EXECUTE on a new
- * function to PUBLIC and no schema file revoked it, so PostgREST served it to
- * `anon`: with only the publishable key and a workspace id (which `anon` reads
- * off any public dashboard row) an unauthenticated caller got the whole
- * roster. See docs/audits/2026-08-19-catchup-audit.md, finding F-5.
+ * this workspace?" `public.util__is_workspace_member` answers it about a user
+ * id the caller already holds, so there is nothing to enumerate.
  *
- * The replacement, `public.util__is_workspace_member`, answers the same
- * question about a user id the caller already holds, so there is nothing left
- * to enumerate. This file pins both halves: the enumerator is gone, and the
- * predicate that replaced it is reachable only by `authenticated` while the
+ * The shape to keep out is a `security definer` helper that takes only a
+ * workspace id and returns every member's `auth.users.id`. Postgres grants
+ * EXECUTE on a new function to PUBLIC, so PostgREST serves such a helper to
+ * `anon`, and a workspace id is not a secret: `anon` reads one off any public
+ * dashboard row, which is enough for an unauthenticated caller to pull a whole
+ * tenant's roster. See docs/audits/2026-08-19-catchup-audit.md, finding F-5.
+ *
+ * This file pins both halves: no roster enumerator exists, and the predicate
+ * that answers the question is reachable only by `authenticated` while the
  * membership invariant it backs still holds.
  */
 begin;
@@ -70,14 +69,14 @@ select throws_ok (
   'anon cannot select workspace_memberships'
 );
 
--- 2. The enumerator is gone. A `uuid[]` of every member, keyed only on a
---    workspace id, is a roster dump whatever its ACL says, so the fix removes
---    the shape rather than trying to grant around it.
+-- 2. No roster enumerator exists. A `uuid[]` of every member, keyed only on a
+--    workspace id, is a roster dump whatever its ACL says, so the shape stays
+--    out rather than being granted around.
 select hasnt_function (
   'public',
   'util__get_workspace_members',
   array['uuid'],
-  'the roster enumerator util__get_workspace_members no longer exists'
+  'no util__get_workspace_members roster enumerator is defined'
 );
 
 -- 3-5. The replacement is reachable by exactly one role. `authenticated` needs

@@ -50,9 +50,9 @@ describe("splitSqlStatements", () => {
   });
 
   // A quoted identifier is not a string, and this repo writes policy and
-  // constraint names as English prose. An apostrophe in one used to open a
-  // string that ran to the next quote or to end of file, so every following
-  // statement vanished from the parse with no error anywhere.
+  // constraint names as English prose. If an apostrophe in one opened a
+  // string, it would run to the next quote or to end of file and every
+  // following statement would vanish from the parse with no error anywhere.
   it("treats an apostrophe inside a double-quoted identifier as text", () => {
     const sql =
       'create policy "Owner\'s rows" on public.t for select using (true);\ngrant select on table public.t to authenticated;\n';

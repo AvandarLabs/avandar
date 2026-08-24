@@ -62,19 +62,15 @@ execute on function public.util__get_auth_user_owned_workspaces () to authentica
 /**
  * Whether a user belongs to a workspace.
  *
- * Replaces `util__get_workspace_members`, which took a workspace id, checked
- * nothing about its caller, and returned every member's `auth.users.id`.
- * Postgres grants EXECUTE on a new function to PUBLIC and nothing revoked it,
- * so PostgREST served that roster to `anon`: the publishable key plus a
- * workspace id, which `anon` reads off any public dashboard row, was enough to
- * enumerate a tenant's members. See docs/audits/2026-08-19-catchup-audit.md,
- * finding F-5.
+ * Answers the question about a user id the caller already holds, so there is
+ * nothing here to enumerate: one boolean about one named user.
  *
- * All four policies that called the enumerator asked the same narrow question,
- * "is this row's new owner a member of this workspace", about a user id they
- * already held. Answering that instead of returning the list removes the
- * enumeration rather than trying to grant around it, and leaks nothing the
- * caller did not already supply: one boolean about one named user.
+ * Do not replace it with a helper that takes only a workspace id and returns
+ * the member list. Postgres grants EXECUTE on a new function to PUBLIC,
+ * PostgREST then serves it to `anon`, and a workspace id is not a secret
+ * (`anon` reads one off any public dashboard row), so such a helper hands a
+ * tenant's whole roster to anyone holding the publishable key. See
+ * docs/audits/2026-08-19-catchup-audit.md, finding F-5.
  *
  * `security definer` because a `with check` has to see membership rows the
  * caller's own RLS on `workspace_memberships` would hide.

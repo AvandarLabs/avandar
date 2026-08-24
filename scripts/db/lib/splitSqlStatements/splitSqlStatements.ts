@@ -109,7 +109,10 @@ function _advanceInsideDelimiter(
 }
 
 /** Whether the character before `index` could end an identifier or number. */
-function _isWordCharacterBefore(sql: string, index: number): boolean {
+function _isWordCharacterBefore(
+  options: Readonly<{ sql: string; index: number }>,
+): boolean {
+  const { sql, index } = options;
   const previous = index === 0 ? "" : sql[index - 1];
   return previous !== undefined && /[A-Za-z_0-9$]/u.test(previous);
 }
@@ -136,7 +139,7 @@ function _startDelimiterAt(
   if (
     (sql[index] === "E" || sql[index] === "e") &&
     sql[index + 1] === "'" &&
-    !_isWordCharacterBefore(sql, index)
+    !_isWordCharacterBefore({ sql, index })
   ) {
     return {
       index: index + 2,
@@ -144,12 +147,13 @@ function _startDelimiterAt(
     };
   }
   // A double-quoted identifier. Load-bearing rather than pedantic: policy and
-  // constraint names are quoted identifiers written in English, so one holding
-  // an apostrophe ("Owner's rows") used to flip the scanner into string mode
-  // and swallow every following statement in the file. That is silent, and
-  // both callers act on the result: the privilege reconciler would see the
-  // swallowed `grant`s as undeclared and generate a migration revoking them,
-  // and the view stripper would find nothing to strip.
+  // constraint names are quoted identifiers written in English, so one can
+  // hold an apostrophe ("Owner's rows"). Without this branch that apostrophe
+  // opens a string that runs to the next quote or to end of file, and every
+  // statement after it silently disappears from the parse. Both callers act on
+  // that result: the privilege reconciler reads the swallowed `grant`s as
+  // undeclared and generates a migration revoking them, and the view stripper
+  // finds nothing to strip.
   if (sql[index] === '"') {
     return { index: index + 1, flags: { ...flags, inDoubleQuote: true } };
   }

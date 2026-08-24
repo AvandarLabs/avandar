@@ -158,7 +158,11 @@ $$;
 -- SECURITY INVOKER trigger that calls this runs as whoever ran the
 -- statement, so that role needs EXECUTE on the callee as well.
 revoke
-execute on function public.util__auth_user_meets_min_app_role (uuid, public.app_type, public.role_level)
+execute on function public.util__auth_user_meets_min_app_role (
+  uuid,
+  public.app_type,
+  public.role_level
+)
 from
   public,
   anon,
@@ -166,7 +170,11 @@ from
   service_role;
 
 grant
-execute on function public.util__auth_user_meets_min_app_role (uuid, public.app_type, public.role_level) to authenticated;
+execute on function public.util__auth_user_meets_min_app_role (
+  uuid,
+  public.app_type,
+  public.role_level
+) to authenticated;
 
 /**
  * Workspace owner or Settings (global) admin — membership and settings UI.

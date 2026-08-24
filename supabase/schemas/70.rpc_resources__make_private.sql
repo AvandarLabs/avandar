@@ -17,12 +17,12 @@
  * Owner-only. A non-owner resource admin who ran this would delete their own
  * share and lock themselves out on the spot, so they are refused, not warned.
  *
- * Handles every `resource_type`. Maps were added to the enum, to
- * `resource_shares`, to `util__resource_effective_role`, and to both ownership
- * rpcs during the 2026-08 window but not here, so the GIS app's General Access
- * -> Private choice, which reaches this rpc with 'map' from the same
- * `ShareResourceButton` datasets use, raised `unsupported resource type: map`.
- * See docs/audits/2026-08-19-catchup-audit.md, finding F-6.
+ * Handles every `resource_type`, and every arm has to stay handled. The GIS
+ * app renders the same `ShareResourceButton` as datasets with
+ * `resourceType="map"`, so General Access -> Private reaches this rpc with
+ * 'map'; an unhandled arm falls through to the raise below and that resource
+ * cannot be made private at all. See
+ * docs/audits/2026-08-19-catchup-audit.md, finding F-6.
  *
  * Does not touch `is_public`. For now, a published dashboard stays
  * world-readable after this runs, because the anon SELECT policy keys on

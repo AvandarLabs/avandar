@@ -137,7 +137,14 @@ set
 -- the SECURITY INVOKER `rpc_datasets__add_*` wrappers, which run as the
 -- caller, so the caller needs EXECUTE here too.
 revoke
-execute on function public.rpc_datasets__add_dataset (uuid, uuid, text, text, public.datasets__source_type, public.dataset_column_input[])
+execute on function public.rpc_datasets__add_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.datasets__source_type,
+  public.dataset_column_input[]
+)
 from
   public,
   anon,
@@ -145,4 +152,11 @@ from
   service_role;
 
 grant
-execute on function public.rpc_datasets__add_dataset (uuid, uuid, text, text, public.datasets__source_type, public.dataset_column_input[]) to authenticated;
+execute on function public.rpc_datasets__add_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.datasets__source_type,
+  public.dataset_column_input[]
+) to authenticated;

@@ -63,7 +63,17 @@ $$ language plpgsql security invoker;
 
 -- `authenticated` only, the one role that calls this as an rpc.
 revoke
-execute on function public.rpc_datasets__add_google_sheets_dataset (uuid, uuid, text, text, public.dataset_column_input[], text, text, integer, public.util__nullable_text)
+execute on function public.rpc_datasets__add_google_sheets_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  text,
+  text,
+  integer,
+  public.util__nullable_text
+)
 from
   public,
   anon,
@@ -71,4 +81,14 @@ from
   service_role;
 
 grant
-execute on function public.rpc_datasets__add_google_sheets_dataset (uuid, uuid, text, text, public.dataset_column_input[], text, text, integer, public.util__nullable_text) to authenticated;
+execute on function public.rpc_datasets__add_google_sheets_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  text,
+  text,
+  integer,
+  public.util__nullable_text
+) to authenticated;
