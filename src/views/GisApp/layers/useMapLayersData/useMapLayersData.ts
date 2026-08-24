@@ -2,8 +2,6 @@ import { makeIdLookupMap, propEq } from "@avandar/utils";
 import { useQueries } from "@tanstack/react-query";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { useEffect } from "react";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { compileLatLngOverlaySql } from "@/clients/maps/MapLayerSpatialQuery/compileLatLngOverlaySql/compileLatLngOverlaySql";
 import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
@@ -13,7 +11,8 @@ import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/Work
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
-import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
+import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
+import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { PointLayerSource } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
@@ -50,11 +49,11 @@ function _layerNeedsSpatial(layer: MapLayer.T, overlay: MapOverlay): boolean {
   );
 }
 
-/** True while a configured spatial layer waits for capability detection. */
+/** True while a configured spatial layer waits on the Spatial request. */
 function _isWaitingForSpatial(
   layer: MapLayer.T,
   overlay: MapOverlay,
-  availability: string,
+  availability: DuckDbSpatialAvailability,
 ): boolean {
   return _layerNeedsSpatial(layer, overlay) && availability === "loading";
 }
@@ -63,7 +62,7 @@ function _isWaitingForSpatial(
 function _getCapabilityError(
   layer: MapLayer.T,
   overlay: MapOverlay,
-  availability: string,
+  availability: DuckDbSpatialAvailability,
 ): Error | undefined {
   return _layerNeedsSpatial(layer, overlay) && availability === "unavailable" ?
       new Error("DuckDB Spatial is unavailable for this geometry layer")
@@ -270,22 +269,6 @@ async function _runLatLngLayer(options: {
   return { type: "rows", queryResult: result, didAutoLimit };
 }
 
-function useInitializeDuckDbForSpatialLayers(
-  hasSpatialLayer: boolean,
-  spatialAvailability: string,
-): void {
-  useEffect(
-    function initializeDuckDbForSpatialLayers() {
-      if (hasSpatialLayer && spatialAvailability === "loading") {
-        void DuckDbClient.initialize().catch(() => {
-          return undefined;
-        });
-      }
-    },
-    [hasSpatialLayer, spatialAvailability],
-  );
-}
-
 type LayerQueryContext = {
   layers: readonly MapLayer.T[];
   workspaceId: Workspace.Id;
@@ -294,7 +277,7 @@ type LayerQueryContext = {
   datasets: readonly Dataset.T[];
   datasetColumns: readonly DatasetColumn.T[];
   overlay: MapOverlay;
-  spatialAvailability: string;
+  spatialAvailability: DuckDbSpatialAvailability;
 };
 
 function _createLayerQuery(
@@ -370,7 +353,7 @@ function _createLayerQuery(
 function _toLayerQueryStateMap(
   layers: readonly MapLayer.T[],
   overlay: MapOverlay,
-  spatialAvailability: string,
+  spatialAvailability: DuckDbSpatialAvailability,
   results: ReadonlyArray<{
     data: MapLayerDataResult | undefined;
     isLoading: boolean;
@@ -404,7 +387,12 @@ function _toLayerQueryStateMap(
   );
 }
 
-/** Runs the independent structured query for every configured map layer. */
+/**
+ * Runs the independent structured query for every configured map layer.
+ *
+ * Reads the Spatial capability but assumes the extension is already
+ * available.
+ */
 export function useMapLayersData({
   layers,
   workspaceId,
@@ -424,10 +412,6 @@ export function useMapLayersData({
 }): Map<MapLayer.Id, MapLayerQueryState> {
   const spatialAvailability = useDuckDbSpatialAvailability();
   const zoomBand = Math.max(0, Math.min(24, Math.floor(zoom)));
-  const hasSpatialLayer = layers.some((layer) => {
-    return _layerNeedsSpatial(layer, overlay);
-  });
-  useInitializeDuckDbForSpatialLayers(hasSpatialLayer, spatialAvailability);
   const results = useQueries({
     queries: layers.map((layer) => {
       return _createLayerQuery(layer, {

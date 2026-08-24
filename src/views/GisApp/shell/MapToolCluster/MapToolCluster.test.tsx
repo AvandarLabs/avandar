@@ -89,9 +89,9 @@ describe("MapToolCluster", () => {
 
     expect(labels).toEqual([
       "Pan and select",
-      "Draw an area to filter by. This tool needs DuckDB Spatial, which is unavailable.",
+      "Draw an area to filter by. This tool needs geometry support, which could not be loaded.",
       "Measure distance and area",
-      "Buffer around a layer. This tool needs DuckDB Spatial, which is unavailable.",
+      "Buffer around a layer. This tool needs geometry support, which could not be loaded.",
       "Annotate the map",
       "Erase annotations",
     ]);
@@ -253,7 +253,7 @@ describe("MapToolCluster", () => {
 
     expect(
       screen.getByRole("button", {
-        name: "Draw an area to filter by. This tool needs DuckDB Spatial, which is unavailable.",
+        name: "Draw an area to filter by. This tool needs geometry support, which could not be loaded.",
       }),
     ).toHaveAttribute("aria-disabled", "true");
   });

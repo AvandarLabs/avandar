@@ -25,7 +25,8 @@ export function LayerLeadStatus({
   const operationalState = getMapLayerOperationalState(viewState);
   const status =
     operationalState.type === "rebindRequired" ? t`Geometry must be rebound`
-    : operationalState.type === "spatialUnavailable" ? t`Spatial is unavailable`
+    : operationalState.type === "spatialUnavailable" ?
+      t`Geometry support unavailable`
     : operationalState.type === "suppressed" ?
       t`${operationalState.featureCount} areas suppressed`
     : operationalState.type === "noData" ?

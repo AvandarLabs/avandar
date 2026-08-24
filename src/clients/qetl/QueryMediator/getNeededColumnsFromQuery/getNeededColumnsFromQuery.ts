@@ -1,3 +1,4 @@
+import { isDefined } from "@avandar/utils";
 import {
   normalizeColumns,
   unionColumnSets,
@@ -16,6 +17,7 @@ import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.typ
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type ColumnSet = readonly string[] | "all";
+type TokenAtIndex = { tokens: readonly SqlToken[]; index: number };
 type ColumnSetByDatasetId = Record<string, ColumnSet>;
 
 const SKIP_KEYWORDS = new Set([
@@ -81,13 +83,11 @@ function _getConceptColumnsByDatasetId(
       .filter(_isDatasetColumnAttribute)
       .reduce((nextColumnsByDatasetId, column) => {
         const prior = nextColumnsByDatasetId[column.datasetId] ?? [];
-        return {
-          ...nextColumnsByDatasetId,
-          [column.datasetId]: unionColumnSets(prior, [
-            column.selectColumnName,
-            column.primaryKeyColumnName,
-          ]),
-        };
+        nextColumnsByDatasetId[column.datasetId] = unionColumnSets(prior, [
+          column.selectColumnName,
+          column.primaryKeyColumnName,
+        ]);
+        return nextColumnsByDatasetId;
       }, columnsByDatasetId);
   }, {});
 }
@@ -126,6 +126,81 @@ function _selectListHasStar(tokens: readonly SqlToken[]): boolean {
   });
 }
 
+/** True when the two tokens ending at `index` spell the `::` cast operator. */
+function _isCastOperatorEnd(options: Readonly<TokenAtIndex>): boolean {
+  const { tokens, index } = options;
+  return tokens[index]?.value === ":" && tokens[index - 1]?.value === ":";
+}
+
+/**
+ * True when the identifier at `index` names a cast's target type.
+ *
+ * A type name sits exactly where a column sits: an unquoted identifier that is
+ * neither a function call nor an alias. Collecting one asks the projection for
+ * a column the Parquet has no chance of holding, and a projection that names a
+ * missing column fails the whole query with a binder error rather than merely
+ * widening the fetch, so this has to be read rather than guessed at.
+ */
+function _isCastTypeName(options: Readonly<TokenAtIndex>): boolean {
+  const { tokens, index } = options;
+  // A multi-word type such as `DOUBLE PRECISION` puts several identifiers
+  // after the operator, so the operator sits before the last token that is
+  // not a bare identifier. Stopping at a keyword is what keeps the alias in
+  // `"cases"::DOUBLE AS total` from reading as another word of the type.
+  const operatorEndIndex = tokens.slice(0, index).findLastIndex((token) => {
+    return (
+      token.kind !== "identifier" ||
+      isKeywordToken({ token, keywords: SKIP_KEYWORDS })
+    );
+  });
+  return _isCastOperatorEnd({ tokens, index: operatorEndIndex });
+}
+
+/** Names introduced by `AS` in this statement, which no relation carries. */
+function _getAliasNames(tokens: readonly SqlToken[]): ReadonlySet<string> {
+  return new Set(
+    tokens.flatMap((token, index) => {
+      return (
+          token.kind === "identifier" &&
+            isKeywordToken({ token: tokens[index - 1], keywords: "AS" })
+        ) ?
+          [token.value]
+        : [];
+    }),
+  );
+}
+
+/** Index of one of the statement's own keywords, ignoring subqueries. */
+function _getTopLevelKeywordIndex(
+  options: Readonly<{ tokens: readonly SqlToken[]; keyword: string }>,
+): number | undefined {
+  const { tokens, keyword } = options;
+  return getKeywordIndex({
+    depth: 0,
+    endIndex: tokens.length,
+    keyword,
+    startIndex: 0,
+    tokens,
+  });
+}
+
+/**
+ * The index after which a bare name might resolve to a select-list alias.
+ *
+ * Before `GROUP BY` there is nowhere an alias is in scope: the select list,
+ * `FROM`, `JOIN ... ON` and `WHERE` are all evaluated before the select list
+ * is projected, so a name in any of them is a real column even when an alias
+ * of the same name exists.
+ */
+function _getAliasScopeIndex(tokens: readonly SqlToken[]): number | undefined {
+  const candidates = [
+    _getTopLevelKeywordIndex({ tokens, keyword: "GROUP" }),
+    _getTopLevelKeywordIndex({ tokens, keyword: "HAVING" }),
+    _getTopLevelKeywordIndex({ tokens, keyword: "ORDER" }),
+  ].filter(isDefined);
+  return candidates.length === 0 ? undefined : Math.min(...candidates);
+}
+
 function _shouldSkipIdentifier(
   tokens: readonly SqlToken[],
   index: number,
@@ -138,6 +213,9 @@ function _shouldSkipIdentifier(
     return true;
   }
   if (tokens[index + 1]?.value === "(") {
+    return true;
+  }
+  if (_isCastTypeName({ tokens, index })) {
     return true;
   }
   return isKeywordToken({ token: tokens[index - 1], keywords: "AS" });
@@ -181,10 +259,40 @@ function _getColumnRefAtIndex(
   };
 }
 
+/**
+ * The column set an occurrence of an alias name contributes.
+ *
+ * Three regions, because a name that matches an alias is not always the alias.
+ * Before `GROUP BY` no alias is in scope, so the name is a real column and is
+ * collected as one: that is what keeps `SUM("cases") AS "cases"` projecting
+ * `cases`. From `ORDER BY` on, every dialect resolves the name against the
+ * select list, so it is the alias and contributes nothing. Between the two the
+ * name could be either, and the token stream cannot say which. Widening costs
+ * bytes; picking wrong costs the whole query, so that middle case fails wide.
+ */
+function _getAliasReferenceColumns(
+  options: Readonly<{
+    aliasScopeIndex: number | undefined;
+    columnName: string;
+    index: number;
+    orderByIndex: number | undefined;
+  }>,
+): ColumnSet {
+  const { aliasScopeIndex, columnName, index, orderByIndex } = options;
+  return (
+    orderByIndex !== undefined && index > orderByIndex ? []
+    : aliasScopeIndex !== undefined && index > aliasScopeIndex ? "all"
+    : [columnName]
+  );
+}
+
 function _collectSqlColumns(
   tokens: readonly SqlToken[],
   sqlDatasetIds: readonly string[],
 ): ColumnSetByDatasetId {
+  const aliasNames = _getAliasNames(tokens);
+  const aliasScopeIndex = _getAliasScopeIndex(tokens);
+  const orderByIndex = _getTopLevelKeywordIndex({ tokens, keyword: "ORDER" });
   return tokens.reduce<ColumnSetByDatasetId>(
     (columnsByDatasetId, _token, index) => {
       if (_shouldSkipIdentifier(tokens, index)) {
@@ -198,11 +306,21 @@ function _collectSqlColumns(
       if (columnRef === undefined) {
         return columnsByDatasetId;
       }
+      const contributed =
+        aliasNames.has(columnRef.columnName) ?
+          _getAliasReferenceColumns({
+            aliasScopeIndex,
+            columnName: columnRef.columnName,
+            index,
+            orderByIndex,
+          })
+        : [columnRef.columnName];
       const prior = columnsByDatasetId[columnRef.datasetId] ?? [];
-      return {
-        ...columnsByDatasetId,
-        [columnRef.datasetId]: unionColumnSets(prior, [columnRef.columnName]),
-      };
+      columnsByDatasetId[columnRef.datasetId] = unionColumnSets(
+        prior,
+        contributed,
+      );
+      return columnsByDatasetId;
     },
     {},
   );

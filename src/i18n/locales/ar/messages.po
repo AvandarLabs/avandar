@@ -2011,6 +2011,12 @@ msgstr "عنوان البريد الإلكتروني"
 msgid "Smooth"
 msgstr "سلس"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+#~ msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
+#~ "can take a moment on a slow connection."
+#~ msgstr "تتوفر أعمدة الأشكال الهندسية عند انتهاء تنزيل DuckDB Spatial، وقد "
+#~ "يستغرق ذلك بعض الوقت على اتصال بطيء."
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "أدخل اسمًا للحقل"
@@ -2400,8 +2406,8 @@ msgstr "تجاهل"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool is available when Spatial finishes loading."
-msgstr "تتوفر هذه الأداة عند انتهاء تحميل Spatial."
+#~ msgid "This tool is available when Spatial finishes loading."
+#~ msgstr "تتوفر هذه الأداة عند انتهاء تحميل Spatial."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2599,10 +2605,10 @@ msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "The layer configuration is saved. Retry after connectivity or the "
-"Spatial extension becomes available."
-msgstr "تم حفظ إعدادات الطبقة. أعد المحاولة بعد استعادة الاتصال أو إتاحة "
-"Spatial extension."
+#~ msgid "The layer configuration is saved. Retry after connectivity or the "
+#~ "Spatial extension becomes available."
+#~ msgstr "تم حفظ إعدادات الطبقة. أعد المحاولة بعد استعادة الاتصال أو إتاحة "
+#~ "Spatial extension."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -2818,6 +2824,12 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "لون واحد"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "Geometry support is still downloading. This can take a moment on a slow "
+"connection."
+msgstr "لا يزال يجري تنزيل دعم الأشكال الهندسية. قد يستغرق ذلك بعض الوقت على "
+"اتصال بطيء."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3397,6 +3409,12 @@ msgstr "تم تلخيص بياناتك"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "حشوة"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "The layer configuration is saved. Try again once your connection is "
+"back, or reload the page."
+msgstr "تم حفظ إعدادات الطبقة. أعد المحاولة بعد استعادة الاتصال، أو أعد تحميل "
+"الصفحة."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -4087,8 +4105,8 @@ msgstr "إرسال"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr "تحتاج هذه الأداة إلى DuckDB Spatial، وهو غير متاح."
+#~ msgid "This tool needs DuckDB Spatial, which is unavailable."
+#~ msgstr "تحتاج هذه الأداة إلى DuckDB Spatial، وهو غير متاح."
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -5008,8 +5026,8 @@ msgid "Type your answer..."
 msgstr "اكتب إجابتك..."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns are available when Spatial finishes loading."
-msgstr "تتوفر أعمدة الأشكال الهندسية عند انتهاء Spatial من التحميل."
+#~ msgid "Geometry columns are available when Spatial finishes loading."
+#~ msgstr "تتوفر أعمدة الأشكال الهندسية عند انتهاء Spatial من التحميل."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -5062,6 +5080,10 @@ msgstr "فشل تسجيل الخروج"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
 msgstr "لقد اتصلت بنجاح بـ {0}"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "Geometry support is unavailable"
+msgstr "دعم الأشكال الهندسية غير متاح"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -6018,6 +6040,10 @@ msgstr "يبدو أن هذه البيانات تحتوي على معلومات �
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "ابدأ باستكشاف مساحة العمل الخاصة بك أو رفع أول مجموعة بيانات لك."
 
+#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
+msgid "Geometry support unavailable"
+msgstr "دعم الأشكال الهندسية غير متاح"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr "متراص"
@@ -6192,8 +6218,8 @@ msgid "Buffer of {sourceName}"
 msgstr "نطاق حول {sourceName}"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-msgstr "تتطلب أعمدة الأشكال الهندسية DuckDB Spatial، وهو غير متاح."
+#~ msgid "Geometry columns need DuckDB Spatial, which is unavailable."
+#~ msgstr "تتطلب أعمدة الأشكال الهندسية DuckDB Spatial، وهو غير متاح."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -6569,6 +6595,11 @@ msgstr "نموذج الدردشة غير المتصل جاهز"
 msgid "Column description updated successfully!"
 msgstr "تم تحديث وصف العمود بنجاح!"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs geometry support, which could not be loaded."
+msgstr "تتطلب هذه الأداة دعم الأشكال الهندسية، وقد تعذّر تحميله."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "احفظ تغييراتك أولاً: يعكس PDF لوحة التحكم المحفوظة."
@@ -6883,6 +6914,10 @@ msgid "Welcome to your data source manager. Pick a CSV or Excel file from your "
 "computer. No spreadsheet handy? <0>Download our sample</0> and use that."
 msgstr "مرحبًا بك في مدير مصدر البيانات لديك. اختر ملف CSV أو Excel من جهاز "
 "الكمبيوتر. لا تملك جدول بيانات جاهزًا؟ <0>نزّل نموذجنا</0> واستخدمه."
+
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+msgid "Geometry unavailable"
+msgstr "الأشكال الهندسية غير متاحة"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -7405,6 +7440,11 @@ msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
 msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغاء وصولك إليها. إذا كنت تعتقد أن "
 "هذا حدث عن طريق الخطأ، فتواصل مع مالك مساحة العمل."
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool turns on when geometry support finishes downloading."
+msgstr "تصبح هذه الأداة متاحة عند انتهاء تنزيل دعم الأشكال الهندسية."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
@@ -8591,8 +8631,8 @@ msgid "Delete user group"
 msgstr "احذف مجموعة المستخدمين"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-msgid "Spatial unavailable"
-msgstr "Spatial غير متاح"
+#~ msgid "Spatial unavailable"
+#~ msgstr "Spatial غير متاح"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
@@ -8898,6 +8938,10 @@ msgstr "لتأكيد، اكتب <0>{confirmationTarget}</0> أدناه:"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} و{groupClause}"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "These options need geometry support, which could not be loaded."
+msgstr "تتطلب هذه الخيارات دعم الأشكال الهندسية، وقد تعذّر تحميله."
+
 #: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
@@ -8989,8 +9033,8 @@ msgstr "لم يُبلّغ عنه"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "Spatial is unavailable"
-msgstr "Spatial غير متاح"
+#~ msgid "Spatial is unavailable"
+#~ msgstr "Spatial غير متاح"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

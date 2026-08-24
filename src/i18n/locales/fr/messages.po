@@ -2063,6 +2063,13 @@ msgstr "Adresse e-mail"
 msgid "Smooth"
 msgstr "Lissé"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+#~ msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
+#~ "can take a moment on a slow connection."
+#~ msgstr "Les colonnes de géométrie s'activent une fois le téléchargement de "
+#~ "DuckDB Spatial terminé, ce qui peut prendre un moment avec une "
+#~ "connexion lente."
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Entrez un nom pour le champ"
@@ -2462,8 +2469,8 @@ msgstr "Abandonner"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool is available when Spatial finishes loading."
-msgstr "Cet outil est disponible une fois le chargement de Spatial terminé."
+#~ msgid "This tool is available when Spatial finishes loading."
+#~ msgstr "Cet outil est disponible une fois le chargement de Spatial terminé."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2672,10 +2679,10 @@ msgid "Workspace ID"
 msgstr "ID de l'espace de travail"
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "The layer configuration is saved. Retry after connectivity or the "
-"Spatial extension becomes available."
-msgstr "La configuration du calque est enregistrée. Réessayez lorsque la "
-"connectivité ou l’extension Spatial sera disponible."
+#~ msgid "The layer configuration is saved. Retry after connectivity or the "
+#~ "Spatial extension becomes available."
+#~ msgstr "La configuration du calque est enregistrée. Réessayez lorsque la "
+#~ "connectivité ou l’extension Spatial sera disponible."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -2895,6 +2902,12 @@ msgstr "votre ensemble de données"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "Couleur unique"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "Geometry support is still downloading. This can take a moment on a slow "
+"connection."
+msgstr "La prise en charge de la géométrie est en cours de téléchargement. Cela "
+"peut prendre un moment avec une connexion lente."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3488,6 +3501,12 @@ msgstr "Vos données sont résumées"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Marge intérieure"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "The layer configuration is saved. Try again once your connection is "
+"back, or reload the page."
+msgstr "La configuration du calque est enregistrée. Réessayez une fois la "
+"connexion rétablie, ou rechargez la page."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -4194,8 +4213,8 @@ msgstr "Soumettre"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr "Cet outil nécessite DuckDB Spatial, qui n’est pas disponible."
+#~ msgid "This tool needs DuckDB Spatial, which is unavailable."
+#~ msgstr "Cet outil nécessite DuckDB Spatial, qui n’est pas disponible."
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -5136,9 +5155,9 @@ msgid "Type your answer..."
 msgstr "Tapez votre réponse..."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns are available when Spatial finishes loading."
-msgstr "Les colonnes de géométrie seront disponibles une fois le chargement de "
-"Spatial terminé."
+#~ msgid "Geometry columns are available when Spatial finishes loading."
+#~ msgstr "Les colonnes de géométrie seront disponibles une fois le chargement de "
+#~ "Spatial terminé."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -5191,6 +5210,10 @@ msgstr "Échec de la déconnexion"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
 msgstr "Vous vous êtes connecté avec succès à {0}"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "Geometry support is unavailable"
+msgstr "La prise en charge de la géométrie est indisponible"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -6167,6 +6190,10 @@ msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "Commencez par explorer votre espace de travail ou en téléchargeant "
 "votre premier jeu de données."
 
+#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
+msgid "Geometry support unavailable"
+msgstr "Prise en charge de la géométrie indisponible"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr "Empilé"
@@ -6341,9 +6368,9 @@ msgid "Buffer of {sourceName}"
 msgstr "Zone tampon de {sourceName}"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-msgstr "Les colonnes de géométrie nécessitent DuckDB Spatial, qui n’est pas "
-"disponible."
+#~ msgid "Geometry columns need DuckDB Spatial, which is unavailable."
+#~ msgstr "Les colonnes de géométrie nécessitent DuckDB Spatial, qui n’est pas "
+#~ "disponible."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -6733,6 +6760,12 @@ msgstr "Modèle de chat hors ligne prêt"
 msgid "Column description updated successfully!"
 msgstr "Description de la colonne mise à jour avec succès !"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs geometry support, which could not be loaded."
+msgstr "Cet outil nécessite la prise en charge de la géométrie, qui n'a pas pu "
+"être chargée."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "Enregistrez d'abord vos modifications : le PDF reflète le tableau de "
@@ -7056,6 +7089,10 @@ msgstr "Bienvenue dans le gestionnaire de vos sources de données. Sélectionnez
 "un fichier CSV ou Excel sur votre ordinateur. Vous n’avez pas de "
 "feuille de calcul sous la main ? <0>Téléchargez notre exemple</0> et "
 "utilisez-le."
+
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+msgid "Geometry unavailable"
+msgstr "Géométrie indisponible"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -7591,6 +7628,12 @@ msgid "This workspace no longer exists or your access has been revoked. If you "
 msgstr "Cet espace de travail n’existe plus ou votre accès a été révoqué. Si "
 "vous pensez qu’il s’agit d’une erreur, contactez le propriétaire de "
 "votre espace de travail."
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool turns on when geometry support finishes downloading."
+msgstr "Cet outil s'active une fois le téléchargement de la prise en charge de "
+"la géométrie terminé."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
@@ -8801,8 +8844,8 @@ msgid "Delete user group"
 msgstr "Supprimer le groupe d'utilisateurs"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-msgid "Spatial unavailable"
-msgstr "Données spatiales indisponibles"
+#~ msgid "Spatial unavailable"
+#~ msgstr "Données spatiales indisponibles"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
@@ -9115,6 +9158,11 @@ msgstr "Pour confirmer, tapez <0>{confirmationTarget}</0> ci-dessous :"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} et {groupClause}"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "These options need geometry support, which could not be loaded."
+msgstr "Ces options nécessitent la prise en charge de la géométrie, qui n'a pas "
+"pu être chargée."
+
 #: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
@@ -9206,8 +9254,8 @@ msgstr "Non renseigné"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "Spatial is unavailable"
-msgstr "Les données spatiales sont indisponibles"
+#~ msgid "Spatial is unavailable"
+#~ msgstr "Les données spatiales sont indisponibles"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
