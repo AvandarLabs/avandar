@@ -124,17 +124,33 @@ You do not need to check anything out, and you do not need to touch the read
 worktree. The script rewrites the ref and resets that worktree for you, so the
 files are updated on disk when the command returns.
 
-Afterwards you have two diffs:
+Then go back to the read worktree and relaunch difit. There are two reviews
+worth running, and they are separate difit sessions:
 
-| Command | Shows |
-| --- | --- |
-| `git diff review/base review/<tier>` | The whole tier as it now stands, fixes included. Your main review. |
-| `git diff review/<tier>-prev review/<tier>` | Only what the adversarial pass changed. Review this too: those fixes are unreviewed agent code. |
+```sh
+cd "$(wt go review/t1-sql)"
+
+pnpm diff-review review/base            # the whole tier, fixes included
+pnpm diff-review review/t1-sql-prev     # ONLY what the adversarial pass changed
+```
+
+| Command | Shows | Equivalent |
+| --- | --- | --- |
+| `pnpm diff-review review/base` | The whole tier as it now stands, fixes included. Your main review. | `git diff review/base review/<tier>` |
+| `pnpm diff-review review/<tier>-prev` | Only what the adversarial pass changed. Review this too: those fixes are unreviewed agent code. | `git diff review/<tier>-prev review/<tier>` |
+
+The two produce different difit transcripts, because `dif` names its artifacts
+`<branch-slug>-difit-<scope-slug>` from the branch *and* the comparison. So
+`review/base` writes `review-t1-sql-difit-at-review-base-*` and
+`review/t1-sql-prev` writes `review-t1-sql-difit-at-review-t1-sql-prev-*`. They
+do not clobber each other, and each keeps its own comments and reviewed state.
 
 Two constraints:
 
-- **Refresh between review rounds, never mid-round.** Moving the ref
-  invalidates difit's reviewed state for that branch.
+- **Refresh between review rounds, never mid-round.** The refresh moves the
+  branch, so difit's `-reviewed.json` for the `review/base` comparison no
+  longer lines up with the commits it recorded. Finish a round, refresh, then
+  start the next.
 - If the read worktree has uncommitted edits the script refuses to move it
   rather than clobbering them. Tier worktrees are read-only lenses, so if that
   happens, something was edited in the wrong place.
