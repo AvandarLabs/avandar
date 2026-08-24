@@ -67,7 +67,7 @@ Ordered by blast radius per line, not by size.
 
 | Tier | Ref | Files | +Lines | Agent pass | Human pass | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | in progress | Hooks/lint clean; see F-1 |
+| Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1, F-2, F-3; net posture stronger |
 | SQL + privileges | `review/t1-sql` | 156 | 21,054 | not started | not started | Highest risk |
 | Edge functions | `review/t2-edge` | 73 | 4,697 | not started | not started | Untrusted input reaches SQL |
 | Core / clients | `review/t2-core` | 816 | 82,768 | not started | not started | |
@@ -131,3 +131,67 @@ production only; keep the split but make e2e a required check on `main`; or
 accept it and document why.
 
 **Owner:** Pablo (decision) · **Status:** open
+
+### F-2 — COOP/COEP dropped from `vercel.json`, COOP possibly over-removed (S3, open)
+
+**Where:** `vercel.json`, `index.html`
+**From:** `3e37a1b61` "Let chat design case types…", 08-19 08:59, about an hour
+before the demo, on the `qetl-impl` branch.
+
+`Cross-Origin-Opener-Policy: same-origin` and
+`Cross-Origin-Embedder-Policy: credentialless` were removed from the
+all-routes header block, so the app is no longer cross-origin isolated in
+production.
+
+This is **documented and deliberate**, not a silent regression: the comment in
+`index.html` explains that the Google Picker cannot run inside an isolated
+document (credentialless it has no cookie jar and asks for cookie access;
+unmarked, COEP refuses the frame outright), and that Sheets import matters
+more than `SharedArrayBuffer` for the WebLLM offline-chat runtime. The
+credentialless iframe installer correctly gained a `window.crossOriginIsolated`
+guard so it goes dormant. The only process problem is that an unrelated
+commit carried the change and its message does not mention it.
+
+The substantive question is narrower: **COEP had to go for the Picker, but
+COOP may not have.** The two headers do different jobs. COEP governs
+subresource and iframe embedding, which is what blocks the Picker. COOP
+governs the window/opener relationship, and dropping it is what costs the
+cross-window and XS-Leaks protection on every route. `same-origin-allow-popups`
+would keep that protection for the general case while still letting the
+Picker's popup postMessage back to its opener.
+
+Proposed: try `Cross-Origin-Opener-Policy: same-origin-allow-popups` with COEP
+left off, and verify the Picker and Sheets import still work. If they do, the
+app gets most of the COOP protection back at no functional cost. Note that
+`vite.config.ts` sets no COOP/COEP either, so dev matches prod.
+
+**Owner:** Pablo (decision) · **Status:** open
+
+### F-3 — `.gitignore` no longer ignores `.cursor/plans` (S4, open)
+
+**Where:** `.gitignore`
+
+The Cursor entry changed from `.cursor/plans` to `.cursor/.cursor/`, so agent
+plan files written to `.cursor/plans` are no longer ignored. Nothing has
+leaked yet (`git ls-files .cursor` shows only rules, settings, and skills),
+so this is latent. Restore `.cursor/plans` alongside the new entry.
+
+**Owner:** unassigned · **Status:** open
+
+## Tier t6-guardrails: closing note
+
+Worth recording because it is the opposite of what the audit assumed. Apart
+from F-1 and F-2, every guardrail in this tier got **stronger** during the
+crunch window:
+
+- `test:db` gained `db:validate-privileges` and the dashboard-publishing
+  migration test on top of `supabase test db`.
+- `type-check` gained `type-check:deno`, covering `shared`, `supabase/functions`,
+  and `packages/shared`.
+- Three git hooks were added (`pre-commit`, `pre-merge-commit`, and a new
+  Supabase-config stage in `pre-push`).
+- Every new eslint ignore is a gitignored build artifact (`playwright-report`,
+  `.temp`, `supabase/.temp`) with a written justification. No lint rule was
+  disabled, and `.prettierrc`'s `expressionWidth` 8 to 40 is formatting only.
+- Dependency additions are all explained by shipped features (`pdfjs-dist`,
+  `@dnd-kit/*`, `react-joyride`, `@duckdb/node-api`) plus a Supabase CLI bump.
