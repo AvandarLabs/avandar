@@ -233,9 +233,12 @@ revisited. No change.
 The Cursor entry changed from `.cursor/plans` to `.cursor/.cursor/`, so agent
 plan files written to `.cursor/plans` are no longer ignored. Nothing has
 leaked yet (`git ls-files .cursor` shows only rules, settings, and skills),
-so this is latent. Restore `.cursor/plans` alongside the new entry.
+so this is latent.
 
-**Owner:** unassigned · **Status:** open
+**Resolution (2026-08-23):** accepted as-is. Keep whatever `.gitignore` is
+current on `develop`. No change.
+
+**Status:** accepted, closed
 
 ## Tier t6-guardrails: closing note
 
@@ -302,6 +305,42 @@ pgTAP files, one per uncovered table, landing on `fix/audit-t1-sql` with the
 rest of the t1 work. Follow the `rls_maps`
 shape: two workspaces, an outsider member of the second, then assert the
 outsider sees zero rows of the first workspace's data and that an insider
-still does. Six files, largely mechanical once the first is written.
+still does.
 
-**Owner:** unassigned · **Status:** open
+**Resolved (2026-08-23).** Six files added under
+`supabase/tests/database/permissions/`:
+
+| File | Table |
+| --- | --- |
+| `rls_concepts.test.sql` | `public.concepts` |
+| `rls_concept_attributes.test.sql` | `public.concept_attributes` |
+| `rls_individuals.test.sql` | `public.individuals` |
+| `rls_datasets__pdf_file.test.sql` | `public.datasets__pdf_file` |
+| `rls_attribute_mappings__dataset_column.test.sql` | `public.attribute_mappings__dataset_column` |
+| `rls_attribute_mappings__manual_entry.test.sql` | `public.attribute_mappings__manual_entry` |
+
+Each asserts six things: an insider reads the row; an outsider reads zero rows
+of that workspace; an outsider's INSERT naming the other workspace raises
+42501; an outsider's UPDATE and DELETE are filtered by RLS and leave the row
+intact; and `anon` cannot reach the table at all. 36 assertions.
+
+Verified, not just written:
+
+- `supabase test db`: 60 files, 663 tests, all pass.
+- `pnpm test:db` end to end (pgTAP + `db:validate-privileges` + the
+  dashboard-publishing migration script): exit 0.
+- **Mutation-tested.** Weakening the `concepts` SELECT policy to `using (true)`
+  makes assertion 2 fail, which is what proves the assertion is sensitive to
+  the regression rather than vacuously true. A passing test written by the same
+  kind of process that wrote the code is not evidence on its own; this is.
+
+One hypothesis was investigated and **disproved** along the way, so it is not a
+finding. The `concepts` UPDATE policy has a `with check` but no `using` clause,
+which looked like it might let an outsider re-parent a row into their own
+workspace. Probed directly against the local database: the row does not move.
+Postgres applies the SELECT policy when resolving the UPDATE's `WHERE`, so an
+outsider's statement matches zero rows. `individuals` has the mirror-image
+asymmetry (`using` but no `with check`) and is safe for the documented reason
+that `with check` defaults to the `using` expression.
+
+**Status:** resolved
