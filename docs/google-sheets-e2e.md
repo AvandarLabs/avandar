@@ -2,7 +2,7 @@
 
 `tests/e2e/google-sheets-import.spec.ts` covers the Sheets connector in two
 tests. The first needs nothing and runs everywhere. The second talks to Google
-and is skipped until two environment variables are set.
+and runs only when the run asks for it by passing `--third-party`.
 
 ## What is real and what is not
 
@@ -34,14 +34,29 @@ count is only reachable if the transcode did not abort on it.
 
 ## Test 2: real Drive (opt-in)
 
-Set these to run it:
+Tagged `@third-party`, so it is excluded from `pnpm test:e2e` and therefore from
+the PR gate and both deploy workflows. See
+[`rules/e2e-testing.md`](rules/e2e-testing.md) for why a blocking job must never
+call a third party. To run it:
 
-| Variable | Meaning |
-| --- | --- |
+```bash
+pnpm test:e2e:third-party tests/e2e/google-sheets-import.spec.ts
+```
+
+It needs these in the environment (`.env.development` is gitignored and is
+dotenv-loaded by `playwright.config.ts`, so it is the right home for them
+locally):
+
+| Variable                   | Meaning                                                  |
+| -------------------------- | -------------------------------------------------------- |
 | `E2E_GOOGLE_REFRESH_TOKEN` | Refresh token for the Google account that owns the grant |
-| `E2E_GOOGLE_SHEET_ID` | Drive file id of the test sheet |
-| `E2E_GOOGLE_SHEET_NAME` | Optional; only labels the fake pick |
-| `E2E_GOOGLE_EMAIL` | Optional; only fills `tokens__google.google_email` |
+| `E2E_GOOGLE_SHEET_ID`      | Drive file id of the test sheet                          |
+| `E2E_GOOGLE_SHEET_NAME`    | Optional; only labels the fake pick                      |
+| `E2E_GOOGLE_EMAIL`         | Optional; only fills `tokens__google.google_email`       |
+
+The first two are required: with `--third-party` passed and either missing, the
+test **fails** rather than skipping, because a green run that quietly skipped
+the only test that reaches Google is indistinguishable from one that did not.
 
 It seeds the token with an expiry **in the past** on purpose, so the route
 refreshes against Google before answering. The refresh path is covered too, and
@@ -60,6 +75,32 @@ Two consequences:
 - The grant is what has to be created by hand, once, and it then persists until
   the user revokes Avandar at
   [myaccount.google.com/permissions](https://myaccount.google.com/permissions).
+
+### Which account, and what its token is worth
+
+`E2E_GOOGLE_REFRESH_TOKEN` does not expire, so it is a standing credential. What
+it is worth is bounded by `drive.file`: it can read exactly the files its account
+has picked through the Picker, and nothing else in that Drive.
+
+That bound is the whole security argument, and how much weight it has to carry
+depends on where the token lives:
+
+- **Local only**, in a gitignored `.env.development`, is the current
+  arrangement, and your own account is defensible there. Anything able to read
+  that file could read your browser session too, so the token adds little.
+- **A shared secret store** (a CI job, anything another person or machine can
+  reach) needs a dedicated account whose Drive holds nothing but the fixture
+  sheet. Pointed at a personal account, the token reaches every sheet that
+  account has ever picked through Avandar, and it keeps doing so until somebody
+  revokes it by hand.
+
+A service account cannot stand in for either. `drive.file` grants are recorded
+against a **user** consenting through the Picker, and a service account never
+picks anything, so there is no grant to record; and the spec deliberately drives
+the real `google-auth/tokens` refresh, which is a user-token flow a service
+account's JWT exchange would bypass. Making one work would mean widening to
+`drive.readonly`, a Sensitive scope needing Google verification, which is not
+worth it for a test.
 
 So the setup is: create the sheet, pick it once through the app as the test
 account, then copy that account's refresh token out of `tokens__google`.

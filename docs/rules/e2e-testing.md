@@ -6,6 +6,39 @@ unit/integration (Vitest) rules see [`testing.md`](testing.md). The
 review-agent form of these rules is in
 [`../code-reviews/references/e2e-tests.md`](../code-reviews/references/e2e-tests.md).
 
+## Never let a blocking job call a third party
+
+A spec that reaches a real third-party service is tagged with
+`E2E_THIRD_PARTY_TAG` (`@third-party`, from
+`tests/e2e/setup/e2eThirdPartyMode/`) and is excluded from every run that did
+not ask for it:
+
+| Command                                  | Runs                                           |
+| ---------------------------------------- | ---------------------------------------------- |
+| `pnpm test:e2e`                          | everything except `@third-party`               |
+| `pnpm test:e2e:third-party`              | everything, including `@third-party`           |
+| `./scripts/runAllTests.sh --third-party` | the whole suite, including `@third-party`      |
+| `pnpm test:e2e:offline`                  | everything except `@online` and `@third-party` |
+
+The PR gate and both deploy workflows run `pnpm test:e2e`. They must keep doing
+so: a job that blocks a merge or a deploy cannot be allowed to fail because
+somebody else's service is down, their quota ran out, or a standing credential
+was revoked.
+
+Gate by tag, not by whether the credentials are present. Both look like "skipped
+by default", but only the tag holds: an env-shaped gate starts running live
+specs the moment someone adds the secrets to a job's `env:` block, which is
+precisely how a blocking gate acquires a third-party dependency by accident.
+
+Inside a tagged spec, read credentials with `requireE2EThirdPartyEnv`, which
+throws on a missing one rather than skipping. A spec that runs only when named
+explicitly must not report green having skipped itself: that is the same green
+as a run that really did reach the service.
+
+Tag such a spec only when it earns it: it is the only kind that catches the
+third party changing its contract, which every stubbed spec passes straight
+through. Anything the stub can prove belongs in an untagged spec.
+
 ## Diagnose a flake before fixing it
 
 An intermittent failure has a mechanism: an aged-process slowdown, a cold-start

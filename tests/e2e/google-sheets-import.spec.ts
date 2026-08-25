@@ -4,16 +4,17 @@ import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { installFakeGooglePicker } from "./helpers/installFakeGooglePicker";
 import { parseDatasetIdFromDataManagerUrl } from "./helpers/manualUploadCloudSyncFlow";
-import {
-  removeGoogleTokens,
-  seedGoogleToken,
-} from "./helpers/seedGoogleToken";
+import { removeGoogleTokens, seedGoogleToken } from "./helpers/seedGoogleToken";
 import {
   createSupabaseAdminClient,
   deleteAllDatasetsInWorkspaceForE2E,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import {
+  E2E_THIRD_PARTY_TAG,
+  requireE2EThirdPartyEnv,
+} from "./setup/e2eThirdPartyMode/e2eThirdPartyMode";
 import type { Page, Route } from "@playwright/test";
 
 /**
@@ -42,10 +43,6 @@ const FIXTURE_SHEET = {
  * row. Kept in step with `tests/data/google-sheet-late-prose/makeFixture.mjs`.
  */
 const FIXTURE_TOTAL_ROW_COUNT = 701;
-
-/** A Drive file id that only the real-Drive test uses. */
-const REAL_SHEET_ID = process.env.E2E_GOOGLE_SHEET_ID;
-const REAL_REFRESH_TOKEN = process.env.E2E_GOOGLE_REFRESH_TOKEN;
 
 type DriveRequestLog = { urls: string[] };
 
@@ -241,46 +238,54 @@ test.describe("Google Sheets connector", () => {
       .toBe(FIXTURE_TOTAL_ROW_COUNT);
   });
 
-  // Opt-in, and skipped by default: it needs a Google account whose refresh
-  // token is in the environment and which has already granted this app
+  // Excluded from every run that did not ask for `--third-party`, because it is
+  // the one test here that leaves the machine: it needs a Google account whose
+  // refresh token is in the environment and which has already granted this app
   // per-file access to `E2E_GOOGLE_SHEET_ID` through the Picker once. See
   // `docs/google-sheets-e2e.md` for how to produce both.
-  test("imports from the real Drive API", async ({
-    freshBrowserPage: page,
-    e2eWorkerDb,
-  }) => {
-    test.skip(
-      !REAL_REFRESH_TOKEN || !REAL_SHEET_ID,
-      "Set E2E_GOOGLE_REFRESH_TOKEN and E2E_GOOGLE_SHEET_ID to run this.",
-    );
+  test(
+    "imports from the real Drive API",
+    { tag: E2E_THIRD_PARTY_TAG },
+    async ({ freshBrowserPage: page, e2eWorkerDb }) => {
+      // Throws rather than skipping: this test only runs when it was asked for
+      // by name, and a green `--third-party` run that skipped it is
+      // indistinguishable from one that really reached Google.
+      const {
+        E2E_GOOGLE_SHEET_ID: realSheetId,
+        E2E_GOOGLE_REFRESH_TOKEN: realRefreshToken,
+      } = requireE2EThirdPartyEnv([
+        "E2E_GOOGLE_SHEET_ID",
+        "E2E_GOOGLE_REFRESH_TOKEN",
+      ]);
 
-    // A past expiry on purpose: it makes `google-auth/tokens` refresh against
-    // Google before answering, so the refresh path is covered too and no
-    // access token has to be stored anywhere.
-    await seedGoogleToken({
-      email: e2eWorkerDb.primaryUser.email,
-      accessToken: "ya29.expired-placeholder",
-      refreshToken: REAL_REFRESH_TOKEN!,
-      expiryDate: new Date(Date.now() - 60 * 1000),
-      googleEmail: process.env.E2E_GOOGLE_EMAIL ?? "e2e@example.com",
-    });
-    await installFakeGooglePicker(page, {
-      id: REAL_SHEET_ID!,
-      name: process.env.E2E_GOOGLE_SHEET_NAME ?? "e2e-google-sheet",
-    });
+      // A past expiry on purpose: it makes `google-auth/tokens` refresh against
+      // Google before answering, so the refresh path is covered too and no
+      // access token has to be stored anywhere.
+      await seedGoogleToken({
+        email: e2eWorkerDb.primaryUser.email,
+        accessToken: "ya29.expired-placeholder",
+        refreshToken: realRefreshToken,
+        expiryDate: new Date(Date.now() - 60 * 1000),
+        googleEmail: process.env.E2E_GOOGLE_EMAIL ?? "e2e@example.com",
+      });
+      await installFakeGooglePicker(page, {
+        id: realSheetId,
+        name: process.env.E2E_GOOGLE_SHEET_NAME ?? "e2e-google-sheet",
+      });
 
-    await signInWithEmailPassword(page, {
-      email: e2eWorkerDb.primaryUser.email,
-      password: e2eWorkerDb.primaryUser.password,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-    await pickSheetInConnectorsTab(page, e2eWorkerDb.workspaceSlug);
+      await signInWithEmailPassword(page, {
+        email: e2eWorkerDb.primaryUser.email,
+        password: e2eWorkerDb.primaryUser.password,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+      await pickSheetInConnectorsTab(page, e2eWorkerDb.workspaceSlug);
 
-    // No cell assertion here: the sheet's contents are not this repo's to
-    // pin. That the preview rendered at all means Drive answered, the export
-    // parsed, and the rows reached the form.
-    await expect(
-      page.getByText("These are the first", { exact: false }),
-    ).toBeVisible({ timeout: LONG_WAIT });
-  });
+      // No cell assertion here: the sheet's contents are not this repo's to
+      // pin. That the preview rendered at all means Drive answered, the export
+      // parsed, and the rows reached the form.
+      await expect(
+        page.getByText("These are the first", { exact: false }),
+      ).toBeVisible({ timeout: LONG_WAIT });
+    },
+  );
 });

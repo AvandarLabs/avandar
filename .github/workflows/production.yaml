@@ -129,6 +129,9 @@ jobs:
       - run: bash scripts/ci/verify-supabase-api-is-running.sh
       - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
       - run: pnpm exec playwright install --with-deps chromium
+      # Deliberately `test:e2e`, never `test:e2e:third-party`: this gates a
+      # deploy, so it must not depend on a third party. See
+      # docs/rules/e2e-testing.md.
       - run: pnpm test:e2e
       - name: Upload Supabase functions log
         if: ${{ !cancelled() }}

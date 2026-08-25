@@ -4,6 +4,10 @@ import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
 import { E2EPreflight } from "./tests/e2e/setup/E2EPreflight";
 import {
+  E2E_THIRD_PARTY_TAG,
+  isE2EThirdPartyMode,
+} from "./tests/e2e/setup/e2eThirdPartyMode/e2eThirdPartyMode";
+import {
   E2E_ONLINE_TAG,
   ensureE2EViteFeatureFlags,
   isE2EOfflineMode,
@@ -53,6 +57,23 @@ function mergeE2EFeatureFlags(): string {
 }
 
 const e2eFeatureFlags = mergeE2EFeatureFlags();
+
+/**
+ * The tags this run excludes, as literals safe to join into one alternation.
+ *
+ * - Offline runs drop {@link E2E_ONLINE_TAG}: those specs need a
+ *   network-fetched DuckDB extension, and excluding them beats letting them
+ *   time out against controls that never enable.
+ * - Every run that was not asked for third-party specs drops
+ *   {@link E2E_THIRD_PARTY_TAG}, so reaching a real third-party service is
+ *   something a run opts into rather than something a stray environment
+ *   variable can switch on. This is what keeps live calls out of the blocking
+ *   PR gate.
+ */
+const excludedTags = [
+  ...(isE2EOfflineMode() ? [E2E_ONLINE_TAG] : []),
+  ...(isE2EThirdPartyMode() ? [] : [E2E_THIRD_PARTY_TAG]),
+];
 
 /**
  * Per-test ceiling:
@@ -126,9 +147,8 @@ export default defineConfig({
       timeout: 180_000,
     },
   ],
-  // Offline runs skip the specs that need a network-fetched DuckDB extension
-  // rather than letting them time out against controls that never enable.
-  grepInvert: isE2EOfflineMode() ? new RegExp(E2E_ONLINE_TAG) : undefined,
+  grepInvert:
+    excludedTags.length > 0 ? new RegExp(excludedTags.join("|")) : undefined,
   globalSetup: "./tests/e2e/setup/globalSetup.ts",
   globalTeardown: "./tests/e2e/setup/globalTeardown.ts",
 });
