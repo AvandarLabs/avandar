@@ -88,3 +88,4 @@ The local-environment commands (`supabase switch`, `supabase restore`,
 `supabase status`) operate on `.env.development` files by name and are only
 meaningful locally. They currently accept `--staging` and `--prod` and ignore
 them, because the flags are global by design rather than declared per command.
+They should refuse them instead: AVA-350.

@@ -10,11 +10,15 @@ import { printError } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
 // Declared globally rather than per command: pointing the CLI at a deployment
-// is a property of the invocation, not of any one command, and Acclimate
-// rejects an option the command it is parsing has not declared. Acclimate
-// propagates these down to every subcommand, so they are legal and documented
-// everywhere. The entry point below reads them off argv rather than from a
-// parsed action, because the env file has to be chosen before any action runs.
+// is a property of the invocation, not of any one command. Acclimate propagates
+// a global option down to every subcommand, so declaring here is what puts
+// these in each help screen and hands their parsed value to any action that
+// wants it. The declaration is not what makes them accepted: Acclimate ignores
+// an option nobody declared (see AVA-304), so an undeclared `--prod` would be
+// silently swallowed rather than refused.
+//
+// The entry point below reads them off argv rather than from a parsed action,
+// because the env file has to be chosen before any action runs.
 const cli = Acclimate.createCLI("ava")
   .addGlobalOption({
     name: "--staging",
