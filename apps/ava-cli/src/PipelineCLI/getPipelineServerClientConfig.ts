@@ -1,3 +1,5 @@
+import { requireEnv } from "@ava-cli/avaEnv/avaEnv";
+
 export type PipelineServerClientConfig = Readonly<{
   baseURL: string;
   serverSecret: string;
@@ -17,30 +19,12 @@ function _normalizeBaseURL(rawBaseURL: string): string {
 }
 
 function _getBaseURL(): string {
-  const url = (process.env.AVA_PIPELINE_SERVER_URL ?? "").trim();
-
-  if (!url) {
-    throw new Error("AVA_PIPELINE_SERVER_URL is not set in .env.development");
-  }
-
-  return _normalizeBaseURL(url);
-}
-
-function _getServerSecret(): string {
-  const secret = (process.env.AVA_PIPELINE_SERVER_SECRET ?? "").trim();
-
-  if (!secret) {
-    throw new Error(
-      "AVA_PIPELINE_SERVER_SECRET is not set in .env.development",
-    );
-  }
-
-  return secret;
+  return _normalizeBaseURL(requireEnv("AVA_PIPELINE_SERVER_URL"));
 }
 
 export function getPipelineServerClientConfig(): PipelineServerClientConfig {
   return {
     baseURL: _getBaseURL(),
-    serverSecret: _getServerSecret(),
+    serverSecret: requireEnv("AVA_PIPELINE_SERVER_SECRET"),
   };
 }

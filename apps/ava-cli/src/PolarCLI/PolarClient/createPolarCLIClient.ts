@@ -1,3 +1,4 @@
+import { requireEnv } from "@ava-cli/avaEnv/avaEnv";
 import { getItemsFromListPage } from "@ava-cli/PolarCLI/PolarClient/listUtils";
 import { Polar } from "@polar-sh/sdk";
 
@@ -9,10 +10,7 @@ export type PolarCLIClient = {
 };
 
 function _getPolarServerType(): PolarServerType {
-  const serverType = process.env.POLAR_SERVER_TYPE;
-  if (!serverType) {
-    throw new Error("POLAR_SERVER_TYPE is not set in .env.development");
-  }
+  const serverType = requireEnv("POLAR_SERVER_TYPE");
 
   if (serverType !== "sandbox" && serverType !== "production") {
     throw new Error(
@@ -21,14 +19,6 @@ function _getPolarServerType(): PolarServerType {
     );
   }
   return serverType;
-}
-
-function _getPolarAccessToken(): string {
-  const accessToken = process.env.POLAR_ACCESS_TOKEN;
-  if (!accessToken) {
-    throw new Error("POLAR_ACCESS_TOKEN is not set in .env.development");
-  }
-  return accessToken;
 }
 
 type Organization = Readonly<{
@@ -55,11 +45,11 @@ async function _getOrganizationId(polar: Polar): Promise<string> {
 /**
  * Create an authenticated Polar client and resolve the organizationId.
  *
- * Loads `.env.development` to read `POLAR_ACCESS_TOKEN` and
- * `POLAR_SERVER_TYPE`.
+ * Reads `POLAR_ACCESS_TOKEN` and `POLAR_SERVER_TYPE` from whichever env file
+ * this invocation loaded.
  */
 export async function createPolarCLIClient(): Promise<PolarCLIClient> {
-  const accessToken = _getPolarAccessToken();
+  const accessToken = requireEnv("POLAR_ACCESS_TOKEN");
   const serverType = _getPolarServerType();
 
   const polar = new Polar({

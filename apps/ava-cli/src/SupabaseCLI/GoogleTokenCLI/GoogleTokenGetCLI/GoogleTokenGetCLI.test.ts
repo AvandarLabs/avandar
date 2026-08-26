@@ -57,8 +57,6 @@ function _getRequestedUrl(fetchMock: ReturnType<typeof vi.fn>): string {
 
 const LOCAL_OPTIONS = {
   email: "pablo@avandarlabs.com",
-  staging: false,
-  prod: false,
   raw: false,
 } as const;
 
@@ -165,21 +163,12 @@ describe("runGoogleTokenGet", () => {
     expect(logs).not.toContain("Failed to read the Google refresh token");
   });
 
-  it("rejects --staging and --prod together, before any request", async () => {
-    const fetchMock = _mockFetchReturning([_makeRow()]);
-
-    await expect(
-      runGoogleTokenGet({ ...LOCAL_OPTIONS, staging: true, prod: true }),
-    ).rejects.toThrow(/at most one of --staging and --prod/);
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
   it("names the missing variable and its file", async () => {
     delete process.env.VITE_SUPABASE_API_URL;
     _mockFetchReturning([_makeRow()]);
 
     await expect(runGoogleTokenGet({ ...LOCAL_OPTIONS })).rejects.toThrow(
-      /VITE_SUPABASE_API_URL is not set in \.env\.development/,
+      "VITE_SUPABASE_API_URL is not set in .env.development",
     );
   });
 

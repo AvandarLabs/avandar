@@ -113,8 +113,9 @@ echo "E2E_GOOGLE_REFRESH_TOKEN=$(ava supabase google-token get you@avandarlabs.c
   >> .env.development
 ```
 
-The command reads the local database by default and takes `--staging` or
-`--prod`. It also warns when the stored token still carries the Sensitive
+The command reads the local database by default, and `--staging` or `--prod`
+point it elsewhere (see [`apps/ava-cli/README.md`](../apps/ava-cli/README.md)).
+It also warns when the stored token still carries the Sensitive
 `auth/spreadsheets` scope, which a grant older than that scope's removal will.
 
 Put the test sheet in a **shared drive**, which also keeps the

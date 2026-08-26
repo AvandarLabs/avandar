@@ -1,8 +1,12 @@
 import { spawn } from "node:child_process";
 import * as path from "node:path";
+import {
+  getLoadedAvaEnvFile,
+  getLoadedAvaEnvTarget,
+  requireEnv,
+} from "@ava-cli/avaEnv/avaEnv";
 import { getSupabaseScriptsList } from "@ava-cli/SupabaseCLI/SupabaseRunCLI/getSupabaseScriptsList";
 import { Acclimate } from "@avandar/acclimate";
-import * as dotenv from "dotenv";
 
 const PROJECT_ROOT = path.join(process.cwd());
 
@@ -16,36 +20,6 @@ const SUPABASE_SCRIPT_RUNNER_PATH = path.join(
   "supabase-script-runner",
   "main.ts",
 );
-
-type DotenvConfigResult = Readonly<{
-  error?: unknown;
-}>;
-
-function _loadProductionEnv(): void {
-  const result = dotenv.config({
-    path: ".env.production",
-    quiet: true,
-  }) as DotenvConfigResult;
-  if (result.error !== undefined) {
-    throw new Error(
-      "Failed to load .env.production. Run this command from the repo root " +
-        "so we can load the environment variables.",
-    );
-  }
-}
-
-function _loadStagingEnv(): void {
-  const result = dotenv.config({
-    path: ".env.staging",
-    quiet: true,
-  }) as DotenvConfigResult;
-  if (result.error !== undefined) {
-    throw new Error(
-      "Failed to load .env.staging. Run this command from the repo root " +
-        "so we can load the environment variables.",
-    );
-  }
-}
 
 async function _printScriptsList(): Promise<void> {
   Acclimate.log("\n|white|The following scripts are available:");
@@ -96,23 +70,7 @@ export const SupabaseRunCLI = Acclimate.createCLI("run")
     required: false,
     type: "string",
   })
-  .addOption({
-    name: "--prod",
-    description:
-      "Use .env.production to run this script. We use .env.development by default.",
-    required: false,
-    default: false,
-    type: "boolean",
-  })
-  .addOption({
-    name: "--staging",
-    description:
-      "Use .env.staging to run this script. We use .env.development by default. ",
-    default: false,
-    required: false,
-    type: "boolean",
-  })
-  .action(async ({ script, sql, prod, staging, listScripts }) => {
+  .action(async ({ script, sql, listScripts }) => {
     if (listScripts) {
       await _printScriptsList();
       return;
@@ -128,15 +86,6 @@ export const SupabaseRunCLI = Acclimate.createCLI("run")
       await _printUsage();
       Acclimate.log("|red|ERROR: No SQL was provided.");
       return;
-    }
-
-    // set up the environment
-    if (staging) {
-      Acclimate.log("|yellow|Loading staging environment...");
-      _loadStagingEnv();
-    } else if (prod) {
-      Acclimate.log("|yellow|Loading production environment...");
-      _loadProductionEnv();
     }
 
     // find the requested script module
@@ -156,10 +105,20 @@ export const SupabaseRunCLI = Acclimate.createCLI("run")
       scriptName: scriptToRun,
     });
 
-    const dbLocation =
-      staging ? "staging"
-      : prod ? "production"
-      : "local";
+    // Read from the invocation's target rather than from flags of its own:
+    // `--staging` and `--prod` are global options, and the entry point has
+    // already loaded exactly one env file for them.
+    const dbLocation = getLoadedAvaEnvTarget();
+
+    // Validated here, in the parent, so a target whose env file has no
+    // connection string fails by name instead of the child silently using
+    // whatever `SUPABASE_POSTGRES_URL` happened to be in the shell.
+    requireEnv("SUPABASE_POSTGRES_URL");
+
+    Acclimate.log("|yellow|Using $envFile$ ($dbLocation$)", {
+      envFile: getLoadedAvaEnvFile(),
+      dbLocation,
+    });
 
     const scriptFilePath = path.join(
       PROJECT_ROOT,

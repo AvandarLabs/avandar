@@ -1,3 +1,4 @@
+import { getLoadedAvaEnvTarget, requireEnv } from "@ava-cli/avaEnv/avaEnv";
 import {
   printError,
   printInfo,
@@ -5,16 +6,6 @@ import {
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
-import * as dotenv from "dotenv";
-
-/** Which deployment's `tokens__google` to read. */
-type SupabaseTarget = "local" | "staging" | "production";
-
-const ENV_FILE_FROM_TARGET = {
-  local: ".env.development",
-  staging: ".env.staging",
-  production: ".env.production",
-} as const satisfies Record<SupabaseTarget, string>;
 
 /**
  * The Sensitive scope the app stopped requesting.
@@ -33,73 +24,19 @@ type GoogleTokenRow = Readonly<{
   updated_at: string;
 }>;
 
-/** Reads the target from the mutually exclusive environment flags. */
-function _getTarget(
-  options: Readonly<{ staging: boolean; prod: boolean }>,
-): SupabaseTarget {
-  if (options.staging && options.prod) {
-    throw new Error("Pass at most one of --staging and --prod.");
-  }
-  if (options.staging) {
-    return "staging";
-  }
-  if (options.prod) {
-    return "production";
-  }
-  return "local";
-}
-
 /**
- * Loads the target's env file over whatever `loadDevEnv` already put in place.
- *
- * `override: true` is required, not stylistic. The CLI entry point loads
- * `.env.development` before any command runs, and dotenv leaves an existing
- * `process.env` value alone by default, so a plain `dotenv.config` here would
- * be silently ignored for every variable the two files share and this command
- * would read the local database while reporting that it read production.
- *
- * `local` loads nothing, because the entry point already loaded exactly this
- * file.
- */
-function _loadEnvForTarget(target: SupabaseTarget): void {
-  if (target === "local") {
-    return;
-  }
-  const path = ENV_FILE_FROM_TARGET[target];
-  const result = dotenv.config({ path, override: true, quiet: true }) as {
-    error?: unknown;
-  };
-  if (result.error !== undefined) {
-    throw new Error(
-      `Failed to load ${path}. Run this command from the repo root.`,
-    );
-  }
-}
-
-/**
- * The REST endpoint and secret key for the loaded environment.
+ * The REST endpoint and secret key for the invocation's environment.
  *
  * Deliberately reads only `VITE_SUPABASE_API_URL`, with no fallback to
- * `SUPABASE_URL`. Both name the same thing, but only the former is present in
- * all three env files, and a fallback would quietly resolve to the *local*
- * `SUPABASE_URL` left behind by the entry point whenever a remote target's file
- * omits it. Reading a local database under a `--prod` banner is the one outcome
- * worth engineering against here.
+ * `SUPABASE_URL`. Both name the same thing, and accepting either would mean a
+ * target whose file defines neither could still resolve one from the ambient
+ * shell. `requireEnv` names the file to add it to instead.
  */
-function _getRestConfig(
-  target: SupabaseTarget,
-): Readonly<{ apiUrl: string; secretKey: string }> {
-  const apiUrl = process.env.VITE_SUPABASE_API_URL;
-  const secretKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const path = ENV_FILE_FROM_TARGET[target];
-
-  if (!apiUrl) {
-    throw new Error(`VITE_SUPABASE_API_URL is not set in ${path}.`);
-  }
-  if (!secretKey) {
-    throw new Error(`SUPABASE_SERVICE_ROLE_KEY is not set in ${path}.`);
-  }
-  return { apiUrl: apiUrl.replace(/\/+$/, ""), secretKey };
+function _getRestConfig(): Readonly<{ apiUrl: string; secretKey: string }> {
+  return {
+    apiUrl: requireEnv("VITE_SUPABASE_API_URL").replace(/\/+$/, ""),
+    secretKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
+  };
 }
 
 /**
@@ -141,22 +78,16 @@ async function _fetchTokenRows(
  * This is separated from the CLI wiring so it can be unit-tested.
  */
 export async function runGoogleTokenGet(
-  options: Readonly<{
-    email: string;
-    staging: boolean;
-    prod: boolean;
-    raw: boolean;
-  }>,
+  options: Readonly<{ email: string; raw: boolean }>,
 ): Promise<void> {
   const { email, raw } = options;
-  const target = _getTarget(options);
+  const target = getLoadedAvaEnvTarget();
 
   // Only the lookup is wrapped. A missing row is an ordinary outcome with its
   // own guidance, not a failure to report twice, so it is handled after this.
   let rows: readonly GoogleTokenRow[];
   try {
-    _loadEnvForTarget(target);
-    const { apiUrl, secretKey } = _getRestConfig(target);
+    const { apiUrl, secretKey } = _getRestConfig();
 
     if (!raw) {
       printInfo(`Reading tokens__google from ${target} (${apiUrl})...`);
@@ -235,21 +166,6 @@ export const GoogleTokenGetCLI = Acclimate.createCLI("get")
     },
   })
   .addOption({
-    name: "--prod",
-    description:
-      "Read from .env.production. We use .env.development by default.",
-    required: false,
-    default: false,
-    type: "boolean",
-  })
-  .addOption({
-    name: "--staging",
-    description: "Read from .env.staging. We use .env.development by default.",
-    required: false,
-    default: false,
-    type: "boolean",
-  })
-  .addOption({
     name: "--raw",
     description:
       "Print only the refresh token, so it can be captured in a shell " +
@@ -258,15 +174,6 @@ export const GoogleTokenGetCLI = Acclimate.createCLI("get")
     default: false,
     type: "boolean",
   })
-  .action(
-    (
-      commandArguments: Readonly<{
-        email: string;
-        staging: boolean;
-        prod: boolean;
-        raw: boolean;
-      }>,
-    ) => {
-      return runGoogleTokenGet(commandArguments);
-    },
-  );
+  .action((commandArguments: Readonly<{ email: string; raw: boolean }>) => {
+    return runGoogleTokenGet(commandArguments);
+  });
