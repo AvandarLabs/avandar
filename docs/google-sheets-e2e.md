@@ -103,7 +103,19 @@ account's JWT exchange would bypass. Making one work would mean widening to
 worth it for a test.
 
 So the setup is: create the sheet, pick it once through the app as the test
-account, then copy that account's refresh token out of `tokens__google`.
+account, then read that account's refresh token back out:
+
+```bash
+ava supabase google-token get you@avandarlabs.com
+
+# Or, to append it straight to the env file:
+echo "E2E_GOOGLE_REFRESH_TOKEN=$(ava supabase google-token get you@avandarlabs.com --raw)" \
+  >> .env.development
+```
+
+The command reads the local database by default and takes `--staging` or
+`--prod`. It also warns when the stored token still carries the Sensitive
+`auth/spreadsheets` scope, which a grant older than that scope's removal will.
 
 Put the test sheet in a **shared drive**, which also keeps the
 `supportsAllDrives` regression covered against the real API. A shared-drive file
