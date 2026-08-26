@@ -9,13 +9,15 @@
 #   Runs every workspace test suite in sequence. Stops at the first failure.
 #
 #   End-to-end specs that talk to a real third-party service are tagged
-#   `@third-party` and excluded unless --third-party is passed, so a default run
-#   never depends on somebody else's uptime, quota or credentials.
+#   `@third-party`. A default run includes them and each one skips itself when
+#   its credentials are absent, so this stays green on a machine that was never
+#   given them.
 #
 # Options:
 #   --quick, -q     Skip end-to-end tests (test:e2e).
-#   --third-party   Include the @third-party end-to-end specs. Needs their
-#                   credentials in the environment; see docs/rules/e2e-testing.md.
+#   --third-party   Run ONLY the @third-party end-to-end specs, and fail rather
+#                   than skip when their credentials are absent. The other
+#                   end-to-end specs do not run. See docs/rules/e2e-testing.md.
 
 set -euo pipefail
 
@@ -30,7 +32,8 @@ usage() {
   echo "Usage: ./scripts/runAllTests.sh [--quick|-q] [--third-party]"
   echo "Runs the full Avandar test suite."
   echo "  --quick, -q     Skip end-to-end tests."
-  echo "  --third-party   Include the @third-party end-to-end specs."
+  echo "  --third-party   Run only the @third-party e2e specs, failing on"
+  echo "                  absent credentials instead of skipping."
   exit 1
 }
 
@@ -55,7 +58,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Rejected rather than silently resolved: --quick skips the end-to-end run that
-# --third-party exists to widen, so the pair can only be a mistake, and either
+# --third-party exists to narrow, so the pair can only be a mistake, and either
 # precedence would ignore half of what was asked for.
 if [ "$QUICK" = true ] && [ "$THIRD_PARTY" = true ]; then
   echo "Error: --quick skips end-to-end tests, so --third-party cannot apply." >&2

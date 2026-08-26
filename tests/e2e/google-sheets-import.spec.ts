@@ -238,25 +238,29 @@ test.describe("Google Sheets connector", () => {
       .toBe(FIXTURE_TOTAL_ROW_COUNT);
   });
 
-  // Excluded from every run that did not ask for `--third-party`, because it is
-  // the one test here that leaves the machine: it needs a Google account whose
+  // The one test here that leaves the machine. It needs a Google account whose
   // refresh token is in the environment and which has already granted this app
   // per-file access to `E2E_GOOGLE_SHEET_ID` through the Picker once. See
   // `docs/google-sheets-e2e.md` for how to produce both.
+  //
+  // It runs in a bare `pnpm test:e2e` and skips itself when those are absent,
+  // so a machine without the credentials stays green. `pnpm
+  // test:e2e:third-party` narrows the run to this test and makes the same
+  // absence a failure.
   test(
     "imports from the real Drive API",
     { tag: E2E_THIRD_PARTY_TAG },
     async ({ freshBrowserPage: page, e2eWorkerDb }) => {
-      // Throws rather than skipping: this test only runs when it was asked for
-      // by name, and a green `--third-party` run that skipped it is
-      // indistinguishable from one that really reached Google.
+      // Skips or fails depending on how the run was invoked, which is the
+      // whole reason this goes through the helper rather than reading
+      // `process.env` here.
       const {
         E2E_GOOGLE_SHEET_ID: realSheetId,
         E2E_GOOGLE_REFRESH_TOKEN: realRefreshToken,
-      } = requireE2EThirdPartyEnv([
-        "E2E_GOOGLE_SHEET_ID",
-        "E2E_GOOGLE_REFRESH_TOKEN",
-      ]);
+      } = requireE2EThirdPartyEnv({
+        test,
+        variableNames: ["E2E_GOOGLE_SHEET_ID", "E2E_GOOGLE_REFRESH_TOKEN"],
+      });
 
       // A past expiry on purpose: it makes `google-auth/tokens` refresh against
       // Google before answering, so the refresh path is covered too and no

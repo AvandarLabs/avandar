@@ -58,22 +58,31 @@ function mergeE2EFeatureFlags(): string {
 
 const e2eFeatureFlags = mergeE2EFeatureFlags();
 
+// Rejected rather than silently resolved: a third-party spec exists to reach a
+// real service over the network, which is the one thing an offline run has
+// declared it cannot do, so the pair can only be a mistake.
+if (isE2EOfflineMode() && isE2EThirdPartyMode()) {
+  throw new Error(
+    "PLAYWRIGHT_E2E_OFFLINE and PLAYWRIGHT_E2E_THIRD_PARTY are contradictory: " +
+      "the third-party specs exist to reach a real service over the network.",
+  );
+}
+
 /**
  * The tags this run excludes, as literals safe to join into one alternation.
  *
- * - Offline runs drop {@link E2E_ONLINE_TAG}: those specs need a
- *   network-fetched DuckDB extension, and excluding them beats letting them
- *   time out against controls that never enable.
- * - Every run that was not asked for third-party specs drops
- *   {@link E2E_THIRD_PARTY_TAG}, so reaching a real third-party service is
- *   something a run opts into rather than something a stray environment
- *   variable can switch on. This is what keeps live calls out of the blocking
- *   PR gate.
+ * Offline runs drop both:
+ * - {@link E2E_ONLINE_TAG}, whose specs need a network-fetched DuckDB
+ *   extension, because excluding them beats letting them time out against
+ *   controls that never enable.
+ * - {@link E2E_THIRD_PARTY_TAG}, whose specs need a real service.
+ *
+ * Nothing else excludes anything. A default run includes the third-party specs
+ * and lets each one skip itself when its credentials are absent, which is what
+ * keeps a full run green on a machine that was never given them.
  */
-const excludedTags = [
-  ...(isE2EOfflineMode() ? [E2E_ONLINE_TAG] : []),
-  ...(isE2EThirdPartyMode() ? [] : [E2E_THIRD_PARTY_TAG]),
-];
+const excludedTags =
+  isE2EOfflineMode() ? [E2E_ONLINE_TAG, E2E_THIRD_PARTY_TAG] : [];
 
 /**
  * Per-test ceiling:
@@ -147,6 +156,11 @@ export default defineConfig({
       timeout: 180_000,
     },
   ],
+  // Narrows the run to the tagged specs, so `pnpm test:e2e:third-party` is how
+  // you exercise the live paths without waiting for the whole suite. Their
+  // missing-credential handling turns loud in the same mode; see
+  // `requireE2EThirdPartyEnv`.
+  grep: isE2EThirdPartyMode() ? new RegExp(E2E_THIRD_PARTY_TAG) : undefined,
   grepInvert:
     excludedTags.length > 0 ? new RegExp(excludedTags.join("|")) : undefined,
   globalSetup: "./tests/e2e/setup/globalSetup.ts",

@@ -1,8 +1,9 @@
 # Google Sheets connector e2e
 
 `tests/e2e/google-sheets-import.spec.ts` covers the Sheets connector in two
-tests. The first needs nothing and runs everywhere. The second talks to Google
-and runs only when the run asks for it by passing `--third-party`.
+tests. The first needs nothing and runs everywhere. The second talks to Google:
+it runs whenever its credentials are in the environment, and skips itself when
+they are not.
 
 ## What is real and what is not
 
@@ -32,12 +33,22 @@ That last one is the regression guard on `all_varchar`: the fixture's
 `indicator_value` column is numeric for 700 rows and then prose, and the row
 count is only reachable if the transcode did not abort on it.
 
-## Test 2: real Drive (opt-in)
+## Test 2: real Drive (credentials-gated)
 
-Tagged `@third-party`, so it is excluded from `pnpm test:e2e` and therefore from
-the PR gate and both deploy workflows. See
-[`rules/e2e-testing.md`](rules/e2e-testing.md) for why a blocking job must never
-call a third party. To run it:
+Tagged `@third-party`. What that tag controls is not whether the test runs, but
+what a missing credential means:
+
+| Command                     | This test                                                             |
+| --------------------------- | --------------------------------------------------------------------- |
+| `pnpm test:e2e`             | runs if its credentials are set, **skips** if not                     |
+| `pnpm test:e2e:third-party` | the only test that runs, and **fails** if its credentials are not set |
+| `pnpm test:e2e:offline`     | excluded                                                              |
+
+So it runs in a full local suite once you have set it up, and skips in CI, which
+holds no credentials. See [`rules/e2e-testing.md`](rules/e2e-testing.md) for the
+reasoning and for what that asks of a blocking job.
+
+To run just this test:
 
 ```bash
 pnpm test:e2e:third-party tests/e2e/google-sheets-import.spec.ts
@@ -54,9 +65,11 @@ locally):
 | `E2E_GOOGLE_SHEET_NAME`    | Optional; only labels the fake pick                      |
 | `E2E_GOOGLE_EMAIL`         | Optional; only fills `tokens__google.google_email`       |
 
-The first two are required: with `--third-party` passed and either missing, the
-test **fails** rather than skipping, because a green run that quietly skipped
-the only test that reaches Google is indistinguishable from one that did not.
+The first two are what the gate reads. With `--third-party` passed and either
+missing, the test **fails** rather than skipping, because a green run that
+quietly skipped the only test that reaches Google is indistinguishable from one
+that did not. Without `--third-party` the same absence is a skip, so a machine
+that was never set up stays green.
 
 It seeds the token with an expiry **in the past** on purpose, so the route
 refreshes against Google before answering. The refresh path is covered too, and

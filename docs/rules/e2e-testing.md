@@ -6,38 +6,49 @@ unit/integration (Vitest) rules see [`testing.md`](testing.md). The
 review-agent form of these rules is in
 [`../code-reviews/references/e2e-tests.md`](../code-reviews/references/e2e-tests.md).
 
-## Never let a blocking job call a third party
+## A third-party spec skips by default and fails only when asked for
 
 A spec that reaches a real third-party service is tagged with
 `E2E_THIRD_PARTY_TAG` (`@third-party`, from
-`tests/e2e/setup/e2eThirdPartyMode/`) and is excluded from every run that did
-not ask for it:
+`tests/e2e/setup/e2eThirdPartyMode/`). The tag does not decide whether the spec
+runs. It decides what a **missing credential** means:
 
-| Command                                  | Runs                                           |
-| ---------------------------------------- | ---------------------------------------------- |
-| `pnpm test:e2e`                          | everything except `@third-party`               |
-| `pnpm test:e2e:third-party`              | everything, including `@third-party`           |
-| `./scripts/runAllTests.sh --third-party` | the whole suite, including `@third-party`      |
-| `pnpm test:e2e:offline`                  | everything except `@online` and `@third-party` |
+| Command                                  | Runs                                           | A missing env var on a tagged spec                 |
+| ---------------------------------------- | ---------------------------------------------- | -------------------------------------------------- |
+| `pnpm test:e2e`                          | everything, tagged specs included              | **skipped**, with the variable names in the reason |
+| `pnpm test:e2e:third-party`              | only the tagged specs                          | **hard failure**                                   |
+| `pnpm test:e2e:offline`                  | everything except `@online` and `@third-party` | n/a                                                |
+| `./scripts/runAllTests.sh --third-party` | the unit suites, then only the tagged specs    | hard failure                                       |
 
-The PR gate and both deploy workflows run `pnpm test:e2e`. They must keep doing
-so: a job that blocks a merge or a deploy cannot be allowed to fail because
-somebody else's service is down, their quota ran out, or a standing credential
-was revoked.
+Read credentials with `requireE2EThirdPartyEnv({ test, variableNames })`, which
+applies that asymmetry for you. Never read `process.env` for them directly in a
+spec, or you lose it.
 
-Gate by tag, not by whether the credentials are present. Both look like "skipped
-by default", but only the tag holds: an env-shaped gate starts running live
-specs the moment someone adds the secrets to a job's `env:` block, which is
-precisely how a blocking gate acquires a third-party dependency by accident.
+The asymmetry is the point. A full run must not go red on a machine that was
+never given the credentials, and CI holds none, so there the tagged specs skip
+and the gate stays about the change under review. But a run invoked to exercise
+the third party specifically must not report green having quietly skipped the
+one spec that touches it: that is the same green as a run which really reached
+the service, and it is the failure mode this whole arrangement exists to
+prevent.
 
-Inside a tagged spec, read credentials with `requireE2EThirdPartyEnv`, which
-throws on a missing one rather than skipping. A spec that runs only when named
-explicitly must not report green having skipped itself: that is the same green
-as a run that really did reach the service.
+### What this asks of a blocking job
 
-Tag such a spec only when it earns it: it is the only kind that catches the
-third party changing its contract, which every stubbed spec passes straight
-through. Anything the stub can prove belongs in an untagged spec.
+The PR gate and both deploy workflows run `pnpm test:e2e`, so today they list
+the tagged specs and skip them for want of credentials. That is a property of
+the environment, not of the tag, so the rule is now about the credentials:
+
+**Do not put third-party credentials into a blocking job's `env:`.** Doing so
+turns those skips into live network calls inside a job that gates a merge or a
+deploy, which can then fail because somebody else's service is down, their quota
+ran out, or a standing credential was revoked. If a live check is wanted in CI,
+give it its own scheduled or manually-dispatched job running
+`pnpm test:e2e:third-party`, where a missing credential is loud and a failure
+blocks nothing.
+
+Tag a spec only when it earns it: it is the only kind that catches the third
+party changing its contract, which every stubbed spec passes straight through.
+Anything the stub can prove belongs in an untagged spec.
 
 ## Diagnose a flake before fixing it
 

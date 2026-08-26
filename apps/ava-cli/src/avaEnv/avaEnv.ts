@@ -54,11 +54,10 @@ let _loadedTarget: AvaEnvTarget = "local";
  * @param argv Arguments after the executable and script, i.e.
  * `process.argv.slice(2)`.
  */
-export function getAvaEnvTargetFromArgv(
-  argv: readonly string[],
-): AvaEnvTarget {
+export function getAvaEnvTargetFromArgv(argv: readonly string[]): AvaEnvTarget {
+  const passed = new Set(argv);
   const flags = Object.keys(TARGET_FROM_FLAG).filter((flag) => {
-    return argv.includes(flag);
+    return passed.has(flag);
   }) as ReadonlyArray<keyof typeof TARGET_FROM_FLAG>;
 
   if (flags.length > 1) {
