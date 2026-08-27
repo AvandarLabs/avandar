@@ -2008,12 +2008,6 @@ msgstr "Email address"
 msgid "Smooth"
 msgstr "Smooth"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
-#~ "can take a moment on a slow connection."
-#~ msgstr "Geometry columns turn on when DuckDB Spatial finishes downloading, "
-#~ "which can take a moment on a slow connection."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Enter a name for the field"
@@ -2402,11 +2396,6 @@ msgstr "Exact"
 msgid "Discard"
 msgstr "Discard"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool is available when Spatial finishes loading."
-#~ msgstr "This tool is available when Spatial finishes loading."
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "A dark or satellite basemap may photocopy poorly."
@@ -2603,12 +2592,6 @@ msgstr "PDF downloaded."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "Workspace ID"
-
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "The layer configuration is saved. Retry after connectivity or the "
-#~ "Spatial extension becomes available."
-#~ msgstr "The layer configuration is saved. Retry after connectivity or the "
-#~ "Spatial extension becomes available."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -4105,11 +4088,6 @@ msgstr "No file selected"
 msgid "Submit"
 msgstr "Submit"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool needs DuckDB Spatial, which is unavailable."
-#~ msgstr "This tool needs DuckDB Spatial, which is unavailable."
-
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "dashboard"
@@ -5028,10 +5006,6 @@ msgstr "Get a sum of the values"
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "Type your answer..."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns are available when Spatial finishes loading."
-#~ msgstr "Geometry columns are available when Spatial finishes loading."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -6225,10 +6199,6 @@ msgstr "Shared dashboard limit reached"
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "Buffer of {sourceName}"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-#~ msgstr "Geometry columns need DuckDB Spatial, which is unavailable."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -8645,10 +8615,6 @@ msgstr "Chosen from what we detected. Switch it if that reads wrong."
 msgid "Delete user group"
 msgstr "Delete user group"
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "Spatial unavailable"
-#~ msgstr "Spatial unavailable"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
 msgstr "Give the dashboard a name, then create it."
@@ -9045,11 +9011,6 @@ msgstr "Loading..."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
 msgstr "Not reported"
-
-#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "Spatial is unavailable"
-#~ msgstr "Spatial is unavailable"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

@@ -2039,12 +2039,6 @@ msgstr "Endereço de e-mail"
 msgid "Smooth"
 msgstr "Suave"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
-#~ "can take a moment on a slow connection."
-#~ msgstr "As colunas de geometria são ativadas quando o DuckDB Spatial termina de "
-#~ "baixar, o que pode levar um momento em uma conexão lenta."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Digite um nome para o campo"
@@ -2439,12 +2433,6 @@ msgstr "Exato"
 msgid "Discard"
 msgstr "Descartar"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool is available when Spatial finishes loading."
-#~ msgstr "Esta ferramenta estará disponível quando o Spatial terminar de "
-#~ "carregar."
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "Um mapa-base escuro ou de satélite pode não ser reproduzido bem em "
@@ -2645,12 +2633,6 @@ msgstr "PDF baixado."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "ID do espaço de trabalho"
-
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "The layer configuration is saved. Retry after connectivity or the "
-#~ "Spatial extension becomes available."
-#~ msgstr "A configuração da camada foi salva. Tente novamente quando houver "
-#~ "conectividade ou quando a extensão Spatial estiver disponível."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -4165,11 +4147,6 @@ msgstr "Nenhum arquivo selecionado"
 msgid "Submit"
 msgstr "Enviar"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool needs DuckDB Spatial, which is unavailable."
-#~ msgstr "Esta ferramenta precisa do DuckDB Spatial, que não está disponível."
-
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "painel"
@@ -5095,11 +5072,6 @@ msgstr "Obter a soma dos valores"
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "Digite sua resposta..."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns are available when Spatial finishes loading."
-#~ msgstr "As colunas de geometria estarão disponíveis quando o Spatial terminar "
-#~ "de carregar."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -6302,11 +6274,6 @@ msgstr "Limite de dashboards compartilhados atingido"
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "Buffer de {sourceName}"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-#~ msgstr "As colunas de geometria precisam do DuckDB Spatial, que não está "
-#~ "disponível."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -8754,10 +8721,6 @@ msgstr "Escolhido com base no que detectamos. Altere se isso estiver incorreto."
 msgid "Delete user group"
 msgstr "Excluir grupo de usuários"
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "Spatial unavailable"
-#~ msgstr "Dados espaciais indisponíveis"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
 msgstr "Dê um nome ao dashboard e crie-o."
@@ -9158,11 +9121,6 @@ msgstr "Carregando..."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
 msgstr "Não informado"
-
-#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "Spatial is unavailable"
-#~ msgstr "Os dados espaciais estão indisponíveis"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

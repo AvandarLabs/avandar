@@ -2011,12 +2011,6 @@ msgstr "عنوان البريد الإلكتروني"
 msgid "Smooth"
 msgstr "سلس"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
-#~ "can take a moment on a slow connection."
-#~ msgstr "تتوفر أعمدة الأشكال الهندسية عند انتهاء تنزيل DuckDB Spatial، وقد "
-#~ "يستغرق ذلك بعض الوقت على اتصال بطيء."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "أدخل اسمًا للحقل"
@@ -2404,11 +2398,6 @@ msgstr "دقيق"
 msgid "Discard"
 msgstr "تجاهل"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool is available when Spatial finishes loading."
-#~ msgstr "تتوفر هذه الأداة عند انتهاء تحميل Spatial."
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "قد لا تُنسخ الخريطة الأساسية الداكنة أو خريطة الأقمار الصناعية جيدًا."
@@ -2603,12 +2592,6 @@ msgstr "تم تنزيل PDF."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
-
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "The layer configuration is saved. Retry after connectivity or the "
-#~ "Spatial extension becomes available."
-#~ msgstr "تم حفظ إعدادات الطبقة. أعد المحاولة بعد استعادة الاتصال أو إتاحة "
-#~ "Spatial extension."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -4103,11 +4086,6 @@ msgstr "لا يوجد ملف محدد"
 msgid "Submit"
 msgstr "إرسال"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool needs DuckDB Spatial, which is unavailable."
-#~ msgstr "تحتاج هذه الأداة إلى DuckDB Spatial، وهو غير متاح."
-
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "لوحة التحكم"
@@ -5024,10 +5002,6 @@ msgstr "احصل على مجموع القيم"
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "اكتب إجابتك..."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns are available when Spatial finishes loading."
-#~ msgstr "تتوفر أعمدة الأشكال الهندسية عند انتهاء Spatial من التحميل."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -6216,10 +6190,6 @@ msgstr "تم بلوغ حد لوحات المعلومات المشتركة"
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "نطاق حول {sourceName}"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-#~ msgstr "تتطلب أعمدة الأشكال الهندسية DuckDB Spatial، وهو غير متاح."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -8630,10 +8600,6 @@ msgstr "تم الاختيار بناءً على ما اكتشفناه. بدّل�
 msgid "Delete user group"
 msgstr "احذف مجموعة المستخدمين"
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "Spatial unavailable"
-#~ msgstr "Spatial غير متاح"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
 msgstr "أدخل اسمًا للوحة المعلومات، ثم أنشئها."
@@ -9030,11 +8996,6 @@ msgstr "جارٍ التحميل..."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
 msgstr "لم يُبلّغ عنه"
-
-#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "Spatial is unavailable"
-#~ msgstr "Spatial غير متاح"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

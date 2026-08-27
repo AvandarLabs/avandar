@@ -1956,11 +1956,6 @@ msgstr "電子郵件地址"
 msgid "Smooth"
 msgstr "平滑"
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns turn on when DuckDB Spatial finishes downloading, which "
-#~ "can take a moment on a slow connection."
-#~ msgstr "DuckDB Spatial 下載完成後即可使用幾何欄位；在網路較慢時可能需要稍等。"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "為該欄位輸入名稱"
@@ -2339,11 +2334,6 @@ msgstr "確切"
 msgid "Discard"
 msgstr "捨棄"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool is available when Spatial finishes loading."
-#~ msgstr "Spatial 完成載入後即可使用此工具。"
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "深色或衛星底圖可能不適合影印。"
@@ -2529,11 +2519,6 @@ msgstr "PDF 已下載。"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "工作區 ID"
-
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "The layer configuration is saved. Retry after connectivity or the "
-#~ "Spatial extension becomes available."
-#~ msgstr "圖層設定已儲存。請在連線恢復或 Spatial 擴充功能可用後重試。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -3990,11 +3975,6 @@ msgstr "未選擇任何檔案"
 msgid "Submit"
 msgstr "提交"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "This tool needs DuckDB Spatial, which is unavailable."
-#~ msgstr "此工具需要 DuckDB Spatial，但目前無法使用。"
-
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "儀表板"
@@ -4896,10 +4876,6 @@ msgstr "獲取數值總和"
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "輸入您的答案..."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns are available when Spatial finishes loading."
-#~ msgstr "Spatial 完成載入後即可使用幾何欄位。"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -6071,10 +6047,6 @@ msgstr "已達分享儀表板上限"
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "{sourceName} 的緩衝區"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-#~ msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-#~ msgstr "幾何欄位需要 DuckDB Spatial，但目前無法使用。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -8430,10 +8402,6 @@ msgstr "根據偵測結果選取。如果顯示不正確，請切換選項。"
 msgid "Delete user group"
 msgstr "刪除用戶群組"
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-#~ msgid "Spatial unavailable"
-#~ msgstr "無法使用空間資料"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
 msgstr "為儀表板命名，然後建立儀表板。"
@@ -8822,11 +8790,6 @@ msgstr "載入中..."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
 msgstr "未回報"
-
-#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-#~ msgid "Spatial is unavailable"
-#~ msgstr "無法使用空間資料"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
