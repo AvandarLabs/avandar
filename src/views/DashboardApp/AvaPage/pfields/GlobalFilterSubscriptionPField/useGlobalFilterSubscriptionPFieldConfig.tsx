@@ -9,7 +9,7 @@ import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblo
  * subscription field. The field `label` is translated via the Lingui macro,
  * so this must be invoked from a React component / hook.
  */
-// eslint-disable-next-line max-len
+// oxlint-disable-next-line eslint-js/max-len -- Typed hook API
 export function useGlobalFilterSubscriptionPFieldConfig(): CustomField<GlobalFilterSubscription> {
   const { t } = useLingui();
   return useMemo(() => {

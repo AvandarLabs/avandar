@@ -45,7 +45,7 @@ the product into something that truly serves your mission.
 
    `pnpm install` also points your git hooks at the repo's `.githooks/`
    directory (via the `prepare` script). A `pre-push` hook then runs
-   `oxfmt`, `prettier` (Supabase schema SQL only), `eslint --fix`, and
+   `oxfmt`, `prettier` (Supabase schema SQL only), `oxlint --fix`, and
    `stylelint --fix` on files changed on the current branch before letting a
    push through, and blocks the push if any files were reformatted so you can
    review and commit the changes. If you ever need to bypass it for a one-off,
@@ -142,8 +142,7 @@ routes; they do not stub Supabase APIs.
 - Vite
 - TypeScript
 - Mantine
-- TailwindCSS (this is on v3 because `eslint-plugin-tailwindcss` does not support
-  v4 yet)
+- TailwindCSS
 - React Query
 - React Router
 - Supabase

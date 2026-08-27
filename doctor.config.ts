@@ -5,6 +5,9 @@ import { defineConfig } from "react-doctor/api";
  * ESLint plugin) and is wired into `pnpm lint` so every engineer runs it.
  */
 export default defineConfig({
+  // `pnpm lint` runs Oxlint first. React Doctor's temporary extends config
+  // breaks JS import resolution, so React Doctor runs only its curated rules.
+  adoptExistingLintConfig: false,
   ignore: {
     // `js-combine-iterations` flags `.map().filter()`-style chains as two
     // passes and tells you to fold them into one `for`/`reduce`. This repo

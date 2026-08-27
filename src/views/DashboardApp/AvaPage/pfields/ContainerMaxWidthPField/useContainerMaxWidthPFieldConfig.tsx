@@ -13,7 +13,7 @@ import {
  */
 // TODO(jpsyx): this should not be of type `unknown` and should be something
 // more specific
-// eslint-disable-next-line max-len
+// oxlint-disable-next-line eslint-js/max-len -- Typed hook API
 export function useContainerMaxWidthPFieldConfig(): CustomField<ContainerMaxWidthValue> {
   const { t } = useLingui();
 

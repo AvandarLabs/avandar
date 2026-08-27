@@ -46,7 +46,7 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "dateOfLastSync",
 ] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
 
-// eslint-disable-next-line max-len
+// oxlint-disable-next-line eslint-js/max-len -- Generic return type
 function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource> {
   const { t } = useLingui();
   return {

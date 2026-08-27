@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
 import { lingui } from "@lingui/vite-plugin";
-import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { loadEnv } from "vite";
@@ -86,7 +85,6 @@ export default defineConfig(({ mode }) => {
             }),
             reactWithLinguiMacro(),
             lingui(),
-            eslintPlugin(),
             nodePolyfills(),
             VitePWA({
               registerType: "autoUpdate",

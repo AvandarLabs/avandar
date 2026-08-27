@@ -1,5 +1,5 @@
-// eslint-disable-next-line import-x/extensions
-import PdfSniffWorker from "@/workers/pdfSniff.worker/pdfSniff.worker.ts?worker";
+// oxlint-disable-next-line import/default -- Vite query has virtual default
+import PdfSniffWorker from "@/workers/pdfSniff.worker/pdfSniff.worker?worker";
 import type {
   PdfExtractResult,
   PdfSniffError,

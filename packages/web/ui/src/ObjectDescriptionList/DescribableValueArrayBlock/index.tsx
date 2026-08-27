@@ -116,7 +116,7 @@ export function DescribableValueArrayBlock<
           maxItemsCount={maxItemsCount}
           rootData={rootData}
           onSubmitChange={onSubmitChange}
-          // eslint-disable-next-line max-len
+          // oxlint-disable-next-line eslint-js/max-len -- Generic JSX cast
           {...(objectArrayOrNestedArrayRenderOptions as unknown as ObjectArrayRenderOptions<
             DescribableObject,
             RootData
@@ -127,7 +127,7 @@ export function DescribableValueArrayBlock<
           maxItemsCount={maxItemsCount}
           rootData={rootData}
           onSubmitChange={onSubmitChange}
-          // eslint-disable-next-line max-len
+          // oxlint-disable-next-line eslint-js/max-len -- Generic JSX cast
           {...(objectArrayOrNestedArrayRenderOptions as unknown as NestedArrayRenderOptions<
             T,
             RootData
