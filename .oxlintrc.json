@@ -24,6 +24,9 @@
     "builtin": true
   },
   "settings": {
+    "react": {
+      "version": "19.2.5"
+    },
     "import-x/resolver": {
       "typescript": {
         "project": [
