@@ -25,6 +25,7 @@ import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type {
   VizConfig,
+  VizConfigRegistry,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
 
@@ -201,21 +202,60 @@ export const DataExplorerStateManager = createAppStateManager({
     /**
      * Change the active visualization.
      *
-     * Converts the config and applies structured `hydrateFromQuery`.
-     * Result-based `hydrateFromQueryResult` runs in `DataExplorerApp` when
-     * query results are present (see `syncVizFromQueryResult`).
+     * Remembers the outgoing config under its own viz type, then restores
+     * what the user last had for the incoming one. Restoring is what makes
+     * a bar -> pie -> bar round trip keep the bar chart's axes, grid, and
+     * legend, none of which a pie config can carry.
+     *
+     * A remembered config can name columns the current query no longer
+     * returns, so it is reconciled against the latest result columns on the
+     * way back in. That repairs it in place instead of restoring something
+     * stale: surviving keys keep their styling and dropped ones are
+     * re-seeded. See `applyVizConfigFromQueryResult`.
+     *
+     * With nothing remembered, this falls back to converting the current
+     * config and applying structured `hydrateFromQuery`, which is what the
+     * first switch to any type does.
      */
     setActiveVizType: (state: DataExplorerAppState, newVizType: VizType) => {
-      const { vizConfig, query } = state;
+      const { vizConfig, query, rawSql, vizConfigMemory, lastResultColumns } =
+        state;
 
-      return setValue(
-        state,
-        "vizConfig",
-        VizConfigs.hydrateFromQuery(
-          VizConfigs.convertVizConfig(vizConfig, newVizType),
-          query,
-        ),
-      );
+      if (vizConfig.vizType === newVizType) {
+        return state;
+      }
+
+      const remembered = vizConfigMemory[newVizType];
+      const nextVizConfig =
+        remembered === undefined ?
+          VizConfigs.hydrateFromQuery(
+            VizConfigs.convertVizConfig(vizConfig, newVizType),
+            query,
+          )
+          // Without results there is nothing to reconcile against, so the
+          // remembered config stands as-is until `syncVizFromQueryResult`
+          // runs.
+        : lastResultColumns === undefined ? remembered
+        : applyVizConfigFromQueryResult({
+            vizConfig: remembered,
+            rawSql,
+            query,
+            columns: lastResultColumns,
+          });
+
+      // TypeScript widens the computed union key to `string` and so cannot see
+      // that `vizConfig` lands under its own `vizType`. The key is taken from
+      // the value itself, so the correlation holds by construction.
+      const nextMemory = {
+        ...vizConfigMemory,
+        [vizConfig.vizType]: vizConfig,
+      } as Partial<VizConfigRegistry>;
+
+      return {
+        ...state,
+        vizConfig: nextVizConfig,
+        vizConfigMemory: nextMemory,
+      };
     },
 
     /**
