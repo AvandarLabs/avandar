@@ -1,12 +1,21 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "import",
-    "unicorn"
-  ],
+  "plugins": ["eslint", "import", "react", "jsx-a11y", "typescript"],
   "jsPlugins": [
-    "@tanstack/eslint-plugin-router",
-    "@tanstack/eslint-plugin-query"
+    {
+      "name": "eslint-js",
+      "specifier": "oxlint-plugin-eslint"
+    },
+    {
+      "name": "import-js",
+      "specifier": "eslint-plugin-import-x"
+    },
+    {
+      "name": "react-js",
+      "specifier": "eslint-plugin-react"
+    },
+    "@tanstack/eslint-plugin-query",
+    "@tanstack/eslint-plugin-router"
   ],
   "categories": {
     "correctness": "off"
@@ -14,11 +23,31 @@
   "env": {
     "builtin": true
   },
+  "settings": {
+    "import-x/resolver": {
+      "typescript": {
+        "project": [
+          "tsconfig.json",
+          "tsconfig.app.json",
+          "tsconfig.node.json",
+          "tsconfig.base.json",
+          "shared/tsconfig.json",
+          "apps/*/tsconfig.json",
+          "apps/*/tsconfig.*.json",
+          "packages/*/*/tsconfig.json"
+        ],
+        "alwaysTryTypes": true,
+        "noWarnOnMultipleProjects": true
+      }
+    }
+  },
   "ignorePatterns": [
     "**/dist/**",
     ".agents/**",
     ".claude",
     ".claude/**",
+    ".cursor/**",
+    ".opencode/**",
     "agent-skills/**",
     "apps/desktop/build/**",
     "apps/desktop/bundle/**",
@@ -41,17 +70,38 @@
     "@tanstack/query/infinite-query-property-order": "error",
     "@tanstack/query/no-void-query-fn": "error",
     "@tanstack/query/mutation-property-order": "error",
-    "import/namespace": "error",
     "import/default": "error",
+    "import/export": "error",
+    "import/named": "error",
+    "import/namespace": "error",
     "import/no-named-as-default": "warn",
     "import/no-named-as-default-member": "warn",
-    "import/no-duplicates": "warn"
+    "import/no-duplicates": "warn",
+    "import-js/no-unresolved": [
+      "error",
+      {
+        "ignore": ["^virtual:"]
+      }
+    ],
+    "eslint-js/max-len": [
+      "error",
+      {
+        "code": 80,
+        "tabWidth": 2,
+        "comments": 80,
+        "ignorePattern": "^import\\s.+\\sfrom\\s.+;$",
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreRegExpLiterals": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "eslint-js/no-octal": "error",
+    "eslint-js/no-unsafe-optional-chaining": "error"
   },
   "overrides": [
     {
-      "files": [
-        "**/*.{js,jsx,ts,tsx}"
-      ],
+      "files": ["**/*.{js,jsx,ts,tsx}"],
       "rules": {
         "constructor-super": "off",
         "for-direction": "error",
@@ -99,7 +149,7 @@
         "no-unreachable": "off",
         "no-unsafe-finally": "error",
         "no-unsafe-negation": "off",
-        "no-unsafe-optional-chaining": "error",
+        "no-unsafe-optional-chaining": "off",
         "no-unused-labels": "error",
         "no-unused-private-class-members": "error",
         "no-unused-vars": "off",
@@ -133,11 +183,9 @@
         "typescript/prefer-as-const": "error",
         "typescript/prefer-namespace-keyword": "error",
         "typescript/triple-slash-reference": "error",
-        "arrow-body-style": [
-          "error",
-          "always"
-        ],
-        "react/function-component-definition": [
+        "arrow-body-style": ["error", "always"],
+        "react/function-component-definition": "off",
+        "react-js/function-component-definition": [
           "error",
           {
             "namedComponents": "function-declaration",
@@ -147,37 +195,29 @@
         "react/jsx-filename-extension": [
           "warn",
           {
-            "extensions": [
-              ".tsx",
-              ".jsx"
-            ]
+            "extensions": [".tsx", ".jsx"]
           }
         ],
         "react/react-in-jsx-scope": "off",
         "jsx-a11y/anchor-is-valid": [
           "error",
           {
-            "components": [
-              "Link"
-            ],
-            "specialLink": [
-              "to"
-            ]
+            "components": ["Link"],
+            "specialLink": ["to"]
           }
         ],
         "jsx-a11y/label-has-associated-control": [
           "error",
           {
-            "labelComponents": [
-              "LabelWrapper"
-            ],
-            "labelAttributes": [
-              "label"
-            ],
+            "labelComponents": ["LabelWrapper"],
+            "labelAttributes": ["label"],
             "controlComponents": []
           }
         ],
         "no-shadow": "error",
+        "curly": "off",
+        "prefer-template": "off",
+        "typescript/consistent-type-imports": "off",
         "import/extensions": [
           "error",
           "ignorePackages",
@@ -189,6 +229,7 @@
           }
         ],
         "import/no-duplicates": "error",
+        "import/no-default-export": "off",
         "import/prefer-default-export": "off",
         "react/rules-of-hooks": "error",
         "react/exhaustive-deps": "error",
@@ -206,11 +247,6 @@
           }
         ]
       },
-      "plugins": [
-        "typescript",
-        "react",
-        "jsx-a11y"
-      ],
       "env": {
         "es2024": true,
         "node": true
@@ -1278,18 +1314,25 @@
       }
     },
     {
-      "files": [
-        "supabase/functions/**/*.ts"
-      ],
+      "files": ["supabase/functions/**/*.ts"],
       "rules": {
+        "import-js/no-unresolved": "off",
         "import/extensions": "off"
       }
     },
     {
-      "files": [
-        "shared/**/*.{ts,tsx}",
-        "packages/shared/**/*.{ts,tsx}"
-      ],
+      "files": ["apps/desktop/**/*.{ts,tsx}"],
+      "rules": {
+        "import-js/no-unresolved": [
+          "error",
+          {
+            "ignore": ["^bun:", "^duckdb$"]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
       "rules": {
         "import/extensions": [
           "error",
@@ -1347,19 +1390,14 @@
       }
     },
     {
-      "files": [
-        "packages/**/*.{js,jsx,ts,tsx}"
-      ],
+      "files": ["packages/**/*.{js,jsx,ts,tsx}"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "group": [
-                  "@/*",
-                  "$/*"
-                ],
+                "group": ["@/*", "$/*"],
                 "message": "Publishable packages cannot import app code. `@/*` (src) and `$/*` (shared) resolve here but would be bundled into the published tarball. Move what you need into a package, or take it as a parameter."
               }
             ]
@@ -1368,9 +1406,7 @@
       }
     },
     {
-      "files": [
-        "packages/shared/**/*.{js,jsx,ts,tsx}"
-      ],
+      "files": ["packages/shared/**/*.{js,jsx,ts,tsx}"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -1403,10 +1439,7 @@
                 "message": "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../)."
               },
               {
-                "group": [
-                  "@/*",
-                  "$/*"
-                ],
+                "group": ["@/*", "$/*"],
                 "message": "Publishable packages cannot import app code. `@/*` (src) and `$/*` (shared) resolve here but would be bundled into the published tarball. Move what you need into a package, or take it as a parameter."
               }
             ]
@@ -1415,35 +1448,30 @@
       }
     },
     {
-      "files": [
-        "**/vitest.config.ts"
-      ],
+      "files": ["**/vitest*.config.ts"],
       "rules": {
         "no-restricted-imports": "off"
       }
     },
     {
-      "files": [
-        "tests/e2e/**/*.{ts,tsx}"
-      ],
+      "files": ["tests/e2e/**/*.{ts,tsx}"],
       "rules": {
         "react/rules-of-hooks": "off"
-      },
-      "plugins": [
-        "react"
-      ]
+      }
     },
     {
-      "files": [
-        "tests/e2e/**/*.fixture.ts"
-      ],
+      "files": ["tests/e2e/**/*.fixture.ts"],
       "rules": {
         "no-empty-pattern": "off"
       }
     },
     {
-      "files": [
-        "src/**/*.{ts,tsx}"
+      "files": ["src/**/*.{ts,tsx}"],
+      "excludeFiles": [
+        "src/lib/privacy/decideIfDataCanCrossBoundary.tsx",
+        "src/lib/privacy/sessionSecret.ts",
+        "src/lib/privacy/pendingAcks.ts",
+        "src/lib/privacy/**/*.test.ts"
       ],
       "rules": {
         "no-restricted-imports": [
@@ -1452,16 +1480,12 @@
             "paths": [
               {
                 "name": "@/lib/privacy/sessionSecret",
-                "importNames": [
-                  "issueAckToken"
-                ],
+                "importNames": ["issueAckToken"],
                 "message": "Privacy chokepoint: ack tokens must only be minted inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead."
               },
               {
                 "name": "@/lib/privacy/pendingAcks",
-                "importNames": [
-                  "registerAck"
-                ],
+                "importNames": ["registerAck"],
                 "message": "Privacy chokepoint: pending acks must only be registered inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead."
               }
             ]
