@@ -40,6 +40,7 @@ If a required tool is missing, stop and give the user the exact remediation.
 | Request or state | Mode |
 | --- | --- |
 | Explicit summary request | Summary |
+| Explicit request for a walkthrough, an as-built design doc, or a document to read before the code | Walkthrough |
 | Regenerate guide, mark reviewed, or report reviewed state | Diff guide |
 | Open reviewer comments | Continue |
 | Ask the agent to critique a PR or local diff, including `pr`, `pre`, `pre-review`, or `/diff-review auto <PR-number>` | PR review |
@@ -78,6 +79,7 @@ Use the slug rules in `scripts/dif/src/comparison.rs` and
 | Structured guide | `-guide.json` |
 | Diff summary | `-summary.md` |
 | Manual test plan | `-test-plan.md` |
+| Walkthrough | `-walkthrough.md` |
 | Reviewed state | `-reviewed.json` |
 
 The skill writes these artifacts. The TUI reads them and owns live session
@@ -341,6 +343,335 @@ The test plan is a numbered list of concrete manual steps. Include exact paths,
 clicks, and commands. Put commands in fenced code blocks and literal text the
 user must copy in blockquotes or another isolated markdown block.
 
+## Walkthrough contract
+
+The walkthrough is the as-built design document for one change: the theory of
+the change, written to be read before any code. It is indexed by idea, not by
+file. The guide answers "where do I go next", a thread answers "why is this
+line like this", and the walkthrough answers "what is this change, and why is
+it shaped this way".
+
+Write `-walkthrough.md` in Walkthrough mode only. Never write it automatically:
+it costs real effort and is worth nothing to a reader who did not ask for it.
+
+The walkthrough is always a markdown file in `.difit/`, named from the same
+stem as every other artifact (see [Artifact names](#artifact-names)). It is
+printed from that file. Never publish it to a hosting service, and never
+substitute a hosted page for the file.
+
+### Sections
+
+Use these headings in this order, numbered, omitting any that would be empty.
+Numbers are stable for the life of the review so the reviewer can annotate a
+printout and cite `§3.2` back to you.
+
+1. **Purpose.** The problem in the reader's terms and what "done" means. No
+   file names, no module names. Two paragraphs at most, and it must **name
+   every strand of work in the change**, because a strand the reader has not
+   been told about will read as a non sequitur when its section arrives.
+   Finish with a one-line map, strand to section number, so the reader can
+   predict the section list before reading it.
+2. **Shape of the solution.** The mental model: the moving parts and how data
+   flows between them, as prose plus at least one mermaid diagram. When the
+   change has more than one strand, say here how they relate, including "these
+   two are independent" when that is the truth.
+3. **One section per strand of work,** named after the concern rather than the
+   kind of thing it contains. Use numbered subsections (`3.1`, `3.2`) for the
+   pieces inside a strand, so the reviewer can cite one.
+
+   **Do not file sections by artifact kind.** "Components", "Algorithms and
+   invariants", "Helpers" are category buckets, and a bucket strands its
+   contents: the reader who meets a SQL projection algorithm under
+   "Algorithms" has to reconstruct for themselves why it is in this change at
+   all. A section named for the concern carries that connection for free.
+
+   **Filing by strand changes where things go, never how deeply they are
+   covered.** Inside a strand, cover every one of these that applies, at the
+   depth a section dedicated to it would have had:
+
+   - **Each unit that carries design weight:** what it is responsible for, why
+     it is a separate unit rather than folded into its caller, who calls it,
+     what it depends on, and what it deliberately does not know about. Skip
+     units whose name and signature already explain them.
+   - **Each algorithm whose logic is not evident on one read:** the excerpt it
+     lives in (see [Code alongside the prose](#code-alongside-the-prose)), one
+     concrete worked example giving actual inputs, the intermediate states and
+     the output, the invariant the code maintains, and what breaks when that
+     invariant is violated. Add a mermaid flowchart for branching logic and a
+     mermaid state diagram for anything with lifecycle states.
+   - **Each constraint the strand has to respect,** including the failure mode
+     it closes or is exposed to, and what the code can and cannot prove as a
+     result. These are the paragraphs a reviewer most often disagrees with, so
+     they earn their space.
+   - **Each behaviour-preserving rewrite:** the argument a reader can check on
+     paper for why the two forms agree. Which conditions correspond, what the
+     boundary cases map to, what the empty or no-match case returns in each. A
+     test count or a property-check result is evidence that the argument holds;
+     it is not the argument, and a reviewer cannot re-derive it from a number.
+   - **Provenance and destination** for a value that crosses a boundary: where
+     it comes from and who consumes it, both named in backticks. "Closure state
+     written by a callback" leaves the reader unable to find either end;
+     "`selectBundle` discovers it during init and every later `ensureExtension`
+     call reads it" is checkable against the code.
+   - **The layout,** where the directory or module structure is itself a design
+     decision. A dependency graph is welcome. Where an artifact is written is
+     also a decision: name the path and the reason for that place.
+
+   Filing by strand makes coverage easy to lose: an item that had its own
+   section under an artifact-based layout has no obvious home under a
+   strand-based one, and it fails by disappearing silently rather than by
+   leaving an empty heading. Auditing this list is part of
+   [Closing checks](#closing-checks).
+4. **Interface changes.** Any user-visible change, with evidence. See
+   [Screenshots](#screenshots).
+5. **Decisions.** One bullet per real decision: what was chosen, the
+   alternative that was rejected, why, and what evidence would reverse it. A
+   decision with no rejected alternative is not a decision, it is narration:
+   cut it, or say plainly that the choice was arbitrary. Cite precedent per
+   [Citations](#citations).
+6. **Deliberately not handled.** Scope boundaries and known gaps, so the
+   reviewer does not spend attention rediscovering them.
+7. **Open questions.** Explicit asks for the reviewer, each answerable. A
+   change with genuinely no open question probably did not need a walkthrough.
+8. **Reading order.** Map each section to the `-guide.md` group numbers that
+   implement it, so the reviewer can go from a section straight to its code.
+9. **Sources.** The numbered reference list, present whenever the body cites
+    anything.
+
+### Diagrams
+
+Diagrams are expected, not optional. Prefer mermaid, which the published page
+renders natively, and pick the type from what the reader needs to conclude:
+
+| To show | Use |
+| --- | --- |
+| Architecture, module or directory dependencies | `flowchart` / `graph` |
+| Branching logic in an algorithm | `flowchart` |
+| Lifecycle or capability states | `stateDiagram-v2` |
+| An ordered exchange between components or processes | `sequenceDiagram` |
+| Data model or table relationships | `erDiagram` |
+
+Give every diagram a caption stating what to notice in it. A diagram the reader
+cannot draw a conclusion from is decoration: cut it. Draw the dependency or
+data-flow direction, and when a directory tree is the clearest form for a
+layout decision, a fenced tree is fine alongside the graph.
+
+#### Size every diagram, do not let the renderer decide
+
+A rendered diagram passes through **two** scalings before it reaches paper, and
+they multiply. Mermaid lays the diagram out inside its renderer's viewport
+(roughly 800px wide) and shrinks the whole drawing, type included, if it does
+not fit. The PDF tool then shrinks the resulting image again to the text block.
+Neither step is visible in the source, which is why an unsized diagram lands
+somewhere arbitrary: measured on this repo's own walkthrough, one diagram
+printed its labels at 3.2pt and another at 14.3pt, against 10.5pt body text.
+
+Control both, and neither needs a renderer to check.
+
+**1. Pin the type size in the source.** Put this line first inside every
+mermaid fence, changing only the config key to match the diagram type
+(`flowchart`, `sequence`, `state`, `er`):
+
+```
+%%{init: {'themeVariables': {'fontSize': '11px'}, 'flowchart': {'nodeSpacing': 25, 'rankSpacing': 25, 'padding': 4}}}%%
+```
+
+Measured, for a four-node vertical flowchart: mermaid's default prints labels
+at 14.3pt and fills 66% of the page; `fontSize: '11px'` prints at 9.7pt, and
+the spacing values bring it to 36%. Aim for labels a little under body text and
+a drawn height under half the text block. This is the part a reviewer can
+verify by inspection: the line is either there or it is not.
+
+**2. Keep the natural layout inside the viewport.** The pin sets the font, but
+it cannot survive the renderer's own shrink: a diagram too wide for the
+viewport is scaled down before the PDF tool ever sees it, so the two shrinks
+compound and the pinned size is silently lost. The same over-wide diagram
+printed at 3.2pt unpinned and still only 8.7pt pinned, squashed into a strip.
+Since you cannot render to check, keep the widest row inside these measured
+budgets:
+
+| Widest row | Labels | Natural width | Verdict |
+| --- | --- | --- | --- |
+| 1 node | any | 130-210pt | safe |
+| 2 nodes | up to ~20 chars | ~480pt | safe |
+| 3 nodes | up to ~20 chars | ~760pt | at the ceiling |
+| 4-5 nodes | short (<8 chars) | 580-670pt | at the ceiling |
+| 2 subgraphs side by side | any | 780pt+ | over: it will be squashed |
+
+So: **widest row of three, or two once labels run past about twenty
+characters.** Depth is cheap and width is not, so default to `flowchart TD` and
+use `LR` only for three or fewer short nodes. Never place two subgraphs side by
+side. Two disconnected components are also placed side by side, and an
+invisible `~~~` link between them stacks them instead.
+
+**3. Split rather than squeeze.** Two diagrams, each inside the budget, both
+read. One diagram carrying the same content does not. A before/after pair
+belongs in two fences.
+
+Two cautions from measuring this. `direction TB` inside a subgraph does not
+narrow a wide diagram; it changes the internal flow and nothing else, so the
+fix is always fewer nodes per row. And a `sequenceDiagram` is only legible with
+two participants: three already needs 650pt, five cannot fit at all, so express
+an ordering as a vertical flowchart instead.
+
+### Screenshots
+
+For any user-visible change, include a screenshot. Drive the app to the changed
+state and capture it. When capture is genuinely blocked, say so in one sentence
+and fall back to an ASCII wireframe of the changed surface. Blocked means
+blocked, not inconvenient: no browser automation available, an unrunnable local
+stack, or a flow gated behind a third-party credential the run does not hold.
+
+Save captures under `.difit/<stem>-walkthrough-assets/` and reference them
+with relative paths, so the links resolve from the markdown file itself.
+
+### Citations
+
+Where a decision, structure, or algorithm has academic or published precedent,
+cite it: the design pattern by name, the book, or the paper. Use IEEE style,
+bracketed numerals numbered by first appearance in the text, resolved in a
+final Sources section with a URL when one exists.
+
+Cite only what actually informed or names the decision. A citation that merely
+decorates a choice the author reached independently is padding, and padding
+costs the reviewer the trust that the real citations need.
+
+**Citations travel with their claim.** A restructure that leaves a supported
+claim unsupported has lowered the document's standard of evidence without anyone
+deciding to. Verifying that is part of the closing pass; see
+[Closing checks](#closing-checks).
+
+```markdown
+The loader memoizes the in-flight promise rather than the resolved value, so
+concurrent callers share one fetch [1], and the module keeps its cache private
+so callers cannot observe the difference [2].
+
+## 10. Sources
+
+[1] D. Michie, "Memo functions and machine learning", *Nature*, vol. 218,
+    pp. 19-22, 1968. https://doi.org/10.1038/218019a0
+[2] D. L. Parnas, "On the criteria to be used in decomposing systems into
+    modules", *Commun. ACM*, vol. 15, no. 12, pp. 1053-1058, 1972.
+    https://doi.org/10.1145/361598.361623
+```
+
+### Code alongside the prose
+
+Assume the reader has the printout and nothing else. No editor, no second
+window, no way to look up an identifier you name. So **when an explanation
+depends on code, put the code above the paragraph that explains it**, the way a
+technical article does: snippet first, then the prose that acts on it. A
+paragraph that says "the read is only valid after the `await getDb()` above it"
+is unreadable to someone who cannot see the lines in question.
+
+- **Quote the excerpt, not the unit.** Five to fifteen lines, trimmed to what
+  the paragraph is about. A whole function is a tour; the reader stops reading
+  tours.
+- **Point at the lines you mean** with the fence's highlight spec, so the eye
+  lands on the two lines the paragraph is about rather than scanning the block:
+
+  ````markdown
+  ```typescript {3,4}
+  const ensureExtension = (name: string) => {
+    const existing = extensionPromises.get(name);
+    const db = await getDb();
+    if (!shouldLoad({ hasPthreadWorker })) return false;
+    return loadIt(db, name);
+  };
+  ```
+  ````
+
+  This is the meta-string convention Docusaurus, Shiki and rehype-pretty-code
+  use, single lines and ranges both (`{2,4-6}`). MDX proper, meaning JSX inside
+  Markdown, is not supported: only the highlight spec is read.
+- **Never name a line by number in prose.** Describe the line by its content,
+  "the highlighted read of `hasPthreadWorker`", not "line 12". A spec and a
+  prose line number are two copies of one fact, and editing the snippet
+  invalidates one of them without warning. Verifying the spec itself lands on
+  the intended lines is part of the closing pass; see
+  [Closing checks](#closing-checks).
+- **The snippet is the subject, not the content.** After it, say the thing the
+  code cannot say: why the order matters, what breaks if it changes, which
+  caller depends on it. Never narrate it line by line.
+- **Elide with `...`** rather than including scaffolding the paragraph does not
+  discuss.
+- A snippet whose paragraph would survive its deletion should be deleted.
+- **A snippet buys you nothing on the "why".** It answers what the code is, and
+  never discharges the prose's duty to say why. When adding one forces a cut,
+  cut narration of the snippet, never the reasoning the snippet cannot show.
+  Compression around a new snippet is the most reliable way to lose the
+  provenance, the equivalence argument and the rejected alternative all at once.
+
+### Flow and orientation
+
+A section that is factually perfect and arrives from nowhere has failed. Being
+correct about an algorithm is worth nothing if the reader is still working out
+why they are reading about it. This is a prose problem, and the fix is
+structural, not more words.
+
+- **Open every section by locating it.** One sentence, before the subject:
+  which strand of the change this belongs to, and what question it answers.
+  Never open a section on its own subject.
+- **Earn the reader's arrival.** If a section follows from the one before,
+  say how. If it does not, say that: "this is independent of everything above,
+  and is here because it shipped in the same branch" orients better than
+  silence.
+- **Order sections by dependency,** so the context a section needs has always
+  already been read.
+- **Transitions are one sentence.** Flow is a property of structure, not of
+  length; a walkthrough that got longer to explain itself has usually got
+  worse.
+- **Check the structure by reading only the headings and each section's first
+  sentence.** That pass is part of [Closing checks](#closing-checks).
+
+### Closing checks
+
+Four passes over the finished draft, before handing it over. Each catches a
+class of defect that reading the document top to bottom does not.
+
+1. **Find every fact the document states twice, and confirm the copies agree.**
+   A walkthrough is full of deliberate duplication, and every instance of it is
+   somewhere a later edit can go stale silently. There is no lint for this: the
+   document stays valid Markdown and reads fine, and only the two copies
+   disagree. Known instances, all of which have bitten:
+
+   - A count in the prose against what the section actually lists. "Two
+     unrelated corrections rode along" above a section listing four.
+   - A highlight spec against the printed snippet. Count the snippet's lines and
+     confirm each number in the spec lands on the line you mean; an off-by-one
+     shades the wrong line and nothing else will tell you.
+   - A claim that carried a citation, after the sections moved. A shrinking
+     Sources list is the symptom.
+   - The strand map in Purpose against the sections delivered.
+   - A section cross-reference (`§4.2`) against where that content now lives.
+
+2. **Audit the coverage,** per the checklist in section 3 of
+   [Sections](#sections): walk it against every strand and confirm where each
+   item landed, saying so when an item does not apply.
+
+3. **Read only the headings and each section's first sentence.** If that alone
+   does not tell the story of the change, the structure is wrong, and no detail
+   inside the sections will fix it.
+
+4. **Look at the diagrams at print size,** per
+   [Size every diagram](#size-every-diagram-do-not-let-the-renderer-decide). A
+   diagram outside the budget is one to restructure, not to ship.
+
+### Rules
+
+- Target 1,200 to 3,000 words of prose. Hard cap 4,000, excluding diagrams,
+  code excerpts, and sources. Length tracks the number of ideas in the change,
+  never its file count.
+- Quote code as evidence for a claim, never as a tour: see
+  [Code alongside the prose](#code-alongside-the-prose).
+- Every rationale must stand on its own without the old code in view. "We used
+  to do X" fails; "do not do X, because Y" passes.
+- Name the uncertain calls. Where the author was unsure, or the decision was
+  close, say so: that is where reviewer attention pays best.
+- Never restate the diff, never narrate file by file, and never explain a
+  function whose name already does.
+- No em dashes.
+
 ## Chat output
 
 After Initial and manual Continue rounds, send one raw-markdown navigation
@@ -519,6 +850,41 @@ Summary mode is read-only and explicit-only.
 4. Output only the summary block.
 
 Do not write artifacts, source files, commits, or comments in Summary mode.
+
+### Walkthrough
+
+Selected only by an explicit request. Read-only with respect to source.
+
+1. Resolve the artifacts for the selected comparison. Require `-guide.md` and
+   `-guide.json`; when either is absent, run Initial first, because the
+   walkthrough cites group numbers.
+2. Start from what `.difit/` already holds, then go past it. The guide's
+   grouping and file tags, the transcript's threads, `-summary.md`,
+   `-test-plan.md`, and any `<branch>_explanations.md` are a prepared map of
+   this diff: read them first to orient, and to avoid re-deriving conclusions
+   an earlier round already reached. None of it is required content and none of
+   it is authoritative. Verify anything you carry forward against the code, and
+   treat a disagreement between an artifact and the code as a finding worth
+   stating.
+3. Read the full diff, then read the surrounding code the diff calls into and
+   is called from. The walkthrough describes the system as it now stands, so
+   unchanged collaborators are in scope for understanding even though they are
+   out of scope for review.
+4. Capture screenshots for user-visible changes, per
+   [Screenshots](#screenshots).
+5. Where a decision's rationale is not recoverable from the code, say so
+   rather than inventing one, and add it to Open questions.
+6. Write `-walkthrough.md`. Do not touch the transcript, the guides, the
+   reviewed state, or any source file.
+7. Report the section count and the prose word count, then end the response
+   with a table naming the walkthrough. One row is expected; the table is
+   there so the path stands out at the end of a long reply.
+
+   ```markdown
+   | Walkthrough | Location |
+   | --- | --- |
+   | <the document's H1 title> | `.difit/<stem>-walkthrough.md` |
+   ```
 
 ### Cleanup
 

@@ -42,9 +42,9 @@ function _getOperationalCopy(options: {
   }
   if (operationalState.type === "spatialUnavailable") {
     return {
-      title: i18n._(msg`Spatial is unavailable`),
+      title: i18n._(msg`Geometry support is unavailable`),
       body: i18n._(
-        msg`The layer configuration is saved. Retry after connectivity or the Spatial extension becomes available.`,
+        msg`The layer configuration is saved. Try again once your connection is back, or reload the page.`,
       ),
       showRetry: true,
     };

@@ -19,6 +19,7 @@ import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptModel } from "$/models/ontology/Concept/Concept.types";
@@ -97,7 +98,7 @@ function _makeDataset(tableName: string): DatasetModel["Read"] {
 function _makeColumn(args: {
   id: string;
   name: string;
-  dataType?: string;
+  dataType?: AvaDataType.T;
   aggregation?: QueryAggregationTypeT;
 }): QueryColumnRead {
   return Model.make("QueryColumn", {
@@ -129,7 +130,7 @@ function _makeConcept(): ConceptModel["Read"] {
 function _makeConceptAttributeColumn(args: {
   id: string;
   name: string;
-  dataType?: string;
+  dataType?: AvaDataType.T;
   aggregation?: QueryAggregationTypeT;
 }): QueryColumnRead {
   return Model.make("QueryColumn", {

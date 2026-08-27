@@ -2,7 +2,7 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import { useDetectedSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability/useDuckDbSpatialAvailability";
+import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
@@ -49,13 +49,17 @@ function _getSpatialDescription(
   availability: DuckDbSpatialAvailability,
 ): string | undefined {
   if (availability === "loading") {
+    // "geometry support", not "DuckDB Spatial": the engine's name means
+    // nothing to the person reading this. And "downloading", not "loading",
+    // because the wait is a ~6MB fetch from a CDN, long enough on a slow
+    // connection that a dimmed option with no explanation reads as broken.
     return i18n._(
-      msg`Geometry columns are available when Spatial finishes loading.`,
+      msg`Geometry support is still downloading. This can take a moment on a slow connection.`,
     );
   }
   if (availability === "unavailable") {
     return i18n._(
-      msg`Geometry columns need DuckDB Spatial, which is unavailable.`,
+      msg`These options need geometry support, which could not be loaded.`,
     );
   }
   return undefined;
@@ -183,10 +187,10 @@ export function GeometryBindingTypeSelect({
   onLayerChange,
 }: Props): ReactNode {
   const { t, i18n } = useLingui();
-  // Reading the capability here also starts detection: the spatial options
-  // below stay disabled until it resolves, and on a map with no spatial layer
-  // nothing else would ever ask.
-  const availability = useDetectedSpatialAvailability();
+  // Read only: `GisApp` requests the extension when the map opens, which is
+  // always before this control can be reached, so the options below have the
+  // whole time the user spends opening the inspector to become selectable.
+  const availability = useDuckDbSpatialAvailability();
   return (
     <Select
       label={t`Geometry`}

@@ -58,7 +58,7 @@ describe("BufferMapTool", () => {
 
     expect(
       screen.getByRole("button", {
-        name: "Buffer around a layer. This tool needs DuckDB Spatial, which is unavailable.",
+        name: "Buffer around a layer. This tool needs geometry support, which could not be loaded.",
       }),
     ).toHaveAttribute("aria-disabled", "true");
   });

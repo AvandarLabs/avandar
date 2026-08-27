@@ -29,9 +29,13 @@ function _spatialUnavailableReason(
   availability: DuckDbSpatialAvailability,
 ): string {
   if (availability === "loading") {
-    return i18n._(msg`This tool is available when Spatial finishes loading.`);
+    return i18n._(
+      msg`This tool turns on when geometry support finishes downloading.`,
+    );
   }
-  return i18n._(msg`This tool needs DuckDB Spatial, which is unavailable.`);
+  return i18n._(
+    msg`This tool needs geometry support, which could not be loaded.`,
+  );
 }
 
 /** Area tool: available only while DuckDB Spatial can run GIS queries. */

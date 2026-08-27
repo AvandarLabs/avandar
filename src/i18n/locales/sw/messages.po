@@ -2431,11 +2431,6 @@ msgstr "Kamili"
 msgid "Discard"
 msgstr "Tupa"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool is available when Spatial finishes loading."
-msgstr "Zana hii itapatikana Spatial itakapomaliza kupakia."
-
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "Ramani ya msingi yenye giza au ya satelaiti inaweza kunakiliwa vibaya "
@@ -2637,12 +2632,6 @@ msgstr "PDF imeshukuliwa."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "Kitambulisho cha eneo la kazi"
-
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "The layer configuration is saved. Retry after connectivity or the "
-"Spatial extension becomes available."
-msgstr "Usanidi wa tabaka umehifadhiwa. Jaribu tena baada ya muunganisho au "
-"kiendelezi cha Spatial kupatikana."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -2860,6 +2849,12 @@ msgstr "seti yako ya data"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "Rangi moja"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "Geometry support is still downloading. This can take a moment on a slow "
+"connection."
+msgstr "Usaidizi wa jiometri bado unapakuliwa. Hii inaweza kuchukua muda kwa "
+"muunganisho wa polepole."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3446,6 +3441,12 @@ msgstr "Data yako imefupishwa"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Pengo la ndani"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "The layer configuration is saved. Try again once your connection is "
+"back, or reload the page."
+msgstr "Mipangilio ya safu imehifadhiwa. Jaribu tena muunganisho utakaporejea, "
+"au upakie upya ukurasa."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -4142,11 +4143,6 @@ msgstr "Hakuna faili iliyochaguliwa"
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Submit"
 msgstr "Wasilisha"
-
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr "Zana hii inahitaji DuckDB Spatial, ambayo haipatikani."
 
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
@@ -5077,10 +5073,6 @@ msgstr "Pata jumla ya thamani"
 msgid "Type your answer..."
 msgstr "Andika jibu lako..."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns are available when Spatial finishes loading."
-msgstr "Safu wima za jiometri zinapatikana Spatial inapomaliza kupakia."
-
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
 msgstr "Ingiza"
@@ -5133,6 +5125,10 @@ msgstr "Kutoka nje kumeshindikana"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
 msgstr "Umepata kuunganishwa kwa {0} kwa mafanikio"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "Geometry support is unavailable"
+msgstr "Usaidizi wa jiometri haupatikani"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -6099,6 +6095,10 @@ msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "Anza kwa kuchunguza eneo lako la kazi au kupakia dataset yako ya "
 "kwanza."
 
+#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
+msgid "Geometry support unavailable"
+msgstr "Usaidizi wa jiometri haupatikani"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
 msgstr "Zilizopangwa kwa tabaka"
@@ -6271,10 +6271,6 @@ msgstr "Kikomo cha dashibodi zilizoshirikiwa kimefikiwa"
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "Bafa ya {sourceName}"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-msgstr "Safu wima za jiometri zinahitaji DuckDB Spatial, ambayo haipatikani."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -6658,6 +6654,11 @@ msgstr "Mfano wa mazungumzo ya mtandaoni uko tayari"
 msgid "Column description updated successfully!"
 msgstr "Maelezo ya safu yameboreshwa kwa mafanikio!"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs geometry support, which could not be loaded."
+msgstr "Zana hii inahitaji usaidizi wa jiometri, ambao haukuweza kupakiwa."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "Hifadhi mabadiliko yako kwanza: PDF inaonyesha dashibodi "
@@ -6976,6 +6977,10 @@ msgid "Welcome to your data source manager. Pick a CSV or Excel file from your "
 msgstr "Karibu kwenye kidhibiti chako cha chanzo cha data. Chagua faili la CSV "
 "au Excel kutoka kwenye kompyuta yako. Huna lahajedwali tayari? <0>Pakua "
 "sampuli yetu</0> na uitumie."
+
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+msgid "Geometry unavailable"
+msgstr "Jiometri haipatikani"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
@@ -7504,6 +7509,11 @@ msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
 msgstr "Workspace hii haipo tena au umeondolewa kwenye ufikiaji wake. Ikiwa "
 "unafikiri hili ni kosa, wasiliana na mmiliki wa workspace."
+
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool turns on when geometry support finishes downloading."
+msgstr "Zana hii inawaka usaidizi wa jiometri unapomaliza kupakuliwa."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
@@ -8700,10 +8710,6 @@ msgstr "Imechaguliwa kutokana na tulichogundua. Ibadilishe ikiwa haijasomeka "
 msgid "Delete user group"
 msgstr "Futa kikundi cha mtumiaji"
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-msgid "Spatial unavailable"
-msgstr "Spatial haipatikani"
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
 msgstr "Ipe dashibodi jina, kisha iunde."
@@ -9009,6 +9015,10 @@ msgstr "Ili kuthibitisha, andika <0>{confirmationTarget}</0> hapa chini:"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} na {groupClause}"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "These options need geometry support, which could not be loaded."
+msgstr "Chaguo hizi zinahitaji usaidizi wa jiometri, ambao haukuweza kupakiwa."
+
 #: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
@@ -9097,11 +9107,6 @@ msgstr "Inapakia..."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
 msgstr "Haijaripotiwa"
-
-#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "Spatial is unavailable"
-msgstr "Spatial haipatikani"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

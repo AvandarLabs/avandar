@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeSourceCrsTransformFromGeometrySql } from "./makeSourceCrsTransformFromGeometrySql";
+import { makeSourceCrsTransformFromGeometrySql } from "../makeSourceCrsTransformFromGeometrySql";
 
 describe("makeSourceCrsTransformFromGeometrySql", () => {
   it("leaves geometry unchanged when the source CRS is unset", () => {

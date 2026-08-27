@@ -68,6 +68,8 @@ export type DuckDbLoadParquetOptions = {
 export type DuckDbClientOperations = {
   closeConnection: (conn: duckdb.AsyncDuckDBConnection) => Promise<void>;
   connect: () => Promise<duckdb.AsyncDuckDBConnection>;
+  /** Loads the `excel` extension `read_xlsx` needs. Fetched once per page. */
+  ensureExcel: () => Promise<boolean>;
   dropTableViewAndFile: (
     options: Readonly<{
       tableOrViewName: string;
