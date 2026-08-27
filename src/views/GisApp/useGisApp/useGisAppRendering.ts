@@ -7,11 +7,11 @@ import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegen
 import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
 import { useMapLayersData } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
-import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
-import type { GisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
+import type { GisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 
 /** Collects already-loaded spatial FeatureCollections, keyed by layer. */
 function _getSpatialFeatureCollections(

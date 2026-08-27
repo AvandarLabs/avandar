@@ -21,9 +21,11 @@ function _buildCsvField(value: unknown): string {
     return "";
   }
   const text =
-    typeof value === "string" ? value
-    : typeof value === "number" || typeof value === "boolean" ? `${value}`
-    : (JSON.stringify(value) ?? "");
+    typeof value === "string"
+      ? value
+      : typeof value === "number" || typeof value === "boolean"
+        ? `${value}`
+        : (JSON.stringify(value) ?? "");
 
   if (text === "" || QUOTE_REQUIRED_PATTERN.test(text)) {
     return `"${text.replaceAll('"', '""')}"`;

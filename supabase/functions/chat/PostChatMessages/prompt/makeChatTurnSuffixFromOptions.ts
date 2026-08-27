@@ -19,8 +19,8 @@ function formatResultColumns(
       return `- ${column.name} (${column.dataType})`;
     })
     .join("\n");
-  return lines ?
-      `The user is currently looking at a result with these columns:\n${lines}`
+  return lines
+    ? `The user is currently looking at a result with these columns:\n${lines}`
     : "";
 }
 
@@ -46,7 +46,7 @@ export function makeChatTurnSuffixFromOptions(
   ].filter((section) => {
     return section.length > 0;
   });
-  return sections.length === 0 ?
-      ""
+  return sections.length === 0
+    ? ""
     : `[Turn context]\n${sections.join("\n\n")}`;
 }

@@ -156,14 +156,16 @@ export function DatasetParseControls({
     .with({ sourceType: "pdf_file" }, (pdfProps) => {
       // What a PDF import is parameterised by is chosen on the page itself,
       // which needs the file. Without it there is nothing to draw on.
-      return sourceFile ?
-          <PdfParseControls
-            sourceFile={sourceFile}
-            metadata={pdfProps}
-            onDataSourceMetadataChange={onDataSourceMetadataChange}
-            onRequestDataReparse={onRequestDataReparse}
-          />
-        : <></>;
+      return sourceFile ? (
+        <PdfParseControls
+          sourceFile={sourceFile}
+          metadata={pdfProps}
+          onDataSourceMetadataChange={onDataSourceMetadataChange}
+          onRequestDataReparse={onRequestDataReparse}
+        />
+      ) : (
+        <></>
+      );
     })
     .with({ sourceType: "google_sheets" }, (googleSheetsProps) => {
       const { parseOptions, datasetLoadResult } = googleSheetsProps;

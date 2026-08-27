@@ -1,8 +1,8 @@
 import { createUsePuck } from "@puckeditor/core";
+import { useMemo } from "react";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
-import { useMemo } from "react";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { VizConfigContent } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
@@ -63,16 +63,16 @@ export function VizConfigPField({
     query: emptyStructuredQuery,
     rawSql: rawSql,
     analyticsSurface: "viz_config",
-    ...(workspaceId !== undefined ?
-      {
-        auth: "workspace" as const,
-        workspaceId,
-      }
-    : {
-        auth: "public" as const,
-        publicAvaPageId: dashboardId,
-        snapshotRevision,
-      }),
+    ...(workspaceId !== undefined
+      ? {
+          auth: "workspace" as const,
+          workspaceId,
+        }
+      : {
+          auth: "public" as const,
+          publicAvaPageId: dashboardId,
+          snapshotRevision,
+        }),
   });
 
   return (

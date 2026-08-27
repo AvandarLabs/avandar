@@ -70,11 +70,11 @@ function ForgotPasswordPage() {
     >
       <form onSubmit={onFormSubmit}>
         <Stack>
-          {!isOnline ?
+          {!isOnline ? (
             <Alert color="yellow" variant="light">
               <Trans>Password reset requires an internet connection.</Trans>
             </Alert>
-          : null}
+          ) : null}
           <TextInput
             label={t`Email`}
             name="email"

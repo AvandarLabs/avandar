@@ -19,14 +19,12 @@ export function getNuxTourStepAfterTransition(options: {
   stepCount: number;
 }): NuxTourStepAfterTransition {
   const nextIndex =
-    options.action === "prev" ?
-      options.currentIndex - 1
-    : options.currentIndex + 1;
-  return (
-      options.action === "close" ||
-        options.action === "skip" ||
-        nextIndex >= options.stepCount
-    ) ?
-      { kind: "close" }
+    options.action === "prev"
+      ? options.currentIndex - 1
+      : options.currentIndex + 1;
+  return options.action === "close" ||
+    options.action === "skip" ||
+    nextIndex >= options.stepCount
+    ? { kind: "close" }
     : { kind: "goToStep", index: nextIndex };
 }

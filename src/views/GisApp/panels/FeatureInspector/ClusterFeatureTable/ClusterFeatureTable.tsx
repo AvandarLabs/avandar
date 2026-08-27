@@ -9,8 +9,8 @@ import {
   CLUSTER_LEAVES_PAGE_SIZE,
   useClusterLeavesPage,
 } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/useClusterLeavesPage/useClusterLeavesPage";
-import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { ReactNode, RefObject } from "react";
 
@@ -72,20 +72,21 @@ export function ClusterFeatureTable({
           {t`Zoom to cluster`}
         </Button>
       </Group>
-      {zoomError ?
+      {zoomError ? (
         <Text c="red" size="xs" px="sm" pb="xs">
           {t`Could not zoom to this cluster.`}
         </Text>
-      : null}
-      {pageState.status === "loading" ?
+      ) : null}
+      {pageState.status === "loading" ? (
         <Group justify="center" p="md">
           <Loader role="status" aria-label={t`Loading features`} size="sm" />
         </Group>
-      : pageState.status === "error" ?
+      ) : pageState.status === "error" ? (
         <Text c="red" size="sm" p="md">
           {t`Could not load this cluster's features.`}
         </Text>
-      : <ClusterFeatureTableBody
+      ) : (
+        <ClusterFeatureTableBody
           leaves={pageState.leaves}
           layer={layer}
           page={page}
@@ -93,7 +94,7 @@ export function ClusterFeatureTable({
           onPageChange={setPage}
           onRowClick={onRowClick}
         />
-      }
+      )}
     </div>
   );
 }

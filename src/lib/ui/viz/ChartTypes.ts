@@ -1,6 +1,6 @@
-import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
+import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 
 /**
  * Common props for XY charts (bar / line / area). Each chart wrapper

@@ -9,16 +9,16 @@ import {
   makeRoleGroupIdFromAcceptedInvite,
   WorkspaceInviteRoleOverrideSchema,
 } from "@sbfn/workspaces/makeRoleGroupIdFromAcceptedInvite/makeRoleGroupIdFromAcceptedInvite.ts";
+import { z } from "zod";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
-import { z } from "zod";
-import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
 import type {
   AppType,
   RoleLevel,
 } from "$/models/Permissions/Permissions.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
 
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;
@@ -201,12 +201,12 @@ export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
             }),
           );
           const mergedMatrix =
-            (roleOverrides ?? []).length === 0 ?
-              baseMatrix
-            : Permissions.RolesMatrix.applyRoleOverridesToMatrix(
-                baseMatrix,
-                roleOverrides ?? [],
-              );
+            (roleOverrides ?? []).length === 0
+              ? baseMatrix
+              : Permissions.RolesMatrix.applyRoleOverridesToMatrix(
+                  baseMatrix,
+                  roleOverrides ?? [],
+                );
           const inviteRoleMirror =
             mergedMatrix.settings === "admin" ? "admin" : "member";
 

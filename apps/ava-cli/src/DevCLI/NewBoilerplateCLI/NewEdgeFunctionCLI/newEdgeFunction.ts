@@ -180,13 +180,20 @@ export function writeEdgeFunctionTemplateFiles(
 }
 
 /**
- * Runs Prettier on a file via the repo toolchain.
+ * Runs the repo's formatter for this file's language: Prettier owns SQL,
+ * oxfmt owns everything else.
+ *
+ * oxfmt needs `--ignore-path .oxfmtignore`; left to its defaults it reads
+ * `.prettierignore`, which is now `*`, and would format nothing.
  */
-export function formatFileWithRepoPrettier(options: {
+export function formatGeneratedFile(options: {
   projectRoot: string;
   filePath: string;
 }): void {
-  execSync(`pnpm exec prettier --write "${options.filePath}"`, {
+  const formatter = options.filePath.endsWith(".sql")
+    ? `pnpm exec prettier --write "${options.filePath}"`
+    : `pnpm exec oxfmt --ignore-path .oxfmtignore "${options.filePath}"`;
+  execSync(formatter, {
     cwd: options.projectRoot,
     stdio: "pipe",
   });
@@ -240,18 +247,18 @@ export function setEdgeFunctionVerifyJWTInConfigTOML(options: {
     _isTOMLSectionHeaderLine,
   );
   const sectionEnd =
-    nextSectionRelativeIndex === -1 ?
-      lines.length
-    : sectionStart + 1 + nextSectionRelativeIndex;
+    nextSectionRelativeIndex === -1
+      ? lines.length
+      : sectionStart + 1 + nextSectionRelativeIndex;
 
   const sectionBody = lines.slice(sectionStart + 1, sectionEnd);
   const verifyJWTRelativeIndex = sectionBody.findIndex((line) => {
     return /^\s*verify_jwt\s*=/.test(line);
   });
   const verifyJWTLineIndex =
-    verifyJWTRelativeIndex === -1 ? -1 : (
-      sectionStart + 1 + verifyJWTRelativeIndex
-    );
+    verifyJWTRelativeIndex === -1
+      ? -1
+      : sectionStart + 1 + verifyJWTRelativeIndex;
 
   if (verifyJWTLineIndex !== -1) {
     lines[verifyJWTLineIndex] = lines[verifyJWTLineIndex]!.replace(
@@ -263,9 +270,9 @@ export function setEdgeFunctionVerifyJWTInConfigTOML(options: {
       return /^\s*enabled\s*=/.test(line);
     });
     const insertAt =
-      enabledRelativeIndex === -1 ?
-        sectionStart + 1
-      : sectionStart + 1 + enabledRelativeIndex + 1;
+      enabledRelativeIndex === -1
+        ? sectionStart + 1
+        : sectionStart + 1 + enabledRelativeIndex + 1;
 
     lines.splice(insertAt, 0, "verify_jwt = false");
   }
@@ -327,11 +334,11 @@ export function runNewEdgeFunction(options: RunNewEdgeFunctionOptions): void {
     "http-api.types.ts",
   );
   updateHTTPAPITypes({ httpAPITypesPath, functionName });
-  formatFileWithRepoPrettier({
+  formatGeneratedFile({
     projectRoot,
     filePath: httpAPITypesPath,
   });
-  formatFileWithRepoPrettier({
+  formatGeneratedFile({
     projectRoot,
     filePath: rootDenoJSONPath,
   });

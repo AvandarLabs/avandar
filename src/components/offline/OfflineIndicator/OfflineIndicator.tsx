@@ -9,11 +9,11 @@ import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 export function OfflineIndicator(): JSX.Element | null {
   const isOnline = useIsOnline();
   return isOnline ? null : (
-      <Group gap={4} wrap="nowrap" aria-live="polite">
-        <IconWifiOff size={14} stroke={1.5} aria-hidden />
-        <Text size="xs" c="dimmed" fw={500}>
-          <Trans>You are offline</Trans>
-        </Text>
-      </Group>
-    );
+    <Group gap={4} wrap="nowrap" aria-live="polite">
+      <IconWifiOff size={14} stroke={1.5} aria-hidden />
+      <Text size="xs" c="dimmed" fw={500}>
+        <Trans>You are offline</Trans>
+      </Text>
+    </Group>
+  );
 }

@@ -1,5 +1,5 @@
-import { buildCsvFromDatastoreRecords } from "$/open-data/buildCsvFromDatastoreRecords.ts";
 import { describe, expect, it } from "vitest";
+import { buildCsvFromDatastoreRecords } from "$/open-data/buildCsvFromDatastoreRecords.ts";
 import type { CkanDatastoreField } from "$/open-data/CkanClient/CkanClient.types.ts";
 
 function _fields(...ids: readonly string[]): CkanDatastoreField[] {

@@ -13,7 +13,7 @@ export function ImportStatusCallout({
   failureTitle,
   failureMessage,
 }: Readonly<Props>): ReactNode {
-  return numRows === 0 ?
-      <Callout title={failureTitle} color="error" message={failureMessage} />
-    : null;
+  return numRows === 0 ? (
+    <Callout title={failureTitle} color="error" message={failureMessage} />
+  ) : null;
 }

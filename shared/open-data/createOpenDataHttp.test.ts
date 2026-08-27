@@ -1,5 +1,5 @@
-import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
 import { describe, expect, it, vi } from "vitest";
+import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
 import type { FetchLike } from "$/open-data/createOpenDataHttp.ts";
 
 const URL_UNDER_TEST =

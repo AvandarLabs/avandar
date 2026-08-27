@@ -1,5 +1,5 @@
-import { renderFilterGroup } from "$/models/queries/StructuredQuery/renderFilterGroup/renderFilterGroup.ts";
 import { describe, expect, it } from "vitest";
+import { renderFilterGroup } from "$/models/queries/StructuredQuery/renderFilterGroup/renderFilterGroup.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 const TEXT_RULE = {

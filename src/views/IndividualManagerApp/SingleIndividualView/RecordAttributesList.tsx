@@ -35,9 +35,9 @@ export function RecordAttributesList({ attributes }: Props): ReactNode {
           <div key={attribute.name} role="listitem" className={css.field}>
             <Text size="xs" c="dimmed">
               {attribute.name}
-              {attribute.sourceName ?
+              {attribute.sourceName ? (
                 <span className={css.source}> · {attribute.sourceName}</span>
-              : null}
+              ) : null}
             </Text>
             <Text className={css.value}>
               {unknownToString(attribute.value)}

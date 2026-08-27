@@ -12,11 +12,14 @@ import type { UnionToIntersection } from "type-fest";
  * an array is not one. That branch names the key type directly instead.
  */
 type DexieModelTable<M extends DexieCrudModelSpec> =
-  M["modelPrimaryKey"] extends readonly string[] ?
-    Table<M["DBRead"], M["modelPrimaryKeyType"] & IndexableType, M["DBRead"]>
-  : M["modelPrimaryKey"] extends keyof M["DBRead"] ?
-    EntityTable<M["DBRead"], M["modelPrimaryKey"]>
-  : EntityTable<M["DBRead"], Extract<M["modelPrimaryKey"], keyof M["DBRead"]>>;
+  M["modelPrimaryKey"] extends readonly string[]
+    ? Table<M["DBRead"], M["modelPrimaryKeyType"] & IndexableType, M["DBRead"]>
+    : M["modelPrimaryKey"] extends keyof M["DBRead"]
+      ? EntityTable<M["DBRead"], M["modelPrimaryKey"]>
+      : EntityTable<
+          M["DBRead"],
+          Extract<M["modelPrimaryKey"], keyof M["DBRead"]>
+        >;
 
 /**
  * A record of Dexie tables representing CRUD models.
@@ -28,11 +31,11 @@ type DexieModelTableRecord<M extends DexieCrudModelSpec> = UnionToIntersection<
   // model name is associated to its correct model type, rather than being a
   // union of all model types.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  M extends any ?
-    {
-      [K in M["modelName"]]: DexieModelTable<M>;
-    }
-  : never
+  M extends any
+    ? {
+        [K in M["modelName"]]: DexieModelTable<M>;
+      }
+    : never
 >;
 
 /**
@@ -76,59 +79,59 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
   // it will get distributed. This will keep the union discriminated rather than
   // merged into one single object with each key unioned.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DBSchema extends any ?
-    {
-      /** The base unconfigured Dexie DB */
-      db: Dexie;
+  DBSchema extends any
+    ? {
+        /** The base unconfigured Dexie DB */
+        db: Dexie;
 
-      /** The version of the Dexie DB to register */
-      version: DBSchema["version"];
+        /** The version of the Dexie DB to register */
+        version: DBSchema["version"];
 
-      /** The models to register */
-      models: {
-        [M in DBSchema["models"][number] as M["modelName"]]: {
-          /**
-           * The primary key for this historical schema version. A model can
-           * be re-keyed in a later version, while older registrations must
-           * preserve their original key to let Dexie run the upgrade.
-           */
-          primaryKey: DBSchemaPrimaryKey<M>;
-          /**
-           * Additional columns to index. The primary key column does not have
-           * to be specified here. If it is, it'll just get ignored. Primary
-           * keys are indexed automatically.
-           */
-          columnsToIndex?: Array<keyof M["DBRead"]>;
+        /** The models to register */
+        models: {
+          [M in DBSchema["models"][number] as M["modelName"]]: {
+            /**
+             * The primary key for this historical schema version. A model can
+             * be re-keyed in a later version, while older registrations must
+             * preserve their original key to let Dexie run the upgrade.
+             */
+            primaryKey: DBSchemaPrimaryKey<M>;
+            /**
+             * Additional columns to index. The primary key column does not have
+             * to be specified here. If it is, it'll just get ignored. Primary
+             * keys are indexed automatically.
+             */
+            columnsToIndex?: Array<keyof M["DBRead"]>;
+          };
         };
-      };
 
-      /**
-       * Names of object stores to physically delete in this version.
-       *
-       * `models` can only create or re-index a store, so a store whose
-       * *primary key* changed cannot be expressed there. IndexedDB cannot
-       * re-key a store in place and Dexie aborts the entire upgrade with
-       * "Not yet support for changing primary key" when it sees one. Naming a
-       * store here emits a `null` entry in Dexie's `stores()` spec, which is
-       * how Dexie is told to drop the physical store.
-       *
-       * Dexie cannot drop and recreate the same store within a single
-       * version, so a re-key takes two versions: delete the store here, then
-       * declare it again under `models` in the NEXT version.
-       *
-       * Every row in a deleted store is destroyed, so only delete stores
-       * whose contents can be derived again (for example a download cache).
-       */
-      modelsToDelete?: readonly string[];
+        /**
+         * Names of object stores to physically delete in this version.
+         *
+         * `models` can only create or re-index a store, so a store whose
+         * *primary key* changed cannot be expressed there. IndexedDB cannot
+         * re-key a store in place and Dexie aborts the entire upgrade with
+         * "Not yet support for changing primary key" when it sees one. Naming a
+         * store here emits a `null` entry in Dexie's `stores()` spec, which is
+         * how Dexie is told to drop the physical store.
+         *
+         * Dexie cannot drop and recreate the same store within a single
+         * version, so a re-key takes two versions: delete the store here, then
+         * declare it again under `models` in the NEXT version.
+         *
+         * Every row in a deleted store is destroyed, so only delete stores
+         * whose contents can be derived again (for example a download cache).
+         */
+        modelsToDelete?: readonly string[];
 
-      /**
-       * The upgrader function to run when the Dexie DB is upgraded.
-       * Refer to Dexie's Database Versioning docs for more information.
-       * @see {@link https://dexie.org/docs/Tutorial/Design#database-versioning Dexie Database Versioning}
-       */
-      upgrader?: (tx: Transaction) => Promise<void> | void;
-    }
-  : never;
+        /**
+         * The upgrader function to run when the Dexie DB is upgraded.
+         * Refer to Dexie's Database Versioning docs for more information.
+         * @see {@link https://dexie.org/docs/Tutorial/Design#database-versioning Dexie Database Versioning}
+         */
+        upgrader?: (tx: Transaction) => Promise<void> | void;
+      }
+    : never;
 
 type GenericDexieDBSchema = {
   version: number;
@@ -169,11 +172,8 @@ type DexieDBVersionManager<
    * @returns The Dexie DB version configuration.
    */
   defineVersion: <
-    VersionNum extends keyof DBSchemaRegistry extends (
-      `v${infer V extends number}`
-    ) ?
-      V
-    : never,
+    VersionNum extends
+      (keyof DBSchemaRegistry extends `v${infer V extends number}` ? V : never),
     DBSchema extends DBSchemaRegistry[`v${VersionNum}`] =
       DBSchemaRegistry[`v${VersionNum}`],
   >(
@@ -202,9 +202,8 @@ function _getDexieTableDefinition(
   }>,
 ): string {
   const isCompoundKey = Array.isArray(options.primaryKey);
-  const primaryKeySpec =
-    isCompoundKey ?
-      `[${(options.primaryKey as readonly string[]).join("+")}]`
+  const primaryKeySpec = isCompoundKey
+    ? `[${(options.primaryKey as readonly string[]).join("+")}]`
     : `&${options.primaryKey as string}`;
   const columnsWithoutPrimaryKey = options.columnsToIndex.filter(
     (columnName) => {

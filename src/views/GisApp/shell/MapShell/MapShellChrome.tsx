@@ -49,9 +49,9 @@ export function MapShellChrome({
           <div className={css.mapShellTopBar} ref={topBarRef}>
             {topBar}
           </div>
-          {firstRunCard ?
+          {firstRunCard ? (
             <div className={css.mapShellFirstRun}>{firstRunCard}</div>
-          : null}
+          ) : null}
           <div className={css.mapShellLeftColumn} ref={leftColumnRef}>
             {layerPanel}
           </div>

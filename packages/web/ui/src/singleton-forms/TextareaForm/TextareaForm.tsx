@@ -153,17 +153,17 @@ export function TextareaForm({
         ])}
         {...moreTextareaProps}
       />
-      {showSubmitButton ?
+      {showSubmitButton ? (
         <Button
           type="submit"
           form={formId}
           loading={isSubmitting}
           onClick={
-            asField ?
-              () => {
-                onFormSubmit();
-              }
-            : undefined
+            asField
+              ? () => {
+                  onFormSubmit();
+                }
+              : undefined
           }
           disabled={
             isSubmitting ||
@@ -176,12 +176,12 @@ export function TextareaForm({
             {shortcutText}
           </Text>
         </Button>
-      : null}
-      {showCancelButton ?
+      ) : null}
+      {showCancelButton ? (
         <Button variant="default" onClick={onCancel}>
           {resolvedCancelLabel}
         </Button>
-      : null}
+      ) : null}
     </Group>
   );
 

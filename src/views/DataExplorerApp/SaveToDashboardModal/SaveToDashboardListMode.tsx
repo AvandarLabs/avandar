@@ -85,15 +85,16 @@ export function SaveToDashboardListMode({
         aria-label={t`Search dashboards`}
       />
 
-      {isLoading ?
+      {isLoading ? (
         <Group justify="center" py="lg">
           <Loader size="sm" />
         </Group>
-      : filteredDashboards.length === 0 ?
+      ) : filteredDashboards.length === 0 ? (
         <Text size="sm" c="dimmed" className={css.emptyFilter}>
           <Trans>No dashboards match &ldquo;{searchQuery}&rdquo;.</Trans>
         </Text>
-      : <div role="listbox" aria-label={t`Dashboards`} className={css.list}>
+      ) : (
+        <div role="listbox" aria-label={t`Dashboards`} className={css.list}>
           {filteredDashboards.map((dashboard) => {
             const isSelected = dashboard.id === selectedDashboardId;
             return (
@@ -122,14 +123,14 @@ export function SaveToDashboardListMode({
                     Updated {formatDashboardDate(dashboard.updatedAt, i18n)}
                   </Trans>
                 </Text>
-                {isSelected ?
+                {isSelected ? (
                   <IconCheck size={16} stroke={2} className={css.rowCheck} />
-                : null}
+                ) : null}
               </UnstyledButton>
             );
           })}
         </div>
-      }
+      )}
 
       <Group justify="space-between" mt="xs">
         <Button

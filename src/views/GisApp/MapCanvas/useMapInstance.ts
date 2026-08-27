@@ -4,13 +4,13 @@ import { useAttachMapInstance } from "@/views/GisApp/MapCanvas/useAttachMapInsta
 import { useLatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import { useMapInstanceRefs } from "@/views/GisApp/MapCanvas/useMapInstanceRefs";
 import { useMapWindowResize } from "@/views/GisApp/MapCanvas/useMapWindowResize/useMapWindowResize";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type {
   MapClusterClickHandler,
   MapFeatureClickHandler,
 } from "@/views/GisApp/MapCanvas/useLatestMapValues";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { RefObject } from "react";
 

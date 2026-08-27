@@ -48,12 +48,11 @@ export function ChatEmptyState(): React.ReactNode {
   const suggestionTarget = useMemo(() => {
     const availableDatasets = datasets ?? [];
     const randomDataset = getRandomItem(availableDatasets);
-    return (
-      openDataset ? { datasetId: openDataset.datasetId, name: openDataset.name }
-      : randomDataset ?
-        { datasetId: randomDataset.id, name: randomDataset.name }
-      : undefined
-    );
+    return openDataset
+      ? { datasetId: openDataset.datasetId, name: openDataset.name }
+      : randomDataset
+        ? { datasetId: randomDataset.id, name: randomDataset.name }
+        : undefined;
   }, [datasets, openDataset]);
 
   const [datasetColumns] = DatasetColumnClient.useGetAll({
@@ -89,29 +88,32 @@ export function ChatEmptyState(): React.ReactNode {
       </Group>
       <Stack gap={4}>
         <Text size="md" fw={600} c="neutral.9">
-          {context.app === "dashboards" ?
+          {context.app === "dashboards" ? (
             <Trans>Build a chart in chat</Trans>
-          : context.app === "case-manager" ?
+          ) : context.app === "case-manager" ? (
             <Trans>Design case types in chat</Trans>
-          : <Trans>Ask about your data</Trans>}
+          ) : (
+            <Trans>Ask about your data</Trans>
+          )}
         </Text>
         <Text size="sm" c="neutral.6" lh={1.5}>
-          {context.app === "data-explorer" ?
+          {context.app === "data-explorer" ? (
             <Trans>
               Type a question and I will generate the SQL and run it on the
               canvas.
             </Trans>
-          : context.app === "dashboards" ?
+          ) : context.app === "dashboards" ? (
             <Trans>
               Ask me to add a chart to this dashboard. I will pick a viz type,
               write the SQL, and drop a block onto the page.
             </Trans>
-          : context.app === "case-manager" ?
+          ) : context.app === "case-manager" ? (
             <Trans>
               I will propose case types from your dataset names and columns.
               Pick from the options or tell me what to create.
             </Trans>
-          : <Trans>
+          ) : (
+            <Trans>
               Chat is enabled in the Data Explorer and Dashboards.{" "}
               <Link
                 to={dataExplorerLink.to}
@@ -125,10 +127,10 @@ export function ChatEmptyState(): React.ReactNode {
               </Link>
               .
             </Trans>
-          }
+          )}
         </Text>
       </Stack>
-      {suggestions.length > 0 ?
+      {suggestions.length > 0 ? (
         <Stack gap="xxs" mt="xs">
           <Text size="xs" c="neutral.6" tt="uppercase" fw={600}>
             <Trans>Try one of these</Trans>
@@ -157,7 +159,7 @@ export function ChatEmptyState(): React.ReactNode {
             );
           })}
         </Stack>
-      : null}
+      ) : null}
     </Stack>
   );
 }

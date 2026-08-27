@@ -35,7 +35,7 @@ export function DashboardPreviewBanner({
         </Text>
         <DashboardPreviewVisibilitySummary visibility={dashboard.visibility} />
       </Group>
-      {canEdit ?
+      {canEdit ? (
         <Button
           size="compact-sm"
           variant="outline"
@@ -50,7 +50,7 @@ export function DashboardPreviewBanner({
         >
           <Trans>Back to editor</Trans>
         </Button>
-      : null}
+      ) : null}
     </Group>
   );
 }

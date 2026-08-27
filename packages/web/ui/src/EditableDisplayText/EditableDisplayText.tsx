@@ -110,14 +110,14 @@ export function EditableDisplayText({
       hasDefinedProps(passThroughProps.style, "width"));
 
   const isMac = getIsMacPlatform();
-  const keyboardShortcut =
-    passThroughProps.textarea ?
-      isMac ? "⌘↵"
+  const keyboardShortcut = passThroughProps.textarea
+    ? isMac
+      ? "⌘↵"
       : "Ctrl↵"
     : "Enter";
-  const keyboardShortcutSymbol =
-    passThroughProps.textarea ?
-      isMac ? "⌘↵"
+  const keyboardShortcutSymbol = passThroughProps.textarea
+    ? isMac
+      ? "⌘↵"
       : "Ctrl↵"
     : "↵";
 

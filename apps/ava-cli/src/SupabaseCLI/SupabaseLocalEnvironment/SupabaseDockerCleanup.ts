@@ -88,11 +88,11 @@ async function _removeTemporaryResource(
       );
     }
     const result = await options.io.removeSupabaseResource(options.resource);
-    return result.ok ? undefined : (
-        new Error(
+    return result.ok
+      ? undefined
+      : new Error(
           `Cannot remove Docker ${options.resource.type} ${options.resource.id}: ${result.stderr || "unknown cleanup error"}`,
-        )
-      );
+        );
   } catch (error) {
     return error instanceof Error ? error : new Error(String(error));
   }
@@ -126,8 +126,8 @@ function _makeCleanupError(
   const identifiers = failures.map(({ resource }) => {
     return `${resource.type}:${resource.id}`;
   });
-  return failures.length === 0 ?
-      undefined
+  return failures.length === 0
+    ? undefined
     : new AggregateError(
         failures.map(prop("error")),
         `Temporary Supabase resources remain: ${identifiers.join(", ")}`,

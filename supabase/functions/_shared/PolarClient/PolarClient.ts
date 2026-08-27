@@ -308,11 +308,11 @@ function createPolarClient(): PolarClient {
 
     createCustomerSessions: async (options) => {
       const { customerId, avandarUserId, returnURL } = options;
-      const customerSessionOptions =
-        customerId ? { customerId, returnUrl: returnURL }
-        : avandarUserId ?
-          { externalCustomerId: avandarUserId, returnUrl: returnURL }
-        : undefined;
+      const customerSessionOptions = customerId
+        ? { customerId, returnUrl: returnURL }
+        : avandarUserId
+          ? { externalCustomerId: avandarUserId, returnUrl: returnURL }
+          : undefined;
       if (!customerSessionOptions) {
         throw new Error("No customer session options provided");
       }

@@ -39,11 +39,11 @@ export function PublishingActions({
     actionKind === "disabled_no_audience" || isBlockedReason !== undefined;
   return (
     <Group justify="flex-end">
-      {onUpgrade ?
+      {onUpgrade ? (
         <Button variant="light" onClick={onUpgrade}>
           <Trans>Upgrade plan</Trans>
         </Button>
-      : null}
+      ) : null}
       <Tooltip label={isBlockedReason ?? ""} disabled={!isBlockedReason}>
         <Box {...NuxAnchors.props(NuxAnchors.ids.dashboardPublishButton)}>
           <Button

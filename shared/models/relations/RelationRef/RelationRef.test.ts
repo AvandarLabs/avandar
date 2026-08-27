@@ -1,5 +1,5 @@
-import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import { describe, expect, it } from "vitest";
+import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { Concept } from "$/models/ontology/Concept/Concept.ts";
 

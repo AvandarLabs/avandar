@@ -39,13 +39,13 @@ git checkout review/t1-sql && dif review/base       # diff-review skill
 
 Two axes:
 
-- **Tier slices** (`review/t<N>-<area>`) answer *what is live right now in
-  this risk area*. Cumulative from base to tip, and a provable partition:
+- **Tier slices** (`review/t<N>-<area>`) answer _what is live right now in
+  this risk area_. Cumulative from base to tip, and a provable partition:
   the script asserts that applying every tier reproduces the tip's tree
   exactly, and fails if any path escapes. Read-only; a tier tree is a real
   git tree but a mixed-version snapshot, so it will not typecheck or boot.
-- **Branch slices** (`review/b/<slug>`, `review/b/<slug>-base`) answer *what
-  did this agent actually write*. Real runnable historical states, pinned to
+- **Branch slices** (`review/b/<slug>`, `review/b/<slug>-base`) answer _what
+  did this agent actually write_. Real runnable historical states, pinned to
   history. They overlap: `qetl-registry`, `qetl-column-projection`, and
   `chat-concept-aliases` are all fully contained in `qetl-impl`.
 
@@ -56,12 +56,12 @@ to `develop`.**
 
 For every tier t1 through t6, and for every branch slice, the loop is the same:
 
-| Step | Where | What |
-| --- | --- | --- |
-| 1. Agent adversarial pass | `fix/audit-<tier>` worktree | Agent reads the scoped diff, records findings, applies fixes it is confident in |
-| 2. Human pass | `review/<tier>` worktree | You read the same scoped diff in difit and comment |
-| 3. Fixes | `fix/audit-<tier>` worktree | All edits, tests, and ledger updates |
-| 4. Merge | `fix/audit-<tier>` → `develop` | The only thing that ever merges |
+| Step                      | Where                          | What                                                                            |
+| ------------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| 1. Agent adversarial pass | `fix/audit-<tier>` worktree    | Agent reads the scoped diff, records findings, applies fixes it is confident in |
+| 2. Human pass             | `review/<tier>` worktree       | You read the same scoped diff in difit and comment                              |
+| 3. Fixes                  | `fix/audit-<tier>` worktree    | All edits, tests, and ledger updates                                            |
+| 4. Merge                  | `fix/audit-<tier>` → `develop` | The only thing that ever merges                                                 |
 
 Set both worktrees up once per tier:
 
@@ -134,13 +134,13 @@ pnpm diff-review review/base            # the whole tier, fixes included
 pnpm diff-review review/t1-sql-prev     # ONLY what the adversarial pass changed
 ```
 
-| Command | Shows | Equivalent |
-| --- | --- | --- |
-| `pnpm diff-review review/base` | The whole tier as it now stands, fixes included. Your main review. | `git diff review/base review/<tier>` |
+| Command                               | Shows                                                                                           | Equivalent                                  |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `pnpm diff-review review/base`        | The whole tier as it now stands, fixes included. Your main review.                              | `git diff review/base review/<tier>`        |
 | `pnpm diff-review review/<tier>-prev` | Only what the adversarial pass changed. Review this too: those fixes are unreviewed agent code. | `git diff review/<tier>-prev review/<tier>` |
 
 The two produce different difit transcripts, because `dif` names its artifacts
-`<branch-slug>-difit-<scope-slug>` from the branch *and* the comparison. So
+`<branch-slug>-difit-<scope-slug>` from the branch _and_ the comparison. So
 `review/base` writes `review-t1-sql-difit-at-review-base-*` and
 `review/t1-sql-prev` writes `review-t1-sql-difit-at-review-t1-sql-prev-*`. They
 do not clobber each other, and each keeps its own comments and reviewed state.
@@ -160,11 +160,11 @@ build with no arguments.
 
 ## Fix lanes
 
-| Lane | Branch | For | Ships |
-| --- | --- | --- | --- |
-| Hotfix | `fix/<specific>` | Cross-tenant exposure, data loss | Immediately, own PR |
-| Tier | `fix/audit-<tier>` | Substantive defects | When the tier closes |
-| Nit | `chore/audit-nits` | Typos, dead code, naming | Whenever; blocks nothing |
+| Lane   | Branch             | For                              | Ships                    |
+| ------ | ------------------ | -------------------------------- | ------------------------ |
+| Hotfix | `fix/<specific>`   | Cross-tenant exposure, data loss | Immediately, own PR      |
+| Tier   | `fix/audit-<tier>` | Substantive defects              | When the tier closes     |
+| Nit    | `chore/audit-nits` | Typos, dead code, naming         | Whenever; blocks nothing |
 
 Watch out: `.githooks/pre-push` runs the Lingui pipeline and exits 2 when
 catalogs change, so any fix branch touching user-facing strings gets blocked
@@ -174,37 +174,37 @@ once and needs a follow-up commit with regenerated catalogs.
 
 Ordered by blast radius per line, not by size.
 
-| Tier | Ref | Files | +Lines | Agent pass | Human pass | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1/F-2 accepted, F-3 open |
-| SQL + privileges | `review/t1-sql` | 156 | 21,054 | not started | not started | Highest risk |
-| Edge functions | `review/t2-edge` | 73 | 4,697 | not started | not started | Untrusted input reaches SQL |
-| Core / clients | `review/t2-core` | 816 | 82,768 | not started | not started | |
-| UI | `review/t3-ui` | 1,329 | 95,084 | not started | not started | Spot-check, demo-driven |
-| E2E tests | `review/t4-e2e` | 69 | 7,311 | not started | not started | |
-| i18n | `review/t5-i18n` | 25 | 29,593 | not started | not started | Skim |
-| Docs / plans | `review/t5-docs` | 157 | 102,719 | not started | not started | Read as spec, not code |
+| Tier             | Ref                    | Files | +Lines  | Agent pass  | Human pass  | Notes                       |
+| ---------------- | ---------------------- | ----- | ------- | ----------- | ----------- | --------------------------- |
+| Guardrails       | `review/t6-guardrails` | 47    | 3,480   | n/a         | **done**    | F-1/F-2 accepted, F-3 open  |
+| SQL + privileges | `review/t1-sql`        | 156   | 21,054  | not started | not started | Highest risk                |
+| Edge functions   | `review/t2-edge`       | 73    | 4,697   | not started | not started | Untrusted input reaches SQL |
+| Core / clients   | `review/t2-core`       | 816   | 82,768  | not started | not started |                             |
+| UI               | `review/t3-ui`         | 1,329 | 95,084  | not started | not started | Spot-check, demo-driven     |
+| E2E tests        | `review/t4-e2e`        | 69    | 7,311   | not started | not started |                             |
+| i18n             | `review/t5-i18n`       | 25    | 29,593  | not started | not started | Skim                        |
+| Docs / plans     | `review/t5-docs`       | 157   | 102,719 | not started | not started | Read as spec, not code      |
 
 ## Branch status
 
-| Branch | Ref | Files | +Lines | Agent pass | Human pass |
-| --- | --- | --- | --- | --- | --- |
-| qetl-impl | `review/b/qetl-impl` | 472 | 53,116 | not started | not started |
-| pdf-import | `review/b/pdf-import` | 201 | 38,806 | not started | not started |
-| nux | `review/b/nux` | 262 | 25,901 | not started | not started |
-| filters | `review/b/filters` | 104 | 15,317 | not started | not started |
-| gis-pdf-export | `review/b/gis-pdf-export` | 150 | 14,190 | not started | not started |
-| qetl-registry | `review/b/qetl-registry` | 86 | 8,781 | not started | not started |
-| newchat | `review/b/newchat` | 84 | 4,896 | not started | not started |
-| gis-ux | `review/b/gis-ux` | 60 | 3,841 | not started | not started |
-| pdf-geometry | `review/b/pdf-geometry` | 36 | 2,752 | not started | not started |
-| qetl-column-projection | `review/b/qetl-column-projection` | 22 | 2,390 | not started | not started |
-| chat-concept-aliases | `review/b/chat-concept-aliases` | 30 | 1,516 | not started | not started |
-| demo-blockers | `review/b/demo-blockers` | 27 | 1,334 | not started | not started |
-| supabase-switch | `review/b/supabase-switch` | 31 | 1,047 | not started | not started |
-| gis-geo-binding | `review/b/gis-geo-binding` | 23 | 184 | not started | not started |
-| xlsx-skip-rows | `review/b/xlsx-skip-rows` | 3 | 201 | not started | not started |
-| pdf-output-mode | `review/b/pdf-output-mode` | 5 | 6 | not started | not started |
+| Branch                 | Ref                               | Files | +Lines | Agent pass  | Human pass  |
+| ---------------------- | --------------------------------- | ----- | ------ | ----------- | ----------- |
+| qetl-impl              | `review/b/qetl-impl`              | 472   | 53,116 | not started | not started |
+| pdf-import             | `review/b/pdf-import`             | 201   | 38,806 | not started | not started |
+| nux                    | `review/b/nux`                    | 262   | 25,901 | not started | not started |
+| filters                | `review/b/filters`                | 104   | 15,317 | not started | not started |
+| gis-pdf-export         | `review/b/gis-pdf-export`         | 150   | 14,190 | not started | not started |
+| qetl-registry          | `review/b/qetl-registry`          | 86    | 8,781  | not started | not started |
+| newchat                | `review/b/newchat`                | 84    | 4,896  | not started | not started |
+| gis-ux                 | `review/b/gis-ux`                 | 60    | 3,841  | not started | not started |
+| pdf-geometry           | `review/b/pdf-geometry`           | 36    | 2,752  | not started | not started |
+| qetl-column-projection | `review/b/qetl-column-projection` | 22    | 2,390  | not started | not started |
+| chat-concept-aliases   | `review/b/chat-concept-aliases`   | 30    | 1,516  | not started | not started |
+| demo-blockers          | `review/b/demo-blockers`          | 27    | 1,334  | not started | not started |
+| supabase-switch        | `review/b/supabase-switch`        | 31    | 1,047  | not started | not started |
+| gis-geo-binding        | `review/b/gis-geo-binding`        | 23    | 184    | not started | not started |
+| xlsx-skip-rows         | `review/b/xlsx-skip-rows`         | 3     | 201    | not started | not started |
+| pdf-output-mode        | `review/b/pdf-output-mode`        | 5     | 6      | not started | not started |
 
 Note: `qetl-impl` had agent adversarial review during development (commits
 "Close adversarial review findings", "Address review:", and

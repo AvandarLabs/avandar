@@ -22,15 +22,15 @@ import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { applyCreatedCaseTypes } from "@/views/OntologyDesignerApp/applyCreatedCaseTypes/applyCreatedCaseTypes";
-import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
-import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
-import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { MutableRefObject } from "react";
 
 type ApplyChatModelTurnResponseOptions = {
@@ -121,9 +121,8 @@ async function reviewAndApplySql(
 export async function applyChatModelTurnResponse(
   options: Readonly<ApplyChatModelTurnResponseOptions>,
 ): Promise<ChatModelRunResult> {
-  const sqlApplied =
-    options.response.generatedSql ?
-      await reviewAndApplySql({
+  const sqlApplied = options.response.generatedSql
+    ? await reviewAndApplySql({
         ...options,
         sql: options.response.generatedSql.sql,
       })

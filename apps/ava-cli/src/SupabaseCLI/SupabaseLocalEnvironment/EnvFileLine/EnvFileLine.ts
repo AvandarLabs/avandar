@@ -8,22 +8,20 @@ export type EnvAssignment = {
 
 function _getAssignment(line: string): EnvAssignment | undefined {
   const separatorIndex = line.indexOf("=");
-  return separatorIndex < 1 ? undefined : (
-      {
+  return separatorIndex < 1
+    ? undefined
+    : {
         key: line.slice(0, separatorIndex),
         value: line.slice(separatorIndex + 1).trim(),
-      }
-    );
+      };
 }
 
 function _getQuote(value: string): string {
   const quote = value.slice(0, 1);
-  return (
-      value.length >= 2 &&
-        (quote === '"' || quote === "'") &&
-        value.endsWith(quote)
-    ) ?
-      quote
+  return value.length >= 2 &&
+    (quote === '"' || quote === "'") &&
+    value.endsWith(quote)
+    ? quote
     : "";
 }
 

@@ -49,22 +49,22 @@ function useVizConfigSchemas() {
   return useMemo(() => {
     const XAxisKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen an X axis`
+        return issue.input === undefined
+          ? t`You haven't chosen an X axis`
           : t`Invalid X axis selected`;
       },
     });
     const NameKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a name column`
+        return issue.input === undefined
+          ? t`You haven't chosen a name column`
           : t`Invalid name column selected`;
       },
     });
     const ValueKeySchema = string({
       error: (issue) => {
-        return issue.input === undefined ?
-            t`You haven't chosen a value column`
+        return issue.input === undefined
+          ? t`You haven't chosen a value column`
           : t`Invalid value column selected`;
       },
     });

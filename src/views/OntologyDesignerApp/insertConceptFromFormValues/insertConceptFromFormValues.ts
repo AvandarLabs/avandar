@@ -4,9 +4,9 @@ import { AttributeMappingClient } from "@/clients/ontology/AttributeMappingClien
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { hasPropKeys } from "@/lib/utils/guards/guards";
-import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 function _mappingsFromAttributes(
   attributes: ConceptFormSubmitValues["attributes"],

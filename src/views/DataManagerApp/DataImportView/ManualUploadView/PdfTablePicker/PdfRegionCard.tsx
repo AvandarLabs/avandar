@@ -159,15 +159,16 @@ export function PdfRegionCard({
           }}
         />
 
-        {classification ?
+        {classification ? (
           <Group gap="xs" align="flex-start" wrap="nowrap">
             <Badge
               size="xs"
               color={
-                classification.confidence === "high" ? "green"
-                : classification.confidence === "medium" ?
-                  "yellow"
-                : "gray"
+                classification.confidence === "high"
+                  ? "green"
+                  : classification.confidence === "medium"
+                    ? "yellow"
+                    : "gray"
               }
             >
               {classification.confidence}
@@ -176,9 +177,9 @@ export function PdfRegionCard({
               {classification.evidence.join(" ")}
             </Text>
           </Group>
-        : null}
+        ) : null}
 
-        {coverageFlag ?
+        {coverageFlag ? (
           <Stack gap={4}>
             <Text size="xs" c="dimmed">
               {coverageFlag.detail}
@@ -195,20 +196,20 @@ export function PdfRegionCard({
             >
               <Trans>Extract with the assistant</Trans>
             </Button>
-            {!isOnline ?
+            {!isOnline ? (
               <Text size="xs" c="dimmed">
                 {t`You are offline, so nothing can be sent. Kept the rule-based results.`}
               </Text>
-            : null}
-            {assistStatus?.message !== undefined ?
+            ) : null}
+            {assistStatus?.message !== undefined ? (
               <Text size="xs" c="dimmed">
                 {assistStatus.message}
               </Text>
-            : null}
+            ) : null}
           </Stack>
-        : null}
+        ) : null}
 
-        {region.shape === "labelled_graphic" ?
+        {region.shape === "labelled_graphic" ? (
           <PdfAxisCalibration
             isPicking={isCalibrating}
             points={calibrationPoints}
@@ -216,11 +217,9 @@ export function PdfRegionCard({
             onApply={onApplyCalibration}
             onCancel={onCancelCalibration}
           />
-        : null}
+        ) : null}
 
-        {table?.chartAxis ?
-          <ChartAxisNote axis={table.chartAxis} />
-        : null}
+        {table?.chartAxis ? <ChartAxisNote axis={table.chartAxis} /> : null}
       </Stack>
     </Paper>
   );

@@ -44,7 +44,7 @@ export function GenericError({ error, reset }: Props): React.ReactNode {
             <Trans>Go home</Trans>
           </Button>
         </Group>
-        {import.meta.env.DEV ?
+        {import.meta.env.DEV ? (
           <Stack gap="xs" w="100%">
             <Button
               variant="subtle"
@@ -55,15 +55,15 @@ export function GenericError({ error, reset }: Props): React.ReactNode {
                 });
               }}
             >
-              {showDetails ?
+              {showDetails ? (
                 <Trans>Hide details</Trans>
-              : <Trans>Show details</Trans>}
+              ) : (
+                <Trans>Show details</Trans>
+              )}
             </Button>
-            {showDetails ?
-              <Code block>{message}</Code>
-            : null}
+            {showDetails ? <Code block>{message}</Code> : null}
           </Stack>
-        : null}
+        ) : null}
       </Stack>
     </Center>
   );

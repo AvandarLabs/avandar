@@ -2,9 +2,9 @@ import { MapOutputActions } from "@/views/GisApp/shell/MapTopBar/MapOutputAction
 import { MapTitleInput } from "@/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleInput";
 import css from "@/views/GisApp/shell/MapTopBar/MapTopBar.module.css";
 import { SaveStateIndicator } from "@/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator";
-import type { MapSaveState } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapSaveState } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import type { ReactNode } from "react";
 
 type Props = {

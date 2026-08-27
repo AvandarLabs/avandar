@@ -70,11 +70,11 @@ function UnmountRefHarness() {
         data-testid="truncation-flag"
         data-truncated={String(isTruncated)}
       />
-      {showTarget ?
+      {showTarget ? (
         <div data-testid="inner" ref={setRef}>
           inner
         </div>
-      : null}
+      ) : null}
       <button
         type="button"
         onClick={() => {

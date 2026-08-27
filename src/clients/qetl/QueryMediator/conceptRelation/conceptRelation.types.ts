@@ -1,6 +1,6 @@
-import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
+import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 
 /**
  * Everything one concept's DuckDB relation is built from, read once.

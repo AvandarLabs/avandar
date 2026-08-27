@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { runQueryPrerequisite } from "@/components/Nux/NuxPrerequisites/firstDashboard/runQueryPrerequisite/runQueryPrerequisite";
+import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";
 import type { NuxPrerequisiteFacts } from "@/components/Nux/NuxPrerequisites/NuxPrerequisite.types";
-import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 
 const EMPTY_FACTS: NuxPrerequisiteFacts = {
   hasDataset: false,

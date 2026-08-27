@@ -1,21 +1,21 @@
 import { matchLiteral, propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { appLabel } from "$/copy/appLabel";
 import { useState } from "react";
+import { appLabel } from "$/copy/appLabel";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { notifyError } from "@/utils/notifications/notify";
 import { GeneralAccessModule } from "./GeneralAccessModule/GeneralAccessModule";
 import { getAppTypeFromResourceType } from "./getAppTypeFromResourceType/getAppTypeFromResourceType";
 import { openMakePrivateConfirmModal } from "./openMakePrivateConfirmModal";
+import type { RoleLevel } from "$/models/Permissions/Permissions";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
 import type {
   ResourceShareRow,
   ResourceSharingState,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseGeneralAccessControlOptions = {
   resourceName: string;
@@ -255,9 +255,8 @@ export function useGeneralAccessControl(
         setWantsRestricted(false);
       },
     });
-  const derivedValue =
-    options.sharingState ?
-      GeneralAccessModule.fromResourceState({
+  const derivedValue = options.sharingState
+    ? GeneralAccessModule.fromResourceState({
         ...options.sharingState,
         isPublicSelected: options.isPublicPublishTargeted,
       })

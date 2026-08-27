@@ -45,14 +45,14 @@ export function TextColumnSummary({ summary, totalRows }: Props): ReactNode {
             />
           );
         })}
-        {top.value.length > 5 ?
+        {top.value.length > 5 ? (
           <Text size="xs" c="dimmed" mt={4}>
             <Trans>
               +{top.value.length - 5} more values tied at{" "}
               {top.count.toLocaleString()} rows
             </Trans>
           </Text>
-        : null}
+        ) : null}
       </Stack>
     </Stack>
   );

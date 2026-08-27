@@ -70,9 +70,8 @@ export function ensureE2EViteFeatureFlags(): void {
       flag,
     );
   });
-  process.env.VITE_FEATURE_FLAGS =
-    isE2EOfflineMode() ?
-      _appendViteFeatureFlag(
+  process.env.VITE_FEATURE_FLAGS = isE2EOfflineMode()
+    ? _appendViteFeatureFlag(
         process.env.VITE_FEATURE_FLAGS,
         "disable-duckdb-spatial",
       )

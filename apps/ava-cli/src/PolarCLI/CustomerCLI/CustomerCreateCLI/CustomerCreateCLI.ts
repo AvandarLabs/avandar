@@ -59,9 +59,9 @@ export async function runCustomerCreate(): Promise<void> {
     });
 
     const subscriptionId =
-      typeof (subscription as { id?: unknown }).id === "string" ?
-        (subscription as { id: string }).id
-      : "unknown";
+      typeof (subscription as { id?: unknown }).id === "string"
+        ? (subscription as { id: string }).id
+        : "unknown";
 
     printSuccess("Created test customer and Free subscription.");
     printSuccess(`customerId: ${customer.id}`);

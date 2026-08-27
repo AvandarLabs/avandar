@@ -68,12 +68,12 @@ function _refuseWrongBranch(
   git: ReleaseCommands,
 ): PreflightRefusal | undefined {
   const currentBranch = getCurrentBranch(git);
-  return currentBranch === RELEASE_SOURCE_BRANCH ? undefined : (
-      {
+  return currentBranch === RELEASE_SOURCE_BRANCH
+    ? undefined
+    : {
         reason: "wrong-branch",
         message: `Releases are cut from "${RELEASE_SOURCE_BRANCH}" (currently on "${currentBranch ?? "a detached HEAD"}").`,
-      }
-    );
+      };
 }
 
 /**
@@ -86,12 +86,12 @@ function _refuseWrongBranch(
  */
 function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
   const trackedChanges = getTrackedChanges(git);
-  return trackedChanges === undefined ? undefined : (
-      {
+  return trackedChanges === undefined
+    ? undefined
+    : {
         reason: "dirty-tree",
         message: `The working tree has tracked changes, which would be swept into the version commit. Commit or stash them first:\n${trackedChanges}`,
-      }
-    );
+      };
 }
 
 /**
@@ -119,19 +119,17 @@ function _refuseWithoutPushPermission(
     ".permissions.push",
   ]);
   // An unverified answer is not a yes, for a command with these consequences.
-  return (
-    !pushPermissionResult.ok ?
-      {
+  return !pushPermissionResult.ok
+    ? {
         reason: "unverified-push-permission",
         message: `Could not confirm you can push to ${repoSlug}: ${describeCommandFailure(pushPermissionResult, "the gh CLI could not answer")}. Releases push ${RELEASE_SOURCE_BRANCH} and ${RELEASE_TARGET_BRANCH}, so this refuses rather than guess. Run \`gh auth login\` and try again.`,
       }
-    : pushPermissionResult.stdout.trim() !== "true" ?
-      {
-        reason: "no-push-permission",
-        message: `You do not have push access to ${repoSlug}, so this release would fail once it tried to push ${RELEASE_SOURCE_BRANCH}. Ask whoever owns the repo to cut the release.`,
-      }
-    : undefined
-  );
+    : pushPermissionResult.stdout.trim() !== "true"
+      ? {
+          reason: "no-push-permission",
+          message: `You do not have push access to ${repoSlug}, so this release would fail once it tried to push ${RELEASE_SOURCE_BRANCH}. Ask whoever owns the repo to cut the release.`,
+        }
+      : undefined;
 }
 
 /** The refusal when origin cannot be fetched. */
@@ -139,12 +137,12 @@ function _refuseFailedFetch(
   git: ReleaseCommands,
 ): PreflightRefusal | undefined {
   const fetchResult = git.tryGit(["fetch", "--prune", "--tags", "origin"]);
-  return fetchResult.ok ? undefined : (
-      {
+  return fetchResult.ok
+    ? undefined
+    : {
         reason: "fetch-failed",
         message: `Could not fetch from origin: ${describeCommandFailure(fetchResult, "git gave no reason")}`,
-      }
-    );
+      };
 }
 
 /**
@@ -181,9 +179,8 @@ function _resolveReleaseRefs(git: ReleaseCommands): PreflightResult {
     return { ok: false, ...outOfSync };
   }
 
-  const localMainSha =
-    refExists(git, `refs/heads/${RELEASE_TARGET_BRANCH}`) ?
-      revParse(git, RELEASE_TARGET_BRANCH)
+  const localMainSha = refExists(git, `refs/heads/${RELEASE_TARGET_BRANCH}`)
+    ? revParse(git, RELEASE_TARGET_BRANCH)
     : undefined;
   return { ok: true, originDevelopSha, originMainSha, localMainSha };
 }

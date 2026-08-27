@@ -1,6 +1,6 @@
-import { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
+import { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DataSourceMetadata } from "../DatasetImportForm.types";

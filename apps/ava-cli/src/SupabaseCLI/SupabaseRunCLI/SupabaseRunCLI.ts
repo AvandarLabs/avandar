@@ -156,10 +156,7 @@ export const SupabaseRunCLI = Acclimate.createCLI("run")
       scriptName: scriptToRun,
     });
 
-    const dbLocation =
-      staging ? "staging"
-      : prod ? "production"
-      : "local";
+    const dbLocation = staging ? "staging" : prod ? "production" : "local";
 
     const scriptFilePath = path.join(
       PROJECT_ROOT,

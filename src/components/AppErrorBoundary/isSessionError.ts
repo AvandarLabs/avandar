@@ -35,9 +35,11 @@ export function isSessionError(error: unknown): boolean {
   }
 
   const message =
-    error instanceof Error ? error.message
-    : typeof error === "string" ? error
-    : "";
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : "";
   const normalized = message.toLowerCase();
   return SESSION_ERROR_SIGNATURES.some((signature) => {
     return normalized.includes(signature);

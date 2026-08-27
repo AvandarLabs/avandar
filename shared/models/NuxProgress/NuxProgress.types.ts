@@ -1,10 +1,10 @@
-import type { UUID } from "@avandar/utils";
 import type {
   FIRST_DASHBOARD_TUTORIAL_KEY,
   NUX_MILESTONE_KEYS,
 } from "$/models/NuxProgress/NuxProgress.constants.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Database } from "$/types/database.types.ts";
+import type { UUID } from "@avandar/utils";
 
 export type NuxProgressId = UUID<"NuxProgress">;
 

@@ -1,9 +1,9 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 export type OpenDataDatasetId = UUID<"OpenDataDataset">;

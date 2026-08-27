@@ -34,11 +34,13 @@ export function NavbarLinkItem({
       align="center"
       className={css.navbarLinkPill}
     >
-      {isUtility ?
+      {isUtility ? (
         <Group gap={0} wrap="nowrap">
           {label}
         </Group>
-      : label}
+      ) : (
+        label
+      )}
     </Flex>
   );
 

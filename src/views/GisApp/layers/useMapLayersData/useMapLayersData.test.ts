@@ -1,8 +1,8 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import {
   createQueryableLayer,
@@ -11,9 +11,9 @@ import {
   UNIT_SQUARE,
   wrapperForHook,
 } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData.fixtures";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 const {
   ensureSpatialMock,

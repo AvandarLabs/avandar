@@ -22,13 +22,13 @@ export function DashboardAccessDeniedView({
         <Text c="dimmed">
           <Trans>Ask the dashboard's owner to share it with you.</Trans>
         </Text>
-        {canSwitchAccount ?
+        {canSwitchAccount ? (
           <Group mt="md">
             <Button component={Link} to="/signin" variant="outline">
               <Trans>Sign in with a different account</Trans>
             </Button>
           </Group>
-        : null}
+        ) : null}
       </Stack>
     </Paper>
   );

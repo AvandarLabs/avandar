@@ -23,11 +23,11 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
 import css from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 type Props = {
   onOpen: (info: OpenDatasetInfo, rawSql: string) => void;
@@ -84,8 +84,8 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   // filter is treated as unselected without any state write. When the filter
   // clears and the dataset reappears, the selection comes back.
   const selectedDataset = useMemo(() => {
-    return selectedDatasetId ?
-        filtered.find(propEq("id", selectedDatasetId))
+    return selectedDatasetId
+      ? filtered.find(propEq("id", selectedDatasetId))
       : undefined;
   }, [filtered, selectedDatasetId]);
 
@@ -199,15 +199,16 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         }}
       />
 
-      {isLoadingDatasets ?
+      {isLoadingDatasets ? (
         <Group justify="center" py="lg">
           <Loader size="sm" />
         </Group>
-      : filtered.length === 0 ?
+      ) : filtered.length === 0 ? (
         <Text c="dimmed" size="sm" className={css.emptyState}>
           <Trans>No saved datasets found.</Trans>
         </Text>
-      : <div role="listbox" aria-label={t`Saved datasets`} className={css.list}>
+      ) : (
+        <div role="listbox" aria-label={t`Saved datasets`} className={css.list}>
           {filtered.map((dataset) => {
             const isSelected = dataset.id === selectedDataset?.id;
             return (
@@ -249,15 +250,15 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
             );
           })}
         </div>
-      }
+      )}
 
-      {selectedDataset ?
+      {selectedDataset ? (
         <Group className={css.footer} justify="flex-end">
           <Button loading={isBusy} onClick={onOpenSelected}>
             <Trans>Open {selectedDataset.name}</Trans>
           </Button>
         </Group>
-      : null}
+      ) : null}
     </div>
   );
 }

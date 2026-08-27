@@ -1,8 +1,8 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 /**
  * Annotate sub-cluster: four drawing tools, persist, and the pinned row.
  */
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@/test-utils";
 import { AnnotateHarness } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateHarness";
 import {

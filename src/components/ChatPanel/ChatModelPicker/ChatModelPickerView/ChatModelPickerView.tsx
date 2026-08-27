@@ -2,8 +2,8 @@ import { Tooltip } from "@avandar/ui";
 import { Button, Combobox, Group, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import css from "./ChatModelPickerView.module.css";
-import type { ComboboxStore } from "@mantine/core";
 import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
+import type { ComboboxStore } from "@mantine/core";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -36,13 +36,13 @@ function _renderModelGroups(
                 <Text size="sm" className={css.chatModelPickerViewOptionLabel}>
                   {model.name}
                 </Text>
-                {isSelected ?
+                {isSelected ? (
                   <IconCheck
                     size={14}
                     className={css.chatModelPickerViewSelectedIcon}
                     aria-hidden
                   />
-                : null}
+                ) : null}
               </Group>
             </Combobox.Option>
           );
@@ -91,13 +91,13 @@ function _renderTrigger(
 function _renderDropdown(
   options: Pick<Props, "combobox" | "groups" | "resolvedModelId">,
 ): ReactNode {
-  return options.combobox.dropdownOpened ?
-      <Combobox.Dropdown className={css.chatModelPickerViewDropdown}>
-        <Combobox.Options className={css.chatModelPickerViewOptions}>
-          {_renderModelGroups(options)}
-        </Combobox.Options>
-      </Combobox.Dropdown>
-    : null;
+  return options.combobox.dropdownOpened ? (
+    <Combobox.Dropdown className={css.chatModelPickerViewDropdown}>
+      <Combobox.Options className={css.chatModelPickerViewOptions}>
+        {_renderModelGroups(options)}
+      </Combobox.Options>
+    </Combobox.Dropdown>
+  ) : null;
 }
 
 /** Renders the accessible trigger and grouped options for the model picker. */

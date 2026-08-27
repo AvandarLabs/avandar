@@ -1,8 +1,8 @@
 import { RadarChart as MantineRadarChart } from "@mantine/charts";
 import { useMemo } from "react";
-import type { UnknownDataFrame } from "@avandar/utils";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   data: UnknownDataFrame;
@@ -39,13 +39,17 @@ export function RadarChart({
     const position = chartStyle?.legend?.position ?? "top";
     return {
       verticalAlign:
-        position === "bottom" ? "bottom"
-        : position === "top" ? "top"
-        : "middle",
+        position === "bottom"
+          ? "bottom"
+          : position === "top"
+            ? "top"
+            : "middle",
       align:
-        position === "left" ? "left"
-        : position === "right" ? "right"
-        : "center",
+        position === "left"
+          ? "left"
+          : position === "right"
+            ? "right"
+            : "center",
     } as const;
   }, [chartStyle?.legend?.position]);
 

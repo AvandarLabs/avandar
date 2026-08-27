@@ -50,8 +50,8 @@ function _readRequiredString(
 function _getStatusKeyFromEnvKey(
   envKey: string,
 ): keyof SupabaseLocalStatus | undefined {
-  return Object.hasOwn(ENV_VALUE_FROM_KEY, envKey) ?
-      ENV_VALUE_FROM_KEY[envKey as keyof typeof ENV_VALUE_FROM_KEY]
+  return Object.hasOwn(ENV_VALUE_FROM_KEY, envKey)
+    ? ENV_VALUE_FROM_KEY[envKey as keyof typeof ENV_VALUE_FROM_KEY]
     : undefined;
 }
 

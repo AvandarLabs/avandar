@@ -11,9 +11,9 @@ export function assertIsDefined<T>(
 ): asserts value is Exclude<T, undefined> {
   if (value === undefined) {
     throw new Error(
-      typeof msgOrOptions === "string" ? msgOrOptions : (
-        `Expected ${msgOrOptions.name} to be defined. Received undefined.`
-      ),
+      typeof msgOrOptions === "string"
+        ? msgOrOptions
+        : `Expected ${msgOrOptions.name} to be defined. Received undefined.`,
     );
   }
 }

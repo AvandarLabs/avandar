@@ -1,8 +1,8 @@
-import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { createLayerGeometryCache } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
-import type { LayerGeometryInputs } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerGeometryInputs } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 
 const LAYER_ID = uuid<MapLayer.Id>();
 

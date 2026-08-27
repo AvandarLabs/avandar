@@ -60,11 +60,11 @@ export function OfflineChatDownloadControl({
     });
   }, [t, forceUpdate]);
 
-  const tooltipLabel =
-    !hasAnyDownloaded ? t`Download offline chat model (WebLLM)`
-    : isSelectedDownloaded ?
-      t`Offline chat model ready. Click to switch or re-download.`
-    : t`Download a different offline chat model`;
+  const tooltipLabel = !hasAnyDownloaded
+    ? t`Download offline chat model (WebLLM)`
+    : isSelectedDownloaded
+      ? t`Offline chat model ready. Click to switch or re-download.`
+      : t`Download a different offline chat model`;
 
   return (
     <Tooltip label={tooltipLabel}>

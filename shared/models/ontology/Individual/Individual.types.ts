@@ -1,7 +1,7 @@
-import type { UUID } from "@avandar/utils";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 export type IndividualId = UUID<"Individual">;

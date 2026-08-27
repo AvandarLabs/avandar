@@ -11,6 +11,7 @@ import {
   OBSERVATION_HEADER,
 } from "@/workers/pdfSniff/combineRegions/combineRegions";
 import { resolveOutputMode } from "@/workers/pdfSniff/resolveOutputMode/resolveOutputMode";
+import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 import type {
   DataSourceMetadata,
   PdfDataSourceMetadata,
@@ -21,7 +22,6 @@ import type {
   ExtractedTable,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
-import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -159,9 +159,9 @@ export function PdfParseControls({
       }),
     ),
     chosenMode:
-      metadata.parseOptions.isOutputModeUserChosen === true ?
-        metadata.parseOptions.outputMode
-      : undefined,
+      metadata.parseOptions.isOutputModeUserChosen === true
+        ? metadata.parseOptions.outputMode
+        : undefined,
   });
   const copy = getOutputModeCopy({
     i18n,
@@ -205,11 +205,11 @@ export function PdfParseControls({
             />
           </Stack>
         </Radio.Group>
-        {copy.note ?
+        {copy.note ? (
           <Text size="xs" c="dimmed">
             {copy.note}
           </Text>
-        : null}
+        ) : null}
       </Stack>
       <PdfRegionPicker
         file={sourceFile}
@@ -228,13 +228,13 @@ export function PdfParseControls({
           applyReviewedTable(table, { llmModel });
         }}
       />
-      {activeTable ?
+      {activeTable ? (
         <PdfReviewGrid
           table={activeTable}
           onTableChange={applyReviewedTable}
           onRowFocus={setFocusedProvenance}
         />
-      : null}
+      ) : null}
     </Stack>
   );
 }

@@ -11,11 +11,9 @@ export function getVersionFromAvaPageData(
   }>,
 ): number | undefined {
   if (data.root.props) {
-    return (
-        "schemaVersion" in data.root.props &&
-          isNumber(data.root.props.schemaVersion)
-      ) ?
-        data.root.props.schemaVersion
+    return "schemaVersion" in data.root.props &&
+      isNumber(data.root.props.schemaVersion)
+      ? data.root.props.schemaVersion
       : undefined;
   }
   return undefined;

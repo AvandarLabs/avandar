@@ -1,5 +1,5 @@
-import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { GeneralAccessValue } from "./GeneralAccessModule/GeneralAccessModule";
 import type { ReactNode } from "react";
 
 /**

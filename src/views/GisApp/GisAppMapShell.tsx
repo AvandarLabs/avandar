@@ -1,7 +1,7 @@
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useRef, useState } from "react";
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";
 import { getExportLegendEntries } from "@/views/GisApp/export/getExportLegendEntries/getExportLegendEntries";

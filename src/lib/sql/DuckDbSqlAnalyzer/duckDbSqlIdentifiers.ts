@@ -19,8 +19,8 @@ export function getRelationRefFromTableName(
   tableName: string,
 ): RelationRef.T | undefined {
   const relation = RelationRef.fromTableName(tableName.toLowerCase());
-  return relation !== undefined && UUID_REGEX.test(relation.id) ?
-      relation
+  return relation !== undefined && UUID_REGEX.test(relation.id)
+    ? relation
     : undefined;
 }
 
@@ -76,8 +76,8 @@ export function getDatasetIdFromTableName(
   tableName: string,
 ): string | undefined {
   const finalPart = tableName.split(".").at(-1)?.replace(/^"|"$/g, "");
-  return finalPart !== undefined && UUID_REGEX.test(finalPart) ?
-      finalPart.toLowerCase()
+  return finalPart !== undefined && UUID_REGEX.test(finalPart)
+    ? finalPart.toLowerCase()
     : undefined;
 }
 
@@ -88,14 +88,14 @@ export function getDatasetIdFromRelationAtIndex(
   const { relationIndex, tokens } = options;
   const relationToken = tokens[relationIndex];
   if (relationToken?.kind === "string") {
-    return UUID_REGEX.test(relationToken.value) ?
-        relationToken.value.toLowerCase()
+    return UUID_REGEX.test(relationToken.value)
+      ? relationToken.value.toLowerCase()
       : undefined;
   }
   const identifier = getIdentifierParts({ tokens, startIndex: relationIndex });
   const datasetId = identifier?.parts.at(-1)?.toLowerCase();
-  return datasetId !== undefined && UUID_REGEX.test(datasetId) ?
-      datasetId
+  return datasetId !== undefined && UUID_REGEX.test(datasetId)
+    ? datasetId
     : undefined;
 }
 

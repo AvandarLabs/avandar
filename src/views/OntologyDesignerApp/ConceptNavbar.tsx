@@ -41,9 +41,10 @@ export function ConceptNavbar({
 
   return (
     <Box className={clsx(css.pane, className)} {...boxProps}>
-      {isLoading ?
+      {isLoading ? (
         <Loader m="md" size="sm" />
-      : <ScrollArea h="100%" w="100%">
+      ) : (
+        <ScrollArea h="100%" w="100%">
           <NavLinkList
             pt="md"
             links={conceptLinks}
@@ -53,7 +54,7 @@ export function ConceptNavbar({
             inactiveHoverColor="neutral.1"
           />
         </ScrollArea>
-      }
+      )}
     </Box>
   );
 }

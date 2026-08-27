@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { ColorInput, TextInput } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
@@ -42,8 +42,8 @@ export function CategoricalControls({
             onChange={(event) => {
               const categories = color.categories.map(
                 (current, currentIndex) => {
-                  return currentIndex === index ?
-                      { ...current, value: event.currentTarget.value }
+                  return currentIndex === index
+                    ? { ...current, value: event.currentTarget.value }
                     : current;
                 },
               );

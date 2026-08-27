@@ -45,9 +45,9 @@ function _buildDriveErrorMessage(
   }>,
 ): string {
   const detail =
-    options.reason === undefined ?
-      `HTTP ${options.status}`
-    : `HTTP ${options.status}, reason "${options.reason}"`;
+    options.reason === undefined
+      ? `HTTP ${options.status}`
+      : `HTTP ${options.status}, reason "${options.reason}"`;
   return `Google Drive request failed (${options.code}): ${detail}.`;
 }
 

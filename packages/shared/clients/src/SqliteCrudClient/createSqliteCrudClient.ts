@@ -320,8 +320,8 @@ function _buildWhereClause<DBRead extends Record<string, unknown>>(
     });
   });
 
-  return clauses.length === 0 ?
-      { where: "", params: [] }
+  return clauses.length === 0
+    ? { where: "", params: [] }
     : { where: ` where ${clauses.join(" and ")}`, params };
 }
 
@@ -389,9 +389,9 @@ function _buildInsertSql(args: Readonly<BuildInsertSqlArgs>): string {
         })
         .join(", ");
       conflict =
-        updates.length === 0 ?
-          ` on conflict (${onCols}) do nothing`
-        : ` on conflict (${onCols}) do update set ${updates}`;
+        updates.length === 0
+          ? ` on conflict (${onCols}) do nothing`
+          : ` on conflict (${onCols}) do update set ${updates}`;
     }
   }
   return `insert into ${table} (${colsClause}) values ${values}${conflict} returning *`;

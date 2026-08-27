@@ -4,8 +4,8 @@ import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/Export
 import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton";
 import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
 import { DashboardShareButton } from "@/views/DashboardApp/DashboardShareModal/DashboardShareButton";
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ReactElement } from "react";
 
 type Props = {

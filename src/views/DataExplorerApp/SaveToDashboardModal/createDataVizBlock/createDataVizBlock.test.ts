@@ -1,5 +1,5 @@
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it } from "vitest";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import {
   createDataVizBlock,
   DATA_EXPLORER_FALLBACK_PROMPT,

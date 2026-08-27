@@ -72,8 +72,8 @@ function _withApplyAoiFilter(
   options: Readonly<{ layer: MapLayer.T; applyAoiFilter: boolean }>,
 ): MapLayer.T {
   const { layer, applyAoiFilter } = options;
-  return applyAoiFilter === layer.applyAoiFilter ?
-      layer
+  return applyAoiFilter === layer.applyAoiFilter
+    ? layer
     : { ...layer, applyAoiFilter };
 }
 
@@ -97,9 +97,9 @@ function withName(
     return layer;
   }
   const legend =
-    layer.legend.title === layer.name ?
-      { ...layer.legend, title: name }
-    : layer.legend;
+    layer.legend.title === layer.name
+      ? { ...layer.legend, title: name }
+      : layer.legend;
   return { ...layer, name, legend };
 }
 

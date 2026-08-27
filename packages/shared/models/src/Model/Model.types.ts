@@ -6,8 +6,8 @@ export type ModelTypeKey = "__type";
 export type ModelBase<
   MType extends string = string,
   MProps extends Record<string, unknown> = EmptyObject,
-> =
-  MProps extends EmptyObject ? { __type: MType }
+> = MProps extends EmptyObject
+  ? { __type: MType }
   : Simplify<{ __type: MType } & MProps>;
 
 export type ModelVersioned<

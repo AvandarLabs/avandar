@@ -1,5 +1,5 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import {
   clearDatasetRowCountCache,

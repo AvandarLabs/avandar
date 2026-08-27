@@ -71,8 +71,8 @@ function _isRectangle(mark: PathMark): boolean {
 }
 
 function _barOf(bbox: BBox, orientation: Orientation): Bar {
-  return orientation === "bar" ?
-      {
+  return orientation === "bar"
+    ? {
         bbox,
         categoryCenter: (bbox[1] + bbox[3]) / 2,
         freeEdge: bbox[2],

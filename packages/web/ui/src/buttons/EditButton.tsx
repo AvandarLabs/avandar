@@ -58,24 +58,24 @@ export function EditButton({
   };
 
   const passThroughProps =
-    as === "button" ?
-      {
-        ...defaultButtonProps,
-        ...props,
-      }
-    : {
-        ...defaultAnchorProps,
-        ...props,
-      };
+    as === "button"
+      ? {
+          ...defaultButtonProps,
+          ...props,
+        }
+      : {
+          ...defaultAnchorProps,
+          ...props,
+        };
 
   return (
     <ActionIcon
       tooltip={
-        withTooltip ?
-          props.name ?
-            i18n.editNamed(props.name)
-          : i18n.edit
-        : undefined
+        withTooltip
+          ? props.name
+            ? i18n.editNamed(props.name)
+            : i18n.edit
+          : undefined
       }
       {...passThroughProps}
     >

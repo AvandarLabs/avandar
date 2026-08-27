@@ -34,20 +34,22 @@ export function OntologyDesignerApp(): JSX.Element {
       toolbarButtonSection={<NewCaseTypeButton />}
       containerProps={showMasterDetail ? undefined : { p: "md" }}
     >
-      {showMasterDetail ?
+      {showMasterDetail ? (
         <Flex align="stretch" h="100%">
-          {caseTypes.length > 0 || isLoading ?
+          {caseTypes.length > 0 || isLoading ? (
             <ConceptNavbar
               miw={240}
               concepts={caseTypes}
               isLoading={isLoading}
             />
-          : null}
+          ) : null}
           <ScrollArea h="100%" w="100%">
             <Outlet />
           </ScrollArea>
         </Flex>
-      : <Outlet />}
+      ) : (
+        <Outlet />
+      )}
     </AppLayout>
   );
 }

@@ -6217,9 +6217,9 @@
           .setAttribute("aria-expanded", "false");
         // Cases by health zone has no coordinate columns; the others do.
         goToState(
-          option.textContent.indexOf("by health zone") !== -1 ?
-            "bind-none"
-          : "bind-inferred",
+          option.textContent.indexOf("by health zone") !== -1
+            ? "bind-none"
+            : "bind-inferred",
         );
       });
     });

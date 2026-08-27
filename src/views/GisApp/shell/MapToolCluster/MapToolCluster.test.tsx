@@ -1,11 +1,11 @@
+import { useState } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 /**
  * Tool cluster: Area gating, pressed state, Escape, and AOI commit.
  */
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { useState } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, within } from "@/test-utils";
 import {
   createFakeMap,
@@ -16,9 +16,9 @@ import {
   AreaToolHarness,
   MeasureToolHarness,
 } from "@/views/GisApp/shell/MapToolCluster/mapToolClusterHarness";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { FeatureFlag } from "@/config/FeatureFlagConfig";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ReactNode } from "react";
 
 const spatialAvailability = vi.hoisted(() => {

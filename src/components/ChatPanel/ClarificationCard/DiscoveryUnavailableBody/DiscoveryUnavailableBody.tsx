@@ -25,7 +25,7 @@ export function DiscoveryUnavailableBody({
 }: Readonly<Props>): React.ReactNode {
   return (
     <Stack gap="xs">
-      {error ?
+      {error ? (
         <Alert
           icon={<IconAlertCircle size={14} />}
           color="red"
@@ -38,19 +38,20 @@ export function DiscoveryUnavailableBody({
             {queryPreview}
           </Code>
         </Alert>
-      : <Text size="xs" c="dimmed">
+      ) : (
+        <Text size="xs" c="dimmed">
           <Trans>
             No values were returned from {column}. Describe what you need
             instead.
           </Trans>
         </Text>
-      }
-      {error && (onRetry || onRequestDifferentDiscovery) ?
+      )}
+      {error && (onRetry || onRequestDifferentDiscovery) ? (
         <DiscoveryRecoveryActions
           onRetry={onRetry}
           onRequestDifferentDiscovery={onRequestDifferentDiscovery}
         />
-      : null}
+      ) : null}
       <DiscoveryCustomFallback onSubmit={onSubmit} />
     </Stack>
   );

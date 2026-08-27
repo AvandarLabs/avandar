@@ -5,10 +5,6 @@ import { parseProposeCaseType } from "@sbfn/chat/PostChatMessages/parsing/parseP
 import { cleanLlmGeneratedSql } from "@sbfn/chat/utils/cleanLlmGeneratedSql/cleanLlmGeneratedSql.ts";
 import { extractSqlFromAssistantText } from "@sbfn/chat/utils/extractSqlFromAssistantText/extractSqlFromAssistantText.ts";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
-import type {
-  OpenRouterMessage,
-  OpenRouterToolCall,
-} from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type {
   ChatClarifyRequest,
@@ -16,6 +12,10 @@ import type {
   ChatGeneratedDashboardBlock,
   ChatProposedCaseType,
 } from "$/types/chat.types.ts";
+import type {
+  OpenRouterMessage,
+  OpenRouterToolCall,
+} from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 
 export type ParsedAttempt = {
   text: string;
@@ -142,9 +142,8 @@ function applySqlTableAliasesToParsedAttempt(
     return parsed;
   }
   const aliases = SqlTableAlias.fromSchema({ datasets, concepts });
-  const generatedSql =
-    parsed.generatedSql ?
-      {
+  const generatedSql = parsed.generatedSql
+    ? {
         ...parsed.generatedSql,
         sql: SqlTableAlias.applyToSql(parsed.generatedSql.sql, aliases),
       }

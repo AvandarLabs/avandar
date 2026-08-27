@@ -123,9 +123,9 @@ function _getLayerGeometry(options: {
     sensitivity: options.layer.sensitivity,
     propertyColumnNames: _getPropertyColumnNames(options),
     rows:
-      options.queryState?.data?.type === "rows" ?
-        options.queryState.data.queryResult.data
-      : undefined,
+      options.queryState?.data?.type === "rows"
+        ? options.queryState.data.queryResult.data
+        : undefined,
   });
 }
 

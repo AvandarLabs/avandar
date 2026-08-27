@@ -90,8 +90,8 @@ export function GlobalFilterSubscriptionPField({
         {modeDescriptions[subscription.mode]}
       </Text>
 
-      {subscription.mode === "selected" ?
-        registeredFilters.length === 0 ?
+      {subscription.mode === "selected" ? (
+        registeredFilters.length === 0 ? (
           <Alert
             color="blue"
             variant="light"
@@ -104,7 +104,8 @@ export function GlobalFilterSubscriptionPField({
               </Trans>
             </Text>
           </Alert>
-        : <ScrollArea.Autosize mah={200}>
+        ) : (
+          <ScrollArea.Autosize mah={200}>
             <Stack gap={4}>
               {registeredFilters.map((f) => {
                 return (
@@ -128,8 +129,8 @@ export function GlobalFilterSubscriptionPField({
               })}
             </Stack>
           </ScrollArea.Autosize>
-
-      : null}
+        )
+      ) : null}
     </Stack>
   );
 }

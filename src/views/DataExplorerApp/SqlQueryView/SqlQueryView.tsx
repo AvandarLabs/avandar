@@ -81,35 +81,36 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
     <SqlSyncWarningNotes syncWarnings={sqlSyncWarnings} />
   );
 
-  const editor =
-    isEditMode ?
-      <SqlQueryEditPanel
-        initialSql={rawSql}
-        submitButtonLabel={t`Re-run query`}
-        cancelButtonLabel={t`Cancel`}
-        minRows={SQL_EDITOR_MIN_ROWS}
-        onSubmit={onSubmitSql}
-        onCancel={() => {
-          setIsEditMode(false);
-        }}
-      />
-    : <SqlReadOnlyBlock
-        displaySql={displaySql}
-        minRows={SQL_EDITOR_MIN_ROWS}
-        onEdit={() => {
-          setIsEditMode(true);
-        }}
-      />;
+  const editor = isEditMode ? (
+    <SqlQueryEditPanel
+      initialSql={rawSql}
+      submitButtonLabel={t`Re-run query`}
+      cancelButtonLabel={t`Cancel`}
+      minRows={SQL_EDITOR_MIN_ROWS}
+      onSubmit={onSubmitSql}
+      onCancel={() => {
+        setIsEditMode(false);
+      }}
+    />
+  ) : (
+    <SqlReadOnlyBlock
+      displaySql={displaySql}
+      minRows={SQL_EDITOR_MIN_ROWS}
+      onEdit={() => {
+        setIsEditMode(true);
+      }}
+    />
+  );
 
   const groups: SettingsColumnGroup[] = [
     { id: "sql", title: "SQL", content: editor },
-    hasSyncWarnings ?
-      {
-        id: "sync-notes",
-        title: t`Manual form shows an approximation`,
-        content: syncWarningNotes,
-      }
-    : undefined,
+    hasSyncWarnings
+      ? {
+          id: "sync-notes",
+          title: t`Manual form shows an approximation`,
+          content: syncWarningNotes,
+        }
+      : undefined,
   ].filter(isDefined);
 
   return matchLiteral(layout, {
@@ -125,7 +126,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
     stacked: () => {
       return (
         <Stack gap="xs" px="sm" className={css.root}>
-          {hasSyncWarnings ?
+          {hasSyncWarnings ? (
             <Alert
               icon={<IconAlertTriangle size={16} />}
               color="yellow"
@@ -134,7 +135,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
             >
               {syncWarningNotes}
             </Alert>
-          : null}
+          ) : null}
           {editor}
         </Stack>
       );
