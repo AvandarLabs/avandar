@@ -60,7 +60,7 @@ buckets, no share-modal changes. Those are phases 2 to 4.
 **Non-goals**
 
 - No new `role_level` values, no new `app_type`, no new permission keys. This
-  phase changes _when_ an existing grant applies, not what grants exist.
+  phase changes *when* an existing grant applies, not what grants exist.
 - No change to the resource-share data model.
 - No request-access flow. A user who cannot see a resource sees nothing; there
   is no "ask the owner" affordance.
@@ -225,7 +225,7 @@ a second row fetch in a function that RLS calls per row.
 
 ### 4.1 Closing the `resource_shares` self-grant bypass
 
-Narrowing `util__resource_effective_role` is sufficient for the _read_ helpers
+Narrowing `util__resource_effective_role` is sufficient for the *read* helpers
 (parent §4.3), but not on its own. `17.rls.resource_shares.sql` grants
 `util__is_settings_admin` **unconditionally**, as a disjunct that does not
 consult `util__auth_user_can_access_resource`:
@@ -592,31 +592,31 @@ Extend `supabase/tests/database/permissions/`. Following the existing style
 
 New file `util_is_resource_private_to_owner.test.sql`:
 
-| Fixture                                                                                                   | Expected                               |
-| --------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| restricted, zero shares                                                                                   | `true`                                 |
-| restricted, one `user` share to a non-owner                                                               | `false`                                |
-| restricted, one `user` share whose principal **is** the owner                                             | `true`                                 |
-| restricted, one `workspace` share (`principal_id is null`)                                                | `false`                                |
-| restricted, one `user_group` share                                                                        | `false`                                |
+| Fixture | Expected |
+| --- | --- |
+| restricted, zero shares | `true` |
+| restricted, one `user` share to a non-owner | `false` |
+| restricted, one `user` share whose principal **is** the owner | `true` |
+| restricted, one `workspace` share (`principal_id is null`) | `false` |
+| restricted, one `user_group` share | `false` |
 | restricted, `user_group` share with `requires_app_access = true` and no group member holding the app role | `false` (§3.1: intent to share counts) |
-| not restricted, zero shares                                                                               | `false`                                |
-| nonexistent resource id                                                                                   | `false`                                |
+| not restricted, zero shares | `false` |
+| nonexistent resource id | `false` |
 
 Run each case for `dashboard` and `dataset`.
 
 Extend `util_resource_effective_role.test.sql`:
 
-| Actor                               | Resource                                         | Expected                   |
-| ----------------------------------- | ------------------------------------------------ | -------------------------- |
-| Settings Admin                      | restricted, zero shares, owned by another member | `null`                     |
-| Settings Admin                      | restricted, shared to a third party              | `admin`                    |
-| Settings Admin                      | unrestricted                                     | `admin`                    |
-| Settings Admin                      | own restricted resource                          | `admin` (owner path)       |
-| Settings Admin                      | dashboard `is_public`, restricted, zero shares   | `admin` (§4 `v_is_public`) |
-| Workspace owner, not Settings Admin | restricted, zero shares                          | `null`                     |
-| Resource owner                      | own restricted resource                          | `admin`                    |
-| Member with a viewer share          | restricted                                       | `viewer`                   |
+| Actor | Resource | Expected |
+| --- | --- | --- |
+| Settings Admin | restricted, zero shares, owned by another member | `null` |
+| Settings Admin | restricted, shared to a third party | `admin` |
+| Settings Admin | unrestricted | `admin` |
+| Settings Admin | own restricted resource | `admin` (owner path) |
+| Settings Admin | dashboard `is_public`, restricted, zero shares | `admin` (§4 `v_is_public`) |
+| Workspace owner, not Settings Admin | restricted, zero shares | `null` |
+| Resource owner | own restricted resource | `admin` |
+| Member with a viewer share | restricted | `viewer` |
 
 Extend `resource_rls_role_matrix.test.sql`,
 `rls_datasets_dashboards_manager_writes.test.sql`, and
@@ -647,7 +647,7 @@ New file `resource_shares_private_resource_guard.test.sql`, covering §4.1:
 New file `rpc_resources__transfer_ownership.test.sql`:
 
 - Settings Admin can transfer; `owner_id` **and** `owner_profile_id` both move,
-  asserted for dashboards _and_ datasets since both carry the column.
+  asserted for dashboards *and* datasets since both carry the column.
 - A plain member cannot: `42501`.
 - Transferring to a non-member raises.
 - Transferring to the current owner is a no-op and writes no audit row.
@@ -680,15 +680,15 @@ member, then reassign it and confirm the count moves.
 
 ## 8. Risks
 
-| Risk                                                                                                                                                      | Mitigation                                                                                                                                                                                             |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Admins perceive the change as data loss.                                                                                                                  | Release note plus the Privacy log panel in the same deploy (§6.2).                                                                                                                                     |
-| An admin workflow silently depended on reading members' restricted resources.                                                                             | The pre-deploy count query in §6.2 sizes the exposure. Nothing in-repo depends on it, but a support or ops habit might.                                                                                |
-| `owner_profile_id` forgotten in the transfer RPC, leaving the offboarding deadlock unresolved while the RPC reports success. Applies to both tables.      | Called out in §5.2 step 5 and asserted in pgTAP for dashboards and datasets.                                                                                                                           |
-| Someone later adds a super-user bypass to a `may_select_*` helper above its `can_access_resource` gate, silently reopening the hole.                      | The §7.1 requirement to assert through the `may_select_*` helpers, not only `effective_role`.                                                                                                          |
-| Another unconditional super-user disjunct exists somewhere that grants a write which in turn grants a read, as the `resource_shares` policies did (§4.1). | Audited during design; see §8.1. Re-audit whenever a new policy references `util__is_settings_admin` or `util__can_manage_workspace_settings`.                                                         |
-| Performance regression: `effective_role` runs per row under RLS and now sometimes runs an extra `exists` on `resource_shares`.                            | The composed predicate short-circuits on `v_is_restricted`, so unrestricted resources (the common case) never run the subquery. The restricted path uses the existing `idx_resource_shares__resource`. |
-| Security-definer functions with a wrong `search_path` become an injection vector.                                                                         | All new functions set `search_path = public`, matching every existing helper.                                                                                                                          |
+| Risk | Mitigation |
+| --- | --- |
+| Admins perceive the change as data loss. | Release note plus the Privacy log panel in the same deploy (§6.2). |
+| An admin workflow silently depended on reading members' restricted resources. | The pre-deploy count query in §6.2 sizes the exposure. Nothing in-repo depends on it, but a support or ops habit might. |
+| `owner_profile_id` forgotten in the transfer RPC, leaving the offboarding deadlock unresolved while the RPC reports success. Applies to both tables. | Called out in §5.2 step 5 and asserted in pgTAP for dashboards and datasets. |
+| Someone later adds a super-user bypass to a `may_select_*` helper above its `can_access_resource` gate, silently reopening the hole. | The §7.1 requirement to assert through the `may_select_*` helpers, not only `effective_role`. |
+| Another unconditional super-user disjunct exists somewhere that grants a write which in turn grants a read, as the `resource_shares` policies did (§4.1). | Audited during design; see §8.1. Re-audit whenever a new policy references `util__is_settings_admin` or `util__can_manage_workspace_settings`. |
+| Performance regression: `effective_role` runs per row under RLS and now sometimes runs an extra `exists` on `resource_shares`. | The composed predicate short-circuits on `v_is_restricted`, so unrestricted resources (the common case) never run the subquery. The restricted path uses the existing `idx_resource_shares__resource`. |
+| Security-definer functions with a wrong `search_path` become an injection vector. | All new functions set `search_path = public`, matching every existing helper. |
 
 ---
 
@@ -698,14 +698,14 @@ Every other site referencing `util__is_settings_admin` or
 `util__can_manage_workspace_settings` was checked for the §4.1 shape, a write
 permitted unconditionally that in turn manufactures a read. All are closed.
 
-| Site                                                              | Grants                                                               | Why it cannot reach a private resource                                                                                                                                                                                                                                                                                 |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `07.role_groups.rls.sql`, `07.role_group_app_roles.rls.sql`       | Edit the per-app role matrix                                         | A private resource is `is_restricted`, so the app-role default never applies to it. Raising your own app role changes nothing.                                                                                                                                                                                         |
-| `07.rls.user_groups.sql`, `10.user_groups__memberships.sql`       | Create groups, add yourself to one                                   | A private resource has no `user_group` share to match.                                                                                                                                                                                                                                                                 |
-| `18.user_workspace_policies.sql` (`workspaces` UPDATE)            | Reassign `owner_id`, so an admin can make themselves workspace owner | Workspace owners are **not** short-circuited in `util__resource_effective_role`, and the `may_select_*` `can_manage_workspace_settings` bypass sits behind the `can_access_resource` gate (parent §4.3). Becoming owner grants nothing here.                                                                           |
-| `18.user_workspace_policies.sql` (`workspace_memberships` DELETE) | Remove another member                                                | `util__resource_effective_role` keys on the **caller's** membership, not the owner's, so removing the owner grants the admin nothing. It does strand the resource, since the `dashboards` UPDATE policy requires `owner_id` to still be a workspace member; that is an argument for the transfer RPC, not a read hole. |
-| `18.user_workspace_policies.sql` (`user_profiles` DELETE)         | Delete a member's profile                                            | `owner_profile_id` is `on delete no action` on both resource tables, so the delete is refused.                                                                                                                                                                                                                         |
-| `60.rpc_datasets__add_dataset.sql`                                | Create a dataset                                                     | Creating a new resource says nothing about an existing one.                                                                                                                                                                                                                                                            |
+| Site | Grants | Why it cannot reach a private resource |
+| --- | --- | --- |
+| `07.role_groups.rls.sql`, `07.role_group_app_roles.rls.sql` | Edit the per-app role matrix | A private resource is `is_restricted`, so the app-role default never applies to it. Raising your own app role changes nothing. |
+| `07.rls.user_groups.sql`, `10.user_groups__memberships.sql` | Create groups, add yourself to one | A private resource has no `user_group` share to match. |
+| `18.user_workspace_policies.sql` (`workspaces` UPDATE) | Reassign `owner_id`, so an admin can make themselves workspace owner | Workspace owners are **not** short-circuited in `util__resource_effective_role`, and the `may_select_*` `can_manage_workspace_settings` bypass sits behind the `can_access_resource` gate (parent §4.3). Becoming owner grants nothing here. |
+| `18.user_workspace_policies.sql` (`workspace_memberships` DELETE) | Remove another member | `util__resource_effective_role` keys on the **caller's** membership, not the owner's, so removing the owner grants the admin nothing. It does strand the resource, since the `dashboards` UPDATE policy requires `owner_id` to still be a workspace member; that is an argument for the transfer RPC, not a read hole. |
+| `18.user_workspace_policies.sql` (`user_profiles` DELETE) | Delete a member's profile | `owner_profile_id` is `on delete no action` on both resource tables, so the delete is refused. |
+| `60.rpc_datasets__add_dataset.sql` | Create a dataset | Creating a new resource says nothing about an existing one. |
 
 Post-fix, an admin also cannot flip `is_restricted` on a private resource:
 `dashboards` and `datasets` UPDATE route through

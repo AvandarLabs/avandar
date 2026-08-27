@@ -31,22 +31,22 @@ delta without diffing.
 The verbatim draft is preserved outside the repo at the lane C session's scratch
 directory as `spec4.md`.
 
-| #   | Change                                                                                                                                                                                                                                      | Why                                                                                                                                                                                                                                                                                                                                                                                         |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **New blocker found: `GoogleSheetsDatasetParsers` cannot parse a real row.** `google_account_id` is validated with `z.uuid()`, but the column holds a Google `sub`. See section 3.1                                                         | Proven, not inferred. This alone makes the exit criterion unreachable, and the draft did not mention it                                                                                                                                                                                                                                                                                     |
-| 2   | **Second blocker found: the "Connect to Google Sheets" button was hard-disabled.** `GoogleSheetsImportView.tsx:369` set `disabled` unconditionally. See section 3.2                                                                         | A user with no existing token could not reach the Picker at all, so "import through the Picker" was not demonstrable on a fresh account. Removed outright, not flagged                                                                                                                                                                                                                      |
-| 3   | **This lane ships no `SourceWrapper` and touches no `QetlClient` file.** Draft sections 5.3 and 7.1, and draft minimum-path steps 5, 6, 10 and 11, all edited files that belong to other lanes. Replaced by section 8, the integration seam | `docs/superpowers/plans/2026-08-19-qetl-parallelization.md:212` and the lane C handoff both make `src/clients/qetl/` off-limits here                                                                                                                                                                                                                                                        |
-| 4   | **The tab list comes from the exported workbook, not from the Sheets API.** Draft section 7.2 item 1 fetched `availableSheets` from `google-sheets/:id`. See section 7.2                                                                    | `sniffXlsxFile` already returns `sheets: string[]` (`src/workers/xlsxSniff.worker.ts:30`). Using it removes the connector's last Sheets API call, so `drive.file` sufficiency stops depending on a scope claim about `spreadsheets.get`, and the project-global 300 reads/minute quota leaves the connector entirely                                                                        |
-| 5   | **`p_sheet_name` is `public.util__nullable_text`, not `text default null`.** See section 6.1                                                                                                                                                | `supabase/schemas/50.rpc_util_types.sql:16` exists precisely because Supabase's type generator will not emit a nullable parameter for a bare `text`. `rpc_datasets__add_xlsx_file_dataset` already uses the wrapper for the identical column                                                                                                                                                |
-| 6   | **The scope reduction has nothing to migrate.** See section 9.1                                                                                                                                                                             | Removing a scope from the authorization request does not narrow a refresh token already granted under the wider set, so an earlier revision worked through that migration in detail. It does not apply: the connector shipped hard-disabled, so there are no existing users on the sensitive grant (Pablo, 2026-08-19) and every token from here forward is `drive.file` only               |
-| 7   | **Losing the per-file grant presents as 404, not 403.** Draft section 9.3 offered both. See section 10.3                                                                                                                                    | Under `drive.file` a non-granted file is invisible, so Drive answers "not found". The consequence is that revocation and deletion are indistinguishable to us, which changes the error copy                                                                                                                                                                                                 |
-| 8   | **The 10 MB cap cannot be pre-checked, and the error is the only signal.** See section 11.3                                                                                                                                                 | The cap is on the size of the _rendered_ XLSX, which is unknown before the call. `maxBytesPerCall` is documentation, not an enforceable guard                                                                                                                                                                                                                                               |
-| 9   | **`File.version` false positives are guaranteed, not merely possible.** See section 11.1                                                                                                                                                    | Drive documents `version` as reflecting "every change made to the file on the server, even those not visible to the user"                                                                                                                                                                                                                                                                   |
-| 10  | **Four corrections handed to the integration session rather than applied here.** See section 8.3                                                                                                                                            | They are edits to `GoogleSheetsWrapper` and to `shared/models/relations/`, both outside this lane                                                                                                                                                                                                                                                                                           |
-| 11  | **Stale line references fixed and every code block labelled.** `qetlDiceExtractors.ts` throws at `:131`, not `:107`. Section 15 states the compile status of every snippet                                                                  | Draft snippets were shipped uncompiled in QETL plan tasks 5, 7, 11 and 14, and the repo had to be declared the authority                                                                                                                                                                                                                                                                    |
-| 12  | **`rows_to_skip` is dropped for `google_sheets`, as the draft decided, and the reason is now proven rather than assumed.** See section 7.4                                                                                                  | This revision set out to overturn the draft's regression by carrying the skip through `read_xlsx`'s `range`. Executed against the pinned DuckDB, that does not work: every open-ended range form is either rejected or pads the result to the sheet's maximum extent. The draft's decision stands, and section 7.4 now records the measurements and the exact recipe a follow-up would need |
-| 13  | **A new row stores the tab that was read, not the tab that was selected.** See section 6.3                                                                                                                                                  | Found by a surviving mutation during implementation, not by reading the code: the two differ when a user picks a tab and saves without re-parsing, and storing the selection would leave `sheet_name` disagreeing with `dataset_columns`                                                                                                                                                    |
-| 14  | **Error copy uses `msg` + `i18n._`, not a threaded `t`.** See section 10.3                                                                                                                                                                  | The first implementation passed `t` into a helper, which `docs/rules/i18n.md:16` bans by name: the extractor cannot follow a macro out of its lexical scope, so every string would have stayed untranslated in all six non-English locales while still rendering in English. Caught because the strings came back empty in the jsdom tests                                                  |
+| # | Change | Why |
+|---|---|---|
+| 1 | **New blocker found: `GoogleSheetsDatasetParsers` cannot parse a real row.** `google_account_id` is validated with `z.uuid()`, but the column holds a Google `sub`. See section 3.1 | Proven, not inferred. This alone makes the exit criterion unreachable, and the draft did not mention it |
+| 2 | **Second blocker found: the "Connect to Google Sheets" button was hard-disabled.** `GoogleSheetsImportView.tsx:369` set `disabled` unconditionally. See section 3.2 | A user with no existing token could not reach the Picker at all, so "import through the Picker" was not demonstrable on a fresh account. Removed outright, not flagged |
+| 3 | **This lane ships no `SourceWrapper` and touches no `QetlClient` file.** Draft sections 5.3 and 7.1, and draft minimum-path steps 5, 6, 10 and 11, all edited files that belong to other lanes. Replaced by section 8, the integration seam | `docs/superpowers/plans/2026-08-19-qetl-parallelization.md:212` and the lane C handoff both make `src/clients/qetl/` off-limits here |
+| 4 | **The tab list comes from the exported workbook, not from the Sheets API.** Draft section 7.2 item 1 fetched `availableSheets` from `google-sheets/:id`. See section 7.2 | `sniffXlsxFile` already returns `sheets: string[]` (`src/workers/xlsxSniff.worker.ts:30`). Using it removes the connector's last Sheets API call, so `drive.file` sufficiency stops depending on a scope claim about `spreadsheets.get`, and the project-global 300 reads/minute quota leaves the connector entirely |
+| 5 | **`p_sheet_name` is `public.util__nullable_text`, not `text default null`.** See section 6.1 | `supabase/schemas/50.rpc_util_types.sql:16` exists precisely because Supabase's type generator will not emit a nullable parameter for a bare `text`. `rpc_datasets__add_xlsx_file_dataset` already uses the wrapper for the identical column |
+| 6 | **The scope reduction has nothing to migrate.** See section 9.1 | Removing a scope from the authorization request does not narrow a refresh token already granted under the wider set, so an earlier revision worked through that migration in detail. It does not apply: the connector shipped hard-disabled, so there are no existing users on the sensitive grant (Pablo, 2026-08-19) and every token from here forward is `drive.file` only |
+| 7 | **Losing the per-file grant presents as 404, not 403.** Draft section 9.3 offered both. See section 10.3 | Under `drive.file` a non-granted file is invisible, so Drive answers "not found". The consequence is that revocation and deletion are indistinguishable to us, which changes the error copy |
+| 8 | **The 10 MB cap cannot be pre-checked, and the error is the only signal.** See section 11.3 | The cap is on the size of the *rendered* XLSX, which is unknown before the call. `maxBytesPerCall` is documentation, not an enforceable guard |
+| 9 | **`File.version` false positives are guaranteed, not merely possible.** See section 11.1 | Drive documents `version` as reflecting "every change made to the file on the server, even those not visible to the user" |
+| 10 | **Four corrections handed to the integration session rather than applied here.** See section 8.3 | They are edits to `GoogleSheetsWrapper` and to `shared/models/relations/`, both outside this lane |
+| 11 | **Stale line references fixed and every code block labelled.** `qetlDiceExtractors.ts` throws at `:131`, not `:107`. Section 15 states the compile status of every snippet | Draft snippets were shipped uncompiled in QETL plan tasks 5, 7, 11 and 14, and the repo had to be declared the authority |
+| 12 | **`rows_to_skip` is dropped for `google_sheets`, as the draft decided, and the reason is now proven rather than assumed.** See section 7.4 | This revision set out to overturn the draft's regression by carrying the skip through `read_xlsx`'s `range`. Executed against the pinned DuckDB, that does not work: every open-ended range form is either rejected or pads the result to the sheet's maximum extent. The draft's decision stands, and section 7.4 now records the measurements and the exact recipe a follow-up would need |
+| 13 | **A new row stores the tab that was read, not the tab that was selected.** See section 6.3 | Found by a surviving mutation during implementation, not by reading the code: the two differ when a user picks a tab and saves without re-parsing, and storing the selection would leave `sheet_name` disagreeing with `dataset_columns` |
+| 14 | **Error copy uses `msg` + `i18n._`, not a threaded `t`.** See section 10.3 | The first implementation passed `t` into a helper, which `docs/rules/i18n.md:16` bans by name: the extractor cannot follow a macro out of its lexical scope, so every string would have stayed untranslated in all six non-English locales while still rendering in English. Caught because the strings came back empty in the jsdom tests |
 
 ---
 
@@ -248,12 +248,12 @@ account id as a UUID has the same defect. The plan includes a sweep
 ### 3.2 The Picker is unreachable on an account with no token
 
 `GoogleSheetsImportView.tsx:366-397` renders, for a user who is not yet Google
-authenticated, a `Tooltip` reading _"Google sheets connector is disabled while
-this feature is under maintenance."_ wrapped around a `Button` whose first prop
+authenticated, a `Tooltip` reading *"Google sheets connector is disabled while
+this feature is under maintenance."* wrapped around a `Button` whose first prop
 is `disabled`. The `onClick` that fetches `google-auth/auth-url` and redirects
 to consent is present and unreachable.
 
-The exit criterion is _import a Sheet through the Picker on `drive.file` alone_.
+The exit criterion is *import a Sheet through the Picker on `drive.file` alone*.
 Demonstrating "on `drive.file` alone" wants a token granted from the narrowed
 scope set (section 9.1), and a new grant needs the consent flow, which needs
 this button. An account that happens to hold an old token can reach the Picker,
@@ -277,12 +277,12 @@ The 2026-08-18 draft's section 3 listed Google Cloud console work. The decisions
 log section 3 closed all of it (Pablo, 2026-08-18). Restated here so nobody
 re-requests it:
 
-| #   | Item                                                                 | State                                                                                                                       |
-| --- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Google Drive API enabled on the project behind `GOOGLE_CLIENT_ID`    | **Done.** Project number `323714789211`, verified as the numeric prefix of `GOOGLE_CLIENT_ID` in `.env.development.edge:30` |
-| 2   | Picker API enabled, API key not restricted away from Drive or Picker | **Done and verified clean**                                                                                                 |
-| 3   | `VITE_GOOGLE_PICKER_API_KEY` present                                 | **Present** in `.env.development:16` and `.env.example:20`                                                                  |
-| 4   | Scope reduction needs console action                                 | **No.** A narrower request is always allowed                                                                                |
+| # | Item | State |
+|---|---|---|
+| 1 | Google Drive API enabled on the project behind `GOOGLE_CLIENT_ID` | **Done.** Project number `323714789211`, verified as the numeric prefix of `GOOGLE_CLIENT_ID` in `.env.development.edge:30` |
+| 2 | Picker API enabled, API key not restricted away from Drive or Picker | **Done and verified clean** |
+| 3 | `VITE_GOOGLE_PICKER_API_KEY` present | **Present** in `.env.development:16` and `.env.example:20` |
+| 4 | Scope reduction needs console action | **No.** A narrower request is always allowed |
 
 **One item is not console work and is not a file edit either.** `.env.production`
 and `.env.staging` are gitignored (`.gitignore:29-31`) and neither carries
@@ -367,7 +367,7 @@ section 5.2.
 
 1. **`setAppId(<project number>)`.** Google's Picker guide is explicit that
    `PickerBuilder.setAppId` takes the Cloud project number and that it is what
-   _"allows the app to access the user's files"_, and that the same Cloud project
+   *"allows the app to access the user's files"*, and that the same Cloud project
    must hold both the client id and the app id. The current builder
    (`useGooglePicker.ts:75-93`) sets `setOAuthToken` and `setDeveloperKey` and
    **not** `setAppId`. The method exists in this repo's type definitions
@@ -437,10 +437,10 @@ them; section 8.1 shows the two-line call site.
 
 Endpoints, so the implementer does not have to look them up:
 
-| Call    | Request                                                                                                                                                                                                              |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Export  | `GET https://www.googleapis.com/drive/v3/files/{fileId}/export?mimeType=application%2Fvnd.openxmlformats-officedocument.spreadsheetml.sheet` with `Authorization: Bearer <token>`; the response body is the workbook |
-| Version | `GET https://www.googleapis.com/drive/v3/files/{fileId}?fields=version` with the same header; the response is `{ "version": "42" }`                                                                                  |
+| Call | Request |
+|---|---|
+| Export | `GET https://www.googleapis.com/drive/v3/files/{fileId}/export?mimeType=application%2Fvnd.openxmlformats-officedocument.spreadsheetml.sheet` with `Authorization: Bearer <token>`; the response body is the workbook |
+| Version | `GET https://www.googleapis.com/drive/v3/files/{fileId}?fields=version` with the same header; the response is `{ "version": "42" }` |
 
 **The version is read before the export, not after, and this ordering is a
 correctness decision.** Read after, and a file edited between the two calls
@@ -530,18 +530,18 @@ project.
    `supabase/migrations/<UTC timestamp>_add_sheet_name_to_google_sheets_datasets.sql`.
 
    **Review the generated diff for two specific things**, because `supabase db
-diff` cannot see intent:
+   diff` cannot see intent:
 
    - **A `drop function if exists` for the old eight-argument signature.**
      `create or replace function` with a different argument list creates an
-     _overload_ rather than replacing, and two overloads reachable by name make
+     *overload* rather than replacing, and two overloads reachable by name make
      PostgREST ambiguous. The precedent is
      `supabase/migrations/20251001090658_Added nullable arguments to rpc_datasets__add_csv_file_dataset.sql`,
      whose first statement is exactly that drop. If the generator does not emit
      it, add it, and say so in the plan's task record.
    - **The four RLS policies and the `updated_at` trigger on
      `datasets__google_sheets` are not dropped and recreated.** An `alter table
-... add column` should not touch them. If the diff rewrites them, it is
+     ... add column` should not touch them. If the diff rewrites them, it is
      doing more than asked.
 
 4. **`pnpm db:gen-types`**, so `shared/types/database.types.ts` carries the new
@@ -551,12 +551,12 @@ diff` cannot see intent:
 
 ### 6.2 Model layer
 
-| File                                                                                                       | Change                                                                                                                                                                                                                                                                                                                          |
-| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `shared/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types.ts`                                  | Add `sheetName: string \| null` to `GoogleSheetsDatasetRead` with a doc comment; add `"sheetName"` to the `SetOptional` list in `Insert` (currently `"createdAt" \| "id" \| "rowsToSkip" \| "updatedAt"`)                                                                                                                       |
-| `shared/models/datasets/GoogleSheetsDataset/GoogleSheetsDatasetParsers.ts`                                 | Add `sheet_name: z.string().nullable()` to `DBReadSchema`, **and** fix `google_account_id` per section 3.1. The `ZodConsistencyTests` type test at the bottom of that file fails to compile if the first is forgotten, which is the intended guard; nothing at compile time catches the second, which is why section 3.1 exists |
-| `src/clients/datasets/DatasetClient/createDatasetMutations.ts` (the `_makeInsertGoogleSheetsDataset` body) | Pass `p_sheet_name: { value: params.sheetName ?? null }`                                                                                                                                                                                                                                                                        |
-| `src/clients/datasets/DatasetClient/DatasetClient.types.ts:63-67`                                          | Add `sheetName?: string` to `GoogleSheetsDatasetInsertParams`, matching `XlsxDatasetInsertParams:56`                                                                                                                                                                                                                            |
+| File | Change |
+|---|---|
+| `shared/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types.ts` | Add `sheetName: string \| null` to `GoogleSheetsDatasetRead` with a doc comment; add `"sheetName"` to the `SetOptional` list in `Insert` (currently `"createdAt" \| "id" \| "rowsToSkip" \| "updatedAt"`) |
+| `shared/models/datasets/GoogleSheetsDataset/GoogleSheetsDatasetParsers.ts` | Add `sheet_name: z.string().nullable()` to `DBReadSchema`, **and** fix `google_account_id` per section 3.1. The `ZodConsistencyTests` type test at the bottom of that file fails to compile if the first is forgotten, which is the intended guard; nothing at compile time catches the second, which is why section 3.1 exists |
+| `src/clients/datasets/DatasetClient/createDatasetMutations.ts` (the `_makeInsertGoogleSheetsDataset` body) | Pass `p_sheet_name: { value: params.sheetName ?? null }` |
+| `src/clients/datasets/DatasetClient/DatasetClient.types.ts:63-67` | Add `sheetName?: string` to `GoogleSheetsDatasetInsertParams`, matching `XlsxDatasetInsertParams:56` |
 
 `rows_to_skip` stays on the table and stays applied (section 7.4).
 
@@ -570,7 +570,7 @@ every existing row gets `sheet_name = NULL`.
 `GoogleSheetsRoutes.ts:44-66` reads `sheets[0]` after filtering to `sheetType
 === "GRID"`. So no data migration and no rewrite of stored metadata.
 
-**A new row stores the tab that was _read_, not the tab that was _selected_.**
+**A new row stores the tab that was *read*, not the tab that was *selected*.**
 The two diverge when a user picks a different tab and saves without pressing
 "Process data again": the columns recorded in `dataset_columns` are still the
 parsed tab's, so recording the newly selected name would leave `sheet_name`
@@ -586,8 +586,8 @@ parsed tabs differ, which is what the original fixture could not express.
 
 One honest caveat, unchanged from the draft and worth keeping. `NULL` resolves
 through two slightly different "first" definitions: the old import path meant
-_the first GRID tab as the Sheets API orders them_, while `read_xlsx` with no
-`sheet` argument means _the first sheet in the exported workbook_. These agree
+*the first GRID tab as the Sheets API orders them*, while `read_xlsx` with no
+`sheet` argument means *the first sheet in the exported workbook*. These agree
 unless the workbook's first tab is not a GRID (a chart-only tab, for instance),
 which is rare and which the user can fix in one action once the tab selector
 exists. The mitigation is cheap and worth taking: **new rows always write a
@@ -598,8 +598,8 @@ with a shrinking blast radius instead of a permanent one.
 
 `GoogleSheetsWrapper` declares `relations: "named-tabs"`, documented in
 `shared/models/relations/RelationCapabilities/RelationCapabilities.types.ts:24-27`
-as _"How many relations one `RelationRef` exposes ... a Google spreadsheet is
-many, one per named tab."_
+as *"How many relations one `RelationRef` exposes ... a Google spreadsheet is
+many, one per named tab."*
 
 **A `RelationRef` cannot express a tab today.**
 `shared/models/relations/RelationRef/RelationRef.types.ts:10-13`:
@@ -650,14 +650,14 @@ its signature make it a drop-in for acquisition:
 1. **It accepts raw bytes.** `DuckDbLoadXlsxOptions` is a union of
    `{ file: File }` and `{ fileBytes: Uint8Array<ArrayBuffer> }`
    (`duckDbXlsxLoad.ts:32-35`). The export response needs no `File` wrapper.
-2. **It takes the tab.** `sheet?: string`, documented as _"Worksheet name for
-   `read_xlsx`. Omit to load the first sheet (DuckDb default)"_, and passed
+2. **It takes the tab.** `sheet?: string`, documented as *"Worksheet name for
+   `read_xlsx`. Omit to load the first sheet (DuckDb default)"*, and passed
    through as `sheet = '<escaped>'` in `_transcodeXlsxToParquet`, escaped with
    `escapeSqlSingleQuotedLiteral`.
 3. **It returns exactly what acquisition must return.**
-   `DuckDbLoadXlsxResult.parquetData: Blob`, documented as _"The transcoded
+   `DuckDbLoadXlsxResult.parquetData: Blob`, documented as *"The transcoded
    parquet bytes for the loaded sheet ... Callers persist this Blob (e.g. into
-   IndexedDB) instead of re-running the conversion later"_. `AcquiredRelation`
+   IndexedDB) instead of re-running the conversion later"*. `AcquiredRelation`
    in `SourceWrapper.types.ts:21-25` wants `{ ref, parquetBlob, sourceVersion }`.
    The Blob is the same value.
 
@@ -693,7 +693,7 @@ So `GoogleSheetsImportView.tsx` changes to:
    `src/clients/datasets/xlsxSniff.ts:14`).
 3. Let the user pick a tab (a `Select`, defaulting to `defaultSheet`).
 4. Call `LocalDatasetClient.startXlsxImport({ file, parseOptions: { sheet,
-hasHeader } })` instead of `startCsvImport`, wrapping the bytes in a `File`
+   hasHeader } })` instead of `startCsvImport`, wrapping the bytes in a `File`
    because that mutation takes one (`LocalDatasetClient.ts:232-261`).
 5. Save with `sheetName` set to the chosen tab.
 
@@ -728,14 +728,14 @@ and the route may have other callers to confirm. Section 14 item 7 records it.
 The typing changes this forces, because `google_sheets` metadata is currently
 declared with the **CSV** load shape:
 
-| File                                                                                                                | Change                                                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DatasetImportForm.types.ts:59-63`                                                                                  | `GoogleSheetsLoadResult.sheetLoadMetadata` becomes `DuckDbLoadXlsxResult`; `rawText: string` becomes the workbook bytes                                             |
-| `useImportedColumns.ts:37-41`                                                                                       | The `google_sheets` branch reads the xlsx shape. The `csv_file` and `xlsx_file` branch immediately above it is the template, and `google_sheets` may simply join it |
-| `useSaveDataset.ts` (`_saveGoogleSheetsDataset`)                                                                    | Read columns from the xlsx result and pass `sheetName`                                                                                                              |
-| `makeDatasetImportedPayloadFromSaveResult`                                                                          | Analytics payload follows the same shape change                                                                                                                     |
-| `DatasetParseControls.tsx:142-159`                                                                                  | The `google_sheets` branch swaps its rows-to-skip `NumberInput` for a tab `Select` (section 7.4)                                                                    |
-| `useImportedColumns.test.ts`, `makeDatasetImportedPayloadFromSaveResult.test.ts`, `GoogleSheetsImportView.test.tsx` | These assert the CSV shape and must be updated in the same change                                                                                                   |
+| File | Change |
+|---|---|
+| `DatasetImportForm.types.ts:59-63` | `GoogleSheetsLoadResult.sheetLoadMetadata` becomes `DuckDbLoadXlsxResult`; `rawText: string` becomes the workbook bytes |
+| `useImportedColumns.ts:37-41` | The `google_sheets` branch reads the xlsx shape. The `csv_file` and `xlsx_file` branch immediately above it is the template, and `google_sheets` may simply join it |
+| `useSaveDataset.ts` (`_saveGoogleSheetsDataset`) | Read columns from the xlsx result and pass `sheetName` |
+| `makeDatasetImportedPayloadFromSaveResult` | Analytics payload follows the same shape change |
+| `DatasetParseControls.tsx:142-159` | The `google_sheets` branch swaps its rows-to-skip `NumberInput` for a tab `Select` (section 7.4) |
+| `useImportedColumns.test.ts`, `makeDatasetImportedPayloadFromSaveResult.test.ts`, `GoogleSheetsImportView.test.tsx` | These assert the CSV shape and must be updated in the same change |
 
 That is six files plus three test files: contained, mechanical, and typed
 end-to-end, so the compiler enumerates the work. It is the largest single piece
@@ -768,17 +768,17 @@ open-ended A1 syntax verified against the pinned DuckDB, which it had not done.
 run, against real workbook bytes in the node executed project on DuckDB
 `v1.5.5`, and it says the draft was right:
 
-| `read_xlsx(..., header = true, sheet = 'Only', range = ...)` | Result                                                                        |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| `range = 'A3:'`                                              | **Rejected.** `Binder Error: Invalid range 'A3:' specified`                   |
-| `range = 'A3'`                                               | **Rejected.** `Binder Error: Invalid range 'A3' specified`                    |
-| `range = '3:'`                                               | **Rejected.** `Binder Error: Invalid range '3:' specified`                    |
-| `range = 'A3:B5'` (exact)                                    | Correct: 2 rows, 2 columns, headers from row 3                                |
-| `range = 'A3:B1000'` (row bound too high)                    | 2 real rows followed by **998 all-NULL rows**                                 |
-| `range = 'A3:B'` (row bound omitted)                         | Same padding: rows to the sheet's maximum extent                              |
-| `range = 'A3:B', stop_at_empty = true`                       | Correct: 2 rows, 2 columns                                                    |
-| `range = 'A3:Z', stop_at_empty = true`                       | 2 rows and **26 columns**: `colA`, `colB`, then phantom `C2`, `_1`, `_2`, ... |
-| `range = 'A3:XFD', stop_at_empty = true`                     | 2 rows and **16,384 columns**                                                 |
+| `read_xlsx(..., header = true, sheet = 'Only', range = ...)` | Result |
+|---|---|
+| `range = 'A3:'` | **Rejected.** `Binder Error: Invalid range 'A3:' specified` |
+| `range = 'A3'` | **Rejected.** `Binder Error: Invalid range 'A3' specified` |
+| `range = '3:'` | **Rejected.** `Binder Error: Invalid range '3:' specified` |
+| `range = 'A3:B5'` (exact) | Correct: 2 rows, 2 columns, headers from row 3 |
+| `range = 'A3:B1000'` (row bound too high) | 2 real rows followed by **998 all-NULL rows** |
+| `range = 'A3:B'` (row bound omitted) | Same padding: rows to the sheet's maximum extent |
+| `range = 'A3:B', stop_at_empty = true` | Correct: 2 rows, 2 columns |
+| `range = 'A3:Z', stop_at_empty = true` | 2 rows and **26 columns**: `colA`, `colB`, then phantom `C2`, `_1`, `_2`, ... |
+| `range = 'A3:XFD', stop_at_empty = true` | 2 rows and **16,384 columns** |
 
 So `range` is usable only when **both** bounds are exact. `stop_at_empty = true`
 solves the row bound and does nothing for the column bound: an over-wide end
@@ -800,7 +800,7 @@ table; removing a column is a larger and riskier change than leaving a now-unrea
 one.
 
 **The follow-up now has a recipe rather than a question** (section 14 item 2).
-Skip _n_ rows is:
+Skip *n* rows is:
 
 ```text
 range = 'A<n+1>:<lastUsedColumn><lastUsedRow>'
@@ -960,7 +960,7 @@ scope: ["openid", "email", "https://www.googleapis.com/auth/drive.file"],
 ```
 
 An earlier revision of this spec worked through what removing a scope does to
-refresh tokens that were granted under the wider set: it narrows _new_ grants
+refresh tokens that were granted under the wider set: it narrows *new* grants
 only, and an existing token keeps the wider grant, with
 `tokens__google.scope` still recording it, until the user revokes or
 re-consents.
@@ -1029,7 +1029,7 @@ spinner is orphaned. Today `useGooglePicker`'s callback ignores every
 non-`PICKED` action, which is nearly right; it needs to invoke an `onCancel` so
 the view can reset. Test: open the Picker, dismiss it, and assert the import
 view is back to its initial state with no notification shown, with a positive
-control asserting that a _pick_ does show one.
+control asserting that a *pick* does show one.
 
 ### 10.2 The Picker itself failed
 
@@ -1039,15 +1039,15 @@ failure there costs an evening. Notify with the raw Picker error in the log.
 
 ### 10.3 Export and version errors
 
-| Failure                                                                                                   | What the user sees                                                                                                                          | Recovery                                                                                                                              |
-| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Drive API disabled on the project (403 `accessNotConfigured`)                                             | _"Google Drive access is not configured for this deployment."_                                                                              | None for the user. Log loudly; this is a deployment error masquerading as a permission error                                          |
-| Export over the limit (403 `exportSizeLimitExceeded`, message _"This file is too large to be exported."_) | _"This sheet is too large to import. Google can export at most 10 MB at a time."_                                                           | Split the sheet, or wait for the paging follow-up (section 14 item 1)                                                                 |
-| **No per-file grant, or the file was deleted (404)**                                                      | _"Avandar cannot open this Google Sheet. It may have been deleted, or its access may have been removed."_ with a **Reconnect sheet** action | Reopen the Picker for that dataset. Only possible because the grant is per-file and re-granting is one pick (section 5.1, property 2) |
-| Token expired or revoked (401)                                                                            | _"Your Google connection expired."_ with a **Reconnect Google** action                                                                      | The existing consent flow. See section 9.3 on why this arrives as a 401 rather than as our own error                                  |
-| Rate limited (429, or 403 `userRateLimitExceeded`)                                                        | _"Google is rate limiting this request. Retrying."_                                                                                         | One retry with backoff, then a plain error. Rare, now that the connector is on Drive's pool                                           |
-| The stored tab is gone (renamed or deleted; `read_xlsx` errors on an unknown sheet)                       | _"The tab 'Q3 data' is no longer in this spreadsheet."_ with a **Choose a tab** action                                                      | Reselect from the tab list, which updates `sheet_name`                                                                                |
-| Network failure mid-export                                                                                | The generic import error already in the view                                                                                                | Retry                                                                                                                                 |
+| Failure | What the user sees | Recovery |
+|---|---|---|
+| Drive API disabled on the project (403 `accessNotConfigured`) | *"Google Drive access is not configured for this deployment."* | None for the user. Log loudly; this is a deployment error masquerading as a permission error |
+| Export over the limit (403 `exportSizeLimitExceeded`, message *"This file is too large to be exported."*) | *"This sheet is too large to import. Google can export at most 10 MB at a time."* | Split the sheet, or wait for the paging follow-up (section 14 item 1) |
+| **No per-file grant, or the file was deleted (404)** | *"Avandar cannot open this Google Sheet. It may have been deleted, or its access may have been removed."* with a **Reconnect sheet** action | Reopen the Picker for that dataset. Only possible because the grant is per-file and re-granting is one pick (section 5.1, property 2) |
+| Token expired or revoked (401) | *"Your Google connection expired."* with a **Reconnect Google** action | The existing consent flow. See section 9.3 on why this arrives as a 401 rather than as our own error |
+| Rate limited (429, or 403 `userRateLimitExceeded`) | *"Google is rate limiting this request. Retrying."* | One retry with backoff, then a plain error. Rare, now that the connector is on Drive's pool |
+| The stored tab is gone (renamed or deleted; `read_xlsx` errors on an unknown sheet) | *"The tab 'Q3 data' is no longer in this spreadsheet."* with a **Choose a tab** action | Reselect from the tab list, which updates `sheet_name` |
+| Network failure mid-export | The generic import error already in the view | Retry |
 
 All of these use `notifyError({ title, message })` from
 `@/utils/notifications/notify`, which is the pattern
@@ -1089,17 +1089,17 @@ spec 5's open data APIs, which do rate-limit and do return 429.
 
 ## 11. Freshness
 
-**Resolved by the proposal, line 1601.** Phase 1 reads: _"Drive `File.version`
-freshness with a debounced check and an explicit-refresh menu item"_. This closes
+**Resolved by the proposal, line 1601.** Phase 1 reads: *"Drive `File.version`
+freshness with a debounced check and an explicit-refresh menu item"*. This closes
 `.temp/qetl/review/open-questions.md` question 3 ("latest possible on every
 query, session snapshot, or an explicit user refresh"). Neither
 latest-on-every-query nor a session snapshot is the design.
 
 ### 11.1 What `File.version` is, and its one flaw
 
-Drive documents `File.version` as _"A monotonically increasing version number
+Drive documents `File.version` as *"A monotonically increasing version number
 for the file. This reflects every change made to the file on the server, even
-those not visible to the user."_ It is an int64 delivered as a JSON string. One
+those not visible to the user."* It is an int64 delivered as a JSON string. One
 metadata `GET` with `fields=version` retrieves it, so it is orders of magnitude
 cheaper than an export.
 
@@ -1147,7 +1147,7 @@ that makes that acceptable.
 
 Google's Drive documentation states plainly that exported content is limited to
 10 MB, and exceeding it returns HTTP 403 with reason `exportSizeLimitExceeded`
-and message _"This file is too large to be exported."_ Field reports exist of
+and message *"This file is too large to be exported."* Field reports exist of
 the limit biting below 10 MB, so the number is a documented ceiling rather than a
 guaranteed allowance.
 
@@ -1182,8 +1182,8 @@ Why not the other two candidates:
 
 - **`ResyncDatasetsBlock`** is the "your local data is missing, re-upload it"
   modal. It is fed by `useSyncLocalDatasets`, which queries `source_type: { in:
-["csv_file", "xlsx_file"] }` and carries the comment `TODO(jpsyx): add syncing
-google sheets from backend`. Google Sheets datasets never appear there and
+  ["csv_file", "xlsx_file"] }` and carries the comment `TODO(jpsyx): add syncing
+  google sheets from backend`. Google Sheets datasets never appear there and
   should not start to: with acquisition working, a missing local copy for a Sheet
   is not a user problem, it is a cache miss that resolves itself. Leave that
   query alone.
@@ -1216,19 +1216,19 @@ check and it is the one that matters. The automated tests around it:
 
 ### 12.1 Unit, no network
 
-| Area                                  | Test                                                                                                                                                                                                                                                                                                                 |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GoogleDriveClient` export            | `driveFetch` injected. Asserts the URL carries the XLSX `mimeType`, the header carries the bearer token, and the returned bytes are the response body unchanged                                                                                                                                                      |
-| `GoogleDriveClient` version           | Asserts the request carries `fields=version` and that the returned `SourceVersion` is the response's `version` string verbatim, not coerced to a number                                                                                                                                                              |
-| **Call ordering**                     | With a `driveFetch` that records call order, asserts the version request precedes the export request (section 5.3). Positive control: both calls happen                                                                                                                                                              |
-| Error mapping                         | Each row of section 10.3 asserted case by case, from a `driveFetch` that returns that status and body. The 404 case asserts **one** error covering both revocation and deletion, since the API gives no way to tell them apart                                                                                       |
-| Scope declaration                     | `getAuthURL` requests exactly `openid`, `email`, `https://www.googleapis.com/auth/drive.file`. Asserted on the generated URL, not on a constant                                                                                                                                                                      |
-| Tab column                            | `GoogleSheetsDatasetParsers` round-trips `sheet_name` present and `null`. `ZodConsistencyTests` covers the type side at compile time                                                                                                                                                                                 |
-| **`google_account_id` (section 3.1)** | The parser accepts a **real Google `sub`** (a 21-digit numeric string), with a positive control that a valid row still parses. This is the test whose absence let the defect ship: a UUID fixture passes either way                                                                                                  |
-| Picker `setAppId`                     | The builder receives `setAppId` with the configured app id. A positive control asserts `setDeveloperKey` is still called, so a broken builder mock cannot pass both                                                                                                                                                  |
-| Picker cancel and error               | `Action.CANCEL` invokes `onCancel` and shows no notification; `Action.ERROR` invokes `onError` and does. Each with the other as its control                                                                                                                                                                          |
-| Debounce                              | Two checks inside the window issue one Drive call; outside it, two. Boundary asserted at 59,999 ms and 60,000 ms with the injected clock. Explicit refresh always issues one                                                                                                                                         |
-| Import path                           | `GoogleSheetsImportView.test.tsx` asserts the xlsx metadata shape and that the tab the user selects reaches `startXlsxImport` and `insertGoogleSheetsDataset`. `useImportedColumns.test.ts`'s _"maps google_sheets DuckDB columns using the CSV load shape"_ case is rewritten to the xlsx shape rather than deleted |
+| Area | Test |
+|---|---|
+| `GoogleDriveClient` export | `driveFetch` injected. Asserts the URL carries the XLSX `mimeType`, the header carries the bearer token, and the returned bytes are the response body unchanged |
+| `GoogleDriveClient` version | Asserts the request carries `fields=version` and that the returned `SourceVersion` is the response's `version` string verbatim, not coerced to a number |
+| **Call ordering** | With a `driveFetch` that records call order, asserts the version request precedes the export request (section 5.3). Positive control: both calls happen |
+| Error mapping | Each row of section 10.3 asserted case by case, from a `driveFetch` that returns that status and body. The 404 case asserts **one** error covering both revocation and deletion, since the API gives no way to tell them apart |
+| Scope declaration | `getAuthURL` requests exactly `openid`, `email`, `https://www.googleapis.com/auth/drive.file`. Asserted on the generated URL, not on a constant |
+| Tab column | `GoogleSheetsDatasetParsers` round-trips `sheet_name` present and `null`. `ZodConsistencyTests` covers the type side at compile time |
+| **`google_account_id` (section 3.1)** | The parser accepts a **real Google `sub`** (a 21-digit numeric string), with a positive control that a valid row still parses. This is the test whose absence let the defect ship: a UUID fixture passes either way |
+| Picker `setAppId` | The builder receives `setAppId` with the configured app id. A positive control asserts `setDeveloperKey` is still called, so a broken builder mock cannot pass both |
+| Picker cancel and error | `Action.CANCEL` invokes `onCancel` and shows no notification; `Action.ERROR` invokes `onError` and does. Each with the other as its control |
+| Debounce | Two checks inside the window issue one Drive call; outside it, two. Boundary asserted at 59,999 ms and 60,000 ms with the injected clock. Explicit refresh always issues one |
+| Import path | `GoogleSheetsImportView.test.tsx` asserts the xlsx metadata shape and that the tab the user selects reaches `startXlsxImport` and `insertGoogleSheetsDataset`. `useImportedColumns.test.ts`'s *"maps google_sheets DuckDB columns using the CSV load shape"* case is rewritten to the xlsx shape rather than deleted |
 
 **Every negative assertion carries a positive control.** A
 `not.toHaveBeenCalled()` beside a mock that was never wired passes for the wrong
@@ -1346,18 +1346,18 @@ cannot compile anywhere because it imports two modules that do not yet coexist o
 one branch. **The repo is the authority.** QETL plan tasks 5, 7, 11 and 14
 shipped sample code that did not compile, and a banner had to be added saying so.
 
-| Risk                                                                                                                                            | Mitigation                                                                                                                                                                                                                                                                                                            |
-| ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **The Picker does not register a `drive.file` grant** because `setAppId` is missing, producing a 404 on export from a file the user just picked | Section 5.2 item 1, done first in the plan. Verify by exporting immediately after a fresh pick, in a browser profile that has never authorized Avandar. Section 5.2 item 3 makes the Picker's own error loud so this is not misdiagnosed. **Highest-likelihood demo-night failure**                                   |
-| `VITE_GOOGLE_PICKER_APP_ID` is set locally and forgotten in Vercel, so the connector works on localhost and 404s in staging                     | Section 16 gives Pablo the value and the click path. The env read throws a named error when the var is missing, rather than passing `undefined` to `setAppId`                                                                                                                                                         |
-| The import refactor (section 7.2) is larger than the clock allows                                                                               | Section 13 puts acquisition before the import change, so the demo works on today's import path (first tab, `sheet_name = NULL`) even if the refactor is unfinished                                                                                                                                                    |
-| Column types differ between CSV-sniffed import metadata and `read_xlsx` acquisition, on datasets imported before this change                    | `_getColumnReplacements` casts each column to its stored `dataType`, so the stored schema wins. Section 12.4 checks a real row                                                                                                                                                                                        |
-| Existing rows resolve `NULL` to a different "first tab" than the old import did                                                                 | Section 6.3. Rare, user-fixable in one action, and new rows never write `NULL`                                                                                                                                                                                                                                        |
-| `File.version` changes without the rows changing, so refreshes happen more often than needed                                                    | Accepted deliberately, and guaranteed rather than possible (section 11.1). A false positive costs one export; a false negative would serve wrong rows                                                                                                                                                                 |
-| The generated migration creates an RPC overload instead of replacing the function, and PostgREST goes ambiguous                                 | Section 6.1 item 3 names the exact statement to look for and the migration that sets the precedent                                                                                                                                                                                                                    |
-| Someone re-opens the `rows_to_skip` question and re-derives the same dead end                                                                   | Section 7.4 records the measurements against DuckDB `v1.5.5`, including the recipe that does work and the three files it would need                                                                                                                                                                                   |
-| A 10 MB export sounds generous and is not, for a wide sheet                                                                                     | Named error (section 10.3), no client-side pre-check pretending otherwise (section 11.3), and the ceiling declared as `maxBytesPerCall` so it is discoverable                                                                                                                                                         |
-| The connector goes live to every workspace                                                                                                      | **Intended.** The connector is being enabled (section 3.2), so the hard disable is removed outright and there is no flag. What limits exposure is that `google_sheets` is still unqueryable until the integration session lands the wrapper body (section 8.1): a user can import a Sheet and cannot yet read it back |
+| Risk | Mitigation |
+|---|---|
+| **The Picker does not register a `drive.file` grant** because `setAppId` is missing, producing a 404 on export from a file the user just picked | Section 5.2 item 1, done first in the plan. Verify by exporting immediately after a fresh pick, in a browser profile that has never authorized Avandar. Section 5.2 item 3 makes the Picker's own error loud so this is not misdiagnosed. **Highest-likelihood demo-night failure** |
+| `VITE_GOOGLE_PICKER_APP_ID` is set locally and forgotten in Vercel, so the connector works on localhost and 404s in staging | Section 16 gives Pablo the value and the click path. The env read throws a named error when the var is missing, rather than passing `undefined` to `setAppId` |
+| The import refactor (section 7.2) is larger than the clock allows | Section 13 puts acquisition before the import change, so the demo works on today's import path (first tab, `sheet_name = NULL`) even if the refactor is unfinished |
+| Column types differ between CSV-sniffed import metadata and `read_xlsx` acquisition, on datasets imported before this change | `_getColumnReplacements` casts each column to its stored `dataType`, so the stored schema wins. Section 12.4 checks a real row |
+| Existing rows resolve `NULL` to a different "first tab" than the old import did | Section 6.3. Rare, user-fixable in one action, and new rows never write `NULL` |
+| `File.version` changes without the rows changing, so refreshes happen more often than needed | Accepted deliberately, and guaranteed rather than possible (section 11.1). A false positive costs one export; a false negative would serve wrong rows |
+| The generated migration creates an RPC overload instead of replacing the function, and PostgREST goes ambiguous | Section 6.1 item 3 names the exact statement to look for and the migration that sets the precedent |
+| Someone re-opens the `rows_to_skip` question and re-derives the same dead end | Section 7.4 records the measurements against DuckDB `v1.5.5`, including the recipe that does work and the three files it would need |
+| A 10 MB export sounds generous and is not, for a wide sheet | Named error (section 10.3), no client-side pre-check pretending otherwise (section 11.3), and the ceiling declared as `maxBytesPerCall` so it is discoverable |
+| The connector goes live to every workspace | **Intended.** The connector is being enabled (section 3.2), so the hard disable is removed outright and there is no flag. What limits exposure is that `google_sheets` is still unqueryable until the integration session lands the wrapper body (section 8.1): a user can import a Sheet and cannot yet read it back |
 
 ---
 
@@ -1366,17 +1366,17 @@ shipped sample code that did not compile, and a banner had to be added saying so
 The smallest ordered set that gets a real Sheet imported and queried. Effort
 figures assume one implementer who has read sections 5 to 11.
 
-| #   | Step                                                                                                                                 | Effort | Notes                                                                                                                                                                      |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Section 3.1: the parser fix and the sweep                                                                                            | 30 min | Nothing reads a Sheets dataset row until this lands                                                                                                                        |
-| 2   | Section 3.2: remove the hard disable from the connect button                                                                         | 15 min | No fresh grant is possible without it                                                                                                                                      |
-| 3   | `.setAppId()` plus `VITE_GOOGLE_PICKER_APP_ID` in `.env.development` and `.env.example`                                              | 20 min | Cheap, and it is the failure that looks like something else                                                                                                                |
-| 4   | The Drive module (section 5.3) with the error mapping from section 10.3                                                              | 60 min | Two fetches, injected transport, ordering test                                                                                                                             |
-| 5   | Schema and model: `sheet_name`, the RPC, the generated migration, `pnpm db:gen-types`                                                | 60 min | `ava supabase switch` first. Review the diff per section 6.1 item 3                                                                                                        |
-| 6   | **Demo checkpoint: exit criterion.** Fresh Google account, connect, pick a Sheet, hard-reload, query it in the SQL surface, get rows | 15 min | Needs the integration session's wrapper body, or a temporary local call from the import view for the checkpoint only                                                       |
-| 7   | The tab selector and the XLSX import switch (sections 7.2, 7.4)                                                                      | 2 h    | The largest step. Cut it first; step 6 passes without it, using the first tab. Cutting it also keeps the rows-to-skip control, which is the one thing this step takes away |
-| 8   | Debounce and the refresh action (sections 11.2, 11.4)                                                                                | 75 min | Skippable for a demo; without it refresh is the only freshness mechanism                                                                                                   |
-| 9   | Drop `auth/spreadsheets` (section 9)                                                                                                 | 10 min | Last, so step 6 is demonstrated on a narrow grant. Coordinate with section 8.2 item 1                                                                                      |
+| # | Step | Effort | Notes |
+|---|---|---|---|
+| 1 | Section 3.1: the parser fix and the sweep | 30 min | Nothing reads a Sheets dataset row until this lands |
+| 2 | Section 3.2: remove the hard disable from the connect button | 15 min | No fresh grant is possible without it |
+| 3 | `.setAppId()` plus `VITE_GOOGLE_PICKER_APP_ID` in `.env.development` and `.env.example` | 20 min | Cheap, and it is the failure that looks like something else |
+| 4 | The Drive module (section 5.3) with the error mapping from section 10.3 | 60 min | Two fetches, injected transport, ordering test |
+| 5 | Schema and model: `sheet_name`, the RPC, the generated migration, `pnpm db:gen-types` | 60 min | `ava supabase switch` first. Review the diff per section 6.1 item 3 |
+| 6 | **Demo checkpoint: exit criterion.** Fresh Google account, connect, pick a Sheet, hard-reload, query it in the SQL surface, get rows | 15 min | Needs the integration session's wrapper body, or a temporary local call from the import view for the checkpoint only |
+| 7 | The tab selector and the XLSX import switch (sections 7.2, 7.4) | 2 h | The largest step. Cut it first; step 6 passes without it, using the first tab. Cutting it also keeps the rows-to-skip control, which is the one thing this step takes away |
+| 8 | Debounce and the refresh action (sections 11.2, 11.4) | 75 min | Skippable for a demo; without it refresh is the only freshness mechanism |
+| 9 | Drop `auth/spreadsheets` (section 9) | 10 min | Last, so step 6 is demonstrated on a narrow grant. Coordinate with section 8.2 item 1 |
 
 **What the demo shows if only steps 1 to 6 land:** a Google Sheet imported
 through the Picker, surviving a reload, queried in SQL, returning rows, with the

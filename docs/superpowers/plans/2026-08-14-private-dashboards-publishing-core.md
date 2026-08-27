@@ -19,14 +19,14 @@ Read the spec. This plan implements it and does not repeat its reasoning.
 **Two conventions in this repo will bite you if you skip them:**
 
 1. **Schema changes are declarative.** You edit `supabase/schemas/*.sql` and
-   _generate_ the migration with `pnpm db:new-migration <name>`. You never
+   *generate* the migration with `pnpm db:new-migration <name>`. You never
    hand-write a migration for `public` schema objects. Task 1 is the one place
    you edit a generated migration afterwards, and only to insert a DML backfill
    that `db diff` structurally cannot produce.
 
 2. **Storage is the exact inverse.** Migrations touching `storage.objects` or
    `storage.buckets` are hand-written, must contain storage statements and
-   _nothing else_, must be named `{timestamp}_STORAGE-<desc>.sql`, must have
+   *nothing else*, must be named `{timestamp}_STORAGE-<desc>.sql`, must have
    every statement idempotent, must be registered in `[db.seed] sql_paths` in
    `supabase/config.toml`, and must be mirrored into
    `supabase/schemas/99.storage.sql`. Miss the mirror and the next unrelated
@@ -48,18 +48,18 @@ are gone and you re-run `pnpm db:reset` from your branch.
 
 **Command reference used throughout**
 
-| Command                                | What it does                                                                             |
-| -------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `pnpm db:new-migration <name>`         | `supabase stop` then `db diff -f <name>`; generates a migration from `supabase/schemas/` |
-| `pnpm db:reset`                        | Rebuilds the local DB from migrations, then replays `[db.seed] sql_paths`                |
-| `pnpm test:db`                         | Runs pgTAP (`supabase test db`)                                                          |
-| `pnpm db:gen-types`                    | Regenerates `shared/types/database.types.ts`                                             |
-| `pnpm type-check`                      | `tsc -b --noEmit` across the monorepo                                                    |
-| `pnpm test:frontend`                   | Vitest for `src/`                                                                        |
-| `pnpm test:e2e`                        | Playwright                                                                               |
-| `pnpm desktop:sqlite:gen-migrations`   | Regenerates the desktop SQLite mirror                                                    |
-| `pnpm desktop:sqlite:check-migrations` | Verifies the mirror matches                                                              |
-| `pnpm i18n:extract`                    | Extracts Lingui strings                                                                  |
+| Command | What it does |
+| --- | --- |
+| `pnpm db:new-migration <name>` | `supabase stop` then `db diff -f <name>`; generates a migration from `supabase/schemas/` |
+| `pnpm db:reset` | Rebuilds the local DB from migrations, then replays `[db.seed] sql_paths` |
+| `pnpm test:db` | Runs pgTAP (`supabase test db`) |
+| `pnpm db:gen-types` | Regenerates `shared/types/database.types.ts` |
+| `pnpm type-check` | `tsc -b --noEmit` across the monorepo |
+| `pnpm test:frontend` | Vitest for `src/` |
+| `pnpm test:e2e` | Playwright |
+| `pnpm desktop:sqlite:gen-migrations` | Regenerates the desktop SQLite mirror |
+| `pnpm desktop:sqlite:check-migrations` | Verifies the mirror matches |
+| `pnpm i18n:extract` | Extracts Lingui strings |
 
 ---
 
@@ -67,73 +67,73 @@ are gone and you re-run `pnpm db:reset` from your branch.
 
 **Created**
 
-| File                                                                               | Responsibility                                                                                                |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `supabase/schemas/00.enum.dashboard_visibility.sql`                                | The `dashboard_visibility` enum, alone, so it sorts before the table that uses it                             |
-| `supabase/migrations/<ts>_dashboard_visibility_model.sql`                          | Generated, then hand-edited to add the backfill                                                               |
-| `supabase/migrations/<ts>_add_util_storage_object_dashboard_id.sql`                | Generated; the helper the storage policies call. Non-storage, so it must land before the `_STORAGE` migration |
-| `supabase/migrations/<ts>_STORAGE-published-private-bucket.sql`                    | Hand-written: the new bucket, its four policies, and the narrowed `published` policies                        |
-| `supabase/tests/database/dashboards/dashboard_visibility_slug_namespaces.test.sql` | pgTAP: the two slug namespaces and the generated column                                                       |
-| `supabase/tests/database/dashboards/storage_published_buckets.test.sql`            | pgTAP: both buckets' policies, per role                                                                       |
-| `src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView.tsx`         | The single "You need access" surface used by every viewer route                                               |
-| `src/clients/dashboards/buildSnapshotTransitionPlan.ts`                            | Which bucket a publish writes and which it clears; the ordering both transitions depend on                    |
-| `src/clients/dashboards/resolveDashboardRoute.ts`                                  | All `<slugOrId>` branching for both viewer routes, with reads injected so it is testable                      |
-| `src/clients/dashboards/makeDashboardRouteDeps.ts`                                 | Binds those injected reads to the real clients                                                                |
-| `src/routes/d/$slugOrId.tsx`                                                       | Public viewer route, replaces `d/$slug.tsx`; turns resolver outcomes into router calls                        |
-| `src/routes/_auth/$workspaceSlug/d/$slugOrId.tsx`                                  | Workspace-only viewer route, same shape                                                                       |
-| `src/clients/dashboards/resolveDashboardRoute.test.ts`                             | Vitest for every loader branch                                                                                |
-| `src/clients/dashboards/buildSnapshotTransitionPlan.test.ts`                       | Vitest for the transition ordering                                                                            |
-| `src/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard.test.ts`     | Vitest for the surface-to-auth mapping                                                                        |
-| `src/clients/storage/PublicDatasetParquetStorageClient/utils.test.ts`              | Vitest for bucket routing                                                                                     |
-| `tests/e2e/dashboard-private-snapshot-bucket.spec.ts`                              | Playwright: the bucket really is private over HTTP                                                            |
-| `tests/e2e/dashboard-viewer-role-routing.spec.ts`                                  | Playwright: a viewer-role user lands on preview, not the editor                                               |
+| File | Responsibility |
+| --- | --- |
+| `supabase/schemas/00.enum.dashboard_visibility.sql` | The `dashboard_visibility` enum, alone, so it sorts before the table that uses it |
+| `supabase/migrations/<ts>_dashboard_visibility_model.sql` | Generated, then hand-edited to add the backfill |
+| `supabase/migrations/<ts>_add_util_storage_object_dashboard_id.sql` | Generated; the helper the storage policies call. Non-storage, so it must land before the `_STORAGE` migration |
+| `supabase/migrations/<ts>_STORAGE-published-private-bucket.sql` | Hand-written: the new bucket, its four policies, and the narrowed `published` policies |
+| `supabase/tests/database/dashboards/dashboard_visibility_slug_namespaces.test.sql` | pgTAP: the two slug namespaces and the generated column |
+| `supabase/tests/database/dashboards/storage_published_buckets.test.sql` | pgTAP: both buckets' policies, per role |
+| `src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView.tsx` | The single "You need access" surface used by every viewer route |
+| `src/clients/dashboards/buildSnapshotTransitionPlan.ts` | Which bucket a publish writes and which it clears; the ordering both transitions depend on |
+| `src/clients/dashboards/resolveDashboardRoute.ts` | All `<slugOrId>` branching for both viewer routes, with reads injected so it is testable |
+| `src/clients/dashboards/makeDashboardRouteDeps.ts` | Binds those injected reads to the real clients |
+| `src/routes/d/$slugOrId.tsx` | Public viewer route, replaces `d/$slug.tsx`; turns resolver outcomes into router calls |
+| `src/routes/_auth/$workspaceSlug/d/$slugOrId.tsx` | Workspace-only viewer route, same shape |
+| `src/clients/dashboards/resolveDashboardRoute.test.ts` | Vitest for every loader branch |
+| `src/clients/dashboards/buildSnapshotTransitionPlan.test.ts` | Vitest for the transition ordering |
+| `src/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard.test.ts` | Vitest for the surface-to-auth mapping |
+| `src/clients/storage/PublicDatasetParquetStorageClient/utils.test.ts` | Vitest for bucket routing |
+| `tests/e2e/dashboard-private-snapshot-bucket.spec.ts` | Playwright: the bucket really is private over HTTP |
+| `tests/e2e/dashboard-viewer-role-routing.spec.ts` | Playwright: a viewer-role user lands on preview, not the editor |
 
 **Modified**
 
-| File                                                                                            | Change                                                                       |
-| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `supabase/schemas/10.dashboards.sql`                                                            | `visibility` column, `is_public` becomes generated, two slug indexes         |
-| `supabase/schemas/16.utils.resource-permissions.sql`                                            | Adds `util__storage_object_dashboard_id`                                     |
-| `supabase/schemas/99.storage.sql`                                                               | Mirrors the new and narrowed policies                                        |
-| `supabase/config.toml`                                                                          | Registers the new `_STORAGE` migration in `[db.seed] sql_paths`              |
-| `apps/desktop/migrations/*.gen.sql`                                                             | Regenerated, then hand-edited for the enum and generated column              |
-| `shared/models/Dashboard/Dashboard.types.ts`                                                    | `visibility` added; `isPublic` removed from Insert/Update                    |
-| `shared/models/Dashboard/DashboardParsers.ts`                                                   | `visibility` in the DB read schema                                           |
-| `shared/types/database.types.ts`                                                                | Regenerated                                                                  |
-| `supabase/functions/dashboards/DashboardsRoutes/DashboardsRoutes.ts`                            | Namespace-aware slug check                                                   |
-| `supabase/functions/dashboards/DashboardsRoutes/DashboardsRoutes.types.ts`                      | `visibility` on the body, `reserved` reason                                  |
-| `supabase/functions/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.ts` | Rejects UUID-shaped slugs                                                    |
-| `src/clients/storage/PublicDatasetParquetStorageClient/utils.ts`                                | Bucket map, both bucket names                                                |
-| `src/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient.ts`    | Takes visibility; gains `deleteDatasetsForDashboard`                         |
-| `src/clients/dexie/DexieCrudClient.types.ts`                                                    | `primaryKey` accepts an array                                                |
-| `src/clients/dexie/DexieDBVersionManager.ts`                                                    | Emits a compound Dexie key; table type follows                               |
-| `src/clients/dexie/createDexieCrudClient.ts`                                                    | Key casts use `modelPrimaryKeyType`                                          |
-| `src/models/LocalPublicDataset/LocalPublicDataset.types.ts`                                     | Compound primary key                                                         |
-| `src/db/dexie/dexieVersions/dexieVersions.ts`                                                   | Version 8                                                                    |
-| `src/db/dexie/dexieVersions/dexieVersions.test.ts`                                              | Asserts v8                                                                   |
-| `src/clients/datasets/LocalPublicDatasetClient.ts`                                              | Compound key, visibility                                                     |
-| `src/clients/datasets/LocalPublicDatasetRawDataClient.ts`                                       | Compound key, visibility                                                     |
-| `src/clients/qetl/PublicQetlClient.ts`                                                          | Visibility in the cache key and the storage calls                            |
-| `src/clients/queries/runStructuredQuery/runStructuredQuery.ts`                                  | Third auth variant                                                           |
-| `src/views/DashboardApp/AvaPage/useAvaPageMetadata.ts`                                          | Third auth variant                                                           |
-| `src/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard.ts`                       | Takes the rendering surface                                                  |
-| `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx`          | Maps the third variant                                                       |
-| `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx`                            | Passes surface `editor`                                                      |
-| `src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx`                            | `published` / `preview` modes                                                |
-| `src/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets.ts`             | Keys off `visibility`                                                        |
-| `src/clients/dashboards/DashboardClient.ts`                                                     | `publishDashboard` takes visibility; adds `unpublishDashboard`, `fullDelete` |
-| `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx`    | Passes `visibility: "public"`; `reserved` copy                               |
-| `src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx`                          | Uses `fullDelete`                                                            |
-| `src/views/DashboardApp/DashboardListView/DashboardListView.tsx`                                | Drops `isPublic: false`                                                      |
-| `src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx`                       | Drops `isPublic: false`                                                      |
-| `src/routes/public/dashboards/$workspaceSlug/$dashboardId.tsx`                                  | Becomes an unconditional redirect                                            |
-| `src/routes/_auth/$workspaceSlug/dashboards/edit/$dashboardId.tsx`                              | Redirects non-editors to preview                                             |
-| `src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx`                           | Passes edit rights to the banner                                             |
+| File | Change |
+| --- | --- |
+| `supabase/schemas/10.dashboards.sql` | `visibility` column, `is_public` becomes generated, two slug indexes |
+| `supabase/schemas/16.utils.resource-permissions.sql` | Adds `util__storage_object_dashboard_id` |
+| `supabase/schemas/99.storage.sql` | Mirrors the new and narrowed policies |
+| `supabase/config.toml` | Registers the new `_STORAGE` migration in `[db.seed] sql_paths` |
+| `apps/desktop/migrations/*.gen.sql` | Regenerated, then hand-edited for the enum and generated column |
+| `shared/models/Dashboard/Dashboard.types.ts` | `visibility` added; `isPublic` removed from Insert/Update |
+| `shared/models/Dashboard/DashboardParsers.ts` | `visibility` in the DB read schema |
+| `shared/types/database.types.ts` | Regenerated |
+| `supabase/functions/dashboards/DashboardsRoutes/DashboardsRoutes.ts` | Namespace-aware slug check |
+| `supabase/functions/dashboards/DashboardsRoutes/DashboardsRoutes.types.ts` | `visibility` on the body, `reserved` reason |
+| `supabase/functions/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.ts` | Rejects UUID-shaped slugs |
+| `src/clients/storage/PublicDatasetParquetStorageClient/utils.ts` | Bucket map, both bucket names |
+| `src/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient.ts` | Takes visibility; gains `deleteDatasetsForDashboard` |
+| `src/clients/dexie/DexieCrudClient.types.ts` | `primaryKey` accepts an array |
+| `src/clients/dexie/DexieDBVersionManager.ts` | Emits a compound Dexie key; table type follows |
+| `src/clients/dexie/createDexieCrudClient.ts` | Key casts use `modelPrimaryKeyType` |
+| `src/models/LocalPublicDataset/LocalPublicDataset.types.ts` | Compound primary key |
+| `src/db/dexie/dexieVersions/dexieVersions.ts` | Version 8 |
+| `src/db/dexie/dexieVersions/dexieVersions.test.ts` | Asserts v8 |
+| `src/clients/datasets/LocalPublicDatasetClient.ts` | Compound key, visibility |
+| `src/clients/datasets/LocalPublicDatasetRawDataClient.ts` | Compound key, visibility |
+| `src/clients/qetl/PublicQetlClient.ts` | Visibility in the cache key and the storage calls |
+| `src/clients/queries/runStructuredQuery/runStructuredQuery.ts` | Third auth variant |
+| `src/views/DashboardApp/AvaPage/useAvaPageMetadata.ts` | Third auth variant |
+| `src/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard.ts` | Takes the rendering surface |
+| `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock.tsx` | Maps the third variant |
+| `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx` | Passes surface `editor` |
+| `src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx` | `published` / `preview` modes |
+| `src/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets.ts` | Keys off `visibility` |
+| `src/clients/dashboards/DashboardClient.ts` | `publishDashboard` takes visibility; adds `unpublishDashboard`, `fullDelete` |
+| `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx` | Passes `visibility: "public"`; `reserved` copy |
+| `src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx` | Uses `fullDelete` |
+| `src/views/DashboardApp/DashboardListView/DashboardListView.tsx` | Drops `isPublic: false` |
+| `src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx` | Drops `isPublic: false` |
+| `src/routes/public/dashboards/$workspaceSlug/$dashboardId.tsx` | Becomes an unconditional redirect |
+| `src/routes/_auth/$workspaceSlug/dashboards/edit/$dashboardId.tsx` | Redirects non-editors to preview |
+| `src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx` | Passes edit rights to the banner |
 
 **Deleted**
 
-| File                     | Why                           |
-| ------------------------ | ----------------------------- |
+| File | Why |
+| --- | --- |
 | `src/routes/d/$slug.tsx` | Replaced by `d/$slugOrId.tsx` |
 
 ---
@@ -143,7 +143,6 @@ are gone and you re-run `pnpm db:reset` from your branch.
 ## Task 1: The visibility model
 
 **Files:**
-
 - Create: `supabase/schemas/00.enum.dashboard_visibility.sql`
 - Modify: `supabase/schemas/10.dashboards.sql:20` (the `is_public` column) and `:66-73` (the slug index)
 - Create: `supabase/migrations/<timestamp>_dashboard_visibility_model.sql` (generated, then edited)
@@ -551,7 +550,6 @@ non-storage migration, because a `_STORAGE` migration is replayed wholesale by
 the seed pass and must contain storage statements only.
 
 **Files:**
-
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql` (append after `util__storage_object_workspace_id`, around line 802)
 - Create: `supabase/migrations/<timestamp>_add_util_storage_object_dashboard_id.sql` (generated)
 - Test: `supabase/tests/database/dashboards/storage_published_buckets.test.sql` (created here, extended in Task 3)
@@ -693,7 +691,6 @@ Read `supabase/schemas/99.storage.sql`'s header before starting. This task is
 where the repo has historically lost policies.
 
 **Files:**
-
 - Create: `supabase/migrations/<timestamp>_STORAGE-published-private-bucket.sql` (hand-written)
 - Modify: `supabase/config.toml` (the `[db.seed] sql_paths` array, around line 61)
 - Modify: `supabase/schemas/99.storage.sql:180-224` (the `published` block)
@@ -1099,7 +1096,8 @@ policies at all.
 - [ ] **Step 5: Mirror the policies into the declarative schema**
 
 In `supabase/schemas/99.storage.sql`, replace the entire `published` block
-(the comment beginning `-- Bucket \`published\``through the closing of the`"Authenticated users can UPDATE published datasets"` policy) with:
+(the comment beginning `-- Bucket \`published\`` through the closing of the
+`"Authenticated users can UPDATE published datasets"` policy) with:
 
 ```sql
 --
@@ -1251,7 +1249,6 @@ git commit -m "feat(db): add the published-private bucket and gate snapshot writ
 ## Task 4: The desktop SQLite mirror
 
 **Files:**
-
 - Modify: `apps/desktop/migrations/<generated>.gen.sql`
 
 - [ ] **Step 1: Regenerate the mirror**
@@ -1335,7 +1332,6 @@ git commit -m "chore(desktop): mirror the dashboard visibility migration to SQLi
 ## Task 5: Dashboard model types
 
 **Files:**
-
 - Modify: `shared/models/Dashboard/Dashboard.types.ts`
 - Modify: `shared/models/Dashboard/DashboardParsers.ts:28`
 - Modify: `src/views/DashboardApp/DashboardListView/DashboardListView.tsx:112`
@@ -1358,15 +1354,15 @@ In the `DashboardRead` body, add `visibility` next to `isPublic` and expand
 `isPublic`'s docstring:
 
 ```ts
-/**
- * Whether the dashboard is public. Derived in Postgres from `visibility`,
- * so it is read-only: it appears on `Read` and on neither `Insert` nor
- * `Update`.
- */
-isPublic: boolean;
+    /**
+     * Whether the dashboard is public. Derived in Postgres from `visibility`,
+     * so it is read-only: it appears on `Read` and on neither `Insert` nor
+     * `Update`.
+     */
+    isPublic: boolean;
 
-/** Publication state. Write this, not `isPublic`. */
-visibility: DashboardVisibility;
+    /** Publication state. Write this, not `isPublic`. */
+    visibility: DashboardVisibility;
 ```
 
 Then replace the `modelTypes` block, since `Insert` and `Update` currently
@@ -1374,14 +1370,14 @@ derive from `DashboardRead` wholesale and would otherwise keep offering the
 generated column:
 
 ```ts
-modelTypes: {
-  Read: DashboardRead;
-  Insert: SetOptional<
-    Omit<DashboardRead, "isPublic">,
-    "createdAt" | "id" | "isRestricted" | "updatedAt" | "visibility"
-  >;
-  Update: Partial<Omit<DashboardRead, "isPublic">>;
-}
+    modelTypes: {
+      Read: DashboardRead;
+      Insert: SetOptional<
+        Omit<DashboardRead, "isPublic">,
+        "createdAt" | "id" | "isRestricted" | "updatedAt" | "visibility"
+      >;
+      Update: Partial<Omit<DashboardRead, "isPublic">>;
+    };
 ```
 
 - [ ] **Step 2: Update the parser**
@@ -1444,7 +1440,6 @@ git commit -m "feat(models): add dashboard visibility and make isPublic read-onl
 ## Task 6: Namespace-aware slug validation
 
 **Files:**
-
 - Modify: `supabase/functions/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.ts`
 - Test: `supabase/functions/dashboards/DashboardsRoutes/validateDashboardSlug/validateDashboardSlug.test.ts`
 - Modify: `supabase/functions/dashboards/DashboardsRoutes/DashboardsRoutes.types.ts`
@@ -1459,18 +1454,15 @@ Append to
 matching the surrounding test style in that file:
 
 ```ts
-Deno.test(
-  "rejects a UUID-shaped slug so it cannot shadow a dashboard id",
-  () => {
-    // `/d/<slugOrId>` resolves a UUID-shaped segment as an id. The slug pattern
-    // `^[a-z0-9-]+$` with a 64 character limit already admits a 36 character
-    // UUID, so without this rule the two namespaces genuinely overlap.
-    const result = validateDashboardSlug(
-      "550e8400-e29b-41d4-a716-446655440000",
-    );
-    assertEquals(result, { isValid: false, reason: "reserved" });
-  },
-);
+Deno.test("rejects a UUID-shaped slug so it cannot shadow a dashboard id", () => {
+  // `/d/<slugOrId>` resolves a UUID-shaped segment as an id. The slug pattern
+  // `^[a-z0-9-]+$` with a 64 character limit already admits a 36 character
+  // UUID, so without this rule the two namespaces genuinely overlap.
+  const result = validateDashboardSlug(
+    "550e8400-e29b-41d4-a716-446655440000",
+  );
+  assertEquals(result, { isValid: false, reason: "reserved" });
+});
 
 Deno.test("still accepts a slug that merely contains hex and hyphens", () => {
   assertEquals(validateDashboardSlug("q3-2026-revenue"), undefined);
@@ -1554,8 +1546,7 @@ const SLUG_MAX_LENGTH = 64;
  * A slug of this shape would be resolved as a dashboard id by `/d/<slugOrId>`,
  * so it can never be reached as a slug and would shadow a real dashboard.
  */
-const UUID_SHAPED =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
+const UUID_SHAPED = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
 
 /** Returns the format violation for a requested dashboard vanity slug. */
 export function validateDashboardSlug(
@@ -1576,8 +1567,8 @@ export function validateDashboardSlug(
   if (slug.length < SLUG_MIN_LENGTH) {
     return { isValid: false, reason: "too_short", limit: SLUG_MIN_LENGTH };
   }
-  return slug.length > SLUG_MAX_LENGTH
-    ? { isValid: false, reason: "too_long", limit: SLUG_MAX_LENGTH }
+  return slug.length > SLUG_MAX_LENGTH ?
+      { isValid: false, reason: "too_long", limit: SLUG_MAX_LENGTH }
     : undefined;
 }
 ```
@@ -1668,8 +1659,9 @@ export const DashboardsRoutes = defineRoutes<DashboardsApi>("dashboards", {
             throw error;
           }
 
-          const collision = dashboardId
-            ? (existing ?? []).find(propNotEq("id", dashboardId))
+          const collision =
+            dashboardId ?
+              (existing ?? []).find(propNotEq("id", dashboardId))
             : existing?.at(0);
 
           if (collision) {
@@ -1768,7 +1760,6 @@ git commit -m "feat(dashboards): scope slug validation to the target namespace"
 ## Task 7: Bucket routing in the snapshot storage client
 
 **Files:**
-
 - Modify: `src/clients/storage/PublicDatasetParquetStorageClient/utils.ts`
 - Create: `src/clients/storage/PublicDatasetParquetStorageClient/utils.test.ts`
 - Modify: `src/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient.ts`
@@ -1830,10 +1821,7 @@ Replace the top of
 `getPublicDatasetParquetStoragePath` exactly as it is):
 
 ```ts
-import type {
-  DashboardId,
-  DashboardVisibility,
-} from "$/models/Dashboard/Dashboard.types";
+import type { DashboardId, DashboardVisibility } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 // Due to a Supabase bug we cannot use "public" as a bucket name, so
@@ -1851,7 +1839,8 @@ export const PRIVATE_BUCKET_NAME = "published-private" as const;
 export type PublishedVisibility = Exclude<DashboardVisibility, "draft">;
 
 export type SnapshotBucketName =
-  typeof PUBLIC_BUCKET_NAME | typeof PRIVATE_BUCKET_NAME;
+  | typeof PUBLIC_BUCKET_NAME
+  | typeof PRIVATE_BUCKET_NAME;
 
 /**
  * The only place that maps visibility to bucket. Callers pass visibility so no
@@ -2137,7 +2126,6 @@ The Dexie CRUD layer's runtime already handles compound key paths
 types and the schema-string emission need to change.
 
 **Files:**
-
 - Modify: `src/clients/dexie/DexieCrudClient.types.ts:12`
 - Modify: `src/clients/dexie/DexieDBVersionManager.ts:10-21` and `:158-172`
 - Modify: `src/clients/dexie/createDexieCrudClient.ts` (the `IDType` casts)
@@ -2157,15 +2145,15 @@ AvaDexieVersionManager.getVersion("v8");`, rename the `describe` block to
 that block with `v8Schemas`, and append this test inside the describe block:
 
 ```ts
-it("keys the public snapshot cache by dashboard and dataset together", () => {
-  // Two dashboards can publish the same dataset with different slices. Keyed
-  // by datasetId alone they overwrite each other, which after P2 means a
-  // private snapshot can be served into a public dashboard's render.
-  expect(db.LocalPublicDataset.schema.primKey.keyPath).toEqual([
-    "dashboardId",
-    "datasetId",
-  ]);
-});
+  it("keys the public snapshot cache by dashboard and dataset together", () => {
+    // Two dashboards can publish the same dataset with different slices. Keyed
+    // by datasetId alone they overwrite each other, which after P2 means a
+    // private snapshot can be served into a public dashboard's render.
+    expect(db.LocalPublicDataset.schema.primKey.keyPath).toEqual([
+      "dashboardId",
+      "datasetId",
+    ]);
+  });
 ```
 
 - [ ] **Step 2: Run the test to verify it fails**
@@ -2212,9 +2200,9 @@ Replace the `DexieModelTableRecord` helper:
  * That branch names the key type directly instead.
  */
 type DexieModelTable<M extends DexieCrudModelSpec> =
-  M["modelPrimaryKey"] extends keyof M["DBRead"]
-    ? EntityTable<M["DBRead"], M["modelPrimaryKey"]>
-    : Table<M["DBRead"], M["modelPrimaryKeyType"] & IndexableType, M["DBRead"]>;
+  M["modelPrimaryKey"] extends keyof M["DBRead"] ?
+    EntityTable<M["DBRead"], M["modelPrimaryKey"]>
+  : Table<M["DBRead"], M["modelPrimaryKeyType"] & IndexableType, M["DBRead"]>;
 
 /**
  * A record of Dexie tables representing CRUD models.
@@ -2226,42 +2214,43 @@ type DexieModelTableRecord<M extends DexieCrudModelSpec> = UnionToIntersection<
   // model name is associated to its correct model type, rather than being a
   // union of all model types.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  M extends any
-    ? {
-        [K in M["modelName"]]: DexieModelTable<M>;
-      }
-    : never
+  M extends any ?
+    {
+      [K in M["modelName"]]: DexieModelTable<M>;
+    }
+  : never
 >;
 ```
 
 Then replace the schema-string emission inside `_registerDexieDBVersion`:
 
 ```ts
-objectKeys(models).forEach((modelName) => {
-  const { primaryKey, columnsToIndex = [] } = models[modelName]!;
-  const isCompoundKey = Array.isArray(primaryKey);
+    objectKeys(models).forEach((modelName) => {
+      const { primaryKey, columnsToIndex = [] } = models[modelName]!;
+      const isCompoundKey = Array.isArray(primaryKey);
 
-  // A compound primary key is written `[a+b]` and is inherently unique, so
-  // it takes no `&` prefix; a single-column key does, to tell Dexie the
-  // key is unique.
-  const primaryKeySpec = isCompoundKey
-    ? `[${(primaryKey as readonly string[]).join("+")}]`
-    : `&${primaryKey as string}`;
+      // A compound primary key is written `[a+b]` and is inherently unique, so
+      // it takes no `&` prefix; a single-column key does, to tell Dexie the
+      // key is unique.
+      const primaryKeySpec =
+        isCompoundKey ?
+          `[${(primaryKey as readonly string[]).join("+")}]`
+        : `&${primaryKey as string}`;
 
-  // Only a single-column key is implicitly indexed by its own name. The
-  // components of a compound key are not, so a `columnsToIndex` entry
-  // naming one of them is meaningful and must be kept.
-  const columnsWithoutPrimaryKey = columnsToIndex.filter((columnName) => {
-    return isCompoundKey || columnName !== primaryKey;
-  });
+      // Only a single-column key is implicitly indexed by its own name. The
+      // components of a compound key are not, so a `columnsToIndex` entry
+      // naming one of them is meaningful and must be kept.
+      const columnsWithoutPrimaryKey = columnsToIndex.filter((columnName) => {
+        return isCompoundKey || columnName !== primaryKey;
+      });
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore This is safe
-  dexieTableDefs[modelName] = [
-    primaryKeySpec,
-    ...columnsWithoutPrimaryKey,
-  ].join(",");
-});
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore This is safe
+      dexieTableDefs[modelName] = [
+        primaryKeySpec,
+        ...columnsWithoutPrimaryKey,
+      ].join(",");
+    });
 ```
 
 - [ ] **Step 5: Fix the key casts in the CRUD client**
@@ -2269,13 +2258,13 @@ objectKeys(models).forEach((modelName) => {
 In `src/clients/dexie/createDexieCrudClient.ts`, replace every occurrence of
 
 ```ts
-IDType<M["DBRead"], M["modelPrimaryKey"]>;
+IDType<M["DBRead"], M["modelPrimaryKey"]>
 ```
 
 with
 
 ```ts
-IDType<M["DBRead"], M["modelPrimaryKeyType"]>;
+IDType<M["DBRead"], M["modelPrimaryKeyType"]>
 ```
 
 There are 10 occurrences (lines 206, 285, 309, 358, 439, 538, 569, 596, 612,
@@ -2318,15 +2307,15 @@ In `src/db/dexie/dexieVersions/dexieVersions.ts`, add to the `Schemas` type
 after `v7`:
 
 ```ts
-v8: {
-  version: 8;
-  models: [
-    LocalDatasetModel,
-    LocalPublicDatasetModel,
-    ConsentAuditEntry.Model,
-    ClarificationAuditEntry.Model,
-  ];
-}
+  v8: {
+    version: 8;
+    models: [
+      LocalDatasetModel,
+      LocalPublicDatasetModel,
+      ConsentAuditEntry.Model,
+      ClarificationAuditEntry.Model,
+    ];
+  };
 ```
 
 Add this entry at the end of the `DBDefinitions` array, after the `<7>` entry:
@@ -2414,7 +2403,6 @@ git commit -m "fix(dexie): key the public snapshot cache by dashboard and datase
 ## Task 9: Thread visibility through the snapshot caches
 
 **Files:**
-
 - Modify: `src/clients/datasets/LocalPublicDatasetClient.ts`
 - Modify: `src/clients/datasets/LocalPublicDatasetRawDataClient.ts`
 - Modify: `src/clients/qetl/PublicQetlClient.ts`
@@ -2537,21 +2525,22 @@ In the implementation, destructure `bucket` and use the compound key. Replace
 the destructuring line and the two lookups:
 
 ```ts
-const { bucket, dashboardId, datasetIds } = params;
+        const { bucket, dashboardId, datasetIds } = params;
 ```
 
 ```ts
-const cachedDataset = await LocalPublicDatasetClient.getById({
-  id: [dashboardId, datasetId],
-});
+            const cachedDataset = await LocalPublicDatasetClient.getById({
+              id: [dashboardId, datasetId],
+            });
 ```
 
 ```ts
-publicDataset = await LocalPublicDatasetClient.fetchPublicDatasetToIndexedDB({
-  bucket,
-  dashboardId,
-  datasetId,
-});
+                publicDataset =
+                  await LocalPublicDatasetClient.fetchPublicDatasetToIndexedDB({
+                    bucket,
+                    dashboardId,
+                    datasetId,
+                  });
 ```
 
 Task 8 fixed the IndexedDB collision, but DuckDB has the same one and it is not
@@ -2585,28 +2574,29 @@ const loadedSliceOwnerByDatasetId = new Map<DatasetId, DashboardId>();
 Then replace the in-memory check at the top of the `promiseMap` callback:
 
 ```ts
-const isAlreadyInMemory: boolean = await DuckDbClient.hasTableOrView(datasetId);
-const loadedOwner = loadedSliceOwnerByDatasetId.get(datasetId);
+            const isAlreadyInMemory: boolean =
+              await DuckDbClient.hasTableOrView(datasetId);
+            const loadedOwner = loadedSliceOwnerByDatasetId.get(datasetId);
 
-if (isAlreadyInMemory && loadedOwner === dashboardId) {
-  return;
-}
+            if (isAlreadyInMemory && loadedOwner === dashboardId) {
+              return;
+            }
 
-if (isAlreadyInMemory) {
-  // Someone else's slice is sitting under this name. Drop it
-  // rather than render their rows on this dashboard.
-  await DuckDbClient.dropTableViewAndFile(datasetId);
-}
+            if (isAlreadyInMemory) {
+              // Someone else's slice is sitting under this name. Drop it
+              // rather than render their rows on this dashboard.
+              await DuckDbClient.dropTableViewAndFile(datasetId);
+            }
 ```
 
 and record the owner immediately after the load:
 
 ```ts
-await DuckDbClient.loadParquet({
-  tableName: datasetId,
-  blob: publicDataset.parquetData,
-});
-loadedSliceOwnerByDatasetId.set(datasetId, dashboardId);
+            await DuckDbClient.loadParquet({
+              tableName: datasetId,
+              blob: publicDataset.parquetData,
+            });
+            loadedSliceOwnerByDatasetId.set(datasetId, dashboardId);
 ```
 
 - [ ] **Step 3: Update `PublicQetlClient`**
@@ -2710,7 +2700,6 @@ git commit -m "refactor(clients): thread snapshot visibility through the local c
 ## Task 10: The third page-metadata variant
 
 **Files:**
-
 - Modify: `src/views/DashboardApp/AvaPage/useAvaPageMetadata.ts`
 - Modify: `src/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard.ts`
 - Create: `src/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard.test.ts`
@@ -2989,9 +2978,9 @@ replace the auth spread:
 In `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx:126`:
 
 ```ts
-const avaPageMetadata = useMemo(() => {
-  return getAvaPageMetadataFromDashboard(dashboard, "editor");
-}, [dashboard]);
+  const avaPageMetadata = useMemo(() => {
+    return getAvaPageMetadataFromDashboard(dashboard, "editor");
+  }, [dashboard]);
 ```
 
 In `src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx`, leave
@@ -3078,7 +3067,6 @@ git commit -m "feat(dashboards): route page data by visibility and render surfac
 ## Task 11: Publish, unpublish, and delete transitions
 
 **Files:**
-
 - Modify: `src/clients/dashboards/DashboardClient.ts`
 - Create: `src/clients/dashboards/buildSnapshotTransitionPlan.test.ts`
 - Modify: `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal.tsx:208-212`
@@ -3122,9 +3110,8 @@ describe("unpublish and delete cleanup", () => {
     });
 
     expect(deleteDatasetsForDashboard).toHaveBeenCalledTimes(2);
-    expect(
-      deleteDatasetsForDashboard.mock.calls.map(([c]) => c.bucket).sort(),
-    ).toEqual(["published", "published-private"]);
+    expect(deleteDatasetsForDashboard.mock.calls.map(([c]) => c.bucket).sort())
+      .toEqual(["published", "published-private"]);
   });
 });
 ```
@@ -3323,38 +3310,40 @@ at roughly lines 162, 198, 237, and 253) gains `bucket: uploadBucket,` as its
 first property. Change the surrounding log line too:
 
 ```ts
-logger.log("Copying dataset parquet blobs to the snapshot bucket", {
-  dashboardId,
-  dependentDatasetIds,
-  uploadBucket,
-});
+            logger.log("Copying dataset parquet blobs to the snapshot bucket", {
+              dashboardId,
+              dependentDatasetIds,
+              uploadBucket,
+            });
 ```
 
 Then, after the dataset loop closes and before the `nextConfig` computation,
 add the clear step:
 
 ```ts
-// Step 3: clear the bucket this dashboard no longer belongs in.
-// Doing this AFTER the upload means the worst case is a duplicate
-// copy rather than a window with no data at all.
-await PublicDatasetParquetStorageClient.deleteDatasetsForDashboard({
-  bucket: clearBucket,
-  dashboardId,
-});
+          // Step 3: clear the bucket this dashboard no longer belongs in.
+          // Doing this AFTER the upload means the worst case is a duplicate
+          // copy rather than a window with no data at all.
+          await PublicDatasetParquetStorageClient.deleteDatasetsForDashboard({
+            bucket: clearBucket,
+            dashboardId,
+          });
 ```
 
 Finally replace `isPublic: true` in the update model with the enum:
 
 ```ts
-const updateModel: Partial<Dashboard.T> = {
-  visibility,
-  ...(slug ? { slug: slug.action === "set" ? slug.value : undefined } : {}),
-  ...(nextConfig
-    ? {
-        config: nextConfig as unknown as Dashboard.T["config"],
-      }
-    : {}),
-};
+          const updateModel: Partial<Dashboard.T> = {
+            visibility,
+            ...(slug ?
+              { slug: slug.action === "set" ? slug.value : undefined }
+            : {}),
+            ...(nextConfig ?
+              {
+                config: nextConfig as unknown as Dashboard.T["config"],
+              }
+            : {}),
+          };
 ```
 
 - [ ] **Step 6: Add unpublish and fullDelete**
@@ -3449,12 +3438,12 @@ Then register the new mutations at the bottom of the file:
 In `PublishDashboardModal.tsx`, add the audience to the publish call:
 
 ```ts
-publishDashboard({
-  dashboardId: currentDashboard.id,
-  visibility: "public",
-  ...(slugUpdate ? { slug: slugUpdate } : {}),
-  publishConfig,
-});
+    publishDashboard({
+      dashboardId: currentDashboard.id,
+      visibility: "public",
+      ...(slugUpdate ? { slug: slugUpdate } : {}),
+      publishConfig,
+    });
 ```
 
 In `DeleteDashboardButton.tsx`, switch the hook:
@@ -3490,7 +3479,6 @@ git commit -m "feat(dashboards): add visibility-aware publish, unpublish, and de
 ## Task 12: The access-denied surface and the viewer modes
 
 **Files:**
-
 - Create: `src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView.tsx`
 - Modify: `src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx`
 
@@ -3536,13 +3524,13 @@ export function DashboardAccessDeniedView({
         <Text c="dimmed">
           <Trans>Ask the dashboard's owner to share it with you.</Trans>
         </Text>
-        {canSwitchAccount ? (
+        {canSwitchAccount ?
           <Group mt="md">
             <Button component={Link} to="/signin" variant="outline">
               <Trans>Sign in with a different account</Trans>
             </Button>
           </Group>
-        ) : null}
+        : null}
       </Stack>
     </Paper>
   );
@@ -3584,22 +3572,22 @@ export function DashboardViewerView({
 Replace the metadata memo so it passes the surface through:
 
 ```tsx
-const avaPageMetadata = useMemo(() => {
-  return getAvaPageMetadataFromDashboard(
-    dashboard,
-    mode === "preview" ? "preview" : "published",
-  );
-}, [dashboard, mode]);
+  const avaPageMetadata = useMemo(() => {
+    return getAvaPageMetadataFromDashboard(
+      dashboard,
+      mode === "preview" ? "preview" : "published",
+    );
+  }, [dashboard, mode]);
 ```
 
 Replace the access gate. It is now an assertion rather than the access decision:
 
 ```tsx
-// Defense in depth only. The route loaders own the access decision and have
-// already made it; a draft reaching this view means a loader branch is wrong.
-if (mode === "published" && dashboard.visibility === "draft") {
-  return <DashboardAccessDeniedView />;
-}
+  // Defense in depth only. The route loaders own the access decision and have
+  // already made it; a draft reaching this view means a loader branch is wrong.
+  if (mode === "published" && dashboard.visibility === "draft") {
+    return <DashboardAccessDeniedView />;
+  }
 ```
 
 Replace the preview banner's status line and its button guard:
@@ -3662,7 +3650,6 @@ module with injected reads makes it testable and keeps the two routes from
 drifting apart.
 
 **Files:**
-
 - Create: `src/clients/dashboards/resolveDashboardRoute.ts`
 - Create: `src/clients/dashboards/resolveDashboardRoute.test.ts`
 - Create: `src/clients/dashboards/makeDashboardRouteDeps.ts`
@@ -3802,11 +3789,9 @@ describe("resolvePublicDashboardRoute", () => {
     const outcome = await resolvePublicDashboardRoute({
       slugOrId: DASHBOARD_ID,
       deps: makeDeps({
-        getById: vi
-          .fn()
-          .mockResolvedValue(
-            makeDashboard({ visibility: "draft", slug: "q3" }),
-          ),
+        getById: vi.fn().mockResolvedValue(
+          makeDashboard({ visibility: "draft", slug: "q3" }),
+        ),
       }),
     });
     expect(outcome).toEqual({ kind: "denied" });
@@ -3947,8 +3932,8 @@ async function _sendToWorkspaceUrl(params: {
   if (!workspace) {
     // The row was readable but its workspace is not one of ours, so the
     // workspace-scoped route cannot serve it either.
-    return (await deps.isAuthenticated())
-      ? { kind: "denied" }
+    return (await deps.isAuthenticated()) ?
+        { kind: "denied" }
       : { kind: "signIn" };
   }
 
@@ -3971,13 +3956,14 @@ export async function resolvePublicDashboardRoute(params: {
 }): Promise<DashboardRouteOutcome> {
   const { slugOrId, deps } = params;
 
-  const candidate = isUuidShaped(slugOrId)
-    ? await deps.getById(slugOrId as DashboardId)
+  const candidate =
+    isUuidShaped(slugOrId) ?
+      await deps.getById(slugOrId as DashboardId)
     : (await deps.findBySlug({ slug: slugOrId, visibility: "public" }))[0];
 
   if (candidate?.visibility === "public") {
-    return candidate.slug && candidate.slug !== slugOrId
-      ? { kind: "redirectToPublic", slugOrId: candidate.slug }
+    return candidate.slug && candidate.slug !== slugOrId ?
+        { kind: "redirectToPublic", slugOrId: candidate.slug }
       : { kind: "render", dashboard: candidate };
   }
 
@@ -4030,8 +4016,9 @@ export async function resolveWorkspaceDashboardRoute(params: {
     return { kind: "denied" };
   }
 
-  const candidate = isUuidShaped(slugOrId)
-    ? await deps.getById(slugOrId as DashboardId)
+  const candidate =
+    isUuidShaped(slugOrId) ?
+      await deps.getById(slugOrId as DashboardId)
     : (
         await deps.findBySlug({
           slug: slugOrId,
@@ -4058,8 +4045,8 @@ export async function resolveWorkspaceDashboardRoute(params: {
     return { kind: "denied" };
   }
 
-  return candidate.slug && candidate.slug !== slugOrId
-    ? { kind: "redirectToWorkspace", workspaceSlug, slugOrId: candidate.slug }
+  return candidate.slug && candidate.slug !== slugOrId ?
+      { kind: "redirectToWorkspace", workspaceSlug, slugOrId: candidate.slug }
     : { kind: "render", dashboard: candidate };
 }
 ```
@@ -4138,7 +4125,6 @@ git commit -m "feat(dashboards): add the slug-or-id viewer route resolver"
 ## Task 14: The public viewer route
 
 **Files:**
-
 - Create: `src/routes/d/$slugOrId.tsx`
 - Delete: `src/routes/d/$slug.tsx`
 
@@ -4156,7 +4142,8 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type LoaderResult =
-  { kind: "render"; dashboard: Dashboard.T } | { kind: "denied" };
+  | { kind: "render"; dashboard: Dashboard.T }
+  | { kind: "denied" };
 
 /**
  * Canonical public URL for a published dashboard:
@@ -4253,7 +4240,6 @@ git commit -m "feat(routes): accept a slug or id at the public dashboard URL"
 ## Task 15: The workspace-scoped viewer route
 
 **Files:**
-
 - Create: `src/routes/_auth/$workspaceSlug/d/$slugOrId.tsx`
 
 - [ ] **Step 1: Create the route**
@@ -4275,7 +4261,8 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type LoaderResult =
-  { kind: "render"; dashboard: Dashboard.T } | { kind: "denied" };
+  | { kind: "render"; dashboard: Dashboard.T }
+  | { kind: "denied" };
 
 /**
  * Workspace-only URL for a published dashboard:
@@ -4363,7 +4350,6 @@ git commit -m "feat(routes): add the workspace-scoped dashboard viewer URL"
 ## Task 16: Reduce the legacy route to a redirect
 
 **Files:**
-
 - Modify: `src/routes/public/dashboards/$workspaceSlug/$dashboardId.tsx`
 
 - [ ] **Step 1: Replace the file**
@@ -4428,7 +4414,6 @@ git commit -m "refactor(routes): reduce the legacy dashboard URL to a redirect"
 ## Task 17: Route viewer-role users to preview, not the editor
 
 **Files:**
-
 - Modify: `src/routes/_auth/$workspaceSlug/dashboards/edit/$dashboardId.tsx`
 - Modify: `src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx`
 - Create: `tests/e2e/dashboard-viewer-role-routing.spec.ts`
@@ -4668,13 +4653,12 @@ git commit -m "fix(dashboards): send viewer-role users to preview instead of the
 
 ## Task 18: Prove the private bucket is actually private
 
-The pgTAP tests in Task 3 prove the _policies_ are right. They prove nothing
+The pgTAP tests in Task 3 prove the *policies* are right. They prove nothing
 about the bucket being private: a bucket created with `public = true` is served
 through a path that never consults `storage.objects` RLS at all, and every one
 of those assertions would still pass.
 
 **Files:**
-
 - Create: `tests/e2e/dashboard-private-snapshot-bucket.spec.ts`
 
 - [ ] **Step 1: Write the failing test**
@@ -4836,7 +4820,7 @@ git commit -m "chore: formatting after the P2 publishing core"
    dashboard in production silently becomes a draft.
 
 2. **Task 3, Step 4.** The `sql_paths` entry must name a real file and must
-   come after the restore migration. A typo there is a _warning_, not an error:
+   come after the restore migration. A typo there is a *warning*, not an error:
    `db reset` reports success and the bucket ends up with no policies. Step 7
    is what catches it.
 

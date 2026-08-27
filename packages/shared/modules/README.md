@@ -21,24 +21,20 @@ No peer dependencies.
 ## Usage
 
 ```ts
-import {
-  createModule,
-  createModuleFactory,
-  withNewMembers,
-} from "@avandar/modules";
+import { createModule, createModuleFactory, withNewMembers } from "@avandar/modules";
 
 const Counter = createModule("Counter", {
   state: { count: 0 },
   builder: (m) => ({
     increment: () => m.setCount((c) => c + 1),
-    double: () => m.setCount((c) => c * 2),
+    double:    () => m.setCount((c) => c * 2),
   }),
 });
 
-Counter.getCount(); // 0
+Counter.getCount();        // 0
 const next = Counter.increment().double();
-next.getCount(); // 2
-Counter.getCount(); // still 0 (immutable)
+next.getCount();           // 2
+Counter.getCount();        // still 0 (immutable)
 ```
 
 ### Mixins
@@ -61,11 +57,9 @@ The `withNewMembers` helper is a convenience shortcut for mixins that only
 add members (no new state):
 
 ```ts
-const WithReset = Counter.mixin(
-  withNewMembers({
-    reset: () => Counter.setCount(0),
-  }),
-);
+const WithReset = Counter.mixin(withNewMembers({
+  reset: () => Counter.setCount(0),
+}));
 ```
 
 ### Factories
@@ -75,11 +69,7 @@ returns a fresh child module each time. Useful when each instance needs its
 own state but should share members.
 
 ```ts
-type CounterModule = Module<
-  "Counter",
-  { count: number },
-  { increment: () => CounterModule }
->;
+type CounterModule = Module<"Counter", { count: number }, { increment: () => CounterModule }>;
 
 const CounterFactory = createModuleFactory<CounterModule>("Counter", {
   childBuilder: (m) => ({
@@ -97,22 +87,22 @@ const b = CounterFactory.create({ count: 100 });
 
 Creates a module.
 
-| Option    | Type                                      | Description                                                               |
-| --------- | ----------------------------------------- | ------------------------------------------------------------------------- |
-| `state`   | object                                    | Initial state. Auto-generates `getX()` / `setX()` accessors for each key. |
-| `builder` | `(accessors) => members` or `members` obj | Returns the module's members (functions, data) given its base accessors.  |
+| Option    | Type                                      | Description                                                                |
+| --------- | ----------------------------------------- | -------------------------------------------------------------------------- |
+| `state`   | object                                    | Initial state. Auto-generates `getX()` / `setX()` accessors for each key.  |
+| `builder` | `(accessors) => members` or `members` obj | Returns the module's members (functions, data) given its base accessors.   |
 
 Every module instance has the following base accessors:
 
-| Member                       | Description                                                                       |
-| ---------------------------- | --------------------------------------------------------------------------------- |
-| `getModuleName()`            | Returns the module's name string                                                  |
-| `getState()`                 | Returns the full current state object                                             |
-| `setState(partial)`          | Returns a new module with `partial` merged into state                             |
-| `set(keyPath, value)`        | Returns a new module with `value` set at a dot-notation `keyPath` in state        |
-| `get<Key>()` (per state key) | Returns the value of `state[key]`                                                 |
-| `set<Key>(value)` (per key)  | Returns a new module with `state[key]` replaced. Accepts a value or `(prev) => v` |
-| `mixin(mixinFn)`             | Returns a new module with extra state/members merged in                           |
+| Member                      | Description                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| `getModuleName()`           | Returns the module's name string                                                  |
+| `getState()`                | Returns the full current state object                                             |
+| `setState(partial)`         | Returns a new module with `partial` merged into state                             |
+| `set(keyPath, value)`       | Returns a new module with `value` set at a dot-notation `keyPath` in state        |
+| `get<Key>()` (per state key)| Returns the value of `state[key]`                                                 |
+| `set<Key>(value)` (per key) | Returns a new module with `state[key]` replaced. Accepts a value or `(prev) => v` |
+| `mixin(mixinFn)`            | Returns a new module with extra state/members merged in                           |
 
 ### `createModuleFactory<ChildModule>(moduleName, options)`
 
@@ -120,8 +110,8 @@ Creates a factory module that produces child instances on demand. The
 factory itself is a module named `${moduleName}Factory` with a single
 `create(state)` member.
 
-| Option         | Type                          | Description                                                |
-| -------------- | ----------------------------- | ---------------------------------------------------------- |
+| Option         | Type                          | Description                                              |
+| -------------- | ----------------------------- | -------------------------------------------------------- |
 | `childBuilder` | `(accessors) => childMembers` | Members each created child should have given its accessors |
 
 ### `withNewMembers(members)`
@@ -132,11 +122,11 @@ state or accessors.
 
 ## Types
 
-| Type                     | Description                                                                             |
-| ------------------------ | --------------------------------------------------------------------------------------- |
-| `Module<Name, State, M>` | A full module: base accessors + state getters/setters + `mixin` + your custom members   |
+| Type                     | Description                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| `Module<Name, State, M>` | A full module: base accessors + state getters/setters + `mixin` + your custom members  |
 | `BaseModule<...>`        | Alias for `Accessors` — the auto-generated accessor surface, without `mixin` or members |
-| `ModuleFactory<Child>`   | The factory module type produced by `createModuleFactory`                               |
+| `ModuleFactory<Child>`   | The factory module type produced by `createModuleFactory`                              |
 | `EmptyObject`            | Re-export from `@avandar/utils`; the default state/members shape                        |
 
 ## License

@@ -36,18 +36,18 @@ includes one concept:
 
 ## Decisions
 
-| Topic                   | Choice                                                                                                                                                                       |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Alias prefixes          | Datasets stay `t0`, `t1`, … sorted by dataset id. Concepts get `c0`, `c1`, … sorted by concept id. Prefixes cannot collide.                                                  |
-| Rewrite target          | `RelationRef.toTableName`. Datasets remain a bare UUID. Concepts become `concept_<uuid>`. Do not hard-code the `concept_` prefix in `SqlTableAlias`.                         |
-| Alias entries           | Discriminated union: `{ kind: "dataset", alias, datasetId, name }` or `{ kind: "concept", alias, conceptId, name }`.                                                         |
-| Builder                 | `fromDatasets` and `fromConcepts` stay. Call sites that have both use `fromSchema({ datasets, concepts })`, which concatenates dataset aliases then concept aliases.         |
-| Schema block            | One line per alias, same shape as today: `- alias: Label (name, name)`. Concept lines list `concept_attributes.name` only. No UUIDs.                                         |
-| Schema fetch            | `fetchWorkspaceSchema` loads `concepts` (`id, name`) and `concept_attributes` (`concept_id, name`) independently of datasets. A concept-only workspace still lists concepts. |
-| Cloud parse             | `parseOpenRouterResponse` rewrites when **either** datasets or concepts are present. Skip only when both are empty.                                                          |
-| Leftover generate route | `queries/:workspaceId/generate` uses the same fetch + `fromSchema` + `applyToSql`.                                                                                           |
-| Offline prompts         | `OfflineChatSchema` carries `concepts` and `conceptAttributes`. `buildOfflinePrompts` formats and repairs through `fromSchema`.                                              |
-| Offline repair          | After rewrite, `concept_<uuid>` is an allowed table name. Repair must not remap a concept alias or concept table name onto a dataset.                                        |
+| Topic | Choice |
+| ----- | ------ |
+| Alias prefixes | Datasets stay `t0`, `t1`, … sorted by dataset id. Concepts get `c0`, `c1`, … sorted by concept id. Prefixes cannot collide. |
+| Rewrite target | `RelationRef.toTableName`. Datasets remain a bare UUID. Concepts become `concept_<uuid>`. Do not hard-code the `concept_` prefix in `SqlTableAlias`. |
+| Alias entries | Discriminated union: `{ kind: "dataset", alias, datasetId, name }` or `{ kind: "concept", alias, conceptId, name }`. |
+| Builder | `fromDatasets` and `fromConcepts` stay. Call sites that have both use `fromSchema({ datasets, concepts })`, which concatenates dataset aliases then concept aliases. |
+| Schema block | One line per alias, same shape as today: `- alias: Label (name, name)`. Concept lines list `concept_attributes.name` only. No UUIDs. |
+| Schema fetch | `fetchWorkspaceSchema` loads `concepts` (`id, name`) and `concept_attributes` (`concept_id, name`) independently of datasets. A concept-only workspace still lists concepts. |
+| Cloud parse | `parseOpenRouterResponse` rewrites when **either** datasets or concepts are present. Skip only when both are empty. |
+| Leftover generate route | `queries/:workspaceId/generate` uses the same fetch + `fromSchema` + `applyToSql`. |
+| Offline prompts | `OfflineChatSchema` carries `concepts` and `conceptAttributes`. `buildOfflinePrompts` formats and repairs through `fromSchema`. |
+| Offline repair | After rewrite, `concept_<uuid>` is an allowed table name. Repair must not remap a concept alias or concept table name onto a dataset. |
 
 ## Approaches considered
 
@@ -87,27 +87,10 @@ undefined.
 
 ```ts
 {
-  datasets: {
-    id: string;
-    name: string;
-  }
-  [];
-  columns: {
-    dataset_id: string;
-    name: string;
-    data_type: string;
-  }
-  [];
-  concepts: {
-    id: string;
-    name: string;
-  }
-  [];
-  conceptAttributes: {
-    concept_id: string;
-    name: string;
-  }
-  [];
+  datasets: { id: string; name: string }[];
+  columns: { dataset_id: string; name: string; data_type: string }[];
+  concepts: { id: string; name: string }[];
+  conceptAttributes: { concept_id: string; name: string }[];
 }
 ```
 

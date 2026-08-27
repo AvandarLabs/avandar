@@ -8,13 +8,13 @@
 
 ## 1. Where the work is
 
-|                 |                                                                                                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Worktree**    | `/Users/pablo/src/worktrees/avandar/feat/qetl-registry`                                                                                                                                     |
-| **Branch**      | `feat/qetl-registry`                                                                                                                                                                        |
-| **Base commit** | `cf851570` (branched from `feat/qetl-impl`)                                                                                                                                                 |
-| **Committed?**  | **No. Nothing is committed.** Pablo asked for the work to stay dirty for review.                                                                                                            |
-| **Backups**     | `/private/tmp/claude-501/-Users-pablo-src-worktrees-avandar-feat-qetl-impl/907e04be-0fb8-4c3a-ab84-713d4952d676/scratchpad/backup-*/` (7 snapshots, each `untracked.tar` + `modified.diff`) |
+| | |
+|---|---|
+| **Worktree** | `/Users/pablo/src/worktrees/avandar/feat/qetl-registry` |
+| **Branch** | `feat/qetl-registry` |
+| **Base commit** | `cf851570` (branched from `feat/qetl-impl`) |
+| **Committed?** | **No. Nothing is committed.** Pablo asked for the work to stay dirty for review. |
+| **Backups** | `/private/tmp/claude-501/-Users-pablo-src-worktrees-avandar-feat-qetl-impl/907e04be-0fb8-4c3a-ab84-713d4952d676/scratchpad/backup-*/` (7 snapshots, each `untracked.tar` + `modified.diff`) |
 
 **Do not commit without asking Pablo.** His standing rule is no commits, pushes,
 merges or PRs by default.
@@ -101,17 +101,17 @@ importing `@/…` fails it. That is why the executed suites live in
 
 Tasks 1-5 are the other session's, already committed in our base. **Ours:**
 
-| Task   | Deliverable                                                                                |
-| ------ | ------------------------------------------------------------------------------------------ |
-| 6      | `DuckDbSqlAnalyzer` read analysis returns `relations: RelationRef.T[]`                     |
-| 7      | `RelationRegistry` with construction-time validation                                       |
-| 8      | `extractReferencedRelations` adapter                                                       |
-| 9      | `DatasetParquetWrapper` (`csv_file`, `xlsx_file`, `open_data`)                             |
-| 10     | `VirtualDatasetWrapper`, `GoogleSheetsWrapper` (still throws, by design)                   |
-| 11     | `ConceptWrapper` + `buildConceptQueryResult` moved out of `runStructuredQueryWithMetadata` |
-| 14     | executed row-level suite for `structuredQueryToSql`                                        |
-| **12** | **Cutover done.** Both `source_type` match statements are gone.                            |
-| **13** | **Renames done.**                                                                          |
+| Task | Deliverable |
+|---|---|
+| 6 | `DuckDbSqlAnalyzer` read analysis returns `relations: RelationRef.T[]` |
+| 7 | `RelationRegistry` with construction-time validation |
+| 8 | `extractReferencedRelations` adapter |
+| 9 | `DatasetParquetWrapper` (`csv_file`, `xlsx_file`, `open_data`) |
+| 10 | `VirtualDatasetWrapper`, `GoogleSheetsWrapper` (still throws, by design) |
+| 11 | `ConceptWrapper` + `buildConceptQueryResult` moved out of `runStructuredQueryWithMetadata` |
+| 14 | executed row-level suite for `structuredQueryToSql` |
+| **12** | **Cutover done.** Both `source_type` match statements are gone. |
+| **13** | **Renames done.** |
 
 **Task 12 detail.** `relationLoading.ts`'s `_fetchRelationSource` resolves through
 the registry to `wrapper.acquire`; `getRelationSources.ts` replaced its `match`
@@ -171,10 +171,7 @@ const individuals = await IndividualClient.getAll(
   where("concept_id", "eq", conceptId),
 );
 // 2. One column as CSV text; no user data enters a SQL string.
-const fileText = toCsvColumn(
-  "external_id",
-  individuals.map(prop("externalId")),
-);
+const fileText = toCsvColumn("external_id", individuals.map(prop("externalId")));
 // 3. Existing tested loader.
 await DuckDbClient.loadCsv({
   tableName: `${RelationRef.toTableName(ref)}__individuals`,
@@ -216,13 +213,13 @@ would silently produce all-NULL columns.
 
 ## 5. Steps 5-9, not started
 
-| Step  | Work                                                                                                                                                                                                                                                                                                   |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Step | Work |
+|---|---|
 | **5** | Expand a concept ref to its contributing dataset ids (`expandRelationRefs`), extend the **workspace allowlist** to accept concept refs, and load datasets → spine → view in that order. Spec 3 §5.3 calls the allowlist the highest-risk line: without it a concept from another workspace could load. |
-| **6** | `structuredQueryToSql`: delete the throw at `:48-50`, name the table via `RelationRef.toTableName`, **and open the aggregation gate at `:84`**.                                                                                                                                                        |
-| **7** | Delete `_runConceptQuery` and its `Concept` arm from `runStructuredQueryWithMetadata`, plus `ConceptWrapper`'s delegating `buildConceptQueryResult`; collapse the one-arm match.                                                                                                                       |
-| **8** | `generateIndividuals` creates a DuckDB table named with the concept's **bare UUID**, violating the "bare UUID is always a dataset" invariant `RelationRef.fromTableName` encodes. Rename and drop it.                                                                                                  |
-| **9** | Rehearsal: two concepts each selected and charted, joined to each other, and one joined to a dataset with filter, group-by and sort.                                                                                                                                                                   |
+| **6** | `structuredQueryToSql`: delete the throw at `:48-50`, name the table via `RelationRef.toTableName`, **and open the aggregation gate at `:84`**. |
+| **7** | Delete `_runConceptQuery` and its `Concept` arm from `runStructuredQueryWithMetadata`, plus `ConceptWrapper`'s delegating `buildConceptQueryResult`; collapse the one-arm match. |
+| **8** | `generateIndividuals` creates a DuckDB table named with the concept's **bare UUID**, violating the "bare UUID is always a dataset" invariant `RelationRef.fromTableName` encodes. Rename and drop it. |
+| **9** | Rehearsal: two concepts each selected and charted, joined to each other, and one joined to a dataset with filter, group-by and sort. |
 
 ### Step 6 is the top risk in the whole spec
 
@@ -250,17 +247,17 @@ emitting), and keep a case proving a map-only aggregation now emits valid SQL.
 
 ## 6. Pablo's decisions (also in the decisions log)
 
-| Decision                     |                                                                                                     |
-| ---------------------------- | --------------------------------------------------------------------------------------------------- |
-| Demo surface                 | **Both** a workspace dashboard **and** a public share link.                                         |
-| Array attributes             | At least one demo concept has one. **In scope**, implemented.                                       |
-| `first` determinism fix      | Ships **silently**, no release note.                                                                |
-| 14-day offline authorization | **Accepted**; document explicitly.                                                                  |
-| Raw-SQL column attribution   | **Schedule the work**, do not narrow the exit criterion.                                            |
-| Dataset entity key           | It **exists** (mapping to the concept identifier attribute). Spec 2 was wrong; correction recorded. |
-| Tasks 12/13                  | Do tonight before demo work. **Done.**                                                              |
-| Google Drive API             | **Enabled.** Picker API checked and clean. Spec 4 has no console blockers left.                     |
-| Demo Sheet size              | Comfortably under 10 MB.                                                                            |
+| Decision | |
+|---|---|
+| Demo surface | **Both** a workspace dashboard **and** a public share link. |
+| Array attributes | At least one demo concept has one. **In scope**, implemented. |
+| `first` determinism fix | Ships **silently**, no release note. |
+| 14-day offline authorization | **Accepted**; document explicitly. |
+| Raw-SQL column attribution | **Schedule the work**, do not narrow the exit criterion. |
+| Dataset entity key | It **exists** (mapping to the concept identifier attribute). Spec 2 was wrong; correction recorded. |
+| Tasks 12/13 | Do tonight before demo work. **Done.** |
+| Google Drive API | **Enabled.** Picker API checked and clean. Spec 4 has no console blockers left. |
+| Demo Sheet size | Comfortably under 10 MB. |
 
 ### Concepts on a public link is unsolved and is the thing to cut first
 

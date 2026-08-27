@@ -528,9 +528,9 @@ export function hasBufferCycle(
     seen.add(currentId);
     const current = byId.get(currentId);
     currentId =
-      current?.geoBinding?.type === "bufferOfLayer"
-        ? current.geoBinding.layerId
-        : undefined;
+      current?.geoBinding?.type === "bufferOfLayer" ?
+        current.geoBinding.layerId
+      : undefined;
   }
   return false;
 }

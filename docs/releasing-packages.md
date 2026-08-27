@@ -45,7 +45,7 @@ expired token is the first thing to check.
 publishing, automation tokens are rejected outright and step 1 cannot work.
 Either allow automation tokens or go straight to trusted publishing.
 
-**Consuming repos:** any repo that installs these packages _and_ sets
+**Consuming repos:** any repo that installs these packages *and* sets
 `minimumReleaseAge` must add `@avandar/*` to `minimumReleaseAgeExclude`, or a
 freshly published version is unresolvable there for three days. This repo
 already has that entry.

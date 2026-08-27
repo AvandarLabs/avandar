@@ -219,12 +219,12 @@ export const ChatViewEvent = {
     return {
       app: pageContext.app,
       route,
-      ...(pageContext.openDatasetId
-        ? { openDatasetId: pageContext.openDatasetId }
-        : {}),
-      ...(pageContext.dashboardId
-        ? { dashboardId: pageContext.dashboardId }
-        : {}),
+      ...(pageContext.openDatasetId ?
+        { openDatasetId: pageContext.openDatasetId }
+      : {}),
+      ...(pageContext.dashboardId ?
+        { dashboardId: pageContext.dashboardId }
+      : {}),
     };
   },
 
@@ -638,8 +638,9 @@ Read `buildDataExplorerToolDefinitions` and concatenate so the OpenRouter `tools
 5. `PostChatMessages.ts`:
 
 ```ts
-const sqlSystemPrompt = needsSchema
-  ? buildSqlSystemPrompt({
+const sqlSystemPrompt =
+  needsSchema ?
+    buildSqlSystemPrompt({
       prompt: lastUserPrompt,
       datasets: schema.datasets,
       columns: schema.columns,
@@ -939,9 +940,9 @@ Expected: FAIL.
 
 ```ts
 const initialMessages =
-  user && workspace.id
-    ? ChatThreadStore.read({ workspaceId: workspace.id, userId: user.id })
-    : [];
+  user && workspace.id ?
+    ChatThreadStore.read({ workspaceId: workspace.id, userId: user.id })
+  : [];
 return useLocalRuntime(adapter, { initialMessages });
 ```
 

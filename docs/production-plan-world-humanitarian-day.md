@@ -79,7 +79,6 @@ These are the cross-cutting refactors that unblock the products. They are
 listed first because their ordering drives the whole plan.
 
 ### P0. QETL Engine - proper OLAP + non-OLAP implementation
-
 **Current state:** `src/clients/qetl/QETLClient.ts` is a self-labeled v0
 prototype (Baldacci 2017 model) running DuckDB-WASM in the browser. It fetches
 **whole datasets** only, has no real dicing/filtering/optimization, no cube
@@ -108,14 +107,13 @@ branching**. `google_sheets` extraction throws "not supported".
 - `[BLOCKS: P1 (partly), P2 cross-querying, P5 case-mgmt queries, P6 connectors, P3 dashboard perf]`
 
 ### P1. Query DSL - JSON-first, LLM-facing
-
 **Current state:** A mature JSON DSL **already exists** -
 `shared/models/queries/StructuredQuery` with a bidirectional bridge
 (`structuredQueryToSql` via knex, `sqlToStructuredQuery` via node-sql-parser).
 But the LLM path (`supabase/functions/chat`, offline WebLLM) emits **raw SQL**
 via a `generateSql` tool, and `structuredQueryToSql` **throws on concept
-sources**. So the "simplified JSON DSL for LLMs" is mostly _wiring the LLM to
-the DSL we already have_ + closing gaps.
+sources**. So the "simplified JSON DSL for LLMs" is mostly *wiring the LLM to
+the DSL we already have* + closing gaps.
 
 - P1.1 `[REFACTOR]` Freeze and document `StructuredQuery` as the canonical,
   versioned JSON query contract (publish a JSON Schema for it).
@@ -133,7 +131,6 @@ the DSL we already have_ + closing gaps.
 - `[Depends on: P0 for execution; P2 for ABox querying]`
 
 ### P2. Cross-product query fabric (ABox as a first-class queryable source)
-
 **Current state:** The ABox is virtual; querying it routes through
 `AttributeAssertionClient` (external-id union + per-dataset correlated
 subqueries - the multi-dataset merge). DSL/DuckDB path **throws** for a
@@ -155,7 +152,6 @@ the "wire all products together for cross-querying" ask.
 - `[Depends on: P0, P1; BLOCKS: dashboards-on-ABox, GIS-on-ABox, case-mgmt reporting]`
 
 ### P3. Permissions completion and extension
-
 **Current state:** Granular per-app roles + `resource_shares` (Drive-style) are
 designed and largely built (`ResourceShareClient`, `ShareResourceModal` merged
 with tests). BUT: production still runs on legacy `user_roles.role =
@@ -178,7 +174,6 @@ surface may not have shipped; **there is no guest tier**.
 - `[BLOCKS: P4 guests, P7 GIS permissions, P5 case-mgmt permissions, P8 private dashboards]`
 
 ### P4. Guest access tier (Notion-style guests)
-
 **Current state:** Net-new. Every invitee today becomes a full workspace member
 with a 4-app role matrix. No lightweight external-guest concept exists.
 
@@ -195,7 +190,6 @@ with a 4-app role matrix. No lightweight external-guest concept exists.
 - `[Depends on: P3]`
 
 ### P5. Ontology Designer refactor (rename + DL model)
-
 **Current state:** Clean TBox/ABox split already exists
 (`OntologyDesignerApp` = TBox, `IndividualManagerApp` = ABox), and P5.1 below
 has shipped. Gaps vs a real DL/ontology model: **no roles (object properties)
@@ -225,7 +219,6 @@ re-writes all rows (no incremental sync).
 - `[Depends on: touches P2/P0 for materialization; BLOCKS: P5b, P5c case-mgmt]`
 
 ### P5b. Configurable TBox (workspace-configurable schema)
-
 **Current state:** `Individual.status` is a free `string` defaulted to `active`;
 status options are hard-coded in a stub UI. Nothing configurable.
 
@@ -238,7 +231,6 @@ status options are hard-coded in a stub UI. Nothing configurable.
 - `[Depends on: P5]`
 
 ### P5c. Case Management product (evolve legacy ontology → configurable cases)
-
 **Current state:** Case-management UI is **stubs with no backend**:
 `ActivityBlock` (comments) calls `notifyNotImplemented`; `StatusPill` is a
 hard-coded combobox with no persistence; `Individual.assignedTo` column exists with
@@ -266,7 +258,6 @@ no writer/UI. Greenfield.
 ## Products (Tracks A–H) - built on the foundations above
 
 ### P6. Data Connectors (Sheets, Postgres, HDX / Open Data)
-
 **Current state:** `google_sheets` source **exists and is code-complete but
 disabled** in the UI ("under maintenance"), and QETL throws on it. **No
 Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
@@ -289,10 +280,9 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
 - P6.5 `[REFACTOR]` Open-data catalog Beta → production (search, provenance,
   refresh cadence surfacing).
 - `[Depends on: P0 (live-source extractors P0.8) for Sheets/Postgres; pipeline
-framework already exists for HDX]`
+  framework already exists for HDX]`
 
 ### P7. GIS Tool
-
 **Current state:** MapLibre GL **point-plotting prototype**
 (`src/components/GISApp`). Only `Point` geometry; **no choropleth / polygons /
 lines / heatmaps / layers**; style picker hard-disabled; heavy `console.log`s;
@@ -316,16 +306,14 @@ embeddable in dashboards; datasets only (not virtual/ABox sources).
 - P7.9 `[NEW]` Wire **permissions** on maps (route guard + `resource_type` map,
   from P3.2).
 - `[Depends on: P3.2 (perms), P2 (ABox layers), P6 (HDX layers); map rendering
-itself is PARALLEL]`
+  itself is PARALLEL]`
 
 ### P8. Dashboards and Visualizations
-
 **Current state:** Puck-based editor (`AvaPage`, PBlocks, schema V4). Filters
 and series settings exist **but are buggy** (detailed below). Public vs private
 publishing exists (`is_public` + parquet copy to public bucket + slices).
 
 #### Refactors (unblock the fixes)
-
 - P8.1 `[REFACTOR]` **Query column identity**: introduce `QueryColumnId` and
   key viz axes/series and filters by column **id, not name string** (several
   open `TODO(jpsyx)` in `BarChart/LineChart` configs, `hydrateXY`, filters).
@@ -335,7 +323,6 @@ publishing exists (`is_public` + parquet copy to public bucket + slices).
   model (superseded by Puck `AvaPageData`).
 
 #### Filters (fix the "there but very buggy")
-
 - P8.3 `[FIX]` **Validated filter columns**: filter column must be picked from
   the query's actual output columns (dropdown), not free-text that errors at
   view time. Applies to both dashboard-level `Filter` PBlock and per-viz local
@@ -354,7 +341,6 @@ publishing exists (`is_public` + parquet copy to public bucket + slices).
   and tested.
 
 #### Series settings (fix the "non-buggy series settings")
-
 - P8.9 `[FIX]` Stop **silently dropping** series/axes when a column key doesn't
   resolve after re-query (surface + let user remap). Depends on P8.1.
 - P8.10 `[FIX]` **Stacked/percent** semantics (per-series `stackId` currently
@@ -365,7 +351,6 @@ publishing exists (`is_public` + parquet copy to public bucket + slices).
   scatter/pie/funnel/radar/bubble) with consistent color/label/mark controls.
 
 #### Dashboard features
-
 - P8.13 `[NEW]` **Internal private dashboards** UX (product side of P3.4):
   create/share a dashboard visible only to me or a group, cleanly separate from
   "publish public". Uses `ShareResourceModal` + `is_restricted`.
@@ -375,7 +360,6 @@ publishing exists (`is_public` + parquet copy to public bucket + slices).
 - `[Depends on: P8.1 for P8.4/P8.5/P8.9; P2 for P8.14; P3 for P8.13]`
 
 ### P9. Desktop App (Electrobun → Tauri) + Offline Mode
-
 **Current state:** Web offline (Dexie + duckdb-wasm) is **shipped**. Desktop is
 Electrobun, **through Phase 2** (native layer works: `bun:sqlite`, native
 DuckDB, keychain, filesystem blob store, full typed IPC, ~70 generated SQLite
@@ -385,7 +369,6 @@ one-way `SnapshotBootstrap` pull exists. Platform abstraction seam
 engine are **independent workstreams**.
 
 #### Tauri migration (shell + transport + packaging)
-
 - P9.1 `[REFACTOR]` **Full Rust-native Tauri rewrite** (decided): reimplement
   the privileged services (`bun:sqlite` → `rusqlite`/`sqlx`, native DuckDB →
   `duckdb-rs`, keychain → Tauri `keyring`/stronghold, filesystem blob store →
@@ -406,7 +389,6 @@ engine are **independent workstreams**.
   "Bun on Windows" blocker; likely post-demo.
 
 #### Offline sync engine (Phase 3 - the crux of "fully working offline")
-
 - P9.6 `[NEW]` Per-row sync columns + `sync_outbox` / `parquet_blob_outbox` /
   `sync_cursor` tables; **every data write + its outbox row in one SQLite
   transaction** (non-negotiable invariant).
@@ -421,10 +403,9 @@ engine are **independent workstreams**.
   (matching the P9.1 Rust-native decision); keep the outbox/pull-loop/LWW logic
   pure and property-tested since silent data loss is the failure mode.
 - `[Tauri Rust shell (P9.1–P9.5) PARALLEL with sync engine (P9.6–P9.11); both
-only depend on the web build existing]`
+  only depend on the web build existing]`
 
 ### P10. App-Wide AI Chat and Chat Sessions
-
 **Current state:** `ChatPanel` is already mounted app-wide in the layout, but
 the assistant is **product-scoped**: `ChatPageContext.app` is one of
 `data-explorer | data-sources | dashboards | other`, and its capabilities are
@@ -434,7 +415,6 @@ is a **single persisted thread** (localStorage via `ChatPanelProvider`) - no
 concept of multiple chat sessions, a "New chat" action, or chat history.
 
 #### Refactors
-
 - P10.1 `[REFACTOR]` Make the assistant **app-wide / product-agnostic**: turn
   page context into an optional hint, not a hard scope. One agent that can
   operate across any product (query any source, build dashboards, configure
@@ -445,7 +425,6 @@ concept of multiple chat sessions, a "New chat" action, or chat history.
   data uniformly.
 
 #### Features
-
 - P10.3 `[NEW]` **Chat session model**: persist chat sessions/threads
   (server-side, workspace + user scoped) instead of a single localStorage
   thread; store message history.
@@ -462,7 +441,7 @@ concept of multiple chat sessions, a "New chat" action, or chat history.
 - P10.8 `[NEW]` **Permission-aware chat**: the agent can only read/act on
   resources the user can access (respects P3).
 - `[Depends on: P1, P2 for full cross-product capability; the session model
-(P10.3–P10.5) is PARALLEL and can start now]`
+  (P10.3–P10.5) is PARALLEL and can start now]`
 
 ---
 
@@ -558,7 +537,7 @@ even if later, deeper items are still stabilizing on demo day. Land these first:
    are the highest-risk items for the date - have the web/online path as the
    reliable fallback for the live demo.
 
-**Nothing is cut** - the items above are the _first_ to land, not the _only_
+**Nothing is cut** - the items above are the *first* to land, not the *only*
 items. The highest-risk-for-the-date pieces (full QETL OLAP/non-OLAP rewrite
 P0.3/P0.4, cross-query fabric P2, Postgres connector P6.2, choropleth/multi-
 layer GIS P7.2–P7.8, Rust offline sync engine P9.6–P9.11) proceed concurrently;

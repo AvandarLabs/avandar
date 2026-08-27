@@ -109,10 +109,10 @@ must answer how many, of what kind, how fast, and whether it worked.
 
 ### Acquisition
 
-| Event                  | Emitter                | Payload                                       |
-| ---------------------- | ---------------------- | --------------------------------------------- |
-| `user.registered`      | trigger (`auth.users`) | `emailDomain`, `provider`, `hadPendingInvite` |
-| `user.email_confirmed` | trigger (`auth.users`) | `emailDomain`, `secondsToConfirm`             |
+| Event | Emitter | Payload |
+| --- | --- | --- |
+| `user.registered` | trigger (`auth.users`) | `emailDomain`, `provider`, `hadPendingInvite` |
+| `user.email_confirmed` | trigger (`auth.users`) | `emailDomain`, `secondsToConfirm` |
 
 `hadPendingInvite` is resolved inside the trigger by checking
 `workspace_invites` for the new user's email. It separates viral from organic
@@ -120,31 +120,31 @@ signup at no extra cost.
 
 ### Activation
 
-| Event                 | Emitter                | Payload                                                                                        |
-| --------------------- | ---------------------- | ---------------------------------------------------------------------------------------------- |
-| `workspace.created`   | trigger (`workspaces`) | `isFirstWorkspaceForUser`, `secondsSinceUserRegistered`                                        |
-| `dataset.imported`    | client                 | `datasetId`, `sourceType`, `columnCount`, `rowCount`, `isFirstInWorkspace`                     |
-| `query.ran`           | client                 | `trigger`, `source`, `dataSourceType`, `rowCount`, `columnCount`, `durationMs`, `didAutoLimit` |
-| `dashboard.published` | client                 | `dashboardId`, `blockCount`, `hasVanitySlug`                                                   |
+| Event | Emitter | Payload |
+| --- | --- | --- |
+| `workspace.created` | trigger (`workspaces`) | `isFirstWorkspaceForUser`, `secondsSinceUserRegistered` |
+| `dataset.imported` | client | `datasetId`, `sourceType`, `columnCount`, `rowCount`, `isFirstInWorkspace` |
+| `query.ran` | client | `trigger`, `source`, `dataSourceType`, `rowCount`, `columnCount`, `durationMs`, `didAutoLimit` |
+| `dashboard.published` | client | `dashboardId`, `blockCount`, `hasVanitySlug` |
 
 `rowCount` and `columnCount` on `dataset.imported` are recorded when known at
 save time and omitted otherwise.
 
 ### Engagement
 
-| Event                              | Emitter                | Payload                                                                                                                              |
-| ---------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `user.signed_in`                   | trigger (`auth.users`) | `daysSinceLastSignIn`, `isFirstSignIn`                                                                                               |
-| `chat.message_sent`                | client                 | `promptChars`, `pageApp`, `modelId`, `runtimeMode`, `hasOpenDataset`                                                                 |
-| `chat.sql_generated`               | client                 | `sqlChars`                                                                                                                           |
-| `chat.turn_completed`              | edge (`chat`)          | `modelId`, `latencyMs`, `attemptCount`, `outcome`, `promptChars`, `responseChars`, `piiSeverity`, `wasSampled`, `schemaDatasetCount` |
-| `chat.turn_failed`                 | edge (`chat`)          | `modelId`, `errorClass`, `latencyMs`                                                                                                 |
-| `dashboard.block_added_via_chat`   | client                 | `blockKind`, `vizType`, `dashboardId`, `blockCountAfter`                                                                             |
-| `dashboard.filter_changed`         | client                 | `dashboardId`, `filterId`, `mode`, `wasCleared`                                                                                      |
-| `dashboard.share_settings_updated` | client                 | `dashboardId`, `slugAction`                                                                                                          |
-| `dashboard.pdf_export_opened`      | client                 | `dashboardId`, `blockCount`                                                                                                          |
-| `dashboard.pdf_exported`           | client                 | `dashboardId`, `blockCount`, `durationMs`                                                                                            |
-| `query.failed`                     | client                 | `surface`, `trigger`, `errorClass`, `errorMessage`, `isOffline`                                                                      |
+| Event | Emitter | Payload |
+| --- | --- | --- |
+| `user.signed_in` | trigger (`auth.users`) | `daysSinceLastSignIn`, `isFirstSignIn` |
+| `chat.message_sent` | client | `promptChars`, `pageApp`, `modelId`, `runtimeMode`, `hasOpenDataset` |
+| `chat.sql_generated` | client | `sqlChars` |
+| `chat.turn_completed` | edge (`chat`) | `modelId`, `latencyMs`, `attemptCount`, `outcome`, `promptChars`, `responseChars`, `piiSeverity`, `wasSampled`, `schemaDatasetCount` |
+| `chat.turn_failed` | edge (`chat`) | `modelId`, `errorClass`, `latencyMs` |
+| `dashboard.block_added_via_chat` | client | `blockKind`, `vizType`, `dashboardId`, `blockCountAfter` |
+| `dashboard.filter_changed` | client | `dashboardId`, `filterId`, `mode`, `wasCleared` |
+| `dashboard.share_settings_updated` | client | `dashboardId`, `slugAction` |
+| `dashboard.pdf_export_opened` | client | `dashboardId`, `blockCount` |
+| `dashboard.pdf_exported` | client | `dashboardId`, `blockCount`, `durationMs` |
+| `query.failed` | client | `surface`, `trigger`, `errorClass`, `errorMessage`, `isOffline` |
 
 `runtimeMode` is `cloud` or `local` and is the only way to observe on-device
 chat, which never reaches the server. `attemptCount` exposes how often the
@@ -153,12 +153,12 @@ invisible today.
 
 ### Expansion
 
-| Event                       | Emitter                           | Payload                                                                           |
-| --------------------------- | --------------------------------- | --------------------------------------------------------------------------------- |
-| `workspace.invite_sent`     | trigger (`workspace_invites`)     | `inviteId`, `invitedEmailDomain`, `inviteeAlreadyRegistered`, `memberCountBefore` |
-| `workspace.invite_accepted` | trigger (`workspace_invites`)     | `inviteId`, `secondsFromInviteToAccept`, `memberCountAfter`                       |
-| `member.removed`            | trigger (`workspace_memberships`) | `memberCountAfter`                                                                |
-| `dashboard.public_viewed`   | edge (`dashboards`)               | `dashboardId`, `viaVanitySlug`, `referrerHost`                                    |
+| Event | Emitter | Payload |
+| --- | --- | --- |
+| `workspace.invite_sent` | trigger (`workspace_invites`) | `inviteId`, `invitedEmailDomain`, `inviteeAlreadyRegistered`, `memberCountBefore` |
+| `workspace.invite_accepted` | trigger (`workspace_invites`) | `inviteId`, `secondsFromInviteToAccept`, `memberCountAfter` |
+| `member.removed` | trigger (`workspace_memberships`) | `memberCountAfter` |
+| `dashboard.public_viewed` | edge (`dashboards`) | `dashboardId`, `viaVanitySlug`, `referrerHost` |
 
 Invites store the invite row's own id plus the email domain, never the address.
 `inviteId` is the join key between `invite_sent` and `invite_accepted`, which
@@ -176,11 +176,11 @@ now.
 
 ### Revenue
 
-| Event                         | Emitter                   | Payload                                    |
-| ----------------------------- | ------------------------- | ------------------------------------------ |
-| `subscription.created`        | trigger (`subscriptions`) | `plan`, `isPolarBacked`, `status`          |
-| `subscription.plan_changed`   | trigger (`subscriptions`) | `fromPlan`, `toPlan`, `direction`, `seats` |
-| `subscription.status_changed` | trigger (`subscriptions`) | `fromStatus`, `toStatus`, `plan`           |
+| Event | Emitter | Payload |
+| --- | --- | --- |
+| `subscription.created` | trigger (`subscriptions`) | `plan`, `isPolarBacked`, `status` |
+| `subscription.plan_changed` | trigger (`subscriptions`) | `fromPlan`, `toPlan`, `direction`, `seats` |
+| `subscription.status_changed` | trigger (`subscriptions`) | `fromStatus`, `toStatus`, `plan` |
 
 `direction` is `upgrade`, `downgrade`, or `lateral`, computed from the ordering
 `free < basic < premium`, so upgrade and downgrade rates are one `group by`.
@@ -301,21 +301,21 @@ anywhere in the schema.
 
 The only new table.
 
-| Column                             | Notes                                        |
-| ---------------------------------- | -------------------------------------------- |
-| `id`, `created_at`                 |                                              |
-| `workspace_id`                     | references `workspaces`, `on delete cascade` |
-| `user_id`                          | references `auth.users`, `on delete cascade` |
-| `feature_plan_type`                | the plan at capture time                     |
-| `model_id`, `page_app`, `outcome`  |                                              |
-| `attempt_count`, `had_consent_ack` |                                              |
-| `messages`                         | jsonb, redacted conversation                 |
-| `assistant_text`                   | redacted                                     |
-| `generated_sql`                    | redacted, nullable                           |
-| `schema_snapshot`                  | jsonb, redacted                              |
-| `pii_severity`                     | `clean` or `warning`; `critical` never lands |
-| `redacted_categories`              | text array                                   |
-| `redaction_version`                | int                                          |
+| Column | Notes |
+| --- | --- |
+| `id`, `created_at` | |
+| `workspace_id` | references `workspaces`, `on delete cascade` |
+| `user_id` | references `auth.users`, `on delete cascade` |
+| `feature_plan_type` | the plan at capture time |
+| `model_id`, `page_app`, `outcome` | |
+| `attempt_count`, `had_consent_ack` | |
+| `messages` | jsonb, redacted conversation |
+| `assistant_text` | redacted |
+| `generated_sql` | redacted, nullable |
+| `schema_snapshot` | jsonb, redacted |
+| `pii_severity` | `clean` or `warning`; `critical` never lands |
+| `redacted_categories` | text array |
+| `redaction_version` | int |
 
 Three columns carry more weight than they appear to.
 
@@ -394,10 +394,10 @@ prompts, so a model trained on it learns to emit the tokens.
 
 The category split is not uniform:
 
-| Categories                                                                          | Treatment                          |
-| ----------------------------------------------------------------------------------- | ---------------------------------- |
+| Categories | Treatment |
+| --- | --- |
 | `direct_identifier`, `precise_location`, `demographic_sensitive`, `free_text_risky` | replaced with same-type surrogates |
-| `government_id`, `financial`, `medical`                                             | the whole sample is discarded      |
+| `government_id`, `financial`, `medical` | the whole sample is discarded |
 
 Surrogates are never appropriate for identifiers and financial figures, and
 generating a plausible fake government id inside otherwise real context is the
@@ -469,16 +469,16 @@ sets `web` or `desktop` from `isDesktop()`.
 
 The event-emitting triggers are one per table and operation:
 
-| Table                   | Operation      | Events                                                     |
-| ----------------------- | -------------- | ---------------------------------------------------------- |
-| `auth.users`            | `after insert` | `user.registered`                                          |
-| `auth.users`            | `after update` | `user.email_confirmed`, `user.signed_in`                   |
-| `workspaces`            | `after insert` | `workspace.created`                                        |
-| `workspace_invites`     | `after insert` | `workspace.invite_sent`                                    |
-| `workspace_invites`     | `after update` | `workspace.invite_accepted`                                |
-| `workspace_memberships` | `after delete` | `member.removed`                                           |
-| `subscriptions`         | `after insert` | `subscription.created`                                     |
-| `subscriptions`         | `after update` | `subscription.plan_changed`, `subscription.status_changed` |
+| Table | Operation | Events |
+| --- | --- | --- |
+| `auth.users` | `after insert` | `user.registered` |
+| `auth.users` | `after update` | `user.email_confirmed`, `user.signed_in` |
+| `workspaces` | `after insert` | `workspace.created` |
+| `workspace_invites` | `after insert` | `workspace.invite_sent` |
+| `workspace_invites` | `after update` | `workspace.invite_accepted` |
+| `workspace_memberships` | `after delete` | `member.removed` |
+| `subscriptions` | `after insert` | `subscription.created` |
+| `subscriptions` | `after update` | `subscription.plan_changed`, `subscription.status_changed` |
 
 The two `auth.users` update events share one trigger because both are decided
 by comparing `OLD` and `NEW` on the same row: `email_confirmed_at` going from
@@ -501,15 +501,15 @@ browser as a structural fact rather than as a correctly-configured policy. A
 view in `public` would be exposed through PostgREST, and without
 `security_invoker = on` would bypass RLS entirely.
 
-| View                           | Content                                                                                 |
-| ------------------------------ | --------------------------------------------------------------------------------------- |
-| `analytics.acquisition_funnel` | registered, confirmed, first workspace, by registration week cohort                     |
-| `analytics.activation`         | per workspace, days to first dataset, first query, first published dashboard            |
-| `analytics.active_users`       | daily and weekly actives from `engagement` rows, split by `client`                      |
-| `analytics.retention_cohorts`  | built from `user.signed_in`'s `daysSinceLastSignIn`                                     |
-| `analytics.invite_conversion`  | `invite_sent` joined to `invite_accepted` on `inviteId`, with time to accept            |
-| `analytics.plan_movement`      | upgrades, downgrades, cancellations by month                                            |
-| `analytics.chat_health`        | turns, `attemptCount` distribution, outcome mix, failure rate, local versus cloud split |
+| View | Content |
+| --- | --- |
+| `analytics.acquisition_funnel` | registered, confirmed, first workspace, by registration week cohort |
+| `analytics.activation` | per workspace, days to first dataset, first query, first published dashboard |
+| `analytics.active_users` | daily and weekly actives from `engagement` rows, split by `client` |
+| `analytics.retention_cohorts` | built from `user.signed_in`'s `daysSinceLastSignIn` |
+| `analytics.invite_conversion` | `invite_sent` joined to `invite_accepted` on `inviteId`, with time to accept |
+| `analytics.plan_movement` | upgrades, downgrades, cancellations by month |
+| `analytics.chat_health` | turns, `attemptCount` distribution, outcome mix, failure rate, local versus cloud split |
 
 ## Error Handling
 

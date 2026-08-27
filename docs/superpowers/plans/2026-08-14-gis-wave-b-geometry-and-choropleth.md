@@ -446,8 +446,8 @@ function _migrateVersion1(config: ConfigV1): AvaMapConfigRead {
 
 function _parseCurrentConfig(json: unknown): AvaMapConfigRead {
   const versioned = ConfigVersionSchema.parse(json);
-  return versioned.version === 1
-    ? ConfigV2Schema.parse(_migrateVersion1(ConfigV1Schema.parse(json)))
+  return versioned.version === 1 ?
+      ConfigV2Schema.parse(_migrateVersion1(ConfigV1Schema.parse(json)))
     : ConfigV2Schema.parse(json);
 }
 ```

@@ -5,18 +5,18 @@ licensed, lockstep-versioned at `0.1.0`, independent of the app version.
 
 ## Locked decisions
 
-| Decision        | Choice                                                                                                                                                                                        |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Versioning      | Lockstep (Changesets `fixed` mode), independent of app version                                                                                                                                |
-| Start version   | `0.1.0` for all packages                                                                                                                                                                      |
-| License         | MIT per package; repo and app stay CPAL-1.0                                                                                                                                                   |
-| Registry access | Public                                                                                                                                                                                        |
-| Module format   | ESM only                                                                                                                                                                                      |
-| Build           | `tsup` (`--format esm --dts`); Vite library mode for `@avandar/ui`                                                                                                                            |
-| Entry points    | One general entry per package. A second entry only for a genuinely different concern (`utils/encoding`, `utils/sql`, `ui/hooks`, `models/zod`). Never a subpath mirroring an internal folder. |
-| Local dev       | `workspace:*` + `exports` -> `src`, `publishConfig.exports` -> `dist`                                                                                                                         |
-| Peer deps       | Anything whose objects cross the API boundary (React, Mantine, react-query, supabase-js, duckdb)                                                                                              |
-| React           | `^19`                                                                                                                                                                                         |
+| Decision | Choice |
+| --- | --- |
+| Versioning | Lockstep (Changesets `fixed` mode), independent of app version |
+| Start version | `0.1.0` for all packages |
+| License | MIT per package; repo and app stay CPAL-1.0 |
+| Registry access | Public |
+| Module format | ESM only |
+| Build | `tsup` (`--format esm --dts`); Vite library mode for `@avandar/ui` |
+| Entry points | One general entry per package. A second entry only for a genuinely different concern (`utils/encoding`, `utils/sql`, `ui/hooks`, `models/zod`). Never a subpath mirroring an internal folder. |
+| Local dev | `workspace:*` + `exports` -> `src`, `publishConfig.exports` -> `dist` |
+| Peer deps | Anything whose objects cross the API boundary (React, Mantine, react-query, supabase-js, duckdb) |
+| React | `^19` |
 
 ### Architecture rule
 
@@ -36,19 +36,19 @@ across all ten packages.
 ## Entry-point surface
 
 Gap measured across all declared entry points, counting only imports from
-_outside_ each package (a package's own internal deep imports never need to be
+*outside* each package (a package's own internal deep imports never need to be
 public). Resolved in Phase 2:
 
-| Package         | Entries | Exported | External deep-imports | Was missing                  |
-| --------------- | ------- | -------- | --------------------- | ---------------------------- |
-| `utils`         | 3       | 177      | 73                    | `objectFilter`               |
-| `clients`       | 1       | 22       | 8                     | `RegisteredSupabaseDatabase` |
-| `models`        | 2       | 1        | 1                     | none                         |
-| `modules`       | 1       | 8        | 4                     | none                         |
-| `logger`        | 1       | 4        | 2                     | none                         |
-| `ui`            | 2       | 46       | 1                     | none                         |
-| `hooks`         | 1       | 21       | 2                     | none                         |
-| `browser-utils` | 1       | 8        | 0                     | none                         |
+| Package | Entries | Exported | External deep-imports | Was missing |
+| --- | --- | --- | --- | --- |
+| `utils` | 3 | 177 | 73 | `objectFilter` |
+| `clients` | 1 | 22 | 8 | `RegisteredSupabaseDatabase` |
+| `models` | 2 | 1 | 1 | none |
+| `modules` | 1 | 8 | 4 | none |
+| `logger` | 1 | 4 | 2 | none |
+| `ui` | 2 | 46 | 1 | none |
+| `hooks` | 1 | 21 | 2 | none |
+| `browser-utils` | 1 | 8 | 0 | none |
 
 The barrels were already near-complete. Both gaps are now closed.
 
@@ -216,11 +216,11 @@ graph edge `ava-query -> ui` is gone.
 Three separate forks appeared as packages gained their own declarations, each
 breaking the build in a different way:
 
-| Package     | Forked into     | Failure                                        |
-| ----------- | --------------- | ---------------------------------------------- |
-| `react`     | 19.2.4 / 19.2.5 | "Invalid hook call" at runtime                 |
-| `type-fest` | 5.4.4 / 5.6.0   | `Paths` did not satisfy `_Paths`               |
-| `zod`       | 4.3.6 / 4.4.3   | `ZodObject` did not match `ObjectDBReadSchema` |
+| Package | Forked into | Failure |
+| --- | --- | --- |
+| `react` | 19.2.4 / 19.2.5 | "Invalid hook call" at runtime |
+| `type-fest` | 5.4.4 / 5.6.0 | `Paths` did not satisfy `_Paths` |
+| `zod` | 4.3.6 / 4.4.3 | `ZodObject` did not match `ObjectDBReadSchema` |
 
 The cause is always the same: a new declaration re-resolves independently while
 the existing lockfile entry stays put, so one specifier becomes two versions.
@@ -372,7 +372,7 @@ an internal alias that does not exist outside this repo. It now says
 `declare module "@avandar/clients"`.
 
 That works only because declarations are bundled: `Register` ends up genuinely
-_declared_ in `dist/index.d.ts` rather than re-exported from another module, so
+*declared* in `dist/index.d.ts` rather than re-exported from another module, so
 the augmentation merges. Verified against the packed tarball from a clean
 consumer, with a negative control — removing the augmentation makes
 `RegisteredSupabaseDatabaseTableNames` fall back to `string` and TypeScript

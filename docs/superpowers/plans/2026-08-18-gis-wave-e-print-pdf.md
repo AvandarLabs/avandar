@@ -92,34 +92,34 @@ offered only on the eligible symbologies and bindings.
 Create these files. Existing files listed under each task are modified in
 place. Do not introduce barrels.
 
-| File                                                                                                         | Responsibility                                 |
-| ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
-| `shared/models/AvaMap/AvaMapConfig/ExportLayout.types.ts`                                                    | `ExportLayout`, paper, orientation types       |
-| `shared/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts`                               | Version 5 Zod schema                           |
-| `shared/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts`          | Immutable `exportLayout` updates               |
-| `shared/models/AvaMap/MapLayer/DisputedStatus.types.ts`                                                      | `DisputedStatusRef`, `DisputedStatusValues`    |
-| `shared/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts`                                      | Eligibility and disjointness predicates        |
-| `src/views/GisApp/layers/MapLayerUpdates/disputedStatusUpdates.ts`                                           | Inspector updaters for the bind                |
-| `src/views/GisApp/layers/DisputedBoundary/DisputedBoundary.ts`                                               | Property name, casing colors, classification   |
-| `src/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeDisputedCasingLayerSpec.ts` | Dashed casing `MapLayerSpec`                   |
-| `src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx`       | Column select plus the two value multi-selects |
-| `src/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.tsx`                      | Locked legend row                              |
-| `src/views/GisApp/export/ExportPageLayout/ExportPageLayout.ts`                                               | Millimetre geometry for both orientations      |
-| `src/views/GisApp/export/makeExportMapSpec/makeExportMapSpec.ts`                                             | Chrome-free export `MapSpec`                   |
-| `src/views/GisApp/export/getExportFilterReadout/getExportFilterReadout.ts`                                   | Derived time and AOI disclosure                |
-| `src/views/GisApp/export/getExportFurnitureText/getExportFurnitureText.ts`                                   | Title, subtitle, source-line fallbacks         |
-| `src/views/GisApp/export/getExportFilename/getExportFilename.ts`                                             | `{title}-{yyyy-mm-dd}.pdf`                     |
-| `src/views/GisApp/export/captureExportMapCanvas/captureExportMapCanvas.ts`                                   | Offscreen MapLibre mount, idle wait, snapshot  |
-| `src/views/GisApp/export/composeExportPdf/composeExportPdf.ts`                                               | `jsPDF` composition and paging                 |
-| `src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts`                                       | Download orchestration and status              |
-| `src/views/GisApp/export/ExportSheet/ExportSheet.tsx`                                                        | The sheet, sole writer of `exportLayout`       |
-| `src/views/GisApp/export/ExportSheet/ExportSheetControls.tsx`                                                | Paper, orientation, text, furniture toggles    |
-| `src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx`                                                 | Aggregate-only, dark-basemap, filter readout   |
-| `src/views/GisApp/export/ExportSheet/ExportSheetPreview.tsx`                                                 | Scaled preview using the same composition      |
-| `tests/data/gis-wave-e/disputed-boundaries.csv`                                                              | Polygon fixture with a disputed-status column  |
-| `tests/e2e/gis-disputed-boundaries.spec.ts`                                                                  | Slice 8.5 test 1                               |
-| `tests/e2e/gis-export-layout.spec.ts`                                                                        | Slice 8.5 test 2                               |
-| `tests/e2e/gis-export-pdf.spec.ts`                                                                           | Slice 8.5 test 3                               |
+| File                                                                                                        | Responsibility                                        |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `shared/models/AvaMap/AvaMapConfig/ExportLayout.types.ts`                                                   | `ExportLayout`, paper, orientation types               |
+| `shared/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts`                              | Version 5 Zod schema                                   |
+| `shared/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts`          | Immutable `exportLayout` updates                       |
+| `shared/models/AvaMap/MapLayer/DisputedStatus.types.ts`                                                     | `DisputedStatusRef`, `DisputedStatusValues`            |
+| `shared/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts`                                     | Eligibility and disjointness predicates                |
+| `src/views/GisApp/layers/MapLayerUpdates/disputedStatusUpdates.ts`                                          | Inspector updaters for the bind                        |
+| `src/views/GisApp/layers/DisputedBoundary/DisputedBoundary.ts`                                              | Property name, casing colors, classification           |
+| `src/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeDisputedCasingLayerSpec.ts` | Dashed casing `MapLayerSpec`                           |
+| `src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls.tsx`      | Column select plus the two value multi-selects         |
+| `src/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.tsx`                     | Locked legend row                                      |
+| `src/views/GisApp/export/ExportPageLayout/ExportPageLayout.ts`                                              | Millimetre geometry for both orientations              |
+| `src/views/GisApp/export/makeExportMapSpec/makeExportMapSpec.ts`                                            | Chrome-free export `MapSpec`                           |
+| `src/views/GisApp/export/getExportFilterReadout/getExportFilterReadout.ts`                                  | Derived time and AOI disclosure                        |
+| `src/views/GisApp/export/getExportFurnitureText/getExportFurnitureText.ts`                                  | Title, subtitle, source-line fallbacks                 |
+| `src/views/GisApp/export/getExportFilename/getExportFilename.ts`                                            | `{title}-{yyyy-mm-dd}.pdf`                             |
+| `src/views/GisApp/export/captureExportMapCanvas/captureExportMapCanvas.ts`                                  | Offscreen MapLibre mount, idle wait, snapshot          |
+| `src/views/GisApp/export/composeExportPdf/composeExportPdf.ts`                                              | `jsPDF` composition and paging                         |
+| `src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts`                                      | Download orchestration and status                      |
+| `src/views/GisApp/export/ExportSheet/ExportSheet.tsx`                                                       | The sheet, sole writer of `exportLayout`               |
+| `src/views/GisApp/export/ExportSheet/ExportSheetControls.tsx`                                               | Paper, orientation, text, furniture toggles            |
+| `src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx`                                                | Aggregate-only, dark-basemap, filter readout           |
+| `src/views/GisApp/export/ExportSheet/ExportSheetPreview.tsx`                                                | Scaled preview using the same composition              |
+| `tests/data/gis-wave-e/disputed-boundaries.csv`                                                             | Polygon fixture with a disputed-status column          |
+| `tests/e2e/gis-disputed-boundaries.spec.ts`                                                                 | Slice 8.5 test 1                                       |
+| `tests/e2e/gis-export-layout.spec.ts`                                                                       | Slice 8.5 test 2                                       |
+| `tests/e2e/gis-export-pdf.spec.ts`                                                                          | Slice 8.5 test 3                                       |
 
 ## Defaults (use these exact values)
 
@@ -271,8 +271,8 @@ import type {
 Inside `AvaMapConfigBody`, after `annotationsZIndex`:
 
 ```ts
-/** Persisted page furniture for the PDF export. */
-exportLayout: ExportLayout;
+  /** Persisted page furniture for the PDF export. */
+  exportLayout: ExportLayout;
 ```
 
 Change the model version at the bottom of the same file:
@@ -296,11 +296,11 @@ import type {
 ```
 
 ```ts
-/** Column carrying disputed-boundary status, or unset when all settled. */
-disputedStatusColumn: DisputedStatusRef | undefined;
+  /** Column carrying disputed-boundary status, or unset when all settled. */
+  disputedStatusColumn: DisputedStatusRef | undefined;
 
-/** Which source values mean disputed and which mean undetermined. */
-disputedStatusValues: DisputedStatusValues;
+  /** Which source values mean disputed and which mean undetermined. */
+  disputedStatusValues: DisputedStatusValues;
 ```
 
 - [ ] **Step 4: Re-export both through the model namespaces**
@@ -317,12 +317,12 @@ import type {
 ```
 
 ```ts
-/** Persisted page furniture for the PDF export. */
-export type ExportLayout = ExportLayoutType;
-/** A paper size the export sheet offers. */
-export type ExportPaper = ExportPaperType;
-/** A page orientation the export sheet offers. */
-export type ExportOrientation = ExportOrientationType;
+  /** Persisted page furniture for the PDF export. */
+  export type ExportLayout = ExportLayoutType;
+  /** A paper size the export sheet offers. */
+  export type ExportPaper = ExportPaperType;
+  /** A page orientation the export sheet offers. */
+  export type ExportOrientation = ExportOrientationType;
 ```
 
 In `shared/models/AvaMap/MapLayer/MapLayer.ts`:
@@ -336,12 +336,12 @@ import type {
 ```
 
 ```ts
-/** Where a layer's disputed-status values come from. */
-export type DisputedStatusRef = DisputedStatusRefType;
-/** Which source values mean disputed and which mean undetermined. */
-export type DisputedStatusValues = DisputedStatusValuesType;
-/** How one feature's boundary line is drawn. */
-export type DisputedStatus = DisputedStatusType;
+  /** Where a layer's disputed-status values come from. */
+  export type DisputedStatusRef = DisputedStatusRefType;
+  /** Which source values mean disputed and which mean undetermined. */
+  export type DisputedStatusValues = DisputedStatusValuesType;
+  /** How one feature's boundary line is drawn. */
+  export type DisputedStatus = DisputedStatusType;
 ```
 
 - [ ] **Step 5: Confirm the expected compile break**
@@ -607,10 +607,12 @@ const V5LayerCommonShape = {
   disputedStatusValues: DisputedStatusValuesSchema,
 } as const;
 
-const V5StandardLayerSchema =
-  V4StandardLayerSchema.extend(V5LayerCommonShape).strict();
-const V5AggregateOnlyLayerSchema =
-  V4AggregateOnlyLayerSchema.extend(V5LayerCommonShape).strict();
+const V5StandardLayerSchema = V4StandardLayerSchema.extend(
+  V5LayerCommonShape,
+).strict();
+const V5AggregateOnlyLayerSchema = V4AggregateOnlyLayerSchema.extend(
+  V5LayerCommonShape,
+).strict();
 
 /** Version 5 layer: standard paint or aggregate-only fill. */
 export const AvaMapConfigV5LayerSchema = z.union([
@@ -738,7 +740,7 @@ import { AvaMapConfigV5Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigS
 ```
 
 **The buffer invariant must move out of the current-version path.** Until now
-version 4 _was_ the current version, so `_assertBufferInvariants` ran on every
+version 4 *was* the current version, so `_assertBufferInvariants` ran on every
 version 4 document by way of `_parseCurrentConfig`. Once version 4 routes
 through the migration, that check would be skipped for it and for versions 1
 through 3. A buffer cycle in a persisted version 2 map is exactly as
@@ -756,10 +758,7 @@ function _parseCurrentConfig(json: unknown): AvaMapConfigRead {
 }
 
 /** Parses or migrates by version, without asserting cross-layer invariants. */
-function _readConfigByVersion(
-  json: unknown,
-  version: number,
-): AvaMapConfigRead {
+function _readConfigByVersion(json: unknown, version: number): AvaMapConfigRead {
   if (version === 1) {
     return migrateAvaMapConfig.fromV1(AvaMapConfigV1Schema.parse(json));
   }
@@ -799,7 +798,7 @@ layer graph, and migration preserves that graph.
 In the `AvaMapConfigSchema` object also set `schema: AvaMapConfigV5Schema`, and
 change `toJson` to parse with `AvaMapConfigV5Schema`.
 
-A _missing_ buffer source stays legal; only a cycle is rejected. The existing
+A *missing* buffer source stays legal; only a cycle is rejected. The existing
 "keeps a buffer whose source layer is missing" and "round-trips a buffer whose
 source layer is missing" cases must keep passing, so do not tighten this beyond
 the cycle check.
@@ -963,8 +962,8 @@ export const exportLayoutUpdaters = {
       ...exportLayout,
       disclaimer: _normalizeDisclaimer(exportLayout.disclaimer),
     };
-    return _isSameLayout(config.exportLayout, next)
-      ? config
+    return _isSameLayout(config.exportLayout, next) ?
+        config
       : { ...config, exportLayout: next };
   },
 };
@@ -1162,17 +1161,17 @@ Expected: FAIL. `MapFurnitureBar` has no `disclaimer` prop.
 In `MapFurnitureBar.tsx`, add to `Props`:
 
 ```ts
-/** Persisted disclaimer, or unset to show the localized default. */
-disclaimer: string | undefined;
+  /** Persisted disclaimer, or unset to show the localized default. */
+  disclaimer: string | undefined;
 ```
 
 and replace the disclaimer span's body:
 
 ```tsx
-<span className={css.mapFurnitureBarDisclaimer}>
-  {disclaimer ??
-    t`The boundaries and names shown do not imply official endorsement or acceptance.`}
-</span>
+      <span className={css.mapFurnitureBarDisclaimer}>
+        {disclaimer ??
+          t`The boundaries and names shown do not imply official endorsement or acceptance.`}
+      </span>
 ```
 
 - [ ] **Step 4: Pass it from the GIS app**
@@ -1180,13 +1179,13 @@ and replace the disclaimer span's body:
 In `GisAppFurnitureBar.tsx`:
 
 ```tsx
-return (
-  <MapFurnitureBar
-    mapInstance={app.mapInstance}
-    attribution={attribution}
-    disclaimer={app.mapConfig.exportLayout.disclaimer}
-  />
-);
+  return (
+    <MapFurnitureBar
+      mapInstance={app.mapInstance}
+      attribution={attribution}
+      disclaimer={app.mapConfig.exportLayout.disclaimer}
+    />
+  );
 ```
 
 - [ ] **Step 5: Run the test to verify it passes**
@@ -1229,10 +1228,7 @@ const VALUES = {
 describe("DisputedBoundary.getStatusFromValue", () => {
   it("reads a disputed value", () => {
     expect(
-      DisputedBoundary.getStatusFromValue({
-        value: "Disputed",
-        values: VALUES,
-      }),
+      DisputedBoundary.getStatusFromValue({ value: "Disputed", values: VALUES }),
     ).toBe("disputed");
   });
 
@@ -1797,10 +1793,7 @@ import { describe, expect, it } from "vitest";
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import {
-  EMPTY_STATS,
-  makeFillLayerFixture,
-} from "./makeLayerSpecFromMapLayer.fixtures";
+import { EMPTY_STATS, makeFillLayerFixture } from "./makeLayerSpecFromMapLayer.fixtures";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 function _boundLayer(): MapLayer.T {
@@ -2028,17 +2021,17 @@ In `makeLayerSpecFromMapLayer.ts`, add `canvas` to
 returned object append the casing after `layerSpecs`:
 
 ```ts
-const layerSpecs = _makeMapLayerSpecs({
-  layer,
-  stats,
-  valueColumnName,
-  sourceId,
-});
-const casingSpecs = makeDisputedCasingLayerSpec({
-  layer,
-  sourceId,
-  canvas: canvas ?? "light",
-});
+  const layerSpecs = _makeMapLayerSpecs({
+    layer,
+    stats,
+    valueColumnName,
+    sourceId,
+  });
+  const casingSpecs = makeDisputedCasingLayerSpec({
+    layer,
+    sourceId,
+    canvas: canvas ?? "light",
+  });
 ```
 
 ```ts
@@ -2185,16 +2178,16 @@ whose color arrives as the inline runtime value above.
 In `MapLegend.tsx`, add to `Props`:
 
 ```ts
-/** True when at least one drawn feature is disputed or undetermined. */
-hasDrawnDisputedFeature: boolean;
+  /** True when at least one drawn feature is disputed or undetermined. */
+  hasDrawnDisputedFeature: boolean;
 ```
 
 Change the early return so the panel still renders when the row is required:
 
 ```tsx
-if (shown.length === 0 && !hasDrawnDisputedFeature) {
-  return null;
-}
+  if (shown.length === 0 && !hasDrawnDisputedFeature) {
+    return null;
+  }
 ```
 
 and render `{hasDrawnDisputedFeature ? <DisputedLegendRow /> : null}` as the
@@ -2219,8 +2212,8 @@ no-data drops, AOI, and time have already been applied. In
 `useAvaMapRender.ts`, add to `AvaMapRender`:
 
 ```ts
-/** True when any visible layer draws a disputed or undetermined boundary. */
-hasDrawnDisputedFeature: boolean;
+  /** True when any visible layer draws a disputed or undetermined boundary. */
+  hasDrawnDisputedFeature: boolean;
 ```
 
 and set it in `_makeAvaMapRender`:
@@ -2389,8 +2382,8 @@ function _withDisputedStatusColumn(
 ): MapLayer.T {
   const { layer, reference } = options;
   if (reference === undefined) {
-    return layer.disputedStatusColumn === undefined
-      ? layer
+    return layer.disputedStatusColumn === undefined ?
+        layer
       : {
           ...layer,
           disputedStatusColumn: undefined,
@@ -2453,13 +2446,13 @@ boundary dataset's columns hook, the same one
 `aggregatePointsToBoundaries`. Its `description` is:
 
 ```tsx
-const description =
-  layer.disputedStatusColumn === undefined
-    ? t`No disputed-status column. Outlines render as settled.`
+  const description =
+    layer.disputedStatusColumn === undefined ?
+      t`No disputed-status column. Outlines render as settled.`
     : layer.disputedStatusValues.disputed.length === 0 &&
-        layer.disputedStatusValues.undetermined.length === 0
-      ? t`Column bound. No values assigned; outlines render as settled.`
-      : undefined;
+      layer.disputedStatusValues.undetermined.length === 0 ?
+      t`Column bound. No values assigned; outlines render as settled.`
+    : undefined;
 ```
 
 When a column is bound, it also renders two Mantine `MultiSelect`s labelled
@@ -2474,7 +2467,7 @@ The updater already rejects an overlap, which is what the sixth test asserts.
 In `DataSection.tsx`, after `<TimeColumnSelect ... />`:
 
 ```tsx
-<DisputedStatusControls layer={layer} onLayerChange={onLayerChange} />
+      <DisputedStatusControls layer={layer} onLayerChange={onLayerChange} />
 ```
 
 - [ ] **Step 6: Run the inspector tests**
@@ -3137,19 +3130,25 @@ describe("ExportSheet", () => {
     _render({ basemap: { type: "builtIn", style: "dark" } });
 
     expect(screen.getByText(/photocopy poorly/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Download PDF" })).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Download PDF" }),
+    ).toBeEnabled();
   });
 
   it("stays available with an empty layer stack", () => {
     _render({ layers: [] });
 
-    expect(screen.getByRole("button", { name: "Download PDF" })).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Download PDF" }),
+    ).toBeEnabled();
   });
 
   it("stays available while DuckDB Spatial is unavailable", () => {
     _render({ spatialAvailability: "unavailable" });
 
-    expect(screen.getByRole("button", { name: "Download PDF" })).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Download PDF" }),
+    ).toBeEnabled();
   });
 });
 ```
@@ -3743,18 +3742,12 @@ retry affordance when `status === "error"`. Add these tests to
 `ExportSheet.test.tsx`:
 
 ```tsx
-it("disables the download while the export is pending", () => {
-  /* ... */
-});
-it("shows a retry status when the download fails", () => {
-  /* ... */
-});
+it("disables the download while the export is pending", () => { /* ... */ });
+it("shows a retry status when the download fails", () => { /* ... */ });
 it("gives the preview an accessible name", () => {
   _render({});
 
-  expect(
-    screen.getByRole("img", { name: "Export preview" }),
-  ).toBeInTheDocument();
+  expect(screen.getByRole("img", { name: "Export preview" })).toBeInTheDocument();
 });
 ```
 

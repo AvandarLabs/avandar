@@ -83,12 +83,11 @@ function _writeNewFile(options: { filePath: string; contents: string }): void {
 
 /**
  * Formats a freshly generated file with whichever formatter owns its
- * language. Prettier is caged to SQL by the repo's `.prettierignore`;
- * everything else belongs to oxfmt.
+ * language. Prettier owns SQL; everything else belongs to oxfmt.
  */
 async function _formatGeneratedFile(filePath: string): Promise<void> {
   if (filePath.endsWith(".sql")) {
-    await _formatFileWithPrettier(filePath);
+    await _formatSqlFileWithPrettier(filePath);
   } else {
     await _formatFileWithOxfmt(filePath);
   }
@@ -124,25 +123,31 @@ function _readOxfmtConfig(): FormatConfig | undefined {
     : undefined;
 }
 
-async function _formatFileWithPrettier(filePath: string): Promise<void> {
+/**
+ * Formats one generated SQL file with Prettier.
+ *
+ * The parser is named outright rather than inferred through
+ * `getFileInfo`. Inference consults `.prettierignore`, which ignores
+ * everything outside `supabase/schemas/` so that Prettier cannot touch the
+ * languages oxfmt owns. An inferred parser therefore comes back null for
+ * any other path, and `ava dev new table --dir` accepts one: without this,
+ * a table generated outside the schemas directory is written unformatted
+ * and says nothing about it.
+ *
+ * `resolveConfig` still supplies the repo's `*.sql` override, which is
+ * matched on the file's name and so applies wherever the file lands.
+ */
+async function _formatSqlFileWithPrettier(filePath: string): Promise<void> {
   const prettier = await _getPrettier();
   const fileContents = await fs.promises.readFile(filePath, "utf8");
-
   const resolvedConfig = await prettier.resolveConfig(filePath);
-  const ignorePath = path.join(PROJECT_ROOT, ".prettierignore");
-  const fileInfo = await prettier.getFileInfo(filePath, {
-    ignorePath: fs.existsSync(ignorePath) ? ignorePath : undefined,
+  const formatted = await prettier.format(fileContents, {
+    ...resolvedConfig,
+    filepath: filePath,
+    parser: "sql",
   });
 
-  if (fileInfo.inferredParser) {
-    const formatted = await prettier.format(fileContents, {
-      ...resolvedConfig,
-      filepath: filePath,
-      parser: fileInfo.inferredParser,
-    });
-
-    if (formatted !== fileContents) {
-      await fs.promises.writeFile(filePath, formatted, "utf8");
-    }
+  if (formatted !== fileContents) {
+    await fs.promises.writeFile(filePath, formatted, "utf8");
   }
 }

@@ -21,22 +21,22 @@ code should read the same way.
 
 ## The vocabulary
 
-| DL term                       | Meaning                                     | What it is here                                           |
-| ----------------------------- | ------------------------------------------- | --------------------------------------------------------- |
-| **Ontology**                  | TBox + ABox for a domain                    | Everything in one workspace                               |
-| **TBox**                      | Terminological layer: the axioms            | The set of concepts, their attributes, and their mappings |
-| **ABox**                      | Assertional layer: the facts                | The individuals and their attribute assertions            |
-| **Concept**                   | A named class of individuals                | One `concepts` row                                        |
-| **Individual**                | A member of the domain                      | One `individuals` row                                     |
-| **Role**                      | Binary relation between individuals         | Does not exist yet (P5.2)                                 |
-| **Attribute** (concrete role) | Relation from an individual to a data value | One `concept_attributes` row                              |
-| **Assertion**                 | A fact: `C(a)` or `A(a, v)`                 | One computed `AttributeAssertion`                         |
-| **Mapping**                   | OBDA rule deriving assertions from a source | One `attribute_mappings__*` row                           |
+| DL term | Meaning | What it is here |
+| --- | --- | --- |
+| **Ontology** | TBox + ABox for a domain | Everything in one workspace |
+| **TBox** | Terminological layer: the axioms | The set of concepts, their attributes, and their mappings |
+| **ABox** | Assertional layer: the facts | The individuals and their attribute assertions |
+| **Concept** | A named class of individuals | One `concepts` row |
+| **Individual** | A member of the domain | One `individuals` row |
+| **Role** | Binary relation between individuals | Does not exist yet (P5.2) |
+| **Attribute** (concrete role) | Relation from an individual to a data value | One `concept_attributes` row |
+| **Assertion** | A fact: `C(a)` or `A(a, v)` | One computed `AttributeAssertion` |
+| **Mapping** | OBDA rule deriving assertions from a source | One `attribute_mappings__*` row |
 
 ### Where the layers sit
 
 An ontology is `K = ⟨T, A⟩`. **Both halves are sets of formulas**, not objects
-with ids. The TBox is _all_ the terminology at once; the ABox is _all_ the
+with ids. The TBox is *all* the terminology at once; the ABox is *all* the
 assertions at once. A concept is one predicate appearing in TBox axioms; an
 individual is one constant appearing in ABox assertions.
 
@@ -59,12 +59,12 @@ the mappings rather than stored, which is why `AttributeAssertion` has no table.
 ### Two rules that keep the usage honest
 
 1. **A TBox is not a unit you can have many of.** A workspace has one TBox
-   containing many _concepts_. Never write `TboxId` or `tboxes`. The production
+   containing many *concepts*. Never write `TboxId` or `tboxes`. The production
    plan's shorthand ("a TBox extends another", "status sets per TBox") means "a
    concept subsumes another" and "status sets per concept"; that reading is
    what P5.3 will implement. This doc deliberately diverges from that shorthand.
 2. **`TBox` and `ABox` are layer words.** They belong in prose, comments, and
-   doc headings. Identifiers name the things _inside_ the layers, which is how
+   doc headings. Identifiers name the things *inside* the layers, which is how
    DL literature reads: you never see an object called `TBox_1`, you see
    concepts and individuals. After this refactor `Abox` and `Tbox` appear in
    zero identifiers.
@@ -78,13 +78,13 @@ together.
 
 ### Tables
 
-| Today                                    | New                                  |
-| ---------------------------------------- | ------------------------------------ |
-| `entity_configs`                         | `concepts`                           |
-| `entity_field_configs`                   | `concept_attributes`                 |
-| `entities`                               | `individuals`                        |
+| Today | New |
+| --- | --- |
+| `entity_configs` | `concepts` |
+| `entity_field_configs` | `concept_attributes` |
+| `entities` | `individuals` |
 | `value_extractors__dataset_column_value` | `attribute_mappings__dataset_column` |
-| `value_extractors__manual_entry`         | `attribute_mappings__manual_entry`   |
+| `value_extractors__manual_entry` | `attribute_mappings__manual_entry` |
 
 `manual_entry` is a degenerate mapping: the value is asserted directly rather
 than derived from a source query. It keeps the `attribute_mappings__` prefix so
@@ -92,22 +92,22 @@ the discriminated family stays greppable.
 
 ### Enums
 
-| Today                                        | New                                          |
-| -------------------------------------------- | -------------------------------------------- |
-| `entity_field_configs__value_extractor_type` | `concept_attributes__mapping_type`           |
-| value `'dataset_column_value'`               | `'dataset_column'`                           |
-| value `'manual_entry'`                       | unchanged                                    |
-| `value_extractors__value_picker_rule_type`   | `attribute_mappings__value_picker_rule_type` |
+| Today | New |
+| --- | --- |
+| `entity_field_configs__value_extractor_type` | `concept_attributes__mapping_type` |
+| value `'dataset_column_value'` | `'dataset_column'` |
+| value `'manual_entry'` | unchanged |
+| `value_extractors__value_picker_rule_type` | `attribute_mappings__value_picker_rule_type` |
 
 ### Columns
 
-| Table                   | Today                    | New                    |
-| ----------------------- | ------------------------ | ---------------------- |
-| `individuals`           | `entity_config_id`       | `concept_id`           |
-| `concept_attributes`    | `entity_config_id`       | `concept_id`           |
-| `concept_attributes`    | `value_extractor_type`   | `mapping_type`         |
-| `concept_attributes`    | `is_id_field`            | `is_identifier`        |
-| `concept_attributes`    | `is_title_field`         | `is_label`             |
+| Table | Today | New |
+| --- | --- | --- |
+| `individuals` | `entity_config_id` | `concept_id` |
+| `concept_attributes` | `entity_config_id` | `concept_id` |
+| `concept_attributes` | `value_extractor_type` | `mapping_type` |
+| `concept_attributes` | `is_id_field` | `is_identifier` |
+| `concept_attributes` | `is_title_field` | `is_label` |
 | `attribute_mappings__*` | `entity_field_config_id` | `concept_attribute_id` |
 
 `individuals.external_id` keeps its name: it is the source-side key the
@@ -118,13 +118,13 @@ individual is matched on across datasets, and the term is accurate.
 
 ### Schema files
 
-| Today                                                            | New                                         |
-| ---------------------------------------------------------------- | ------------------------------------------- |
-| `supabase/schemas/10.entity_configs.sql`                         | `10.concepts.sql`                           |
-| `supabase/schemas/20.entity_field_configs.sql`                   | `20.concept_attributes.sql`                 |
-| `supabase/schemas/20.entities.sql`                               | `20.individuals.sql`                        |
+| Today | New |
+| --- | --- |
+| `supabase/schemas/10.entity_configs.sql` | `10.concepts.sql` |
+| `supabase/schemas/20.entity_field_configs.sql` | `20.concept_attributes.sql` |
+| `supabase/schemas/20.entities.sql` | `20.individuals.sql` |
 | `supabase/schemas/30.value_extractors__dataset_column_value.sql` | `30.attribute_mappings__dataset_column.sql` |
-| `supabase/schemas/30.value_extractors__manual_entry.sql`         | `30.attribute_mappings__manual_entry.sql`   |
+| `supabase/schemas/30.value_extractors__manual_entry.sql` | `30.attribute_mappings__manual_entry.sql` |
 
 Numeric prefixes are unchanged, so apply order is preserved.
 
@@ -132,21 +132,21 @@ Numeric prefixes are unchanged, so apply order is preserved.
 
 Every dependent object is renamed to track its table. Notable ones:
 
-| Today                                                      | New                                                                                    |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `tr_entity_config__set_updated_at`                         | `tr_concept__set_updated_at`                                                           |
-| `tr_entity_field_config__set_updated_at`                   | `tr_concept_attribute__set_updated_at`                                                 |
-| `tr_entities__set_updated_at`                              | `tr_individuals__set_updated_at`                                                       |
-| `tr_value_extractors__dataset_column_value_set_updated_at` | `tr_attribute_mappings__dataset_column_set_updated_at`                                 |
-| `tr_value_extractors__manual_entry_set_updated_at`         | `tr_attribute_mappings__manual_entry_set_updated_at`                                   |
-| `entity_field_configs__validate_title_and_id_fields()`     | `concept_attributes__validate_label_and_identifiers()`                                 |
-| `tr_entity_field_configs__validate_title_id_fields`        | `tr_concept_attributes__validate_label_and_identifiers`                                |
-| `idx_entity_configs__workspace_id`                         | `idx_concepts__workspace_id`                                                           |
-| `idx_entity_field_configs__entity_config_id_workspace_id`  | `idx_concept_attributes__concept_id_workspace_id`                                      |
-| `idx_dataset_column_value_extractors__efc_id_workspace_id` | `idx_attribute_mappings__dataset_column__attribute_workspace`                          |
-| `idx_manual_entry_value_extractors__efc_id_workspace_id`   | `idx_attribute_mappings__manual_entry__attribute_workspace`                            |
-| constraint `entities__entity_config_external_id_unique`    | `individuals__concept_external_id_unique`                                              |
-| RLS policy `"User can SELECT entity_configs"`              | `"User can SELECT concepts"` (and the INSERT/UPDATE/DELETE peers, for all five tables) |
+| Today | New |
+| --- | --- |
+| `tr_entity_config__set_updated_at` | `tr_concept__set_updated_at` |
+| `tr_entity_field_config__set_updated_at` | `tr_concept_attribute__set_updated_at` |
+| `tr_entities__set_updated_at` | `tr_individuals__set_updated_at` |
+| `tr_value_extractors__dataset_column_value_set_updated_at` | `tr_attribute_mappings__dataset_column_set_updated_at` |
+| `tr_value_extractors__manual_entry_set_updated_at` | `tr_attribute_mappings__manual_entry_set_updated_at` |
+| `entity_field_configs__validate_title_and_id_fields()` | `concept_attributes__validate_label_and_identifiers()` |
+| `tr_entity_field_configs__validate_title_id_fields` | `tr_concept_attributes__validate_label_and_identifiers` |
+| `idx_entity_configs__workspace_id` | `idx_concepts__workspace_id` |
+| `idx_entity_field_configs__entity_config_id_workspace_id` | `idx_concept_attributes__concept_id_workspace_id` |
+| `idx_dataset_column_value_extractors__efc_id_workspace_id` | `idx_attribute_mappings__dataset_column__attribute_workspace` |
+| `idx_manual_entry_value_extractors__efc_id_workspace_id` | `idx_attribute_mappings__manual_entry__attribute_workspace` |
+| constraint `entities__entity_config_external_id_unique` | `individuals__concept_external_id_unique` |
+| RLS policy `"User can SELECT entity_configs"` | `"User can SELECT concepts"` (and the INSERT/UPDATE/DELETE peers, for all five tables) |
 
 No other schema object references these tables: `app_type`, `resource_type`,
 `resource_shares`, the entitlement triggers, and every RPC are untouched.
@@ -169,42 +169,42 @@ shared/models/ontology/
 
 ### Types
 
-| Today                                             | New                                                               |
-| ------------------------------------------------- | ----------------------------------------------------------------- |
-| `EntityConfig` (namespace)                        | `Concept`                                                         |
-| `EntityConfigModel`                               | `ConceptModel`                                                    |
-| `EntityConfigId`                                  | `ConceptId`                                                       |
+| Today | New |
+| --- | --- |
+| `EntityConfig` (namespace) | `Concept` |
+| `EntityConfigModel` | `ConceptModel` |
+| `EntityConfigId` | `ConceptId` |
 | `EntityConfigRead` / `Insert` / `Update` / `Full` | `ConceptRead` / `ConceptInsert` / `ConceptUpdate` / `ConceptFull` |
-| `EntityConfigWith`                                | `ConceptWith`                                                     |
-| `BuildableEntityConfig`                           | `BuildableConcept`                                                |
-| `BuildableFieldConfig`                            | `BuildableAttribute`                                              |
-| `EntityConfigModule`                              | `ConceptModule`                                                   |
-| `EntityConfigParsers`                             | `ConceptParsers`                                                  |
-| `IEntityConfigUtils`                              | `IConceptUtils`                                                   |
-| `BindWithEntityConfig`                            | `BindWithConcept`                                                 |
-| `EntityFieldConfig` (namespace)                   | `ConceptAttribute`                                                |
-| `EntityFieldConfigModel`                          | `ConceptAttributeModel`                                           |
-| `EntityFieldConfigId`                             | `ConceptAttributeId`                                              |
-| `EntityFieldConfigRead` / `Insert` / `Update`     | `ConceptAttributeRead` / `Insert` / `Update`                      |
-| `EntityFieldConfigParsers`                        | `ConceptAttributeParsers`                                         |
-| `EntityFieldConfigWithValueExtractor`             | `ConceptAttributeWithMapping`                                     |
-| `ValueExtractorType`                              | `AttributeMappingType`                                            |
-| `EntityFieldValueExtractor`                       | `AttributeMapping`                                                |
-| `EntityFieldValueExtractorId`                     | `AttributeMappingId`                                              |
-| `EntityFieldValueExtractorRegistry`               | `AttributeMappingRegistry`                                        |
-| `EntityFieldValueExtractorModelRegistry`          | `AttributeMappingModelRegistry`                                   |
-| `DatasetColumnValueExtractorModel`                | `DatasetColumnMappingModel`                                       |
-| `DatasetColumnValueExtractor*`                    | `DatasetColumnMapping*`                                           |
-| `ManualEntryExtractorModel`                       | `ManualEntryMappingModel`                                         |
-| `ManualEntryExtractor*`                           | `ManualEntryMapping*`                                             |
-| `Entity` (namespace)                              | `Individual`                                                      |
-| `EntityModel`                                     | `IndividualModel`                                                 |
-| `EntityId`                                        | `IndividualId`                                                    |
-| `EntityRead`                                      | `IndividualRead`                                                  |
-| `EntityParsers`                                   | `IndividualParsers`                                               |
-| `EntityFieldValue` (namespace)                    | `AttributeAssertion`                                              |
-| `EntityFieldValueId`                              | `AttributeAssertionId`                                            |
-| `EntityFieldValueRead`                            | `AttributeAssertionRead`                                          |
+| `EntityConfigWith` | `ConceptWith` |
+| `BuildableEntityConfig` | `BuildableConcept` |
+| `BuildableFieldConfig` | `BuildableAttribute` |
+| `EntityConfigModule` | `ConceptModule` |
+| `EntityConfigParsers` | `ConceptParsers` |
+| `IEntityConfigUtils` | `IConceptUtils` |
+| `BindWithEntityConfig` | `BindWithConcept` |
+| `EntityFieldConfig` (namespace) | `ConceptAttribute` |
+| `EntityFieldConfigModel` | `ConceptAttributeModel` |
+| `EntityFieldConfigId` | `ConceptAttributeId` |
+| `EntityFieldConfigRead` / `Insert` / `Update` | `ConceptAttributeRead` / `Insert` / `Update` |
+| `EntityFieldConfigParsers` | `ConceptAttributeParsers` |
+| `EntityFieldConfigWithValueExtractor` | `ConceptAttributeWithMapping` |
+| `ValueExtractorType` | `AttributeMappingType` |
+| `EntityFieldValueExtractor` | `AttributeMapping` |
+| `EntityFieldValueExtractorId` | `AttributeMappingId` |
+| `EntityFieldValueExtractorRegistry` | `AttributeMappingRegistry` |
+| `EntityFieldValueExtractorModelRegistry` | `AttributeMappingModelRegistry` |
+| `DatasetColumnValueExtractorModel` | `DatasetColumnMappingModel` |
+| `DatasetColumnValueExtractor*` | `DatasetColumnMapping*` |
+| `ManualEntryExtractorModel` | `ManualEntryMappingModel` |
+| `ManualEntryExtractor*` | `ManualEntryMapping*` |
+| `Entity` (namespace) | `Individual` |
+| `EntityModel` | `IndividualModel` |
+| `EntityId` | `IndividualId` |
+| `EntityRead` | `IndividualRead` |
+| `EntityParsers` | `IndividualParsers` |
+| `EntityFieldValue` (namespace) | `AttributeAssertion` |
+| `EntityFieldValueId` | `AttributeAssertionId` |
+| `EntityFieldValueRead` | `AttributeAssertionRead` |
 
 ### Model type discriminators
 
@@ -217,15 +217,15 @@ IndexedDB, or a URL. `dashboards.config` stores Puck blocks with raw SQL, and
 
 ### Field names on records
 
-| Today                 | New                      |
-| --------------------- | ------------------------ |
-| `entityConfigId`      | `conceptId`              |
-| `entityFieldConfigId` | `conceptAttributeId`     |
-| `isIdField`           | `isIdentifier`           |
-| `isTitleField`        | `isLabel`                |
-| `valueExtractorType`  | `mappingType`            |
-| `valueExtractor`      | `mapping`                |
-| `ConceptFull.fields`  | `ConceptFull.attributes` |
+| Today | New |
+| --- | --- |
+| `entityConfigId` | `conceptId` |
+| `entityFieldConfigId` | `conceptAttributeId` |
+| `isIdField` | `isIdentifier` |
+| `isTitleField` | `isLabel` |
+| `valueExtractorType` | `mappingType` |
+| `valueExtractor` | `mapping` |
+| `ConceptFull.fields` | `ConceptFull.attributes` |
 
 ## Clients
 
@@ -233,17 +233,17 @@ IndexedDB, or a URL. `dashboards.config` stores Puck blocks with raw SQL, and
 `src/clients/ontology/`. Note this also fixes a mis-filing: today
 `EntityFieldConfigClient` (a TBox concern) lives under `entities/`.
 
-| Today                                                             | New                                                      |
-| ----------------------------------------------------------------- | -------------------------------------------------------- |
-| `src/clients/entity-configs/EntityConfigClient.ts`                | `src/clients/ontology/ConceptClient.ts`                  |
-| `src/clients/entities/EntityFieldConfigClient.ts`                 | `src/clients/ontology/ConceptAttributeClient.ts`         |
-| `src/clients/entity-configs/ValueExtractorClient.ts`              | `src/clients/ontology/AttributeMappingClient.ts`         |
-| `src/clients/entity-configs/DatasetColumnValueExtractorClient.ts` | `src/clients/ontology/DatasetColumnMappingClient.ts`     |
-| `src/clients/entity-configs/ManualEntryExtractorClient.ts`        | `src/clients/ontology/ManualEntryMappingClient.ts`       |
-| `src/clients/entities/EntityClient.ts`                            | `src/clients/ontology/IndividualClient.ts`               |
-| `src/clients/entities/EntityFieldValueClient/`                    | `src/clients/ontology/AttributeAssertionClient/`         |
-| `…/getEntityFieldValues/getEntityFieldValues.ts`                  | `…/getAttributeAssertions/getAttributeAssertions.ts`     |
-| `…/getEntityFieldValues/getDatasetColumnFieldValues.ts`           | `…/getAttributeAssertions/getDatasetColumnAssertions.ts` |
+| Today | New |
+| --- | --- |
+| `src/clients/entity-configs/EntityConfigClient.ts` | `src/clients/ontology/ConceptClient.ts` |
+| `src/clients/entities/EntityFieldConfigClient.ts` | `src/clients/ontology/ConceptAttributeClient.ts` |
+| `src/clients/entity-configs/ValueExtractorClient.ts` | `src/clients/ontology/AttributeMappingClient.ts` |
+| `src/clients/entity-configs/DatasetColumnValueExtractorClient.ts` | `src/clients/ontology/DatasetColumnMappingClient.ts` |
+| `src/clients/entity-configs/ManualEntryExtractorClient.ts` | `src/clients/ontology/ManualEntryMappingClient.ts` |
+| `src/clients/entities/EntityClient.ts` | `src/clients/ontology/IndividualClient.ts` |
+| `src/clients/entities/EntityFieldValueClient/` | `src/clients/ontology/AttributeAssertionClient/` |
+| `…/getEntityFieldValues/getEntityFieldValues.ts` | `…/getAttributeAssertions/getAttributeAssertions.ts` |
+| `…/getEntityFieldValues/getDatasetColumnFieldValues.ts` | `…/getAttributeAssertions/getDatasetColumnAssertions.ts` |
 
 Clients are named after their model, as everywhere else in the tree
 (`DatasetClient`, `DashboardClient`). `AttributeAssertionClient` has no table
@@ -253,49 +253,49 @@ demand, but it is still the client for that model.
 
 Its two methods split along a line worth making explicit in the names:
 
-| Today                                  | New                               | What it returns                              |
-| -------------------------------------- | --------------------------------- | -------------------------------------------- |
-| `getAllEntityFieldValues`              | `getConceptExtension`             | Every individual of a concept, as a relation |
-| `getEntityFieldValues`                 | `getAttributeAssertions`          | The assertions for one individual            |
-| `IEntityFieldValueClient`              | `IAttributeAssertionClient`       |                                              |
-| `EntityFieldValueClientQueries`        | `AttributeAssertionClientQueries` |                                              |
-| `createEntityFieldValueClient`         | `createAttributeAssertionClient`  |                                              |
-| `useGetEntityFieldValues`              | `useGetAttributeAssertions`       |                                              |
-| `_getEntityFieldValuesByExtractorType` | `_getAssertionsByMappingType`     |                                              |
+| Today | New | What it returns |
+| --- | --- | --- |
+| `getAllEntityFieldValues` | `getConceptExtension` | Every individual of a concept, as a relation |
+| `getEntityFieldValues` | `getAttributeAssertions` | The assertions for one individual |
+| `IEntityFieldValueClient` | `IAttributeAssertionClient` | |
+| `EntityFieldValueClientQueries` | `AttributeAssertionClientQueries` | |
+| `createEntityFieldValueClient` | `createAttributeAssertionClient` | |
+| `useGetEntityFieldValues` | `useGetAttributeAssertions` | |
+| `_getEntityFieldValuesByExtractorType` | `_getAssertionsByMappingType` | |
 
-The _extension_ of a concept is the set of individuals belonging to it, so
+The *extension* of a concept is the set of individuals belonging to it, so
 `getConceptExtension` is the precise term for what QETL Phase 3 calls "the ABox
 becomes a relation".
 
 ## Views and routes
 
-| Today                                                      | New                                                                 |
-| ---------------------------------------------------------- | ------------------------------------------------------------------- |
-| `src/views/EntityDesignerApp/`                             | `src/views/OntologyDesignerApp/`                                    |
-| `EntityConfigCreatorView/`                                 | `ConceptCreatorView/`                                               |
-| `EntityConfigCreatorStore`                                 | `ConceptCreatorStore`                                               |
-| `EntityConfigCreatorState`                                 | `ConceptCreatorState`                                               |
-| `entityConfigFormTypes.ts`                                 | `conceptFormTypes.ts`                                               |
+| Today | New |
+| --- | --- |
+| `src/views/EntityDesignerApp/` | `src/views/OntologyDesignerApp/` |
+| `EntityConfigCreatorView/` | `ConceptCreatorView/` |
+| `EntityConfigCreatorStore` | `ConceptCreatorStore` |
+| `EntityConfigCreatorState` | `ConceptCreatorState` |
+| `entityConfigFormTypes.ts` | `conceptFormTypes.ts` |
 | `EntityConfigFormValues` / `FormType` / `FormSubmitValues` | `ConceptFormValues` / `ConceptFormType` / `ConceptFormSubmitValues` |
-| `EntityFieldFormValues`                                    | `AttributeFormValues`                                               |
-| `getDefaultEntityConfigFormValues`                         | `getDefaultConceptFormValues`                                       |
-| `useSubmitEntityCreatorForm`                               | `useSubmitConceptCreatorForm`                                       |
-| `DatasetColumnFieldsBlock/`                                | `DatasetColumnAttributesBlock/`                                     |
-| `DatasetColumnExtractorCreator`                            | `DatasetColumnMappingCreator`                                       |
-| `ManualEntryFieldsBlock`                                   | `ManualEntryAttributesBlock`                                        |
-| `IDConfigBlock/`                                           | `IdentifierBlock/`                                                  |
-| `EntityConfigMetaView/`                                    | `ConceptMetaView/`                                                  |
-| `useHydratedEntityConfig`                                  | `useHydratedConcept`                                                |
-| `generateEntities/`                                        | `generateIndividuals/`                                              |
-| `EntityConfigNavbar`                                       | `ConceptNavbar`                                                     |
-| `EntityMetaErrorView`                                      | `ConceptMetaErrorView`                                              |
-| `EntityDesignerRoot`                                       | `OntologyDesignerRoot`                                              |
-| `src/views/EntityManagerApp/`                              | `src/views/IndividualManagerApp/`                                   |
-| `EntityNavbar`                                             | `IndividualNavbar`                                                  |
-| `SingleEntityView/`                                        | `SingleIndividualView/`                                             |
-| `HydratedEntity` / `useHydratedEntity`                     | `HydratedIndividual` / `useHydratedIndividual`                      |
-| `EntityManagerWithNoEntitySelected`                        | `IndividualManagerWithNoIndividualSelected`                         |
-| `EntityManagerRootWithNoConfigSelected`                    | `IndividualManagerRootWithNoConceptSelected`                        |
+| `EntityFieldFormValues` | `AttributeFormValues` |
+| `getDefaultEntityConfigFormValues` | `getDefaultConceptFormValues` |
+| `useSubmitEntityCreatorForm` | `useSubmitConceptCreatorForm` |
+| `DatasetColumnFieldsBlock/` | `DatasetColumnAttributesBlock/` |
+| `DatasetColumnExtractorCreator` | `DatasetColumnMappingCreator` |
+| `ManualEntryFieldsBlock` | `ManualEntryAttributesBlock` |
+| `IDConfigBlock/` | `IdentifierBlock/` |
+| `EntityConfigMetaView/` | `ConceptMetaView/` |
+| `useHydratedEntityConfig` | `useHydratedConcept` |
+| `generateEntities/` | `generateIndividuals/` |
+| `EntityConfigNavbar` | `ConceptNavbar` |
+| `EntityMetaErrorView` | `ConceptMetaErrorView` |
+| `EntityDesignerRoot` | `OntologyDesignerRoot` |
+| `src/views/EntityManagerApp/` | `src/views/IndividualManagerApp/` |
+| `EntityNavbar` | `IndividualNavbar` |
+| `SingleEntityView/` | `SingleIndividualView/` |
+| `HydratedEntity` / `useHydratedEntity` | `HydratedIndividual` / `useHydratedIndividual` |
+| `EntityManagerWithNoEntitySelected` | `IndividualManagerWithNoIndividualSelected` |
+| `EntityManagerRootWithNoConfigSelected` | `IndividualManagerRootWithNoConceptSelected` |
 
 The designer authors the terminology and is named for the product
 ("Ontology Designer", per the production plan). The manager is named for what
@@ -303,13 +303,13 @@ it manages, individuals, rather than for the layer they sit in.
 
 ### Routes
 
-| Today                                                      | New                                                           |
-| ---------------------------------------------------------- | ------------------------------------------------------------- |
-| `/$workspaceSlug/entity-designer`                          | `/$workspaceSlug/ontology-designer`                           |
-| `/$workspaceSlug/entity-designer/$entityConfigId`          | `/$workspaceSlug/ontology-designer/$conceptId`                |
-| `/$workspaceSlug/entity-designer/entity-creator`           | `/$workspaceSlug/ontology-designer/concept-creator`           |
-| `/$workspaceSlug/entity-manager`                           | `/$workspaceSlug/individual-manager`                          |
-| `/$workspaceSlug/entity-manager/$entityConfigId`           | `/$workspaceSlug/individual-manager/$conceptId`               |
+| Today | New |
+| --- | --- |
+| `/$workspaceSlug/entity-designer` | `/$workspaceSlug/ontology-designer` |
+| `/$workspaceSlug/entity-designer/$entityConfigId` | `/$workspaceSlug/ontology-designer/$conceptId` |
+| `/$workspaceSlug/entity-designer/entity-creator` | `/$workspaceSlug/ontology-designer/concept-creator` |
+| `/$workspaceSlug/entity-manager` | `/$workspaceSlug/individual-manager` |
+| `/$workspaceSlug/entity-manager/$entityConfigId` | `/$workspaceSlug/individual-manager/$conceptId` |
 | `/$workspaceSlug/entity-manager/$entityConfigId/$entityId` | `/$workspaceSlug/individual-manager/$conceptId/$individualId` |
 
 `shared/config/AvaRoutePaths.types.ts` and `src/routeTree.gen.ts` follow.
@@ -321,15 +321,15 @@ it manages, individuals, rather than for the layer they sit in.
 
 ## Query layer
 
-| Today                                          | New                                    |
-| ---------------------------------------------- | -------------------------------------- |
-| `QueryDataSource = Dataset \| EntityConfig`    | `= Dataset \| Concept`                 |
-| `QueryColumn.makeFromEntityFieldConfig`        | `QueryColumn.makeFromConceptAttribute` |
-| `runStructuredQuery` match arm `EntityConfig:` | `Concept:`                             |
-| `_runEntityConfigQuery`                        | `_runConceptQuery`                     |
-| `_buildEntityConfigResult`                     | `_buildConceptQueryResult`             |
-| `isEntityConfigSource`                         | `isConceptSource`                      |
-| `structuredQueryToSql` throw                   | message says "concept"                 |
+| Today | New |
+| --- | --- |
+| `QueryDataSource = Dataset \| EntityConfig` | `= Dataset \| Concept` |
+| `QueryColumn.makeFromEntityFieldConfig` | `QueryColumn.makeFromConceptAttribute` |
+| `runStructuredQuery` match arm `EntityConfig:` | `Concept:` |
+| `_runEntityConfigQuery` | `_runConceptQuery` |
+| `_buildEntityConfigResult` | `_buildConceptQueryResult` |
+| `isEntityConfigSource` | `isConceptSource` |
+| `structuredQueryToSql` throw | message says "concept" |
 
 ## Other call sites
 
@@ -358,16 +358,16 @@ it manages, individuals, rather than for the layer they sit in.
 Four `t` / `<Trans>` messages interpolate a variable whose **name** is part of
 the generated message id, so renaming the variable changes the id:
 
-| Old placeholder                        | New placeholder         |
-| -------------------------------------- | ----------------------- |
-| `{entityConfigName}`                   | `{conceptName}`         |
-| `{singularEntityConfigName}`           | `{singularConceptName}` |
-| `{pluralEntityConfigName}`             | `{pluralConceptName}`   |
-| `{fieldName}` (ontology designer only) | `{attributeName}`       |
+| Old placeholder | New placeholder |
+| --- | --- |
+| `{entityConfigName}` | `{conceptName}` |
+| `{singularEntityConfigName}` | `{singularConceptName}` |
+| `{pluralEntityConfigName}` | `{pluralConceptName}` |
+| `{fieldName}` (ontology designer only) | `{attributeName}` |
 
 Eleven message ids move as a result. **The visible English is unchanged in all
 eleven**; only the placeholder token inside it differs. To keep the existing
-translations, the msgid _and_ msgstr were rewritten in place in every locale
+translations, the msgid *and* msgstr were rewritten in place in every locale
 catalog before re-extracting, rather than letting extraction orphan them.
 `lingui extract` afterwards reports **0 missing** in all seven translated
 locales.

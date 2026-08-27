@@ -16,8 +16,8 @@ Typed CRUD client primitives. Provides:
 - A `Register` interface that downstream consumers augment to register
   their Supabase `Database` type.
 
-This package separates _what a model client does_ (CRUD operations) from
-_where the data lives_ (Supabase, an HTTP API, an in-memory store, etc.).
+This package separates *what a model client does* (CRUD operations) from
+*where the data lives* (Supabase, an HTTP API, an in-memory store, etc.).
 
 ESM only. Requires Node 22+.
 
@@ -81,9 +81,9 @@ a `ServiceClient`.
 Creates a named `@avandar/modules` module with a single member,
 `getClientName()`. By convention `clientName` ends in `"Client"`.
 
-| Type            | Description                                       |
-| --------------- | ------------------------------------------------- |
-| `ServiceClient` | The module type returned by `createServiceClient` |
+| Type            | Description                                              |
+| --------------- | -------------------------------------------------------- |
+| `ServiceClient` | The module type returned by `createServiceClient`        |
 
 ---
 
@@ -98,40 +98,40 @@ The client exposes a high-level surface in frontend model types.
 
 Builds a `ModelCrudClient<M>`.
 
-| Option                   | Description                                                                        |
-| ------------------------ | ---------------------------------------------------------------------------------- |
-| `modelName`              | Model name (used to brand the client and log lines)                                |
-| `parsers`                | A parser registry from `makeParserRegistry`                                        |
-| `crudFunctions`          | The implementation of each CRUD operation against the data store                   |
-| `defaultGetAllBatchSize` | Page size used by `getAll` to paginate (default `500`)                             |
-| `additionalQueries`      | Extra query functions merged into the client; eligible for auto-generated hooks    |
-| `additionalMutations`    | Extra mutation functions merged into the client; eligible for auto-generated hooks |
+| Option                  | Description                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| `modelName`             | Model name (used to brand the client and log lines)                               |
+| `parsers`               | A parser registry from `makeParserRegistry`                                       |
+| `crudFunctions`         | The implementation of each CRUD operation against the data store                  |
+| `defaultGetAllBatchSize`| Page size used by `getAll` to paginate (default `500`)                            |
+| `additionalQueries`     | Extra query functions merged into the client; eligible for auto-generated hooks   |
+| `additionalMutations`   | Extra mutation functions merged into the client; eligible for auto-generated hooks |
 
 The returned client exposes the following methods (all return promises):
 
-| Method                                   | Description                                                           |
-| ---------------------------------------- | --------------------------------------------------------------------- |
-| `getById({ id })`                        | Single read by primary key. `id` may be nullish (returns `undefined`) |
-| `getCount({ where? })`                   | Total row count matching the filter                                   |
-| `getPage({ where?, pageSize, pageNum })` | One page of rows plus pagination metadata                             |
-| `getAll({ where?, batchSize? })`         | All rows, internally paginated                                        |
-| `getOne({ where? })`                     | First row matching the filter                                         |
-| `insert({ data, upsert?, onConflict? })` | Insert (or upsert) a single row                                       |
-| `bulkInsert({ data[], ... })`            | Insert (or upsert) many rows                                          |
-| `update({ id, data })`                   | Update a single row                                                   |
-| `delete({ id })`                         | Delete a single row                                                   |
-| `bulkDelete({ ids[] })`                  | Delete many rows                                                      |
-| `parsers`                                | The parser registry                                                   |
-| `crudFunctions`                          | The raw CRUD functions, in case direct DB-type access is needed       |
+| Method                   | Description                                                       |
+| ------------------------ | ----------------------------------------------------------------- |
+| `getById({ id })`        | Single read by primary key. `id` may be nullish (returns `undefined`) |
+| `getCount({ where? })`   | Total row count matching the filter                               |
+| `getPage({ where?, pageSize, pageNum })` | One page of rows plus pagination metadata         |
+| `getAll({ where?, batchSize? })`         | All rows, internally paginated                    |
+| `getOne({ where? })`     | First row matching the filter                                     |
+| `insert({ data, upsert?, onConflict? })` | Insert (or upsert) a single row                   |
+| `bulkInsert({ data[], ... })`            | Insert (or upsert) many rows                      |
+| `update({ id, data })`   | Update a single row                                               |
+| `delete({ id })`         | Delete a single row                                               |
+| `bulkDelete({ ids[] })`  | Delete many rows                                                  |
+| `parsers`                | The parser registry                                               |
+| `crudFunctions`          | The raw CRUD functions, in case direct DB-type access is needed   |
 
 ### Types
 
-| Type                          | Description                                                                                                               |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Type                          | Description                                                                |
+| ----------------------------- | -------------------------------------------------------------------------- |
 | `CrudModelSpec`               | Generic spec: `modelName`, `modelPrimaryKeyType`, plus `DBRead`/`DBInsert`/`DBUpdate` and `Read`/`Insert`/`Update` shapes |
-| `ModelCrudClient<M>`          | The full client surface for a given `CrudModelSpec`                                                                       |
-| `ClientReturningOnlyPromises` | Record shape required for `additionalQueries` and `additionalMutations`                                                   |
-| `UpsertOptions`               | `{ upsert?, onConflict? }` shared by `insert` / `bulkInsert`                                                              |
+| `ModelCrudClient<M>`          | The full client surface for a given `CrudModelSpec`                        |
+| `ClientReturningOnlyPromises` | Record shape required for `additionalQueries` and `additionalMutations`    |
+| `UpsertOptions`               | `{ upsert?, onConflict? }` shared by `insert` / `bulkInsert`               |
 
 ---
 
@@ -143,15 +143,15 @@ interface, so callers only need to declare frontend model types.
 
 ### `createSupabaseCrudClient(options)`
 
-| Option              | Description                                                                                        |
-| ------------------- | -------------------------------------------------------------------------------------------------- |
-| `modelName`         | Model name                                                                                         |
-| `tableName`         | Supabase table name (typed against the registered database)                                        |
-| `dbTablePrimaryKey` | Primary key column name (typed against the table row)                                              |
-| `parsers`           | Parser registry from `makeParserRegistry`                                                          |
-| `dbClient`          | A `SupabaseClient<RegisteredSupabaseDatabase>` instance                                            |
+| Option              | Description                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------ |
+| `modelName`         | Model name                                                                                 |
+| `tableName`         | Supabase table name (typed against the registered database)                                |
+| `dbTablePrimaryKey` | Primary key column name (typed against the table row)                                      |
+| `parsers`           | Parser registry from `makeParserRegistry`                                                  |
+| `dbClient`          | A `SupabaseClient<RegisteredSupabaseDatabase>` instance                                    |
 | `queries?`          | Builder that returns extra promise-returning query functions; receives `dbClient`, parsers, logger |
-| `mutations?`        | Builder that returns extra promise-returning mutation functions; same arguments                    |
+| `mutations?`        | Builder that returns extra promise-returning mutation functions; same arguments            |
 
 The returned client extends `ModelCrudClient` with `setDBClient(newClient)`
 for swapping out the underlying Supabase client (used to seed data with an
@@ -165,10 +165,10 @@ without using the full CRUD machinery.
 
 ### Types
 
-| Type                    | Description                                                           |
-| ----------------------- | --------------------------------------------------------------------- |
-| `SupabaseCrudModelSpec` | Wrapper that derives DB types from the registered Supabase `Database` |
-| `WithSupabaseClient`    | A `ServiceClient` augmented with `setDBClient`                        |
+| Type                  | Description                                                              |
+| --------------------- | ------------------------------------------------------------------------ |
+| `SupabaseCrudModelSpec` | Wrapper that derives DB types from the registered Supabase `Database`  |
+| `WithSupabaseClient`  | A `ServiceClient` augmented with `setDBClient`                           |
 
 ---
 
@@ -202,9 +202,9 @@ const WidgetClient = createSqliteCrudClient({
 });
 ```
 
-| Type              | Description                                     |
-| ----------------- | ----------------------------------------------- |
-| `SqliteTransport` | `{ query, run }`, both taking `{ sql, params }` |
+| Type              | Description                                            |
+| ----------------- | ------------------------------------------------------ |
+| `SqliteTransport` | `{ query, run }`, both taking `{ sql, params }`         |
 
 Known limitations: JSON-typed columns are stringified on write but returned as
 raw strings on read, and boolean columns come back as integer 0/1. Model
@@ -231,9 +231,9 @@ The builder hardens each parser:
   DB schema (Supabase rejects unknown keys) and remove `undefined` values
   that may have been re-introduced by the `pick`.
 
-| Type                      | Description                           |
-| ------------------------- | ------------------------------------- |
-| `ModelCrudParserRegistry` | The shape returned from `.build(...)` |
+| Type                     | Description                                              |
+| ------------------------ | -------------------------------------------------------- |
+| `ModelCrudParserRegistry`| The shape returned from `.build(...)`                    |
 
 ---
 
@@ -255,9 +255,9 @@ declare module "@avandar/clients" {
 Once registered, `tableName`, `DBRead`, `DBInsert`, and `DBUpdate` types
 flow through `createSupabaseCrudClient` automatically.
 
-| Type       | Description                                               |
-| ---------- | --------------------------------------------------------- |
-| `Register` | Augmentation target for registering a Supabase `Database` |
+| Type       | Description                                                  |
+| ---------- | ------------------------------------------------------------ |
+| `Register` | Augmentation target for registering a Supabase `Database`    |
 
 ## License
 

@@ -14,15 +14,15 @@ labels rotated ninety degrees.
 
 ## Scope
 
-| Viz                      | X axis      | Y axis       | In scope |
-| ------------------------ | ----------- | ------------ | -------- |
-| `bar`                    | category    | value        | yes      |
-| `line`                   | category    | value        | yes      |
-| `area`                   | category    | value        | yes      |
-| `scatter`                | value       | value        | yes      |
-| `bubble`                 | value       | value        | yes      |
-| `radar`                  | polar angle | polar radius | no       |
-| `pie`, `funnel`, `table` | none        | none         | n/a      |
+| Viz | X axis | Y axis | In scope |
+| --- | --- | --- | --- |
+| `bar` | category | value | yes |
+| `line` | category | value | yes |
+| `area` | category | value | yes |
+| `scatter` | value | value | yes |
+| `bubble` | value | value | yes |
+| `radar` | polar angle | polar radius | no |
+| `pie`, `funnel`, `table` | none | none | n/a |
 
 Radar is deliberately excluded. Its polar radius axis could carry a minimum,
 maximum, and interval, but rotation is meaningless on a polar angle axis and
@@ -206,12 +206,11 @@ export function resolveAxisScale(
    non-negative data, is already on the lattice. An **explicit** bound is never
    moved, so a user-set maximum that falls between ticks simply truncates the
    last one.
-
 4. **Cap the tick count at 100.** `tickInterval: 1` on a `0`-to-`1e9` axis would
    otherwise allocate a billion-element array and hang the tab. Over the cap,
    drop `ticks` and keep the domain.
 5. Set `allowDataOverflow: true` only when the user explicitly set a bound, so a
-   maximum _below_ the data actually clips instead of Recharts silently widening
+   maximum *below* the data actually clips instead of Recharts silently widening
    it back out. Derived bounds never set it.
 6. Guards: an explicit `min >= max` ignores both bounds; a non-finite or
    non-positive `tickInterval` is ignored.
@@ -259,13 +258,7 @@ Its second positional parameter becomes an options object, since it now needs
 more than `baseXAxisProps`:
 
 ```ts
-applyChartStyle(style, {
-  baseXAxisProps,
-  xExtent,
-  yExtent,
-  xTickLabels,
-  axisRoles,
-});
+applyChartStyle(style, { baseXAxisProps, xExtent, yExtent, xTickLabels, axisRoles });
 ```
 
 Four call sites and the existing prop test change mechanically.
@@ -343,9 +336,7 @@ fivefold, so the axis descriptors move into a factory in
 `shared/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts`:
 
 ```ts
-export function makeAxisDescriptors<
-  TConfig extends { chartStyle?: ChartStyle },
->(
+export function makeAxisDescriptors<TConfig extends { chartStyle?: ChartStyle }>(
   axis: "xAxis" | "yAxis",
   role: AxisRole,
   options?: { rotation?: boolean },
@@ -454,8 +445,8 @@ written as a lookup so E4 extends it with one branch rather than reworking it.
 
 **Axis number format (E15).** The gap analysis calls the number format system
 the keystone that all four axes read from. It replaces `applyChartStyle`'s
-hardcoded `_formatYAxisTick`. That is a change to the tick _formatter_, not to
-the tick _values_, so it composes with this work: `resolveAxisScale` keeps
+hardcoded `_formatYAxisTick`. That is a change to the tick *formatter*, not to
+the tick *values*, so it composes with this work: `resolveAxisScale` keeps
 producing the values and E15 changes how they are printed. The only coupling is
 `resolveTickRotation`'s label measurement, which already takes formatted strings
 as input and so picks up any new formatter automatically.

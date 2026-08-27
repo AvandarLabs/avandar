@@ -29,6 +29,68 @@ remaining type-3 judgement.
 - `prettier-plugin-sql` (SQL only), Stylelint (unchanged), Vitest, the
   public `avandar-code-review` skill.
 
+## Refresh 2026-08-21 (post-`develop` merge)
+
+`develop` was merged into `feat/oxlint` at `09a59226`: 131 commits and 2475
+changed files since this plan was written at `20733aab` (2026-08-16). No
+phase has been implemented yet; all 83 steps are still unchecked. The plan
+has been re-verified against the merged tree. Corrections are inline, each
+marked `> **Refresh 2026-08-21:**`. The substantive ones:
+
+1. **`.vscode/settings.json` no longer exists.** Merge `02cf4081` ("Merge
+   feat/filters") deleted it. `.vscode/` now holds only `extensions.json`,
+   and the path is not gitignored. Task 3 Step 2 has to create the file, and
+   its "keep the existing Deno / Stylelint / TypeScript keys" instruction
+   has nothing to keep. Recover those keys from
+   `git show e63ebeea:.vscode/settings.json` if they are still wanted.
+2. **`.prettierrc` `expressionWidth` is 40, not 8.** Task 2 Step 1's
+   replacement config would have silently reflowed every schema file.
+3. **`.prettierignore` gained `supabase/migration-upgrade-tests/**/*.sql`**
+   (byte-stable migration fixtures), so Task 1 Step 3's copy was stale.
+4. **A repo-wide `oxfmt` write is broader than anything Prettier does
+   today.** `pnpm format` never runs a formatter over the whole tree: it
+   filters the changed-file list through
+   `scripts/format-changed-files/ignore-patterns.txt`, which drops
+   `agent-skills/**`, every `*.md`, `supabase/migrations/**`, and `*.gen.*`.
+   `.prettierignore` drops none of those. Task 5's `pnpm exec oxfmt` would
+   therefore sweep 374 markdown files (37 of them under `agent-skills/`) and
+   the raw SQL migrations. `.oxfmtignore` now mirrors `ignore-patterns.txt`.
+5. **36 `// prettier-ignore` directives are live in the tree**, almost all
+   in `shared/models/AvaMap/**` (landed in `aaa61bc7`, "Refactored GIS to
+   newest conventions" #268). oxfmt does not read them. Task 5 gained a
+   triage step ahead of the repo-wide write.
+6. **Import-sort fidelity is not what Task 1 assumed.** Today's
+   `.prettierrc` `importOrder` ends with `<TYPES>` and knows only `^@/`; the
+   planned oxfmt `sortImports` puts `type-import` first and treats `$/` as
+   internal. Both differences move real code, and `$/` is now the dominant
+   alias across `shared/`. Flagged for sign-off in Task 1.
+7. **`eslint.config.js` moved.** `max-len` options are at lines 200 to 212,
+   not 186 to 198; the ignore list gained `playwright-report/**`,
+   `.temp/**`, and `supabase/.temp/**`; and Task 7's mapping table was
+   missing several rules that are live today.
+8. **The review skill moved a lot.** `SKILL.md` is +382/-75 with a new
+   "Focused Reviews" section (packs `docstrings`, `files`, `naming`, `tests`,
+   plus a "Focused-review find lanes" table) from `0fbc436e` and `2db4a395`.
+   `react-checklist` +52, `tests-checklist` +56, repo-local
+   `extra-checklist` +17, `docs/rules/testing.md` +63,
+   `docs/rules/typescript.md` +46. The Task 9 and Task 15 sweeps were always
+   mandatory; they now have a concrete delta to start from, and Tasks 14 and
+   19 must prune the new focused packs, not only General Checks and the
+   phase checklists.
+9. **A new root Vitest project exists** (`vitest.executed.config.ts`,
+   `pnpm test:executed`). A top-level `eslint-plugin-avandar/` is absent from
+   `vite.config.ts`'s `test.exclude`, so its tests would be swept into
+   `pnpm test:frontend` under jsdom with the app's setup file. Task 10 now
+   decides this explicitly.
+
+Re-verified as unchanged: the three CI workflows that call `pnpm lint`
+(`pr-develop.yaml`, `staging.yaml`, `production.yaml`); the root `lint` and
+`lint:ts:fix-changed` scripts; `apps/pipeline-server` and
+`apps/dev-fanout-server` both on `"lint": "eslint ."`; `minimumReleaseAge:
+4320`; every `avandar-code-review` checklist path Task 9 lists;
+`.cursor/rules/global.mdc` lines 30 to 31; `scripts/verify-packages.sh`
+line 30; and `apps/ava-cli/tsup.config.ts` `external: ["prettier", ...]`.
+
 ## Global Constraints
 
 - Do not write to any Supabase database or remote project.
@@ -66,6 +128,14 @@ remaining type-3 judgement.
   from the cooldown.
 - JS plugins cannot be type-aware. Do not add custom type-aware rules.
 - Context7 library for oxlint/oxfmt docs: `/websites/oxc_rs_guide_usage`.
+- A repo-wide formatter write is new for this repo. `.oxfmtignore` must
+  mirror `scripts/format-changed-files/ignore-patterns.txt` (markdown,
+  `agent-skills/**`, `supabase/migrations/**`, `*.gen.*`) and not just
+  `.prettierignore`. Reformatting markdown repo-wide is **out of scope**
+  here; if the user wants it, it is its own commit on its own branch.
+- 36 `// prettier-ignore` directives are live as of 2026-08-21, mostly in
+  `shared/models/AvaMap/**`. oxfmt does not honour them. Triage each in
+  Task 5. Do not leave a directive in the tree that no formatter reads.
 
 ## File map
 
@@ -81,6 +151,11 @@ remaining type-3 judgement.
 | `scripts/format-changed-files/format-changed-files.sh`                  | oxfmt → prettier SQL → oxlint --fix → stylelint                     |
 | `apps/ava-cli/src/utils/writeFileFromTemplate/writeFileFromTemplate.ts` | oxfmt for non-SQL; prettier for `.sql`                              |
 | `agent-skills/public-skills/skills/avandar-code-review/`                | skill + checklists                                                  |
+| `scripts/format-changed-files/ignore-patterns.txt`                      | changed-file filter; the real source of "never format this"         |
+| `.vscode/settings.json`                                                 | **does not exist** (deleted in `02cf4081`); Task 3 creates it       |
+| `vite.config.ts` `test.exclude`                                         | must exclude `eslint-plugin-avandar/**` (Task 10)                   |
+| `docs/code-reviews/extra-checklist.md`                                  | line 52 names ESLint's `no-restricted-imports`; retarget in Task 8  |
+| `README.md`                                                             | line 48 pre-push text; line 145 Tailwind-v3-because-of-eslint note  |
 
 ---
 
@@ -188,24 +263,74 @@ Then edit `.oxfmtrc.json` so it contains at least:
 Delete any migrated `experimentalTernaries`. Default oxfmt `printWidth` is
 100; leaving it unset is a bug.
 
+<<<<<<< HEAD
 - [x] **Step 3: Write `.oxfmtignore`**
+=======
+> **Refresh 2026-08-21:** the `sortImports` block above is **not** a
+> faithful port of today's Prettier order, and the difference is not
+> cosmetic. `.prettierrc` `importOrder` is
+> `["<BUILTIN_MODULES>", "<THIRD_PARTY_MODULES>", "^@/(.*)$", "^[.]", "<TYPES>"]`:
+> type imports sort **last** and `$/` is not an internal pattern, so `$/`
+> imports currently land in the third-party group. The config above sorts
+> `type-import` **first** and treats `$/` as internal. `$/` is now the
+> dominant alias across `shared/` (see `shared/models/AvaMap/**`), so both
+> changes will move a large number of lines in Task 5. Decide deliberately
+> and get user sign-off before Task 5: either keep the plan's order (nicer,
+> big diff) or port the current order literally (`groups` ending in
+> `type-import`, `internalPattern` of `["^@/"]` only). Also note
+> `.prettierrc` has an `overrides` entry setting `trailingComma: "none"`
+> for `*.jsonc`; confirm oxfmt does not emit trailing commas into `.jsonc`
+> files, since `.oxlintrc.jsonc` may be one of them.
 
-Copy today's `.prettierignore` and add `*.sql` so oxfmt never touches SQL:
+- [ ] **Step 3: Write `.oxfmtignore`**
+>>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
+
+`.oxfmtignore` is the union of today's `.prettierignore` **and**
+`scripts/format-changed-files/ignore-patterns.txt`, because Task 5 runs
+oxfmt over the whole tree and nothing has ever done that here:
 
 ```
 node_modules
 dist
 build
 .agents
+agent-skills
+playwright-report
+.temp
+supabase/.temp
 src/routeTree.gen.ts
 LICENSE
 shared/types/database.types.ts
 src/i18n/locales/*/messages.ts
-supabase/tests/**/*.sql
+*.gen.*
+*.md
 *.sql
 ```
 
+<<<<<<< HEAD
 - [x] **Step 4: Smoke-check one file without writing the repo**
+=======
+> **Refresh 2026-08-21:** the original snippet copied a stale
+> `.prettierignore` and would have let a whole-tree run loose on things no
+> formatter touches today. Changes and why:
+>
+> - `*.md` and `agent-skills` come from `ignore-patterns.txt`
+>   (`\.md$`, `^agent-skills/`). Without them, `pnpm exec oxfmt` in Task 5
+>   reflows 374 markdown files, 37 of them vendored agent skills.
+> - `*.gen.*` comes from `ignore-patterns.txt`; it also covers
+>   `src/routeTree.gen.ts`, which is kept explicit for readability.
+> - `playwright-report`, `.temp`, and `supabase/.temp` are gitignored build
+>   or scratch output that `eslint.config.js` had to add to its ignores
+>   after `pnpm lint` blew up on them. A whole-tree formatter has the same
+>   exposure.
+> - `*.sql` alone supersedes the old `supabase/tests/**/*.sql` line and
+>   also covers `supabase/migrations/**` and the
+>   `supabase/migration-upgrade-tests/**/*.sql` fixtures that
+>   `.prettierignore` gained after this plan was written. Those fixtures are
+>   deliberately byte-stable; do not let any formatter reflow them.
+
+- [ ] **Step 4: Smoke-check one file without writing the repo**
+>>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
 
 ```bash
 pnpm exec oxfmt --check src/main.tsx
@@ -238,6 +363,12 @@ EOF
 
 - Consumes: current Prettier SQL override (`language: postgresql`, all
   `*Case: lower`).
+
+> **Refresh 2026-08-21:** `expressionWidth` in the snippet below was
+> corrected from `8` to `40`, which is what `.prettierrc` actually carries.
+> Shipping `8` would have reflowed every file under `supabase/schemas/` on
+> the next `pnpm format`. Re-read the live `.prettierrc` `*.sql` override
+> before pasting the block; copy it, do not retype it.
 - Produces: `pnpm exec prettier --write some.ts` is a no-op (ignored);
   `pnpm exec prettier --write supabase/schemas/<file>.sql` still formats.
 
@@ -257,7 +388,7 @@ EOF
         "identifierCase": "lower",
         "indentStyle": "standard",
         "logicalOperatorNewline": "after",
-        "expressionWidth": 8,
+        "expressionWidth": 40,
         "linesBetweenQueries": 1
       }
     }
@@ -274,7 +405,22 @@ EOF
 !supabase/schemas/**
 ```
 
+<<<<<<< HEAD
 - [x] **Step 3: Drop JS Prettier plugins**
+=======
+> **Refresh 2026-08-21:** this inversion has a second-order effect on
+> Task 4 that the plan did not account for.
+> `apps/ava-cli/.../writeFileFromTemplate.ts` decides whether to format by
+> calling `prettier.getFileInfo(filePath, { ignorePath: ".prettierignore" })`
+> and bailing when `inferredParser` is null, which is exactly what Prettier
+> returns for an ignored path. After the inversion, that helper becomes a
+> no-op for every path outside `supabase/schemas/`. That is fine for
+> `ava supabase table new`, whose `OUTPUT_DIR` is `supabase/schemas`, but it
+> silently stops formatting when a caller passes `--output-dir` elsewhere.
+> Task 4 Step 2 now covers the decision.
+
+- [ ] **Step 3: Drop JS Prettier plugins**
+>>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
 
 ```bash
 pnpm remove @ianvs/prettier-plugin-sort-imports prettier-plugin-tailwindcss
@@ -308,8 +454,9 @@ EOF
 **Files:**
 
 - Modify: `scripts/format-changed-files/format-changed-files.sh`
-- Modify: `.vscode/settings.json`
-- Modify: `README.md` (the pre-push paragraph around lines 46–52)
+- **Create** (not modify): `.vscode/settings.json`
+- Modify: `README.md` (the pre-push paragraph, lines 45–52; the formatter
+  sentence is line 48)
 - Modify: `.cursor/rules/global.mdc` (Libraries: Formatter line)
 - Modify: `AGENTS.md` only if it names Prettier as the JS formatter
 
@@ -376,12 +523,29 @@ In `.vscode/settings.json` set:
 }
 ```
 
-Keep the existing Deno / Stylelint / TypeScript keys.
+> **Refresh 2026-08-21:** `.vscode/settings.json` is **gone**. Merge
+> `02cf4081` deleted it and `.vscode/` now tracks only `extensions.json`;
+> the path is not gitignored, so this is a create, not a modify. There are
+> no "existing Deno / Stylelint / TypeScript keys" to keep. The last tracked
+> version is `git show e63ebeea:.vscode/settings.json` (from "Stop the Deno
+> language service from taking over the TypeScript workspace"); read it,
+> then decide with the user whether to restore those keys alongside the
+> formatter keys or to leave the file uncommitted as before. Do not
+> resurrect the Deno scoping silently: it was deliberate work that then
+> disappeared in a merge, and re-adding it is a separate concern from
+> formatters. Also check whether `.vscode/extensions.json` should recommend
+> `oxc.oxc-vscode`.
 
 - [x] **Step 3: Docs**
 
-`README.md` pre-push sentence becomes: oxfmt, prettier on SQL schemas,
-eslint --fix, stylelint --fix.
+`README.md` line 48 pre-push sentence becomes: oxfmt, prettier on SQL
+schemas, eslint --fix, stylelint --fix.
+
+Leave `README.md` line 145 alone in this task. It pins TailwindCSS to v3
+"because `eslint-plugin-tailwindcss` does not support v4 yet", and that
+rationale only dies in Task 8 when the plugin is uninstalled. Note that the
+plugin is already a dead devDependency: `eslint.config.js` never imports it,
+so nothing enforces the constraint the README claims.
 
 `.cursor/rules/global.mdc`:
 
@@ -454,7 +618,18 @@ if `formatted.code` is wrong; use whatever field the installed version
 returns.
 
 Call `_formatGeneratedFile` where `_formatFileWithPrettier` is called
-today.
+today (line 54, `void _formatFileWithPrettier(outputAbsPath)`).
+
+> **Refresh 2026-08-21:** decide what happens to the `ignorePath` /
+> `getFileInfo` gate inside `_formatFileWithPrettier` while you are in this
+> file. Once Task 2 inverts `.prettierignore`, that gate rejects everything
+> outside `supabase/schemas/`, so a `.sql` file generated anywhere else is
+> written unformatted with no diagnostic. `ava supabase table new` defaults
+> to `OUTPUT_DIR = "supabase/schemas"` and is unaffected, but it accepts an
+> `--output-dir` override. Cleanest fix: drop the `ignorePath` argument in
+> the SQL branch and pass `parser: "sql"` explicitly, so the generator's
+> intent to format its own output does not depend on a repo-wide ignore file
+> that now ignores the repo.
 
 - [x] **Step 3: `formatFileWithRepoPrettier` in newEdgeFunction.ts**
 
@@ -502,7 +677,36 @@ EOF
 - Produces: a single formatting commit so later phases do not mix style
   churn with lint/plugin work.
 
+<<<<<<< HEAD
 - [x] **Step 1: Write**
+=======
+- [ ] **Step 0: Triage the 36 `// prettier-ignore` directives**
+
+```bash
+grep -rn --include='*.ts' --include='*.tsx' --exclude-dir=node_modules \
+  'prettier-ignore' .
+```
+
+> **Refresh 2026-08-21:** these did not exist when this plan was written.
+> 36 of them are live, nearly all in `shared/models/AvaMap/**`, from
+> `aaa61bc7` ("Refactored GIS to newest conventions", #268). Two shapes
+> appear: a standalone `// prettier-ignore` above an `export { ... } from`
+> block (for example `shared/models/AvaMap/AvaMapConfig/AvaMapConfig.ts:25`)
+> and a trailing `Name, // prettier-ignore` inside an import specifier list
+> (for example `shared/models/AvaMap/MapLayer/MapLayer.ts:27`).
+>
+> oxfmt does not read `// prettier-ignore`. For each site, establish whether
+> it is load-bearing (run oxfmt on that one file and read the diff) and then
+> either translate it to oxfmt's own ignore directive (confirm the spelling
+> against Context7 `/websites/oxc_rs_guide_usage`; do not guess) or delete
+> it. Do not carry a directive forward that no formatter honours. The
+> trailing-specifier ones look like sort-plugin workarounds and are the
+> likeliest to be inert now that the sort plugin is gone; verify rather than
+> assume. This triage lands in its own commit, before the repo-wide write,
+> so Step 3's formatting commit stays reviewable.
+
+- [ ] **Step 1: Write**
+>>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
 
 ```bash
 pnpm exec oxfmt
@@ -510,7 +714,20 @@ pnpm exec oxfmt
 
 Do not pass SQL paths. `.oxfmtignore` already has `*.sql`.
 
+<<<<<<< HEAD
 - [x] **Step 2: Sanity**
+=======
+> **Refresh 2026-08-21:** before this write, diff `.oxfmtignore` against
+> `scripts/format-changed-files/ignore-patterns.txt` one more time and run
+> `pnpm exec oxfmt --check 2>&1 | wc -l` first. Nothing in this repo has
+> ever run a formatter over the whole tree; `pnpm format` only ever sees
+> changed files filtered through `ignore-patterns.txt`. If the check output
+> names markdown, anything under `agent-skills/`, `supabase/migrations/`, or
+> a `*.gen.*` file, the ignore file is wrong. Stop and fix it rather than
+> committing the sweep.
+
+- [ ] **Step 2: Sanity**
+>>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
 
 ```bash
 pnpm exec oxfmt --check
@@ -621,7 +838,7 @@ options):
 
 | Today                                                                         | Oxlint                                                                                                       |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `max-len` 80 including comments, ignore import lines/urls/strings/templates   | `eslint-js/max-len` (or `eslint/max-len`) with the same options object from `eslint.config.js` lines 186–198 |
+| `max-len` 80 including comments, ignore import lines/urls/strings/templates   | `eslint-js/max-len` (or `eslint/max-len`) with the same options object from `eslint.config.js` lines 200–212 |
 | `arrow-body-style: always`                                                    | native equivalent; keep `always`                                                                             |
 | `explicit-module-boundary-types`                                              | native typescript rule                                                                                       |
 | `array-type: array-simple`                                                    | native                                                                                                       |
@@ -641,9 +858,47 @@ options):
 | e2e fixtures: `no-empty-pattern` off                                          | override                                                                                                     |
 | vitest.config.ts: `no-restricted-imports` off                                 | override                                                                                                     |
 
-Ignores must include today's list: `**/dist/**`, `.agents/**`, `.claude/**`,
-`agent-skills/**`, desktop build/bundle/cache, `src/i18n/locales/**/messages.ts`,
-`shared/types/database.types.ts`.
+> **Refresh 2026-08-21:** the table above is missing rules that are live in
+> `eslint.config.js` today. Re-derive the mapping from the file, not from
+> this table. Specifically:
+>
+> - `supabase/functions/**/*.ts` turns **both** `import-x/no-unresolved`
+>   **and** `import-x/extensions` off. The table only mentions the former.
+> - `react/jsx-filename-extension` is `"warn"` for `.tsx`/`.jsx`;
+>   `react/no-unused-prop-types`, `react/prop-types`,
+>   `react/react-in-jsx-scope`, and `react/require-default-props` are
+>   `"off"`; `camelcase` is `"off"`; base `no-shadow` is `"off"` in favour
+>   of the TS-aware one. Carry the offs across or oxlint's defaults will
+>   turn them back on.
+> - The `no-restricted-imports` override for `**/vitest.config.ts` does
+>   **not** match the root `vitest.executed.config.ts` added since this plan
+>   was written. Widen the glob to `**/vitest*.config.ts` when porting, and
+>   check whether the executed config currently passes only because that
+>   override is missing.
+> - `eslint-plugin-tailwindcss` is a devDependency that `eslint.config.js`
+>   never imports. There is nothing to map; it is a plain uninstall in
+>   Task 8, and `README.md` line 145 is claiming a constraint that no
+>   longer exists.
+> - `eslintPluginImportX.flatConfigs.recommended`, the TanStack
+>   `flat/recommended` configs, and `js.configs.recommended` +
+>   `tseslint.configs.recommended` are all pulled in wholesale. Enumerate
+>   what those actually enable before assuming oxlint's presets match.
+
+Ignores must include today's list, which grew after this plan was written:
+`**/dist/**`, a nested bare `dist`, `.agents/**`, `.claude` and
+`.claude/**`, `agent-skills/**`, `apps/desktop/build|bundle|.electrobun-cache`,
+`playwright-report/**`, `src/i18n/locales/**/messages.ts`, `.temp/**`,
+`supabase/.temp/**`, and (in a later config block)
+`shared/types/database.types.ts` and `src/i18n/locales/*/messages.ts`.
+
+> **Refresh 2026-08-21:** `playwright-report/**`, `.temp/**`, and
+> `supabase/.temp/**` are new since 2026-08-16. Each was added because
+> `pnpm lint` failed on gitignored-but-still-linted build or scratch output,
+> and each failure was machine-dependent (it reproduced only where the e2e
+> suite or the local Supabase stack had been run, and passed in CI where it
+> had not). Read the comments on those entries in `eslint.config.js` before
+> porting; dropping one reintroduces a bug that took a real debugging
+> session to find.
 
 Also enable, because the review skill already treats them as mechanical and
 oxlint has them natively (do not wait for the Avandar plugin):
@@ -708,7 +963,12 @@ in Task 8, not mixed into the config commit if the diff is large.
 - Delete: `eslint.config.js`
 - Modify: `.cursor/rules/global.mdc` (Linter line)
 - Modify: `README.md`
-- Modify: `scripts/verify-packages.sh` comment that names `eslint.config.js`
+- Modify: `scripts/verify-packages.sh` line 30 comment that names
+  `eslint.config.js`
+- Modify: `docs/code-reviews/extra-checklist.md` line 52, which tells review
+  agents that "ESLint's `no-restricted-imports` already blocks them there"
+- Modify: `README.md` line 145 (the TailwindCSS-v3-because-of-
+  `eslint-plugin-tailwindcss` rationale dies with the uninstall)
 
 **Interfaces:**
 
@@ -752,6 +1012,14 @@ Format script Stage 8:
 pnpm exec oxlint --fix "${JSTS[@]}" >&2 || true
 ```
 
+> **Refresh 2026-08-21:** the line being replaced is
+> `pnpm exec eslint --fix --no-warn-ignored "${JSTS[@]}"`. `--no-warn-ignored`
+> is ESLint-specific and exists because the script passes explicit paths that
+> may be ignored by config. Check what oxlint does when handed an explicitly
+> ignored path: if it warns or exits non-zero, find the equivalent flag
+> rather than dropping the behaviour. The `|| true` masks the exit code but
+> not the noise.
+
 - [ ] **Step 2: Remove the Vite ESLint overlay**
 
 Delete `import eslintPlugin from "@nabla/vite-plugin-eslint"` and
@@ -767,10 +1035,19 @@ rm eslint.config.js
 
 - [ ] **Step 4: Docs**
 
-`.cursor/rules/global.mdc`: `Linter: Oxlint` (drop "ESLint v9").
-`README.md`: pre-push uses oxlint --fix.
-`scripts/verify-packages.sh`: the comment about `packages/**` in
+`.cursor/rules/global.mdc` lines 30 to 31: `Linter: Oxlint` (drop "ESLint
+v9"); the Formatter line was already handled in Task 3.
+`README.md` line 48: pre-push uses oxlint --fix.
+`README.md` line 145: TailwindCSS is no longer held at v3 by
+`eslint-plugin-tailwindcss`. Either state the real reason it is still on v3
+or drop the parenthetical, and confirm with the user before implying a v4
+upgrade is now unblocked.
+`scripts/verify-packages.sh` line 30: the comment about `packages/**` in
 `eslint.config.js` should name `.oxlintrc.json`.
+`docs/code-reviews/extra-checklist.md` line 52: "ESLint's
+`no-restricted-imports`" becomes oxlint's. This file is read by
+`avandar-code-review` at review time, so a stale tool name here sends review
+agents looking for a linter that is gone.
 
 - [ ] **Step 5: Verify**
 
@@ -852,9 +1129,49 @@ file's AST/text without the type checker, without walking other files
 parsers. Native oxlint that already covers a type-2 rule counts as
 covered: put it in `.oxlintrc.json`, not the plugin.
 
+> **Refresh 2026-08-21:** the sweep is no longer hypothetical. Measured
+> drift from `20733aab` to `09a59226` in the review surface:
+>
+> | File | Delta |
+> | --- | --- |
+> | `avandar-code-review/SKILL.md` | +382 / -75 |
+> | `docs/code-reviews/react-checklist.md` | +52 |
+> | `docs/code-reviews/tests-checklist.md` | +56 |
+> | `docs/code-reviews/comments-checklist.md` | +4 |
+> | `docs/code-reviews/module-checklist.md` | +4 |
+> | `docs/code-reviews/typescript-checklist.md` | +4 |
+> | repo-local `docs/code-reviews/extra-checklist.md` | +17 |
+> | `docs/rules/testing.md` | +63 |
+> | `docs/rules/typescript.md` | +46 |
+>
+> Commits: `0fbc436e` (concatenatable focused Auto reviews), `2db4a395`
+> (tests-focused Auto review pack), `aa09038a` (internal dashboard sharing).
+> Start the sweep from
+> `git diff 20733aab..HEAD -- agent-skills/public-skills/skills/avandar-code-review docs/code-reviews docs/rules`;
+> it is a much cheaper entry point than a cold read, though Step 1 still
+> requires the full read afterwards.
+>
+> The structural change matters more than the line counts. `SKILL.md` gained
+> a **Focused Reviews** section (around lines 89 to 270) defining four
+> concatenatable packs (`docstrings`, `files`, `naming`, `tests`), each with
+> its own find lane, plus a "Focused-review find lanes" table and a
+> fan-out threshold. Those packs carry their own find instructions,
+> independent of General Checks and the phase checklists. Every "delete the
+> find grep" instruction in Tasks 14 and 19 has to cover the focused packs
+> too, or a deleted rule keeps getting hunted through
+> `avandar-code-review naming` while the full review no longer looks for it.
+>
+> Two things do **not** need changing, checked on 2026-08-21: the
+> "Public Core And Repo-Local Rules" heading that Task 14 anchors the Lint
+> Plugin Gate to still exists (`SKILL.md` line 20), and the
+> "Lint And Typecheck After Review" section is tool-agnostic (it inspects
+> `package.json` `scripts` and runs `pnpm lint`), so replacing ESLint with
+> oxlint needs no edit there.
+
 - [ ] **Step 1: Read every file in the list above end to end.** Do not
       skim. New bullets, new checklists, and repo-local extra phases all
       count. If `extra-checklist.md` points at more files, follow them.
+      Include the Focused Reviews packs and their find lanes.
 
 - [ ] **Step 2: Classify every rule** into type 1, 2, or 3. Closed
       denylists are type 1. Open naming / comment quality / architecture
@@ -909,6 +1226,32 @@ unchanged.
 - Consumes: oxlint CLI, fixture source strings.
 - Produces: `runOxlintFixture({ rule, code, fix? })` → `{ diagnostics,
 output }`. Plugin `meta.name` is `avandar` so rules are `avandar/foo`.
+
+> **Refresh 2026-08-21:** decide where these tests run before writing them.
+> Root `vite.config.ts` sets `test.exclude` to `defaultExclude` plus
+> `tests/e2e/**/*.spec.ts`, `.agents/**`, `.claude/**`, `apps/**`,
+> `packages/**`, and `**/*.executed.test.ts`. A new top-level
+> `eslint-plugin-avandar/` matches none of those, so
+> `eslint-plugin-avandar/rules/*.test.ts` would be picked up by
+> `pnpm test:frontend` and run under `environment: "jsdom"` with
+> `setupFiles: "./tests/vitest.setup.ts"`. These tests shell out to
+> `pnpm exec oxlint` per fixture: they want a node environment, no setup
+> file, and a generous timeout, and they will be slow.
+>
+> Recommended: add `"eslint-plugin-avandar/**"` to `test.exclude` in
+> `vite.config.ts`, give the plugin its own `vitest.config.ts`
+> (`environment: "node"`, no setup file), add a root
+> `"test:lint-plugin": "pnpm exec vitest run --root eslint-plugin-avandar"`
+> script, and register it in `scripts/runAllTests.sh`, which enumerates
+> suites explicitly rather than globbing. Note that the plugin dir is
+> deliberately not a workspace member, so `pnpm --filter` will not reach it;
+> that is why the script is a root script. Also note the root `test:frontend`
+> script passes its own `--exclude` flags, which **replace** rather than
+> extend the config's `exclude` array in some Vitest versions: verify which
+> behaviour this version has before relying on the config change alone.
+>
+> Task 20 Step 1 assumes `pnpm exec vitest run eslint-plugin-avandar`
+> works from the repo root; keep whatever you choose consistent with it.
 
 - [ ] **Step 1: Plugin package (not published, not a workspace member)**
 
@@ -1372,6 +1715,15 @@ type-2 disable is almost always wrong; report it unless the reason names
 a genuine parser/false-positive.
 ```
 
+> **Refresh 2026-08-21:** the deletion list below predates the Focused
+> Reviews section in `SKILL.md`. For every rule you delete, check all four
+> places it can live: General Checks, the phase checklist, the **focused
+> pack** that covers it (`docstrings`, `files`, `naming`, `tests`), and that
+> pack's entry in the "Focused-review find lanes" table. The `naming` and
+> `docstrings` packs in particular overlap heavily with the type-2 rules
+> below. Missing one means `avandar-code-review naming` keeps hunting a rule
+> that oxlint already auto-fixes.
+
 Then delete from checklists (including **Find candidates** greps):
 
 - Em dash in comments (`SKILL.md` General Checks + comments-checklist)
@@ -1726,6 +2078,15 @@ Delete the **Find candidates** bash block for file length in `SKILL.md`
 directory-module "this is bad / this is good" tree, plus the migration
 exception (now also an oxlint ignore).
 
+> **Refresh 2026-08-21:** the `files` focused pack is the one most likely to
+> be a pure duplicate of `avandar/max-file-lines` after this task, and the
+> `naming` pack of `avandar/no-vague-identifiers`. Do not just prune their
+> find lanes: decide with the user whether either pack still has a reason to
+> exist once its gate is a lint error, and delete the pack (and its row in
+> the "Focused-review find lanes" table, and its name in the `Invocation`
+> section) if it does not. A pack that only re-finds lint errors is worse
+> than no pack, because it invites agents to re-litigate a green lint run.
+
 Delete vague-name find guidance that duplicates `next`/`prev`/`val`/`n`.
 Keep "avoid abbreviations" and conversion `to`/`from` naming (type 3 /
 deferred).
@@ -1771,10 +2132,29 @@ Expected: all exit 0.
 
 ```bash
 rg -n '"eslint"|eslint\\.config|from "eslint"' package.json apps/pipeline-server/package.json apps/dev-fanout-server/package.json vite.config.ts
+rg -n 'eslint|prettier' README.md .cursor/rules/global.mdc scripts/verify-packages.sh docs/code-reviews/extra-checklist.md
+rg -n 'prettier-ignore' --glob '!node_modules' --glob '*.ts' --glob '*.tsx' .
 ```
 
-Expected: no CLI/config hits. `eslint-plugin-import-x` and
-`eslint-plugin-avandar` mentions are allowed.
+Expected: no CLI/config hits from the first command.
+`eslint-plugin-import-x` and `eslint-plugin-avandar` mentions are allowed.
+The second command must show no stale tool names (Task 3 and Task 8 cover
+`README.md` lines 48 and 145, `global.mdc` lines 30 to 31,
+`verify-packages.sh` line 30, and `extra-checklist.md` line 52). The third
+must return nothing: every `// prettier-ignore` was translated or deleted in
+Task 5 Step 0, and Prettier no longer parses those files.
+
+- [ ] **Step 3a: Confirm the format script and its ignore file agree**
+
+```bash
+pnpm format
+git status --porcelain
+```
+
+Expected: exit 0 with no rewrites on a clean tree. `pnpm format` is what the
+`pre-push` hook runs, so a disagreement between `.oxfmtignore`,
+`.prettierignore`, and `scripts/format-changed-files/ignore-patterns.txt`
+shows up here as an unpushable branch rather than as a lint failure.
 
 - [ ] **Step 4: No extra commit unless something failed and you fixed it**
 
@@ -1800,7 +2180,7 @@ Expected: no CLI/config hits. `eslint-plugin-import-x` and
 
 | Layer                                                              | Owns                                                       |
 | ------------------------------------------------------------------ | ---------------------------------------------------------- |
-| oxfmt                                                              | JS/TS/JSON/CSS/MD layout, import sort, Tailwind class sort |
+| oxfmt                                                              | JS/TS/JSON/CSS layout, import sort, Tailwind class sort. **Not** markdown: `.oxfmtignore` excludes `*.md`, matching what `pnpm format` skips today. Reformatting markdown repo-wide is a separate decision. |
 | Prettier                                                           | `supabase/schemas/**/*.sql` only                           |
 | oxlint native + jsPlugins (TanStack, import-x unresolved, max-len) | today's ESLint policy                                      |
 | `avandar/*` type 2                                                 | mechanical rewrites; skill deleted                         |

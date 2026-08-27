@@ -69,7 +69,7 @@ apply it with these repo-local specifics:
   from that (no retry loop, no second reload, no raised timeout), so this flake
   presents as a **hard failure**, not a slow pass. Writes are also throttled, so
   a `page.goto` within roughly a second of a mutation restores the
-  _pre-mutation_ snapshot. Real case: `dataset-sharing`'s tag-share test created
+  *pre-mutation* snapshot. Real case: `dataset-sharing`'s tag-share test created
   a user group, navigated, and could not find it in the members drawer again.
 - `page.goto` is correct for the first landing after sign-in, or when the test
   deliberately exercises a cold reload. Flag a mid-flow `page.goto` whose
@@ -117,7 +117,7 @@ apply it with these repo-local specifics:
 
 **A `toPass` body must converge, not toggle**
 
-- `toPass` re-runs its whole body, so an action that _toggles_ state undoes the
+- `toPass` re-runs its whole body, so an action that *toggles* state undoes the
   previous attempt. Flag a retry body that clicks a dropdown, checkbox, or
   disclosure unconditionally: it closes what the last attempt opened and halves
   the effective retries while still reading like a normal retry loop. Real case:
@@ -135,7 +135,7 @@ apply it with these repo-local specifics:
 
 **Seed the minimum the assertion needs**
 
-- A test that asserts _rendering_ (a chart/element appears) should seed a
+- A test that asserts *rendering* (a chart/element appears) should seed a
   constant/literal result, not build and query a real dataset, so it does not
   inherit the data pipeline's flakiness. Query a real dataset only when the
   query itself is under test. Example: `save-to-dashboard-renders` seeds its bar

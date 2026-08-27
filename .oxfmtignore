@@ -19,6 +19,14 @@ src/i18n/locales/*/messages.ts
 # Prettier owns SQL. oxfmt must never touch it.
 *.sql
 
+# Markdown and generated files, matching the `\.md$` and `\.gen\.` entries in
+# `scripts/format-changed-files/ignore-patterns.txt`. Nothing has ever
+# reformatted prose here, and a whole-tree run would rewrite every table in
+# `docs/`. `*.gen.*` also covers `src/routeTree.gen.ts`, which stays listed
+# above so the reason for excluding it is readable on its own.
+*.md
+*.gen.*
+
 # Trees ESLint already excludes, kept in sync so the formatter and the linter
 # agree on what is "our" code. Most are gitignored too, but not all:
 # `agent-skills/` is vendored third-party skill content that we do not restyle,

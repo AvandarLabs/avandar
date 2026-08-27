@@ -38,11 +38,11 @@ Git tree; `AGENTS.md` defines when agents switch and restore local instances.
   guidance for an invalid project id or protected port.
 
 - [x] Write failing Vitest fixtures for canonical, changed, commented, remote,
-      and stdin configuration behavior.
+  and stdin configuration behavior.
 - [x] Run `pnpm vitest run scripts/supabase/validate-standard-local-config.test.ts`
-      and confirm the new test fails because the validator is absent.
+  and confirm the new test fails because the validator is absent.
 - [x] Implement the smallest stdin parser that reads only root and local section
-      assignments, then checks every canonical key.
+  assignments, then checks every canonical key.
 - [x] Re-run the focused Vitest test and confirm it passes.
 
 ### Task 2: Wire Git guards
@@ -62,9 +62,9 @@ Git tree; `AGENTS.md` defines when agents switch and restore local instances.
 - [x] Add working-tree and staged-index validation to `pre-commit`.
 - [x] Add target-branch validation to `pre-merge-commit`.
 - [x] Preserve pre-push ref input while validating every non-deleted local SHA
-      before its existing i18n and formatting stages.
+  before its existing i18n and formatting stages.
 - [x] Run `bash -n` for all three hooks and manually exercise the validator
-      against canonical and modified fixture input.
+  against canonical and modified fixture input.
 
 ### Task 3: Record the agent workflow
 
@@ -78,7 +78,7 @@ Git tree; `AGENTS.md` defines when agents switch and restore local instances.
 - Produces: explicit `ava supabase switch` and `ava supabase restore` rules.
 
 - [x] Add the non-`develop` migration isolation, branch-id derivation, restore,
-      and no-commit rules under the Supabase section.
+  and no-commit rules under the Supabase section.
 - [x] Verify the documented command names match the Ava CLI command source.
 
 ### Task 4: Verify the completed guard

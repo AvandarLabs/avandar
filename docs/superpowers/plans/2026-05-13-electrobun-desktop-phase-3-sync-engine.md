@@ -4,7 +4,7 @@
 >
 > **Per-step test handoff:** After completing every Step in this plan, output an enumerated list (`1.`, `2.`, `3.`, …) of the exact actions the human partner should take to verify the just-completed Step — commands to run (copy-pasteable), files or UI to inspect, and the expected result for each. Do this for every Step, including "trivial" config/file-creation steps; never skip or summarize. The list is in addition to (not a replacement for) the Manual review checkpoint at the end of each Task.
 >
-> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers _within_ a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
+> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers *within* a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` (sections "RdbClient & Local Relational Store" and "SyncEngine (V1)")
 **Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G3.x) referenced in each Task below. Phase 3 leans heavily on property-based testing (fast-check) because the failure mode is silent data loss.
@@ -12,7 +12,6 @@
 **Goal:** Wire a complete V1 sync engine: every SQLite write enqueues an outbox row in the same transaction; a push loop drains the outbox to Supabase; a pull loop fetches deltas back; LWW resolves conflicts. Parquet files marked `online_storage_allowed` upload on reconnect via resumable TUS. UI shows sync status.
 
 **Architecture:**
-
 - Per-row sync columns (`_local_updated_at`, `_server_updated_at`, `_sync_state`, `_deleted_at`) are added to every syncable SQLite table via a migration.
 - Three new sync tables: `sync_outbox` (relational mutations queued for push), `parquet_blob_outbox` (queued blob uploads), `sync_cursor` (per-table pull cursor).
 - `createSqliteCrudClient` wraps every write so the data write + outbox row are in **one** SQLite transaction. Non-negotiable invariant for crash safety.
@@ -22,7 +21,6 @@
 **Tech Stack:** bun:sqlite, Bun's `fetch`, TUS protocol for resumable uploads (port the existing `DatasetParquetStorageClient` TUS logic from web to Bun), `node:net` for network online detection.
 
 **Phase exit criteria:**
-
 1. Mutating a row on desktop while offline → enqueues to `sync_outbox`; on reconnect, observed on Supabase.
 2. Updating the same row on Supabase (web) → observed on desktop within ~30s when online.
 3. Concurrent edits resolved by LWW (the later `_local_updated_at`/`updated_at` wins) and `_sync_state` is `clean` afterward.
@@ -37,22 +35,18 @@
 ## File Structure
 
 **New: SQLite migration adding sync columns + sync tables**
-
-- `apps/desktop/migrations/9999_phase3_sync_schema.sql` — appended _after_ generated migrations (filename chosen to sort last; rename when integrating with the generator's numbering)
+- `apps/desktop/migrations/9999_phase3_sync_schema.sql` — appended *after* generated migrations (filename chosen to sort last; rename when integrating with the generator's numbering)
 - `apps/desktop/sync/sync-schema.test.ts` — verifies sync columns exist on every `SYNCABLE_TABLES` entry
 
 **New: Sync types**
-
 - `apps/desktop/main/services/sync/types.ts` — `OutboxRow`, `ParquetOutboxRow`, `SyncCursorRow`
 
 **New: Outbox-aware write helper**
-
 - `packages/shared/clients/src/SqliteCrudClient/withOutbox.ts` — wraps a write in a transaction that also inserts to `sync_outbox`
 - `packages/shared/clients/src/SqliteCrudClient/withOutbox.test.ts`
 - Modify: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts` — use `withOutbox`
 
 **New: Sync engine in Bun main**
-
 - `apps/desktop/main/services/sync/SyncEngine.ts` — orchestrator
 - `apps/desktop/main/services/sync/SyncEngine.test.ts`
 - `apps/desktop/main/services/sync/PushLoop.ts` — relational push
@@ -67,21 +61,17 @@
 - `apps/desktop/main/platform/network.ts` — OS network change events
 
 **New: Sync IPC**
-
 - `packages/shared/platform/src/ipc/contracts.ts` — add `SyncContracts` block
 - `apps/desktop/main/ipc/sync.ts` — register handlers
 
 **New: Desktop sync provider**
-
 - `packages/shared/platform/src/desktop/DesktopSyncEngine.ts`
 
 **New: UI**
-
 - `packages/web/components/src/SyncStatusIndicator/SyncStatusIndicator.tsx` (or matching location in the codebase)
 - `packages/web/components/src/SyncStatusIndicator/SyncStatusIndicator.test.tsx`
 
 **Modified:**
-
 - `apps/desktop/main/index.ts` — start the sync engine after services initialize
 - Root layout (`src/routes/__root.tsx` or equivalent) — mount the `SyncStatusIndicator`
 
@@ -92,13 +82,11 @@
 **Test groupings:** G3.1 (Sync schema migration — all _sync_* columns present per syncable table; bookkeeping tables exist; idempotent on rerun).
 
 **PR boundaries:** 1 PR.
-
 - PR 1: All Steps — new migration SQL file plus its idempotency test; the migration only runs on next desktop launch and the web app never touches SQLite, so `pnpm test`/`type-check`/`lint`/CI stay green and current users are unaffected.
 
 Add per-row sync columns to every `SYNCABLE_TABLES` table, plus the three sync engine tables.
 
 **Files:**
-
 - Create: `apps/desktop/migrations/9999_phase3_sync_schema.sql`
 - Test: `apps/desktop/sync/sync-schema.test.ts`
 
@@ -222,12 +210,8 @@ describe("sync schema", () => {
         .query<{ name: string }, []>(`pragma table_info(${table})`)
         .all()
         .map((r) => r.name);
-      expect(cols, `${table} missing _local_updated_at`).toContain(
-        "_local_updated_at",
-      );
-      expect(cols, `${table} missing _server_updated_at`).toContain(
-        "_server_updated_at",
-      );
+      expect(cols, `${table} missing _local_updated_at`).toContain("_local_updated_at");
+      expect(cols, `${table} missing _server_updated_at`).toContain("_server_updated_at");
       expect(cols, `${table} missing _sync_state`).toContain("_sync_state");
       expect(cols, `${table} missing _deleted_at`).toContain("_deleted_at");
     }
@@ -266,23 +250,19 @@ Expected: green.
 - [ ] **Step 4: Manual review checkpoint (do NOT commit)**
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test apps/desktop/sync/sync-schema.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
-
 Expected: schema test green; typecheck clean.
 
 **Verify:**
-
 - Open `apps/desktop/migrations/9999_phase3_sync_schema.sql` and confirm every table listed in `SYNCABLE_TABLES` has all four sync columns (`_local_updated_at`, `_server_updated_at`, `_sync_state`, `_deleted_at`) — eyeball the manifest against the migration, do not trust the test alone to catch missing tables.
 - Confirm `sync_outbox`, `parquet_blob_outbox`, and `sync_cursor` are all created with the expected columns and indexes per the plan.
 - The migration filename sorts last in `apps/desktop/migrations/` so it applies after generated migrations.
 - Test groupings G3.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual smoke test (desktop app — `pnpm dev:desktop`):**
-
 1. Delete any existing local SQLite file so migrations re-apply from a clean slate: `rm "$HOME/Library/Application Support/Avandar/metadata.sqlite"` (adjust the bundle path if different).
 2. Launch the desktop app and sign in so the DB initializes and migrations run.
 3. Inspect the schema directly:
@@ -305,15 +285,13 @@ Expected: `.schema` output matches the SQL in `9999_phase3_sync_schema.sql`; `pr
 **Test groupings:** G3.2 (Outbox/data atomicity property test — fast-check random sequences of writes with injected failures at each tx step; invariant: count(outbox per row_id) ∈ {0, 1} always, never partial; the highest-leverage test in the entire project).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: `withOutbox` helper module + its atomicity property test — the helper is new, nothing imports it from a hot path yet, so `pnpm test`/`type-check`/`lint`/CI stay green and behavior is unchanged.
 - PR 2: Migrate `createSqliteCrudClient` write paths to use `withOutbox` — integration boundary where the atomicity invariant goes live; web app continues to talk to Supabase directly and only desktop's SQLite writes are touched.
-  (Manual review checkpoint Steps are gates between PRs.)
+(Manual review checkpoint Steps are gates between PRs.)
 
 The critical invariant: every CRUD mutation appends to `sync_outbox` **in the same SQLite transaction** as the data write. Implement once in a helper; call from every mutation path.
 
 **Files:**
-
 - Create: `packages/shared/clients/src/SqliteCrudClient/withOutbox.ts`
 - Test: `packages/shared/clients/src/SqliteCrudClient/withOutbox.test.ts`
 - Modify: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
@@ -378,11 +356,7 @@ describe("writeWithOutbox", () => {
     __setIpcBridgeForTests({ send: sendMock, once: onceMock });
     onceMock.mockImplementation((_channel, cb) => {
       Promise.resolve().then(() =>
-        cb({
-          id: (sendMock.mock.calls[0]?.[1] as { id: string }).id,
-          ok: true,
-          result: { changes: 1 },
-        }),
+        cb({ id: (sendMock.mock.calls[0]?.[1] as { id: string }).id, ok: true, result: { changes: 1 } }),
       );
     });
 
@@ -432,9 +406,7 @@ export type WriteWithOutboxArgs = {
   readonly payload: Readonly<Record<string, unknown>>;
 };
 
-export async function writeWithOutbox(
-  args: WriteWithOutboxArgs,
-): Promise<void> {
+export async function writeWithOutbox(args: WriteWithOutboxArgs): Promise<void> {
   await callIpc(RdbContracts.runWithOutbox, {
     tableName: args.tableName,
     rowId: args.rowId,
@@ -548,13 +520,7 @@ describe("write atomicity (integration)", () => {
       ).run("d1", "Demo", Date.now());
       db.prepare(
         "insert into sync_outbox (table_name, row_id, op, payload, created_at) values (?, ?, ?, ?, ?)",
-      ).run(
-        "datasets",
-        "d1",
-        "insert",
-        '{"id":"d1","name":"Demo"}',
-        Date.now(),
-      );
+      ).run("datasets", "d1", "insert", '{"id":"d1","name":"Demo"}', Date.now());
     });
     tx();
 
@@ -608,17 +574,14 @@ Expected: green.
 This is the single most important review in Phase 3. A bug here causes silent data loss (a data write lands without an outbox row, or vice-versa). Do not skim.
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test packages/shared/clients/src/SqliteCrudClient/withOutbox.test.ts
 pnpm --filter @avandar/desktop test apps/desktop/main/ipc/rdb.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
-
 Expected: all tests green; typecheck clean.
 
 **Verify (code review — do NOT rely on tests alone):**
-
 - Open `apps/desktop/main/ipc/rdb.ts` `runWithOutbox` handler. Confirm the data `INSERT/UPDATE/DELETE` AND the `insert into sync_outbox` are inside the SAME `db.transaction(() => { ... })` block, with no early returns, awaits, or exception swallowing between them.
 - Open `packages/shared/clients/src/SqliteCrudClient/withOutbox.ts`. Confirm every mutation path (insert, update, delete) routes through `runWithOutbox` — there is no bypass that calls `rdb.run(...)` directly for a syncable table.
 - Open `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`. Search the diff for any remaining direct `db.run`, `db.prepare(...).run`, or unwrapped IPC `run` call on a syncable table. There should be none.
@@ -626,7 +589,6 @@ Expected: all tests green; typecheck clean.
 - Test groupings G3.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual integrity test (the failure mode is crash-mid-flight; reproduce it):**
-
 1. Start the desktop app with the network disabled.
 2. Open the SQLite DB in a second terminal: `sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite"`. Note current `sync_outbox` row count.
 3. In the UI, create or rename an entity (e.g. a dataset). Watch the outbox count tick up by exactly 1.
@@ -648,13 +610,11 @@ Expected: zero divergence between data writes and outbox entries across all forc
 **Test groupings:** G3.3 (LWW pure-fn truth table — {local, server} × {live, tombstone, missing} × {<, =, >}, ~27 cases); G3.4 (LWW property tests via fast-check — idempotency, tie-determinism, tombstone-monotonicity).
 
 **PR boundaries:** 1 PR.
-
 - PR 1: All Steps — pure function module + truth-table tests + fast-check property tests; no caller imports it yet, so the web app is unaffected and all CI gates remain green.
 
 The conflict-resolution rule is a small pure function — testable without IO.
 
 **Files:**
-
 - Create: `apps/desktop/main/services/sync/Lww.ts`
 - Test: `apps/desktop/main/services/sync/Lww.test.ts`
 
@@ -765,16 +725,13 @@ pnpm --filter @avandar/desktop test
 `resolveLww` is a pure function — review is unit-test-driven, no smoke test needed.
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/Lww.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
-
 Expected: all 4 cases green (server-later, local-later, tie-server-wins, tombstone-always-wins); typecheck clean.
 
 **Verify:**
-
 - Read `apps/desktop/main/services/sync/Lww.ts`. Confirm the function is pure: no IO, no `Date.now()`, no module-level mutable state, no logging side effects.
 - Confirm tombstone precedence: `serverRow._deleted_at != null` causes the server to win regardless of `localUpdatedAt` (this is intentional — deletes propagate).
 - Confirm tie-breaking is `server` (server is canonical) — the test asserts this and the implementation must use `>` not `>=` for local-wins.
@@ -790,13 +747,11 @@ Expected: all 4 cases green (server-later, local-later, tie-server-wins, tombsto
 **Test groupings:** G3.5 (NetworkProbe — fake timers; start() idempotent; rapid flap collapses to single transitions; stop() mid-flight aborts cleanly).
 
 **PR boundaries:** 1 PR.
-
 - PR 1: All Steps — NetworkProbe state machine + unit tests with fake timers; nothing wires it into the orchestrator yet, so it's dormant code and the web app is untouched.
 
 Detect online/offline state. Simple poll-based for V1; OS-level network change events as a V2 nicety.
 
 **Files:**
-
 - Create: `apps/desktop/main/services/sync/NetworkProbe.ts`
 - Test: `apps/desktop/main/services/sync/NetworkProbe.test.ts`
 
@@ -933,16 +888,13 @@ pnpm --filter @avandar/desktop test
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/NetworkProbe.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
-
 Expected: probe transitions tested with fake timers/fake fetch are green; typecheck clean.
 
 **Verify:**
-
 - Open `apps/desktop/main/services/sync/NetworkProbe.ts`. Confirm:
   - Listener `onChange` callbacks only fire on actual state transitions, never on duplicate same-state polls (avoids log spam and redundant loop wake-ups).
   - `stop()` clears the interval and is idempotent (calling twice does not crash).
@@ -950,7 +902,6 @@ Expected: probe transitions tested with fake timers/fake fetch are green; typech
 - Test groupings G3.5 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual smoke test (desktop app — `pnpm dev:desktop`):**
-
 1. Start the app online; confirm the in-app sync indicator (or, if Task 9 not built yet, the main-process logs) shows `online`.
 2. Disable Wi-Fi from the macOS menu bar (or run `sudo ifconfig en0 down`).
 3. Within one probe interval (per `NetworkProbe.ts`, typically 5–15s), watch logs / status flip to `offline`. Confirm only ONE transition event is logged (no duplicates).
@@ -968,15 +919,13 @@ Expected: clean `online ↔ offline` transitions logged once each, no spurious e
 **Test groupings:** G3.6 (PushLoop drain order, batch boundary, backoff math, transient-vs-permanent classification); G3.7 (PushLoop duplicate-delivery idempotency property — fast-check crash after Supabase ack but before outbox delete; assert server-side row count = 1 after replay).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: PushLoop module + unit tests + duplicate-delivery property tests with mocked Supabase REST; orchestrator does not import it yet, so it's dormant and CI stays green.
 - PR 2: Integration test against the real `sync_outbox` shape from Task 2 — purely additive test coverage, no runtime wiring; safe to merge independently.
-  (Manual review checkpoint Steps are gates between PRs.)
+(Manual review checkpoint Steps are gates between PRs.)
 
 Drains `sync_outbox` to Supabase.
 
 **Files:**
-
 - Create: `apps/desktop/main/services/sync/PushLoop.ts`
 - Test: `apps/desktop/main/services/sync/PushLoop.test.ts`
 
@@ -1014,7 +963,9 @@ describe("drainPushQueue", () => {
     );
 
     const rest = {
-      apply: vi.fn().mockResolvedValueOnce({ ok: true, serverUpdatedAt: 1500 }),
+      apply: vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, serverUpdatedAt: 1500 }),
     };
     const result = await drainPushQueue({
       db,
@@ -1025,9 +976,7 @@ describe("drainPushQueue", () => {
 
     expect(result.successCount).toBe(1);
     expect(result.errorCount).toBe(0);
-    const remaining = db
-      .query<{ id: number }, []>("select id from sync_outbox")
-      .all();
+    const remaining = db.query<{ id: number }, []>("select id from sync_outbox").all();
     expect(remaining).toEqual([]);
 
     const row = db
@@ -1050,9 +999,7 @@ describe("drainPushQueue", () => {
     );
 
     const rest = {
-      apply: vi
-        .fn()
-        .mockResolvedValueOnce({ ok: false, transient: true, error: "503" }),
+      apply: vi.fn().mockResolvedValueOnce({ ok: false, transient: true, error: "503" }),
     };
     const result = await drainPushQueue({
       db,
@@ -1063,11 +1010,7 @@ describe("drainPushQueue", () => {
 
     expect(result.successCount).toBe(0);
     expect(result.errorCount).toBe(1);
-    const row = db
-      .query<{ attempts: number; last_error: string }, []>(
-        "select attempts, last_error from sync_outbox",
-      )
-      .get()!;
+    const row = db.query<{ attempts: number; last_error: string }, []>("select attempts, last_error from sync_outbox").get()!;
     expect(row.attempts).toBe(1);
     expect(row.last_error).toContain("503");
     db.close();
@@ -1086,11 +1029,7 @@ describe("drainPushQueue", () => {
     );
 
     const rest = {
-      apply: vi.fn().mockResolvedValueOnce({
-        ok: false,
-        transient: false,
-        error: "FK violation",
-      }),
+      apply: vi.fn().mockResolvedValueOnce({ ok: false, transient: false, error: "FK violation" }),
     };
     await drainPushQueue({
       db,
@@ -1099,11 +1038,7 @@ describe("drainPushQueue", () => {
       batchSize: 10,
     });
 
-    const row = db
-      .query<{ _sync_state: string }, []>(
-        "select _sync_state from datasets where id='d1'",
-      )
-      .get()!;
+    const row = db.query<{ _sync_state: string }, []>("select _sync_state from datasets where id='d1'").get()!;
     expect(row._sync_state).toBe("conflict");
     db.close();
   });
@@ -1285,9 +1220,7 @@ export function createSupabaseRestClient(): SupabaseRestClient {
     }
 
     if (res.ok) {
-      const body = (await res.json()) as Array<{
-        updated_at?: string | number;
-      }>;
+      const body = (await res.json()) as Array<{ updated_at?: string | number }>;
       const updatedAt =
         body[0]?.updated_at !== undefined
           ? Number(new Date(body[0]!.updated_at as string).getTime())
@@ -1297,11 +1230,7 @@ export function createSupabaseRestClient(): SupabaseRestClient {
     if (res.status >= 500 || res.status === 429) {
       return { ok: false, transient: true, error: `${res.status}` };
     }
-    return {
-      ok: false,
-      transient: false,
-      error: `${res.status} ${await res.text()}`,
-    };
+    return { ok: false, transient: false, error: `${res.status} ${await res.text()}` };
   }
 
   return { selectAll, selectChangedSince, apply };
@@ -1313,16 +1242,13 @@ export function createSupabaseRestClient(): SupabaseRestClient {
 - [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/PushLoop.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
-
 Expected: success-path, transient-failure-with-retry, and permanent-failure-marks-error tests all green; typecheck clean.
 
 **Verify:**
-
 - Open `apps/desktop/main/services/sync/PushLoop.ts`. Confirm:
   - On success: outbox row is deleted, `_sync_state` flips to `clean`, `_server_updated_at` is written, all inside one SQLite transaction.
   - On transient (5xx / 429) failure: outbox row is retained, `attempts` is incremented, no `_sync_state` change.
@@ -1331,7 +1257,6 @@ Expected: success-path, transient-failure-with-retry, and permanent-failure-mark
 - Test groupings G3.6, G3.7 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual smoke test (desktop app — `pnpm dev:desktop`):**
-
 1. Sign in online; confirm baseline `select count(*) from sync_outbox;` is 0.
 2. Disable network (Wi-Fi off or `sudo ifconfig en0 down`).
 3. In the UI, perform 3 distinct edits to syncable rows (e.g. rename a dataset, edit a dashboard, create a new entity).
@@ -1356,15 +1281,13 @@ Expected: outbox drains to empty within seconds of reconnect; data rows transiti
 **Test groupings:** G3.8 (PullLoop cursor monotonicity, tombstone propagation, per-table cursor isolation, LWW-skipped-row still advances cursor); G3.9 (PullLoop ↔ PushLoop race — server-wins pull deletes outbox row; subsequent push response writes to a now-different row state).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: PullLoop module + unit tests including LWW-vs-outbox race coverage; nothing wires it in, so it's dormant and the web app is unaffected.
 - PR 2: Cross-loop race tests using PullLoop and PushLoop together — additive test-only PR; both modules already exist and are still unwired, so CI stays green.
-  (Manual review checkpoint Steps are gates between PRs.)
+(Manual review checkpoint Steps are gates between PRs.)
 
 Pulls Supabase deltas into local SQLite; resolves conflicts via LWW.
 
 **Files:**
-
 - Create: `apps/desktop/main/services/sync/PullLoop.ts`
 - Test: `apps/desktop/main/services/sync/PullLoop.test.ts`
 
@@ -1436,14 +1359,9 @@ describe("drainPullQueue", () => {
 
     expect(result.totalInserted).toBe(2);
     const rows = db
-      .query<{ id: string; name: string }, []>(
-        "select id, name from datasets order by id",
-      )
+      .query<{ id: string; name: string }, []>("select id, name from datasets order by id")
       .all();
-    expect(rows).toEqual([
-      { id: "a", name: "Alpha" },
-      { id: "b", name: "Bravo" },
-    ]);
+    expect(rows).toEqual([{ id: "a", name: "Alpha" }, { id: "b", name: "Bravo" }]);
     const cursor = db
       .query<{ last_pulled_server_updated_at: number }, []>(
         "select last_pulled_server_updated_at from sync_cursor where table_name='datasets'",
@@ -1469,18 +1387,9 @@ describe("drainPullQueue", () => {
         .mockResolvedValue([]),
     };
 
-    await drainPullQueue({
-      db,
-      rest: rest as never,
-      accessToken: "tok",
-      tables: ["datasets"],
-    });
+    await drainPullQueue({ db, rest: rest as never, accessToken: "tok", tables: ["datasets"] });
 
-    const row = db
-      .query<{ name: string; _sync_state: string }, []>(
-        "select name, _sync_state from datasets where id='a'",
-      )
-      .get()!;
+    const row = db.query<{ name: string; _sync_state: string }, []>("select name, _sync_state from datasets where id='a'").get()!;
     expect(row.name).toBe("Server");
     expect(row._sync_state).toBe("clean");
   });
@@ -1501,16 +1410,9 @@ describe("drainPullQueue", () => {
         .mockResolvedValue([]),
     };
 
-    await drainPullQueue({
-      db,
-      rest: rest as never,
-      accessToken: "tok",
-      tables: ["datasets"],
-    });
+    await drainPullQueue({ db, rest: rest as never, accessToken: "tok", tables: ["datasets"] });
 
-    const row = db
-      .query<{ name: string }, []>("select name from datasets where id='a'")
-      .get()!;
+    const row = db.query<{ name: string }, []>("select name from datasets where id='a'").get()!;
     expect(row.name).toBe("Local");
   });
 });
@@ -1553,13 +1455,11 @@ export async function drainPullQueue(
   let totalSkipped = 0;
 
   for (const table of tables) {
-    const cursor = (
-      db
-        .query<{ ts: number }, []>(
-          "select coalesce((select last_pulled_server_updated_at from sync_cursor where table_name = ?), 0) as ts",
-        )
-        .get(table) ?? { ts: 0 }
-    ).ts;
+    const cursor = (db
+      .query<{ ts: number }, []>(
+        "select coalesce((select last_pulled_server_updated_at from sync_cursor where table_name = ?), 0) as ts",
+      )
+      .get(table) ?? { ts: 0 }).ts;
 
     const incoming = await rest.selectChangedSince(table, cursor, accessToken);
     if (incoming.length === 0) continue;
@@ -1576,14 +1476,13 @@ export async function drainPullQueue(
         if (serverUpdatedAt > maxUpdatedAt) maxUpdatedAt = serverUpdatedAt;
 
         const local = db
-          .query<
-            {
-              _local_updated_at: number;
-              _sync_state: string;
-              _deleted_at: number | null;
-            } & Record<string, unknown>,
-            []
-          >(`select * from ${table} where id = ? limit 1`)
+          .query<{
+            _local_updated_at: number;
+            _sync_state: string;
+            _deleted_at: number | null;
+          } & Record<string, unknown>, []>(
+            `select * from ${table} where id = ? limit 1`,
+          )
           .get(rowId);
 
         if (!local) {
@@ -1653,7 +1552,9 @@ export async function drainPullQueue(
   return { totalInserted, totalUpdated, totalSkipped };
 }
 
-function stripUpdatedAt(row: Record<string, unknown>): Record<string, unknown> {
+function stripUpdatedAt(
+  row: Record<string, unknown>,
+): Record<string, unknown> {
   const { updated_at, ...rest } = row;
   return rest;
 }
@@ -1682,16 +1583,13 @@ pnpm --filter @avandar/desktop test
 - [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/PullLoop.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
-
 Expected: pull-fetch-and-merge, LWW conflict-resolution, and cursor-advance tests green; typecheck clean.
 
 **Verify:**
-
 - Open `apps/desktop/main/services/sync/PullLoop.ts`. Confirm:
   - The pull cursor (`sync_cursor.last_pulled_server_updated_at`) is advanced only AFTER a successful local apply (so a crash mid-pull doesn't lose deltas).
   - Conflicts route through `resolveLww` (Task 3) — no ad-hoc tie-breaking in the pull path.
@@ -1700,7 +1598,6 @@ Expected: pull-fetch-and-merge, LWW conflict-resolution, and cursor-advance test
 - Test groupings G3.8, G3.9 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual smoke test (desktop app — `pnpm dev:desktop`):**
-
 1. Sign in on the desktop app. Open Supabase Studio (or the web app on a different device/browser) for the same account.
 2. Note the current value of `sync_cursor`:
    ```bash
@@ -1726,15 +1623,13 @@ Expected: cross-device edits propagate within ~30s; cursor monotonically advance
 **Test groupings:** G3.10 (ParquetUploadLoop with real mini-TUS server in vitest — resume from bytes_uploaded; 404 on HEAD → restart at 0; 409 on PATCH → re-HEAD + adjust; toggling online_storage_allowed=false mid-upload enqueues delete).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: TUS resumable upload module + mini-TUS server vitest fixture + unit tests; not invoked from anywhere yet, so it's dormant and CI stays green.
 - PR 2: Integration with `parquet_blob_outbox` + resume scenarios — exercises the Task 1 outbox shape; still unwired from orchestrator, so the web app and live desktop sessions are unaffected.
-  (Manual review checkpoint Steps are gates between PRs.)
+(Manual review checkpoint Steps are gates between PRs.)
 
 Drains `parquet_blob_outbox` to Supabase Storage. Port the existing TUS pattern from `src/clients/DatasetParquetStorageClient`.
 
 **Files:**
-
 - Create: `apps/desktop/main/services/sync/ParquetUploadLoop.ts`
 - Test: `apps/desktop/main/services/sync/ParquetUploadLoop.test.ts`
 
@@ -1779,10 +1674,9 @@ describe("drainParquetUploadQueue", () => {
     );
 
     const tus = {
-      uploadFile: vi.fn().mockResolvedValueOnce({
-        ok: true,
-        finalUrl: "https://supabase/blob/d1.parquet",
-      }),
+      uploadFile: vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, finalUrl: "https://supabase/blob/d1.parquet" }),
     };
 
     const result = await drainParquetUploadQueue({
@@ -1794,9 +1688,7 @@ describe("drainParquetUploadQueue", () => {
 
     expect(result.successCount).toBe(1);
     expect(tus.uploadFile).toHaveBeenCalled();
-    const remaining = db
-      .query<{ id: number }, []>("select id from parquet_blob_outbox")
-      .all();
+    const remaining = db.query<{ id: number }, []>("select id from parquet_blob_outbox").all();
     expect(remaining).toEqual([]);
     db.close();
   });
@@ -1849,13 +1741,7 @@ export type TusClient = {
     onProgress?: (bytesUploaded: number) => void;
   }): Promise<
     | { ok: true; finalUrl: string }
-    | {
-        ok: false;
-        transient: boolean;
-        error: string;
-        partialUrl?: string;
-        bytesUploaded?: number;
-      }
+    | { ok: false; transient: boolean; error: string; partialUrl?: string; bytesUploaded?: number }
   >;
 };
 
@@ -1880,7 +1766,7 @@ export function createTusClient(): TusClient {
           headers: {
             "Tus-Resumable": "1.0.0",
             "Upload-Length": String(totalSize),
-            Authorization: `Bearer ${accessToken}`,
+            "Authorization": `Bearer ${accessToken}`,
             "Content-Type": "application/offset+octet-stream",
           },
         });
@@ -1893,27 +1779,16 @@ export function createTusClient(): TusClient {
         }
         uploadUrl = res.headers.get("Location") ?? undefined;
         if (!uploadUrl) {
-          return {
-            ok: false,
-            transient: true,
-            error: "TUS missing Location header",
-          };
+          return { ok: false, transient: true, error: "TUS missing Location header" };
         }
       } else {
         // HEAD to determine current offset
         const head = await fetch(uploadUrl, {
           method: "HEAD",
-          headers: {
-            "Tus-Resumable": "1.0.0",
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { "Tus-Resumable": "1.0.0", Authorization: `Bearer ${accessToken}` },
         });
         if (!head.ok) {
-          return {
-            ok: false,
-            transient: true,
-            error: `TUS HEAD ${head.status}`,
-          };
+          return { ok: false, transient: true, error: `TUS HEAD ${head.status}` };
         }
         offset = Number(head.headers.get("Upload-Offset") ?? "0");
       }
@@ -1922,9 +1797,7 @@ export function createTusClient(): TusClient {
       const fd = openSync(filePath, "r");
       try {
         while (offset < totalSize) {
-          const chunk = Buffer.alloc(
-            Math.min(chunkSizeBytes, totalSize - offset),
-          );
+          const chunk = Buffer.alloc(Math.min(chunkSizeBytes, totalSize - offset));
           readSync(fd, chunk, 0, chunk.length, offset);
 
           const patch = await fetch(uploadUrl, {
@@ -2066,16 +1939,13 @@ pnpm --filter @avandar/desktop test
 - [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/ParquetUploadLoop.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
-
 Expected: tests covering TUS create, `HEAD` resume, byte-offset upload, expired URL (404 on HEAD), and successful completion are green; typecheck clean.
 
 **Verify:**
-
 - Open `apps/desktop/main/services/sync/ParquetUploadLoop.ts`. Confirm:
   - Each upload row in `parquet_blob_outbox` is uploaded via TUS — `PATCH` calls include `Upload-Offset` matching the server's `HEAD` response, NOT a stale local cache.
   - On resume, `bytes_uploaded` in `parquet_blob_outbox` is updated only after the `PATCH` actually succeeds (so a crash mid-`PATCH` will re-probe with `HEAD` on next run rather than skipping bytes).
@@ -2084,7 +1954,6 @@ Expected: tests covering TUS create, `HEAD` resume, byte-offset upload, expired 
 - Test groupings G3.10 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual smoke test (desktop app — `pnpm dev:desktop`):**
-
 1. Sign in online. Open Supabase Studio → Storage → the parquet bucket so you can watch for new files.
 2. Disable the network.
 3. In the desktop app, upload a CSV dataset that's at least a few MB (so resume is observable) with the `online_storage_allowed` option enabled.
@@ -2109,15 +1978,13 @@ Expected: uploads survive a force-quit and resume from the server-observed offse
 **Test groupings:** G3.11 (SyncEngine orchestrator convergence — seed 50 outbox rows + 3 parquet uploads + 20 server-side changes; assert convergence within N ticks; local rows == server rows); G3.12 (Convergence under random network drops via fast-check state-machine model; random sequence of local writes, server writes, network toggles, ticks; assert eventual convergence); G3.13 (Orchestrator mutex — concurrent forceSync() doesn't double-drain; assert _server_updated_at never regresses).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: Orchestrator module + unit tests + mutex/convergence/state-machine tests + `SyncContracts` IPC additions; the orchestrator exists but Bun-main never constructs it, so all sync code stays dormant and CI gates pass.
 - PR 2: **Integration boundary** — wire the orchestrator into the Bun-main entry point. THIS is the moment sync goes live for desktop users; everything before this is dormant code. Web users still hit Supabase directly via existing clients, so the web app is unaffected.
-  (Manual review checkpoint Steps are gates between PRs.)
+(Manual review checkpoint Steps are gates between PRs.)
 
 Glue the loops together; export status via IPC.
 
 **Files:**
-
 - Create: `apps/desktop/main/services/sync/SyncEngine.ts`
 - Test: `apps/desktop/main/services/sync/SyncEngine.test.ts`
 - Add: `SyncContracts` to `packages/shared/platform/src/ipc/contracts.ts`
@@ -2190,18 +2057,14 @@ export function createSyncEngine(args: SyncEngineArgs): SyncEngineWorker {
   }
 
   function computePendingCounts() {
-    const pendingRows = (
-      args.db
-        .query<{ c: number }, []>("select count(*) as c from sync_outbox")
-        .get() ?? { c: 0 }
-    ).c;
-    const pendingParquets = (
-      args.db
-        .query<{ c: number }, []>(
-          "select count(*) as c from parquet_blob_outbox where online_storage_allowed = 1",
-        )
-        .get() ?? { c: 0 }
-    ).c;
+    const pendingRows = (args.db
+      .query<{ c: number }, []>("select count(*) as c from sync_outbox")
+      .get() ?? { c: 0 }).c;
+    const pendingParquets = (args.db
+      .query<{ c: number }, []>(
+        "select count(*) as c from parquet_blob_outbox where online_storage_allowed = 1",
+      )
+      .get() ?? { c: 0 }).c;
     return { pendingRows, pendingParquets };
   }
 
@@ -2327,11 +2190,7 @@ describe("SyncEngine status transitions", () => {
 
     const engine = createSyncEngine({
       db: fakeDb,
-      rest: {
-        apply: vi.fn(),
-        selectChangedSince: vi.fn(),
-        selectAll: vi.fn(),
-      } as never,
+      rest: { apply: vi.fn(), selectChangedSince: vi.fn(), selectAll: vi.fn() } as never,
       tus: { uploadFile: vi.fn() } as never,
       network: probe as never,
       getAccessToken: () => "tok",
@@ -2406,11 +2265,7 @@ let cachedStatus: SyncStatus = { kind: "offline" };
 
 // Wire to the event channel.
 function bindStatusEvents(): void {
-  const bridge = (
-    globalThis as unknown as {
-      electrobun?: { on: (c: string, cb: (m: unknown) => void) => void };
-    }
-  ).electrobun;
+  const bridge = (globalThis as unknown as { electrobun?: { on: (c: string, cb: (m: unknown) => void) => void } }).electrobun;
   if (!bridge) return;
   bridge.on(SyncContracts.statusEvent.name, (raw: unknown) => {
     const status = (raw as { status: SyncStatus }).status;
@@ -2488,17 +2343,14 @@ window.on("closed", async () => {
 - [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/SyncEngine.test.ts
 pnpm --filter @avandar/desktop typecheck
 pnpm test
 ```
-
 Expected: orchestrator unit tests green; full repo test suite green; typecheck clean.
 
 **Verify:**
-
 - Open `apps/desktop/main/services/sync/SyncEngine.ts`. Confirm:
   - `start()` is idempotent (calling twice does not double up timers / listeners).
   - `stop()` cleanly clears all timers and removes the `NetworkProbe.onChange` listener (no leak on app close).
@@ -2509,7 +2361,6 @@ Expected: orchestrator unit tests green; full repo test suite green; typecheck c
 - Test groupings G3.11, G3.12, G3.13 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual smoke test (desktop app — `pnpm dev:desktop`) — END-TO-END HAPPY PATH:**
-
 1. Start the app online, sign in. Confirm the (Task 9) indicator shows `online-idle` (or watch main-process logs for the equivalent state line).
 2. Disable network. Confirm status flips to `offline`.
 3. While offline, perform 2 mixed actions:
@@ -2538,15 +2389,13 @@ Expected: status indicator settles on `online-idle` after both queues drain; cle
 **Test groupings:** G3.14 (Status UI component — 4 SyncStatus shapes render correctly; click → detail panel opens; unmount removes listener).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: `SyncStatusIndicator` component + its tests + integration with the existing PlatformProvider's SyncEngine; component is not yet mounted in app chrome, so the web build is unaffected.
 - PR 2: Mount the indicator into the app chrome — visible only to desktop users (web has no SyncEngine in PlatformProvider, so the indicator renders nothing / no-ops on web), keeping the web app behavior unchanged.
-  (Manual review checkpoint Steps are gates between PRs.)
+(Manual review checkpoint Steps are gates between PRs.)
 
 Small React component in the app chrome.
 
 **Files:**
-
 - Create: `packages/web/components/src/SyncStatusIndicator/SyncStatusIndicator.tsx`
 - Test: `packages/web/components/src/SyncStatusIndicator/SyncStatusIndicator.test.tsx`
 - Modify: app root layout to render the indicator
@@ -2624,11 +2473,7 @@ Create `packages/web/components/src/SyncStatusIndicator/SyncStatusIndicator.tsx`
 
 ```tsx
 import { Badge, Group, Loader, Text, Tooltip } from "@mantine/core";
-import {
-  IconCheck,
-  IconCloudOff,
-  IconAlertTriangle,
-} from "@tabler/icons-react";
+import { IconCheck, IconCloudOff, IconAlertTriangle } from "@tabler/icons-react";
 import type { SyncStatus } from "@avandar/platform";
 
 export function SyncStatusIndicator({ status }: { status: SyncStatus }) {
@@ -2713,16 +2558,13 @@ The indicator should appear in the header and reflect status changes.
 - [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
 **Run:**
-
 ```bash
 pnpm --filter @avandar/components test SyncStatusIndicator
 pnpm --filter @avandar/web typecheck
 ```
-
 Expected: component tests green (rendering per status, click-to-detail, conflict surfacing); typecheck clean.
 
 **Verify:**
-
 - Open `packages/web/components/src/SyncStatusIndicator/SyncStatusIndicator.tsx`. Confirm:
   - The component renders distinct visual states for `idle`, `syncing`, `offline`, `error` — easy to differentiate at a glance (color + icon + tooltip).
   - It reads from `usePlatform().syncEngine` and subscribes via `onStatusChange`, with cleanup on unmount (no listener leak).
@@ -2731,7 +2573,6 @@ Expected: component tests green (rendering per status, click-to-detail, conflict
 - Test groupings G3.14 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Manual smoke test (desktop app — `pnpm dev:desktop`):**
-
 1. Launch the desktop app and sign in. Visually confirm the indicator is present in the app chrome (header / status bar).
 2. Online idle → the indicator shows the `idle`/`online` state (e.g. green dot, "Synced").
 3. Make an edit while online — the indicator briefly transitions to `syncing` then back to `idle`.
@@ -2752,7 +2593,6 @@ Expected: indicator accurately reflects every state transition; detail panel sur
 **Test groupings:** G3.15 (Full end-to-end via fake-IPC harness — offline edits + offline upload → online → drain → desktop SQLite and mocked Supabase converge; Phase 3 acceptance criterion as a script).
 
 **PR boundaries:** 1 PR.
-
 - PR 1: Spec annotation / acceptance-checklist doc Step — verification-only, no code changes touch product behavior; safe doc PR. Manual smoke-test / acceptance Steps are gates (not code PRs) and are exercised against the Task 8 PR 2 wiring that already shipped.
 
 - [ ] **Step 1: Round-trip smoke test**
@@ -2763,7 +2603,7 @@ Expected: indicator accurately reflects every state transition; detail panel sur
 4. Make another edit. Verify it's visible inside the app (read-through to local SQLite).
 5. Reconnect.
 6. Verify the second edit appears on Supabase within ~30s.
-7. From the _web_ app (a different browser session), make a third edit.
+7. From the *web* app (a different browser session), make a third edit.
 8. Verify the third edit appears in the desktop app within ~30s.
 
 - [ ] **Step 2: Conflict round-trip**
@@ -2772,7 +2612,7 @@ Expected: indicator accurately reflects every state transition; detail panel sur
 2. Edit row X on desktop.
 3. Edit row X on web.
 4. Reconnect.
-5. Verify _one_ version wins (per LWW), both clients converge.
+5. Verify *one* version wins (per LWW), both clients converge.
 
 - [ ] **Step 3: Parquet upload-on-reconnect**
 
@@ -2801,17 +2641,14 @@ Update `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 3 
 Phase 3 is the riskiest correctness work in the project. Before declaring done, confirm every prior task's greenlight gate actually passed — not just that you reached the end.
 
 **Run:**
-
 ```bash
 pnpm test
 pnpm --filter @avandar/desktop typecheck
 pnpm --filter @avandar/web typecheck
 ```
-
 Expected: full repo green; typechecks clean across desktop and web.
 
 **Verify — checkpoint roll-up (re-confirm each Task's greenlight criterion):**
-
 - Task 1: schema migration applied; `sync_outbox`, `parquet_blob_outbox`, `sync_cursor`, and per-row `_sync_*` columns present on every syncable table.
 - Task 2: code review confirms outbox INSERT and data write share one `db.transaction(...)`; force-quit-mid-write produced zero divergence over multiple trials.
 - Task 3: `resolveLww` is pure and tested for tombstone precedence + tie-server-wins.
@@ -2824,7 +2661,6 @@ Expected: full repo green; typechecks clean across desktop and web.
 - Test groupings G3.15 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
 **Documentation update:**
-
 - Update `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 3 line to mark complete — but do NOT commit. Leave the change unstaged for human review.
 
 **Greenlight criteria:** every prior task's greenlight gate passed (not merely "step ran") AND the acceptance smoke tests in Steps 1–6 above all observed end-to-end. Phase 3 is ready for human sign-off and integration; the human will handle commits and any spec marker.
@@ -2845,10 +2681,10 @@ Expected: full repo green; typechecks clean across desktop and web.
 
 ## Risks Specific to Phase 3
 
-| Risk                                                                                                                 | Mitigation in this phase                                                                                                                                                                                                                          |
-| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Race condition between push and pull on the same row (push starts, server returns conflict, pull arrives mid-flight) | Per-row sync is sequential within a loop iteration; concurrent push+pull cycles can interleave but the LWW resolution is idempotent. Document this in the SyncEngine code; integration-test the scenario explicitly in Task 8.                    |
-| Outbox grows unbounded if upstream is permanently broken                                                             | Surface in the SyncStatusIndicator; add a "clear failed sync items" admin action in V2. For V1, expect the user to escalate when they see a persistent error.                                                                                     |
-| TUS resumable upload state diverges between local `tus_upload_url` and Supabase Storage's actual state               | The `HEAD` step at upload resume re-reads server-side offset before sending bytes; bytes that overlap are idempotent at the byte level. If `HEAD` returns 404 (the resumable URL expired), clear it and restart. Implement this in Task 7 Step 4. |
-| LWW silently drops user edits when clock skew is severe                                                              | Both `_local_updated_at` and server `updated_at` come from the same machine's wall clock at write time — meaningfully wrong only if the machine's clock is wrong by minutes. For V1, accept this; V2's HLC fixes it.                              |
-| Schema drift: a new Supabase column appears that desktop SQLite doesn't have — pulled rows fail to insert            | Detected at runtime as a SQLite `no such column` error. The generator/CI drift check (Phase 2) is the front-line defense. If a column is missing, add it to the manifest's generated migration and redeploy.                                      |
+| Risk | Mitigation in this phase |
+|---|---|
+| Race condition between push and pull on the same row (push starts, server returns conflict, pull arrives mid-flight) | Per-row sync is sequential within a loop iteration; concurrent push+pull cycles can interleave but the LWW resolution is idempotent. Document this in the SyncEngine code; integration-test the scenario explicitly in Task 8. |
+| Outbox grows unbounded if upstream is permanently broken | Surface in the SyncStatusIndicator; add a "clear failed sync items" admin action in V2. For V1, expect the user to escalate when they see a persistent error. |
+| TUS resumable upload state diverges between local `tus_upload_url` and Supabase Storage's actual state | The `HEAD` step at upload resume re-reads server-side offset before sending bytes; bytes that overlap are idempotent at the byte level. If `HEAD` returns 404 (the resumable URL expired), clear it and restart. Implement this in Task 7 Step 4. |
+| LWW silently drops user edits when clock skew is severe | Both `_local_updated_at` and server `updated_at` come from the same machine's wall clock at write time — meaningfully wrong only if the machine's clock is wrong by minutes. For V1, accept this; V2's HLC fixes it. |
+| Schema drift: a new Supabase column appears that desktop SQLite doesn't have — pulled rows fail to insert | Detected at runtime as a SQLite `no such column` error. The generator/CI drift check (Phase 2) is the front-line defense. If a column is missing, add it to the manifest's generated migration and redeploy. |

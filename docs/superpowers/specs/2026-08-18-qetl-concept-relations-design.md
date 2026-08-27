@@ -173,17 +173,17 @@ queries and raw SQL is unchanged, including every bookmarked `?sql=` URL.
 
 ## 3. Decisions (resolved)
 
-| Decision                                                     | Resolution                                                                                                          | Why                                                                                                                                                                                                                                                                            |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Table or view for the concept relation?                      | **View**, `CREATE OR REPLACE VIEW`, rebuilt on every query that references the concept                              | A view is a definition, so rebuilding is nearly free and **invalidation disappears entirely**. A materialized table would need its own freshness rule the day a contributing dataset reloads or a mapping changes, and that rule is spec 2's job, not this spec's              |
-| Full-width view or projected view?                           | **Full width**: every attribute of the concept is a column, always                                                  | The view has a stable name, so its schema cannot vary per query, or a bookmarked `SELECT "age" FROM concept_x` breaks when the next query needs fewer columns. Narrowness comes from DuckDB's projection pushdown (section 8)                                                  |
-| Where do rows come from?                                     | **`individuals`**, the Postgres table, which is authoritative                                                       | Proposal section 17. It is also the only spine under which `unique (concept_id, external_id)` proves the grain                                                                                                                                                                 |
-| How do individuals reach DuckDB?                             | **A registered CSV text file** loaded through the existing `DuckDbClient.loadCsv({ tableName, fileText })`          | It puts **zero user-controlled text into a SQL string**. Inlining a `VALUES` list would add an escaping obligation on `external_id`, which is user data; the codebase already has that exposure at `AttributeAssertionClient.ts:208` and this spec should not add a second one |
-| Where does per-attribute value-picker SQL come from?         | **Reuse `getSQLSelectOfMapping`** unchanged in shape, with `externalIdsTable` pointed at the spine                  | It already takes `externalIdsTable` and `externalIdColumn` as parameters, so the seam exists. Fixing `first` inside it fixes it for `generateIndividuals` too, which imports the same function                                                                                 |
-| How does `first` get a total order?                          | **A second, row-numbered view per dataset**, `ava_rows_<datasetId>`, over `read_parquet(..., file_row_number=true)` | A dataset's public view is `SELECT * FROM read_parquet("<id>")`, so `file_row_number` is not visible through it, and adding it there would leak a column into every `SELECT *` in the product. A parallel view costs one extra `CREATE VIEW` and changes nothing observable    |
-| Is `row_number() OVER ()` acceptable instead?                | **No**                                                                                                              | DuckDB's scan order under parallelism is unspecified, so it is an order but not a _stable_ one. A rule deterministic only by luck is not deterministic                                                                                                                         |
-| Does the relation expose non-attribute columns?              | **`external_id` only**, and only when no attribute is already named `external_id`                                   | It is the join key two concepts share when their identifier attributes are named differently, which the exit criteria need. Everything else (individual id, name, status, `assigned_to`) is deferred rather than guessed                                                       |
-| Does `AttributeAssertionClient.getConceptExtension` survive? | **Yes, unchanged, for now.** The relation does not call it                                                          | The single-individual detail path still uses the client. Consolidating the two is a follow-up (section 12), and forcing it now would grow this spec past tonight                                                                                                               |
+| Decision | Resolution | Why |
+|---|---|---|
+| Table or view for the concept relation? | **View**, `CREATE OR REPLACE VIEW`, rebuilt on every query that references the concept | A view is a definition, so rebuilding is nearly free and **invalidation disappears entirely**. A materialized table would need its own freshness rule the day a contributing dataset reloads or a mapping changes, and that rule is spec 2's job, not this spec's |
+| Full-width view or projected view? | **Full width**: every attribute of the concept is a column, always | The view has a stable name, so its schema cannot vary per query, or a bookmarked `SELECT "age" FROM concept_x` breaks when the next query needs fewer columns. Narrowness comes from DuckDB's projection pushdown (section 8) |
+| Where do rows come from? | **`individuals`**, the Postgres table, which is authoritative | Proposal section 17. It is also the only spine under which `unique (concept_id, external_id)` proves the grain |
+| How do individuals reach DuckDB? | **A registered CSV text file** loaded through the existing `DuckDbClient.loadCsv({ tableName, fileText })` | It puts **zero user-controlled text into a SQL string**. Inlining a `VALUES` list would add an escaping obligation on `external_id`, which is user data; the codebase already has that exposure at `AttributeAssertionClient.ts:208` and this spec should not add a second one |
+| Where does per-attribute value-picker SQL come from? | **Reuse `getSQLSelectOfMapping`** unchanged in shape, with `externalIdsTable` pointed at the spine | It already takes `externalIdsTable` and `externalIdColumn` as parameters, so the seam exists. Fixing `first` inside it fixes it for `generateIndividuals` too, which imports the same function |
+| How does `first` get a total order? | **A second, row-numbered view per dataset**, `ava_rows_<datasetId>`, over `read_parquet(..., file_row_number=true)` | A dataset's public view is `SELECT * FROM read_parquet("<id>")`, so `file_row_number` is not visible through it, and adding it there would leak a column into every `SELECT *` in the product. A parallel view costs one extra `CREATE VIEW` and changes nothing observable |
+| Is `row_number() OVER ()` acceptable instead? | **No** | DuckDB's scan order under parallelism is unspecified, so it is an order but not a *stable* one. A rule deterministic only by luck is not deterministic |
+| Does the relation expose non-attribute columns? | **`external_id` only**, and only when no attribute is already named `external_id` | It is the join key two concepts share when their identifier attributes are named differently, which the exit criteria need. Everything else (individual id, name, status, `assigned_to`) is deferred rather than guessed |
+| Does `AttributeAssertionClient.getConceptExtension` survive? | **Yes, unchanged, for now.** The relation does not call it | The single-individual detail path still uses the client. Consolidating the two is a follow-up (section 12), and forcing it now would grow this spec past tonight |
 
 ---
 
@@ -267,10 +267,10 @@ Two derived names this spec introduces, both deliberately **not** UUID-shaped so
 `RelationRef.fromTableName` returns `undefined` for them and the SQL analyzer
 never mistakes one for a relation:
 
-| Name                        | What it is                                                            | Lifetime                                                  |
-| --------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------- |
-| `ava_rows_<datasetId>`      | Row-numbered view over the same registered parquet file (section 4.6) | Created beside the dataset's public view, dropped with it |
-| `concept_<id>__individuals` | The spine table for one concept (section 4.3)                         | Replaced on every query that references the concept       |
+| Name | What it is | Lifetime |
+|---|---|---|
+| `ava_rows_<datasetId>` | Row-numbered view over the same registered parquet file (section 4.6) | Created beside the dataset's public view, dropped with it |
+| `concept_<id>__individuals` | The spine table for one concept (section 4.3) | Replaced on every query that references the concept |
 
 `concept_<id>__individuals` starts with the `concept_` prefix, so
 `fromTableName` strips it and then tests `<id>__individuals` for UUID shape,
@@ -326,11 +326,11 @@ which is exactly the token that would key it.
 For each of the concept's attributes, in a stable order (sorted by attribute
 name, so two runs emit byte-identical SQL):
 
-| Attribute's `mapping_type` | Column emitted                                                                                                          |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `dataset_column`           | `getSQLSelectOfMapping(...)` against `ava_rows_<datasetId>`, correlated to the spine, aliased to the **attribute name** |
-| `manual_entry`             | `CAST(NULL AS <duckdb type>) AS "<name>"`                                                                               |
-| no mapping row at all      | `CAST(NULL AS <duckdb type>) AS "<name>"`                                                                               |
+| Attribute's `mapping_type` | Column emitted |
+|---|---|
+| `dataset_column` | `getSQLSelectOfMapping(...)` against `ava_rows_<datasetId>`, correlated to the spine, aliased to the **attribute name** |
+| `manual_entry` | `CAST(NULL AS <duckdb type>) AS "<name>"` |
+| no mapping row at all | `CAST(NULL AS <duckdb type>) AS "<name>"` |
 
 **Manual-entry attributes must not throw.** Today
 `getAttributeAssertions._getAssertionsByMappingType` throws
@@ -361,16 +361,16 @@ honest: we hold no value. Section 12 records that manual entry stays unread.
 
 ### 4.5 The grain proof
 
-The proposal asks this spec to _prove_ the grain holds through the join, not to
+The proposal asks this spec to *prove* the grain holds through the join, not to
 add a uniqueness check, because the database already enforces one.
 
-| Step                        | Why the grain survives                                                                                                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `individuals` in Postgres   | `unique (concept_id, external_id)` (`20.individuals.sql:24`). Filtering by one `concept_id` therefore yields distinct `external_id`                                           |
-| `external_id` is never NULL | `external_id text not null`. The NULL-key exclusion rule revision 5 specified is not needed and must not be added                                                             |
-| CSV round trip              | One row in, one row out; `toCsv` neither deduplicates nor drops. Test: row count in equals `COUNT(*)` out                                                                     |
-| Spine table                 | `SELECT ... FROM spine`, no join, no `DISTINCT`. A `DISTINCT` here would be a latent bug, not a safety net, because it would mask a spine that had already lost the invariant |
-| Attribute columns           | Correlated **scalar** subqueries. A scalar subquery contributes exactly one value per outer row or errors; it cannot add rows                                                 |
+| Step | Why the grain survives |
+|---|---|
+| `individuals` in Postgres | `unique (concept_id, external_id)` (`20.individuals.sql:24`). Filtering by one `concept_id` therefore yields distinct `external_id` |
+| `external_id` is never NULL | `external_id text not null`. The NULL-key exclusion rule revision 5 specified is not needed and must not be added |
+| CSV round trip | One row in, one row out; `toCsv` neither deduplicates nor drops. Test: row count in equals `COUNT(*)` out |
+| Spine table | `SELECT ... FROM spine`, no join, no `DISTINCT`. A `DISTINCT` here would be a latent bug, not a safety net, because it would mask a spine that had already lost the invariant |
+| Attribute columns | Correlated **scalar** subqueries. A scalar subquery contributes exactly one value per outer row or errors; it cannot add rows |
 
 Observable form of the proof, and it is one query:
 
@@ -413,7 +413,7 @@ makes this safe to land in a hurry.
 
 **Fallback, if the second view misbehaves under duckdb-wasm:** order `first` by
 the selected column itself, `ORDER BY dataset."<col>" NULLS LAST`. That is
-deterministic in the returned _value_, which is what the exit criterion
+deterministic in the returned *value*, which is what the exit criterion
 measures, and it needs no new views. It changes the meaning of `first` from
 "first in file order" to "smallest", which is a semantic change worth stating
 out loud rather than shipping quietly. Prefer the view; keep this in the pocket.
@@ -423,12 +423,12 @@ out loud rather than shipping quietly. Prefer the view; keep this in the pocket.
 `ConceptWrapper.describe(ref)` (the method spec 1 declares) returns a
 `RelationSchema` built from `concept_attributes` with no rows read:
 
-| `RelationSchema` column | Source                                                                                              |
-| ----------------------- | --------------------------------------------------------------------------------------------------- |
-| name                    | `concept_attributes.name`, after the de-duplication in 4.4                                          |
-| data type               | `concept_attributes.data_type`, an `AvaDataType`, mapped through the existing `DuckDbDataTypeUtils` |
-| nullable                | always true; a value picker may find nothing                                                        |
-| plus one                | `external_id`, text, not null, unless an attribute has taken the name                               |
+| `RelationSchema` column | Source |
+|---|---|
+| name | `concept_attributes.name`, after the de-duplication in 4.4 |
+| data type | `concept_attributes.data_type`, an `AvaDataType`, mapped through the existing `DuckDbDataTypeUtils` |
+| nullable | always true; a value picker may find nothing |
+| plus one | `external_id`, text, not null, unless an attribute has taken the name |
 
 `is_array` is read and **rejected** for now (section 12), not silently
 flattened.
@@ -444,7 +444,7 @@ Numbered to match spec 1 section 5, with the concept-specific steps marked.
    `[{ kind: "concept", id }]`; for raw SQL it is whatever
    `extractReferencedRelations` finds, which spec 1 taught to recognize
    `concept_<uuid>`.
-2. **Expand.** _(new, section 5.3)_ Each concept ref expands to itself plus its
+2. **Expand.** *(new, section 5.3)* Each concept ref expands to itself plus its
    contributing dataset refs.
 3. **Authorize** the **expanded** set (section 7).
 4. **Probe the cache** with a key computed over the **expanded** set (spec 2).
@@ -456,11 +456,11 @@ Numbered to match spec 1 section 5, with the concept-specific steps marked.
 
 Three edits, all small, all in one file:
 
-| Edit                            | Before                                                          | After                                                                                           |
-| ------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| The throw at lines 48-50        | throws for any `Concept` source                                 | deleted                                                                                         |
-| The table name at line 73       | `nestedSubquery ? undefined : dataSource?.id`                   | `nestedSubquery ? undefined : dataSource && RelationRef.toTableName(toRelationRef(dataSource))` |
-| The aggregation gate at line 84 | `if (Model.isOfModelType(column?.baseColumn, "DatasetColumn"))` | accepts a `ConceptAttribute` base column too                                                    |
+| Edit | Before | After |
+|---|---|---|
+| The throw at lines 48-50 | throws for any `Concept` source | deleted |
+| The table name at line 73 | `nestedSubquery ? undefined : dataSource?.id` | `nestedSubquery ? undefined : dataSource && RelationRef.toTableName(toRelationRef(dataSource))` |
+| The aggregation gate at line 84 | `if (Model.isOfModelType(column?.baseColumn, "DatasetColumn"))` | accepts a `ConceptAttribute` base column too |
 
 **The third edit is easy to miss and it silently voids an exit criterion.** That
 `if` is what populates `groupByColumnNames` and `duckDbAggregations`. A
@@ -555,15 +555,15 @@ input on every run.
 
 ### 6.1 The seven
 
-| Rule            | Today                                                                                                        | Change                                                                                                                                                                                                                         | Determinism argument                                                                                                                                                                                                                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `first`         | `LIMIT 1`, no `ORDER BY` (`getDatasetColumnAssertions.ts:60-70`). Observed: four distinct values in six runs | Add `ORDER BY dataset."file_row_number"` against `ava_rows_<datasetId>`. Across datasets, order by dataset id first (each attribute reads exactly one dataset, so this is only visible once an attribute has several mappings) | `file_row_number` is unique within a parquet file, so the order is **total**, not merely defined. Dataset id alone is insufficient when two rows come from the same dataset, which is the common case                                                                                                |
-| `most_frequent` | `ORDER BY COUNT(*) DESC, "<col>"` (line 81)                                                                  | **None. Verify and leave alone**                                                                                                                                                                                               | Count descending then the value itself is a total order on distinct values, because `GROUP BY` has already made them distinct                                                                                                                                                                        |
-| `sum`           | `CAST(SUM(col) AS DOUBLE)`                                                                                   | Sum in `DECIMAL` where the attribute's type allows, then cast                                                                                                                                                                  | Order-insensitive over a fixed input set, and 4.5 fixes the input set. The residual hazard is **float non-associativity**: DuckDB may add partitions in a different order across runs, so a `DOUBLE` sum can differ in its last bits. Exact `DECIMAL` addition removes the hazard rather than hoping |
-| `avg`           | `CAST(AVG(col) AS DOUBLE)`                                                                                   | Same treatment as `sum`                                                                                                                                                                                                        | `AVG` is `SUM/COUNT` and inherits exactly the same hazard                                                                                                                                                                                                                                            |
-| `count`         | `CAST(COUNT(col) AS DOUBLE)`                                                                                 | None                                                                                                                                                                                                                           | Integer, order-insensitive, input set fixed by 4.5. `COUNT(col)` skips NULLs, which is the existing behaviour and is left alone deliberately                                                                                                                                                         |
-| `max`           | `CAST(MAX(col) AS DOUBLE)`                                                                                   | **Drop the `DOUBLE` cast**; cast per the attribute's declared type or not at all                                                                                                                                               | See 6.2: the tie-break the proposal asks for is unnecessary here, and the cast is a live defect                                                                                                                                                                                                      |
-| `min`           | `CAST(MIN(col) AS DOUBLE)`                                                                                   | Same as `max`                                                                                                                                                                                                                  | Same as `max`                                                                                                                                                                                                                                                                                        |
+| Rule | Today | Change | Determinism argument |
+|---|---|---|---|
+| `first` | `LIMIT 1`, no `ORDER BY` (`getDatasetColumnAssertions.ts:60-70`). Observed: four distinct values in six runs | Add `ORDER BY dataset."file_row_number"` against `ava_rows_<datasetId>`. Across datasets, order by dataset id first (each attribute reads exactly one dataset, so this is only visible once an attribute has several mappings) | `file_row_number` is unique within a parquet file, so the order is **total**, not merely defined. Dataset id alone is insufficient when two rows come from the same dataset, which is the common case |
+| `most_frequent` | `ORDER BY COUNT(*) DESC, "<col>"` (line 81) | **None. Verify and leave alone** | Count descending then the value itself is a total order on distinct values, because `GROUP BY` has already made them distinct |
+| `sum` | `CAST(SUM(col) AS DOUBLE)` | Sum in `DECIMAL` where the attribute's type allows, then cast | Order-insensitive over a fixed input set, and 4.5 fixes the input set. The residual hazard is **float non-associativity**: DuckDB may add partitions in a different order across runs, so a `DOUBLE` sum can differ in its last bits. Exact `DECIMAL` addition removes the hazard rather than hoping |
+| `avg` | `CAST(AVG(col) AS DOUBLE)` | Same treatment as `sum` | `AVG` is `SUM/COUNT` and inherits exactly the same hazard |
+| `count` | `CAST(COUNT(col) AS DOUBLE)` | None | Integer, order-insensitive, input set fixed by 4.5. `COUNT(col)` skips NULLs, which is the existing behaviour and is left alone deliberately |
+| `max` | `CAST(MAX(col) AS DOUBLE)` | **Drop the `DOUBLE` cast**; cast per the attribute's declared type or not at all | See 6.2: the tie-break the proposal asks for is unnecessary here, and the cast is a live defect |
+| `min` | `CAST(MIN(col) AS DOUBLE)` | Same as `max` | Same as `max` |
 
 **Both copies, one fix.** The single-individual path
 (`AttributeAssertionClient.ts:228-285`) reimplements all seven inline and its
@@ -576,7 +576,7 @@ tonight, fix both and add a test that the two agree on a tied fixture.
 ### 6.2 Two corrections to the proposal
 
 **`max` and `min` do not need a tie-break, and the proposal's reason for asking
-does not apply as implemented.** A tie-break matters for _arg-max_, that is,
+does not apply as implemented.** A tie-break matters for *arg-max*, that is,
 "return column B from the row with the greatest A". These rules return the
 extremum of the compared column itself, so ties return the same value by
 definition. The obligation should be recorded as **conditional**: the day
@@ -693,15 +693,15 @@ Two obligations from 12.1 apply directly and must be respected tonight:
 Spec 2 owns the cache key and the pushdown-plus-result-cache seam. This spec
 designs neither. The seam between them:
 
-| Direction                      | Item                                                                                                              | Note                                                                                                                  |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Needs from spec 2              | `authorize(refs)` called on the **expanded** set, before any cache probe                                          | Section 7, obligation 1. This spec provides the expansion; spec 2 provides the check and its position in the pipeline |
-| Needs from spec 2              | The cache key computed from the **expanded** set                                                                  | Section 7, obligation 2. This spec guarantees the set is sorted, de-duplicated and idempotent so it can be hashed     |
-| Needs from spec 2              | A statement of whether a cache hit can serve a query naming a concept at all, given the view is rebuilt per query | The rows are what is cached, not the view, so this should be yes. It needs saying, not assuming                       |
-| Nice from spec 2, not required | Spine caching keyed on concept plus freshness token                                                               | Section 4.3. Without it, every concept query reloads the spine, which is fine at demo scale                           |
-| Owes spec 2                    | `expandRelationRefs`, as the single named seam both obligations hang on                                           | Section 5.3                                                                                                           |
-| Owes spec 2                    | The fact that a concept reference implies dataset references, so the cache must not treat a concept as a leaf     | Section 5.3                                                                                                           |
-| Owes spec 5                    | Nothing. Per the proposal, **no new acquisition machinery is needed for concepts**                                | Section 11.2's existing pushdown mode applies unchanged                                                               |
+| Direction | Item | Note |
+|---|---|---|
+| Needs from spec 2 | `authorize(refs)` called on the **expanded** set, before any cache probe | Section 7, obligation 1. This spec provides the expansion; spec 2 provides the check and its position in the pipeline |
+| Needs from spec 2 | The cache key computed from the **expanded** set | Section 7, obligation 2. This spec guarantees the set is sorted, de-duplicated and idempotent so it can be hashed |
+| Needs from spec 2 | A statement of whether a cache hit can serve a query naming a concept at all, given the view is rebuilt per query | The rows are what is cached, not the view, so this should be yes. It needs saying, not assuming |
+| Nice from spec 2, not required | Spine caching keyed on concept plus freshness token | Section 4.3. Without it, every concept query reloads the spine, which is fine at demo scale |
+| Owes spec 2 | `expandRelationRefs`, as the single named seam both obligations hang on | Section 5.3 |
+| Owes spec 2 | The fact that a concept reference implies dataset references, so the cache must not treat a concept as a leaf | Section 5.3 |
+| Owes spec 5 | Nothing. Per the proposal, **no new acquisition machinery is needed for concepts** | Section 11.2's existing pushdown mode applies unchanged |
 
 ---
 
@@ -711,23 +711,23 @@ Executed and row-level, in spec 1's `*.executed.test.ts` node project against
 real DuckDB. A test that mocks DuckDB characterizes the mock, and every claim in
 this spec is a claim about rows.
 
-| Area                          | Test                                                                                                                                                                                                                       |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Grain                         | `COUNT(*) = COUNT(DISTINCT external_id)` on a fixture where one individual is contributed to by two datasets. This is the test that fails on today's concatenating implementation                                          |
-| Missing contribution          | An individual with no row in a contributing dataset appears once, with NULL for that dataset's attributes                                                                                                                  |
-| Unknown external id           | A dataset row whose `external_id` has no `individuals` row does **not** appear                                                                                                                                             |
-| The seven rules               | Section 6.3's tied fixture, all seven, plus the ten-run `first` assertion                                                                                                                                                  |
-| Both rule copies agree        | The relation and `AttributeAssertionClient`'s single-individual path return the same value for the same tied attribute                                                                                                     |
-| Spine escaping                | `external_id` values `O'Brien`, `a,b` and `he said "hi"` all round-trip, and the row count is preserved                                                                                                                    |
-| Attribute name hazards        | Duplicate attribute names de-duplicate deterministically; a name containing a double quote is queryable; an attribute named `external_id` wins and suppresses the reserved column                                          |
-| Manual entry                  | A concept with one manual-entry attribute is queryable, with that column NULL, and does not throw                                                                                                                          |
-| `structuredQueryToSql`        | A concept source compiles to `FROM "concept_<uuid>"`; a group-by on a `ConceptAttribute` emits a `GROUP BY`; an aggregation on one emits the aggregate. **The group-by case is the regression guard for 5.1's third edit** |
-| Naming                        | `RelationRef.fromTableName("concept_<uuid>__individuals")` is `undefined`; `fromTableName("ava_rows_<uuid>")` is `undefined`                                                                                               |
-| Deletion                      | No reference to `_runConceptQuery`, `buildConceptQueryResult` or `getConceptExtension` remains in `runStructuredQueryWithMetadata`                                                                                         |
-| Dataset regression            | `SELECT *` on a dataset returns the same columns as before, with **no** `file_row_number`. This is what proves the second view is invisible                                                                                |
-| Raw SQL regression            | A bookmarked `?sql=` URL against a dataset, including one with a CTE, returns exactly what it returned before                                                                                                              |
-| Authorization (with spec 2)   | Denied on one contributing dataset, a query naming only the concept returns `forbidden`                                                                                                                                    |
-| Determinism of the SQL itself | Building the same view twice produces byte-identical SQL                                                                                                                                                                   |
+| Area | Test |
+|---|---|
+| Grain | `COUNT(*) = COUNT(DISTINCT external_id)` on a fixture where one individual is contributed to by two datasets. This is the test that fails on today's concatenating implementation |
+| Missing contribution | An individual with no row in a contributing dataset appears once, with NULL for that dataset's attributes |
+| Unknown external id | A dataset row whose `external_id` has no `individuals` row does **not** appear |
+| The seven rules | Section 6.3's tied fixture, all seven, plus the ten-run `first` assertion |
+| Both rule copies agree | The relation and `AttributeAssertionClient`'s single-individual path return the same value for the same tied attribute |
+| Spine escaping | `external_id` values `O'Brien`, `a,b` and `he said "hi"` all round-trip, and the row count is preserved |
+| Attribute name hazards | Duplicate attribute names de-duplicate deterministically; a name containing a double quote is queryable; an attribute named `external_id` wins and suppresses the reserved column |
+| Manual entry | A concept with one manual-entry attribute is queryable, with that column NULL, and does not throw |
+| `structuredQueryToSql` | A concept source compiles to `FROM "concept_<uuid>"`; a group-by on a `ConceptAttribute` emits a `GROUP BY`; an aggregation on one emits the aggregate. **The group-by case is the regression guard for 5.1's third edit** |
+| Naming | `RelationRef.fromTableName("concept_<uuid>__individuals")` is `undefined`; `fromTableName("ava_rows_<uuid>")` is `undefined` |
+| Deletion | No reference to `_runConceptQuery`, `buildConceptQueryResult` or `getConceptExtension` remains in `runStructuredQueryWithMetadata` |
+| Dataset regression | `SELECT *` on a dataset returns the same columns as before, with **no** `file_row_number`. This is what proves the second view is invisible |
+| Raw SQL regression | A bookmarked `?sql=` URL against a dataset, including one with a CTE, returns exactly what it returned before |
+| Authorization (with spec 2) | Denied on one contributing dataset, a query naming only the concept returns `forbidden` |
+| Determinism of the SQL itself | Building the same view twice produces byte-identical SQL |
 
 ---
 
@@ -777,7 +777,7 @@ Recorded so the next author does not read silence as an answer.
    `AttributeAssertionClient.getAttributeAssertions` keeps its own inline copy
    of the seven rules, fixed in parallel (6.1). The right end state is one
    implementation, most likely `SELECT * FROM concept_<id> WHERE external_id =
-?` against this spec's view, which would delete roughly 120 lines. It is a
+   ?` against this spec's view, which would delete roughly 120 lines. It is a
    follow-up because the detail page is not on the demo path.
 4. **Concepts on public and published snapshots are unsupported.**
    `PublicQetlClient` has no ontology access and a snapshot stores raw SQL, so a
@@ -803,19 +803,19 @@ Recorded so the next author does not read silence as an answer.
 
 ## 13. Risks
 
-| Risk                                                                                                                                                                             | Mitigation                                                                                                                                                                             |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The group-by gate at `structuredQueryToSql.ts:84` is missed, so concepts return rows but silently ignore group-by and aggregation, reproducing the deleted TODO one layer deeper | Called out as edit three of three in 5.1, with a dedicated row-level test in section 10. It is the most likely way this spec ships looking finished and is not                         |
-| The workspace allowlist is not extended, so a concept from another workspace loads                                                                                               | Named in 5.3 as the highest-risk line. The gate is a security control; test a cross-workspace concept id and expect it dropped                                                         |
-| `first` becoming deterministic changes values users have already seen and possibly printed                                                                                       | It is a defect fix and the proposal calls it a correctness defect. Say so in the release note rather than hiding it. Determinism is the point; the previous value was one of four      |
-| Two copies of the seven rules drift further apart because only one is fixed                                                                                                      | 6.1 requires both, and a test asserts they agree on a tied fixture. Consolidation is scheduled (section 12) rather than assumed                                                        |
-| The `ava_rows_` view leaks `file_row_number` into a user-visible result                                                                                                          | Only the concept relation reads it. Guarded by the dataset `SELECT *` regression test, which is exit criterion 9                                                                       |
-| A stale `ava_rows_` view outlives its parquet file                                                                                                                               | Created in `loadParquetIntoDuckDb` beside the public view and dropped by `dropTableViewAndFile`. Both live in the same file; changing one without the other should be caught in review |
-| A bare-UUID staging table for a concept breaks the "bare UUID is always a dataset" invariant that every later spec trusts                                                        | The rename in 4.2 is required, not optional, and it is one string plus a drop                                                                                                          |
-| The spine's CSV round trip mangles an `external_id`, silently dropping or merging individuals                                                                                    | Three escaping tests plus a row-count assertion (section 10). The alternative, `VALUES` inlining, would have made this an injection risk instead of a quoting risk                     |
-| Float sums differ across runs, failing the determinism bar in a way that looks like flakiness                                                                                    | Exact `DECIMAL` addition where the type allows (6.1). If deferred, the ten-run assertion must cover `sum` and `avg` too so the flake is diagnosed as this and not as infrastructure    |
-| A full-width view makes narrow queries slow enough to look broken in the demo                                                                                                    | Measure with `EXPLAIN` (section 8). Correctness is unaffected; if it is slow, cut the demo to concepts with few attributes and let spec 2 fix it properly                              |
-| `loadCsv`'s coordinator lease fights the query's lease, deadlocking the spine load                                                                                               | Pass the query's existing `datasetDuckDbLease` through, exactly as `loadDiceFacts` already does for parquet. The `VALUES` fallback in 4.3 exists for this case                         |
+| Risk | Mitigation |
+|---|---|
+| The group-by gate at `structuredQueryToSql.ts:84` is missed, so concepts return rows but silently ignore group-by and aggregation, reproducing the deleted TODO one layer deeper | Called out as edit three of three in 5.1, with a dedicated row-level test in section 10. It is the most likely way this spec ships looking finished and is not |
+| The workspace allowlist is not extended, so a concept from another workspace loads | Named in 5.3 as the highest-risk line. The gate is a security control; test a cross-workspace concept id and expect it dropped |
+| `first` becoming deterministic changes values users have already seen and possibly printed | It is a defect fix and the proposal calls it a correctness defect. Say so in the release note rather than hiding it. Determinism is the point; the previous value was one of four |
+| Two copies of the seven rules drift further apart because only one is fixed | 6.1 requires both, and a test asserts they agree on a tied fixture. Consolidation is scheduled (section 12) rather than assumed |
+| The `ava_rows_` view leaks `file_row_number` into a user-visible result | Only the concept relation reads it. Guarded by the dataset `SELECT *` regression test, which is exit criterion 9 |
+| A stale `ava_rows_` view outlives its parquet file | Created in `loadParquetIntoDuckDb` beside the public view and dropped by `dropTableViewAndFile`. Both live in the same file; changing one without the other should be caught in review |
+| A bare-UUID staging table for a concept breaks the "bare UUID is always a dataset" invariant that every later spec trusts | The rename in 4.2 is required, not optional, and it is one string plus a drop |
+| The spine's CSV round trip mangles an `external_id`, silently dropping or merging individuals | Three escaping tests plus a row-count assertion (section 10). The alternative, `VALUES` inlining, would have made this an injection risk instead of a quoting risk |
+| Float sums differ across runs, failing the determinism bar in a way that looks like flakiness | Exact `DECIMAL` addition where the type allows (6.1). If deferred, the ten-run assertion must cover `sum` and `avg` too so the flake is diagnosed as this and not as infrastructure |
+| A full-width view makes narrow queries slow enough to look broken in the demo | Measure with `EXPLAIN` (section 8). Correctness is unaffected; if it is slow, cut the demo to concepts with few attributes and let spec 2 fix it properly |
+| `loadCsv`'s coordinator lease fights the query's lease, deadlocking the spine load | Pass the query's existing `datasetDuckDbLease` through, exactly as `loadDiceFacts` already does for parquet. The `VALUES` fallback in 4.3 exists for this case |
 
 ---
 
@@ -826,17 +826,17 @@ Everything else in this spec is either a correctness obligation that can land
 immediately after, or a follow-up already marked as such. Estimates are for one
 engineer who has read the spec.
 
-| #   | Step                                                                                                                                                                                                        | Effort | Why it is on the path                                                                                                       |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Confirm section 1.1: click a concept in Data Explorer, see the throw                                                                                                                                        | 5 min  | If it does not throw, the risk story changes and step 6 needs a characterization test first                                 |
-| 2   | Add `ava_rows_<datasetId>` beside the dataset view in `duckDbParquetLoad.ts`, and drop it in `dropTableViewAndFile`                                                                                         | 30 min | `first` needs a total order, and the whole determinism exit criterion hangs on it. Fallback in 4.6 if it fights duckdb-wasm |
-| 3   | Fix `first` in `getSQLSelectOfMapping` (`ORDER BY file_row_number`, reading `ava_rows_`), and add the `most_frequent` tie-break to the second copy in `AttributeAssertionClient.ts:245`                     | 45 min | Exit criterion 7. One edit in a shared function also fixes `generateIndividuals`' label picker                              |
-| 4   | Build the concept view: spine from `individuals` through `loadCsv`, one `getSQLSelectOfMapping` column per attribute, typed NULL for manual entry, `CREATE OR REPLACE VIEW` under `RelationRef.toTableName` | 2-3 h  | This is the spec. Everything else is plumbing around it                                                                     |
-| 5   | Wire it into relation loading: expand a concept ref to its contributing datasets, extend the workspace allowlist to accept concept refs, load datasets then spine then view                                 | 1-2 h  | Without expansion the datasets the view reads are not loaded, and without the allowlist the ref is dropped                  |
-| 6   | `structuredQueryToSql`: delete the throw, name the table through `RelationRef.toTableName`, **and open the aggregation gate at line 84**                                                                    | 30 min | Exit criteria 5, and criterion 4's group-by. Three edits, one file                                                          |
-| 7   | Delete `_runConceptQuery`, the `Concept` arm, `ConceptWrapper`'s delegating `buildConceptQueryResult`, and collapse the one-arm match                                                                       | 20 min | Exit criterion 6                                                                                                            |
-| 8   | Rename `generateIndividuals`' bare-UUID staging table and drop it when done                                                                                                                                 | 15 min | Protects the naming invariant every later spec trusts. Cheap now, expensive to discover later                               |
-| 9   | Demo rehearsal: two concepts each selected and charted, then joined in raw SQL, then one joined to a dataset with filter, group-by and sort                                                                 | 45 min | Exit criteria 1 through 4. No join UI is needed; joins are raw SQL today                                                    |
+| # | Step | Effort | Why it is on the path |
+|---|---|---|---|
+| 1 | Confirm section 1.1: click a concept in Data Explorer, see the throw | 5 min | If it does not throw, the risk story changes and step 6 needs a characterization test first |
+| 2 | Add `ava_rows_<datasetId>` beside the dataset view in `duckDbParquetLoad.ts`, and drop it in `dropTableViewAndFile` | 30 min | `first` needs a total order, and the whole determinism exit criterion hangs on it. Fallback in 4.6 if it fights duckdb-wasm |
+| 3 | Fix `first` in `getSQLSelectOfMapping` (`ORDER BY file_row_number`, reading `ava_rows_`), and add the `most_frequent` tie-break to the second copy in `AttributeAssertionClient.ts:245` | 45 min | Exit criterion 7. One edit in a shared function also fixes `generateIndividuals`' label picker |
+| 4 | Build the concept view: spine from `individuals` through `loadCsv`, one `getSQLSelectOfMapping` column per attribute, typed NULL for manual entry, `CREATE OR REPLACE VIEW` under `RelationRef.toTableName` | 2-3 h | This is the spec. Everything else is plumbing around it |
+| 5 | Wire it into relation loading: expand a concept ref to its contributing datasets, extend the workspace allowlist to accept concept refs, load datasets then spine then view | 1-2 h | Without expansion the datasets the view reads are not loaded, and without the allowlist the ref is dropped |
+| 6 | `structuredQueryToSql`: delete the throw, name the table through `RelationRef.toTableName`, **and open the aggregation gate at line 84** | 30 min | Exit criteria 5, and criterion 4's group-by. Three edits, one file |
+| 7 | Delete `_runConceptQuery`, the `Concept` arm, `ConceptWrapper`'s delegating `buildConceptQueryResult`, and collapse the one-arm match | 20 min | Exit criterion 6 |
+| 8 | Rename `generateIndividuals`' bare-UUID staging table and drop it when done | 15 min | Protects the naming invariant every later spec trusts. Cheap now, expensive to discover later |
+| 9 | Demo rehearsal: two concepts each selected and charted, then joined in raw SQL, then one joined to a dataset with filter, group-by and sort | 45 min | Exit criteria 1 through 4. No join UI is needed; joins are raw SQL today |
 
 Rough total: **6 to 8 hours**, of which steps 4 and 5 are the substance.
 

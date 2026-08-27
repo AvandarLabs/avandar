@@ -7,11 +7,11 @@
 > tasks here are shared foundation that region extraction needs too, and the
 > detection half cannot unblock a merge it extracts nothing for.
 >
-> | Execute instead                                                                                                        | Contains                                                                 |
-> | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+> | Execute instead | Contains |
+> |---|---|
 > | [`2026-08-18-pdf-import-phase-b1-extraction-foundation.md`](./2026-08-18-pdf-import-phase-b1-extraction-foundation.md) | Tasks 1 to 5, 12, 14 to 16 and 18 from here, plus word and line assembly |
-> | [`2026-08-18-pdf-import-phase-b2-selection-extraction.md`](./2026-08-18-pdf-import-phase-b2-selection-extraction.md)   | New. Task 17 rewritten as the region picker. **The merge gate.**         |
-> | [`2026-08-18-pdf-import-phase-b3-auto-table-detection.md`](./2026-08-18-pdf-import-phase-b3-auto-table-detection.md)   | Tasks 6 to 11, 13 and 19 from here                                       |
+> | [`2026-08-18-pdf-import-phase-b2-selection-extraction.md`](./2026-08-18-pdf-import-phase-b2-selection-extraction.md) | New. Task 17 rewritten as the region picker. **The merge gate.** |
+> | [`2026-08-18-pdf-import-phase-b3-auto-table-detection.md`](./2026-08-18-pdf-import-phase-b3-auto-table-detection.md) | Tasks 6 to 11, 13 and 19 from here |
 >
 > Task bodies were moved verbatim, so nothing written here was lost. Kept for
 > history and for the self-review notes at the end. See
@@ -66,11 +66,11 @@ Three real CC BY papers live in `public/test-data/pdf/` with attribution and
 per-file notes in that directory's README. Read it before writing detector
 tests. Summary of what each proves:
 
-| Fixture                                     | Tagged | Proves                                                                                                                 |
-| ------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `frontiers-peru-child-health-insurance.pdf` | yes    | Structure tree path, multi-page continuation, two tables side by side on one page, wrapped header cells, Unicode minus |
-| `plos-one-online-research-data-quality.pdf` | no     | Untagged multi-page continuation                                                                                       |
-| `plos-one-ncd-mobile-phone-surveys.pdf`     | no     | Four-level spanning headers, `n (%)` values, dashes as nulls, a real broken ToUnicode map                              |
+| Fixture | Tagged | Proves |
+|---|---|---|
+| `frontiers-peru-child-health-insurance.pdf` | yes | Structure tree path, multi-page continuation, two tables side by side on one page, wrapped header cells, Unicode minus |
+| `plos-one-online-research-data-quality.pdf` | no | Untagged multi-page continuation |
+| `plos-one-ncd-mobile-phone-surveys.pdf` | no | Four-level spanning headers, `n (%)` values, dashes as nulls, a real broken ToUnicode map |
 
 ## File structure
 
@@ -78,34 +78,33 @@ All detection code lives under `src/workers/pdfSniff/`, one file per
 responsibility, so each is unit-testable against fixture JSON with no PDF in
 the loop:
 
-| File                                          | Responsibility                                      |
-| --------------------------------------------- | --------------------------------------------------- |
-| `src/workers/pdfSniff.worker.ts`              | Worker entry: orchestrate, post progress and result |
-| `src/workers/pdfSniff/types.ts`               | Shared geometry and candidate types                 |
-| `src/workers/pdfSniff/extractPageGeometry.ts` | The only file that touches pdf.js                   |
-| `src/workers/pdfSniff/detectTextLayer.ts`     | Scanned-PDF guard                                   |
-| `src/workers/pdfSniff/normalizeCellValue.ts`  | PDF-specific value cleanup                          |
-| `src/workers/pdfSniff/detectTaggedTables.ts`  | Signal A                                            |
-| `src/workers/pdfSniff/detectLatticeTables.ts` | Signal B                                            |
-| `src/workers/pdfSniff/detectStreamTables.ts`  | Signal C                                            |
-| `src/workers/pdfSniff/dedupeCandidates.ts`    | Cross-signal dedup                                  |
-| `src/workers/pdfSniff/mergePageSpans.ts`      | Multi-page joining                                  |
-| `src/workers/pdfSniff/scoreCandidate.ts`      | Confidence scoring                                  |
-| `src/clients/datasets/pdfSniff.ts`            | Main-thread driver                                  |
+| File | Responsibility |
+|---|---|
+| `src/workers/pdfSniff.worker.ts` | Worker entry: orchestrate, post progress and result |
+| `src/workers/pdfSniff/types.ts` | Shared geometry and candidate types |
+| `src/workers/pdfSniff/extractPageGeometry.ts` | The only file that touches pdf.js |
+| `src/workers/pdfSniff/detectTextLayer.ts` | Scanned-PDF guard |
+| `src/workers/pdfSniff/normalizeCellValue.ts` | PDF-specific value cleanup |
+| `src/workers/pdfSniff/detectTaggedTables.ts` | Signal A |
+| `src/workers/pdfSniff/detectLatticeTables.ts` | Signal B |
+| `src/workers/pdfSniff/detectStreamTables.ts` | Signal C |
+| `src/workers/pdfSniff/dedupeCandidates.ts` | Cross-signal dedup |
+| `src/workers/pdfSniff/mergePageSpans.ts` | Multi-page joining |
+| `src/workers/pdfSniff/scoreCandidate.ts` | Confidence scoring |
+| `src/clients/datasets/pdfSniff.ts` | Main-thread driver |
 
 UI and wiring:
 
-| File                                                                                         | Responsibility                   |
-| -------------------------------------------------------------------------------------------- | -------------------------------- |
+| File | Responsibility |
+|---|---|
 | `src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfTablePicker.tsx` | Candidate list plus page preview |
-| `src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx` | Canvas render with bbox overlay  |
+| `src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx` | Canvas render with bbox overlay |
 
 ---
 
 ## Task 1: Add pdfjs-dist and prove it runs in a worker
 
 **Files:**
-
 - Modify: `package.json`
 - Create: `src/workers/pdfSniff/loadPdfJs.ts`
 - Create: `src/workers/pdfSniff/loadPdfJs.test.ts`
@@ -124,8 +123,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { loadPdfDocument } from "./loadPdfJs";
 
-const FIXTURE =
-  "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf";
+const FIXTURE = "public/test-data/pdf/frontiers-peru-child-health-insurance.pdf";
 
 describe("loadPdfDocument", () => {
   it("opens a real PDF and reports its page count", async () => {
@@ -216,7 +214,6 @@ git commit -m "feat: add pdfjs-dist and a PDF document loader"
 ## Task 2: Shared geometry types
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/types.ts`
 
 No test: this file is types only, and the type checker is the test.
@@ -321,7 +318,6 @@ git commit -m "feat: add pdf sniff geometry types"
 ## Task 3: Normalise cell values
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/normalizeCellValue.ts`
 - Create: `src/workers/pdfSniff/normalizeCellValue.test.ts`
 
@@ -330,7 +326,7 @@ wrong. Survey of the real fixtures turned up two cases worth stating plainly:
 
 1. **Parentheses do not always mean negative.** Public health tables write
    `361 (84.7)` for count and percent. Only treat parentheses as a sign when
-   they wrap the _entire_ value.
+   they wrap the *entire* value.
 2. **The digits must not change.** `12%` becomes `12`, not `0.12`. Converting
    to a fraction would silently disagree with what the reader sees in the
    document, and a user comparing our table to the PDF would conclude we had
@@ -460,7 +456,9 @@ describe("normalizeCellValue", () => {
     });
 
     it("collapses non-breaking spaces", () => {
-      expect(normalizeCellValue("Health facility")).toBe("Health facility");
+      expect(normalizeCellValue("Health facility")).toBe(
+        "Health facility",
+      );
     });
   });
 });
@@ -572,9 +570,7 @@ export function normalizeCellValue(rawValue: string): string {
   const candidate = _stripThousandsSeparators(withoutPercent);
 
   if (NUMERIC_PATTERN.test(candidate)) {
-    return isAccountingNegative
-      ? `-${candidate.replace(/^-/u, "")}`
-      : candidate;
+    return isAccountingNegative ? `-${candidate.replace(/^-/u, "")}` : candidate;
   }
 
   // Not a number we recognise. Return the collapsed original so nothing is
@@ -612,7 +608,6 @@ git commit -m "feat: normalise pdf cell values without changing their digits"
 ## Task 4: Extract page geometry from pdf.js
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/extractPageGeometry.ts`
 - Create: `src/workers/pdfSniff/extractPageGeometry.test.ts`
 
@@ -760,7 +755,9 @@ async function _extractRules(page: PDFPageProxy): Promise<RuleSegment[]> {
     if (operatorList.fnArray[i] !== pdfjs.OPS.constructPath) {
       continue;
     }
-    const args = operatorList.argsArray[i] as [number[], number[]] | undefined;
+    const args = operatorList.argsArray[i] as
+      | [number[], number[]]
+      | undefined;
     if (!args) {
       continue;
     }
@@ -918,7 +915,6 @@ git commit -m "feat: normalise pdf page geometry from pdf.js"
 ## Task 5: The scanned-PDF guard
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/detectTextLayer.ts`
 - Create: `src/workers/pdfSniff/detectTextLayer.test.ts`
 
@@ -1127,7 +1123,6 @@ git commit -m "feat: diagnose scanned and unreliable pdf text layers"
 ## Task 6: Lattice detection from ruling lines
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/detectLatticeTables.ts`
 - Create: `src/workers/pdfSniff/detectLatticeTables.test.ts`
 
@@ -1506,7 +1501,6 @@ git commit -m "feat: detect ruled pdf tables from content-stream geometry"
 ## Task 7: Tagged structure tree detection
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/detectTaggedTables.ts`
 - Create: `src/workers/pdfSniff/detectTaggedTables.test.ts`
 
@@ -1523,12 +1517,7 @@ import { detectTaggedTables } from "./detectTaggedTables";
 import type { StructTreeNode } from "./detectTaggedTables";
 import type { PageGeometry, TextItem } from "./types";
 
-function textItem(
-  text: string,
-  x: number,
-  y: number,
-  id: string,
-): TextItem & {
+function textItem(text: string, x: number, y: number, id: string): TextItem & {
   id: string;
 } {
   return {
@@ -1646,7 +1635,9 @@ describe("detectTaggedTables", () => {
         },
         {
           role: "TR",
-          children: [{ role: "TD", children: [{ type: "content", id: "t3" }] }],
+          children: [
+            { role: "TD", children: [{ type: "content", id: "t3" }] },
+          ],
         },
       ],
     };
@@ -1741,7 +1732,12 @@ function _bboxOf(items: readonly TextItem[], page: PageGeometry): BBox {
   const ys = items.flatMap((i) => {
     return [i.y, i.y + i.height];
   });
-  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  return [
+    Math.min(...xs),
+    Math.min(...ys),
+    Math.max(...xs),
+    Math.max(...ys),
+  ];
 }
 
 /**
@@ -1837,7 +1833,6 @@ git commit -m "feat: read tables from tagged pdf structure trees"
 ## Task 8: Stream detection from whitespace
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/detectStreamTables.ts`
 - Create: `src/workers/pdfSniff/detectStreamTables.test.ts`
 
@@ -1981,7 +1976,9 @@ const MIN_COLUMNS = 2;
  */
 const MIN_COLUMN_OCCUPANCY = 0.6;
 
-function _groupIntoRows(items: readonly TextItem[]): TextItem[][] {
+function _groupIntoRows(
+  items: readonly TextItem[],
+): TextItem[][] {
   const rows: TextItem[][] = [];
 
   for (const item of items) {
@@ -2013,9 +2010,7 @@ function _groupIntoRows(items: readonly TextItem[]): TextItem[][] {
  * This is the crux of stream detection and the reason it earns only medium
  * or low confidence: alignment is evidence of a column, not proof of one.
  */
-function _findColumnPositions(
-  rows: readonly (readonly TextItem[])[],
-): number[] {
+function _findColumnPositions(rows: readonly (readonly TextItem[])[]): number[] {
   const clusters: { position: number; rowsSeen: Set<number> }[] = [];
 
   rows.forEach((row, rowIndex) => {
@@ -2129,7 +2124,6 @@ git commit -m "feat: detect borderless pdf tables from text alignment"
 ## Task 9: Deduplicate candidates across signals
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/dedupeCandidates.ts`
 - Create: `src/workers/pdfSniff/dedupeCandidates.test.ts`
 
@@ -2261,7 +2255,10 @@ const MODE_RANK: Record<PdfDetectionMode, number> = {
 };
 
 function _intersectionOverUnion(a: BBox, b: BBox): number {
-  const overlapWidth = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
+  const overlapWidth = Math.max(
+    0,
+    Math.min(a[2], b[2]) - Math.max(a[0], b[0]),
+  );
   const overlapHeight = Math.max(
     0,
     Math.min(a[3], b[3]) - Math.max(a[1], b[1]),
@@ -2340,7 +2337,6 @@ git commit -m "feat: dedupe pdf table candidates across detection signals"
 ## Task 10: Merge tables that span pages
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/mergePageSpans.ts`
 - Create: `src/workers/pdfSniff/mergePageSpans.test.ts`
 
@@ -2393,11 +2389,7 @@ describe("mergePageSpans", () => {
     expect(merged[0]!.fragments.map((f) => f.pageIndex)).toEqual([3, 4]);
     // The header appears once. The repeat on page 4 is page furniture, not
     // data, and leaving it in would inject a fake row mid-table.
-    expect(merged[0]!.cells).toEqual([
-      HEADER,
-      ["Gao", "1204"],
-      ["Mopti", "987"],
-    ]);
+    expect(merged[0]!.cells).toEqual([HEADER, ["Gao", "1204"], ["Mopti", "987"]]);
   });
 
   it("merges a continuation page that omits the header", () => {
@@ -2417,11 +2409,7 @@ describe("mergePageSpans", () => {
     ]);
 
     expect(merged).toHaveLength(1);
-    expect(merged[0]!.cells).toEqual([
-      HEADER,
-      ["Gao", "1204"],
-      ["Mopti", "987"],
-    ]);
+    expect(merged[0]!.cells).toEqual([HEADER, ["Gao", "1204"], ["Mopti", "987"]]);
   });
 
   it("does not merge across a gap in page numbers", () => {
@@ -2452,10 +2440,7 @@ describe("mergePageSpans", () => {
       fragment({
         pageIndex: 4,
         gridX: [100, 200, 300, 400],
-        cells: [
-          ["A", "B", "C"],
-          ["1", "2", "3"],
-        ],
+        cells: [["A", "B", "C"], ["1", "2", "3"]],
       }),
     ]);
 
@@ -2638,7 +2623,6 @@ git commit -m "feat: merge pdf table fragments across page spans"
 ## Task 11: Score confidence and detect headers
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/scoreCandidate.ts`
 - Create: `src/workers/pdfSniff/scoreCandidate.test.ts`
 
@@ -2968,7 +2952,6 @@ git commit -m "feat: score pdf table confidence and resolve headers"
 ## Task 12: The sniff worker and its driver
 
 **Files:**
-
 - Create: `src/workers/pdfSniff.worker.ts`
 - Create: `src/clients/datasets/pdfSniff.ts`
 
@@ -3001,11 +2984,7 @@ import { loadPdfDocument } from "./pdfSniff/loadPdfJs";
 import { mergePageSpans } from "./pdfSniff/mergePageSpans";
 import { scoreCandidate } from "./pdfSniff/scoreCandidate";
 import type { ContentItemIndex } from "./pdfSniff/detectTaggedTables";
-import type {
-  CandidateTable,
-  PageGeometry,
-  ScoredTable,
-} from "./pdfSniff/types";
+import type { CandidateTable, PageGeometry, ScoredTable } from "./pdfSniff/types";
 
 /**
  * Hard cap on pages scanned when the user has not chosen a range. Beyond
@@ -3173,8 +3152,9 @@ self.addEventListener("message", async (event: MessageEvent<SniffRequest>) => {
     _post({
       type: "error",
       reason: isPasswordError ? "password_required" : "unknown",
-      message: isPasswordError
-        ? "This PDF is password protected. Enter its password to continue."
+      message:
+        isPasswordError ?
+          "This PDF is password protected. Enter its password to continue."
         : message,
     });
   } finally {
@@ -3236,11 +3216,7 @@ export async function sniffPdfFile(params: {
     return await new Promise<PdfSniffResult>((resolve, reject) => {
       worker.addEventListener(
         "message",
-        (
-          event: MessageEvent<
-            PdfSniffResult | PdfSniffProgress | PdfSniffError
-          >,
-        ) => {
+        (event: MessageEvent<PdfSniffResult | PdfSniffProgress | PdfSniffError>) => {
           const data = event.data;
           if (data.type === "progress") {
             params.onProgress?.(data);
@@ -3293,7 +3269,6 @@ git commit -m "feat: add pdf sniff worker and main-thread driver"
 ## Task 13: Wire marked content into tagged detection
 
 **Files:**
-
 - Modify: `src/workers/pdfSniff/extractPageGeometry.ts`
 - Modify: `src/workers/pdfSniff.worker.ts`
 - Create: `src/workers/pdfSniff/pdfSniff.fixtures.test.ts`
@@ -3423,9 +3398,9 @@ export async function extractPageGeometry(
 Replace the `getTextContent()` call with:
 
 ```ts
-const textContent = await page.getTextContent({
-  includeMarkedContent: options.includeMarkedContent ?? false,
-});
+  const textContent = await page.getTextContent({
+    includeMarkedContent: options.includeMarkedContent ?? false,
+  });
 ```
 
 When `includeMarkedContent` is true, pdf.js interleaves
@@ -3433,43 +3408,43 @@ When `includeMarkedContent` is true, pdf.js interleaves
 the most recent id and record it against each item:
 
 ```ts
-const contentIndex: Record<string, TextItem> = {};
-let currentMarkedContentId: string | undefined;
-const rawItems: TextItem[] = [];
+  const contentIndex: Record<string, TextItem> = {};
+  let currentMarkedContentId: string | undefined;
+  const rawItems: TextItem[] = [];
 
-for (const rawItem of textContent.items) {
-  if (!("str" in rawItem)) {
-    // A marked-content boundary. `id` is present on begin markers and
-    // absent on end markers, so an absent id clears the current scope.
-    const markerId = (rawItem as { id?: string }).id;
-    currentMarkedContentId = markerId;
-    continue;
+  for (const rawItem of textContent.items) {
+    if (!("str" in rawItem)) {
+      // A marked-content boundary. `id` is present on begin markers and
+      // absent on end markers, so an absent id clears the current scope.
+      const markerId = (rawItem as { id?: string }).id;
+      currentMarkedContentId = markerId;
+      continue;
+    }
+    if (rawItem.str.length === 0) {
+      continue;
+    }
+    const item: TextItem = {
+      text: rawItem.str,
+      x: rawItem.transform[4] ?? 0,
+      y: rawItem.transform[5] ?? 0,
+      width: rawItem.width ?? 0,
+      height: rawItem.height ?? 0,
+      fontName: rawItem.fontName ?? "",
+      unmappedCharRatio: _unmappedCharRatio(rawItem.str),
+    };
+    rawItems.push(item);
+    if (currentMarkedContentId !== undefined) {
+      contentIndex[currentMarkedContentId] = item;
+    }
   }
-  if (rawItem.str.length === 0) {
-    continue;
-  }
-  const item: TextItem = {
-    text: rawItem.str,
-    x: rawItem.transform[4] ?? 0,
-    y: rawItem.transform[5] ?? 0,
-    width: rawItem.width ?? 0,
-    height: rawItem.height ?? 0,
-    fontName: rawItem.fontName ?? "",
-    unmappedCharRatio: _unmappedCharRatio(rawItem.str),
-  };
-  rawItems.push(item);
-  if (currentMarkedContentId !== undefined) {
-    contentIndex[currentMarkedContentId] = item;
-  }
-}
 
-const textItems = rawItems.sort((a, b) => {
-  const yDelta = b.y - a.y;
-  if (Math.abs(yDelta) > 1) {
-    return yDelta;
-  }
-  return a.x - b.x;
-});
+  const textItems = rawItems.sort((a, b) => {
+    const yDelta = b.y - a.y;
+    if (Math.abs(yDelta) > 1) {
+      return yDelta;
+    }
+    return a.x - b.x;
+  });
 ```
 
 and return `{ geometry: { ... }, contentIndex }`.
@@ -3480,9 +3455,9 @@ and return `{ geometry: { ... }, contentIndex }`.
 helper to:
 
 ```ts
-const { geometry } = await extractPageGeometry(page, pageNumber - 1);
-await doc.destroy();
-return geometry;
+  const { geometry } = await extractPageGeometry(page, pageNumber - 1);
+  await doc.destroy();
+  return geometry;
 ```
 
 - [ ] **Step 5: Update the worker call site**
@@ -3490,11 +3465,11 @@ return geometry;
 In `pdfSniff.worker.ts`, replace the geometry call with:
 
 ```ts
-const { geometry, contentIndex } = await extractPageGeometry(
-  page,
-  pageNumber - 1,
-  { includeMarkedContent: true },
-);
+      const { geometry, contentIndex } = await extractPageGeometry(
+        page,
+        pageNumber - 1,
+        { includeMarkedContent: true },
+      );
 ```
 
 and delete the `const contentIndex: ContentItemIndex = {};` line.
@@ -3527,7 +3502,6 @@ git commit -m "feat: map marked content to text items for tagged detection"
 ## Task 14: Type the extracted table through DuckDB
 
 **Files:**
-
 - Create: `src/clients/datasets/pdfTableToColumns.ts`
 - Create: `src/clients/datasets/pdfTableToColumns.test.ts`
 
@@ -3585,7 +3559,10 @@ describe("pdfTableToCsv", () => {
 
   it("escapes embedded quotes", () => {
     const csv = pdfTableToCsv({
-      cells: [["Name"], ['He said "hi"']],
+      cells: [
+        ["Name"],
+        ['He said "hi"'],
+      ],
       headerRows: 1,
     });
 
@@ -3727,7 +3704,6 @@ git commit -m "feat: serialise extracted pdf tables to csv for duckdb typing"
 ## Task 15: Compute the drift fingerprint
 
 **Files:**
-
 - Create: `src/clients/datasets/pdfTableFingerprint.ts`
 - Create: `src/clients/datasets/pdfTableFingerprint.test.ts`
 
@@ -3771,11 +3747,7 @@ describe("computePdfTableFingerprint", () => {
     const a = await computePdfTableFingerprint(TABLE);
     const b = await computePdfTableFingerprint({
       ...TABLE,
-      cells: [
-        ["District", "Cases"],
-        ["Gao", "9999"],
-        ["Mopti", "987"],
-      ],
+      cells: [["District", "Cases"], ["Gao", "9999"], ["Mopti", "987"]],
     });
 
     expect(a.hash).not.toBe(b.hash);
@@ -3793,11 +3765,7 @@ describe("fingerprintsMatch", () => {
     // resolving the same geometry to a different table.
     const original = await computePdfTableFingerprint(TABLE);
     const drifted = await computePdfTableFingerprint({
-      cells: [
-        ["Region", "Total"],
-        ["Gao", "1204"],
-        ["Mopti", "987"],
-      ],
+      cells: [["Region", "Total"], ["Gao", "1204"], ["Mopti", "987"]],
       headerRows: 1,
     });
 
@@ -3807,10 +3775,7 @@ describe("fingerprintsMatch", () => {
   it("reports a mismatch when the row count changes", async () => {
     const original = await computePdfTableFingerprint(TABLE);
     const truncated = await computePdfTableFingerprint({
-      cells: [
-        ["District", "Cases"],
-        ["Gao", "1204"],
-      ],
+      cells: [["District", "Cases"], ["Gao", "1204"]],
       headerRows: 1,
     });
 
@@ -3898,7 +3863,6 @@ git commit -m "feat: fingerprint extracted pdf tables to detect drift"
 ## Task 16: The page preview canvas
 
 **Files:**
-
 - Create: `src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx`
 
 Renders one page to a canvas with the detected bounding box drawn over it.
@@ -4016,9 +3980,7 @@ export function PdfPagePreview({
   return (
     <Box pos="relative" w={width}>
       <canvas ref={canvasRef} style={{ width: "100%", height: "auto" }} />
-      {status === "loading" && (
-        <Loader size="sm" pos="absolute" top={8} left={8} />
-      )}
+      {status === "loading" && <Loader size="sm" pos="absolute" top={8} left={8} />}
       {status === "error" && (
         <Text size="xs" c="dimmed">
           Could not render this page.
@@ -4046,7 +4008,6 @@ git commit -m "feat: render pdf page previews with detected table outlines"
 ## Task 17: The table picker
 
 **Files:**
-
 - Create: `src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfTablePicker.tsx`
 - Create: `src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfTablePicker.test.tsx`
 
@@ -4076,10 +4037,7 @@ const TABLES: ScoredTable[] = [
     detectionMode: "lattice",
     gridX: [100, 250, 400],
     gridY: [700, 400, 100],
-    cells: [
-      ["District", "Cases"],
-      ["Gao", "1204"],
-    ],
+    cells: [["District", "Cases"], ["Gao", "1204"]],
     confidence: "high",
     confidenceNotes: ["Built from the ruling lines drawn in the document."],
     headerRows: 1,
@@ -4103,9 +4061,7 @@ const TABLES: ScoredTable[] = [
   },
 ];
 
-function renderPicker(
-  props: Partial<React.ComponentProps<typeof PdfTablePicker>> = {},
-) {
+function renderPicker(props: Partial<React.ComponentProps<typeof PdfTablePicker>> = {}) {
   return render(
     <MantineProvider>
       <PdfTablePicker
@@ -4137,9 +4093,7 @@ describe("PdfTablePicker", () => {
     // A user cannot sanity-check a guess they were not told was a guess.
     renderPicker();
 
-    expect(
-      screen.getByText(/guessed from text alignment/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/guessed from text alignment/i)).toBeInTheDocument();
   });
 
   it("offers a split control only for merged tables", () => {
@@ -4180,7 +4134,15 @@ Create `PdfTablePicker.tsx`:
 
 ```tsx
 import { Trans } from "@lingui/react/macro";
-import { Badge, Button, Group, Paper, Radio, Stack, Text } from "@mantine/core";
+import {
+  Badge,
+  Button,
+  Group,
+  Paper,
+  Radio,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { PdfPagePreview } from "./PdfPagePreview";
 import type { ScoredTable } from "@/workers/pdfSniff/types";
 
@@ -4254,8 +4216,8 @@ export function PdfTablePicker({
                     {_pageLabel(table)}
                   </Text>
                   <Text size="sm" c="dimmed">
-                    {rowCount} {rowCount === 1 ? "row" : "rows"} × {columnCount}{" "}
-                    {columnCount === 1 ? "column" : "columns"}
+                    {rowCount} {rowCount === 1 ? "row" : "rows"} ×{" "}
+                    {columnCount} {columnCount === 1 ? "column" : "columns"}
                   </Text>
                   <Badge
                     size="sm"
@@ -4327,7 +4289,6 @@ git commit -m "feat: add pdf table picker with confidence and page previews"
 ## Task 18: Wire PDF into the import flow
 
 **Files:**
-
 - Modify: `src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx:36-60,179-187`
 - Modify: `src/views/DataManagerApp/DataImportView/ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts`
 - Modify: `src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types.ts`
@@ -4634,7 +4595,6 @@ git commit -m "feat: wire pdf import through the manual upload flow"
 ## Task 19: Synthetic fixtures for the uncovered cases
 
 **Files:**
-
 - Create: `scripts/generate-pdf-test-fixtures/generate-pdf-test-fixtures.ts`
 - Create: `public/test-data/pdf/synthetic-scanned-no-text-layer.pdf`
 - Create: `public/test-data/pdf/synthetic-fully-ruled-statistics.pdf`

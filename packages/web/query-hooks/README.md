@@ -36,11 +36,11 @@ import { AvaQueryProvider } from "@avandar/query-hooks";
 
 Mounting the provider is optional.
 
-| Export                       | Description                           |
-| ---------------------------- | ------------------------------------- |
-| `AvaQueryProvider`           | Supplies the error reporter           |
-| `useAvaQueryErrorReporter()` | Reads the active reporter             |
-| `AvaQueryErrorReporter`      | `({ title, message, cause }) => void` |
+| Export                       | Description                                    |
+| ---------------------------- | ---------------------------------------------- |
+| `AvaQueryProvider`           | Supplies the error reporter                    |
+| `useAvaQueryErrorReporter()` | Reads the active reporter                      |
+| `AvaQueryErrorReporter`      | `({ title, message, cause }) => void`          |
 
 ---
 
@@ -61,11 +61,11 @@ const [users, isLoading] = useQuery({
 });
 ```
 
-| Type                  | Description                                |
-| --------------------- | ------------------------------------------ |
-| `UseQueryOptions`     | Options accepted by `useQuery`             |
-| `UseQueryResult`      | The raw TanStack result object             |
-| `UseQueryResultTuple` | The `[data, isLoading, queryResult]` shape |
+| Type                  | Description                                     |
+| --------------------- | ----------------------------------------------- |
+| `UseQueryOptions`     | Options accepted by `useQuery`                  |
+| `UseQueryResult`      | The raw TanStack result object                  |
+| `UseQueryResultTuple` | The `[data, isLoading, queryResult]` shape      |
 
 ## `useMutation(options)`
 
@@ -91,12 +91,12 @@ await createUser.async({ name: "Bob" });
 
 The plural options take precedence over the singular ones.
 
-| Type                     | Description                                           |
-| ------------------------ | ----------------------------------------------------- |
-| `UseMutationOptions`     | TanStack's options plus the invalidate/refetch fields |
-| `UseMutationResult`      | The raw TanStack mutation result                      |
-| `UseMutateFunction`      | The `mutate` callable, with `.async` attached         |
-| `UseMutationResultTuple` | The `[mutate, isPending, mutationResult]` shape       |
+| Type                     | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| `UseMutationOptions`     | TanStack's options plus the invalidate/refetch fields   |
+| `UseMutationResult`      | The raw TanStack mutation result                        |
+| `UseMutateFunction`      | The `mutate` callable, with `.async` attached           |
+| `UseMutationResultTuple` | The `[mutate, isPending, mutationResult]` shape         |
 
 ---
 
@@ -136,12 +136,12 @@ The augmented client also exposes:
 Mutation hooks accept `UseMutationOptions` plus `invalidateGetAllQuery`, which
 appends the client's `getAll` key to the invalidation list.
 
-| Export                      | Description                                       |
-| --------------------------- | ------------------------------------------------- |
-| `DEFAULT_QUERY_FN_NAMES`    | Names treated as queries by default               |
-| `DEFAULT_MUTATION_FN_NAMES` | Names treated as mutations by default             |
-| `WithQueryHooks`            | The augmented client type                         |
-| `FnNameReturningPromise`    | Keys of an object whose values return a `Promise` |
+| Export                      | Description                                        |
+| --------------------------- | -------------------------------------------------- |
+| `DEFAULT_QUERY_FN_NAMES`    | Names treated as queries by default                 |
+| `DEFAULT_MUTATION_FN_NAMES` | Names treated as mutations by default               |
+| `WithQueryHooks`            | The augmented client type                           |
+| `FnNameReturningPromise`    | Keys of an object whose values return a `Promise`   |
 
 `DefaultError`, `QueryClient`, and `QueryKey` are re-exported unchanged from
 `@tanstack/react-query` for convenience.

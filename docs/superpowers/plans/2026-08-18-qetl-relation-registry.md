@@ -62,31 +62,31 @@ Read these before Task 1. They are enforced by `docs/rules/typescript.md` and
 
 **Commands:**
 
-| Purpose                             | Command                        |
-| ----------------------------------- | ------------------------------ |
-| Frontend tests (jsdom)              | `pnpm test:frontend <pattern>` |
+| Purpose | Command |
+|---|---|
+| Frontend tests (jsdom) | `pnpm test:frontend <pattern>` |
 | Executed tests (node, after Task 1) | `pnpm test:executed <pattern>` |
-| Type check                          | `pnpm type-check`              |
+| Type check | `pnpm type-check` |
 
 ---
 
 ## File structure
 
-| File                                                                         | Responsibility                                        |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `vitest.executed.config.ts`                                                  | Second Vitest project, `environment: "node"`          |
-| `shared/models/relations/RelationRef/RelationRef.ts`                         | The ref union, and ref ↔ table-name conversion        |
-| `shared/models/relations/RelationCapabilities/RelationCapabilities.types.ts` | The twelve capability fields                          |
-| `shared/models/relations/RelationSchema/RelationSchema.types.ts`             | Columns without rows                                  |
-| `shared/models/relations/SourceWrapper/SourceWrapper.types.ts`               | Wrapper interface, request and context types          |
-| `src/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types.ts`                   | Extended: `read` analysis carries `relations`         |
-| `src/clients/qetl/wrappers/extractReferencedRelations/`                      | Adapter: analysis → refs, throw → `unsupported`       |
-| `src/clients/qetl/RelationRegistry/RelationRegistry.ts`                      | Ref → wrapper resolution                              |
-| `src/clients/qetl/wrappers/DatasetParquetWrapper/`                           | `csv_file`, `xlsx_file`, `open_data`                  |
-| `src/clients/qetl/wrappers/VirtualDatasetWrapper/`                           | `virtual`                                             |
-| `src/clients/qetl/wrappers/GoogleSheetsWrapper/`                             | `google_sheets`: declares capabilities, still throws  |
-| `src/clients/qetl/wrappers/ConceptWrapper/`                                  | `concept`: delegates to `AttributeAssertionClient`    |
-| `src/clients/qetl/QetlClient/getRelationSources.ts`                          | Renamed from `qetlDiceExtractors.ts`, registry-driven |
+| File | Responsibility |
+|---|---|
+| `vitest.executed.config.ts` | Second Vitest project, `environment: "node"` |
+| `shared/models/relations/RelationRef/RelationRef.ts` | The ref union, and ref ↔ table-name conversion |
+| `shared/models/relations/RelationCapabilities/RelationCapabilities.types.ts` | The twelve capability fields |
+| `shared/models/relations/RelationSchema/RelationSchema.types.ts` | Columns without rows |
+| `shared/models/relations/SourceWrapper/SourceWrapper.types.ts` | Wrapper interface, request and context types |
+| `src/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types.ts` | Extended: `read` analysis carries `relations` |
+| `src/clients/qetl/wrappers/extractReferencedRelations/` | Adapter: analysis → refs, throw → `unsupported` |
+| `src/clients/qetl/RelationRegistry/RelationRegistry.ts` | Ref → wrapper resolution |
+| `src/clients/qetl/wrappers/DatasetParquetWrapper/` | `csv_file`, `xlsx_file`, `open_data` |
+| `src/clients/qetl/wrappers/VirtualDatasetWrapper/` | `virtual` |
+| `src/clients/qetl/wrappers/GoogleSheetsWrapper/` | `google_sheets`: declares capabilities, still throws |
+| `src/clients/qetl/wrappers/ConceptWrapper/` | `concept`: delegates to `AttributeAssertionClient` |
+| `src/clients/qetl/QetlClient/getRelationSources.ts` | Renamed from `qetlDiceExtractors.ts`, registry-driven |
 
 **Landing order rationale:** the harness (Task 1) and the types (Tasks 2 to 4)
 are additive and land first. Characterization tests (Task 5) come **before** any
@@ -103,7 +103,6 @@ returns the right rows until this exists. `vite.config.ts:207` sets
 `environment: "jsdom"` for everything, and DuckDB-Wasm cannot run there.
 
 **Files:**
-
 - Modify: `package.json`
 - Create: `vitest.executed.config.ts`
 - Modify: `vite.config.ts` (exclude the executed pattern from the jsdom project)
@@ -235,7 +234,6 @@ git commit -m "test(qetl): add executed test harness with @duckdb/node-api"
 ## Task 2: `RelationRef`
 
 **Files:**
-
 - Create: `shared/models/relations/RelationRef/RelationRef.ts`
 - Test: `shared/models/relations/RelationRef/RelationRef.test.ts`
 
@@ -313,7 +311,8 @@ import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
  * the discriminant the relation registry dispatches on.
  */
 export type RelationRefT =
-  { kind: "dataset"; id: DatasetId } | { kind: "concept"; id: ConceptId };
+  | { kind: "dataset"; id: DatasetId }
+  | { kind: "concept"; id: ConceptId };
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -343,8 +342,8 @@ function _fromTableName(tableName: string): RelationRefT | undefined {
   }
   if (tableName.startsWith(CONCEPT_PREFIX)) {
     const id = tableName.slice(CONCEPT_PREFIX.length);
-    return UUID_PATTERN.test(id)
-      ? { kind: "concept", id: id as ConceptId }
+    return UUID_PATTERN.test(id) ?
+        { kind: "concept", id: id as ConceptId }
       : undefined;
   }
   return undefined;
@@ -379,7 +378,6 @@ Task 7 tests capabilities where they carry behaviour: that every registered
 wrapper declares one.
 
 **Files:**
-
 - Create: `shared/models/relations/RelationCapabilities/RelationCapabilities.types.ts`
 - Create: `shared/models/relations/RelationSchema/RelationSchema.types.ts`
 
@@ -490,7 +488,6 @@ git commit -m "feat(qetl): declare RelationCapabilities and RelationSchema types
 ## Task 4: `SourceWrapper`
 
 **Files:**
-
 - Create: `shared/models/relations/SourceWrapper/SourceWrapper.types.ts`
 
 - [ ] **Step 1: Write the interface**
@@ -604,7 +601,6 @@ test. A characterization test records what the code does now, including what is
 wrong, so a refactor that changes behaviour fails loudly.
 
 **Files:**
-
 - Create: `src/clients/qetl/QetlClient/__tests__/qetlDiceExtractors.characterization.test.ts`
 
 - [ ] **Step 1: Read the code under test**
@@ -672,8 +668,9 @@ describe("getDiceExtractors characterization", () => {
     datasetGetAllMock.mockResolvedValue([_dataset(CSV_ID, "csv_file")]);
     csvGetAllMock.mockResolvedValue([{ datasetId: CSV_ID }]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { getDiceExtractors } = await import(
+      "@/clients/qetl/QetlClient/qetlDiceExtractors"
+    );
 
     await expect(getDiceExtractors([CSV_ID])).resolves.toEqual([
       {
@@ -688,8 +685,9 @@ describe("getDiceExtractors characterization", () => {
     datasetGetAllMock.mockResolvedValue([_dataset(VIRTUAL_ID, "virtual")]);
     virtualGetAllMock.mockResolvedValue([{ datasetId: VIRTUAL_ID }]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { getDiceExtractors } = await import(
+      "@/clients/qetl/QetlClient/qetlDiceExtractors"
+    );
 
     await expect(getDiceExtractors([VIRTUAL_ID])).resolves.toEqual([
       {
@@ -701,10 +699,13 @@ describe("getDiceExtractors characterization", () => {
   });
 
   it("throws for google sheets, which is the behaviour to preserve", async () => {
-    datasetGetAllMock.mockResolvedValue([_dataset(SHEETS_ID, "google_sheets")]);
+    datasetGetAllMock.mockResolvedValue([
+      _dataset(SHEETS_ID, "google_sheets"),
+    ]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { getDiceExtractors } = await import(
+      "@/clients/qetl/QetlClient/qetlDiceExtractors"
+    );
 
     await expect(getDiceExtractors([SHEETS_ID])).rejects.toThrow(
       "Google Sheets extraction is not supported yet",
@@ -714,8 +715,9 @@ describe("getDiceExtractors characterization", () => {
   it("returns nothing for no dependencies", async () => {
     datasetGetAllMock.mockResolvedValue([]);
 
-    const { getDiceExtractors } =
-      await import("@/clients/qetl/QetlClient/qetlDiceExtractors");
+    const { getDiceExtractors } = await import(
+      "@/clients/qetl/QetlClient/qetlDiceExtractors"
+    );
 
     await expect(getDiceExtractors([])).resolves.toEqual([]);
   });
@@ -745,7 +747,6 @@ mutation targets from reads, tolerates `QUALIFY` and `EXCLUDE`, and fails closed
 **Do not rewrite it.** Only the return type changes, so it can name a concept.
 
 **Files:**
-
 - Modify: `src/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types.ts`
 - Modify: `src/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.ts`
 - Test: `src/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.test.ts`
@@ -756,34 +757,34 @@ Append to `src/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.test.ts`. Read the
 existing tests first and match their helper style.
 
 ```ts
-it("returns a prefixed concept table as a concept relation", () => {
-  const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
-    `SELECT * FROM "concept_9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1"`,
-  );
+  it("returns a prefixed concept table as a concept relation", () => {
+    const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+      `SELECT * FROM "concept_9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1"`,
+    );
 
-  expect(analysis).toEqual({
-    kind: "read",
-    relations: [
-      {
-        kind: "concept",
-        id: "9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1",
-      },
-    ],
+    expect(analysis).toEqual({
+      kind: "read",
+      relations: [
+        {
+          kind: "concept",
+          id: "9a8b7c6d-2222-4333-8444-f6e5d4c3b2a1",
+        },
+      ],
+    });
   });
-});
 
-it("returns a bare uuid table as a dataset relation", () => {
-  const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
-    `SELECT * FROM "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6"`,
-  );
+  it("returns a bare uuid table as a dataset relation", () => {
+    const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+      `SELECT * FROM "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6"`,
+    );
 
-  expect(analysis).toEqual({
-    kind: "read",
-    relations: [
-      { kind: "dataset", id: "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" },
-    ],
+    expect(analysis).toEqual({
+      kind: "read",
+      relations: [
+        { kind: "dataset", id: "0f2c9f3e-1111-4222-8333-a1b2c3d4e5f6" },
+      ],
+    });
   });
-});
 ```
 
 - [ ] **Step 2: Run it to verify it fails**
@@ -851,7 +852,6 @@ git commit -m "feat(qetl): analyze SQL into RelationRefs, not just dataset ids"
 ## Task 7: `RelationRegistry`
 
 **Files:**
-
 - Create: `src/clients/qetl/RelationRegistry/RelationRegistry.ts`
 - Test: `src/clients/qetl/RelationRegistry/RelationRegistry.test.ts`
 
@@ -861,7 +861,9 @@ git commit -m "feat(qetl): analyze SQL into RelationRefs, not just dataset ids"
 import { describe, expect, it, vi } from "vitest";
 import { createRelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
-import type { RelationRefT } from "$/models/relations/RelationRef/RelationRef";
+import type {
+  RelationRefT,
+} from "$/models/relations/RelationRef/RelationRef";
 import type { SourceWrapper } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 
 const CAPABILITIES = {
@@ -1086,7 +1088,6 @@ git commit -m "feat(qetl): add RelationRegistry resolving refs to wrappers"
 ## Task 8: `extractReferencedRelations` adapter
 
 **Files:**
-
 - Create: `src/clients/qetl/wrappers/extractReferencedRelations/extractReferencedRelations.ts`
 - Test: `src/clients/qetl/wrappers/extractReferencedRelations/extractReferencedRelations.test.ts`
 
@@ -1207,7 +1208,6 @@ rows already arrive as Parquet. Behaviour must be identical to the
 `_getCsvExtractors` / `_getXlsxExtractors` / `_getOpenDataExtractors` path.
 
 **Files:**
-
 - Create: `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts`
 - Test: `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.test.ts`
 
@@ -1374,7 +1374,6 @@ Two small wrappers, together because neither is more than a capability
 declaration plus the behaviour that already exists.
 
 **Files:**
-
 - Create: `src/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper.ts`
 - Create: `src/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper.ts`
 - Test: `src/clients/qetl/wrappers/__tests__/wrapperCapabilities.test.ts`
@@ -1508,8 +1507,8 @@ what `getAuthURL.ts` requests today. Spec 4 changes the request. Add this
 comment above the field so the mismatch is deliberate and visible:
 
 ```ts
-// Target scopes. `getAuthURL.ts` still requests `auth/spreadsheets`;
-// spec 4 drops it. Asserted against the request in spec 4, not here.
+  // Target scopes. `getAuthURL.ts` still requests `auth/spreadsheets`;
+  // spec 4 drops it. Asserted against the request in spec 4, not here.
 ```
 
 - [ ] **Step 5: Run it to verify it passes**
@@ -1536,7 +1535,6 @@ dataset-like source. It delegates to `AttributeAssertionClient` exactly as
 makes it a registered relation.
 
 **Files:**
-
 - Create: `src/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper.ts`
 - Test: `src/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper.test.ts`
 
@@ -1588,14 +1586,13 @@ describe("ConceptWrapper", () => {
       getConceptExtension: vi.fn(),
     });
 
-    await expect(
-      wrapper.describe(CONCEPT_REF as never, CONTEXT),
-    ).resolves.toEqual({
-      columns: [
-        { name: "district", dataType: "VARCHAR" },
-        { name: "cases", dataType: "BIGINT" },
-      ],
-    });
+    await expect(wrapper.describe(CONCEPT_REF as never, CONTEXT)).resolves
+      .toEqual({
+        columns: [
+          { name: "district", dataType: "VARCHAR" },
+          { name: "cases", dataType: "BIGINT" },
+        ],
+      });
   });
 });
 ```
@@ -1664,7 +1661,6 @@ The behaviour-bearing task. The characterization tests from Task 5 are the
 safety net: they must still pass, unchanged, afterwards.
 
 **Files:**
-
 - Modify: `src/clients/qetl/QetlClient/qetlDiceExtractors.ts`
 - Modify: `src/clients/qetl/QetlClient/qetlFactLoading.ts`
 - Create: `src/clients/qetl/wrappers/createDefaultRegistry.ts`
@@ -1795,18 +1791,18 @@ git mv PublicQetlClient PublicQuerySession
 
 - [ ] **Step 2: Rename the symbols**
 
-| From                                 | To                                             |
-| ------------------------------------ | ---------------------------------------------- |
-| `QetlClient`                         | `QueryMediator`                                |
-| `IQetlClient`                        | `IQueryMediator`                               |
-| `QetlClientFactory`                  | `QueryMediatorFactory`                         |
-| `WorkspaceQetlClient`                | `WorkspaceQuerySession`                        |
-| `PublicQetlClient`                   | `PublicQuerySession`                           |
-| `getDiceExtractors`                  | `getRelationSources`                           |
-| `getMissingDice`                     | **`getRelationsNotInMemory`**                  |
-| `getDiceFromSql`                     | **`getQueryDependencies`**                     |
-| `DiceExtractor`                      | `RelationSource`                               |
-| `ExtractedFact`                      | `AcquiredRelationBytes`                        |
+| From | To |
+|---|---|
+| `QetlClient` | `QueryMediator` |
+| `IQetlClient` | `IQueryMediator` |
+| `QetlClientFactory` | `QueryMediatorFactory` |
+| `WorkspaceQetlClient` | `WorkspaceQuerySession` |
+| `PublicQetlClient` | `PublicQuerySession` |
+| `getDiceExtractors` | `getRelationSources` |
+| `getMissingDice` | **`getRelationsNotInMemory`** |
+| `getDiceFromSql` | **`getQueryDependencies`** |
+| `DiceExtractor` | `RelationSource` |
+| `ExtractedFact` | `AcquiredRelationBytes` |
 | `insertToStorageCache` (facts param) | keep name, rename param `facts` to `relations` |
 
 Follow the compiler: `pnpm type-check` lists every site.
@@ -1816,7 +1812,7 @@ after Task 8 shipped: that name is **already taken** by
 `src/clients/qetl/wrappers/extractReferencedRelations/`, the analyzer adapter
 that converts SQL into `RelationRef[]`. Two different things must not carry one
 name, and these are confusingly adjacent, so a reader would assume the runner
-option _is_ the adapter.
+option *is* the adapter.
 
 They are genuinely different. The adapter is a **pure syntactic conversion**,
 SQL to refs. The runner option is a **session-scoped policy hook** answering
@@ -1860,7 +1856,6 @@ path. Proposal Phase 0's exit criterion is that at least one test goes red when
 a query returns wrong rows. Today none can.
 
 **Files:**
-
 - Create: `src/lib/sql/__tests__/structuredQueryToSql.executed.test.ts`
 
 **Corrected location.** An earlier draft put this under
@@ -1959,19 +1954,19 @@ git commit -m "test(queries): add executed row-level suite for structuredQueryTo
 
 **Spec coverage.** Every spec section maps to a task:
 
-| Spec section                 | Task                                          |
-| ---------------------------- | --------------------------------------------- |
-| 4.1 `RelationRef`            | 2                                             |
-| 4.2 `SourceWrapper`          | 4                                             |
-| 4.3 `RelationCapabilities`   | 3, declared per wrapper in 9 to 11            |
-| 4.4 `RelationRegistry`       | 7                                             |
-| 4.5 `QueryMediator` dispatch | 12                                            |
-| 5 Data flow                  | 12                                            |
-| 6 Relation identification    | 6, 8                                          |
-| 7 The renaming               | 13                                            |
-| 8 Module layout              | file structure table, realised across 2 to 13 |
-| 9 Executed test harness      | 1                                             |
-| 10 Testing                   | 5, plus per-task tests, plus 14               |
+| Spec section | Task |
+|---|---|
+| 4.1 `RelationRef` | 2 |
+| 4.2 `SourceWrapper` | 4 |
+| 4.3 `RelationCapabilities` | 3, declared per wrapper in 9 to 11 |
+| 4.4 `RelationRegistry` | 7 |
+| 4.5 `QueryMediator` dispatch | 12 |
+| 5 Data flow | 12 |
+| 6 Relation identification | 6, 8 |
+| 7 The renaming | 13 |
+| 8 Module layout | file structure table, realised across 2 to 13 |
+| 9 Executed test harness | 1 |
+| 10 Testing | 5, plus per-task tests, plus 14 |
 
 **Gap found and closed during review.** Task 12 Step 2 exposes something the
 spec does not address: `dataset`, `virtual` and `google_sheets` share one
@@ -1979,7 +1974,7 @@ relation **kind**, so a registry keyed on kind cannot hold three wrappers for
 them, and Task 7's duplicate-kind guard would reject the attempt. The plan
 resolves it with a composite dataset wrapper that dispatches on `sourceType`
 internally. **This is worth carrying back into the spec**, because it changes
-what "one wrapper per source" means: one wrapper per _kind_, dispatching on
+what "one wrapper per source" means: one wrapper per *kind*, dispatching on
 source type within a kind.
 
 **Type consistency.** `RelationRefT` is the type and `RelationRef` the value

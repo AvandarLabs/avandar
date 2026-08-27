@@ -32,12 +32,12 @@ to start mattering.
 
 ### 1.1 What P4 delivers
 
-| Item            | Summary                                                                                                                 |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| The predicate   | What "shareable" counts as, in one place, in both SQL and TypeScript                                                    |
-| The backstop    | Postgres triggers on `dashboards` and on `resource_shares`, covering both ways the limit is crossed                     |
+| Item | Summary |
+| --- | --- |
+| The predicate | What "shareable" counts as, in one place, in both SQL and TypeScript |
+| The backstop | Postgres triggers on `dashboards` and on `resource_shares`, covering both ways the limit is crossed |
 | The client gate | `can_publish_shareable_dashboard` through the existing permission plumbing, so the UI blocks before the database has to |
-| The surface     | The publish action explains the limit and offers an upgrade, reusing the dataset-limit precedent                        |
+| The surface | The publish action explains the limit and offers an upgrade, reusing the dataset-limit precedent |
 
 ### 1.2 What P4 does not deliver
 
@@ -76,15 +76,15 @@ to start mattering.
 
 ## 3. Decisions
 
-| #      | Decision                                                                                                                                                                         | Rejected alternative and why                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D-P4-1 | A dashboard counts as **shareable** when `visibility = 'public'`, or when `visibility = 'workspace'` and it is not private to its owner.                                         | Counting every non-`draft` row would charge a user for a dashboard they published and then narrowed to themselves, which nobody else can see. Counting `is_restricted` alone is the hole umbrella §4.2 already identified: a public dashboard is world-readable no matter what its share rows say, so it must count unconditionally.                                                                                            |
-| D-P4-2 | Enforce with triggers on **both** `dashboards` and `resource_shares`.                                                                                                            | Umbrella D8. The client plus edge-function precedent used by `can_add_datasets` covers only the publish path. Adding a share to an already-published, self-only dashboard is a direct PostgREST write with no function in it, and it is a normal user action rather than an exotic bypass.                                                                                                                                      |
-| D-P4-3 | A workspace with **no** subscription row is treated as free tier (limit 1), not denied outright.                                                                                 | `canAddDatasets` returns `false` for a missing subscription, which is right for a client gate but wrong for a trigger: it would make dashboard publishing fail during workspace provisioning, and any future path that creates a workspace before its subscription row. Free-tier fallback matches `getEffectiveEntitlementLimits`, which is the function that already answers "what limits apply".                             |
-| D-P4-4 | The triggers exempt the service role and direct psql exactly as P3's publish-publicly trigger does, with the same `current_user <> 'authenticated' or auth.uid() is null` guard. | Two enforcement triggers on the same table with different exemption rules is a trap. P3 already established this shape and learned why `auth.uid()` alone is insufficient (a lingering `request.jwt.claims` survives a switch to `postgres`).                                                                                                                                                                                   |
-| D-P4-5 | The UI gate lives on the **publish action**, not on the "Anyone with the link" option. This supersedes P3 §5.3.                                                                  | The limit counts workspace-published dashboards too, not just public ones. Gating only the public option would let a free workspace publish its second _internal_ dashboard through a UI that showed no objection, and be rejected by the trigger with a generic failure. P3's prop was built to carry a second reason for the public option; that reason turns out to belong one level up, on the action both audiences share. |
-| D-P4-6 | No trigger on `delete`, and none on the downgrade paths.                                                                                                                         | Removing a share, unpublishing, or making a dashboard private can only reduce the count. Umbrella §5.3 says the same about `resource_shares` deletes. A trigger that fires on a state it can never reject is pure cost.                                                                                                                                                                                                         |
-| D-P4-7 | Duplicate the "shareable" predicate in SQL rather than calling out to TypeScript, and pin both with tests.                                                                       | There is no mechanism to share logic between Postgres and the client. The umbrella already accepted this duplication for the status and free-limit values; §5.2 records exactly what is duplicated and where the comments must point.                                                                                                                                                                                           |
+| # | Decision | Rejected alternative and why |
+| --- | --- | --- |
+| D-P4-1 | A dashboard counts as **shareable** when `visibility = 'public'`, or when `visibility = 'workspace'` and it is not private to its owner. | Counting every non-`draft` row would charge a user for a dashboard they published and then narrowed to themselves, which nobody else can see. Counting `is_restricted` alone is the hole umbrella §4.2 already identified: a public dashboard is world-readable no matter what its share rows say, so it must count unconditionally. |
+| D-P4-2 | Enforce with triggers on **both** `dashboards` and `resource_shares`. | Umbrella D8. The client plus edge-function precedent used by `can_add_datasets` covers only the publish path. Adding a share to an already-published, self-only dashboard is a direct PostgREST write with no function in it, and it is a normal user action rather than an exotic bypass. |
+| D-P4-3 | A workspace with **no** subscription row is treated as free tier (limit 1), not denied outright. | `canAddDatasets` returns `false` for a missing subscription, which is right for a client gate but wrong for a trigger: it would make dashboard publishing fail during workspace provisioning, and any future path that creates a workspace before its subscription row. Free-tier fallback matches `getEffectiveEntitlementLimits`, which is the function that already answers "what limits apply". |
+| D-P4-4 | The triggers exempt the service role and direct psql exactly as P3's publish-publicly trigger does, with the same `current_user <> 'authenticated' or auth.uid() is null` guard. | Two enforcement triggers on the same table with different exemption rules is a trap. P3 already established this shape and learned why `auth.uid()` alone is insufficient (a lingering `request.jwt.claims` survives a switch to `postgres`). |
+| D-P4-5 | The UI gate lives on the **publish action**, not on the "Anyone with the link" option. This supersedes P3 §5.3. | The limit counts workspace-published dashboards too, not just public ones. Gating only the public option would let a free workspace publish its second *internal* dashboard through a UI that showed no objection, and be rejected by the trigger with a generic failure. P3's prop was built to carry a second reason for the public option; that reason turns out to belong one level up, on the action both audiences share. |
+| D-P4-6 | No trigger on `delete`, and none on the downgrade paths. | Removing a share, unpublishing, or making a dashboard private can only reduce the count. Umbrella §5.3 says the same about `resource_shares` deletes. A trigger that fires on a state it can never reject is pure cost. |
+| D-P4-7 | Duplicate the "shareable" predicate in SQL rather than calling out to TypeScript, and pin both with tests. | There is no mechanism to share logic between Postgres and the client. The umbrella already accepted this duplication for the status and free-limit values; §5.2 records exactly what is duplicated and where the comments must point. |
 
 ---
 
@@ -95,13 +95,13 @@ The whole phase turns on this predicate, so it is stated once, precisely.
 A dashboard in a workspace counts against `max_shareable_dashboards_allowed`
 when **somebody other than its owner can reach it**:
 
-| Visibility  | Private to owner | Counts  | Why                                                                                                                                                                         |
-| ----------- | ---------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `draft`     | either           | No      | Nobody but its editors can open it, which P3 made true in the database as well as the UI.                                                                                   |
-| `workspace` | yes              | No      | Published, but every non-owner share was revoked. The owner is the only reader.                                                                                             |
-| `workspace` | no               | **Yes** | Colleagues can open it. This is the shape the whole feature exists to sell.                                                                                                 |
-| `public`    | yes              | **Yes** | World-readable regardless of share rows. Umbrella §4.2 is explicit that a public dashboard is never private, and that letting restriction hide it from the count is a hole. |
-| `public`    | no               | **Yes** | Obviously.                                                                                                                                                                  |
+| Visibility | Private to owner | Counts | Why |
+| --- | --- | --- | --- |
+| `draft` | either | No | Nobody but its editors can open it, which P3 made true in the database as well as the UI. |
+| `workspace` | yes | No | Published, but every non-owner share was revoked. The owner is the only reader. |
+| `workspace` | no | **Yes** | Colleagues can open it. This is the shape the whole feature exists to sell. |
+| `public` | yes | **Yes** | World-readable regardless of share rows. Umbrella §4.2 is explicit that a public dashboard is never private, and that letting restriction hide it from the count is a hole. |
+| `public` | no | **Yes** | Obviously. |
 
 "Private to owner" is P1's existing `util__is_resource_private_to_owner`, which
 is `is_restricted` and no non-owner `resource_shares` row. P4 introduces no new
@@ -197,7 +197,7 @@ Item H's list, unchanged except where P3 moved something:
 - `getEffectiveEntitlementLimits` gains `maxShareableDashboardsAllowed`,
   falling back to `FreePlanLimitsConfig` exactly as the other two limits do.
 - `SubscriptionModule.canPublishShareableDashboard({ subscription,
-numShareableDashboardsInWorkspace })` mirrors `canAddDatasets`: `undefined`
+  numShareableDashboardsInWorkspace })` mirrors `canAddDatasets`: `undefined`
   limit means unlimited, and a missing subscription returns `false`, which is
   the conservative client answer and is deliberately stricter than the trigger
   (D-P4-3).
@@ -241,7 +241,7 @@ make that safe:
 - Nothing is unpublished or unshared. Existing dashboards keep working.
 - Every narrowing operation stays permitted, so a workspace over the limit can
   always get back under it.
-- Only the operation that would _add_ a shareable dashboard is refused.
+- Only the operation that would *add* a shareable dashboard is refused.
 
 A workspace with three shareable dashboards on the free plan therefore keeps
 all three, and simply cannot make a fourth. That is the right trade: the
@@ -293,13 +293,13 @@ stays unpublished.
 
 ## 9. Risks
 
-| Risk                                                               | Mitigation                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The SQL and TypeScript definitions of "shareable" drift.           | One SQL function, one TS predicate, cross-referencing comments, and pgTAP covering §4's table so a change on either side has to be deliberate.                                                                                                                     |
+| Risk | Mitigation |
+| --- | --- |
+| The SQL and TypeScript definitions of "shareable" drift. | One SQL function, one TS predicate, cross-referencing comments, and pgTAP covering §4's table so a change on either side has to be deliberate. |
 | A trigger rejects a legitimate write and blocks a paying customer. | `null` means unlimited and is checked before any counting; every narrowing path is exempt by construction; the service role is exempt. This is the risk the umbrella named when it put entitlements last, and it is why the count excludes the row being modified. |
-| The two enforcement triggers on `dashboards` interact.             | Both are `before update`, neither reads the other's result, and P3's naming convention already accounts for a second one. Postgres fires them alphabetically.                                                                                                      |
-| A user hits the database error without the UI explaining it.       | §6.2 and §6.3 route both paths to the limit modal, and the error carries a recognisable code. The UI gate is the first line; the trigger is the backstop, not the messenger.                                                                                       |
-| Workspaces already over the limit are disrupted.                   | §7. Nothing is removed and every reduction is permitted.                                                                                                                                                                                                           |
+| The two enforcement triggers on `dashboards` interact. | Both are `before update`, neither reads the other's result, and P3's naming convention already accounts for a second one. Postgres fires them alphabetically. |
+| A user hits the database error without the UI explaining it. | §6.2 and §6.3 route both paths to the limit modal, and the error carries a recognisable code. The UI gate is the first line; the trigger is the backstop, not the messenger. |
+| Workspaces already over the limit are disrupted. | §7. Nothing is removed and every reduction is permitted. |
 
 ---
 

@@ -25,11 +25,11 @@ is the merged share modal in P3.
 
 ### 1.1 What P2 delivers
 
-| Item | Summary                                                                                                                                                            |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| A    | `dashboard_visibility` enum, `visibility` column, `is_public` as a generated column, split slug namespaces, namespace-aware slug validation                        |
-| B    | `published-private` bucket and its policies, DELETE policies on both buckets, bucket-parameterized snapshot clients, publish / unpublish / delete transitions      |
-| D    | `/d/<slugOrId>` and `/<workspaceSlug>/d/<slugOrId>` viewer routes, the legacy canonical route reduced to a redirect, viewer-role users routed away from the editor |
+| Item | Summary |
+| --- | --- |
+| A | `dashboard_visibility` enum, `visibility` column, `is_public` as a generated column, split slug namespaces, namespace-aware slug validation |
+| B | `published-private` bucket and its policies, DELETE policies on both buckets, bucket-parameterized snapshot clients, publish / unpublish / delete transitions |
+| D | `/d/<slugOrId>` and `/<workspaceSlug>/d/<slugOrId>` viewer routes, the legacy canonical route reduced to a redirect, viewer-role users routed away from the editor |
 
 It also fixes four defects the design pass turned up. They are in scope because
 P2 either rewrites the code that contains them or creates the path that makes
@@ -55,7 +55,7 @@ the code walk provided, and both are recorded in §3 with their reasoning.
   `/d/<slug>`, with a single global slug namespace. P2 splits the namespace
   and the URL by audience. See D-P2-3.
 - **Umbrella §5.6** specified that `/public/dashboards/<workspaceSlug>/<dashboardId>`
-  keeps its path _and gains the same access branches as the vanity route_. P2
+  keeps its path *and gains the same access branches as the vanity route*. P2
   keeps the path but reduces the route to an unconditional redirect. See
   D-P2-4.
 
@@ -96,16 +96,16 @@ that viewer-role access requires a published dashboard is deferred to P3. See
 
 ## 3. Decisions
 
-| #      | Decision                                                                                                                                                                                | Rejected alternative and why                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D-P2-1 | Ship P2 with no feature flag.                                                                                                                                                           | The umbrella said "behind a feature flag", written before it was settled that P3 owns the only control. Nothing in P2 can produce a `workspace`-visibility dashboard, so a flag would gate an unreachable branch, add a second code path no test exercises through the real UI, and hide the two defect fixes that we want live. P3 introduces the flag alongside the first thing a user can see.                                                                                                                                     |
-| D-P2-2 | Ship the publish, unpublish, and delete transitions in P2 even though only `publishDashboard({ visibility: 'public' })` has a caller.                                                   | Deferring them to P3 would put the storage state machine and the modal rebuild in one review, which is exactly what the umbrella's phasing exists to prevent. Tested API first, UI second.                                                                                                                                                                                                                                                                                                                                            |
-| D-P2-3 | Split the slug namespace and the URL by audience: `/d/<slugOrId>` globally unique for `public`, `/<workspaceSlug>/d/<slugOrId>` unique per workspace for `workspace`.                   | One global namespace (umbrella D4) lets a workspace-only dashboard, which nobody outside its workspace can see, permanently squat a global slug, invisibly on both sides. Resolving one `/d/<slug>` against the viewer's workspaces was the other option, and it reintroduces ambiguity for a user in two workspaces and cannot work for anonymous viewers at all. The cost, accepted explicitly, is that umbrella D4's promise that the URL never changes with the audience no longer holds; §6.2 mitigates it with cross-redirects. |
-| D-P2-4 | `/public/dashboards/<workspaceSlug>/<dashboardId>` becomes an unconditional redirect to `/d/<dashboardId>`, with no loader query.                                                       | Giving it the same access branches as the vanity routes (umbrella §5.6) triples the number of places that hold access logic and error copy, for a path we want to delete. As a one-line shim it stays correct by construction and can be removed the day printed QR codes stop mattering.                                                                                                                                                                                                                                             |
-| D-P2-5 | `/d/<slugOrId>` and `/<workspaceSlug>/d/<slugOrId>` accept a dashboard id or a slug in the same segment, resolved by UUID shape, and `validateDashboardSlug` rejects UUID-shaped slugs. | Separate id and slug routes keep the legacy path alive forever under a new name. Accepting both without reserving the UUID shape leaves the two namespaces genuinely overlapping, because `SLUG_MAX_LENGTH` is 64 and the slug pattern `^[a-z0-9-]+$` already admits a 36-character UUID.                                                                                                                                                                                                                                             |
-| D-P2-6 | Storage writes to both snapshot buckets require edit rights on the dashboard.                                                                                                           | The existing `published` policies let any authenticated user overwrite any dashboard's snapshot. P2 rewrites these policies anyway to add DELETE, so the marginal cost of gating them properly is a few lines. See §7 D1.                                                                                                                                                                                                                                                                                                             |
-| D-P2-7 | `getAvaPageMetadataFromDashboard` takes the rendering surface explicitly instead of inferring it from the row.                                                                          | Inferring from `isPublic` alone is what makes the editor read a stale snapshot today (§7 D2), and after P2 a wrong inference routes a read to the wrong bucket. The surface is always known at the call site.                                                                                                                                                                                                                                                                                                                         |
-| D-P2-8 | Clean storage before deleting the dashboard row, and abort the delete if cleanup fails.                                                                                                 | Deleting the row first is what produced umbrella defect §1.2.1: objects outlive the only record that could locate them. Cleanup-first makes deletion retriable and never leaves an orphan behind a deleted row. It does not survive a crashed client; that residue is documented in §10 rather than closed here.                                                                                                                                                                                                                      |
+| # | Decision | Rejected alternative and why |
+| --- | --- | --- |
+| D-P2-1 | Ship P2 with no feature flag. | The umbrella said "behind a feature flag", written before it was settled that P3 owns the only control. Nothing in P2 can produce a `workspace`-visibility dashboard, so a flag would gate an unreachable branch, add a second code path no test exercises through the real UI, and hide the two defect fixes that we want live. P3 introduces the flag alongside the first thing a user can see. |
+| D-P2-2 | Ship the publish, unpublish, and delete transitions in P2 even though only `publishDashboard({ visibility: 'public' })` has a caller. | Deferring them to P3 would put the storage state machine and the modal rebuild in one review, which is exactly what the umbrella's phasing exists to prevent. Tested API first, UI second. |
+| D-P2-3 | Split the slug namespace and the URL by audience: `/d/<slugOrId>` globally unique for `public`, `/<workspaceSlug>/d/<slugOrId>` unique per workspace for `workspace`. | One global namespace (umbrella D4) lets a workspace-only dashboard, which nobody outside its workspace can see, permanently squat a global slug, invisibly on both sides. Resolving one `/d/<slug>` against the viewer's workspaces was the other option, and it reintroduces ambiguity for a user in two workspaces and cannot work for anonymous viewers at all. The cost, accepted explicitly, is that umbrella D4's promise that the URL never changes with the audience no longer holds; §6.2 mitigates it with cross-redirects. |
+| D-P2-4 | `/public/dashboards/<workspaceSlug>/<dashboardId>` becomes an unconditional redirect to `/d/<dashboardId>`, with no loader query. | Giving it the same access branches as the vanity routes (umbrella §5.6) triples the number of places that hold access logic and error copy, for a path we want to delete. As a one-line shim it stays correct by construction and can be removed the day printed QR codes stop mattering. |
+| D-P2-5 | `/d/<slugOrId>` and `/<workspaceSlug>/d/<slugOrId>` accept a dashboard id or a slug in the same segment, resolved by UUID shape, and `validateDashboardSlug` rejects UUID-shaped slugs. | Separate id and slug routes keep the legacy path alive forever under a new name. Accepting both without reserving the UUID shape leaves the two namespaces genuinely overlapping, because `SLUG_MAX_LENGTH` is 64 and the slug pattern `^[a-z0-9-]+$` already admits a 36-character UUID. |
+| D-P2-6 | Storage writes to both snapshot buckets require edit rights on the dashboard. | The existing `published` policies let any authenticated user overwrite any dashboard's snapshot. P2 rewrites these policies anyway to add DELETE, so the marginal cost of gating them properly is a few lines. See §7 D1. |
+| D-P2-7 | `getAvaPageMetadataFromDashboard` takes the rendering surface explicitly instead of inferring it from the row. | Inferring from `isPublic` alone is what makes the editor read a stale snapshot today (§7 D2), and after P2 a wrong inference routes a read to the wrong bucket. The surface is always known at the call site. |
+| D-P2-8 | Clean storage before deleting the dashboard row, and abort the delete if cleanup fails. | Deleting the row first is what produced umbrella defect §1.2.1: objects outlive the only record that could locate them. Cleanup-first makes deletion retriable and never leaves an orphan behind a deleted row. It does not survive a crashed client; that residue is documented in §10 rather than closed here. |
 
 ---
 
@@ -203,9 +203,9 @@ touching storage (§5.5).
 checks `.eq("is_public", true)`. It gains a `visibility` field on the request
 body and branches:
 
-| Target      | Check                                                          |
-| ----------- | -------------------------------------------------------------- |
-| `public`    | `slug = $1 and visibility = 'public'`, globally                |
+| Target | Check |
+| --- | --- |
+| `public` | `slug = $1 and visibility = 'public'`, globally |
 | `workspace` | `slug = $1 and visibility = 'workspace' and workspace_id = $2` |
 
 `workspace_id` is **derived from `dashboardId` through the admin client**, never
@@ -271,11 +271,11 @@ New bucket `published-private`, `public: false`. Both buckets use the same
 object path, `dashboards/<dashboardId>/datasets/<datasetId>.parquet`, so only
 the bucket varies with visibility.
 
-| Visibility  | Bucket                | SELECT gate                                  |
-| ----------- | --------------------- | -------------------------------------------- |
-| `public`    | `published`           | anon and authenticated, path shape only      |
-| `workspace` | `published-private`   | `util__auth_user_may_select_dashboard(<id>)` |
-| `draft`     | none, objects removed | n/a                                          |
+| Visibility | Bucket | SELECT gate |
+| --- | --- | --- |
+| `public` | `published` | anon and authenticated, path shape only |
+| `workspace` | `published-private` | `util__auth_user_may_select_dashboard(<id>)` |
+| `draft` | none, objects removed | n/a |
 
 The gate splits by verb rather than using one predicate for all four policies.
 Reading a snapshot is exactly "may I see this dashboard"; writing one is
@@ -416,15 +416,15 @@ params union and `DataVizPBlock`'s mapping gain the matching branch, and
 Per D-P2-7, `getAvaPageMetadataFromDashboard` takes the rendering surface
 explicitly:
 
-| Surface     | Visibility  | `auth`                                   | Data source      |
-| ----------- | ----------- | ---------------------------------------- | ---------------- |
-| `editor`    | any         | `workspace`                              | live             |
-| `preview`   | `draft`     | `workspace`                              | live             |
-| `preview`   | `workspace` | `workspace_published`                    | private snapshot |
-| `preview`   | `public`    | `public`                                 | public snapshot  |
-| `published` | `workspace` | `workspace_published`                    | private snapshot |
-| `published` | `public`    | `public`                                 | public snapshot  |
-| `published` | `draft`     | unreachable; the loader rejects it first |                  |
+| Surface | Visibility | `auth` | Data source |
+| --- | --- | --- | --- |
+| `editor` | any | `workspace` | live |
+| `preview` | `draft` | `workspace` | live |
+| `preview` | `workspace` | `workspace_published` | private snapshot |
+| `preview` | `public` | `public` | public snapshot |
+| `published` | `workspace` | `workspace_published` | private snapshot |
+| `published` | `public` | `public` | public snapshot |
+| `published` | `draft` | unreachable; the loader rejects it first |  |
 
 `editor` is unconditionally live, which is the fix for §7 D2. `preview` shows
 what a viewer would see when there is something published to see, and falls
@@ -467,11 +467,11 @@ fix it. The key becomes compound over the two existing columns, which is Dexie's
 
 ### 6.1 The URL model
 
-| URL                                                | Audience       | Layout                     | Slug scope    |
-| -------------------------------------------------- | -------------- | -------------------------- | ------------- |
-| `/d/<slugOrId>`                                    | public         | bare, outside `_auth`      | global        |
-| `/<workspaceSlug>/d/<slugOrId>`                    | workspace-only | inside `_auth`, app chrome | per workspace |
-| `/public/dashboards/<workspaceSlug>/<dashboardId>` | legacy         | none, pure redirect        | n/a           |
+| URL | Audience | Layout | Slug scope |
+| --- | --- | --- | --- |
+| `/d/<slugOrId>` | public | bare, outside `_auth` | global |
+| `/<workspaceSlug>/d/<slugOrId>` | workspace-only | inside `_auth`, app chrome | per workspace |
+| `/public/dashboards/<workspaceSlug>/<dashboardId>` | legacy | none, pure redirect | n/a |
 
 Route files become `src/routes/d/$slugOrId.tsx` and
 `src/routes/_auth/$workspaceSlug/d/$slugOrId.tsx`. The existing
@@ -599,7 +599,7 @@ of policies P2 is rewriting anyway.
 **D2. Editing a published dashboard previews stale snapshot data.**
 `DashboardEditorView.tsx:126` passes `getAvaPageMetadataFromDashboard(dashboard)`
 into Puck, and that function keys purely off `dashboard.isPublic`, so the
-_editor_ for a public dashboard reads the published snapshot instead of live
+*editor* for a public dashboard reads the published snapshot instead of live
 workspace data. Edits are previewed against whatever was last published. Fixed
 by D-P2-7 and the table in §5.6.
 
@@ -681,7 +681,7 @@ The viewer-role redirect from editor to preview, which is P2's one
 user-reachable behavior change, plus one end-to-end assertion that a
 `published-private` object seeded for a workspace dashboard is unreadable by a
 member with no share, through the real HTTP storage API rather than through
-Postgres. That last one exists because the pgTAP tests prove the _policy_ is
+Postgres. That last one exists because the pgTAP tests prove the *policy* is
 right while proving nothing about the bucket actually being private: a bucket
 created with `public: true` serves objects through a path that never consults
 `storage.objects` RLS at all.
@@ -690,15 +690,15 @@ created with `public: true` serves objects through a path that never consults
 
 ## 9. Risks
 
-| Risk                                                                                         | Mitigation                                                                                                                                                                                             |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The `is_public` swap fails or reorders badly against the anon RLS policy and the slug index. | Hand-written migration with the explicit order in §4.2; acceptance is a clean `supabase db diff`.                                                                                                      |
-| The SQLite mirror silently diverges, since `partition.ts` does not flag `ADD COLUMN`.        | Deliberate hand-edit with a comment, verified by `check-sqlite-migrations`.                                                                                                                            |
-| A `workspace -> public` flip collides in the global slug namespace and half-publishes.       | Slug validation against the target namespace runs first, before any upload (§5.5).                                                                                                                     |
-| `99.storage.sql` is not updated with the new policies and the next `db diff` drops them.     | Called out in §5.2; the file's own header documents four prior occurrences.                                                                                                                            |
-| Narrowing the `published` write policies breaks an existing publish path.                    | The only writer is `publishDashboard`, which runs as the acting user on a dashboard they are editing, so `util__auth_user_can_update_resource` is already satisfied. Covered by the integration tests. |
-| The Dexie version 8 upgrade drops cached snapshots for every existing user.                  | Intended. The table is a pure cache of re-downloadable blobs, and old rows cannot be disambiguated. Cost is one re-download per dashboard.                                                             |
-| A crashed client orphans snapshot objects.                                                   | Not closed in P2. See §10.                                                                                                                                                                             |
+| Risk | Mitigation |
+| --- | --- |
+| The `is_public` swap fails or reorders badly against the anon RLS policy and the slug index. | Hand-written migration with the explicit order in §4.2; acceptance is a clean `supabase db diff`. |
+| The SQLite mirror silently diverges, since `partition.ts` does not flag `ADD COLUMN`. | Deliberate hand-edit with a comment, verified by `check-sqlite-migrations`. |
+| A `workspace -> public` flip collides in the global slug namespace and half-publishes. | Slug validation against the target namespace runs first, before any upload (§5.5). |
+| `99.storage.sql` is not updated with the new policies and the next `db diff` drops them. | Called out in §5.2; the file's own header documents four prior occurrences. |
+| Narrowing the `published` write policies breaks an existing publish path. | The only writer is `publishDashboard`, which runs as the acting user on a dashboard they are editing, so `util__auth_user_can_update_resource` is already satisfied. Covered by the integration tests. |
+| The Dexie version 8 upgrade drops cached snapshots for every existing user. | Intended. The table is a pure cache of re-downloadable blobs, and old rows cannot be disambiguated. Cost is one re-download per dashboard. |
+| A crashed client orphans snapshot objects. | Not closed in P2. See §10. |
 
 ---
 

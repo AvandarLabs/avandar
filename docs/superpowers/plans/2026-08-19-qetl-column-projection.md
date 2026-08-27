@@ -48,12 +48,10 @@
 ### Task 1: `unionColumnSets` and `normalizeColumns`
 
 **Files:**
-
 - Modify: `shared/models/relations/RelationCacheKey/RelationCacheKey.ts`
 - Modify: `shared/models/relations/RelationCacheKey/RelationCacheKey.test.ts`
 
 **Interfaces:**
-
 - Consumes: `coversColumns` (already exported)
 - Produces: `normalizeColumns(columns: readonly string[] | "all"): readonly string[] | "all"`; `unionColumnSets(left, right): readonly string[] | "all"`
 
@@ -135,12 +133,10 @@ Expected: PASS.
 ### Task 2: `getNeededColumnsFromQuery`
 
 **Files:**
-
 - Create: `src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery.ts`
 - Create: `src/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery.test.ts`
 
 **Interfaces:**
-
 - Consumes: `ConceptRelationPlan`, `DuckDbSqlAnalyzer` tokenizer (`getSqlTokens`, `isKeywordToken`, `getKeywordIndex`, `getParenthesisDepths`), `unionColumnSets`, `normalizeColumns`
 - Produces: `getNeededColumnsFromQuery({ rawSql, datasetIds, conceptRelations }): Record<string, readonly string[] | "all">`
 
@@ -260,12 +256,10 @@ Expected: PASS.
 ### Task 3: Map query names to Parquet `originalName`
 
 **Files:**
-
 - Create: `src/clients/qetl/QueryMediator/getParquetColumnNamesFromNeeded/getParquetColumnNamesFromNeeded.ts`
 - Create: `src/clients/qetl/QueryMediator/getParquetColumnNamesFromNeeded/getParquetColumnNamesFromNeeded.test.ts`
 
 **Interfaces:**
-
 - Consumes: `DatasetColumn.T` (`name`, `originalName`), `normalizeColumns`
 - Produces: `getParquetColumnNamesFromNeeded({ needed, datasetColumns }): readonly string[] | "all"`
 
@@ -276,7 +270,9 @@ it("maps a renamed view name to originalName", () => {
   expect(
     getParquetColumnNamesFromNeeded({
       needed: ["display_status"],
-      datasetColumns: [{ name: "display_status", originalName: "status" }],
+      datasetColumns: [
+        { name: "display_status", originalName: "status" },
+      ],
     }),
   ).toEqual(["status"]);
 });
@@ -285,7 +281,9 @@ it("keeps originalName when the query already used it", () => {
   expect(
     getParquetColumnNamesFromNeeded({
       needed: ["status"],
-      datasetColumns: [{ name: "display_status", originalName: "status" }],
+      datasetColumns: [
+        { name: "display_status", originalName: "status" },
+      ],
     }),
   ).toEqual(["status"]);
 });
@@ -338,12 +336,10 @@ Run: `pnpm exec vitest run src/clients/qetl/QueryMediator/getParquetColumnNamesF
 ### Task 4: In-memory cache fake implements `coversColumns` and `growFrom`
 
 **Files:**
-
 - Modify: `src/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache.ts`
 - Create: `src/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache.test.ts`
 
 **Interfaces:**
-
 - Consumes: `coversColumns`, `normalizeColumns` from RelationCacheKey
 - Produces: same `RelationCachePort`, but probe hits only on coverage; misses include `growFrom` when a live narrower entry exists
 
@@ -391,13 +387,11 @@ Store `write.columns` via `normalizeColumns`. `probe`: if no entry, miss with `g
 ### Task 5: Queryable-tier column coverage
 
 **Files:**
-
 - Create: `src/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns.ts`
 - Create: `src/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns.test.ts`
 - Modify: `src/clients/qetl/QueryMediator/getRelationSources.ts` — `probeRelationCache`
 
 **Interfaces:**
-
 - Produces: `rememberQueryableColumns(datasetId, columns)`, `forgetQueryableColumns(datasetId)`, `getQueryableColumns(datasetId): readonly string[] | "all" | undefined`
 - `probeRelationCache(datasetIds, neededByDatasetId)`: miss if absent from DuckDB; miss if present but `coversColumns(loaded, needed)` is false; loaded defaults to `"all"` when the sidecar has no entry
 
@@ -435,14 +429,12 @@ Expected: PASS (temporary `"all"` preserves current behaviour).
 ### Task 6: `projectParquetBlob`
 
 **Files:**
-
 - Create: `src/clients/DuckDbClient/projectParquetBlob/projectParquetBlob.ts`
 - Create: `src/clients/DuckDbClient/projectParquetBlob/projectParquetBlob.test.ts`
 - Modify: `src/clients/DuckDbClient/DuckDbClient.ts` — public method that delegates
 - Modify: `src/clients/DuckDbClient/duckDbClientOperations.ts` — add `projectParquetBlob` only if extracted units need it; otherwise keep it on the client class only
 
 **Interfaces:**
-
 - Produces: `projectParquetBlob({ parquetBlob, columns, datasetDuckDbLease }): Promise<Blob>`
 - SQL: `SELECT "c1", "c2" FROM read_parquet('$file$')` with `returnType: "parquet"` and `TRUSTED_INTERNAL_SQL`. No DISTINCT, GROUP BY, or ORDER BY.
 - File name: `ava_proj_<uuid>` (not a RelationRef).
@@ -477,9 +469,9 @@ export async function projectParquetBlob(
   const fileName = `ava_proj_${uuid()}`;
   const db = await options.client.getDb();
   const blob =
-    options.parquetBlob.type === MIMEType.APPLICATION_PARQUET
-      ? options.parquetBlob
-      : new Blob([options.parquetBlob], { type: MIMEType.APPLICATION_PARQUET });
+    options.parquetBlob.type === MIMEType.APPLICATION_PARQUET ?
+      options.parquetBlob
+    : new Blob([options.parquetBlob], { type: MIMEType.APPLICATION_PARQUET });
   await registerParquetFile({ db, tableName: fileName, blob });
   try {
     const selectList = options.columns
@@ -517,14 +509,12 @@ async projectParquetBlob(options: Omit<..., "client">): Promise<Blob> {
 ### Task 7: Thread needed columns through the runner and relation loading
 
 **Files:**
-
 - Modify: `src/clients/qetl/QueryMediator/QueryMediator.types.ts` — `AcquiredRelationBytes` gains `columns: readonly string[] | "all"`
 - Modify: `src/clients/qetl/QueryMediator/queryRunner.ts`
 - Modify: `src/clients/qetl/QueryMediator/relationLoading.ts`
 - Create: `src/clients/qetl/QueryMediator/__tests__/relationCacheProjection.test.ts`
 
 **Interfaces:**
-
 - Consumes: Tasks 2–6
 - Produces: probe/acquire/write using per-dataset column sets; projection on finite acquire sets; sidecar remember on load
 
@@ -588,7 +578,6 @@ Update `AcquiredRelationBytes` call sites in tests that construct the type.
 ### Task 8: Executed projection proof + STATUS
 
 **Files:**
-
 - Create: `src/lib/sql/__tests__/projectParquetBlob.executed.test.ts`
 - Create: `STATUS.md`
 
@@ -599,24 +588,13 @@ This test proves the SQL contract against real DuckDB (node-api), not wasm. It d
 ```ts
 it("keeps row count and order when projecting two of three columns", async () => {
   await withDuckDb(async (connection) => {
-    await connection.run(
-      "CREATE TABLE src AS SELECT * FROM (VALUES (1,'x'), (2,'y'), (2,'z')) t(id, label, extra)",
-    );
+    await connection.run("CREATE TABLE src AS SELECT * FROM (VALUES (1,'x'), (2,'y'), (2,'z')) t(id, label, extra)");
     await connection.run("COPY src TO 'src.parquet' (FORMAT PARQUET)");
-    await connection.run(
-      `COPY (SELECT id, label FROM read_parquet('src.parquet')) TO 'out.parquet' (FORMAT PARQUET)`,
-    );
-    const src = await connection.runAndReadAll(
-      "SELECT id, label FROM read_parquet('src.parquet')",
-    );
-    const out = await connection.runAndReadAll(
-      "SELECT * FROM read_parquet('out.parquet')",
-    );
+    await connection.run(`COPY (SELECT id, label FROM read_parquet('src.parquet')) TO 'out.parquet' (FORMAT PARQUET)`);
+    const src = await connection.runAndReadAll("SELECT id, label FROM read_parquet('src.parquet')");
+    const out = await connection.runAndReadAll("SELECT * FROM read_parquet('out.parquet')");
     expect(out.getRowObjects()).toEqual(src.getRowObjects());
-    expect(Object.keys(out.getRowObjects()[0] ?? {}).sort()).toEqual([
-      "id",
-      "label",
-    ]);
+    expect(Object.keys(out.getRowObjects()[0] ?? {}).sort()).toEqual(["id", "label"]);
   });
 });
 ```

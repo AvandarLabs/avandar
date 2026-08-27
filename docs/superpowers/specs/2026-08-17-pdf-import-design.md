@@ -57,19 +57,19 @@ designed in
 
 ## Decisions
 
-| Decision           | Choice                                                                |
-| ------------------ | --------------------------------------------------------------------- |
-| Library            | `pdfjs-dist`, own the detection algorithm                             |
-| Runtime            | Fully in-browser, in a web worker                                     |
-| Detection signals  | All three: tagged structure tree, ruling lines, whitespace clustering |
-| Source pointer     | Resolved geometry plus a content fingerprint                          |
-| Multi-page tables  | Auto-merge, shown as merged, user can split                           |
-| Multi-row headers  | Auto-detect count, flatten with a separator                           |
-| Merged cells       | Fill down, reported in the preview                                    |
-| Scanned PDFs       | Detect early, block with a diagnosis                                  |
-| Type inference     | Normalise PDF-specific noise, then reuse DuckDB's CSV sniffer         |
-| Page range         | User-selectable, in phase 1                                           |
-| Multi-table import | One dataset per import (sheet model); N datasets deferred to AVA-316  |
+| Decision | Choice |
+|---|---|
+| Library | `pdfjs-dist`, own the detection algorithm |
+| Runtime | Fully in-browser, in a web worker |
+| Detection signals | All three: tagged structure tree, ruling lines, whitespace clustering |
+| Source pointer | Resolved geometry plus a content fingerprint |
+| Multi-page tables | Auto-merge, shown as merged, user can split |
+| Multi-row headers | Auto-detect count, flatten with a separator |
+| Merged cells | Fill down, reported in the preview |
+| Scanned PDFs | Detect early, block with a diagnosis |
+| Type inference | Normalise PDF-specific noise, then reuse DuckDB's CSV sniffer |
+| Page range | User-selectable, in phase 1 |
+| Multi-table import | One dataset per import (sheet model); N datasets deferred to AVA-316 |
 
 ### Why pdfjs-dist
 
@@ -88,7 +88,7 @@ path operators (`getOperatorList`), the tagged structure tree
 opposite problem: writing PDFs, incremental saves that preserve signatures,
 PAdES signing, form filling. Its own launch post lists rendering to canvas or
 image as out of scope, and it exposes neither vector path operators nor the
-structure tree. It is worth revisiting if we ever need to _generate_ signed
+structure tree. It is worth revisiting if we ever need to *generate* signed
 PDFs, where it would beat our current `jspdf` dependency.
 
 ### Why in-browser
@@ -203,8 +203,8 @@ Same four RLS policies and `updated_at` trigger as the xlsx table, plus
 
 ### Why geometry rather than an ordinal index
 
-An Excel sheet name is an identity Excel guarantees. "Table 3" is an _output of
-our own detector_. If we ship a detection improvement, yesterday's table 3 can
+An Excel sheet name is an identity Excel guarantees. "Table 3" is an *output of
+our own detector*. If we ship a detection improvement, yesterday's table 3 can
 become today's table 4, silently re-pointing a saved dataset at different data.
 Storing resolved geometry makes re-parse reproducible independent of detector
 version, and is the same data model phase 2's manual regions need.
@@ -212,7 +212,7 @@ version, and is the same data model phase 2's manual regions need.
 The fingerprint (header names, row and column count, content hash) is compared
 on re-parse. A mismatch warns the user rather than quietly importing something
 else. Geometry prevents renumbering; the fingerprint is the only mechanism that
-can actually _notice_ drift.
+can actually *notice* drift.
 
 ### Types
 
@@ -247,7 +247,7 @@ behaves identically whether it arrived by CSV or by PDF.
 
 **Critical ambiguity:** parentheses do not always mean negative. Public health
 tables routinely write `361 (84.7)` for count and percent. The normaliser must
-only treat parentheses as a sign when they wrap the _entire_ cell value, never
+only treat parentheses as a sign when they wrap the *entire* cell value, never
 when they follow another number. Fixture
 `plos-one-ncd-mobile-phone-surveys.pdf` exists specifically to hold this line.
 
@@ -304,15 +304,15 @@ workspace storage quota.
 Each of these gets an explicit, named path rather than falling through to a
 generic failure:
 
-| Condition                             | Behaviour                                                                                                                                                       |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| No text layer (scanned)               | Detected _before_ any detection work. Explain that the file appears to be a scan, report the evidence, point at OCR as planned. Never report "no tables found". |
-| Zero candidates found                 | Distinguish from the scanned case. Suggest widening the page range, and note that manual region selection is coming.                                            |
-| Encrypted / password-protected        | Prompt for a password via pdf.js's callback.                                                                                                                    |
-| Extraction-disallowed permission flag | Surface the restriction; do not silently override it.                                                                                                           |
-| Broken ToUnicode map                  | Detect a high ratio of unmapped or private-use glyphs and warn that text may be unreliable, rather than importing mojibake.                                     |
-| Fingerprint mismatch on re-parse      | Warn and require confirmation before replacing the data.                                                                                                        |
-| Page count over the detection cap     | Require an explicit page range rather than scanning indefinitely.                                                                                               |
+| Condition | Behaviour |
+|---|---|
+| No text layer (scanned) | Detected *before* any detection work. Explain that the file appears to be a scan, report the evidence, point at OCR as planned. Never report "no tables found". |
+| Zero candidates found | Distinguish from the scanned case. Suggest widening the page range, and note that manual region selection is coming. |
+| Encrypted / password-protected | Prompt for a password via pdf.js's callback. |
+| Extraction-disallowed permission flag | Surface the restriction; do not silently override it. |
+| Broken ToUnicode map | Detect a high ratio of unmapped or private-use glyphs and warn that text may be unreliable, rather than importing mojibake. |
+| Fingerprint mismatch on re-parse | Warn and require confirmation before replacing the data. |
+| Page count over the detection cap | Require an explicit page range rather than scanning indefinitely. |
 
 ## Testing
 

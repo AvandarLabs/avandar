@@ -4,7 +4,7 @@
 >
 > **Per-step test handoff:** After completing every Step in this plan, output an enumerated list (`1.`, `2.`, `3.`, …) of the exact actions the human partner should take to verify the just-completed Step — commands to run (copy-pasteable), files or UI to inspect, and the expected result for each. Do this for every Step, including "trivial" config/file-creation steps; never skip or summarize. The list is in addition to (not a replacement for) the Manual review checkpoint at the end of each Task.
 >
-> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers _within_ a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
+> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers *within* a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` (sections "Observability", "Codebase, Build & Packaging")
 **Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G4.x) referenced in each Task below.
@@ -12,7 +12,6 @@
 **Goal:** Production-ready macOS distribution. Wire up the platform-aware logger with desktop file sink + rotation, enforce the "no raw user data in logs" discipline, ship an in-app bug-report flow, and set up code signing, notarization, and auto-update for the macOS bundle.
 
 **Architecture:**
-
 - The existing `@avandar/logger` package gets a platform-aware `Sink` interface; desktop uses a JSONL file writer with daily/size rotation; web uses `console.error` only.
 - A custom ESLint rule blocks raw-data identifiers in logger calls.
 - The bug-report dialog lives in `packages/web/components/` and submits to a new Supabase Edge Function `bug-reports`.
@@ -22,7 +21,6 @@
 **Tech Stack:** existing `@avandar/logger`, ESLint custom rule, Mantine `Modal`, Supabase Edge Function (Deno), `xcrun notarytool`, Electrobun's updater.
 
 **Phase exit criteria:**
-
 1. Desktop log files are written, rotated, and capped per spec.
 2. CI lint fails if a developer logs raw user data.
 3. A user can submit a bug report from within the app; the report (with sanitized logs) lands in the team's collection point.
@@ -37,7 +35,6 @@
 ## File Structure
 
 **Modified: logger**
-
 - `packages/shared/logger/src/index.ts` — re-exports
 - `packages/shared/logger/src/types.ts` — `LogSink`, `LogLevel`, `LogEvent`
 - `packages/shared/logger/src/createLogger.ts` — main factory; replaces existing direct console calls
@@ -47,13 +44,11 @@
 - Tests for each above
 
 **New: lint rule**
-
 - `eslint-rules/no-raw-data-in-logger.js`
 - `eslint-rules/no-raw-data-in-logger.test.js`
 - Modify: `eslint.config.js` to register the rule
 
 **New: bug report flow**
-
 - `packages/web/components/src/BugReportDialog/BugReportDialog.tsx`
 - `packages/web/components/src/BugReportDialog/BugReportDialog.test.tsx`
 - `apps/desktop/main/ipc/bug-report.ts` — collects log files via IPC
@@ -62,7 +57,6 @@
 - `supabase/functions/bug-reports/index.test.ts`
 
 **New: macOS signing & distribution**
-
 - `apps/desktop/scripts/sign-mac.sh` — wraps `codesign`, `xcrun notarytool`
 - `apps/desktop/scripts/build-and-sign-mac.sh` — full pipeline
 - `apps/desktop/scripts/publish-update-manifest.ts` — uploads bundle + manifest to Supabase Storage
@@ -70,7 +64,6 @@
 - `.github/workflows/desktop-release-mac.yml` — CI workflow
 
 **Modified:**
-
 - `apps/desktop/main/index.ts` — wire the desktop log sink
 - `apps/desktop/main/ipc/bug-report.ts` — IPC handler registration
 
@@ -81,13 +74,11 @@
 **Test groupings:** G4.1 (Logger rotation math — size boundary at MAX_BYTES; date boundary; collision append; injected clock + fs adapter); G4.2 (Logger redaction unit — emails, URLs, base64 blobs, nested arrays, mixed-content strings, null/undefined short-circuits); G4.3 (Logger redaction property test via fast-check — random row-like objects with sensitive leaves at depth ≤5; assert no email/JWT/blob pattern appears in serialized output; belt-and-suspenders for ESLint rule blind spots); G4.4 (Logger FileSink integration — real tmp dir, faked clock; daily rotation; 14-day cleanup; 100MB total cap eviction).
 
 **PR boundaries:** 3 PRs.
-
 - PR 1: Sink interface + console sink — web behavior unchanged because console sink preserves the existing `console.error` default in `packages/shared/logger/`.
 - PR 2: FileSink module + redaction wrapper + unit/integration tests (G4.1–G4.4) — module exists but nothing instantiates it, so neither web nor desktop runtime behavior changes.
 - PR 3: Wire FileSink as the desktop sink in the bootstrap behind an `isDesktop` check — web continues using console sink, desktop opts in.
 
 **Files:**
-
 - Inspect current logger surface first: `packages/shared/logger/src/index.ts`
 - Modify the logger to accept a pluggable sink. Tests-first.
 
@@ -98,7 +89,7 @@ cat packages/shared/logger/src/index.ts
 ls packages/shared/logger/src/
 ```
 
-Document the current API surface (likely something like `log.info / log.warn / log.error`). The goal is to preserve the surface and only swap the _sink_.
+Document the current API surface (likely something like `log.info / log.warn / log.error`). The goal is to preserve the surface and only swap the *sink*.
 
 - [ ] **Step 2: Write the failing test for the sink interface**
 
@@ -181,11 +172,7 @@ export type Logger = {
 
 export function createLogger(args: CreateLoggerArgs): Logger {
   const minLevel = LEVEL_ORDER[args.level];
-  function emit(
-    level: LogLevel,
-    eventName: string,
-    fields: Record<string, unknown> = {},
-  ) {
+  function emit(level: LogLevel, eventName: string, fields: Record<string, unknown> = {}) {
     if (LEVEL_ORDER[level] < minLevel) return;
     args.sink.write({ timestamp: Date.now(), level, eventName, fields });
   }
@@ -228,15 +215,7 @@ export class ConsoleSink implements LogSink {
 Create `packages/shared/logger/src/sinks/FileSink.ts`:
 
 ```ts
-import {
-  appendFileSync,
-  statSync,
-  renameSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  unlinkSync,
-} from "node:fs";
+import { appendFileSync, statSync, renameSync, existsSync, mkdirSync, readdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import type { LogEvent, LogSink } from "../createLogger.ts";
 
@@ -364,18 +343,14 @@ import { redact } from "./redaction.ts";
 
 describe("redact", () => {
   it("redacts emails inside strings", () => {
-    expect(redact("hello user@example.com world")).toBe(
-      "hello [REDACTED] world",
-    );
+    expect(redact("hello user@example.com world")).toBe("hello [REDACTED] world");
   });
   it("redacts long base64 chunks", () => {
     const long = "x" + "A".repeat(250);
     expect(redact(long)).toContain("[REDACTED]");
   });
   it("recurses through objects", () => {
-    expect(redact({ a: { b: "user@example.com" } })).toEqual({
-      a: { b: "[REDACTED]" },
-    });
+    expect(redact({ a: { b: "user@example.com" } })).toEqual({ a: { b: "[REDACTED]" } });
   });
   it("leaves non-sensitive strings alone", () => {
     expect(redact("just a normal string")).toBe("just a normal string");
@@ -414,14 +389,12 @@ git grep "console\." -- apps/desktop/main/
 - [ ] **Step 10: Manual review checkpoint (do NOT commit)**
 
   **Run:**
-
   ```bash
   pnpm --filter @avandar/logger test
   pnpm --filter @avandar/logger typecheck
   pnpm lint
   git grep "console\." -- apps/desktop/main/
   ```
-
   Expected: all logger unit tests pass (sink interface, level filtering, ConsoleSink, FileSink rotation/cleanup, redaction); typecheck clean; lint clean; `git grep` returns no residual `console.*` calls in `apps/desktop/main/`.
 
   **Verify:**
@@ -449,12 +422,10 @@ git grep "console\." -- apps/desktop/main/
 **Test groupings:** G4.5 (ESLint rule cases via RuleTester — positive: { row }, { payload }, { data }, nested; negative: structured fields, non-logger objects; documented limitations: aliased imports, destructured methods).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: Add the rule with `severity: 'off'` (or behind an opt-in config) + RuleTester suite (G4.5) + audit and fix all existing repo violations — CI stays green because the rule does not flag anything yet, and pre-existing violations are repaired in the same PR.
 - PR 2: Flip the rule from `off` to `error` in the ESLint config — safe to merge only after PR 1 has eliminated violations, otherwise CI would red the whole repo.
 
 **Files:**
-
 - Create: `eslint-rules/no-raw-data-in-logger.js`
 - Create: `eslint-rules/no-raw-data-in-logger.test.js`
 - Modify: `eslint.config.js`
@@ -607,12 +578,10 @@ Expected: no errors.
 - [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
   **Run:**
-
   ```bash
   node eslint-rules/no-raw-data-in-logger.test.js
   pnpm lint
   ```
-
   Expected: the RuleTester script exits cleanly (it throws on the first valid/invalid mismatch, so no thrown error means all cases passed); `pnpm lint` is clean against the real codebase.
 
   **Verify:**
@@ -637,13 +606,11 @@ Expected: no errors.
 **Test groupings:** G4.6 (BugReportBundle selection — 7 most-recent files; oversize file truncated; redacted content passes through); G4.7 (Edge Function schema validation + auth — 401 without header; 405 on GET; 400 on malformed body via Zod; 200 writes correct object path); G4.8 (Bug report dialog flow via fake-IPC e2e — open Settings → preview → submit; mock Edge Function fetch; assert payload schema).
 
 **PR boundaries:** 3 PRs.
-
 - PR 1: Edge Function + Zod validator + tests (G4.7), deployed but with no client callers yet — server-side only, no web or desktop code change, so user-facing behavior is unchanged.
 - PR 2: BugReportBundle helper module + tests (G4.6), not wired into any UI — pure module addition, nothing imports it at runtime.
 - PR 3: Settings dialog UI + Submit button wiring (G4.8) — goes live only after PRs 1 and 2 have shipped, so the wired button has a working server and bundler to talk to.
 
 **Files:**
-
 - Create: `apps/desktop/main/services/BugReportBundle.ts`
 - Create: `apps/desktop/main/ipc/bug-report.ts`
 - Create: `packages/shared/platform/src/ipc/contracts.ts` — add `BugReportContracts`
@@ -662,10 +629,7 @@ export const BugReportContracts = {
     {
       readonly appVersion: string;
       readonly osVersion: string;
-      readonly logFiles: ReadonlyArray<{
-        readonly name: string;
-        readonly content: string;
-      }>;
+      readonly logFiles: ReadonlyArray<{ readonly name: string; readonly content: string }>;
     }
   >("bugReport.bundle"),
 };
@@ -696,11 +660,7 @@ export function buildBugReportBundle(args: {
 }): BugReportBundle {
   const files = readdirSync(args.logsDir)
     .filter((f) => f.endsWith(".log"))
-    .map((f) => ({
-      name: f,
-      path: join(args.logsDir, f),
-      stat: statSync(join(args.logsDir, f)),
-    }))
+    .map((f) => ({ name: f, path: join(args.logsDir, f), stat: statSync(join(args.logsDir, f)) }))
     .sort((a, b) => b.stat.mtimeMs - a.stat.mtimeMs)
     .slice(0, MAX_LOG_FILES);
 
@@ -736,10 +696,7 @@ import { readFileSync } from "node:fs";
 
 const PACKAGE_JSON_PATH = join(import.meta.dir, "..", "..", "package.json");
 
-export function registerBugReportHandlers(
-  server: IpcServer,
-  logsDir: string,
-): void {
+export function registerBugReportHandlers(server: IpcServer, logsDir: string): void {
   server.handle(BugReportContracts.bundle, async () => {
     const pkg = JSON.parse(readFileSync(PACKAGE_JSON_PATH, "utf8")) as {
       version: string;
@@ -762,15 +719,7 @@ Create `packages/web/components/src/BugReportDialog/BugReportDialog.tsx`:
 
 ```tsx
 import { useState } from "react";
-import {
-  Button,
-  Group,
-  Modal,
-  Stack,
-  Switch,
-  Text,
-  Textarea,
-} from "@mantine/core";
+import { Button, Group, Modal, Stack, Switch, Text, Textarea } from "@mantine/core";
 import { callIpc, BugReportContracts, isDesktop } from "@avandar/platform";
 
 type Props = {
@@ -857,14 +806,8 @@ export function BugReportDialog({ opened, onClose, submit }: Props) {
           </Stack>
         )}
         <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            onClick={onSubmit}
-            loading={submitting}
-            disabled={!description.trim()}
-          >
+          <Button variant="default" onClick={onClose}>Cancel</Button>
+          <Button onClick={onSubmit} loading={submitting} disabled={!description.trim()}>
             Submit
           </Button>
         </Group>
@@ -888,8 +831,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 serve(async (req) => {
-  if (req.method !== "POST")
-    return new Response("Method not allowed", { status: 405 });
+  if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) return new Response("Unauthorized", { status: 401 });
@@ -900,7 +842,7 @@ serve(async (req) => {
   const { data: userData } = await userClient.auth.getUser();
   if (!userData?.user) return new Response("Unauthorized", { status: 401 });
 
-  const payload = (await req.json()) as {
+  const payload = await req.json() as {
     description: string;
     appVersion: string;
     osVersion: string;
@@ -913,20 +855,14 @@ serve(async (req) => {
   const objectPath = `bug-reports/${userData.user.id}/${bugId}.json`;
   const { error } = await admin.storage.from("internal").upload(
     objectPath,
-    new Blob(
-      [
-        JSON.stringify({
-          userId: userData.user.id,
-          submittedAt: Date.now(),
-          ...payload,
-        }),
-      ],
-      { type: "application/json" },
-    ),
+    new Blob([JSON.stringify({
+      userId: userData.user.id,
+      submittedAt: Date.now(),
+      ...payload,
+    })], { type: "application/json" }),
     { upsert: false },
   );
-  if (error)
-    return new Response(`Storage error: ${error.message}`, { status: 500 });
+  if (error) return new Response(`Storage error: ${error.message}`, { status: 500 });
 
   return new Response(JSON.stringify({ ok: true, bugId }), {
     headers: { "Content-Type": "application/json" },
@@ -957,7 +893,6 @@ Trigger an error (or just open the dialog), submit a report, verify it lands in 
 - [ ] **Step 8: Manual review checkpoint (do NOT commit)**
 
   **Run:**
-
   ```bash
   pnpm --filter @avandar/platform test
   pnpm --filter @avandar/desktop test
@@ -966,7 +901,6 @@ Trigger an error (or just open the dialog), submit a report, verify it lands in 
   pnpm typecheck
   supabase functions list
   ```
-
   Expected: unit tests pass for `BugReportBundle` (file selection limit, truncation behavior, preserved-redaction); `BugReportDialog` tests pass (description required, preview toggle, submit handler invoked); lint and typecheck clean; the `bug-reports` function appears in the deployed list.
 
   **Verify:**
@@ -996,7 +930,6 @@ Trigger an error (or just open the dialog), submit a report, verify it lands in 
 **PR boundaries:** 1 PR. Adds shell scripts, an entitlements plist, and an `electrobun.config.ts` entitlements path — none of these are on the build hot path until the Task 6 CI workflow invokes them on tag pushes, so merging cannot regress web, the existing desktop dev build, or normal-PR CI.
 
 **Files:**
-
 - Create: `apps/desktop/scripts/sign-mac.sh`
 - Create: `apps/desktop/scripts/notarize-mac.sh`
 - Create: `apps/desktop/scripts/build-and-sign-mac.sh`
@@ -1006,14 +939,12 @@ Trigger an error (or just open the dialog), submit a report, verify it lands in 
 - [ ] **Step 1: Procure or confirm Apple Developer ID**
 
 Verify the team has a paid Apple Developer account. Required:
-
 - Developer ID Application certificate
 - Apple Team ID
 - An Apple ID with App Store Connect access for notarization
 - App-specific password for notarization (`appleid.apple.com` → Sign-In and Security → App-Specific Passwords)
 
 Store credentials as CI secrets:
-
 - `APPLE_DEVELOPER_ID_NAME` (e.g. `Developer ID Application: Avandar Labs (TEAM12345)`)
 - `APPLE_TEAM_ID`
 - `APPLE_ID_EMAIL`
@@ -1159,7 +1090,7 @@ bash apps/desktop/scripts/build-and-sign-mac.sh
 
 Expected: a signed `.app` and `.dmg` under `apps/desktop/bundle/`.
 
-Test the bundle on a _different_ Mac that's never opened the app:
+Test the bundle on a *different* Mac that's never opened the app:
 
 ```bash
 open apps/desktop/bundle/Avandar.dmg
@@ -1172,7 +1103,6 @@ Expected: opens without Gatekeeper warnings.
 - [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
   **Run:**
-
   ```bash
   codesign --verify --deep --strict --verbose=2 apps/desktop/bundle/**/*.app
   codesign --display --entitlements :- apps/desktop/bundle/**/*.app
@@ -1180,7 +1110,6 @@ Expected: opens without Gatekeeper warnings.
   xcrun stapler validate apps/desktop/bundle/**/*.app
   hdiutil verify apps/desktop/bundle/Avandar.dmg
   ```
-
   Expected: `codesign --verify` exits 0; entitlements output shows the five keys from `entitlements.mac.plist`; `spctl --assess` reports `accepted` with source `Notarized Developer ID`; `stapler validate` reports `The validate action worked!`; DMG verification passes.
 
   **Verify:**
@@ -1208,14 +1137,12 @@ Expected: opens without Gatekeeper warnings.
 **Test groupings:** G4.9 (Auto-updater version comparison + manifest parsing — semver edges; 1.0.0-beta; missing fields; malformed JSON).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: Updater module + manifest parser + version-compare unit tests (G4.9), not wired into the Bun-main bootstrap — pure module + publish script, no runtime path executes the updater, so neither web nor desktop behavior changes.
 - PR 2: Wire updater into Bun-main startup + Settings "Check for updates" UI — desktop-only entry point, web is untouched.
 
 Use Electrobun's built-in updater. The app polls a manifest URL on launch; if a newer version is listed, download and self-update.
 
 **Files:**
-
 - Modify: `apps/desktop/electrobun.config.ts` — add updater block
 - Create: `apps/desktop/scripts/publish-update-manifest.ts`
 
@@ -1228,9 +1155,7 @@ const config: ElectrobunConfig = {
   // ... existing fields
   updater: {
     channel: "stable",
-    feedUrl:
-      process.env.AVA_UPDATE_FEED_URL ??
-      "https://<your-supabase-storage-domain>/updates/mac/stable/manifest.json",
+    feedUrl: process.env.AVA_UPDATE_FEED_URL ?? "https://<your-supabase-storage-domain>/updates/mac/stable/manifest.json",
   },
 };
 ```
@@ -1254,9 +1179,7 @@ const CHANNEL = "stable";
 const PLATFORM = "mac";
 
 const REPO_ROOT = join(import.meta.dir, "..", "..", "..");
-const PKG = JSON.parse(
-  readFileSync(join(REPO_ROOT, "package.json"), "utf8"),
-) as {
+const PKG = JSON.parse(readFileSync(join(REPO_ROOT, "package.json"), "utf8")) as {
   version: string;
 };
 
@@ -1322,13 +1245,11 @@ fi
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
   **Run:**
-
   ```bash
   curl -sSf "$AVA_UPDATE_FEED_URL" | jq .
   pnpm --filter @avandar/desktop typecheck
   pnpm lint
   ```
-
   Expected: the manifest URL responds 200 with a JSON body containing `version`, `releasedAt`, `url`, `sizeBytes`; typecheck and lint clean.
 
   **Verify:**
@@ -1358,7 +1279,6 @@ fi
 **PR boundaries:** 1 PR. Adds a new workflow file that triggers only on tag pushes (`v*`) — it does not run on regular pull-request CI, so existing PR check status is unchanged. Web is untouched; desktop runtime is untouched until a release tag is cut.
 
 **Files:**
-
 - Create: `.github/workflows/desktop-release-mac.yml`
 
 - [ ] **Step 1: Write the workflow**
@@ -1430,7 +1350,6 @@ jobs:
 - [ ] **Step 2: Add the CI secrets**
 
 Via GitHub UI (repo Settings → Secrets and variables → Actions):
-
 - `MACOS_CERT_P12_BASE64` — base64 of your exported `.p12` Developer ID cert
 - `MACOS_CERT_PASSWORD` — password for the .p12
 - `KEYCHAIN_PASSWORD` — random password for the ephemeral CI keychain
@@ -1448,7 +1367,6 @@ Re-run with `publish-update: true` to verify the manifest path.
 - [ ] **Step 4: Manual review checkpoint (do NOT commit)**
 
   **Run:**
-
   ```bash
   gh workflow list
   gh workflow run desktop-release-mac.yml --ref <your-branch> -f publish-update=false
@@ -1457,13 +1375,12 @@ Re-run with `publish-update: true` to verify the manifest path.
   codesign --verify --deep --strict --verbose=2 /tmp/ava-ci-artifact/Avandar.dmg
   spctl --assess --type open --context context:primary-signature /tmp/ava-ci-artifact/Avandar.dmg
   ```
-
   Expected: workflow appears in `gh workflow list`; the dispatched run finishes green; the artifact downloads; `codesign --verify` passes on the CI-produced DMG; `spctl --assess` reports it as accepted.
 
   **Verify:**
   - `.github/workflows/desktop-release-mac.yml` runs on `macos-14`, pins pnpm to `10.30.3`, Node `22`, and uses `oven-sh/setup-bun@v2`.
   - The "Import code signing certificate" step creates an ephemeral keychain, decodes the cert from base64, imports it, and deletes `cert.p12` at the end. It never echoes any secret value.
-  - All required secrets are configured in repo Settings → Secrets and variables → Actions (verify by _name only_ in the GitHub UI — do NOT view or echo values): `MACOS_CERT_P12_BASE64`, `MACOS_CERT_PASSWORD`, `KEYCHAIN_PASSWORD`, `APPLE_DEVELOPER_ID_NAME`, `APPLE_ID_EMAIL`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
+  - All required secrets are configured in repo Settings → Secrets and variables → Actions (verify by *name only* in the GitHub UI — do NOT view or echo values): `MACOS_CERT_P12_BASE64`, `MACOS_CERT_PASSWORD`, `KEYCHAIN_PASSWORD`, `APPLE_DEVELOPER_ID_NAME`, `APPLE_ID_EMAIL`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
   - The "Publish update manifest" step is gated on `inputs.publish-update == 'true'` so the default dispatch path does not publish.
   - The artifact upload step names the artifact `avandar-desktop-mac` and uploads `apps/desktop/bundle/Avandar.dmg`.
   - Test groupings G4.10 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
@@ -1472,7 +1389,7 @@ Re-run with `publish-update: true` to verify the manifest path.
   1. Dispatch the workflow with `publish-update=false` from a feature branch; confirm green run and downloadable artifact.
   2. Install the downloaded DMG on a clean Mac (or quarantine-tagged copy) and confirm Gatekeeper accepts and the app launches.
   3. Bump version, re-dispatch with `publish-update=true`, watch the run, then `curl -sSf "$AVA_UPDATE_FEED_URL" | jq .version` and confirm it now reports the new version.
-  4. Inspect the run logs and confirm no secret value (cert password, app-specific password, service role key) is printed — only env var _names_ should be visible.
+  4. Inspect the run logs and confirm no secret value (cert password, app-specific password, service role key) is printed — only env var *names* should be visible.
 
   Expected: the CI workflow produces a signed, notarized, Gatekeeper-accepted DMG identical in shape to local builds, optionally updating the manifest when explicitly requested, with zero secret leakage in logs.
 
@@ -1491,7 +1408,6 @@ Build, sign, and distribute the signed `.dmg` to a small internal user group (5-
 - [ ] **Step 2: Two-week observation window**
 
 Capture:
-
 - Crash reports (from `<userDataDir>/logs/` files attached to bug reports)
 - Auto-update behavior on each member's machine
 - Sync engine correctness — anyone seeing missing data, duplicated rows, or stale state
@@ -1500,7 +1416,6 @@ Capture:
 - [ ] **Step 3: Triage**
 
 Categorize findings as:
-
 - Blocker (fix before broader rollout)
 - Tolerable (file for V2)
 - Already-known risk per the spec's register
@@ -1512,13 +1427,11 @@ Address any blocker as a hotfix PR + new release through the CI workflow.
 - [ ] **Step 5: Manual review checkpoint — Phase 4 acceptance (do NOT commit)**
 
   **Run:**
-
   ```bash
   pnpm test
   pnpm lint
   pnpm typecheck
   ```
-
   Expected: full repo test, lint, and typecheck all clean.
 
   **Verify:**
@@ -1554,10 +1467,10 @@ Address any blocker as a hotfix PR + new release through the CI workflow.
 
 ## Risks Specific to Phase 4
 
-| Risk                                                                                         | Mitigation in this phase                                                                                                                               |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Electrobun's updater APIs are immature; auto-update path may not work cleanly                | Manual fallback documented in Task 5 Step 1; ship that if Electrobun's updater stalls                                                                  |
-| Notarization fails because of an unforeseen entitlement requirement (e.g. Bun JIT)           | Entitlements file in Task 2 already enables JIT + library validation disable; if more is needed, iterate via `xcrun notarytool log` output             |
-| User reports unredacted PII in their submitted logs                                          | Logger redaction is on by default; bug-report dialog's "Preview" toggle gives the user one more chance to review                                       |
-| Auto-update bricks the app on a failure                                                      | Phase 4 doesn't introduce rollback; mitigation is keeping the installed `.app` intact during update download, only swapping on successful verification |
-| Internal dogfood surfaces something fundamental (e.g. sync engine LWW eating someone's work) | Phase 3's diagnostic tooling helps reproduce; if a critical correctness bug emerges, treat as a Phase 3 spec change, not a Phase 4 patch               |
+| Risk | Mitigation in this phase |
+|---|---|
+| Electrobun's updater APIs are immature; auto-update path may not work cleanly | Manual fallback documented in Task 5 Step 1; ship that if Electrobun's updater stalls |
+| Notarization fails because of an unforeseen entitlement requirement (e.g. Bun JIT) | Entitlements file in Task 2 already enables JIT + library validation disable; if more is needed, iterate via `xcrun notarytool log` output |
+| User reports unredacted PII in their submitted logs | Logger redaction is on by default; bug-report dialog's "Preview" toggle gives the user one more chance to review |
+| Auto-update bricks the app on a failure | Phase 4 doesn't introduce rollback; mitigation is keeping the installed `.app` intact during update download, only swapping on successful verification |
+| Internal dogfood surfaces something fundamental (e.g. sync engine LWW eating someone's work) | Phase 3's diagnostic tooling helps reproduce; if a critical correctness bug emerges, treat as a Phase 3 spec change, not a Phase 4 patch |

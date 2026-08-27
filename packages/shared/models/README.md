@@ -25,8 +25,8 @@ pnpm add @avandar/models
 
 | Entry                 | Contents                                           |
 | --------------------- | -------------------------------------------------- |
-| `@avandar/models`     | `Model` — the value helpers and the type namespace |
-| `@avandar/models/zod` | Zod schema builders for models                     |
+| `@avandar/models`     | `Model` — the value helpers and the type namespace   |
+| `@avandar/models/zod` | Zod schema builders for models                      |
 
 ## Usage
 
@@ -46,8 +46,8 @@ const label = Model.match(model, {
 const typedId = Model.getTypedId(user); // { id: 'u1', __type: 'User' }
 
 // Runtime type guards
-Model.isModel(value); // true if value has a `__type` string
-Model.isOfModelType(value, "User"); // true if `__type === "User"`
+Model.isModel(value);                 // true if value has a `__type` string
+Model.isOfModelType(value, "User");   // true if `__type === "User"`
 
 // Higher-order guard for use with `.filter`, `.find`, etc.
 users.filter(Model.valIsOfModelType("Admin"));
@@ -70,8 +70,7 @@ Pattern-matches a model union by its `__type`, calling the corresponding
 function. Throws if no branch matches.
 
 ```ts
-type Shape =
-  Model.Base<"Circle", { r: number }> | Model.Base<"Square", { s: number }>;
+type Shape = Model.Base<"Circle", { r: number }> | Model.Base<"Square", { s: number }>;
 const area = Model.match(shape, {
   Circle: ({ r }) => Math.PI * r * r,
   Square: ({ s }) => s * s,
@@ -95,12 +94,13 @@ every other property. Useful for keying lookups or passing references.
 
 ## Types
 
-| Type               | Description                                                               |
-| ------------------ | ------------------------------------------------------------------------- |
-| `Model.Base<T,P>`  | Base model shape: `{ __type: T } & P` (defaults: `string`, `EmptyObject`) |
-| `Model.Versioned`  | Base model extended with a numeric `version` field                        |
-| `Model.Type<M>`    | Utility type: extracts the `__type` string literal from a model           |
-| `Model.TypedId<M>` | Utility type: `{ __type, id }` picked from a model with an `id` property  |
+| Type              | Description                                                                  |
+| ----------------- | ---------------------------------------------------------------------------- |
+| `Model.Base<T,P>` | Base model shape: `{ __type: T } & P` (defaults: `string`, `EmptyObject`)    |
+| `Model.Versioned` | Base model extended with a numeric `version` field                           |
+| `Model.Type<M>`   | Utility type: extracts the `__type` string literal from a model              |
+| `Model.TypedId<M>`| Utility type: `{ __type, id }` picked from a model with an `id` property     |
+
 
 ## Dependencies
 

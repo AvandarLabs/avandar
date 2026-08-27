@@ -15,9 +15,9 @@
 **The branch does not merge until this plan's Task 20 passes.** Two documents
 define done:
 
-- International Medical Corps, _Sudan Cholera Response Situation Report #1_,
+- International Medical Corps, *Sudan Cholera Response Situation Report #1*,
   24 June 2025.
-- UN OCHA, _Sudan Cholera Operational Update_, 3 July 2025.
+- UN OCHA, *Sudan Cholera Operational Update*, 3 July 2025.
 
 Neither contains a single table, which is why Phase B3's detector cannot
 unblock this merge and why this phase exists. Task 20 turns "we can process
@@ -130,15 +130,15 @@ work worth losing.
 
 **The four shapes, and why a table detector does not cover them.**
 
-| Shape              | What it looks like                                | Where in the gate documents             |
-| ------------------ | ------------------------------------------------- | --------------------------------------- |
-| `grid_table`       | Ruled or aligned cells                            | Neither document                        |
-| `labelled_graphic` | Values and labels as separate text at coordinates | OCHA map, KPI tiles, funding bars       |
-| `repeating_blocks` | Numbered headings with run-in labels              | OCHA page 2 pillars                     |
-| `prose_measures`   | Numbers inside sentences                          | IMC page 1, OCHA highlights and funding |
+| Shape | What it looks like | Where in the gate documents |
+|---|---|---|
+| `grid_table` | Ruled or aligned cells | Neither document |
+| `labelled_graphic` | Values and labels as separate text at coordinates | OCHA map, KPI tiles, funding bars |
+| `repeating_blocks` | Numbered headings with run-in labels | OCHA page 2 pillars |
+| `prose_measures` | Numbers inside sentences | IMC page 1, OCHA highlights and funding |
 
 **The association problem, which is the hard part.** In a labelled graphic the
-link between a value and its label exists _only_ in the coordinates. Running
+link between a value and its label exists *only* in the coordinates. Running
 the OCHA map through a conventional text extractor tears `29` away from
 `NORTHERN` and strands them lines apart, because reading order is not spatial
 order.
@@ -146,12 +146,12 @@ order.
 **This was measured during design, not assumed.** Nearest-label association
 over the OCHA map's 16 state figures scored:
 
-| Outcome                          | Count |
-| -------------------------------- | ----- |
-| Correct and unambiguous          | 10    |
-| Correct but flagged as uncertain | 4     |
-| Wrong but flagged as uncertain   | 1     |
-| Silently wrong                   | 1     |
+| Outcome | Count |
+|---|---|
+| Correct and unambiguous | 10 |
+| Correct but flagged as uncertain | 4 |
+| Wrong but flagged as uncertain | 1 |
+| Silently wrong | 1 |
 
 Three consequences drive the design of Tasks 3, 4 and 17:
 
@@ -160,7 +160,7 @@ Three consequences drive the design of Tasks 3, 4 and 17:
 2. **The best-to-runner-up distance ratio is a usable uncertainty signal.** It
    caught one of the two errors. Above 0.8, flag rather than guess.
 3. **Label assembly must separate two rules.** Same-line merging uses the
-   horizontal _edge gap_; stacked-line merging requires tight x-centre
+   horizontal *edge gap*; stacked-line merging requires tight x-centre
    alignment. Two earlier runs failed by conflating them, first fusing
    `KHARTOUM` with `KASSALA`, then splitting `RED SEA` in half.
 
@@ -182,7 +182,7 @@ generation caveats" section first. The three that matter here:
    `supabase/migrations/20260504000010_add_xlsx_file_source_type_enum_value.sql`.
    `db diff` mishandles them because RPC signatures depend on the type.
 2. **Check branch currency before reading any diff.** `git rev-list --count
-HEAD..develop` must be 0, or the diff reports missing commits as drift.
+   HEAD..develop` must be 0, or the diff reports missing commits as drift.
 3. **Expect seven benign `analytics` view recreations.** Every drop has a
    matching recreate. Strip the pairs from generated migrations; there is no
    bug to chase.
@@ -191,51 +191,50 @@ HEAD..develop` must be 0, or the diff reports missing commits as drift.
 
 **Create, under `src/workers/pdfSniff/`:**
 
-| File                                                     | Responsibility                                   | Task |
-| -------------------------------------------------------- | ------------------------------------------------ | ---- |
-| `clipToRegion.ts`                                        | Page geometry to region geometry                 | 2    |
-| `assembleLabels.ts`                                      | Same-line and stacked-line label merging         | 3    |
-| `assembleQuantities.ts`                                  | A numeral plus its suffix, read as one figure    | 5    |
-| `pairByProximity.ts`                                     | Value to label association, plus ambiguity ratio | 4    |
-| `extractors/extractLabelledGraphic.ts`                   | Shape: labelled graphic                          | 5    |
-| `parseRunInLabels.ts`                                    | Run-in label blocks                              | 6    |
-| `extractors/extractRepeatingBlocks.ts`                   | Shape: repeating blocks                          | 7    |
-| `extractMeasurements.ts`                                 | Number, unit and subject from sentences          | 8    |
-| `extractors/extractProseMeasures.ts`                     | Shape: prose measurements                        | 9    |
-| `extractors/extractGridTable.ts`                         | Shape: grid table                                | 10   |
-| `classifyRegion.ts`                                      | Choose a shape, report the evidence              | 11   |
-| `combineRegions.ts`                                      | Union or normalise to observations               | 12   |
-| `extractDocumentMetadata.ts`                             | Title, org, report number, date                  | 13   |
-| `llm/buildRegionPrompt.ts`, `llm/parseRegionResponse.ts` | Model assist                                     | 18   |
+| File | Responsibility | Task |
+|---|---|---|
+| `clipToRegion.ts` | Page geometry to region geometry | 2 |
+| `assembleLabels.ts` | Same-line and stacked-line label merging | 3 |
+| `assembleQuantities.ts` | A numeral plus its suffix, read as one figure | 5 |
+| `pairByProximity.ts` | Value to label association, plus ambiguity ratio | 4 |
+| `extractors/extractLabelledGraphic.ts` | Shape: labelled graphic | 5 |
+| `parseRunInLabels.ts` | Run-in label blocks | 6 |
+| `extractors/extractRepeatingBlocks.ts` | Shape: repeating blocks | 7 |
+| `extractMeasurements.ts` | Number, unit and subject from sentences | 8 |
+| `extractors/extractProseMeasures.ts` | Shape: prose measurements | 9 |
+| `extractors/extractGridTable.ts` | Shape: grid table | 10 |
+| `classifyRegion.ts` | Choose a shape, report the evidence | 11 |
+| `combineRegions.ts` | Union or normalise to observations | 12 |
+| `extractDocumentMetadata.ts` | Title, org, report number, date | 13 |
+| `llm/buildRegionPrompt.ts`, `llm/parseRegionResponse.ts` | Model assist | 18 |
 
 **Create, under `.../ManualUploadView/PdfTablePicker/`:**
 
-| File                   | Responsibility                        | Task |
-| ---------------------- | ------------------------------------- | ---- |
-| `PdfRegionOverlay.tsx` | Draw and edit boxes over the page     | 15   |
-| `PdfRegionPicker.tsx`  | Region list, shape override, evidence | 16   |
-| `PdfReviewGrid.tsx`    | Editable rows, flags, provenance link | 17   |
+| File | Responsibility | Task |
+|---|---|---|
+| `PdfRegionOverlay.tsx` | Draw and edit boxes over the page | 15 |
+| `PdfRegionPicker.tsx` | Region list, shape override, evidence | 16 |
+| `PdfReviewGrid.tsx` | Editable rows, flags, provenance link | 17 |
 
 **Modify:**
 
-| File                                                         | Change                                                   | Task |
-| ------------------------------------------------------------ | -------------------------------------------------------- | ---- |
-| `supabase/schemas/20.datasets__pdf_file.sql`                 | Restructure `regions`, add `output_mode` and `llm_model` | 1    |
-| `supabase/schemas/00.enum.datasets__pdf_region_shape.sql`    | New enum                                                 | 1    |
-| `supabase/schemas/00.enum.datasets__pdf_output_mode.sql`     | New enum                                                 | 1    |
-| `supabase/schemas/70.rpc_datasets__add_pdf_file_dataset.sql` | New parameters                                           | 1    |
-| `shared/models/datasets/PdfFileDataset/*`                    | Model, parsers, types                                    | 1    |
-| `src/workers/pdfSniff.worker.ts`                             | Add the `extract` message                                | 14   |
-| `src/clients/datasets/pdfSniff.ts`                           | Add `extractPdfRegions`                                  | 14   |
-| `.../PdfTablePicker/PdfPagePreview.tsx`                      | Several highlights, not one                              | 15   |
-| `.../useSaveDataset/useSaveDataset.ts`                       | Real `pdf_file` save arm                                 | 19   |
+| File | Change | Task |
+|---|---|---|
+| `supabase/schemas/20.datasets__pdf_file.sql` | Restructure `regions`, add `output_mode` and `llm_model` | 1 |
+| `supabase/schemas/00.enum.datasets__pdf_region_shape.sql` | New enum | 1 |
+| `supabase/schemas/00.enum.datasets__pdf_output_mode.sql` | New enum | 1 |
+| `supabase/schemas/70.rpc_datasets__add_pdf_file_dataset.sql` | New parameters | 1 |
+| `shared/models/datasets/PdfFileDataset/*` | Model, parsers, types | 1 |
+| `src/workers/pdfSniff.worker.ts` | Add the `extract` message | 14 |
+| `src/clients/datasets/pdfSniff.ts` | Add `extractPdfRegions` | 14 |
+| `.../PdfTablePicker/PdfPagePreview.tsx` | Several highlights, not one | 15 |
+| `.../useSaveDataset/useSaveDataset.ts` | Real `pdf_file` save arm | 19 |
 
 ---
 
 ## Task 1: Restructure the region model and schema
 
 **Files:**
-
 - Create: `supabase/schemas/00.enum.datasets__pdf_region_shape.sql`
 - Create: `supabase/schemas/00.enum.datasets__pdf_output_mode.sql`
 - Modify: `supabase/schemas/20.datasets__pdf_file.sql`
@@ -250,7 +249,7 @@ modelled one dataset as one table: `regions` held page fragments of a single
 logical table, with `detection_mode`, `grid_x`, `grid_y`, `header_rows` and
 `fill_merged_cells` beside it as table-wide settings.
 
-Those are all per-region concepts once a dataset can hold a map _and_ a KPI
+Those are all per-region concepts once a dataset can hold a map *and* a KPI
 row. Leaving them as columns would mean two sources of truth for the same
 setting. Nothing has shipped, so restructuring now is cheaper than carrying the
 contradiction.
@@ -472,16 +471,7 @@ describe("PdfFileDataset region parsing", () => {
     expect(() => {
       return PdfFileDataset.Parsers.fromDBReadToModel({
         // ... same row as above, with:
-        regions: [
-          {
-            id: "r1",
-            label: "x",
-            shape: "sideways",
-            detectionMode: "manual",
-            fragments: [],
-            options: {},
-          },
-        ],
+        regions: [{ id: "r1", label: "x", shape: "sideways", detectionMode: "manual", fragments: [], options: {} }],
       } as never);
     }).toThrow();
   });
@@ -553,7 +543,6 @@ git commit -m "refactor: move per-region pdf settings into the regions column"
 ## Task 2: Clip page geometry to a region
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/clipToRegion.ts`
 - Create: `src/workers/pdfSniff/clipToRegion.test.ts`
 
@@ -572,15 +561,7 @@ import { clipToRegion } from "./clipToRegion";
 import type { PageGeometry, TextItem } from "./types";
 
 function textItem(text: string, x: number, y: number, width = 30): TextItem {
-  return {
-    text,
-    x,
-    y,
-    width,
-    height: 10,
-    fontName: "f1",
-    unmappedCharRatio: 0,
-  };
+  return { text, x, y, width, height: 10, fontName: "f1", unmappedCharRatio: 0 };
 }
 
 function page(): PageGeometry {
@@ -721,7 +702,10 @@ function _insideFraction(item: TextItem, bbox: BBox): number {
  * consumes the result, so a change here changes all four shapes at once,
  * which is the intent: users expect one selection rule, not four.
  */
-export function clipToRegion(page: PageGeometry, bbox: BBox): RegionGeometry {
+export function clipToRegion(
+  page: PageGeometry,
+  bbox: BBox,
+): RegionGeometry {
   const [x0, y0, x1, y1] = bbox;
 
   return {
@@ -759,7 +743,6 @@ git commit -m "feat: clip pdf page geometry to a selected region"
 ## Task 3: Assemble multi-word labels
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/assembleLabels.ts`
 - Create: `src/workers/pdfSniff/assembleLabels.test.ts`
 
@@ -898,7 +881,7 @@ rather than a typo. Union-find does a **single pairwise pass over the original
 items**. `WEST`'s centre is 112.5 and `NORTH`'s is 143; `KORDOFAN`'s is 125.
 Neither is within `STACKED_MAX_CENTRE_DELTA` (12) of `KORDOFAN` on its own, at
 12.5 and 18. But `WEST` and `NORTH` merge on the same line first, and the
-_merged_ label's centre is 129, only 4 from `KORDOFAN`. A pairwise pass can
+*merged* label's centre is 129, only 4 from `KORDOFAN`. A pairwise pass can
 never find that, because it never re-evaluates against merged geometry.
 
 **The shipped implementation is agglomerative instead**: it tracks clusters
@@ -1050,11 +1033,9 @@ git commit -m "feat: assemble multi-word labels from separate text items"
 ```
 
 ---
-
 ## Task 4: Pair values to labels by proximity
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/pairByProximity.ts`
 - Create: `src/workers/pdfSniff/pairByProximity.test.ts`
 
@@ -1084,15 +1065,7 @@ function label(text: string, cx: number, cy: number): AssembledLabel {
 }
 
 function value(text: string, x: number, y: number): TextItem {
-  return {
-    text,
-    x,
-    y,
-    width: 12,
-    height: 8,
-    fontName: "f1",
-    unmappedCharRatio: 0,
-  };
+  return { text, x, y, width: 12, height: 8, fontName: "f1", unmappedCharRatio: 0 };
 }
 
 describe("pairByProximity", () => {
@@ -1231,7 +1204,10 @@ export type ProximityResult = readonly ProximityPair[] & {
   unmatchedValues: readonly string[];
 };
 
-function _distance(item: TextItem, label: AssembledLabel): number {
+function _distance(
+  item: TextItem,
+  label: AssembledLabel,
+): number {
   const cx = item.x + item.width / 2;
   const cy = item.y + item.height / 2;
   return Math.hypot(cx - label.cx, cy - label.cy);
@@ -1296,9 +1272,9 @@ export function pairByProximity(params: {
       }, Number.POSITIVE_INFINITY);
 
     const ambiguityRatio =
-      Number.isFinite(runnerUp) && runnerUp > 0
-        ? candidate.distance / runnerUp
-        : 0;
+      Number.isFinite(runnerUp) && runnerUp > 0 ?
+        candidate.distance / runnerUp
+      : 0;
 
     pairs.push({
       value: candidate.valueItem.text,
@@ -1352,7 +1328,6 @@ git commit -m "feat: pair values to labels by proximity with an ambiguity signal
 ## Task 5: Extract a labelled graphic
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/extractors/extractLabelledGraphic.ts`
 - Create: `src/workers/pdfSniff/extractors/extractLabelledGraphic.test.ts`
 
@@ -1441,7 +1416,9 @@ describe("extractLabelledGraphic", () => {
     );
 
     expect(result.cells).toContainEqual(["ABYEI", ""]);
-    expect(result.flags.some((f) => f.reason === "unmatched_label")).toBe(true);
+    expect(
+      result.flags.some((f) => f.reason === "unmatched_label"),
+    ).toBe(true);
   });
 
   it("treats a legend's bin boundaries as values, not labels", () => {
@@ -1550,10 +1527,7 @@ export function extractLabelledGraphic(
 
   pairs.forEach((pair, index) => {
     cells.push([pair.label, normalizeCellValue(pair.value)]);
-    rowProvenance.push({
-      page: region.pageIndex,
-      bbox: _bboxOf(pair.valueItem),
-    });
+    rowProvenance.push({ page: region.pageIndex, bbox: _bboxOf(pair.valueItem) });
 
     if (pair.isAmbiguous) {
       flags.push({
@@ -1619,7 +1593,6 @@ git commit -m "feat: extract labelled graphics from maps, charts and kpi tiles"
 ## Task 6: Parse run-in labels
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/parseRunInLabels.ts`
 - Create: `src/workers/pdfSniff/parseRunInLabels.test.ts`
 
@@ -1641,15 +1614,7 @@ function line(text: string, y: number, fontName = "body"): TextLine {
     y,
     text,
     items: [
-      {
-        text,
-        x: 100,
-        y,
-        width: text.length * 4,
-        height: 9,
-        fontName,
-        unmappedCharRatio: 0,
-      },
+      { text, x: 100, y, width: text.length * 4, height: 9, fontName, unmappedCharRatio: 0 },
     ],
   };
 }
@@ -1707,9 +1672,7 @@ describe("parseRunInLabels", () => {
     ]);
 
     expect(Object.keys(blocks[0]!.fields)).toEqual(["Responses"]);
-    expect(blocks[0]!.fields.Responses).toBe(
-      "Deliveries arrive at 09:00 daily",
-    );
+    expect(blocks[0]!.fields.Responses).toBe("Deliveries arrive at 09:00 daily");
   });
 
   it("returns nothing when there is no numbered heading", () => {
@@ -1856,7 +1819,6 @@ git commit -m "feat: parse numbered headings with run-in labels"
 ## Task 7: Extract repeating blocks
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/extractors/extractRepeatingBlocks.ts`
 - Create: `src/workers/pdfSniff/extractors/extractRepeatingBlocks.test.ts`
 
@@ -1997,12 +1959,7 @@ Create `src/workers/pdfSniff/extractors/extractRepeatingBlocks.ts`:
 ```ts
 import { groupLines } from "../groupLines";
 import { parseRunInLabels } from "../parseRunInLabels";
-import type {
-  BBox,
-  ExtractedTable,
-  PdfCellFlag,
-  RegionGeometry,
-} from "../types";
+import type { BBox, ExtractedTable, PdfCellFlag, RegionGeometry } from "../types";
 
 /**
  * Reads numbered sections with run-in labels into one row per section.
@@ -2101,11 +2058,9 @@ git commit -m "feat: extract repeating labelled blocks into rows"
 ```
 
 ---
-
 ## Task 8: Extract measurements from sentences
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/extractMeasurements.ts`
 - Create: `src/workers/pdfSniff/extractMeasurements.test.ts`
 
@@ -2183,9 +2138,9 @@ describe("extractMeasurements", () => {
       value: 16,
       unit: "percent",
     });
-    expect(
-      extractMeasurements("a case fatality rate of 2.6%")[0],
-    ).toMatchObject({ value: 2.6, unit: "percent" });
+    expect(extractMeasurements("a case fatality rate of 2.6%")[0]).toMatchObject(
+      { value: 2.6, unit: "percent" },
+    );
   });
 
   it("keeps a multi-word metric", () => {
@@ -2278,8 +2233,7 @@ const SCALE_WORDS: Record<string, number> = {
 const SCALE_WORD_SET = new Set(Object.keys(SCALE_WORDS));
 
 /** A trailing "in <Place>" clause naming the subject of the measurements. */
-const SUBJECT_CLAUSE =
-  /\bin\s+([A-Z][A-Za-z]*(?:\s+[A-Z][A-Za-z]*){0,2})\b(?=[.,;]|$)/u;
+const SUBJECT_CLAUSE = /\bin\s+([A-Z][A-Za-z]*(?:\s+[A-Z][A-Za-z]*){0,2})\b(?=[.,;]|$)/u;
 
 /**
  * A number, optionally preceded by a currency symbol and followed by a scale
@@ -2362,7 +2316,9 @@ function _cleanMetric(phrase: string): string {
  * is far more damaging than a missing one the user can see is missing. The
  * model assist exists to raise recall without loosening these rules.
  */
-export function extractMeasurements(sentence: string): readonly Measurement[] {
+export function extractMeasurements(
+  sentence: string,
+): readonly Measurement[] {
   const subjectMatch = SUBJECT_CLAUSE.exec(sentence);
   const subject = subjectMatch ? subjectMatch[1]!.trim() : null;
 
@@ -2384,7 +2340,9 @@ export function extractMeasurements(sentence: string): readonly Measurement[] {
         subject,
         metric: isPercent && metric.length === 0 ? "percentage" : metric,
         value: _parseNumber(rawNumber!) * scale,
-        unit: currency ? "usd" : isPercent ? "percent" : "n",
+        unit: currency ? "usd"
+        : isPercent ? "percent"
+        : "n",
         sourceText: sentence.trim(),
       });
     }
@@ -2418,7 +2376,6 @@ git commit -m "feat: extract measurements from sentences"
 ## Task 9: Extract prose measures
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/extractors/extractProseMeasures.ts`
 - Create: `src/workers/pdfSniff/extractors/extractProseMeasures.test.ts`
 
@@ -2534,12 +2491,7 @@ Create `src/workers/pdfSniff/extractors/extractProseMeasures.ts`:
 ```ts
 import { extractMeasurements } from "../extractMeasurements";
 import { groupLines } from "../groupLines";
-import type {
-  BBox,
-  ExtractedTable,
-  PdfCellFlag,
-  RegionGeometry,
-} from "../types";
+import type { BBox, ExtractedTable, PdfCellFlag, RegionGeometry } from "../types";
 
 /**
  * Below this fraction of the region's numerals appearing in extracted rows,
@@ -2575,9 +2527,11 @@ export function extractProseMeasures(
     .replace(/\s+/gu, " ")
     .trim();
 
-  const measurements = text.split(SENTENCE_SPLIT).flatMap((sentence) => {
-    return extractMeasurements(sentence);
-  });
+  const measurements = text
+    .split(SENTENCE_SPLIT)
+    .flatMap((sentence) => {
+      return extractMeasurements(sentence);
+    });
 
   if (measurements.length === 0) {
     return {
@@ -2654,7 +2608,6 @@ git commit -m "feat: extract measurements from regions of prose"
 ## Task 10: Extract a grid table
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/extractors/extractGridTable.ts`
 - Create: `src/workers/pdfSniff/extractors/extractGridTable.test.ts`
 
@@ -2831,9 +2784,9 @@ export function extractGridTable(
 ): ExtractedTable {
   const lines = groupLines(region.textItems);
   const columns =
-    options.gridX && options.gridX.length > 0
-      ? [...options.gridX]
-      : _deriveColumns(lines);
+    options.gridX && options.gridX.length > 0 ?
+      [...options.gridX]
+    : _deriveColumns(lines);
 
   if (lines.length < MIN_ROWS || columns.length < 2) {
     return {
@@ -2912,7 +2865,6 @@ git commit -m "feat: extract grid tables from a region"
 ## Task 11: Classify a region
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/classifyRegion.ts`
 - Create: `src/workers/pdfSniff/classifyRegion.test.ts`
 
@@ -2930,7 +2882,12 @@ import { describe, expect, it } from "vitest";
 import { classifyRegion } from "./classifyRegion";
 import type { RegionGeometry, RuleSegment, TextItem } from "./types";
 
-function item(text: string, x: number, y: number, fontName = "body"): TextItem {
+function item(
+  text: string,
+  x: number,
+  y: number,
+  fontName = "body",
+): TextItem {
   return {
     text,
     x,
@@ -3070,7 +3027,9 @@ function _isNumeric(text: string): boolean {
  * see what we looked at before overriding, otherwise the dropdown is a guess
  * they have no basis to correct.
  */
-export function classifyRegion(region: RegionGeometry): RegionClassification {
+export function classifyRegion(
+  region: RegionGeometry,
+): RegionClassification {
   const evidence: string[] = [];
   const lines = groupLines(region.textItems);
   const items = region.textItems.filter((item) => {
@@ -3171,7 +3130,6 @@ git commit -m "feat: classify a region's shape and report the evidence"
 ## Task 12: Combine several regions
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/combineRegions.ts`
 - Create: `src/workers/pdfSniff/combineRegions.test.ts`
 
@@ -3219,14 +3177,8 @@ describe("combineRegions", () => {
   it("unions regions whose headers match", () => {
     const result = combineRegions({
       tables: [
-        table("a", [
-          ["District", "Cases"],
-          ["Gao", "1204"],
-        ]),
-        table("b", [
-          ["District", "Cases"],
-          ["Mopti", "987"],
-        ]),
+        table("a", [["District", "Cases"], ["Gao", "1204"]]),
+        table("b", [["District", "Cases"], ["Mopti", "987"]]),
       ],
       regionLabels: { a: "Page 4", b: "Page 5" },
       documentMetadata: DOC,
@@ -3243,14 +3195,8 @@ describe("combineRegions", () => {
   it("treats headers differing only by case or spacing as matching", () => {
     const result = combineRegions({
       tables: [
-        table("a", [
-          ["District", "Cases"],
-          ["Gao", "1204"],
-        ]),
-        table("b", [
-          [" district ", "CASES"],
-          ["Mopti", "987"],
-        ]),
+        table("a", [["District", "Cases"], ["Gao", "1204"]]),
+        table("b", [[" district ", "CASES"], ["Mopti", "987"]]),
       ],
       regionLabels: { a: "Page 4", b: "Page 5" },
       documentMetadata: DOC,
@@ -3263,14 +3209,8 @@ describe("combineRegions", () => {
   it("normalises regions with different headers to observations", () => {
     const result = combineRegions({
       tables: [
-        table("map", [
-          ["label", "value"],
-          ["Khartoum", "408"],
-        ]),
-        table("kpi", [
-          ["label", "value", "unit"],
-          ["cases", "83000", "n"],
-        ]),
+        table("map", [["label", "value"], ["Khartoum", "408"]]),
+        table("kpi", [["label", "value", "unit"], ["cases", "83000", "n"]]),
       ],
       regionLabels: { map: "Deaths by state", kpi: "Headline figures" },
       documentMetadata: DOC,
@@ -3299,14 +3239,8 @@ describe("combineRegions", () => {
     // This is the join key that lets sitrep #1 and #2 stack.
     const result = combineRegions({
       tables: [
-        table("map", [
-          ["label", "value"],
-          ["Khartoum", "408"],
-        ]),
-        table("kpi", [
-          ["a", "b", "c"],
-          ["1", "2", "3"],
-        ]),
+        table("map", [["label", "value"], ["Khartoum", "408"]]),
+        table("kpi", [["a", "b", "c"], ["1", "2", "3"]]),
       ],
       regionLabels: { map: "m", kpi: "k" },
       documentMetadata: DOC,
@@ -3320,12 +3254,7 @@ describe("combineRegions", () => {
 
   it("keeps a single region in its natural schema", () => {
     const result = combineRegions({
-      tables: [
-        table("a", [
-          ["District", "Cases"],
-          ["Gao", "1204"],
-        ]),
-      ],
+      tables: [table("a", [["District", "Cases"], ["Gao", "1204"]])],
       regionLabels: { a: "Table" },
       documentMetadata: DOC,
     });
@@ -3336,12 +3265,7 @@ describe("combineRegions", () => {
 
   it("honours an explicit observations request for one region", () => {
     const result = combineRegions({
-      tables: [
-        table("a", [
-          ["label", "value"],
-          ["Khartoum", "408"],
-        ]),
-      ],
+      tables: [table("a", [["label", "value"], ["Khartoum", "408"]])],
       regionLabels: { a: "Deaths" },
       documentMetadata: DOC,
       outputMode: "observations",
@@ -3352,10 +3276,7 @@ describe("combineRegions", () => {
 
   it("marks a flagged row's confidence as needing review", () => {
     const flagged: ExtractedTable = {
-      ...table("a", [
-        ["label", "value"],
-        ["Khartoum", "408"],
-      ]),
+      ...table("a", [["label", "value"], ["Khartoum", "408"]]),
       flags: [
         {
           rowIndex: 0,
@@ -3367,13 +3288,7 @@ describe("combineRegions", () => {
     };
 
     const result = combineRegions({
-      tables: [
-        flagged,
-        table("b", [
-          ["x", "y", "z"],
-          ["1", "2", "3"],
-        ]),
-      ],
+      tables: [flagged, table("b", [["x", "y", "z"], ["1", "2", "3"]])],
       regionLabels: { a: "m", b: "k" },
       documentMetadata: DOC,
     });
@@ -3539,15 +3454,15 @@ export function combineRegions(params: {
       const provenance = table.rowProvenance[rowIndex];
       rows.push([
         row[subjectIndex] ?? "",
-        metricIndex >= 0 ? (row[metricIndex] ?? "") : label,
-        valueIndex >= 0 ? (row[valueIndex] ?? "") : (row[1] ?? ""),
-        unitIndex >= 0 ? (row[unitIndex] ?? "") : "n",
+        metricIndex >= 0 ? row[metricIndex] ?? "" : label,
+        valueIndex >= 0 ? row[valueIndex] ?? "" : row[1] ?? "",
+        unitIndex >= 0 ? row[unitIndex] ?? "" : "n",
         "",
         provenance ? String(provenance.page + 1) : "",
         label,
         flagged.has(rowIndex) ? "review" : "high",
         table.extractedBy,
-        sourceIndex >= 0 ? (row[sourceIndex] ?? "") : "",
+        sourceIndex >= 0 ? row[sourceIndex] ?? "" : "",
         doc.title ?? "",
         doc.organisation ?? "",
         doc.publishedAt ?? "",
@@ -3573,11 +3488,9 @@ git commit -m "feat: combine regions by header match or as observations"
 ```
 
 ---
-
 ## Task 13: Extract document metadata
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/extractDocumentMetadata.ts`
 - Create: `src/workers/pdfSniff/extractDocumentMetadata.test.ts`
 
@@ -3594,7 +3507,12 @@ import { describe, expect, it } from "vitest";
 import { extractDocumentMetadata } from "./extractDocumentMetadata";
 import type { PageGeometry, TextItem } from "./types";
 
-function item(text: string, y: number, height = 10, x = 36): TextItem {
+function item(
+  text: string,
+  y: number,
+  height = 10,
+  x = 36,
+): TextItem {
   return {
     text,
     x,
@@ -3661,10 +3579,7 @@ describe("extractDocumentMetadata", () => {
 
   it("reads a month-first date", () => {
     const meta = extractDocumentMetadata({
-      page: firstPage([
-        item("Situation Report", 790, 20),
-        item("June 24, 2025", 760, 12),
-      ]),
+      page: firstPage([item("Situation Report", 790, 20), item("June 24, 2025", 760, 12)]),
       info: {},
     });
 
@@ -3738,31 +3653,14 @@ const TITLE_BAND = 0.75;
 const TITLE_SIZE_RATIO = 1.4;
 
 const MONTHS: Record<string, number> = {
-  january: 1,
-  february: 2,
-  march: 3,
-  april: 4,
-  may: 5,
-  june: 6,
-  july: 7,
-  august: 8,
-  september: 9,
-  october: 10,
-  november: 11,
-  december: 12,
+  january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+  july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
 };
 
 const MONTH_NAMES = Object.keys(MONTHS).join("|");
-const DAY_FIRST = new RegExp(
-  String.raw`\b(\d{1,2})\s+(${MONTH_NAMES})\s+(\d{4})\b`,
-  "iu",
-);
-const MONTH_FIRST = new RegExp(
-  String.raw`\b(${MONTH_NAMES})\s+(\d{1,2}),?\s+(\d{4})\b`,
-  "iu",
-);
-const REPORT_NUMBER =
-  /\b(?:report|update|sitrep)\s*(?:no\.?|number|#)\s*(\d+)\b/iu;
+const DAY_FIRST = new RegExp(String.raw`\b(\d{1,2})\s+(${MONTH_NAMES})\s+(\d{4})\b`, "iu");
+const MONTH_FIRST = new RegExp(String.raw`\b(${MONTH_NAMES})\s+(\d{1,2}),?\s+(\d{4})\b`, "iu");
+const REPORT_NUMBER = /\b(?:report|update|sitrep)\s*(?:no\.?|number|#)\s*(\d+)\b/iu;
 
 /** `D:20250703121904+02'00'` */
 const PDF_DATE = /^D:(\d{4})(\d{2})(\d{2})/u;
@@ -3859,9 +3757,9 @@ export function extractDocumentMetadata(params: {
   const infoTitle =
     typeof params.info.Title === "string" ? params.info.Title.trim() : "";
   const title =
-    infoTitle.length > 0 && !_isFileName(infoTitle)
-      ? infoTitle
-      : _titleFromPage(params.page);
+    infoTitle.length > 0 && !_isFileName(infoTitle) ?
+      infoTitle
+    : _titleFromPage(params.page);
 
   const author =
     typeof params.info.Author === "string" ? params.info.Author.trim() : "";
@@ -3873,9 +3771,9 @@ export function extractDocumentMetadata(params: {
     .join(" ");
 
   const infoDate =
-    typeof params.info.CreationDate === "string"
-      ? PDF_DATE.exec(params.info.CreationDate)
-      : null;
+    typeof params.info.CreationDate === "string" ?
+      PDF_DATE.exec(params.info.CreationDate)
+    : null;
 
   const reportNumber = REPORT_NUMBER.exec(pageText);
 
@@ -3883,8 +3781,9 @@ export function extractDocumentMetadata(params: {
     title: title && title.length > 0 ? title : null,
     organisation: author.length > 0 ? author : null,
     reportNumber: reportNumber ? reportNumber[1]! : null,
-    publishedAt: infoDate
-      ? _iso(Number(infoDate[1]), Number(infoDate[2]), Number(infoDate[3]))
+    publishedAt:
+      infoDate ?
+        _iso(Number(infoDate[1]), Number(infoDate[2]), Number(infoDate[3]))
       : _dateFromText(pageText),
   };
 }
@@ -3916,15 +3815,16 @@ and populate it just before posting the result, after the text-layer guard has
 passed:
 
 ```ts
-const { info } = await doc.getMetadata();
-const documentMetadata = pages[0]
-  ? extractDocumentMetadata({
-      page: pages[0],
-      info: (info ?? {}) as Record<string, unknown>,
-    })
-  : { title: null, organisation: null, reportNumber: null, publishedAt: null };
+    const { info } = await doc.getMetadata();
+    const documentMetadata =
+      pages[0] ?
+        extractDocumentMetadata({
+          page: pages[0],
+          info: (info ?? {}) as Record<string, unknown>,
+        })
+      : { title: null, organisation: null, reportNumber: null, publishedAt: null };
 
-_post({ type: "result", pageCount: doc.numPages, pages, documentMetadata });
+    _post({ type: "result", pageCount: doc.numPages, pages, documentMetadata });
 ```
 
 Import `extractDocumentMetadata` and the `DocumentMetadata` type.
@@ -3946,7 +3846,6 @@ git commit -m "feat: extract pdf document metadata as a cross-report join key"
 ## Task 14: Add the extract message to the worker
 
 **Files:**
-
 - Modify: `src/workers/pdfSniff.worker.ts`
 - Modify: `src/clients/datasets/pdfSniff.ts`
 
@@ -3984,81 +3883,81 @@ Add `PdfExtractResult` to the `SniffResponse` union.
 Still in the worker, add a handler branch before the `sniff` one:
 
 ```ts
-if (request.type === "extract") {
-  const pagesByIndex = new Map(
-    request.pages.map((page) => {
-      return [page.pageIndex, page];
-    }),
-  );
-  const tables: ExtractedTable[] = [];
-  const classifications: Record<string, RegionClassification> = {};
-
-  for (const region of request.regions) {
-    // A region spanning pages is clipped per fragment and concatenated, so
-    // a table continuing across a page break arrives as one table.
-    const clipped = region.fragments.flatMap((fragment) => {
-      const page = pagesByIndex.get(fragment.page);
-      return page ? [clipToRegion(page, fragment.bbox)] : [];
-    });
-    if (clipped.length === 0) {
-      continue;
-    }
-    const merged: RegionGeometry = {
-      pageIndex: clipped[0]!.pageIndex,
-      bbox: clipped[0]!.bbox,
-      textItems: clipped.flatMap((c) => {
-        return c.textItems;
+  if (request.type === "extract") {
+    const pagesByIndex = new Map(
+      request.pages.map((page) => {
+        return [page.pageIndex, page];
       }),
-      rules: clipped.flatMap((c) => {
-        return c.rules;
-      }),
-    };
-
-    const classification = classifyRegion(merged);
-    classifications[region.id] = classification;
-
-    // The user's explicit shape always wins over the classifier's guess.
-    const shape = region.shape ?? classification.shape;
-    const options = { regionId: region.id, ...region.options };
-
-    tables.push(
-      match(shape)
-        .with("grid_table", () => {
-          return extractGridTable(merged, options);
-        })
-        .with("labelled_graphic", () => {
-          return extractLabelledGraphic(merged, options);
-        })
-        .with("repeating_blocks", () => {
-          return extractRepeatingBlocks(merged, options);
-        })
-        .with("prose_measures", () => {
-          return extractProseMeasures(merged, options);
-        })
-        .exhaustive(),
     );
-  }
+    const tables: ExtractedTable[] = [];
+    const classifications: Record<string, RegionClassification> = {};
 
-  const regionLabels = Object.fromEntries(
-    request.regions.map((region) => {
-      return [region.id, region.label];
-    }),
-  );
+    for (const region of request.regions) {
+      // A region spanning pages is clipped per fragment and concatenated, so
+      // a table continuing across a page break arrives as one table.
+      const clipped = region.fragments.flatMap((fragment) => {
+        const page = pagesByIndex.get(fragment.page);
+        return page ? [clipToRegion(page, fragment.bbox)] : [];
+      });
+      if (clipped.length === 0) {
+        continue;
+      }
+      const merged: RegionGeometry = {
+        pageIndex: clipped[0]!.pageIndex,
+        bbox: clipped[0]!.bbox,
+        textItems: clipped.flatMap((c) => {
+          return c.textItems;
+        }),
+        rules: clipped.flatMap((c) => {
+          return c.rules;
+        }),
+      };
 
-  _post({
-    type: "extract_result",
-    tables,
-    classifications,
-    combined: combineRegions({
+      const classification = classifyRegion(merged);
+      classifications[region.id] = classification;
+
+      // The user's explicit shape always wins over the classifier's guess.
+      const shape = region.shape ?? classification.shape;
+      const options = { regionId: region.id, ...region.options };
+
+      tables.push(
+        match(shape)
+          .with("grid_table", () => {
+            return extractGridTable(merged, options);
+          })
+          .with("labelled_graphic", () => {
+            return extractLabelledGraphic(merged, options);
+          })
+          .with("repeating_blocks", () => {
+            return extractRepeatingBlocks(merged, options);
+          })
+          .with("prose_measures", () => {
+            return extractProseMeasures(merged, options);
+          })
+          .exhaustive(),
+      );
+    }
+
+    const regionLabels = Object.fromEntries(
+      request.regions.map((region) => {
+        return [region.id, region.label];
+      }),
+    );
+
+    _post({
+      type: "extract_result",
       tables,
-      regionLabels,
-      documentMetadata: request.documentMetadata,
-      outputMode: request.outputMode,
-    }),
-  });
-  _close();
-  return;
-}
+      classifications,
+      combined: combineRegions({
+        tables,
+        regionLabels,
+        documentMetadata: request.documentMetadata,
+        outputMode: request.outputMode,
+      }),
+    });
+    _close();
+    return;
+  }
 ```
 
 Add the imports for `clipToRegion`, `classifyRegion`, `combineRegions`, the
@@ -4083,19 +3982,16 @@ export async function extractPdfRegions(params: {
   const worker = new PdfSniffWorker();
   try {
     return await new Promise<PdfExtractResult>((resolve, reject) => {
-      worker.addEventListener(
-        "message",
-        (event: MessageEvent<SniffResponse>) => {
-          const data = event.data;
-          if (data.type === "extract_result") {
-            resolve(data);
-            return;
-          }
-          if (data.type === "error") {
-            reject(new PdfSniffRejection(data));
-          }
-        },
-      );
+      worker.addEventListener("message", (event: MessageEvent<SniffResponse>) => {
+        const data = event.data;
+        if (data.type === "extract_result") {
+          resolve(data);
+          return;
+        }
+        if (data.type === "error") {
+          reject(new PdfSniffRejection(data));
+        }
+      });
       worker.addEventListener(
         "error",
         (event) => {
@@ -4129,7 +4025,6 @@ git commit -m "feat: extract selected pdf regions in the worker"
 ## Task 15: Draw regions on the page
 
 **Files:**
-
 - Modify: `.../ManualUploadView/PdfTablePicker/PdfPagePreview.tsx`
 - Create: `.../ManualUploadView/PdfTablePicker/PdfRegionOverlay.tsx`
 - Create: `.../ManualUploadView/PdfTablePicker/PdfRegionOverlay.test.tsx`
@@ -4161,32 +4056,34 @@ type Props = {
 and replace the single-highlight block with:
 
 ```tsx
-for (const highlight of highlights ?? []) {
-  // PDF y grows upward, canvas y grows downward, so the box has to be
-  // flipped as well as scaled.
-  const [x0, y0, x1, y1] = highlight.bbox;
-  context.save();
-  context.strokeStyle = highlight.isActive
-    ? "rgba(34, 139, 230, 0.95)"
-    : "rgba(34, 139, 230, 0.5)";
-  context.fillStyle = highlight.isActive
-    ? "rgba(34, 139, 230, 0.18)"
-    : "rgba(34, 139, 230, 0.08)";
-  context.lineWidth = highlight.isActive ? 2 : 1;
-  context.fillRect(
-    x0 * scale,
-    canvas.height - y1 * scale,
-    (x1 - x0) * scale,
-    (y1 - y0) * scale,
-  );
-  context.strokeRect(
-    x0 * scale,
-    canvas.height - y1 * scale,
-    (x1 - x0) * scale,
-    (y1 - y0) * scale,
-  );
-  context.restore();
-}
+        for (const highlight of highlights ?? []) {
+          // PDF y grows upward, canvas y grows downward, so the box has to be
+          // flipped as well as scaled.
+          const [x0, y0, x1, y1] = highlight.bbox;
+          context.save();
+          context.strokeStyle =
+            highlight.isActive ?
+              "rgba(34, 139, 230, 0.95)"
+            : "rgba(34, 139, 230, 0.5)";
+          context.fillStyle =
+            highlight.isActive ?
+              "rgba(34, 139, 230, 0.18)"
+            : "rgba(34, 139, 230, 0.08)";
+          context.lineWidth = highlight.isActive ? 2 : 1;
+          context.fillRect(
+            x0 * scale,
+            canvas.height - y1 * scale,
+            (x1 - x0) * scale,
+            (y1 - y0) * scale,
+          );
+          context.strokeRect(
+            x0 * scale,
+            canvas.height - y1 * scale,
+            (x1 - x0) * scale,
+            (y1 - y0) * scale,
+          );
+          context.restore();
+        }
 ```
 
 Call `onScaleChange?.(scale)` after rendering, and add `highlights` to the
@@ -4317,7 +4214,9 @@ export function PdfRegionOverlay({
     height: number;
   }>(null);
 
-  const localPoint = (event: React.PointerEvent): { x: number; y: number } => {
+  const localPoint = (
+    event: React.PointerEvent,
+  ): { x: number; y: number } => {
     const rect = surfaceRef.current?.getBoundingClientRect();
     return {
       x: event.clientX - (rect?.left ?? 0),
@@ -4416,7 +4315,6 @@ git commit -m "feat: draw selection regions over a rendered pdf page"
 ## Task 16: The region picker
 
 **Files:**
-
 - Create: `.../ManualUploadView/PdfTablePicker/PdfRegionPicker.tsx`
 - Create: `.../ManualUploadView/PdfTablePicker/PdfRegionPicker.test.tsx`
 
@@ -4679,9 +4577,9 @@ export function PdfRegionPicker({
               style={{
                 cursor: "pointer",
                 borderColor:
-                  region.id === activeRegionId
-                    ? "var(--mantine-color-blue-5)"
-                    : undefined,
+                  region.id === activeRegionId ?
+                    "var(--mantine-color-blue-5)"
+                  : undefined,
               }}
             >
               <Stack gap="xs">
@@ -4731,11 +4629,9 @@ export function PdfRegionPicker({
                     <Badge
                       size="xs"
                       color={
-                        classification.confidence === "high"
-                          ? "green"
-                          : classification.confidence === "medium"
-                            ? "yellow"
-                            : "gray"
+                        classification.confidence === "high" ? "green"
+                        : classification.confidence === "medium" ? "yellow"
+                        : "gray"
                       }
                     >
                       {classification.confidence}
@@ -4772,7 +4668,6 @@ git commit -m "feat: add the pdf region picker with shape override and evidence"
 ## Task 17: The review grid
 
 **Files:**
-
 - Create: `.../ManualUploadView/PdfTablePicker/PdfReviewGrid.tsx`
 - Create: `.../ManualUploadView/PdfTablePicker/PdfReviewGrid.test.tsx`
 
@@ -4804,7 +4699,7 @@ const TABLE: ExtractedTable = {
       rowIndex: 1,
       columnIndex: 0,
       reason: "ambiguous_association",
-      detail: '"83" was nearly as close to another label.',
+      detail: "\"83\" was nearly as close to another label.",
     },
   ],
   extractedBy: "rules",
@@ -4816,26 +4711,14 @@ const TABLE: ExtractedTable = {
 
 describe("PdfReviewGrid", () => {
   it("renders the extracted rows", () => {
-    render(
-      <PdfReviewGrid
-        table={TABLE}
-        onTableChange={vi.fn()}
-        onRowFocus={vi.fn()}
-      />,
-    );
+    render(<PdfReviewGrid table={TABLE} onTableChange={vi.fn()} onRowFocus={vi.fn()} />);
 
     expect(screen.getByDisplayValue("KHARTOUM")).toBeInTheDocument();
     expect(screen.getByDisplayValue("408")).toBeInTheDocument();
   });
 
   it("marks a flagged cell and explains why", () => {
-    render(
-      <PdfReviewGrid
-        table={TABLE}
-        onTableChange={vi.fn()}
-        onRowFocus={vi.fn()}
-      />,
-    );
+    render(<PdfReviewGrid table={TABLE} onTableChange={vi.fn()} onRowFocus={vi.fn()} />);
 
     expect(
       screen.getByText(/nearly as close to another label/i),
@@ -4843,13 +4726,7 @@ describe("PdfReviewGrid", () => {
   });
 
   it("reports how many rows need review", () => {
-    render(
-      <PdfReviewGrid
-        table={TABLE}
-        onTableChange={vi.fn()}
-        onRowFocus={vi.fn()}
-      />,
-    );
+    render(<PdfReviewGrid table={TABLE} onTableChange={vi.fn()} onRowFocus={vi.fn()} />);
 
     expect(screen.getByText(/1 of 2 rows needs review/i)).toBeInTheDocument();
   });
@@ -4857,11 +4734,7 @@ describe("PdfReviewGrid", () => {
   it("lets the user correct a cell", async () => {
     const onTableChange = vi.fn();
     render(
-      <PdfReviewGrid
-        table={TABLE}
-        onTableChange={onTableChange}
-        onRowFocus={vi.fn()}
-      />,
+      <PdfReviewGrid table={TABLE} onTableChange={onTableChange} onRowFocus={vi.fn()} />,
     );
 
     const cell = screen.getByDisplayValue("RIVER NILE");
@@ -4885,11 +4758,7 @@ describe("PdfReviewGrid", () => {
     // make the review counter useless.
     const onTableChange = vi.fn();
     render(
-      <PdfReviewGrid
-        table={TABLE}
-        onTableChange={onTableChange}
-        onRowFocus={vi.fn()}
-      />,
+      <PdfReviewGrid table={TABLE} onTableChange={onTableChange} onRowFocus={vi.fn()} />,
     );
 
     const cell = screen.getByDisplayValue("RIVER NILE");
@@ -4905,11 +4774,7 @@ describe("PdfReviewGrid", () => {
   it("reports the source position when a row is focused", async () => {
     const onRowFocus = vi.fn();
     render(
-      <PdfReviewGrid
-        table={TABLE}
-        onTableChange={vi.fn()}
-        onRowFocus={onRowFocus}
-      />,
+      <PdfReviewGrid table={TABLE} onTableChange={vi.fn()} onRowFocus={onRowFocus} />,
     );
 
     await userEvent.click(screen.getByDisplayValue("KHARTOUM"));
@@ -4932,15 +4797,7 @@ Expected: FAIL, cannot resolve `./PdfReviewGrid`.
 Create `PdfReviewGrid.tsx`:
 
 ```tsx
-import {
-  Alert,
-  Box,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-  Tooltip,
-} from "@mantine/core";
+import { Alert, Box, Stack, Table, Text, TextInput, Tooltip } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import type { BBox, ExtractedTable } from "@/workers/pdfSniff/types";
 
@@ -5069,13 +4926,11 @@ export function PdfReviewGrid({
                     );
                     return (
                       <Table.Td key={columnIndex}>
-                        {flag ? (
+                        {flag ?
                           <Tooltip label={flag} multiline w={260}>
                             <div>{input}</div>
                           </Tooltip>
-                        ) : (
-                          input
-                        )}
+                        : input}
                       </Table.Td>
                     );
                   })}
@@ -5092,11 +4947,7 @@ export function PdfReviewGrid({
         })
         .map((flag) => {
           return (
-            <Text
-              key={`${flag.rowIndex}-${flag.columnIndex}`}
-              size="xs"
-              c="dimmed"
-            >
+            <Text key={`${flag.rowIndex}-${flag.columnIndex}`} size="xs" c="dimmed">
               {flag.detail}
             </Text>
           );
@@ -5123,7 +4974,6 @@ git commit -m "feat: add the pdf extraction review grid"
 ## Task 18: Model-assisted prose extraction
 
 **Files:**
-
 - Create: `src/workers/pdfSniff/llm/buildRegionPrompt.ts`
 - Create: `src/workers/pdfSniff/llm/parseRegionResponse.ts`
 - Create: `src/workers/pdfSniff/llm/parseRegionResponse.test.ts`
@@ -5159,7 +5009,7 @@ export function buildRegionPrompt(params: {
     "Extract every quantitative measurement from the text below.",
     "",
     "Return JSON only, as an array of objects with exactly these keys:",
-    "  subject (string or null), metric (string), value (number),",
+    '  subject (string or null), metric (string), value (number),',
     '  unit ("n" | "percent" | "usd"), sourceText (string)',
     "",
     "Rules:",
@@ -5170,13 +5020,13 @@ export function buildRegionPrompt(params: {
     "- Do not infer, estimate or combine figures. Extract only what is stated.",
     "- Return [] if there are no measurements.",
     "",
-    params.ruleResults.length > 0
-      ? `Already extracted (do not repeat these): ${JSON.stringify(
-          params.ruleResults.map((m) => {
-            return { metric: m.metric, value: m.value };
-          }),
-        )}`
-      : "",
+    params.ruleResults.length > 0 ?
+      `Already extracted (do not repeat these): ${JSON.stringify(
+        params.ruleResults.map((m) => {
+          return { metric: m.metric, value: m.value };
+        }),
+      )}`
+    : "",
     "",
     "Text:",
     params.regionText,
@@ -5188,7 +5038,7 @@ export function buildRegionPrompt(params: {
 
 Create `src/workers/pdfSniff/llm/parseRegionResponse.test.ts`:
 
-````ts
+```ts
 import { describe, expect, it } from "vitest";
 import { parseRegionResponse } from "./parseRegionResponse";
 
@@ -5239,20 +5089,8 @@ describe("parseRegionResponse", () => {
       pageIndex: 0,
       bbox: [0, 0, 100, 100],
       responseText: JSON.stringify([
-        {
-          subject: null,
-          metric: "cases",
-          value: "several",
-          unit: "n",
-          sourceText: "x",
-        },
-        {
-          subject: null,
-          metric: "deaths",
-          value: 3,
-          unit: "n",
-          sourceText: "y",
-        },
+        { subject: null, metric: "cases", value: "several", unit: "n", sourceText: "x" },
+        { subject: null, metric: "deaths", value: 3, unit: "n", sourceText: "y" },
       ]),
     });
 
@@ -5266,13 +5104,7 @@ describe("parseRegionResponse", () => {
       pageIndex: 0,
       bbox: [0, 0, 100, 100],
       responseText: JSON.stringify([
-        {
-          subject: null,
-          metric: "x",
-          value: 1,
-          unit: "bananas",
-          sourceText: "z",
-        },
+        { subject: null, metric: "x", value: 1, unit: "bananas", sourceText: "z" },
       ]),
     });
 
@@ -5291,7 +5123,7 @@ describe("parseRegionResponse", () => {
     expect(table.flags).toHaveLength(1);
   });
 });
-````
+```
 
 - [ ] **Step 3: Run test to verify it fails**
 
@@ -5302,7 +5134,7 @@ Expected: FAIL, cannot resolve `./parseRegionResponse`.
 
 Create `src/workers/pdfSniff/llm/parseRegionResponse.ts`:
 
-````ts
+```ts
 import { z } from "zod";
 import type { BBox, ExtractedTable } from "../types";
 
@@ -5361,13 +5193,10 @@ export function parseRegionResponse(params: {
     };
   }
 
-  const rows = z
-    .array(
-      MeasurementSchema.catch(() => {
-        // A single malformed row must not discard the whole response.
-        return null as never;
-      }),
-    )
+  const rows = z.array(MeasurementSchema.catch(() => {
+    // A single malformed row must not discard the whole response.
+    return null as never;
+  }))
     .catch([])
     .parse(parsed)
     .filter((row) => {
@@ -5400,7 +5229,7 @@ export function parseRegionResponse(params: {
     }),
   };
 }
-````
+```
 
 - [ ] **Step 5: Run test to verify it passes**
 
@@ -5445,7 +5274,6 @@ git commit -m "feat: offer model-assisted prose extraction behind the consent ga
 ## Task 19: Save a PDF dataset
 
 **Files:**
-
 - Modify: `.../DatasetImportForm/useSaveDataset/useSaveDataset.ts`
 - Modify: `.../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile.ts`
 - Modify: `.../DatasetImportForm/DatasetParseControls.tsx`
@@ -5623,7 +5451,6 @@ git commit -m "feat: save a dataset from extracted pdf regions"
 ## Task 20: The executable merge gate
 
 **Files:**
-
 - Create: `public/test-data/pdf/gate/README.md`
 - Create: `scripts/fetch-gate-fixtures.mjs`
 - Create: `src/workers/pdfSniff/gateDocuments.test.ts`
@@ -5721,8 +5548,7 @@ import { extractProseMeasures } from "./extractors/extractProseMeasures";
 import { extractRepeatingBlocks } from "./extractors/extractRepeatingBlocks";
 import type { BBox, PageGeometry } from "./types";
 
-const OCHA =
-  "public/test-data/pdf/gate/ocha-sudan-cholera-update-2025-07-03.pdf";
+const OCHA = "public/test-data/pdf/gate/ocha-sudan-cholera-update-2025-07-03.pdf";
 const IMC = "public/test-data/pdf/gate/imc-sudan-cholera-sitrep-1.pdf";
 
 async function pageOf(path: string, pageNumber: number): Promise<PageGeometry> {

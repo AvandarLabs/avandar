@@ -49,7 +49,7 @@ correct invocation differs by setup:
 - **Shared stack (not switched).** Every worktree shares one Supabase on the
   standard ports, `AVA_VITE_DEV_PORT` is unset, and Playwright falls back to
   5173, where a vite instance from another worktree may be squatting while
-  pointing at a _different_ Supabase. Pass an explicit free port instead:
+  pointing at a *different* Supabase. Pass an explicit free port instead:
   `PLAYWRIGHT_BASE_URL=http://127.0.0.1:5199 npx playwright test tests/e2e/pdf-import.spec.ts`.
   The symptom of getting this wrong is a sign-in failure reading "Invalid login
   credentials", which looks nothing like the actual cause.
@@ -178,7 +178,7 @@ grant was found.
 ### 3.1 Phase A audit — do this first
 
 See section 4 below. Phase A underpins everything already built, has **67
-unverified plan steps**, and two of its defects were found _by accident_ during
+unverified plan steps**, and two of its defects were found *by accident* during
 B1 and B2 without anyone looking for them.
 
 ### 3.2 Phase B3 — automatic table detection
@@ -206,7 +206,7 @@ assertions:
    pillars are read as three column regions. Fixing it needs reading order
    across region fragments.
 2. **`NORTH KORDOFAN Khartoum`** — a capital-city annotation fuses into the
-   state label. The _value_ is correct. Requiring matching fonts to merge was
+   state label. The *value* is correct. Requiring matching fonts to merge was
    implemented and **measured**: it frees `Khartoum` to win the 408 figure from
    `KHARTOUM` on distance (15.9pt vs 20.5pt), unflagged, and pushes flagged rows
    to 7. Do not retry that. The real fix is for association to distinguish a
@@ -245,7 +245,7 @@ has **0 of 67 checkboxes ticked**. Phase A was implemented before the session
 that built B1 and B2, by a different run, and was never verified against its own
 plan.
 
-Two defects were found in it _incidentally_, without anyone auditing:
+Two defects were found in it *incidentally*, without anyone auditing:
 
 1. **The declarative schema omitted `service_role`** from `datasets__pdf_file`'s
    grant while the creating migration had granted it. The two states disagreed,
@@ -272,14 +272,14 @@ has exercised.
 
 Do not spend much time here; B1, B2 and the gate lean on these daily.
 
-| Phase A task                               | Status                                                                                                                                                                                |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Retention classification                | Exercised. `requiresOriginalFileRetention` now drives both the pin and the cache decision, with tests in `LocalDatasetClient.sourceRetention.test.ts`.                                |
-| 2. Enum members                            | Exercised. `pdf_file` and the detection-mode enum are used throughout.                                                                                                                |
-| 4. `datasets__pdf_file` table and model    | **Restructured** by B2 Task 1 (per-region settings moved into `regions` jsonb; `output_mode` and `llm_model` added; five columns dropped). Audit the _current_ shape, not the plan's. |
-| 5. Creation RPC and source client          | Exercised by the save path and the E2E.                                                                                                                                               |
-| 6. Pin against LRU eviction                | Partly exercised; see below.                                                                                                                                                          |
-| 7. Preserve pinned bytes after transcoding | Partly exercised; see below.                                                                                                                                                          |
+| Phase A task | Status |
+|---|---|
+| 1. Retention classification | Exercised. `requiresOriginalFileRetention` now drives both the pin and the cache decision, with tests in `LocalDatasetClient.sourceRetention.test.ts`. |
+| 2. Enum members | Exercised. `pdf_file` and the detection-mode enum are used throughout. |
+| 4. `datasets__pdf_file` table and model | **Restructured** by B2 Task 1 (per-region settings moved into `regions` jsonb; `output_mode` and `llm_model` added; five columns dropped). Audit the *current* shape, not the plan's. |
+| 5. Creation RPC and source client | Exercised by the save path and the E2E. |
+| 6. Pin against LRU eviction | Partly exercised; see below. |
+| 7. Preserve pinned bytes after transcoding | Partly exercised; see below. |
 
 ### Where to actually look
 
@@ -321,7 +321,7 @@ have silently broken.
 **D. Eviction and post-transcode clearing (Tasks 6, 7).**
 Two mechanisms delete `sourceBytes` for CSV/XLSX and must skip pinned rows: the
 LRU evictor (`_evictSourceCache`, 1GB cumulative cap) and the post-transcode
-clear. The B2 fix covered the _ceiling_, not these two.
+clear. The B2 fix covered the *ceiling*, not these two.
 
 Worth testing directly: fill the cache past the LRU cap with unpinned rows plus
 one pinned PDF row, run the evictor, and assert the pinned row keeps its bytes.

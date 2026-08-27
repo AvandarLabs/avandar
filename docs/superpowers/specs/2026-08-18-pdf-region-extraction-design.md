@@ -55,9 +55,9 @@ object and travel the same path.
 
 Two documents were named as the merge gate for v0:
 
-- International Medical Corps, _Sudan Cholera Response Situation Report #1_,
+- International Medical Corps, *Sudan Cholera Response Situation Report #1*,
   24 June 2025 (via ReliefWeb), 2 pages.
-- UN OCHA, _Sudan Cholera Operational Update_, 3 July 2025, 3 pages.
+- UN OCHA, *Sudan Cholera Operational Update*, 3 July 2025, 3 pages.
 
 Both were read during design. The finding that motivates this spec:
 
@@ -127,7 +127,7 @@ geometry against the axis scale, and every result is an estimate.
 
 **Deferred out of v0.** It is the only one of the four that cannot produce an
 exact number, and the least common shape. The v0 test suite asserts it is
-_absent_, so the omission is explicit rather than accidental.
+*absent*, so the omission is explicit rather than accidental.
 
 ## The proximity experiment
 
@@ -136,12 +136,12 @@ belongs to which label. That assumption was tested during design rather than
 asserted. Real coordinates were extracted from OCHA page 1 and nearest-label
 association run against the 16 state figures.
 
-| Outcome                          | Count |
-| -------------------------------- | ----- |
-| Correct and unambiguous          | 10    |
-| Correct but flagged as uncertain | 4     |
-| Wrong but flagged as uncertain   | 1     |
-| **Silently wrong**               | **1** |
+| Outcome | Count |
+|---|---|
+| Correct and unambiguous | 10 |
+| Correct but flagged as uncertain | 4 |
+| Wrong but flagged as uncertain | 1 |
+| **Silently wrong** | **1** |
 
 Four conclusions, each of which changes the design:
 
@@ -174,15 +174,15 @@ distinct rules that must not be conflated:
 
 ## Decisions
 
-| Decision                    | Choice                                                           |
-| --------------------------- | ---------------------------------------------------------------- |
-| Model assistance            | Rules first; model opt-in behind the existing consent gate       |
-| Shape selection             | Auto-classify with visible evidence, user can override           |
-| Document to dataset mapping | One import, one dataset; several regions combine                 |
-| Sequencing                  | Foundation, then selection extraction, then auto table detection |
-| Extraction engine structure | Four extractors over a shared primitive layer                    |
-| Chart geometry reading      | Deferred; asserted absent in tests                               |
-| Merge gate                  | Executable: fixture tests over both named documents              |
+| Decision | Choice |
+|---|---|
+| Model assistance | Rules first; model opt-in behind the existing consent gate |
+| Shape selection | Auto-classify with visible evidence, user can override |
+| Document to dataset mapping | One import, one dataset; several regions combine |
+| Sequencing | Foundation, then selection extraction, then auto table detection |
+| Extraction engine structure | Four extractors over a shared primitive layer |
+| Chart geometry reading | Deferred; asserted absent in tests |
+| Merge gate | Executable: fixture tests over both named documents |
 
 ## Architecture
 
@@ -218,23 +218,23 @@ PDF ──→ extractPageGeometry ──→ words[] · paths[] · structTree?   
 Extends the structure already established in the Phase B plan rather than
 introducing a parallel one. All of it lives under `src/workers/pdfSniff/`.
 
-| File                                   | Responsibility                                   | Phase |
-| -------------------------------------- | ------------------------------------------------ | ----- |
-| `assembleWords.ts`                     | Glyph runs to words, via x-gap and font metrics  | B1    |
-| `groupLines.ts`                        | Line clustering by y-overlap                     | B1    |
-| `clipToRegion.ts`                      | Page geometry to region geometry                 | B2    |
-| `assembleLabels.ts`                    | Same-line and stacked-line label merging         | B2    |
-| `assembleQuantities.ts`                | A numeral plus its suffix, read as one figure    | B2    |
-| `pairByProximity.ts`                   | Value to label association, plus ambiguity ratio | B2    |
-| `parseRunInLabels.ts`                  | Run-in label blocks (`Responses:` and friends)   | B2    |
-| `extractMeasurements.ts`               | Number, unit and subject from sentences          | B2    |
-| `classifyRegion.ts`                    | Choose a shape, report the evidence              | B2    |
-| `extractors/extractGridTable.ts`       | Shape: grid table                                | B2    |
-| `extractors/extractLabelledGraphic.ts` | Shape: labelled graphic                          | B2    |
-| `extractors/extractRepeatingBlocks.ts` | Shape: repeating blocks                          | B2    |
-| `extractors/extractProseMeasures.ts`   | Shape: prose measurements                        | B2    |
-| `llm/buildRegionPrompt.ts`             | Region text to prompt                            | B2    |
-| `llm/parseRegionResponse.ts`           | Model response to `ExtractedTable`               | B2    |
+| File | Responsibility | Phase |
+|---|---|---|
+| `assembleWords.ts` | Glyph runs to words, via x-gap and font metrics | B1 |
+| `groupLines.ts` | Line clustering by y-overlap | B1 |
+| `clipToRegion.ts` | Page geometry to region geometry | B2 |
+| `assembleLabels.ts` | Same-line and stacked-line label merging | B2 |
+| `assembleQuantities.ts` | A numeral plus its suffix, read as one figure | B2 |
+| `pairByProximity.ts` | Value to label association, plus ambiguity ratio | B2 |
+| `parseRunInLabels.ts` | Run-in label blocks (`Responses:` and friends) | B2 |
+| `extractMeasurements.ts` | Number, unit and subject from sentences | B2 |
+| `classifyRegion.ts` | Choose a shape, report the evidence | B2 |
+| `extractors/extractGridTable.ts` | Shape: grid table | B2 |
+| `extractors/extractLabelledGraphic.ts` | Shape: labelled graphic | B2 |
+| `extractors/extractRepeatingBlocks.ts` | Shape: repeating blocks | B2 |
+| `extractors/extractProseMeasures.ts` | Shape: prose measurements | B2 |
+| `llm/buildRegionPrompt.ts` | Region text to prompt | B2 |
+| `llm/parseRegionResponse.ts` | Model response to `ExtractedTable` | B2 |
 
 `assembleWords` and `groupLines` are pulled **forward** out of the current
 stream-detection task, because all four shapes need them rather than tables
@@ -323,19 +323,19 @@ falls out of the general rule instead of being its own code path.
 Document metadata is denormalised onto every row, because that is what makes
 successive reports union cleanly.
 
-| Column                 | Example                                |
-| ---------------------- | -------------------------------------- |
-| `subject`              | `Khartoum`, `WASH`                     |
-| `subject_kind`         | `admin1`, `sector`, `national`         |
-| `metric`               | `deaths`, `cases`, `funding_received`  |
-| `value`                | `408`, `3000000`                       |
-| `unit`                 | `n`, `usd`, `percent`                  |
-| `period`               | `2025-06`, `since 2024-07`             |
-| `qualifier`            | `suspected`, `confirmed`, `cumulative` |
-| `page`, `region_label` | provenance                             |
-| `confidence`           | `high`, `review`                       |
-| `extracted_by`         | `rules`, `model`                       |
-| `source_text`          | the sentence or label it came from     |
+| Column | Example |
+|---|---|
+| `subject` | `Khartoum`, `WASH` |
+| `subject_kind` | `admin1`, `sector`, `national` |
+| `metric` | `deaths`, `cases`, `funding_received` |
+| `value` | `408`, `3000000` |
+| `unit` | `n`, `usd`, `percent` |
+| `period` | `2025-06`, `since 2024-07` |
+| `qualifier` | `suspected`, `confirmed`, `cumulative` |
+| `page`, `region_label` | provenance |
+| `confidence` | `high`, `review` |
+| `extracted_by` | `rules`, `model` |
+| `source_text` | the sentence or label it came from |
 
 `confidence` and `extracted_by` are deliberately separate columns. Confidence
 is about whether the value is right; `extracted_by` is about what produced it.
@@ -433,14 +433,14 @@ On top of the conditions already handled in the original spec (scanned,
 encrypted, broken ToUnicode map, extraction-disallowed flag, fingerprint
 drift, page-count cap):
 
-| Condition                                               | Behaviour                                                                            |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Region drawn over an image with no text                 | Report that the region has no text layer, kept distinct from "found nothing"         |
-| Classifier below confidence threshold                   | Do not guess: ask for the shape, showing evidence for each candidate                 |
-| Ambiguous proximity pairs                               | Import allowed, flagged rows visibly marked, `confidence` preserved into the dataset |
-| Observations mode over a region with no numeric content | Explain that nothing measurable was found and suggest natural mode                   |
-| Text selection crossing a column boundary               | Clip by text run and show what was captured before extracting                        |
-| Region produces zero rows                               | Report which extractor ran and what it looked for                                    |
+| Condition | Behaviour |
+|---|---|
+| Region drawn over an image with no text | Report that the region has no text layer, kept distinct from "found nothing" |
+| Classifier below confidence threshold | Do not guess: ask for the shape, showing evidence for each candidate |
+| Ambiguous proximity pairs | Import allowed, flagged rows visibly marked, `confidence` preserved into the dataset |
+| Observations mode over a region with no numeric content | Explain that nothing measurable was found and suggest natural mode |
+| Text selection crossing a column boundary | Clip by text run and show what was captured before extracting |
+| Region produces zero rows | Report which extractor ran and what it looked for |
 
 ## Testing
 
@@ -492,11 +492,11 @@ The existing Phase B plan is split in three. Roughly half its tasks are shared
 foundation that region extraction needs just as much as table detection does,
 so building them once and first avoids duplicated work.
 
-| Phase                       | Contents                                                                                                                                                                                                                                    | Status                                                                 |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **B1 Foundation**           | pdfjs-dist in a worker, shared geometry types, `normalizeCellValue`, `extractPageGeometry`, scanned-PDF guard, `assembleWords`, `groupLines`, sniff worker and driver, DuckDB typing, drift fingerprint, page preview canvas, import wiring | Existing Phase B tasks 1 to 5, 12, 14 to 16, 18                        |
-| **B2 Selection extraction** | `clipToRegion`, `assembleLabels`, `pairByProximity`, `parseRunInLabels`, `extractMeasurements`, `classifyRegion`, the four extractors, the model path, the region picker and review grid, the `regions` restructure                         | New, plus existing task 17 rewritten. **This is the merge gate.**      |
-| **B3 Auto table detection** | Lattice, tagged and stream detection, cross-signal dedup, page-span merge, confidence scoring                                                                                                                                               | Existing Phase B tasks 6 to 11, 13, and the table-specific parts of 19 |
+| Phase | Contents | Status |
+|---|---|---|
+| **B1 Foundation** | pdfjs-dist in a worker, shared geometry types, `normalizeCellValue`, `extractPageGeometry`, scanned-PDF guard, `assembleWords`, `groupLines`, sniff worker and driver, DuckDB typing, drift fingerprint, page preview canvas, import wiring | Existing Phase B tasks 1 to 5, 12, 14 to 16, 18 |
+| **B2 Selection extraction** | `clipToRegion`, `assembleLabels`, `pairByProximity`, `parseRunInLabels`, `extractMeasurements`, `classifyRegion`, the four extractors, the model path, the region picker and review grid, the `regions` restructure | New, plus existing task 17 rewritten. **This is the merge gate.** |
+| **B3 Auto table detection** | Lattice, tagged and stream detection, cross-signal dedup, page-span merge, confidence scoring | Existing Phase B tasks 6 to 11, 13, and the table-specific parts of 19 |
 
 Two notes on the mapping. Existing task 17 ("The table picker") is **rewritten
 rather than moved**: it becomes the region picker, which hosts detected tables

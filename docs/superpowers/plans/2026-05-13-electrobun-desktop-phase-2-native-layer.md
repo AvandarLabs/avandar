@@ -1808,9 +1808,10 @@ describe("Sqlite", () => {
 
     db.run("insert into widgets (name, color) values ('a', 'red');");
     const rows = db
-      .query<{ name: string; color: string }, []>(
-        "select name, color from widgets",
-      )
+      .query<
+        { name: string; color: string },
+        []
+      >("select name, color from widgets")
       .all();
     expect(rows).toEqual([{ name: "a", color: "red" }]);
     db.close();
@@ -2048,7 +2049,8 @@ import { loadMigrations } from "./services/loadMigrations.ts";
 import { openSqliteDatabase, runMigrations } from "./services/Sqlite.ts";
 
 const mode = (process.env.AVA_DESKTOP_MODE ?? "development") as
-  "development" | "production";
+  | "development"
+  | "production";
 
 const dataDir = getUserDataDir();
 const db = openSqliteDatabase(join(dataDir, "metadata.sqlite"));
@@ -2211,8 +2213,9 @@ export function createSqliteCrudClient<M>(spec: RdbCrudModelSpec<M>) {
       },
       async list(filter) {
         const { where, params } = buildWhere(filter);
-        const order = filter?.orderBy
-          ? "order by " +
+        const order =
+          filter?.orderBy ?
+            "order by " +
             filter.orderBy
               .map(
                 (o) => `${o.column} ${o.direction === "desc" ? "desc" : "asc"}`,
@@ -2277,8 +2280,8 @@ function buildWhere(
     params.push(...vals);
   }
 
-  return clauses.length === 0
-    ? { where: "", params: [] }
+  return clauses.length === 0 ?
+      { where: "", params: [] }
     : { where: `where ${clauses.join(" and ")}`, params };
 }
 ```
@@ -2496,9 +2499,10 @@ describe("bootstrapSnapshotIfNeeded", () => {
     await bootstrapSnapshotIfNeeded(db, rest as never, "token", ["datasets"]);
 
     const rows = db
-      .query<{ id: string; name: string }, []>(
-        "select id, name from datasets order by id",
-      )
+      .query<
+        { id: string; name: string },
+        []
+      >("select id, name from datasets order by id")
       .all();
     expect(rows).toEqual([
       { id: "a", name: "Alpha" },
@@ -3146,11 +3150,7 @@ if (process.platform !== "darwin") {
 }
 
 export type Keychain = {
-  set(
-    serviceName: string,
-    accountName: string,
-    password: string,
-  ): Promise<void>;
+  set(serviceName: string, accountName: string, password: string): Promise<void>;
   get(serviceName: string, accountName: string): Promise<string | null>;
   delete(serviceName: string, accountName: string): Promise<void>;
 };
@@ -3197,9 +3197,7 @@ export function createKeychain(spawn: Spawner = Bun.spawn): Keychain {
         password,
       );
       if (exitCode !== 0) {
-        throw new Error(
-          `security add-generic-password exit ${exitCode}: ${stderr.trim()}`,
-        );
+        throw new Error(`security add-generic-password exit ${exitCode}: ${stderr.trim()}`);
       }
     },
 
@@ -3216,9 +3214,7 @@ export function createKeychain(spawn: Spawner = Bun.spawn): Keychain {
         return null;
       }
       if (exitCode !== 0) {
-        throw new Error(
-          `security find-generic-password exit ${exitCode}: ${stderr.trim()}`,
-        );
+        throw new Error(`security find-generic-password exit ${exitCode}: ${stderr.trim()}`);
       }
       // `security` always appends a newline.
       return stdout.replace(/\n$/, "");
@@ -3234,9 +3230,7 @@ export function createKeychain(spawn: Spawner = Bun.spawn): Keychain {
       ]);
       // 44 = nothing matched; treat delete as idempotent.
       if (exitCode !== 0 && exitCode !== 44) {
-        throw new Error(
-          `security delete-generic-password exit ${exitCode}: ${stderr.trim()}`,
-        );
+        throw new Error(`security delete-generic-password exit ${exitCode}: ${stderr.trim()}`);
       }
     },
   };
@@ -3301,11 +3295,7 @@ export function registerAuthHandlers(
       user: { id: string; email: string };
     };
 
-    await keychain.set(
-      KEYCHAIN_SERVICE,
-      REFRESH_TOKEN_ACCOUNT,
-      data.refresh_token,
-    );
+    await keychain.set(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT, data.refresh_token);
     currentAccessToken = {
       token: data.access_token,
       expiresAt: Date.now() + data.expires_in * 1000,
@@ -3340,10 +3330,7 @@ export function registerAuthHandlers(
       };
     }
     // Try to refresh from keychain.
-    const refreshToken = await keychain.get(
-      KEYCHAIN_SERVICE,
-      REFRESH_TOKEN_ACCOUNT,
-    );
+    const refreshToken = await keychain.get(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
     if (!refreshToken) return { session: null };
     try {
       const res = await fetch(
@@ -3369,11 +3356,7 @@ export function registerAuthHandlers(
         expires_in: number;
         user: { id: string; email: string };
       };
-      await keychain.set(
-        KEYCHAIN_SERVICE,
-        REFRESH_TOKEN_ACCOUNT,
-        data.refresh_token,
-      );
+      await keychain.set(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT, data.refresh_token);
       currentAccessToken = {
         token: data.access_token,
         expiresAt: Date.now() + data.expires_in * 1000,
@@ -3406,10 +3389,7 @@ export function registerAuthHandlers(
 }
 
 async function getSessionViaRefresh(keychain: Keychain) {
-  const refreshToken = await keychain.get(
-    KEYCHAIN_SERVICE,
-    REFRESH_TOKEN_ACCOUNT,
-  );
+  const refreshToken = await keychain.get(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
   if (!refreshToken) return null;
   const res = await fetch(
     `${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,
@@ -4309,10 +4289,10 @@ Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`, mark Phas
 
 ## Risks Specific to Phase 2
 
-| Risk                                                                                 | Mitigation in this phase                                                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| sqlglot output requires per-table touch-ups for Postgres-only features               | Hard-error generator + human review in Task 6 Step 9; fix the _generator_ not the output                                                                                                                                                                                                                                 |
-| `security` CLI output / exit-code format drifts on a new macOS release               | Pure-layer unit tests pin the expected argv shape, exit codes (0, 44), and stdout newline handling; gated integration test (G2.14) catches drift against the real binary on each supported macOS version; thrown errors quote stderr so a regression surfaces with the exact OS message instead of a silent wrong-result |
-| Native `duckdb` Node binding fails to load under Bun                                 | Phase 2 Task 10 tests catch this; if blocked, evaluate `@duckdb/node-api` or compile against duckdb-bindings-node-bun. Worst case: stay on duckdb-wasm for desktop in Phase 2 and accept the memory limits temporarily                                                                                                   |
-| Webview ↔ Bun IPC pipeline mismatches Electrobun's actual API                        | Task 8 Step 2 explicitly calls out the `window.ipc` shim — engineer adapts to real names                                                                                                                                                                                                                                 |
-| Dropping duckdb-wasm from desktop bundle breaks if some code path imports it eagerly | Decision in Task 10 Step 9 — if blocked, accept the bundle bloat; do not delay Phase 2 on this optimization                                                                                                                                                                                                              |
+| Risk                                                                                 | Mitigation in this phase                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| sqlglot output requires per-table touch-ups for Postgres-only features               | Hard-error generator + human review in Task 6 Step 9; fix the _generator_ not the output                                                                                                                               |
+| `security` CLI output / exit-code format drifts on a new macOS release                | Pure-layer unit tests pin the expected argv shape, exit codes (0, 44), and stdout newline handling; gated integration test (G2.14) catches drift against the real binary on each supported macOS version; thrown errors quote stderr so a regression surfaces with the exact OS message instead of a silent wrong-result |
+| Native `duckdb` Node binding fails to load under Bun                                 | Phase 2 Task 10 tests catch this; if blocked, evaluate `@duckdb/node-api` or compile against duckdb-bindings-node-bun. Worst case: stay on duckdb-wasm for desktop in Phase 2 and accept the memory limits temporarily |
+| Webview ↔ Bun IPC pipeline mismatches Electrobun's actual API                        | Task 8 Step 2 explicitly calls out the `window.ipc` shim — engineer adapts to real names                                                                                                                               |
+| Dropping duckdb-wasm from desktop bundle breaks if some code path imports it eagerly | Decision in Task 10 Step 9 — if blocked, accept the bundle bloat; do not delay Phase 2 on this optimization                                                                                                            |

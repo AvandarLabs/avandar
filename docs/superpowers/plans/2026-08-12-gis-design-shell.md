@@ -16,12 +16,12 @@
 
 Load these before the task that needs them. Do not improvise around them.
 
-| Skill                             | Used in       | Why                                                                                  |
-| --------------------------------- | ------------- | ------------------------------------------------------------------------------------ |
-| `impeccable`                      | Tasks 3-8     | Drives the visual design, hierarchy, and interaction critique                        |
-| `dataviz`                         | Task 7        | Color ramps, legends, and classification visuals that survive light, dark, and print |
-| `artifact-design` then `Artifact` | Tasks 4, 6, 8 | Publishes each prototype revision as a reviewable page                               |
-| Playwright MCP                    | Tasks 2, 9    | Screenshots and live interaction against `localhost`                                 |
+| Skill | Used in | Why |
+| --- | --- | --- |
+| `impeccable` | Tasks 3-8 | Drives the visual design, hierarchy, and interaction critique |
+| `dataviz` | Task 7 | Color ramps, legends, and classification visuals that survive light, dark, and print |
+| `artifact-design` then `Artifact` | Tasks 4, 6, 8 | Publishes each prototype revision as a reviewable page |
+| Playwright MCP | Tasks 2, 9 | Screenshots and live interaction against `localhost` |
 
 ## Constraints the design must respect
 
@@ -42,19 +42,18 @@ Tasks 3, 4, 6, 7, and 8 each end with a gate: present the artifact and **wait fo
 
 ## File structure
 
-| File                                                    | Responsibility                                             |
-| ------------------------------------------------------- | ---------------------------------------------------------- |
-| `docs/design/gis/current-state/*.png`                   | Screenshots of today's chrome, for the before/after record |
-| `docs/design/gis/feature-home-inventory.md`             | Every feature mapped to a UI home. The gating deliverable  |
-| `docs/design/gis/shell-prototype.html`                  | Single-file static prototype, all states reachable         |
-| `docs/superpowers/specs/2026-08-12-gis-shell-design.md` | The written design spec the waves implement against        |
+| File | Responsibility |
+| --- | --- |
+| `docs/design/gis/current-state/*.png` | Screenshots of today's chrome, for the before/after record |
+| `docs/design/gis/feature-home-inventory.md` | Every feature mapped to a UI home. The gating deliverable |
+| `docs/design/gis/shell-prototype.html` | Single-file static prototype, all states reachable |
+| `docs/superpowers/specs/2026-08-12-gis-shell-design.md` | The written design spec the waves implement against |
 
 ---
 
 ## Task 1: Read the spec and inventory the features to place
 
 **Files:**
-
 - Create: `docs/design/gis/feature-home-inventory.md`
 
 - [ ] **Step 1: Read the source of truth**
@@ -73,82 +72,82 @@ Every feature from the GIS design spec §10, with the UI surface that owns it.
 
 ## Left panel: layer stack
 
-| Feature                                | Surface                                                | Wave |
-| -------------------------------------- | ------------------------------------------------------ | ---- |
-| Multi-layer stack, reorder, visibility | Layer list, drag handle, eye toggle                    | A    |
-| Add layer                              | Primary button at panel top, opens add-layer flow      | A    |
-| Layer rename, duplicate, delete        | Row overflow menu                                      | A    |
-| Sensitive-layer badge                  | Inline badge on the layer row                          | B    |
-| Boundary-join match report             | Warning affordance on the layer row, opens detail      | B    |
-| Annotation layer                       | A layer row of its own, pinned to the top of the stack | D    |
+| Feature | Surface | Wave |
+| --- | --- | --- |
+| Multi-layer stack, reorder, visibility | Layer list, drag handle, eye toggle | A |
+| Add layer | Primary button at panel top, opens add-layer flow | A |
+| Layer rename, duplicate, delete | Row overflow menu | A |
+| Sensitive-layer badge | Inline badge on the layer row | B |
+| Boundary-join match report | Warning affordance on the layer row, opens detail | B |
+| Annotation layer | A layer row of its own, pinned to the top of the stack | D |
 
 ## Right panel: layer inspector
 
-| Feature                              | Surface                                                   | Wave |
-| ------------------------------------ | --------------------------------------------------------- | ---- |
-| Data source selection                | Inspector "Data" section                                  | A    |
-| Geometry binding (lat/lng columns)   | Inspector "Data" section                                  | A    |
-| Geometry column / WKT binding        | Same control, different binding type                      | B    |
-| Boundary join binding                | Same control, different binding type                      | B    |
-| Symbology type switch                | Inspector "Style" section, segmented control              | A    |
-| Single color                         | Style section color input                                 | A    |
-| Categorical palette                  | Style section, palette picker plus per-category overrides | B    |
-| Graduated ramp                       | Style section, ramp picker                                | B    |
-| Classification method and breaks     | Classification editor, opens from Style section           | B    |
-| Normalization (per capita, per 100k) | Classification editor, "Normalize by" control             | B    |
-| No-data treatment                    | Classification editor, always-visible row                 | B    |
-| Proportional symbol scaling          | Style section, size controls                              | C    |
-| Cluster and heatmap options          | Style section, per symbology type                         | C    |
-| Binning size and grid                | Style section, binning controls                           | C    |
-| Popup field selection                | Inspector "Popup" section                                 | A    |
-| Legend title, units, position        | Inspector "Legend" section                                | A    |
-| Layer filters                        | Inspector "Filter" section                                | A    |
-| CRS override                         | Inspector "Data" section, advanced disclosure             | C    |
+| Feature | Surface | Wave |
+| --- | --- | --- |
+| Data source selection | Inspector "Data" section | A |
+| Geometry binding (lat/lng columns) | Inspector "Data" section | A |
+| Geometry column / WKT binding | Same control, different binding type | B |
+| Boundary join binding | Same control, different binding type | B |
+| Symbology type switch | Inspector "Style" section, segmented control | A |
+| Single color | Style section color input | A |
+| Categorical palette | Style section, palette picker plus per-category overrides | B |
+| Graduated ramp | Style section, ramp picker | B |
+| Classification method and breaks | Classification editor, opens from Style section | B |
+| Normalization (per capita, per 100k) | Classification editor, "Normalize by" control | B |
+| No-data treatment | Classification editor, always-visible row | B |
+| Proportional symbol scaling | Style section, size controls | C |
+| Cluster and heatmap options | Style section, per symbology type | C |
+| Binning size and grid | Style section, binning controls | C |
+| Popup field selection | Inspector "Popup" section | A |
+| Legend title, units, position | Inspector "Legend" section | A |
+| Layer filters | Inspector "Filter" section | A |
+| CRS override | Inspector "Data" section, advanced disclosure | C |
 
 ## Floating tool cluster
 
-| Feature                                  | Surface                                              | Wave |
-| ---------------------------------------- | ---------------------------------------------------- | ---- |
-| Draw area of interest, filter by it      | Tool cluster, "Area" tool                            | D    |
-| Measure distance and area                | Tool cluster, "Measure" tool                         | D    |
-| Buffer and distance analysis             | Tool cluster, "Buffer" tool, writes a new layer      | D    |
-| Annotation tools (text, arrow, freehand) | Tool cluster, expands into an annotation sub-cluster | D    |
-| Go to coordinate or P-code               | Tool cluster search, or top bar search               | D    |
+| Feature | Surface | Wave |
+| --- | --- | --- |
+| Draw area of interest, filter by it | Tool cluster, "Area" tool | D |
+| Measure distance and area | Tool cluster, "Measure" tool | D |
+| Buffer and distance analysis | Tool cluster, "Buffer" tool, writes a new layer | D |
+| Annotation tools (text, arrow, freehand) | Tool cluster, expands into an annotation sub-cluster | D |
+| Go to coordinate or P-code | Tool cluster search, or top bar search | D |
 
 ## Top bar
 
-| Feature                                        | Surface                                 | Wave |
-| ---------------------------------------------- | --------------------------------------- | ---- |
-| Map name, rename                               | Editable title                          | A    |
-| Save state and save action                     | Title area                              | A    |
-| Share, permissions                             | Share button, reuses ShareResourceModal | A    |
-| Basemap switch, custom tile source, no-basemap | Basemap control                         | A    |
-| Export to PNG and PDF                          | Export button, opens export layout      | E    |
-| Bookmarks and saved views                      | Views menu                              | A    |
+| Feature | Surface | Wave |
+| --- | --- | --- |
+| Map name, rename | Editable title | A |
+| Save state and save action | Title area | A |
+| Share, permissions | Share button, reuses ShareResourceModal | A |
+| Basemap switch, custom tile source, no-basemap | Basemap control | A |
+| Export to PNG and PDF | Export button, opens export layout | E |
+| Bookmarks and saved views | Views menu | A |
 
 ## Bottom bar
 
-| Feature                              | Surface                                 | Wave |
-| ------------------------------------ | --------------------------------------- | ---- |
-| Scale bar                            | Bottom right, MapLibre ScaleControl     | A    |
-| Coordinate readout                   | Bottom left                             | A    |
-| Attribution and disclaimer           | Bottom right, required, non-dismissible | A    |
-| Offline / degraded basemap indicator | Bottom left status chip                 | E    |
+| Feature | Surface | Wave |
+| --- | --- | --- |
+| Scale bar | Bottom right, MapLibre ScaleControl | A |
+| Coordinate readout | Bottom left | A |
+| Attribution and disclaimer | Bottom right, required, non-dismissible | A |
+| Offline / degraded basemap indicator | Bottom left status chip | E |
 
 ## Over-map overlays
 
-| Feature                                    | Surface                                               | Wave      |
-| ------------------------------------------ | ----------------------------------------------------- | --------- |
-| Legend                                     | Positioned per layer legend config                    | A         |
-| Time slider                                | Bottom center, above the bottom bar                   | D         |
-| Loading, empty, error, dropped-rows status | Status overlay, bottom center                         | A (built) |
-| Coordinate validation report               | Opens from the dropped-rows status                    | C         |
-| Feature inspector                          | Right drawer, replaces the inspector panel while open | A (built) |
+| Feature | Surface | Wave |
+| --- | --- | --- |
+| Legend | Positioned per layer legend config | A |
+| Time slider | Bottom center, above the bottom bar | D |
+| Loading, empty, error, dropped-rows status | Status overlay, bottom center | A (built) |
+| Coordinate validation report | Opens from the dropped-rows status | C |
+| Feature inspector | Right drawer, replaces the inspector panel while open | A (built) |
 
 ## Unplaced
 
-| Feature               | Why unplaced                                    | Decision needed                                   |
-| --------------------- | ----------------------------------------------- | ------------------------------------------------- |
+| Feature | Why unplaced | Decision needed |
+| --- | --- | --- |
 | Isochrone travel time | Needs an external routing service, stretch item | Whether it is a tool-cluster tool or a layer type |
 ```
 
@@ -168,7 +167,6 @@ git commit -m "docs(gis): inventory every GIS feature against a UI home"
 ## Task 2: Capture the current state
 
 **Files:**
-
 - Create: `docs/design/gis/current-state/*.png`
 
 - [ ] **Step 1: Run the app**
@@ -206,7 +204,6 @@ git commit -m "docs(gis): record the current map chrome and its gaps"
 ## Task 3: Establish the design direction
 
 **Files:**
-
 - Create: `docs/superpowers/specs/2026-08-12-gis-shell-design.md` (sections 1-3)
 
 - [ ] **Step 1: Load the design skill**
@@ -249,7 +246,6 @@ git commit -m "docs(gis): choose a GIS shell direction"
 ## Task 4: Build the shell prototype
 
 **Files:**
-
 - Create: `docs/design/gis/shell-prototype.html`
 
 - [ ] **Step 1: Build a single-file static prototype**
@@ -288,7 +284,6 @@ git commit -m "docs(gis): add the GIS shell prototype"
 ## Task 5: Design the flows
 
 **Files:**
-
 - Modify: `docs/superpowers/specs/2026-08-12-gis-shell-design.md` (section 4)
 - Modify: `docs/design/gis/shell-prototype.html`
 
@@ -320,7 +315,6 @@ git commit -m "docs(gis): design the add-layer, symbology, and classification fl
 ## Task 6: Design every state, including the ones that carry risk
 
 **Files:**
-
 - Modify: `docs/superpowers/specs/2026-08-12-gis-shell-design.md` (section 5)
 - Modify: `docs/design/gis/shell-prototype.html`
 
@@ -366,7 +360,6 @@ git commit -m "docs(gis): design map states, validation, and sensitive-layer han
 ## Task 7: Color, ramps, and legends
 
 **Files:**
-
 - Modify: `docs/superpowers/specs/2026-08-12-gis-shell-design.md` (section 6)
 - Modify: `docs/design/gis/shell-prototype.html`
 
@@ -410,7 +403,6 @@ git commit -m "docs(gis): specify map color ramps and legend design"
 ## Task 8: Print export, responsive, and theme
 
 **Files:**
-
 - Modify: `docs/superpowers/specs/2026-08-12-gis-shell-design.md` (sections 7-8)
 - Modify: `docs/design/gis/shell-prototype.html`
 
@@ -446,7 +438,6 @@ git commit -m "docs(gis): design print export, responsive, and theme behavior"
 ## Task 9: Accessibility and implementation handoff
 
 **Files:**
-
 - Modify: `docs/superpowers/specs/2026-08-12-gis-shell-design.md` (sections 9-10)
 
 - [ ] **Step 1: Walk the prototype by keyboard**
@@ -495,7 +486,7 @@ git commit -m "docs(gis): finish the GIS shell design spec and component invento
 - [ ] The prototype is published as an Artifact at a stable URL, redeployed rather than re-created on each revision.
 - [ ] Ramps are validated in light, dark, and greyscale, with hex values written down.
 - [ ] No-data, suppressed-cell, and zero are visually distinct from each other.
-- [ ] The sensitive-layer states show _why_ point rendering is unavailable, not merely that it is.
+- [ ] The sensitive-layer states show *why* point rendering is unavailable, not merely that it is.
 - [ ] Attribution and disclaimer are present and non-removable on screen and on export.
 - [ ] Keyboard walk-through recorded, with every control reachable and named.
 - [ ] The component inventory names real `MapLayer` fields from spec §4.

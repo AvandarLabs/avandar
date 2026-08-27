@@ -43,13 +43,13 @@ orthogonal gate: how MANY dashboards this workspace may make reachable at all.
 
 **Baselines to measure against**
 
-| Suite    | Command                                        | Baseline                       |
-| -------- | ---------------------------------------------- | ------------------------------ |
-| Types    | `pnpm type-check`                              | 0 errors                       |
-| Frontend | `pnpm test:frontend`                           | 257 files / 1618 tests, exit 0 |
-| Database | `npx supabase test db supabase/tests/database` | 47 files / 508 tests           |
-| Lint     | `pnpm lint`                                    | exit 0                         |
-| i18n     | `pnpm i18n:check`                              | exit 0                         |
+| Suite | Command | Baseline |
+| --- | --- | --- |
+| Types | `pnpm type-check` | 0 errors |
+| Frontend | `pnpm test:frontend` | 257 files / 1618 tests, exit 0 |
+| Database | `npx supabase test db supabase/tests/database` | 47 files / 508 tests |
+| Lint | `pnpm lint` | exit 0 |
+| i18n | `pnpm i18n:check` | exit 0 |
 
 Playwright needs `pnpm fns:serve` running for edge functions.
 
@@ -59,30 +59,30 @@ Playwright needs `pnpm fns:serve` running for edge functions.
 
 **Created**
 
-| File                                                                             | Responsibility                                                                                                                |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `supabase/schemas/18.entitlements.dashboards.sql`                                | The shareable predicate, the limit resolver, the shared guard, and both triggers. Sorts after the tables and helpers it reads |
-| `supabase/migrations/<ts>_dashboards_shareable_entitlement.sql`                  | Generated, trimmed to this phase's statements                                                                                 |
-| `supabase/tests/database/dashboards/shareable_entitlement_predicate.test.sql`    | pgTAP for §4's table and the limit resolver                                                                                   |
-| `supabase/tests/database/dashboards/shareable_entitlement_triggers.test.sql`     | pgTAP for both enforcement paths                                                                                              |
-| `src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx`      | The upgrade surface, modelled on `DatasetLimitReachedModal`                                                                   |
-| `src/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit.ts`       | Resolves whether this dashboard may consume a new allowance                                                                   |
-| `src/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit.test.tsx` | Vitest for the hook, including the already-counts exemption                                                                   |
-| `tests/e2e/dashboard-shareable-limit.spec.ts`                                    | Playwright: a free workspace's second publish is refused with the modal                                                       |
+| File | Responsibility |
+| --- | --- |
+| `supabase/schemas/18.entitlements.dashboards.sql` | The shareable predicate, the limit resolver, the shared guard, and both triggers. Sorts after the tables and helpers it reads |
+| `supabase/migrations/<ts>_dashboards_shareable_entitlement.sql` | Generated, trimmed to this phase's statements |
+| `supabase/tests/database/dashboards/shareable_entitlement_predicate.test.sql` | pgTAP for §4's table and the limit resolver |
+| `supabase/tests/database/dashboards/shareable_entitlement_triggers.test.sql` | pgTAP for both enforcement paths |
+| `src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx` | The upgrade surface, modelled on `DatasetLimitReachedModal` |
+| `src/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit.ts` | Resolves whether this dashboard may consume a new allowance |
+| `src/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit.test.tsx` | Vitest for the hook, including the already-counts exemption |
+| `tests/e2e/dashboard-shareable-limit.spec.ts` | Playwright: a free workspace's second publish is refused with the modal |
 
 **Modified**
 
-| File                                                                       | Change                                                                                                                                   |
-| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `shared/models/Subscription/Subscription.types.ts`                         | `SubscriptionPermission` gains `can_publish_shareable_dashboard`                                                                         |
-| `shared/models/Subscription/SubscriptionModule/SubscriptionModule.ts`      | The permission key, `maxShareableDashboardsAllowed` in `getEffectiveEntitlementLimits`, and the `canPublishShareableDashboard` predicate |
-| `shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts` | Covers the new predicate and limit                                                                                                       |
-| `supabase/functions/subscriptions/services/hasSubscriptionPermission.ts`   | The new `matchLiteral` branch                                                                                                            |
-| `src/clients/SubscriptionPermissionsClient.ts`                             | `canPublishShareableDashboard` query                                                                                                     |
-| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx`       | The plan entry in the blocked-reason chain, and the modal                                                                                |
-| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.test.tsx`  | Covers the plan block and its exemption                                                                                                  |
-| `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx`     | Recognises the trigger's error on the share path                                                                                         |
-| `docs/superpowers/specs/2026-08-13-private-dashboards-design.md`           | Marks P4 landed, completing the project                                                                                                  |
+| File | Change |
+| --- | --- |
+| `shared/models/Subscription/Subscription.types.ts` | `SubscriptionPermission` gains `can_publish_shareable_dashboard` |
+| `shared/models/Subscription/SubscriptionModule/SubscriptionModule.ts` | The permission key, `maxShareableDashboardsAllowed` in `getEffectiveEntitlementLimits`, and the `canPublishShareableDashboard` predicate |
+| `shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts` | Covers the new predicate and limit |
+| `supabase/functions/subscriptions/services/hasSubscriptionPermission.ts` | The new `matchLiteral` branch |
+| `src/clients/SubscriptionPermissionsClient.ts` | `canPublishShareableDashboard` query |
+| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx` | The plan entry in the blocked-reason chain, and the modal |
+| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.test.tsx` | Covers the plan block and its exemption |
+| `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx` | Recognises the trigger's error on the share path |
+| `docs/superpowers/specs/2026-08-13-private-dashboards-design.md` | Marks P4 landed, completing the project |
 
 ---
 
@@ -92,7 +92,6 @@ One function, so the triggers and the tests cannot disagree about what is being
 counted.
 
 **Files:**
-
 - Create: `supabase/schemas/18.entitlements.dashboards.sql`
 - Test: `supabase/tests/database/dashboards/shareable_entitlement_predicate.test.sql`
 
@@ -243,7 +242,6 @@ git commit -m "feat(db): define which dashboards count as shareable"
 ## Task 2: The limit resolver
 
 **Files:**
-
 - Modify: `supabase/schemas/18.entitlements.dashboards.sql`
 - Modify: the migration from Task 1 (regenerate)
 - Test: `supabase/tests/database/dashboards/shareable_entitlement_predicate.test.sql` (extend)
@@ -372,7 +370,6 @@ git commit -m "feat(db): resolve the workspace shareable-dashboard cap"
 ## Task 3: Both enforcement triggers
 
 **Files:**
-
 - Modify: `supabase/schemas/18.entitlements.dashboards.sql`
 - Create: `supabase/tests/database/dashboards/shareable_entitlement_triggers.test.sql`
 
@@ -623,7 +620,6 @@ git commit -m "feat(db): enforce the shareable-dashboard plan limit"
 ## Task 4: The TypeScript predicate and permission key
 
 **Files:**
-
 - Modify: `shared/models/Subscription/Subscription.types.ts:13`
 - Modify: `shared/models/Subscription/SubscriptionModule/SubscriptionModule.ts:36-38,115-131,225-245`
 - Test: `shared/models/Subscription/SubscriptionModule/SubscriptionModule.test.ts`
@@ -709,7 +705,9 @@ In `Subscription.types.ts`:
 
 ```ts
 export type SubscriptionPermission =
-  "can_add_datasets" | "can_invite_users" | "can_publish_shareable_dashboard";
+  | "can_add_datasets"
+  | "can_invite_users"
+  | "can_publish_shareable_dashboard";
 ```
 
 In `SubscriptionModule.ts`, add the key to the registry:
@@ -781,7 +779,6 @@ git commit -m "feat(subscriptions): add the shareable-dashboard entitlement pred
 ## Task 5: The edge-function branch and the client query
 
 **Files:**
-
 - Modify: `supabase/functions/subscriptions/services/hasSubscriptionPermission.ts:68`
 - Modify: `src/clients/SubscriptionPermissionsClient.ts`
 
@@ -861,12 +858,13 @@ In `SubscriptionPermissionsClient.ts`, add to `SubscriptionPermissionQueries`
 and to the `queries` object, mirroring `canAddDataset` exactly:
 
 ```ts
-/**
- * Backend permission check: whether the workspace may make one more
- * dashboard shareable under its plan.
- */
-canPublishShareableDashboard: (params: { subscriptionId: string }) =>
-  Promise<{ allowed: boolean }>;
+  /**
+   * Backend permission check: whether the workspace may make one more
+   * dashboard shareable under its plan.
+   */
+  canPublishShareableDashboard: (params: {
+    subscriptionId: string;
+  }) => Promise<{ allowed: boolean }>;
 ```
 
 ```ts
@@ -906,7 +904,6 @@ git commit -m "feat(subscriptions): answer the shareable-dashboard permission"
 ## Task 6: Block the publish action and offer the upgrade
 
 **Files:**
-
 - Create: `src/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit.ts`
 - Create: `src/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit.test.tsx`
 - Create: `src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal.tsx`
@@ -925,10 +922,7 @@ it("does not block a dashboard that already counts as shareable", () => {
   // when the workspace is at it.
   const { result } = renderHook(() => {
     return useShareableDashboardLimit({
-      dashboard: makeDashboard({
-        visibility: "workspace",
-        isRestricted: false,
-      }),
+      dashboard: makeDashboard({ visibility: "workspace", isRestricted: false }),
       targetVisibility: "workspace",
     });
   });
@@ -948,10 +942,7 @@ it("blocks a draft that would become the second shareable dashboard", () => {
 it("does not block when the target is draft, because unpublishing is free", () => {
   const { result } = renderHook(() => {
     return useShareableDashboardLimit({
-      dashboard: makeDashboard({
-        visibility: "workspace",
-        isRestricted: false,
-      }),
+      dashboard: makeDashboard({ visibility: "workspace", isRestricted: false }),
       targetVisibility: "draft",
     });
   });
@@ -1043,7 +1034,6 @@ git commit -m "feat(dashboards): block publishing at the plan limit and offer th
 ## Task 7: The share path's error, and the sweep
 
 **Files:**
-
 - Modify: `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx`
 - Modify: `docs/superpowers/specs/2026-08-13-private-dashboards-design.md`
 - Create: `tests/e2e/dashboard-shareable-limit.spec.ts`

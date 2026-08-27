@@ -242,15 +242,15 @@ it is the path.
 
 Same 440-resource sample:
 
-| Field                   | Non-empty   | Note                                           |
-| ----------------------- | ----------- | ---------------------------------------------- |
-| `hash`                  | **440/440** | 32 hex chars on every one, i.e. an MD5         |
-| `size`                  | 440/440     | bytes                                          |
-| `last_modified`         | 440/440     | e.g. `2022-05-24T04:02:33.007599`, no timezone |
-| `metadata_modified`     | 440/440     | per resource, and also present per package     |
-| `format`                | 440/440     | `CSV` 380, `JSON` 52, `GeoJSON` 4, `XLSX` 4    |
-| `mimetype`              | 262/440     | **not** reliable; do not branch on it          |
-| `url` == `download_url` | 440/440     | one URL, not two                               |
+| Field | Non-empty | Note |
+|---|---|---|
+| `hash` | **440/440** | 32 hex chars on every one, i.e. an MD5 |
+| `size` | 440/440 | bytes |
+| `last_modified` | 440/440 | e.g. `2022-05-24T04:02:33.007599`, no timezone |
+| `metadata_modified` | 440/440 | per resource, and also present per package |
+| `format` | 440/440 | `CSV` 380, `JSON` 52, `GeoJSON` 4, `XLSX` 4 |
+| `mimetype` | 262/440 | **not** reliable; do not branch on it |
+| `url` == `download_url` | 440/440 | one URL, not two |
 
 `hash` looks like the ideal version token and mostly is, but it is **not
 guaranteed**: the `readme.txt` resource in 1.3, an older upload, carries
@@ -274,20 +274,20 @@ downloading them.
 
 ## 4. Decisions (resolved)
 
-| Decision                                  | Resolution                                                                                                                                                                                                                | Why                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Catalog generalization shape              | **A discriminated `access_kind` enum column plus four typed columns, with CHECK constraints per kind.** Not a JSONB blob                                                                                                  | Proposal section 11 requires "a typed value per connector, not documentation and not JSON config". A discriminant is what makes the TypeScript union exhaustive and the SQL invariant a database fact rather than a convention                                                                                                                                                                                                                             |
-| Which existing columns carry the API case | **`external_dataset_id` yes, `external_service_name` no**                                                                                                                                                                 | The handoff nominated both. `external_dataset_id` is genuinely the CKAN dataset id. `external_service_name` holds prose today (`"World Development Indicators API"`, verified in `catalogOpenDataInsert.ts:191`) and its own column comment says "External name of the service"; overloading a display-name column as a machine discriminant is how 1.2 happened. Section 6.1 adds `api_service` instead and leaves `external_service_name` a display name |
-| The existing unique constraint            | **Do not touch it.** Add a separate partial unique index for API rows                                                                                                                                                     | Making its columns nullable neither drops nor invalidates it, and the pipeline's `ON CONFLICT (parquet_file_name, pipeline_name)` keeps inferring it. Converting it to a partial index **would** break that upsert, because `ON CONFLICT` inference against a partial index requires the statement to repeat the index predicate, which supabase-js cannot express. Section 6.3                                                                            |
-| Resource identity                         | **`api_resource_id` is required for API rows. No implicit first resource**                                                                                                                                                | Section 1.3: the first resource of a real HDX dataset is a readme. This is a deliberate divergence from spec 4's nullable `sheet_name`                                                                                                                                                                                                                                                                                                                     |
-| Acquisition mode for HDX                  | **Relation acquisition of the resource file, always**                                                                                                                                                                     | Section 3.2. The pushdown half of section 11.2 is anonymous-forbidden on HDX, so there is nothing to push down. This also means `predicatePushdown: "none"` is correct, which is what `DatasetParquetWrapper` already declares                                                                                                                                                                                                                             |
-| How `"probe"` is probed                   | **Read `datastore_active` off the `package_show` response already being fetched. Zero extra calls**                                                                                                                       | Section 7.1. The probe is free because the same call supplies the download URL. Its answer on HDX is constant for reachability reasons (3.2), which is worth recording rather than pretending discovery is live                                                                                                                                                                                                                                            |
-| Datastore fetch path                      | **Specified, not implemented**                                                                                                                                                                                            | Section 3.2. Implementing it would be untestable dead code. Section 9 specifies paging and tearing so a follow-up need not re-derive them                                                                                                                                                                                                                                                                                                                  |
-| Where bytes are fetched                   | **Through an injected byte fetcher. Default is direct `fetch`, which is correct in Node, in the desktop app, and against Avandar's own storage. The browser needs a proxy, which this lane specifies and does not build** | Section 3.1 and section 5.3. Direct-default is what keeps the existing Supabase-storage Parquet path working unchanged                                                                                                                                                                                                                                                                                                                                     |
-| What "bytes" means                        | **A discriminated `{ contentKind: "parquet" \| "csv", bytes }`, not a Parquet blob**                                                                                                                                      | Section 10. Transcoding CSV to Parquet requires DuckDB, and dragging a DuckDB client into this module would break both "no dependency on QETL" and testability against a faked HTTP layer. The caller already owns a DuckDB client                                                                                                                                                                                                                         |
-| `SourceVersion`                           | **`hash` when non-empty, else `last_modified` and `size` joined; opaque, never parsed**                                                                                                                                   | Section 3.4 and section 8. Stated as a change **hint**, not proof of sameness                                                                                                                                                                                                                                                                                                                                                                              |
-| Socrata                                   | **Out of scope for this lane**                                                                                                                                                                                            | Section 13.1                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| Where the module lives                    | **`shared/`, not `src/clients/`**                                                                                                                                                                                         | It must be reachable from the browser, from a Deno proxy route, and from Node tests. `shared/` is the only tree all three can import. It also satisfies the handoff's rule 3, since nothing here is a client singleton                                                                                                                                                                                                                                     |
+| Decision | Resolution | Why |
+|---|---|---|
+| Catalog generalization shape | **A discriminated `access_kind` enum column plus four typed columns, with CHECK constraints per kind.** Not a JSONB blob | Proposal section 11 requires "a typed value per connector, not documentation and not JSON config". A discriminant is what makes the TypeScript union exhaustive and the SQL invariant a database fact rather than a convention |
+| Which existing columns carry the API case | **`external_dataset_id` yes, `external_service_name` no** | The handoff nominated both. `external_dataset_id` is genuinely the CKAN dataset id. `external_service_name` holds prose today (`"World Development Indicators API"`, verified in `catalogOpenDataInsert.ts:191`) and its own column comment says "External name of the service"; overloading a display-name column as a machine discriminant is how 1.2 happened. Section 6.1 adds `api_service` instead and leaves `external_service_name` a display name |
+| The existing unique constraint | **Do not touch it.** Add a separate partial unique index for API rows | Making its columns nullable neither drops nor invalidates it, and the pipeline's `ON CONFLICT (parquet_file_name, pipeline_name)` keeps inferring it. Converting it to a partial index **would** break that upsert, because `ON CONFLICT` inference against a partial index requires the statement to repeat the index predicate, which supabase-js cannot express. Section 6.3 |
+| Resource identity | **`api_resource_id` is required for API rows. No implicit first resource** | Section 1.3: the first resource of a real HDX dataset is a readme. This is a deliberate divergence from spec 4's nullable `sheet_name` |
+| Acquisition mode for HDX | **Relation acquisition of the resource file, always** | Section 3.2. The pushdown half of section 11.2 is anonymous-forbidden on HDX, so there is nothing to push down. This also means `predicatePushdown: "none"` is correct, which is what `DatasetParquetWrapper` already declares |
+| How `"probe"` is probed | **Read `datastore_active` off the `package_show` response already being fetched. Zero extra calls** | Section 7.1. The probe is free because the same call supplies the download URL. Its answer on HDX is constant for reachability reasons (3.2), which is worth recording rather than pretending discovery is live |
+| Datastore fetch path | **Specified, not implemented** | Section 3.2. Implementing it would be untestable dead code. Section 9 specifies paging and tearing so a follow-up need not re-derive them |
+| Where bytes are fetched | **Through an injected byte fetcher. Default is direct `fetch`, which is correct in Node, in the desktop app, and against Avandar's own storage. The browser needs a proxy, which this lane specifies and does not build** | Section 3.1 and section 5.3. Direct-default is what keeps the existing Supabase-storage Parquet path working unchanged |
+| What "bytes" means | **A discriminated `{ contentKind: "parquet" \| "csv", bytes }`, not a Parquet blob** | Section 10. Transcoding CSV to Parquet requires DuckDB, and dragging a DuckDB client into this module would break both "no dependency on QETL" and testability against a faked HTTP layer. The caller already owns a DuckDB client |
+| `SourceVersion` | **`hash` when non-empty, else `last_modified` and `size` joined; opaque, never parsed** | Section 3.4 and section 8. Stated as a change **hint**, not proof of sameness |
+| Socrata | **Out of scope for this lane** | Section 13.1 |
+| Where the module lives | **`shared/`, not `src/clients/`** | It must be reachable from the browser, from a Deno proxy route, and from Node tests. `shared/` is the only tree all three can import. It also satisfies the handoff's rule 3, since nothing here is a client singleton |
 
 ---
 
@@ -359,11 +359,11 @@ dependency would hide that.
 
 `shared/CkanClient/`, no state, every call taking its base URL as an argument:
 
-| Call             | Request                                                                             | Verified                       |
-| ---------------- | ----------------------------------------------------------------------------------- | ------------------------------ |
-| Dataset metadata | `GET {baseUrl}/api/3/action/package_show?id={datasetId}`                            | yes, 3.1                       |
-| Datastore page   | `GET {baseUrl}/api/3/action/datastore_search?resource_id={id}&limit={n}&offset={n}` | yes, 403 anonymous on HDX, 3.2 |
-| Resource bytes   | `GET {resource.url}`, following redirects                                           | yes, 3.1                       |
+| Call | Request | Verified |
+|---|---|---|
+| Dataset metadata | `GET {baseUrl}/api/3/action/package_show?id={datasetId}` | yes, 3.1 |
+| Datastore page | `GET {baseUrl}/api/3/action/datastore_search?resource_id={id}&limit={n}&offset={n}` | yes, 403 anonymous on HDX, 3.2 |
+| Resource bytes | `GET {resource.url}`, following redirects | yes, 3.1 |
 
 Every CKAN action response is `{ success: boolean, result?: ..., error?: { __type, message } }`,
 so the client checks `success` before `result` and maps `error.__type` to a named
@@ -603,21 +603,21 @@ constraint catalog_entries__open_data__api_base_url_is_https check (
 The format decides how the bytes are parsed, so it is needed at plan time, and
 storing it makes an entry's readability checkable without a network call. It is a
 **cache of CKAN's `format`**, which can drift if a resource is replaced. The
-module therefore treats the stored value as the _expected_ format and the live
+module therefore treats the stored value as the *expected* format and the live
 `package_show` value as authoritative, raising a named mismatch error rather than
 silently parsing bytes as the wrong thing (section 11).
 
 ### 6.2 What changes, file by file
 
-| File                                                                   | Change                                                                                                                                                                            |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `supabase/schemas/00.enum.catalog_entries__open_data__access_kind.sql` | New, one `create type`                                                                                                                                                            |
-| `supabase/schemas/00.enum.catalog_entries__open_data__api_service.sql` | New, one `create type`                                                                                                                                                            |
-| `supabase/schemas/10.catalog_entries__open_data.sql`                   | Nullability on three columns, five new columns, three CHECKs, one partial unique index. The existing `unique_parquet_file_pipeline` is left byte-identical                        |
-| `shared/models/catalog-entries/.../OpenDataCatalogEntry.types.ts`      | Three fields become `string \| undefined`; five fields added; the `OpenDataAccess` union added                                                                                    |
-| `shared/models/catalog-entries/.../OpenDataCatalogEntryParsers.ts`     | `DBReadSchema` gains the five columns and loosens three to `.nullable()`. The existing `ZodConsistencyTests` block fails to compile if any is missed, which is the intended guard |
-| `shared/models/catalog-entries/.../OpenDataCatalogEntryModule.ts`      | New: `toAccess(entry)`                                                                                                                                                            |
-| `shared/types/database.types.ts`                                       | Regenerated, not hand-edited                                                                                                                                                      |
+| File | Change |
+|---|---|
+| `supabase/schemas/00.enum.catalog_entries__open_data__access_kind.sql` | New, one `create type` |
+| `supabase/schemas/00.enum.catalog_entries__open_data__api_service.sql` | New, one `create type` |
+| `supabase/schemas/10.catalog_entries__open_data.sql` | Nullability on three columns, five new columns, three CHECKs, one partial unique index. The existing `unique_parquet_file_pipeline` is left byte-identical |
+| `shared/models/catalog-entries/.../OpenDataCatalogEntry.types.ts` | Three fields become `string \| undefined`; five fields added; the `OpenDataAccess` union added |
+| `shared/models/catalog-entries/.../OpenDataCatalogEntryParsers.ts` | `DBReadSchema` gains the five columns and loosens three to `.nullable()`. The existing `ZodConsistencyTests` block fails to compile if any is missed, which is the intended guard |
+| `shared/models/catalog-entries/.../OpenDataCatalogEntryModule.ts` | New: `toAccess(entry)` |
+| `shared/types/database.types.ts` | Regenerated, not hand-edited |
 
 ### 6.3 How the existing uniqueness constraint survives
 
@@ -628,7 +628,7 @@ pipeline.
 
 1. **Making a column nullable does not drop or invalidate its unique index.**
    The constraint and its backing index are untouched by `alter column ... drop
-not null`.
+   not null`.
 2. **Postgres 15 defaults to `NULLS DISTINCT`** (`supabase/config.toml:36` sets
    `major_version = 15`). Two rows with `(null, null)` therefore do not conflict,
    so any number of API rows coexist under the constraint. The constraint simply
@@ -827,7 +827,7 @@ defer it.
 
 **What it answers on HDX, honestly.** Two facts from section 3 combine:
 `datastore_active` is true on ~1 resource in 441 (3.3), and every datastore action
-is anonymous-forbidden regardless (3.2). So the probe's _reachability_ answer is
+is anonymous-forbidden regardless (3.2). So the probe's *reachability* answer is
 constant: **the resource file, every time.** `datastore_active` varies; whether
 Avandar can use it does not.
 
@@ -870,20 +870,20 @@ it is a direct consequence of 3.2 and 3.3.
 
 ### 7.3 The values, per resource
 
-| Field                     | Value for a CKAN resource file | Note                                                   |
-| ------------------------- | ------------------------------ | ------------------------------------------------------ |
-| `relations`               | `"single"`                     | One catalog entry names one resource                   |
-| `acquisitionUnit`         | `{ kind: "whole-relation" }`   | It is a file                                           |
-| `predicatePushdown`       | `"none"`                       | A file answers no questions                            |
-| `aggregatePushdown`       | `false`                        |                                                        |
-| `wholeRelationAcquirable` | `"yes"`                        | Per 7.1, `"probe"`'s answer is constant here. See 7.4  |
-| `maxRowsPerCall`          | `"unbounded"`                  | Bounded by bytes, not rows                             |
-| `maxBytesPerCall`         | the configured ceiling         | Enforced by this spec, not by CKAN, which caps nothing |
-| `freshnessSignal`         | `"version-token"`              | The token in section 8                                 |
-| `rowIdentity`             | `"positional"`                 | CKAN resource files carry no key                       |
-| `multiCallAtomicity`      | `true`                         | One download, one snapshot                             |
-| `quotaScope`              | `{ kind: "per-host", host }`   | HDX rate-limits and returns 429 (proposal 11.1)        |
-| `grantedScope`            | `[]`                           | Anonymous                                              |
+| Field | Value for a CKAN resource file | Note |
+|---|---|---|
+| `relations` | `"single"` | One catalog entry names one resource |
+| `acquisitionUnit` | `{ kind: "whole-relation" }` | It is a file |
+| `predicatePushdown` | `"none"` | A file answers no questions |
+| `aggregatePushdown` | `false` | |
+| `wholeRelationAcquirable` | `"yes"` | Per 7.1, `"probe"`'s answer is constant here. See 7.4 |
+| `maxRowsPerCall` | `"unbounded"` | Bounded by bytes, not rows |
+| `maxBytesPerCall` | the configured ceiling | Enforced by this spec, not by CKAN, which caps nothing |
+| `freshnessSignal` | `"version-token"` | The token in section 8 |
+| `rowIdentity` | `"positional"` | CKAN resource files carry no key |
+| `multiCallAtomicity` | `true` | One download, one snapshot |
+| `quotaScope` | `{ kind: "per-host", host }` | HDX rate-limits and returns 429 (proposal 11.1) |
+| `grantedScope` | `[]` | Anonymous |
 
 ### 7.4 What integration must change in the wrapper's declaration
 
@@ -931,7 +931,7 @@ may split it.
 
 - **A changed token is strong evidence the data changed.** Both `hash` and
   `(last_modified, size)` move when a resource is replaced.
-- **An unchanged token is _not_ proof the data is unchanged.** For the
+- **An unchanged token is *not* proof the data is unchanged.** For the
   `hash` case the residual risk is small and is CKAN's own bookkeeping: the field
   is metadata CKAN maintains, not a checksum Avandar computed over the bytes it
   received, so a resource replaced without CKAN updating `hash` is
@@ -953,9 +953,9 @@ CKAN `hash` risks changing too rarely.
   (`"c086fe47cb06dfe2fa770043eb3f973c"`, verified in 3.1) and is strictly better
   evidence than CKAN's metadata. It is rejected because obtaining it means
   following the presigned redirect and issuing the byte request, which defeats the
-  purpose of a _cheap_ change token: `RelationCapabilities` describes
+  purpose of a *cheap* change token: `RelationCapabilities` describes
   `freshnessSignal` as "a cheap token that says the source changed, **without
-  refetching it**". It is worth capturing _after_ a download as a stronger token
+  refetching it**". It is worth capturing *after* a download as a stronger token
   for the next comparison, which section 13.3 records as a follow-up.
 - **The package's `metadata_modified`** tracks metadata edits, not data (3.1's
   three-year gap between the two fields), so it would invalidate the cache on a
@@ -1031,12 +1031,12 @@ re-transcoding. This is the same split, drawn at the same place.
 
 Format mapping:
 
-| CKAN `format`     | `contentKind`          | Caller does                                 |
-| ----------------- | ---------------------- | ------------------------------------------- |
-| `Parquet`         | `"parquet"`            | Uses the bytes directly                     |
-| `CSV`             | `"csv"`                | `DuckDbClient.loadCsv`, takes `parquetData` |
-| `XLSX`            | out of scope this lane | 13.4                                        |
-| `JSON`, `GeoJSON` | out of scope this lane | 13.4                                        |
+| CKAN `format` | `contentKind` | Caller does |
+|---|---|---|
+| `Parquet` | `"parquet"` | Uses the bytes directly |
+| `CSV` | `"csv"` | `DuckDbClient.loadCsv`, takes `parquetData` |
+| `XLSX` | out of scope this lane | 13.4 |
+| `JSON`, `GeoJSON` | out of scope this lane | 13.4 |
 
 CSV is the case that matters: 380 of 440 sampled resources (3.4).
 
@@ -1104,17 +1104,17 @@ and Resend clients, neither of which belongs in an acquisition path.
 The context fields are a discriminated union, so a size refusal cannot carry a
 format and a format mismatch cannot carry a byte count.
 
-| `code`                        | When                                                           | Verified cause                 |
-| ----------------------------- | -------------------------------------------------------------- | ------------------------------ |
-| `ckan-action-failed`          | `200` with `success: false`, carrying CKAN's `error.__type`    | CKAN's envelope, 5.2           |
-| `ckan-authorization-required` | CKAN's `error.__type` is `Authorization Error`                 | 3.2                            |
-| `resource-not-found`          | `api_resource_id` absent from `package_show`                   | Resource deleted or re-pointed |
-| `resource-is-remote-api`      | `url_type` is not `upload`                                     | 3.5                            |
-| `resource-format-unsupported` | `format` is not readable, naming it                            | 1.3's `zip` and `TXT`          |
-| `resource-format-changed`     | live `format` differs from `api_resource_format`               | 6.1.1                          |
-| `resource-too-large`          | `size` exceeds the ceiling, raised before download             | 3.1's 73 MB resource           |
-| `resource-unreachable`        | byte read failed, including the CORS case                      | 3.1                            |
-| `access-shape-invalid`        | `toAccess` returned `undefined`, or the entry is pipeline-kind | 6.4                            |
+| `code` | When | Verified cause |
+|---|---|---|
+| `ckan-action-failed` | `200` with `success: false`, carrying CKAN's `error.__type` | CKAN's envelope, 5.2 |
+| `ckan-authorization-required` | CKAN's `error.__type` is `Authorization Error` | 3.2 |
+| `resource-not-found` | `api_resource_id` absent from `package_show` | Resource deleted or re-pointed |
+| `resource-is-remote-api` | `url_type` is not `upload` | 3.5 |
+| `resource-format-unsupported` | `format` is not readable, naming it | 1.3's `zip` and `TXT` |
+| `resource-format-changed` | live `format` differs from `api_resource_format` | 6.1.1 |
+| `resource-too-large` | `size` exceeds the ceiling, raised before download | 3.1's 73 MB resource |
+| `resource-unreachable` | byte read failed, including the CORS case | 3.1 |
+| `access-shape-invalid` | `toAccess` returned `undefined`, or the entry is pipeline-kind | 6.4 |
 
 Two logging rules, both from section 3.1: never log the download `Location`
 header or the URL it yields, since a presigned S3 URL is a credential; and never
@@ -1138,34 +1138,34 @@ The done-bar from the handoff: **an HDX resource resolves to bytes plus a
 `SourceVersion`, with no dependency on QETL.** Every test below injects
 `OpenDataHttp` and touches no network.
 
-| Area                 | Test                                                                                                                                                                                                                                                           |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CkanClient`         | `package_show` builds the right URL; a `200` with `success: false` raises `CkanActionFailed` carrying `error.__type`; a `403` on a datastore action raises `CkanAuthorizationRequired`. Zod rejects a response missing `resources`                             |
-| `mimetype` tolerance | A resource with `mimetype: null` parses, since 40% of real ones are (3.4)                                                                                                                                                                                      |
-| Resource selection   | The named `api_resource_id` is selected **from a package whose first resource is a readme**, which is the 1.3 shape and the test that would catch a first-resource fallback creeping back in                                                                   |
-| Refusals             | Each row of section 11's table, asserted case by case                                                                                                                                                                                                          |
-| Size ceiling         | A resource whose `size` exceeds the ceiling raises `CkanResourceTooLarge` **and `getBytes` is never called**. Paired with a positive control in the same file where `getBytes` **is** called, so the `not.toHaveBeenCalled()` cannot pass for the wrong reason |
-| `SourceVersion`      | Non-empty `hash` produces the `ckan:hash:` token; empty `hash` falls back to `ckan:mtime:`; the two forms cannot collide                                                                                                                                       |
-| Acquisition          | A CSV resource returns `contentKind: "csv"`, the exact bytes `getBytes` yielded, and the expected token                                                                                                                                                        |
-| `toAccess`           | Round-trips both kinds; returns `undefined` for a row satisfying neither                                                                                                                                                                                       |
-| Parsers              | `OpenDataCatalogEntryParsers` round-trips an API row and a pipeline row. The existing `ZodConsistencyTests` block covers the type side at compile time                                                                                                         |
+| Area | Test |
+|---|---|
+| `CkanClient` | `package_show` builds the right URL; a `200` with `success: false` raises `CkanActionFailed` carrying `error.__type`; a `403` on a datastore action raises `CkanAuthorizationRequired`. Zod rejects a response missing `resources` |
+| `mimetype` tolerance | A resource with `mimetype: null` parses, since 40% of real ones are (3.4) |
+| Resource selection | The named `api_resource_id` is selected **from a package whose first resource is a readme**, which is the 1.3 shape and the test that would catch a first-resource fallback creeping back in |
+| Refusals | Each row of section 11's table, asserted case by case |
+| Size ceiling | A resource whose `size` exceeds the ceiling raises `CkanResourceTooLarge` **and `getBytes` is never called**. Paired with a positive control in the same file where `getBytes` **is** called, so the `not.toHaveBeenCalled()` cannot pass for the wrong reason |
+| `SourceVersion` | Non-empty `hash` produces the `ckan:hash:` token; empty `hash` falls back to `ckan:mtime:`; the two forms cannot collide |
+| Acquisition | A CSV resource returns `contentKind: "csv"`, the exact bytes `getBytes` yielded, and the expected token |
+| `toAccess` | Round-trips both kinds; returns `undefined` for a row satisfying neither |
+| Parsers | `OpenDataCatalogEntryParsers` round-trips an API row and a pipeline row. The existing `ZodConsistencyTests` block covers the type side at compile time |
 
 ### 12.2 pgTAP, for the claims in section 6
 
 Section 6.3 and 6.5 are claims about database behaviour, so they are asserted in
 SQL, in `supabase/tests/database/`:
 
-| Claim                    | Assertion                                                                                                                                                                                                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Back-compat              | A row inserted the **old** way (three pipeline columns, no `access_kind`) succeeds and reads back `access_kind = 'pipeline_parquet'`                                                                                                                    |
-| The upsert still works   | `insert ... on conflict (parquet_file_name, pipeline_name) do update` succeeds and updates rather than duplicating. This is the pipeline's exact statement shape and the highest-value test here                                                        |
-| `NULLS DISTINCT`         | Two API rows with null `parquet_file_name` and null `pipeline_name` both insert                                                                                                                                                                         |
-| API uniqueness           | Two API rows identical on all four index columns: the second fails                                                                                                                                                                                      |
-| API uniqueness is scoped | Same dataset and resource id under a **different** `api_base_url`: both insert                                                                                                                                                                          |
-| CHECK, positive half     | An API row missing `api_resource_id` fails                                                                                                                                                                                                              |
-| CHECK, negative half     | A pipeline row with `api_service` set fails                                                                                                                                                                                                             |
-| https CHECK              | `api_base_url` of `http://...` fails                                                                                                                                                                                                                    |
-| RLS unchanged            | `authenticated` selects; an unauthenticated role does not; `authenticated` cannot insert. Per `docs/rules/sql.md`, the negative cases are the point, and this table's policy is `select`-only to `authenticated` with writes reserved to `service_role` |
+| Claim | Assertion |
+|---|---|
+| Back-compat | A row inserted the **old** way (three pipeline columns, no `access_kind`) succeeds and reads back `access_kind = 'pipeline_parquet'` |
+| The upsert still works | `insert ... on conflict (parquet_file_name, pipeline_name) do update` succeeds and updates rather than duplicating. This is the pipeline's exact statement shape and the highest-value test here |
+| `NULLS DISTINCT` | Two API rows with null `parquet_file_name` and null `pipeline_name` both insert |
+| API uniqueness | Two API rows identical on all four index columns: the second fails |
+| API uniqueness is scoped | Same dataset and resource id under a **different** `api_base_url`: both insert |
+| CHECK, positive half | An API row missing `api_resource_id` fails |
+| CHECK, negative half | A pipeline row with `api_service` set fails |
+| https CHECK | `api_base_url` of `http://...` fails |
+| RLS unchanged | `authenticated` selects; an unauthenticated role does not; `authenticated` cannot insert. Per `docs/rules/sql.md`, the negative cases are the point, and this table's policy is `select`-only to `authenticated` with writes reserved to `service_role` |
 
 ### 12.3 Executed, against the real reader
 
@@ -1176,7 +1176,8 @@ optional key, which must land in the right column rather than shift the row. The
 assertion is on the **rows DuckDB returns**, never on the CSV string.
 
 A real HDX CSV is checked in as a small fixture, with its provenance URL in a
-comment: the 235-byte `fts_requirements_funding_covid_mwi.csv` verified in section 3. It gives the suite one case that is real rather than authored.
+comment: the 235-byte `fts_requirements_funding_covid_mwi.csv` verified in section
+3. It gives the suite one case that is real rather than authored.
 
 If `uv` or Python is unavailable and `pnpm desktop:sqlite:gen-migrations` cannot
 run, the desktop migration is **not** hand-written into
@@ -1249,14 +1250,14 @@ MWI,1104,Malawi Flash Appeal 2022,FMWI22,5,Flash appeal,2022-02-26,2022-05-31,..
 
 **The refusal ladder, also verified live against HDX:**
 
-| Catalogued resource                                                      | Result                                                     |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| The 235-byte CSV above                                                   | `200`, 235 bytes, content kind `csv`                       |
-| `movement-range-maps`' readme (`TXT`, that dataset's **first** resource) | `409 resource-format-unsupported`                          |
-| A real 66.7 MB `iati-ukr` CSV, ceiling 25 MB                             | `413 resource-too-large` in **0.33 s**, nothing downloaded |
-| A `pipeline_parquet` entry                                               | `409 access-shape-invalid`                                 |
-| An unknown catalog entry id                                              | `404 catalog-entry-not-found`                              |
-| No bearer token                                                          | `401`                                                      |
+| Catalogued resource | Result |
+|---|---|
+| The 235-byte CSV above | `200`, 235 bytes, content kind `csv` |
+| `movement-range-maps`' readme (`TXT`, that dataset's **first** resource) | `409 resource-format-unsupported` |
+| A real 66.7 MB `iati-ukr` CSV, ceiling 25 MB | `413 resource-too-large` in **0.33 s**, nothing downloaded |
+| A `pipeline_parquet` entry | `409 access-shape-invalid` |
+| An unknown catalog entry id | `404 catalog-entry-not-found` |
+| No bearer token | `401` |
 
 The 66.7 MB case is the one to re-run after any change to section 7.2: a
 sub-second refusal is the evidence that the guard read the size from metadata
@@ -1307,7 +1308,7 @@ generalization.
 
 ### 13.3 A content-hash token captured after download
 
-Section 8 rejects the S3 `ETag` as a _cheap_ freshness signal, correctly. It is
+Section 8 rejects the S3 `ETag` as a *cheap* freshness signal, correctly. It is
 still the strongest available evidence, and it is free once bytes have been
 fetched. Capturing it after a download and preferring it on the next comparison
 would give CKAN a real content token. It needs a place to live, which is spec 2's
@@ -1338,17 +1339,17 @@ a backend, which matches the table's `select`-only grant to `authenticated`.
 
 ## 14. Risks
 
-| Risk                                                                                                                                     | Likelihood                                                                                                                                                        | Mitigation                                                                                                                                                                                                                                                                                                                                                                                |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Nothing in the app calls the acquisition path, so it can rot unnoticed**                                                               | High. The two candidate call sites both belong to other lanes                                                                                                     | The proxy itself is built and verified live (5.3, 12.5), so the remaining step is small. But until it is taken, no product code reaches any of this, and only 12.5 exercises it. This is the top risk in this document                                                                                                                                                                    |
-| **The edge route is reachable by any authenticated user of any workspace**                                                               | Medium                                                                                                                                                            | The catalog is a public, workspace-independent table with `select` granted to `authenticated`, so this matches the read it already permits. Worth revisiting if catalog entries ever become workspace-scoped, because the route would then leak across workspaces                                                                                                                         |
-| **A CKAN instance returns a resource URL on a host it does not control**                                                                 | Low, and the reason step 4 of 5.3.1 exists                                                                                                                        | Exact-host match on an `https` URL, with a test for the suffix bypass and a mutation proving it fires                                                                                                                                                                                                                                                                                     |
-| **The desktop mirror keeps `NOT NULL` and API rows fail to sync**                                                                        | **Live, not hypothetical.** The override body exists and is SQLite-verified, but the generator that would emit the `.gen.sql` is broken for a pre-existing reason | 6.6. The mirror stays stale until the generator is fixed, which is another lane's defect. Escalated in section 15                                                                                                                                                                                                                                                                         |
-| **Someone "tidies" the unique constraint into a partial index**                                                                          | Medium. It looks like an improvement                                                                                                                              | 6.3 explains it; 12.2 tests the pipeline's exact upsert; 12.4 mutation 7 proves the test fires                                                                                                                                                                                                                                                                                            |
-| **HXL tag rows break CSV type detection.** HDX CSVs may carry a second header row of `#hashtags`, which would make every column a string | Unquantified                                                                                                                                                      | Measured 0 of 10 sampled HDX CSVs, **but the sample is biased**: the small-CSV filter drew almost entirely from one provider's FTS exports. Treat the 0 as "not measured" rather than "does not happen". Left open here, because it is a CSV-sniffing concern in the DuckDB path the caller owns, not in this module. Flagged so the first wrong-typed HDX import is diagnosed in minutes |
-| **`hash` silently stops changing on a replaced resource**                                                                                | Low but undetectable                                                                                                                                              | 8 states the asymmetry, so no code treats a cache hit as verified freshness                                                                                                                                                                                                                                                                                                               |
-| **`format` drifts from `api_resource_format`**                                                                                           | Low                                                                                                                                                               | `CkanResourceFormatChanged`, 6.1.1. Fails loudly rather than parsing bytes as the wrong format                                                                                                                                                                                                                                                                                            |
-| **A CKAN instance that is not HDX behaves differently**                                                                                  | Medium                                                                                                                                                            | Every finding in section 3 is HDX-specific and labelled as such. `api_base_url` in the uniqueness key (6.3) means a second instance is separable, so a per-instance difference is representable rather than a global assumption                                                                                                                                                           |
+| Risk | Likelihood | Mitigation |
+|---|---|---|
+| **Nothing in the app calls the acquisition path, so it can rot unnoticed** | High. The two candidate call sites both belong to other lanes | The proxy itself is built and verified live (5.3, 12.5), so the remaining step is small. But until it is taken, no product code reaches any of this, and only 12.5 exercises it. This is the top risk in this document |
+| **The edge route is reachable by any authenticated user of any workspace** | Medium | The catalog is a public, workspace-independent table with `select` granted to `authenticated`, so this matches the read it already permits. Worth revisiting if catalog entries ever become workspace-scoped, because the route would then leak across workspaces |
+| **A CKAN instance returns a resource URL on a host it does not control** | Low, and the reason step 4 of 5.3.1 exists | Exact-host match on an `https` URL, with a test for the suffix bypass and a mutation proving it fires |
+| **The desktop mirror keeps `NOT NULL` and API rows fail to sync** | **Live, not hypothetical.** The override body exists and is SQLite-verified, but the generator that would emit the `.gen.sql` is broken for a pre-existing reason | 6.6. The mirror stays stale until the generator is fixed, which is another lane's defect. Escalated in section 15 |
+| **Someone "tidies" the unique constraint into a partial index** | Medium. It looks like an improvement | 6.3 explains it; 12.2 tests the pipeline's exact upsert; 12.4 mutation 7 proves the test fires |
+| **HXL tag rows break CSV type detection.** HDX CSVs may carry a second header row of `#hashtags`, which would make every column a string | Unquantified | Measured 0 of 10 sampled HDX CSVs, **but the sample is biased**: the small-CSV filter drew almost entirely from one provider's FTS exports. Treat the 0 as "not measured" rather than "does not happen". Left open here, because it is a CSV-sniffing concern in the DuckDB path the caller owns, not in this module. Flagged so the first wrong-typed HDX import is diagnosed in minutes |
+| **`hash` silently stops changing on a replaced resource** | Low but undetectable | 8 states the asymmetry, so no code treats a cache hit as verified freshness |
+| **`format` drifts from `api_resource_format`** | Low | `CkanResourceFormatChanged`, 6.1.1. Fails loudly rather than parsing bytes as the wrong format |
+| **A CKAN instance that is not HDX behaves differently** | Medium | Every finding in section 3 is HDX-specific and labelled as such. `api_base_url` in the uniqueness key (6.3) means a second instance is separable, so a per-instance difference is representable rather than a global assumption |
 
 ---
 

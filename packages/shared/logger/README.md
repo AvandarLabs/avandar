@@ -40,12 +40,12 @@ const child = Logger.appendName("Auth").setCallerName("login").setEnabled(true);
 
 Creates a new browser logger instance.
 
-| Option               | Type      | Default | Description                                     |
-| -------------------- | --------- | ------- | ----------------------------------------------- |
-| `loggerName`         | `string`  | —       | Prefix shown in styled log output               |
-| `callerName`         | `string`  | —       | Overrides auto-detected caller from stack trace |
-| `enabled`            | `boolean` | `true`  | Whether logging is active                       |
-| `suppressConsoleLog` | `boolean` | `false` | When true, `log()` calls are suppressed         |
+| Option               | Type      | Default | Description                                      |
+| -------------------- | --------- | ------- | ------------------------------------------------ |
+| `loggerName`         | `string`  | —       | Prefix shown in styled log output                |
+| `callerName`         | `string`  | —       | Overrides auto-detected caller from stack trace  |
+| `enabled`            | `boolean` | `true`  | Whether logging is active                        |
+| `suppressConsoleLog` | `boolean` | `false` | When true, `log()` calls are suppressed          |
 
 ### `withLogger(baseModule, moduleBuilder)`
 
@@ -58,13 +58,16 @@ caller name for the returned module's log output.
 import { createModule } from "@avandar/modules";
 import { withLogger } from "@avandar/logger";
 
-const MyModule = withLogger(createModule("MyModule"), (logger) => ({
-  doWork() {
-    logger.log("working");
-  },
-}));
+const MyModule = withLogger(
+  createModule("MyModule"),
+  (logger) => ({
+    doWork() {
+      logger.log("working");
+    },
+  }),
+);
 
-MyModule.doWork(); // silent
+MyModule.doWork();              // silent
 MyModule.withLogger().doWork(); // logs
 ```
 
@@ -75,15 +78,15 @@ MyModule.withLogger().doWork(); // logs
 The shape returned by `createWebLogger`. All mutators are immutable — they
 return a new logger instance.
 
-| Method                 | Description                                                        |
-| ---------------------- | ------------------------------------------------------------------ |
-| `log(...args)`         | Styled log output (suppressed if `enabled` is false)               |
-| `warn(...args)`        | Styled warning                                                     |
-| `error(error, extra?)` | Forwards to `console.error`                                        |
-| `isEnabled()`          | Returns current enabled state                                      |
-| `setEnabled(enabled)`  | Returns a new logger with the given enabled state                  |
-| `appendName(name)`     | Returns a new logger with `name` appended (`parent:child` format)  |
-| `setCallerName(name)`  | Returns a new logger with a fixed caller name (skips stack lookup) |
+| Method                  | Description                                                         |
+| ----------------------- | ------------------------------------------------------------------- |
+| `log(...args)`          | Styled log output (suppressed if `enabled` is false)                |
+| `warn(...args)`         | Styled warning                                                      |
+| `error(error, extra?)`  | Forwards to `console.error`                                         |
+| `isEnabled()`           | Returns current enabled state                                       |
+| `setEnabled(enabled)`   | Returns a new logger with the given enabled state                   |
+| `appendName(name)`      | Returns a new logger with `name` appended (`parent:child` format)   |
+| `setCallerName(name)`   | Returns a new logger with a fixed caller name (skips stack lookup)  |
 
 ### `WithLogger<M>`
 

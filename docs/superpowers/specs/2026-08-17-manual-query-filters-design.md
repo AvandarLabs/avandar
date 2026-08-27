@@ -84,17 +84,17 @@ unblock each other, but nothing here ships on its own:
 
 ## 3. Decisions
 
-| #   | Decision                                                                                                                                                 | Rationale                                                                                                                                                                                                                |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| D1  | **Filters may reference any column in the dataset**, not only the columns selected for display                                                           | Removes F7 (a rule whose column was deselected kept filtering invisibly) and the "add columns first" gate. Matches what people expect from a query builder: what you filter on and what you display are separate choices |
-| D2  | **Text comparison is case-insensitive by default**, with a per-rule `Match case` toggle                                                                  | The reported expectation. Applies uniformly to `=`, `!=`, `in`, `contains`, `starts with`, `ends with` and their negations, so there is one rule to learn instead of per-operator trivia                                 |
-| D3  | **Debounced execution, gated on rule completeness and validity**                                                                                         | Keeps the live feel while killing the query-per-keystroke, the `col = ''` query fired the instant a rule is added, and the empty-grid flash                                                                              |
-| D4  | **Custom rule row rendered inside react-querybuilder**                                                                                                   | The library keeps owning tree logic (add, remove, nest, combinators, SQL parse hooks). We replace only the rendered controls. Avoids reimplementing grouping while giving full control of layout                         |
-| D5  | List values (`in`, `not_in`, `between`) are **arrays in the model**, with a tolerant reader that still accepts today's comma-joined strings              | Fixes F4 without a model version bump. `react-querybuilder`'s `listsAsArrays` produces arrays natively                                                                                                                   |
-| D6  | Legacy `like` / `not_like` operator ids are **kept and rendered exactly as today** (raw pattern, case-sensitive), and are never produced by the UI again | Saved queries and dashboards keep their current meaning. New rules use explicit `contains` / `starts_with` / `ends_with`. No migration, no silent re-interpretation                                                      |
-| D7  | One SQL renderer serves both `WHERE` and `HAVING`                                                                                                        | Today `applyFilters` (knex) and `applyHaving` (string building) implement operators twice, which is exactly how F15-style drift happens                                                                                  |
-| D8  | Every operator in the catalog **must round-trip** through `sqlToStructuredQuery`                                                                         | Otherwise adding operators makes SQL mode flag our own generated SQL as an approximation. Enforced by a table-driven test over the catalog, not by discipline                                                            |
-| D9  | Incomplete or invalid rules are **excluded from the query and named in the UI**, never silently dropped and never run                                    | The current mix (drop `between`, run `= ''`, run `= NULL`, or leave stale results) is the trust bug behind F5 and F8                                                                                                     |
+| # | Decision | Rationale |
+|---|---|---|
+| D1 | **Filters may reference any column in the dataset**, not only the columns selected for display | Removes F7 (a rule whose column was deselected kept filtering invisibly) and the "add columns first" gate. Matches what people expect from a query builder: what you filter on and what you display are separate choices |
+| D2 | **Text comparison is case-insensitive by default**, with a per-rule `Match case` toggle | The reported expectation. Applies uniformly to `=`, `!=`, `in`, `contains`, `starts with`, `ends with` and their negations, so there is one rule to learn instead of per-operator trivia |
+| D3 | **Debounced execution, gated on rule completeness and validity** | Keeps the live feel while killing the query-per-keystroke, the `col = ''` query fired the instant a rule is added, and the empty-grid flash |
+| D4 | **Custom rule row rendered inside react-querybuilder** | The library keeps owning tree logic (add, remove, nest, combinators, SQL parse hooks). We replace only the rendered controls. Avoids reimplementing grouping while giving full control of layout |
+| D5 | List values (`in`, `not_in`, `between`) are **arrays in the model**, with a tolerant reader that still accepts today's comma-joined strings | Fixes F4 without a model version bump. `react-querybuilder`'s `listsAsArrays` produces arrays natively |
+| D6 | Legacy `like` / `not_like` operator ids are **kept and rendered exactly as today** (raw pattern, case-sensitive), and are never produced by the UI again | Saved queries and dashboards keep their current meaning. New rules use explicit `contains` / `starts_with` / `ends_with`. No migration, no silent re-interpretation |
+| D7 | One SQL renderer serves both `WHERE` and `HAVING` | Today `applyFilters` (knex) and `applyHaving` (string building) implement operators twice, which is exactly how F15-style drift happens |
+| D8 | Every operator in the catalog **must round-trip** through `sqlToStructuredQuery` | Otherwise adding operators makes SQL mode flag our own generated SQL as an approximation. Enforced by a table-driven test over the catalog, not by discipline |
+| D9 | Incomplete or invalid rules are **excluded from the query and named in the UI**, never silently dropped and never run | The current mix (drop `between`, run `= ''`, run `= NULL`, or leave stale results) is the trust bug behind F5 and F8 |
 
 ## 4. Root causes
 
@@ -162,34 +162,34 @@ In the SQL column, `ci(x)` means `lower(x)` when the rule is case-insensitive
 rendered as `CAST(:v AS DATE)` or `CAST(:v AS TIMESTAMP)`, numeric values as bare
 numbers, and text as quoted strings (see "Typed literals" below).
 
-| Internal id                    | Label                              | Types             | Value            | SQL                                                                 |
-| ------------------------------ | ---------------------------------- | ----------------- | ---------------- | ------------------------------------------------------------------- |
-| `=`                            | is / equals (temporal: `on`)       | all               | scalar           | text: `ci(col) = ci(:v)`; other: `col = :v`                         |
-| `!=`                           | is not (temporal: `not on`)        | all               | scalar           | text: `ci(col) <> ci(:v)`; other: `col <> :v`                       |
-| `>`                            | greater than (temporal: `after`)   | numeric, temporal | scalar           | `col > :v`                                                          |
-| `>=`                           | at least (temporal: `on or after`) | numeric, temporal | scalar           | `col >= :v`                                                         |
-| `<`                            | less than (temporal: `before`)     | numeric, temporal | scalar           | `col < :v`                                                          |
-| `<=`                           | at most (temporal: `on or before`) | numeric, temporal | scalar           | `col <= :v`                                                         |
-| `contains`                     | contains                           | text              | scalar           | `contains(ci(col), ci(:v))`                                         |
-| `not_contains`                 | does not contain                   | text              | scalar           | `NOT contains(ci(col), ci(:v))`                                     |
-| `starts_with`                  | starts with                        | text              | scalar           | `starts_with(ci(col), ci(:v))`                                      |
-| `not_starts_with`              | does not start with                | text              | scalar           | `NOT starts_with(ci(col), ci(:v))`                                  |
-| `ends_with`                    | ends with                          | text              | scalar           | `ends_with(ci(col), ci(:v))`                                        |
-| `not_ends_with`                | does not end with                  | text              | scalar           | `NOT ends_with(ci(col), ci(:v))`                                    |
-| `in`                           | is any of                          | all               | array, 1+        | text: `ci(col) IN (ci(:a), ...)`; other: `col IN (:a, ...)`         |
-| `not_in`                       | is none of                         | all               | array, 1+        | text: `ci(col) NOT IN (ci(:a), ...)`; other: `col NOT IN (:a, ...)` |
-| `between`                      | is between                         | numeric, temporal | array, exactly 2 | `col BETWEEN :a AND :b`                                             |
-| `not_between`                  | is not between                     | numeric, temporal | array, exactly 2 | `col NOT BETWEEN :a AND :b`                                         |
-| `is_null`                      | has no value                       | all               | none             | `col IS NULL`                                                       |
-| `is_not_null`                  | has a value                        | all               | none             | `col IS NOT NULL`                                                   |
-| `is_blank`                     | is blank                           | text              | none             | `coalesce(trim(col), '') = ''`                                      |
-| `is_not_blank`                 | is not blank                       | text              | none             | `coalesce(trim(col), '') <> ''`                                     |
-| `is_true`                      | is true                            | boolean           | none             | `col IS TRUE`                                                       |
-| `is_false`                     | is false                           | boolean           | none             | `col IS FALSE`                                                      |
-| `matches_regex`                | matches regex                      | text              | scalar           | `regexp_matches(col, :v)`                                           |
-| `not_matches_regex`            | does not match regex               | text              | scalar           | `NOT regexp_matches(col, :v)`                                       |
-| `like` (legacy, read-only)     | (not offered)                      | text              | scalar           | `col LIKE :v`                                                       |
-| `not_like` (legacy, read-only) | (not offered)                      | text              | scalar           | `col NOT LIKE :v`                                                   |
+| Internal id | Label | Types | Value | SQL |
+|---|---|---|---|---|
+| `=` | is / equals (temporal: `on`) | all | scalar | text: `ci(col) = ci(:v)`; other: `col = :v` |
+| `!=` | is not (temporal: `not on`) | all | scalar | text: `ci(col) <> ci(:v)`; other: `col <> :v` |
+| `>` | greater than (temporal: `after`) | numeric, temporal | scalar | `col > :v` |
+| `>=` | at least (temporal: `on or after`) | numeric, temporal | scalar | `col >= :v` |
+| `<` | less than (temporal: `before`) | numeric, temporal | scalar | `col < :v` |
+| `<=` | at most (temporal: `on or before`) | numeric, temporal | scalar | `col <= :v` |
+| `contains` | contains | text | scalar | `contains(ci(col), ci(:v))` |
+| `not_contains` | does not contain | text | scalar | `NOT contains(ci(col), ci(:v))` |
+| `starts_with` | starts with | text | scalar | `starts_with(ci(col), ci(:v))` |
+| `not_starts_with` | does not start with | text | scalar | `NOT starts_with(ci(col), ci(:v))` |
+| `ends_with` | ends with | text | scalar | `ends_with(ci(col), ci(:v))` |
+| `not_ends_with` | does not end with | text | scalar | `NOT ends_with(ci(col), ci(:v))` |
+| `in` | is any of | all | array, 1+ | text: `ci(col) IN (ci(:a), ...)`; other: `col IN (:a, ...)` |
+| `not_in` | is none of | all | array, 1+ | text: `ci(col) NOT IN (ci(:a), ...)`; other: `col NOT IN (:a, ...)` |
+| `between` | is between | numeric, temporal | array, exactly 2 | `col BETWEEN :a AND :b` |
+| `not_between` | is not between | numeric, temporal | array, exactly 2 | `col NOT BETWEEN :a AND :b` |
+| `is_null` | has no value | all | none | `col IS NULL` |
+| `is_not_null` | has a value | all | none | `col IS NOT NULL` |
+| `is_blank` | is blank | text | none | `coalesce(trim(col), '') = ''` |
+| `is_not_blank` | is not blank | text | none | `coalesce(trim(col), '') <> ''` |
+| `is_true` | is true | boolean | none | `col IS TRUE` |
+| `is_false` | is false | boolean | none | `col IS FALSE` |
+| `matches_regex` | matches regex | text | scalar | `regexp_matches(col, :v)` |
+| `not_matches_regex` | does not match regex | text | scalar | `NOT regexp_matches(col, :v)` |
+| `like` (legacy, read-only) | (not offered) | text | scalar | `col LIKE :v` |
+| `not_like` (legacy, read-only) | (not offered) | text | scalar | `col NOT LIKE :v` |
 
 The `Match case` toggle lives on the rule as `matchCase?: boolean`, absent
 meaning case-insensitive, and is rendered only for text columns. It does not
@@ -210,22 +210,22 @@ own `%` and `_` escaped and an `ESCAPE` clause. That was the first design, and
 `database: "postgresql"`) rejects it, which would break D8 for every text
 operator. Verified against the installed `node-sql-parser` 5.x:
 
-| SQL form                                                                    | Parses                                                   |
-| --------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `"c" ILIKE '%x%'`                                                           | yes                                                      |
-| `"c" NOT ILIKE '%x%'`                                                       | yes                                                      |
-| `"c" ILIKE '%x!%y%' ESCAPE '!'`                                             | yes                                                      |
-| `"c" ILIKE '%x%' ESCAPE '\'`                                                | **no** (a backslash-only string literal fails the lexer) |
-| `"c" GLOB 'x*'`                                                             | **no** (operator unknown to the grammar)                 |
-| `contains("c", 'x')`, `starts_with`, `ends_with`, with or without `lower()` | yes                                                      |
-| `NOT contains("c", 'x')`                                                    | yes (`unary_expr` wrapping a `function`)                 |
-| `regexp_matches("c", '^x')`, `NOT regexp_matches(...)`                      | yes                                                      |
-| `"c" IS TRUE`, `"c" IS FALSE`, `"c" IS NOT TRUE`                            | yes (`IS` with a `bool` right side)                      |
-| `"c" NOT BETWEEN 1 AND 2`                                                   | yes                                                      |
-| `lower("c") IN (lower('a'))`, `NOT IN`                                      | yes                                                      |
-| `coalesce(trim("c"), '') = ''` and `<> ''`                                  | yes                                                      |
-| `"c" > CAST('2020-01-01' AS DATE)`, `AS TIMESTAMP`, `DATE '2020-01-01'`     | yes                                                      |
-| `"c" > 1000` (unquoted number)                                              | yes                                                      |
+| SQL form | Parses |
+|---|---|
+| `"c" ILIKE '%x%'` | yes |
+| `"c" NOT ILIKE '%x%'` | yes |
+| `"c" ILIKE '%x!%y%' ESCAPE '!'` | yes |
+| `"c" ILIKE '%x%' ESCAPE '\'` | **no** (a backslash-only string literal fails the lexer) |
+| `"c" GLOB 'x*'` | **no** (operator unknown to the grammar) |
+| `contains("c", 'x')`, `starts_with`, `ends_with`, with or without `lower()` | yes |
+| `NOT contains("c", 'x')` | yes (`unary_expr` wrapping a `function`) |
+| `regexp_matches("c", '^x')`, `NOT regexp_matches(...)` | yes |
+| `"c" IS TRUE`, `"c" IS FALSE`, `"c" IS NOT TRUE` | yes (`IS` with a `bool` right side) |
+| `"c" NOT BETWEEN 1 AND 2` | yes |
+| `lower("c") IN (lower('a'))`, `NOT IN` | yes |
+| `coalesce(trim("c"), '') = ''` and `<> ''` | yes |
+| `"c" > CAST('2020-01-01' AS DATE)`, `AS TIMESTAMP`, `DATE '2020-01-01'` | yes |
+| `"c" > 1000` (unquoted number) | yes |
 
 Two consequences, both improvements:
 
@@ -467,7 +467,7 @@ the grid is for, and it should name the columns involved on hover or expand.
    section 7.
 4. **Type hints in the value editor**: placeholder text per operator and type
    (`YYYY-MM-DD` for dates, `Lower bound` / `Upper bound` for `between`, `Add a
-value` for the `in` chip editor), so the list and date cases stop being
+   value` for the `in` chip editor), so the list and date cases stop being
    guesswork (U11).
 
 ## 9. Rule row and tree layout
@@ -531,19 +531,19 @@ each item is easier or safer once the one above it exists. The implementation
 plan (`docs/superpowers/plans/2026-08-17-manual-query-filters.md`) breaks these
 into tasks.
 
-| Order | Work                                                                                                                                                                                           | Root cause | Findings closed                            |
-| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------ |
-| 1     | Stable node ids, local library state, debounce and commit rules (6.1, 6.2)                                                                                                                     | R1         | F2, F12                                    |
-| 2     | Explicit uppercase combinators plus `showCombinatorsBetweenRules` (6.3)                                                                                                                        | R2         | F3, U6                                     |
-| 3     | Operator catalog with type facets; one renderer for `WHERE` and `HAVING`; substring functions for text matching; typed literals; array values with tolerant reader (5.1, 5.1.1, 5.2, D5 to D7) | R3         | F1, F4, F11, F15, M1 to M9                 |
-| 4     | SQL to form parity for every catalog entry, with the round-trip test (5.4, D8)                                                                                                                 | R3         | F15                                        |
-| 5     | `isFilterRuleComplete`, `validateFilterRule`, exclusion semantics, inline messages, applied-filter summary (5.3, 8.2, 8.3, D9)                                                                 | R4         | F5 (partly), F8                            |
-| 6     | Query error surface in the results area and both dashboard hosts (8.1)                                                                                                                         | R4         | F5                                         |
-| 7     | Shared column hook, any-dataset-column scope, panel gating, reconciliation on data source change (section 7)                                                                                   | R5         | F6, F7, U17                                |
-| 8     | Typed value editors: number, date, boolean, chips for lists (8.4)                                                                                                                              | R3         | U11, U12                                   |
-| 9     | Rule row, hierarchy, actions, dropdown placement, scroll ownership, panel rebalance, in both hosts (section 9)                                                                                 | layout     | U1 to U5, U7 to U10, U13 to U16            |
-| 10    | Field-change behavior and stable default column ordering (6.4)                                                                                                                                 | R1, R3     | F13                                        |
-| 11    | Test net: unit, literal-value handling, round-trip, component regression, row-count end to end (section 11)                                                                                    | all        | regression protection for all of the above |
+| Order | Work | Root cause | Findings closed |
+|---|---|---|---|
+| 1 | Stable node ids, local library state, debounce and commit rules (6.1, 6.2) | R1 | F2, F12 |
+| 2 | Explicit uppercase combinators plus `showCombinatorsBetweenRules` (6.3) | R2 | F3, U6 |
+| 3 | Operator catalog with type facets; one renderer for `WHERE` and `HAVING`; substring functions for text matching; typed literals; array values with tolerant reader (5.1, 5.1.1, 5.2, D5 to D7) | R3 | F1, F4, F11, F15, M1 to M9 |
+| 4 | SQL to form parity for every catalog entry, with the round-trip test (5.4, D8) | R3 | F15 |
+| 5 | `isFilterRuleComplete`, `validateFilterRule`, exclusion semantics, inline messages, applied-filter summary (5.3, 8.2, 8.3, D9) | R4 | F5 (partly), F8 |
+| 6 | Query error surface in the results area and both dashboard hosts (8.1) | R4 | F5 |
+| 7 | Shared column hook, any-dataset-column scope, panel gating, reconciliation on data source change (section 7) | R5 | F6, F7, U17 |
+| 8 | Typed value editors: number, date, boolean, chips for lists (8.4) | R3 | U11, U12 |
+| 9 | Rule row, hierarchy, actions, dropdown placement, scroll ownership, panel rebalance, in both hosts (section 9) | layout | U1 to U5, U7 to U10, U13 to U16 |
+| 10 | Field-change behavior and stable default column ordering (6.4) | R1, R3 | F13 |
+| 11 | Test net: unit, literal-value handling, round-trip, component regression, row-count end to end (section 11) | all | regression protection for all of the above |
 
 Items 3 and 4 are one unit of work in practice: an operator added without a
 parse rule fails the round-trip test, which is the point of D8. Item 9 depends on

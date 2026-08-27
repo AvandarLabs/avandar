@@ -4,7 +4,7 @@
 >
 > **Per-step test handoff:** After completing every Step in this plan, output an enumerated list (`1.`, `2.`, `3.`, …) of the exact actions the human partner should take to verify the just-completed Step — commands to run (copy-pasteable), files or UI to inspect, and the expected result for each. Do this for every Step, including "trivial" config/file-creation steps; never skip or summarize. The list is in addition to (not a replacement for) the Manual review checkpoint at the end of each Task.
 >
-> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers _within_ a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
+> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers *within* a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` (Phase 5 section)
 
@@ -13,7 +13,6 @@
 **Goal:** Reach feature parity on Windows. Most of the architecture from Phases 0–4 is already portable; this plan covers the genuinely Windows-specific bits — keychain via the `cmdkey` + PowerShell shellout, code signing, the installer format, and a regression sweep on Windows-native quirks.
 
 **Architecture:** The macOS path resolution (`resolveUserDataDir`) and process model are unchanged on Windows. What changes:
-
 - **Keychain**: Shell out to `cmdkey` (for set/delete) and PowerShell's `Get-StoredCredential` (for read), mirroring the macOS `/usr/bin/security` shellout. Same `Keychain.set/get/delete` API; platform switch inside the module. FFI to `wincred.dll` / `advapi32.dll` is explicitly out of scope — the call frequency doesn't justify it (see the design spec's "Decisions Captured" section).
 - **Code signing**: Authenticode with an EV (Extended Validation) certificate strongly recommended to avoid SmartScreen warmup; OV certs work with longer reputation buildup.
 - **Installer**: A signed `.exe` produced by Electrobun's bundler, optionally wrapped in an `.msi` via WiX. Phase 5 ships the `.exe` only; `.msi` is a stretch goal.
@@ -22,7 +21,6 @@
 **Tech Stack:** Windows 10+ (Windows 11 preferred), WebView2 runtime (preinstalled on Windows 11; bundled with the installer on Windows 10), Bun on Windows (Bun's Windows support is recent; verify compatibility), `signtool.exe` for Authenticode signing.
 
 **Phase exit criteria:**
-
 1. The desktop app runs on Windows 11 with feature parity to macOS Phase 4 (auth, SQLite, DuckDB, parquet upload, sync engine, bug reports).
 2. A signed Windows `.exe` installer exits the CI pipeline.
 3. Auto-update flows to/from `win/stable/manifest.json` on Supabase Storage.
@@ -35,7 +33,6 @@
 ## File Structure
 
 **Modified:**
-
 - `apps/desktop/main/services/Keychain.ts` — branch on `process.platform`; add Windows implementation
 - `apps/desktop/main/platform/userDataDir.ts` — already handles win32 from Phase 2; verify
 - `apps/desktop/electrobun.config.ts` — add `win-x64` to `platforms`
@@ -46,7 +43,6 @@
 - `apps/desktop/README.md` — update with Windows install/run instructions
 
 **New (optional):**
-
 - `apps/desktop/installer/windows.wxs` — WiX installer definition if `.msi` is in scope
 
 ---
@@ -56,12 +52,10 @@
 **Test groupings:** G5.1 (userDataDir Windows fixtures — happy path, username with spaces, UNC path, missing APPDATA throws; uses path/win32 mode on macOS CI; also runs on actual Windows CI per G5.5).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: Step 1 — Extend `userDataDir` resolver coverage with Windows fixture tests using `path/win32` so they run green on macOS CI without changing runtime behavior; web app unaffected.
 - PR 2: Steps 2–4 — Add `win-x64` to `electrobun.config.ts` and any Windows-only main-bootstrap branches; bundler config change is inert on macOS builds and the manual review checkpoint is a gate, not a code change.
 
 **Files:**
-
 - Verify: `apps/desktop/main/platform/userDataDir.ts` (already handles win32 from Phase 2 Task 4)
 - Modify: `apps/desktop/electrobun.config.ts`
 
@@ -102,12 +96,10 @@ If the build fails: triage as **Bun-on-Windows compatibility** vs **Electrobun-o
 - [ ] **Step 4: Manual review checkpoint (do NOT commit)**
 
   **Run (on a Windows host):**
-
   ```powershell
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop build
   ```
-
   Expected: unit tests green (including the `win32` `userDataDir` test); a build artifact lands under `apps\desktop\bundle\win-x64\`.
 
   **Verify:**
@@ -138,7 +130,6 @@ If the build fails: triage as **Bun-on-Windows compatibility** vs **Electrobun-o
 **Design decision (inherited from Phase 2 Task 11):** the keychain is read ~once at boot and written ~once per access-token refresh. At that frequency the cost of `cmdkey` / PowerShell `fork+exec` is invisible, and the shellout shape lets us avoid FFI marshaling and `CREDENTIALW` struct layout entirely. FFI to `wincred.dll` / `advapi32.dll` is explicitly out of scope for V1 and V2.
 
 **Files:**
-
 - Modify: `apps/desktop/main/services/Keychain.ts` — branch on `process.platform`, delegate to the platform module
 - Create: `apps/desktop/main/services/Keychain.mac.ts` — extract today's `security`-CLI implementation (no behavior change)
 - Create: `apps/desktop/main/services/Keychain.win.ts`
@@ -242,12 +233,10 @@ Expected: unit tests green on any host (mocked spawn); integration tests green o
 **Test groupings:** G5.3 (signtool argv snapshot — /fd SHA256, /tr, /td SHA256 present — plus Windows CI sign-and-verify smoke against a fixture binary; covers both OV-style and EV-style cert paths).
 
 **PR boundaries:** 2 PRs.
-
 - PR 1: Steps 1–3 — Add `sign-win.ps1` + `build-and-sign-win.ps1` and the signtool argv snapshot test; scripts exist but no workflow invokes them yet, so existing CI is unaffected and snapshots run cross-platform.
 - PR 2: Steps 4–5 — Add a manual `workflow_dispatch` job that signs a fixture binary and runs `signtool verify /pa` to validate the script end-to-end; opt-in workflow only, no impact on default CI or macOS path.
 
 **Files:**
-
 - Create: `apps/desktop/scripts/sign-win.ps1`
 - Create: `apps/desktop/scripts/build-and-sign-win.ps1`
 
@@ -256,7 +245,6 @@ Expected: unit tests green on any host (mocked spawn); integration tests green o
 Decision per the spec: EV cert (recommended) or OV cert (acceptable). Order from a CA (DigiCert, Sectigo, GlobalSign). EV certs ship on a hardware token (USB) that the build machine must have physically inserted; OV certs are just .pfx files.
 
 For CI signing, OV is easier (the cert lives on the runner as a secret). EV requires either:
-
 - A self-hosted runner with the USB token plugged in, or
 - A cloud signing service (e.g. SignPath, Azure Trusted Signing) — adds vendor dependency
 
@@ -345,12 +333,10 @@ Note: SmartScreen reputation is separate from Authenticode signing. The first re
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
   **Run (on a Windows host with the cert available):**
-
   ```powershell
   powershell -ExecutionPolicy Bypass -File apps\desktop\scripts\build-and-sign-win.ps1
   signtool verify /pa /v .\apps\desktop\bundle\win-x64\Avandar.exe
   ```
-
   Expected: `signtool verify` reports `Successfully verified` and lists the expected publisher subject + a trusted timestamp.
 
   **Verify:**
@@ -375,11 +361,9 @@ Note: SmartScreen reputation is separate from Authenticode signing. The first re
 ## Task 4: Windows release CI workflow
 
 **PR boundaries:** 1 PR.
-
 - PR 1: Steps 1–3 — New workflow file + `publish-update-manifest.ts` platform generalization; workflow runs only on `workflow_dispatch` (and tag pushes if added later), so default branch CI and macOS release flow are untouched. The publish script change reads a new env var with a `mac` default, preserving existing macOS behavior.
 
 **Files:**
-
 - Create: `.github/workflows/desktop-release-win.yml`
 
 - [ ] **Step 1: Write the workflow**
@@ -466,14 +450,12 @@ const releaseKey = `${PLATFORM}/${CHANNEL}/Avandar-${PKG.version}.${ext}`;
 - [ ] **Step 3: Manual review checkpoint (do NOT commit)**
 
   **Run (from a test branch, via the GitHub Actions UI or `gh`):**
-
   ```bash
   gh workflow run desktop-release-win.yml --ref <test-branch> -f publish-update=false
   gh run watch
   # After the run completes:
   gh run download --name avandar-desktop-win
   ```
-
   Expected: the workflow finishes green on `windows-2022`; a signed `Avandar*.exe` artifact is downloadable.
 
   **Verify:**
@@ -499,7 +481,6 @@ const releaseKey = `${PLATFORM}/${CHANNEL}/Avandar-${PKG.version}.${ext}`;
 **Test groupings:** G5.4 (@windows-regression Playwright suite via WebView2 CDP — re-runs every prior phase's e2e specs against the built .exe; requires one-day spike first to verify Electrobun forwards WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS); G5.5 (Cross-platform vitest matrix green on windows-latest runners; Phase 5 exit gate).
 
 **PR boundaries:** Multi-PR depending on how the audit Steps split.
-
 - PR 1: Set up the `@windows-regression` Playwright tag + WebView2 CDP launch fixture + a single smoke test (the Phase 0 login flow on Windows); suite is opt-in via tag, so existing macOS Playwright runs are unaffected.
 - PR 2..N: Each prior phase's regression spec is its own PR (Phase 2 upload, Phase 3 sync, Phase 4 logger, etc.), tagged `@windows-regression` so it only runs on Windows CI; each PR keeps macOS/web behavior unchanged.
 - PR N+1: Add `windows-latest` to the existing vitest matrix and fix any tests that fail (e.g. add `it.skipIf` guards to macOS-only specs); this is the gate that fails Windows CI if uncovered drift exists, so it lands last.
@@ -529,7 +510,6 @@ Same checklist as Phase 4 internal dogfood, plus Windows-specific:
 - [ ] **Step 2: Run the same matrix on Windows 10**
 
 The major risk vs Windows 11 is WebView2 — preinstalled on 11, must be installed (or bundled) on 10. Confirm the installer either:
-
 - Bundles the WebView2 evergreen runtime, or
 - Prompts to install it via Microsoft's distributable
 
@@ -556,23 +536,22 @@ Append to `apps/desktop/README.md`:
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
   **Run (on a Windows host, against the signed CI artifact from Task 4):**
-
   ```powershell
   signtool verify /pa Avandar.exe
   cmdkey /list:com.avandarlabs.desktop/supabase-refresh-token
   ```
-
   Expected: signature verifies; the Credential Manager entry appears once the user has signed in.
 
   **Verify — per-phase regression sweep on Windows (record pass/fail per row):**
 
-  | Phase        | Smoke                                                                                                                                                                                | Pass/Fail | Notes |
-  | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ----- |
-  | 0            | Sign in with Supabase credentials; confirm session lands                                                                                                                             |           |       |
-  | 2            | Upload a CSV, run a DuckDB query against it, quit and relaunch, confirm data + workspace persist under `%APPDATA%\Avandar\`                                                          |           |       |
-  | 3            | Disconnect network, edit a workspace offline, generate a parquet upload, reconnect, watch the push loop drain to Supabase                                                            |           |       |
-  | 4            | Trigger an info+error log line and confirm it lands in the logger sink; submit a bug report and confirm it uploads; publish a newer build and confirm auto-update offers/installs it |           |       |
-  | 5 (Win-only) | Verify `%APPDATA%\Avandar\blobs\workspaces\...` layout, Credential Manager entry, WebView2 load, SmartScreen prompt behavior                                                         |           |       |
+  | Phase | Smoke | Pass/Fail | Notes |
+  |---|---|---|---|
+  | 0 | Sign in with Supabase credentials; confirm session lands | | |
+  | 2 | Upload a CSV, run a DuckDB query against it, quit and relaunch, confirm data + workspace persist under `%APPDATA%\Avandar\` | | |
+  | 3 | Disconnect network, edit a workspace offline, generate a parquet upload, reconnect, watch the push loop drain to Supabase | | |
+  | 4 | Trigger an info+error log line and confirm it lands in the logger sink; submit a bug report and confirm it uploads; publish a newer build and confirm auto-update offers/installs it | | |
+  | 5 (Win-only) | Verify `%APPDATA%\Avandar\blobs\workspaces\...` layout, Credential Manager entry, WebView2 load, SmartScreen prompt behavior | | |
+
   - Repeat the full sweep on **Windows 10** to confirm WebView2 bundling/bootstrap behaves correctly.
   - Repeat the install step on a **clean Windows VM with no developer tools** to catch missing runtime DLLs.
   - The README update lists the `%APPDATA%\Avandar\` data location, the WebView2 requirement, and the temporary SmartScreen prompt expectation.
@@ -592,13 +571,11 @@ Append to `apps/desktop/README.md`:
 ## Task 6: Phase 5 acceptance checklist
 
 **PR boundaries:** No code-change boundaries — verification + spec annotation only.
-
 - All Steps are manual verification (CI status check, cross-platform sync round-trip, spec annotation, internal announcement); any incidental edits (e.g. spec/README updates in Steps 3–4) are documentation-only PRs that cannot regress web or desktop behavior.
 
 - [ ] **Step 1: Both CI workflows green**
 
 Confirm:
-
 - `Desktop Release (macOS)` — green
 - `Desktop Release (Windows)` — green
 
@@ -611,12 +588,10 @@ Install on macOS and Windows. Log in as the same user on both. Make edits on eac
   Update `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 5 line in place — annotate it with the completion date (today) and a pointer to this plan.
 
   **Run (on a Windows host, as the final pre-ship gate):**
-
   ```powershell
   signtool verify /pa Avandar.exe
   pnpm --filter @avandar/desktop test
   ```
-
   Expected: signature still verifies; tests stay green.
 
   **Verify:**
@@ -654,11 +629,11 @@ Update `apps/desktop/README.md` "Phase status" header to "V1 complete — macOS 
 
 ## Risks Specific to Phase 5
 
-| Risk                                                                                                                  | Mitigation in this phase                                                                                                                                                                                                                     |
-| --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bun on Windows lacks parity with macOS for `bun:sqlite` or `Bun.spawn`                                                | Verify each in Task 1 Step 3; if blocked, evaluate Node + `better-sqlite3` + `child_process.spawn` as a Windows-only main-process runtime — single platform divergence, all other code unchanged                                             |
-| WebView2 missing on Windows 10                                                                                        | Bundle the evergreen runtime in the installer, or prompt to install on first launch                                                                                                                                                          |
-| OV cert SmartScreen warmup blocks internal testers                                                                    | Document in README (done in Task 5 Step 4); communicate the temporary nature; consider EV in V2 if it materially hurts adoption                                                                                                              |
-| `cmdkey` or PowerShell `PasswordVault` output / exit-code format differs from documentation                           | Pin formats in pure-layer unit tests; gated integration test (G5.2) runs against the real binary on each supported Windows version; thrown errors quote stderr so a regression surfaces with the OS message instead of a silent wrong-result |
-| Cross-platform sync surfaces subtle bugs (e.g. line endings in stored content, path separators in `parquet_blob_key`) | Already guarded by always-forward-slash key shape; verify in Task 6 Step 2; if drift, fix with a one-shot normalization pass and a SQLite migration                                                                                          |
-| Electrobun's Windows installer behavior differs from documentation                                                    | The plan's smoke tests in Task 5 are the primary safety net; engineer adapts per actual Electrobun output                                                                                                                                    |
+| Risk | Mitigation in this phase |
+|---|---|
+| Bun on Windows lacks parity with macOS for `bun:sqlite` or `Bun.spawn` | Verify each in Task 1 Step 3; if blocked, evaluate Node + `better-sqlite3` + `child_process.spawn` as a Windows-only main-process runtime — single platform divergence, all other code unchanged |
+| WebView2 missing on Windows 10 | Bundle the evergreen runtime in the installer, or prompt to install on first launch |
+| OV cert SmartScreen warmup blocks internal testers | Document in README (done in Task 5 Step 4); communicate the temporary nature; consider EV in V2 if it materially hurts adoption |
+| `cmdkey` or PowerShell `PasswordVault` output / exit-code format differs from documentation | Pin formats in pure-layer unit tests; gated integration test (G5.2) runs against the real binary on each supported Windows version; thrown errors quote stderr so a regression surfaces with the OS message instead of a silent wrong-result |
+| Cross-platform sync surfaces subtle bugs (e.g. line endings in stored content, path separators in `parquet_blob_key`) | Already guarded by always-forward-slash key shape; verify in Task 6 Step 2; if drift, fix with a one-shot normalization pass and a SQLite migration |
+| Electrobun's Windows installer behavior differs from documentation | The plan's smoke tests in Task 5 are the primary safety net; engineer adapts per actual Electrobun output |

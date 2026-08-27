@@ -257,14 +257,14 @@ E2E: one-click text place; rectangle drag for area; do not query Isochrone.
 
 ## Spec coverage
 
-| Spec section                           | Task |
-| -------------------------------------- | ---- |
-| Hide Isochrone, Eraser slot            | 1    |
-| Rectangle / snap / clip / hit / cursor | 2    |
-| Alt pan, cursors, dragPan              | 3    |
-| Area gestures                          | 4    |
-| Arrow drag                             | 5    |
-| Text place + overlay + revert          | 6    |
-| Text move + resize                     | 7    |
-| Eraser                                 | 8    |
-| Measure snap, e2e                      | 9    |
+| Spec section | Task |
+| --- | --- |
+| Hide Isochrone, Eraser slot | 1 |
+| Rectangle / snap / clip / hit / cursor | 2 |
+| Alt pan, cursors, dragPan | 3 |
+| Area gestures | 4 |
+| Arrow drag | 5 |
+| Text place + overlay + revert | 6 |
+| Text move + resize | 7 |
+| Eraser | 8 |
+| Measure snap, e2e | 9 |

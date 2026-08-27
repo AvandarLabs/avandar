@@ -4,7 +4,7 @@
 
 **Goal:** Give a user one place to choose a dashboard's audience, including "only my workspace", by merging publishing into the share modal, and make published dashboards findable.
 
-**Architecture:** `ShareResourceModal` stays resource-generic and grows one optional `publishing` prop that only dashboards supply. General access grows a fourth value, "Anyone with the link", which selects a _target_ visibility rather than writing it; the Publish and Unpublish buttons in the modal footer are what call P2's `publishDashboard` / `unpublishDashboard`. Publishing publicly becomes an admin-tier permission enforced by a Postgres trigger on the transition. The dashboards index stops filtering on `owner_id` and lets RLS decide, and cards gain audience badges.
+**Architecture:** `ShareResourceModal` stays resource-generic and grows one optional `publishing` prop that only dashboards supply. General access grows a fourth value, "Anyone with the link", which selects a *target* visibility rather than writing it; the Publish and Unpublish buttons in the modal footer are what call P2's `publishDashboard` / `unpublishDashboard`. Publishing publicly becomes an admin-tier permission enforced by a Postgres trigger on the transition. The dashboards index stops filtering on `owner_id` and lets RLS decide, and cards gain audience badges.
 
 **Tech Stack:** TypeScript, React, Mantine, TanStack Router, Lingui, Vitest, Playwright, Postgres / Supabase (declarative schema in `supabase/schemas/`), pgTAP.
 
@@ -52,18 +52,18 @@ pnpm db:reset
 
 **Command reference used throughout**
 
-| Command                        | What it does                                                                             |
-| ------------------------------ | ---------------------------------------------------------------------------------------- |
+| Command | What it does |
+| --- | --- |
 | `pnpm db:new-migration <name>` | `supabase stop` then `db diff -f <name>`; generates a migration from `supabase/schemas/` |
-| `pnpm db:reset`                | Rebuilds the local DB from migrations, then replays `[db.seed] sql_paths`                |
-| `pnpm test:db`                 | Runs pgTAP (`supabase test db`)                                                          |
-| `pnpm type-check`              | `tsc -b --noEmit` across the monorepo                                                    |
-| `pnpm test:frontend`           | Vitest                                                                                   |
-| `pnpm test:frontend <path>`    | Vitest for one file                                                                      |
-| `pnpm test:e2e`                | Playwright                                                                               |
-| `pnpm lint`                    | ESLint plus the react-doctor rules                                                       |
-| `pnpm i18n:extract`            | Extracts Lingui strings                                                                  |
-| `pnpm i18n:check`              | Fails when extracted strings are not committed                                           |
+| `pnpm db:reset` | Rebuilds the local DB from migrations, then replays `[db.seed] sql_paths` |
+| `pnpm test:db` | Runs pgTAP (`supabase test db`) |
+| `pnpm type-check` | `tsc -b --noEmit` across the monorepo |
+| `pnpm test:frontend` | Vitest |
+| `pnpm test:frontend <path>` | Vitest for one file |
+| `pnpm test:e2e` | Playwright |
+| `pnpm lint` | ESLint plus the react-doctor rules |
+| `pnpm i18n:extract` | Extracts Lingui strings |
+| `pnpm i18n:check` | Fails when extracted strings are not committed |
 
 ---
 
@@ -71,74 +71,74 @@ pnpm db:reset
 
 **Created**
 
-| File                                                                                                     | Responsibility                                                                                           |
-| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx`                                     | Dashboard-only wrapper: owns publishing state, renders `ShareResourceModal` with the `publishing` prop   |
-| `src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx`                                    | Toolbar entry point; replaces both `ShareResourceButton` and `PublishDashboardButton` for dashboards     |
-| `src/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule.ts`      | Pure: access value to target visibility, and target plus persisted visibility to the primary action kind |
-| `src/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule.test.ts` | Vitest for both mappings                                                                                 |
-| `src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts`                            | Target visibility, slug input and validation, publish config, and the two mutations                      |
-| `src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.test.tsx`                      | Vitest: which mutation each action kind calls                                                            |
-| `src/views/DashboardApp/DashboardShareModal/PublishingSection.tsx`                                       | Composes status, slug field, slice section, and share links                                              |
-| `src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx`                                       | The primary button and Unpublish, with the offline and unsaved-changes gates                             |
-| `src/views/DashboardApp/DashboardShareModal/PublishingActions.test.tsx`                                  | Vitest: labels and disabled states per action kind                                                       |
-| `src/components/permissions/ShareResourceModal/ShareResourceModal.types.ts`                              | The `ShareResourcePublishing` prop type, shared by the modal and its dashboard caller                    |
-| `src/components/permissions/useShareButtonState/useShareButtonState.ts`                                  | The admin-on-resource gate and tooltip copy, extracted so two buttons share one rule                     |
-| `supabase/tests/database/dashboards/publish_publicly_permission.test.sql`                                | pgTAP for the transition trigger                                                                         |
-| `tests/e2e/dashboard-workspace-publishing.spec.ts`                                                       | Playwright: publish to workspace, colleague reads it, signed-out does not                                |
-| `tests/e2e/dashboard-discovery.spec.ts`                                                                  | Playwright: a shared dashboard appears in the index with its badge                                       |
+| File | Responsibility |
+| --- | --- |
+| `src/views/DashboardApp/DashboardShareModal/DashboardShareModal.tsx` | Dashboard-only wrapper: owns publishing state, renders `ShareResourceModal` with the `publishing` prop |
+| `src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx` | Toolbar entry point; replaces both `ShareResourceButton` and `PublishDashboardButton` for dashboards |
+| `src/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule.ts` | Pure: access value to target visibility, and target plus persisted visibility to the primary action kind |
+| `src/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule.test.ts` | Vitest for both mappings |
+| `src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts` | Target visibility, slug input and validation, publish config, and the two mutations |
+| `src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.test.tsx` | Vitest: which mutation each action kind calls |
+| `src/views/DashboardApp/DashboardShareModal/PublishingSection.tsx` | Composes status, slug field, slice section, and share links |
+| `src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx` | The primary button and Unpublish, with the offline and unsaved-changes gates |
+| `src/views/DashboardApp/DashboardShareModal/PublishingActions.test.tsx` | Vitest: labels and disabled states per action kind |
+| `src/components/permissions/ShareResourceModal/ShareResourceModal.types.ts` | The `ShareResourcePublishing` prop type, shared by the modal and its dashboard caller |
+| `src/components/permissions/useShareButtonState/useShareButtonState.ts` | The admin-on-resource gate and tooltip copy, extracted so two buttons share one rule |
+| `supabase/tests/database/dashboards/publish_publicly_permission.test.sql` | pgTAP for the transition trigger |
+| `tests/e2e/dashboard-workspace-publishing.spec.ts` | Playwright: publish to workspace, colleague reads it, signed-out does not |
+| `tests/e2e/dashboard-discovery.spec.ts` | Playwright: a shared dashboard appears in the index with its badge |
 
 **Modified**
 
-| File                                                                                                                                                                    | Change                                                                                       |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `src/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule.ts`                                                                              | Fourth value, `fromResourceState`, availability and disabled flags on the options            |
-| `src/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule.test.ts`                                                                         | Covers the fourth value                                                                      |
-| `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx`                                                                               | Renders the fourth option, its tooltip, and the disabled reason                              |
-| `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.test.tsx`                                                                          | Covers the fourth option                                                                     |
-| `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx`                                                                                                  | Optional `publishing` prop; renders the section and actions                                  |
-| `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx`                                                                                             | Adds the with-publishing cases; existing cases unchanged                                     |
-| `src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts`                                                                                              | Accepts the target visibility; `public` writes no shares                                     |
-| `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts`                                                                                  | Publication span                                                                             |
-| `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.test.ts`                                                                             | Covers the publication span                                                                  |
-| `src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts`                                                                                          | The extra line when the dashboard is public                                                  |
-| `src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx`                                                                                         | Passes it through                                                                            |
-| `src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx`                                                                             | Uses `useShareButtonState`                                                                   |
-| `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts`                                                                                                     | `dashboards__can_publish_publicly` at the admin tier                                         |
-| `shared/models/Permissions/PermissionsModule/PermissionsModule.test.ts`                                                                                                 | Asserts the new key's tier                                                                   |
-| `supabase/schemas/10.dashboards.sql`                                                                                                                                    | The publish-publicly trigger and its function                                                |
-| `shared/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts`                                                                                                         | Adds `dashboard.unpublished`; deletes the reservation comment                                |
-| `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts`                                                                                                             | `visibility` on both publish payloads; the unpublish payload                                 |
-| `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards.ts` | Branches on `visibility`, emits it (moves in Task 6)                                         |
-| `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx`                                                                                                    | Toolbar loses `PublishDashboardButton`, `ShareResourceButton` becomes `DashboardShareButton` |
-| `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.test.tsx`                                                                                               | Mocks the new button                                                                         |
-| `src/routes/_auth/$workspaceSlug/dashboards/index.tsx`                                                                                                                  | Drops the `owner_id` filter                                                                  |
-| `src/views/DashboardApp/DashboardListView/DashboardListView.tsx`                                                                                                        | Owner-first ordering; passes the current user id                                             |
-| `src/views/DashboardApp/DashboardListView/DashboardCard.tsx`                                                                                                            | Audience badges                                                                              |
-| `src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx`                                                                                                   | Denies viewers on a draft                                                                    |
-| `src/routes/_auth/$workspaceSlug/dashboards/preview/-$dashboardId.test.tsx`                                                                                             | Covers the new branch                                                                        |
-| `docs/permissions-architecture.md`                                                                                                                                      | Records the viewer/editor discovery asymmetry                                                |
-| `docs/superpowers/specs/2026-08-13-private-dashboards-design.md`                                                                                                        | Marks P3 landed                                                                              |
+| File | Change |
+| --- | --- |
+| `src/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule.ts` | Fourth value, `fromResourceState`, availability and disabled flags on the options |
+| `src/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule.test.ts` | Covers the fourth value |
+| `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx` | Renders the fourth option, its tooltip, and the disabled reason |
+| `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.test.tsx` | Covers the fourth option |
+| `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx` | Optional `publishing` prop; renders the section and actions |
+| `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx` | Adds the with-publishing cases; existing cases unchanged |
+| `src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts` | Accepts the target visibility; `public` writes no shares |
+| `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts` | Publication span |
+| `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.test.ts` | Covers the publication span |
+| `src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts` | The extra line when the dashboard is public |
+| `src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx` | Passes it through |
+| `src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx` | Uses `useShareButtonState` |
+| `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts` | `dashboards__can_publish_publicly` at the admin tier |
+| `shared/models/Permissions/PermissionsModule/PermissionsModule.test.ts` | Asserts the new key's tier |
+| `supabase/schemas/10.dashboards.sql` | The publish-publicly trigger and its function |
+| `shared/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts` | Adds `dashboard.unpublished`; deletes the reservation comment |
+| `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | `visibility` on both publish payloads; the unpublish payload |
+| `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards.ts` | Branches on `visibility`, emits it (moves in Task 6) |
+| `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx` | Toolbar loses `PublishDashboardButton`, `ShareResourceButton` becomes `DashboardShareButton` |
+| `src/views/DashboardApp/DashboardEditorView/DashboardEditorView.test.tsx` | Mocks the new button |
+| `src/routes/_auth/$workspaceSlug/dashboards/index.tsx` | Drops the `owner_id` filter |
+| `src/views/DashboardApp/DashboardListView/DashboardListView.tsx` | Owner-first ordering; passes the current user id |
+| `src/views/DashboardApp/DashboardListView/DashboardCard.tsx` | Audience badges |
+| `src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx` | Denies viewers on a draft |
+| `src/routes/_auth/$workspaceSlug/dashboards/preview/-$dashboardId.test.tsx` | Covers the new branch |
+| `docs/permissions-architecture.md` | Records the viewer/editor discovery asymmetry |
+| `docs/superpowers/specs/2026-08-13-private-dashboards-design.md` | Marks P3 landed |
 
 **Moved** (Task 6, `git mv`, no behavior change in that task)
 
-| From `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/`                                                                                                                  | To `src/views/DashboardApp/DashboardShareModal/` |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `VanitySlugField/`                                                                                                                                                                        | `VanitySlugField/`                               |
-| `PublishDashboardStatus/`                                                                                                                                                                 | `PublishDashboardStatus/`                        |
-| `PublishedShareLinks.tsx`, `ShareUrlRow.tsx`                                                                                                                                              | same names                                       |
-| `PublishSliceSection.tsx`, `PublishSliceSection.types.ts`, `PublishSliceRowFilter.tsx`, `SliceModeEditor.tsx`, `CustomSliceEditor.tsx`, `AddRowFilterMenu.tsx`, `QueriedSlicePreview.tsx` | same names                                       |
-| `buildShareUrls.ts`, `toVanitySlug/`                                                                                                                                                      | same names                                       |
-| `makeDashboardPublishAnalyticsEventFromDashboards/`                                                                                                                                       | same name                                        |
+| From `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/` | To `src/views/DashboardApp/DashboardShareModal/` |
+| --- | --- |
+| `VanitySlugField/` | `VanitySlugField/` |
+| `PublishDashboardStatus/` | `PublishDashboardStatus/` |
+| `PublishedShareLinks.tsx`, `ShareUrlRow.tsx` | same names |
+| `PublishSliceSection.tsx`, `PublishSliceSection.types.ts`, `PublishSliceRowFilter.tsx`, `SliceModeEditor.tsx`, `CustomSliceEditor.tsx`, `AddRowFilterMenu.tsx`, `QueriedSlicePreview.tsx` | same names |
+| `buildShareUrls.ts`, `toVanitySlug/` | same names |
+| `makeDashboardPublishAnalyticsEventFromDashboards/` | same name |
 
 **Deleted** (Task 9)
 
-| File                                                         | Why                                                      |
-| ------------------------------------------------------------ | -------------------------------------------------------- |
-| `.../PublishDashboardModal/PublishDashboardModal.tsx`        | Replaced by `DashboardShareModal`                        |
-| `.../PublishDashboardModal/PublishDashboardModal.test.tsx`   | Its behavior is covered by the new hook and action tests |
+| File | Why |
+| --- | --- |
+| `.../PublishDashboardModal/PublishDashboardModal.tsx` | Replaced by `DashboardShareModal` |
+| `.../PublishDashboardModal/PublishDashboardModal.test.tsx` | Its behavior is covered by the new hook and action tests |
 | `.../PublishDashboardModal/PublishDashboardModalContent.tsx` | Replaced by `PublishingSection` plus `PublishingActions` |
-| `.../DashboardEditorView/PublishDashboardButton.tsx`         | The toolbar has one Share button now                     |
+| `.../DashboardEditorView/PublishDashboardButton.tsx` | The toolbar has one Share button now |
 
 ---
 
@@ -149,7 +149,6 @@ It must stay resource-generic, so it never imports a Dashboard type: the caller
 passes a boolean.
 
 **Files:**
-
 - Modify: `src/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule.ts`
 - Test: `src/components/permissions/ShareResourceModal/GeneralAccessModule/GeneralAccessModule.test.ts`
 
@@ -300,15 +299,15 @@ function _makeDropdownOptionsFromLabels(
     },
     { value: "restricted", label: options.labels.restricted, disabled: false },
     { value: "workspace", label: options.labels.workspace, disabled: false },
-    ...(options.isPublicOptionAvailable
-      ? [
-          {
-            value: "public" as const,
-            label: options.labels.public,
-            disabled: options.isPublicOptionDisabled,
-          },
-        ]
-      : []),
+    ...(options.isPublicOptionAvailable ?
+      [
+        {
+          value: "public" as const,
+          label: options.labels.public,
+          disabled: options.isPublicOptionDisabled,
+        },
+      ]
+    : []),
   ];
 }
 ```
@@ -337,7 +336,7 @@ Run: `pnpm type-check`
 
 Expected: FAIL, in `ShareGeneralAccess.tsx` only, because
 `makeDropdownOptionsFromLabels` now needs two more arguments and a `public`
-label. Task 2 fixes it. If anything _else_ fails, a caller you have not
+label. Task 2 fixes it. If anything *else* fails, a caller you have not
 accounted for exists; find it before continuing.
 
 - [ ] **Step 6: Commit**
@@ -352,7 +351,6 @@ git commit -m "feat(permissions): add the public General access value"
 ## Task 2: The dropdown renders the fourth option
 
 **Files:**
-
 - Modify: `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx`
 - Test: `src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.test.tsx`
 
@@ -452,17 +450,17 @@ type Props = {
 Pass the new arguments and label:
 
 ```ts
-const generalOptions = GeneralAccessModule.makeDropdownOptionsFromLabels({
-  isOwner,
-  labels: {
-    private: t`Only me`,
-    restricted: t`Restricted`,
-    workspace: t`Anyone in ${app}`,
-    public: t`Anyone with the link`,
-  },
-  isPublicOptionAvailable,
-  isPublicOptionDisabled: publicOptionDisabledReason !== undefined,
-});
+  const generalOptions = GeneralAccessModule.makeDropdownOptionsFromLabels({
+    isOwner,
+    labels: {
+      private: t`Only me`,
+      restricted: t`Restricted`,
+      workspace: t`Anyone in ${app}`,
+      public: t`Anyone with the link`,
+    },
+    isPublicOptionAvailable,
+    isPublicOptionDisabled: publicOptionDisabledReason !== undefined,
+  });
 ```
 
 Add the fourth tooltip branch (`matchLiteral` is exhaustive, so this will not
@@ -477,13 +475,11 @@ compile without it):
 Render the reason under the dropdown, before the existing dimmed helper text:
 
 ```tsx
-{
-  publicOptionDisabledReason ? (
-    <Text size="xs" c="dimmed">
-      {publicOptionDisabledReason}
-    </Text>
-  ) : null;
-}
+      {publicOptionDisabledReason ?
+        <Text size="xs" c="dimmed">
+          {publicOptionDisabledReason}
+        </Text>
+      : null}
 ```
 
 - [ ] **Step 4: Run the tests to verify they pass**
@@ -528,7 +524,6 @@ git commit -m "feat(permissions): render the public General access option"
 ## Task 3: The publication span in the summary line
 
 **Files:**
-
 - Modify: `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts`
 - Test: `src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.test.ts`
 
@@ -550,9 +545,9 @@ describe("publication", () => {
 
   it("says nothing about publication when the resource has none", () => {
     const spans = buildShareSummary({ ...base, publication: undefined });
-    expect(
-      spans.map((span) => span.kind === "text" && span.text).join(""),
-    ).not.toContain("Published");
+    expect(spans.map((span) => span.kind === "text" && span.text).join("")).not.toContain(
+      "Published",
+    );
   });
 
   it("reports a draft dashboard as not published", () => {
@@ -640,9 +635,10 @@ every branch. Replace the early `if (!hasAnyShares)` block's returns and the
 final return with a single tail:
 
 ```ts
-const publicationSpans = opts.publication
-  ? buildPublicationSpans(opts.publication, opts.workspaceName)
-  : [];
+  const publicationSpans =
+    opts.publication ?
+      buildPublicationSpans(opts.publication, opts.workspaceName)
+    : [];
 ```
 
 and append `...publicationSpans` to each returned array.
@@ -667,7 +663,6 @@ git commit -m "feat(permissions): add the publication span to the share summary"
 ## Task 4: The publish-publicly permission key
 
 **Files:**
-
 - Modify: `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts:56-67`
 - Test: `shared/models/Permissions/PermissionsModule/PermissionsModule.test.ts`
 
@@ -732,12 +727,11 @@ git commit -m "feat(permissions): add dashboards__can_publish_publicly"
 
 ## Task 5: The transition trigger
 
-The rule is about a _transition_ into `public`, so it cannot be an RLS
+The rule is about a *transition* into `public`, so it cannot be an RLS
 `with check`, which has no `OLD`. A `with check` would also reject an editor
 re-saving a dashboard an admin published, which works today.
 
 **Files:**
-
 - Modify: `supabase/schemas/10.dashboards.sql` (append after the
   `tr__dashboards__prevent_workspace_id_change` trigger, before the indexes)
 - Create: `supabase/migrations/<timestamp>_dashboards_enforce_publish_publicly.sql` (generated)
@@ -970,7 +964,6 @@ the history of every moved file, and the diffs in Tasks 7 to 10 are behavior,
 not relocation.
 
 **Files:**
-
 - Move: the whole "Moved" table in File Structure
 - Modify: every file that imports a moved path
 
@@ -1031,7 +1024,6 @@ P2 split the URL by audience. The slug field and the share links still speak
 only the public dialect.
 
 **Files:**
-
 - Modify: `src/views/DashboardApp/DashboardShareModal/buildShareUrls.ts`
 - Modify: `src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx`
 - Test: `src/views/DashboardApp/DashboardShareModal/buildShareUrls.test.ts` (create)
@@ -1122,9 +1114,9 @@ type Options = {
 export function buildShareUrls(args: Readonly<Options>): ShareUrls {
   const base = _origin().replace(/\/$/, "");
   const prefix =
-    args.visibility === "public"
-      ? `${base}/d`
-      : `${base}/${args.workspaceSlug}/d`;
+    args.visibility === "public" ? `${base}/d` : (
+      `${base}/${args.workspaceSlug}/d`
+    );
   return {
     canonical: `${prefix}/${args.dashboardId}`,
     vanity: args.slug ? `${prefix}/${args.slug}` : undefined,
@@ -1154,10 +1146,10 @@ type Props = {
 ```
 
 ```tsx
-<Code className={css.vanitySlugFieldPreview}>
-  {urlPrefix}
-  {normalisedSlug}
-</Code>
+          <Code className={css.vanitySlugFieldPreview}>
+            {urlPrefix}
+            {normalisedSlug}
+          </Code>
 ```
 
 - [ ] **Step 4: Run the test to verify it passes**
@@ -1191,7 +1183,6 @@ git commit -m "feat(dashboards): make share URLs and the slug preview audience-a
 ## Task 8: The publishing module and its control hook
 
 **Files:**
-
 - Create: `src/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule.ts`
 - Create: `src/views/DashboardApp/DashboardShareModal/DashboardPublishingModule/DashboardPublishingModule.test.ts`
 - Create: `src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl.ts`
@@ -1297,7 +1288,9 @@ export type PublishActionKind =
   | "unpublish"
   | "disabled_no_audience";
 
-function _targetVisibilityFor(value: GeneralAccessValue): Dashboard.Visibility {
+function _targetVisibilityFor(
+  value: GeneralAccessValue,
+): Dashboard.Visibility {
   return _TARGET_VISIBILITY_BY_ACCESS_VALUE[value];
 }
 
@@ -1317,8 +1310,8 @@ function _getPublishActionKind(
   }>,
 ): PublishActionKind {
   if (options.targetVisibility === "draft") {
-    return options.visibility === "draft"
-      ? "disabled_no_audience"
+    return options.visibility === "draft" ?
+        "disabled_no_audience"
       : "unpublish";
   }
   if (options.visibility === options.targetVisibility) {
@@ -1327,8 +1320,8 @@ function _getPublishActionKind(
   if (options.targetVisibility === "public") {
     return "publish_public";
   }
-  return options.visibility === "public"
-    ? "make_internal"
+  return options.visibility === "public" ?
+      "make_internal"
     : "publish_workspace";
 }
 
@@ -1370,12 +1363,12 @@ vi.mock("@/clients/dashboards/DashboardClient", () => {
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
-  return {
-    useCurrentWorkspace: () => ({ id: "ws-1", slug: "acme", name: "Acme" }),
-  };
+  return { useCurrentWorkspace: () => ({ id: "ws-1", slug: "acme", name: "Acme" }) };
 });
 
-function makeDashboard(visibility: Dashboard.Visibility): Dashboard.T {
+function makeDashboard(
+  visibility: Dashboard.Visibility,
+): Dashboard.T {
   return {
     id: "11111111-2222-4333-8444-555555555555",
     workspaceId: "ws-1",
@@ -1395,9 +1388,7 @@ describe("useDashboardPublishingControl", () => {
 
   it("starts with the target equal to the persisted visibility", () => {
     const { result } = renderHook(() => {
-      return useDashboardPublishingControl({
-        dashboard: makeDashboard("public"),
-      });
+      return useDashboardPublishingControl({ dashboard: makeDashboard("public") });
     });
     expect(result.current.targetVisibility).toBe("public");
     expect(result.current.actionKind).toBe("republish");
@@ -1405,9 +1396,7 @@ describe("useDashboardPublishingControl", () => {
 
   it("publishes to the workspace when the target is workspace", () => {
     const { result } = renderHook(() => {
-      return useDashboardPublishingControl({
-        dashboard: makeDashboard("draft"),
-      });
+      return useDashboardPublishingControl({ dashboard: makeDashboard("draft") });
     });
     act(() => {
       result.current.onGeneralAccessChange("workspace");
@@ -1443,9 +1432,7 @@ describe("useDashboardPublishingControl", () => {
 
   it("does nothing when there is no audience to publish to", () => {
     const { result } = renderHook(() => {
-      return useDashboardPublishingControl({
-        dashboard: makeDashboard("draft"),
-      });
+      return useDashboardPublishingControl({ dashboard: makeDashboard("draft") });
     });
     act(() => {
       result.current.onPrimaryAction();
@@ -1522,8 +1509,9 @@ export function useDashboardPublishingControl(
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [currentDashboard, setCurrentDashboard] = useState(options.dashboard);
-  const [targetVisibility, setTargetVisibility] =
-    useState<Dashboard.Visibility>(options.dashboard.visibility);
+  const [targetVisibility, setTargetVisibility] = useState<Dashboard.Visibility>(
+    options.dashboard.visibility,
+  );
   const [slugInput, setSlugInput] = useState(currentDashboard.slug ?? "");
   const normalisedSlug = toVanitySlug(slugInput);
   const [publishConfig, setPublishConfig] = useState(() => {
@@ -1540,9 +1528,9 @@ export function useDashboardPublishingControl(
   const [publishDashboard, isPublishing] = DashboardClient.usePublishDashboard({
     onSuccess: (updatedDashboard) => {
       notifySuccess(
-        currentDashboard.visibility === "draft"
-          ? t`Dashboard published!`
-          : t`Dashboard share settings updated.`,
+        currentDashboard.visibility === "draft" ?
+          t`Dashboard published!`
+        : t`Dashboard share settings updated.`,
       );
       void AnalyticsClient.logEvent({
         ...makeDashboardPublishAnalyticsEventFromDashboards({
@@ -1599,11 +1587,10 @@ export function useDashboardPublishingControl(
       return;
     }
     // Every other kind is a publish to the target; only the label differs.
-    const slugUpdate = normalisedSlug
-      ? { action: "set" as const, value: normalisedSlug }
-      : currentDashboard.slug
-        ? { action: "clear" as const }
-        : undefined;
+    const slugUpdate =
+      normalisedSlug ? { action: "set" as const, value: normalisedSlug }
+      : currentDashboard.slug ? { action: "clear" as const }
+      : undefined;
     publishDashboard({
       dashboardId: currentDashboard.id,
       // `disabled_no_audience` and `unpublish` are the only draft targets, and
@@ -1667,17 +1654,17 @@ file verbatim, with one change: the debounced effect passes the target rather
 than the literal `"public"`, and skips validation entirely for a draft target.
 
 ```ts
-const timeoutId = window.setTimeout(() => {
-  if (targetVisibility === "draft") {
-    // A draft has no URL, so it has no namespace to collide in.
-    return;
-  }
-  validateSlug({
-    slug: normalisedSlug,
-    dashboardId,
-    visibility: targetVisibility,
-  });
-}, SLUG_VALIDATION_DEBOUNCE_MS);
+      const timeoutId = window.setTimeout(() => {
+        if (targetVisibility === "draft") {
+          // A draft has no URL, so it has no namespace to collide in.
+          return;
+        }
+        validateSlug({
+          slug: normalisedSlug,
+          dashboardId,
+          visibility: targetVisibility,
+        });
+      }, SLUG_VALIDATION_DEBOUNCE_MS);
 ```
 
 Add `targetVisibility` to that effect's dependency array, which is what
@@ -1773,7 +1760,6 @@ This is the task that makes the surface visible. It ends with the old modal
 deleted.
 
 **Files:**
-
 - Create: `src/views/DashboardApp/DashboardShareModal/PublishingSection.tsx`
 - Create: `src/views/DashboardApp/DashboardShareModal/PublishingActions.tsx`
 - Create: `src/views/DashboardApp/DashboardShareModal/PublishingActions.test.tsx`
@@ -1825,7 +1811,9 @@ describe("PublishingActions", () => {
         onPrimaryAction={noop}
       />,
     );
-    expect(screen.getByRole("button", { name: "Make internal" })).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Make internal" }),
+    ).toBeEnabled();
   });
 
   it("disables the action when there is no audience selected", () => {
@@ -1947,52 +1935,48 @@ type Props = {
 ```
 
 ```tsx
-{
-  matchLiteral(visibility, {
-    draft: () => (
-      <Alert color="blue" icon={<IconInfoCircle size={18} />} variant="light">
-        <Text size="sm">
-          <Trans>
-            Not published yet. Nobody can open this dashboard from a link until
-            you publish it.
-          </Trans>
-        </Text>
-      </Alert>
-    ),
-    workspace: () => (
-      <Alert color="teal" icon={<IconBuilding size={18} />} variant="light">
-        <Text size="sm">
-          <Trans>
-            This dashboard is published to your workspace. Only people you have
-            given access can open the link below.
-          </Trans>
-        </Text>
-      </Alert>
-    ),
-    public: () => (
-      <Alert color="orange" icon={<IconWorld size={18} />} variant="light">
-        <Text size="sm">
-          <Trans>
-            This dashboard is <strong>public</strong>. Anyone with the link can
-            view it, with no Avandar account.
-          </Trans>
-        </Text>
-      </Alert>
-    ),
-  });
-}
-{
-  targetVisibility !== visibility ? (
-    <Alert color="yellow" icon={<IconInfoCircle size={18} />} variant="light">
-      <Text size="sm">
-        <Trans>
-          Your access change is saved, but the published copy still reflects the
-          previous audience. Use the button below to apply it.
-        </Trans>
-      </Text>
-    </Alert>
-  ) : null;
-}
+      {matchLiteral(visibility, {
+        draft: () => (
+          <Alert color="blue" icon={<IconInfoCircle size={18} />} variant="light">
+            <Text size="sm">
+              <Trans>
+                Not published yet. Nobody can open this dashboard from a link
+                until you publish it.
+              </Trans>
+            </Text>
+          </Alert>
+        ),
+        workspace: () => (
+          <Alert color="teal" icon={<IconBuilding size={18} />} variant="light">
+            <Text size="sm">
+              <Trans>
+                This dashboard is published to your workspace. Only people you
+                have given access can open the link below.
+              </Trans>
+            </Text>
+          </Alert>
+        ),
+        public: () => (
+          <Alert color="orange" icon={<IconWorld size={18} />} variant="light">
+            <Text size="sm">
+              <Trans>
+                This dashboard is <strong>public</strong>. Anyone with the link
+                can view it, with no Avandar account.
+              </Trans>
+            </Text>
+          </Alert>
+        ),
+      })}
+      {targetVisibility !== visibility ?
+        <Alert color="yellow" icon={<IconInfoCircle size={18} />} variant="light">
+          <Text size="sm">
+            <Trans>
+              Your access change is saved, but the published copy still reflects
+              the previous audience. Use the button below to apply it.
+            </Trans>
+          </Text>
+        </Alert>
+      : null}
 ```
 
 That second alert is the one that makes umbrella section 5.4's ordering
@@ -2052,9 +2036,7 @@ export function PublishingSection({ publishing }: Readonly<Props>): ReactNode {
         visibility={publishing.currentDashboard.visibility}
         targetVisibility={publishing.targetVisibility}
         isUsingVanity={Boolean(publishing.shareUrls.vanity)}
-        targetUrl={
-          publishing.shareUrls.vanity ?? publishing.shareUrls.canonical
-        }
+        targetUrl={publishing.shareUrls.vanity ?? publishing.shareUrls.canonical}
       />
       <VanitySlugField
         slugInput={publishing.slugInput}
@@ -2070,9 +2052,9 @@ export function PublishingSection({ publishing }: Readonly<Props>): ReactNode {
         publishConfig={publishing.publishConfig}
         onChange={publishing.onPublishConfigChange}
       />
-      {isPublished ? (
+      {isPublished ?
         <PublishedShareLinks shareUrls={publishing.shareUrls} />
-      ) : null}
+      : null}
     </Stack>
   );
 }
@@ -2150,70 +2132,69 @@ In `ShareResourceModal.tsx`, add `publishing?: ShareResourcePublishing` to
 `Props`, pass it into the control, and render the two slots:
 
 ```tsx
-const generalAccess = useGeneralAccessControl({
-  // ...existing options...
-  isPubliclyPublished: publishing?.targetVisibility === "public",
-});
+  const generalAccess = useGeneralAccessControl({
+    // ...existing options...
+    isPubliclyPublished: publishing?.targetVisibility === "public",
+  });
 ```
 
 ```tsx
-<ShareGeneralAccess
-  resourceType={resourceType}
-  value={generalAccess.displayedValue}
-  isOwner={generalAccess.isOwner}
-  isBusy={generalAccess.isBusy}
-  workspaceShareRole={workspaceShare?.role ?? null}
-  isPublicOptionAvailable={publishing !== undefined}
-  publicOptionDisabledReason={publishing?.publicOptionDisabledReason}
-  onChange={(value) => {
-    // The dropdown moves the publish target and writes share state; it
-    // never writes visibility. The footer button does that.
-    publishing?.onGeneralAccessChange(value);
-    generalAccess.onChange(value);
-  }}
-  onWorkspaceRoleChange={generalAccess.onWorkspaceRoleChange}
-/>
+      <ShareGeneralAccess
+        resourceType={resourceType}
+        value={generalAccess.displayedValue}
+        isOwner={generalAccess.isOwner}
+        isBusy={generalAccess.isBusy}
+        workspaceShareRole={workspaceShare?.role ?? null}
+        isPublicOptionAvailable={publishing !== undefined}
+        publicOptionDisabledReason={publishing?.publicOptionDisabledReason}
+        onChange={(value) => {
+          // The dropdown moves the publish target and writes share state; it
+          // never writes visibility. The footer button does that.
+          publishing?.onGeneralAccessChange(value);
+          generalAccess.onChange(value);
+        }}
+        onWorkspaceRoleChange={generalAccess.onWorkspaceRoleChange}
+      />
 ```
 
 Render `publishing?.section` directly after `<ShareSummaryLine />`, and replace
 the footer `Group` with:
 
 ```tsx
-{
-  publishing?.section;
-}
+      {publishing?.section}
 
-<Group justify="space-between" mt="md">
-  <Button variant="default" onClick={onClose}>
-    <Trans>Done</Trans>
-  </Button>
-  {publishing?.actions}
-</Group>;
+      <Group justify="space-between" mt="md">
+        <Button variant="default" onClick={onClose}>
+          <Trans>Done</Trans>
+        </Button>
+        {publishing?.actions}
+      </Group>
 ```
 
 Pass the publication into the summary:
 
 ```tsx
-const spans = buildShareSummary({
-  // ...existing options...
-  publication: publishing ? publishing.targetVisibility : undefined,
-});
+  const spans = buildShareSummary({
+    // ...existing options...
+    publication: publishing ? publishing.targetVisibility : undefined,
+  });
 ```
 
 In `useGeneralAccessControl.ts`, accept the new option and add the fourth
 branch:
 
 ```ts
-isPubliclyPublished: boolean;
+  isPubliclyPublished: boolean;
 ```
 
 ```ts
-const derivedValue = options.sharingState
-  ? GeneralAccessModule.fromResourceState({
-      ...options.sharingState,
-      isPubliclyPublished: options.isPubliclyPublished,
-    })
-  : "private";
+  const derivedValue =
+    options.sharingState ?
+      GeneralAccessModule.fromResourceState({
+        ...options.sharingState,
+        isPubliclyPublished: options.isPubliclyPublished,
+      })
+    : "private";
 ```
 
 The `public` branch of that hook's `matchLiteral` already exists: Task 2 added
@@ -2262,11 +2243,11 @@ export function DashboardShareModal({
     "dashboards__can_publish_publicly",
   );
   const publishing = useDashboardPublishingControl({ dashboard });
-  const isBlockedReason = offline.isBlocked
-    ? t`Unavailable offline`
-    : hasUnsavedChanges
-      ? t`You cannot publish while there are unsaved changes. Save first.`
-      : undefined;
+  const isBlockedReason =
+    offline.isBlocked ? t`Unavailable offline`
+    : hasUnsavedChanges ?
+      t`You cannot publish while there are unsaved changes. Save first.`
+    : undefined;
 
   return (
     <ShareResourceModal
@@ -2276,9 +2257,10 @@ export function DashboardShareModal({
       onClose={onClose}
       publishing={{
         targetVisibility: publishing.targetVisibility,
-        publicOptionDisabledReason: canPublishPublicly
-          ? undefined
-          : t`Only workspace admins can publish to the web.`,
+        publicOptionDisabledReason:
+          canPublishPublicly ? undefined : (
+            t`Only workspace admins can publish to the web.`
+          ),
         section: <PublishingSection publishing={publishing} />,
         actions: (
           <PublishingActions
@@ -2329,9 +2311,9 @@ export function useShareButtonState(
   return {
     isDisabled: !options.resourceId || isLoadingRole || !canManageShares,
     tooltip:
-      canManageShares || isLoadingRole
-        ? t`Share this ${resourceLabel}`
-        : t`You need admin access on this resource to manage sharing.`,
+      canManageShares || isLoadingRole ?
+        t`Share this ${resourceLabel}`
+      : t`You need admin access on this resource to manage sharing.`,
   };
 }
 ```
@@ -2472,7 +2454,6 @@ false for a workspace-published dashboard. Republishing an internal dashboard
 would emit `dashboard.published` every time.
 
 **Files:**
-
 - Modify: `shared/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts:20-30,69-73`
 - Modify: `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts:106-110`
 - Modify: `src/views/DashboardApp/DashboardShareModal/makeDashboardPublishAnalyticsEventFromDashboards/makeDashboardPublishAnalyticsEventFromDashboards.ts`
@@ -2598,7 +2579,6 @@ snapshot objects, which is not a side effect to bury in a confirmation someone
 clicked for a different reason.
 
 **Files:**
-
 - Modify: `src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy.ts`
 - Modify: `src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx`
 - Modify: `src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts`
@@ -2681,7 +2661,6 @@ git commit -m "feat(permissions): warn that Only me leaves a public dashboard pu
 ## Task 12: Discovery, the index query and the ordering
 
 **Files:**
-
 - Modify: `src/routes/_auth/$workspaceSlug/dashboards/index.tsx`
 - Modify: `src/views/DashboardApp/DashboardListView/DashboardListView.tsx:159-183`
 - Test: `src/views/DashboardApp/DashboardListView/DashboardListView.test.tsx` (create if absent)
@@ -2798,22 +2777,22 @@ then sort before mapping. The view already has `userProfile` in scope for
 `onCreateDashboard`:
 
 ```tsx
-const orderedDashboards = useMemo(() => {
-  return sortDashboardsForList(dashboards, userProfile?.userId);
-}, [dashboards, userProfile?.userId]);
+  const orderedDashboards = useMemo(() => {
+    return sortDashboardsForList(dashboards, userProfile?.userId);
+  }, [dashboards, userProfile?.userId]);
 ```
 
 and map over `orderedDashboards` instead of `dashboards`, passing the owner
 flag to the card:
 
 ```tsx
-<DashboardCard
-  key={dashboard.id}
-  dashboard={dashboard}
-  isOwnedByCurrentUser={dashboard.ownerId === userProfile?.userId}
-  offlineStatus={getDashboardOfflineStatus(dashboard)}
-  onClick={onCardClick}
-/>
+                <DashboardCard
+                  key={dashboard.id}
+                  dashboard={dashboard}
+                  isOwnedByCurrentUser={dashboard.ownerId === userProfile?.userId}
+                  offlineStatus={getDashboardOfflineStatus(dashboard)}
+                  onClick={onCardClick}
+                />
 ```
 
 - [ ] **Step 7: Verify**
@@ -2836,7 +2815,6 @@ git commit -m "feat(dashboards): let RLS decide the dashboards index"
 ## Task 13: Audience badges on the card
 
 **Files:**
-
 - Modify: `src/views/DashboardApp/DashboardListView/DashboardCard.tsx`
 - Test: `src/views/DashboardApp/DashboardListView/DashboardCard.test.tsx` (create)
 
@@ -2873,7 +2851,10 @@ describe("DashboardCard", () => {
 
   it("does not badge your own dashboards, which would be noise on every card", () => {
     render(
-      <DashboardCard dashboard={makeDashboard("draft")} isOwnedByCurrentUser />,
+      <DashboardCard
+        dashboard={makeDashboard("draft")}
+        isOwnedByCurrentUser
+      />,
     );
     expect(screen.queryByText("Shared with you")).toBeNull();
     expect(screen.queryByText("Yours")).toBeNull();
@@ -2913,34 +2894,28 @@ Expected: FAIL, unknown prop and missing badges.
 Add to `Props`:
 
 ```ts
-/** Drives the "Shared with you" badge; there is deliberately no "Yours". */
-isOwnedByCurrentUser: boolean;
+  /** Drives the "Shared with you" badge; there is deliberately no "Yours". */
+  isOwnedByCurrentUser: boolean;
 ```
 
 Add the badges inside the existing badge `Group`, before the offline ones:
 
 ```tsx
-{
-  !isOwnedByCurrentUser ? (
-    <Badge size="xs" color="grape" variant="light">
-      <Trans>Shared with you</Trans>
-    </Badge>
-  ) : null;
-}
-{
-  dashboard.visibility === "workspace" ? (
-    <Badge size="xs" color="blue" variant="light">
-      <Trans>Published to workspace</Trans>
-    </Badge>
-  ) : null;
-}
-{
-  dashboard.visibility === "public" ? (
-    <Badge size="xs" color="orange" variant="light">
-      <Trans>Public</Trans>
-    </Badge>
-  ) : null;
-}
+          {!isOwnedByCurrentUser ?
+            <Badge size="xs" color="grape" variant="light">
+              <Trans>Shared with you</Trans>
+            </Badge>
+          : null}
+          {dashboard.visibility === "workspace" ?
+            <Badge size="xs" color="blue" variant="light">
+              <Trans>Published to workspace</Trans>
+            </Badge>
+          : null}
+          {dashboard.visibility === "public" ?
+            <Badge size="xs" color="orange" variant="light">
+              <Trans>Public</Trans>
+            </Badge>
+          : null}
 ```
 
 - [ ] **Step 4: Run it to verify it passes**
@@ -2966,7 +2941,6 @@ internally would have stranded everyone holding a viewer share. Task 9 shipped
 the control, so the rule can land.
 
 **Files:**
-
 - Modify: `src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx`
 - Test: `src/routes/_auth/$workspaceSlug/dashboards/preview/-$dashboardId.test.tsx`
 
@@ -3017,28 +2991,28 @@ Expected: FAIL, `isAccessDenied` is undefined.
 In the preview route's loader:
 
 ```ts
-const canEdit = await UserClient.canAccessResource({
-  resourceType: "dashboard",
-  resourceId: params.dashboardId,
-  minRole: "editor",
-});
+    const canEdit = await UserClient.canAccessResource({
+      resourceType: "dashboard",
+      resourceId: params.dashboardId,
+      minRole: "editor",
+    });
 
-// A viewer may open a dashboard only once it is published. `draft` is the
-// state in which a dashboard is not ready for anyone but the people who
-// can edit it; P2 shipped the state and P3 shipped the control that leaves
-// it, so the rule can finally bind. See the P3 design, section 7.
-const isAccessDenied = !canEdit && dashboard.visibility === "draft";
+    // A viewer may open a dashboard only once it is published. `draft` is the
+    // state in which a dashboard is not ready for anyone but the people who
+    // can edit it; P2 shipped the state and P3 shipped the control that leaves
+    // it, so the rule can finally bind. See the P3 design, section 7.
+    const isAccessDenied = !canEdit && dashboard.visibility === "draft";
 
-return { dashboard, canEdit, isAccessDenied };
+    return { dashboard, canEdit, isAccessDenied };
 ```
 
 and in the component:
 
 ```tsx
-const { dashboard, canEdit, isAccessDenied } = Route.useLoaderData();
-if (isAccessDenied) {
-  return <DashboardAccessDeniedView />;
-}
+  const { dashboard, canEdit, isAccessDenied } = Route.useLoaderData();
+  if (isAccessDenied) {
+    return <DashboardAccessDeniedView />;
+  }
 ```
 
 Import `DashboardAccessDeniedView` from
@@ -3062,7 +3036,6 @@ git commit -m "feat(dashboards): require a published dashboard for viewer access
 ## Task 15: End-to-end coverage
 
 **Files:**
-
 - Create: `tests/e2e/dashboard-workspace-publishing.spec.ts`
 - Create: `tests/e2e/dashboard-discovery.spec.ts`
 
@@ -3083,12 +3056,16 @@ test("an owner publishes to the workspace and a colleague can read it", async ({
 }) => {
   const dashboard = await seedDashboard({ workspace, name: "Q3 Revenue" });
 
-  await ownerPage.goto(`/${workspace.slug}/dashboards/edit/${dashboard.id}`);
+  await ownerPage.goto(
+    `/${workspace.slug}/dashboards/edit/${dashboard.id}`,
+  );
   await ownerPage.getByRole("button", { name: "Share" }).click();
   await ownerPage
     .getByLabel("General access")
     .selectOption({ label: "Anyone in Dashboards" });
-  await ownerPage.getByRole("button", { name: "Publish to workspace" }).click();
+  await ownerPage
+    .getByRole("button", { name: "Publish to workspace" })
+    .click();
   await expect(
     ownerPage.getByText("This dashboard is published to your workspace"),
   ).toBeVisible();
@@ -3180,7 +3157,6 @@ git commit -m "test(e2e): cover workspace publishing and shared-dashboard discov
 ## Task 16: Documentation and the full verification sweep
 
 **Files:**
-
 - Modify: `docs/permissions-architecture.md`
 - Modify: `docs/superpowers/specs/2026-08-13-private-dashboards-design.md`
 
