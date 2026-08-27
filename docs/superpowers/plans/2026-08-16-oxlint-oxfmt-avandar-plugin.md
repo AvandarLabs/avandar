@@ -185,7 +185,10 @@ the plan; Phase 2 has to work with the result, not the text.
 6. **`.oxfmtignore` mirrors ESLint's ignore list** (`agent-skills/**`,
    `.claude/**`, `playwright-report/**`, and so on). Two files under
    `agent-skills/` are deliberate IIFE fragments that no parser reads
-   standalone, and vendored skill content should not be restyled.
+   standalone, and vendored skill content should not be restyled. `*.md`
+   and `*.gen.*` were missed on the first pass, so the Task 5 sweep did
+   reflow 95 markdown files; they have since been restored to their
+   pre-sweep state and the two globs added.
 7. **Losing `experimentalTernaries` broke `max-len` in three files.** Two
    needed comments rewrapped. `AnalyticsEventPayloads` was 29 conditionals
    deep, so its tail arms started past column 80 whatever they contained;
@@ -204,6 +207,15 @@ the plan; Phase 2 has to work with the result, not the text.
    `newlinesBetween: false`. `internalPattern` still claims `$/` even
    though the old `importOrder` did not, since `$/` is `shared/` and
    genuinely is our code; that costs about 68 files of churn.
+9. **The `.prettierignore` inversion silently disabled SQL formatting in
+   `writeFileFromTemplate`**, exactly as the 2026-08-21 refresh predicted.
+   `_formatFileWithPrettier` inferred its parser through `getFileInfo`,
+   which consults `.prettierignore` and returns null for every path outside
+   `supabase/schemas/`, so `ava dev new table --dir <elsewhere>` wrote
+   unformatted SQL and said nothing. The helper is now
+   `_formatSqlFileWithPrettier` and names `parser: "sql"` outright;
+   `resolveConfig` still supplies the `*.sql` override, which matches on
+   file name and so applies wherever the file lands.
 
 ### Task 1: Install oxfmt and write its config
 
@@ -263,9 +275,6 @@ Then edit `.oxfmtrc.json` so it contains at least:
 Delete any migrated `experimentalTernaries`. Default oxfmt `printWidth` is
 100; leaving it unset is a bug.
 
-<<<<<<< HEAD
-- [x] **Step 3: Write `.oxfmtignore`**
-=======
 > **Refresh 2026-08-21:** the `sortImports` block above is **not** a
 > faithful port of today's Prettier order, and the difference is not
 > cosmetic. `.prettierrc` `importOrder` is
@@ -282,8 +291,7 @@ Delete any migrated `experimentalTernaries`. Default oxfmt `printWidth` is
 > for `*.jsonc`; confirm oxfmt does not emit trailing commas into `.jsonc`
 > files, since `.oxlintrc.jsonc` may be one of them.
 
-- [ ] **Step 3: Write `.oxfmtignore`**
->>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
+- [x] **Step 3: Write `.oxfmtignore`**
 
 `.oxfmtignore` is the union of today's `.prettierignore` **and**
 `scripts/format-changed-files/ignore-patterns.txt`, because Task 5 runs
@@ -307,9 +315,6 @@ src/i18n/locales/*/messages.ts
 *.sql
 ```
 
-<<<<<<< HEAD
-- [x] **Step 4: Smoke-check one file without writing the repo**
-=======
 > **Refresh 2026-08-21:** the original snippet copied a stale
 > `.prettierignore` and would have let a whole-tree run loose on things no
 > formatter touches today. Changes and why:
@@ -329,8 +334,7 @@ src/i18n/locales/*/messages.ts
 >   `.prettierignore` gained after this plan was written. Those fixtures are
 >   deliberately byte-stable; do not let any formatter reflow them.
 
-- [ ] **Step 4: Smoke-check one file without writing the repo**
->>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
+- [x] **Step 4: Smoke-check one file without writing the repo**
 
 ```bash
 pnpm exec oxfmt --check src/main.tsx
@@ -405,9 +409,6 @@ EOF
 !supabase/schemas/**
 ```
 
-<<<<<<< HEAD
-- [x] **Step 3: Drop JS Prettier plugins**
-=======
 > **Refresh 2026-08-21:** this inversion has a second-order effect on
 > Task 4 that the plan did not account for.
 > `apps/ava-cli/.../writeFileFromTemplate.ts` decides whether to format by
@@ -419,8 +420,7 @@ EOF
 > silently stops formatting when a caller passes `--output-dir` elsewhere.
 > Task 4 Step 2 now covers the decision.
 
-- [ ] **Step 3: Drop JS Prettier plugins**
->>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
+- [x] **Step 3: Drop JS Prettier plugins**
 
 ```bash
 pnpm remove @ianvs/prettier-plugin-sort-imports prettier-plugin-tailwindcss
@@ -677,9 +677,6 @@ EOF
 - Produces: a single formatting commit so later phases do not mix style
   churn with lint/plugin work.
 
-<<<<<<< HEAD
-- [x] **Step 1: Write**
-=======
 - [ ] **Step 0: Triage the 36 `// prettier-ignore` directives**
 
 ```bash
@@ -704,9 +701,16 @@ grep -rn --include='*.ts' --include='*.tsx' --exclude-dir=node_modules \
 > likeliest to be inert now that the sort plugin is gone; verify rather than
 > assume. This triage lands in its own commit, before the repo-wide write,
 > so Step 3's formatting commit stays reviewable.
+>
+> **Finding 2026-08-27:** oxfmt 0.64.0 *does* honour `// prettier-ignore`
+> (and `// oxfmt-ignore`). Verified directly, and all 36 sites came through
+> the Task 5 sweep unchanged, including the trailing
+> `Name, // prettier-ignore` shape inside import specifier lists in
+> `shared/models/AvaMap/**`. The premise of this step no longer holds, so
+> it is left unticked pending a decision rather than done: the directives
+> are inert-but-harmless, not broken.
 
-- [ ] **Step 1: Write**
->>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
+- [x] **Step 1: Write**
 
 ```bash
 pnpm exec oxfmt
@@ -714,9 +718,6 @@ pnpm exec oxfmt
 
 Do not pass SQL paths. `.oxfmtignore` already has `*.sql`.
 
-<<<<<<< HEAD
-- [x] **Step 2: Sanity**
-=======
 > **Refresh 2026-08-21:** before this write, diff `.oxfmtignore` against
 > `scripts/format-changed-files/ignore-patterns.txt` one more time and run
 > `pnpm exec oxfmt --check 2>&1 | wc -l` first. Nothing in this repo has
@@ -726,8 +727,7 @@ Do not pass SQL paths. `.oxfmtignore` already has `*.sql`.
 > a `*.gen.*` file, the ignore file is wrong. Stop and fix it rather than
 > committing the sweep.
 
-- [ ] **Step 2: Sanity**
->>>>>>> ac5a9694449bfeb9901262243f90b1cf1f704f90
+- [x] **Step 2: Sanity**
 
 ```bash
 pnpm exec oxfmt --check
