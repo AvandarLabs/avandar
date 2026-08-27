@@ -677,7 +677,7 @@ EOF
 - Produces: a single formatting commit so later phases do not mix style
   churn with lint/plugin work.
 
-- [ ] **Step 0: Triage the 36 `// prettier-ignore` directives**
+- [x] **Step 0: Triage the 36 `// prettier-ignore` directives**
 
 ```bash
 grep -rn --include='*.ts' --include='*.tsx' --exclude-dir=node_modules \
@@ -702,13 +702,19 @@ grep -rn --include='*.ts' --include='*.tsx' --exclude-dir=node_modules \
 > assume. This triage lands in its own commit, before the repo-wide write,
 > so Step 3's formatting commit stays reviewable.
 >
-> **Finding 2026-08-27:** oxfmt 0.64.0 *does* honour `// prettier-ignore`
-> (and `// oxfmt-ignore`). Verified directly, and all 36 sites came through
-> the Task 5 sweep unchanged, including the trailing
-> `Name, // prettier-ignore` shape inside import specifier lists in
-> `shared/models/AvaMap/**`. The premise of this step no longer holds, so
-> it is left unticked pending a decision rather than done: the directives
-> are inert-but-harmless, not broken.
+> **Resolved 2026-08-27:** oxfmt 0.64.0 *does* honour `// prettier-ignore`,
+> so the directives were never inert. Stripping all 36 and re-running oxfmt
+> collapses each guarded import/export onto one line of up to 133
+> characters, and turns
+> `DuckDbSpatialAvailability.ts`'s hand-wrapped return type into an
+> 88-character `max-len` error. They are load-bearing.
+>
+> All 36 were therefore renamed to oxfmt's native `// oxfmt-ignore` rather
+> than deleted. Reading a competitor's directive name is an undocumented
+> courtesy and Phase 2 removes the last reason anyone would expect Prettier
+> here. The rename is a proven no-op: every one of the 20 files is
+> byte-identical once the directive name is normalised, and
+> `oxfmt --check` stays clean.
 
 - [x] **Step 1: Write**
 

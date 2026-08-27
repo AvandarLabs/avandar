@@ -189,7 +189,7 @@ describe("compileMapLayerSpatialQuery grid bin", () => {
     );
 
     expect(rawSql).toContain(
-      'sum("population") AS "__avandar_denominator"', // prettier-ignore
+      'sum("population") AS "__avandar_denominator"', // oxfmt-ignore
     );
   });
 

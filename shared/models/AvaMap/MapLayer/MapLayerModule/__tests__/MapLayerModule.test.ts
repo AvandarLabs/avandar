@@ -7,7 +7,7 @@ import {
   createNumericColumn,
 } from "$/models/AvaMap/MapLayer/MapLayerModule/__tests__/MapLayerModule.fixtures.ts";
 import {
-  QueryColumn, // prettier-ignore
+  QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /** An exact layer whose points are aggregated into fixed hexagonal cells. */

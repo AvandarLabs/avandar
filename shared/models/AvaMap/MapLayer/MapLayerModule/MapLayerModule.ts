@@ -7,17 +7,17 @@ import {
   EMPTY_DISPUTED_STATUS_VALUES,
 } from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
 import {
-  QueryColumn, // prettier-ignore
+  QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import {
-  StructuredQuery, // prettier-ignore
+  StructuredQuery, // oxfmt-ignore
 } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import type {
   AreaGeoBinding,
-  GeoBindingColumnNames, // prettier-ignore
+  GeoBindingColumnNames, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
-  FillSymbology, // prettier-ignore
+  FillSymbology, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type {
   AggregateOnlyMapLayerRead,
@@ -26,7 +26,7 @@ import type {
   StandardMapLayerRead,
 } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 import type {
-  QueryDataSource, // prettier-ignore
+  QueryDataSource, // oxfmt-ignore
 } from "$/models/queries/QueryDataSource/QueryDataSource.ts";
 
 /** Fallback symbol color when the author has not picked one. */

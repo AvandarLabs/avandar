@@ -1,6 +1,6 @@
 import type { AvaMapConfigRead } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 import type {
-  ExportLayout, // prettier-ignore
+  ExportLayout, // oxfmt-ignore
 } from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
 import type { Expect, IsEqual } from "@avandar/utils";
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  DEFAULT_EXPORT_LAYOUT, // prettier-ignore
+  DEFAULT_EXPORT_LAYOUT, // oxfmt-ignore
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts";
 import {
   AvaMapConfigV1LayerSchema,

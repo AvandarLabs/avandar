@@ -1,7 +1,7 @@
 import type { MapLayerId } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type {
-  DatasetColumn, // prettier-ignore
+  DatasetColumn, // oxfmt-ignore
 } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { UUID } from "@avandar/utils";

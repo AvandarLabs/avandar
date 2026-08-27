@@ -8,10 +8,10 @@ import type {
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
   FillSymbology,
-  LayerSymbology, // prettier-ignore
+  LayerSymbology, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type {
-  LegendConfig, // prettier-ignore
+  LegendConfig, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/LegendConfig.types.ts";
 import type {
   AggregateOnlySensitivity,
@@ -19,10 +19,10 @@ import type {
   JitterSensitivity,
 } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types.ts";
 import type {
-  QueryColumn, // prettier-ignore
+  QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
-  StructuredQuery, // prettier-ignore
+  StructuredQuery, // oxfmt-ignore
 } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import type { Model } from "@avandar/models";
 import type { UUID } from "@avandar/utils";

@@ -1,5 +1,5 @@
 import type {
-  DisputedStatusValues, // prettier-ignore
+  DisputedStatusValues, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/DisputedStatus.types.ts";
 import type { MapLayerRead } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 

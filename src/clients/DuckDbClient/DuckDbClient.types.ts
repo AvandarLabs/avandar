@@ -3,7 +3,7 @@ import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregat
 import type { UUID } from "@avandar/utils";
 
 export type {
-  DuckDbSpatialAvailability, // prettier-ignore
+  DuckDbSpatialAvailability, // oxfmt-ignore
 } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 
 /**
