@@ -762,6 +762,18 @@ If `git status` shows no changes, skip the commit.
 Do not add `eslint-plugin-avandar` yet. Goal: same policy as
 `eslint.config.js`, faster, no ESLint CLI.
 
+### Phase 2 as built (deviations from the text below)
+
+- Oxlint and `oxlint-plugin-eslint` are installed at 1.80.0. The flat config migration uses `@oxlint/migrate`, then is hand-tuned from the live ESLint policy.
+- The final config uses native import, react, jsx-a11y, typescript, and core rules, with JS fallbacks. `eslint-plugin-react` remains for react-js function-component-definition parity because native Oxlint 1.80 misidentifies a `forwardRef` pattern. `eslint-import-resolver-typescript` remains for `import-js/no-unresolved` aliases and workspaces. Do not remove either package while those config entries remain.
+- `react.version` is pinned to installed `19.2.5` because Oxlint 1.80 rejects `detect`; update it with React upgrades.
+- `.cursor/**` and `.opencode/**` are Oxlint ignores because Oxlint follows their skill symlinks while ESLint does not, preserving the linted file set.
+- Measured and deferred to Phase 3 Task 13: `curly` (5), `prefer-template` (17), `typescript/consistent-type-imports` (340), and `import/no-default-export` (41). `typescript/no-explicit-any` has zero unsuppressed hits and is enabled.
+- Existing ESLint-only suppressions for the nine migration errors are converted or replaced without broad config exemptions. Native import and React parity warnings remain nonblocking at their former warning severity.
+- React Doctor sets `adoptExistingLintConfig: false` because it already runs after root Oxlint and its temporary extends config breaks import-js resolution under Oxlint 1.80.
+- `lint:ts:fix-changed` has a portable shell argument-count guard so GNU xargs cannot turn empty input into a repo-wide `oxlint --fix`.
+- ESLint CLI, config, and Vite overlay are removed. Retained ESLint ecosystem packages are runtime inputs to Oxlint JS plugins, not an ESLint CLI fallback.
+
 ### Task 6: Install oxlint and migrate the flat config
 
 **Files:**
@@ -775,7 +787,7 @@ Do not add `eslint-plugin-avandar` yet. Goal: same policy as
 - Produces: a starting oxlint config. Hand-tune in Task 7; do not delete
   ESLint until Task 8 is green.
 
-- [ ] **Step 1: Install**
+- [x] **Step 1: Install**
 
 ```bash
 pnpm add -D oxlint@latest oxlint-plugin-eslint
@@ -783,7 +795,7 @@ pnpm add -D oxlint@latest oxlint-plugin-eslint
 
 Same `minimumReleaseAge` rule as oxfmt.
 
-- [ ] **Step 2: Migrate**
+- [x] **Step 2: Migrate**
 
 ```bash
 pnpm exec oxlint --migrate eslint.config.js
@@ -792,7 +804,7 @@ pnpm exec oxlint --migrate eslint.config.js
 If the CLI is `npx @oxlint/migrate eslint.config.js` on this version, use
 that (Context7 `/websites/oxc_rs_guide_usage`, "Run migration tool").
 
-- [ ] **Step 3: Commit the generated file plus any migrate notes**
+- [x] **Step 3: Commit the generated file plus any migrate notes**
 
 ```bash
 git add .oxlintrc.json package.json pnpm-lock.yaml
@@ -929,9 +941,9 @@ Phase 3 Task 13 alongside `--fix` and a dedicated rewrite commit. Record
 in the PR which of these five were deferred to Task 13. The Task 9 sweep
 may drop or add names on that list if native oxlint coverage changed.
 
-- [ ] **Step 1: Edit `.oxlintrc.json` to the mapping above**
+- [x] **Step 1: Edit `.oxlintrc.json` to the mapping above**
 
-- [ ] **Step 2: Compare**
+- [x] **Step 2: Compare**
 
 ```bash
 pnpm exec eslint . 2>&1 | tee /tmp/eslint-out.txt | tail
@@ -942,7 +954,7 @@ Expected: oxlint is not missing a currently-failing ESLint rule we care
 about. New oxlint-only hits: either fix the code (mechanical) or disable
 the new rule if it is unused-vars/correctness we agreed to keep off.
 
-- [ ] **Step 3: Commit the config only**
+- [x] **Step 3: Commit the config only**
 
 ```bash
 git add .oxlintrc.json
@@ -1003,7 +1015,7 @@ Keep until native replacements exist (Task 7 `jsPlugins`):
 Keep `prettier` + `prettier-plugin-sql`. Keep `stylelint*`. Keep
 `react-doctor`.
 
-- [ ] **Step 1: Point scripts at oxlint**
+- [x] **Step 1: Point scripts at oxlint**
 
 Root:
 
@@ -1026,20 +1038,20 @@ pnpm exec oxlint --fix "${JSTS[@]}" >&2 || true
 > rather than dropping the behaviour. The `|| true` masks the exit code but
 > not the noise.
 
-- [ ] **Step 2: Remove the Vite ESLint overlay**
+- [x] **Step 2: Remove the Vite ESLint overlay**
 
 Delete `import eslintPlugin from "@nabla/vite-plugin-eslint"` and
 `eslintPlugin()` from `vite.config.ts`. Do not replace it with an oxlint
 Vite plugin.
 
-- [ ] **Step 3: Delete `eslint.config.js` and uninstall the ESLint stack**
+- [x] **Step 3: Delete `eslint.config.js` and uninstall the ESLint stack**
 
 ```bash
 pnpm remove eslint @eslint/js typescript-eslint globals eslint-config-prettier eslint-import-resolver-typescript eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-refresh eslint-plugin-jsx-a11y eslint-plugin-unused-imports eslint-plugin-tailwindcss @nabla/vite-plugin-eslint
 rm eslint.config.js
 ```
 
-- [ ] **Step 4: Docs**
+- [x] **Step 4: Docs**
 
 `.cursor/rules/global.mdc` lines 30 to 31: `Linter: Oxlint` (drop "ESLint
 v9"); the Formatter line was already handled in Task 3.
@@ -1055,7 +1067,7 @@ upgrade is now unblocked.
 `avandar-code-review` at review time, so a stale tool name here sends review
 agents looking for a linter that is gone.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 ```bash
 pnpm lint
@@ -1065,7 +1077,7 @@ Expected: exit 0, or a punch list of real violations you fix in this
 task if they are small. If `import/no-default-export` (etc.) was deferred
 to Task 13, it must still be `"off"` here so this command is green.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -u package.json pnpm-lock.yaml apps/pipeline-server/package.json apps/dev-fanout-server/package.json scripts/format-changed-files/format-changed-files.sh vite.config.ts .cursor/rules/global.mdc README.md scripts/verify-packages.sh
