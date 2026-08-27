@@ -119,9 +119,7 @@ function _makeRecordingPickerAPI(): {
   const builder = {
     addView: (viewOrId: unknown) => {
       // Recorded in call order, since the tab order is the `addView` order.
-      addedViews.push(
-        optionsByView.get(viewOrId as object) ?? viewOrId,
-      );
+      addedViews.push(optionsByView.get(viewOrId as object) ?? viewOrId);
       builderCalls.set("addView", [viewOrId]);
       return builder;
     },

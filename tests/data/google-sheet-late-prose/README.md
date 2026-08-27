@@ -17,7 +17,7 @@ Could not convert string 'Female share of graduates ...' to DOUBLE
 The failure was invisible until late because the import's preview step is
 SheetJS rather than DuckDB, and SheetJS reads the same workbook happily. The
 user was told the preview parsed, then the background transcode died.
-`buildReadXlsxArgs` now passes `all_varchar = true`, which is also the type both
+`makeReadXlsxArgs` now passes `all_varchar = true`, which is also the type both
 xlsx callers record for every column.
 
 The second tab (`Country`) exists so the tab selector has more than one option,

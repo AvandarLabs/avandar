@@ -18,13 +18,9 @@ function _normalizeBaseURL(rawBaseURL: string): string {
   return parsed.toString().replace(/\/+$/, "");
 }
 
-function _getBaseURL(): string {
-  return _normalizeBaseURL(requireEnv("AVA_PIPELINE_SERVER_URL"));
-}
-
 export function getPipelineServerClientConfig(): PipelineServerClientConfig {
   return {
-    baseURL: _getBaseURL(),
+    baseURL: _normalizeBaseURL(requireEnv("AVA_PIPELINE_SERVER_URL")),
     serverSecret: requireEnv("AVA_PIPELINE_SERVER_SECRET"),
   };
 }

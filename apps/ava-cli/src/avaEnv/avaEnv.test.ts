@@ -45,7 +45,12 @@ describe("getAvaEnvTargetFromArgv", () => {
 
   it("refuses both at once rather than picking one", () => {
     expect(() => {
-      return getAvaEnvTargetFromArgv(["supabase", "run", "--staging", "--prod"]);
+      return getAvaEnvTargetFromArgv([
+        "supabase",
+        "run",
+        "--staging",
+        "--prod",
+      ]);
     }).toThrow(/at most one of --staging and --prod/);
   });
 

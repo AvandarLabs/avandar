@@ -9,10 +9,19 @@ export type ReadXlsxArgsOptions = {
 
   /** Cell range, e.g. `A4:D1048576`. Omit to read from the first cell. */
   range?: string;
+
+  /**
+   * Whether to stop at the first empty row. Defaults to true.
+   *
+   * Always emitted rather than left to DuckDB, whose own default flips with the
+   * range: on without one, off with one, which would pad a ranged read out to
+   * the format's maximum row. Pass false for a probe that must see past a gap.
+   */
+  stopAtEmpty?: boolean;
 };
 
 /**
- * Builds the argument list for a `read_xlsx(...)` call.
+ * Makes the argument list for a `read_xlsx(...)` call.
  *
  * Split out from the query text so the reader's behavior under these arguments
  * can be executed against a real DuckDB in a test, which is the only way to
@@ -31,12 +40,13 @@ export type ReadXlsxArgsOptions = {
  * records, since both xlsx callers write `column_type: "VARCHAR"` for every
  * sniffed column.
  *
- * @param options The header, sheet and range to read.
+ * @param options The header, sheet, range and empty-row handling to read with.
  * @returns The comma-separated arguments, ready to follow the file argument.
  */
-export function buildReadXlsxArgs(
+export function makeReadXlsxArgs(
   options: Readonly<ReadXlsxArgsOptions>,
 ): string {
+  const stopAtEmpty = options.stopAtEmpty ?? true;
   const args = [
     `header = ${options.hasHeader}`,
     "all_varchar = true",
@@ -44,9 +54,7 @@ export function buildReadXlsxArgs(
       ""
     : `sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`,
     options.range === undefined ? "" : `range = '${options.range}'`,
-    // Naming a range turns `stop_at_empty` off, which would pad the read out to
-    // the format's maximum row, so it is switched back on alongside the range.
-    options.range === undefined ? "" : "stop_at_empty = true",
+    `stop_at_empty = ${stopAtEmpty}`,
   ];
   return args
     .filter((arg) => {

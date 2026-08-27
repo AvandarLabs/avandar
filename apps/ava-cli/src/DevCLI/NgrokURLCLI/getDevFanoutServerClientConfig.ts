@@ -18,10 +18,6 @@ function _normalizeBaseURL(rawBaseURL: string): string {
   return parsed.toString().replace(/\/+$/, "");
 }
 
-function _getBaseURL(): string {
-  return _normalizeBaseURL(requireEnv("AVA_DEV_FANOUT_SERVER_URL"));
-}
-
 /**
  * Create an authenticated client config for the dev-fanout-server.
  *
@@ -30,7 +26,7 @@ function _getBaseURL(): string {
  */
 export function getDevFanoutServerClientConfig(): DevFanoutClientConfig {
   return {
-    baseURL: _getBaseURL(),
+    baseURL: _normalizeBaseURL(requireEnv("AVA_DEV_FANOUT_SERVER_URL")),
     adminToken: requireEnv("AVA_DEV_FANOUT_ADMIN_SERVER_SECRET"),
   };
 }

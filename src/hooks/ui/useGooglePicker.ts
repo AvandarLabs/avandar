@@ -85,9 +85,9 @@ const VIEW_LABELS = {
  * of this.
  */
 function _spreadsheetViews(
-  pickerAPI: GooglePickerAPI,
-  i18n: I18n,
+  options: Readonly<{ pickerAPI: GooglePickerAPI; i18n: I18n }>,
 ): Array<GPickerDocsView | GPickerViewId> {
+  const { pickerAPI, i18n } = options;
   if (typeof pickerAPI.DocsView !== "function") {
     return [pickerAPI.ViewId.SPREADSHEETS];
   }
@@ -183,7 +183,7 @@ export function useGooglePicker({
     const builder = new pickerAPI.PickerBuilder();
     // Added in a loop because the tab order is the `addView` order, and a
     // fluent chain cannot vary in length.
-    _spreadsheetViews(pickerAPI, i18n).forEach((view) => {
+    _spreadsheetViews({ pickerAPI, i18n }).forEach((view) => {
       builder.addView(view);
     });
 

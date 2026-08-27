@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import * as XLSX from "xlsx";
-import { buildReadXlsxArgs } from "@/clients/DuckDbClient/buildReadXlsxArgs/buildReadXlsxArgs";
+import { makeReadXlsxArgs } from "@/clients/DuckDbClient/makeReadXlsxArgs/makeReadXlsxArgs";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 
 /**
@@ -32,17 +32,43 @@ const NUMERIC_ROW_COUNT = 700;
  * {@link NUMERIC_ROW_COUNT} rows and then one long sentence.
  */
 function _lateProseWorkbookBytes(): Uint8Array<ArrayBuffer> {
-  const rows: Array<[string, string | number]> = [["series", "value"]];
-  for (let index = 0; index < NUMERIC_ROW_COUNT; index++) {
-    rows.push([`series-${index}`, index]);
-  }
-  rows.push(["series-prose", LATE_PROSE]);
+  const numericRows: Array<[string, string | number]> = Array.from(
+    { length: NUMERIC_ROW_COUNT },
+    (_unused, index) => {
+      return [`series-${index}`, index];
+    },
+  );
+  const rows: Array<[string, string | number]> = [
+    ["series", "value"],
+    ...numericRows,
+    ["series-prose", LATE_PROSE],
+  ];
 
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(
     workbook,
     XLSX.utils.aoa_to_sheet(rows),
     "Stats",
+  );
+  const buffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "buffer",
+  }) as Buffer;
+  return Uint8Array.from(buffer) as Uint8Array<ArrayBuffer>;
+}
+
+/**
+ * A one-tab workbook with a blank row in the middle and data after it.
+ *
+ * The width probe reads a window like this: a title block can leave a gap
+ * before the widest row, so the probe must be able to see past one.
+ */
+function _gappedWorkbookBytes(): Uint8Array<ArrayBuffer> {
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(
+    workbook,
+    XLSX.utils.aoa_to_sheet([["a", "b"], ["before", "1"], [], ["after", "2"]]),
+    "Gapped",
   );
   const buffer = XLSX.write(workbook, {
     bookType: "xlsx",
@@ -63,20 +89,22 @@ function _stageWorkbook(xlsxBytes: Uint8Array<ArrayBuffer>): string {
 
 /** Reads a staged workbook with the production argument list. */
 async function _readWorkbook(
-  stagedFile: string,
+  options: Readonly<{
+    stagedFile: string;
+    readArgs?: Parameters<typeof makeReadXlsxArgs>[0];
+  }>,
 ): Promise<Array<Record<string, unknown>>> {
+  const readArgs = makeReadXlsxArgs(options.readArgs ?? { hasHeader: true });
   return withDuckDb(async (connection) => {
     await connection.run("INSTALL excel; LOAD excel;");
     const reader = await connection.runAndReadAll(
-      `SELECT * FROM read_xlsx('${stagedFile}', ${buildReadXlsxArgs({
-        hasHeader: true,
-      })})`,
+      `SELECT * FROM read_xlsx('${options.stagedFile}', ${readArgs})`,
     );
     return reader.getRowObjects() as Array<Record<string, unknown>>;
   });
 }
 
-describe("buildReadXlsxArgs", () => {
+describe("makeReadXlsxArgs", () => {
   it("reads a column that turns from numbers into prose partway down", async () => {
     // Left to its own type inference, `read_xlsx` decides this column is a
     // DOUBLE from the rows it samples and then fails the whole read on the
@@ -84,7 +112,7 @@ describe("buildReadXlsxArgs", () => {
     // reported a successful preview.
     const stagedFile = _stageWorkbook(_lateProseWorkbookBytes());
 
-    const rows = await _readWorkbook(stagedFile);
+    const rows = await _readWorkbook({ stagedFile });
 
     expect(rows).toHaveLength(NUMERIC_ROW_COUNT + 1);
     expect(rows.at(-1)?.value).toBe(LATE_PROSE);
@@ -96,8 +124,48 @@ describe("buildReadXlsxArgs", () => {
     // the dataset was saved with.
     const stagedFile = _stageWorkbook(_lateProseWorkbookBytes());
 
-    const rows = await _readWorkbook(stagedFile);
+    const rows = await _readWorkbook({ stagedFile });
 
     expect(rows[0]?.value).toBe("0");
+  });
+
+  // The width probe's argument shape. It reads a fixed window that may contain
+  // a gap, so it is the one caller that needs the read to continue past a blank
+  // row rather than treat it as the end of the data.
+  it("reads past a blank row when told not to stop at one", async () => {
+    const stagedFile = _stageWorkbook(_gappedWorkbookBytes());
+
+    const rows = await _readWorkbook({
+      stagedFile,
+      readArgs: {
+        hasHeader: false,
+        range: "A1:B10",
+        stopAtEmpty: false,
+      },
+    });
+
+    expect(
+      rows.some((row) => {
+        return Object.values(row).includes("after");
+      }),
+    ).toBe(true);
+  });
+
+  // The transcode's shape, and the reason `stop_at_empty` is emitted rather
+  // than left to DuckDB: naming a range turns its own default off, which would
+  // pad the read out to the format's maximum row.
+  it("stops at a blank row by default, even with a range named", async () => {
+    const stagedFile = _stageWorkbook(_gappedWorkbookBytes());
+
+    const rows = await _readWorkbook({
+      stagedFile,
+      readArgs: { hasHeader: false, range: "A1:B10" },
+    });
+
+    expect(
+      rows.some((row) => {
+        return Object.values(row).includes("after");
+      }),
+    ).toBe(false);
   });
 });

@@ -47,7 +47,7 @@ const FIXTURE_TOTAL_ROW_COUNT = 701;
 type DriveRequestLog = { urls: string[] };
 
 /** Matches the dataset detail URL a completed save lands on. */
-function datasetMetaUrlPattern(workspaceSlug: string): RegExp {
+function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
   const escaped = workspaceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(`/${escaped}/data-manager/[0-9a-f-]{36}`, "i");
 }
@@ -58,7 +58,7 @@ function datasetMetaUrlPattern(workspaceSlug: string): RegExp {
  * One handler for both endpoints rather than two patterns, so the order
  * Playwright resolves overlapping routes in cannot change which one wins.
  */
-async function stubDriveExport(page: Page): Promise<DriveRequestLog> {
+async function _stubDriveExport(page: Page): Promise<DriveRequestLog> {
   const log: DriveRequestLog = { urls: [] };
   const workbookBytes = readFileSync(FIXTURE_PATH);
 
@@ -86,7 +86,7 @@ async function stubDriveExport(page: Page): Promise<DriveRequestLog> {
 }
 
 /** Opens the Connectors tab and picks a sheet through the stubbed Picker. */
-async function pickSheetInConnectorsTab(
+async function _pickSheetInConnectorsTab(
   page: Page,
   workspaceSlug: string,
 ): Promise<void> {
@@ -112,7 +112,7 @@ async function pickSheetInConnectorsTab(
  * says nothing. The transcode that used to choke on it is covered after the
  * save instead, by the parquet.
  */
-async function expectImportedPreview(
+async function _expectImportedPreview(
   page: Page,
   expectedDatasetName: string,
 ): Promise<void> {
@@ -132,110 +132,122 @@ async function expectImportedPreview(
   ).toBeVisible({ timeout: SHORT_WAIT });
 }
 
-test.describe("Google Sheets connector", () => {
-  // Datasets first, tokens second. `datasets__google_sheets.google_account_id`
-  // is a foreign key onto `tokens__google`, so dropping the token while an
-  // imported sheet still references it fails the constraint.
-  test.afterEach(async ({ e2eWorkerDb }) => {
-    const admin = createSupabaseAdminClient();
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: e2eWorkerDb.workspaceSlug,
-    });
-    await deleteAllDatasetsInWorkspaceForE2E({
-      supabaseAdminClient: admin,
-      workspaceId,
-    });
-    await removeGoogleTokens(e2eWorkerDb.primaryUser.email);
+/**
+ * Drops everything either test creates: the imported dataset and the token.
+ *
+ * Datasets first, tokens second. `datasets__google_sheets.google_account_id`
+ * is a foreign key onto `tokens__google`, so dropping the token while an
+ * imported sheet still references it fails the constraint.
+ */
+async function _cleanUpGoogleSheetImport(
+  e2eWorkerDb: Readonly<{
+    workspaceSlug: string;
+    primaryUser: Readonly<{ email: string }>;
+  }>,
+): Promise<void> {
+  const admin = createSupabaseAdminClient();
+  const workspaceId = await getWorkspaceIdBySlug({
+    supabaseAdminClient: admin,
+    slug: e2eWorkerDb.workspaceSlug,
   });
+  await deleteAllDatasetsInWorkspaceForE2E({
+    supabaseAdminClient: admin,
+    workspaceId,
+  });
+  await removeGoogleTokens(e2eWorkerDb.primaryUser.email);
+}
 
-  // A fresh browser process: the workbook is small, but the parse is
-  // DuckDB-WASM and this spec runs late enough in the suite to inherit the
-  // shared process's accumulated pressure (see `freshBrowserPage`).
+test.describe("Google Sheets connector", () => {
   test("imports a picked sheet, parsing a column that turns into prose", async ({
-    freshBrowserPage: page,
+    page,
     e2eWorkerDb,
   }) => {
-    // A future expiry, so `google-auth/tokens` returns this token untouched
-    // instead of trying to refresh a fake one against Google.
-    await seedGoogleToken({
-      email: e2eWorkerDb.primaryUser.email,
-      accessToken: "ya29.e2e-stubbed-access-token",
-      refreshToken: "1//e2e-stubbed-refresh-token",
-      expiryDate: new Date(Date.now() + 60 * 60 * 1000),
-    });
-    await installFakeGooglePicker(page, FIXTURE_SHEET);
-    const driveLog = await stubDriveExport(page);
+    try {
+      // A future expiry, so `google-auth/tokens` returns this token untouched
+      // instead of trying to refresh a fake one against Google.
+      await seedGoogleToken({
+        email: e2eWorkerDb.primaryUser.email,
+        accessToken: "ya29.e2e-stubbed-access-token",
+        refreshToken: "1//e2e-stubbed-refresh-token",
+        expiryDate: new Date(Date.now() + 60 * 60 * 1000),
+      });
+      await installFakeGooglePicker(page, FIXTURE_SHEET);
+      const driveLog = await _stubDriveExport(page);
 
-    await signInWithEmailPassword(page, {
-      email: e2eWorkerDb.primaryUser.email,
-      password: e2eWorkerDb.primaryUser.password,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-    await pickSheetInConnectorsTab(page, e2eWorkerDb.workspaceSlug);
+      await signInWithEmailPassword(page, {
+        email: e2eWorkerDb.primaryUser.email,
+        password: e2eWorkerDb.primaryUser.password,
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+      await _pickSheetInConnectorsTab(page, e2eWorkerDb.workspaceSlug);
 
-    await expect(
-      page.getByText(`Selected document: ${FIXTURE_SHEET.name}`),
-    ).toBeVisible({ timeout: LONG_WAIT });
+      await expect(
+        page.getByText(`Selected document: ${FIXTURE_SHEET.name}`),
+      ).toBeVisible({ timeout: LONG_WAIT });
 
-    await expectImportedPreview(page, FIXTURE_SHEET.name);
+      await _expectImportedPreview(page, FIXTURE_SHEET.name);
 
-    // Both Drive calls must declare shared drive support. Without it Drive
-    // answers 404 `notFound` for any file that lives in a shared drive, which
-    // the client can only read as a withdrawn per-file grant.
-    expect(driveLog.urls.length).toBeGreaterThanOrEqual(2);
-    driveLog.urls.forEach((url) => {
-      expect(url).toContain("supportsAllDrives=true");
-    });
+      // Both Drive calls must declare shared drive support. Without it Drive
+      // answers 404 `notFound` for any file that lives in a shared drive, which
+      // the client can only read as a withdrawn per-file grant.
+      expect(driveLog.urls.length).toBeGreaterThanOrEqual(2);
+      driveLog.urls.forEach((url) => {
+        expect(url).toContain("supportsAllDrives=true");
+      });
 
-    // Saving is what makes this cover the transcode: the parquet uploaded here
-    // is the output of the `read_xlsx` that used to abort on the prose cell in
-    // row 702. No parquet, no upload, and this poll never turns true.
-    //
-    // Saved directly rather than through the shared cloud-sync save helper,
-    // which first looks for the offline-only checkbox. A `google_sheets` source
-    // has nowhere offline to live (see `DatasetSource.canBeOfflineOnly`), so
-    // that control is deliberately absent here and the dataset is always
-    // cloud-stored.
-    await page.getByRole("button", { name: "Save Dataset" }).click();
-    await expect
-      .poll(
-        () => {
-          return datasetMetaUrlPattern(e2eWorkerDb.workspaceSlug).test(
-            page.url(),
-          );
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toBe(true);
+      // Saving is what makes this cover the transcode: the parquet uploaded
+      // here is the output of the `read_xlsx` that used to abort on the prose
+      // cell in row 702. No parquet, no upload, and this poll never turns
+      // true.
+      //
+      // Saved directly rather than through the shared cloud-sync save helper,
+      // which first looks for the offline-only checkbox. A `google_sheets`
+      // source has nowhere offline to live (see
+      // `DatasetSource.canBeOfflineOnly`), so
+      // that control is deliberately absent here and the dataset is always
+      // cloud-stored.
+      await page.getByRole("button", { name: "Save Dataset" }).click();
+      await expect
+        .poll(
+          () => {
+            return _datasetMetaUrlPattern(e2eWorkerDb.workspaceSlug).test(
+              page.url(),
+            );
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toBe(true);
 
-    const datasetId = parseDatasetIdFromDataManagerUrl({
-      url: page.url(),
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
-    if (!datasetId) {
-      throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
+      const datasetId = parseDatasetIdFromDataManagerUrl({
+        url: page.url(),
+        workspaceSlug: e2eWorkerDb.workspaceSlug,
+      });
+      if (!datasetId) {
+        throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
+      }
+
+      expect(datasetId).toBeTruthy();
+
+      // The summary's row count is read with `COUNT(*)` over the transcoded
+      // table, so it is only reachable if the transcode finished. All 701 rows,
+      // not just the sniffed preview: an off-by-many here would mean the read
+      // stopped early.
+      await page.getByRole("tab", { name: "Data Summary" }).click();
+      await expect
+        .poll(
+          async () => {
+            const outline = await page
+              .getByRole("navigation", { name: "Column outline" })
+              .innerText();
+            const match = outline.match(/(\d[\d,]*) rows/i);
+            return match?.[1] ? Number(match[1].replaceAll(",", "")) : 0;
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toBe(FIXTURE_TOTAL_ROW_COUNT);
+    } finally {
+      await _cleanUpGoogleSheetImport(e2eWorkerDb);
     }
-
-    expect(datasetId).toBeTruthy();
-
-    // The summary's row count is read with `COUNT(*)` over the transcoded
-    // table, so it is only reachable if the transcode finished. All 701 rows,
-    // not just the sniffed preview: an off-by-many here would mean the read
-    // stopped early.
-    await page.getByRole("tab", { name: "Data Summary" }).click();
-    await expect
-      .poll(
-        async () => {
-          const outline = await page
-            .getByRole("navigation", { name: "Column outline" })
-            .innerText();
-          const match = outline.match(/(\d[\d,]*) rows/i);
-          return match?.[1] ? Number(match[1].replaceAll(",", "")) : 0;
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toBe(FIXTURE_TOTAL_ROW_COUNT);
   });
 
   // The one test here that leaves the machine. It needs a Google account whose
@@ -250,46 +262,50 @@ test.describe("Google Sheets connector", () => {
   test(
     "imports from the real Drive API",
     { tag: E2E_THIRD_PARTY_TAG },
-    async ({ freshBrowserPage: page, e2eWorkerDb }) => {
-      // Skips or fails depending on how the run was invoked, which is the
-      // whole reason this goes through the helper rather than reading
-      // `process.env` here.
-      const {
-        E2E_GOOGLE_SHEET_ID: realSheetId,
-        E2E_GOOGLE_REFRESH_TOKEN: realRefreshToken,
-      } = requireE2EThirdPartyEnv({
-        test,
-        variableNames: ["E2E_GOOGLE_SHEET_ID", "E2E_GOOGLE_REFRESH_TOKEN"],
-      });
+    async ({ page, e2eWorkerDb }) => {
+      try {
+        // Skips or fails depending on how the run was invoked, which is the
+        // whole reason this goes through the helper rather than reading
+        // `process.env` here.
+        const {
+          E2E_GOOGLE_SHEET_ID: realSheetId,
+          E2E_GOOGLE_REFRESH_TOKEN: realRefreshToken,
+        } = requireE2EThirdPartyEnv({
+          test,
+          variableNames: ["E2E_GOOGLE_SHEET_ID", "E2E_GOOGLE_REFRESH_TOKEN"],
+        });
 
-      // A past expiry on purpose: it makes `google-auth/tokens` refresh against
-      // Google before answering, so the refresh path is covered too and no
-      // access token has to be stored anywhere.
-      await seedGoogleToken({
-        email: e2eWorkerDb.primaryUser.email,
-        accessToken: "ya29.expired-placeholder",
-        refreshToken: realRefreshToken,
-        expiryDate: new Date(Date.now() - 60 * 1000),
-        googleEmail: process.env.E2E_GOOGLE_EMAIL ?? "e2e@example.com",
-      });
-      await installFakeGooglePicker(page, {
-        id: realSheetId,
-        name: process.env.E2E_GOOGLE_SHEET_NAME ?? "e2e-google-sheet",
-      });
+        // A past expiry on purpose: it makes `google-auth/tokens` refresh
+        // against Google before answering, so the refresh path is covered too
+        // and no access token has to be stored anywhere.
+        await seedGoogleToken({
+          email: e2eWorkerDb.primaryUser.email,
+          accessToken: "ya29.expired-placeholder",
+          refreshToken: realRefreshToken,
+          expiryDate: new Date(Date.now() - 60 * 1000),
+          googleEmail: process.env.E2E_GOOGLE_EMAIL ?? "e2e@example.com",
+        });
+        await installFakeGooglePicker(page, {
+          id: realSheetId,
+          name: process.env.E2E_GOOGLE_SHEET_NAME ?? "e2e-google-sheet",
+        });
 
-      await signInWithEmailPassword(page, {
-        email: e2eWorkerDb.primaryUser.email,
-        password: e2eWorkerDb.primaryUser.password,
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-      await pickSheetInConnectorsTab(page, e2eWorkerDb.workspaceSlug);
+        await signInWithEmailPassword(page, {
+          email: e2eWorkerDb.primaryUser.email,
+          password: e2eWorkerDb.primaryUser.password,
+          workspaceSlug: e2eWorkerDb.workspaceSlug,
+        });
+        await _pickSheetInConnectorsTab(page, e2eWorkerDb.workspaceSlug);
 
-      // No cell assertion here: the sheet's contents are not this repo's to
-      // pin. That the preview rendered at all means Drive answered, the export
-      // parsed, and the rows reached the form.
-      await expect(
-        page.getByText("These are the first", { exact: false }),
-      ).toBeVisible({ timeout: LONG_WAIT });
+        // No cell assertion here: the sheet's contents are not this repo's
+        // to pin. That the preview rendered at all means Drive answered, the
+        // export parsed, and the rows reached the form.
+        await expect(
+          page.getByText("These are the first", { exact: false }),
+        ).toBeVisible({ timeout: LONG_WAIT });
+      } finally {
+        await _cleanUpGoogleSheetImport(e2eWorkerDb);
+      }
     },
   );
 });

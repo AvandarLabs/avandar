@@ -87,8 +87,8 @@ export function requireE2EThirdPartyEnv<Name extends string>(
     }
     test.skip(true, `Set ${names} to run this against the real service.`);
 
-    // Playwright's `test.skip(true, …)` aborts the test by throwing, so this is
-    // unreachable in a real run. It is here so a `test` that does not abort
+    // Playwright's `test.skip(true, …)` aborts the test by throwing, so this
+    // is unreachable in a real run. It is here so a `test` that does not abort
     // cannot fall through and read the credentials that are missing.
     throw new Error(`Skipped: ${names} ${isOrAre} not set.`);
   }

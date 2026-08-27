@@ -109,7 +109,7 @@ describe("getGoogleSheetVersion", () => {
     });
   });
 
-    it("sends the token as a bearer Authorization header", async () => {
+  it("sends the token as a bearer Authorization header", async () => {
     const { driveFetch, requests } = _makeRecordingFetch([
       _versionResponse("42"),
     ]);

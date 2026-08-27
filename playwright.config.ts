@@ -69,22 +69,6 @@ if (isE2EOfflineMode() && isE2EThirdPartyMode()) {
 }
 
 /**
- * The tags this run excludes, as literals safe to join into one alternation.
- *
- * Offline runs drop both:
- * - {@link E2E_ONLINE_TAG}, whose specs need a network-fetched DuckDB
- *   extension, because excluding them beats letting them time out against
- *   controls that never enable.
- * - {@link E2E_THIRD_PARTY_TAG}, whose specs need a real service.
- *
- * Nothing else excludes anything. A default run includes the third-party specs
- * and lets each one skip itself when its credentials are absent, which is what
- * keeps a full run green on a machine that was never given them.
- */
-const excludedTags =
-  isE2EOfflineMode() ? [E2E_ONLINE_TAG, E2E_THIRD_PARTY_TAG] : [];
-
-/**
  * Per-test ceiling:
  * - 45s locally so failures surface quickly
  * - 90s in CI for noisier infra
@@ -161,8 +145,17 @@ export default defineConfig({
   // missing-credential handling turns loud in the same mode; see
   // `requireE2EThirdPartyEnv`.
   grep: isE2EThirdPartyMode() ? new RegExp(E2E_THIRD_PARTY_TAG) : undefined,
+  // Only an offline run excludes anything, and it excludes both: the `@online`
+  // specs need a network-fetched DuckDB extension, and the `@third-party` ones
+  // need a real service. Excluding them beats letting them time out.
+  //
+  // A default run includes the third-party specs and lets each skip itself when
+  // its credentials are absent, which is what keeps a full run green on a
+  // machine that was never given them.
   grepInvert:
-    excludedTags.length > 0 ? new RegExp(excludedTags.join("|")) : undefined,
+    isE2EOfflineMode() ?
+      new RegExp(`${E2E_ONLINE_TAG}|${E2E_THIRD_PARTY_TAG}`)
+    : undefined,
   globalSetup: "./tests/e2e/setup/globalSetup.ts",
   globalTeardown: "./tests/e2e/setup/globalTeardown.ts",
 });

@@ -25,21 +25,6 @@ type GoogleTokenRow = Readonly<{
 }>;
 
 /**
- * The REST endpoint and secret key for the invocation's environment.
- *
- * Deliberately reads only `VITE_SUPABASE_API_URL`, with no fallback to
- * `SUPABASE_URL`. Both name the same thing, and accepting either would mean a
- * target whose file defines neither could still resolve one from the ambient
- * shell. `requireEnv` names the file to add it to instead.
- */
-function _getRestConfig(): Readonly<{ apiUrl: string; secretKey: string }> {
-  return {
-    apiUrl: requireEnv("VITE_SUPABASE_API_URL").replace(/\/+$/, ""),
-    secretKey: requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
-  };
-}
-
-/**
  * Reads every `tokens__google` row for one Google address, newest first.
  *
  * `google_email` is not unique: the unique constraints are on
@@ -87,7 +72,12 @@ export async function runGoogleTokenGet(
   // own guidance, not a failure to report twice, so it is handled after this.
   let rows: readonly GoogleTokenRow[];
   try {
-    const { apiUrl, secretKey } = _getRestConfig();
+    // Deliberately only `VITE_SUPABASE_API_URL`, with no fallback to
+    // `SUPABASE_URL`. Both name the same thing, and accepting either would mean
+    // a target whose file defines neither could still resolve one from the
+    // ambient shell. `requireEnv` names the file to add it to instead.
+    const apiUrl = requireEnv("VITE_SUPABASE_API_URL").replace(/\/+$/, "");
+    const secretKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!raw) {
       printInfo(`Reading tokens__google from ${target} (${apiUrl})...`);

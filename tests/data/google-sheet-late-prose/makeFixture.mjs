@@ -16,11 +16,13 @@ export const LATE_PROSE =
   "number of graduates in the given field of education from tertiary " +
   "education.";
 
-const rows = [["series_code", "indicator_value"]];
-for (let index = 0; index < NUMERIC_ROW_COUNT; index++) {
-  rows.push([`SE.TER.GRAD.${index}`, index]);
-}
-rows.push(["SE.TER.GRAD.FE.ZS", LATE_PROSE]);
+const rows = [
+  ["series_code", "indicator_value"],
+  ...Array.from({ length: NUMERIC_ROW_COUNT }, (_unused, index) => {
+    return [`SE.TER.GRAD.${index}`, index];
+  }),
+  ["SE.TER.GRAD.FE.ZS", LATE_PROSE],
+];
 
 const workbook = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(rows), "Series");
