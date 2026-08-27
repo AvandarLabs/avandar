@@ -69,7 +69,6 @@ function _readTemplateFile(templateFilePath: string): string {
   if (!fs.existsSync(templateFilePath)) {
     throw new Error(`Template file not found: ${templateFilePath}`);
   }
-
   return fs.readFileSync(templateFilePath, "utf8");
 }
 
@@ -90,10 +89,9 @@ function _writeNewFile(options: { filePath: string; contents: string }): void {
 async function _formatGeneratedFile(filePath: string): Promise<void> {
   if (filePath.endsWith(".sql")) {
     await _formatFileWithPrettier(filePath);
-    return;
+  } else {
+    await _formatFileWithOxfmt(filePath);
   }
-
-  await _formatFileWithOxfmt(filePath);
 }
 
 /**
@@ -110,11 +108,9 @@ async function _formatFileWithOxfmt(filePath: string): Promise<void> {
   const fileContents = await fs.promises.readFile(filePath, "utf8");
   const formatted = await format(filePath, fileContents, _readOxfmtConfig());
 
-  if (formatted.code === fileContents) {
-    return;
+  if (formatted.code !== fileContents) {
+    await fs.promises.writeFile(filePath, formatted.code, "utf8");
   }
-
-  await fs.promises.writeFile(filePath, formatted.code, "utf8");
 }
 
 /**
@@ -123,11 +119,9 @@ async function _formatFileWithOxfmt(filePath: string): Promise<void> {
  */
 function _readOxfmtConfig(): FormatConfig | undefined {
   const configPath = path.join(PROJECT_ROOT, ".oxfmtrc.json");
-  if (!fs.existsSync(configPath)) {
-    return undefined;
-  }
-
-  return JSON.parse(fs.readFileSync(configPath, "utf8")) as FormatConfig;
+  return fs.existsSync(configPath)
+    ? (JSON.parse(fs.readFileSync(configPath, "utf8")) as FormatConfig)
+    : undefined;
 }
 
 async function _formatFileWithPrettier(filePath: string): Promise<void> {
@@ -140,19 +134,15 @@ async function _formatFileWithPrettier(filePath: string): Promise<void> {
     ignorePath: fs.existsSync(ignorePath) ? ignorePath : undefined,
   });
 
-  if (!fileInfo.inferredParser) {
-    return;
+  if (fileInfo.inferredParser) {
+    const formatted = await prettier.format(fileContents, {
+      ...resolvedConfig,
+      filepath: filePath,
+      parser: fileInfo.inferredParser,
+    });
+
+    if (formatted !== fileContents) {
+      await fs.promises.writeFile(filePath, formatted, "utf8");
+    }
   }
-
-  const formatted = await prettier.format(fileContents, {
-    ...resolvedConfig,
-    filepath: filePath,
-    parser: fileInfo.inferredParser,
-  });
-
-  if (formatted === fileContents) {
-    return;
-  }
-
-  await fs.promises.writeFile(filePath, formatted, "utf8");
 }
