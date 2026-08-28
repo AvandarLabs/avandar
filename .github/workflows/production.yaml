@@ -131,10 +131,6 @@ jobs:
       - run: bash scripts/ci/verify-supabase-api-is-running.sh
       - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
       - run: pnpm exec playwright install --with-deps chromium
-      # `--no-third-party` drops the `@third-party` specs outright, instead of
-      # relying on their credentials being absent. This gates a deploy, so it
-      # must not depend on a third party. Do not add those credentials to
-      # `env:` here either. See docs/rules/e2e-testing.md.
       - run: pnpm test:e2e --no-third-party
       - name: Upload Supabase functions log
         if: ${{ !cancelled() }}
