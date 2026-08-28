@@ -1,4 +1,4 @@
-import { getAvaEnvTargetFromArgv, loadAvaEnv } from "@ava-cli/avaEnv/avaEnv";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 import { DevCLI } from "@ava-cli/DevCLI/DevCLI";
 import { NewBoilerplateCLI } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewBoilerplateCLI";
 import { PipelineCLI } from "@ava-cli/PipelineCLI/PipelineCLI";
@@ -56,7 +56,7 @@ if (!assertCLIIsUpToDate()) {
 // combination is reported here rather than thrown from module scope, so it
 // reads as a CLI error instead of a Node stack trace.
 try {
-  loadAvaEnv({ target: getAvaEnvTargetFromArgv(process.argv.slice(2)) });
+  AvaEnv.load({ target: AvaEnv.getEnvTargetFromArgv(process.argv.slice(2)) });
 } catch (error: unknown) {
   printError(error instanceof Error ? error.message : String(error));
   process.exit(1);

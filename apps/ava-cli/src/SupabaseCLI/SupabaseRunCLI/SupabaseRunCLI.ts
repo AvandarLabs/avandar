@@ -1,10 +1,6 @@
 import { spawn } from "node:child_process";
 import * as path from "node:path";
-import {
-  getLoadedAvaEnvFile,
-  getLoadedAvaEnvTarget,
-  requireEnv,
-} from "@ava-cli/avaEnv/avaEnv";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 import { getSupabaseScriptsList } from "@ava-cli/SupabaseCLI/SupabaseRunCLI/getSupabaseScriptsList";
 import { Acclimate } from "@avandar/acclimate";
 
@@ -105,15 +101,15 @@ export const SupabaseRunCLI = Acclimate.createCLI("run")
       scriptName: scriptToRun,
     });
 
-    const dbLocation = getLoadedAvaEnvTarget();
+    const dbLocation = AvaEnv.getLoadedEnvTarget();
 
     // Validated here, in the parent, so a target whose env file has no
     // connection string fails by name instead of the child silently using
     // whatever `SUPABASE_POSTGRES_URL` happened to be in the shell.
-    requireEnv("SUPABASE_POSTGRES_URL");
+    AvaEnv.requireVar("SUPABASE_POSTGRES_URL");
 
     Acclimate.log("|yellow|Using $envFile$ ($dbLocation$)", {
-      envFile: getLoadedAvaEnvFile(),
+      envFile: AvaEnv.getLoadedEnvFile(),
       dbLocation,
     });
 

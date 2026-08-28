@@ -1,4 +1,4 @@
-import { requireEnv } from "@ava-cli/avaEnv/avaEnv";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 import { getItemsFromListPage } from "@ava-cli/PolarCLI/PolarClient/listUtils";
 import { Polar } from "@polar-sh/sdk";
 
@@ -10,7 +10,7 @@ export type PolarCLIClient = {
 };
 
 function _getPolarServerType(): PolarServerType {
-  const serverType = requireEnv("POLAR_SERVER_TYPE");
+  const serverType = AvaEnv.requireVar("POLAR_SERVER_TYPE");
 
   if (serverType !== "sandbox" && serverType !== "production") {
     throw new Error(
@@ -49,7 +49,7 @@ async function _getOrganizationId(polar: Polar): Promise<string> {
  * this invocation loaded.
  */
 export async function createPolarCLIClient(): Promise<PolarCLIClient> {
-  const accessToken = requireEnv("POLAR_ACCESS_TOKEN");
+  const accessToken = AvaEnv.requireVar("POLAR_ACCESS_TOKEN");
   const serverType = _getPolarServerType();
 
   const polar = new Polar({

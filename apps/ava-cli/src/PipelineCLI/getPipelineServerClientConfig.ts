@@ -1,4 +1,4 @@
-import { requireEnv } from "@ava-cli/avaEnv/avaEnv";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 
 export type PipelineServerClientConfig = Readonly<{
   baseURL: string;
@@ -20,7 +20,7 @@ function _normalizeBaseURL(rawBaseURL: string): string {
 
 export function getPipelineServerClientConfig(): PipelineServerClientConfig {
   return {
-    baseURL: _normalizeBaseURL(requireEnv("AVA_PIPELINE_SERVER_URL")),
-    serverSecret: requireEnv("AVA_PIPELINE_SERVER_SECRET"),
+    baseURL: _normalizeBaseURL(AvaEnv.requireVar("AVA_PIPELINE_SERVER_URL")),
+    serverSecret: AvaEnv.requireVar("AVA_PIPELINE_SERVER_SECRET"),
   };
 }

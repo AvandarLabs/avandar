@@ -1,4 +1,4 @@
-import { requireEnv } from "@ava-cli/avaEnv/avaEnv";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 
 export type DevFanoutClientConfig = Readonly<{
   baseURL: string;
@@ -26,7 +26,7 @@ function _normalizeBaseURL(rawBaseURL: string): string {
  */
 export function getDevFanoutServerClientConfig(): DevFanoutClientConfig {
   return {
-    baseURL: _normalizeBaseURL(requireEnv("AVA_DEV_FANOUT_SERVER_URL")),
-    adminToken: requireEnv("AVA_DEV_FANOUT_ADMIN_SERVER_SECRET"),
+    baseURL: _normalizeBaseURL(AvaEnv.requireVar("AVA_DEV_FANOUT_SERVER_URL")),
+    adminToken: AvaEnv.requireVar("AVA_DEV_FANOUT_ADMIN_SERVER_SECRET"),
   };
 }

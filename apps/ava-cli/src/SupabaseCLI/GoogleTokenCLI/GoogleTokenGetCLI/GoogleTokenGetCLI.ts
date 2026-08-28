@@ -1,4 +1,4 @@
-import { getLoadedAvaEnvTarget, requireEnv } from "@ava-cli/avaEnv/avaEnv";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 import {
   printError,
   printInfo,
@@ -66,7 +66,7 @@ export async function runGoogleTokenGet(
   options: Readonly<{ email: string; raw: boolean }>,
 ): Promise<void> {
   const { email, raw } = options;
-  const target = getLoadedAvaEnvTarget();
+  const target = AvaEnv.getLoadedEnvTarget();
 
   // Only the lookup is wrapped. A missing row is an ordinary outcome with its
   // own guidance, not a failure to report twice, so it is handled after this.
@@ -75,9 +75,12 @@ export async function runGoogleTokenGet(
     // Deliberately only `VITE_SUPABASE_API_URL`, with no fallback to
     // `SUPABASE_URL`. Both name the same thing, and accepting either would mean
     // a target whose file defines neither could still resolve one from the
-    // ambient shell. `requireEnv` names the file to add it to instead.
-    const apiUrl = requireEnv("VITE_SUPABASE_API_URL").replace(/\/+$/, "");
-    const secretKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
+    // ambient shell. `AvaEnv.requireVar` names the file to add it to instead.
+    const apiUrl = AvaEnv.requireVar("VITE_SUPABASE_API_URL").replace(
+      /\/+$/,
+      "",
+    );
+    const secretKey = AvaEnv.requireVar("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!raw) {
       printInfo(`Reading tokens__google from ${target} (${apiUrl})...`);

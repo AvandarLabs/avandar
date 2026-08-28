@@ -52,19 +52,20 @@ CLI.
 
 ### Reading env vars in a command
 
-Use `requireEnv` from `@ava-cli/avaEnv/avaEnv`, never `process.env` directly:
+Use `AvaEnv.requireVar` from `@ava-cli/AvaEnv/AvaEnv`, never `process.env`
+directly:
 
 ```ts
-import { requireEnv } from "@ava-cli/avaEnv/avaEnv";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 
-const url = requireEnv("AVA_PIPELINE_SERVER_URL");
+const url = AvaEnv.requireVar("AVA_PIPELINE_SERVER_URL");
 ```
 
 It throws naming both the variable and the file this invocation actually
 loaded, so the message sends the reader to the right place. A key that is
 present but blank counts as missing.
 
-`getLoadedAvaEnvTarget()` gives the target as `"local" | "staging" |
+`AvaEnv.getLoadedEnvTarget()` gives the target as `"local" | "staging" |
 "production"` when a command needs to label or branch on it. Do not add
 per-command `--staging` or `--prod` options; they are global.
 
