@@ -103,7 +103,7 @@ export function requireE2EThirdPartyEnv<Name extends string>(
 
 /**
  * The flag that drops the third-party specs from a run that could have run
- * them. Accepted by `pnpm test:e2e` through `scripts/runE2E.mjs`, which turns
+ * them. Accepted by `pnpm test:e2e` through `scripts/runE2E.ts`, which turns
  * it into `PLAYWRIGHT_E2E_NO_THIRD_PARTY`; Playwright's own CLI rejects options
  * it does not define, so the flag cannot be read from `process.argv` here.
  */

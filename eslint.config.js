@@ -221,6 +221,18 @@ export default [
   },
   {
     /*
+     * Run by `node` directly, which strips the types and then resolves the
+     * import as plain ESM: a relative specifier there has to carry its `.ts`
+     * extension or the process exits with ERR_MODULE_NOT_FOUND. `tsc` accepts
+     * it through `allowImportingTsExtensions`.
+     */
+    files: ["scripts/runE2E.ts"],
+    rules: {
+      "import-x/extensions": "off",
+    },
+  },
+  {
+    /*
      * The desktop shell runs on Bun in the main process. Bun built-ins
      * like `bun:sqlite` and `bun:test` aren't resolvable by the standard
      * TS/Node import resolver, so ignore them here. Source files use
