@@ -78,8 +78,18 @@ async function _stubGoogleSheet(page: Page): Promise<DriveRequestLog> {
   const csvByGid = new Map(
     FIXTURE_TABS.map((tab) => {
       const worksheet = workbook.Sheets[workbook.SheetNames[tab.index]!]!;
-      return [String(tab.sheetId), XLSX.utils.sheet_to_csv(worksheet)];
+      // CRLF, because that is what Google's CSV export returns. An LF fixture
+      // hid a hang in the CSV reader that every real import walked into.
+      return [
+        String(tab.sheetId),
+        XLSX.utils.sheet_to_csv(worksheet).replaceAll("\n", "\r\n"),
+      ];
     }),
+  );
+  // PROBE: the exact bytes Google returns, CRLF and no trailing newline.
+  csvByGid.set(
+    String(FIXTURE_TABS[1]!.sheetId),
+    "country,indicator_value\r\nKenya,41\r\nPeru,57\r\nNepal,22",
   );
 
   await page.route("**/drive/v3/files/**", async (route: Route) => {
