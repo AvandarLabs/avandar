@@ -263,3 +263,59 @@ export async function getGoogleSheetTabCsvExport(
 
   return { csvText: await response.text(), sourceVersion };
 }
+
+/**
+ * Downloads the tab a stored dataset points at, resolving it by name.
+ *
+ * The one place that knows what a stored tab name of `null` means: the
+ * workbook's first tab, which is what rows written before the tab column
+ * carried. Import, refresh and query-time acquisition all come through here,
+ * so a dataset's rows are read the same way whoever asked for them.
+ *
+ * Resolution is by title because that is what
+ * `datasets__google_sheets.sheet_name` stores, and a title is the one property
+ * of a tab a user can rename. A renamed tab therefore fails here, loudly and by
+ * name, rather than quietly returning some other tab's rows. Recording the gid
+ * at import so a rename stops mattering is AVA-352.
+ *
+ * @param params The file and stored tab name, the token, and the transport.
+ * @returns The tab as CSV text, the tab it resolved to, and the source version.
+ */
+export async function getStoredGoogleSheetTabCsv(
+  params: Readonly<{
+    fileId: string;
+    sheetName: string | null;
+    accessToken: string;
+    driveFetch?: GoogleDriveFetch;
+  }>,
+): Promise<AcquiredGoogleSheetTabCsv & { tab: GoogleSheetTab }> {
+  const tabs = await getGoogleSheetTabs({
+    fileId: params.fileId,
+    accessToken: params.accessToken,
+    driveFetch: params.driveFetch,
+  });
+
+  const tab =
+    params.sheetName === null
+      ? tabs[0]
+      : tabs.find((candidate) => {
+          return candidate.title === params.sheetName;
+        });
+
+  if (!tab) {
+    throw new GoogleDriveError({
+      code: "sheet-not-found",
+      status: 404,
+      reason: params.sheetName ?? "first-tab",
+    });
+  }
+
+  const acquired = await getGoogleSheetTabCsvExport({
+    fileId: params.fileId,
+    sheetId: tab.sheetId,
+    accessToken: params.accessToken,
+    driveFetch: params.driveFetch,
+  });
+
+  return { ...acquired, tab };
+}

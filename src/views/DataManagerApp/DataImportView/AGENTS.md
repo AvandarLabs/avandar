@@ -90,6 +90,15 @@ because its inference aborts the whole import on the first cell that does not
 match. A tab downloaded as CSV therefore arrives with real types; the same tab
 inside an exported workbook arrives as text.
 
+**One download path per source, shared by import, refresh and acquisition.**
+A dataset's rows are read at import, again when the user refreshes it, and
+again when a query re-acquires it. If those go through different readers the
+same dataset is typed differently depending on who asked, which is a bug that
+only shows up long after the import looked fine.
+`getStoredGoogleSheetTabCsv` is the Sheets version: it owns what a stored tab
+name of `null` means and what a renamed tab does, and all three callers go
+through it.
+
 **Pass values a mutation needs as parameters, not from state.** A mutation
 created during the render before a pick closes over the state as it was then,
 which reads as the previous source's value rather than as an obvious error.

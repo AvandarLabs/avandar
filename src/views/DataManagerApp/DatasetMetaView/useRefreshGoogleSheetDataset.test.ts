@@ -21,8 +21,7 @@ const {
   apiGetMock,
   dropLocalDatasetMock,
   startCsvImportMock,
-  getGoogleSheetTabsMock,
-  getGoogleSheetTabCsvExportMock,
+  getStoredGoogleSheetTabCsvMock,
   evictRelationCacheMock,
   notifySuccessMock,
   notifyErrorMock,
@@ -31,8 +30,7 @@ const {
     apiGetMock: vi.fn(),
     dropLocalDatasetMock: vi.fn(),
     startCsvImportMock: vi.fn(),
-    getGoogleSheetTabsMock: vi.fn(),
-    getGoogleSheetTabCsvExportMock: vi.fn(),
+    getStoredGoogleSheetTabCsvMock: vi.fn(),
     evictRelationCacheMock: vi.fn(),
     notifySuccessMock: vi.fn(),
     notifyErrorMock: vi.fn(),
@@ -53,10 +51,7 @@ vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
 });
 
 vi.mock("@/clients/google/GoogleDriveClient/GoogleDriveClient", () => {
-  return {
-    getGoogleSheetTabs: getGoogleSheetTabsMock,
-    getGoogleSheetTabCsvExport: getGoogleSheetTabCsvExportMock,
-  };
+  return { getStoredGoogleSheetTabCsv: getStoredGoogleSheetTabCsvMock };
 });
 
 vi.mock(
@@ -154,19 +149,14 @@ describe("useRefreshGoogleSheetDataset", () => {
       callOrder.push("drop");
     });
 
-    getGoogleSheetTabsMock.mockReset();
-    getGoogleSheetTabsMock.mockImplementation(async () => {
-      callOrder.push("list-tabs");
-      return [
-        { sheetId: 0, title: "Colombia", index: 0 },
-        { sheetId: 988142735, title: "Kenya", index: 1 },
-      ];
-    });
-
-    getGoogleSheetTabCsvExportMock.mockReset();
-    getGoogleSheetTabCsvExportMock.mockImplementation(async () => {
-      callOrder.push("export");
-      return { csvText: "county\nNairobi\n", sourceVersion: "99" };
+    getStoredGoogleSheetTabCsvMock.mockReset();
+    getStoredGoogleSheetTabCsvMock.mockImplementation(async () => {
+      callOrder.push("download");
+      return {
+        csvText: "county\r\nNairobi\r\n",
+        sourceVersion: "99",
+        tab: { sheetId: 988142735, title: "Kenya", index: 1 },
+      };
     });
 
     startCsvImportMock.mockReset();
@@ -199,13 +189,7 @@ describe("useRefreshGoogleSheetDataset", () => {
     // leave the old table registered if the export then failed.
     await _refresh();
 
-    expect(callOrder).toEqual([
-      "evict",
-      "drop",
-      "list-tabs",
-      "export",
-      "import",
-    ]);
+    expect(callOrder).toEqual(["evict", "drop", "download", "import"]);
   });
 
   it("evicts the workspace relation-cache identity so the next query re-acquires", async () => {
@@ -220,31 +204,36 @@ describe("useRefreshGoogleSheetDataset", () => {
     );
   });
 
-  it("downloads the dataset's stored tab, resolved to its gid", async () => {
+  it("asks for the dataset's stored tab by name", async () => {
+    // Resolving the name to a tab is `getStoredGoogleSheetTabCsv`'s job, and it
+    // is shared with import and query-time acquisition so all three read a
+    // dataset's rows the same way.
     await _refresh("Kenya");
 
-    expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledWith(
-      expect.objectContaining({ sheetId: 988142735 }),
+    expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sheetName: "Kenya" }),
     );
   });
 
-  it("downloads the first tab when the stored tab is null", async () => {
+  it("passes a null stored tab through, which means the first tab", async () => {
     // Positive control for the test above, and the legacy-row contract: `null`
     // means the workbook's first tab, which is what those rows already read.
     await _refresh(null);
 
-    expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledWith(
-      expect.objectContaining({ sheetId: 0 }),
+    expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sheetName: null }),
     );
   });
 
   it("reads the dataset's own document with the refreshed token", async () => {
     await _refresh();
 
-    expect(getGoogleSheetTabsMock).toHaveBeenCalledWith({
-      fileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
-      accessToken: "ya29.refresh-test-token",
-    });
+    expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
+        accessToken: "ya29.refresh-test-token",
+      }),
+    );
   });
 
   it("announces success", async () => {
@@ -257,7 +246,7 @@ describe("useRefreshGoogleSheetDataset", () => {
   });
 
   it("reports a failure instead of announcing success", async () => {
-    getGoogleSheetTabCsvExportMock.mockRejectedValue(
+    getStoredGoogleSheetTabCsvMock.mockRejectedValue(
       new Error("Drive is down"),
     );
 
@@ -279,6 +268,6 @@ describe("useRefreshGoogleSheetDataset", () => {
     await waitFor(() => {
       expect(notifyErrorMock).toHaveBeenCalled();
     });
-    expect(getGoogleSheetTabsMock).not.toHaveBeenCalled();
+    expect(getStoredGoogleSheetTabCsvMock).not.toHaveBeenCalled();
   });
 });

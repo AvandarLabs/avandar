@@ -5,10 +5,17 @@ import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/Google
 
 const FILE_ID = "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";
 const ACCESS_TOKEN = "ya29.test-access-token";
-const WORKBOOK_BYTES = Uint8Array.from([
-  0x50, 0x4b, 0x03, 0x04,
-]) as Uint8Array<ArrayBuffer>;
 
+const FIRST_TAB_CSV = "city,population\nBogota,7900000\n";
+const SECOND_TAB_CSV = "county,residents\nNairobi,4400000\n";
+
+/**
+ * Answers the three calls an acquisition makes: the file version from Drive,
+ * the tab list from the Sheets API, and the tab itself from the export host.
+ *
+ * The two tabs return different CSV, so an assertion about one cannot pass
+ * while the other was downloaded.
+ */
 function _makeDriveFetch(version = "12"): GoogleDriveFetch {
   return async (url) => {
     if (url.includes("fields=version")) {
@@ -17,107 +24,109 @@ function _makeDriveFetch(version = "12"): GoogleDriveFetch {
         headers: { "Content-Type": "application/json" },
       });
     }
-    return new Response(WORKBOOK_BYTES, { status: 200 });
+    if (url.includes("sheets.googleapis.com")) {
+      return new Response(
+        JSON.stringify({
+          sheets: [
+            { properties: { sheetId: 0, title: "Cities", index: 0 } },
+            { properties: { sheetId: 77, title: "Q3 data", index: 1 } },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    }
+    return new Response(
+      url.includes("gid=77") ? SECOND_TAB_CSV : FIRST_TAB_CSV,
+      { status: 200 },
+    );
   };
 }
 
 describe("acquireGoogleSheetRelation", () => {
-  it("passes the stored tab name through to the reader", async () => {
-    const readXlsx = vi.fn().mockResolvedValue("rows");
+  it("downloads the stored tab and reads its CSV", async () => {
+    const readCsv = vi.fn().mockResolvedValue("rows");
 
     await acquireGoogleSheetRelation({
       fileId: FILE_ID,
       accessToken: ACCESS_TOKEN,
       sheetName: "Q3 data",
-      readXlsx,
+      readCsv,
       driveFetch: _makeDriveFetch(),
     });
 
-    expect(readXlsx).toHaveBeenCalledWith(
-      expect.objectContaining({ sheet: "Q3 data" }),
-    );
+    expect(readCsv).toHaveBeenCalledWith({ csvText: SECOND_TAB_CSV });
   });
 
-  it("turns a null tab name into read_xlsx's own default", async () => {
-    // `undefined`, not `null` and not the empty string: `read_xlsx` reads the
-    // first sheet only when the argument is absent, and `sheet = ''` would
-    // instead look for a tab literally named "".
-    const readXlsx = vi.fn().mockResolvedValue("rows");
+  it("reads the first tab when the stored tab name is null", async () => {
+    // `null` is what rows written before the tab column carry, and it means
+    // the workbook's first tab. Resolving it to anything else would silently
+    // re-point a dataset at another tab's rows.
+    const readCsv = vi.fn().mockResolvedValue("rows");
 
     await acquireGoogleSheetRelation({
       fileId: FILE_ID,
       accessToken: ACCESS_TOKEN,
       sheetName: null,
-      readXlsx,
+      readCsv,
       driveFetch: _makeDriveFetch(),
     });
 
-    expect(readXlsx).toHaveBeenCalledWith(
-      expect.objectContaining({ sheet: undefined }),
-    );
-  });
-
-  it("hands the reader the exported bytes unchanged", async () => {
-    const readXlsx = vi.fn().mockResolvedValue("rows");
-
-    await acquireGoogleSheetRelation({
-      fileId: FILE_ID,
-      accessToken: ACCESS_TOKEN,
-      sheetName: null,
-      readXlsx,
-      driveFetch: _makeDriveFetch(),
-    });
-
-    const passedBytes = readXlsx.mock.calls[0]![0].xlsxBytes as Uint8Array;
-    expect(Array.from(passedBytes)).toEqual(Array.from(WORKBOOK_BYTES));
+    expect(readCsv).toHaveBeenCalledWith({ csvText: FIRST_TAB_CSV });
   });
 
   it("returns the reader's output beside the Drive version", async () => {
-    const readXlsx = vi.fn().mockResolvedValue({ parquetBlob: "blob" });
+    const readCsv = vi.fn().mockResolvedValue({ parquetBlob: "blob" });
 
-    const result = await acquireGoogleSheetRelation({
+    const acquired = await acquireGoogleSheetRelation({
       fileId: FILE_ID,
       accessToken: ACCESS_TOKEN,
-      sheetName: null,
-      readXlsx,
-      driveFetch: _makeDriveFetch("99"),
+      sheetName: "Cities",
+      readCsv,
+      driveFetch: _makeDriveFetch("31"),
     });
 
-    expect(result).toEqual({
+    expect(acquired).toEqual({
       relation: { parquetBlob: "blob" },
-      sourceVersion: "99",
+      sourceVersion: "31",
     });
   });
 
-  it("does not read the workbook when Drive refuses the export", async () => {
-    const readXlsx = vi.fn().mockResolvedValue("rows");
-    const driveFetch: GoogleDriveFetch = async (url) => {
-      if (url.includes("fields=version")) {
-        return new Response(JSON.stringify({ version: "12" }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
-      }
-      return new Response(
-        JSON.stringify({
-          error: { errors: [{ reason: "exportSizeLimitExceeded" }] },
-        }),
-        { status: 403, headers: { "Content-Type": "application/json" } },
-      );
+  it("names the tab when a rename means it is no longer there", async () => {
+    // A tab is stored by title, and a title is renameable. Failing by name
+    // beats returning some other tab's rows, and beats the binder error the
+    // workbook-wide read used to raise from inside DuckDB.
+    const readCsv = vi.fn();
+
+    await expect(
+      acquireGoogleSheetRelation({
+        fileId: FILE_ID,
+        accessToken: ACCESS_TOKEN,
+        sheetName: "Renamed away",
+        readCsv,
+        driveFetch: _makeDriveFetch(),
+      }),
+    ).rejects.toMatchObject({ code: "sheet-not-found" });
+    expect(readCsv).not.toHaveBeenCalled();
+  });
+
+  it("does not read anything when Drive refuses the file", async () => {
+    const readCsv = vi.fn();
+    const driveFetch: GoogleDriveFetch = async () => {
+      return new Response(JSON.stringify({ error: { errors: [{}] } }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
     };
 
     await expect(
       acquireGoogleSheetRelation({
         fileId: FILE_ID,
         accessToken: ACCESS_TOKEN,
-        sheetName: null,
-        readXlsx,
+        sheetName: "Cities",
+        readCsv,
         driveFetch,
       }),
     ).rejects.toBeInstanceOf(GoogleDriveError);
-
-    // The positive controls above prove the reader is reachable, so this is not
-    // passing because `readXlsx` is never called at all.
-    expect(readXlsx).not.toHaveBeenCalled();
+    expect(readCsv).not.toHaveBeenCalled();
   });
 });

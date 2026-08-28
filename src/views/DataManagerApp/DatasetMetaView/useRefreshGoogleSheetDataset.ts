@@ -4,10 +4,7 @@ import { useLingui } from "@lingui/react/macro";
 import { makePrincipalKeyFromWorkspaceSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { APIClient } from "@/clients/APIClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import {
-  getGoogleSheetTabCsvExport,
-  getGoogleSheetTabs,
-} from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
+import { getStoredGoogleSheetTabCsv } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import { clearGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -88,31 +85,13 @@ export function useRefreshGoogleSheetDataset(): UseMutationResultTuple<
         throw new Error("No Google token is available for this user");
       }
 
-      // The tab is stored by name, so the gid it exports under is looked up
-      // here rather than remembered. A renamed tab therefore fails to refresh,
-      // which is the same thing that happened when the name was handed to
-      // `read_xlsx`, and it fails loudly instead of silently importing another
-      // tab's rows.
-      const tabs = await getGoogleSheetTabs({
+      // The same download acquisition and import use, so a refreshed dataset
+      // is read exactly the way the original import read it. It resolves the
+      // stored tab name, and fails by name when a rename means it no longer
+      // matches, rather than quietly returning another tab's rows.
+      const { csvText } = await getStoredGoogleSheetTabCsv({
         fileId: sourceDataset.googleDocumentId,
-        accessToken,
-      });
-      const tab =
-        sourceDataset.sheetName === null
-          ? tabs[0]
-          : tabs.find((candidate) => {
-              return candidate.title === sourceDataset.sheetName;
-            });
-      if (!tab) {
-        throw new Error(
-          `The tab "${sourceDataset.sheetName}" is no longer in this ` +
-            "spreadsheet. It may have been renamed or deleted.",
-        );
-      }
-
-      const { csvText } = await getGoogleSheetTabCsvExport({
-        fileId: sourceDataset.googleDocumentId,
-        sheetId: tab.sheetId,
+        sheetName: sourceDataset.sheetName,
         accessToken,
       });
 
