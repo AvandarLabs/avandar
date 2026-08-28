@@ -341,8 +341,8 @@ describe("useGooglePicker", () => {
   it("adds a My Drive, a Shared with me and a Shared drives tab", async () => {
     // One view per scope, because `setEnableDrives(true)` re-roots a view at
     // the shared drives list rather than adding to it: a single view carrying
-    // it could no longer reach My Drive at all. Order matters, since it is the
-    // tab order.
+    // it cannot reach My Drive at all. Order matters, since it is the tab
+    // order.
     const harness = _makeRecordingPickerAPI();
     useGooglePickerAPIMock.mockReturnValue([harness.pickerAPI, false]);
     const { useGooglePicker } = await import("@/hooks/ui/useGooglePicker");

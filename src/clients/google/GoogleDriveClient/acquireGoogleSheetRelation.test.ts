@@ -93,8 +93,8 @@ describe("acquireGoogleSheetRelation", () => {
 
   it("names the tab when a rename means it is no longer there", async () => {
     // A tab is stored by title, and a title is renameable. Failing by name
-    // beats returning some other tab's rows, and beats the binder error the
-    // workbook-wide read used to raise from inside DuckDB.
+    // beats returning some other tab's rows, and beats the binder error a
+    // workbook-wide read raises from inside DuckDB.
     const readCsv = vi.fn();
 
     await expect(

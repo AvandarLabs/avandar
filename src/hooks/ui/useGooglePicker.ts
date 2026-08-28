@@ -64,9 +64,9 @@ const VIEW_LABELS = {
  *
  * Three views rather than one, because a DocsView's scope is a property of the
  * whole view: `setEnableDrives(true)` does not *add* shared drives to a view,
- * it re-roots that view at the shared drives list, so the one view that could
- * reach a shared drive was also the one view that could no longer reach My
- * Drive. Splitting the scopes across views is what the Picker's tabs are for,
+ * it re-roots that view at the shared drives list, so a single view that
+ * reaches a shared drive is a view that cannot reach My Drive at all.
+ * Splitting the scopes across views is what the Picker's tabs are for,
  * and it beats a single flat listing on legibility anyway: each tab browses as
  * a folder hierarchy, and search still spans all of them regardless of which
  * tab is open.

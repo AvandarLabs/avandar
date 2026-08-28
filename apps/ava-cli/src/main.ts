@@ -14,7 +14,7 @@ import { Acclimate } from "@avandar/acclimate";
 // a global option down to every subcommand, so declaring here is what puts
 // these in each help screen and hands their parsed value to any action that
 // wants it. The declaration is not what makes them accepted: Acclimate ignores
-// an option nobody declared (see AVA-304), so an undeclared `--prod` would be
+// an option nobody declared, so an undeclared `--prod` would be
 // silently swallowed rather than refused.
 //
 // The entry point below reads them off argv rather than from a parsed action,

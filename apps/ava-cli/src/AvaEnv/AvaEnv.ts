@@ -11,13 +11,14 @@ export type AvaEnvTarget = "local" | "staging" | "production";
  * Exactly one of these is loaded per invocation, and nothing is merged. A run
  * pointed at staging sees `.env.staging` and only `.env.staging`, so a variable
  * that file omits is genuinely absent rather than quietly inherited from
- * `.env.development`. That inheritance is what used to make `--prod` announce
- * production and then act on the local database.
+ * `.env.development`. Do not merge a fallback file in behind one of these: a
+ * `--prod` run would then announce production and act on whatever database
+ * `.env.development` names.
  *
- * The consequence is deliberate: `.env.staging` and `.env.production` were
- * written while the merge existed, so they are missing variables that a
- * `--staging` or `--prod` run now needs. {@link AvaEnv.requireVar} is how that
- * surfaces, naming both the variable and the file to add it to.
+ * The consequence is deliberate: `.env.staging` and `.env.production` are
+ * missing variables that a `--staging` or `--prod` run needs, and nothing
+ * supplies them. {@link AvaEnv.requireVar} is how that surfaces, naming both
+ * the variable and the file to add it to.
  */
 export const ENV_FILE_FROM_TARGET = {
   local: ".env.development",

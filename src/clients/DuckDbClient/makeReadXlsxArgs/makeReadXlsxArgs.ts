@@ -38,8 +38,8 @@ export type ReadXlsxArgsOptions = {
  * same workbook happily and the user has already been told the preview parsed.
  * Reading everything as text also agrees with the schema the import actually
  * records, since the manual upload path writes `column_type: "VARCHAR"` for
- * every sniffed xlsx column. Google Sheets no longer reads this way at all: a
- * tab is downloaded as CSV, whose reader types each column from the data.
+ * every sniffed xlsx column. Google Sheets does not come through here at all:
+ * a tab is downloaded as CSV, whose reader types each column from the data.
  *
  * @param options The header, sheet, range and empty-row handling to read with.
  * @returns The comma-separated arguments, ready to follow the file argument.

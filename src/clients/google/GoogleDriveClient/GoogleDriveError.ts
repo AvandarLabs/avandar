@@ -32,8 +32,8 @@ export type GoogleDriveErrorCode =
    *
    * Not a transport failure, and it is a `GoogleDriveError` anyway so callers
    * keep branching on one code set. A tab is stored by title, and a title is
-   * renameable, so this is what a rename looks like from here. AVA-352 records
-   * the gid at import to make renames stop mattering.
+   * renameable, so this is what a rename looks like from here. Storing each
+   * tab's `gid` at import would make renames stop mattering.
    */
   | "sheet-not-found"
 

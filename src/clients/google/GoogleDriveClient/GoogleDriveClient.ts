@@ -275,8 +275,8 @@ export async function getGoogleSheetTabCsvExport(
  * Resolution is by title because that is what
  * `datasets__google_sheets.sheet_name` stores, and a title is the one property
  * of a tab a user can rename. A renamed tab therefore fails here, loudly and by
- * name, rather than quietly returning some other tab's rows. Recording the gid
- * at import so a rename stops mattering is AVA-352.
+ * name, rather than quietly returning some other tab's rows. Recording each
+ * tab's `gid` at import would make a rename stop mattering.
  *
  * @param params The file and stored tab name, the token, and the transport.
  * @returns The tab as CSV text, the tab it resolved to, and the source version.

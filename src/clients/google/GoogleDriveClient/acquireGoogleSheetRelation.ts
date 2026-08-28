@@ -24,12 +24,11 @@ export type AcquiredGoogleSheetRelation<TRelation> = {
  * Acquires one tab of a Google Sheet: download that tab as CSV, then read it.
  *
  * This is the whole connector in one function, and it deliberately shares
- * `getStoredGoogleSheetTabCsv` with import and refresh. Acquisition used to
- * export the entire workbook and read the tab back out with `read_xlsx`, which
- * meant a dataset's rows were typed one way when imported and another way when
- * re-acquired: the xlsx reader has to be told to read everything as text, while
- * the CSV reader types each column from the data. One download path, one set of
- * types.
+ * `getStoredGoogleSheetTabCsv` with import and refresh. Do not acquire by
+ * exporting the whole workbook and reading the tab back out with `read_xlsx`:
+ * that reader has to be told to read everything as text, so a dataset would be
+ * typed one way when imported and another way when re-acquired. One download
+ * path, one set of types.
  *
  * Everything it needs arrives as an argument. It reads no dataset record, holds
  * no token, and imports no client singleton, so the wrapper that eventually

@@ -167,8 +167,8 @@ async function _pickSheetInConnectorsTab(
  *
  * Deliberately **not** asserted here: the prose cell. It is the last row of 701
  * and the preview shows only the first handful, so its absence from this grid
- * says nothing. The transcode that used to choke on it is covered after the
- * save instead, by the parquet.
+ * says nothing. The transcode is what chokes on that cell, and it is covered
+ * after the save instead, by the parquet.
  */
 async function _expectImportedPreview(
   page: Page,
@@ -178,8 +178,8 @@ async function _expectImportedPreview(
     page.getByText("These are the first", { exact: false }),
   ).toBeVisible({ timeout: LONG_WAIT });
 
-  // The picked sheet's name, not the "Google Sheet" placeholder: the export
-  // mutation used to read it from state it could not see yet.
+  // The picked sheet's name, not the "Google Sheet" placeholder: a mutation
+  // that reads the name from state cannot see the pick that created it.
   await expect(page.getByLabel("Dataset name")).toHaveValue(
     expectedDatasetName,
     { timeout: SHORT_WAIT },
@@ -274,7 +274,7 @@ test.describe("Google Sheets connector", () => {
       });
 
       // Saving is what makes this cover the transcode: the parquet uploaded
-      // here is the output of the read that used to abort on the prose cell in
+      // here is the output of the read that has to survive the prose cell in
       // row 702. No parquet, no upload, and this poll never turns true.
       //
       // Saved directly rather than through the shared cloud-sync save helper,
