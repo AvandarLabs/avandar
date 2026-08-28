@@ -91,9 +91,9 @@ function _advanceInsideDelimiter(
     return {
       index: index + 1,
       flags:
-        sql[index] === "'" ?
-          { ...flags, inSingleQuote: false, isEscapeString: false }
-        : flags,
+        sql[index] === "'"
+          ? { ...flags, inSingleQuote: false, isEscapeString: false }
+          : flags,
     };
   }
   if (flags.inDoubleQuote) {
