@@ -5,6 +5,12 @@
 - Use `docs/` for architectural notes, design decisions, and checklists
   (for example `docs/<topic>.md`).
 - Granular workspace permissions: `docs/permissions-architecture.md`.
+- A subsystem whose parts have to keep the same shape as each other carries a
+  `README.md` in its own directory. Read it before adding to that directory,
+  and update it when the shape it describes changes. The data import views
+  (`src/views/DataManagerApp/DataImportView/README.md`) are the worked
+  example: it says how a new import source is built so every one of them
+  stays symmetrical.
 - If Context7 MCP is configured, use it to reference the most up-to-date
   documentation of any library when you need it.
 
