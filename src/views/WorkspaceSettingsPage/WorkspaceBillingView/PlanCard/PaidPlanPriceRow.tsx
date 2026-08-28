@@ -21,18 +21,20 @@ export function PaidPlanPriceRow({ discount, plan }: Props): JSX.Element {
   );
   return (
     <Stack gap="xs">
-      {discount && plan.planInterval === "year" ?
+      {discount && plan.planInterval === "year" ? (
         <Text size="sm" c="green" fw={500}>
           <Trans>You save {discount}% compared to monthly billing</Trans>
         </Text>
-      : null}
+      ) : null}
       <Box w="100%">
         <Text size="xl" fw={600} mb="xs">
           <Trans>{formattedPriceToDisplay}/seat</Trans>
           <Text component="span" size="sm" fw={400} c="dimmed" ml="xs">
-            {plan.planInterval === "year" ?
+            {plan.planInterval === "year" ? (
               <Trans>/month (paid yearly)</Trans>
-            : <Trans>/month</Trans>}
+            ) : (
+              <Trans>/month</Trans>
+            )}
           </Text>
         </Text>
       </Box>

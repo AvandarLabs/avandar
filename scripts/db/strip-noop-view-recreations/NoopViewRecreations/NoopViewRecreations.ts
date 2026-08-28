@@ -63,8 +63,8 @@ function _getViewRefFromMatch(
   const { match, firstGroup } = options;
   const schema = match[firstGroup] ?? match[firstGroup + 1];
   const name = match[firstGroup + 2] ?? match[firstGroup + 3];
-  return schema !== undefined && name !== undefined ?
-      { schema, name }
+  return schema !== undefined && name !== undefined
+    ? { schema, name }
     : undefined;
 }
 
@@ -77,8 +77,8 @@ function _getCreateViewFromStatement(
   }
   const view = _getViewRefFromMatch({ match, firstGroup: 1 });
   const viewBody = match[5];
-  return view && viewBody !== undefined ?
-      { ...statement, view, viewBody: viewBody.trim() }
+  return view && viewBody !== undefined
+    ? { ...statement, view, viewBody: viewBody.trim() }
     : undefined;
 }
 

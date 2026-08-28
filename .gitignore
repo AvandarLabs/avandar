@@ -44,9 +44,6 @@ supabase/snippets/
 # Deno (local type-check only; breaks Supabase edge bundler when committed)
 deno.lock
 
-# Cursor
-.cursor/.cursor/
-
 # Playwright
 /playwright/
 /playwright-report/

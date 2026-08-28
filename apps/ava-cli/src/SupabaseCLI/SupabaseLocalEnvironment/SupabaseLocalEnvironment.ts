@@ -68,8 +68,8 @@ function _errorsIncludingCleanup(
     lastError: unknown;
   }>,
 ): unknown[] {
-  return options.cleanupError ?
-      [options.firstError, options.cleanupError, options.lastError]
+  return options.cleanupError
+    ? [options.firstError, options.cleanupError, options.lastError]
     : [options.firstError, options.lastError];
 }
 
@@ -80,8 +80,8 @@ function _manualCleanupSuffix(
   }>,
 ): string {
   const { temporaryProjectId, cleanupError } = options;
-  return cleanupError ?
-      ` manual cleanup is required for ${temporaryProjectId}.`
+  return cleanupError
+    ? ` manual cleanup is required for ${temporaryProjectId}.`
     : "";
 }
 
@@ -263,9 +263,8 @@ async function _removeRestoredBackup(
   try {
     await options.io.removePath(options.preparation.backupDirectory);
   } catch (backupError) {
-    const errors =
-      options.cleanupError ?
-        [options.cleanupError, backupError]
+    const errors = options.cleanupError
+      ? [options.cleanupError, backupError]
       : [backupError];
     throw new AggregateError(
       errors,

@@ -1,5 +1,5 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type DashboardOwner = {
   profileId: string;

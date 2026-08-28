@@ -31,9 +31,8 @@ async function _captureAndDownloadPdf(
   options: Readonly<CaptureOptions>,
 ): Promise<void> {
   const baseCanvas = await _snapshotElement(options.element);
-  const finalCanvas =
-    options.annotationCanvas ?
-      _composite({
+  const finalCanvas = options.annotationCanvas
+    ? _composite({
         baseCanvas,
         overlayCanvas: options.annotationCanvas,
       })

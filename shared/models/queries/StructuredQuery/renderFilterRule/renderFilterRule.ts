@@ -51,9 +51,9 @@ export function renderFilterRule(
   // error and lose the results of every other rule. Validation runs against the
   // effective type so a live `columnTypes` override is honoured.
   const effectiveRule =
-    dataType === rule.columnDataType ?
-      rule
-    : { ...rule, columnDataType: dataType };
+    dataType === rule.columnDataType
+      ? rule
+      : { ...rule, columnDataType: dataType };
   if (QueryFilterValidation.validateRule(effectiveRule) !== undefined) {
     return undefined;
   }

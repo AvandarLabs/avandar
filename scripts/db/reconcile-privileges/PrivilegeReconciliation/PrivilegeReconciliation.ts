@@ -169,11 +169,15 @@ function _getDefaultAclParts(object: string): {
 } {
   const [schema = "", objectType = ""] = object.split("|");
   const objectClass =
-    objectType === "r" ? "tables"
-    : objectType === "S" ? "sequences"
-    : objectType === "f" ? "functions"
-    : objectType === "T" ? "types"
-    : "";
+    objectType === "r"
+      ? "tables"
+      : objectType === "S"
+        ? "sequences"
+        : objectType === "f"
+          ? "functions"
+          : objectType === "T"
+            ? "types"
+            : "";
   return { schema, objectClass };
 }
 

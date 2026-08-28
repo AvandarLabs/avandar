@@ -1,11 +1,11 @@
 import "fake-indexeddb/auto";
+import Dexie from "dexie";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   makePrincipalKeyFromPublicSession,
   makePrincipalKeyFromWorkspaceSession,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
-import Dexie from "dexie";
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import {
   AvaDexieVersionManager,

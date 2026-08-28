@@ -90,9 +90,8 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
 
   useEffect(
     function syncLastQueryError() {
-      const message =
-        dataQuery.isError ?
-          (formatOfflineQueryError(dataQuery.error) ?? dataQuery.error.message)
+      const message = dataQuery.isError
+        ? (formatOfflineQueryError(dataQuery.error) ?? dataQuery.error.message)
         : undefined;
       if (message !== state.lastQueryError) {
         dispatch.setLastQueryError(message);

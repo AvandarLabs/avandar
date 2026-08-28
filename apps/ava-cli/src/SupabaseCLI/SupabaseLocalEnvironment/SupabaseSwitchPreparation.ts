@@ -94,8 +94,9 @@ async function _requireSwitchSourceFiles(
     const isFile =
       (await options.io.pathExists(sourcePath)) &&
       (await options.io.isFile(sourcePath));
-    const canonicalSourcePath =
-      isFile ? await options.io.realPath(sourcePath) : "";
+    const canonicalSourcePath = isFile
+      ? await options.io.realPath(sourcePath)
+      : "";
     const expectedSourcePath = path.join(
       canonicalWorktreePath,
       path.relative(options.worktreePath, sourcePath),

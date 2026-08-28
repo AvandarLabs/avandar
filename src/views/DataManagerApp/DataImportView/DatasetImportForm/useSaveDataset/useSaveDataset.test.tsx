@@ -4,6 +4,8 @@ import { createElement } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { useSaveDataset } from "./useSaveDataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   CsvFileLoadResult,
   PdfFileLoadResult,
@@ -18,8 +20,6 @@ import type {
   DuckDbColumnSchema,
   DuckDbLoadXlsxResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement, ReactNode } from "react";
 
 const TEST_WORKSPACE = {

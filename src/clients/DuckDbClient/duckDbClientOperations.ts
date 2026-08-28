@@ -1,3 +1,5 @@
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   DatasetDuckDbLease,
   PublicSnapshotDuckDbOwner,
@@ -10,8 +12,6 @@ import type {
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { ILogger } from "@avandar/logger";
 import type * as duckdb from "@duckdb/duckdb-wasm";
-import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 /**
  * Marks SQL that this module built itself, so the fail-closed analyzer may

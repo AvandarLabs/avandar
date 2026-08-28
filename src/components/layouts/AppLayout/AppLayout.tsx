@@ -64,13 +64,13 @@ export function AppLayout({
       mah="100dvh"
       h="100dvh"
     >
-      {isDesktopPlatform ?
+      {isDesktopPlatform ? (
         <div
           aria-hidden
           className="electrobun-webkit-app-region-drag"
           style={TITLEBAR_DRAG_REGION_STYLE}
         />
-      : null}
+      ) : null}
       <Paper className={css.paper}>
         <Flex direction="column" mih={0} flex={1} gap={0}>
           <AppToolbar title={title} floatingToolbar={floatingToolbar}>

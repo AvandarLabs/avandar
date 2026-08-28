@@ -312,12 +312,10 @@ function _maxSeverity(hits: readonly PiiPatternHit[]): PiiSeverity {
   ) {
     return "critical";
   }
-  return (
-      hits.some((h) => {
-        return CATEGORY_WARNING.has(h.category);
-      })
-    ) ?
-      "warning"
+  return hits.some((h) => {
+    return CATEGORY_WARNING.has(h.category);
+  })
+    ? "warning"
     : "clean";
 }
 
@@ -329,8 +327,9 @@ export function detectPii(input: {
   columnName?: string;
   values?: readonly unknown[];
 }): PiiDetectionResult {
-  const columnHits =
-    input.columnName ? _detectFromColumnName(input.columnName) : [];
+  const columnHits = input.columnName
+    ? _detectFromColumnName(input.columnName)
+    : [];
   const contentHits = input.values ? _detectFromContent(input.values) : [];
 
   const hits = [...columnHits, ...contentHits];

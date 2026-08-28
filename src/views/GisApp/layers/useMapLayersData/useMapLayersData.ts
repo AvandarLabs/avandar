@@ -12,15 +12,15 @@ import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQ
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { PointLayerSource } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/runPointLayerQuery";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
 import type { UseQueryOptions } from "@tanstack/react-query";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** One layer's query, as the map render pipeline needs to see it. */
 export type MapLayerQueryState = {
@@ -64,8 +64,8 @@ function _getCapabilityError(
   overlay: MapOverlay,
   availability: DuckDbSpatialAvailability,
 ): Error | undefined {
-  return _layerNeedsSpatial(layer, overlay) && availability === "unavailable" ?
-      new Error("DuckDB Spatial is unavailable for this geometry layer")
+  return _layerNeedsSpatial(layer, overlay) && availability === "unavailable"
+    ? new Error("DuckDB Spatial is unavailable for this geometry layer")
     : undefined;
 }
 
@@ -134,9 +134,9 @@ function _getQueryColumnName(
     return undefined;
   }
   const column = layer.source.queryColumns.find(propEq("id", columnId));
-  return column === undefined ? undefined : (
-      QueryColumn.getDerivedColumnName(column)
-    );
+  return column === undefined
+    ? undefined
+    : QueryColumn.getDerivedColumnName(column);
 }
 
 /** The declared type of a layer's bound column, for SQL that depends on it. */
@@ -303,14 +303,14 @@ function _createLayerQuery(
       context.workspaceId,
       ...MapLayerData.getQueryKeyFromMapLayer(
         layer,
-        needsSpatial ?
-          {
-            availability: context.spatialAvailability,
-            zoomBand: context.zoomBand,
-            simplificationReferenceLatitude:
-              context.simplificationReferenceLatitude,
-          }
-        : undefined,
+        needsSpatial
+          ? {
+              availability: context.spatialAvailability,
+              zoomBand: context.zoomBand,
+              simplificationReferenceLatitude:
+                context.simplificationReferenceLatitude,
+            }
+          : undefined,
         context.overlay,
         context.layers,
         isLatLngPointLayer ? { zoomBand: context.zoomBand } : undefined,
@@ -319,11 +319,11 @@ function _createLayerQuery(
     // A point layer re-aggregates on every zoom band, so without a placeholder
     // the layer would blank out and refit on each step rather than repaint.
     placeholderData:
-      _isSpatialBinding(layer) || isLatLngPointLayer ?
-        (previous: MapLayerDataResult | undefined) => {
-          return previous;
-        }
-      : undefined,
+      _isSpatialBinding(layer) || isLatLngPointLayer
+        ? (previous: MapLayerDataResult | undefined) => {
+            return previous;
+          }
+        : undefined,
     queryFn: async ({ signal }): Promise<MapLayerDataResult> => {
       if (_isSpatialBinding(layer)) {
         return await _runSpatialLayer({

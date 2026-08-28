@@ -13,11 +13,11 @@ import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { roleSelectTooltip } from "../copy/roleSelectTooltip";
 import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 type Props = {
   share: ResourceShareRow;
@@ -65,14 +65,16 @@ export function SharePrincipalRow({
 
   return (
     <Group wrap="nowrap" align="center" gap="sm">
-      {isGroup ?
+      {isGroup ? (
         <IconTag size={16} aria-hidden />
-      : <IconUser size={16} aria-hidden />}
+      ) : (
+        <IconUser size={16} aria-hidden />
+      )}
       <Text size="sm" flex={1}>
         {displayName}
       </Text>
 
-      {isOwnerRow ?
+      {isOwnerRow ? (
         <Tooltip
           label={t`The owner always has admin access. To change owner, use the ${resource} settings.`}
         >
@@ -80,7 +82,8 @@ export function SharePrincipalRow({
             <Trans>Owner</Trans>
           </Badge>
         </Tooltip>
-      : <Tooltip label={roleSelectTooltip()}>
+      ) : (
+        <Tooltip label={roleSelectTooltip()}>
           <Select
             w={120}
             disabled={isReadOnly}
@@ -95,9 +98,9 @@ export function SharePrincipalRow({
             aria-label={t`Role for ${displayName}`}
           />
         </Tooltip>
-      }
+      )}
 
-      {isGroup && !isOwnerRow && onToggleRequiresAppAccess ?
+      {isGroup && !isOwnerRow && onToggleRequiresAppAccess ? (
         <Tooltip
           label={t`When on, members of this group only get access if they already have ${app} access in the workspace. When off, every member of the group gets access here, even if they normally can't open ${app}.`}
           multiline
@@ -114,9 +117,9 @@ export function SharePrincipalRow({
             aria-label={t`Limit ${displayName} to app access`}
           />
         </Tooltip>
-      : null}
+      ) : null}
 
-      {!isOwnerRow ?
+      {!isOwnerRow ? (
         <Tooltip label={t`Remove access for ${name}.`}>
           <ActionIcon
             variant="subtle"
@@ -128,7 +131,7 @@ export function SharePrincipalRow({
             <IconX size={16} />
           </ActionIcon>
         </Tooltip>
-      : null}
+      ) : null}
     </Group>
   );
 }

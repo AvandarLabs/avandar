@@ -124,10 +124,9 @@ export function getGeoBindingGuessFromColumns(
   const longitude =
     highLongitude ??
     _findNumericColumn(columns, LOW_CONFIDENCE_LONGITUDE_NAMES);
-  return (
-    highLatitude && highLongitude ?
-      _buildGuess(highLatitude, highLongitude, "high")
-    : latitude && longitude ? _buildGuess(latitude, longitude, "low")
-    : undefined
-  );
+  return highLatitude && highLongitude
+    ? _buildGuess(highLatitude, highLongitude, "high")
+    : latitude && longitude
+      ? _buildGuess(latitude, longitude, "low")
+      : undefined;
 }

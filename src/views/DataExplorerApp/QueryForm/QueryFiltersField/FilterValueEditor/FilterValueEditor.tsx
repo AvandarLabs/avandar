@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
+import { match } from "ts-pattern";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator";
 import { QueryFilterValue } from "$/models/queries/StructuredQuery/QueryFilterValue/QueryFilterValue";
-import { match } from "ts-pattern";
 import { FilterListInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterListInput";
 import { FilterPairInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput";
 import { FilterScalarInput } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterScalarInput";
@@ -62,15 +62,15 @@ export function FilterValueEditor({
     })
     .with("scalar", () => {
       const placeholder =
-        operator === "matches_regex" || operator === "not_matches_regex" ?
-          t`Regular expression`
-        : t`Value`;
+        operator === "matches_regex" || operator === "not_matches_regex"
+          ? t`Regular expression`
+          : t`Value`;
       return (
         <FilterScalarInput
           testId={
-            dataType !== undefined && AvaDataType.isTemporal(dataType) ?
-              "filter-value-date"
-            : "filter-value-scalar"
+            dataType !== undefined && AvaDataType.isTemporal(dataType)
+              ? "filter-value-date"
+              : "filter-value-scalar"
           }
           value={QueryFilterValue.getScalar(value) ?? ""}
           placeholder={placeholder}

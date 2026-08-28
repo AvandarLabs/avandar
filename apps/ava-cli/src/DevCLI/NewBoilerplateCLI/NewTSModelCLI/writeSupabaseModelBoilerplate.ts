@@ -28,9 +28,8 @@ export function writeSupabaseModelBoilerplate(options: {
 
   const outputDir = path.posix.join(modelsDirRelative, modelName);
 
-  const mainTemplate =
-    addModule ?
-      "SupabaseModel.main.withModule.ts.template"
+  const mainTemplate = addModule
+    ? "SupabaseModel.main.withModule.ts.template"
     : "SupabaseModel.main.ts.template";
 
   writeFileFromTemplate({

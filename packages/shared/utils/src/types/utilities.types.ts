@@ -19,8 +19,9 @@ import type {
  * in a string template. So, it returns MyId instead of \`${MyId}\`.
  */
 export type StringKeyOf<T> =
-  BroadStringKeyOf<T> extends `${infer S extends string}` ? S
-  : BroadStringKeyOf<T>;
+  BroadStringKeyOf<T> extends `${infer S extends string}`
+    ? S
+    : BroadStringKeyOf<T>;
 
 export type CamelCase<
   T extends string,
@@ -55,39 +56,53 @@ export type Unbrand<T> = T extends Brand<infer U, string> ? U : T;
  * Recursively removes all `TypeToExclude` types from a type.
  */
 export type ExcludeDeep<T, TypeToExclude> =
-  T extends Array<infer U> ? Array<ExcludeDeep<U, TypeToExclude>>
-  : T extends ReadonlyArray<infer U> ?
-    ReadonlyArray<ExcludeDeep<U, TypeToExclude>>
-  : T extends Map<infer K, infer V> ? Map<K, ExcludeDeep<V, TypeToExclude>>
-  : T extends ReadonlyMap<infer K, infer V> ?
-    ReadonlyMap<K, ExcludeDeep<V, TypeToExclude>>
-  : T extends Set<infer U> ? Set<ExcludeDeep<U, TypeToExclude>>
-  : T extends ReadonlySet<infer U> ? ReadonlySet<ExcludeDeep<U, TypeToExclude>>
-  : T extends UnknownObject ?
-    {
-      [K in keyof T as Exclude<T[K], TypeToExclude> extends never ? never
-      : K]: ExcludeDeep<T[K], TypeToExclude>;
-    }
-  : Exclude<T, TypeToExclude>;
+  T extends Array<infer U>
+    ? Array<ExcludeDeep<U, TypeToExclude>>
+    : T extends ReadonlyArray<infer U>
+      ? ReadonlyArray<ExcludeDeep<U, TypeToExclude>>
+      : T extends Map<infer K, infer V>
+        ? Map<K, ExcludeDeep<V, TypeToExclude>>
+        : T extends ReadonlyMap<infer K, infer V>
+          ? ReadonlyMap<K, ExcludeDeep<V, TypeToExclude>>
+          : T extends Set<infer U>
+            ? Set<ExcludeDeep<U, TypeToExclude>>
+            : T extends ReadonlySet<infer U>
+              ? ReadonlySet<ExcludeDeep<U, TypeToExclude>>
+              : T extends UnknownObject
+                ? {
+                    [
+                      K in keyof T as Exclude<T[K], TypeToExclude> extends never
+                        ? never
+                        : K
+                    ]: ExcludeDeep<T[K], TypeToExclude>;
+                  }
+                : Exclude<T, TypeToExclude>;
 
 export type SwapDeep<T, TypeToSwap, SwapWith> =
-  T extends Array<infer U> ? Array<SwapDeep<U, TypeToSwap, SwapWith>>
-  : T extends ReadonlyArray<infer U> ?
-    ReadonlyArray<SwapDeep<U, TypeToSwap, SwapWith>>
-  : T extends Map<infer K, infer V> ? Map<K, SwapDeep<V, TypeToSwap, SwapWith>>
-  : T extends ReadonlyMap<infer K, infer V> ?
-    ReadonlyMap<K, SwapDeep<V, TypeToSwap, SwapWith>>
-  : T extends Set<infer U> ? Set<SwapDeep<U, TypeToSwap, SwapWith>>
-  : T extends ReadonlySet<infer U> ?
-    ReadonlySet<SwapDeep<U, TypeToSwap, SwapWith>>
-  : T extends UnknownObject ?
-    {
-      [K in keyof T as Exclude<T[K], TypeToSwap> extends never ? never
-      : K]: SwapDeep<T[K], TypeToSwap, SwapWith>;
-    }
-  : // check if this is correct
-  T extends TypeToSwap ? Exclude<T, TypeToSwap> | SwapWith
-  : T;
+  T extends Array<infer U>
+    ? Array<SwapDeep<U, TypeToSwap, SwapWith>>
+    : T extends ReadonlyArray<infer U>
+      ? ReadonlyArray<SwapDeep<U, TypeToSwap, SwapWith>>
+      : T extends Map<infer K, infer V>
+        ? Map<K, SwapDeep<V, TypeToSwap, SwapWith>>
+        : T extends ReadonlyMap<infer K, infer V>
+          ? ReadonlyMap<K, SwapDeep<V, TypeToSwap, SwapWith>>
+          : T extends Set<infer U>
+            ? Set<SwapDeep<U, TypeToSwap, SwapWith>>
+            : T extends ReadonlySet<infer U>
+              ? ReadonlySet<SwapDeep<U, TypeToSwap, SwapWith>>
+              : T extends UnknownObject
+                ? {
+                    [
+                      K in keyof T as Exclude<T[K], TypeToSwap> extends never
+                        ? never
+                        : K
+                    ]: SwapDeep<T[K], TypeToSwap, SwapWith>;
+                  }
+                : // check if this is correct
+                  T extends TypeToSwap
+                  ? Exclude<T, TypeToSwap> | SwapWith
+                  : T;
 
 export type UndefinedToNullDeep<T> = SwapDeep<T, undefined, null>;
 export type NullToUndefinedDeep<T> = SwapDeep<T, null, undefined>;
@@ -127,11 +142,11 @@ export type FirstParameter<Func extends AnyFunction> =
  * parameter)
  */
 export type TailParameters<Func extends AnyFunction> =
-  Func extends AnyFunctionWithArguments<infer Args> ?
-    Args extends [unknown, ...infer Tail] ?
-      Tail
-    : never
-  : never;
+  Func extends AnyFunctionWithArguments<infer Args>
+    ? Args extends [unknown, ...infer Tail]
+      ? Tail
+      : never
+    : never;
 
 /**
  * Represents a single-parameter function that returns the same type it was
@@ -174,8 +189,9 @@ export type ReplaceTypes<
   OriginalObject extends UnknownRecord,
   NewTypes extends UnknownRecord,
 > = {
-  [K in keyof OriginalObject]: K extends keyof NewTypes ? NewTypes[K]
-  : OriginalObject[K];
+  [K in keyof OriginalObject]: K extends keyof NewTypes
+    ? NewTypes[K]
+    : OriginalObject[K];
 };
 
 /**
@@ -206,11 +222,11 @@ export type ObjectRegistry<
 > = Simplify<
   UnionToIntersection<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    U extends any ?
-      {
-        [V in U as Extract<U[KeyProp], string>]: V;
-      }
-    : never
+    U extends any
+      ? {
+          [V in U as Extract<U[KeyProp], string>]: V;
+        }
+      : never
   >
 >;
 
@@ -225,10 +241,10 @@ export type ObjectRegistry<
 export type MergeObjects<
   ObjA extends UnknownObject | EmptyObject,
   ObjB extends UnknownObject | EmptyObject,
-> =
-  ObjA extends EmptyObject ?
-    ObjB extends EmptyObject ?
-      EmptyObject
+> = ObjA extends EmptyObject
+  ? ObjB extends EmptyObject
+    ? EmptyObject
     : ObjB
-  : ObjB extends EmptyObject ? ObjA
-  : ObjA & ObjB;
+  : ObjB extends EmptyObject
+    ? ObjA
+    : ObjA & ObjB;

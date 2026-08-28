@@ -1,8 +1,8 @@
 import { propEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /** True when the layer's query returns every column a point binding names. */
 function _isPointBindingComplete(
@@ -15,8 +15,8 @@ function _isPointBindingComplete(
       layer.source.queryColumns.some(propEq("id", columnId))
     );
   };
-  return points.type === "geometryColumn" ?
-      hasColumn(points.column)
+  return points.type === "geometryColumn"
+    ? hasColumn(points.column)
     : hasColumn(points.latitude) && hasColumn(points.longitude);
 }
 

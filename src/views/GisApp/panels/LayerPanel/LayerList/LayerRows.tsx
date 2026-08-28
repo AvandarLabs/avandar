@@ -2,10 +2,10 @@ import { match } from "ts-pattern";
 import { AnnotationLayerRow } from "@/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow";
 import { LayerRow } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRow";
 import { makeStackOrderFromLayerMove } from "@/views/GisApp/panels/LayerPanel/makeStackOrderFromLayerMove/makeStackOrderFromLayerMove";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
-import type { LayerPanelItem } from "@/views/GisApp/panels/LayerPanel/LayerList/makeLayerPanelItemsFromRows";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
+import type { LayerPanelItem } from "@/views/GisApp/panels/LayerPanel/LayerList/makeLayerPanelItemsFromRows";
 import type { ReactNode } from "react";
 
 type Props = {

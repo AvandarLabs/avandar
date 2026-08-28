@@ -40,8 +40,8 @@ async function _readRenderedCoordinates(
       }
       const data = source.data as GeoJSON.FeatureCollection;
       return data.features.flatMap((feature) => {
-        return feature.geometry.type === "Point" ?
-            [
+        return feature.geometry.type === "Point"
+          ? [
               [
                 Math.round(feature.geometry.coordinates[0]! * 10) / 10,
                 Math.round(feature.geometry.coordinates[1]! * 10) / 10,

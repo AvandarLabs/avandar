@@ -174,7 +174,7 @@ export function ConsentLogPanel(): React.ReactNode {
         </Group>
       </Group>
 
-      {filtered.length === 0 ?
+      {filtered.length === 0 ? (
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
             <Trans>
@@ -183,7 +183,8 @@ export function ConsentLogPanel(): React.ReactNode {
             </Trans>
           </Text>
         </Card>
-      : <Table striped withTableBorder>
+      ) : (
+        <Table striped withTableBorder>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>
@@ -250,32 +251,31 @@ export function ConsentLogPanel(): React.ReactNode {
                           </Badge>
                         );
                       })}
-                      {(
-                        entry.detectedPii.length === 0 &&
-                        entry.detectedBias.length === 0
-                      ) ?
+                      {entry.detectedPii.length === 0 &&
+                      entry.detectedBias.length === 0 ? (
                         <Text size="xs" c="dimmed">
                           <Trans>(clean)</Trans>
                         </Text>
-                      : null}
+                      ) : null}
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                    {entry.sourceColumn ?
+                    {entry.sourceColumn ? (
                       <Text size="xs" ff="monospace">
                         {entry.sourceColumn}
                       </Text>
-                    : <Text size="xs" c="dimmed">
+                    ) : (
+                      <Text size="xs" c="dimmed">
                         —
                       </Text>
-                    }
+                    )}
                   </Table.Td>
                 </Table.Tr>
               );
             })}
           </Table.Tbody>
         </Table>
-      }
+      )}
     </Stack>
   );
 }

@@ -12,16 +12,16 @@ import { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator
 import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
-import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { Module } from "@avandar/modules";
-import type { EmptyObject } from "@avandar/utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
+import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type { Module } from "@avandar/modules";
+import type { EmptyObject } from "@avandar/utils";
 
 export type IWorkspaceQetlClient = Module<
   "WorkspaceQuerySession",

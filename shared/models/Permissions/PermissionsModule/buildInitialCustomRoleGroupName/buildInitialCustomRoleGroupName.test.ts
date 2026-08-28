@@ -1,5 +1,5 @@
-import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { describe, expect, it } from "vitest";
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
 
@@ -49,9 +49,8 @@ function _createMockRoleGroupsDb(options: {
                       return {
                         async throwOnError() {
                           return {
-                            data:
-                              options.isNameTaken(name) ?
-                                { id: "existing" }
+                            data: options.isNameTaken(name)
+                              ? { id: "existing" }
                               : null,
                             error: null,
                           };

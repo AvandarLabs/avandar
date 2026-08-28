@@ -17,8 +17,8 @@ function _renderNode(
     return renderFilterRule(node, options);
   }
   const nested = renderFilterGroup(node, options);
-  return nested ?
-      { sql: `(${nested.sql})`, bindings: nested.bindings }
+  return nested
+    ? { sql: `(${nested.sql})`, bindings: nested.bindings }
     : undefined;
 }
 

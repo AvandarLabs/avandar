@@ -27,24 +27,24 @@ export function AuthLayout({
 
   return (
     <Stack gap={0} mih="100dvh">
-      {isDesktopPlatform ?
+      {isDesktopPlatform ? (
         <Box
           aria-hidden
           className="electrobun-webkit-app-region-drag"
           style={TITLEBAR_DRAG_REGION_STYLE}
         />
-      : null}
+      ) : null}
       <Container size={512} py="xxl">
         <Stack>
           <Title ta="center" order={1}>
             {title}
           </Title>
 
-          {subtitle ?
+          {subtitle ? (
             <Text ta="center" className="space-x-2" c="dimmed">
               {subtitle}
             </Text>
-          : null}
+          ) : null}
 
           <Paper>{children}</Paper>
 

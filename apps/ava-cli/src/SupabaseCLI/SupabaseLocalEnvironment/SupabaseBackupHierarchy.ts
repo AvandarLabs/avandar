@@ -48,8 +48,9 @@ async function _requireBackupDirectory(
   const exists = await options.io.pathExists(options.directoryPath);
   const isDirectory =
     exists && (await options.io.isDirectory(options.directoryPath));
-  const canonicalPath =
-    isDirectory ? await options.io.realPath(options.directoryPath) : "";
+  const canonicalPath = isDirectory
+    ? await options.io.realPath(options.directoryPath)
+    : "";
   if (!isDirectory || canonicalPath !== options.expectedCanonicalPath) {
     throw new Error(
       "Supabase backup has an unsafe deterministic backup hierarchy.",

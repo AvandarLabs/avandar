@@ -112,10 +112,11 @@ export function PrimitiveValueItem<
           <NumberValueItem
             editMode={editMode}
             value={
-              isNullish(value) ? value
-              : isStringOrNumber(value) ?
-                value
-              : String(value)
+              isNullish(value)
+                ? value
+                : isStringOrNumber(value)
+                  ? value
+                  : String(value)
             }
             onChange={(newValue) => {
               return onChange?.(newValue as T);

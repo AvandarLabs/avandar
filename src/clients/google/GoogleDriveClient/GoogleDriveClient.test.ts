@@ -57,11 +57,11 @@ function _workbookResponse(
 
 function _driveErrorResponse(status: number, reason?: string): Response {
   const body =
-    reason === undefined ?
-      JSON.stringify({ error: { code: status } })
-    : JSON.stringify({
-        error: { code: status, errors: [{ domain: "global", reason }] },
-      });
+    reason === undefined
+      ? JSON.stringify({ error: { code: status } })
+      : JSON.stringify({
+          error: { code: status, errors: [{ domain: "global", reason }] },
+        });
   return new Response(body, {
     status,
     headers: { "Content-Type": "application/json" },

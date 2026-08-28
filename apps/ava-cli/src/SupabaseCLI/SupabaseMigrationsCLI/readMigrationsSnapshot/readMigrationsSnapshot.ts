@@ -169,8 +169,9 @@ export function readMigrationsSnapshot(
       workingTreeMigrations,
       migrationsOnBase,
     }),
-    configToml:
-      existsSync(configTomlPath) ? readFileSync(configTomlPath, "utf-8") : "",
+    configToml: existsSync(configTomlPath)
+      ? readFileSync(configTomlPath, "utf-8")
+      : "",
     now,
   };
 }

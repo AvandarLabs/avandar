@@ -57,10 +57,11 @@ export function PiiWarningPanel({
         label={<Trans>Detected:</Trans>}
         hits={pii.hits}
         color={
-          pii.severity === "critical" ? "red"
-          : pii.severity === "warning" ?
-            "yellow"
-          : "gray"
+          pii.severity === "critical"
+            ? "red"
+            : pii.severity === "warning"
+              ? "yellow"
+              : "gray"
         }
       />
 

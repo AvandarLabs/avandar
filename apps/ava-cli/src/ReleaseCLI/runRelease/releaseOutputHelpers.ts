@@ -79,25 +79,25 @@ export function printVersionReference(
   }
 
   const nextRow =
-    needsNextVersion && isDefined(suggestedNext) ?
-      ([
-        "suggested next:",
-        `${suggestedNext} (patch bump, becomes ${toDevVersion(suggestedNext)})`,
-      ] as const)
-    : undefined;
+    needsNextVersion && isDefined(suggestedNext)
+      ? ([
+          "suggested next:",
+          `${suggestedNext} (patch bump, becomes ${toDevVersion(suggestedNext)})`,
+        ] as const)
+      : undefined;
   const details = [
-    needsReleaseVersion ?
-      ([
-        `current on ${RELEASE_TARGET_BRANCH}:`,
-        mainVersion ?? "unknown",
-      ] as const)
-    : undefined,
-    needsReleaseVersion ?
-      ([`current on ${RELEASE_SOURCE_BRANCH}:`, developVersion] as const)
-    : undefined,
-    needsReleaseVersion ?
-      (["suggested release:", suggestedRelease] as const)
-    : undefined,
+    needsReleaseVersion
+      ? ([
+          `current on ${RELEASE_TARGET_BRANCH}:`,
+          mainVersion ?? "unknown",
+        ] as const)
+      : undefined,
+    needsReleaseVersion
+      ? ([`current on ${RELEASE_SOURCE_BRANCH}:`, developVersion] as const)
+      : undefined,
+    needsReleaseVersion
+      ? (["suggested release:", suggestedRelease] as const)
+      : undefined,
     nextRow,
   ].filter(isDefined);
 

@@ -7,8 +7,8 @@ import { isMapTimeColumn } from "@/views/GisApp/layers/isMapTimeColumn/isMapTime
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { withQueryColumn } from "@/views/GisApp/layers/MapLayerUpdates/withQueryColumn";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -53,9 +53,8 @@ function _timeColumnOptions(columns: readonly QueryColumn.T[]) {
 /** Selects the query column used to filter this layer by time. */
 export function TimeColumnSelect({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const columns = useLayerSourceColumns(dataSourceId).filter(isMapTimeColumn);
   const selectedColumn = MapLayerUpdates.getQueryColumnFromLayer({
@@ -74,9 +73,9 @@ export function TimeColumnSelect({ layer, onLayerChange }: Props): ReactNode {
       value={selectedColumn?.baseColumn.id ?? null}
       onChange={(columnId) => {
         const column =
-          columnId === null ? undefined : (
-            columns.find(propEq("baseColumn.id", columnId))
-          );
+          columnId === null
+            ? undefined
+            : columns.find(propEq("baseColumn.id", columnId));
         onLayerChange((current) => {
           return _bindTimeColumn(current, column);
         });

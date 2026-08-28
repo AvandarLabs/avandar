@@ -59,8 +59,8 @@ async function _readLayerPaint(
     const layer = style?.layers?.find((candidate) => {
       return candidate.id.endsWith(suffix);
     });
-    return layer && "paint" in layer ?
-        (layer.paint as Record<string, unknown>)
+    return layer && "paint" in layer
+      ? (layer.paint as Record<string, unknown>)
       : undefined;
   }, layerIdSuffix);
 }

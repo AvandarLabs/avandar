@@ -22,9 +22,11 @@ export function MapListView({ avaMaps, workspaceSlug }: Props): ReactNode {
       }
       containerProps={{ p: "md" }}
     >
-      {avaMaps.length === 0 ?
+      {avaMaps.length === 0 ? (
         <EmptyMapList />
-      : <MapGrid avaMaps={avaMaps} workspaceSlug={workspaceSlug} />}
+      ) : (
+        <MapGrid avaMaps={avaMaps} workspaceSlug={workspaceSlug} />
+      )}
     </AppLayout>
   );
 }

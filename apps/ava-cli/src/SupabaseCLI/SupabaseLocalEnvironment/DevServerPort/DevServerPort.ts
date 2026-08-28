@@ -23,8 +23,8 @@ function _getEnvValueFromLine(
   options: Readonly<{ line: string; key: string }>,
 ): string | undefined {
   const assignment = EnvFileLine.getAssignment(options.line);
-  return assignment?.key === options.key ?
-      EnvFileLine.getUnquotedValue(assignment.value)
+  return assignment?.key === options.key
+    ? EnvFileLine.getUnquotedValue(assignment.value)
     : undefined;
 }
 
@@ -41,13 +41,11 @@ function _getEnvValueFromContents(
 
 function _getPortFromText(text: string): number | undefined {
   const port = Number(text);
-  return (
-      text !== "" &&
-        Number.isInteger(port) &&
-        port >= MIN_TCP_PORT &&
-        port <= MAX_TCP_PORT
-    ) ?
-      port
+  return text !== "" &&
+    Number.isInteger(port) &&
+    port >= MIN_TCP_PORT &&
+    port <= MAX_TCP_PORT
+    ? port
     : undefined;
 }
 
@@ -58,9 +56,9 @@ function _getPortFromAppUrl(envContents: string): number | undefined {
   });
   const loopbackAppUrl =
     appUrl === undefined ? undefined : EnvFileLine.getLoopbackUrl(appUrl);
-  return loopbackAppUrl === undefined ? undefined : (
-      _getPortFromText(loopbackAppUrl.port)
-    );
+  return loopbackAppUrl === undefined
+    ? undefined
+    : _getPortFromText(loopbackAppUrl.port);
 }
 
 function _getPortFromEnvContents(envContents: string): number | undefined {
@@ -68,8 +66,8 @@ function _getPortFromEnvContents(envContents: string): number | undefined {
     envContents,
     key: DEV_SERVER_PORT_ENV_KEY,
   });
-  return pinnedPort === undefined ?
-      _getPortFromAppUrl(envContents)
+  return pinnedPort === undefined
+    ? _getPortFromAppUrl(envContents)
     : _getPortFromText(pinnedPort);
 }
 
@@ -98,11 +96,9 @@ async function _findAvailableDevServerPort(
 ): Promise<number> {
   const { candidatePort, reservedPorts, isPortAvailable } = options;
   _requireValidPort(candidatePort);
-  return (
-      !reservedPorts.includes(candidatePort) &&
-        (await isPortAvailable(candidatePort))
-    ) ?
-      candidatePort
+  return !reservedPorts.includes(candidatePort) &&
+    (await isPortAvailable(candidatePort))
+    ? candidatePort
     : await _findAvailableDevServerPort({
         ...options,
         candidatePort: candidatePort + 1,
@@ -114,13 +110,13 @@ async function _getAvailable(
 ): Promise<number> {
   const { currentDevServerPort, portDelta, reservedPorts, isPortAvailable } =
     options;
-  return portDelta === 0 ? currentDevServerPort : (
-      await _findAvailableDevServerPort({
+  return portDelta === 0
+    ? currentDevServerPort
+    : await _findAvailableDevServerPort({
         candidatePort: _requireValidPort(currentDevServerPort + portDelta),
         reservedPorts,
         isPortAvailable,
-      })
-    );
+      });
 }
 
 function _makeEnvLineWithDevServerPort(
@@ -158,9 +154,9 @@ function _toDevelopmentEnv(
       key: DEV_SERVER_PORT_ENV_KEY,
     }) !== undefined;
   const separator = rewrittenContents.endsWith("\n") ? "" : "\n";
-  return hasPinnedPort ? rewrittenContents : (
-      `${rewrittenContents}${separator}\n${DEV_SERVER_PORT_COMMENT}\n${DEV_SERVER_PORT_ENV_KEY}=${devServerPort}\n`
-    );
+  return hasPinnedPort
+    ? rewrittenContents
+    : `${rewrittenContents}${separator}\n${DEV_SERVER_PORT_COMMENT}\n${DEV_SERVER_PORT_ENV_KEY}=${devServerPort}\n`;
 }
 
 /** Derives and records the Vite dev-server port a worktree serves on. */

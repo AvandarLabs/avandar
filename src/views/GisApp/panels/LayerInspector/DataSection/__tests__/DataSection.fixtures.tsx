@@ -3,10 +3,10 @@
  * imports this first so its `vi.mock` calls register before the module graph.
  */
 import { Model } from "@avandar/models";
+import { vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
-import { vi } from "vitest";
 import { createDataSectionMapLayerUpdatesMock } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.mapLayerUpdatesMock";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -199,9 +199,11 @@ vi.mock(
             aria-label={label}
             onClick={() => {
               onChange(
-                label === "Latitude" ? fixtures.latitudeColumn
-                : label === "Longitude" ? fixtures.longitudeColumn
-                : fixtures.geometryColumn,
+                label === "Latitude"
+                  ? fixtures.latitudeColumn
+                  : label === "Longitude"
+                    ? fixtures.longitudeColumn
+                    : fixtures.geometryColumn,
               );
             }}
           >

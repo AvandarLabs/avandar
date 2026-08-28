@@ -3,9 +3,9 @@
  * and it is the only place in the GIS view that asks for DuckDB Spatial.
  */
 import { Model } from "@avandar/models";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
 import { GisApp } from "@/views/GisApp/GisApp";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";

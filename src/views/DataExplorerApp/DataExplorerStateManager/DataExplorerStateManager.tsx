@@ -13,10 +13,6 @@ import {
   isSameColumnSchema,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
-import type {
-  DataExplorerAppState,
-  OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -27,6 +23,10 @@ import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  DataExplorerAppState,
+  OpenDatasetInfo,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 // Re-exported INITIAL_DATA_EXPLORER_STATE lives in
 // DataExplorerAppState.types.ts so other consumers can import it without

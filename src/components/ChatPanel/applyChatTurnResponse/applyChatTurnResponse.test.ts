@@ -1,8 +1,8 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it, vi } from "vitest";
 import { applyChatTurnResponse } from "./applyChatTurnResponse";
-import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";
 
 const SQL_RESULTS_ON_CANVAS = "The results are on the canvas to the left.";
 

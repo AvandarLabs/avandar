@@ -160,23 +160,22 @@ async function _transcodeXlsxToParquet(
     xlsxStagingFile: string;
   }>,
 ): Promise<void> {
-  const sheetClause =
-    options.sheet ?
-      `, sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`
+  const sheetClause = options.sheet
+    ? `, sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`
     : "";
   // A range is only needed to skip a title block, and detecting the sheet's
   // width costs a read of its own, so neither happens without a skip.
   const lastColumn =
-    options.rowsToSkip > 0 ?
-      await _detectLastPopulatedColumn({
-        client: options.client,
-        conn: options.conn,
-        datasetDuckDbLease: options.datasetDuckDbLease,
-        rowsToSkip: options.rowsToSkip,
-        sheetClause,
-        xlsxStagingFile: options.xlsxStagingFile,
-      })
-    : undefined;
+    options.rowsToSkip > 0
+      ? await _detectLastPopulatedColumn({
+          client: options.client,
+          conn: options.conn,
+          datasetDuckDbLease: options.datasetDuckDbLease,
+          rowsToSkip: options.rowsToSkip,
+          sheetClause,
+          xlsxStagingFile: options.xlsxStagingFile,
+        })
+      : undefined;
   const range = buildXlsxReadRange(options.rowsToSkip, lastColumn);
   // Naming a range turns `stop_at_empty` off, which would pad the read out to
   // the format's maximum row, so it is switched back on alongside the range.

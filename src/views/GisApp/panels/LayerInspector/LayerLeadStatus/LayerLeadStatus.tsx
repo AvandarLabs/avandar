@@ -24,31 +24,30 @@ export function LayerLeadStatus({
   const total = mapped + viewState.droppedRowCount;
   const operationalState = getMapLayerOperationalState(viewState);
   const status =
-    operationalState.type === "rebindRequired" ? t`Geometry must be rebound`
-    : operationalState.type === "spatialUnavailable" ?
-      t`Geometry support unavailable`
-    : operationalState.type === "suppressed" ?
-      t`${operationalState.featureCount} areas suppressed`
-    : operationalState.type === "noData" ?
-      t`${operationalState.featureCount} areas have no data`
-    : matchLiteral(viewState.status, {
-        unbound: t`Not plotted yet`,
-        loading: t`Loading`,
-        error: t`Could not load`,
-        empty: t`0 rows`,
-        ready: t`${mapped} of ${total} rows mapped`,
-      });
+    operationalState.type === "rebindRequired"
+      ? t`Geometry must be rebound`
+      : operationalState.type === "spatialUnavailable"
+        ? t`Geometry support unavailable`
+        : operationalState.type === "suppressed"
+          ? t`${operationalState.featureCount} areas suppressed`
+          : operationalState.type === "noData"
+            ? t`${operationalState.featureCount} areas have no data`
+            : matchLiteral(viewState.status, {
+                unbound: t`Not plotted yet`,
+                loading: t`Loading`,
+                error: t`Could not load`,
+                empty: t`0 rows`,
+                ready: t`${mapped} of ${total} rows mapped`,
+              });
   return (
     <div className={css.layerLeadStatus}>
       {status}
-      {(
-        viewState.spatialDiagnostics?.matchedSourceKeyCount !== undefined &&
-        onOpenMatchReport
-      ) ?
+      {viewState.spatialDiagnostics?.matchedSourceKeyCount !== undefined &&
+      onOpenMatchReport ? (
         <Button variant="subtle" size="compact-xs" onClick={onOpenMatchReport}>
           {t`Review matches`}
         </Button>
-      : null}
+      ) : null}
     </div>
   );
 }

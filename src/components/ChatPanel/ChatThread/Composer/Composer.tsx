@@ -33,9 +33,11 @@ export function Composer(): React.ReactNode {
   const chatDisabled = !isChatEnabled;
 
   const placeholder =
-    context.app === "dashboards" ? t`Ask me to add a chart to this dashboard...`
-    : context.app === "data-explorer" ? t`Ask about your data...`
-    : t`Chat is enabled in Data Explorer and Dashboards`;
+    context.app === "dashboards"
+      ? t`Ask me to add a chart to this dashboard...`
+      : context.app === "data-explorer"
+        ? t`Ask about your data...`
+        : t`Chat is enabled in Data Explorer and Dashboards`;
 
   return (
     <div

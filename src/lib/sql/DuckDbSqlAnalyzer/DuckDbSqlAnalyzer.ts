@@ -12,12 +12,12 @@ import {
   hasInvalidTokenStructure,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
+import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   DuckDbSqlAnalysis,
   SourceAnalysis,
   SqlToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 
 export type {
   DuckDbSqlAnalysis,

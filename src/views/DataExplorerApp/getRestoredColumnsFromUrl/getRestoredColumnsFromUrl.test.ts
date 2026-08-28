@@ -5,8 +5,8 @@
  */
 import { Model } from "@avandar/models";
 import { prop } from "@avandar/utils";
-import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { getRestoredColumnsFromUrl } from "@/views/DataExplorerApp/getRestoredColumnsFromUrl/getRestoredColumnsFromUrl";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";

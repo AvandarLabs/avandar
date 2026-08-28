@@ -177,9 +177,9 @@ Nothing has been released. Fix the push and run the command again.`,
     }
   }
   // On a dry run no commit was made, so the release commit is the branch tip.
-  return git.dryRun ? originDevelopSha : (
-      (revParse(git, "HEAD") ?? originDevelopSha)
-    );
+  return git.dryRun
+    ? originDevelopSha
+    : (revParse(git, "HEAD") ?? originDevelopSha);
 }
 
 /**

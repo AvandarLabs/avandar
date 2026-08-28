@@ -70,9 +70,9 @@ export function Select<T extends NonNullable<string>>({
   const theme = useMantineTheme();
   const themeComboboxDefaults = theme.components?.Combobox?.defaultProps;
   const resolvedComboboxDefaults =
-    typeof themeComboboxDefaults === "function" ?
-      themeComboboxDefaults(theme)
-    : themeComboboxDefaults;
+    typeof themeComboboxDefaults === "function"
+      ? themeComboboxDefaults(theme)
+      : themeComboboxDefaults;
 
   return (
     <MantineSelect

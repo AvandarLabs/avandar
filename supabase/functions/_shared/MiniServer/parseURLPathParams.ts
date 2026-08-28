@@ -15,9 +15,8 @@ export type ValidPathParamsSchemaShape<
 
 export type ValidPathParamsSchema<
   PathParams extends AnyValidPathParamsRecord | undefined,
-> =
-  PathParams extends AnyValidPathParamsRecord ?
-    ZodObject<ValidPathParamsSchemaShape<PathParams>>
+> = PathParams extends AnyValidPathParamsRecord
+  ? ZodObject<ValidPathParamsSchemaShape<PathParams>>
   : undefined;
 
 /**
@@ -48,23 +47,21 @@ export function parseURLPathParams<
     }
   | { success: false; params: undefined } {
   // first, make sure the pattern starts with a slash, and doesn't end in one
-  const patternStartingWithSlash =
-    pattern.startsWith("/") ? pattern : (`/${pattern}` as Pattern);
-  const patternToUse =
-    patternStartingWithSlash.endsWith("/") ?
-      patternStartingWithSlash.slice(0, -1) // remove trailing slash
+  const patternStartingWithSlash = pattern.startsWith("/")
+    ? pattern
+    : (`/${pattern}` as Pattern);
+  const patternToUse = patternStartingWithSlash.endsWith("/")
+    ? patternStartingWithSlash.slice(0, -1) // remove trailing slash
     : patternStartingWithSlash;
 
   // now, get the pathname from the URL to match again. And then also make
   // sure this path starts with a slash and doesn't end in one.
   const extractedURLPathname = new URL(url).pathname;
-  const urlStartingWithSlash =
-    extractedURLPathname.startsWith("/") ? extractedURLPathname : (
-      `/${extractedURLPathname}`
-    );
-  const urlToUse =
-    urlStartingWithSlash.endsWith("/") ?
-      urlStartingWithSlash.slice(0, -1) // remove trailing slash
+  const urlStartingWithSlash = extractedURLPathname.startsWith("/")
+    ? extractedURLPathname
+    : `/${extractedURLPathname}`;
+  const urlToUse = urlStartingWithSlash.endsWith("/")
+    ? urlStartingWithSlash.slice(0, -1) // remove trailing slash
     : urlStartingWithSlash;
 
   // base case: matching against the / pattern

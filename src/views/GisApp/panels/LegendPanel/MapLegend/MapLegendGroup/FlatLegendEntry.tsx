@@ -25,14 +25,14 @@ export function FlatLegendEntry({
         />
         {entryLabel}
       </li>
-      {showNoData ?
+      {showNoData ? (
         <li className={css.mapLegendGroupItem}>
           <span
             className={clsx(css.mapLegendGroupKey, css.mapLegendGroupKeyNoData)}
           />
           {t`Not reported`}
         </li>
-      : null}
+      ) : null}
     </>
   );
 }

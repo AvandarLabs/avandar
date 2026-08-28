@@ -105,11 +105,11 @@ export function checkDevelopCI(
   }
 
   const run = runs.find(propEq("headSha", commitSha));
-  return (
-    run === undefined ? { kind: "missing" }
-    : run.status !== "completed" ?
-      { kind: "pending", status: run.status, url: run.url }
-    : run.conclusion === "success" ? { kind: "passed", url: run.url }
-    : { kind: "failed", conclusion: run.conclusion, url: run.url }
-  );
+  return run === undefined
+    ? { kind: "missing" }
+    : run.status !== "completed"
+      ? { kind: "pending", status: run.status, url: run.url }
+      : run.conclusion === "success"
+        ? { kind: "passed", url: run.url }
+        : { kind: "failed", conclusion: run.conclusion, url: run.url };
 }

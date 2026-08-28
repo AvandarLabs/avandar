@@ -52,8 +52,8 @@ export function getManualQueryLimitValue(
   if (query.limit !== undefined) {
     return query.limit;
   }
-  return shouldDefaultManualQueryLimit(query) ?
-      DEFAULT_MANUAL_QUERY_LIMIT
+  return shouldDefaultManualQueryLimit(query)
+    ? DEFAULT_MANUAL_QUERY_LIMIT
     : undefined;
 }
 
@@ -92,7 +92,7 @@ export function applyDefaultManualQueryLimit(
 export function largeDatasetAutoLimitFromRowCount(
   rowCount: number,
 ): number | undefined {
-  return rowCount > LARGE_DATASET_ROW_THRESHOLD ?
-      LARGE_DATASET_AUTO_LIMIT
+  return rowCount > LARGE_DATASET_ROW_THRESHOLD
+    ? LARGE_DATASET_AUTO_LIMIT
     : undefined;
 }

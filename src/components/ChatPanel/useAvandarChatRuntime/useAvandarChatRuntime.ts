@@ -15,9 +15,9 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { ChatModelAdapter } from "@assistant-ui/react";
-import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 
 /**
  * The Assistant UI runtime for the Avandar chat panel.
@@ -83,8 +83,8 @@ export function useAvandarChatRuntime(): {
     contextWindowExceeded: t`This question is too large for the on-device model. Try a shorter question, or reconnect to use cloud chat.`,
   });
   const [initialMessages] = useState(() => {
-    return user && workspace.id ?
-        ChatThreadStore.read({ workspaceId: workspace.id, userId: user.id })
+    return user && workspace.id
+      ? ChatThreadStore.read({ workspaceId: workspace.id, userId: user.id })
       : [];
   });
   const hasHydratedPersistedThreadRef = useRef(initialMessages.length > 0);

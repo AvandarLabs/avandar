@@ -88,7 +88,7 @@ function CheckoutPage() {
   }, [subscriptions, workspace.id, workspace.slug, navigate, queryClient]);
 
   const contents =
-    success === true ?
+    success === true ? (
       <>
         <ThemeIcon size={64} radius="xl" variant="light" color="green">
           <IconCheck size={32} stroke={2.5} />
@@ -116,7 +116,7 @@ function CheckoutPage() {
           <Trans>Continue to your workspace</Trans>
         </Button>
       </>
-    : null;
+    ) : null;
 
   // This shouldn't be reached due to beforeLoad redirect
   return (

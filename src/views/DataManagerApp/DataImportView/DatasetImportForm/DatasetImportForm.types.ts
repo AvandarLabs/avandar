@@ -1,3 +1,4 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   CsvFileLoadResult,
   PdfFileLoadResult,
@@ -12,7 +13,6 @@ import type {
 } from "./useSaveDataset/useSaveDataset";
 import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { UnknownObject } from "@avandar/utils";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 export type DatasetImportFormValues = {
   name: string;

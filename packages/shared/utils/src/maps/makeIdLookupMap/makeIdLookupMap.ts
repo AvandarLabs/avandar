@@ -15,24 +15,27 @@ import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.t
  */
 export function makeIdLookupMap<
   T extends object,
-  IdKey extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T> =
-    "id" extends ([ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>) ?
-      "id"
-    : never,
-  IdType extends IdKey extends keyof T ? T[IdKey]
-  : IdKey extends ObjectPaths<T> ? PathValue<T, IdKey>
-  : never = IdKey extends keyof T ? T[IdKey]
-  : IdKey extends ObjectPaths<T> ? PathValue<T, IdKey>
-  : never,
+  IdKey extends ([ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>) =
+    "id" extends ([ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>)
+      ? "id"
+      : never,
+  IdType extends (IdKey extends keyof T
+    ? T[IdKey]
+    : IdKey extends ObjectPaths<T>
+      ? PathValue<T, IdKey>
+      : never) = IdKey extends keyof T
+    ? T[IdKey]
+    : IdKey extends ObjectPaths<T>
+      ? PathValue<T, IdKey>
+      : never,
 >(
   list: readonly T[],
   { key = "id" as IdKey }: { key?: IdKey } = {},
 ): Map<IdType, T> {
   const map = new Map<IdType, T>();
   for (const item of list) {
-    const id =
-      String(key).includes(".") ?
-        (getValue(item, key) as IdType)
+    const id = String(key).includes(".")
+      ? (getValue(item, key) as IdType)
       : (item[key as keyof T] as IdType);
     map.set(id, item);
   }

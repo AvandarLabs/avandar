@@ -47,26 +47,25 @@ export function buildChatSystemContent(
   const isLikelyRefinement =
     isDataExplorer && hasLastSql && REFINEMENT_HINTS.test(lastUserPrompt);
 
-  const refinementContext =
-    isLikelyRefinement ?
-      `\n\nThe user's previous turn produced this SQL, and the current message looks like a refinement of it. When generating SQL, edit this prior query rather than starting over.\n\nPrevious SQL:\n\`\`\`sql\n${lastSql}\n\`\`\``
+  const refinementContext = isLikelyRefinement
+    ? `\n\nThe user's previous turn produced this SQL, and the current message looks like a refinement of it. When generating SQL, edit this prior query rather than starting over.\n\nPrevious SQL:\n\`\`\`sql\n${lastSql}\n\`\`\``
     : "";
 
   const errorContext =
-    isDataExplorer && hasLastSql && lastError ?
-      `\n\nThe previous SQL failed at runtime with this error. Use the error to fix the query.\n\nPrevious SQL:\n\`\`\`sql\n${lastSql}\n\`\`\`\n\nError:\n${lastError}`
-    : "";
+    isDataExplorer && hasLastSql && lastError
+      ? `\n\nThe previous SQL failed at runtime with this error. Use the error to fix the query.\n\nPrevious SQL:\n\`\`\`sql\n${lastSql}\n\`\`\`\n\nError:\n${lastError}`
+      : "";
 
   const resultColumnsContext =
-    isDataExplorer && lastResultColumns && lastResultColumns.length > 0 ?
-      `\n\nThe user is currently looking at a result with these columns:\n${lastResultColumns
-        .map((column) => {
-          return `- ${column.name} (${column.dataType})`;
-        })
-        .join(
-          "\n",
-        )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
-    : "";
+    isDataExplorer && lastResultColumns && lastResultColumns.length > 0
+      ? `\n\nThe user is currently looking at a result with these columns:\n${lastResultColumns
+          .map((column) => {
+            return `- ${column.name} (${column.dataType})`;
+          })
+          .join(
+            "\n",
+          )}\n\nWhen answering or generating new SQL, treat this as the live result schema.`
+      : "";
 
   const prefixWithSql = `${unifiedSystemPrefix}\n\n${sqlSystemPrompt}`;
   const surfaceContent = ((): string => {

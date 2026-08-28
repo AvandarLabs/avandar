@@ -26,8 +26,9 @@ export function registry<
 >(): {
   keys: <
     T extends [LiteralUnion, ...LiteralUnion[]],
-    MissingKeys extends keyof FullRegistry extends T[number] ? T[number]
-    : Exclude<keyof FullRegistry, T[number]>,
+    MissingKeys extends (keyof FullRegistry extends T[number]
+      ? T[number]
+      : Exclude<keyof FullRegistry, T[number]>),
   >(
     ...keys: T & MissingKeys[]
   ) => T;

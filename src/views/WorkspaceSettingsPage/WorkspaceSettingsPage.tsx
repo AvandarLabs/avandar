@@ -116,8 +116,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
               initialValue: workspace.name,
               label: t`Workspace Name`,
               validateFn: (value: string) => {
-                return value.trim() === "" ?
-                    t`Workspace name is required`
+                return value.trim() === ""
+                  ? t`Workspace name is required`
                   : undefined;
               },
             },
@@ -135,9 +135,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
             });
           }}
         />
-        {isCurrentUserTheWorkspaceOwner ?
+        {isCurrentUserTheWorkspaceOwner ? (
           <WorkspaceDangerZone workspace={workspace} />
-        : null}
+        ) : null}
       </Stack>
     );
   };
@@ -166,7 +166,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
   return (
     <AppLayout title={t`Settings`}>
       <Container py="xxxl" size="xl">
-        {isCurrentUserTheWorkspaceOwner ?
+        {isCurrentUserTheWorkspaceOwner ? (
           <Tabs
             tabIds={OWNER_TAB_IDS}
             value={isOwnerTabId(tabName) ? tabName : "general"}
@@ -202,7 +202,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
             }}
           />
-        : <Tabs
+        ) : (
+          <Tabs
             tabIds={NON_OWNER_TAB_IDS}
             value={isNonOwnerTabId(tabName) ? tabName : "general"}
             onTabChange={navigateToTab}
@@ -233,7 +234,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
             }}
           />
-        }
+        )}
       </Container>
     </AppLayout>
   );

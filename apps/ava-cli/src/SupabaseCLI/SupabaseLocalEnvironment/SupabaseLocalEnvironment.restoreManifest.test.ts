@@ -196,8 +196,8 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
     writeFakeManifest(fake)({
       ...manifest,
       files: manifest.files.map((backupFile) => {
-        return backupFile.sourcePath === EDGE_ENV_PATH ?
-            { ...backupFile, backupPath: makeBackupPath(ENV_PATH) }
+        return backupFile.sourcePath === EDGE_ENV_PATH
+          ? { ...backupFile, backupPath: makeBackupPath(ENV_PATH) }
           : backupFile;
       }),
     });
@@ -217,8 +217,8 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
     writeFakeManifest(fake)({
       ...manifest,
       files: manifest.files.map((backupFile) => {
-        return backupFile.sourcePath === ENV_PATH ?
-            { ...backupFile, backupPath: unexpectedBackupPath }
+        return backupFile.sourcePath === ENV_PATH
+          ? { ...backupFile, backupPath: unexpectedBackupPath }
           : backupFile;
       }),
     });

@@ -55,8 +55,8 @@ function _makeCheckResult(
     fixHints = [],
   } = options;
 
-  return problems.length === 0 ?
-      { title, status: "pass", summary: passSummary, details: [...passDetails] }
+  return problems.length === 0
+    ? { title, status: "pass", summary: passSummary, details: [...passDetails] }
     : {
         title,
         status: failStatus,
@@ -120,8 +120,8 @@ function _findFilenameProblem(filename: string, now: Date): string | undefined {
     return `${filename} has a timestamp that is not a real UTC date. Fix: rename it using a real YYYYMMDDHHMMSS instant.`;
   }
 
-  return parsed.getTime() > now.getTime() ?
-      `${filename} is dated in the future, so it sorts ahead of every migration written between now and then. Fix: rename it with the current UTC timestamp, and check your system clock if the tool generated it.`
+  return parsed.getTime() > now.getTime()
+    ? `${filename} is dated in the future, so it sorts ahead of every migration written between now and then. Fix: rename it with the current UTC timestamp, and check your system clock if the tool generated it.`
     : undefined;
 }
 
@@ -143,9 +143,9 @@ function _checkFilenames(snapshot: MigrationsSnapshot): MigrationCheckResult {
     title: "Migration filenames are well-formed and not future-dated",
     problems,
     passSummary:
-      newMigrations.length === 0 ?
-        "no new migrations to check"
-      : `${newMigrations.length} new migration(s) named correctly`,
+      newMigrations.length === 0
+        ? "no new migrations to check"
+        : `${newMigrations.length} new migration(s) named correctly`,
     failSummary: `${problems.length} filename problem(s)`,
   });
 }
@@ -206,9 +206,9 @@ function _checkOrderingAgainstBase(
   // none for a new one to land in front of.
   if (newMigrations.length === 0 || latestOnBase === undefined) {
     const summary =
-      newMigrations.length === 0 ?
-        `no migrations added on top of "${snapshot.baseBranch}"`
-      : `"${snapshot.baseBranch}" has no migrations to conflict with`;
+      newMigrations.length === 0
+        ? `no migrations added on top of "${snapshot.baseBranch}"`
+        : `"${snapshot.baseBranch}" has no migrations to conflict with`;
     return { title, status: "pass", summary, details: [] };
   }
 
@@ -318,16 +318,16 @@ function _findNonIdempotentStatements(
   return statements.flatMap((statement) => {
     const createdPolicy = /create\s+policy\s+("[^"]+"|\S+)/i.exec(statement);
     if (createdPolicy?.[1] !== undefined) {
-      return droppedPolicies.has(createdPolicy[1]) ?
-          []
+      return droppedPolicies.has(createdPolicy[1])
+        ? []
         : [
             `${filename} creates policy ${createdPolicy[1]} with no matching "drop policy if exists", so replaying it fails with SQLSTATE 42710. Fix: add \`drop policy if exists ${createdPolicy[1]} on storage.objects;\` immediately before it.`,
           ];
     }
 
     const insertsBucket = /insert\s+into\s+storage\.buckets/i.test(statement);
-    return insertsBucket && !/on\s+conflict/i.test(statement) ?
-        [
+    return insertsBucket && !/on\s+conflict/i.test(statement)
+      ? [
           `${filename} inserts into storage.buckets with no "on conflict", so replaying it fails on the primary key. Fix: append \`on conflict (id) do nothing\`.`,
         ]
       : [];
@@ -351,11 +351,11 @@ function _findStorageProblems(
   // `sql_paths` rather than edited.
   const isSeeded = snapshot.configToml.includes(filename);
   return [
-    ...(isSeeded ?
-      []
-    : [
-        `${filename} is not listed in [db.seed] sql_paths in supabase/config.toml, so it will not be replayed. Fix: add "./migrations/${filename}" to sql_paths, positioned after any file whose policies it narrows.`,
-      ]),
+    ...(isSeeded
+      ? []
+      : [
+          `${filename} is not listed in [db.seed] sql_paths in supabase/config.toml, so it will not be replayed. Fix: add "./migrations/${filename}" to sql_paths, positioned after any file whose policies it narrows.`,
+        ]),
     ..._findNonStorageStatements(filename, contents),
     ...(isSeeded ? _findNonIdempotentStatements(filename, contents) : []),
   ];
@@ -403,9 +403,9 @@ function _checkStorageConventions(
       "Storage migrations are marked, seeded, storage-only, and idempotent",
     problems,
     passSummary:
-      storageMigrations.length === 0 ?
-        "no new storage migrations"
-      : `${storageMigrations.length} storage migration(s) follow the seed rules`,
+      storageMigrations.length === 0
+        ? "no new storage migrations"
+        : `${storageMigrations.length} storage migration(s) follow the seed rules`,
     failSummary: `${problems.length} storage convention problem(s)`,
   });
 }

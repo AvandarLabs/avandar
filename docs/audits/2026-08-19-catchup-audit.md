@@ -39,13 +39,13 @@ git checkout review/t1-sql && dif review/base       # diff-review skill
 
 Two axes:
 
-- **Tier slices** (`review/t<N>-<area>`) answer *what is live right now in
-  this risk area*. Cumulative from base to tip, and a provable partition:
+- **Tier slices** (`review/t<N>-<area>`) answer _what is live right now in
+  this risk area_. Cumulative from base to tip, and a provable partition:
   the script asserts that applying every tier reproduces the tip's tree
   exactly, and fails if any path escapes. Read-only; a tier tree is a real
   git tree but a mixed-version snapshot, so it will not typecheck or boot.
-- **Branch slices** (`review/b/<slug>`, `review/b/<slug>-base`) answer *what
-  did this agent actually write*. Real runnable historical states, pinned to
+- **Branch slices** (`review/b/<slug>`, `review/b/<slug>-base`) answer _what
+  did this agent actually write_. Real runnable historical states, pinned to
   history. They overlap: `qetl-registry`, `qetl-column-projection`, and
   `chat-concept-aliases` are all fully contained in `qetl-impl`.
 
@@ -56,12 +56,12 @@ to `develop`.**
 
 For every tier t1 through t6, and for every branch slice, the loop is the same:
 
-| Step | Where | What |
-| --- | --- | --- |
-| 1. Agent adversarial pass | `fix/audit-<tier>` worktree | Agent reads the scoped diff, records findings, applies fixes it is confident in |
-| 2. Human pass | `review/<tier>` worktree | You read the same scoped diff in difit and comment |
-| 3. Fixes | `fix/audit-<tier>` worktree | All edits, tests, and ledger updates |
-| 4. Merge | `fix/audit-<tier>` → `develop` | The only thing that ever merges |
+| Step                      | Where                          | What                                                                            |
+| ------------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| 1. Agent adversarial pass | `fix/audit-<tier>` worktree    | Agent reads the scoped diff, records findings, applies fixes it is confident in |
+| 2. Human pass             | `review/<tier>` worktree       | You read the same scoped diff in difit and comment                              |
+| 3. Fixes                  | `fix/audit-<tier>` worktree    | All edits, tests, and ledger updates                                            |
+| 4. Merge                  | `fix/audit-<tier>` → `develop` | The only thing that ever merges                                                 |
 
 Set both worktrees up once per tier:
 
@@ -100,13 +100,71 @@ Tell it: findings go in this ledger, fixes go in the working tree, and it must
 never check out, commit to, or merge a `review/*` ref. Those are regenerated
 lenses, not branches.
 
+### Refreshing a tier after the adversarial pass
+
+Once the adversarial pass has committed fixes to `fix/audit-<tier>`, the
+`review/<tier>` ref is stale: it still shows the code as it landed. Refresh it
+so the human pass reads the hardened version.
+
+**Run it from the main checkout, `~/src/avandar`, on `develop`.**
+
+```sh
+cd ~/src/avandar
+bash scripts/review/build-audit-refs.sh --tier t1-sql --tip fix/audit-t1-sql
+```
+
+The script operates on refs and works from any worktree, but the main checkout
+is the one place the current version is always present. A `fix/audit-*` branch
+only has whatever version of the script it was cut with, and a `review/*`
+worktree is a synthetic tree that will drift from `develop` by design. Running
+it from `~/src/avandar` avoids having to think about which copy you are
+invoking.
+
+You do not need to check anything out, and you do not need to touch the read
+worktree. The script rewrites the ref and resets that worktree for you, so the
+files are updated on disk when the command returns.
+
+Then go back to the read worktree and relaunch difit. There are two reviews
+worth running, and they are separate difit sessions:
+
+```sh
+cd "$(wt go review/t1-sql)"
+
+pnpm diff-review review/base            # the whole tier, fixes included
+pnpm diff-review review/t1-sql-prev     # ONLY what the adversarial pass changed
+```
+
+| Command                               | Shows                                                                                           | Equivalent                                  |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `pnpm diff-review review/base`        | The whole tier as it now stands, fixes included. Your main review.                              | `git diff review/base review/<tier>`        |
+| `pnpm diff-review review/<tier>-prev` | Only what the adversarial pass changed. Review this too: those fixes are unreviewed agent code. | `git diff review/<tier>-prev review/<tier>` |
+
+The two produce different difit transcripts, because `dif` names its artifacts
+`<branch-slug>-difit-<scope-slug>` from the branch _and_ the comparison. So
+`review/base` writes `review-t1-sql-difit-at-review-base-*` and
+`review/t1-sql-prev` writes `review-t1-sql-difit-at-review-t1-sql-prev-*`. They
+do not clobber each other, and each keeps its own comments and reviewed state.
+
+Two constraints:
+
+- **Refresh between review rounds, never mid-round.** The refresh moves the
+  branch, so difit's `-reviewed.json` for the `review/base` comparison no
+  longer lines up with the commits it recorded. Finish a round, refresh, then
+  start the next.
+- If the read worktree has uncommitted edits the script refuses to move it
+  rather than clobbering them. Tier worktrees are read-only lenses, so if that
+  happens, something was edited in the wrong place.
+
+To point a tier back at `develop` after the fixes have merged, re-run the full
+build with no arguments.
+
 ## Fix lanes
 
-| Lane | Branch | For | Ships |
-| --- | --- | --- | --- |
-| Hotfix | `fix/<specific>` | Cross-tenant exposure, data loss | Immediately, own PR |
-| Tier | `fix/audit-<tier>` | Substantive defects | When the tier closes |
-| Nit | `chore/audit-nits` | Typos, dead code, naming | Whenever; blocks nothing |
+| Lane   | Branch             | For                              | Ships                    |
+| ------ | ------------------ | -------------------------------- | ------------------------ |
+| Hotfix | `fix/<specific>`   | Cross-tenant exposure, data loss | Immediately, own PR      |
+| Tier   | `fix/audit-<tier>` | Substantive defects              | When the tier closes     |
+| Nit    | `chore/audit-nits` | Typos, dead code, naming         | Whenever; blocks nothing |
 
 Watch out: `.githooks/pre-push` runs the Lingui pipeline and exits 2 when
 catalogs change, so any fix branch touching user-facing strings gets blocked

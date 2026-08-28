@@ -55,10 +55,9 @@ export async function hydrateNuxProgressForWorkspace(
   }
 
   const completedMilestones = [...progress.completedMilestones, ...keys];
-  const status =
-    nuxSelectors.areAllMilestonesComplete(completedMilestones) ? "completed" : (
-      progress.status
-    );
+  const status = nuxSelectors.areAllMilestonesComplete(completedMilestones)
+    ? "completed"
+    : progress.status;
 
   await NuxProgressClient.updateProgress({
     progressId: progress.progressId,

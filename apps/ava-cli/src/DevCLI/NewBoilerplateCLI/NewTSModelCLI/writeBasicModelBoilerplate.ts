@@ -17,8 +17,9 @@ export function writeBasicModelBoilerplate(options: {
   const { modelName, modelsDirRelative, addModule, templateParams } = options;
   const outputDir = path.posix.join(modelsDirRelative, modelName);
 
-  const mainTemplate =
-    addModule ? "Model.main.withModule.ts.template" : "Model.main.ts.template";
+  const mainTemplate = addModule
+    ? "Model.main.withModule.ts.template"
+    : "Model.main.ts.template";
 
   writeFileFromTemplate({
     templateDir: TEMPLATES_DIR,
