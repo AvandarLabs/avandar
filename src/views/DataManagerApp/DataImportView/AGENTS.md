@@ -1,10 +1,8 @@
 # Data import views
 
-One tab per data source, all rendered by
-[`DataImportTabs.tsx`](DataImportTabs.tsx). This file is the rule for how a
-source-specific import view is built, so a reader who knows one of them knows
-all of them, and so a new source is a copy of an existing shape rather than a
-new invention.
+This file contains rules for how to build source-specific import views.
+This ensures that new sources copy an existing shape and keeps import views
+symmetrical rather than each doing their own inventions.
 
 ## Which views this governs
 
@@ -21,16 +19,16 @@ take it as the example to copy.
 
 ## The shape
 
-Three parts, in this order, and nothing else in the view:
+Two parts, in this order, and nothing else in the view:
 
 1. **A loader hook**, `useLoad<Source>`, in its own directory beside the view.
    It owns every piece of state the import has, runs the acquisition and the
    sniff, and returns them. The view holds no import state of its own.
 2. **The view**, which renders the source picker, wires the picker's callbacks
-   to the hook, and gates the form on the hook's values.
-3. **A private `_<Source>ImportForm` component** in the view file, which
-   renders `DatasetImportForm` from already-narrowed props. The gate does the
-   narrowing, so this component never repeats it.
+   to the hook, and renders `DatasetImportForm` inline behind the gate. Do not
+   wrap that form in a private sub-component: the gate has already narrowed
+   the values it needs, so a wrapper only re-declares them as props and adds a
+   hop between the gate and the form it guards.
 
 The loader hook returns these, named the same way in every view:
 

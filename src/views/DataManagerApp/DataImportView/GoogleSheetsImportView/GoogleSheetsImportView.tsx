@@ -22,11 +22,8 @@ import { notifyError } from "@/utils/notifications/notify";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { useLoadGoogleSheet } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { GPicker, GPickerResponseObject } from "@/lib/types/google-picker";
 import type { GoogleSheetsDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
-import type { GoogleSheetLoad } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet";
-import type { ReactNode } from "react";
 
 type Props = BoxProps & {
   /**
@@ -35,43 +32,6 @@ type Props = BoxProps & {
    */
   onSaveSuccess?: (dataset: Dataset.T) => void;
 };
-
-type GoogleSheetsImportFormProps = {
-  previewRows: UnknownRow[];
-  dataSourceMetadata: GoogleSheetsDataSourceMetadata;
-  isProcessing: boolean;
-  onSaveSuccess?: (dataset: Dataset.T) => void;
-  onRequestDataReparse: GoogleSheetLoad["onRequestDataReparse"];
-  setDataSourceMetadata: GoogleSheetLoad["setDataSourceMetadata"];
-};
-
-function _GoogleSheetsImportForm(
-  props: Readonly<GoogleSheetsImportFormProps>,
-): ReactNode {
-  const {
-    previewRows,
-    dataSourceMetadata,
-    isProcessing,
-    onSaveSuccess,
-    onRequestDataReparse,
-    setDataSourceMetadata,
-  } = props;
-  return (
-    <DatasetImportForm
-      key={dataSourceMetadata.datasetLoadResult.sheetLoadMetadata.id}
-      dataSourceMetadata={dataSourceMetadata}
-      initialDatasetName={dataSourceMetadata.datasetLoadResult.spreadsheetName}
-      isProcessing={isProcessing}
-      onSaveSuccess={onSaveSuccess}
-      onDataSourceMetadataChange={(metadata) => {
-        setDataSourceMetadata(metadata as GoogleSheetsDataSourceMetadata);
-      }}
-      onRequestDataReparse={onRequestDataReparse}
-      parseOptions={dataSourceMetadata.parseOptions}
-      rows={previewRows}
-    />
-  );
-}
 
 function _openGooglePicker(params: {
   picker: GPicker | undefined;
@@ -234,15 +194,24 @@ export function GoogleSheetsImportView({
         {previewRows &&
         dataSourceMetadata &&
         googleSheetLoad.exportedWorkbook ? (
-          <_GoogleSheetsImportForm
-            previewRows={previewRows}
+          <DatasetImportForm
+            key={dataSourceMetadata.datasetLoadResult.sheetLoadMetadata.id}
+            initialDatasetName={
+              dataSourceMetadata.datasetLoadResult.spreadsheetName
+            }
+            rows={previewRows}
             dataSourceMetadata={dataSourceMetadata}
+            parseOptions={dataSourceMetadata.parseOptions}
+            onSaveSuccess={onSaveSuccess}
+            onDataSourceMetadataChange={(metadata) => {
+              googleSheetLoad.setDataSourceMetadata(
+                metadata as GoogleSheetsDataSourceMetadata,
+              );
+            }}
             isProcessing={
               googleSheetLoad.isExportingSheet || googleSheetLoad.isLoadingSheet
             }
-            onSaveSuccess={onSaveSuccess}
             onRequestDataReparse={googleSheetLoad.onRequestDataReparse}
-            setDataSourceMetadata={googleSheetLoad.setDataSourceMetadata}
           />
         ) : null}
       </Stack>

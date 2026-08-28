@@ -62,7 +62,7 @@ type GoogleSheetParseRequest = {
  * read the same way: the retained source (`exportedWorkbook` here, the
  * uploaded `File` there), the rows the sniff produced, the metadata the form
  * saves from, and the callbacks the view hands to its source picker and its
- * form. See `../../README.md` for the shape both views follow.
+ * form. See `../../AGENTS.md` for the shape both views follow.
  */
 export type GoogleSheetLoad = {
   selectedDocument: GPickerDocumentObject | undefined;
