@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Runs `playwright test`, after taking the arguments Playwright does not have.
  *
@@ -9,13 +8,10 @@
  * other argument is passed through untouched, so `pnpm test:e2e <spec>`,
  * `--grep`, `--headed` and the rest keep working.
  *
- * Run by `node` directly, with no loader: Node strips the types itself, and
- * this script imports nothing but `node:child_process` and one flag constant,
- * so it needs neither the `$/` aliases nor the Vite pipeline that
- * `pnpm vite-script` exists for.
+ * Run through `pnpm vite-script`, like every other `.ts` script here.
  */
 import { spawn } from "node:child_process";
-import { E2E_NO_THIRD_PARTY_FLAG } from "../tests/e2e/setup/e2eThirdPartyMode/e2eThirdPartyMode.ts";
+import { E2E_NO_THIRD_PARTY_FLAG } from "../tests/e2e/setup/e2eThirdPartyMode/e2eThirdPartyMode";
 
 const args = process.argv.slice(2);
 const isNoThirdParty = args.includes(E2E_NO_THIRD_PARTY_FLAG);
