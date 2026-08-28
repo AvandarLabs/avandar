@@ -1,10 +1,10 @@
 ---
 name: avandar-code-review
-description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by docstrings, files, naming, and/or tests (any subset, concatenatable).
+description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by comments, files, naming, and/or tests (any subset, concatenatable).
 metadata:
   author: jpsyx
-  version: "2.2.0"
-  tags: avandar, code-review, typescript, react, sql, conventions, style, docstrings, files, naming, tests
+  version: "2.3.0"
+  tags: avandar, code-review, typescript, react, sql, conventions, style, comments, files, naming, tests
 ---
 
 # Avandar Code Review
@@ -14,7 +14,7 @@ and style conventions. The core skill must make sense outside the
 Avandar product repo. On a **full review**, run the common-mistakes and
 general-checks sections, then only apply the language-specific and
 library-gated phases when the diff matches their gate. On a **focused
-review** (`docstrings`, `files`, `naming`, and/or `tests`), skip every
+review** (`comments`, `files`, `naming`, and/or `tests`), skip every
 phase and bullet outside the selected packs; see **Focused Reviews**.
 
 ## Public Core And Repo-Local Rules
@@ -101,20 +101,21 @@ Duplicate tokens collapse. The recognized pack tokens are:
 
 | Token | Pack |
 |-------|------|
-| `docstrings` | comments, comment blocks, and docstrings |
+| `comments` | every comment: docstrings, comment blocks, and inline comments |
+| `docstrings` | alias for `comments`, kept so the older token still works |
 | `files` | file hierarchy, directories, coupling, file names, single main export |
 | `naming` | variable, function, and module-object naming |
 | `tests` | test quality: tautologies, placeholders, observable behavior, e2e UI vs DB |
 
 Examples:
 
-- `avandar-code-review docstrings`
+- `avandar-code-review comments`
 - `avandar-code-review files`
 - `avandar-code-review naming`
 - `avandar-code-review tests`
 - `avandar-code-review files naming`
-- `avandar-code-review files naming docstrings`
-- `avandar-code-review files naming docstrings tests`
+- `avandar-code-review files naming comments`
+- `avandar-code-review files naming comments tests`
 
 If at least one pack token is present, this is a focused review:
 
@@ -140,7 +141,7 @@ Unknown extra words that are not pack tokens, mode names, or an explicit
 base branch do not start a focused review on their own. Ignore them when
 at least one pack token is present.
 
-### Pack: `docstrings`
+### Pack: `comments`
 
 Gate: the diff includes any source file that supports `/** ... */` and
 `//` comments (same gate as Phase: comments).
@@ -259,7 +260,7 @@ full-review lane.
 
 | Lane | Pack | Gate |
 |------|------|------|
-| `focused-docstrings` | `docstrings` | comments gate |
+| `focused-comments` | `comments` | comments gate |
 | `focused-files` | `files` | `.ts` / `.tsx` in the diff |
 | `focused-naming` | `naming` | `.ts` / `.tsx` in the diff |
 | `focused-tests` | `tests` | test-file gate (`*.test.*` / `*.spec.*`) |
@@ -457,7 +458,7 @@ modified by the author under review). Do not flag issues on context lines
    the phases inline in this agent.
 
    **Focused review:** the only phases that fire are the selected packs,
-   in this order (omit any pack the user did not name): `docstrings`,
+   in this order (omit any pack the user did not name): `comments`,
    `files`, `naming`, `tests`. Do not gate on extra-checklist or library
    presence. Skip the rest of this step.
 
@@ -607,7 +608,7 @@ system itself (declarations, assertions and escape hatches, absence,
 literal unions, readonly contracts) rather than naming, module and file
 structure, function shape, and import/export form. `comments` and
 `module` are small and mechanical, so they share one lane on a full
-review. A focused `docstrings` / `files` / `naming` review splits them
+review. A focused `comments` / `files` / `naming` review splits them
 into the `focused-*` lanes instead, because the point of those packs is
 to apply one subset in isolation. Each lane reads its full file slice as
 context but applies only its own rule lens.
@@ -919,7 +920,7 @@ SKILL file.
   C-family languages).
 - **Reference:**
   [`docs/code-reviews/comments-checklist.md`](docs/code-reviews/comments-checklist.md)
-- **Focused review:** this phase is the core of the `docstrings` pack.
+- **Focused review:** this phase is the core of the `comments` pack.
   See **Focused Reviews** for the extra comment bullets pulled from
   Most Common Mistakes, General Checks, and the TypeScript checklist.
 
