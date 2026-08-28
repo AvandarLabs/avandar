@@ -5,7 +5,9 @@ import {
   Box,
   BoxProps,
   Button,
+  Group,
   Loader,
+  Select,
   Stack,
   Text,
   UnstyledButton,
@@ -58,7 +60,17 @@ export function GoogleSheetsImportView({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const googleSheetLoad = useLoadGoogleSheet();
-  const { selectedDocument, previewRows, dataSourceMetadata } = googleSheetLoad;
+  const { pickedSheet, availableTabs, previewRows, dataSourceMetadata } =
+    googleSheetLoad;
+
+  // Asked only when there is something to ask: a one-tab workbook imports on
+  // the pick, because one Avandar dataset is one tab and there is only one.
+  //
+  // Withdrawn once a tab has been imported, because from then on the import
+  // form carries its own tab selector. Two controls for one choice is worse
+  // than either alone: they can disagree, and only one of them re-parses.
+  const hasTabChoice =
+    (availableTabs?.length ?? 0) > 1 && dataSourceMetadata === undefined;
 
   const notifyPickerCouldNotOpen = useCallback(() => {
     notifyError({
@@ -152,12 +164,43 @@ export function GoogleSheetsImportView({
               </Button>
             )}
 
-            {selectedDocument ? (
+            {pickedSheet ? (
               <>
                 <Text>
-                  <Trans>Selected document: {selectedDocument.name}</Trans>
+                  <Trans>
+                    Selected document: {pickedSheet.spreadsheetName}
+                  </Trans>
                 </Text>
-                {googleSheetLoad.isLoadingSheet ? <Loader /> : null}
+                {googleSheetLoad.isListingTabs ? <Loader /> : null}
+                {hasTabChoice ? (
+                  <Group align="flex-end" gap="sm">
+                    <Select
+                      label={t`Tab to import`}
+                      description={t`One dataset is one tab.`}
+                      data={(availableTabs ?? []).map((tab) => {
+                        return { value: String(tab.sheetId), label: tab.title };
+                      })}
+                      value={
+                        googleSheetLoad.selectedTabId === undefined
+                          ? null
+                          : String(googleSheetLoad.selectedTabId)
+                      }
+                      onChange={(value) => {
+                        if (value !== null) {
+                          googleSheetLoad.setSelectedTabId(Number(value));
+                        }
+                      }}
+                    />
+                    <Button
+                      onClick={googleSheetLoad.onProcessSelectedTab}
+                      loading={googleSheetLoad.isLoadingSheet}
+                    >
+                      <Trans>Process</Trans>
+                    </Button>
+                  </Group>
+                ) : googleSheetLoad.isLoadingSheet ? (
+                  <Loader />
+                ) : null}
               </>
             ) : null}
           </>
@@ -191,11 +234,9 @@ export function GoogleSheetsImportView({
           </Button>
         )}
 
-        {previewRows &&
-        dataSourceMetadata &&
-        googleSheetLoad.exportedWorkbook ? (
+        {previewRows && dataSourceMetadata && pickedSheet ? (
           <DatasetImportForm
-            key={dataSourceMetadata.datasetLoadResult.sheetLoadMetadata.id}
+            key={dataSourceMetadata.datasetLoadResult.id}
             initialDatasetName={
               dataSourceMetadata.datasetLoadResult.spreadsheetName
             }
@@ -208,9 +249,7 @@ export function GoogleSheetsImportView({
                 metadata as GoogleSheetsDataSourceMetadata,
               );
             }}
-            isProcessing={
-              googleSheetLoad.isExportingSheet || googleSheetLoad.isLoadingSheet
-            }
+            isProcessing={googleSheetLoad.isLoadingSheet}
             onRequestDataReparse={googleSheetLoad.onRequestDataReparse}
           />
         ) : null}

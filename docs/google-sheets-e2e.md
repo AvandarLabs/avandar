@@ -16,27 +16,36 @@ already-present `window.google.picker.PickerBuilder` as loaded. **There is no
 e2e flag in the app and no test-only branch in any hook.**
 
 Everything after the pick is real: the `google-auth/tokens` route, its refresh,
-the Drive client's URL construction, DuckDB-WASM's read of the workbook, and the
-dataset the rows land in.
+the client's URL construction for all three Google endpoints (the file version
+from Drive, the tab list from the Sheets API, the chosen tab's CSV from the
+export URL), DuckDB-WASM's read of that CSV, and the dataset the rows land in.
 
 The Google account connection is seeded straight into `tokens__google` by
 `tests/e2e/helpers/seedGoogleToken.ts`, rather than driven through Google's
 consent screen. That is the "pre-UI setup" exception in `docs/rules/testing.md`.
 
-## Test 1: stubbed Drive (always runs)
+## Test 1: stubbed Google (always runs)
 
-Drive is answered from `tests/data/google-sheet-late-prose/`. It asserts the
-form renders, the dataset is named after the picked sheet, both Drive calls carry
-`supportsAllDrives=true`, and the saved dataset has all 701 rows.
+Google is answered from `tests/data/google-sheet-late-prose/`, whose workbook is
+converted to CSV per tab by the stub, so the rows the browser parses are the
+fixture's own. It asserts that nothing is downloaded until a tab is chosen, that
+the chosen tab's gid reaches the download, that the form renders, that the
+dataset is named after the picked sheet, that the Drive call carries
+`supportsAllDrives=true`, and that the saved dataset has all 701 rows.
 
-That last one is the regression guard on `all_varchar`: the fixture's
-`indicator_value` column is numeric for 700 rows and then prose, and the row
-count is only reachable if the transcode did not abort on it.
+That last one is the regression guard on the column whose type changes late:
+the fixture's `indicator_value` is numeric for 700 rows and then prose, and the
+row count is only reachable if the read did not abort on it or drop it.
 
-## Test 2: real Drive (credentials-gated)
+## Test 2: real Google (credentials-gated)
 
 Tagged `@third-party`. What that tag controls is not whether the test runs, but
 what a missing credential means:
+
+The fixture sheet `avandar-e2e-fixture` has two tabs, `Countries` and `Cities`.
+The test imports the **second** one, so a download that ignored the chosen gid
+would bring back the first tab's columns and fail. Override the tab name with
+`E2E_GOOGLE_SHEET_SECOND_TAB` if the sheet is ever restructured.
 
 | Command                          | This test                                                             |
 | -------------------------------- | --------------------------------------------------------------------- |
@@ -65,6 +74,7 @@ locally):
 | `E2E_GOOGLE_REFRESH_TOKEN` | Refresh token for the Google account that owns the grant |
 | `E2E_GOOGLE_SHEET_ID`      | Drive file id of the test sheet                          |
 | `E2E_GOOGLE_SHEET_NAME`    | Optional; only labels the fake pick                      |
+| `E2E_GOOGLE_SHEET_SECOND_TAB` | Optional; the tab the real test imports, default `Cities` |
 | `E2E_GOOGLE_EMAIL`         | Optional; only fills `tokens__google.google_email`       |
 
 The first two are what the gate reads. With `--third-party` passed and either

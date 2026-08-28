@@ -3,10 +3,25 @@ import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDrive
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type {
   AcquiredGoogleSheet,
+  AcquiredGoogleSheetTabCsv,
   GoogleDriveFetch,
+  GoogleSheetTab,
 } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 
 const DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files";
+
+/** The Sheets API, which is where a workbook's tab list comes from. */
+const SHEETS_API_URL = "https://sheets.googleapis.com/v4/spreadsheets";
+
+/**
+ * The per-tab CSV export, which the Drive API has no equivalent of.
+ *
+ * `files.export` to `text/csv` renders only the workbook's first tab, so
+ * addressing a tab by its `gid` means going to this endpoint, the one behind
+ * File > Download > CSV in the Sheets UI. It takes the same OAuth bearer token
+ * as the API calls above, on the same `drive.file` grant the Picker hands out.
+ */
+const SHEETS_TAB_EXPORT_URL = "https://docs.google.com/spreadsheets/d";
 
 /**
  * Declares that this client understands shared drives, and must be sent on
@@ -154,4 +169,97 @@ export async function getGoogleSheetXlsxExport(
     xlsxBytes: new Uint8Array(await response.arrayBuffer()),
     sourceVersion,
   };
+}
+
+/**
+ * Lists a spreadsheet's tabs without reading a single cell.
+ *
+ * The `fields` mask asks for tab properties only, so this is cheap enough to
+ * run the moment a file is picked, which is what lets the user choose a tab
+ * before anything is downloaded. One Avandar dataset is one tab, so this is the
+ * list that choice is made from.
+ *
+ * Uses the Sheets API rather than Drive because Drive has no concept of a tab.
+ * The `drive.file` scope the Picker grants covers it: that grant is per file
+ * and applies across Google APIs, not just Drive.
+ *
+ * @param params The file to list, the token to list it with, and the transport.
+ * @returns Every tab, in workbook order.
+ */
+export async function getGoogleSheetTabs(
+  params: Readonly<{
+    fileId: string;
+    accessToken: string;
+    driveFetch?: GoogleDriveFetch;
+  }>,
+): Promise<GoogleSheetTab[]> {
+  const response = await _getDriveResponse({
+    url:
+      `${SHEETS_API_URL}/${encodeURIComponent(params.fileId)}` +
+      "?fields=sheets.properties(sheetId,title,index)",
+    accessToken: params.accessToken,
+    driveFetch: params.driveFetch ?? _fetchFromGoogle,
+  });
+
+  const body = (await response.json()) as {
+    sheets?: ReadonlyArray<{ properties?: Partial<GoogleSheetTab> }>;
+  };
+  const tabs = (body.sheets ?? []).flatMap((sheet) => {
+    const { sheetId, title, index } = sheet.properties ?? {};
+    return typeof sheetId === "number" && typeof title === "string"
+      ? [{ sheetId, title, index: index ?? 0 }]
+      : [];
+  });
+
+  if (tabs.length === 0) {
+    throw new GoogleDriveError({
+      code: "unknown",
+      status: response.status,
+      reason: "missing-sheet-properties",
+    });
+  }
+
+  return tabs;
+}
+
+/**
+ * Exports one tab of a Google Sheet as CSV, with the version it was exported
+ * at.
+ *
+ * One tab rather than the whole workbook, because one Avandar dataset is one
+ * tab. CSV rather than `.xlsx` because DuckDB's CSV reader types its columns
+ * from the data, where `read_xlsx` has to be told to read everything as text to
+ * avoid aborting on a column whose type changes partway down.
+ *
+ * The version is read first, for the reason
+ * {@link getGoogleSheetXlsxExport} gives.
+ *
+ * @param params The file and tab to export, the token, and the transport.
+ * @returns The tab as CSV text and the source version it belongs to.
+ */
+export async function getGoogleSheetTabCsvExport(
+  params: Readonly<{
+    fileId: string;
+    sheetId: number;
+    accessToken: string;
+    driveFetch?: GoogleDriveFetch;
+  }>,
+): Promise<AcquiredGoogleSheetTabCsv> {
+  const driveFetch = params.driveFetch ?? _fetchFromGoogle;
+
+  const sourceVersion = await getGoogleSheetVersion({
+    fileId: params.fileId,
+    accessToken: params.accessToken,
+    driveFetch,
+  });
+
+  const response = await _getDriveResponse({
+    url:
+      `${SHEETS_TAB_EXPORT_URL}/${encodeURIComponent(params.fileId)}/export` +
+      `?format=csv&gid=${encodeURIComponent(String(params.sheetId))}`,
+    accessToken: params.accessToken,
+    driveFetch,
+  });
+
+  return { csvText: await response.text(), sourceVersion };
 }

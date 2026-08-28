@@ -4,7 +4,10 @@ import { useLingui } from "@lingui/react/macro";
 import { makePrincipalKeyFromWorkspaceSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { APIClient } from "@/clients/APIClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { getGoogleSheetXlsxExport } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
+import {
+  getGoogleSheetTabCsvExport,
+  getGoogleSheetTabs,
+} from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import { clearGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -85,21 +88,44 @@ export function useRefreshGoogleSheetDataset(): UseMutationResultTuple<
         throw new Error("No Google token is available for this user");
       }
 
-      const { xlsxBytes } = await getGoogleSheetXlsxExport({
+      // The tab is stored by name, so the gid it exports under is looked up
+      // here rather than remembered. A renamed tab therefore fails to refresh,
+      // which is the same thing that happened when the name was handed to
+      // `read_xlsx`, and it fails loudly instead of silently importing another
+      // tab's rows.
+      const tabs = await getGoogleSheetTabs({
         fileId: sourceDataset.googleDocumentId,
         accessToken,
       });
+      const tab =
+        sourceDataset.sheetName === null
+          ? tabs[0]
+          : tabs.find((candidate) => {
+              return candidate.title === sourceDataset.sheetName;
+            });
+      if (!tab) {
+        throw new Error(
+          `The tab "${sourceDataset.sheetName}" is no longer in this ` +
+            "spreadsheet. It may have been renamed or deleted.",
+        );
+      }
 
-      await LocalDatasetClient.startXlsxImport({
+      const { csvText } = await getGoogleSheetTabCsvExport({
+        fileId: sourceDataset.googleDocumentId,
+        sheetId: tab.sheetId,
+        accessToken,
+      });
+
+      // Re-imported the same way the dataset was first imported: one tab, as
+      // CSV. Refreshing through a different reader would retype the columns.
+      await LocalDatasetClient.startCsvImport({
         datasetId,
         userId: user!.id as User.Id,
         workspaceId: workspace.id,
-        file: new File([new Blob([xlsxBytes])], `${datasetId}.xlsx`, {
-          type: MIMEType.APPLICATION_OPENXML_EXCEL,
+        file: new File([csvText], `${datasetId}.csv`, {
+          type: MIMEType.TEXT_CSV,
         }),
-        // `null` means the workbook's first tab, which is `read_xlsx`'s own
-        // default and what a missing stored tab name means today.
-        parseOptions: { sheet: sourceDataset.sheetName ?? undefined },
+        parseOptions: {},
       });
     },
 

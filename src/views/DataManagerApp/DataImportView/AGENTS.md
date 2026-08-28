@@ -34,7 +34,7 @@ The loader hook returns these, named the same way in every view:
 
 | Field | What it is |
 | --- | --- |
-| the retained source | The bytes or handle a re-parse reads again: `uploadedFile` on the manual path, `exportedWorkbook` on the Sheets path |
+| the retained source | What a re-parse reads again: `uploadedFile` on the manual path, the picked file plus its chosen tab on the Sheets path |
 | `previewRows` | The rows the sniff produced |
 | `dataSourceMetadata` | What the form saves from |
 | `setDataSourceMetadata` | Handed to the form's `onDataSourceMetadataChange` |
@@ -45,10 +45,10 @@ The two current implementations, side by side:
 
 | | `ManualUploadView` | `GoogleSheetsImportView` |
 | --- | --- | --- |
-| Source picker | `FileUploadForm` | `useGooglePicker` |
+| Source picker | `FileUploadForm` | `useGooglePicker`, then a tab dropdown |
 | Loader hook | `useManualUploadParse` over `useLoadManualUploadFile` | `useLoadGoogleSheet` |
-| Retained source | `uploadedFile` | `exportedWorkbook` |
-| Gate | `previewRows && uploadedFile && dataSourceMetadata` | `previewRows && dataSourceMetadata && exportedWorkbook` |
+| Retained source | `uploadedFile` | `pickedSheet` plus the chosen tab |
+| Gate | `previewRows && uploadedFile && dataSourceMetadata` | `previewRows && dataSourceMetadata && pickedSheet` |
 
 The manual path splits its hook in two because it branches over CSV, XLSX and
 PDF; the Sheets path has one source format and one hook. Split only when a
@@ -68,10 +68,27 @@ state,** unless the source genuinely produces rows outside the metadata, as
 the manual path's PDF branch does. Two pieces of state for one sniff can
 disagree about whether a preview exists; one cannot.
 
-**Keep the source bytes so a re-parse never re-acquires them.** Choosing a
-different tab, delimiter or page range must read what is already in hand. A
-re-parse that goes back to the network is a bug even when it works, because it
-can fail for reasons the first read already ruled out.
+**Keep local source bytes so a re-parse never re-reads them from disk.**
+Choosing a different delimiter or page range must read the `File` already in
+hand.
+
+A remote source is the exception, and Sheets is one: a tab is its own download,
+the sheet may have changed since the last one, and the alternative is holding a
+whole workbook to serve one tab. Re-download there, and pay for it by never
+downloading anything the user did not ask for.
+
+**One dataset is one tab.** Ask which tab before downloading, not after. The
+Sheets API's properties-only read (`getGoogleSheetTabs`) lists a workbook's tabs
+without a single cell, so there is no excuse for fetching a workbook to find out
+what is in it. A one-tab workbook has nothing to ask about and must not grow a
+click.
+
+**Prefer CSV to xlsx for a remote spreadsheet.** DuckDB's CSV reader types each
+column from the data, and widens a column to text when its sniff sample sees a
+value that does not fit. `read_xlsx` has to be told to read everything as text,
+because its inference aborts the whole import on the first cell that does not
+match. A tab downloaded as CSV therefore arrives with real types; the same tab
+inside an exported workbook arrives as text.
 
 **Pass values a mutation needs as parameters, not from state.** A mutation
 created during the render before a pick closes over the state as it was then,
@@ -91,7 +108,8 @@ drives real workbook bytes through a real sniff for this reason, and the
 ## Adding a new import view
 
 1. Copy `GoogleSheetsImportView` if the source is remote, `ManualUploadView`
-   if it is local, and keep the field names above.
+   if it is local, and keep the field names above. A remote source that has
+   sub-parts (tabs, sheets, tables) lists them first and imports one.
 2. Add the `DataSourceMetadata` and `ParseOptions` members for the source in
    [`DatasetImportForm.types.ts`](DatasetImportForm/DatasetImportForm.types.ts)
    and [`useSaveDataset`](DatasetImportForm/useSaveDataset/useSaveDataset.ts).

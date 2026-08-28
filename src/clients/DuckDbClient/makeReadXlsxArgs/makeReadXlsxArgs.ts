@@ -37,8 +37,9 @@ export type ReadXlsxArgsOptions = {
  * moment for it: the sniff phase is SheetJS rather than DuckDB, so it reads the
  * same workbook happily and the user has already been told the preview parsed.
  * Reading everything as text also agrees with the schema the import actually
- * records, since both xlsx callers write `column_type: "VARCHAR"` for every
- * sniffed column.
+ * records, since the manual upload path writes `column_type: "VARCHAR"` for
+ * every sniffed xlsx column. Google Sheets no longer reads this way at all: a
+ * tab is downloaded as CSV, whose reader types each column from the data.
  *
  * @param options The header, sheet, range and empty-row handling to read with.
  * @returns The comma-separated arguments, ready to follow the file argument.
@@ -50,9 +51,9 @@ export function makeReadXlsxArgs(
   const args = [
     `header = ${options.hasHeader}`,
     "all_varchar = true",
-    options.sheet === undefined ?
-      ""
-    : `sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`,
+    options.sheet === undefined
+      ? ""
+      : `sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`,
     options.range === undefined ? "" : `range = '${options.range}'`,
     `stop_at_empty = ${stopAtEmpty}`,
   ];

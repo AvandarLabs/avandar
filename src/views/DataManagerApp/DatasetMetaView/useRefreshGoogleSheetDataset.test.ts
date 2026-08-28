@@ -14,18 +14,15 @@ import type { ReactNode } from "react";
 const DATASET_ID = "11111111-1111-4111-8111-111111111111" as Dataset.Id;
 const USER_ID = "00000000-0000-4000-8000-000000000001" as User.Id;
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000002" as Workspace.Id;
-const WORKBOOK_BYTES = Uint8Array.from([
-  0x50, 0x4b, 0x03, 0x04,
-]) as Uint8Array<ArrayBuffer>;
-
 /** Records the order the refresh steps ran in. */
 const callOrder: string[] = [];
 
 const {
   apiGetMock,
   dropLocalDatasetMock,
-  startXlsxImportMock,
-  getGoogleSheetXlsxExportMock,
+  startCsvImportMock,
+  getGoogleSheetTabsMock,
+  getGoogleSheetTabCsvExportMock,
   evictRelationCacheMock,
   notifySuccessMock,
   notifyErrorMock,
@@ -33,8 +30,9 @@ const {
   return {
     apiGetMock: vi.fn(),
     dropLocalDatasetMock: vi.fn(),
-    startXlsxImportMock: vi.fn(),
-    getGoogleSheetXlsxExportMock: vi.fn(),
+    startCsvImportMock: vi.fn(),
+    getGoogleSheetTabsMock: vi.fn(),
+    getGoogleSheetTabCsvExportMock: vi.fn(),
     evictRelationCacheMock: vi.fn(),
     notifySuccessMock: vi.fn(),
     notifyErrorMock: vi.fn(),
@@ -49,13 +47,16 @@ vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {
       dropLocalDataset: dropLocalDatasetMock,
-      startXlsxImport: startXlsxImportMock,
+      startCsvImport: startCsvImportMock,
     },
   };
 });
 
 vi.mock("@/clients/google/GoogleDriveClient/GoogleDriveClient", () => {
-  return { getGoogleSheetXlsxExport: getGoogleSheetXlsxExportMock };
+  return {
+    getGoogleSheetTabs: getGoogleSheetTabsMock,
+    getGoogleSheetTabCsvExport: getGoogleSheetTabCsvExportMock,
+  };
 });
 
 vi.mock(
@@ -153,20 +154,28 @@ describe("useRefreshGoogleSheetDataset", () => {
       callOrder.push("drop");
     });
 
-    getGoogleSheetXlsxExportMock.mockReset();
-    getGoogleSheetXlsxExportMock.mockImplementation(async () => {
-      callOrder.push("export");
-      return { xlsxBytes: WORKBOOK_BYTES, sourceVersion: "99" };
+    getGoogleSheetTabsMock.mockReset();
+    getGoogleSheetTabsMock.mockImplementation(async () => {
+      callOrder.push("list-tabs");
+      return [
+        { sheetId: 0, title: "Colombia", index: 0 },
+        { sheetId: 988142735, title: "Kenya", index: 1 },
+      ];
     });
 
-    startXlsxImportMock.mockReset();
-    startXlsxImportMock.mockImplementation(async () => {
+    getGoogleSheetTabCsvExportMock.mockReset();
+    getGoogleSheetTabCsvExportMock.mockImplementation(async () => {
+      callOrder.push("export");
+      return { csvText: "county\nNairobi\n", sourceVersion: "99" };
+    });
+
+    startCsvImportMock.mockReset();
+    startCsvImportMock.mockImplementation(async () => {
       callOrder.push("import");
       return {
-        sheets: ["Colombia", "Kenya"],
-        defaultSheet: "Colombia",
-        columns: ["county"],
+        columns: [{ column_name: "county", column_type: "VARCHAR" }],
         previewRows: [{ county: "Nairobi" }],
+        csvSniff: {},
       };
     });
 
@@ -185,12 +194,18 @@ describe("useRefreshGoogleSheetDataset", () => {
     expect(GOOGLE_SHEET_FRESHNESS_CACHE.has(DATASET_ID)).toBe(false);
   });
 
-  it("drops the local copy before re-exporting", async () => {
+  it("drops the local copy before re-downloading", async () => {
     // Order matters: re-importing over a live local row and DuckDB table would
     // leave the old table registered if the export then failed.
     await _refresh();
 
-    expect(callOrder).toEqual(["evict", "drop", "export", "import"]);
+    expect(callOrder).toEqual([
+      "evict",
+      "drop",
+      "list-tabs",
+      "export",
+      "import",
+    ]);
   });
 
   it("evicts the workspace relation-cache identity so the next query re-acquires", async () => {
@@ -205,31 +220,28 @@ describe("useRefreshGoogleSheetDataset", () => {
     );
   });
 
-  it("re-reads the dataset's stored tab", async () => {
+  it("downloads the dataset's stored tab, resolved to its gid", async () => {
     await _refresh("Kenya");
 
-    expect(startXlsxImportMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        datasetId: DATASET_ID,
-        parseOptions: { sheet: "Kenya" },
-      }),
+    expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sheetId: 988142735 }),
     );
   });
 
-  it("re-reads the first tab when the stored tab is null", async () => {
+  it("downloads the first tab when the stored tab is null", async () => {
     // Positive control for the test above, and the legacy-row contract: `null`
-    // means the workbook's first tab, which is `read_xlsx`'s own default.
+    // means the workbook's first tab, which is what those rows already read.
     await _refresh(null);
 
-    expect(startXlsxImportMock).toHaveBeenCalledWith(
-      expect.objectContaining({ parseOptions: { sheet: undefined } }),
+    expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledWith(
+      expect.objectContaining({ sheetId: 0 }),
     );
   });
 
-  it("exports the dataset's own document with the refreshed token", async () => {
+  it("reads the dataset's own document with the refreshed token", async () => {
     await _refresh();
 
-    expect(getGoogleSheetXlsxExportMock).toHaveBeenCalledWith({
+    expect(getGoogleSheetTabsMock).toHaveBeenCalledWith({
       fileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
       accessToken: "ya29.refresh-test-token",
     });
@@ -245,7 +257,9 @@ describe("useRefreshGoogleSheetDataset", () => {
   });
 
   it("reports a failure instead of announcing success", async () => {
-    getGoogleSheetXlsxExportMock.mockRejectedValue(new Error("Drive is down"));
+    getGoogleSheetTabCsvExportMock.mockRejectedValue(
+      new Error("Drive is down"),
+    );
 
     await _refresh();
 
@@ -254,7 +268,7 @@ describe("useRefreshGoogleSheetDataset", () => {
     });
     expect(notifySuccessMock).not.toHaveBeenCalled();
     // The workbook never arrived, so nothing may have been re-imported.
-    expect(startXlsxImportMock).not.toHaveBeenCalled();
+    expect(startCsvImportMock).not.toHaveBeenCalled();
   });
 
   it("fails when the user has no Google token", async () => {
@@ -265,6 +279,6 @@ describe("useRefreshGoogleSheetDataset", () => {
     await waitFor(() => {
       expect(notifyErrorMock).toHaveBeenCalled();
     });
-    expect(getGoogleSheetXlsxExportMock).not.toHaveBeenCalled();
+    expect(getGoogleSheetTabsMock).not.toHaveBeenCalled();
   });
 });

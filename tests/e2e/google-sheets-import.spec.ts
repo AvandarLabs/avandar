@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import * as XLSX from "xlsx";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { installFakeGooglePicker } from "./helpers/installFakeGooglePicker";
@@ -18,14 +19,14 @@ import {
 import type { Page, Route } from "@playwright/test";
 
 /**
- * The Google Sheets connector, end to end: the stored Google token, the Drive
- * export, DuckDB's read of the exported workbook, and the import form the rows
- * land in.
+ * The Google Sheets connector, end to end: the stored Google token, the tab
+ * list, the per-tab CSV download, DuckDB's read of it, and the import form the
+ * rows land in.
  *
  * Only the Picker itself is stubbed (see `installFakeGooglePicker` for why it
  * has to be). The token comes from the real `google-auth/tokens` route, the
- * export is a real Drive request built by the real client, and the parse is
- * real DuckDB-WASM in the real browser.
+ * requests are built by the real client, and the parse is real DuckDB-WASM in
+ * the real browser.
  */
 
 const FIXTURE_PATH = path.join(
@@ -37,6 +38,17 @@ const FIXTURE_SHEET = {
   id: "1FixtureSheetIdAbCdEfGhIjKlMnOpQrSt",
   name: "gender-stats-series",
 };
+
+/**
+ * The fixture workbook's tabs, with the gids this stub answers to.
+ *
+ * Two of them, so the connector has to ask which one to import and the answer
+ * has to reach the download. The first is the 701-row one.
+ */
+const FIXTURE_TABS = [
+  { sheetId: 0, title: "Series", index: 0 },
+  { sheetId: 1234567, title: "Country", index: 1 },
+];
 
 /**
  * Every data row on the fixture's first tab: 700 numeric rows plus the prose
@@ -53,36 +65,72 @@ function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
 }
 
 /**
- * Answers Drive out of the local fixture and records what was asked for.
+ * Answers Google out of the local fixture and records what was asked for.
  *
- * One handler for both endpoints rather than two patterns, so the order
- * Playwright resolves overlapping routes in cannot change which one wins.
+ * Three endpoints, because the connector uses three: Drive for the file
+ * version, the Sheets API for the tab list, and the per-tab CSV export for the
+ * cells. The workbook fixture is converted to CSV here, so the rows the browser
+ * parses are the fixture's own rather than a second hand-written copy.
  */
-async function _stubDriveExport(page: Page): Promise<DriveRequestLog> {
+async function _stubGoogleSheet(page: Page): Promise<DriveRequestLog> {
   const log: DriveRequestLog = { urls: [] };
-  const workbookBytes = readFileSync(FIXTURE_PATH);
+  const workbook = XLSX.read(readFileSync(FIXTURE_PATH), { type: "buffer" });
+  const csvByGid = new Map(
+    FIXTURE_TABS.map((tab) => {
+      const worksheet = workbook.Sheets[workbook.SheetNames[tab.index]!]!;
+      return [String(tab.sheetId), XLSX.utils.sheet_to_csv(worksheet)];
+    }),
+  );
 
   await page.route("**/drive/v3/files/**", async (route: Route) => {
-    const url = route.request().url();
-    log.urls.push(url);
-
-    if (url.includes("fields=version")) {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ version: "7" }),
-      });
-      return;
-    }
+    log.urls.push(route.request().url());
     await route.fulfill({
       status: 200,
-      contentType:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      body: workbookBytes,
+      contentType: "application/json",
+      body: JSON.stringify({ version: "7" }),
     });
   });
 
+  await page.route(
+    "**/sheets.googleapis.com/v4/spreadsheets/**",
+    async (route: Route) => {
+      log.urls.push(route.request().url());
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          sheets: FIXTURE_TABS.map((properties) => {
+            return { properties };
+          }),
+        }),
+      });
+    },
+  );
+
+  await page.route(
+    "**/docs.google.com/spreadsheets/**",
+    async (route: Route) => {
+      const url = route.request().url();
+      log.urls.push(url);
+      const gid = new URL(url).searchParams.get("gid") ?? "0";
+      await route.fulfill({
+        status: 200,
+        contentType: "text/csv",
+        body: csvByGid.get(gid) ?? "",
+      });
+    },
+  );
+
   return log;
+}
+
+/** Chooses a tab in the pre-import selector and starts the import. */
+async function _importTab(page: Page, tabTitle: string): Promise<void> {
+  const tabSelect = page.getByRole("combobox", { name: "Tab to import" });
+  await expect(tabSelect).toBeVisible({ timeout: LONG_WAIT });
+  await tabSelect.click();
+  await page.getByRole("option", { name: tabTitle, exact: true }).click();
+  await page.getByRole("button", { name: "Process", exact: true }).click();
 }
 
 /** Opens the Connectors tab and picks a sheet through the stubbed Picker. */
@@ -172,7 +220,7 @@ test.describe("Google Sheets connector", () => {
         expiryDate: new Date(Date.now() + 60 * 60 * 1000),
       });
       await installFakeGooglePicker(page, FIXTURE_SHEET);
-      const driveLog = await _stubDriveExport(page);
+      const googleLog = await _stubGoogleSheet(page);
 
       await signInWithEmailPassword(page, {
         email: e2eWorkerDb.primaryUser.email,
@@ -185,20 +233,39 @@ test.describe("Google Sheets connector", () => {
         page.getByText(`Selected document: ${FIXTURE_SHEET.name}`),
       ).toBeVisible({ timeout: LONG_WAIT });
 
+      // Nothing is downloaded before the tab is chosen: the tab list is a
+      // properties-only read, and one dataset is one tab.
+      expect(
+        googleLog.urls.some((url) => {
+          return url.includes("docs.google.com");
+        }),
+      ).toBe(false);
+
+      await _importTab(page, FIXTURE_TABS[0]!.title);
+
       await _expectImportedPreview(page, FIXTURE_SHEET.name);
 
-      // Both Drive calls must declare shared drive support. Without it Drive
+      // The chosen tab's gid reaches the download rather than a default.
+      expect(
+        googleLog.urls.some((url) => {
+          return url.includes(`gid=${FIXTURE_TABS[0]!.sheetId}`);
+        }),
+      ).toBe(true);
+
+      // Every Drive call must declare shared drive support. Without it Drive
       // answers 404 `notFound` for any file that lives in a shared drive, which
       // the client can only read as a withdrawn per-file grant.
-      expect(driveLog.urls.length).toBeGreaterThanOrEqual(2);
-      driveLog.urls.forEach((url) => {
+      const driveUrls = googleLog.urls.filter((url) => {
+        return url.includes("/drive/v3/files/");
+      });
+      expect(driveUrls.length).toBeGreaterThanOrEqual(1);
+      driveUrls.forEach((url) => {
         expect(url).toContain("supportsAllDrives=true");
       });
 
       // Saving is what makes this cover the transcode: the parquet uploaded
-      // here is the output of the `read_xlsx` that used to abort on the prose
-      // cell in row 702. No parquet, no upload, and this poll never turns
-      // true.
+      // here is the output of the read that used to abort on the prose cell in
+      // row 702. No parquet, no upload, and this poll never turns true.
       //
       // Saved directly rather than through the shared cloud-sync save helper,
       // which first looks for the offline-only checkbox. A `google_sheets`
@@ -297,9 +364,15 @@ test.describe("Google Sheets connector", () => {
         });
         await _pickSheetInConnectorsTab(page, e2eWorkerDb.workspaceSlug);
 
+        // The real fixture sheet has two tabs, so the connector asks. Choosing
+        // the second one is what proves the gid reached Google: a download that
+        // ignored it would return the first tab's columns.
+        const secondTab = process.env.E2E_GOOGLE_SHEET_SECOND_TAB ?? "Cities";
+        await _importTab(page, secondTab);
+
         // No cell assertion here: the sheet's contents are not this repo's
-        // to pin. That the preview rendered at all means Drive answered, the
-        // export parsed, and the rows reached the form.
+        // to pin. That the preview rendered at all means Google answered, the
+        // CSV parsed, and the rows reached the form.
         await expect(
           page.getByText("These are the first", { exact: false }),
         ).toBeVisible({ timeout: LONG_WAIT });
