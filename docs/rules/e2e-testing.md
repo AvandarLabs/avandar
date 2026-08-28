@@ -13,13 +13,13 @@ A spec that reaches a real third-party service is tagged with
 `tests/e2e/setup/e2eThirdPartyMode/`). The tag does not decide whether the spec
 runs. It decides what a **missing credential** means:
 
-| Command                                  | Runs                                           | A missing env var on a tagged spec                 |
-| ---------------------------------------- | ---------------------------------------------- | -------------------------------------------------- |
-| `pnpm test:e2e`                          | everything, tagged specs included              | **skipped**, with the variable names in the reason |
-| `pnpm test:e2e --no-third-party`         | everything except `@third-party`               | n/a, the tagged specs never start                  |
-| `pnpm test:e2e:third-party`              | only the tagged specs                          | **hard failure**                                   |
-| `pnpm test:e2e:offline`                  | everything except `@online` and `@third-party` | n/a                                                |
-| `./scripts/runAllTests.sh --third-party` | the unit suites, then only the tagged specs    | hard failure                                       |
+| Command                                                 | Runs                                           | A missing env var on a tagged spec                 |
+| ------------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------- |
+| `pnpm test:e2e`                                         | everything, tagged specs included              | **skipped**, with the variable names in the reason |
+| `pnpm test:e2e --no-third-party`                        | everything except `@third-party`               | n/a, the tagged specs never start                  |
+| `pnpm test:e2e:third-party`                             | only the tagged specs                          | **hard failure**                                   |
+| `pnpm test:e2e:offline`                                 | everything except `@online` and `@third-party` | n/a                                                |
+| `./scripts/test-runners/run-all-tests.sh --third-party` | the unit suites, then only the tagged specs    | hard failure                                       |
 
 Read credentials with `requireE2EThirdPartyEnv({ test, variableNames })`, which
 applies that asymmetry for you. Never read `process.env` for them directly in a

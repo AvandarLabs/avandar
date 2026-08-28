@@ -3,7 +3,7 @@
 # Summary: Runs the full Avandar test suite.
 #
 # Usage:
-#   ./scripts/runAllTests.sh [--quick|-q] [--third-party]
+#   ./scripts/test-runners/run-all-tests.sh [--quick|-q] [--third-party]
 #
 # Description:
 #   Runs every workspace test suite in sequence. Stops at the first failure.
@@ -22,14 +22,14 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PROJECT_ROOT="$SCRIPT_DIR/.."
+PROJECT_ROOT="$SCRIPT_DIR/../.."
 cd "$PROJECT_ROOT"
 
 QUICK=false
 THIRD_PARTY=false
 
 usage() {
-  echo "Usage: ./scripts/runAllTests.sh [--quick|-q] [--third-party]"
+  echo "Usage: ./scripts/test-runners/run-all-tests.sh [--quick|-q] [--third-party]"
   echo "Runs the full Avandar test suite."
   echo "  --quick, -q     Skip end-to-end tests."
   echo "  --third-party   Run only the @third-party e2e specs, failing on"

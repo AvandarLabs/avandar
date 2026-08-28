@@ -11,7 +11,7 @@
  * Run through `pnpm vite-script`, like every other `.ts` script here.
  */
 import { spawn } from "node:child_process";
-import { E2E_NO_THIRD_PARTY_FLAG } from "../tests/e2e/setup/e2eThirdPartyMode/e2eThirdPartyMode";
+import { E2E_NO_THIRD_PARTY_FLAG } from "../../tests/e2e/setup/e2eThirdPartyMode/e2eThirdPartyMode";
 
 const args = process.argv.slice(2);
 const isNoThirdParty = args.includes(E2E_NO_THIRD_PARTY_FLAG);
