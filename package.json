@@ -35,7 +35,7 @@
     "test:modules": "pnpm --filter @avandar/modules test",
     "test:ui": "pnpm --filter @avandar/ui test",
     "test:db": "supabase test db && pnpm db:validate-privileges && ./scripts/test-dashboard-publishing-migrations.sh",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/runE2E.mjs",
     "test:e2e:offline": "PLAYWRIGHT_E2E_OFFLINE=1 playwright test",
     "test:e2e:third-party": "PLAYWRIGHT_E2E_THIRD_PARTY=1 playwright test",
     "test:e2e:headed": "playwright test --headed",

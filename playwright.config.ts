@@ -4,7 +4,9 @@ import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
 import { E2EPreflight } from "./tests/e2e/setup/E2EPreflight";
 import {
+  E2E_NO_THIRD_PARTY_FLAG,
   E2E_THIRD_PARTY_TAG,
+  isE2ENoThirdPartyMode,
   isE2EThirdPartyMode,
 } from "./tests/e2e/setup/e2eThirdPartyMode/e2eThirdPartyMode";
 import {
@@ -66,6 +68,31 @@ if (isE2EOfflineMode() && isE2EThirdPartyMode()) {
     "PLAYWRIGHT_E2E_OFFLINE and PLAYWRIGHT_E2E_THIRD_PARTY are contradictory: " +
       "the third-party specs exist to reach a real service over the network.",
   );
+}
+
+// Same reasoning: a run told to leave the third-party specs out cannot also be
+// the run that exists to exercise them.
+if (isE2ENoThirdPartyMode() && isE2EThirdPartyMode()) {
+  throw new Error(
+    `${E2E_NO_THIRD_PARTY_FLAG} and PLAYWRIGHT_E2E_THIRD_PARTY are ` +
+      "contradictory: one drops the third-party specs and the other runs " +
+      "only them.",
+  );
+}
+
+/**
+ * The tags this run excludes, as one pattern, or `undefined` to exclude none.
+ */
+function buildGrepInvert(): RegExp | undefined {
+  const excludedTags = [
+    ...(isE2EOfflineMode() ? [E2E_ONLINE_TAG] : []),
+    ...(isE2EOfflineMode() || isE2ENoThirdPartyMode()
+      ? [E2E_THIRD_PARTY_TAG]
+      : []),
+  ];
+  return excludedTags.length > 0
+    ? new RegExp(excludedTags.join("|"))
+    : undefined;
 }
 
 /**
@@ -145,17 +172,16 @@ export default defineConfig({
   // missing-credential handling turns loud in the same mode; see
   // `requireE2EThirdPartyEnv`.
   grep: isE2EThirdPartyMode() ? new RegExp(E2E_THIRD_PARTY_TAG) : undefined,
-  // Only an offline run excludes anything, and it excludes both: the `@online`
-  // specs need a network-fetched DuckDB extension, and the `@third-party` ones
-  // need a real service. Excluding them beats letting them time out.
+  // An offline run excludes both: the `@online` specs need a network-fetched
+  // DuckDB extension, and the `@third-party` ones need a real service.
+  // Excluding them beats letting them time out. `--no-third-party` excludes
+  // only the latter, so a blocking job cannot reach a third party even if its
+  // credentials turn up in the environment.
   //
   // A default run includes the third-party specs and lets each skip itself when
   // its credentials are absent, which is what keeps a full run green on a
   // machine that was never given them.
-  grepInvert:
-    isE2EOfflineMode() ?
-      new RegExp(`${E2E_ONLINE_TAG}|${E2E_THIRD_PARTY_TAG}`)
-    : undefined,
+  grepInvert: buildGrepInvert(),
   globalSetup: "./tests/e2e/setup/globalSetup.ts",
   globalTeardown: "./tests/e2e/setup/globalTeardown.ts",
 });

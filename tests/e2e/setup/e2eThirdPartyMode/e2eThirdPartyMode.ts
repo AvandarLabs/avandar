@@ -7,6 +7,7 @@
  * | Run | Tagged specs | A missing env var |
  * | --- | --- | --- |
  * | `pnpm test:e2e` | included | skipped, with the names in the reason |
+ * | `pnpm test:e2e --no-third-party` | excluded | n/a |
  * | `pnpm test:e2e:third-party` | the only ones that run | hard failure |
  * | `pnpm test:e2e:offline` | excluded | n/a |
  *
@@ -98,4 +99,26 @@ export function requireE2EThirdPartyEnv<Name extends string>(
       return [name, (process.env[name] ?? "").trim()];
     }),
   ) as Record<Name, string>;
+}
+
+/**
+ * The flag that drops the third-party specs from a run that could have run
+ * them. Accepted by `pnpm test:e2e` through `scripts/runE2E.mjs`, which turns
+ * it into `PLAYWRIGHT_E2E_NO_THIRD_PARTY`; Playwright's own CLI rejects options
+ * it does not define, so the flag cannot be read from `process.argv` here.
+ */
+export const E2E_NO_THIRD_PARTY_FLAG = "--no-third-party";
+
+/**
+ * True when the run was told to leave the third-party specs out entirely.
+ *
+ * Stronger than the default skip-on-missing-credential behavior, and that is
+ * the point: a blocking job must not reach a third party even if someone gives
+ * it the credentials, whether deliberately or by adding an `E2E_*` variable to
+ * a workflow that shares its `env:` with the gate. The PR gate and both deploy
+ * workflows therefore run `pnpm test:e2e --no-third-party`, which cannot become
+ * a live network call by a change to the environment alone.
+ */
+export function isE2ENoThirdPartyMode(): boolean {
+  return process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY === "1";
 }

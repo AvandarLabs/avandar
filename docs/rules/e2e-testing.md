@@ -16,6 +16,7 @@ runs. It decides what a **missing credential** means:
 | Command                                  | Runs                                           | A missing env var on a tagged spec                 |
 | ---------------------------------------- | ---------------------------------------------- | -------------------------------------------------- |
 | `pnpm test:e2e`                          | everything, tagged specs included              | **skipped**, with the variable names in the reason |
+| `pnpm test:e2e --no-third-party`         | everything except `@third-party`               | n/a, the tagged specs never start                  |
 | `pnpm test:e2e:third-party`              | only the tagged specs                          | **hard failure**                                   |
 | `pnpm test:e2e:offline`                  | everything except `@online` and `@third-party` | n/a                                                |
 | `./scripts/runAllTests.sh --third-party` | the unit suites, then only the tagged specs    | hard failure                                       |
@@ -34,17 +35,22 @@ prevent.
 
 ### What this asks of a blocking job
 
-The PR gate and both deploy workflows run `pnpm test:e2e`, so today they list
-the tagged specs and skip them for want of credentials. That is a property of
-the environment, not of the tag, so the rule is now about the credentials:
+**A blocking job runs `pnpm test:e2e --no-third-party`.** The PR gate and both
+deploy workflows do, which drops the tagged specs from the run outright rather
+than relying on the credentials being absent. Skipping-for-want-of-credentials
+is a property of the environment, and a job that gates a merge or a deploy
+should not be one `E2E_*` variable away from making live network calls: those
+can fail because somebody else's service is down, their quota ran out, or a
+standing credential was revoked. The flag makes that impossible to reach by
+changing the environment alone.
 
-**Do not put third-party credentials into a blocking job's `env:`.** Doing so
-turns those skips into live network calls inside a job that gates a merge or a
-deploy, which can then fail because somebody else's service is down, their quota
-ran out, or a standing credential was revoked. If a live check is wanted in CI,
-give it its own scheduled or manually-dispatched job running
-`pnpm test:e2e:third-party`, where a missing credential is loud and a failure
-blocks nothing.
+Keep the second guard too: **do not put third-party credentials into a blocking
+job's `env:`.** The flag and the absent credentials are independent, and neither
+should be the only thing standing between the gate and a third party.
+
+If a live check is wanted in CI, give it its own scheduled or
+manually-dispatched job running `pnpm test:e2e:third-party`, where a missing
+credential is loud and a failure blocks nothing.
 
 Tag a spec only when it earns it: it is the only kind that catches the third
 party changing its contract, which every stubbed spec passes straight through.

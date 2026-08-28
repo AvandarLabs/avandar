@@ -1,12 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getMissingE2EThirdPartyEnv,
+  isE2ENoThirdPartyMode,
   isE2EThirdPartyMode,
   requireE2EThirdPartyEnv,
 } from "./e2eThirdPartyMode";
 import type { E2ETestSkip } from "./e2eThirdPartyMode";
 
 const originalThirdParty = process.env.PLAYWRIGHT_E2E_THIRD_PARTY;
+const originalNoThirdParty = process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY;
 
 /**
  * Stands in for Playwright's `test`, recording the skip instead of aborting.
@@ -23,6 +25,7 @@ function _fakeTest(): E2ETestSkip & {
 
 afterEach(() => {
   process.env.PLAYWRIGHT_E2E_THIRD_PARTY = originalThirdParty;
+  process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY = originalNoThirdParty;
   delete process.env.E2E_FAKE_TOKEN;
   delete process.env.E2E_FAKE_ID;
 });
@@ -42,6 +45,34 @@ describe("isE2EThirdPartyMode", () => {
     // run's skips into failures.
     process.env.PLAYWRIGHT_E2E_THIRD_PARTY = "true";
     expect(isE2EThirdPartyMode()).toBe(false);
+  });
+});
+
+describe("isE2ENoThirdPartyMode", () => {
+  it("is off for a default run", () => {
+    delete process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY;
+
+    expect(isE2ENoThirdPartyMode()).toBe(false);
+  });
+
+  it("is on only for the exact opt-in value", () => {
+    process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY = "1";
+    expect(isE2ENoThirdPartyMode()).toBe(true);
+
+    // Anything else is off, so a stray value cannot silently drop the
+    // third-party specs from a run that meant to include them.
+    process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY = "true";
+    expect(isE2ENoThirdPartyMode()).toBe(false);
+  });
+
+  it("is independent of third-party mode", () => {
+    process.env.PLAYWRIGHT_E2E_THIRD_PARTY = "1";
+    delete process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY;
+
+    // The two are contradictory, and `playwright.config.ts` is where that is
+    // rejected. Neither reader infers the other's state.
+    expect(isE2ENoThirdPartyMode()).toBe(false);
+    expect(isE2EThirdPartyMode()).toBe(true);
   });
 });
 

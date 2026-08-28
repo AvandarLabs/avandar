@@ -38,15 +38,17 @@ count is only reachable if the transcode did not abort on it.
 Tagged `@third-party`. What that tag controls is not whether the test runs, but
 what a missing credential means:
 
-| Command                     | This test                                                             |
-| --------------------------- | --------------------------------------------------------------------- |
-| `pnpm test:e2e`             | runs if its credentials are set, **skips** if not                     |
-| `pnpm test:e2e:third-party` | the only test that runs, and **fails** if its credentials are not set |
-| `pnpm test:e2e:offline`     | excluded                                                              |
+| Command                          | This test                                                             |
+| -------------------------------- | --------------------------------------------------------------------- |
+| `pnpm test:e2e`                  | runs if its credentials are set, **skips** if not                     |
+| `pnpm test:e2e --no-third-party` | excluded, credentials or not                                          |
+| `pnpm test:e2e:third-party`      | the only test that runs, and **fails** if its credentials are not set |
+| `pnpm test:e2e:offline`          | excluded                                                              |
 
-So it runs in a full local suite once you have set it up, and skips in CI, which
-holds no credentials. See [`rules/e2e-testing.md`](rules/e2e-testing.md) for the
-reasoning and for what that asks of a blocking job.
+So it runs in a full local suite once you have set it up, and never runs in the
+blocking CI jobs, which pass `--no-third-party`. See
+[`rules/e2e-testing.md`](rules/e2e-testing.md) for the reasoning and for what
+that asks of a blocking job.
 
 To run just this test:
 
