@@ -14,8 +14,8 @@ import {
   ConceptFormValues,
   makeDefaultManualEntryAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import type { FormType } from "@avandar/ui/hooks";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { FormType } from "@avandar/ui/hooks";
 
 type Props = {
   conceptForm: FormType<ConceptFormValues>;
@@ -84,16 +84,19 @@ export function ManualEntryAttributesBlock({
   return (
     <Fieldset legend={t`Fields to be manually entered`}>
       <Stack>
-        {conceptForm.errors.attributes ?
+        {conceptForm.errors.attributes ? (
           <Text c="danger">{conceptForm.errors.attributes}</Text>
-        : <>
-            {attributeRows.length === 0 ?
+        ) : (
+          <>
+            {attributeRows.length === 0 ? (
               <Text c="gray">
                 <Trans>No fields have been added</Trans>
               </Text>
-            : attributeRows}
+            ) : (
+              attributeRows
+            )}
           </>
-        }
+        )}
 
         <Button
           onClick={() => {

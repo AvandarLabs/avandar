@@ -52,16 +52,16 @@ export function CoordinateValidationReason({
         <Plural value={drop.count} one="# row" other="# rows" />
       </div>
       <p>
-        {drop.sampleRowIndexes.length === 1 ?
-          t`Row ${rowIndexes}.`
-        : t`Rows ${rowIndexes}.`}{" "}
+        {drop.sampleRowIndexes.length === 1
+          ? t`Row ${rowIndexes}.`
+          : t`Rows ${rowIndexes}.`}{" "}
         {i18n._(_explanation(drop.reason))}
       </p>
-      {drop.reason === "suspectedLatLngSwap" ?
+      {drop.reason === "suspectedLatLngSwap" ? (
         <Button size="compact-xs" variant="default" onClick={onSwapLatLng}>
           {t`Swap latitude and longitude`}
         </Button>
-      : null}
+      ) : null}
     </li>
   );
 }

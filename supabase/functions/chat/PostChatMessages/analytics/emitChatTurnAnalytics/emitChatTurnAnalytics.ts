@@ -1,9 +1,9 @@
 import { logAnalyticsEvent } from "@sbfn/_shared/analytics/logAnalyticsEvent/logAnalyticsEvent.ts";
 import { ChatTurnAnalyticsPayloads } from "@sbfn/chat/PostChatMessages/analytics/ChatTurnAnalyticsPayloads/ChatTurnAnalyticsPayloads.ts";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 import type { AnalyticsApp } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
+import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 
 /** What a turn ended up being, and the facts only the server knows about it. */
 type ChatTurnOutcomeRecord =

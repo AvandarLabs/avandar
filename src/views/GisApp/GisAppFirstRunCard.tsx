@@ -13,7 +13,7 @@ export function GisAppFirstRunCard({
   app,
   onAddLayerFromSource,
 }: Props): ReactNode {
-  return app.mapConfig.layers.length === 0 ?
-      <MapFirstRunCard onAddLayerFromSource={onAddLayerFromSource} />
-    : null;
+  return app.mapConfig.layers.length === 0 ? (
+    <MapFirstRunCard onAddLayerFromSource={onAddLayerFromSource} />
+  ) : null;
 }

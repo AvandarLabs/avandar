@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import {
@@ -6,12 +7,11 @@ import {
   createDataset,
 } from "$/models/AvaMap/MapLayer/MapLayerModule/__tests__/MapLayerModule.fixtures.ts";
 import {
-  QueryColumn, // prettier-ignore
+  QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import { describe, expect, it } from "vitest";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type {
-  DatasetColumn, // prettier-ignore
+  DatasetColumn, // oxfmt-ignore
 } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 

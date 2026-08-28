@@ -68,9 +68,9 @@ export const SupportRoutes = defineRoutes<SupportAPI>("support", {
       const workspaces = memberships.map((row) => {
         const workspace = row.workspace;
         const plan =
-          workspace.subscription != null ?
-            workspace.subscription.feature_plan_type
-          : "free";
+          workspace.subscription != null
+            ? workspace.subscription.feature_plan_type
+            : "free";
 
         return {
           name: workspace.name,

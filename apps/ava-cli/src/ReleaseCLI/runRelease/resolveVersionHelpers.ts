@@ -27,13 +27,13 @@ export async function resolveReleaseVersion(
   if (provided !== undefined) {
     return _requireValidVersion(provided, "The release version");
   }
-  return assumeYes ? suggested : (
-      promptForVersion({
+  return assumeYes
+    ? suggested
+    : promptForVersion({
         message: "Which version are you releasing?",
         defaultValue: suggested,
         label: "The release version",
-      })
-    );
+      });
 }
 
 /** Resolve the version the source branch moves to after the release. */

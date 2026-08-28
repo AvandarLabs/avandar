@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { AvaMapConfigV1Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV1Schema.ts";
 import { AvaMapConfigV2Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV2Schema.ts";
 import { AvaMapConfigV3Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV3Schema.ts";
@@ -5,11 +6,10 @@ import { AvaMapConfigV4Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigS
 import { AvaMapConfigV5Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts";
 import { migrateAvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/migrateAvaMapConfig.ts";
 import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle.ts";
-import { z } from "zod";
-// eslint-disable-next-line no-restricted-imports
-import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type { Json } from "$/types/database.types.ts";
+// eslint-disable-next-line no-restricted-imports
+import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
 
 function _assertBufferInvariants(layers: readonly MapLayer.T[]): void {
   const hasCycle = layers.some((layer) => {

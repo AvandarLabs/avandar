@@ -1,6 +1,6 @@
-import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { AppType } from "$/models/Permissions/Permissions.types.ts";
 import type { Tables } from "$/types/database.types.ts";
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type WorkspacesAPI = APITypeDef<
   "workspaces",

@@ -6,12 +6,12 @@ import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMed
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import { Logger } from "@/utils/Logger";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 
 /**
  * The relations the caller is allowed to reach, supplied by the query session.
@@ -120,8 +120,8 @@ async function _getMappedDatasetColumns(
       return mapping.type === "dataset_column" ? [mapping.datasetColumnId] : [];
     }),
   );
-  return datasetColumnIds.length === 0 ?
-      []
+  return datasetColumnIds.length === 0
+    ? []
     : await DatasetColumnClient.getAll(where("id", "in", datasetColumnIds));
 }
 

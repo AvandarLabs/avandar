@@ -23,14 +23,14 @@ export function PendingClarificationBlock(): React.ReactNode {
   const onRequestDifferentDiscovery =
     useDiscoveryRecovery(pendingClarification);
 
-  return pendingClarification ?
-      <Box px="md" pb="xs">
-        <ClarificationCard
-          request={pendingClarification}
-          onAnswer={onSubmit}
-          resolveDiscovery={resolveDiscovery}
-          onRequestDifferentDiscovery={onRequestDifferentDiscovery}
-        />
-      </Box>
-    : null;
+  return pendingClarification ? (
+    <Box px="md" pb="xs">
+      <ClarificationCard
+        request={pendingClarification}
+        onAnswer={onSubmit}
+        resolveDiscovery={resolveDiscovery}
+        onRequestDifferentDiscovery={onRequestDifferentDiscovery}
+      />
+    </Box>
+  ) : null;
 }

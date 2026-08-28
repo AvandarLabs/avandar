@@ -1,17 +1,17 @@
 import { isDefined } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { match } from "ts-pattern";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BillingPortalButton } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
 import { PlanCard } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard";
 import { useSubscriptionPlans } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/useSubscriptionPlans";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   SubscriptionPlan,
   SubscriptionPlanGroup,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import type { SetRequired } from "type-fest";
 
 type Props = {
@@ -53,11 +53,11 @@ function WorkspaceBillingViewContent({
       }
       return (
         <div>
-          {!hideTitle ?
+          {!hideTitle ? (
             <Title order={3} mb="xs">
               <Trans>Billing</Trans>
             </Title>
-          : null}
+          ) : null}
           <Text c="dimmed">
             <Trans>Choose a plan that works best for your workspace.</Trans>
           </Text>
@@ -118,13 +118,13 @@ function WorkspaceBillingViewContent({
   const sortedPlanGroups: SubscriptionPlanGroup[] =
     subscriptionPlanGroups.toSorted((planGroupA, planGroupB) => {
       const priceA =
-        planGroupA.type === "free" ?
-          0
-        : planGroupA.annualPlan.normalizedPricePerSeatPerMonth;
+        planGroupA.type === "free"
+          ? 0
+          : planGroupA.annualPlan.normalizedPricePerSeatPerMonth;
       const priceB =
-        planGroupB.type === "free" ?
-          0
-        : planGroupB.annualPlan.normalizedPricePerSeatPerMonth;
+        planGroupB.type === "free"
+          ? 0
+          : planGroupB.annualPlan.normalizedPricePerSeatPerMonth;
       return priceA - priceB;
     });
 
@@ -142,9 +142,8 @@ function WorkspaceBillingViewContent({
   );
 
   const subscription = currentWorkspace.subscription;
-  const currentSubscribedPlan =
-    subscription ?
-      allPlans.find((plan) => {
+  const currentSubscribedPlan = subscription
+    ? allPlans.find((plan) => {
         // Polar-backed: match the Polar product id.
         // Native free: any free plan card is the current plan.
         return (
@@ -195,7 +194,7 @@ function WorkspaceBillingViewContent({
             .exhaustive();
         })}
       </Group>
-      {subscription && currentSubscribedPlan?.priceType !== "free" ?
+      {subscription && currentSubscribedPlan?.priceType !== "free" ? (
         <>
           <Group gap="xxxs" align="center">
             <Text c="dimmed">
@@ -225,7 +224,7 @@ function WorkspaceBillingViewContent({
             </Group>
           </div>
         </>
-      : null}
+      ) : null}
     </Stack>
   );
 }

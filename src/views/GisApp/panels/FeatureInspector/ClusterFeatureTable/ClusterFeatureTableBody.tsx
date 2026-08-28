@@ -2,8 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Pagination, Table } from "@mantine/core";
 import css from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable.module.css";
 import { getClusterTableColumns } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumns/getClusterTableColumns";
-import type { ClusterTableColumns } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumnsFromLeaves/getClusterTableColumnsFromLeaves";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { ClusterTableColumns } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumnsFromLeaves/getClusterTableColumnsFromLeaves";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -96,11 +96,11 @@ export function ClusterFeatureTableBody({
           </Table.Tbody>
         </Table>
       </div>
-      {totalPages > 1 ?
+      {totalPages > 1 ? (
         <div className={css.clusterFeatureTablePagination}>
           <Pagination total={totalPages} value={page} onChange={onPageChange} />
         </div>
-      : null}
+      ) : null}
     </>
   );
 }

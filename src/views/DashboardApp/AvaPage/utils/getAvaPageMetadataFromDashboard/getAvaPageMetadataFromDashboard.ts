@@ -1,7 +1,7 @@
 import { assertIsDefined } from "@avandar/utils";
 import { match, P } from "ts-pattern";
-import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 
 /** Where a dashboard page is rendered. */
 export type AvaPageSurface = "editor" | "preview" | "published";

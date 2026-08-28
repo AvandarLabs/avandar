@@ -2,24 +2,24 @@ import { Model } from "@avandar/models";
 import { prop, sortObjList } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+import { match } from "ts-pattern";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { match } from "ts-pattern";
 import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
 import { PublicQuerySession } from "@/clients/qetl/PublicQuerySession/PublicQuerySession";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { buildConceptQueryResult } from "@/clients/qetl/wrappers/ConceptWrapper/buildConceptQueryResult";
 import { resolveManualQueryForExecution } from "@/views/DataExplorerApp/resolveManualQueryForExecution/resolveManualQueryForExecution";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   RunStructuredQueryParams,
   RunStructuredQueryResult,
   StructuredQueryAuth,
 } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
-import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** A structured query's columns, in the stable order execution expects. */
 type SortedQueryColumns = ReadonlyArray<
@@ -41,19 +41,19 @@ async function _selectSqlForExecution(
   const { query, rawSql, isStructuredQueryInSync = true } = params;
 
   const resolved =
-    rawSql === undefined ?
-      await match(params)
-        .with({ auth: "workspace" }, async ({ workspaceId }) => {
-          return await resolveManualQueryForExecution({ query, workspaceId });
-        })
-        .with({ auth: "public" }, () => {
-          return { query, didAutoLimit: false as const };
-        })
-        .with({ auth: "workspace_published" }, () => {
-          return { query, didAutoLimit: false as const };
-        })
-        .exhaustive()
-    : { query, didAutoLimit: false as const };
+    rawSql === undefined
+      ? await match(params)
+          .with({ auth: "workspace" }, async ({ workspaceId }) => {
+            return await resolveManualQueryForExecution({ query, workspaceId });
+          })
+          .with({ auth: "public" }, () => {
+            return { query, didAutoLimit: false as const };
+          })
+          .with({ auth: "workspace_published" }, () => {
+            return { query, didAutoLimit: false as const };
+          })
+          .exhaustive()
+      : { query, didAutoLimit: false as const };
 
   const sqlToRun = selectSqlToExecute({
     rawSql,

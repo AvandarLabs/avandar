@@ -2,8 +2,8 @@ import { isNonEmptyArray, prop, where } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Accordion, Badge, Group, Stack, Text, Title } from "@mantine/core";
 import { IconDatabase, IconShieldLock } from "@tabler/icons-react";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useMemo } from "react";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -11,8 +11,8 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { SliceModeEditor } from "@/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor";
-import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { PublishSliceDataset } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.types";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -124,17 +124,20 @@ export function PublishSliceSection({
                     size="xs"
                     variant="light"
                     color={
-                      slice.mode === "queried" ? "teal"
-                      : slice.mode === "all_columns" ?
-                        "yellow"
-                      : "blue"
+                      slice.mode === "queried"
+                        ? "teal"
+                        : slice.mode === "all_columns"
+                          ? "yellow"
+                          : "blue"
                     }
                   >
-                    {slice.mode === "queried" ?
+                    {slice.mode === "queried" ? (
                       <Trans>Narrowest</Trans>
-                    : slice.mode === "all_columns" ?
+                    ) : slice.mode === "all_columns" ? (
                       <Trans>All columns</Trans>
-                    : <Trans>Custom</Trans>}
+                    ) : (
+                      <Trans>Custom</Trans>
+                    )}
                   </Badge>
                 </Group>
               </Accordion.Control>

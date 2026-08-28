@@ -11,10 +11,10 @@ import {
   getSqlTokens,
   isKeywordToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type ColumnSet = readonly string[] | "all";
 type TokenAtIndex = { tokens: readonly SqlToken[]; index: number };
@@ -160,11 +160,9 @@ function _isCastTypeName(options: Readonly<TokenAtIndex>): boolean {
 function _getAliasNames(tokens: readonly SqlToken[]): ReadonlySet<string> {
   return new Set(
     tokens.flatMap((token, index) => {
-      return (
-          token.kind === "identifier" &&
-            isKeywordToken({ token: tokens[index - 1], keywords: "AS" })
-        ) ?
-          [token.value]
+      return token.kind === "identifier" &&
+        isKeywordToken({ token: tokens[index - 1], keywords: "AS" })
+        ? [token.value]
         : [];
     }),
   );
@@ -242,8 +240,8 @@ function _getColumnRefAtIndex(
   const tableName =
     identifier.parts.length >= 2 ? identifier.parts[0] : undefined;
   if (tableName !== undefined) {
-    return options.sqlDatasetIds.includes(tableName) ?
-        { columnName, datasetId: tableName, endIndex: identifier.endIndex }
+    return options.sqlDatasetIds.includes(tableName)
+      ? { columnName, datasetId: tableName, endIndex: identifier.endIndex }
       : undefined;
   }
   if (
@@ -279,11 +277,11 @@ function _getAliasReferenceColumns(
   }>,
 ): ColumnSet {
   const { aliasScopeIndex, columnName, index, orderByIndex } = options;
-  return (
-    orderByIndex !== undefined && index > orderByIndex ? []
-    : aliasScopeIndex !== undefined && index > aliasScopeIndex ? "all"
-    : [columnName]
-  );
+  return orderByIndex !== undefined && index > orderByIndex
+    ? []
+    : aliasScopeIndex !== undefined && index > aliasScopeIndex
+      ? "all"
+      : [columnName];
 }
 
 function _collectSqlColumns(
@@ -306,9 +304,8 @@ function _collectSqlColumns(
       if (columnRef === undefined) {
         return columnsByDatasetId;
       }
-      const contributed =
-        aliasNames.has(columnRef.columnName) ?
-          _getAliasReferenceColumns({
+      const contributed = aliasNames.has(columnRef.columnName)
+        ? _getAliasReferenceColumns({
             aliasScopeIndex,
             columnName: columnRef.columnName,
             index,

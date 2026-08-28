@@ -100,13 +100,13 @@ function _getCsvRetryResultFromError(
   const { parseOptions, sniffRow } = options.sniffed;
   return {
     parseOptions:
-      parseOptions.quoteChar == null ?
-        {
-          ...parseOptions,
-          quoteChar: DEFAULT_CSV_QUOTE_CHAR,
-          escapeChar: parseOptions.escapeChar ?? DEFAULT_CSV_ESCAPE_CHAR,
-        }
-      : parseOptions,
+      parseOptions.quoteChar == null
+        ? {
+            ...parseOptions,
+            quoteChar: DEFAULT_CSV_QUOTE_CHAR,
+            escapeChar: parseOptions.escapeChar ?? DEFAULT_CSV_ESCAPE_CHAR,
+          }
+        : parseOptions,
     lastSniffRow: sniffRow,
     shouldRetry: true,
   };

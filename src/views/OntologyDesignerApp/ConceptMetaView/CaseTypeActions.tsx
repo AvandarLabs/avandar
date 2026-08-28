@@ -69,9 +69,9 @@ function SyncRecordsButton({ concept, fullConcept }: Props): ReactNode {
           notifications.show({
             title: t`Could not sync ${concept.name} records`,
             message:
-              error instanceof Error ?
-                error.message
-              : t`An unexpected error occurred.`,
+              error instanceof Error
+                ? error.message
+                : t`An unexpected error occurred.`,
             color: "red",
           });
         } finally {

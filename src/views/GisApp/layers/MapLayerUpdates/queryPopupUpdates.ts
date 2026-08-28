@@ -15,8 +15,8 @@ function getQueryColumnFromLayer(
   }>,
 ): QueryColumn.T | undefined {
   const { layer, columnId } = options;
-  return columnId ?
-      layer.source.queryColumns.find(propEq("id", columnId))
+  return columnId
+    ? layer.source.queryColumns.find(propEq("id", columnId))
     : undefined;
 }
 

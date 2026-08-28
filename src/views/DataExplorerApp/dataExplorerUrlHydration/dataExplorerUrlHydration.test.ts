@@ -3,9 +3,9 @@ import {
   shouldDeferUrlHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
 } from "@/views/DataExplorerApp/dataExplorerUrlHydration/dataExplorerUrlHydration";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { ParsedUrlState } from "@/views/DataExplorerApp/DataExplorerUrlState";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 const _minimalBarViz: VizConfig = {
   vizType: "bar",

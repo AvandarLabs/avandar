@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useState } from "react";
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dispatch, SetStateAction } from "react";
 
@@ -31,12 +31,11 @@ export function useGisAppLayerSelection(
     useState<AvaMapConfig.AnnotationFeatureId | undefined>();
   const rows = AvaMapConfig.toStackOrder(mapConfig);
   const selectedLayer =
-    selectedLayerId && !isAnnotationRowSelected ?
-      mapConfig.layers.find(propEq("id", selectedLayerId))
-    : undefined;
-  const selectedAnnotationFeature =
-    selectedAnnotationFeatureId ?
-      mapConfig.annotations.features.find(
+    selectedLayerId && !isAnnotationRowSelected
+      ? mapConfig.layers.find(propEq("id", selectedLayerId))
+      : undefined;
+  const selectedAnnotationFeature = selectedAnnotationFeatureId
+    ? mapConfig.annotations.features.find(
         propEq("id", selectedAnnotationFeatureId),
       )
     : undefined;

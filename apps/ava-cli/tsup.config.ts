@@ -31,5 +31,5 @@ export default defineConfig({
   // bundled. `@avandar/acclimate` is a real published package with a real dist,
   // so it stays external.
   noExternal: ["@avandar/utils", "@avandar/models", "@avandar/clients"],
-  external: ["prettier", "readline/promises"],
+  external: ["oxfmt", "prettier", "readline/promises"],
 });

@@ -5,8 +5,8 @@ import { useRef, useState } from "react";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
 import { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
-import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { ReactNode } from "react";
 
 type HarnessProps = {
@@ -28,9 +28,7 @@ export function AreaToolHarness({
   });
   return (
     <>
-      {invalidRingStatus ?
-        <div role="status">{invalidRingStatus}</div>
-      : null}
+      {invalidRingStatus ? <div role="status">{invalidRingStatus}</div> : null}
       <MapToolCluster
         mapToolMode={mapToolMode}
         onMapToolModeChange={setMapToolMode}

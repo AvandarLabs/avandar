@@ -2,8 +2,8 @@ import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Divider, Loader, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
-import { slugify } from "$/lib/strings/transformations";
 import { useState } from "react";
+import { slugify } from "$/lib/strings/transformations";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -157,9 +157,10 @@ export function CreateWorkspaceForm({
         </Title>,
         "workspaceName",
         "workspaceSlug",
-        slugValidationResult === undefined || slugValidationResult.isValid ?
-          null
-        : <Text c="red">{slugValidationResult.reason}</Text>,
+        slugValidationResult === undefined ||
+        slugValidationResult.isValid ? null : (
+          <Text c="red">{slugValidationResult.reason}</Text>
+        ),
         isValidatingSlug ? <Loader /> : null,
         <Divider mt="xs" />,
         <Title order={4}>

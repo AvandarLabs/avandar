@@ -32,9 +32,9 @@ export function ConceptMetaView({ concept }: Props): JSX.Element {
               <Text size="sm" c="dimmed">
                 <Trans>A type of record you manage</Trans>
               </Text>
-              {concept.description ?
+              {concept.description ? (
                 <Text c="dimmed">{concept.description}</Text>
-              : null}
+              ) : null}
             </Stack>
           </Group>
           <CaseTypeActions concept={concept} fullConcept={fullConcept} />

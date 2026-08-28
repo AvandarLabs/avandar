@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
-import type { UnknownObject } from "@avandar/utils";
 import type {
   QueryResultColumn,
   QueryResultId,
   QueryResultPage,
   QueryResult as QueryResultT,
 } from "$/models/queries/QueryResult/QueryResult.types.ts";
+/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+import type { UnknownObject } from "@avandar/utils";
 
 export { QueryResultModule as QueryResult } from "$/models/queries/QueryResult/QueryResultModule.ts";
 

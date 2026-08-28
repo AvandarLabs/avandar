@@ -26,11 +26,11 @@ export function CanvasEmptyState({
   return (
     <Paper p="xxl" maw={720} mx="auto" className={clsx(css.panel, className)}>
       <Stack gap="lg" align="center" ta="center">
-        {icon ?
+        {icon ? (
           <ThemeIcon size={64} radius="xl" variant="light">
             {icon}
           </ThemeIcon>
-        : null}
+        ) : null}
         <Stack gap="xs">
           <Title order={2} fw={650}>
             {title}

@@ -30,9 +30,11 @@ export function getSqlMentionOptions(
   query: string,
 ): SqlMentionOption[] {
   return catalog.datasets.flatMap((dataset) => {
-    const datasetOption: SqlMentionOption | undefined =
-      _matchesQuery(dataset.name, query) ?
-        {
+    const datasetOption: SqlMentionOption | undefined = _matchesQuery(
+      dataset.name,
+      query,
+    )
+      ? {
           kind: "dataset",
           label: dataset.name,
           insertText: `"${dataset.id}"`,

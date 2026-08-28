@@ -19,12 +19,12 @@ export function EmailSignature({
       {capitalize(signOff)},
       <br />
       {name}
-      {title ?
+      {title ? (
         <>
           <br />
           {title}
         </>
-      : null}
+      ) : null}
       <br />
       {appName}
     </EmailParagraph>

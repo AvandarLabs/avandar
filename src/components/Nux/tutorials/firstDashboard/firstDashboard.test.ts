@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { prop } from "@avandar/utils";
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { describe, expect, it } from "vitest";
+import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import {
   FIRST_DASHBOARD_MILESTONES,
   FIRST_DASHBOARD_SAMPLE_CSV_HREF,

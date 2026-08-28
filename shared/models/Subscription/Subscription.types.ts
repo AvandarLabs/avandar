@@ -1,6 +1,6 @@
-import type { UUID } from "@avandar/utils";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Enums } from "$/types/database.types.ts";
+import type { UUID } from "@avandar/utils";
 
 export type FeaturePlanType = Enums<"subscriptions__feature_plan_type">;
 export type PolarCustomerId = UUID<"PolarCustomer">;

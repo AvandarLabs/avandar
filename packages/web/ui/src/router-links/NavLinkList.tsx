@@ -88,11 +88,13 @@ export function NavLinkList({
         }
         py={gap}
         label={
-          typeof label === "string" ?
+          typeof label === "string" ? (
             <TruncatedText withFullTextTooltip fw={500} size="sm">
               {label}
             </TruncatedText>
-          : label
+          ) : (
+            label
+          )
         }
       />
     );

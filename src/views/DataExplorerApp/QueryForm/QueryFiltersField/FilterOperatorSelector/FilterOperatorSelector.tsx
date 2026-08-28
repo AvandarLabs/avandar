@@ -30,9 +30,8 @@ export function FilterOperatorSelector({
         const name = getOptionNameFromUnknown(option);
         return {
           value: name,
-          label:
-            QueryFilterOperator.isOperator(name) ?
-              queryFilterOperatorLabel({ operator: name, dataType })
+          label: QueryFilterOperator.isOperator(name)
+            ? queryFilterOperatorLabel({ operator: name, dataType })
             : name,
         };
       })}

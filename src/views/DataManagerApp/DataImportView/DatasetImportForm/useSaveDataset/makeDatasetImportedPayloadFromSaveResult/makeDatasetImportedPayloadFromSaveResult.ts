@@ -30,9 +30,9 @@ export function makeDatasetImportedPayloadFromSaveResult(
 ): AnalyticsEventPayloads["dataset.imported"] {
   const { source } = options;
   const columnCount =
-    source.sourceType === "google_sheets" ?
-      source.datasetLoadResult.sheetLoadMetadata.columns.length
-    : source.datasetLoadResult.columns.length;
+    source.sourceType === "google_sheets"
+      ? source.datasetLoadResult.sheetLoadMetadata.columns.length
+      : source.datasetLoadResult.columns.length;
 
   return {
     datasetId: options.datasetId,

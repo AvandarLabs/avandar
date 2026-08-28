@@ -129,8 +129,8 @@ function _getNoopVerdictFromCreate(
 
   try {
     const isIdentical = _getBooleanFromPsqlOutput(runSql(sql));
-    return isIdentical === true ?
-        { isNoop: true, reason: "definition is identical to the live view" }
+    return isIdentical === true
+      ? { isNoop: true, reason: "definition is identical to the live view" }
       : { isNoop: false, reason: "definition differs from the live view" };
   } catch (error) {
     return {

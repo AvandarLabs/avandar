@@ -63,8 +63,8 @@ function _getSelectedWorkspace(
     options.selectedColumns === "workspace_id" &&
     options.filters.id !== undefined &&
     options.subjectWorkspaceId !== undefined;
-  return hasSelectedSubjectWorkspace ?
-      { workspace_id: options.subjectWorkspaceId }
+  return hasSelectedSubjectWorkspace
+    ? { workspace_id: options.subjectWorkspaceId }
     : null;
 }
 

@@ -285,9 +285,9 @@ export const DashboardEditorStateManager = createAppStateManager({
       const pendingUnchanged =
         remainingPending.length === state.pendingBlocks.length;
       if (_areJsonValuesEqual(state.editorData, editorData)) {
-        return pendingUnchanged ? state : (
-            { ...state, pendingBlocks: remainingPending }
-          );
+        return pendingUnchanged
+          ? state
+          : { ...state, pendingBlocks: remainingPending };
       }
       return {
         ...state,

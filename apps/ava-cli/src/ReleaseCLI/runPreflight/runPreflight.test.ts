@@ -61,17 +61,21 @@ function _createReadGit(
     executedCommands.push(`git ${args.join(" ")}`);
     const [verb] = args;
     const revision = args.at(-1) ?? "";
-    return (
-      verb === "status" ? state.trackedChanges
-      : verb === "remote" ? state.remoteUrl
-      : verb !== "rev-parse" ? undefined
-      : args.includes("--abbrev-ref") ? state.branch
-      : revision.includes(`origin/${RELEASE_SOURCE_BRANCH}`) ?
-        state.originDevelop
-      : revision.includes(`origin/${RELEASE_TARGET_BRANCH}`) ? state.originMain
-      : revision === RELEASE_SOURCE_BRANCH ? state.localDevelop
-      : state.originMain
-    );
+    return verb === "status"
+      ? state.trackedChanges
+      : verb === "remote"
+        ? state.remoteUrl
+        : verb !== "rev-parse"
+          ? undefined
+          : args.includes("--abbrev-ref")
+            ? state.branch
+            : revision.includes(`origin/${RELEASE_SOURCE_BRANCH}`)
+              ? state.originDevelop
+              : revision.includes(`origin/${RELEASE_TARGET_BRANCH}`)
+                ? state.originMain
+                : revision === RELEASE_SOURCE_BRANCH
+                  ? state.localDevelop
+                  : state.originMain;
   };
 }
 
@@ -83,16 +87,16 @@ function _createTryGit(
   return (args: readonly string[]): CommandResult => {
     executedCommands.push(`git ${args.join(" ")}`);
     if (args[0] === "fetch") {
-      return state.fetchOk ? OK : (
-          { ok: false, stdout: "", stderr: "permission denied" }
-        );
+      return state.fetchOk
+        ? OK
+        : { ok: false, stdout: "", stderr: "permission denied" };
     }
     // `refExists` runs `rev-parse --verify --quiet <ref>` through here.
     const looksUpLocalMain = args.some((arg) => {
       return arg === `refs/heads/${RELEASE_TARGET_BRANCH}`;
     });
-    return looksUpLocalMain && !state.localMainExists ?
-        { ok: false, stdout: "", stderr: "" }
+    return looksUpLocalMain && !state.localMainExists
+      ? { ok: false, stdout: "", stderr: "" }
       : OK;
   };
 }

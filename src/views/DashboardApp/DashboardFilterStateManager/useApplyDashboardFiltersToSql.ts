@@ -38,9 +38,8 @@ export function useApplyDashboardFiltersToSql(
   const { filtersById } = DashboardFilterStateManager.useState();
   return useMemo(() => {
     const globalFilters = objectValues(filtersById);
-    const subscribedFilterIds =
-      options.filterProps ?
-        DataVizFilters.resolveSubscribedFilterIds({
+    const subscribedFilterIds = options.filterProps
+      ? DataVizFilters.resolveSubscribedFilterIds({
           subscription: options.filterProps.globalFilterSubscription,
           registeredFilters: globalFilters,
         })
@@ -51,8 +50,8 @@ export function useApplyDashboardFiltersToSql(
       ...(subscribedFilterIds !== undefined ? { subscribedFilterIds } : {}),
     });
     const localFilterRecords = _buildLocalFilterRecords(options);
-    return localFilterRecords.length > 0 ?
-        applyDashboardFiltersToSql({
+    return localFilterRecords.length > 0
+      ? applyDashboardFiltersToSql({
           sql: globallyFilteredSql,
           filters: localFilterRecords,
         })

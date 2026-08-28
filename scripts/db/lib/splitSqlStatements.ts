@@ -59,13 +59,13 @@ function _advanceInsideDelimiter(
     };
   }
   if (flags.inBlockComment) {
-    return nextTwoChars === "*/" ?
-        { index: index + 2, flags: { ...flags, inBlockComment: false } }
+    return nextTwoChars === "*/"
+      ? { index: index + 2, flags: { ...flags, inBlockComment: false } }
       : { index: index + 1, flags };
   }
   if (flags.dollarTag !== undefined) {
-    return sql.startsWith(flags.dollarTag, index) ?
-        {
+    return sql.startsWith(flags.dollarTag, index)
+      ? {
           index: index + flags.dollarTag.length,
           flags: { ...flags, dollarTag: undefined },
         }

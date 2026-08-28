@@ -37,12 +37,10 @@ function _score(args: {
       if (labelToken === token) {
         return labelScore + 4;
       }
-      return (
-          labelToken.includes(token) ||
-            token.includes(labelToken) ||
-            shareStem(labelToken, token)
-        ) ?
-          labelScore + 2
+      return labelToken.includes(token) ||
+        token.includes(labelToken) ||
+        shareStem(labelToken, token)
+        ? labelScore + 2
         : labelScore;
     }, 0);
     return score + directMatchScore + tokenScore;

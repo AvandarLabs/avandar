@@ -130,9 +130,9 @@ function _configureDatabaseMocks(): void {
     return { data: [makePersistedDashboard()] };
   });
   getDashboardByIdMock.mockImplementation(async () => {
-    return persistedVisibilityState.isDashboardDeleted ? undefined : (
-        makePersistedDashboard()
-      );
+    return persistedVisibilityState.isDashboardDeleted
+      ? undefined
+      : makePersistedDashboard();
   });
 }
 
@@ -140,9 +140,11 @@ function _makeDatasetFromIndex(
   options: Readonly<{ datasetId: Dataset.Id; datasetIndex: number }>,
 ): Dataset.T {
   const sourceType =
-    options.datasetIndex === 0 ? "virtual"
-    : options.datasetIndex === 2 ? "open_data"
-    : "csv_file";
+    options.datasetIndex === 0
+      ? "virtual"
+      : options.datasetIndex === 2
+        ? "open_data"
+        : "csv_file";
   return Model.make("Dataset", {
     createdAt: "2026-08-14T00:00:00.000Z",
     dateOfLastSync: undefined,

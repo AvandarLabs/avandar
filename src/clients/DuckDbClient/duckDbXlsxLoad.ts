@@ -164,16 +164,16 @@ async function _transcodeXlsxToParquet(
   // A range is only needed to skip a title block, and detecting the sheet's
   // width costs a read of its own, so neither happens without a skip.
   const lastColumn =
-    options.rowsToSkip > 0 ?
-      await _detectLastPopulatedColumn({
-        client: options.client,
-        conn: options.conn,
-        datasetDuckDbLease: options.datasetDuckDbLease,
-        rowsToSkip: options.rowsToSkip,
-        sheet: options.sheet,
-        xlsxStagingFile: options.xlsxStagingFile,
-      })
-    : undefined;
+    options.rowsToSkip > 0
+      ? await _detectLastPopulatedColumn({
+          client: options.client,
+          conn: options.conn,
+          datasetDuckDbLease: options.datasetDuckDbLease,
+          rowsToSkip: options.rowsToSkip,
+          sheet: options.sheet,
+          xlsxStagingFile: options.xlsxStagingFile,
+        })
+      : undefined;
   const readArgs = makeReadXlsxArgs({
     hasHeader: options.hasHeader,
     sheet: options.sheet,

@@ -13,7 +13,7 @@ declare const __AVA_CLI_VERSION__: string;
  * currently describes.
  */
 export function getBuiltCLIVersion(): string | undefined {
-  return typeof __AVA_CLI_VERSION__ === "string" ? __AVA_CLI_VERSION__ : (
-      undefined
-    );
+  return typeof __AVA_CLI_VERSION__ === "string"
+    ? __AVA_CLI_VERSION__
+    : undefined;
 }

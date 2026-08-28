@@ -9,6 +9,9 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@/utils/notifications/notify";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
@@ -19,9 +22,6 @@ import type {
   LocalDatasetCsvParseOptions,
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { UserId } from "$/models/User/User.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Reconciles the background parquet transcoding's authoritative column
@@ -163,20 +163,20 @@ export async function runBackgroundParquetTranscoding(params: {
 
   try {
     const result =
-      params.source.kind === "csv" ?
-        await DuckDbClient.loadCsv({
-          tableName: datasetId,
-          file: params.source.file,
-          numRowsToSkip: params.source.options.numRowsToSkip,
-          delimiter: params.source.options.delimiter,
-        })
-      : await DuckDbClient.loadXlsx({
-          tableName: datasetId,
-          file: params.source.file,
-          sheet: params.source.options.sheet,
-          hasHeader: params.source.options.hasHeader,
-          rowsToSkip: params.source.options.rowsToSkip,
-        });
+      params.source.kind === "csv"
+        ? await DuckDbClient.loadCsv({
+            tableName: datasetId,
+            file: params.source.file,
+            numRowsToSkip: params.source.options.numRowsToSkip,
+            delimiter: params.source.options.delimiter,
+          })
+        : await DuckDbClient.loadXlsx({
+            tableName: datasetId,
+            file: params.source.file,
+            sheet: params.source.options.sheet,
+            hasHeader: params.source.options.hasHeader,
+            rowsToSkip: params.source.options.rowsToSkip,
+          });
 
     const currentRow = await AvaDexie.DB.LocalDataset.get(datasetId);
     await AvaDexie.DB.LocalDataset.update(
@@ -204,13 +204,13 @@ export async function runBackgroundParquetTranscoding(params: {
       notifyWarning({
         title: i18n._(msg`Column types updated`),
         message:
-          changedCount === 1 ?
-            i18n._(
-              msg`Detected column types for 1 column in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
-            )
-          : i18n._(
-              msg`Detected column types for ${changedCount} columns in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
-            ),
+          changedCount === 1
+            ? i18n._(
+                msg`Detected column types for 1 column in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
+              )
+            : i18n._(
+                msg`Detected column types for ${changedCount} columns in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
+              ),
       });
     }
 

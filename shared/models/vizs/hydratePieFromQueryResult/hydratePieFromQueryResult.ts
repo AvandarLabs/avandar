@@ -39,13 +39,13 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
   let nextConfig: VConfig = {
     ...currVizConfig,
     valueKey:
-      currVizConfig.valueKey && colNames.has(currVizConfig.valueKey) ?
-        currVizConfig.valueKey
-      : undefined,
+      currVizConfig.valueKey && colNames.has(currVizConfig.valueKey)
+        ? currVizConfig.valueKey
+        : undefined,
     nameKey:
-      currVizConfig.nameKey && colNames.has(currVizConfig.nameKey) ?
-        currVizConfig.nameKey
-      : undefined,
+      currVizConfig.nameKey && colNames.has(currVizConfig.nameKey)
+        ? currVizConfig.nameKey
+        : undefined,
   };
 
   if (nextConfig.valueKey === undefined) {

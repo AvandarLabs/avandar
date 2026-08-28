@@ -8,8 +8,8 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function _asTrimmedString(value: unknown): string | undefined {
-  return typeof value === "string" && value.trim().length > 0 ?
-      value.trim()
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
     : undefined;
 }
 
@@ -32,9 +32,9 @@ function _parseDatasetColumnAttribute(
     kind: "dataset_column",
     datasetId,
     columnId,
-    ...(_asTrimmedString(raw.description) ?
-      { description: _asTrimmedString(raw.description) }
-    : {}),
+    ...(_asTrimmedString(raw.description)
+      ? { description: _asTrimmedString(raw.description) }
+      : {}),
     ...(raw.isLabel === true ? { isLabel: true } : {}),
   };
 }
@@ -52,9 +52,9 @@ function _parseAttribute(raw: unknown): ChatCreatedCaseAttribute | undefined {
     return {
       name,
       kind: "manual_entry",
-      ...(_asTrimmedString(record.description) ?
-        { description: _asTrimmedString(record.description) }
-      : {}),
+      ...(_asTrimmedString(record.description)
+        ? { description: _asTrimmedString(record.description) }
+        : {}),
     };
   }
   if (record.kind === "dataset_column") {
@@ -108,9 +108,8 @@ function _parseCaseType(raw: unknown): ChatCreatedCaseType | undefined {
       return identity.datasetId;
     }),
   );
-  const attributes =
-    Array.isArray(record.attributes) ?
-      record.attributes
+  const attributes = Array.isArray(record.attributes)
+    ? record.attributes
         .map(_parseAttribute)
         .filter((attribute): attribute is ChatCreatedCaseAttribute => {
           // A dataset column with no join key cannot be matched to a case, so
@@ -127,9 +126,9 @@ function _parseCaseType(raw: unknown): ChatCreatedCaseType | undefined {
     allowManualCreation: record.allowManualCreation === true,
     identities,
     attributes,
-    ...(_asTrimmedString(record.description) ?
-      { description: _asTrimmedString(record.description) }
-    : {}),
+    ...(_asTrimmedString(record.description)
+      ? { description: _asTrimmedString(record.description) }
+      : {}),
   };
 }
 

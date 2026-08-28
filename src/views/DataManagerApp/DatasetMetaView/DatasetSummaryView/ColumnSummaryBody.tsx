@@ -72,17 +72,17 @@ export function ColumnSummaryBody({
   const missingPct = totalRows > 0 ? summary.emptyValuesCount / totalRows : 0;
 
   const typeSummary =
-    summary.type === "text" ?
+    summary.type === "text" ? (
       <TextColumnSummary summary={summary} totalRows={totalRows} />
-    : summary.type === "number" ?
+    ) : summary.type === "number" ? (
       <NumberColumnSummary
         summary={summary}
         totalRows={totalRows}
         dataType={dataType}
       />
-    : summary.type === "date" ?
+    ) : summary.type === "date" ? (
       <DateColumnSummary summary={summary} totalRows={totalRows} />
-    : null;
+    ) : null;
 
   return (
     <Stack gap="md">
@@ -99,7 +99,7 @@ export function ColumnSummaryBody({
             {t`Distinct values`}
           </Text>
         </Stack>
-        {missingPct > 0 ?
+        {missingPct > 0 ? (
           <Group gap="xs" align="center">
             <RingProgress
               size={48}
@@ -121,7 +121,7 @@ export function ColumnSummaryBody({
               </Text>
             </Stack>
           </Group>
-        : null}
+        ) : null}
       </Group>
 
       {typeSummary}
@@ -155,13 +155,15 @@ function _buildHeadlineSentence(args: {
         Ranges from <SummaryTag>{numericLow}</SummaryTag> to{" "}
         <SummaryTag>{numericHigh}</SummaryTag>, averaging{" "}
         <SummaryTag>{avg}</SummaryTag>
-        {Number.isFinite(summary.stdDev) ?
+        {Number.isFinite(summary.stdDev) ? (
           <>
             {" "}
             with a standard deviation of{" "}
             <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>.
           </>
-        : "."}
+        ) : (
+          "."
+        )}
       </Trans>
     );
   }

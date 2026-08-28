@@ -11,10 +11,12 @@ import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.t
  */
 export function prop<
   T extends object,
-  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
-  V extends K extends keyof T ? T[K]
-  : K extends ObjectPaths<T> ? PathValue<T, K>
-  : never,
+  K extends ([ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>),
+  V extends (K extends keyof T
+    ? T[K]
+    : K extends ObjectPaths<T>
+      ? PathValue<T, K>
+      : never),
 >(path: K): (obj: T) => V {
   return (obj: T) => {
     if (String(path).includes(".")) {

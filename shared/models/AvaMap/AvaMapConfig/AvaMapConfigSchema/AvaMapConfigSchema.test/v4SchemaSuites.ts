@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import {
   createMismatchedBufferJson,
@@ -12,7 +13,6 @@ import {
   waveCLayer,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/schemaTestFixtures.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";
-import { describe, expect, it } from "vitest";
 
 describe("AvaMapConfigSchema v4 overlays", () => {
   it("migrates a version 3 config to version 4 without changing wave c layers", () => {

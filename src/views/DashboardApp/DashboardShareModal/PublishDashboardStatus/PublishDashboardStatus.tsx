@@ -3,8 +3,8 @@ import { Stack, Text } from "@mantine/core";
 import { DivergenceAlert } from "./DivergenceAlert";
 import { PublishedTargetUrl } from "./PublishedTargetUrl";
 import { VisibilityAlert } from "./VisibilityAlert";
-import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { VanitySlugFieldProps } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -36,14 +36,16 @@ export function PublishDashboardStatus({
   return (
     <>
       <VisibilityAlert visibility={visibility} />
-      {targetVisibility !== visibility ?
+      {targetVisibility !== visibility ? (
         <DivergenceAlert visibility={visibility} />
-      : null}
+      ) : null}
       <Stack gap={6}>
         <Text size="sm" fw={500}>
-          {isAlreadyPublished ?
+          {isAlreadyPublished ? (
             <Trans>Your dashboard is published at:</Trans>
-          : <Trans>Your dashboard will be published to:</Trans>}
+          ) : (
+            <Trans>Your dashboard will be published to:</Trans>
+          )}
         </Text>
         <PublishedTargetUrl
           targetUrl={targetUrl}
@@ -51,15 +53,16 @@ export function PublishDashboardStatus({
           vanitySlug={vanitySlug}
         />
         <Text size="xs" c="dimmed">
-          {isUsingVanity ?
+          {isUsingVanity ? (
             <Trans>Using your custom URL.</Trans>
-          : isAlreadyPublished ?
+          ) : isAlreadyPublished ? (
             <Trans>By default we use a direct UUID-based link.</Trans>
-          : <Trans>
+          ) : (
+            <Trans>
               By default we use a direct UUID-based link. Add a custom path
               below for a nicer URL.
             </Trans>
-          }
+          )}
         </Text>
       </Stack>
     </>

@@ -42,14 +42,16 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
         <Stack gap="xl">
           <Stack gap="xs">
             <Title order={1}>
-              {isLoadingUserProfile ?
+              {isLoadingUserProfile ? (
                 <>
                   <Trans>Welcome back</Trans>
                   <Loader ml="sm" size="sm" />
                 </>
-              : userProfile ?
+              ) : userProfile ? (
                 <Trans>Welcome back, {userProfile.displayName}</Trans>
-              : <Trans>Welcome back</Trans>}
+              ) : (
+                <Trans>Welcome back</Trans>
+              )}
             </Title>
             <Text size="lg" c="dimmed">
               <Trans>

@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type {
   MapLayerSpec,
   MapSpec,
 } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 type AnnotationVisibility = {
   layout?: { visibility: "none" };

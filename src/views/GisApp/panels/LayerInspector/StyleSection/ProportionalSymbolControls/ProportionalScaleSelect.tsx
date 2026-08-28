@@ -38,11 +38,11 @@ export function ProportionalScaleSelect({
           });
         }}
       />
-      {scale === "sqrt" ?
+      {scale === "sqrt" ? (
         <Callout>
           {t`Symbol area is proportional to the value, not radius, so a value ten times larger draws a symbol about three times wider.`}
         </Callout>
-      : null}
+      ) : null}
     </>
   );
 }

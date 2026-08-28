@@ -100,14 +100,14 @@ self.addEventListener("message", async (event: MessageEvent<SniffRequest>) => {
       maxRows: rowsToTake,
     });
     const previewRows =
-      previewRange === undefined ?
-        []
-      : XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
-          header: hasHeader ? undefined : "A",
-          range: previewRange,
-          defval: null,
-          raw: true,
-        });
+      previewRange === undefined
+        ? []
+        : XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
+            header: hasHeader ? undefined : "A",
+            range: previewRange,
+            defval: null,
+            raw: true,
+          });
 
     // Derive column order from the first row's keys. SheetJS preserves
     // insertion order, which matches the XLSX cell order in `dense` mode.

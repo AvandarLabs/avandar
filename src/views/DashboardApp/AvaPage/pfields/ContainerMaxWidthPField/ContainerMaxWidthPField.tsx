@@ -30,9 +30,9 @@ function _normalizeContainerMaxWidth(value: unknown): ContainerMaxWidthValue {
       normalizedUnit === "px" ? DEFAULT_PX_VALUE : DEFAULT_PERCENT_VALUE;
 
     const normalizedValue: number =
-      typeof rawValue === "number" && Number.isFinite(rawValue) ?
-        Math.round(rawValue)
-      : defaultValue;
+      typeof rawValue === "number" && Number.isFinite(rawValue)
+        ? Math.round(rawValue)
+        : defaultValue;
 
     return { unit: normalizedUnit, value: normalizedValue };
   }

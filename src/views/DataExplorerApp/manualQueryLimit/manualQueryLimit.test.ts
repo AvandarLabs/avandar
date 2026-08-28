@@ -1,5 +1,5 @@
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { describe, expect, it } from "vitest";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import {
   applyDefaultManualQueryLimit,
   DEFAULT_MANUAL_QUERY_LIMIT,

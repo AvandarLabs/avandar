@@ -5,8 +5,8 @@ import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarSeries } from "$/models/vizs/SeriesConfig";
+import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarProps } from "recharts";
 
 type Props = XYChartProps & {
@@ -110,9 +110,9 @@ export function BarChart({
           return {};
         }
         return {
-          ...(found.fillOpacity !== undefined ?
-            { fillOpacity: found.fillOpacity }
-          : {}),
+          ...(found.fillOpacity !== undefined
+            ? { fillOpacity: found.fillOpacity }
+            : {}),
           ...(found.stackId !== undefined ? { stackId: found.stackId } : {}),
         };
       }}

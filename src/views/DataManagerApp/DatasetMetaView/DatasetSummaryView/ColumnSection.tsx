@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Box, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { useIntersection } from "@mantine/hooks";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useContext, useEffect, useRef, useState } from "react";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { ColumnSummaryBody } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody";
 import { buildFullDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
@@ -83,14 +83,16 @@ export function ColumnSection({
             {buildFullDataTypeLabel(dataType, i18n)}
           </Text>
         </Group>
-        {isReadyToLoad ?
+        {isReadyToLoad ? (
           <ColumnSummaryBody
             datasetId={datasetId}
             columnName={columnName}
             dataType={dataType}
             totalRows={totalRows}
           />
-        : <Skeleton height={120} />}
+        ) : (
+          <Skeleton height={120} />
+        )}
       </Stack>
     </Box>
   );

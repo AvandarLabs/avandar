@@ -16,12 +16,13 @@ function _formatSqlLiteral(value: string | number | boolean): string {
 }
 
 function _isValueSet(value: DashboardFilterValue): boolean {
-  return (
-    value === undefined ? false
-    : Array.isArray(value) ? value.length > 0
-    : typeof value === "string" ? value.trim().length > 0
-    : true
-  );
+  return value === undefined
+    ? false
+    : Array.isArray(value)
+      ? value.length > 0
+      : typeof value === "string"
+        ? value.trim().length > 0
+        : true;
 }
 
 function _filterToWhereClause(
@@ -33,8 +34,9 @@ function _filterToWhereClause(
   const columnName = quoteSqlIdentifier(filter.columnName);
   return matchLiteral(filter.operator, {
     in: () => {
-      const values =
-        Array.isArray(filter.value) ? filter.value : [filter.value];
+      const values = Array.isArray(filter.value)
+        ? filter.value
+        : [filter.value];
       const formattedValues = values
         .filter(isDefined)
         .map(_formatSqlLiteral)
@@ -46,11 +48,12 @@ function _filterToWhereClause(
       return `${columnName} ILIKE '%${escapedValue}%'`;
     },
     equals: () => {
-      const value =
-        Array.isArray(filter.value) ? filter.value[0] : filter.value;
-      return value === undefined ? undefined : (
-          `${columnName} = ${_formatSqlLiteral(value)}`
-        );
+      const value = Array.isArray(filter.value)
+        ? filter.value[0]
+        : filter.value;
+      return value === undefined
+        ? undefined
+        : `${columnName} = ${_formatSqlLiteral(value)}`;
     },
   });
 }
@@ -73,8 +76,9 @@ export function applyDashboardFiltersToSql(
   }>,
 ): string {
   const { sql, filters, subscribedFilterIds } = options;
-  const subscribedFilterIdSet =
-    subscribedFilterIds ? new Set(subscribedFilterIds) : undefined;
+  const subscribedFilterIdSet = subscribedFilterIds
+    ? new Set(subscribedFilterIds)
+    : undefined;
   const applicableFilters = filters.filter((filter) => {
     if (subscribedFilterIdSet && !subscribedFilterIdSet.has(filter.filterId)) {
       return false;

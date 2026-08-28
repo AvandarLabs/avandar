@@ -1,17 +1,17 @@
 import { Model } from "@avandar/models";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { TimeColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { QueryColumn as QueryColumnT } from "$/models/queries/QueryColumn/QueryColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 const sourceColumnsState = vi.hoisted(() => {
   return { columns: [] as QueryColumnT.T[] };

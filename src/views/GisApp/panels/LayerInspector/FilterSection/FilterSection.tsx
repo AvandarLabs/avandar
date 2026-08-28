@@ -3,8 +3,8 @@ import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFilter
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { ApplyAoiFilterSwitch } from "@/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -31,15 +31,16 @@ export function FilterSection({
       title={t`Filter`}
       focusRequest={focusRequest}
       note={
-        filterCount === 0 ? undefined
-        : filterCount === 1 ?
-          t`1 filter`
-        : t`${filterCount} filters`
+        filterCount === 0
+          ? undefined
+          : filterCount === 1
+            ? t`1 filter`
+            : t`${filterCount} filters`
       }
     >
-      {showSwitch ?
+      {showSwitch ? (
         <ApplyAoiFilterSwitch layer={layer} onLayerChange={onLayerChange} />
-      : null}
+      ) : null}
       <QueryFiltersField
         columns={layer.source.queryColumns}
         value={layer.source.filters}

@@ -56,10 +56,13 @@ function _parseFunctionPredicate(node: unknown): QueryFilterRule | undefined {
   }
 
   const operator =
-    name === "contains" ? "contains"
-    : name === "starts_with" ? "starts_with"
-    : name === "ends_with" ? "ends_with"
-    : undefined;
+    name === "contains"
+      ? "contains"
+      : name === "starts_with"
+        ? "starts_with"
+        : name === "ends_with"
+          ? "ends_with"
+          : undefined;
   if (!operator) {
     return undefined;
   }

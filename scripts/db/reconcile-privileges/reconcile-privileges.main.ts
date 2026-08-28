@@ -382,13 +382,15 @@ function _getUndeclaredFunctionsSql(
 ): string {
   const { scope, declaredSignatures } = options;
   const declared =
-    declaredSignatures.length === 0 ?
-      "select null::oid where false"
-    : `select to_regprocedure(sig)::oid as oid_ from (values ${declaredSignatures
-        .map((signature) => {
-          return `(${_quoteSqlLiteral(signature)})`;
-        })
-        .join(",")}) as declared (sig) where to_regprocedure(sig) is not null`;
+    declaredSignatures.length === 0
+      ? "select null::oid where false"
+      : `select to_regprocedure(sig)::oid as oid_ from (values ${declaredSignatures
+          .map((signature) => {
+            return `(${_quoteSqlLiteral(signature)})`;
+          })
+          .join(
+            ",",
+          )}) as declared (sig) where to_regprocedure(sig) is not null`;
   return `
 select format('%I.%I(%s)', n.nspname, p.proname,
               pg_get_function_identity_arguments(p.oid))

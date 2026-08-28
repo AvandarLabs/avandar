@@ -1,8 +1,8 @@
 import { isDefined, isPlainObject, isString, traverse } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { Parser } from "node-sql-parser";
 import { match } from "ts-pattern";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -20,13 +20,11 @@ const UUID_REGEX = new RegExp(
 );
 
 function _formatLiteral(value: string | number): string {
-  return (
-    typeof value === "number" ?
-      Number.isFinite(value) ?
-        String(value)
+  return typeof value === "number"
+    ? Number.isFinite(value)
+      ? String(value)
       : "NULL"
-    : `'${value.replace(/'/g, "''")}'`
-  );
+    : `'${value.replace(/'/g, "''")}'`;
 }
 
 /** Columns that publication must retain for each dashboard dataset. */
@@ -119,12 +117,10 @@ function _parseReferencedColumnNames(
     const columnNames = rawColumnNames.map((entry) => {
       return entry.split("::").at(-1) ?? "";
     });
-    return (
-        columnNames.some((columnName) => {
-          return columnName === "(.*)" || columnName === "*";
-        })
-      ) ?
-        undefined
+    return columnNames.some((columnName) => {
+      return columnName === "(.*)" || columnName === "*";
+    })
+      ? undefined
       : columnNames;
   } catch {
     return undefined;
@@ -199,16 +195,16 @@ function _buildColumnProjection(
       const columnNames = options.queriedColumns.filter((columnName) => {
         return options.availableColumnNames.has(columnName);
       });
-      return columnNames.length > 0 ?
-          columnNames.map(quoteSqlIdentifier).join(", ")
+      return columnNames.length > 0
+        ? columnNames.map(quoteSqlIdentifier).join(", ")
         : "*";
     })
     .with({ mode: "custom" }, (sliceConfig) => {
       const columnNames = sliceConfig.columns.filter((columnName) => {
         return options.availableColumnNames.has(columnName);
       });
-      return columnNames.length > 0 ?
-          columnNames.map(quoteSqlIdentifier).join(", ")
+      return columnNames.length > 0
+        ? columnNames.map(quoteSqlIdentifier).join(", ")
         : "*";
     })
     .exhaustive();
@@ -221,16 +217,16 @@ function _buildSliceSql(options: Readonly<BuildSliceSqlOptions>): string {
     availableColumnNames,
   });
   const whereClauses =
-    options.sliceConfig.mode === "custom" ?
-      options.sliceConfig.rowFilters
-        .map((filter) => {
-          return _rowFilterToSql({
-            filter,
-            availableColumnNames,
-          });
-        })
-        .filter(isDefined)
-    : [];
+    options.sliceConfig.mode === "custom"
+      ? options.sliceConfig.rowFilters
+          .map((filter) => {
+            return _rowFilterToSql({
+              filter,
+              availableColumnNames,
+            });
+          })
+          .filter(isDefined)
+      : [];
   const innerSql = options.baseSelectExpr.trim().replace(/;\s*$/u, "");
   const whereClause =
     whereClauses.length > 0 ? ` WHERE ${whereClauses.join(" AND ")}` : "";
@@ -251,29 +247,29 @@ function _rowFilterToSql(
       const values = filter.values.filter((value) => {
         return value.length > 0;
       });
-      return values.length > 0 ?
-          `${columnName} IN (${values.map(_formatLiteral).join(", ")})`
+      return values.length > 0
+        ? `${columnName} IN (${values.map(_formatLiteral).join(", ")})`
         : undefined;
     })
     .with({ kind: "range_number" }, (filter) => {
       const rangeClauses = [
-        typeof filter.min === "number" && Number.isFinite(filter.min) ?
-          `${columnName} >= ${filter.min}`
-        : undefined,
-        typeof filter.max === "number" && Number.isFinite(filter.max) ?
-          `${columnName} <= ${filter.max}`
-        : undefined,
+        typeof filter.min === "number" && Number.isFinite(filter.min)
+          ? `${columnName} >= ${filter.min}`
+          : undefined,
+        typeof filter.max === "number" && Number.isFinite(filter.max)
+          ? `${columnName} <= ${filter.max}`
+          : undefined,
       ].filter(isDefined);
       return rangeClauses.length > 0 ? rangeClauses.join(" AND ") : undefined;
     })
     .with({ kind: "range_date" }, (filter) => {
       const rangeClauses = [
-        filter.start ?
-          `${columnName} >= ${_formatLiteral(filter.start)}`
-        : undefined,
-        filter.end ?
-          `${columnName} <= ${_formatLiteral(filter.end)}`
-        : undefined,
+        filter.start
+          ? `${columnName} >= ${_formatLiteral(filter.start)}`
+          : undefined,
+        filter.end
+          ? `${columnName} <= ${_formatLiteral(filter.end)}`
+          : undefined,
       ].filter(isDefined);
       return rangeClauses.length > 0 ? rangeClauses.join(" AND ") : undefined;
     })
@@ -291,17 +287,16 @@ function _readDashboardPublishConfig(
     return { slices: {} };
   }
   const slices = rawPublishConfig.slices;
-  return isPlainObject(slices) ?
-      { slices: slices as PublishSliceConfig.Dashboard["slices"] }
+  return isPlainObject(slices)
+    ? { slices: slices as PublishSliceConfig.Dashboard["slices"] }
     : { slices: {} };
 }
 
 function _writeDashboardPublishConfig(
   options: Readonly<WriteDashboardPublishConfigOptions>,
 ): Dashboard.T["config"] {
-  const dashboardConfig =
-    isPlainObject(options.dashboardConfig) ?
-      (options.dashboardConfig as Record<string, Dashboard.T["config"]>)
+  const dashboardConfig = isPlainObject(options.dashboardConfig)
+    ? (options.dashboardConfig as Record<string, Dashboard.T["config"]>)
     : {};
   return {
     ...dashboardConfig,

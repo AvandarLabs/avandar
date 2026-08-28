@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { Parser } from "node-sql-parser";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { getOfflineDatasetFromPrompt } from "@/components/ChatPanel/offlineChatHelpers/getOfflineDatasetFromPrompt/getOfflineDatasetFromPrompt";
 import { matchOfflineDatasetTable } from "@/components/ChatPanel/offlineChatHelpers/matchOfflineDatasetTable";

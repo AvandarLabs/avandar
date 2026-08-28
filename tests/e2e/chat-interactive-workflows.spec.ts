@@ -418,8 +418,8 @@ test.describe("chat interactive workflows", () => {
     await mountMockChat({
       page,
       responder: (turnIndex) => {
-        return turnIndex > 0 ?
-            { assistantText: "State selected." }
+        return turnIndex > 0
+          ? { assistantText: "State selected." }
           : {
               assistantText: "Which state do you mean?",
               clarification: {

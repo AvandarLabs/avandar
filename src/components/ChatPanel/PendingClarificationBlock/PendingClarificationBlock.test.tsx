@@ -8,10 +8,10 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { render } from "@/test-utils";
 import { PendingClarificationBlock } from "./PendingClarificationBlock";
-import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
-import type { ClarificationAnswerHandler } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
+import type { ClarificationAnswerHandler } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 
 const {
   appendMock,

@@ -2,11 +2,11 @@ import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import {
-  QueryColumn, // prettier-ignore
+  QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type {
-  DatasetColumn, // prettier-ignore
+  DatasetColumn, // oxfmt-ignore
 } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { User } from "$/models/User/User.ts";
 import type { UserProfile } from "$/models/User/UserProfile.ts";

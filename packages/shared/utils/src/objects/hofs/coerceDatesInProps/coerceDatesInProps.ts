@@ -13,11 +13,11 @@ import type { UnknownObject } from "@utils/types/common.types.ts";
 export function coerceDatesInProps<T extends UnknownObject, K extends keyof T>(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      Date | undefined
-    : Date
-  : T[Key];
+  [Key in keyof T]: Key extends K
+    ? undefined extends T[Key]
+      ? Date | undefined
+      : Date
+    : T[Key];
 } {
   return (obj: T) => {
     return coerceDatesIn(obj, keys);

@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { CustomField } from "@puckeditor/core";
+import { useCallback, useMemo } from "react";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { Workspace } from "$/models/Workspace/Workspace";
-import { useCallback, useMemo } from "react";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 /**
  * React hook that builds the Puck `CustomField` config for editing a

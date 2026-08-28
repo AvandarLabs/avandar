@@ -1,5 +1,5 @@
-import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
 import { describe, expect, it } from "vitest";
+import { resolveColumnKey } from "$/models/vizs/resolveColumnKey/resolveColumnKey.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 const columns: readonly QueryResultColumn[] = [

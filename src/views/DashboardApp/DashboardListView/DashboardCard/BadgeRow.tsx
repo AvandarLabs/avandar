@@ -2,8 +2,8 @@ import { matchLiteral } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Group, Text } from "@mantine/core";
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
-import type { DashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -66,11 +66,11 @@ export function BadgeRow({
 
   return (
     <Group gap="xs">
-      {!isOwnedByCurrentUser ?
+      {!isOwnedByCurrentUser ? (
         <Badge size="xs" color="grape" variant="light">
           <Trans>Shared with you</Trans>
         </Badge>
-      : null}
+      ) : null}
       {visibilityBadge}
       {offlineStatusBadge}
       <Text c="dimmed" size="xs">

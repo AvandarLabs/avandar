@@ -105,9 +105,6 @@ export const SupabaseRunCLI = Acclimate.createCLI("run")
       scriptName: scriptToRun,
     });
 
-    // Read from the invocation's target rather than from flags of its own:
-    // `--staging` and `--prod` are global options, and the entry point has
-    // already loaded exactly one env file for them.
     const dbLocation = getLoadedAvaEnvTarget();
 
     // Validated here, in the parent, so a target whose env file has no

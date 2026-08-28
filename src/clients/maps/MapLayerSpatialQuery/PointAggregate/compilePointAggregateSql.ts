@@ -83,9 +83,9 @@ function _buildCoordinateProjectionSql(
   options: Readonly<CompilePointAggregateSqlOptions>,
 ): string {
   const valueSelection =
-    options.valueColumnName === undefined ?
-      ""
-    : `,\n        TRY_CAST(${quoteSqlIdentifier(options.valueColumnName)} AS DOUBLE) AS ${AggregateAliases.value}`;
+    options.valueColumnName === undefined
+      ? ""
+      : `,\n        TRY_CAST(${quoteSqlIdentifier(options.valueColumnName)} AS DOUBLE) AS ${AggregateAliases.value}`;
   return `SELECT
         TRY_CAST(${quoteSqlIdentifier(options.latitudeColumnName)} AS DOUBLE) AS ${AggregateAliases.latitude},
         TRY_CAST(${quoteSqlIdentifier(options.longitudeColumnName)} AS DOUBLE) AS ${AggregateAliases.longitude}${valueSelection}
@@ -139,9 +139,9 @@ export function compilePointAggregateSql(
 ): string {
   const cellCountSql = "count(*)";
   const valueSelection =
-    options.valueColumnName === undefined ?
-      ""
-    : `,\n    sum(${AggregateAliases.value}) AS ${quoteSqlIdentifier(options.valueColumnName)}`;
+    options.valueColumnName === undefined
+      ? ""
+      : `,\n    sum(${AggregateAliases.value}) AS ${quoteSqlIdentifier(options.valueColumnName)}`;
 
   return `WITH ${AggregateAliases.source} AS (${options.sourceSql}),
   ${AggregateAliases.coordinates} AS (${_buildCoordinateProjectionSql(options)}),

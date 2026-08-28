@@ -3,8 +3,8 @@ import { Select } from "@mantine/core";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { GRADUATED_RAMPS } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls.constants";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -41,9 +41,11 @@ function _createColor(
   const current = layer.symbology.color;
   if (mode === "single") {
     const color =
-      current.type === "single" ? current.color
-      : current.type === "graduated" ? current.ramp[0]
-      : current.categories[0]?.color;
+      current.type === "single"
+        ? current.color
+        : current.type === "graduated"
+          ? current.ramp[0]
+          : current.categories[0]?.color;
     return { type: "single", color: color ?? "#228be6" };
   }
   const value = current.type === mode ? current.value : _getDefaultValue(layer);
@@ -51,9 +53,9 @@ function _createColor(
     return undefined;
   }
   const noData =
-    current.type === "single" ?
-      { color: "#ced4da", label: "" }
-    : current.noData;
+    current.type === "single"
+      ? { color: "#ced4da", label: "" }
+      : current.noData;
   if (mode === "graduated") {
     return {
       type: "graduated",

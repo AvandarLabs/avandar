@@ -9,7 +9,7 @@ export type DuckDbSpatialAvailabilityStore = {
 };
 
 /** Creates an isolated DuckDB Spatial capability store. */
-// prettier-ignore
+// oxfmt-ignore
 export function createDuckDbSpatialAvailabilityStore():
   DuckDbSpatialAvailabilityStore {
   let availability: DuckDbSpatialAvailability = "loading";

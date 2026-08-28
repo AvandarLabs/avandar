@@ -33,10 +33,13 @@ function _canBeOfflineOnly(
     | { type: DatasetSourceType },
 ): boolean {
   const type =
-    typeof sourceType === "string" ? sourceType
-    : Model.isModel(sourceType) ? DatasetSourceModule.getSourceType(sourceType)
-    : "sourceType" in sourceType ? sourceType.sourceType
-    : sourceType.type;
+    typeof sourceType === "string"
+      ? sourceType
+      : Model.isModel(sourceType)
+        ? DatasetSourceModule.getSourceType(sourceType)
+        : "sourceType" in sourceType
+          ? sourceType.sourceType
+          : sourceType.type;
   return match(type)
     .with("csv_file", "xlsx_file", "pdf_file", () => {
       return true;

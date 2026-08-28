@@ -8,8 +8,8 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -110,9 +110,8 @@ export function DatasetSummaryView({ datasetId }: Props): ReactNode {
                       width: 3,
                       height: 14,
                       borderRadius: 2,
-                      backgroundColor:
-                        isActive ?
-                          "var(--mantine-color-primary-6)"
+                      backgroundColor: isActive
+                        ? "var(--mantine-color-primary-6)"
                         : "transparent",
                       flexShrink: 0,
                     }}

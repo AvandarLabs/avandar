@@ -11,31 +11,6 @@ set -euo pipefail
 
 ENV_FILE_NAME=".env.development"
 
-# ------------------------------------------------------------------------------
-# The Picker's app id is the Cloud project number, and that number is the
-# numeric prefix of the OAuth client id. Derived from `GOOGLE_CLIENT_ID` rather
-# than carried as a secret of its own, so the two cannot drift into different
-# Cloud projects - a misconfiguration whose only symptom is a 404 on a Drive
-# export, long after the Picker appeared to work. It is not sensitive; it is
-# already public in the client id.
-#
-# It is required rather than optional: `useGooglePicker` throws without it,
-# which takes the Connectors tab down with the error boundary and leaves the
-# Google Sheets e2e with no "Pick google sheet" button to click.
-#
-# Checked in two steps because `${GOOGLE_CLIENT_ID%%-*}` on its own would NOT
-# trip `set -u` for an unset variable - it quietly expands to the empty string,
-# which would write an empty app id and produce exactly that confusing e2e
-# failure. `:?` is what makes a missing secret fail here instead.
-# ------------------------------------------------------------------------------
-_google_client_id="${GOOGLE_CLIENT_ID:?GOOGLE_CLIENT_ID is required to derive VITE_GOOGLE_PICKER_APP_ID}"
-_google_picker_app_id="${_google_client_id%%-*}"
-if [[ ! "$_google_picker_app_id" =~ ^[0-9]+$ ]]; then
-  echo "GOOGLE_CLIENT_ID does not start with a numeric Cloud project number;" \
-    "cannot derive VITE_GOOGLE_PICKER_APP_ID from '$_google_client_id'." >&2
-  exit 1
-fi
-
 # Declare env dictionar
 declare -A _development_env=(
   # Public environment variables.
@@ -45,7 +20,7 @@ declare -A _development_env=(
   [VITE_HIDE_DEV_TOOLS]="true"
   [VITE_FEATURE_FLAGS]=""
   [VITE_GOOGLE_PICKER_API_KEY]="$VITE_GOOGLE_PICKER_API_KEY"
-  [VITE_GOOGLE_PICKER_APP_ID]="$_google_picker_app_id"
+  [VITE_GOOGLE_PICKER_APP_ID]="$VITE_GOOGLE_PICKER_APP_ID"
 
   # Environment variables for scripts
   [SUPABASE_POSTGRES_URL]="$(get_supabase_env_var DB_URL)"

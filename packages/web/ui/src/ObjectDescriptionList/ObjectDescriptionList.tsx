@@ -17,10 +17,11 @@ type DescribableValueArrayProps<T, RootData extends GenericRootData> = Omit<
   "rootData"
 >;
 
-type Props<T extends GenericRootData> =
-  T extends DescribableObject ? DescribableObjectProps<T, T>
-  : T extends ReadonlyArray<infer U> ? DescribableValueArrayProps<U, T>
-  : never;
+type Props<T extends GenericRootData> = T extends DescribableObject
+  ? DescribableObjectProps<T, T>
+  : T extends ReadonlyArray<infer U>
+    ? DescribableValueArrayProps<U, T>
+    : never;
 
 /**
  * This is the root component for an `ObjectDescriptionList`. It allows

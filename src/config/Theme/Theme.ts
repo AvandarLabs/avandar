@@ -218,12 +218,12 @@ export const Theme = createTheme({
           root: {
             transition: interactiveTransition,
             fontWeight: 500,
-            ...(props.variant === "default" ?
-              {
-                borderColor: cssAvaVar("border-default"),
-                boxShadow: theme.shadows.xs,
-              }
-            : {}),
+            ...(props.variant === "default"
+              ? {
+                  borderColor: cssAvaVar("border-default"),
+                  boxShadow: theme.shadows.xs,
+                }
+              : {}),
           },
         };
       },

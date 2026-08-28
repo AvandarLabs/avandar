@@ -70,9 +70,7 @@ export function InspectorSection({
           stroke={2}
         />
         {title}
-        {note ?
-          <span className={css.inspectorSectionNote}>{note}</span>
-        : null}
+        {note ? <span className={css.inspectorSectionNote}>{note}</span> : null}
       </button>
       <div className={css.inspectorSectionContent}>{children}</div>
     </div>

@@ -1,10 +1,10 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { AttributeMappingType } from "$/models/ontology/AttributeMapping/AttributeMapping.types.ts";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 export type ConceptAttributeId = UUID<"ConceptAttribute">;

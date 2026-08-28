@@ -30,15 +30,17 @@ export function TruncatedText({
     </Text>
   );
 
-  return withFullTextTooltip ?
-      <Tooltip
-        position="left"
-        withArrow
-        {...tooltipProps}
-        label={children}
-        disabled={!isTextTruncated}
-      >
-        {textContents}
-      </Tooltip>
-    : textContents;
+  return withFullTextTooltip ? (
+    <Tooltip
+      position="left"
+      withArrow
+      {...tooltipProps}
+      label={children}
+      disabled={!isTextTruncated}
+    >
+      {textContents}
+    </Tooltip>
+  ) : (
+    textContents
+  );
 }

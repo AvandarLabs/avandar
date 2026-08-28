@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ChatSuggestionColumnPicker } from "./ChatSuggestionColumnPicker";
-import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 
 type ColumnMeta = Pick<DatasetColumn.T, "name" | "dataType" | "columnIdx">;
 

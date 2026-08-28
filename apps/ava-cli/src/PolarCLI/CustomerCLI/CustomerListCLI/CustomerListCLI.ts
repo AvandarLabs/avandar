@@ -152,9 +152,9 @@ export async function runCustomerList({
           name: customer.name ?? "null",
           email: customer.email,
           ...(withIds ? { id: customer.id } : {}),
-          ...(withCreatedAt ?
-            { createdAt: customer.createdAt.toISOString() }
-          : {}),
+          ...(withCreatedAt
+            ? { createdAt: customer.createdAt.toISOString() }
+            : {}),
         };
       });
 

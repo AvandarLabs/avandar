@@ -1,11 +1,11 @@
+import { useState } from "react";
+import { describe, expect, it, vi } from "vitest";
 /**
  * Pinned annotation row: first feature creates it, last delete removes it.
  */
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { AnnotationLayerRow } from "@/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow";
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";

@@ -1,5 +1,5 @@
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { describe, expect, it } from "vitest";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 
 describe("truncateSchemaForOffline", () => {

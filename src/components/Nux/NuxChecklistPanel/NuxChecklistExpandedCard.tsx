@@ -53,7 +53,7 @@ export function NuxChecklistExpandedCard({
             onOpenMilestone={onOpenMilestone}
             unmarkDone={unmarkDone}
           />
-          {state.blockedReason ?
+          {state.blockedReason ? (
             <Stack gap={4}>
               <Text size="xs" c="dimmed">
                 {state.blockedReason}
@@ -68,7 +68,7 @@ export function NuxChecklistExpandedCard({
                 <Trans>Skip this step</Trans>
               </Button>
             </Stack>
-          : null}
+          ) : null}
         </Stack>
       </Card>
     </Portal>

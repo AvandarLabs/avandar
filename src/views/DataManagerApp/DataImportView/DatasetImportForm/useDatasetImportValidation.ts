@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { useForm } from "@mantine/form";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useRef, useState } from "react";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { notifyError } from "@/utils/notifications/notify";
 import type { DatasetImportFormValues } from "./DatasetImportForm.types";
 import type { FormErrors, UseFormReturnType } from "@mantine/form";
@@ -43,13 +43,13 @@ function useErrorMessageForField(): (
   const { t } = useLingui();
   return ({ field, value }) => {
     if (field === "name") {
-      return value.length < maxDatasetNameLength ?
-          undefined
+      return value.length < maxDatasetNameLength
+        ? undefined
         : t`Dataset name must be under ${maxDatasetNameLength} characters (current: ${value.length}).`;
     }
 
-    return value.length < maxDatasetDescriptionLength ?
-        undefined
+    return value.length < maxDatasetDescriptionLength
+      ? undefined
       : t`Description must be under ${maxDatasetDescriptionLength} characters (current: ${value.length}).`;
   };
 }
@@ -90,14 +90,13 @@ function _notifyAndFocusFirstInvalidField(
   notifyError({
     title: options.title,
     message:
-      typeof options.errors[field] === "string" ?
-        options.errors[field]
-      : options.fallbackMessage,
+      typeof options.errors[field] === "string"
+        ? options.errors[field]
+        : options.fallbackMessage,
   });
   const node = (
-    field === "name" ?
-      options.nameInputRef
-    : options.descriptionInputRef).current;
+    field === "name" ? options.nameInputRef : options.descriptionInputRef
+  ).current;
   node?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   node?.focus({ preventScroll: true });
 }

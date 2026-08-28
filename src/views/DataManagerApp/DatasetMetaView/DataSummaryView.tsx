@@ -25,10 +25,8 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
 
   return (
     <Stack>
-      {isLoadingSummary ?
-        <Loader />
-      : null}
-      {summary?.columnSummaries ?
+      {isLoadingSummary ? <Loader /> : null}
+      {summary?.columnSummaries ? (
         <>
           <ObjectDescriptionList
             data={{
@@ -55,7 +53,7 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
             }}
           />
         </>
-      : null}
+      ) : null}
     </Stack>
   );
 }

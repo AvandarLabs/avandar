@@ -13,9 +13,9 @@ export const DashboardRouteUtils: IDashboardRouteUtils = {
       where: {
         slug: { eq: slug },
         visibility: { eq: visibility },
-        ...(workspaceId === undefined ?
-          {}
-        : { workspace_id: { eq: workspaceId } }),
+        ...(workspaceId === undefined
+          ? {}
+          : { workspace_id: { eq: workspaceId } }),
       },
     });
   },

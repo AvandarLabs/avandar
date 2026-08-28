@@ -1,10 +1,10 @@
 import { propEq } from "@avandar/utils";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
   MapLayerRebindReason,
   MapLayerRebindRequired,
 } from "../MapLayerSpatialQuery.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 /** Creates one actionable rebind result. */
 export function createRebindRequired(

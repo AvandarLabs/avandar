@@ -9,8 +9,8 @@ import {
 } from "@codemirror/view";
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
-import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 
 export type SqlPillClickInfo =
   | {
@@ -138,26 +138,26 @@ function _buildDecorationSet(
       return;
     }
     const payload: SqlPillClickInfo =
-      segment.kind === "dataset" ?
-        {
-          kind: "dataset",
-          label: segment.label,
-          datasetId: segment.datasetId,
-          start: segment.start,
-          end: segment.end,
-          raw: segment.raw,
-          anchorRect: new DOMRect(),
-        }
-      : {
-          kind: "column",
-          label: segment.label,
-          name: segment.name,
-          start: segment.start,
-          end: segment.end,
-          raw: segment.raw,
-          isError: outOfScopeStarts.has(segment.start),
-          anchorRect: new DOMRect(),
-        };
+      segment.kind === "dataset"
+        ? {
+            kind: "dataset",
+            label: segment.label,
+            datasetId: segment.datasetId,
+            start: segment.start,
+            end: segment.end,
+            raw: segment.raw,
+            anchorRect: new DOMRect(),
+          }
+        : {
+            kind: "column",
+            label: segment.label,
+            name: segment.name,
+            start: segment.start,
+            end: segment.end,
+            raw: segment.raw,
+            isError: outOfScopeStarts.has(segment.start),
+            anchorRect: new DOMRect(),
+          };
 
     builder.add(
       segment.start,

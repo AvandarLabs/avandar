@@ -5,9 +5,9 @@ import { useSyncExternalStore } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { BufferMapToolPopover } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolPopover";
 import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { I18n } from "@lingui/core";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
 
 type Props = {
