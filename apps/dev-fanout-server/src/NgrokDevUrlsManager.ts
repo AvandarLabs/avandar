@@ -4,13 +4,13 @@ import z from "zod";
 
 const NGROK_DEV_URLS_FILE_PATH = "/data/ngrok-dev-urls.json";
 
-export type NgrokDevURLTarget = Readonly<{
+export type NgrokDevUrlTarget = Readonly<{
   url: string;
   dateAdded: string;
   lastAccessedDate: string | null;
 }>;
 
-const NgrokDevURLsFileSchema = z.object({
+const NgrokDevUrlsFileSchema = z.object({
   targets: z.array(
     z.object({
       url: z.url(),
@@ -25,12 +25,12 @@ const NgrokDevURLsFileSchema = z.object({
  *
  * If the file does not exist, this returns an empty list.
  */
-async function readNgrokDevURLs(): Promise<readonly NgrokDevURLTarget[]> {
+async function readNgrokDevUrls(): Promise<readonly NgrokDevUrlTarget[]> {
   try {
     const rawFile: string = await readFile(NGROK_DEV_URLS_FILE_PATH, "utf8");
     const json: unknown = JSON.parse(rawFile);
 
-    const parsed = NgrokDevURLsFileSchema.parse(json);
+    const parsed = NgrokDevUrlsFileSchema.parse(json);
     return parsed.targets;
   } catch (error: unknown) {
     if (
@@ -49,8 +49,8 @@ async function readNgrokDevURLs(): Promise<readonly NgrokDevURLTarget[]> {
  *
  * This writes atomically by writing a temp file and then renaming it.
  */
-async function writeNgrokDevURLs(options: {
-  targets: readonly NgrokDevURLTarget[];
+async function writeNgrokDevUrls(options: {
+  targets: readonly NgrokDevUrlTarget[];
 }): Promise<void> {
   const dirPath: string = path.dirname(NGROK_DEV_URLS_FILE_PATH);
 
@@ -86,12 +86,12 @@ async function setLastAccessedDates(options: {
     return;
   }
 
-  const existingTargets: readonly NgrokDevURLTarget[] =
-    await readNgrokDevURLs();
+  const existingTargets: readonly NgrokDevUrlTarget[] =
+    await readNgrokDevUrls();
   const urlsToUpdate: Set<string> = new Set(options.urls);
   let hasSomethingChanged: boolean = false;
 
-  const updatedTargets: readonly NgrokDevURLTarget[] = existingTargets.map(
+  const updatedTargets: readonly NgrokDevUrlTarget[] = existingTargets.map(
     (target) => {
       if (
         !urlsToUpdate.has(target.url) ||
@@ -109,12 +109,12 @@ async function setLastAccessedDates(options: {
   );
 
   if (hasSomethingChanged) {
-    await writeNgrokDevURLs({ targets: updatedTargets });
+    await writeNgrokDevUrls({ targets: updatedTargets });
   }
 }
 
-export const NgrokDevURLsManager = {
-  readNgrokDevURLs,
-  writeNgrokDevURLs,
+export const NgrokDevUrlsManager = {
+  readNgrokDevUrls,
+  writeNgrokDevUrls,
   setLastAccessedDates,
 };

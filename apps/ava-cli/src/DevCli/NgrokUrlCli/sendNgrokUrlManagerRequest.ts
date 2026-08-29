@@ -1,14 +1,14 @@
 import { getDevFanoutServerClientConfig } from "@ava-cli/DevCli/NgrokUrlCli/getDevFanoutServerClientConfig";
 import { z } from "zod";
 
-export type NgrokDevURLTarget = Readonly<{
+export type NgrokDevUrlTarget = Readonly<{
   url: string;
   dateAdded: string;
   lastAccessedDate: string | null;
 }>;
 
 type NgrokTargetsResponse = Readonly<{
-  targets: readonly NgrokDevURLTarget[];
+  targets: readonly NgrokDevUrlTarget[];
 }>;
 
 const NgrokTargetsResponseSchema = z.object({

@@ -3,7 +3,7 @@ name: avandar-code-review
 description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by comments, files, naming, and/or tests (any subset, concatenatable).
 metadata:
   author: jpsyx
-  version: "2.3.0"
+  version: "2.4.0"
   tags: avandar, code-review, typescript, react, sql, conventions, style, comments, files, naming, tests
 ---
 
@@ -186,9 +186,9 @@ Apply **only**:
 - From `docs/code-reviews/typescript-checklist.md`, only the file-layout
   bullets: do not add barrel files except in repo-approved directories;
   files that export only types use the `.types.ts` filename suffix;
-  acronyms longer than two letters in **file names** use PascalCase
-  (`Url`, `Sql`, not `URL`, `SQL`). Identifier acronyms belong to
-  `naming`, not this pack.
+  acronyms in **file and directory names** use PascalCase, whatever their
+  length (`Url`, `Sql`, `Cli`, `Io`, not `URL`, `SQL`, `CLI`, `IO`).
+  Identifier acronyms belong to `naming`, not this pack.
 
 Do not apply variable or function identifier naming, comment rules, or
 any other TypeScript / React / SQL / library rule.
@@ -214,11 +214,12 @@ Apply **only**:
   event handlers named `on...`, not `handle...`; conversion-function
   shapes including the retired `resolve` / `compute` / `build` /
   `create` prefixes and the copy-function exemption; React component
-  prop types named `Props`; preserve `e2e` or `E2E` casing exactly;
-  acronyms longer than two letters in **identifiers and type names**
-  use PascalCase; non-exported top-level helper functions prefixed with
-  `_`. File-name acronyms and the `.types.ts` suffix belong to `files`,
-  not this pack.
+  prop types named `Props`; acronyms in **identifiers and type names**
+  use PascalCase, whatever their length and with no exceptions (`Url`,
+  `Cli`, `Id`, `Db`, `Ci`, `Io`, `E2e`), while `UPPERCASE` constants and
+  env var names are unaffected; non-exported top-level helper functions
+  prefixed with `_`. File-name acronyms and the `.types.ts` suffix belong
+  to `files`, not this pack.
 
 "Module naming" here means the identifier of an exported module object
 (PascalCase, `create*Module` builders, conversion methods on the

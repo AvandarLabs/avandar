@@ -4,7 +4,7 @@ import { Polar } from "@polar-sh/sdk";
 
 export type PolarServerType = "sandbox" | "production";
 
-export type PolarCLIClient = {
+export type PolarCliClient = {
   polar: Polar;
   organizationId: string;
 };
@@ -48,7 +48,7 @@ async function _getOrganizationId(polar: Polar): Promise<string> {
  * Reads `POLAR_ACCESS_TOKEN` and `POLAR_SERVER_TYPE` from whichever env file
  * this invocation loaded.
  */
-export async function createPolarCliClient(): Promise<PolarCLIClient> {
+export async function createPolarCliClient(): Promise<PolarCliClient> {
   const accessToken = AvaEnv.requireVar("POLAR_ACCESS_TOKEN");
   const serverType = _getPolarServerType();
 

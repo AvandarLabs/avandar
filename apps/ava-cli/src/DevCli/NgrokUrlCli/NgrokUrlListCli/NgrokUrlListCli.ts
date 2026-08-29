@@ -5,7 +5,7 @@ import {
   printSuccess,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
-import type { NgrokDevURLTarget } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
+import type { NgrokDevUrlTarget } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
 
 function _formatTimestampForDisplay(isoTimestamp: string): string {
   return new Date(isoTimestamp).toUTCString();
@@ -38,7 +38,7 @@ export async function runNgrokUrlList(): Promise<void> {
     }
 
     printSuccess("Registered ngrok URLs:");
-    targets.forEach((target: NgrokDevURLTarget) => {
+    targets.forEach((target: NgrokDevUrlTarget) => {
       const dateAdded: string = _formatTimestampForDisplay(target.dateAdded);
       const lastAccessed: string = _formatLastAccessedForDisplay(
         target.lastAccessedDate,
