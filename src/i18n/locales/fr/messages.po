@@ -410,7 +410,7 @@ msgstr "Encadré"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Process"
-msgstr ""
+msgstr "Traiter"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
@@ -1837,7 +1837,7 @@ msgstr "Annuler"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "One dataset is one tab."
-msgstr ""
+msgstr "Un jeu de données correspond à un onglet."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
@@ -2048,11 +2048,6 @@ msgstr "Ajouter un nouveau jeu de données"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Switch to Free plan"
 msgstr "Passer au plan gratuit"
-
-#. placeholder {0}: formatNumber(numSuccessRows)
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#~ msgid "Parsed {0} rows"
-#~ msgstr "{0} lignes analysées"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -4212,7 +4207,7 @@ msgstr "{0} a été supprimé de ce navigateur."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Tab to import"
-msgstr ""
+msgstr "Onglet à importer"
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
@@ -5281,7 +5276,7 @@ msgstr "Les plus courants"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "Shared drives"
-msgstr ""
+msgstr "Lecteurs partagés"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
@@ -5620,10 +5615,6 @@ msgstr "Développer l’inspecteur"
 #: src/views/OntologyDesignerApp/index.tsx
 msgid "Case Manager"
 msgstr "Gestionnaire de dossiers"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#~ msgid "The tab has a header row"
-#~ msgstr "L’onglet comporte une ligne d’en-tête"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -6758,10 +6749,6 @@ msgstr "Enregistrez d'abord vos modifications : le PDF reflète le tableau de "
 msgid "Units"
 msgstr "Unités"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
-#~ msgid "File failed to load"
-#~ msgstr "Le fichier n'a pas pu être chargé"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
 msgstr "Supprimer le groupe"
@@ -7084,7 +7071,7 @@ msgstr "Jeu de données des limites"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "Shared with me"
-msgstr ""
+msgstr "Partagés avec moi"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -7662,7 +7649,7 @@ msgstr "Reprise du traitement de l'ensemble de données…"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Tab not found"
-msgstr ""
+msgstr "Onglet introuvable"
 
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
@@ -8009,7 +7996,9 @@ msgstr "Saisissez votre texte ici"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
-msgstr ""
+msgstr "Cet onglet ne se trouve plus dans cette feuille de calcul. Il a "
+"peut-être été renommé ou supprimé. Sélectionnez à nouveau la feuille, "
+"puis choisissez un onglet."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8590,10 +8579,6 @@ msgid "You need to be signed in to ask the assistant. Kept the rule-based "
 msgstr "Vous devez être connecté pour interroger l’assistant. Les résultats "
 "basés sur des règles ont été conservés."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#~ msgid "File loaded successfully"
-#~ msgstr "Fichier chargé avec succès"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
 msgstr "Conserver les champs du bloc"
@@ -9008,7 +8993,7 @@ msgstr "Déplacé"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "My Drive"
-msgstr ""
+msgstr "Mon Drive"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "

@@ -390,7 +390,7 @@ msgstr "提示框"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Process"
-msgstr ""
+msgstr "处理"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
@@ -1742,7 +1742,7 @@ msgstr "撤销"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "One dataset is one tab."
-msgstr ""
+msgstr "一个数据集对应一个标签页。"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
@@ -1941,11 +1941,6 @@ msgstr "添加新数据集"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Switch to Free plan"
 msgstr "切换到免费计划"
-
-#. placeholder {0}: formatNumber(numSuccessRows)
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#~ msgid "Parsed {0} rows"
-#~ msgstr "解析了 {0} 行"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -3994,7 +3989,7 @@ msgstr "{0} 已从此浏览器中删除。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Tab to import"
-msgstr ""
+msgstr "要导入的标签页"
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
@@ -5026,7 +5021,7 @@ msgstr "最常见"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "Shared drives"
-msgstr ""
+msgstr "共享云端硬盘"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
@@ -5349,10 +5344,6 @@ msgstr "展开检查器"
 #: src/views/OntologyDesignerApp/index.tsx
 msgid "Case Manager"
 msgstr "案例管理器"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#~ msgid "The tab has a header row"
-#~ msgstr "此标签页包含标题行"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -6446,10 +6437,6 @@ msgstr "请先保存您的更改：PDF反映已保存的仪表板。"
 msgid "Units"
 msgstr "单位"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
-#~ msgid "File failed to load"
-#~ msgstr "文件加载失败"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
 msgstr "移除组"
@@ -6753,7 +6740,7 @@ msgstr "边界数据集"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "Shared with me"
-msgstr ""
+msgstr "与我共享"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -7302,7 +7289,7 @@ msgstr "正在恢复数据集处理…"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Tab not found"
-msgstr ""
+msgstr "未找到标签页"
 
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
@@ -7642,7 +7629,7 @@ msgstr "在此输入文本"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
-msgstr ""
+msgstr "该标签页已不在此电子表格中。它可能已被重命名或删除。请重新选择工作表，然后选择一个标签页。"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8197,10 +8184,6 @@ msgid "You need to be signed in to ask the assistant. Kept the rule-based "
 "results."
 msgstr "您需要登录后才能向助手提问。已保留基于规则的结果。"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#~ msgid "File loaded successfully"
-#~ msgstr "文件加载成功"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
 msgstr "保留区块字段"
@@ -8594,7 +8577,7 @@ msgstr "已偏移"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "My Drive"
-msgstr ""
+msgstr "我的云端硬盘"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
