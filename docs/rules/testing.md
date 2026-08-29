@@ -88,7 +88,7 @@ Practical checks, in order of how often they catch something:
 - **One claim per test.** A name needing "and" usually marks two tests, unless
   the second half is a precondition of the first.
 
-Read the name against a red run: if "FAILED: <name>" does not tell you what
+Read the name against a red run: if `FAILED: <name>` does not tell you what
 broke, the name is not doing its job.
 
 ## Test behavior, not structure
