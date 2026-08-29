@@ -1,4 +1,4 @@
-import { buildHTTPQueryString } from "$/utils/urls/buildHTTPQueryString";
+import { buildHttpQueryString } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString";
 import { getGoogleDriveErrorFromResponse } from "@/clients/google/GoogleDriveClient/getGoogleDriveErrorFromResponse";
 import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
@@ -54,7 +54,7 @@ function _buildDriveFileUrl(
   }>,
 ): string {
   const path = params.path ?? "";
-  const queryString = buildHTTPQueryString(params.queryParams);
+  const queryString = buildHttpQueryString(params.queryParams);
   return `${DRIVE_FILES_URL}/${encodeURIComponent(params.fileId)}${path}?${queryString}`;
 }
 
@@ -212,7 +212,7 @@ export async function getGoogleSheetTabs(
     driveFetch?: GoogleDriveFetch;
   }>,
 ): Promise<GoogleSheetTab[]> {
-  const queryString = buildHTTPQueryString({
+  const queryString = buildHttpQueryString({
     fields: TAB_PROPERTIES_FIELD_MASK,
   });
   const response = await _getDriveResponse({
@@ -273,7 +273,7 @@ export async function getGoogleSheetTabCsvExport(
     driveFetch,
   });
 
-  const queryString = buildHTTPQueryString({
+  const queryString = buildHttpQueryString({
     format: "csv",
     gid: params.sheetId,
   });
