@@ -6,7 +6,7 @@ import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands"
 const STAGING_WORKFLOW = "staging.yaml";
 
 /** The staging CI verdict for one commit. */
-export type CIStatus =
+export type CiStatus =
   /** The run for this exact commit finished successfully. */
   | { kind: "passed"; url: string }
   /** The run for this exact commit finished, but not successfully. */
@@ -70,10 +70,10 @@ function _parseRuns(json: string): readonly WorkflowRun[] | undefined {
  * failure: it is a gap in our information, and the caller decides whether to
  * proceed. It is never reported as a pass.
  */
-export function checkDevelopCI(
+export function checkDevelopCi(
   git: ReleaseCommands,
   options: Readonly<{ commitSha: string; branch: string }>,
-): CIStatus {
+): CiStatus {
   const { commitSha, branch } = options;
 
   const result = git.readCommand("gh", [

@@ -17,7 +17,7 @@ import {
   assertTagIsUnused,
   bumpDevelopToNextVersion,
   commitReleaseVersionOnDevelop,
-  confirmCIVerdict,
+  confirmCiVerdict,
   confirmReleasePlan,
   printReleaseSummary,
   publishMainAndTag,
@@ -44,7 +44,7 @@ export type ReleaseOptions = {
   /** Print every mutating command without running it. */
   dryRun: boolean;
   /** Skip the staging CI check. */
-  skipCICheck: boolean;
+  skipCiCheck: boolean;
 };
 
 /** A preflight that passed, so its refs are known. */
@@ -62,7 +62,7 @@ type SatisfiedPreflight = Extract<PreflightResult, { ok: true }>;
 export async function runRelease(
   options: Readonly<ReleaseOptions>,
 ): Promise<void> {
-  const { yes, dryRun, skipCICheck } = options;
+  const { yes, dryRun, skipCiCheck } = options;
 
   const git = createReleaseCommands({ repoRoot: _requireRepoRoot(), dryRun });
   if (dryRun) {
@@ -75,10 +75,10 @@ export async function runRelease(
   const { originDevelopSha, originMainSha, localMainSha } = preflight;
   const plan = await _resolvePlan(git, options, preflight);
   assertTagIsUnused(git, plan);
-  await confirmCIVerdict(git, {
+  await confirmCiVerdict(git, {
     commitSha: originDevelopSha,
     assumeYes: yes,
-    skip: skipCICheck,
+    skip: skipCiCheck,
   });
   await confirmReleasePlan(git, {
     plan,

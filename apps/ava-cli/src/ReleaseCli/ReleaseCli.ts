@@ -120,7 +120,7 @@ export const ReleaseCli = Acclimate.createCLI("release")
       nextVersion: args.next,
       yes: args.yes,
       dryRun: args.dryRun,
-      skipCICheck: args.skipCiCheck,
+      skipCiCheck: args.skipCiCheck,
     }).catch((error: unknown) => {
       printError(error instanceof Error ? error.message : String(error));
       process.exitCode = 1;

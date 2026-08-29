@@ -1,5 +1,5 @@
-import { checkDevelopCI } from "@ava-cli/ReleaseCli/checkDevelopCI";
-import { describeCIStatus } from "@ava-cli/ReleaseCli/describeCIStatus";
+import { checkDevelopCi } from "@ava-cli/ReleaseCli/checkDevelopCi";
+import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus";
 import {
   createReleaseCommit,
   findWorktreeForBranch,
@@ -67,7 +67,7 @@ export function assertTagIsUnused(
  * Report the staging CI verdict for the commit being released, and ask before
  * proceeding on anything other than a pass.
  */
-export async function confirmCIVerdict(
+export async function confirmCiVerdict(
   git: ReleaseCommands,
   options: Readonly<{ commitSha: string; assumeYes: boolean; skip: boolean }>,
 ): Promise<void> {
@@ -78,11 +78,11 @@ export async function confirmCIVerdict(
     return;
   }
   printHeading("CI");
-  const ciStatus = checkDevelopCI(git, {
+  const ciStatus = checkDevelopCi(git, {
     commitSha,
     branch: RELEASE_SOURCE_BRANCH,
   });
-  const verdict = `${describeCIStatus(ciStatus)} (${shortSha(commitSha)})`;
+  const verdict = `${describeCiStatus(ciStatus)} (${shortSha(commitSha)})`;
 
   if (ciStatus.kind === "passed") {
     printSuccess(verdict);
