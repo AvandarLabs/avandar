@@ -37,7 +37,6 @@ const TAB_CSV: Readonly<Record<number, string>> = {
 };
 
 const {
-  notifySuccessMock,
   notifyErrorMock,
   startCsvImportMock,
   dropLocalDatasetMock,
@@ -74,7 +73,6 @@ const {
   };
 
   return {
-    notifySuccessMock: vi.fn(),
     notifyErrorMock: vi.fn(),
     startCsvImportMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
@@ -91,7 +89,6 @@ vi.mock("@/utils/notifications/notify", async (importOriginal) => {
     await importOriginal<typeof import("@/utils/notifications/notify")>();
   return {
     ...actual,
-    notifySuccess: notifySuccessMock,
     notifyError: notifyErrorMock,
     notifyWarning: vi.fn(),
   };
@@ -411,7 +408,6 @@ describe("GoogleSheetsImportView", () => {
       subscription: undefined,
     } as Workspace.WithSubscription);
 
-    notifySuccessMock.mockClear();
     notifyErrorMock.mockClear();
     startCsvImportMock.mockClear();
     dropLocalDatasetMock.mockClear();
@@ -511,8 +507,9 @@ describe("GoogleSheetsImportView", () => {
 
     await _pickTheSheet();
 
+    // The form rendering is what says the import finished; there is no toast.
     await waitFor(() => {
-      expect(notifySuccessMock).toHaveBeenCalled();
+      expect(screen.getByText(/2 columns were detected/)).toBeInTheDocument();
     });
     expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledWith({
       fileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
@@ -529,8 +526,10 @@ describe("GoogleSheetsImportView", () => {
     await _chooseImportTab(SECOND_TAB);
     await _clickProcess();
 
+    // The second tab's three columns, read out of the CSV that tab returned.
+    // The first tab has two, so this cannot pass having read the wrong tab.
     await waitFor(() => {
-      expect(notifySuccessMock).toHaveBeenCalled();
+      expect(screen.getByText(/3 columns were detected/)).toBeInTheDocument();
     });
 
     expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledTimes(1);
@@ -540,11 +539,6 @@ describe("GoogleSheetsImportView", () => {
       accessToken: "google-sheets-test-access-token",
     });
 
-    // The second tab's three columns, read out of the CSV that tab returned.
-    // The first tab has two, so this cannot pass having read the wrong tab.
-    await waitFor(() => {
-      expect(screen.getByText(/3 columns were detected/)).toBeInTheDocument();
-    });
     ["county", "residents", "capital"].forEach((columnName) => {
       expect(screen.getAllByText(columnName).length).toBeGreaterThan(0);
     });
@@ -559,7 +553,7 @@ describe("GoogleSheetsImportView", () => {
     await _clickProcess();
 
     await waitFor(() => {
-      expect(notifySuccessMock).toHaveBeenCalled();
+      expect(screen.getByText(/2 columns were detected/)).toBeInTheDocument();
     });
 
     expect(vi.mocked(APIClient.get).mock.calls).not.toContainEqual(
@@ -691,8 +685,6 @@ describe("GoogleSheetsImportView", () => {
       ).toBeInTheDocument();
     });
 
-    notifySuccessMock.mockClear();
-
     if (!googlePickerHarness.onCancel) {
       throw new Error("Expected useGooglePicker to register onCancel.");
     }
@@ -704,9 +696,8 @@ describe("GoogleSheetsImportView", () => {
     expect(
       screen.queryByText(/Selected document: regional-population/),
     ).not.toBeInTheDocument();
-    // A dismissal is not a failure, so nothing is announced. The pick above is
-    // the positive control: it did notify, so a silent view cannot pass this.
-    expect(notifySuccessMock).not.toHaveBeenCalled();
+    // A dismissal is not a failure, so nothing is announced.
+    expect(notifyErrorMock).not.toHaveBeenCalled();
   });
 
   it("names the failure when Drive refuses the export as too large", async () => {
@@ -730,7 +721,10 @@ describe("GoogleSheetsImportView", () => {
         }),
       );
     });
-    expect(notifySuccessMock).not.toHaveBeenCalled();
+    // The failure is the whole outcome: no form ever renders behind the toast.
+    expect(
+      screen.queryByText(/columns were detected/),
+    ).not.toBeInTheDocument();
   });
 
   it("tells the user to re-pick when the per-file grant is gone", async () => {

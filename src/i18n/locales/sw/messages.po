@@ -403,6 +403,10 @@ msgstr "Panua"
 msgid "Callout"
 msgstr "Wito wa kuzingatia"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Process"
+msgstr ""
+
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
@@ -1809,6 +1813,10 @@ msgstr "Kanusho la mpaka (Hujumuishwa kila wakati)"
 msgid "Undo"
 msgstr "Futa"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "One dataset is one tab."
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Inapendekezwa ikiwa una takriban RAM ya GB 8 (chaguo-msingi kwa "
@@ -2018,8 +2026,8 @@ msgstr "Badilisha kuwa mpango wa Bure"
 
 #. placeholder {0}: formatNumber(numSuccessRows)
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {0} rows"
-msgstr "Imepangwa {0} safu"
+#~ msgid "Parsed {0} rows"
+#~ msgstr "Imepangwa {0} safu"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -4153,6 +4161,10 @@ msgstr "dashibodi"
 msgid "{0} was deleted from this browser."
 msgstr "{0} imefutwa kutoka kivinjari hiki."
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Tab to import"
+msgstr ""
+
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
@@ -5546,8 +5558,8 @@ msgid "Case Manager"
 msgstr "Msimamizi wa Kesi"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-msgid "The tab has a header row"
-msgstr "Kichupo kina safu ya vichwa"
+#~ msgid "The tab has a header row"
+#~ msgstr "Kichupo kina safu ya vichwa"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5701,7 +5713,7 @@ msgstr "Daraja {0}: thamani {1}"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Puuza vichujio vyote vya kimataifa: uonyeshaji huu haujafichwa."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "Google Sheet"
 msgstr "Google Sheet"
 
@@ -6672,7 +6684,7 @@ msgstr "Hifadhi mabadiliko yako kwanza: PDF inaonyesha dashibodi "
 msgid "Units"
 msgstr "Vipimo"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "File failed to load"
 msgstr "Faili ilishindwa kupakia"
 
@@ -7561,6 +7573,10 @@ msgstr "Poligoni"
 msgid "Resuming dataset processing…"
 msgstr "Inarejelea usindikaji wa seti za data…"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Tab not found"
+msgstr ""
+
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
@@ -7761,7 +7777,7 @@ msgid "Current Plan"
 msgstr "Mpango wa Sasa"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "No rows were read successfully"
 msgstr "Hakuna safu zilizosomeka kwa mafanikio"
 
@@ -7901,6 +7917,11 @@ msgstr "Kitambulisho cha nafasi ya kazi hakiwezi kuwa na nafasi"
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "Weka maandishi yako hapa"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
+"deleted. Pick the sheet again and choose a tab."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8474,8 +8495,8 @@ msgstr "Unahitaji kuwa umeingia ili kumuuliza msaidizi. Matokeo ya kulingana na 
 "kanuni yamehifadhiwa."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File loaded successfully"
-msgstr "Faili imepakiwa kwa mafanikio"
+#~ msgid "File loaded successfully"
+#~ msgstr "Faili imepakiwa kwa mafanikio"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
@@ -8626,7 +8647,7 @@ msgstr "Anwani ya barua pepe isiyo sahihi"
 msgid "Not plotted yet"
 msgstr "Bado haijaonyeshwa"
 
-#. placeholder {0}: selectedDocument.name
+#. placeholder {0}: pickedSheet.spreadsheetName
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
 msgstr "Hati iliyochaguliwa: {0}"

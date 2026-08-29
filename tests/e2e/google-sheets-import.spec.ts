@@ -161,7 +161,8 @@ async function _pickSheetInConnectorsTab(
  *
  * That the form renders at all is one of the assertions: the rows come from the
  * sniff, and a version that queried the not-yet-materialized table for them
- * left this panel empty behind a "parsed N rows" success notification.
+ * left this panel empty. Nothing else announces the import, so an empty panel
+ * is silence.
  *
  * Deliberately **not** asserted here: the prose cell. It is the last row of 701
  * and the preview shows only the first handful, so its absence from this grid

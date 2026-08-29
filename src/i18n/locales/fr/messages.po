@@ -408,6 +408,10 @@ msgstr "Développer"
 msgid "Callout"
 msgstr "Encadré"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Process"
+msgstr ""
+
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
@@ -1831,6 +1835,10 @@ msgstr "Clause de non-responsabilité concernant les limites (Toujours incluse)"
 msgid "Undo"
 msgstr "Annuler"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "One dataset is one tab."
+msgstr ""
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Recommandé si vous disposez d’environ 8 Go de RAM (paramètre par défaut "
@@ -2043,8 +2051,8 @@ msgstr "Passer au plan gratuit"
 
 #. placeholder {0}: formatNumber(numSuccessRows)
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {0} rows"
-msgstr "{0} lignes analysées"
+#~ msgid "Parsed {0} rows"
+#~ msgstr "{0} lignes analysées"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -4202,6 +4210,10 @@ msgstr "tableau de bord"
 msgid "{0} was deleted from this browser."
 msgstr "{0} a été supprimé de ce navigateur."
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Tab to import"
+msgstr ""
+
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (téléchargement d’environ {approxSizeMb} "
@@ -5610,8 +5622,8 @@ msgid "Case Manager"
 msgstr "Gestionnaire de dossiers"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-msgid "The tab has a header row"
-msgstr "L’onglet comporte une ligne d’en-tête"
+#~ msgid "The tab has a header row"
+#~ msgstr "L’onglet comporte une ligne d’en-tête"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5766,7 +5778,7 @@ msgstr "Classe {0} : {1} valeurs"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignorer tous les filtres globaux : cette visualisation est non filtrée."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "Google Sheet"
 msgstr "Feuille Google"
 
@@ -6746,7 +6758,7 @@ msgstr "Enregistrez d'abord vos modifications : le PDF reflète le tableau de "
 msgid "Units"
 msgstr "Unités"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "File failed to load"
 msgstr "Le fichier n'a pas pu être chargé"
 
@@ -7648,6 +7660,10 @@ msgstr "Polygone"
 msgid "Resuming dataset processing…"
 msgstr "Reprise du traitement de l'ensemble de données…"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Tab not found"
+msgstr ""
+
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
@@ -7849,7 +7865,7 @@ msgid "Current Plan"
 msgstr "Plan actuel"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "No rows were read successfully"
 msgstr "Aucune ligne n'a été lue avec succès"
 
@@ -7990,6 +8006,11 @@ msgstr "L’identifiant de l’espace de travail ne peut pas contenir d’espace
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "Saisissez votre texte ici"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
+"deleted. Pick the sheet again and choose a tab."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8571,8 +8592,8 @@ msgstr "Vous devez être connecté pour interroger l’assistant. Les résultats
 "basés sur des règles ont été conservés."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File loaded successfully"
-msgstr "Fichier chargé avec succès"
+#~ msgid "File loaded successfully"
+#~ msgstr "Fichier chargé avec succès"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
@@ -8724,7 +8745,7 @@ msgstr "Adresse e-mail invalide"
 msgid "Not plotted yet"
 msgstr "Pas encore tracé"
 
-#. placeholder {0}: selectedDocument.name
+#. placeholder {0}: pickedSheet.spreadsheetName
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
 msgstr "Document sélectionné : {0}"

@@ -1,5 +1,5 @@
 import { useMutation } from "@avandar/query-hooks";
-import { formatNumber, MIMEType } from "@avandar/utils";
+import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
 import { uuid } from "$/lib/uuid";
@@ -11,7 +11,7 @@ import {
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { notifyError } from "@/utils/notifications/notify";
 import { getGoogleSheetImportErrorCopy } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserId } from "$/models/User/User.types";
@@ -251,18 +251,16 @@ export function useLoadGoogleSheet(): GoogleSheetLoad {
         },
       });
 
-      const numSuccessRows = loadResult.numRows;
-      if (numSuccessRows === 0) {
+      // No success toast: the rendered form is the confirmation, exactly as it
+      // is for a manual upload. A count here would have to come from the
+      // sniff, which stops at the preview cap, so it would announce 200 rows
+      // for a sheet of any size.
+      if (loadResult.numRows === 0) {
         notifyError({
           title: t`File failed to load`,
           message: t`No rows were read successfully`,
         });
-        return;
       }
-      notifySuccess({
-        title: t`File loaded successfully`,
-        message: t`Parsed ${formatNumber(numSuccessRows)} rows`,
-      });
     },
     onError: (error) => {
       Logger.error(error, { devMsg: "Google Sheet tab failed to load" });

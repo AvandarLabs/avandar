@@ -398,6 +398,10 @@ msgstr "Expand"
 msgid "Callout"
 msgstr "Callout"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Process"
+msgstr "Process"
+
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
@@ -1785,6 +1789,10 @@ msgstr "Boundary disclaimer (Always included)"
 msgid "Undo"
 msgstr "Undo"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "One dataset is one tab."
+msgstr "One dataset is one tab."
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Recommended if you have about 8 GB RAM (default for most users)."
@@ -1989,8 +1997,8 @@ msgstr "Switch to Free plan"
 
 #. placeholder {0}: formatNumber(numSuccessRows)
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {0} rows"
-msgstr "Parsed {0} rows"
+#~ msgid "Parsed {0} rows"
+#~ msgstr "Parsed {0} rows"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -4097,6 +4105,10 @@ msgstr "dashboard"
 msgid "{0} was deleted from this browser."
 msgstr "{0} was deleted from this browser."
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Tab to import"
+msgstr "Tab to import"
+
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
@@ -5477,8 +5489,8 @@ msgid "Case Manager"
 msgstr "Case Manager"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-msgid "The tab has a header row"
-msgstr "The tab has a header row"
+#~ msgid "The tab has a header row"
+#~ msgstr "The tab has a header row"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
@@ -5631,7 +5643,7 @@ msgstr "Class {0}: {1} values"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignore all global filters: this visualization is unfiltered."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "Google Sheet"
 msgstr "Google Sheet"
 
@@ -6594,7 +6606,7 @@ msgstr "Save your changes first: the PDF reflects the saved dashboard."
 msgid "Units"
 msgstr "Units"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "File failed to load"
 msgstr "File failed to load"
 
@@ -7477,6 +7489,10 @@ msgstr "Polygon"
 msgid "Resuming dataset processing…"
 msgstr "Resuming dataset processing…"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Tab not found"
+msgstr "Tab not found"
+
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
@@ -7676,7 +7692,7 @@ msgid "Current Plan"
 msgstr "Current Plan"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "No rows were read successfully"
 msgstr "No rows were read successfully"
 
@@ -7815,6 +7831,12 @@ msgstr "The workspace ID cannot contain spaces"
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "Enter your text here"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
+"deleted. Pick the sheet again and choose a tab."
+msgstr "That tab is no longer in this spreadsheet. It may have been renamed or "
+"deleted. Pick the sheet again and choose a tab."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8382,8 +8404,8 @@ msgstr "You need to be signed in to ask the assistant. Kept the rule-based "
 "results."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File loaded successfully"
-msgstr "File loaded successfully"
+#~ msgid "File loaded successfully"
+#~ msgstr "File loaded successfully"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
@@ -8533,7 +8555,7 @@ msgstr "Invalid email address"
 msgid "Not plotted yet"
 msgstr "Not plotted yet"
 
-#. placeholder {0}: selectedDocument.name
+#. placeholder {0}: pickedSheet.spreadsheetName
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
 msgstr "Selected document: {0}"
