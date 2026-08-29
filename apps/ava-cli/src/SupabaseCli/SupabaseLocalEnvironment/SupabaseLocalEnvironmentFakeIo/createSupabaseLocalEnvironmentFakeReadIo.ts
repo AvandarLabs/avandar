@@ -1,12 +1,12 @@
 import path from "node:path";
-import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
-import type { FakeFactoryOptions } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+import type { SupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { FakeFactoryOptions } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 
 /** Creates the read-only filesystem portion of the local-environment fake. */
-export function createSupabaseLocalEnvironmentFakeReadIO(
+export function createSupabaseLocalEnvironmentFakeReadIo(
   factoryOptions: Readonly<FakeFactoryOptions>,
 ): Pick<
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   "readTextFile" | "readDirectory" | "isDirectory" | "isFile"
 > {
   const { state } = factoryOptions;

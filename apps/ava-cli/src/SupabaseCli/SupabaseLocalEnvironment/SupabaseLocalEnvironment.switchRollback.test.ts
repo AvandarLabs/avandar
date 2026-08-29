@@ -5,18 +5,18 @@ import {
   ENV_PATH,
   ORIGINAL_CONFIG,
   ORIGINAL_ENV,
-  SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+  SupabaseLocalEnvironmentFakeIo,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { describe, expect, it } from "vitest";
 
-const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 const { makeBackupDirectory, makeBackupHierarchy } =
   SupabaseLocalEnvironmentFixtures;
 
 describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
   it("starts before reading status and rewriting environments", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     await SupabaseLocalEnvironment.switch({
       io: fake.io,
       temporaryProjectId: "analytics-p2-temp",
@@ -31,7 +31,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
   });
 
   it("rolls back files without invoking project-wide stop when startup fails", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       commandResults: {
         start: { ok: false, stdout: "", stderr: "start failed" },
       },
@@ -56,7 +56,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
   });
 
   it("does not include status stdout in a failure", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       commandResults: {
         "status -o json": {
           ok: false,
@@ -75,7 +75,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
   });
 
   it("preserves cleanup and restoration errors during switch rollback", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       copyFailureTarget: ENV_PATH,
       listResourcesError: "cleanup failed",
       commandResults: {
@@ -107,7 +107,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
   });
 
   it("preserves cleanup and backup-removal errors during switch rollback", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       removeFailureTarget: makeBackupDirectory(),
       listResourcesError: "cleanup failed",
       commandResults: {
@@ -142,7 +142,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
     const otherBackupDirectory = makeBackupDirectory({
       branch: "feat/other-work",
     });
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       commandResults: {
         start: { ok: false, stdout: "", stderr: "start failed" },
       },
@@ -167,7 +167,7 @@ describe("SupabaseLocalEnvironment.switch (startup and rollback)", () => {
       branch: BRANCH,
       worktreePath: "/repo-copy",
     });
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       commandResults: {
         start: { ok: false, stdout: "", stderr: "start failed" },
       },

@@ -6,19 +6,19 @@ import {
   ORIGINAL_CONFIG,
   ORIGINAL_EDGE_ENV,
   ORIGINAL_ENV,
-  SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+  SupabaseLocalEnvironmentFakeIo,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { describe, expect, it } from "vitest";
 
-const { create: createFakeIO, getResourceKeyFromResource: resourceKey } =
-  SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo, getResourceKeyFromResource: resourceKey } =
+  SupabaseLocalEnvironmentFakeIo;
 const { makeBackupDirectory, seedActiveBackup } =
   SupabaseLocalEnvironmentFixtures;
 
 describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () => {
   it("restores files even when temporary project cleanup fails", async () => {
-    const fake = createFakeIO({ listResourcesError: "cleanup failed" });
+    const fake = createFakeIo({ listResourcesError: "cleanup failed" });
     seedActiveBackup(fake);
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
       "analytics-p2-temp requires manual cleanup",
@@ -43,7 +43,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       type: "volume" as const,
       id: "supabase_db_analytics-p2-temp",
     };
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       supabaseResources: [
         temporaryVolume,
         temporaryNetwork,
@@ -77,7 +77,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       type: "container" as const,
       id: "a".repeat(64),
     };
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       supabaseResources: [relabeledContainer],
       resourceInspections: {
         [resourceKey(relabeledContainer)]: {
@@ -104,7 +104,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       type: "network" as const,
       id: "shared-network;delete",
     };
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       supabaseResources: [validContainer, unsafeNetwork],
     });
     seedActiveBackup(fake);
@@ -130,7 +130,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       type: "volume" as const,
       id: "supabase_db_analytics-p2-temp",
     };
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       supabaseResources: [volume, network, secondContainer, firstContainer],
       resourceRemovalFailures: [resourceKey(firstContainer)],
     });
@@ -166,7 +166,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
       type: "container" as const,
       id: "a".repeat(64),
     };
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       supabaseResources: [absentContainer],
       resourceInspections: {
         [resourceKey(absentContainer)]: { exists: false },
@@ -181,7 +181,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
   });
 
   it("restores a backed-up environment file that is currently missing", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     fake.files.delete(EDGE_ENV_PATH);
 
@@ -192,7 +192,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
   });
 
   it("retains the backup when restoring a file fails", async () => {
-    const fake = createFakeIO({ copyFailureTarget: ENV_PATH });
+    const fake = createFakeIo({ copyFailureTarget: ENV_PATH });
     seedActiveBackup(fake);
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
       "Backup retained",
@@ -201,7 +201,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
   });
 
   it("preserves cleanup and restoration errors during explicit restore", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       copyFailureTarget: ENV_PATH,
       listResourcesError: "cleanup failed",
     });
@@ -227,7 +227,7 @@ describe("SupabaseLocalEnvironment.restore (file restoration and cleanup)", () =
   });
 
   it("preserves cleanup and backup-removal errors during explicit restore", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       removeFailureTarget: makeBackupDirectory(),
       listResourcesError: "cleanup failed",
     });

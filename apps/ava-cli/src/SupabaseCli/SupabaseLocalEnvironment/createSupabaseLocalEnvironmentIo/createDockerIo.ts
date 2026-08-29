@@ -1,4 +1,4 @@
-import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand/RunLocalCommand";
+import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
 import { DockerPublishedPorts } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DockerPublishedPorts/DockerPublishedPorts";
 import { SupabaseCommandOutput } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseCommandOutput/SupabaseCommandOutput";
 import { SUPABASE_DOCKER_CLEANUP_RESOURCE_ORDER } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
@@ -13,7 +13,7 @@ import type {
   SupabaseDockerResource,
   SupabaseDockerResourceInspection,
   SupabaseDockerResourceType,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 const SUPABASE_PROJECT_LABEL = "com.supabase.cli.project";
@@ -172,10 +172,10 @@ async function _listPublishedHostPorts(projectRoot: string): Promise<number[]> {
 }
 
 /** Creates the Docker and Supabase command adapter for a project root. */
-export function createDockerIO(
+export function createDockerIo(
   projectRoot: string,
 ): Pick<
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   | "hasSupabaseResources"
   | "listSupabaseResources"
   | "inspectSupabaseResource"

@@ -2,15 +2,15 @@ import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvi
 import {
   EDGE_ENV_PATH,
   ENV_PATH,
-  SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+  SupabaseLocalEnvironmentFakeIo,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { describe, expect, it } from "vitest";
 
-const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 
 describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
   it("moves the dev server by the same delta as the Supabase ports", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
 
     await SupabaseLocalEnvironment.switch({
       io: fake.io,
@@ -24,7 +24,7 @@ describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
   });
 
   it("pins the dev-server port in every development environment file", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
 
     await SupabaseLocalEnvironment.switch({
       io: fake.io,
@@ -37,7 +37,7 @@ describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
   });
 
   it("skips a dev-server port the Supabase set already reserves", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     fake.files.set(ENV_PATH, "VITE_APP_URL=http://localhost:54321/\n");
 
     await expect(
@@ -49,7 +49,7 @@ describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
   });
 
   it("skips a Docker-published Vite port when shifting the dev server", async () => {
-    const fake = createFakeIO({ publishedHostPorts: [6173] });
+    const fake = createFakeIo({ publishedHostPorts: [6173] });
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -59,7 +59,7 @@ describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
   });
 
   it("rewrites every key the codebase reads from the local stack", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
 
     await SupabaseLocalEnvironment.switch({
       io: fake.io,
@@ -85,7 +85,7 @@ describe("SupabaseLocalEnvironment.switch (environment rewriting)", () => {
   });
 
   it("repoints the Google callback at the switched API port", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
 
     await SupabaseLocalEnvironment.switch({
       io: fake.io,

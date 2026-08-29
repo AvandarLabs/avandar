@@ -1,17 +1,17 @@
 /**
  * CLI switch flow: default id from the branch, one switch per branch.
  */
-import { SupabaseLocalEnvironmentFakeIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+import { SupabaseLocalEnvironmentFakeIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { runSupabaseSwitch } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
 import { describe, expect, it, vi } from "vitest";
 
-const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 const { seedActiveBackup } = SupabaseLocalEnvironmentFixtures;
 
 describe("runSupabaseSwitch", () => {
   it("creates a kebab-cased project id from the branch when none is given", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     const confirmReuse = vi.fn();
 
     const outcome = await runSupabaseSwitch({
@@ -27,7 +27,7 @@ describe("runSupabaseSwitch", () => {
   });
 
   it("creates the requested project id when this branch has no switch", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
 
     const outcome = await runSupabaseSwitch({
       io: fake.io,
@@ -42,7 +42,7 @@ describe("runSupabaseSwitch", () => {
   });
 
   it("starts the existing switch when the requested id matches it", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const confirmReuse = vi.fn();
 
@@ -66,7 +66,7 @@ describe("runSupabaseSwitch", () => {
   });
 
   it("asks before reusing when a different id is requested, and reuses on yes", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const confirmReuse = vi.fn(async () => {
       return true;
@@ -86,7 +86,7 @@ describe("runSupabaseSwitch", () => {
   });
 
   it("declines a second switch when the user does not reuse the existing one", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const confirmReuse = vi.fn(async () => {
       return false;
@@ -106,7 +106,7 @@ describe("runSupabaseSwitch", () => {
   });
 
   it("asks before reusing when no id is given and a switch already exists", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const confirmReuse = vi.fn(async () => {
       return false;
@@ -125,7 +125,7 @@ describe("runSupabaseSwitch", () => {
   });
 
   it("does not invent a branch id without a named Git branch", async () => {
-    const fake = createFakeIO({ branch: "" });
+    const fake = createFakeIo({ branch: "" });
     await expect(
       runSupabaseSwitch({
         io: fake.io,

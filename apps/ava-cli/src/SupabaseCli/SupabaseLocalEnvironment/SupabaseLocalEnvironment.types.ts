@@ -63,7 +63,7 @@ export type SupabaseDockerResourceInspection =
 export type CommandOutputMode = "capture" | "stream";
 
 /** Side-effect boundary used by the local Supabase workflows. */
-export type SupabaseLocalEnvironmentIO = {
+export type SupabaseLocalEnvironmentIo = {
   projectRoot: string;
   /** Reads a UTF-8 text file. */
   readTextFile: (filePath: string) => Promise<string>;

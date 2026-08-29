@@ -9,9 +9,9 @@ import {
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
-import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand/RunLocalCommand";
+import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
 import { propPasses } from "@avandar/utils";
-import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { SupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 function _getAbsolutePathFromFilePath(filePath: string): string {
   if (!path.isAbsolute(filePath)) {
@@ -20,10 +20,10 @@ function _getAbsolutePathFromFilePath(filePath: string): string {
   return filePath;
 }
 
-function _createFileReadIO(
+function _createFileReadIo(
   projectRoot: string,
 ): Pick<
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   "readTextFile" | "readDirectory" | "findDevelopmentEnvFiles"
 > {
   return {
@@ -56,8 +56,8 @@ function _createFileReadIO(
   };
 }
 
-function _createFileWriteIO(): Pick<
-  SupabaseLocalEnvironmentIO,
+function _createFileWriteIo(): Pick<
+  SupabaseLocalEnvironmentIo,
   | "writeTextFile"
   | "copyFile"
   | "makeDirectory"
@@ -99,8 +99,8 @@ function _createFileWriteIO(): Pick<
   };
 }
 
-function _createPathIO(): Pick<
-  SupabaseLocalEnvironmentIO,
+function _createPathIo(): Pick<
+  SupabaseLocalEnvironmentIo,
   "isDirectory" | "isFile" | "pathExists" | "realPath" | "isPortAvailable"
 > {
   return {
@@ -129,16 +129,16 @@ function _createPathIO(): Pick<
 }
 
 /** Creates filesystem-backed adapters for local Supabase environment I/O. */
-export const FileSystemIO = {
+export const FileSystemIo = {
   /** Returns an absolute path or rejects a relative path. */
   getAbsolutePathFromFilePath: _getAbsolutePathFromFilePath,
 
   /** Creates the filesystem read adapter for a project root. */
-  createFileReadIO: _createFileReadIO,
+  createFileReadIo: _createFileReadIo,
 
   /** Creates the filesystem write adapter. */
-  createFileWriteIO: _createFileWriteIO,
+  createFileWriteIo: _createFileWriteIo,
 
   /** Creates filesystem path and port inspection adapters. */
-  createPathIO: _createPathIO,
+  createPathIo: _createPathIo,
 };

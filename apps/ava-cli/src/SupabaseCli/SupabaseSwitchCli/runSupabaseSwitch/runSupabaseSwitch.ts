@@ -5,12 +5,12 @@ import {
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import { makeSwitchRequestResolutionFromOptions } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/makeSwitchRequestResolutionFromOptions/makeSwitchRequestResolutionFromOptions";
 import type {
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   SupabaseSwitchResult,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type RunSupabaseSwitchOptions = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   requestedProjectId?: string;
   requestedBasePort?: number;
   skipSeed?: boolean;

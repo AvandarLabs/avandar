@@ -1,6 +1,6 @@
 import * as net from "node:net";
 import path from "node:path";
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
+import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const commandMocks = vi.hoisted(() => {
@@ -82,9 +82,9 @@ function _closeServer(server: net.Server): Promise<void> {
   });
 }
 
-describe("createSupabaseLocalEnvironmentIO (port probing)", () => {
+describe("createSupabaseLocalEnvironmentIo (port probing)", () => {
   it("reports free and occupied loopback ports", async () => {
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
+    const io = createSupabaseLocalEnvironmentIo(process.cwd());
     const occupiedServer = await _listenOnLoopback();
     const address = occupiedServer.address();
     if (address === null || typeof address === "string") {
@@ -107,7 +107,7 @@ describe("createSupabaseLocalEnvironmentIO (port probing)", () => {
       },
     ]);
     const projectRoot = path.resolve(process.cwd());
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.listPublishedHostPorts()).resolves.toEqual([55322]);
     expect(commandMocks.execFile).toHaveBeenCalledWith(
@@ -124,7 +124,7 @@ describe("createSupabaseLocalEnvironmentIO (port probing)", () => {
 
   it("rejects published-port listing when Docker is unavailable", async () => {
     _setCommandFailure({ stderr: "Cannot connect to Docker.", stdout: "" });
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
+    const io = createSupabaseLocalEnvironmentIo(process.cwd());
 
     await expect(io.listPublishedHostPorts()).rejects.toThrow(
       "Cannot list Docker published ports: Cannot connect to Docker.",
@@ -132,7 +132,7 @@ describe("createSupabaseLocalEnvironmentIO (port probing)", () => {
   });
 
   it("reports a port published on every interface as occupied", async () => {
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
+    const io = createSupabaseLocalEnvironmentIo(process.cwd());
     const occupiedServer = await _listenOnAllInterfaces();
     const address = occupiedServer.address();
     if (address === null || typeof address === "string") {

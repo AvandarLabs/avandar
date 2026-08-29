@@ -7,13 +7,13 @@ import {
   ORIGINAL_CONFIG,
   ORIGINAL_ENV,
   PROJECT_ROOT,
-  SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+  SupabaseLocalEnvironmentFakeIo,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { prop, propEq, propPasses, valEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 
-const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 const {
   createGate,
   makeBackupDirectory,
@@ -23,7 +23,7 @@ const {
 
 describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   it("refuses a detached HEAD before creating a backup", async () => {
-    const fake = createFakeIO({ branch: "" });
+    const fake = createFakeIo({ branch: "" });
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -34,7 +34,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("rejects an unsafe project id before creating a backup", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -45,7 +45,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("refuses a project id already owned by local Docker resources", async () => {
-    const fake = createFakeIO({ hasSupabaseResources: true });
+    const fake = createFakeIo({ hasSupabaseResources: true });
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -57,7 +57,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("refuses to reuse the current Supabase project id", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -68,7 +68,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("refuses a second switch for the same branch", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     makeBackupHierarchy().forEach((directoryPath) => {
       fake.directories.add(directoryPath);
     });
@@ -82,7 +82,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("atomically allows only one concurrent switch for the same pair", async () => {
-    const fake = createFakeIO({ beforeReserve: createGate(2) });
+    const fake = createFakeIo({ beforeReserve: createGate(2) });
 
     const results = await Promise.allSettled([
       SupabaseLocalEnvironment.switch({
@@ -120,7 +120,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("skips a Docker-published port set when choosing an automatic base", async () => {
-    const fake = createFakeIO({ publishedHostPorts: [55322] });
+    const fake = createFakeIo({ publishedHostPorts: [55322] });
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -137,7 +137,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("ignores a backup belonging to another branch", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     makeBackupHierarchy({ branch: "feat/other-work" }).forEach(
       (directoryPath) => {
         fake.directories.add(directoryPath);
@@ -157,7 +157,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("ignores a same-branch backup belonging to another worktree", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     makeBackupHierarchy({ branch: BRANCH, worktreePath: "/repo-copy" }).forEach(
       (directoryPath) => {
         fake.directories.add(directoryPath);
@@ -177,7 +177,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("backs up every development file before rewriting configuration", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     await SupabaseLocalEnvironment.switch({
       io: fake.io,
       temporaryProjectId: "analytics-p2-temp",
@@ -203,7 +203,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
 
   it("refuses an externally retargeted backup hierarchy parent", async () => {
     const avaDirectory = `${PROJECT_ROOT}/.ava`;
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [avaDirectory]: "/outside/.ava" },
     });
     fake.directories.add(avaDirectory);
@@ -221,7 +221,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
 
   it("refuses an in-worktree retargeted backup hierarchy parent", async () => {
     const supabaseBackupRoot = `${PROJECT_ROOT}/.ava/backups/supabase`;
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: {
         [supabaseBackupRoot]: `${PROJECT_ROOT}/retargeted/supabase`,
       },
@@ -244,7 +244,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("refuses a config symlink that escapes the canonical worktree", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [CONFIG_PATH]: "/outside/config.toml" },
     });
 
@@ -260,7 +260,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("refuses an environment symlink retargeted inside the worktree", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [ENV_PATH]: `${PROJECT_ROOT}/nested/environment` },
     });
 
@@ -277,7 +277,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
 
   it("refuses a discovered environment path outside the worktree", async () => {
     const externalEnvPath = "/outside/.env.development";
-    const fake = createFakeIO({ developmentEnvFiles: [externalEnvPath] });
+    const fake = createFakeIo({ developmentEnvFiles: [externalEnvPath] });
     fake.files.set(externalEnvPath, ORIGINAL_ENV);
 
     await expect(
@@ -292,7 +292,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("refuses a config directory before reserving or writing", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     fake.files.delete(CONFIG_PATH);
     fake.directories.add(CONFIG_PATH);
 
@@ -308,7 +308,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("refuses an environment directory before reserving or writing", async () => {
-    const fake = createFakeIO({ developmentEnvFiles: [ENV_PATH] });
+    const fake = createFakeIo({ developmentEnvFiles: [ENV_PATH] });
     fake.files.delete(ENV_PATH);
     fake.directories.add(ENV_PATH);
 
@@ -324,7 +324,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
   });
 
   it("removes a partial backup when copying a source file fails", async () => {
-    const fake = createFakeIO({ copyFailureTarget: makeBackupPath(ENV_PATH) });
+    const fake = createFakeIo({ copyFailureTarget: makeBackupPath(ENV_PATH) });
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -340,7 +340,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
 
   it("removes a partial backup when backup directory creation fails", async () => {
     const filesDirectory = `${makeBackupDirectory()}/files`;
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       makeDirectoryFailureTarget: filesDirectory,
     });
 
@@ -358,7 +358,7 @@ describe("SupabaseLocalEnvironment.switch (guards and backup safety)", () => {
 
   it("retains manifest-write and backup-removal errors with the recovery path", async () => {
     const manifestPath = `${makeBackupDirectory()}/manifest.json`;
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       writeFailureTarget: manifestPath,
       removeFailureTarget: makeBackupDirectory(),
     });

@@ -9,7 +9,7 @@ import { SupabasePorts } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/Sup
 import { promiseMap } from "@avandar/utils";
 import type {
   SupabaseConfigState,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   SwitchPreparation,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
@@ -20,7 +20,7 @@ type SwitchSource = {
 };
 
 async function _readSwitchIdentity(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<{
   branch: string;
   worktreePath: string;
@@ -41,7 +41,7 @@ async function _readSwitchIdentity(
 
 async function _readSwitchSource(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     temporaryProjectId: string;
     worktreePath: string;
   }>,
@@ -84,7 +84,7 @@ function _isAllowedSwitchSource(
 
 async function _requireSwitchSourceFiles(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     sourcePaths: readonly string[];
     worktreePath: string;
   }>,
@@ -118,7 +118,7 @@ async function _requireSwitchSourceFiles(
 
 async function _selectSwitchPorts(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     source: SwitchSource;
     requestedBasePort?: number;
     occupiedHostPorts: readonly number[];
@@ -142,7 +142,7 @@ async function _selectSwitchPorts(
 /** Moves the dev server off the port every other worktree serves on. */
 async function _selectDevServerPort(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     envFiles: readonly string[];
     currentApiPort: number;
     basePort: number;
@@ -179,7 +179,7 @@ function _requireSafeProjectId(temporaryProjectId: string): void {
 
 async function _prepareSwitch(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     temporaryProjectId: string;
     requestedBasePort?: number;
   }>,

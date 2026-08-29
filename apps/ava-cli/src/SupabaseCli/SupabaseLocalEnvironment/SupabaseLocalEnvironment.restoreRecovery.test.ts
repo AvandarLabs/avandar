@@ -6,13 +6,13 @@ import {
   ENV_PATH,
   ORIGINAL_CONFIG,
   ORIGINAL_ENV,
-  SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+  SupabaseLocalEnvironmentFakeIo,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 
-const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 const {
   makeBackupDirectory,
   makeBackupPathFromSourcePath: makeBackupPath,
@@ -35,7 +35,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
       canonicalPaths[makeBackupPath(sourcePath)] =
         `${retargetedDirectory}/files/${path.basename(makeBackupPath(sourcePath))}`;
     });
-    const fake = createFakeIO({ canonicalPaths });
+    const fake = createFakeIo({ canonicalPaths });
     seedActiveBackup(fake);
 
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
@@ -46,7 +46,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
   });
 
   it("recovers a switching backup when the active config is missing", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     markBackupSwitching(fake);
     fake.files.delete(CONFIG_PATH);
@@ -63,7 +63,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
   });
 
   it("recovers a switching backup when the active config is malformed", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     markBackupSwitching(fake);
     fake.files.set(CONFIG_PATH, "not valid toml = [");
@@ -79,7 +79,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
   });
 
   it("recovers a switching backup when the active project id differs", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     markBackupSwitching(fake);
     fake.files.set(CONFIG_PATH, ORIGINAL_CONFIG);
@@ -95,7 +95,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
   });
 
   it("validates a switching backup fully before interrupted recovery", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     markBackupSwitching(fake);
     fake.files.delete(CONFIG_PATH);
@@ -115,7 +115,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
   });
 
   it("retains a switching backup when interrupted recovery fails", async () => {
-    const fake = createFakeIO({ copyFailureTarget: ENV_PATH });
+    const fake = createFakeIo({ copyFailureTarget: ENV_PATH });
     seedActiveBackup(fake);
     markBackupSwitching(fake);
     fake.files.delete(CONFIG_PATH);
@@ -128,7 +128,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
   });
 
   it("strictly rejects a missing active config before running a command", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     fake.files.delete(CONFIG_PATH);
 
@@ -140,7 +140,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
   });
 
   it("strictly rejects a malformed active config before running a command", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     fake.files.set(CONFIG_PATH, "not valid toml = [");
 

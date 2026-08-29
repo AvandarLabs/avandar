@@ -1,6 +1,6 @@
 import { rm } from "node:fs/promises";
 import path from "node:path";
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
+import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { promiseMap } from "@avandar/utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -112,13 +112,13 @@ function _expectDockerCommands(
   });
 }
 
-describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () => {
+describe("createSupabaseLocalEnvironmentIo (commands, Docker, Git, ports)", () => {
   it("returns a failed Supabase command result without throwing", async () => {
     _setCommandFailure({
       stderr: "Supabase failed.",
       stdout: "partial output",
     });
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
+    const io = createSupabaseLocalEnvironmentIo(process.cwd());
 
     await expect(io.runSupabase(["status"])).resolves.toEqual({
       ok: false,
@@ -131,7 +131,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
     _setCommandSuccess([{ stderr: "", stdout: "status output" }]);
     const projectRoot = path.resolve(process.cwd());
     const suppliedArgs = ["status", "--output", "json"];
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.runSupabase(suppliedArgs)).resolves.toEqual({
       ok: true,
@@ -154,7 +154,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
   it("overrides the inherited connection when seeding", async () => {
     _setCommandSuccess([{ stderr: "", stdout: "seeded" }]);
     const projectRoot = path.resolve(process.cwd());
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
     // The pre-switch connection `ava` loaded at startup, which the seed must
     // not inherit.
     vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:54321");
@@ -182,7 +182,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
 
   it("rejects resource ownership checks when a Docker query fails", async () => {
     _setCommandFailure({ stderr: "Docker unavailable.", stdout: "" });
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
+    const io = createSupabaseLocalEnvironmentIo(process.cwd());
 
     await expect(io.hasSupabaseResources("local-project")).rejects.toThrow(
       "Cannot verify local Supabase project ownership: Docker unavailable.",
@@ -197,7 +197,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
       { stderr: "", stdout: "" },
     ]);
     const projectRoot = path.resolve(process.cwd());
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
     const projectId = "local-project";
 
     await expect(io.hasSupabaseResources(projectId)).resolves.toBe(false);
@@ -213,7 +213,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
       { stderr: "", stdout: "network-id" },
       { stderr: "", stdout: "" },
     ]);
-    const io = createSupabaseLocalEnvironmentIO(path.resolve(process.cwd()));
+    const io = createSupabaseLocalEnvironmentIo(path.resolve(process.cwd()));
 
     await expect(io.hasSupabaseResources("local-project")).resolves.toBe(true);
   });
@@ -225,7 +225,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
       { stderr: "", stdout: "supabase_db_local-project" },
     ]);
     const projectRoot = path.resolve(process.cwd());
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.listSupabaseResources("local-project")).resolves.toEqual([
       { type: "container", id: "a".repeat(64) },
@@ -284,7 +284,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
     async ({ resource, labelTemplate }) => {
       _setCommandSuccess([{ stderr: "", stdout: '"local-project"' }]);
       const projectRoot = path.resolve(process.cwd());
-      const io = createSupabaseLocalEnvironmentIO(projectRoot);
+      const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
       await expect(io.inspectSupabaseResource(resource)).resolves.toEqual({
         exists: true,
@@ -301,7 +301,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
 
   it("treats an already-absent Docker resource as absent", async () => {
     _setCommandFailure({ stderr: "Error: No such volume: gone", stdout: "" });
-    const io = createSupabaseLocalEnvironmentIO(path.resolve(process.cwd()));
+    const io = createSupabaseLocalEnvironmentIo(path.resolve(process.cwd()));
 
     await expect(
       io.inspectSupabaseResource({ type: "volume", id: "gone" }),
@@ -310,7 +310,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
 
   it("does not hide Docker inspection failures unrelated to absence", async () => {
     _setCommandFailure({ stderr: "Docker unavailable.", stdout: "" });
-    const io = createSupabaseLocalEnvironmentIO(path.resolve(process.cwd()));
+    const io = createSupabaseLocalEnvironmentIo(path.resolve(process.cwd()));
 
     await expect(
       io.inspectSupabaseResource({ type: "network", id: "a".repeat(64) }),
@@ -335,7 +335,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
     async ({ resource, args }) => {
       _setCommandSuccess([{ stderr: "", stdout: "removed" }]);
       const projectRoot = path.resolve(process.cwd());
-      const io = createSupabaseLocalEnvironmentIO(projectRoot);
+      const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
       await expect(io.removeSupabaseResource(resource)).resolves.toEqual({
         ok: true,
@@ -353,7 +353,7 @@ describe("createSupabaseLocalEnvironmentIO (commands, Docker, Git, ports)", () =
 
   it("propagates a failed Git branch query", async () => {
     _setCommandFailure({ stderr: "Git unavailable.", stdout: "" });
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
+    const io = createSupabaseLocalEnvironmentIo(process.cwd());
 
     await expect(io.readBranch()).rejects.toThrow(
       "Cannot read the current Git branch: Git unavailable.",

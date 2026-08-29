@@ -5,13 +5,13 @@ import {
   ENV_PATH,
   ORIGINAL_ENV,
   PROJECT_ROOT,
-  SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+  SupabaseLocalEnvironmentFakeIo,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { SupabaseLocalEnvironmentFixtures } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFixtures";
 import { propNotEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 
-const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 const {
   makeBackupDirectory,
   makeBackupPathFromSourcePath: makeBackupPath,
@@ -23,7 +23,7 @@ const {
 describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   it("refuses a manifest file whose canonical target escapes its directory", async () => {
     const manifestPath = `${makeBackupDirectory()}/manifest.json`;
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [manifestPath]: "/outside/manifest.json" },
     });
     seedActiveBackup(fake);
@@ -36,7 +36,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses malformed manifest JSON before running a command", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     fake.files.set(`${makeBackupDirectory()}/manifest.json`, "not-json");
 
@@ -45,7 +45,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses an unsafe manifest project id before running a command", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     writeFakeManifest(fake)({
       ...readFakeManifest(fake),
@@ -60,7 +60,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest project id that differs from the active config", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     writeFakeManifest(fake)({
       ...readFakeManifest(fake),
@@ -75,7 +75,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest that omits the config backup", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifest = readFakeManifest(fake);
     writeFakeManifest(fake)({
@@ -90,7 +90,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses paired deletion of the config manifest row and backup", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifest = readFakeManifest(fake);
     writeFakeManifest(fake)({
@@ -107,7 +107,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest that omits a development environment backup", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifest = readFakeManifest(fake);
     writeFakeManifest(fake)({
@@ -122,7 +122,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses paired deletion of a current environment row and backup", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifest = readFakeManifest(fake);
     writeFakeManifest(fake)({
@@ -139,7 +139,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest with an unexpected source file", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const unexpectedSourcePath = `${PROJECT_ROOT}/unexpected.txt`;
     const unexpectedBackupPath = makeBackupPath(unexpectedSourcePath);
@@ -163,7 +163,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses an unexpected orphaned backup entry", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const unexpectedSourcePath = `${PROJECT_ROOT}/unexpected.txt`;
     fake.files.set(makeBackupPath(unexpectedSourcePath), "unexpected\n");
@@ -175,7 +175,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses duplicate manifest source paths", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifest = readFakeManifest(fake);
     writeFakeManifest(fake)({
@@ -190,7 +190,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses duplicate manifest backup paths", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifest = readFakeManifest(fake);
     writeFakeManifest(fake)({
@@ -209,7 +209,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a non-deterministic manifest backup path", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const unexpectedBackupPath = `${makeBackupDirectory()}/files/unexpected`;
     fake.files.set(unexpectedBackupPath, ORIGINAL_ENV);
@@ -230,7 +230,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest whose backup file is missing", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     fake.files.delete(makeBackupPath(ENV_PATH));
 
@@ -241,7 +241,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest whose backup entry is not a file", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const backupPath = makeBackupPath(ENV_PATH);
     fake.files.delete(backupPath);
@@ -254,7 +254,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a source path whose canonical target escapes the worktree", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [ENV_PATH]: "/outside/source" },
     });
     seedActiveBackup(fake);
@@ -266,7 +266,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a backup path whose canonical target escapes its directory", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [makeBackupPath(ENV_PATH)]: "/outside/backup" },
     });
     seedActiveBackup(fake);
@@ -278,7 +278,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses duplicate canonical source paths", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [ENV_PATH]: EDGE_ENV_PATH },
     });
     seedActiveBackup(fake);
@@ -290,7 +290,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a source symlink retargeted inside the worktree", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [ENV_PATH]: `${PROJECT_ROOT}/nested/environment` },
     });
     seedActiveBackup(fake);
@@ -303,7 +303,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a source directory before running a command", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     fake.files.delete(ENV_PATH);
     fake.directories.add(ENV_PATH);
@@ -317,7 +317,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
 
   it("refuses a canonical backup files directory outside its backup", async () => {
     const filesDirectory = `${makeBackupDirectory()}/files`;
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       canonicalPaths: { [filesDirectory]: "/outside/files" },
     });
     seedActiveBackup(fake);
@@ -329,7 +329,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest created for a different worktree", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifestPath = `${makeBackupDirectory()}/manifest.json`;
     const manifest = JSON.parse(fake.files.get(manifestPath) ?? "{}") as Record<
@@ -347,7 +347,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
   });
 
   it("refuses a manifest that would restore outside the current worktree", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     seedActiveBackup(fake);
     const manifestPath = `${makeBackupDirectory()}/manifest.json`;
     const manifest = JSON.parse(fake.files.get(manifestPath) ?? "{}") as Record<

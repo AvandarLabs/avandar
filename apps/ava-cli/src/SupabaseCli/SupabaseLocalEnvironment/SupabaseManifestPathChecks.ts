@@ -4,7 +4,7 @@ import { makeSet, promiseMap, propPasses } from "@avandar/utils";
 import type {
   RestorePaths,
   SupabaseBackupManifest,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type CanonicalFilePaths = {
@@ -58,7 +58,7 @@ function _sourcePathFromBackupEntryName(
 
 async function _canonicalSourcePath(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     sourcePath: string;
   }>,
 ): Promise<string> {
@@ -87,7 +87,7 @@ function _requireUniqueCanonicalPaths(
 
 async function _canonicalFilesFromManifest(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     manifest: SupabaseBackupManifest;
   }>,
 ): Promise<CanonicalFilePaths[]> {
@@ -177,7 +177,7 @@ function _requireCanonicalFileContainment(
 
 async function _requireCanonicalManifestPaths(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     manifest: SupabaseBackupManifest;
     paths: RestorePaths;
   }>,

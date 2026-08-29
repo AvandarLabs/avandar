@@ -1,5 +1,5 @@
 import path from "node:path";
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
+import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { SupabaseStatus } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
 import { printError, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
@@ -107,7 +107,7 @@ function _printReport(report: Readonly<SupabaseStatusReport>): void {
 export const SupabaseStatusCli = Acclimate.createCLI("status")
   .description("Report the local Supabase project, ports, and keys in use")
   .action(() => {
-    const io = createSupabaseLocalEnvironmentIO(process.cwd());
+    const io = createSupabaseLocalEnvironmentIo(process.cwd());
     return SupabaseStatus.readStatusReport(io)
       .then(_printReport)
       .catch((error: unknown) => {

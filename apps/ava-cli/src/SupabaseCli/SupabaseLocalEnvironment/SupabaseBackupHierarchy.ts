@@ -1,10 +1,10 @@
 import path from "node:path";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { promiseMapSequential } from "@avandar/utils";
-import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { SupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type PrepareBackupHierarchyOptions = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   branch: string;
   worktreePath: string;
   backupDirectory: string;
@@ -12,7 +12,7 @@ type PrepareBackupHierarchyOptions = {
 
 async function _canonicalWorktreeRoot(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     worktreePath: string;
   }>,
 ): Promise<string> {
@@ -40,7 +40,7 @@ function _canonicalBackupPath(
 
 async function _requireBackupDirectory(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     directoryPath: string;
     expectedCanonicalPath: string;
   }>,
@@ -60,7 +60,7 @@ async function _requireBackupDirectory(
 
 async function _reserveValidatedBackupDirectory(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     canonicalRoot: string;
     directoryPath: string;
   }>,
@@ -112,7 +112,7 @@ async function _prepareBackupHierarchy(
 
 async function _validateBackupHierarchy(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     branch: string;
     worktreePath: string;
   }>,

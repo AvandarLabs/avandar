@@ -5,7 +5,7 @@ import { promiseMap } from "@avandar/utils";
 import type {
   CommandResult,
   SupabaseBackupManifest,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   SupabaseSwitchResult,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
@@ -19,7 +19,7 @@ function _requireCommandSuccess(
 }
 
 async function _readExistingManifest(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<{ branch: string; manifest: SupabaseBackupManifest } | undefined> {
   const branch = await io.readBranch();
   if (branch === "") {
@@ -48,7 +48,7 @@ async function _readExistingManifest(
  * second switch.
  */
 export async function startExistingSwitch(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<SupabaseSwitchResult> {
   const existing = await _readExistingManifest(io);
   if (existing === undefined) {
@@ -78,7 +78,7 @@ export async function startExistingSwitch(
  * backup behind.
  */
 export async function readExistingSwitchProjectId(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<string | undefined> {
   const existing = await _readExistingManifest(io);
   return existing?.manifest.temporaryProjectId;

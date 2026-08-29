@@ -10,7 +10,7 @@ import type {
   DevelopmentEnvFile,
   SupabaseBackupManifest,
   SupabaseEnvironmentDrift,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   SupabaseLocalStatus,
   SupabaseStatusEntry,
   SupabaseStatusReport,
@@ -150,7 +150,7 @@ function _makeStatusReport(
 /** Reads this branch's backup manifest, if a switch left one behind. */
 async function _readManifest(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     branch: string;
     worktreePath: string;
   }>,
@@ -171,14 +171,14 @@ async function _readManifest(
 }
 
 async function _readStatusJson(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<string | undefined> {
   const result = await io.runSupabase(["status", "-o", "json"]);
   return result.ok ? result.stdout : undefined;
 }
 
 async function _readStatusReport(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<SupabaseStatusReport> {
   const [branch, worktreePath, configContents, envFilePaths, statusJson] =
     await Promise.all([

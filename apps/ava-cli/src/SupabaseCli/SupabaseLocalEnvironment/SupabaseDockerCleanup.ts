@@ -8,7 +8,7 @@ import {
 } from "@avandar/utils";
 import type {
   SupabaseDockerResource,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 const DOCKER_IDENTIFIER_PATTERN = /^[a-f0-9]{64}$/;
@@ -17,7 +17,7 @@ const DOCKER_VOLUME_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,254}$/;
 
 async function _cleanupTemporaryProject(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     temporaryProjectId: string;
   }>,
 ): Promise<Error | undefined> {
@@ -70,7 +70,7 @@ function _orderDockerResources(
 
 async function _removeTemporaryResource(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     resource: SupabaseDockerResource;
     temporaryProjectId: string;
   }>,
@@ -100,7 +100,7 @@ async function _removeTemporaryResource(
 
 async function _removeTemporaryResources(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     resources: readonly SupabaseDockerResource[];
     temporaryProjectId: string;
   }>,

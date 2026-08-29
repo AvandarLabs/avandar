@@ -1,5 +1,5 @@
-import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/RunLocalCommand/RunLocalCommand";
-import type { SupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
+import type { SupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 /** The seed entry point `pnpm db:seed` runs once the stack is already up. */
 const SEED_SCRIPT_ARGUMENTS = [
@@ -18,9 +18,9 @@ const SEED_SCRIPT_ARGUMENTS = [
  * stack the worktree used before. `supabase start` is skipped for the same
  * reason it is unnecessary: the caller has just started the project.
  */
-export function createSeedIO(
+export function createSeedIo(
   projectRoot: string,
-): Pick<SupabaseLocalEnvironmentIO, "runSeed"> {
+): Pick<SupabaseLocalEnvironmentIo, "runSeed"> {
   return {
     runSeed: async ({ supabaseUrl, serviceRoleKey }) => {
       return await RunLocalCommand.run({

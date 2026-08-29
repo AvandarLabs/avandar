@@ -8,7 +8,7 @@ import type {
   CommandResult,
   RestorePreparation,
   SupabaseBackupManifest,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   SupabaseLocalStatus,
   SupabaseSeedOutcome,
   SupabaseSwitchResult,
@@ -16,7 +16,7 @@ import type {
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type RollbackSwitchOptions = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   backupDirectory: string;
   manifest: SupabaseBackupManifest;
   switchError: unknown;
@@ -33,7 +33,7 @@ function _requireCommandSuccess(
 
 async function _rewriteDevelopmentEnvironments(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     envFiles: readonly string[];
     status: SupabaseLocalStatus;
     devServerPort: number;
@@ -130,7 +130,7 @@ async function _rollbackSwitch(
 
 async function _activateSwitch(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     preparation: SwitchPreparation;
     temporaryProjectId: string;
   }>,
@@ -189,7 +189,7 @@ async function _activateSwitch(
  */
 async function _seedSwitchedProject(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     status: SupabaseLocalStatus;
     skipSeed: boolean;
   }>,
@@ -219,7 +219,7 @@ async function _seedSwitchedProject(
 
 async function _switch(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     temporaryProjectId: string;
     requestedBasePort?: number;
     skipSeed?: boolean;
@@ -255,7 +255,7 @@ async function _switch(
 
 async function _removeRestoredBackup(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     preparation: RestorePreparation;
     cleanupError: Error | undefined;
   }>,
@@ -275,7 +275,7 @@ async function _removeRestoredBackup(
 
 async function _restoreCleanupError(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     preparation: RestorePreparation;
   }>,
 ): Promise<Error | undefined> {
@@ -292,7 +292,7 @@ async function _restoreCleanupError(
 }
 
 async function _restore(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<void> {
   const preparation =
     await SupabaseRestorePreparation.readRestorePreparation(io);

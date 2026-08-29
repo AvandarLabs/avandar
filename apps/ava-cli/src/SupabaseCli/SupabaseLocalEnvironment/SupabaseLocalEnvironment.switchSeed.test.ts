@@ -3,11 +3,11 @@ import {
   CONFIG_PATH,
   ENV_PATH,
   ORIGINAL_CONFIG,
-  SupabaseLocalEnvironmentFakeIO,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/SupabaseLocalEnvironmentFakeIO";
+  SupabaseLocalEnvironmentFakeIo,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { describe, expect, it } from "vitest";
 
-const { create: createFakeIO } = SupabaseLocalEnvironmentFakeIO;
+const { create: createFakeIo } = SupabaseLocalEnvironmentFakeIo;
 
 /** The connection the fake `supabase status` reports for the new stack. */
 const NEW_STACK_SEED_TARGET = {
@@ -17,7 +17,7 @@ const NEW_STACK_SEED_TARGET = {
 
 describe("SupabaseLocalEnvironment.switch (seeding)", () => {
   it("seeds the stack the switch just started", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -28,7 +28,7 @@ describe("SupabaseLocalEnvironment.switch (seeding)", () => {
   });
 
   it("seeds only once the switch has finished writing its files", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     await SupabaseLocalEnvironment.switch({
       io: fake.io,
       temporaryProjectId: "analytics-p2-temp",
@@ -39,7 +39,7 @@ describe("SupabaseLocalEnvironment.switch (seeding)", () => {
   });
 
   it("leaves the database unseeded when the seed is skipped", async () => {
-    const fake = createFakeIO();
+    const fake = createFakeIo();
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -51,7 +51,7 @@ describe("SupabaseLocalEnvironment.switch (seeding)", () => {
   });
 
   it("keeps the switched project when the seed fails", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       seedResult: { ok: false, stdout: "", stderr: "seed job blew up" },
     });
     await expect(
@@ -68,7 +68,7 @@ describe("SupabaseLocalEnvironment.switch (seeding)", () => {
   });
 
   it("reports a seed that could not be launched as a failure", async () => {
-    const fake = createFakeIO({ seedError: "pnpm is not installed" });
+    const fake = createFakeIo({ seedError: "pnpm is not installed" });
     await expect(
       SupabaseLocalEnvironment.switch({
         io: fake.io,
@@ -80,7 +80,7 @@ describe("SupabaseLocalEnvironment.switch (seeding)", () => {
   });
 
   it("does not seed a switch that rolled back", async () => {
-    const fake = createFakeIO({
+    const fake = createFakeIo({
       commandResults: {
         start: { ok: false, stdout: "", stderr: "start failed" },
       },

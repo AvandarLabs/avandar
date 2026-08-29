@@ -1,7 +1,7 @@
 import { EventEmitter } from "node:events";
 import path from "node:path";
 import { PassThrough } from "node:stream";
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
+import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const commandMocks = vi.hoisted(() => {
@@ -35,7 +35,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("createSupabaseLocalEnvironmentIO streaming", () => {
+describe("createSupabaseLocalEnvironmentIo streaming", () => {
   it("streams the repository Supabase CLI when requested", async () => {
     _setStreamingCommandSuccess();
     const stdoutChunks: string[] = [];
@@ -47,7 +47,7 @@ describe("createSupabaseLocalEnvironmentIO streaming", () => {
       return true;
     });
     const projectRoot = path.resolve(process.cwd());
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(
       io.runSupabase(["start"], { outputMode: "stream" }),

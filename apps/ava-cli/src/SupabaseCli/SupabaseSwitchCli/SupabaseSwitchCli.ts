@@ -1,4 +1,4 @@
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
+import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { runSupabaseSwitch } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/runSupabaseSwitch/runSupabaseSwitch";
 import {
   printError,
@@ -124,7 +124,7 @@ export const SupabaseSwitchCli = Acclimate.createCLI("switch")
       }>,
     ) => {
       return runSupabaseSwitch({
-        io: createSupabaseLocalEnvironmentIO(process.cwd()),
+        io: createSupabaseLocalEnvironmentIo(process.cwd()),
         requestedProjectId: commandArguments.temporaryProjectId,
         requestedBasePort: commandArguments.requestedBasePort,
         skipSeed: commandArguments.noSeed,

@@ -9,25 +9,25 @@ import { z } from "zod";
 import type {
   SupabaseBackupFile,
   SupabaseBackupManifest,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type CopyFileToBackupOptions = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   sourcePath: string;
   worktreePath: string;
   filesDirectory: string;
 };
 
 type CopyFilesToBackupOptions = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   sourcePaths: readonly string[];
   worktreePath: string;
   filesDirectory: string;
 };
 
 type CreateBackupOptions = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   branch: string;
   worktreePath: string;
   backupDirectory: string;
@@ -51,7 +51,7 @@ const SupabaseBackupManifestSchema = z.object({
 
 async function _writeManifest(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     backupDirectory: string;
     manifest: SupabaseBackupManifest;
   }>,
@@ -92,7 +92,7 @@ async function _copyFilesToBackup(
 
 async function _failBackupCreation(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     backupDirectory: string;
     error: unknown;
   }>,
@@ -139,7 +139,7 @@ async function _createBackup(
 
 async function _readManifest(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     backupDirectory: string;
   }>,
 ): Promise<SupabaseBackupManifest> {
@@ -155,7 +155,7 @@ async function _readManifest(
 
 async function _restoreFiles(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     manifest: SupabaseBackupManifest;
   }>,
 ): Promise<void> {

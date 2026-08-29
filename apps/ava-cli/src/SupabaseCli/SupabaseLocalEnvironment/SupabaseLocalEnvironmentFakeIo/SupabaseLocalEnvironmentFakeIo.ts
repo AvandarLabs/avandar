@@ -1,11 +1,11 @@
 import path from "node:path";
-import { createSupabaseLocalEnvironmentFakeReadIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIO/createSupabaseLocalEnvironmentFakeReadIO";
+import { createSupabaseLocalEnvironmentFakeReadIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/createSupabaseLocalEnvironmentFakeReadIo";
 import type {
   CommandOutputMode,
   CommandResult,
   SupabaseDockerResource,
   SupabaseDockerResourceInspection,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   SupabaseSeedTarget,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
@@ -77,7 +77,7 @@ export type FakeOptions = {
 
 /** Mutable state and I/O adapter exposed to local-environment tests. */
 export type FakeHarness = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   files: Map<string, string>;
   directories: Set<string>;
   commands: string[][];
@@ -123,9 +123,9 @@ function _createFakeState(options: Readonly<FakeOptions>): FakeState {
   };
 }
 
-function _createFakeDevelopmentEnvIO(
+function _createFakeDevelopmentEnvIo(
   factoryOptions: Readonly<FakeFactoryOptions>,
-): Pick<SupabaseLocalEnvironmentIO, "findDevelopmentEnvFiles"> {
+): Pick<SupabaseLocalEnvironmentIo, "findDevelopmentEnvFiles"> {
   const { options, state } = factoryOptions;
   return {
     findDevelopmentEnvFiles: async () => {
@@ -146,10 +146,10 @@ function _createFakeDevelopmentEnvIO(
   };
 }
 
-function _createFakeWriteIO(
+function _createFakeWriteIo(
   factoryOptions: Readonly<FakeFactoryOptions>,
 ): Pick<
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   "writeTextFile" | "copyFile" | "makeDirectory" | "reserveDirectory"
 > {
   const { options, state } = factoryOptions;
@@ -190,9 +190,9 @@ function _createFakeWriteIO(
   };
 }
 
-function _createFakePathIO(
+function _createFakePathIo(
   factoryOptions: Readonly<FakeFactoryOptions>,
-): Pick<SupabaseLocalEnvironmentIO, "removePath" | "pathExists" | "realPath"> {
+): Pick<SupabaseLocalEnvironmentIo, "removePath" | "pathExists" | "realPath"> {
   const { options, state } = factoryOptions;
   return {
     removePath: async (targetPath) => {
@@ -235,10 +235,10 @@ function _createFakePathIO(
   };
 }
 
-function _createFakeDockerIO(
+function _createFakeDockerIo(
   factoryOptions: Readonly<FakeFactoryOptions>,
 ): Pick<
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   | "hasSupabaseResources"
   | "listSupabaseResources"
   | "inspectSupabaseResource"
@@ -278,10 +278,10 @@ function _createFakeDockerIO(
   };
 }
 
-function _createFakeCommandIO(
+function _createFakeCommandIo(
   factoryOptions: Readonly<FakeFactoryOptions>,
 ): Pick<
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
   | "readBranch"
   | "readWorktreePath"
   | "isPortAvailable"
@@ -329,17 +329,17 @@ function _createFakeCommandIO(
   };
 }
 
-function _createFakeIO(options: Readonly<FakeOptions> = {}): FakeHarness {
+function _createFakeIo(options: Readonly<FakeOptions> = {}): FakeHarness {
   const state = _createFakeState(options);
   const factoryOptions = { options, state };
-  const io: SupabaseLocalEnvironmentIO = {
+  const io: SupabaseLocalEnvironmentIo = {
     projectRoot: PROJECT_ROOT,
-    ...createSupabaseLocalEnvironmentFakeReadIO(factoryOptions),
-    ..._createFakeDevelopmentEnvIO(factoryOptions),
-    ..._createFakeWriteIO(factoryOptions),
-    ..._createFakePathIO(factoryOptions),
-    ..._createFakeDockerIO(factoryOptions),
-    ..._createFakeCommandIO(factoryOptions),
+    ...createSupabaseLocalEnvironmentFakeReadIo(factoryOptions),
+    ..._createFakeDevelopmentEnvIo(factoryOptions),
+    ..._createFakeWriteIo(factoryOptions),
+    ..._createFakePathIo(factoryOptions),
+    ..._createFakeDockerIo(factoryOptions),
+    ..._createFakeCommandIo(factoryOptions),
   };
   return {
     io,
@@ -355,9 +355,9 @@ function _createFakeIO(options: Readonly<FakeOptions> = {}): FakeHarness {
 }
 
 /** Builds and keys the fake I/O boundary used by local-environment tests. */
-export const SupabaseLocalEnvironmentFakeIO = {
+export const SupabaseLocalEnvironmentFakeIo = {
   /** Creates a mutable fake harness with configurable boundary behavior. */
-  create: _createFakeIO,
+  create: _createFakeIo,
 
   /** Returns the stable lookup key for a fake Docker resource. */
   getResourceKeyFromResource: _getResourceKeyFromResource,

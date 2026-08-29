@@ -9,14 +9,14 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { createSupabaseLocalEnvironmentIO } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIO/createSupabaseLocalEnvironmentIO";
+import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
 import { promiseMap } from "@avandar/utils";
 import { afterEach, describe, expect, it } from "vitest";
 
 let temporaryDirectories: string[] = [];
 
 type RelativePathAssertionOptions = {
-  io: ReturnType<typeof createSupabaseLocalEnvironmentIO>;
+  io: ReturnType<typeof createSupabaseLocalEnvironmentIo>;
   projectRoot: string;
   sourcePath: string;
   targetPath: string;
@@ -74,13 +74,13 @@ async function _expectRelativePathsToReject(
   );
 }
 
-describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
+describe("createSupabaseLocalEnvironmentIo (filesystem and paths)", () => {
   it("distinguishes files from directories", async () => {
     const projectRoot = await mkdtemp(path.join(tmpdir(), "ava-supabase-io-"));
     temporaryDirectories.push(projectRoot);
     const filePath = path.join(projectRoot, "file.txt");
     await writeFile(filePath, "file", "utf8");
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.isFile(filePath)).resolves.toBe(true);
     await expect(io.isFile(projectRoot)).resolves.toBe(false);
@@ -93,7 +93,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
     const symlinkPath = path.join(projectRoot, "target-link.txt");
     await writeFile(targetPath, "target", "utf8");
     await symlink(targetPath, symlinkPath);
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.isFile(symlinkPath)).resolves.toBe(false);
   });
@@ -107,7 +107,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
     await mkdir(directoryPath);
     await symlink(directoryPath, symlinkPath);
     await writeFile(filePath, "file", "utf8");
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.isDirectory(directoryPath)).resolves.toBe(true);
     await expect(io.isDirectory(symlinkPath)).resolves.toBe(false);
@@ -121,7 +121,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
       writeFile(path.join(projectRoot, "second.txt"), "second", "utf8"),
       writeFile(path.join(projectRoot, "first.txt"), "first", "utf8"),
     ]);
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.readDirectory(projectRoot)).resolves.toEqual([
       "first.txt",
@@ -133,7 +133,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
     const projectRoot = await mkdtemp(path.join(tmpdir(), "ava-supabase-io-"));
     temporaryDirectories.push(projectRoot);
     const reservationPath = path.join(projectRoot, "reservation");
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.reserveDirectory(reservationPath)).resolves.toBe(true);
     await expect(io.reserveDirectory(reservationPath)).resolves.toBe(false);
@@ -146,7 +146,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
     const symlinkPath = path.join(projectRoot, "target-link.txt");
     await writeFile(targetPath, "target", "utf8");
     await symlink(targetPath, symlinkPath);
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.realPath(symlinkPath)).resolves.toBe(
       await realpath(targetPath),
@@ -158,7 +158,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
     temporaryDirectories.push(projectRoot);
     const symlinkPath = path.join(projectRoot, "dangling-link.txt");
     await symlink(path.join(projectRoot, "missing.txt"), symlinkPath);
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.pathExists(symlinkPath)).resolves.toBe(true);
   });
@@ -177,7 +177,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
       },
     );
 
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
     await expect(io.findDevelopmentEnvFiles()).resolves.toEqual([
       path.join(projectRoot, ".env.development"),
       path.join(projectRoot, ".env.development.edge"),
@@ -193,7 +193,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
     await writeFile(targetPath, "target", "utf8");
     await mkdir(directoryPath);
     await symlink(targetPath, symlinkPath);
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await expect(io.findDevelopmentEnvFiles()).resolves.toEqual([
       directoryPath,
@@ -203,7 +203,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
 
   it("rejects a relative project root", () => {
     expect(() => {
-      return createSupabaseLocalEnvironmentIO("relative-project-root");
+      return createSupabaseLocalEnvironmentIo("relative-project-root");
     }).toThrow("absolute");
   });
 
@@ -219,7 +219,7 @@ describe("createSupabaseLocalEnvironmentIO (filesystem and paths)", () => {
       writeFile(targetPath, "target", "utf8"),
       writeFile(removePath, "do not remove", "utf8"),
     ]);
-    const io = createSupabaseLocalEnvironmentIO(projectRoot);
+    const io = createSupabaseLocalEnvironmentIo(projectRoot);
 
     await _expectRelativePathsToReject({
       io,

@@ -13,7 +13,7 @@ import type {
   RestorePaths,
   RestorePreparation,
   SupabaseBackupManifest,
-  SupabaseLocalEnvironmentIO,
+  SupabaseLocalEnvironmentIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 
 type DeterministicManifestFilesOptions = {
@@ -25,7 +25,7 @@ type DeterministicManifestFilesOptions = {
 };
 
 type ValidateRestoreManifestOptions = {
-  io: SupabaseLocalEnvironmentIO;
+  io: SupabaseLocalEnvironmentIo;
   manifest: SupabaseBackupManifest;
   branch: string;
   paths: RestorePaths;
@@ -93,7 +93,7 @@ function _requireDeterministicManifestFiles(
 
 async function _requireExistingBackupFiles(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     manifest: SupabaseBackupManifest;
   }>,
 ): Promise<void> {
@@ -113,7 +113,7 @@ async function _requireExistingBackupFiles(
 
 async function _requireCurrentSourcesInManifest(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     manifest: SupabaseBackupManifest;
   }>,
 ): Promise<void> {
@@ -139,7 +139,7 @@ async function _requireCurrentSourcesInManifest(
 
 async function _requireCompleteRestoreFiles(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     manifest: SupabaseBackupManifest;
     paths: RestorePaths;
   }>,
@@ -195,7 +195,7 @@ async function _validateRestoreManifest(
 
 async function _hasProvenRestoreOwnership(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     manifest: SupabaseBackupManifest;
   }>,
 ): Promise<boolean> {
@@ -225,7 +225,7 @@ async function _hasProvenRestoreOwnership(
 
 async function _requireSafeManifestFile(
   options: Readonly<{
-    io: SupabaseLocalEnvironmentIO;
+    io: SupabaseLocalEnvironmentIo;
     backupDirectory: string;
   }>,
 ): Promise<void> {
@@ -253,7 +253,7 @@ async function _requireSafeManifestFile(
 }
 
 async function _readRestorePreparation(
-  io: Readonly<SupabaseLocalEnvironmentIO>,
+  io: Readonly<SupabaseLocalEnvironmentIo>,
 ): Promise<RestorePreparation> {
   const branch = await io.readBranch();
   if (branch === "") {
