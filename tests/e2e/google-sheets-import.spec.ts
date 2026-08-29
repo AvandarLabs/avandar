@@ -214,7 +214,11 @@ async function _cleanUpGoogleSheetImport(
 }
 
 test.describe("Google Sheets connector", () => {
-  test("imports a picked sheet, parsing a column that turns into prose", async ({
+  // Named for what it asserts: the row count after the transcode. It does not
+  // assert the column's type, which the import does not surface yet. See
+  // `tests/data/google-sheet-late-prose/README.md` for why the prose row is
+  // the thing that used to break the read.
+  test("imports every row when a numeric column ends in prose", async ({
     page,
     e2eWorkerDb,
   }) => {
