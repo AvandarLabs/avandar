@@ -77,10 +77,11 @@ locally):
 | `E2E_GOOGLE_SHEET_SECOND_TAB` | Optional; the tab the real test imports, default `Cities` |
 | `E2E_GOOGLE_EMAIL`         | Optional; only fills `tokens__google.google_email`       |
 
-The first two are what the gate reads. With `--third-party` passed and either
+The first two are what the gate reads. With `PLAYWRIGHT_E2E_THIRD_PARTY` set
+and either
 missing, the test **fails** rather than skipping, because a green run that
 quietly skipped the only test that reaches Google is indistinguishable from one
-that did not. Without `--third-party` the same absence is a skip, so a machine
+that did not. Without it the same absence is a skip, so a machine
 that was never set up stays green.
 
 It seeds the token with an expiry **in the past** on purpose, so the route

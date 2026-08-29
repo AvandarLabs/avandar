@@ -27,8 +27,8 @@ export const E2E_THIRD_PARTY_TAG = "@third-party";
  * True when the run was invoked to exercise the third-party specs.
  *
  * Set by `pnpm test:e2e:third-party` and
- * `./scripts/test-runners/run-all-tests.sh --third-party`. It both narrows the
- * run to the tagged specs and makes a missing credential fail rather than
+ * `./scripts/test-runners/run-all-tests.sh --e2e-third-party`. It both narrows
+ * the run to the tagged specs and makes a missing credential fail rather than
  * skip.
  */
 export function isE2EThirdPartyMode(): boolean {
