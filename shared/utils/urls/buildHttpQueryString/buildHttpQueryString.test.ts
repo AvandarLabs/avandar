@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildHttpQueryString } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString";
+import { buildHttpQueryString } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString.ts";
 
 /**
  * What goes in a URL, and what must not.
