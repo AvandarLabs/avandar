@@ -23,12 +23,12 @@ xlsx callers record for every column.
 The second tab (`Country`) exists so the tab selector has more than one option,
 which keeps a first-tab default from passing by accident.
 
-The spec imports `TOTAL_ROW_COUNT`, the tab titles and the fixture path from
-`makeFixture.ts`, so what the tests assert and what the workbook contains cannot
-drift apart.
+The spec imports `TOTAL_ROW_COUNT`, the tab titles and the workbook path from
+`makeTestXlsxData.ts`, so what the tests assert and what the workbook contains
+cannot drift apart.
 
 Regenerate with:
 
 ```bash
-node tests/data/google-sheet-late-prose/makeFixture.ts
+node tests/data/google-sheet-late-prose/makeTestXlsxData.ts
 ```

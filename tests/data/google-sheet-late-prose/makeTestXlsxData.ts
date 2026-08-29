@@ -11,7 +11,7 @@ import * as XLSX from "xlsx";
  * the shape stated below. Regenerate with:
  *
  * ```bash
- * node tests/data/google-sheet-late-prose/makeFixture.ts
+ * node tests/data/google-sheet-late-prose/makeTestXlsxData.ts
  * ```
  *
  * The spec imports the counts and tab names from here, so the fixture and the
@@ -49,13 +49,19 @@ export const LATE_PROSE =
   "education.";
 
 /** The path this fixture is written to and read from. */
-export const FIXTURE_PATH = path.join(
+export const TEST_XLSX_PATH = path.join(
   import.meta.dirname,
   "google-sheet-late-prose.xlsx",
 );
 
-/** Writes the fixture workbook to {@link FIXTURE_PATH}. */
-export function makeFixture(): void {
+/**
+ * Writes the test workbook to {@link TEST_XLSX_PATH}.
+ *
+ * Named for what it produces rather than for a "fixture", which in a
+ * Playwright tree already means an injected per-test resource like the ones in
+ * `tests/e2e/fixtures/`.
+ */
+export function makeTestXlsxData(): void {
   const rows: Array<[string, string | number]> = [
     ["series_code", "indicator_value"],
     ...Array.from(
@@ -84,7 +90,7 @@ export function makeFixture(): void {
   );
 
   writeFileSync(
-    FIXTURE_PATH,
+    TEST_XLSX_PATH,
     XLSX.write(workbook, { bookType: "xlsx", type: "buffer" }),
   );
 }
@@ -92,5 +98,5 @@ export function makeFixture(): void {
 // Importing this module must not write the fixture: the spec imports the
 // counts above, and a test run has no business rewriting its own inputs.
 if (import.meta.main) {
-  makeFixture();
+  makeTestXlsxData();
 }

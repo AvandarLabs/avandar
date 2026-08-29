@@ -2,10 +2,10 @@ import { readFileSync } from "node:fs";
 import * as XLSX from "xlsx";
 import {
   COUNTRY_TAB_TITLE,
-  FIXTURE_PATH,
+  TEST_XLSX_PATH,
   SERIES_TAB_TITLE,
   TOTAL_ROW_COUNT,
-} from "../data/google-sheet-late-prose/makeFixture";
+} from "../data/google-sheet-late-prose/makeTestXlsxData";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { installFakeGooglePicker } from "./helpers/installFakeGooglePicker";
@@ -72,7 +72,7 @@ function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
  */
 async function _stubGoogleSheet(page: Page): Promise<DriveRequestLog> {
   const log: DriveRequestLog = { urls: [] };
-  const workbook = XLSX.read(readFileSync(FIXTURE_PATH), { type: "buffer" });
+  const workbook = XLSX.read(readFileSync(TEST_XLSX_PATH), { type: "buffer" });
   const csvByGid = new Map(
     FIXTURE_TABS.map((tab) => {
       const worksheet = workbook.Sheets[workbook.SheetNames[tab.index]!]!;
