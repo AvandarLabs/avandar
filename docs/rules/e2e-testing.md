@@ -10,7 +10,7 @@ review-agent form of these rules is in
 
 A spec that reaches a real third-party service is tagged with
 `E2E_THIRD_PARTY_TAG` (`@third-party`, from
-`tests/e2e/setup/e2eThirdPartyMode/`). The tag does not decide whether the spec
+`tests/e2e/setup/E2eThirdPartyMode/`). The tag does not decide whether the spec
 runs. It decides what a **missing credential** means:
 
 | Command                                                          | Runs                                                   | A missing env var on a tagged spec                 |
@@ -23,7 +23,7 @@ runs. It decides what a **missing credential** means:
 | `./scripts/test-runners/run-all-tests.sh --e2e-skip-third-party` | the unit suites, then everything except `@third-party` | n/a                                                |
 | `./scripts/test-runners/run-all-tests.sh --e2e-offline`          | the unit suites, then the specs that need no network   | n/a                                                |
 
-Read credentials with `requireE2EThirdPartyEnv({ test, variableNames })`, which
+Read credentials with `E2eThirdPartyMode.requireEnv({ test, variableNames })`, which
 applies that asymmetry for you. Never read `process.env` for them directly in a
 spec, or you lose it.
 

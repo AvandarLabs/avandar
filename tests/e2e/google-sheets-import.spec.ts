@@ -14,8 +14,8 @@ import {
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import {
   E2E_THIRD_PARTY_TAG,
-  requireE2EThirdPartyEnv,
-} from "./setup/e2eThirdPartyMode/e2eThirdPartyMode";
+  E2eThirdPartyMode,
+} from "./setup/E2eThirdPartyMode/E2eThirdPartyMode";
 import type { Page, Route } from "@playwright/test";
 
 /**
@@ -347,7 +347,7 @@ test.describe("Google Sheets connector", () => {
         const {
           E2E_GOOGLE_SHEET_ID: realSheetId,
           E2E_GOOGLE_REFRESH_TOKEN: realRefreshToken,
-        } = requireE2EThirdPartyEnv({
+        } = E2eThirdPartyMode.requireEnv({
           test,
           variableNames: ["E2E_GOOGLE_SHEET_ID", "E2E_GOOGLE_REFRESH_TOKEN"],
         });

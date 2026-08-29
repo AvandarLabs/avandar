@@ -6,9 +6,8 @@ import { E2EPreflight } from "./tests/e2e/setup/E2EPreflight";
 import {
   E2E_NO_THIRD_PARTY_FLAG,
   E2E_THIRD_PARTY_TAG,
-  isE2ENoThirdPartyMode,
-  isE2EThirdPartyMode,
-} from "./tests/e2e/setup/e2eThirdPartyMode/e2eThirdPartyMode";
+  E2eThirdPartyMode,
+} from "./tests/e2e/setup/E2eThirdPartyMode/E2eThirdPartyMode";
 import {
   E2E_ONLINE_TAG,
   ensureE2EViteFeatureFlags,
@@ -63,7 +62,7 @@ const e2eFeatureFlags = mergeE2EFeatureFlags();
 // Rejected rather than silently resolved: a third-party spec exists to reach a
 // real service over the network, which is the one thing an offline run has
 // declared it cannot do, so the pair can only be a mistake.
-if (isE2EOfflineMode() && isE2EThirdPartyMode()) {
+if (isE2EOfflineMode() && E2eThirdPartyMode.isRequested()) {
   throw new Error(
     "PLAYWRIGHT_E2E_OFFLINE and PLAYWRIGHT_E2E_THIRD_PARTY are contradictory: " +
       "the third-party specs exist to reach a real service over the network.",
@@ -72,7 +71,7 @@ if (isE2EOfflineMode() && isE2EThirdPartyMode()) {
 
 // Same reasoning: a run told to leave the third-party specs out cannot also be
 // the run that exists to exercise them.
-if (isE2ENoThirdPartyMode() && isE2EThirdPartyMode()) {
+if (E2eThirdPartyMode.isExcluded() && E2eThirdPartyMode.isRequested()) {
   throw new Error(
     `${E2E_NO_THIRD_PARTY_FLAG} and PLAYWRIGHT_E2E_THIRD_PARTY are ` +
       "contradictory: one drops the third-party specs and the other runs " +
@@ -86,7 +85,7 @@ if (isE2ENoThirdPartyMode() && isE2EThirdPartyMode()) {
 function buildGrepInvert(): RegExp | undefined {
   const excludedTags = [
     ...(isE2EOfflineMode() ? [E2E_ONLINE_TAG] : []),
-    ...(isE2EOfflineMode() || isE2ENoThirdPartyMode()
+    ...(isE2EOfflineMode() || E2eThirdPartyMode.isExcluded()
       ? [E2E_THIRD_PARTY_TAG]
       : []),
   ];
@@ -170,8 +169,10 @@ export default defineConfig({
   // Narrows the run to the tagged specs, so `pnpm test:e2e:third-party` is how
   // you exercise the live paths without waiting for the whole suite. Their
   // missing-credential handling turns loud in the same mode; see
-  // `requireE2EThirdPartyEnv`.
-  grep: isE2EThirdPartyMode() ? new RegExp(E2E_THIRD_PARTY_TAG) : undefined,
+  // `E2eThirdPartyMode.requireEnv`.
+  grep: E2eThirdPartyMode.isRequested()
+    ? new RegExp(E2E_THIRD_PARTY_TAG)
+    : undefined,
   // An offline run excludes both: the `@online` specs need a network-fetched
   // DuckDB extension, and the `@third-party` ones need a real service.
   // Excluding them beats letting them time out. `--no-third-party` excludes

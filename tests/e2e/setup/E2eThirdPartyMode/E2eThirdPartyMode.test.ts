@@ -1,11 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  getMissingE2EThirdPartyEnv,
-  isE2ENoThirdPartyMode,
-  isE2EThirdPartyMode,
-  requireE2EThirdPartyEnv,
-} from "./e2eThirdPartyMode";
-import type { E2ETestSkip } from "./e2eThirdPartyMode";
+import { E2eThirdPartyMode } from "./E2eThirdPartyMode";
+import type { E2eTestSkip } from "./E2eThirdPartyMode";
 
 const originalThirdParty = process.env.PLAYWRIGHT_E2E_THIRD_PARTY;
 const originalNoThirdParty = process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY;
@@ -17,7 +12,7 @@ const originalNoThirdParty = process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY;
  * never reaches the line after it. The fake deliberately does not, which is how
  * the "must not fall through" throw gets covered.
  */
-function _fakeTest(): E2ETestSkip & {
+function _fakeTest(): E2eTestSkip & {
   skip: ReturnType<typeof vi.fn>;
 } {
   return { skip: vi.fn() };
@@ -30,39 +25,39 @@ afterEach(() => {
   delete process.env.E2E_FAKE_ID;
 });
 
-describe("isE2EThirdPartyMode", () => {
+describe("E2eThirdPartyMode.isRequested", () => {
   it("is off for a default run", () => {
     delete process.env.PLAYWRIGHT_E2E_THIRD_PARTY;
 
-    expect(isE2EThirdPartyMode()).toBe(false);
+    expect(E2eThirdPartyMode.isRequested()).toBe(false);
   });
 
   it("is on only for the exact opt-in value", () => {
     process.env.PLAYWRIGHT_E2E_THIRD_PARTY = "1";
-    expect(isE2EThirdPartyMode()).toBe(true);
+    expect(E2eThirdPartyMode.isRequested()).toBe(true);
 
     // Anything else is off, so a stray `=true` or `=0` cannot turn a default
     // run's skips into failures.
     process.env.PLAYWRIGHT_E2E_THIRD_PARTY = "true";
-    expect(isE2EThirdPartyMode()).toBe(false);
+    expect(E2eThirdPartyMode.isRequested()).toBe(false);
   });
 });
 
-describe("isE2ENoThirdPartyMode", () => {
+describe("E2eThirdPartyMode.isExcluded", () => {
   it("is off for a default run", () => {
     delete process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY;
 
-    expect(isE2ENoThirdPartyMode()).toBe(false);
+    expect(E2eThirdPartyMode.isExcluded()).toBe(false);
   });
 
   it("is on only for the exact opt-in value", () => {
     process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY = "1";
-    expect(isE2ENoThirdPartyMode()).toBe(true);
+    expect(E2eThirdPartyMode.isExcluded()).toBe(true);
 
     // Anything else is off, so a stray value cannot silently drop the
     // third-party specs from a run that meant to include them.
     process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY = "true";
-    expect(isE2ENoThirdPartyMode()).toBe(false);
+    expect(E2eThirdPartyMode.isExcluded()).toBe(false);
   });
 
   it("is independent of third-party mode", () => {
@@ -71,18 +66,18 @@ describe("isE2ENoThirdPartyMode", () => {
 
     // The two are contradictory, and `playwright.config.ts` is where that is
     // rejected. Neither reader infers the other's state.
-    expect(isE2ENoThirdPartyMode()).toBe(false);
-    expect(isE2EThirdPartyMode()).toBe(true);
+    expect(E2eThirdPartyMode.isExcluded()).toBe(false);
+    expect(E2eThirdPartyMode.isRequested()).toBe(true);
   });
 });
 
-describe("getMissingE2EThirdPartyEnv", () => {
+describe("E2eThirdPartyMode.getMissingEnv", () => {
   it("is empty when every variable is set", () => {
     process.env.E2E_FAKE_TOKEN = "token-value";
     process.env.E2E_FAKE_ID = "id-value";
 
     expect(
-      getMissingE2EThirdPartyEnv(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]),
+      E2eThirdPartyMode.getMissingEnv(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]),
     ).toEqual([]);
   });
 
@@ -91,7 +86,7 @@ describe("getMissingE2EThirdPartyEnv", () => {
     delete process.env.E2E_FAKE_ID;
 
     expect(
-      getMissingE2EThirdPartyEnv(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]),
+      E2eThirdPartyMode.getMissingEnv(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]),
     ).toEqual(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]);
   });
 
@@ -102,19 +97,19 @@ describe("getMissingE2EThirdPartyEnv", () => {
     process.env.E2E_FAKE_ID = "   ";
 
     expect(
-      getMissingE2EThirdPartyEnv(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]),
+      E2eThirdPartyMode.getMissingEnv(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]),
     ).toEqual(["E2E_FAKE_TOKEN", "E2E_FAKE_ID"]);
   });
 });
 
-describe("requireE2EThirdPartyEnv", () => {
+describe("E2eThirdPartyMode.requireEnv", () => {
   it("returns each requested value, trimmed", () => {
     process.env.E2E_FAKE_TOKEN = " token-value ";
     process.env.E2E_FAKE_ID = "id-value";
     const test = _fakeTest();
 
     expect(
-      requireE2EThirdPartyEnv({
+      E2eThirdPartyMode.requireEnv({
         test,
         variableNames: ["E2E_FAKE_TOKEN", "E2E_FAKE_ID"],
       }),
@@ -133,7 +128,7 @@ describe("requireE2EThirdPartyEnv", () => {
       // The throw only happens because the fake does not abort; Playwright's
       // `skip` does. What matters is that `skip` was the mechanism.
       expect(() => {
-        return requireE2EThirdPartyEnv({
+        return E2eThirdPartyMode.requireEnv({
           test,
           variableNames: ["E2E_FAKE_TOKEN", "E2E_FAKE_ID"],
         });
@@ -152,7 +147,7 @@ describe("requireE2EThirdPartyEnv", () => {
       const test = _fakeTest();
 
       expect(() => {
-        return requireE2EThirdPartyEnv({
+        return E2eThirdPartyMode.requireEnv({
           test,
           variableNames: ["E2E_FAKE_TOKEN"],
         });
@@ -167,7 +162,7 @@ describe("requireE2EThirdPartyEnv", () => {
       process.env.PLAYWRIGHT_E2E_THIRD_PARTY = "1";
 
       expect(() => {
-        return requireE2EThirdPartyEnv({
+        return E2eThirdPartyMode.requireEnv({
           test: _fakeTest(),
           variableNames: ["E2E_FAKE_TOKEN"],
         });
