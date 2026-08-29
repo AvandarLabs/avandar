@@ -58,6 +58,16 @@ Tag a spec only when it earns it: it is the only kind that catches the third
 party changing its contract, which every stubbed spec passes straight through.
 Anything the stub can prove belongs in an untagged spec.
 
+## Name a spec after what it asserts
+
+A spec name says what is true when it passes, never what it does on the way
+there. "parses", "handles" and "works" name activity and survive the deletion
+of the assertion itself. The rule and its checks live in
+[`testing.md`](testing.md#name-a-test-after-what-it-asserts) and apply here
+unchanged, with one thing e2e makes easier to get wrong: a spec that drives a
+long UI flow is tempting to name after the flow. Name it after the one thing
+its assertions require at the end.
+
 ## Diagnose a flake before fixing it
 
 An intermittent failure has a mechanism: an aged-process slowdown, a cold-start

@@ -9,6 +9,40 @@ This file is the core of the `tests` focused review. That pack applies
 this checklist only; it does not apply comment, naming, or file-layout
 rules from other phases.
 
+## Test names must state what the test asserts
+
+Flag a test name that describes activity rather than a claim. A name is read
+far more often than the body, almost always by someone triaging a failure, so
+it has one job: say what is true when the test passes.
+
+The tell is a process verb with no outcome attached: "parses", "handles",
+"processes", "works with", "supports", "checks". These survive any change to
+what is actually asserted, including the change that removes the assertion.
+
+```ts
+// Flag this. Passing tells you something was parsed, not what was required
+// of the result.
+test("imports a picked sheet, parsing a column that turns into prose", ...)
+
+// Recommend this. The name is the claim the assertions make.
+test("imports every row when a numeric column ends in prose", ...)
+```
+
+When recommending a rewrite:
+
+- Take the name from the assertions. If the name describes steps, restate it
+  as the outcome those steps have to produce.
+- Never let the name promise more than the body checks. A name claiming a
+  type, a count or an error the test does not assert is worse than a vague
+  one: it reports coverage that does not exist, so nobody adds it.
+- Keep the condition that made the test worth writing ("when the column ends
+  in prose"), so a failure reads as a specific regression.
+- A name needing "and" is usually two tests, unless the second half is a
+  precondition of the first.
+
+Apply the same test to `describe` blocks: the block plus the name is what the
+runner prints, so judge them together.
+
 ## Tautological and assertion-free tests
 
 Flag any test whose assertion can only fail if a symbol is deleted or renamed,

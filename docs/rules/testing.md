@@ -48,6 +48,49 @@ symbols exist. A runtime test that only re-checks those (a `typeof` check, a
 required) adds maintenance cost with no added safety. Assert on what the types
 cannot: values, side effects, and error paths.
 
+## Name a test after what it asserts
+
+A test name is read far more often than the test body, and almost always by
+someone deciding whether a failure matters. It has one job: say what is true
+when the test passes. Name it after the assertion, not after the machinery that
+gets there.
+
+This rule covers unit, integration and e2e tests alike.
+
+Vague process verbs are the usual failure. "parses", "handles", "processes",
+"works with" and "supports" all describe activity rather than a claim, so they
+survive any change to what is actually checked, including the change that
+deletes the assertion:
+
+```ts
+// Bad. Passing tells you something was parsed. It does not tell you what was
+// required of the result, and it stays accurate if the assertion is weakened
+// to "did not throw".
+test("imports a picked sheet, parsing a column that turns into prose", ...)
+
+// Good. The name is the claim, so a reader knows without opening the body
+// that the count is what turns this red.
+test("imports every row when a numeric column ends in prose", ...)
+```
+
+Practical checks, in order of how often they catch something:
+
+- **State the outcome, not the steps.** If the name describes what the test
+  *does*, rewrite it as what the test *proves*. A name and its assertions
+  should be swappable descriptions of one another.
+- **Do not promise what the test does not check.** The example above asserts a
+  row count. Naming it "detects the column as text" would claim a type
+  assertion that is not there, which is worse than being vague: the next
+  reader takes the coverage as given and does not add it.
+- **Name the condition when the test exists because of one.** "when a numeric
+  column ends in prose" is the reason this test was written, and a failure
+  reads as a specific regression rather than as "the Sheets test broke".
+- **One claim per test.** A name needing "and" usually marks two tests, unless
+  the second half is a precondition of the first.
+
+Read the name against a red run: if "FAILED: <name>" does not tell you what
+broke, the name is not doing its job.
+
 ## Test behavior, not structure
 
 Assert on outputs, side effects, and error branches, not on the shape of the

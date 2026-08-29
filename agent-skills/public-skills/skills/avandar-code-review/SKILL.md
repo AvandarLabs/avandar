@@ -221,6 +221,9 @@ Apply **only**:
   prefixed with `_`. File-name acronyms and the `.types.ts` suffix belong
   to `files`, not this pack.
 
+Test names are not identifiers and belong to the `tests` pack, which
+judges them against what the test asserts. Do not flag them here.
+
 "Module naming" here means the identifier of an exported module object
 (PascalCase, `create*Module` builders, conversion methods on the
 receiver). The file that holds that export matching the export name is
@@ -238,7 +241,8 @@ test naming). Same gate as Phase: tests.
 Apply **only**:
 
 - The entire **Phase: tests** checklist
-  (`docs/code-reviews/tests-checklist.md`): tautological and
+  (`docs/code-reviews/tests-checklist.md`): test names that describe
+  activity instead of the claim the test asserts, tautological and
   assertion-free tests, observable-behavior assertions, placeholder
   tests, runtime assertions that restate the type system, e2e specs
   that write the behavior under test through the database instead of
@@ -1011,7 +1015,11 @@ SKILL file.
 - **Focused review:** this phase is the core of the `tests` pack. See
   **Focused Reviews**. That pack applies this checklist only; it does
   not pull extra bullets from other phases.
-- **Covers:** tautological and assertion-free tests (for example
+- **Covers:** test names that state activity rather than what the test
+  asserts (a name built on "parses", "handles" or "works" survives the
+  deletion of the assertion itself, and a name promising more than the body
+  checks reports coverage that does not exist), tautological and
+  assertion-free tests (for example
   `expect(typeof x).toBe("function")`, which only fails if a symbol is deleted
   or renamed and stays green through any behavioral break), tests that assert
   implementation structure instead of observable behavior, placeholder tests,
