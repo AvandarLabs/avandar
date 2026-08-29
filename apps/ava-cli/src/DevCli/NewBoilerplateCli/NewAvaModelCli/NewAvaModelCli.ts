@@ -1,14 +1,14 @@
 import * as path from "node:path";
-import { getModelPathFromModelsRoot } from "@ava-cli/DevCli/NewBoilerplateCli/NewTSModelCli/getModelPathFromModelsRoot";
-import { writeBasicModelBoilerplate } from "@ava-cli/DevCli/NewBoilerplateCli/NewTSModelCli/writeBasicModelBoilerplate";
-import { writeSupabaseModelBoilerplate } from "@ava-cli/DevCli/NewBoilerplateCli/NewTSModelCli/writeSupabaseModelBoilerplate";
+import { getModelPathFromModelsRoot } from "@ava-cli/DevCli/NewBoilerplateCli/NewAvaModelCli/getModelPathFromModelsRoot";
+import { writeBasicModelBoilerplate } from "@ava-cli/DevCli/NewBoilerplateCli/NewAvaModelCli/writeBasicModelBoilerplate";
+import { writeSupabaseModelBoilerplate } from "@ava-cli/DevCli/NewBoilerplateCli/NewAvaModelCli/writeSupabaseModelBoilerplate";
 import { isPascalCase } from "@ava-cli/utils/validators/isPascalCase/isPascalCase";
 import { Acclimate } from "@avandar/acclimate";
 
 const OUTPUT_MODELS_DIR_BASE = "shared/models";
 const OUTPUT_CLIENTS_DIR_BASE = "src/clients";
 
-export const NewTSModelCli = Acclimate.createCLI("model")
+export const NewAvaModelCli = Acclimate.createCLI("model")
   .addPositionalArg({
     name: "modelName",
     required: true,

@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { TEMPLATES_DIR } from "@ava-cli/DevCli/NewBoilerplateCli/NewTSModelCli/constants";
+import { TEMPLATES_DIR } from "@ava-cli/DevCli/NewBoilerplateCli/NewAvaModelCli/constants";
 import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import { Acclimate } from "@avandar/acclimate";
 
