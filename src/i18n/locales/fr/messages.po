@@ -6759,8 +6759,8 @@ msgid "Units"
 msgstr "Unités"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
-msgid "File failed to load"
-msgstr "Le fichier n'a pas pu être chargé"
+#~ msgid "File failed to load"
+#~ msgstr "Le fichier n'a pas pu être chargé"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
@@ -7865,7 +7865,6 @@ msgid "Current Plan"
 msgstr "Plan actuel"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "No rows were read successfully"
 msgstr "Aucune ligne n'a été lue avec succès"
 

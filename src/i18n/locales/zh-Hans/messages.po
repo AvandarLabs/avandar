@@ -6447,8 +6447,8 @@ msgid "Units"
 msgstr "单位"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
-msgid "File failed to load"
-msgstr "文件加载失败"
+#~ msgid "File failed to load"
+#~ msgstr "文件加载失败"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
@@ -7500,7 +7500,6 @@ msgid "Current Plan"
 msgstr "当前计划"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "No rows were read successfully"
 msgstr "没有成功读取任何行"
 

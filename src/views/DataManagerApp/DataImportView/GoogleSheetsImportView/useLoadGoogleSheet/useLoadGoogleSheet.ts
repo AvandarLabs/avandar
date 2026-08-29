@@ -251,16 +251,11 @@ export function useLoadGoogleSheet(): GoogleSheetLoad {
         },
       });
 
-      // No success toast: the rendered form is the confirmation, exactly as it
-      // is for a manual upload. A count here would have to come from the
-      // sniff, which stops at the preview cap, so it would announce 200 rows
-      // for a sheet of any size.
-      if (loadResult.numRows === 0) {
-        notifyError({
-          title: t`File failed to load`,
-          message: t`No rows were read successfully`,
-        });
-      }
+      // Nothing is announced either way, exactly as for a manual upload. The
+      // rendered form is the confirmation, and a zero-row sheet renders it
+      // too, where `ImportStatusCallout` names the failure. A row count here
+      // would come from the sniff, which stops at the preview cap, so it
+      // would announce 200 rows for a sheet of any size.
     },
     onError: (error) => {
       Logger.error(error, { devMsg: "Google Sheet tab failed to load" });
