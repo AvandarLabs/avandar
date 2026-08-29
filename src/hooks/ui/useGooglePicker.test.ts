@@ -1,6 +1,8 @@
+import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Component, createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { i18n } from "@/i18n/i18n";
 import { renderHook, waitFor } from "@/test-utils";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type {
@@ -64,9 +66,48 @@ function _googleToken(): GoogleToken {
 function _makeRecordingPickerAPI(): {
   pickerAPI: GooglePickerAPI;
   getCallArgs: (method: string) => unknown[] | undefined;
+  getAddedViews: () => unknown[];
   fireCallback: (response: GPickerResponseObject) => void;
 } {
   let callback: ((response: GPickerResponseObject) => void) | undefined;
+
+  // Each DocsView records its own options, so the tabs stay distinguishable.
+  // A single shared view stub would let three `addView` calls collapse into one
+  // set of options and a three-tab assertion would pass on one tab.
+  const optionsByView = new Map<object, Record<string, unknown>>();
+  const addedViews: unknown[] = [];
+
+  const makeDocsViewStub = (): object => {
+    const options: Record<string, unknown> = {};
+    const view = {
+      setMode: (mode: unknown) => {
+        options.mode = mode;
+        return view;
+      },
+      setMimeTypes: (mimeTypes: unknown) => {
+        options.mimeTypes = mimeTypes;
+        return view;
+      },
+      setIncludeFolders: (included: unknown) => {
+        options.includeFolders = included;
+        return view;
+      },
+      setOwnedByMe: (ownedByMe: unknown) => {
+        options.ownedByMe = ownedByMe;
+        return view;
+      },
+      setEnableDrives: (enabled: unknown) => {
+        options.enableDrives = enabled;
+        return view;
+      },
+      setLabel: (label: unknown) => {
+        options.label = label;
+        return view;
+      },
+    };
+    optionsByView.set(view, options);
+    return view;
+  };
 
   const record = (method: string) => {
     return (...args: unknown[]): unknown => {
@@ -76,7 +117,12 @@ function _makeRecordingPickerAPI(): {
   };
 
   const builder = {
-    addView: record("addView"),
+    addView: (viewOrId: unknown) => {
+      // Recorded in call order, since the tab order is the `addView` order.
+      addedViews.push(optionsByView.get(viewOrId as object) ?? viewOrId);
+      builderCalls.set("addView", [viewOrId]);
+      return builder;
+    },
     setOAuthToken: record("setOAuthToken"),
     setDeveloperKey: record("setDeveloperKey"),
     setAppId: record("setAppId"),
@@ -94,24 +140,12 @@ function _makeRecordingPickerAPI(): {
     },
   };
 
-  const docsView = {
-    setMode: () => {
-      return docsView;
-    },
-    setMimeTypes: () => {
-      return docsView;
-    },
-    setIncludeFolders: () => {
-      return docsView;
-    },
-  };
-
   const pickerAPI = {
     PickerBuilder: function PickerBuilderStub() {
       return builder;
     },
     DocsView: function DocsViewStub() {
-      return docsView;
+      return makeDocsViewStub();
     },
     DocsViewMode: { LIST: "list" },
     ViewId: { SPREADSHEETS: "spreadsheets" },
@@ -122,6 +156,9 @@ function _makeRecordingPickerAPI(): {
     pickerAPI,
     getCallArgs: (method) => {
       return builderCalls.get(method);
+    },
+    getAddedViews: () => {
+      return addedViews;
     },
     fireCallback: (response) => {
       if (!callback) {
@@ -136,7 +173,13 @@ function _wrapper({ children }: { children: ReactNode }): JSX.Element {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return createElement(QueryClientProvider, { client: queryClient }, children);
+  // The hook resolves the tab labels through `useLingui`, which throws outright
+  // without a provider above it.
+  return createElement(
+    I18nProvider,
+    { i18n },
+    createElement(QueryClientProvider, { client: queryClient }, children),
+  );
 }
 
 /**
@@ -293,6 +336,38 @@ describe("useGooglePicker", () => {
     } finally {
       vi.unstubAllEnvs();
     }
+  });
+
+  it("adds a My Drive, a Shared with me and a Shared drives tab", async () => {
+    // One view per scope, because `setEnableDrives(true)` re-roots a view at
+    // the shared drives list rather than adding to it: a single view carrying
+    // it cannot reach My Drive at all. Order matters, since it is the tab
+    // order.
+    const harness = _makeRecordingPickerAPI();
+    useGooglePickerAPIMock.mockReturnValue([harness.pickerAPI, false]);
+    const { useGooglePicker } = await import("@/hooks/ui/useGooglePicker");
+
+    renderHook(
+      () => {
+        return useGooglePicker({});
+      },
+      { wrapper: _wrapper },
+    );
+
+    await waitFor(() => {
+      expect(harness.getCallArgs("build")).toEqual([]);
+    });
+
+    const sheetsOnly = {
+      mode: "list",
+      mimeTypes: "application/vnd.google-apps.spreadsheet",
+      includeFolders: true,
+    };
+    expect(harness.getAddedViews()).toEqual([
+      { ...sheetsOnly, label: "My Drive" },
+      { ...sheetsOnly, ownedByMe: false, label: "Shared with me" },
+      { ...sheetsOnly, enableDrives: true, label: "Shared drives" },
+    ]);
   });
 
   it("falls back to ViewId.SPREADSHEETS when DocsView is not a constructor", async () => {

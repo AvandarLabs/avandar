@@ -4,6 +4,11 @@ import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
 import { E2EPreflight } from "./tests/e2e/setup/E2EPreflight";
 import {
+  E2E_NO_THIRD_PARTY_FLAG,
+  E2E_THIRD_PARTY_TAG,
+  E2eThirdPartyMode,
+} from "./tests/e2e/setup/E2eThirdPartyMode/E2eThirdPartyMode";
+import {
   E2E_ONLINE_TAG,
   ensureE2EViteFeatureFlags,
   isE2EOfflineMode,
@@ -53,6 +58,41 @@ function mergeE2EFeatureFlags(): string {
 }
 
 const e2eFeatureFlags = mergeE2EFeatureFlags();
+
+// Rejected rather than silently resolved: a third-party spec exists to reach a
+// real service over the network, which is the one thing an offline run has
+// declared it cannot do, so the pair can only be a mistake.
+if (isE2EOfflineMode() && E2eThirdPartyMode.isRequested()) {
+  throw new Error(
+    "PLAYWRIGHT_E2E_OFFLINE and PLAYWRIGHT_E2E_THIRD_PARTY are contradictory: " +
+      "the third-party specs exist to reach a real service over the network.",
+  );
+}
+
+// Same reasoning: a run told to leave the third-party specs out cannot also be
+// the run that exists to exercise them.
+if (E2eThirdPartyMode.isExcluded() && E2eThirdPartyMode.isRequested()) {
+  throw new Error(
+    `${E2E_NO_THIRD_PARTY_FLAG} and PLAYWRIGHT_E2E_THIRD_PARTY are ` +
+      "contradictory: one drops the third-party specs and the other runs " +
+      "only them.",
+  );
+}
+
+/**
+ * The tags this run excludes, as one pattern, or `undefined` to exclude none.
+ */
+function buildGrepInvert(): RegExp | undefined {
+  const excludedTags = [
+    ...(isE2EOfflineMode() ? [E2E_ONLINE_TAG] : []),
+    ...(isE2EOfflineMode() || E2eThirdPartyMode.isExcluded()
+      ? [E2E_THIRD_PARTY_TAG]
+      : []),
+  ];
+  return excludedTags.length > 0
+    ? new RegExp(excludedTags.join("|"))
+    : undefined;
+}
 
 /**
  * Per-test ceiling:
@@ -126,9 +166,23 @@ export default defineConfig({
       timeout: 180_000,
     },
   ],
-  // Offline runs skip the specs that need a network-fetched DuckDB extension
-  // rather than letting them time out against controls that never enable.
-  grepInvert: isE2EOfflineMode() ? new RegExp(E2E_ONLINE_TAG) : undefined,
+  // Narrows the run to the tagged specs, so `pnpm test:e2e:third-party` is how
+  // you exercise the live paths without waiting for the whole suite. Their
+  // missing-credential handling turns loud in the same mode; see
+  // `E2eThirdPartyMode.requireEnv`.
+  grep: E2eThirdPartyMode.isRequested()
+    ? new RegExp(E2E_THIRD_PARTY_TAG)
+    : undefined,
+  // An offline run excludes both: the `@online` specs need a network-fetched
+  // DuckDB extension, and the `@third-party` ones need a real service.
+  // Excluding them beats letting them time out. `--no-third-party` excludes
+  // only the latter, so a blocking job cannot reach a third party even if its
+  // credentials turn up in the environment.
+  //
+  // A default run includes the third-party specs and lets each skip itself when
+  // its credentials are absent, which is what keeps a full run green on a
+  // machine that was never given them.
+  grepInvert: buildGrepInvert(),
   globalSetup: "./tests/e2e/setup/globalSetup.ts",
   globalTeardown: "./tests/e2e/setup/globalTeardown.ts",
 });

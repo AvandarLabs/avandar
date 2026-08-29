@@ -33,14 +33,13 @@ export type GoogleSheetsWrapperOptions = {
   getAccessToken: () => Promise<string>;
 
   /**
-   * Reads one tab out of exported workbook bytes and returns Parquet. Bound
-   * to the caller's DuckDB lease so acquisition does not race the outer query.
-   * `datasetId` is the bare table the lease already covers.
+   * Reads one tab's CSV and returns Parquet. Bound to the caller's DuckDB
+   * lease so acquisition does not race the outer query. `datasetId` is the
+   * bare table the lease already covers.
    */
-  readXlsx: (params: {
+  readCsv: (params: {
     datasetId: Dataset.Id;
-    xlsxBytes: Uint8Array<ArrayBuffer>;
-    sheet: string | undefined;
+    csvText: string;
   }) => Promise<GoogleSheetParquetRelation>;
 
   /** Injected Drive transport; omitted in production, where `fetch` is used. */
@@ -55,8 +54,8 @@ const CAPABILITIES = {
   relations: "single",
 
   /**
-   * Drive `files.export` returns the whole workbook in one call. Which tab
-   * becomes a relation is a `read_xlsx` argument, not a positional subrange.
+   * A tab is downloaded on its own, as CSV. Which tab becomes a relation is
+   * decided before the download, not by reading a subrange out of it.
    */
   acquisitionUnit: { kind: "whole-relation" },
 
@@ -79,7 +78,12 @@ const CAPABILITIES = {
   rowIdentity: "none",
   multiCallAtomicity: false,
 
-  /** Drive rate-limits per host after the connector stopped calling Sheets. */
+  /**
+   * Acquisition touches three Google hosts: Drive for the file version, the
+   * Sheets API for the tab list, and the export host for the tab itself. Drive
+   * is the one that rate-limits an acquisition loop, so it is the scope
+   * declared here.
+   */
   quotaScope: { kind: "per-host", host: "www.googleapis.com" },
 
   grantedScope: [
@@ -102,12 +106,8 @@ async function _acquireGoogleSheet(
     fileId: source.googleDocumentId,
     accessToken,
     sheetName: source.sheetName,
-    readXlsx: async ({ xlsxBytes, sheet }) => {
-      return await wrapperOptions.readXlsx({
-        datasetId: ref.id,
-        xlsxBytes,
-        sheet,
-      });
+    readCsv: async ({ csvText }) => {
+      return await wrapperOptions.readCsv({ datasetId: ref.id, csvText });
     },
     driveFetch: wrapperOptions.driveFetch,
   });
@@ -126,15 +126,15 @@ function _missingAccessToken(): Promise<never> {
   throw new Error("No Google token is available for this user");
 }
 
-function _missingReadXlsx(): Promise<never> {
-  throw new Error("Google Sheets acquisition needs an XLSX reader");
+function _missingReadCsv(): Promise<never> {
+  throw new Error("Google Sheets acquisition needs a CSV reader");
 }
 
 /**
- * Acquires one Google Sheets tab as Parquet via Drive `files.export`.
+ * Acquires one Google Sheets tab as Parquet, downloading that tab as CSV.
  *
  * `acquire` is present because the capabilities declare the relation
- * acquirable. The source record, token, and XLSX reader arrive as options so
+ * acquirable. The source record, token, and CSV reader arrive as options so
  * this wrapper never re-reads what the relation loader already holds.
  */
 export function createGoogleSheetsWrapper(
@@ -143,7 +143,7 @@ export function createGoogleSheetsWrapper(
   const wrapperOptions: GoogleSheetsWrapperOptions = {
     getSheetSource: options.getSheetSource ?? _missingSheetSource,
     getAccessToken: options.getAccessToken ?? _missingAccessToken,
-    readXlsx: options.readXlsx ?? _missingReadXlsx,
+    readCsv: options.readCsv ?? _missingReadCsv,
     driveFetch: options.driveFetch,
   };
 

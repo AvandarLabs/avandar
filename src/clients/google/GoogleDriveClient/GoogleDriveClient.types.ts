@@ -35,3 +35,33 @@ export type AcquiredGoogleSheet = {
    */
   sourceVersion: SourceVersion;
 };
+
+/**
+ * One tab of a spreadsheet, as the Sheets API reports it.
+ *
+ * Read from `spreadsheets.get` with a `fields` mask that asks for properties
+ * only, so listing a workbook's tabs costs no cell data at all. That is what
+ * lets the import view ask which tab to import before anything is downloaded.
+ */
+export type GoogleSheetTab = {
+  /** The tab's `gid`, which is what an export URL addresses it by. */
+  sheetId: number;
+
+  /** The tab's name, as shown on its tab in the Sheets UI. */
+  title: string;
+
+  /** Position in the workbook, zero-based. Tabs come back in this order. */
+  index: number;
+};
+
+/** One tab's cells as CSV text, and the source version they belong to. */
+export type AcquiredGoogleSheetTabCsv = {
+  /** The tab rendered as CSV, exactly as Google returned it. */
+  csvText: string;
+
+  /**
+   * Drive's `File.version` at the moment the export was requested, read before
+   * the export for the reason {@link AcquiredGoogleSheet.sourceVersion} gives.
+   */
+  sourceVersion: SourceVersion;
+};

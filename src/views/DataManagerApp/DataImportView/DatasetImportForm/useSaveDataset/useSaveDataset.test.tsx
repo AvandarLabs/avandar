@@ -16,10 +16,7 @@ import type {
   GoogleSheetsDataSourceMetadata,
   PdfDataSourceMetadata,
 } from "../DatasetImportForm.types";
-import type {
-  DuckDbColumnSchema,
-  DuckDbLoadXlsxResult,
-} from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { ReactElement, ReactNode } from "react";
 
 const TEST_WORKSPACE = {
@@ -91,22 +88,41 @@ const GOOGLE_SHEETS_PARAMS: DatasetImportFormValues &
   // A Google `sub`, which is what `tokens__google.google_account_id` stores.
   googleAccountId: "108374652910384756291",
   googleDocumentId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
-  parseOptions: { type: "google_sheets", sheetName: "Kenya", hasHeader: true },
+  parseOptions: { type: "google_sheets", sheetName: "Kenya", sheetId: 2 },
   datasetLoadResult: {
     datasetId: SAVED_DATASET.id,
     numRows: 7,
-    spreadsheetName: "regional-population",
-    availableSheetNames: ["Colombia", "Kenya"],
-    sheetLoadMetadata: {
-      type: "xlsx",
-      id: "google-sheet-load-result" as DuckDbLoadXlsxResult["id"],
-      tableName: "import_sheet",
-      xlsxName: "regional-population.xlsx",
-      numRows: 7,
-      columns: [_duckDbColumn("county"), _duckDbColumn("residents")],
-      sheet: "Kenya",
-      parquetData: new Blob(),
+    type: "csv",
+    id: "google-sheet-load-result" as CsvFileLoadResult["id"],
+    tableName: "import_sheet",
+    csvName: "regional-population - Kenya.csv",
+    numRejectedRows: 0,
+    errors: { rejectedScans: [], rejectedRows: [] },
+    columns: [_duckDbColumn("county"), _duckDbColumn("residents")],
+    csvSniff: {
+      Delimiter: ",",
+      Quote: '"',
+      Escape: '"',
+      NewLineDelimiter: "\n",
+      Comment: "#",
+      SkipRows: 0,
+      HasHeader: true,
+      Columns: [],
+      DateFormat: null,
+      TimestampFormat: null,
+      UserArguments: "",
+      Prompt: "",
+      table_name: "import_sheet",
     },
+    parquetData: new Blob(),
+    spreadsheetName: "regional-population",
+    availableTabs: [
+      { sheetId: 1, title: "Colombia", index: 0 },
+      { sheetId: 2, title: "Kenya", index: 1 },
+    ],
+    sheetId: 2,
+    sheetName: "Kenya",
+    previewRows: [],
   },
 };
 
@@ -414,7 +430,7 @@ describe("useSaveDataset", () => {
         parseOptions: {
           type: "google_sheets",
           sheetName: "Colombia",
-          hasHeader: true,
+          sheetId: 1,
         },
       });
     });
@@ -438,7 +454,7 @@ describe("useSaveDataset", () => {
     await act(async () => {
       await result.current[0].async({
         ...GOOGLE_SHEETS_PARAMS,
-        parseOptions: { type: "google_sheets", hasHeader: true },
+        parseOptions: { type: "google_sheets" },
       });
     });
 

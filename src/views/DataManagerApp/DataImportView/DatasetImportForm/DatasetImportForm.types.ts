@@ -11,7 +11,8 @@ import type {
   PdfParseOptions,
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
-import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { GoogleSheetTab } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 import type { UnknownObject } from "@avandar/utils";
 
 export type DatasetImportFormValues = {
@@ -74,18 +75,29 @@ export type BaseLoadResult = {
   numRows: number;
 };
 
-export type GoogleSheetsLoadResult = BaseLoadResult & {
-  /**
-   * Every tab the exported workbook contains, read out of the workbook itself
-   * rather than from the Sheets API. This is what the tab selector offers, and
-   * reading it from the same bytes the transcode reads is what guarantees a tab
-   * the user picks is a tab `read_xlsx` can find.
-   */
-  availableSheetNames: string[];
+export type GoogleSheetsLoadResult = BaseLoadResult &
+  DuckDbLoadCsvResult & {
+    /**
+     * Every tab the workbook contains, from the Sheets API's properties-only
+     * read. This is what the tab selector offers, and it is known before any
+     * cell is downloaded.
+     */
+    availableTabs: GoogleSheetTab[];
 
-  sheetLoadMetadata: DuckDbLoadXlsxResult;
-  spreadsheetName: string;
-};
+    /** The `gid` of the tab this dataset was imported from. */
+    sheetId: number;
+
+    /** The title of the tab this dataset was imported from. */
+    sheetName: string;
+
+    spreadsheetName: string;
+
+    /**
+     * The rows the sniff already read, carried through so the form has its
+     * preview without a second read.
+     */
+    previewRows: UnknownObject[];
+  };
 
 export type GoogleSheetsDataSourceMetadata = {
   sourceType: "google_sheets";

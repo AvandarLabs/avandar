@@ -1,66 +1,31 @@
 import { getCurrentUrl, navigateToExternalUrl } from "@avandar/browser-utils";
-import { useMutation } from "@avandar/query-hooks";
 import { Callout } from "@avandar/ui";
-import { formatNumber, MIMEType } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   BoxProps,
   Button,
+  Group,
   Loader,
+  Select,
   Stack,
   Text,
   UnstyledButton,
 } from "@mantine/core";
-import { useCallback, useState } from "react";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
-import { uuid } from "$/lib/uuid";
+import { useCallback } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { getGoogleSheetXlsxExport } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
-import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
-import {
-  GPicker,
-  GPickerDocumentObject,
-  GPickerResponseObject,
-} from "@/lib/types/google-picker";
 import { Logger } from "@/utils/Logger";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { notifyError } from "@/utils/notifications/notify";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
-import { getGoogleSheetImportErrorCopy } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy";
+import { useLoadGoogleSheet } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UserId } from "$/models/User/User.types";
-import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type {
-  GoogleSheetsDataSourceMetadata,
-  GoogleSheetsLoadResult,
-} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
-import type { GoogleSheetsParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
-
-/**
- * The exported workbook, kept so a re-parse against a different tab does not
- * re-export from Drive. Every tab lives in these same bytes.
- */
-type ExportedWorkbook = {
-  xlsxBytes: Uint8Array<ArrayBuffer>;
-  spreadsheetName: string;
-};
-
-type GoogleSheetsLoadOptions = {
-  datasetId: Dataset.Id;
-  googleAccountId: string;
-  documentId: string;
-  xlsxBytes: Uint8Array<ArrayBuffer>;
-  spreadsheetName: string;
-};
+import type { GPicker, GPickerResponseObject } from "@/lib/types/google-picker";
+import type { GoogleSheetsDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 
 type Props = BoxProps & {
   /**
@@ -69,15 +34,6 @@ type Props = BoxProps & {
    */
   onSaveSuccess?: (dataset: Dataset.T) => void;
 };
-
-/** Wraps workbook bytes in the `File` the local import mutation takes. */
-function _makeWorkbookFile(workbook: Readonly<ExportedWorkbook>): File {
-  return new File(
-    [new Blob([workbook.xlsxBytes])],
-    `${workbook.spreadsheetName}.xlsx`,
-    { type: MIMEType.APPLICATION_OPENXML_EXCEL },
-  );
-}
 
 function _openGooglePicker(params: {
   picker: GPicker | undefined;
@@ -95,207 +51,26 @@ function _openGooglePicker(params: {
   params.picker.setVisible(true);
 }
 
+/**
+ * Google Sheets picker plus the dataset import form after a sheet is sniffed.
+ */
 export function GoogleSheetsImportView({
   onSaveSuccess,
   ...props
 }: Props): JSX.Element {
-  const { t, i18n } = useLingui();
-  const user = useCurrentUser();
-  const workspace = useCurrentWorkspace();
-  const [selectedDocument, setSelectedDocument] = useState<
-    GPickerDocumentObject | undefined
-  >();
-  const [dataSourceMetadata, setDataSourceMetadata] = useState<
-    GoogleSheetsDataSourceMetadata | undefined
-  >();
-  const [previewRows] = DatasetQueryClient.useGetPreviewData({
-    datasetId: dataSourceMetadata?.datasetLoadResult.datasetId,
-    numRows: GlobalAppConfig.dataManagerApp.maxPreviewRows,
-    workspaceId: workspace.id,
-    useQueryOptions: {
-      enabled: !!dataSourceMetadata?.datasetLoadResult,
-    },
-  });
-  const [exportedWorkbook, setExportedWorkbook] = useState<
-    ExportedWorkbook | undefined
-  >();
+  const { t } = useLingui();
+  const googleSheetLoad = useLoadGoogleSheet();
+  const { pickedSheet, availableTabs, previewRows, dataSourceMetadata } =
+    googleSheetLoad;
 
-  const [exportGoogleSheet, isExportingGoogleSheet] = useMutation({
-    mutationFn: async (params: {
-      documentId: string;
-      googleAccountId: string;
-      accessToken: string;
-    }): Promise<ExportedWorkbook> => {
-      // Drive's `files.export` returns the whole workbook, every tab, in one
-      // call. The Sheets API is no longer involved: acquisition and import now
-      // read the same bytes with the same parser, so a tab name recorded at
-      // import is a tab name `read_xlsx` can find, and `drive.file` alone is
-      // provably sufficient.
-      const { xlsxBytes } = await getGoogleSheetXlsxExport({
-        fileId: params.documentId,
-        accessToken: params.accessToken,
-      });
-      return {
-        xlsxBytes,
-        spreadsheetName: selectedDocument?.name ?? t`Google Sheet`,
-      };
-    },
-    onSuccess: (workbook, inputParams) => {
-      setExportedWorkbook(workbook);
-      onRequestParse({
-        documentId: inputParams.documentId,
-        googleAccountId: inputParams.googleAccountId,
-        newDatasetId: uuid() as Dataset.Id,
-        workbook,
-      });
-    },
-    onError: (error) => {
-      Logger.error(error, { devMsg: "Google Sheet export failed" });
-      notifyError(getGoogleSheetImportErrorCopy({ error, i18n }));
-    },
-  });
-
-  // Load the exported workbook into local storage after it has been picked.
-  const [loadGoogleSheet, isLoadingGoogleSheet] = useMutation({
-    mutationFn: async (
-      params: GoogleSheetsLoadOptions & GoogleSheetsParseOptions,
-    ): Promise<GoogleSheetsLoadResult> => {
-      const { datasetId, xlsxBytes, spreadsheetName, sheetName, hasHeader } =
-        params;
-      const file = _makeWorkbookFile({ xlsxBytes, spreadsheetName });
-
-      const sniff = await LocalDatasetClient.startXlsxImport({
-        datasetId,
-        userId: user!.id as UserId,
-        workspaceId: workspace.id,
-        file,
-        parseOptions: { sheet: sheetName, hasHeader },
-      });
-
-      return {
-        datasetId,
-        numRows: sniff.previewRows.length,
-        spreadsheetName,
-        availableSheetNames: sniff.sheets,
-        sheetLoadMetadata: {
-          id: uuid() as DuckDbLoadXlsxResult["id"],
-          type: "xlsx",
-          tableName: datasetId,
-          xlsxName: file.name,
-          columns: sniff.columns.map((columnName) => {
-            return {
-              column_name: columnName,
-              column_type: "VARCHAR",
-              null: "YES",
-              key: null,
-              default: null,
-              extra: null,
-            };
-          }),
-          sheet: sheetName ?? sniff.defaultSheet,
-          numRows: sniff.previewRows.length,
-          // The sniff phase does not produce parquetData; the background
-          // parquet transcoding writes the real Blob into Dexie. Downstream
-          // consumers read parquetData from the Dexie row, not from this
-          // result object, so a placeholder is safe.
-          parquetData: new Blob(),
-        },
-      };
-    },
-    onSuccess: (loadResult, inputParams) => {
-      setDataSourceMetadata({
-        sourceType: "google_sheets",
-        googleAccountId: inputParams.googleAccountId,
-        googleDocumentId: inputParams.documentId,
-        datasetLoadResult: loadResult,
-        parseOptions: {
-          type: "google_sheets",
-          sheetName: loadResult.sheetLoadMetadata.sheet,
-          hasHeader: inputParams.hasHeader,
-        },
-      });
-
-      const numSuccessRows = loadResult.sheetLoadMetadata.numRows;
-      if (numSuccessRows === 0) {
-        notifyError({
-          title: t`File failed to load`,
-          message: t`No rows were read successfully`,
-        });
-        return;
-      }
-      notifySuccess({
-        title: t`File loaded successfully`,
-        message: t`Parsed ${formatNumber(numSuccessRows)} rows`,
-      });
-    },
-    onError: (error) => {
-      Logger.error(error, { devMsg: "Google Sheet failed to load" });
-      notifyError(getGoogleSheetImportErrorCopy({ error, i18n }));
-    },
-  });
-
-  const onRequestParse = useCallback(
-    async (params: {
-      documentId: GPickerDocumentObject["id"];
-      googleAccountId: string;
-      workbook: ExportedWorkbook;
-      newDatasetId: Dataset.Id;
-      datasetIdToDrop?: Dataset.Id;
-      parseOptions?: GoogleSheetsParseOptions;
-    }) => {
-      const {
-        documentId,
-        googleAccountId,
-        newDatasetId,
-        datasetIdToDrop,
-        workbook,
-        parseOptions = { type: "google_sheets" },
-      } = params;
-      if (datasetIdToDrop) {
-        await LocalDatasetClient.dropLocalDataset({
-          datasetId: datasetIdToDrop,
-        });
-      }
-
-      loadGoogleSheet({
-        ...parseOptions,
-        documentId,
-        googleAccountId,
-        datasetId: newDatasetId,
-        xlsxBytes: workbook.xlsxBytes,
-        spreadsheetName: workbook.spreadsheetName,
-      });
-    },
-    [loadGoogleSheet],
-  );
-
-  const onGoogleSheetPicked = useCallback(
-    async (params: {
-      document: GPickerDocumentObject;
-      googleAccount: GoogleToken;
-    }) => {
-      const { document, googleAccount } = params;
-      setSelectedDocument(document);
-      setDataSourceMetadata(undefined);
-      setExportedWorkbook(undefined);
-
-      exportGoogleSheet({
-        documentId: document.id,
-        googleAccountId: googleAccount.google_account_id,
-        accessToken: googleAccount.access_token,
-      });
-    },
-    [exportGoogleSheet],
-  );
-
-  const onPickerCancel = useCallback(() => {
-    // A dismissal is a decision, not a failure, so there is no notification.
-    // The state reset is the whole point: without it the "Selected document"
-    // line and its loader from a previous pick stay on screen.
-    setSelectedDocument(undefined);
-    setDataSourceMetadata(undefined);
-    setExportedWorkbook(undefined);
-  }, []);
+  // Asked only when there is something to ask: a one-tab workbook imports on
+  // the pick, because one Avandar dataset is one tab and there is only one.
+  //
+  // Withdrawn once a tab has been imported, because from then on the import
+  // form carries its own tab selector. Two controls for one choice is worse
+  // than either alone: they can disagree, and only one of them re-parses.
+  const hasTabChoice =
+    (availableTabs?.length ?? 0) > 1 && dataSourceMetadata === undefined;
 
   const notifyPickerCouldNotOpen = useCallback(() => {
     notifyError({
@@ -319,8 +94,8 @@ export function GoogleSheetsImportView({
     isLoadingGoogleAuthState,
     isGoogleAuthenticated,
   } = useGooglePicker({
-    onGoogleSheetPicked,
-    onCancel: onPickerCancel,
+    onGoogleSheetPicked: googleSheetLoad.onGoogleSheetPicked,
+    onCancel: googleSheetLoad.onPickerCancel,
     onError: onPickerError,
   });
 
@@ -389,12 +164,43 @@ export function GoogleSheetsImportView({
               </Button>
             )}
 
-            {selectedDocument ? (
+            {pickedSheet ? (
               <>
                 <Text>
-                  <Trans>Selected document: {selectedDocument.name}</Trans>
+                  <Trans>
+                    Selected document: {pickedSheet.spreadsheetName}
+                  </Trans>
                 </Text>
-                {isLoadingGoogleSheet ? <Loader /> : null}
+                {googleSheetLoad.isListingTabs ? <Loader /> : null}
+                {hasTabChoice ? (
+                  <Group align="flex-end" gap="sm">
+                    <Select
+                      label={t`Tab to import`}
+                      description={t`One dataset is one tab.`}
+                      data={(availableTabs ?? []).map((tab) => {
+                        return { value: String(tab.sheetId), label: tab.title };
+                      })}
+                      value={
+                        googleSheetLoad.selectedTabId === undefined
+                          ? null
+                          : String(googleSheetLoad.selectedTabId)
+                      }
+                      onChange={(value) => {
+                        if (value !== null) {
+                          googleSheetLoad.setSelectedTabId(Number(value));
+                        }
+                      }}
+                    />
+                    <Button
+                      onClick={googleSheetLoad.onProcessSelectedTab}
+                      loading={googleSheetLoad.isLoadingSheet}
+                    >
+                      <Trans>Process</Trans>
+                    </Button>
+                  </Group>
+                ) : googleSheetLoad.isLoadingSheet ? (
+                  <Loader />
+                ) : null}
               </>
             ) : null}
           </>
@@ -428,36 +234,23 @@ export function GoogleSheetsImportView({
           </Button>
         )}
 
-        {previewRows && dataSourceMetadata && exportedWorkbook ? (
+        {previewRows && dataSourceMetadata && pickedSheet ? (
           <DatasetImportForm
-            key={dataSourceMetadata.datasetLoadResult.sheetLoadMetadata.id}
-            dataSourceMetadata={dataSourceMetadata}
+            key={dataSourceMetadata.datasetLoadResult.id}
             initialDatasetName={
               dataSourceMetadata.datasetLoadResult.spreadsheetName
             }
-            isProcessing={isExportingGoogleSheet || isLoadingGoogleSheet}
+            rows={previewRows}
+            dataSourceMetadata={dataSourceMetadata}
+            parseOptions={dataSourceMetadata.parseOptions}
             onSaveSuccess={onSaveSuccess}
             onDataSourceMetadataChange={(metadata) => {
-              setDataSourceMetadata(metadata as GoogleSheetsDataSourceMetadata);
+              googleSheetLoad.setDataSourceMetadata(
+                metadata as GoogleSheetsDataSourceMetadata,
+              );
             }}
-            onRequestDataReparse={async (parseOptions) => {
-              if (parseOptions.type !== "google_sheets") {
-                return;
-              }
-              // Re-parsing a different tab reads the workbook already in hand
-              // rather than exporting it again: `files.export` is workbook
-              // scoped, so every tab is in these bytes.
-              onRequestParse({
-                newDatasetId: uuid() as Dataset.Id,
-                datasetIdToDrop: dataSourceMetadata.datasetLoadResult.datasetId,
-                documentId: dataSourceMetadata.googleDocumentId,
-                googleAccountId: dataSourceMetadata.googleAccountId,
-                workbook: exportedWorkbook,
-                parseOptions,
-              });
-            }}
-            parseOptions={dataSourceMetadata.parseOptions}
-            rows={previewRows}
+            isProcessing={googleSheetLoad.isLoadingSheet}
+            onRequestDataReparse={googleSheetLoad.onRequestDataReparse}
           />
         ) : null}
       </Stack>

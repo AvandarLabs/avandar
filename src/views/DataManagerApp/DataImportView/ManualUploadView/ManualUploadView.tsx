@@ -6,11 +6,8 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
-import { ManualUploadDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import { useManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
 import type { ReactNode } from "react";
 
 type Props = BoxProps & {
@@ -32,55 +29,6 @@ type Props = BoxProps & {
    */
   onSaveSuccess?: (dataset: Dataset.T) => void;
 };
-
-type ManualUploadImportFormProps = {
-  uploadedFile: File;
-  previewRows: UnknownRow[];
-  dataSourceMetadata: ManualUploadDataSourceMetadata;
-  isReparsePending: boolean;
-  onAfterSave?: () => void;
-  onSaveSuccess?: (dataset: Dataset.T) => void;
-  onRequestDataReparse: ManualUploadParse["onRequestDataReparse"];
-  setDataSourceMetadata: ManualUploadParse["setDataSourceMetadata"];
-};
-
-function _ManualUploadImportForm(
-  props: Readonly<ManualUploadImportFormProps>,
-): ReactNode {
-  const {
-    uploadedFile,
-    previewRows,
-    dataSourceMetadata,
-    isReparsePending,
-    onAfterSave,
-    onSaveSuccess,
-    onRequestDataReparse,
-    setDataSourceMetadata,
-  } = props;
-  return (
-    <DatasetImportForm
-      key={dataSourceMetadata.datasetLoadResult.id}
-      initialDatasetName={uploadedFile.name}
-      sourceFile={uploadedFile}
-      rows={previewRows}
-      dataSourceMetadata={dataSourceMetadata}
-      parseOptions={dataSourceMetadata.parseOptions}
-      onSaveSuccess={onSaveSuccess}
-      onDataSourceMetadataChange={(metadata) => {
-        if (!DatasetSource.isManuallyUploadable(metadata)) {
-          return;
-        }
-        setDataSourceMetadata(metadata);
-      }}
-      isProcessing={isReparsePending}
-      onAfterSave={(savedDataset) => {
-        NuxEvents.emit("dataset.saved", { datasetId: savedDataset.id });
-        onAfterSave?.();
-      }}
-      onRequestDataReparse={onRequestDataReparse}
-    />
-  );
-}
 
 /**
  * Spreadsheet picker plus the dataset import form after a file is sniffed.
@@ -117,15 +65,26 @@ export function ManualUploadView({
           />
         </Box>
         {previewRows && uploadedFile && dataSourceMetadata ? (
-          <_ManualUploadImportForm
-            uploadedFile={uploadedFile}
-            previewRows={previewRows}
+          <DatasetImportForm
+            key={dataSourceMetadata.datasetLoadResult.id}
+            initialDatasetName={uploadedFile.name}
+            sourceFile={uploadedFile}
+            rows={previewRows}
             dataSourceMetadata={dataSourceMetadata}
-            isReparsePending={manualUpload.isReparsePending}
-            onAfterSave={onAfterSave}
+            parseOptions={dataSourceMetadata.parseOptions}
             onSaveSuccess={onSaveSuccess}
+            onDataSourceMetadataChange={(metadata) => {
+              if (!DatasetSource.isManuallyUploadable(metadata)) {
+                return;
+              }
+              manualUpload.setDataSourceMetadata(metadata);
+            }}
+            isProcessing={manualUpload.isReparsePending}
+            onAfterSave={(savedDataset) => {
+              NuxEvents.emit("dataset.saved", { datasetId: savedDataset.id });
+              onAfterSave?.();
+            }}
             onRequestDataReparse={manualUpload.onRequestDataReparse}
-            setDataSourceMetadata={manualUpload.setDataSourceMetadata}
           />
         ) : null}
       </Stack>

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  getGoogleSheetTabCsvExport,
+  getGoogleSheetTabs,
   getGoogleSheetVersion,
   getGoogleSheetXlsxExport,
 } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
@@ -82,8 +84,31 @@ describe("getGoogleSheetVersion", () => {
 
     expect(requests).toHaveLength(1);
     expect(requests[0]!.url).toBe(
-      `https://www.googleapis.com/drive/v3/files/${FILE_ID}?fields=version`,
+      `https://www.googleapis.com/drive/v3/files/${FILE_ID}` +
+        "?fields=version&supportsAllDrives=true",
     );
+  });
+
+  it("declares shared drive support on both requests", async () => {
+    // Drive v3 defaults `supportsAllDrives` to false, and a request that omits
+    // it answers 404 `notFound` for a file that lives in a shared drive. That
+    // is indistinguishable from a revoked per-file grant, so omitting it told
+    // the user to re-pick a sheet they had just picked.
+    const { driveFetch, requests } = _makeRecordingFetch([
+      _versionResponse("42"),
+      _workbookResponse(),
+    ]);
+
+    await getGoogleSheetXlsxExport({
+      fileId: FILE_ID,
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(requests).toHaveLength(2);
+    requests.forEach((request) => {
+      expect(request.url).toContain("supportsAllDrives=true");
+    });
   });
 
   it("sends the token as a bearer Authorization header", async () => {
@@ -153,7 +178,8 @@ describe("getGoogleSheetXlsxExport", () => {
 
     expect(requests[1]!.url).toBe(
       `https://www.googleapis.com/drive/v3/files/${FILE_ID}/export` +
-        "?mimeType=application%2Fvnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "?mimeType=application%2Fvnd.openxmlformats-officedocument.spreadsheetml.sheet" +
+        "&supportsAllDrives=true",
     );
     expect(requests[1]!.headers).toEqual({
       Authorization: `Bearer ${ACCESS_TOKEN}`,
@@ -229,7 +255,8 @@ describe("getGoogleSheetXlsxExport", () => {
     });
 
     expect(requests[0]!.url).toBe(
-      "https://www.googleapis.com/drive/v3/files/a%2F..%2Fb%3Fx%3D1?fields=version",
+      "https://www.googleapis.com/drive/v3/files/a%2F..%2Fb%3Fx%3D1" +
+        "?fields=version&supportsAllDrives=true",
     );
   });
 });
@@ -362,5 +389,138 @@ describe("Drive error mapping", () => {
     ).rejects.toBeInstanceOf(GoogleDriveError);
 
     expect(requests).toHaveLength(1);
+  });
+});
+
+describe("getGoogleSheetTabs", () => {
+  function _tabsResponse(): Response {
+    return new Response(
+      JSON.stringify({
+        sheets: [
+          { properties: { sheetId: 0, title: "Countries", index: 0 } },
+          { properties: { sheetId: 988142735, title: "Cities", index: 1 } },
+        ],
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  it("asks the Sheets API for tab properties and nothing else", async () => {
+    // The field mask is the whole point: it is what makes listing a workbook's
+    // tabs cost no cell data, which is what lets the user be asked which tab to
+    // import before anything is downloaded.
+    const { driveFetch, requests } = _makeRecordingFetch([_tabsResponse()]);
+
+    await getGoogleSheetTabs({
+      fileId: FILE_ID,
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0]!.url).toBe(
+      `https://sheets.googleapis.com/v4/spreadsheets/${FILE_ID}` +
+        "?fields=sheets.properties(sheetId%2Ctitle%2Cindex)",
+    );
+    expect(requests[0]!.headers.Authorization).toBe(`Bearer ${ACCESS_TOKEN}`);
+  });
+
+  it("returns every tab in workbook order", async () => {
+    const { driveFetch } = _makeRecordingFetch([_tabsResponse()]);
+
+    const tabs = await getGoogleSheetTabs({
+      fileId: FILE_ID,
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(tabs).toEqual([
+      { sheetId: 0, title: "Countries", index: 0 },
+      { sheetId: 988142735, title: "Cities", index: 1 },
+    ]);
+  });
+
+  it("throws when the response carries no usable tab", async () => {
+    // A body without tab properties would otherwise become an empty tab list,
+    // which reads downstream as "this workbook has no tabs" rather than as the
+    // API answering something we do not understand.
+    const { driveFetch } = _makeRecordingFetch([
+      new Response(JSON.stringify({ sheets: [{}] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    ]);
+
+    await expect(
+      getGoogleSheetTabs({
+        fileId: FILE_ID,
+        accessToken: ACCESS_TOKEN,
+        driveFetch,
+      }),
+    ).rejects.toBeInstanceOf(GoogleDriveError);
+  });
+});
+
+describe("getGoogleSheetTabCsvExport", () => {
+  const CSV_TEXT = "country,indicator_value\nKenya,41\n";
+
+  it("exports the one tab it was given, by gid", async () => {
+    // `files.export` to `text/csv` renders only the first tab, so a per-tab
+    // download has to address the tab itself. One dataset is one tab.
+    const { driveFetch, requests } = _makeRecordingFetch([
+      _versionResponse("42"),
+      new Response(CSV_TEXT, { status: 200 }),
+    ]);
+
+    const result = await getGoogleSheetTabCsvExport({
+      fileId: FILE_ID,
+      sheetId: 988142735,
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(result.csvText).toBe(CSV_TEXT);
+    expect(requests[1]!.url).toBe(
+      `https://docs.google.com/spreadsheets/d/${FILE_ID}/export` +
+        "?format=csv&gid=988142735",
+    );
+  });
+
+  it("reads the version before the tab, never after", async () => {
+    // An edit landing between the two calls then pairs fresh rows with an old
+    // version, which costs one extra download on the next freshness check.
+    // The other order pairs stale rows with a new version, which a cache reads
+    // as current and serves.
+    const { driveFetch, requests } = _makeRecordingFetch([
+      _versionResponse("42"),
+      new Response(CSV_TEXT, { status: 200 }),
+    ]);
+
+    const result = await getGoogleSheetTabCsvExport({
+      fileId: FILE_ID,
+      sheetId: 0,
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(result.sourceVersion).toBe("42");
+    expect(requests[0]!.url).toContain("fields=version");
+    expect(requests[1]!.url).toContain("format=csv");
+  });
+
+  it("maps a refused download onto a Drive error", async () => {
+    const { driveFetch } = _makeRecordingFetch([
+      _versionResponse("42"),
+      _driveErrorResponse(404),
+    ]);
+
+    await expect(
+      getGoogleSheetTabCsvExport({
+        fileId: FILE_ID,
+        sheetId: 0,
+        accessToken: ACCESS_TOKEN,
+        driveFetch,
+      }),
+    ).rejects.toBeInstanceOf(GoogleDriveError);
   });
 });

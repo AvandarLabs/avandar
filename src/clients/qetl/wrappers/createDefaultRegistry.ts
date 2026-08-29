@@ -66,7 +66,7 @@ export type DefaultRegistryOptions = {
   getGoogleAccessToken?: GoogleSheetsWrapperOptions["getAccessToken"];
 
   /** Reads one Sheets tab under the caller's DuckDB lease. */
-  readGoogleSheetXlsx?: GoogleSheetsWrapperOptions["readXlsx"];
+  readGoogleSheetTabCsv?: GoogleSheetsWrapperOptions["readCsv"];
 
   /** Fetches one API-backed catalog resource through the open-data proxy. */
   fetchApiOpenDataResource?: (
@@ -262,7 +262,7 @@ export function createDefaultRegistry(
       googleSheets: createGoogleSheetsWrapper({
         getSheetSource: options.getGoogleSheetsSource ?? _getGoogleSheetsSource,
         getAccessToken: options.getGoogleAccessToken ?? _getGoogleAccessToken,
-        readXlsx: options.readGoogleSheetXlsx,
+        readCsv: options.readGoogleSheetTabCsv,
       }),
     }),
     createConceptWrapper(),
