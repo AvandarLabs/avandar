@@ -57,7 +57,7 @@ async function _requireAdminAuth(options: {
   return undefined;
 }
 
-export async function onListNgrokURLs(
+export async function onListNgrokUrls(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<FastifyReply> {
@@ -73,7 +73,7 @@ export async function onListNgrokURLs(
   });
 }
 
-export async function onAddNgrokURL(
+export async function onAddNgrokUrl(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<FastifyReply> {
@@ -124,7 +124,7 @@ export async function onAddNgrokURL(
   }
 }
 
-export async function onRemoveNgrokURL(
+export async function onRemoveNgrokUrl(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<FastifyReply> {

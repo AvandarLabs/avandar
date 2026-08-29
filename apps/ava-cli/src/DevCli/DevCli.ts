@@ -1,4 +1,4 @@
-import { NgrokCli } from "@ava-cli/DevCli/NgrokURLCli/NgrokCli";
+import { NgrokCli } from "@ava-cli/DevCli/NgrokUrlCli/NgrokCli";
 import { Acclimate } from "@avandar/acclimate";
 
 /** A CLI for development utilities in Avandar. */

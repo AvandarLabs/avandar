@@ -35,7 +35,7 @@ function _getCombinedLogs(): string {
   return logCalls.flat().join("\n");
 }
 
-describe("runNgrokURLRemove", () => {
+describe("runNgrokUrlRemove", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -55,8 +55,8 @@ describe("runNgrokURLRemove", () => {
       );
     });
 
-    const { runNgrokURLRemove } = await import("./NgrokURLRemoveCli");
-    await runNgrokURLRemove({ url: "https://a.example/" });
+    const { runNgrokUrlRemove } = await import("./NgrokUrlRemoveCli");
+    await runNgrokUrlRemove({ url: "https://a.example/" });
 
     expect(fetchMock.mock.calls.length).toBe(1);
 

@@ -81,13 +81,13 @@ function _expectIsISOTimestampOrNull(value: unknown): void {
 }
 
 async function _createServer(): Promise<FastifyInstance> {
-  const { registerNgrokURLRoutes } = await import("./");
+  const { registerNgrokUrlRoutes } = await import("./");
 
   const server: FastifyInstance = Fastify({
     logger: false,
   });
 
-  await server.register(registerNgrokURLRoutes);
+  await server.register(registerNgrokUrlRoutes);
   return server;
 }
 
@@ -110,7 +110,7 @@ function _mockNgrokDevURLsJSONMissing(): void {
   mockedReadFile.mockRejectedValue(error);
 }
 
-describe("registerNgrokURLRoutes", () => {
+describe("registerNgrokUrlRoutes", () => {
   let server: FastifyInstance | undefined = undefined;
 
   beforeEach(async () => {

@@ -1,4 +1,4 @@
-import { getDevFanoutServerClientConfig } from "@ava-cli/DevCli/NgrokURLCli/getDevFanoutServerClientConfig";
+import { getDevFanoutServerClientConfig } from "@ava-cli/DevCli/NgrokUrlCli/getDevFanoutServerClientConfig";
 import { z } from "zod";
 
 export type NgrokDevURLTarget = Readonly<{
@@ -43,7 +43,7 @@ async function _readErrorBody(res: Response): Promise<string> {
   }
 }
 
-export async function sendNgrokURLManagerRequest(options: {
+export async function sendNgrokUrlManagerRequest(options: {
   path: "/ngrok-url/add" | "/ngrok-url/list" | "/ngrok-url/remove";
   method: "GET" | "POST";
   body?: unknown;

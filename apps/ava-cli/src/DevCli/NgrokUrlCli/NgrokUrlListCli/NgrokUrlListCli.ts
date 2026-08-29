@@ -1,11 +1,11 @@
-import { sendNgrokURLManagerRequest } from "@ava-cli/DevCli/NgrokURLCli/sendNgrokURLManagerRequest";
+import { sendNgrokUrlManagerRequest } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
 import {
   printError,
   printInfo,
   printSuccess,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
-import type { NgrokDevURLTarget } from "@ava-cli/DevCli/NgrokURLCli/sendNgrokURLManagerRequest";
+import type { NgrokDevURLTarget } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
 
 function _formatTimestampForDisplay(isoTimestamp: string): string {
   return new Date(isoTimestamp).toUTCString();
@@ -24,10 +24,10 @@ function _formatLastAccessedForDisplay(value: string | null): string {
  *
  * This is separated from the CLI wiring so it can be unit-tested.
  */
-export async function runNgrokURLList(): Promise<void> {
+export async function runNgrokUrlList(): Promise<void> {
   try {
     printInfo("Fetching registered ngrok URLs...");
-    const { targets } = await sendNgrokURLManagerRequest({
+    const { targets } = await sendNgrokUrlManagerRequest({
       path: "/ngrok-url/list",
       method: "GET",
     });
@@ -59,6 +59,6 @@ export async function runNgrokURLList(): Promise<void> {
 }
 
 /** List all registered dev ngrok URLs. */
-export const NgrokURLListCli = Acclimate.createCLI("list")
+export const NgrokUrlListCli = Acclimate.createCLI("list")
   .description("List all registered dev ngrok URLs.")
-  .action(runNgrokURLList);
+  .action(runNgrokUrlList);

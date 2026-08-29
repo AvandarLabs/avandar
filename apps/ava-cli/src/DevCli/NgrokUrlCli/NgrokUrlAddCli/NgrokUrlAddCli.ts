@@ -1,4 +1,4 @@
-import { sendNgrokURLManagerRequest } from "@ava-cli/DevCli/NgrokURLCli/sendNgrokURLManagerRequest";
+import { sendNgrokUrlManagerRequest } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
 import {
   printError,
   printInfo,
@@ -11,12 +11,12 @@ import { Acclimate } from "@avandar/acclimate";
  *
  * This is separated from the CLI wiring so it can be unit-tested.
  */
-export async function runNgrokURLAdd(options: { url: string }): Promise<void> {
+export async function runNgrokUrlAdd(options: { url: string }): Promise<void> {
   const { url } = options;
 
   try {
     printInfo(`Adding ngrok URL: ${url}`);
-    await sendNgrokURLManagerRequest({
+    await sendNgrokUrlManagerRequest({
       path: "/ngrok-url/add",
       method: "POST",
       body: { url },
@@ -32,7 +32,7 @@ export async function runNgrokURLAdd(options: { url: string }): Promise<void> {
 }
 
 /** Add a dev ngrok URL to the registry. */
-export const NgrokURLAddCli = Acclimate.createCLI("add")
+export const NgrokUrlAddCli = Acclimate.createCLI("add")
   .description("Add a dev ngrok URL to the registry.")
   .addPositionalArg({
     name: "url",
@@ -47,5 +47,5 @@ export const NgrokURLAddCli = Acclimate.createCLI("add")
     },
   })
   .action(({ url }: Readonly<{ url: string }>) => {
-    return runNgrokURLAdd({ url });
+    return runNgrokUrlAdd({ url });
   });

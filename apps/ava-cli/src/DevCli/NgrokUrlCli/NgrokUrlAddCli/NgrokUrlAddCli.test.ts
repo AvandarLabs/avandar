@@ -35,7 +35,7 @@ function _getCombinedLogs(): string {
   return logCalls.flat().join("\n");
 }
 
-describe("runNgrokURLList", () => {
+describe("runNgrokUrlAdd", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -45,20 +45,15 @@ describe("runNgrokURLList", () => {
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
   });
 
-  it("lists registered URLs", async () => {
+  it("adds a URL", async () => {
     const fetchMock = _mockFetch(async () => {
       return new Response(
         JSON.stringify({
           targets: [
             {
               url: "https://a.example/",
-              dateAdded: "2026-01-01T00:00:00.000Z",
+              dateAdded: "2026-01-10T12:00:00.000Z",
               lastAccessedDate: null,
-            },
-            {
-              url: "https://b.example/",
-              dateAdded: "2026-01-02T00:00:00.000Z",
-              lastAccessedDate: "2026-01-03T00:00:00.000Z",
             },
           ],
         }),
@@ -66,22 +61,39 @@ describe("runNgrokURLList", () => {
       );
     });
 
-    const { runNgrokURLList } = await import("./NgrokURLListCli");
-    await runNgrokURLList();
+    const { runNgrokUrlAdd } = await import("./NgrokUrlAddCli");
+    await runNgrokUrlAdd({ url: "https://a.example/" });
 
     expect(fetchMock.mock.calls.length).toBe(1);
 
     const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toBe("https://fanout.example/ngrok-url/list");
-    expect(init?.method).toBe("GET");
+    expect(url).toBe("https://fanout.example/ngrok-url/add");
+    expect(init?.method).toBe("POST");
     expect(init?.headers?.authorization).toBe("Bearer secret");
+    expect(init?.body).toBe(JSON.stringify({ url: "https://a.example/" }));
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("Registered ngrok URLs:");
-    expect(logs).toContain("https://a.example/");
-    expect(logs).toContain("https://b.example/");
-    expect(logs).toContain("Thu, 01 Jan 2026 00:00:00 GMT");
-    expect(logs).toContain("Sat, 03 Jan 2026 00:00:00 GMT");
-    expect(logs).toContain("Never");
+    expect(logs).toContain("Registered ngrok URL.");
+  });
+
+  it("throws on non-2xx responses", async () => {
+    _mockFetch(async () => {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          error: "URL already exists.",
+        }),
+        { status: 409, statusText: "Conflict" },
+      );
+    });
+
+    const { runNgrokUrlAdd } = await import("./NgrokUrlAddCli");
+
+    await expect(runNgrokUrlAdd({ url: "https://a.example/" })).rejects.toThrow(
+      "409 Conflict",
+    );
+
+    const logs = _getCombinedLogs();
+    expect(logs).toContain("Failed to add ngrok URL.");
   });
 });

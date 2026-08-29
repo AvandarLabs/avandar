@@ -1,4 +1,4 @@
-import { sendNgrokURLManagerRequest } from "@ava-cli/DevCli/NgrokURLCli/sendNgrokURLManagerRequest";
+import { sendNgrokUrlManagerRequest } from "@ava-cli/DevCli/NgrokUrlCli/sendNgrokUrlManagerRequest";
 import {
   printError,
   printInfo,
@@ -11,13 +11,13 @@ import { Acclimate } from "@avandar/acclimate";
  *
  * This is separated from the CLI wiring so it can be unit-tested.
  */
-export async function runNgrokURLRemove(options: {
+export async function runNgrokUrlRemove(options: {
   url: string;
 }): Promise<void> {
   const { url } = options;
   try {
     printInfo(`Removing ngrok URL: ${url}`);
-    await sendNgrokURLManagerRequest({
+    await sendNgrokUrlManagerRequest({
       path: "/ngrok-url/remove",
       method: "POST",
       body: { url },
@@ -33,7 +33,7 @@ export async function runNgrokURLRemove(options: {
 }
 
 /** Remove a dev ngrok URL from the registry. */
-export const NgrokURLRemoveCli = Acclimate.createCLI("remove")
+export const NgrokUrlRemoveCli = Acclimate.createCLI("remove")
   .description("Remove a dev ngrok URL from the registry.")
   .addPositionalArg({
     name: "url",
@@ -48,5 +48,5 @@ export const NgrokURLRemoveCli = Acclimate.createCLI("remove")
     },
   })
   .action(({ url }: Readonly<{ url: string }>) => {
-    return runNgrokURLRemove({ url });
+    return runNgrokUrlRemove({ url });
   });
