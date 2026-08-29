@@ -10,7 +10,7 @@ import {
   getParquetBlobFromStagingFiles,
   registerXlsxFile,
 } from "@/clients/DuckDbClient/duckDbFileRegistry";
-import { escapeSqlSingleQuotedLiteral } from "@/clients/DuckDbClient/duckDbSqlText";
+import { makeReadXlsxArgs } from "@/clients/DuckDbClient/makeReadXlsxArgs/makeReadXlsxArgs";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DuckDbLoadXlsxResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
@@ -104,22 +104,23 @@ async function _detectLastPopulatedColumn(
     conn: duckdb.AsyncDuckDBConnection;
     datasetDuckDbLease: DatasetDuckDbLease;
     rowsToSkip: number;
-    sheetClause: string;
+    sheet: string | undefined;
     xlsxStagingFile: string;
   }>,
 ): Promise<string | undefined> {
-  const probeRange = buildXlsxWidthProbeRange(
-    options.rowsToSkip,
-    XLSX_WIDTH_PROBE_ROWS,
-  );
+  // `stop_at_empty` is off so a blank row inside the probe window cannot end
+  // the read before the widest row has been seen.
+  const probeArgs = makeReadXlsxArgs({
+    hasHeader: false,
+    sheet: options.sheet,
+    range: buildXlsxWidthProbeRange(options.rowsToSkip, XLSX_WIDTH_PROBE_ROWS),
+    stopAtEmpty: false,
+  });
   try {
     const result = await options.client.runRawQuery<{ cellColumn: string }>(
       `SELECT DISTINCT cellColumn FROM (
           UNPIVOT (
-            SELECT * FROM read_xlsx(
-              '$xlsxFile$', header = false, range = '${probeRange}',
-              stop_at_empty = false, all_varchar = true${options.sheetClause}
-            )
+            SELECT * FROM read_xlsx('$xlsxFile$', ${probeArgs})
           ) ON COLUMNS(*) INTO NAME cellColumn VALUE cellValue
         ) WHERE cellValue IS NOT NULL AND trim(cellValue) <> ''`,
       {
@@ -160,9 +161,6 @@ async function _transcodeXlsxToParquet(
     xlsxStagingFile: string;
   }>,
 ): Promise<void> {
-  const sheetClause = options.sheet
-    ? `, sheet = '${escapeSqlSingleQuotedLiteral(options.sheet)}'`
-    : "";
   // A range is only needed to skip a title block, and detecting the sheet's
   // width costs a read of its own, so neither happens without a skip.
   const lastColumn =
@@ -172,19 +170,18 @@ async function _transcodeXlsxToParquet(
           conn: options.conn,
           datasetDuckDbLease: options.datasetDuckDbLease,
           rowsToSkip: options.rowsToSkip,
-          sheetClause,
+          sheet: options.sheet,
           xlsxStagingFile: options.xlsxStagingFile,
         })
       : undefined;
-  const range = buildXlsxReadRange(options.rowsToSkip, lastColumn);
-  // Naming a range turns `stop_at_empty` off, which would pad the read out to
-  // the format's maximum row, so it is switched back on alongside the range.
-  const rangeClause = range ? `, range = '${range}', stop_at_empty = true` : "";
+  const readArgs = makeReadXlsxArgs({
+    hasHeader: options.hasHeader,
+    sheet: options.sheet,
+    range: buildXlsxReadRange(options.rowsToSkip, lastColumn),
+  });
   await options.client.runRawQuery(
     `COPY (
-        SELECT * FROM read_xlsx(
-          '$xlsxFile$', header = ${options.hasHeader} ${sheetClause}${rangeClause}
-        )
+        SELECT * FROM read_xlsx('$xlsxFile$', ${readArgs})
       ) TO '$pqFile$' (FORMAT PARQUET, COMPRESSION ZSTD)`,
     {
       conn: options.conn,

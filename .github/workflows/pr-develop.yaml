@@ -74,7 +74,7 @@ jobs:
       - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
       # No `playwright install` here: nothing in the quick suite drives a
       # browser, and the Chromium download is the single slowest setup step.
-      - run: bash scripts/runAllTests.sh --quick
+      - run: bash scripts/test-runners/run-all-tests.sh --quick
       - name: Upload Supabase functions log
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -126,7 +126,7 @@ jobs:
       - run: bash scripts/ci/verify-supabase-api-is-running.sh
       - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e
+      - run: pnpm test:e2e --no-third-party
       - name: Upload Supabase functions log
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

@@ -75,17 +75,22 @@ export type PdfParseOptions = {
 export type GoogleSheetsParseOptions = {
   type: "google_sheets";
 
-  /** The tab to read. `undefined` means the workbook's first tab. */
+  /** The title of the tab to read. `undefined` means the first tab. */
   sheetName?: string;
 
-  hasHeader?: boolean;
+  /**
+   * The `gid` of the tab to read, which is what the export URL addresses.
+   *
+   * Preferred over `sheetName` when both are present, because a title can be
+   * changed in the Sheets UI and a gid cannot. The title is still carried so a
+   * saved dataset records which tab a human would recognise.
+   */
+  sheetId?: number;
 
-  // No `numRowsToSkip`. Sheets now goes through the same `read_xlsx` transcode
-  // as `xlsx_file`, and `read_xlsx`'s `range` cannot express "skip n rows"
-  // without the sheet's exact used range: every open-ended form is either
-  // rejected or pads the result to the sheet's maximum extent. A Google Sheets
-  // user can delete preamble rows in the sheet itself, which is the workaround
-  // a CSV-on-disk user does not have.
+  // No `hasHeader`, and no `numRowsToSkip`. A tab is downloaded as CSV and read
+  // by DuckDB's CSV reader, whose sniffer detects the header itself. Skipping
+  // preamble rows is expressible on this path, unlike the `read_xlsx` one it
+  // replaced, but no control offers it yet.
 };
 
 export type FileParseOptions =
@@ -217,7 +222,7 @@ async function _saveGoogleSheetsDataset(
   }>,
 ): Promise<Dataset.T> {
   const { datasetLoadResult } = options.payload;
-  const { columns, sheet } = datasetLoadResult.sheetLoadMetadata;
+  const { columns, sheetName } = datasetLoadResult;
   return DatasetClient.insertGoogleSheetsDataset({
     googleAccountId: options.payload.googleAccountId,
     googleDocumentId: options.payload.googleDocumentId,
@@ -225,18 +230,18 @@ async function _saveGoogleSheetsDataset(
     datasetDescription: options.context.datasetDescription,
     datasetId: datasetLoadResult.datasetId,
     datasetName: options.context.datasetName,
-    // `sheet` is the tab the transcode actually read, and it is deliberately
-    // preferred over `parseOptions.sheetName`, which is only the tab the user
-    // has *selected*. The two diverge when a user picks a different tab and
-    // saves without pressing "Process data again": the stored columns are still
-    // the old tab's, so recording the new tab's name would leave `sheet_name`
+    // The tab the download actually read, and deliberately preferred over
+    // `parseOptions.sheetName`, which is only the tab the user has *selected*.
+    // The two diverge when a user picks a different tab and saves without
+    // pressing "Process data again": the stored columns are still the old
+    // tab's, so recording the new tab's name would leave `sheet_name`
     // disagreeing with `dataset_columns`, and acquisition would then read a tab
     // whose schema was never validated.
     //
     // Always a concrete name, so a stored `null` stays a legacy value that only
     // pre-tab-column rows carry.
-    sheetName: sheet,
-    // Not applied for Sheets or for `xlsx_file`. See the note on
+    sheetName,
+    // No control offers a row skip for Sheets yet. See the note on
     // `GoogleSheetsParseOptions`.
     rowsToSkip: 0,
     workspaceId: options.context.workspaceId,

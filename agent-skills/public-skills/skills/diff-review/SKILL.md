@@ -365,6 +365,15 @@ Use these headings in this order, numbered, omitting any that would be empty.
 Numbers are stable for the life of the review so the reviewer can annotate a
 printout and cite `§3.2` back to you.
 
+Headings are factual navigation. Name the concrete subject and condition in
+plain language. Do not use wordplay, suspense, or a title whose meaning appears
+only after reading the section.
+
+| Avoid | Use |
+| --- | --- |
+| `The 404 that means two things` | `Ambiguous 404 when getting a file from Drive` |
+| `A view's scope is the whole view` | `Picker views cannot combine Drive scopes` |
+
 1. **Purpose.** The problem in the reader's terms and what "done" means. No
    file names, no module names. Two paragraphs at most, and it must **name
    every strand of work in the change**, because a strand the reader has not
@@ -378,6 +387,23 @@ printout and cite `§3.2` back to you.
 3. **One section per strand of work,** named after the concern rather than the
    kind of thing it contains. Use numbered subsections (`3.1`, `3.2`) for the
    pieces inside a strand, so the reviewer can cite one.
+
+   When a section explains one specific defect and its resolution, add `The
+   Problem` and `The Solution` one heading level below it:
+
+   ```markdown
+   ### 3.1 Ambiguous 404 when getting a file from Drive
+
+   #### The Problem
+
+   State the failure condition and evidence.
+
+   #### The Solution
+
+   State the implemented correction and why it closes the failure.
+   ```
+
+   Do not add these headings to sections that do not describe a solved problem.
 
    **Do not file sections by artifact kind.** "Components", "Algorithms and
    invariants", "Helpers" are category buckets, and a bucket strands its
@@ -564,6 +590,16 @@ technical article does: snippet first, then the prose that acts on it. A
 paragraph that says "the read is only valid after the `await getDb()` above it"
 is unreadable to someone who cannot see the lines in question.
 
+- **Name the source before every repository code excerpt.** Use the complete
+  path relative to the project root, immediately above the fence:
+
+  ```markdown
+  **File: `src/lib/google-drive/getGoogleDriveFile.ts`**
+  ```
+
+  Blocks not copied from a repository file, including Mermaid diagrams,
+  commands to run, ASCII wireframes, and illustrative examples, do not receive
+  a file label.
 - **Quote the excerpt, not the unit.** Five to fifteen lines, trimmed to what
   the paragraph is about. A whole function is a tour; the reader stops reading
   tours.
@@ -571,6 +607,8 @@ is unreadable to someone who cannot see the lines in question.
   lands on the two lines the paragraph is about rather than scanning the block:
 
   ````markdown
+  **File: `src/lib/extensions/ensureExtension.ts`**
+
   ```typescript {3,4}
   const ensureExtension = (name: string) => {
     const existing = extensionPromises.get(name);
@@ -624,9 +662,33 @@ structural, not more words.
 - **Check the structure by reading only the headings and each section's first
   sentence.** That pass is part of [Closing checks](#closing-checks).
 
+### Factual prose
+
+Every sentence contributes one of six things: a technical fact, evidence, a
+consequence, a decision, a transition, or a scope boundary. Delete or rewrite
+sentences that only make the document sound engaging.
+
+Importance claims name their reason in the same sentence. Replace a bare label
+such as `important`, `critical`, `central`, or `load-bearing` with the behavior,
+dependency, or failure, or connect the label directly to that reason.
+
+| Remove | Write instead |
+| --- | --- |
+| Reader coaching: `This one is worth dwelling on.` | State the finding: `The existing unit test hid the defect.` |
+| Inflated significance: `This strand is the point of the branch.` | State the coverage gap: `No existing test covered these failures.` |
+| Vague importance: `The separator row is load-bearing.` | State the behavior and failure: `The separator row distinguishes a table from a paragraph; without it, the parser renders the pipes as body text.` |
+| Suspense: `That change surfaced a second, subtler property.` | Name the property and its effect. |
+| Dramatic metaphor or anthropomorphism: `The import got further and then died.` | Name the component and failure: `DuckDB aborted the import after the preview succeeded.` |
+| Punchline contrast: `This looks redundant and is not.` | State why both statements are required. |
+| Editorial judgment: `The view is genuinely not capturable.` | State the blocking condition. |
+| Vague pronoun-led transition: `This has a consequence outside the code.` | Name the affected workflow or system. |
+
+Captions follow the same rule. State what the diagram or screenshot proves;
+do not turn the caption into a slogan or punchline.
+
 ### Closing checks
 
-Four passes over the finished draft, before handing it over. Each catches a
+Five passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
 
 1. **Find every fact the document states twice, and confirm the copies agree.**
@@ -656,6 +718,12 @@ class of defect that reading the document top to bottom does not.
 4. **Look at the diagrams at print size,** per
    [Size every diagram](#size-every-diagram-do-not-let-the-renderer-decide). A
    diagram outside the budget is one to restructure, not to ship.
+
+5. **Audit the writing contract.** Read the headings without the body and
+   confirm each names its subject and condition. Check every solved-problem
+   section for `The Problem` and `The Solution`, every repository code excerpt
+   for its project-relative file label, and every paragraph and caption against
+   [Factual prose](#factual-prose).
 
 ### Rules
 

@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 
 // Baked into the bundle so a running `ava` can compare itself against the
 // version in apps/ava-cli/package.json and refuse to run when it is stale.
-// See src/utils/assertCLIIsUpToDate.
+// See src/utils/assertCliIsUpToDate.
 const { version } = JSON.parse(
   readFileSync(new URL("./package.json", import.meta.url), "utf8"),
 ) as { version: string };

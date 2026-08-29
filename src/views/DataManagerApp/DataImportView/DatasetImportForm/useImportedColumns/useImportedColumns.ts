@@ -31,17 +31,15 @@ export function useImportedColumns(
         // A PDF's columns stay empty until a region is extracted, so this
         // arm yields `[]` for a freshly-uploaded document.
         { sourceType: "pdf_file" },
+        // A Google Sheets tab is downloaded as CSV, so its load result carries
+        // the same top-level columns the file sources do.
+        { sourceType: "google_sheets" },
         (metadata) => {
           return _duckDbColumnsToImportedColumns(
             metadata.datasetLoadResult.columns,
           );
         },
       )
-      .with({ sourceType: "google_sheets" }, (metadata) => {
-        return _duckDbColumnsToImportedColumns(
-          metadata.datasetLoadResult.sheetLoadMetadata.columns,
-        );
-      })
       .exhaustive();
   }, [dataSourceMetadata]);
 }

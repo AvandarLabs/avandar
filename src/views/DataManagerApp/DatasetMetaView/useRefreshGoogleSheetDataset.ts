@@ -4,7 +4,7 @@ import { useLingui } from "@lingui/react/macro";
 import { makePrincipalKeyFromWorkspaceSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { APIClient } from "@/clients/APIClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { getGoogleSheetXlsxExport } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
+import { getStoredGoogleSheetTabCsv } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import { clearGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import { DexieRelationCache } from "@/clients/qetl/RelationCache/DexieRelationCache/DexieRelationCache";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -85,21 +85,26 @@ export function useRefreshGoogleSheetDataset(): UseMutationResultTuple<
         throw new Error("No Google token is available for this user");
       }
 
-      const { xlsxBytes } = await getGoogleSheetXlsxExport({
+      // The same download acquisition and import use, so a refreshed dataset
+      // is read exactly the way the original import read it. It resolves the
+      // stored tab name, and fails by name when a rename means it no longer
+      // matches, rather than quietly returning another tab's rows.
+      const { csvText } = await getStoredGoogleSheetTabCsv({
         fileId: sourceDataset.googleDocumentId,
+        sheetName: sourceDataset.sheetName,
         accessToken,
       });
 
-      await LocalDatasetClient.startXlsxImport({
+      // Re-imported the same way the dataset was first imported: one tab, as
+      // CSV. Refreshing through a different reader would retype the columns.
+      await LocalDatasetClient.startCsvImport({
         datasetId,
         userId: user!.id as User.Id,
         workspaceId: workspace.id,
-        file: new File([new Blob([xlsxBytes])], `${datasetId}.xlsx`, {
-          type: MIMEType.APPLICATION_OPENXML_EXCEL,
+        file: new File([csvText], `${datasetId}.csv`, {
+          type: MIMEType.TEXT_CSV,
         }),
-        // `null` means the workbook's first tab, which is `read_xlsx`'s own
-        // default and what a missing stored tab name means today.
-        parseOptions: { sheet: sourceDataset.sheetName ?? undefined },
+        parseOptions: {},
       });
     },
 

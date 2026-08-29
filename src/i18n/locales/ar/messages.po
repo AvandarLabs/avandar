@@ -399,6 +399,10 @@ msgstr "توسيع"
 msgid "Callout"
 msgstr "مربع تنبيه"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Process"
+msgstr "معالجة"
+
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
 msgid "Style"
@@ -1786,6 +1790,10 @@ msgstr "إخلاء مسؤولية الحدود (مضمّن دائمًا)"
 msgid "Undo"
 msgstr "تراجع"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "One dataset is one tab."
+msgstr "كل مجموعة بيانات هي علامة تبويب واحدة."
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 8 جيجابايت تقريبًا (الإعداد "
@@ -1989,11 +1997,6 @@ msgstr "إضافة مجموعة بيانات جديدة"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Switch to Free plan"
 msgstr "التحويل إلى خطة مجانية"
-
-#. placeholder {0}: formatNumber(numSuccessRows)
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {0} rows"
-msgstr "تم تحليل {0} صفوف"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -4095,6 +4098,10 @@ msgstr "لوحة التحكم"
 msgid "{0} was deleted from this browser."
 msgstr "{0} تم حذفه من هذا المتصفح."
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Tab to import"
+msgstr "علامة تبويب للاستيراد"
+
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB للتنزيل)."
@@ -5139,6 +5146,10 @@ msgstr "لا توجد صفوف"
 msgid "Most common"
 msgstr "الأكثر شيوعًا"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr "محركات الأقراص المشتركة"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
 msgstr "H3"
@@ -5466,10 +5477,6 @@ msgstr "توسيع المفتش"
 msgid "Case Manager"
 msgstr "مدير الحالات"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-msgid "The tab has a header row"
-msgstr "تحتوي علامة التبويب على صف عناوين"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
 msgstr "مدمج"
@@ -5620,7 +5627,7 @@ msgstr "الفئة {0}: {1} من القيم"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "تجاهل جميع عوامل التصفية العالمية: هذه التصور غير مصفاة."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "Google Sheet"
 msgstr "جدول Google"
 
@@ -6578,10 +6585,6 @@ msgstr "احفظ تغييراتك أولاً: يعكس PDF لوحة التحكم
 msgid "Units"
 msgstr "الوحدات"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File failed to load"
-msgstr "فشل تحميل الملف"
-
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
 msgstr "إزالة المجموعة"
@@ -6893,6 +6896,10 @@ msgstr "الأشكال الهندسية غير متاحة"
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "مجموعة بيانات الحدود"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr "تمت مشاركته معي"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -7454,6 +7461,10 @@ msgstr "مضلع"
 msgid "Resuming dataset processing…"
 msgstr "جارٍ استئناف معالجة مجموعة البيانات…"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Tab not found"
+msgstr "لم يتم العثور على علامة التبويب"
+
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
@@ -7653,7 +7664,6 @@ msgid "Current Plan"
 msgstr "الخطة الحالية"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "No rows were read successfully"
 msgstr "لم تتم قراءة أي صفوف بنجاح"
 
@@ -7793,6 +7803,12 @@ msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على م
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "أدخل نصك هنا"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
+"deleted. Pick the sheet again and choose a tab."
+msgstr "لم تعد علامة التبويب هذه موجودة في جدول البيانات. ربما تمت إعادة "
+"تسميتها أو حذفها. اختر الورقة مرة أخرى وحدد علامة تبويب."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8359,10 +8375,6 @@ msgid "You need to be signed in to ask the assistant. Kept the rule-based "
 msgstr "يجب تسجيل الدخول لطرح سؤال على المساعد. تم الاحتفاظ بالنتائج المستندة "
 "إلى القواعد."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File loaded successfully"
-msgstr "تم تحميل الملف بنجاح"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
 msgstr "الاحتفاظ بحقوقول الكتلة"
@@ -8511,7 +8523,7 @@ msgstr "عنوان البريد الإلكتروني غير صالح"
 msgid "Not plotted yet"
 msgstr "لم يتم رسمه بعد"
 
-#. placeholder {0}: selectedDocument.name
+#. placeholder {0}: pickedSheet.spreadsheetName
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
 msgstr "المستند المحدد: {0}"
@@ -8764,6 +8776,10 @@ msgstr "يستخدم HAVING العامل \"{operator}\" الذي لا يدعمه
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "مُزاح"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr "ملفاتي"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
