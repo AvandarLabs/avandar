@@ -722,9 +722,7 @@ describe("GoogleSheetsImportView", () => {
       );
     });
     // The failure is the whole outcome: no form ever renders behind the toast.
-    expect(
-      screen.queryByText(/columns were detected/),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/columns were detected/)).not.toBeInTheDocument();
   });
 
   it("tells the user to re-pick when the per-file grant is gone", async () => {
