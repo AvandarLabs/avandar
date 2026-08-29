@@ -54,6 +54,11 @@ export function buildHTTPQueryString(
           undefinedString: "",
           booleanTrue: "true",
           booleanFalse: "false",
+          // A URL is not a place for a human-readable number. Left on,
+          // `unknownToString` runs numbers through `Intl.NumberFormat`, so a
+          // Google Sheets `gid` of 988142735 goes out as `988,142,735` and the
+          // separator changes with the runtime's locale.
+          formatNumbers: false,
         }),
       )}`;
     })

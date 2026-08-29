@@ -420,7 +420,7 @@ describe("getGoogleSheetTabs", () => {
     expect(requests).toHaveLength(1);
     expect(requests[0]!.url).toBe(
       `https://sheets.googleapis.com/v4/spreadsheets/${FILE_ID}` +
-        "?fields=sheets.properties(sheetId,title,index)",
+        "?fields=sheets.properties(sheetId%2Ctitle%2Cindex)",
     );
     expect(requests[0]!.headers.Authorization).toBe(`Bearer ${ACCESS_TOKEN}`);
   });

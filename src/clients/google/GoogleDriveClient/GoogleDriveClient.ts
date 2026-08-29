@@ -1,3 +1,4 @@
+import { buildHTTPQueryString } from "$/utils/urls/buildHTTPQueryString";
 import { getGoogleDriveErrorFromResponse } from "@/clients/google/GoogleDriveClient/getGoogleDriveErrorFromResponse";
 import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
@@ -25,7 +26,7 @@ const SHEETS_TAB_EXPORT_URL = "https://docs.google.com/spreadsheets/d";
 
 /**
  * Declares that this client understands shared drives, and must be sent on
- * every request.
+ * every Drive request.
  *
  * Drive v3 defaults it to `false`, and a request that omits it cannot see a
  * shared drive item **at all**: `files.get` on a file whose `driveId` is set
@@ -39,7 +40,23 @@ const SHEETS_TAB_EXPORT_URL = "https://docs.google.com/spreadsheets/d";
  * the same file, so relying on one of them accepting narrower parameters than
  * the other only sets up the next 404.
  */
-const SUPPORTS_ALL_DRIVES_PARAM = "supportsAllDrives=true";
+const SHARED_DRIVE_PARAMS = { supportsAllDrives: true };
+
+/** The tab properties a tab list needs, and no cell data. */
+const TAB_PROPERTIES_FIELD_MASK = "sheets.properties(sheetId,title,index)";
+
+/** Builds a `files` URL for one file, with its query string encoded. */
+function _buildDriveFileUrl(
+  params: Readonly<{
+    fileId: string;
+    path?: string;
+    queryParams: Record<string, string | number | boolean>;
+  }>,
+): string {
+  const path = params.path ?? "";
+  const queryString = buildHTTPQueryString(params.queryParams);
+  return `${DRIVE_FILES_URL}/${encodeURIComponent(params.fileId)}${path}?${queryString}`;
+}
 
 /**
  * The MIME type Drive renders a Google Sheet into. This exact string is what
@@ -98,9 +115,10 @@ export async function getGoogleSheetVersion(
   }>,
 ): Promise<SourceVersion> {
   const response = await _getDriveResponse({
-    url:
-      `${DRIVE_FILES_URL}/${encodeURIComponent(params.fileId)}` +
-      `?fields=version&${SUPPORTS_ALL_DRIVES_PARAM}`,
+    url: _buildDriveFileUrl({
+      fileId: params.fileId,
+      queryParams: { fields: "version", ...SHARED_DRIVE_PARAMS },
+    }),
     accessToken: params.accessToken,
     driveFetch: params.driveFetch ?? _fetchFromGoogle,
   });
@@ -157,10 +175,11 @@ export async function getGoogleSheetXlsxExport(
   });
 
   const response = await _getDriveResponse({
-    url:
-      `${DRIVE_FILES_URL}/${encodeURIComponent(params.fileId)}/export` +
-      `?mimeType=${encodeURIComponent(XLSX_MIME_TYPE)}` +
-      `&${SUPPORTS_ALL_DRIVES_PARAM}`,
+    url: _buildDriveFileUrl({
+      fileId: params.fileId,
+      path: "/export",
+      queryParams: { mimeType: XLSX_MIME_TYPE, ...SHARED_DRIVE_PARAMS },
+    }),
     accessToken: params.accessToken,
     driveFetch,
   });
@@ -193,10 +212,11 @@ export async function getGoogleSheetTabs(
     driveFetch?: GoogleDriveFetch;
   }>,
 ): Promise<GoogleSheetTab[]> {
+  const queryString = buildHTTPQueryString({
+    fields: TAB_PROPERTIES_FIELD_MASK,
+  });
   const response = await _getDriveResponse({
-    url:
-      `${SHEETS_API_URL}/${encodeURIComponent(params.fileId)}` +
-      "?fields=sheets.properties(sheetId,title,index)",
+    url: `${SHEETS_API_URL}/${encodeURIComponent(params.fileId)}?${queryString}`,
     accessToken: params.accessToken,
     driveFetch: params.driveFetch ?? _fetchFromGoogle,
   });
@@ -253,10 +273,14 @@ export async function getGoogleSheetTabCsvExport(
     driveFetch,
   });
 
+  const queryString = buildHTTPQueryString({
+    format: "csv",
+    gid: params.sheetId,
+  });
   const response = await _getDriveResponse({
     url:
-      `${SHEETS_TAB_EXPORT_URL}/${encodeURIComponent(params.fileId)}/export` +
-      `?format=csv&gid=${encodeURIComponent(String(params.sheetId))}`,
+      `${SHEETS_TAB_EXPORT_URL}/${encodeURIComponent(params.fileId)}` +
+      `/export?${queryString}`,
     accessToken: params.accessToken,
     driveFetch,
   });
