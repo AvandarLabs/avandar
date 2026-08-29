@@ -1,6 +1,11 @@
 import { readFileSync } from "node:fs";
-import path from "node:path";
 import * as XLSX from "xlsx";
+import {
+  COUNTRY_TAB_TITLE,
+  FIXTURE_PATH,
+  SERIES_TAB_TITLE,
+  TOTAL_ROW_COUNT,
+} from "../data/google-sheet-late-prose/makeFixture";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { installFakeGooglePicker } from "./helpers/installFakeGooglePicker";
@@ -29,11 +34,6 @@ import type { Page, Route } from "@playwright/test";
  * the real browser.
  */
 
-const FIXTURE_PATH = path.join(
-  process.cwd(),
-  "tests/data/google-sheet-late-prose/google-sheet-late-prose.xlsx",
-);
-
 const FIXTURE_SHEET = {
   id: "1FixtureSheetIdAbCdEfGhIjKlMnOpQrSt",
   name: "gender-stats-series",
@@ -42,19 +42,17 @@ const FIXTURE_SHEET = {
 /**
  * The fixture workbook's tabs, with the gids this stub answers to.
  *
+ * The titles come from the generator, so a renamed tab breaks the stub here
+ * rather than in a download that quietly returns the wrong rows. The gids are
+ * this stub's own invention: the fixture is a local workbook and has none.
+ *
  * Two of them, so the connector has to ask which one to import and the answer
- * has to reach the download. The first is the 701-row one.
+ * has to reach the download. The first is the one with the prose row.
  */
 const FIXTURE_TABS = [
-  { sheetId: 0, title: "Series", index: 0 },
-  { sheetId: 1234567, title: "Country", index: 1 },
+  { sheetId: 0, title: SERIES_TAB_TITLE, index: 0 },
+  { sheetId: 1234567, title: COUNTRY_TAB_TITLE, index: 1 },
 ];
-
-/**
- * Every data row on the fixture's first tab: 700 numeric rows plus the prose
- * row. Kept in step with `tests/data/google-sheet-late-prose/makeFixture.mjs`.
- */
-const FIXTURE_TOTAL_ROW_COUNT = 701;
 
 type DriveRequestLog = { urls: string[] };
 
@@ -321,7 +319,7 @@ test.describe("Google Sheets connector", () => {
           },
           { timeout: LONG_WAIT },
         )
-        .toBe(FIXTURE_TOTAL_ROW_COUNT);
+        .toBe(TOTAL_ROW_COUNT);
     } finally {
       await _cleanUpGoogleSheetImport(e2eWorkerDb);
     }
