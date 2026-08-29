@@ -23,7 +23,7 @@ const CLIOptionSchema = z.object({
 
 type CLIOptions = z.infer<typeof CLIOptionSchema>;
 
-function setupCLI() {
+function setupCli() {
   program
     .name("pnpm email:send-email --")
     .description("Send a transactional email to a recipient")
@@ -85,7 +85,7 @@ async function confirmSend(recipient: string): Promise<void> {
 }
 
 async function main() {
-  setupCLI();
+  setupCli();
   const cliOptions = CLIOptionSchema.parse(program.opts());
   try {
     const { to, subject, body } = cliOptions;

@@ -195,7 +195,7 @@ async function createRouteFile(
   );
 }
 
-function setupCLI() {
+function setupCli() {
   program
     .name("pnpm new:route --")
     .description(
@@ -212,7 +212,7 @@ inside it.${RESET}`,
 }
 
 async function main() {
-  setupCLI();
+  setupCli();
   try {
     const { auth } = CLIOptionSchema.parse(program.opts());
     const [route] = CLIArgumentsSchema.parse(program.args);

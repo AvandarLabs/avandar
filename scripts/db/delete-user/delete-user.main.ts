@@ -18,7 +18,7 @@ const CLIOptionSchema = z.object({
   prod: z.boolean().optional(),
 });
 
-function setupCLI() {
+function setupCli() {
   program
     .name("pnpm db:delete-user --")
     .description("Delete a user from Supabase by email")
@@ -94,7 +94,7 @@ async function confirmDelete(options: {
 }
 
 async function main() {
-  setupCLI();
+  setupCli();
   try {
     const { email, prod } = CLIOptionSchema.parse(program.opts());
 

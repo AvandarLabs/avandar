@@ -1,0 +1,158 @@
+import { spawn } from "node:child_process";
+import * as path from "node:path";
+import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
+import { getSupabaseScriptsList } from "@ava-cli/SupabaseCli/SupabaseRunCli/getSupabaseScriptsList";
+import { Acclimate } from "@avandar/acclimate";
+
+const PROJECT_ROOT = path.join(process.cwd());
+
+const SUPABASE_SCRIPT_RUNNER_PATH = path.join(
+  PROJECT_ROOT,
+  "packages",
+  "ava-cli",
+  "src",
+  "SupabaseCli",
+  "SupabaseRunCli",
+  "supabase-script-runner",
+  "main.ts",
+);
+
+async function _printScriptsList(): Promise<void> {
+  Acclimate.log("\n|white|The following scripts are available:");
+  const scriptsList = await getSupabaseScriptsList();
+  const scriptsListString = scriptsList
+    .map((script: string) => {
+      return `- ${script}`;
+    })
+    .join("\n");
+
+  Acclimate.log(scriptsListString);
+}
+
+async function _printUsage(): Promise<void> {
+  Acclimate.log(
+    "|yellow|Usage:\n\tava supabase run --script <script-name> --query <sql>",
+  );
+  Acclimate.log(
+    "\n\t|yellow|The script file should export a `RowSchema` (z.object) and a `function execute({ rows })`.",
+  );
+  Acclimate.log(
+    "\n\t|yellow|The SQL query results will get passed into the specified script's `execute` function.",
+  );
+  await _printScriptsList();
+}
+
+/** A CLI for running an abitrary .ts file with a Supabase Admin Client */
+export const SupabaseRunCli = Acclimate.createCLI("run")
+  .description("Run an arbitrary .ts function with a Supabase Admin Client")
+  .addOption({
+    name: "--script",
+    aliases: ["-s"],
+    description: "The script file name to run",
+    required: false,
+    type: "string",
+  })
+  .addOption({
+    name: "--list-scripts",
+    aliases: ["-l"],
+    description: "The name of the script to run",
+    required: false,
+    type: "boolean",
+  })
+  .addOption({
+    name: "--sql",
+    aliases: ["-q"],
+    description: "The SQL query to run",
+    required: false,
+    type: "string",
+  })
+  .action(async ({ script, sql, listScripts }) => {
+    if (listScripts) {
+      await _printScriptsList();
+      return;
+    }
+
+    if (!script) {
+      await _printUsage();
+      Acclimate.log("|red|ERROR: No script name provided.");
+      return;
+    }
+
+    if (!sql) {
+      await _printUsage();
+      Acclimate.log("|red|ERROR: No SQL was provided.");
+      return;
+    }
+
+    // find the requested script module
+    const validScripts = await getSupabaseScriptsList();
+    const scriptToRun = validScripts.find((s: string) => {
+      return s === script;
+    });
+    if (!scriptToRun) {
+      Acclimate.log(
+        "|red|ERROR: Script '$script$' not found in .ava/scripts directory.",
+        { script },
+      );
+      return _printScriptsList();
+    }
+
+    Acclimate.log("|yellow|Running script: $scriptName$", {
+      scriptName: scriptToRun,
+    });
+
+    const dbLocation = AvaEnv.getLoadedEnvTarget();
+
+    // Validated here, in the parent, so a target whose env file has no
+    // connection string fails by name instead of the child silently using
+    // whatever `SUPABASE_POSTGRES_URL` happened to be in the shell.
+    AvaEnv.requireVar("SUPABASE_POSTGRES_URL");
+
+    Acclimate.log("|yellow|Using $envFile$ ($dbLocation$)", {
+      envFile: AvaEnv.getLoadedEnvFile(),
+      dbLocation,
+    });
+
+    const scriptFilePath = path.join(
+      PROJECT_ROOT,
+      ".ava",
+      "scripts",
+      `${scriptToRun}.ts`,
+    );
+
+    // we spawn a child process to execute the supabase script runner so that
+    // we can use `tsx` to load the `tsconfig.node.json` file. That way
+    // the user-supplied script module can run with the correct TypeScript
+    // compiler options.
+    const child = spawn(
+      "npx",
+      [
+        "tsx",
+        "--tsconfig",
+        path.join(PROJECT_ROOT, "tsconfig.node.json"),
+        SUPABASE_SCRIPT_RUNNER_PATH,
+        "--dbLocationType",
+        dbLocation,
+        "--sql",
+        sql,
+        "--absolutePathToScript",
+        scriptFilePath,
+      ],
+      {
+        cwd: PROJECT_ROOT,
+        stdio: "inherit",
+        // pass through the env we loaded
+        env: { ...process.env },
+      },
+    );
+
+    await new Promise<void>((resolve, reject) => {
+      child.on("close", (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(new Error(`Process exited with ${code}`));
+        }
+      });
+    });
+  });

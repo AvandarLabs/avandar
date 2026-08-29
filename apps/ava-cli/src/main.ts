@@ -1,10 +1,10 @@
 import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
-import { DevCLI } from "@ava-cli/DevCLI/DevCLI";
-import { NewBoilerplateCLI } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewBoilerplateCLI";
-import { PipelineCLI } from "@ava-cli/PipelineCLI/PipelineCLI";
-import { PolarCLI } from "@ava-cli/PolarCLI/PolarCLI";
-import { ReleaseCLI } from "@ava-cli/ReleaseCLI/ReleaseCLI";
-import { SupabaseCLI } from "@ava-cli/SupabaseCLI/SupabaseCLI";
+import { DevCli } from "@ava-cli/DevCli/DevCli";
+import { NewBoilerplateCli } from "@ava-cli/DevCli/NewBoilerplateCli/NewBoilerplateCli";
+import { PipelineCli } from "@ava-cli/PipelineCli/PipelineCli";
+import { PolarCli } from "@ava-cli/PolarCli/PolarCli";
+import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
+import { SupabaseCli } from "@ava-cli/SupabaseCli/SupabaseCli";
 import { assertCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/assertCLIIsUpToDate";
 import { printError } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
@@ -38,12 +38,12 @@ const cli = Acclimate.createCLI("ava")
     default: false,
     type: "boolean",
   })
-  .addCommand("dev", DevCLI)
-  .addCommand("new", NewBoilerplateCLI)
-  .addCommand("pipeline", PipelineCLI)
-  .addCommand("polar", PolarCLI)
-  .addCommand("release", ReleaseCLI)
-  .addCommand("supabase", SupabaseCLI);
+  .addCommand("dev", DevCli)
+  .addCommand("new", NewBoilerplateCli)
+  .addCommand("pipeline", PipelineCli)
+  .addCommand("polar", PolarCli)
+  .addCommand("release", ReleaseCli)
+  .addCommand("supabase", SupabaseCli);
 
 // Nothing rebuilds `ava` automatically, so refuse to run stale code against the
 // repository. Acclimate has no pre-command hook, so this guards the entry
