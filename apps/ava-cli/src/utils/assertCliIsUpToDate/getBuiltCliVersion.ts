@@ -12,7 +12,7 @@ declare const __AVA_CLI_VERSION__: string;
  * therefore a comparison between what is running and what the repository
  * currently describes.
  */
-export function getBuiltCLIVersion(): string | undefined {
+export function getBuiltCliVersion(): string | undefined {
   return typeof __AVA_CLI_VERSION__ === "string"
     ? __AVA_CLI_VERSION__
     : undefined;

@@ -1,5 +1,5 @@
-import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate/checkCLIIsUpToDate";
-import { getBuiltCLIVersion } from "@ava-cli/utils/assertCLIIsUpToDate/getBuiltCLIVersion";
+import { checkCliIsUpToDate } from "@ava-cli/utils/assertCliIsUpToDate/checkCliIsUpToDate/checkCliIsUpToDate";
+import { getBuiltCliVersion } from "@ava-cli/utils/assertCliIsUpToDate/getBuiltCliVersion";
 import { printError, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 
@@ -23,14 +23,14 @@ function _getRunningBundlePath(): string | undefined {
  * Stops the CLI when the running `ava` does not match `apps/ava-cli`.
  *
  * Called before any command runs, so a stale binary cannot act on the
- * repository. See `checkCLIIsUpToDate` for what "match" means and why.
+ * repository. See `checkCliIsUpToDate` for what "match" means and why.
  *
  * @returns true when it is safe to continue running commands.
  */
-export function assertCLIIsUpToDate(): boolean {
-  const result = checkCLIIsUpToDate({
+export function assertCliIsUpToDate(): boolean {
+  const result = checkCliIsUpToDate({
     repoRoot: findRepoRoot(),
-    builtVersion: getBuiltCLIVersion(),
+    builtVersion: getBuiltCliVersion(),
     bundlePath: _getRunningBundlePath(),
   });
 

@@ -13,7 +13,7 @@ const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
 const RESET = "\x1b[0m";
 
-const CLIOptionSchema = z.object({
+const CliOptionSchema = z.object({
   email: z.email(),
   prod: z.boolean().optional(),
 });
@@ -96,7 +96,7 @@ async function confirmDelete(options: {
 async function main() {
   setupCli();
   try {
-    const { email, prod } = CLIOptionSchema.parse(program.opts());
+    const { email, prod } = CliOptionSchema.parse(program.opts());
 
     if (prod) {
       loadProductionEnv();

@@ -1,4 +1,4 @@
-import { createPolarCLIClient } from "@ava-cli/PolarCli/PolarClient/createPolarCLIClient";
+import { createPolarCliClient } from "@ava-cli/PolarCli/PolarClient/createPolarCliClient";
 import {
   getFreeProduct,
   getOrCreateCustomerByEmail,
@@ -26,7 +26,7 @@ export async function runCustomerCreate(): Promise<void> {
 
   try {
     printInfo("Connecting to Polar...");
-    const { polar, organizationId } = await createPolarCLIClient();
+    const { polar, organizationId } = await createPolarCliClient();
 
     printInfo("Resolving Free plan product...");
     const freeProduct = await getFreeProduct({ polar, organizationId });

@@ -1,4 +1,4 @@
-import { createPolarCLIClient } from "@ava-cli/PolarCli/PolarClient/createPolarCLIClient";
+import { createPolarCliClient } from "@ava-cli/PolarCli/PolarClient/createPolarCliClient";
 import { listCustomers } from "@ava-cli/PolarCli/PolarClient/polarHelpers";
 import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
@@ -137,7 +137,7 @@ export async function runCustomerList({
 }): Promise<void> {
   try {
     printInfo("Connecting to Polar...");
-    const { polar, organizationId } = await createPolarCLIClient();
+    const { polar, organizationId } = await createPolarCliClient();
 
     printInfo("Retrieving existing customers");
     const customers = await listCustomers({ polar, organizationId });

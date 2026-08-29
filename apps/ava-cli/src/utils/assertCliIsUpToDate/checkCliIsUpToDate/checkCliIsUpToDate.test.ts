@@ -7,7 +7,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/checkCLIIsUpToDate/checkCLIIsUpToDate";
+import { checkCliIsUpToDate } from "@ava-cli/utils/assertCliIsUpToDate/checkCliIsUpToDate/checkCliIsUpToDate";
 import { afterEach, describe, expect, it } from "vitest";
 
 /**
@@ -65,9 +65,9 @@ afterEach(() => {
   createdRepos.length = 0;
 });
 
-describe("checkCLIIsUpToDate", () => {
+describe("checkCliIsUpToDate", () => {
   it("is up to date outside the monorepo, where there is nothing to compare", () => {
-    const result = checkCLIIsUpToDate({
+    const result = checkCliIsUpToDate({
       repoRoot: undefined,
       builtVersion: "0.0.0",
       bundlePath: undefined,
@@ -79,7 +79,7 @@ describe("checkCLIIsUpToDate", () => {
   it("reports a version mismatch between the running bundle and the source", () => {
     const repoRoot = _createRepo({ sourceVersion: "0.2.0", withBundle: true });
 
-    const result = checkCLIIsUpToDate({
+    const result = checkCliIsUpToDate({
       repoRoot,
       builtVersion: "0.1.0",
       bundlePath: join(repoRoot, "apps/ava-cli/dist/main.cjs"),
@@ -93,7 +93,7 @@ describe("checkCLIIsUpToDate", () => {
   it("reports a missing bundle", () => {
     const repoRoot = _createRepo({ sourceVersion: "0.0.0", withBundle: false });
 
-    const result = checkCLIIsUpToDate({
+    const result = checkCliIsUpToDate({
       repoRoot,
       builtVersion: "0.0.0",
       bundlePath: undefined,
@@ -107,7 +107,7 @@ describe("checkCLIIsUpToDate", () => {
     const repoRoot = _createRepo({ sourceVersion: "0.0.0", withBundle: true });
     _backdate(join(repoRoot, "apps/ava-cli/dist/main.cjs"), 120);
 
-    const result = checkCLIIsUpToDate({
+    const result = checkCliIsUpToDate({
       repoRoot,
       builtVersion: "0.0.0",
       bundlePath: join(repoRoot, "apps/ava-cli/dist/main.cjs"),
@@ -123,7 +123,7 @@ describe("checkCLIIsUpToDate", () => {
     _backdate(join(cliDir, "src/main.ts"), 300);
     _backdate(join(cliDir, "package.json"), 300);
 
-    const result = checkCLIIsUpToDate({
+    const result = checkCliIsUpToDate({
       repoRoot,
       builtVersion: "0.0.0",
       bundlePath: join(cliDir, "dist/main.cjs"),
@@ -142,7 +142,7 @@ describe("checkCLIIsUpToDate", () => {
     // says nothing about whether the code differs.
     _backdate(join(otherRepoRoot, "apps/ava-cli/dist/main.cjs"), 600);
 
-    const result = checkCLIIsUpToDate({
+    const result = checkCliIsUpToDate({
       repoRoot,
       builtVersion: "0.0.0",
       bundlePath: join(otherRepoRoot, "apps/ava-cli/dist/main.cjs"),
@@ -158,7 +158,7 @@ describe("checkCLIIsUpToDate", () => {
       withBundle: true,
     });
 
-    const result = checkCLIIsUpToDate({
+    const result = checkCliIsUpToDate({
       repoRoot,
       builtVersion: "0.1.0",
       bundlePath: join(otherRepoRoot, "apps/ava-cli/dist/main.cjs"),

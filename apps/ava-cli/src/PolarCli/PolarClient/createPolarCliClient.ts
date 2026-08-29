@@ -48,7 +48,7 @@ async function _getOrganizationId(polar: Polar): Promise<string> {
  * Reads `POLAR_ACCESS_TOKEN` and `POLAR_SERVER_TYPE` from whichever env file
  * this invocation loaded.
  */
-export async function createPolarCLIClient(): Promise<PolarCLIClient> {
+export async function createPolarCliClient(): Promise<PolarCLIClient> {
   const accessToken = AvaEnv.requireVar("POLAR_ACCESS_TOKEN");
   const serverType = _getPolarServerType();
 

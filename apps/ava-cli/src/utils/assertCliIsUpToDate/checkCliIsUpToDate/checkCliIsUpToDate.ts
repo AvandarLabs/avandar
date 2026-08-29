@@ -4,7 +4,7 @@ import { isDefined } from "@avandar/utils";
 import type { Dirent } from "node:fs";
 
 /** Whether the running `ava` matches the source, and why not if it does not. */
-export type CLIUpToDateResult =
+export type CliUpToDateResult =
   | { upToDate: true }
   | { upToDate: false; reason: string };
 
@@ -12,7 +12,7 @@ export type CLIUpToDateResult =
 const EXTRA_SOURCE_FILES = ["package.json", "tsup.config.ts"] as const;
 
 /** What the check needs to compare the running CLI against the source. */
-export type CLIUpToDateOptions = {
+export type CliUpToDateOptions = {
   /** The repo the user is standing in, or undefined when outside one. */
   repoRoot: string | undefined;
   /** Version baked into the running bundle, or undefined when unbaked. */
@@ -43,9 +43,9 @@ export type CLIUpToDateOptions = {
  * @returns `{ upToDate: true }` when it is safe to run a command, otherwise the
  * reason to show the user.
  */
-export function checkCLIIsUpToDate(
-  options: Readonly<CLIUpToDateOptions>,
-): CLIUpToDateResult {
+export function checkCliIsUpToDate(
+  options: Readonly<CliUpToDateOptions>,
+): CliUpToDateResult {
   const { repoRoot, builtVersion, bundlePath } = options;
 
   // Outside the monorepo there is no source to compare against.
@@ -75,7 +75,7 @@ export function checkCLIIsUpToDate(
 /** Signal 2: whether the bundle is present and newer than every source file. */
 function _checkBundleIsNewerThanSource(
   options: Readonly<{ cliDir: string; repoRoot: string; bundlePath: string }>,
-): CLIUpToDateResult {
+): CliUpToDateResult {
   const { cliDir, repoRoot, bundlePath } = options;
 
   const bundleModifiedTime = _getModifiedTime(bundlePath);

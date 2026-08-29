@@ -1,4 +1,4 @@
-import { createPolarCLIClient } from "@ava-cli/PolarCli/PolarClient/createPolarCLIClient";
+import { createPolarCliClient } from "@ava-cli/PolarCli/PolarClient/createPolarCliClient";
 import { getItemsFromListPage } from "@ava-cli/PolarCli/PolarClient/listUtils";
 import {
   printError,
@@ -28,7 +28,7 @@ export async function runCustomerRemove(options: {
 
   try {
     printInfo("Connecting to Polar...");
-    const { polar, organizationId } = await createPolarCLIClient();
+    const { polar, organizationId } = await createPolarCliClient();
 
     printInfo("Searching for customer by email...");
     const responses: AsyncIterable<unknown> = await polar.customers.list({

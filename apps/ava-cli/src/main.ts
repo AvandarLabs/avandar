@@ -5,7 +5,7 @@ import { PipelineCli } from "@ava-cli/PipelineCli/PipelineCli";
 import { PolarCli } from "@ava-cli/PolarCli/PolarCli";
 import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
 import { SupabaseCli } from "@ava-cli/SupabaseCli/SupabaseCli";
-import { assertCLIIsUpToDate } from "@ava-cli/utils/assertCLIIsUpToDate/assertCLIIsUpToDate";
+import { assertCliIsUpToDate } from "@ava-cli/utils/assertCliIsUpToDate/assertCliIsUpToDate";
 import { printError } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
@@ -48,7 +48,7 @@ const cli = Acclimate.createCLI("ava")
 // Nothing rebuilds `ava` automatically, so refuse to run stale code against the
 // repository. Acclimate has no pre-command hook, so this guards the entry
 // point.
-if (!assertCLIIsUpToDate()) {
+if (!assertCliIsUpToDate()) {
   process.exit(1);
 }
 

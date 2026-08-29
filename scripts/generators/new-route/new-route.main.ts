@@ -18,8 +18,8 @@ const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
 const RESET = "\x1b[0m";
 
-const CLIArgumentsSchema = z.tuple([z.string().min(1)]);
-const CLIOptionSchema = z.object({
+const CliArgumentsSchema = z.tuple([z.string().min(1)]);
+const CliOptionSchema = z.object({
   auth: z.boolean().optional(),
 });
 
@@ -214,8 +214,8 @@ inside it.${RESET}`,
 async function main() {
   setupCli();
   try {
-    const { auth } = CLIOptionSchema.parse(program.opts());
-    const [route] = CLIArgumentsSchema.parse(program.args);
+    const { auth } = CliOptionSchema.parse(program.opts());
+    const [route] = CliArgumentsSchema.parse(program.args);
 
     const projectRoot = getProjectRoot();
     const baseDir = auth
