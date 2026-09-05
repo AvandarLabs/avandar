@@ -365,14 +365,35 @@ Use these headings in this order, numbered, omitting any that would be empty.
 Numbers are stable for the life of the review so the reviewer can annotate a
 printout and cite `§3.2` back to you.
 
-Headings are factual navigation. Name the concrete subject and condition in
-plain language. Do not use wordplay, suspense, or a title whose meaning appears
-only after reading the section.
+Headings are factual navigation, not titles. A correct, specific, boring
+heading beats an elegant one every time; this is a reference document a
+reviewer navigates under time pressure, not an article they read for pleasure.
+Name the concrete subject and the condition in plain language, and never use
+wordplay, suspense, alliteration, or a phrase whose meaning only resolves after
+reading the section.
+
+Two failure modes, and the second is the one that survives review because it
+reads well:
+
+- **Vague:** the heading names a topic but not a claim, so it cannot be
+  distinguished from three neighbouring sections.
+- **Literary:** the heading is memorable and says nothing checkable. A heading
+  built on a metaphor ("as a durable transition"), an abstract noun phrase
+  ("Claim, then settle"), or a value judgement ("Visibility replaces a
+  boolean") names the author's framing rather than the mechanism.
 
 | Avoid | Use |
 | --- | --- |
 | `The 404 that means two things` | `Ambiguous 404 when getting a file from Drive` |
 | `A view's scope is the whole view` | `Picker views cannot combine Drive scopes` |
+| `Dashboard publication as a durable transition` | `Publishing a dashboard writes storage objects and the row in two steps` |
+| `Claim, then settle` | `A publish claims a revision, uploads objects, then commits visibility` |
+| `Visibility replaces a boolean` | `is_public becomes a three-state visibility column` |
+
+The test: read the heading alone and say what the section will assert. If the
+answer is "something about publishing", rename it. A heading may be a full
+clause and may run to a dozen words; length is not the constraint, and a
+shorter heading that has stopped being specific is worse.
 
 1. **Purpose.** The problem in the reader's terms and what "done" means. No
    file names, no module names. Two paragraphs at most, and it must **name
@@ -482,63 +503,90 @@ cannot draw a conclusion from is decoration: cut it. Draw the dependency or
 data-flow direction, and when a directory tree is the clearest form for a
 layout decision, a fenced tree is fine alongside the graph.
 
-#### Size every diagram, do not let the renderer decide
+#### A diagram must stand alone
 
-A rendered diagram passes through **two** scalings before it reaches paper, and
-they multiply. Mermaid lays the diagram out inside its renderer's viewport
-(roughly 800px wide) and shrinks the whole drawing, type included, if it does
-not fit. The PDF tool then shrinks the resulting image again to the text block.
-Neither step is visible in the source, which is why an unsized diagram lands
-somewhere arbitrary: measured on this repo's own walkthrough, one diagram
-printed its labels at 3.2pt and another at 14.3pt, against 10.5pt body text.
+The caption adds emphasis. It is never what makes the diagram readable. Assume
+the reader looks at the picture first, before any surrounding prose, because
+that is what people do: if the drawing alone does not say what the parts are
+and how they relate, it has failed and no caption repairs it.
 
-Control both, and neither needs a renderer to check.
+That has one consequence that overrides every instinct toward tidiness:
 
-**1. Pin the type size in the source.** Put this line first inside every
-mermaid fence, changing only the config key to match the diagram type
-(`flowchart`, `sequence`, `state`, `er`):
+- **Label nodes and edges in full.** `supabase/schemas/ declares privileges`
+  beats `schemas`. `reconciler exits 1 on drift` beats `drift`. A verbose label
+  is not a defect to be trimmed; a label that only means something to someone
+  who already knows the system is.
+- **Label every edge that is not obvious from its endpoints.** An unlabelled
+  arrow asserts "related somehow", which is rarely the claim being made.
+- **A glossary is REQUIRED whenever any label is abbreviated.** If a node or
+  edge carries a single word, an acronym, an identifier, or any token a reader
+  outside the change would not resolve, the diagram is immediately followed by
+  a definition list naming every such label. Not in the caption prose, and not
+  further down the section: directly under the fence, so it is on the same page
+  as the drawing.
+- **Legends are welcome.** Line style, colour, or shape carrying meaning
+  (staged versus committed, synchronous versus deferred) needs a legend, either
+  as a glossary entry or as a `subgraph Legend` in the diagram itself.
+
+```markdown
+Where:
+
+- **staged** - objects uploaded under a transition claim, readable only by the
+  dashboard's editors.
+- **committed** - the generation `snapshot_revision` points at, readable by the
+  dashboard's audience.
+- **fence** - an `abort_publish` claim written over an abandoned `publish`.
+```
+
+Prefer the full label and no glossary. Reach for a short label plus a glossary
+only when the full one genuinely will not lay out, and never ship a short label
+with neither.
+
+#### Size a diagram by its shape, not by shrinking its type
+
+`markdown-to-pdf` 0.8.0 and later scale every diagram to fill the content box,
+bounded by the page height. That removed the old compounding-shrink problem:
+there is now exactly one scaling, the renderer gets a 2000px viewport so it
+does not pre-squash a wide drawing, and a diagram may take a whole page. Which
+it should, whenever the content earns it. **A full-page diagram is a good
+outcome, not an overrun.** Never trade a label's clarity for compactness.
+
+What the author still controls is the diagram's **aspect ratio**, and that is
+now the only thing that decides printed label size. The content box is about
+490pt wide by 690pt tall, so a portrait-ish diagram uses the whole page and
+prints its type at the largest scale available. A diagram much wider than tall
+is width-bound: it is scaled down until it fits the width, leaves most of the
+page height unused, and prints small type for no benefit.
+
+So the rule is about shape:
+
+- **Default to `flowchart TD`.** Depth costs nothing now: extra rows use the
+  height that a wide diagram would waste.
+- **Keep the widest row to two or three nodes,** even with verbose labels. This
+  is the same ceiling as before, but for a different reason: it is what keeps
+  the drawing portrait, not what keeps it inside a viewport.
+- **Use `LR` only for two or three nodes**, and never place two subgraphs side
+  by side. Two disconnected components are also laid out side by side; an
+  invisible `~~~` link between them stacks them instead.
+- **A `sequenceDiagram` stays legible to about three participants.** Beyond
+  that express the ordering as a vertical flowchart.
+- **Split rather than squeeze.** Two diagrams, each portrait and fully
+  labelled, both read; one wide diagram carrying the same content does not. A
+  before/after pair belongs in two fences.
+
+Type size no longer needs pinning, and the old `fontSize: '11px'` pin is now
+counterproductive: it shrinks labels relative to node padding and edge
+spacing, and since the whole drawing is then scaled up to the page, the only
+lasting effect is smaller text inside larger boxes. Omit the `%%{init}%%` line
+unless you are deliberately raising the label size relative to the drawing:
 
 ```
-%%{init: {'themeVariables': {'fontSize': '11px'}, 'flowchart': {'nodeSpacing': 25, 'rankSpacing': 25, 'padding': 4}}}%%
+%%{init: {'themeVariables': {'fontSize': '16px'}}}%%
 ```
 
-Measured, for a four-node vertical flowchart: mermaid's default prints labels
-at 14.3pt and fills 66% of the page; `fontSize: '11px'` prints at 9.7pt, and
-the spacing values bring it to 36%. Aim for labels a little under body text and
-a drawn height under half the text block. This is the part a reviewer can
-verify by inspection: the line is either there or it is not.
-
-**2. Keep the natural layout inside the viewport.** The pin sets the font, but
-it cannot survive the renderer's own shrink: a diagram too wide for the
-viewport is scaled down before the PDF tool ever sees it, so the two shrinks
-compound and the pinned size is silently lost. The same over-wide diagram
-printed at 3.2pt unpinned and still only 8.7pt pinned, squashed into a strip.
-Since you cannot render to check, keep the widest row inside these measured
-budgets:
-
-| Widest row | Labels | Natural width | Verdict |
-| --- | --- | --- | --- |
-| 1 node | any | 130-210pt | safe |
-| 2 nodes | up to ~20 chars | ~480pt | safe |
-| 3 nodes | up to ~20 chars | ~760pt | at the ceiling |
-| 4-5 nodes | short (<8 chars) | 580-670pt | at the ceiling |
-| 2 subgraphs side by side | any | 780pt+ | over: it will be squashed |
-
-So: **widest row of three, or two once labels run past about twenty
-characters.** Depth is cheap and width is not, so default to `flowchart TD` and
-use `LR` only for three or fewer short nodes. Never place two subgraphs side by
-side. Two disconnected components are also placed side by side, and an
-invisible `~~~` link between them stacks them instead.
-
-**3. Split rather than squeeze.** Two diagrams, each inside the budget, both
-read. One diagram carrying the same content does not. A before/after pair
-belongs in two fences.
-
-Two cautions from measuring this. `direction TB` inside a subgraph does not
-narrow a wide diagram; it changes the internal flow and nothing else, so the
-fix is always fewer nodes per row. And a `sequenceDiagram` is only legible with
-two participants: three already needs 650pt, five cannot fit at all, so express
-an ordering as a vertical flowchart instead.
+One caution carried over from measurement: `direction TB` inside a subgraph
+does not narrow a wide diagram, it only changes the internal flow, so the fix
+for a too-wide diagram is always fewer nodes per row.
 
 ### Screenshots
 
@@ -603,6 +651,49 @@ is unreadable to someone who cannot see the lines in question.
 - **Quote the excerpt, not the unit.** Five to fifteen lines, trimmed to what
   the paragraph is about. A whole function is a tour; the reader stops reading
   tours.
+- **Carry the enclosing scope down to the excerpt.** A trimmed excerpt with no
+  frame around it leaves the reader unable to say what runs it. They have a
+  printout and cannot open the file, so an excerpt beginning `return [` could
+  be in any of a hundred functions. Show every enclosing level as its signature
+  alone, elide the body with `...`, and indent the excerpt where it really
+  sits:
+
+  ````markdown
+  **File: `scripts/db/reconcile-privileges/PrivilegeSql/PrivilegeSql.ts`**
+
+  ```typescript {4,5}
+  function _getReplaySql(options: { scope: Scope; declarations: Declarations }): string {
+    ...
+    return [
+      "begin;",
+      _getStripSql(scope),
+      ...
+    ].join("\n");
+  }
+  ```
+  ````
+
+  Levels stack, so a method inside an exported object shows both:
+
+  ````markdown
+  ```typescript
+  export const PrivilegeSql = {
+    ...
+    getReplaySql(options: ReplayOptions): string {
+      ...
+      return [...];
+    },
+    ...
+  }
+  ```
+  ````
+
+  `...` on its own line is the elision. `// [18 lines]` is equally acceptable
+  and better when the amount omitted is itself the point. Elide anything the
+  paragraph does not discuss, including parameter destructuring and guard
+  clauses; the signature and the discussed lines are the whole budget. An
+  excerpt that already is a complete top-level statement, a `create table`, a
+  `grant`, a policy, needs no frame: it has no enclosing scope to lose.
 - **Point at the lines you mean** with the fence's highlight spec, so the eye
   lands on the two lines the paragraph is about rather than scanning the block:
 
@@ -682,6 +773,10 @@ dependency, or failure, or connect the label directly to that reason.
 | Punchline contrast: `This looks redundant and is not.` | State why both statements are required. |
 | Editorial judgment: `The view is genuinely not capturable.` | State the blocking condition. |
 | Vague pronoun-led transition: `This has a consequence outside the code.` | Name the affected workflow or system. |
+| Singular-insight framing: `which is the single fact that explains the shape` | Drop the framing and state the fact: `schema files are read by the generator and applied to no database.` |
+| Merit or deserving language: `The third state earns its place through the SELECT rule.` | State what it does: `The SELECT rule is what makes draft different from workspace.` |
+| Essay scaffolding: `It is worth noting`, `The interesting question is`, `Two details carry weight`, `Notice that` outside a caption | Delete the scaffold and lead with the fact. |
+| Rule-of-three padding: three parallel clauses where one carries the claim | Keep the clause that is checkable, delete the cadence. |
 
 Captions follow the same rule. State what the diagram or screenshot proves;
 do not turn the caption into a slogan or punchline.
@@ -715,15 +810,23 @@ class of defect that reading the document top to bottom does not.
    does not tell the story of the change, the structure is wrong, and no detail
    inside the sections will fix it.
 
-4. **Look at the diagrams at print size,** per
-   [Size every diagram](#size-every-diagram-do-not-let-the-renderer-decide). A
-   diagram outside the budget is one to restructure, not to ship.
+4. **Cover the caption and read each diagram cold,** per
+   [A diagram must stand alone](#a-diagram-must-stand-alone). Every node and
+   edge label must resolve without the surrounding prose. Any label that is a
+   single word, an acronym, or a bare identifier requires a glossary directly
+   under the fence; a missing glossary is a defect, not a stylistic
+   preference. Then check the shape per
+   [Size a diagram by its shape](#size-a-diagram-by-its-shape-not-by-shrinking-its-type):
+   a diagram wider than it is tall wastes the page and prints small type.
 
 5. **Audit the writing contract.** Read the headings without the body and
-   confirm each names its subject and condition. Check every solved-problem
-   section for `The Problem` and `The Solution`, every repository code excerpt
-   for its project-relative file label, and every paragraph and caption against
-   [Factual prose](#factual-prose).
+   confirm each names a checkable claim rather than a topic or a metaphor.
+   Check every solved-problem section for `The Problem` and `The Solution`,
+   every repository code excerpt for its project-relative file label AND its
+   enclosing signature, and every paragraph and caption against
+   [Factual prose](#factual-prose). Read the draft once looking only for the
+   tells in that table; they cluster at the start of sections and in the
+   sentence before a diagram.
 
 ### Rules
 
@@ -738,6 +841,10 @@ class of defect that reading the document top to bottom does not.
   close, say so: that is where reviewer attention pays best.
 - Never restate the diff, never narrate file by file, and never explain a
   function whose name already does.
+- Never hand-wrap a code excerpt to fit the page. `markdown-to-pdf` 0.8.0 and
+  later break a long line at the measured column budget and mark the
+  continuation with `\u21b3`, so a manual break only adds a wrap the source does
+  not have. Quote the line as it is written.
 - No em dashes.
 
 ## Chat output
