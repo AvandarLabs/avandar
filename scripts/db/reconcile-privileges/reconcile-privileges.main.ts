@@ -70,9 +70,25 @@
  *
  * USAGE
  *
- *   pnpm db:validate-privileges                 # gate; exit 1 on drift
- *   pnpm db:validate-privileges --sql           # print only the SQL it wants
- *   pnpm db:validate-privileges --db-url <url>  # gate another environment
+ * Deliberately not a package script. Every failure it reports is fixed by
+ * `pnpm db:new-migration`, never by re-running this, so exposing it in
+ * `package.json` would offer a re-check that cannot see the fix: a schema-file
+ * edit does not change `supabase/migrations/`, and this gate measures the
+ * migrations. `pnpm test:db` calls the shell script by path, and so should any
+ * other caller.
+ *
+ *   SH=./scripts/db/reconcile-privileges/reconcile-privileges.sh
+ *   pnpm exec $SH                 # gate; exit 1 on drift
+ *   pnpm exec $SH --sql           # print only the SQL it wants
+ *   pnpm exec $SH --db-url <url>  # gate a remote environment
+ *
+ * `pnpm exec`, not a bare path: this runs through `vite-node`, which only
+ * resolves with `node_modules/.bin` on PATH. `pnpm test:db` and
+ * `pnpm db:new-migration` get that for free, being package scripts themselves.
+ *
+ * `--db-url` is the one use with no enclosing workflow: there is no
+ * `db:new-migration` for staging or production, so an ACL audit of a deployed
+ * database runs this directly.
  *
  * `--append` writes the SQL into a migration, and it refuses to run outside
  * `pnpm db:new-migration`. On its own it would skip the no-op view strip that
