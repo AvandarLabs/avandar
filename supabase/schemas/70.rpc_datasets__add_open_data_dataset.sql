@@ -1,16 +1,15 @@
 /**
  * Add an open data dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- *  datasets__open_data.
  *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_catalog_entry_id: The id of the catalog entry that the dataset belongs to
+ * @param p_dataset_id The id of the dataset to add.
+ * @param p_workspace_id The workspace id to add the dataset to.
+ * @param p_dataset_name The name of the dataset.
+ * @param p_dataset_description The description of the dataset.
+ * @param p_columns The columns of the dataset.
+ * @param p_catalog_entry_id The id of the catalog entry that the dataset
+ *   belongs to.
  *
- * @returns: The created dataset
+ * @returns The created dataset.
  */
 create or replace function public.rpc_datasets__add_open_data_dataset (
   p_dataset_id uuid,

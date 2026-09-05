@@ -110,7 +110,6 @@ owner_profile_id,
 workspace_id on public.maps for each row
 execute function public.maps__validate_owner_profile ();
 
--- Trigger the `updated_at` update
 create trigger tr__maps__set_updated_at before
 update on public.maps for each row
 execute function public.util__set_updated_at ();

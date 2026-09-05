@@ -154,35 +154,35 @@ $$;
 /**
  * Whether clearing an active transition commits or restores its boundary.
  *
- * Every one of the four `dashboard_snapshot_transition_kind` values has an arm
- * here, so no claim is terminal. A claim nobody settles pins the row: the
+ * Every `dashboard_snapshot_transition_kind` value has an arm here, so no
+ * claim is terminal. A claim nobody settles pins the row: the
  * update trigger below accepts only a heartbeat, the publish fence, or a
  * settlement, and it has no caller exemption, so a kind missing from this
  * function could not be cleared by `service_role` or even by a repair
  * migration without dropping the trigger first.
  *
- *   publish       - commits the staged generation: adopt the target visibility
- *                   and the staged revision.
- *   abort_publish - restores the boundary the publish started from. Safe to
- *                   restore because a publish stages a NEW revision and never
- *                   touches the objects of the prior one.
- *   unpublish     - the claim already set `visibility` to `draft`; settling
- *                   drops the now-deleted `snapshot_revision`.
- *   delete        - settles exactly like `unpublish`, and deliberately NOT like
- *                   `abort_publish`. It is the escape hatch for a delete whose
- *                   client crashed or whose storage cleanup cannot be finished:
- *                   without it the row could never be published, deleted or
- *                   repaired again. It does not restore
- *                   `snapshot_transition_prior_visibility`, because a `delete`
- *                   claim authorises removing EVERY generation of the
- *                   dashboard's snapshots (`when 'delete' then true` in
- *                   `private.util__auth_user_can_delete_dashboard_snapshot_object`),
- *                   so republishing the prior revision could point a live
- *                   audience at objects that are already gone. Abandoning a
- *                   delete leaves a draft, which is also what the user asked
- *                   for when they started deleting. Only a caller with delete
- *                   rights can reach it: `17.rls.dashboards.sql` requires them
- *                   for any UPDATE of a `delete`-claimed row.
+ * `publish` commits the staged generation: adopt the target visibility and the
+ * staged revision.
+ *
+ * `abort_publish` restores the boundary the publish started from. Safe to
+ * restore because a publish stages a NEW revision and never touches the
+ * objects of the prior one.
+ *
+ * `unpublish` already set `visibility` to `draft` when it was claimed, so
+ * settling only drops the now-deleted `snapshot_revision`.
+ *
+ * `delete` settles the same way, and deliberately NOT like `abort_publish`. It
+ * is the escape hatch for a delete whose client crashed or whose storage
+ * cleanup cannot be finished: without it the row could never be published,
+ * deleted or repaired again. It does not restore
+ * `snapshot_transition_prior_visibility`, because a `delete` claim authorises
+ * removing EVERY generation of the dashboard's snapshots (`when 'delete' then
+ * true` in `private.util__auth_user_can_delete_dashboard_snapshot_object`), so
+ * republishing the prior revision could point a live audience at objects that
+ * are already gone. Abandoning a delete leaves a draft, which is also what the
+ * user asked for when they started deleting. Only a caller with delete rights
+ * can reach it: `17.rls.dashboards.sql` requires them for any UPDATE of a
+ * `delete`-claimed row.
  */
 create or replace function private.dashboards__snapshot_settlement_is_valid (
   p_old_dashboard public.dashboards,
@@ -369,9 +369,10 @@ execute function public.dashboards__prevent_workspace_id_change ();
  * Blocks a transition into `public` for callers below the Dashboards admin
  * tier.
  *
- * This is the server-side counterpart of the `dashboards__can_publish_publicly`
- * permission key in `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts`.
- * That registry is a UI catalog and grants nothing on its own, so without this
+ * The server-side counterpart of the `dashboards__can_publish_publicly`
+ * permission key in
+ * `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts`. That
+ * registry is a UI catalog and grants nothing on its own, so without this
  * trigger the client gate would be the only thing between an editor and the
  * open internet.
  *
@@ -453,7 +454,6 @@ update of visibility,
 snapshot_transition_target_visibility on public.dashboards for each row
 execute function private.dashboards__enforce_publish_publicly ();
 
--- Trigger the `updated_at` update
 create trigger tr_dashboards__set_updated_at before
 update on public.dashboards for each row
 execute function public.util__set_updated_at ();

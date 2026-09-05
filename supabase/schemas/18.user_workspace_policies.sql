@@ -1,7 +1,8 @@
 /**
- * Policies for workspaces, workspace_memberships, user_profiles, and
- * Declared after permission helpers (e.g.
- * util__can_manage_workspace_settings) so RLS can reference them.
+ * Policies for `workspaces`, `workspace_memberships` and `user_profiles`.
+ *
+ * Declared after the permission helpers (such as
+ * `util__can_manage_workspace_settings`) so that RLS can reference them.
  */
 --------------------------------------------------------------------------------
 -- Policies: workspaces

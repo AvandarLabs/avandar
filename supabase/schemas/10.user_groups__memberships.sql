@@ -75,8 +75,10 @@ create policy "Settings admins can delete user_group_memberships" on public.user
   )
 );
 
--- When workspace membership ends, remove matching tag memberships in that
--- workspace so labels do not outlive membership.
+/**
+ * Removes a user's tag memberships in a workspace when their workspace
+ * membership ends, so that labels do not outlive membership.
+ */
 create or replace function public.user_group_memberships__cleanup_on_workspace_member_removed () returns trigger language plpgsql security definer
 set
   search_path = public as $$

@@ -1,5 +1,9 @@
--- Auth function to get a user id by email
--- @returns uuid
+/**
+ * Looks up an auth user by email address, case-insensitively.
+ *
+ * @param p_email The email address to look up.
+ * @returns The user's id, or null when no user has that address.
+ */
 create or replace function public.util__get_user_id_by_email (p_email text) returns uuid as $$
 declare
   v_result uuid;

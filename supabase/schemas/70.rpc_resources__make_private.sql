@@ -27,8 +27,6 @@
  * Does not touch `is_public`. For now, a published dashboard stays
  * world-readable after this runs, because the anon SELECT policy keys on
  * `is_public` alone; publishing is a separate control.
- *
- * @returns void. Nothing about a newly private resource is worth returning.
  */
 create or replace function public.rpc_resources__make_private (
   p_resource_type public.resource_type,

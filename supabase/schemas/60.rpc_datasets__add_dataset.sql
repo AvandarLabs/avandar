@@ -33,14 +33,14 @@ create type public.datasets__csv_file__date_format as (date_format text, timesta
  * authorization. RLS `WITH CHECK` does not reliably see `auth.uid()` for
  * `INSERT` from this PL/pgSQL body under `SECURITY INVOKER`.
  *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_dataset_source_type: The source type of the dataset
- * @param p_columns: The columns of the dataset
+ * @param p_dataset_id The id of the dataset to add.
+ * @param p_workspace_id The workspace id to add the dataset to.
+ * @param p_dataset_name The name of the dataset.
+ * @param p_dataset_description The description of the dataset.
+ * @param p_dataset_source_type The source type of the dataset.
+ * @param p_columns The columns of the dataset.
  *
- * @returns: The created dataset
+ * @returns The created dataset.
  *
  * TODO(jpsyx): add this function to a private schema
  */

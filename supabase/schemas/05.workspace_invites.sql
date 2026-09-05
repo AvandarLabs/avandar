@@ -180,7 +180,6 @@ create policy "Settings admins can delete any workspace invite" on public.worksp
   )
 );
 
--- Trigger the `updated_at` update
 create trigger tr_workspace_invites__set_updated_at before
 update on public.workspace_invites for each row
 execute function public.util__set_updated_at ();

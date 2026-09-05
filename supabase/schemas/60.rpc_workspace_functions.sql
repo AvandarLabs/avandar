@@ -1,12 +1,11 @@
 /**
  * Create a new workspace and assign the current user as the owner.
- * 
- * @param p_workspace_name: The name of the workspace
- * @param p_workspace_slug: The slug of the workspace
- * @param p_full_name: The full name of the owner
- * @param p_display_name: The display name of the owner
- * 
- * @returns: The created workspace
+ *
+ * @param p_workspace_name The name of the workspace.
+ * @param p_workspace_slug The slug of the workspace.
+ * @param p_full_name The full name of the owner.
+ * @param p_display_name The display name of the owner.
+ * @returns The created workspace.
  */
 create or replace function public.rpc_workspaces__create_with_owner (
   p_workspace_name text,

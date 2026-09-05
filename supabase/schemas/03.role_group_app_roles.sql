@@ -1,6 +1,7 @@
--- Per-app role_level for one role_group (one row per app). So each
--- role_group_id can have many rows here, each with one (app, role) tuple.
--- Members pick up these role levels via workspace_memberships.role_group_id
+/**
+ * Per-app `role_level` for one role group, one row per `(app, role)` tuple.
+ * Members pick these levels up through `workspace_memberships.role_group_id`.
+ */
 create table public.role_group_app_roles (
   id uuid primary key default gen_random_uuid(),
   role_group_id uuid not null references public.role_groups (id) on update cascade on delete cascade,

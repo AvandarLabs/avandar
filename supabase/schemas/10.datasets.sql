@@ -78,7 +78,6 @@ create trigger tr__datasets__prevent_workspace_id_change before
 update of workspace_id on public.datasets for each row
 execute function public.datasets__prevent_workspace_id_change ();
 
--- Trigger the `updated_at` update
 create trigger tr_datasets__set_updated_at before
 update on public.datasets for each row
 execute function public.util__set_updated_at ();

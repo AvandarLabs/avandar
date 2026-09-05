@@ -1,21 +1,19 @@
 /**
  * Add an Excel (.xlsx) file dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__xlsx_file.
  *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_is_in_cloud_storage: Whether the raw file is stored in cloud storage
- * @param p_size_in_bytes: The size of the file in bytes
- * @param p_rows_to_skip: The number of rows to skip at the top of the sheet
- * @param p_sheet_name: The worksheet name that was imported (nullable wrapper)
- * @param p_has_header: Whether the worksheet has a header row
- * @param p_date_format: Date and timestamp format hints for parsing
+ * @param p_dataset_id The id of the dataset to add.
+ * @param p_workspace_id The workspace id to add the dataset to.
+ * @param p_dataset_name The name of the dataset.
+ * @param p_dataset_description The description of the dataset.
+ * @param p_columns The columns of the dataset.
+ * @param p_is_in_cloud_storage Whether the raw file is stored in cloud storage.
+ * @param p_size_in_bytes The size of the file in bytes.
+ * @param p_rows_to_skip The number of rows to skip at the top of the sheet.
+ * @param p_sheet_name The worksheet name that was imported (nullable wrapper)
+ * @param p_has_header Whether the worksheet has a header row.
+ * @param p_date_format Date and timestamp format hints for parsing.
  *
- * @returns: The created dataset
+ * @returns The created dataset.
  */
 create or replace function public.rpc_datasets__add_xlsx_file_dataset (
   p_dataset_id uuid,

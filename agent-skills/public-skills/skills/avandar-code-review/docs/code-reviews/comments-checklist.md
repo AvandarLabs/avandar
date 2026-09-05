@@ -4,6 +4,11 @@ Use this checklist when the diff includes any source file that supports
 both block (`/** ... */`) and line (`//`) comments. This applies to
 TypeScript, TSX, JavaScript, JSX, and most C-family languages.
 
+It also applies to `.sql`, where the block comment is `/** ... */` and the
+line comment is `--`. Read every `//` below as `--` for a SQL file, and
+apply the **Comments** section of `sql-checklist.md` alongside this file:
+that section defines which SQL statements take a docstring.
+
 This file is the core of the `docstrings` focused review. That pack also
 applies the comment bullets listed under **Focused Reviews** in
 `SKILL.md`; it does not apply any other phase.

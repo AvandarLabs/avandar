@@ -100,9 +100,6 @@ create policy "User can delete dataset_columns in their workspace" on public.dat
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_dataset_columns__set_updated_at before
 update on public.dataset_columns for each row
 execute function public.util__set_updated_at ();

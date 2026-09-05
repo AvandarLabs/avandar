@@ -1,8 +1,4 @@
-/**
- * Distinct user_group ids the auth user belongs to in this workspace.
- *
- * @returns Array of user_group ids (possibly empty).
- */
+/** Distinct `user_groups` ids the auth user belongs to in this workspace. */
 create or replace function public.util__get_auth_user_user_group_ids (p_workspace_id uuid) returns uuid[] language sql security definer stable
 set
   search_path = public as $$
@@ -166,18 +162,18 @@ from
  * those candidates, not "most roles" or "first match".
  *
  * Short-circuits (no merge with shares):
- * - Resource owner → admin.
- * - Settings (global) admin in the workspace → admin, UNLESS the resource is
+ * - Resource owner -> admin.
+ * - Settings (global) admin in the workspace -> admin, UNLESS the resource is
  *   private to its owner (restricted with zero non-owner shares) and not a
  *   public dashboard.
  *
  * Examples (non-owner, non-settings-admin):
- * - Workspace share viewer + app role editor → editor.
- * - Direct user share admin + app role viewer → admin (ranks 3 vs 1).
- * - Only workspace share viewer, resource is_restricted, no other grant →
+ * - Workspace share viewer + app role editor -> editor.
+ * - Direct user share admin + app role viewer -> admin (ranks 3 vs 1).
+ * - Only workspace share viewer, resource is_restricted, no other grant ->
  *   viewer.
- * - Group share editor + requires_app_access=true, user has no app role on
- *   resource's app → that share candidate is dropped; merge proceeds without it.
+ * - Group share editor + requires_app_access=true, user has no app role on the
+ *   resource's app -> that candidate is dropped; the merge proceeds without it.
  *
  * After owner and settings-admin short-circuits, every other grant path
  * requires a `workspace_memberships` row for this resource's workspace so
@@ -359,11 +355,7 @@ from
 grant
 execute on function public.util__resource_effective_role (public.resource_type, uuid) to authenticated;
 
-/**
- * Whether the auth user meets at least the minimum role on a resource.
- *
- * @returns True when effective role is at least p_min_role.
- */
+/** Whether the auth user's effective role on a resource meets `p_min_role`. */
 create or replace function public.util__auth_user_can_access_resource (
   p_resource_type public.resource_type,
   p_resource_id uuid,
@@ -476,9 +468,7 @@ execute on function public.util__auth_user_can_access_resource_in_workspace (
   public.role_level
 ) to authenticated;
 
-/**
- * App catalog entry for a resource type.
- */
+/** App catalog entry for a resource type. */
 create or replace function public.util__resource_type_to_app_type (p_resource_type public.resource_type) returns public.app_type language sql immutable
 set
   search_path = public as $$
@@ -552,9 +542,7 @@ from
 grant
 execute on function public.util__auth_user_can_insert_workspace_resource (uuid, public.resource_type, uuid) to authenticated;
 
-/**
- * UPDATE on a dashboard or dataset: effective role is at least editor.
- */
+/** UPDATE on a dashboard or dataset: effective role is at least editor. */
 create or replace function public.util__auth_user_can_update_resource (
   p_resource_type public.resource_type,
   p_resource_id uuid
@@ -581,9 +569,7 @@ from
 grant
 execute on function public.util__auth_user_can_update_resource (public.resource_type, uuid) to authenticated;
 
-/**
- * DELETE on a dashboard or dataset: effective role is at least admin.
- */
+/** DELETE on a dashboard or dataset: effective role is at least admin. */
 create or replace function public.util__auth_user_can_delete_resource (
   p_resource_type public.resource_type,
   p_resource_id uuid
@@ -615,7 +601,7 @@ execute on function public.util__auth_user_can_delete_resource (public.resource_
  *
  * Blocks workspace members whose only grant on an unrestricted row is a
  * workspace-wide app role at editor+ (e.g. Global Editor) from reading
- * another user’s dataset, while keeping viewers, owners, settings/workspace
+ * another user's dataset, while keeping viewers, owners, settings/workspace
  * managers, restricted-resource paths, and explicit `resource_shares` grants.
  * Group shares with requires_app_access=true additionally require the auth
  * user to have a data_sources app role.
@@ -1121,17 +1107,17 @@ execute on function public.maps__auth_user_may_select (uuid) to authenticated;
  * src/clients/storage/DatasetParquetStorageClient/utils.ts.
  *
  * The dataset id lives in the FILENAME, not a folder segment, so
- * storage.foldername() cannot reach it and the name is matched whole instead.
+ * `storage.foldername()` cannot reach it and the name is matched whole instead.
  *
- * Returns null rather than raising when the name does not match those shapes,
- * so a storage policy referencing this can never error on an unexpected object
- * name. Callers MUST treat null as "deny": an object whose dataset cannot be
- * identified is not one we can prove the caller may read.
+ * SECURITY: every policy on the `workspaces` bucket gates on this function, so
+ * whatever it accepts is granted the named dataset's permissions. Callers MUST
+ * treat null as "deny": an object whose dataset cannot be identified is not one
+ * we can prove the caller may read. It returns null rather than raising so that
+ * a storage policy referencing it can never error on an unexpected name.
  *
- * SECURITY. Every policy on the `workspaces` bucket gates on this function, so
- * whatever it accepts is granted the named dataset's permissions. Three
- * properties carry that weight, and each is pinned by
- * supabase/tests/database/permissions/storage_original_file_object_names.test.sql:
+ * Three properties of the pattern below carry that weight, and each is pinned
+ * by `storage_original_file_object_names.test.sql` in
+ * `supabase/tests/database/permissions/`:
  *
  *   1. The suffix is an allow-list, not a prefix match. Accepting any name
  *      that merely BEGINS with a uuid would let an arbitrary object claim a
@@ -1141,11 +1127,11 @@ execute on function public.maps__auth_user_may_select (uuid) to authenticated;
  *      sufficient: split_part returns '' both for a trailing slash
  *      (`ws/datasets/x.parquet/`) and for an empty segment followed by more
  *      (`ws/datasets/x.parquet//extra`).
- *   3. Anchoring is whole-string. Postgres ARE only makes `^`/`$` line
- *      anchors under newline-sensitive matching, which is off here, so
- *      neither a trailing newline nor a valid line smuggled after a newline
- *      matches. That differs from PCRE, where `$` matches before a trailing
- *      newline by default, and object names are arbitrary text.
+ *   3. Anchoring is whole-string. Postgres ARE only makes `^`/`$` line anchors
+ *      under newline-sensitive matching, which is off here, so neither a
+ *      trailing newline nor a valid line smuggled after a newline matches.
+ *      That differs from PCRE, where `$` matches before a trailing newline by
+ *      default, and object names are arbitrary text.
  *
  * The extension is capped at ten characters so an over-long tail reads as
  * smuggled content rather than a file type, and is case-insensitive because

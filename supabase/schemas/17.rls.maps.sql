@@ -1,17 +1,17 @@
 /**
  * RLS for `maps`. Requires `16.utils.resource-permissions`.
  *
- *  Resource CRUD matrix (effective role on the row):
- *    viewer: SELECT
- *    editor: SELECT, INSERT (new row in workspace), UPDATE
- *    admin: SELECT, INSERT, UPDATE, DELETE
+ * Resource CRUD matrix (effective role on the row):
+ *   viewer: SELECT
+ *   editor: SELECT, INSERT (new row in workspace), UPDATE
+ *   admin: SELECT, INSERT, UPDATE, DELETE
  *
- *  SELECT also uses `maps__auth_user_may_select` so workspace editors
- * cannot read other members' unrestricted rows without an explicit share.
+ * SELECT also uses `maps__auth_user_may_select`, so workspace editors cannot
+ * read other members' unrestricted rows without an explicit share.
  *
- *  There is deliberately NO anon policy. `maps.is_public` is reserved for a
- * future public embed; until that route and its pgTAP coverage exist, a map
- * is not readable without authenticating.
+ * There is deliberately NO anon policy. `maps.is_public` is reserved for a
+ * future public embed; until that route and its pgTAP coverage exist, a map is
+ * not readable without authenticating.
  */
 /** Checks that an ordinary update keeps the persisted map owner unchanged. */
 create or replace function public.maps__owner_id_matches_stored (p_map_id uuid, p_owner_id uuid) returns boolean language sql security definer stable

@@ -1,13 +1,13 @@
 /**
- * This file contains a collection of utility functions to help with
- * RLS policy checks.
+ * Utility functions used by RLS policy checks.
  *
- * TODO(jpsyx): these need to be moved to a private schema to ensure
- * they are never directly callable from the Supabase JS API.
+ * TODO(jpsyx): these need to be moved to a private schema to ensure they are
+ * never directly callable from the Supabase JS API.
  */
 /**
- * Get all workspaces of the auth user
- * @returns: Array of workspace ids
+ * Gets every workspace the auth user is a member of.
+ *
+ * @returns Array of workspace ids.
  */
 create or replace function public.util__get_auth_user_workspaces () returns uuid[] as $$
 begin
@@ -33,8 +33,9 @@ grant
 execute on function public.util__get_auth_user_workspaces () to authenticated;
 
 /**
- * Get all workspaces that the auth user is an owner of
- * @returns: Array of workspace ids
+ * Gets every workspace the auth user owns.
+ *
+ * @returns Array of workspace ids.
  */
 create or replace function public.util__get_auth_user_owned_workspaces () returns uuid[] as $$
 begin
@@ -62,22 +63,22 @@ execute on function public.util__get_auth_user_owned_workspaces () to authentica
 /**
  * Whether a user belongs to a workspace.
  *
- * Answers the question about a user id the caller already holds, so there is
+ * Answers a question about a user id the caller already holds, so there is
  * nothing here to enumerate: one boolean about one named user.
  *
  * Do not replace it with a helper that takes only a workspace id and returns
  * the member list. Postgres grants EXECUTE on a new function to PUBLIC,
  * PostgREST then serves it to `anon`, and a workspace id is not a secret
- * (`anon` reads one off any public dashboard row), so such a helper hands a
- * tenant's whole roster to anyone holding the publishable key. See
- * docs/audits/2026-08-19-catchup-audit.md, finding F-5.
+ * (`anon` reads one off any public dashboard row), so such a helper would hand
+ * a tenant's whole roster to anyone holding the publishable key. See
+ * `docs/audits/2026-08-19-catchup-audit.md`, finding F-5.
  *
  * `security definer` because a `with check` has to see membership rows the
  * caller's own RLS on `workspace_memberships` would hide.
  *
- * @param p_workspace_id: Workspace to check
- * @param p_user_id: User to check
- * @returns: True when that user has a membership row in that workspace
+ * @param p_workspace_id Workspace to check.
+ * @param p_user_id User to check.
+ * @returns True when that user has a membership row in that workspace.
  */
 create or replace function public.util__is_workspace_member (p_workspace_id uuid, p_user_id uuid) returns boolean language sql security definer stable
 set

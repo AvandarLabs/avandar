@@ -1,28 +1,32 @@
--- Analytics emitters for the revenue funnel.
---
--- These live here rather than in `07.subscriptions.sql` because they call
--- `public.util__log_analytics_event`, which `30.usage_analytics_events.sql`
--- defines, and schema files are applied in lexicographic order.
---
--- Triggers rather than edge code, for one specific reason:
--- `handleSubscriptionUpdatedEvent` in the Polar webhook performs a blind
--- UPDATE and never reads the row it is replacing, so the previous plan and the
--- previous status are only knowable from OLD. Instrumenting here also covers
--- the native free path in `supabase/functions/subscriptions/create-free.ts`
--- without touching either.
--- Orders the feature plans so a plan change is classified with one comparison.
---
--- Lives in this file rather than in a `00.` utility file because it takes the
--- `subscriptions__feature_plan_type` enum, which `07.subscriptions.sql` defines
--- long after the `00.` files are applied.
---
--- Returns null for a plan value that has not been ranked, which is what makes
--- the `lateral` branch below reachable: a plan added to the enum without being
--- ranked here shows up as `lateral` in reporting rather than being silently
--- counted as an upgrade.
---
--- @param p_plan: the feature plan
--- @returns: the plan's position in the free < basic < premium ordering
+/**
+ * Analytics emitters for the revenue funnel.
+ *
+ * These live here rather than in `07.subscriptions.sql` because they call
+ * `public.util__log_analytics_event`, which `30.usage_analytics_events.sql`
+ * defines, and schema files are applied in lexicographic order.
+ *
+ * Triggers rather than edge code, for one specific reason:
+ * `handleSubscriptionUpdatedEvent` in the Polar webhook performs a blind
+ * UPDATE and never reads the row it is replacing, so the previous plan and the
+ * previous status are only knowable from OLD. Instrumenting here also covers
+ * the native free path in `supabase/functions/subscriptions/create-free.ts`
+ * without touching either.
+ */
+/**
+ * Orders the feature plans so a plan change is classified with one comparison.
+ *
+ * Lives in this file rather than in a `00.` utility file because it takes the
+ * `subscriptions__feature_plan_type` enum, which `07.subscriptions.sql` defines
+ * long after the `00.` files are applied.
+ *
+ * Returns null for a plan value that has not been ranked, which is what makes
+ * the `lateral` branch below reachable: a plan added to the enum without being
+ * ranked here shows up as `lateral` in reporting rather than being silently
+ * counted as an upgrade.
+ *
+ * @param p_plan The feature plan.
+ * @returns The plan's position in the free < basic < premium ordering.
+ */
 create or replace function public.util__subscription_plan_rank (
   p_plan public.subscriptions__feature_plan_type
 ) returns integer as $$
@@ -45,17 +49,17 @@ from
   authenticated,
   service_role;
 
--- Records `subscription.created`.
---
--- `isPolarBacked` separates the native free subscriptions, which never touch
--- Polar, from billed ones, so revenue reporting can exclude the free rows
--- without hard-coding a plan name.
---
--- Plan and status are cast to text rather than passed as enums so the stored
--- JSON is a plain string in every case and reporting never has to care how
--- jsonb rendered an enum.
---
--- @returns: trigger
+/**
+ * Records `subscription.created`.
+ *
+ * `isPolarBacked` separates the native free subscriptions, which never touch
+ * Polar, from billed ones, so revenue reporting can exclude the free rows
+ * without hard-coding a plan name.
+ *
+ * Plan and status are cast to text rather than passed as enums so the stored
+ * JSON is a plain string in every case and reporting never has to care how
+ * jsonb rendered an enum.
+ */
 create or replace function public.subscriptions__log_created_analytics_event () returns trigger as $$
 begin
   perform public.util__log_analytics_event(
@@ -89,19 +93,19 @@ create trigger tr__subscriptions__log_created_analytics_event
 after insert on public.subscriptions for each row
 execute function public.subscriptions__log_created_analytics_event ();
 
--- Records `subscription.plan_changed` and `subscription.status_changed`.
---
--- One trigger emits both, because a single webhook-driven UPDATE can change the
--- plan and the status together and reading OLD once is enough for both.
---
--- Every other UPDATE records nothing. The `updated_at` bump fires on every
--- webhook, so guarding on `is distinct from` is what keeps the revenue funnel
--- from being flooded with non-events.
---
--- Churn is this event where `toStatus = 'canceled'`, which is how
--- `analytics.plan_movement` counts cancellations.
---
--- @returns: trigger
+/**
+ * Records `subscription.plan_changed` and `subscription.status_changed`.
+ *
+ * One trigger emits both, because a single webhook-driven UPDATE can change the
+ * plan and the status together and reading OLD once is enough for both.
+ *
+ * Every other UPDATE records nothing. The `updated_at` bump fires on every
+ * webhook, so guarding on `is distinct from` is what keeps the revenue funnel
+ * from being flooded with non-events.
+ *
+ * Churn is this event where `toStatus = 'canceled'`, which is how
+ * `analytics.plan_movement` counts cancellations.
+ */
 create or replace function public.subscriptions__log_updated_analytics_events () returns trigger as $$
 begin
   if new.feature_plan_type is distinct from old.feature_plan_type then
