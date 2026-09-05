@@ -88,7 +88,7 @@
 import {
   getLocalDatabaseConfigFromRepoRoot,
   makeSqlRunner,
-} from "../lib/PsqlUtils/PsqlUtils";
+} from "../utils/PsqlUtils/PsqlUtils";
 import { PrivilegeReconciliation } from "./PrivilegeReconciliation/PrivilegeReconciliation";
 import { PrivilegeSql } from "./PrivilegeSql/PrivilegeSql";
 import { SupabaseFiles } from "./SupabaseFiles/SupabaseFiles";
