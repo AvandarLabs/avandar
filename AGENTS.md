@@ -113,6 +113,39 @@ Implement functionality using red/green TDD.
 ## Supabase
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
+
+### Check the switch BEFORE any database command
+
+This is a stop condition, not a preference. On any branch other than `develop`,
+before running `pnpm db:new-migration`, `pnpm db:reset`, `pnpm test:db`,
+`supabase start`, `supabase stop`, or `supabase db diff`:
+
+1. Run `ava supabase status`.
+2. Confirm it reports this worktree on its own switched project, not on the
+   shared `avandar` stack. The first line reads yellow when the switch state is
+   wrong for the branch.
+3. If it is not switched, run `ava supabase switch` and re-check. Do not run the
+   command you were about to run until status reads green.
+
+**Never run any of those commands from a worktree while it points at the shared
+`avandar` stack.** They stop, rebuild, or reset the one stack that every
+unswitched worktree is using, so the blast radius is every other branch in
+progress, not just this one.
+
+Restarting the shared stack afterwards is not guaranteed to work. Docker can
+hold the host port a torn-down container released, and `supabase start` then
+fails with `port is already allocated` while nothing on the host is listening
+on it. The only remedy at that point is restarting Docker, which takes every
+other local Supabase project down as well. A missing `ava supabase switch` has
+therefore already cost a working stack, not just a bad migration.
+
+If `ava` is not on `PATH`, stop and tell the user. Do not fall back to the
+shared stack, and do not hand-edit `supabase/config.toml` to fake a switch:
+git hooks reject a branch-scoped config, and a half-switched worktree points
+some tools at one project and some at another.
+
+### Migrations
+
 - Always run `pnpm db:reset` immediately before `pnpm db:new-migration`, so the
   diff is taken against a database built only from this branch's migrations.
   All worktrees share the standard `avandar` stack until they switch. Each
