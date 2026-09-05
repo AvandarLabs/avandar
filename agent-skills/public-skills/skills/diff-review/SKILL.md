@@ -445,7 +445,10 @@ shorter heading that has stopped being specific is worse.
      concrete worked example giving actual inputs, the intermediate states and
      the output, the invariant the code maintains, and what breaks when that
      invariant is violated. Add a mermaid flowchart for branching logic and a
-     mermaid state diagram for anything with lifecycle states.
+     mermaid state diagram for anything with lifecycle states. When the
+     algorithm runs in several ordered steps or spans several tools, structure
+     the section per
+     [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline).
    - **Each constraint the strand has to respect,** including the failure mode
      it closes or is exposed to, and what the code can and cannot prove as a
      result. These are the paragraphs a reviewer most often disagrees with, so
@@ -755,6 +758,68 @@ is unreadable to someone who cannot see the lines in question.
   Compression around a new snippet is the most reliable way to lose the
   provenance, the equivalence argument and the rejected alternative all at once.
 
+### Explaining a multi-step algorithm or pipeline
+
+A pipeline, a multi-pass algorithm, or a command that runs several tools in
+order needs a shape the ordinary section structure does not supply. Ordering
+the prose the way the code runs is the obvious choice and the wrong one: the
+reader holds every step unplaced until the last one lands, then re-reads from
+the top to attach them.
+[`references/pipeline-explanation.md`](references/pipeline-explanation.md) is a
+worked example of the structure below, annotated with which rule each part
+satisfies.
+
+Write it in three parts, in this order.
+
+**1. The structural fact, before any step.** Open with whatever reorganises the
+reader's model, and name the design they will otherwise assume. A reader
+meeting a privilege reconciler assumes a shadow database, because that is how
+`supabase db diff` works; the explanation opens by saying there is no shadow
+database and that the replay runs in a rolled-back transaction on the live
+connection. An accurate description that leaves the reader's wrong model
+standing will be read through that model.
+
+**2. The steps, in execution order, one heading each.** Name each step by the
+thing that runs it rather than by what it achieves: `supabase db diff -f
+<name>`, then `strip-noop-view-recreations`, then `supabase db reset`. A step
+named for its trigger can be found in the code and grepped for; a step named
+`Normalisation` cannot.
+
+Each step carries four things, and one that stops at the first two is
+narration:
+
+- What it does.
+- What it produces, and where that output goes.
+- Which defect exists in its absence.
+- What its position in the order depends on. When a step must follow another,
+  name which and why. When two are independent, say so.
+
+**3. One section per property the pipeline guarantees.** A step list states
+what happens and cannot state what holds afterwards, which is what a reviewer
+checks the design against. For each property, use it as the heading, then trace
+it to the specific steps that produce it.
+
+The properties are the reader's questions, and they are rarely "what runs
+first". "Why the same statements are not re-emitted on every run" and "why
+drift cannot reach a committed migration" are separate guarantees produced by
+different steps, and a single section covering both answers neither.
+
+Three rules apply throughout:
+
+- **Trace one traversal with real values.** The input, the intermediate states,
+  the output, per the algorithm bullet in section 3 of [Sections](#sections).
+  For a pipeline this is often a before and after pair of catalog reads, file
+  contents, or command output, quoted rather than described.
+- **State what each step deliberately does not do.** An unexplained exclusion
+  reads as an oversight, so a reviewer spends a comment asking about it.
+  "Functions and default privileges are deliberately not stripped, because
+  their declarations already name every grantee" closes the question that the
+  strip step opens.
+- **Give a two-column table to any step that compares two states.** Name each
+  side, how each is produced, and what each means. Prose that alternates
+  between two states across a paragraph forces the reader to track which one
+  each sentence is about.
+
 ### Flow and orientation
 
 A section that is factually perfect and arrives from nowhere has failed. Being
@@ -839,7 +904,10 @@ own draft.
 
 3. **Read only the headings and each section's first sentence.** If that alone
    does not tell the story of the change, the structure is wrong, and no detail
-   inside the sections will fix it.
+   inside the sections will fix it. For a section covering a pipeline or a
+   multi-step algorithm, confirm it opens on the structural fact rather than on
+   step one, and that each guarantee it claims has its own heading, per
+   [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline).
 
 4. **Cover the caption and read each diagram cold,** per
    [A diagram must stand alone](#a-diagram-must-stand-alone). Every node and
@@ -875,6 +943,7 @@ Dispatch it with:
 - the absolute path of this SKILL.md, told to read
   [Sections](#sections), [Diagrams](#diagrams),
   [Code alongside the prose](#code-alongside-the-prose),
+  [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline),
   [Factual prose](#factual-prose), [Closing checks](#closing-checks) and
   [Rules](#rules) before changing anything,
 - authority to edit the walkthrough file and nothing else.
@@ -1146,7 +1215,10 @@ Selected only by an explicit request. Read-only with respect to source.
 5. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
 6. Write `-walkthrough.md`. Do not touch the transcript, the guides, the
-   reviewed state, or any source file.
+   reviewed state, or any source file. When a strand is a pipeline or a
+   multi-pass algorithm, read
+   [`references/pipeline-explanation.md`](references/pipeline-explanation.md)
+   before writing that section.
 7. Run the style check as the last phase, by dispatching a subagent per
    [The style check runs in a subagent](#the-style-check-runs-in-a-subagent).
    It applies [Closing checks](#closing-checks) and loops on the rendered PDF
