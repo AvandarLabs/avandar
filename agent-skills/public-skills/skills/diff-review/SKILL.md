@@ -542,6 +542,30 @@ Prefer the full label and no glossary. Reach for a short label plus a glossary
 only when the full one genuinely will not lay out, and never ship a short label
 with neither.
 
+#### A figure never spans two pages
+
+The drawing, its glossary, and its caption are one figure and must land on one
+page. A reader who has to turn the page to find out what a label means is doing
+the work the glossary was added to remove.
+
+`markdown-to-pdf` 0.9.0 and later enforce this: the italic paragraph after a
+mermaid fence is read as the caption, a `Where:` glossary between the two joins
+the same figure, and the drawing is re-fitted to the page minus whatever the
+explanation needs. So the mechanism is not your problem. The budget is.
+
+Every line of glossary and caption is a line the drawing does not get, and past
+about a third of the page the renderer starts shrinking the explanation's type
+instead. Both are worse than the alternative, which is a smaller figure:
+
+- **Keep a glossary to what the diagram actually abbreviates.** A glossary is
+  not a place to explain the mechanism; that is what the section's prose is
+  for. One line per abbreviated label.
+- **Keep a caption to one or two sentences.** It states what to notice, not
+  what the diagram shows.
+- **Split a figure that needs more than that.** Two figures, each with its own
+  short explanation, both fit. One figure with a nine-entry glossary does not,
+  and shrinks the drawing that the glossary exists to explain.
+
 #### Size a diagram by its shape, not by shrinking its type
 
 `markdown-to-pdf` 0.8.0 and later scale every diagram to fill the content box,
@@ -786,6 +810,13 @@ do not turn the caption into a slogan or punchline.
 Five passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
 
+Run them by dispatching a subagent, per
+[The style check runs in a subagent](#the-style-check-runs-in-a-subagent). The
+author of a document is the worst reader of it: having just chosen every
+sentence, they read the intent rather than the text, and the tells in
+[Factual prose](#factual-prose) are exactly what an author cannot see in their
+own draft.
+
 1. **Find every fact the document states twice, and confirm the copies agree.**
    A walkthrough is full of deliberate duplication, and every instance of it is
    somewhere a later edit can go stale silently. There is no lint for this: the
@@ -817,7 +848,10 @@ class of defect that reading the document top to bottom does not.
    under the fence; a missing glossary is a defect, not a stylistic
    preference. Then check the shape per
    [Size a diagram by its shape](#size-a-diagram-by-its-shape-not-by-shrinking-its-type):
-   a diagram wider than it is tall wastes the page and prints small type.
+   a diagram wider than it is tall wastes the page and prints small type. Then
+   check the budget per
+   [A figure never spans two pages](#a-figure-never-spans-two-pages): a long
+   glossary shrinks the drawing it exists to explain.
 
 5. **Audit the writing contract.** Read the headings without the body and
    confirm each names a checkable claim rather than a topic or a metaphor.
@@ -827,6 +861,68 @@ class of defect that reading the document top to bottom does not.
    [Factual prose](#factual-prose). Read the draft once looking only for the
    tells in that table; they cluster at the start of sections and in the
    sentence before a diagram.
+
+### The style check runs in a subagent
+
+The last phase of writing a walkthrough is a style check performed by a
+subagent, dispatched once the draft is complete. It reads the finished document
+against this contract and fixes what it finds, so the pass is done by a reader
+who did not choose the words.
+
+Dispatch it with:
+
+- the absolute path of `-walkthrough.md`,
+- the absolute path of this SKILL.md, told to read
+  [Sections](#sections), [Diagrams](#diagrams),
+  [Code alongside the prose](#code-alongside-the-prose),
+  [Factual prose](#factual-prose), [Closing checks](#closing-checks) and
+  [Rules](#rules) before changing anything,
+- authority to edit the walkthrough file and nothing else.
+
+It returns the list of changes it made and anything it judged out of scope.
+
+**Its remit is style, never substance.** It may rewrite a heading, cut a tell,
+retitle a caption, add a missing glossary, reflow a diagram, and correct a
+highlight spec. It may not change a technical claim, add or remove a decision
+or an open question, or alter the meaning of any sentence. When a passage reads
+badly because the underlying claim is unclear, it reports that rather than
+guessing at a fix.
+
+#### The diagrams are checked visually, in a loop
+
+Every rule in [Diagrams](#diagrams) is about what a reader sees, and none of
+them can be verified by reading mermaid source. Overlapping labels, a node whose
+text breaks mid-identifier, an edge label sitting on top of an edge: all of them
+are invisible in the fence and obvious on the page. So the subagent renders and
+looks.
+
+The loop:
+
+1. Render the walkthrough to PDF with `markdown-to-pdf <file.md> --out <pdf>`.
+2. Rasterize the pages that carry diagrams (`pdftoppm -r 80 -png -f N -l N`)
+   and **look at each image**.
+3. Judge each diagram against three things, all of them visual:
+   - **No overlap.** No label over another label, over a node, or over an edge.
+   - **No awkward break.** A label must not break mid-word, mid-identifier, or
+     leave a single word stranded on its own line.
+   - **Legible type.** Diagram labels a little under body text, never so small
+     that the reader would lean in.
+4. Fix what failed and go back to step 1. Keep looping until every diagram
+   passes, then report how many rounds it took.
+
+**Only two levers are permitted, and the diagram's text content is not one of
+them.** The wording of every node and edge label is the author's and must
+survive the check byte for byte. What may change:
+
+- **Type size**, via a `%%{init: {'themeVariables': {'fontSize': '16px'}}}%%`
+  line, up or down.
+- **Layout**: `TD` versus `LR`, where a line breaks inside a label (`<br/>`),
+  node ordering, splitting one diagram into two, or spacing through
+  `nodeSpacing` and `rankSpacing`.
+
+If a diagram cannot be made legible by those two levers alone, the subagent
+says so and leaves it, rather than rewriting a label to make the problem go
+away.
 
 ### Rules
 
@@ -1051,9 +1147,16 @@ Selected only by an explicit request. Read-only with respect to source.
    rather than inventing one, and add it to Open questions.
 6. Write `-walkthrough.md`. Do not touch the transcript, the guides, the
    reviewed state, or any source file.
-7. Report the section count and the prose word count, then end the response
-   with a table naming the walkthrough. One row is expected; the table is
-   there so the path stands out at the end of a long reply.
+7. Run the style check as the last phase, by dispatching a subagent per
+   [The style check runs in a subagent](#the-style-check-runs-in-a-subagent).
+   It applies [Closing checks](#closing-checks) and loops on the rendered PDF
+   until every diagram is visually legible. Do not skip it because the draft
+   looks finished: looking finished to its author is the condition the phase
+   exists to test.
+8. Report the section count, the prose word count, and what the style check
+   changed, then end the response with a table naming the walkthrough. One row
+   is expected; the table is there so the path stands out at the end of a long
+   reply.
 
    ```markdown
    | Walkthrough | Location |
