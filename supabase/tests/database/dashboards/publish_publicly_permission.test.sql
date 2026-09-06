@@ -7,9 +7,8 @@ set search_path to extensions, public;
 -- Publishing a dashboard publicly is an admin-tier act. The rule is about the
 -- TRANSITION into `public`, not about the state: an editor who owns a
 -- dashboard an admin published must still be able to save and republish it.
---
--- See docs/superpowers/specs/2026-08-15-private-dashboards-merged-share-surface-design.md
--- section 5.
+-- `private.dashboards__enforce_publish_publicly` in `10.dashboards.sql` is the
+-- trigger under test.
 
 insert into auth.users (id, email, aud, role)
 values

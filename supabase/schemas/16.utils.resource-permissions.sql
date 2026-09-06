@@ -842,10 +842,9 @@ begin
   end if;
 
   -- `draft` means the owner has not decided this dashboard is ready for anyone
-  -- else, which is the product meaning P2 gave the state and P3's publishing
-  -- control finally makes actionable. Owners and settings admins short-circuit
-  -- above; what remains here is share holders and workspace app roles, and for
-  -- a draft those need edit rights rather than mere read access.
+  -- else. Owners and settings admins short-circuit above; what remains here is
+  -- share holders and workspace app roles, and for a draft those need edit
+  -- rights rather than mere read access.
   if v_visibility = 'draft'::public.dashboard_visibility
     and v_eff_rank < v_editor_rank then
     return false;
