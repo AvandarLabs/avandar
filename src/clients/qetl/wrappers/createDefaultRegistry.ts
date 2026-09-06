@@ -91,13 +91,12 @@ export type DefaultRegistryOptions = {
  *
  * Every field below is chosen to preserve today's behaviour rather than to
  * describe the most capable source, because the only decision the mediator
- * makes from this record in Phase 1 is acquire versus push down, and all six
+ * makes from this record today is acquire versus push down, and all six
  * sources are acquire-only. Where a source is stricter than this record says,
  * its own wrapper still enforces it: Google Sheets caps a call at 10 MB and
- * shares a project-global quota, and its wrapper declares both. Specs 4 and 5
- * are what make per-source-type capabilities load-bearing, and that is when
- * this flattening has to be replaced by resolution finer than the relation
- * kind.
+ * shares a project-global quota, and its wrapper declares both. The first
+ * caller that needs capabilities differing per source type is what forces this
+ * flattening to be replaced by resolution finer than the relation kind.
  */
 const DATASET_CAPABILITIES = {
   /** One dataset row is one relation, including one Google Sheets tab. */

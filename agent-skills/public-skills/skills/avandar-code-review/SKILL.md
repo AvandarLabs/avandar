@@ -143,13 +143,17 @@ at least one pack token is present.
 
 ### Pack: `comments`
 
-Gate: the diff includes any source file that supports `/** ... */` and
-`//` comments (same gate as Phase: comments).
+Gate: the diff includes any source file that supports a block comment
+and a line comment (same gate as Phase: comments), which includes `.sql`.
 
 Apply **only**:
 
 - The entire **Phase: comments** checklist
   (`docs/code-reviews/comments-checklist.md`).
+- For a `.sql` file, the **Comments** section of
+  `docs/code-reviews/sql-checklist.md`, which is where the SQL comment
+  forms (`/** ... */` for declaration docstrings, `--` everywhere else)
+  are defined.
 - **Most Common Mistakes:** Planning comments.
 - **General Checks:** comments should not use em dashes; exported or
   public interfaces, constants, objects, functions, and classes should
@@ -797,6 +801,10 @@ Check these first because they are the most frequent review findings:
 ## General Checks
 
 - Comments should not use em dashes. Prefer a colon or a hyphen.
+- In SQL, a docstring on a `create type` / `table` / `view` / `function` /
+  `schema` uses a `/** ... */` block, never a run of `--` lines; every
+  other comment uses `--`. See the **Comments** section of
+  `docs/code-reviews/sql-checklist.md`.
 - Exported or public interfaces, constants, objects, functions, and classes
   should have block comments or docstrings.
 - Function docstrings should explain the function's purpose and output, not
@@ -920,11 +928,15 @@ SKILL file.
 
 ### Phase: comments
 
-- **Gate:** the diff includes any source file that supports both
-  `/** ... */` and `//` comments (TypeScript, TSX, JavaScript, JSX, most
-  C-family languages).
+- **Gate:** the diff includes any source file that supports both a block
+  comment and a line comment (TypeScript, TSX, JavaScript, JSX, most
+  C-family languages, and `.sql`).
 - **Reference:**
-  [`docs/code-reviews/comments-checklist.md`](docs/code-reviews/comments-checklist.md)
+  [`docs/code-reviews/comments-checklist.md`](docs/code-reviews/comments-checklist.md).
+  For `.sql`, read `/** ... */` for "block comment" and `--` for "line
+  comment", and apply the **Comments** section of
+  [`docs/code-reviews/sql-checklist.md`](docs/code-reviews/sql-checklist.md)
+  alongside it.
 - **Focused review:** this phase is the core of the `comments` pack.
   See **Focused Reviews** for the extra comment bullets pulled from
   Most Common Mistakes, General Checks, and the TypeScript checklist.
@@ -1003,6 +1015,10 @@ SKILL file.
 - **Gate:** the diff includes at least one `.sql` file.
 - **Reference:**
   [`docs/code-reviews/sql-checklist.md`](docs/code-reviews/sql-checklist.md)
+- **Covers:** naming, plus the SQL comment forms. A docstring on a
+  `create type` / `table` / `view` / `function` / `schema` uses a
+  `/** ... */` block; every other comment uses `--`, however many lines
+  it spans.
 
 ### Phase: tests
 

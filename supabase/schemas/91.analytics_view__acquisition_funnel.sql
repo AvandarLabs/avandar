@@ -1,10 +1,12 @@
--- Weekly acquisition funnel: registered, email confirmed, first workspace
--- created.
---
--- Every step is bucketed by the week the user registered, which makes this a
--- cohort rather than a weekly activity count. A user who registers in week 1
--- and creates a workspace in week 3 is counted in week 1 for both, so the row
--- reads as a conversion rate.
+/**
+ * Weekly acquisition funnel: registered, email confirmed, first workspace
+ * created.
+ *
+ * Every step is bucketed by the week the user registered, which makes this a
+ * cohort rather than a weekly activity count. A user who registers in week 1
+ * and creates a workspace in week 3 is counted in week 1 for both, so the row
+ * reads as a conversion rate.
+ */
 create or replace view analytics.acquisition_funnel as
 with
   registrations as (

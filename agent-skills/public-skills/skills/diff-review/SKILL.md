@@ -876,8 +876,10 @@ Five passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
 
 Run them by dispatching a subagent, per
-[The style check runs in a subagent](#the-style-check-runs-in-a-subagent). The
-author of a document is the worst reader of it: having just chosen every
+[The style check runs in a subagent](#the-style-check-runs-in-a-subagent), and
+only after the content review has settled, per
+[The content review runs in a subagent](#the-content-review-runs-in-a-subagent).
+The author of a document is the worst reader of it: having just chosen every
 sentence, they read the intent rather than the text, and the tells in
 [Factual prose](#factual-prose) are exactly what an author cannot see in their
 own draft.
@@ -930,12 +932,104 @@ own draft.
    tells in that table; they cluster at the start of sections and in the
    sentence before a diagram.
 
+### The content review runs in a subagent
+
+A finished walkthrough is checked twice, by two subagents, in this order:
+content, then style. Content first, because a heading polished to state a claim
+that turns out to be false is worse than the vague heading it replaced, and
+because a sentence cut as a tell may have been the only place a caveat was
+recorded.
+
+The content review reads the draft for ACCURACY. Its question is never "does
+this read well", it is "is this true, and is it what the code does". Dispatch it
+with:
+
+- the absolute path of `-walkthrough.md`,
+- the branch and comparison the walkthrough describes, so it can read the diff
+  itself rather than trusting the prose,
+- authority to edit the walkthrough file, and to run read-only verification:
+  `git show` and `git diff` against the base, reads of the working tree and the
+  test suites, and read-only queries against a LOCAL database that already has
+  the change applied. Never a write, and never the production database.
+
+It applies its fixes to the markdown and returns every change with the evidence
+behind it. The parent then accepts or rejects each one: the subagent has read
+the code more recently, the author knows what the change was for, and neither
+alone is a good judge of a disputed claim.
+
+#### Verify against the sources, never against the document
+
+A claim cannot be checked by reading the sentence next to it. Every finding has
+to come from a primary source: the diff, the surrounding code the diff calls
+into, the tests that pin the behaviour, or a query against a local database.
+Where a claim asserts a privilege, a constraint, a default, or a count, run it.
+Where it asserts what the code used to do, read the base revision. A claim the
+reviewer cannot reach a source for is reported as unverified rather than
+accepted.
+
+#### The problem-to-solution join is the highest-yield check
+
+For every section carrying `The Problem` and `The Solution`, and for every pair
+that is implicit, ask one question: does the mechanism named in the solution
+actually close the failure named in the problem? A section can be accurate in
+both halves and wrong in the join, which is why this needs asking separately
+from checking the claims.
+
+The failure mode, from a real review. A section explained that a helper
+returning a whole roster was callable by `anon`, then presented a narrower
+signature as the fix. Both halves were true and the join was wrong: the
+signature was not what stopped `anon`, a `revoke ... from public` in the same
+hunk was, and the signature defended against a different caller entirely, one
+whose grant could not be revoked at all. No sentence in the section was false.
+
+So for each pair, report three things:
+
+- **The mechanism that actually does the work,** named exactly, and whether the
+  document names it. When one change defends against two callers, inputs, or
+  states, the document needs to separate them, because a reader who attributes
+  the fix to the wrong line will later remove the right one.
+- **Whether the solution eliminates the problem or reduces it.** A reduction
+  presented as an elimination is a defect. The same section was missing its
+  residual: a caller who already holds a user id can still test one membership
+  at a time, which is a large reduction and not a closure.
+- **What each half is about.** Two halves that quietly concern different actors
+  or different inputs are the shape this defect takes.
+
+#### Claims, snippets, and highlights
+
+Beyond the joins, check and fix:
+
+- **Every factual assertion**, against a source. Privileges, constraints,
+  defaults, orderings, and "X cannot happen because Y" are the ones that fail.
+- **Every number**, including counts of files, sections, values in an enum, and
+  entries in a list, against what is actually there.
+- **Every cross-file claim.** "Mirrored in TypeScript by `f`" requires that `f`
+  exists and still agrees.
+- **Snippet relevance.** The excerpt must contain the lines the paragraph
+  discusses, and its enclosing signature must be the scope those lines really
+  sit in. An excerpt whose paragraph discusses something not in it is the
+  defect.
+- **Highlight specs**, by counting the printed snippet's lines. A clause the
+  prose points at that spans two source lines needs both, and a spec naming
+  only the first shades half a claim.
+- **Decisions**, for a rejected alternative that is real and a stated reason
+  that is true.
+- **Open questions**, for whether the code has since answered one.
+- **Deliberately not handled**, for whether each gap is still a gap.
+
+Its remit stops at accuracy. It does not rewrite for tone, restructure a
+section, retitle a heading that is merely dull, or touch a diagram for
+legibility: those are the style check's, and doing them here costs the parent
+the ability to tell a correction from a preference. Where a claim is
+unrecoverable from the code, it adds an Open question rather than inventing a
+rationale.
+
 ### The style check runs in a subagent
 
-The last phase of writing a walkthrough is a style check performed by a
-subagent, dispatched once the draft is complete. It reads the finished document
-against this contract and fixes what it finds, so the pass is done by a reader
-who did not choose the words.
+The second and last review phase, dispatched once the content review's changes
+have been accepted or rejected. It reads the document against this contract and
+fixes what it finds, so the pass is done by a reader who did not choose the
+words.
 
 Dispatch it with:
 
@@ -1219,16 +1313,22 @@ Selected only by an explicit request. Read-only with respect to source.
    multi-pass algorithm, read
    [`references/pipeline-explanation.md`](references/pipeline-explanation.md)
    before writing that section.
-7. Run the style check as the last phase, by dispatching a subagent per
+7. Enter the content review phase, by dispatching a subagent per
+   [The content review runs in a subagent](#the-content-review-runs-in-a-subagent).
+   It checks the draft for accuracy against the code, fixes what it finds, and
+   reports each change with its evidence. Read every change and accept or
+   reject it: a rejection is a normal outcome, and a change accepted without
+   reading it defeats the phase.
+8. Then run the style check, by dispatching a subagent per
    [The style check runs in a subagent](#the-style-check-runs-in-a-subagent).
    It applies [Closing checks](#closing-checks) and loops on the rendered PDF
    until every diagram is visually legible. Do not skip it because the draft
    looks finished: looking finished to its author is the condition the phase
    exists to test.
-8. Report the section count, the prose word count, and what the style check
-   changed, then end the response with a table naming the walkthrough. One row
-   is expected; the table is there so the path stands out at the end of a long
-   reply.
+9. Report the section count, the prose word count, what the content review
+   changed and what you rejected, and what the style check changed, then end
+   the response with a table naming the walkthrough. One row is expected; the
+   table is there so the path stands out at the end of a long reply.
 
    ```markdown
    | Walkthrough | Location |

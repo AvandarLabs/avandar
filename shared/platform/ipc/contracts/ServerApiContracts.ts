@@ -5,7 +5,7 @@ import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts
  * is intentionally loose (`unknown` in / `unknown` out); the typed
  * `ServerApiClient` interface in `@avandar/clients` enforces the per-RPC
  * shapes one level up. The Bun-main handler lives in
- * `apps/desktop/main/ipc/api.ts` (Phase 2 Task 14).
+ * `apps/desktop/main/ipc/api.ts`.
  */
 export const ServerApiContracts = {
   rpc: defineIpcContract<{ name: string; args: unknown }, unknown>(
