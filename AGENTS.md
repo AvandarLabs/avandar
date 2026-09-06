@@ -139,10 +139,17 @@ on it. The only remedy at that point is restarting Docker, which takes every
 other local Supabase project down as well. A missing `ava supabase switch` has
 therefore already cost a working stack, not just a bad migration.
 
-If `ava` is not on `PATH`, stop and tell the user. Do not fall back to the
-shared stack, and do not hand-edit `supabase/config.toml` to fake a switch:
-git hooks reject a branch-scoped config, and a half-switched worktree points
-some tools at one project and some at another.
+`ava` is built from this repo, not installed separately. If it is not on
+`PATH`, run `pnpm build:ava-cli`, which builds `apps/ava-cli` and symlinks it
+next to `pnpm`. Do not fall back to the shared stack because the binary is
+missing, and do not hand-edit `supabase/config.toml` to fake a switch: git
+hooks reject a branch-scoped config, and a half-switched worktree points some
+tools at one project and some at another.
+
+A switch rewrites `supabase/config.toml` with a branch project id and its own
+ports. That file must never be staged. Commit the files your change touched by
+path rather than with `git add -A`, and run `ava supabase restore` before any
+authorized merge to `develop`.
 
 ### Migrations
 
