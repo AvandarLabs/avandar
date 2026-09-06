@@ -49,6 +49,7 @@
     "changeset": "changeset",
     "changeset:version": "changeset version && pnpm install --lockfile-only",
     "release": "pnpm build:packages && changeset publish",
+    "skills:update": "./scripts/skills/update-skills.sh",
     "verify:packages": "./scripts/verify-packages.sh",
     "lint": "eslint . && stylelint \"src/**/*.css\" && (react-doctor --yes --scope changed --base develop --no-score || true)",
     "lint:react-doctor": "react-doctor --yes --scope changed --base develop --no-score",
