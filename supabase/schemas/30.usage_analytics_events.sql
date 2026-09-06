@@ -1,14 +1,15 @@
--- Usage analytics events.
--- Captures product-instrumentation events for first-party analytics. Kept
--- inside our own Postgres so we don't ship telemetry to a third party and
--- so users running on workspaces with sensitive data don't have to trust
--- an external analytics vendor.
--- Rows are intentionally not editable. The only valid operation is INSERT
--- by an authenticated workspace member, scoped to a workspace they belong
--- to. Reads are restricted to workspace owners via RLS. There is no
--- platform-admin concept: account-level rows (where `workspace_id` is null)
--- are readable only with the service role, which is how the reporting views
--- in the `analytics` schema are queried.
+/**
+ * Product-instrumentation events for first-party analytics. They stay inside
+ * our own Postgres so we ship no telemetry to a third party, and so workspaces
+ * holding sensitive data do not have to trust an external analytics vendor.
+ *
+ * Rows are intentionally not editable. The only valid operation is INSERT by an
+ * authenticated workspace member, scoped to a workspace they belong to, and
+ * reads are restricted to workspace owners by RLS. There is no platform-admin
+ * concept: account-level rows, where `workspace_id` is null, are readable only
+ * with the service role, which is how the reporting views in the `analytics`
+ * schema are queried.
+ */
 create table public.usage_analytics_events (
   id uuid primary key default gen_random_uuid(),
   -- The workspace the event is scoped to. Most events have a workspace. A
@@ -152,21 +153,20 @@ select
     )
   );
 
--- Maps a stable event name to its funnel stage. This is the single source of
--- truth for `usage_analytics_events.event_category`, and
--- `tr__usage_analytics_events__set_category` is its only caller.
---
--- The mapping lives in SQL rather than in the TypeScript event registry
--- because Postgres triggers emit many of these events and cannot read
--- TypeScript. The registry at
--- `shared/analytics/analyticsEvents/analyticsEvents.ts` mirrors it for
--- developer reference, and a Vitest drift guard fails if the two disagree.
---
--- An unknown name returns `other` rather than raising: recording analytics
--- must never reject a user action.
---
--- @param p_event_name: the event's stable name
--- @returns: the event's funnel stage
+/**
+ * Maps a stable event name to its funnel stage. This is the single source of
+ * truth for `usage_analytics_events.event_category`, and
+ * `tr__usage_analytics_events__set_category` is its only caller.
+ *
+ * The mapping lives in SQL rather than in the TypeScript event registry because
+ * Postgres triggers emit many of these events and cannot read TypeScript. The
+ * registry at `shared/analytics/analyticsEvents/analyticsEvents.ts` mirrors it
+ * for developer reference, and a Vitest drift guard fails if the two disagree.
+ *
+ * @param p_event_name The event's stable name.
+ * @returns The event's funnel stage. An unknown name returns `other` rather
+ *   than raising, because recording analytics must never reject a user action.
+ */
 create or replace function public.util__analytics_event_category (p_event_name text) returns public.usage_analytics_events__category as $$
   select (
     case p_event_name
@@ -219,14 +219,31 @@ create or replace function public.util__analytics_event_category (p_event_name t
   )::public.usage_analytics_events__category;
 $$ language sql immutable;
 
--- Forces `event_category` to agree with `event_name`.
---
--- Runs BEFORE INSERT for two reasons: it satisfies the column's NOT NULL
--- constraint when a caller omits the value, and it deliberately overwrites a
--- caller-supplied value. Reporting groups by this column, so it must never
--- disagree with the event name, and no client is trusted to get it right.
---
--- @returns: trigger
+-- `authenticated` (and `service_role` where it writes) because the
+-- SECURITY INVOKER trigger that calls this runs as whoever ran the
+-- statement, so that role needs EXECUTE on the callee as well.
+revoke
+execute on function public.util__analytics_event_category (text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.util__analytics_event_category (text) to authenticated;
+
+grant
+execute on function public.util__analytics_event_category (text) to service_role;
+
+/**
+ * Forces `event_category` to agree with `event_name`.
+ *
+ * Runs BEFORE INSERT for two reasons: it satisfies the column's NOT NULL
+ * constraint when a caller omits the value, and it deliberately overwrites a
+ * caller-supplied value. Reporting groups by this column, so it must never
+ * disagree with the event name, and no client is trusted to get it right.
+ */
 create or replace function public.usage_analytics_events__set_category () returns trigger as $$
 begin
   new.event_category := public.util__analytics_event_category(new.event_name);
@@ -234,33 +251,41 @@ begin
 end;
 $$ language plpgsql;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.usage_analytics_events__set_category ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 create trigger tr__usage_analytics_events__set_category before insert on public.usage_analytics_events for each row
 execute function public.usage_analytics_events__set_category ();
 
--- Records an analytics event from a Postgres trigger. Triggers must call this
--- rather than inserting directly.
---
--- `client` is always `db` and `app_version` is always null, set here rather
--- than accepted as parameters so no caller can get them wrong. The
--- `event_category` is set by `tr__usage_analytics_events__set_category`.
---
--- The body swallows every error. Recording analytics must never roll back the
--- write that triggered it (a signup, an invite, a subscription change), so this
--- returns cleanly even when the insert fails. The `exception` block runs in a
--- subtransaction, so a failure here rolls back only the failed insert.
---
--- SECURITY DEFINER is required to insert past RLS from a trigger, so EXECUTE is
--- revoked from every client-reachable role. Without that revoke, any
--- authenticated user could forge events for another user or workspace through
--- PostgREST. `search_path` is pinned empty, so every reference is fully
--- qualified.
---
--- @param p_event_name: stable event name; see util__analytics_event_category
--- @param p_workspace_id: workspace the event belongs to, or null
--- @param p_user_id: user who triggered the event, or null
--- @param p_app: app surface, or null when the event is not bound to one
--- @param p_payload: small, PII-free JSON payload, or null
--- @returns: void
+/**
+ * Records an analytics event from a Postgres trigger. Triggers must call this
+ * rather than inserting directly.
+ *
+ * `client` is always `db` and `app_version` is always null, set here rather
+ * than accepted as parameters so that no caller can get them wrong.
+ * `tr__usage_analytics_events__set_category` sets `event_category`.
+ *
+ * Never raises. Recording analytics must never roll back the write that
+ * triggered it (a signup, an invite, a subscription change), so a failed insert
+ * is swallowed in a subtransaction and only that insert is rolled back.
+ *
+ * SECURITY DEFINER is required to insert past RLS from a trigger, so EXECUTE is
+ * revoked from every client-reachable role. Left callable, any authenticated
+ * user could forge events for another user or workspace through PostgREST.
+ *
+ * @param p_event_name Stable event name; see `util__analytics_event_category`.
+ * @param p_workspace_id Workspace the event belongs to, or null.
+ * @param p_user_id User who triggered the event, or null.
+ * @param p_app App surface, or null when the event is not bound to one.
+ * @param p_payload Small, PII-free JSON payload, or null.
+ */
 create or replace function public.util__log_analytics_event (
   p_event_name text,
   p_workspace_id uuid default null,

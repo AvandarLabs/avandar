@@ -8,6 +8,16 @@ import { Subscription } from "$/models/Subscription/Subscription.ts";
 const STORAGE_PAGE_SIZE = 100;
 
 /**
+ * Buckets holding published dashboard snapshots.
+ *
+ * These are NOT reachable from the `workspaces` bucket sweep below. A snapshot
+ * object is named `dashboards/<dashboardId>/...`, with no workspace segment
+ * anywhere in the path, so nothing under the `<workspaceId>` prefix ever
+ * matches one.
+ */
+const DASHBOARD_SNAPSHOT_BUCKETS = ["published", "published-private"] as const;
+
+/**
  * Permanently deletes a workspace and all of its contents.
  * Only callable by the workspace owner.
  * Revokes any active Polar subscription before deleting.
@@ -84,15 +94,16 @@ export const DeleteWorkspace = POST({
      * is non-recursive, so without this a workspace with more than 100
      * entries at any level would silently leave the rest behind.
      */
-    const listWorkspaceStorageFilePaths = async (
-      prefix: string,
+    const listStorageFilePaths = async (
+      options: Readonly<{ bucket: string; prefix: string }>,
     ): Promise<string[]> => {
+      const { bucket, prefix } = options;
       const entries = [];
 
       // Sequential because each page depends on the previous offset.
       for (let offset = 0; ; offset += STORAGE_PAGE_SIZE) {
         const { data: page } = await supabaseAdminClient.storage
-          .from("workspaces")
+          .from(bucket)
           .list(prefix, { limit: STORAGE_PAGE_SIZE, offset });
 
         if (!page || page.length === 0) {
@@ -110,7 +121,10 @@ export const DeleteWorkspace = POST({
       const paths = await Promise.all(
         entries.map((entry) => {
           return entry.id === null
-            ? listWorkspaceStorageFilePaths(`${prefix}/${entry.name}`)
+            ? listStorageFilePaths({
+                bucket,
+                prefix: `${prefix}/${entry.name}`,
+              })
             : Promise.resolve([`${prefix}/${entry.name}`]);
         }),
       );
@@ -123,12 +137,67 @@ export const DeleteWorkspace = POST({
     // storage objects are benign, but a deleted workspace must not
     // linger in the DB.
     try {
-      const filePaths = await listWorkspaceStorageFilePaths(workspaceId);
+      const filePaths = await listStorageFilePaths({
+        bucket: "workspaces",
+        prefix: workspaceId,
+      });
       if (filePaths.length > 0) {
         await supabaseAdminClient.storage.from("workspaces").remove(filePaths);
       }
     } catch (error) {
       console.error("Workspace deletion: storage cleanup failed", {
+        workspaceId,
+        error,
+      });
+    }
+
+    // Published dashboard snapshots, which the sweep above cannot reach.
+    //
+    // This has to happen BEFORE the workspace row is deleted. `dashboards`
+    // cascades on `workspace_id`, and once those rows are gone nothing can
+    // work out which snapshot objects belonged to this workspace: the storage
+    // policies identify an object by parsing the dashboard id out of its path
+    // and looking the row up. The objects would then be unreadable, and
+    // undeletable through the Data API, forever.
+    //
+    // The DELETE policy on `dashboards` does not cover this. It requires a
+    // settled `delete` claim, which is the right rule for an end user removing
+    // one dashboard, but `service_role` holds BYPASSRLS and a cascade never
+    // consults a policy at all. So the cleanup is this route's job.
+    try {
+      const { data: dashboards } = await supabaseAdminClient
+        .from("dashboards")
+        .select("id")
+        .eq("workspace_id", workspaceId)
+        .throwOnError();
+
+      const snapshotPaths = (
+        await Promise.all(
+          (dashboards ?? []).flatMap((dashboard) => {
+            return DASHBOARD_SNAPSHOT_BUCKETS.map(async (bucket) => {
+              return {
+                bucket,
+                paths: await listStorageFilePaths({
+                  bucket,
+                  prefix: `dashboards/${dashboard.id}`,
+                }),
+              };
+            });
+          }),
+        )
+      ).filter((entry) => {
+        return entry.paths.length > 0;
+      });
+
+      await Promise.all(
+        snapshotPaths.map((entry) => {
+          return supabaseAdminClient.storage
+            .from(entry.bucket)
+            .remove(entry.paths);
+        }),
+      );
+    } catch (error) {
+      console.error("Workspace deletion: snapshot cleanup failed", {
         workspaceId,
         error,
       });

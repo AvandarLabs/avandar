@@ -68,8 +68,8 @@ async function _getAllWorkspaceDatasetIds(
 /**
  * Every concept id the workspace owns.
  *
- * This is the other half of the relation allowlist, and spec 3 calls it the
- * highest-risk line in the spec: a concept relation is named
+ * This is the other half of the relation allowlist, and the highest-risk line
+ * in this file: a concept relation is named
  * `concept_<uuid>` in SQL, and without an intersection against this list a
  * `concept_<uuid>` belonging to another workspace would be planned and loaded
  * from a session that has no business reading it. The dataset half of the gate
