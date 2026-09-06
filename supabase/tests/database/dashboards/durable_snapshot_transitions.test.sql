@@ -4,7 +4,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(30);
+select plan(31);
 
 -- Own fixture, not a borrowed one.
 --
@@ -613,6 +613,27 @@ select throws_ok(
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__settled_snapshot_consistent"',
   'a settled public dashboard requires a snapshot revision'
+);
+
+-- The DELETE policy in `17.rls.dashboards.sql` asks only for
+-- `snapshot_transition_kind = 'delete'` and relies on this constraint to supply
+-- the rest of the claim's shape. That reliance is only sound while the
+-- constraint is present AND validated: a NOT VALID constraint leaves
+-- pre-existing rows unchecked, so a malformed claim could survive and satisfy
+-- the policy. Dropping either property must fail here rather than silently
+-- widen who can remove a dashboard.
+select ok(
+  coalesce(
+    (
+      select convalidated
+      from pg_constraint
+      where
+        conrelid = 'public.dashboards'::regclass and
+        conname = 'dashboards__snapshot_transition_consistent'
+    ),
+    false
+  ),
+  'dashboards_delete_relies_on_the_claim_constraint'
 );
 
 select * from finish();

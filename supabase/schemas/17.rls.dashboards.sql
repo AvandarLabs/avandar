@@ -94,33 +94,37 @@ with
     )
   );
 
--- Deleting a dashboard is the last step of a `delete` transition, never a
--- standalone act. Admin rights alone are not enough: the row must already hold
--- a well-formed `delete` claim, which is what proves the caller went through
--- `10.dashboards.sql`'s claim path and cleaned up the snapshot objects first.
--- Without the state requirement an admin could drop the row outright and
--- orphan every object in `published` / `published-private`, since the storage
--- policies identify an object's owner by parsing the dashboard id out of its
--- path and would no longer find a row to authorise against.
+-- Deleting a dashboard through the Data API is the last step of a `delete`
+-- transition, never a standalone act. Admin rights alone are not enough: the
+-- row must already hold a `delete` claim, which is what proves the caller went
+-- through `10.dashboards.sql`'s claim path and cleaned up the snapshot objects
+-- first.
 --
--- The seven trailing conjuncts restate
--- `dashboards__snapshot_transition_consistent`'s `delete` arm verbatim, and the
--- duplication is deliberate defense in depth rather than an oversight. The
--- CHECK constrains what may be WRITTEN and cannot be consulted by a policy;
--- this restates the same shape as a precondition on the READ side of DELETE,
--- so weakening or dropping the constraint does not silently widen who can
--- remove a row. Keep the two in step: any change to that arm belongs here too.
+-- What a `delete` claim looks like is defined ONCE, by the `delete` arm of
+-- `dashboards__snapshot_transition_consistent` in `10.dashboards.sql`. That
+-- constraint is validated, so every row in the table satisfies it, and
+-- `snapshot_transition_kind = 'delete'` therefore implies the whole arm: a
+-- non-null revision that is neither the reserved all-zero uuid nor the live
+-- `snapshot_revision`, a null target visibility, a non-null prior visibility,
+-- `visibility = 'draft'`, and `snapshot_revision` equal to the recorded prior
+-- revision. Restating those seven conditions here would be a second copy of a
+-- definition that is still evolving, and the failure mode of a divergent copy
+-- is silent: RLS filters the row out, DELETE reports zero rows, and the caller
+-- is told the dashboard was removed when it was not.
+--
+-- The dependency is pinned by `dashboards_delete_relies_on_the_claim_constraint`
+-- in `supabase/tests/database/dashboards/durable_snapshot_transitions.test.sql`,
+-- which fails if the constraint is dropped or left NOT VALID.
+--
+-- SCOPE. This governs `authenticated` only, which is the whole of the Data API
+-- surface but not the whole of the system. `service_role` holds BYPASSRLS and
+-- the `workspaces` foreign key cascades on delete, so a workspace deletion
+-- removes dashboard rows without any claim. Snapshot object cleanup for those
+-- paths is the caller's job, not this policy's; see the workspace delete route.
 create policy "Users with admin access can delete dashboards" on public.dashboards for delete to authenticated using (
   public.util__auth_user_can_delete_resource (
     'dashboard'::public.resource_type,
     public.dashboards.id
   ) and
-  public.dashboards.snapshot_transition_kind = 'delete'::public.dashboard_snapshot_transition_kind and
-  public.dashboards.snapshot_transition_revision is not null and
-  public.dashboards.snapshot_transition_revision <> '00000000-0000-0000-0000-000000000000'::uuid and
-  public.dashboards.snapshot_transition_revision is distinct from public.dashboards.snapshot_revision and
-  public.dashboards.snapshot_transition_target_visibility is null and
-  public.dashboards.snapshot_transition_prior_visibility is not null and
-  public.dashboards.visibility = 'draft'::public.dashboard_visibility and
-  public.dashboards.snapshot_revision is not distinct from public.dashboards.snapshot_transition_prior_revision
+  public.dashboards.snapshot_transition_kind = 'delete'::public.dashboard_snapshot_transition_kind
 );
