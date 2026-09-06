@@ -1179,7 +1179,7 @@ msgstr "البروتوكول"
 msgid "Build your first dashboard"
 msgstr "أنشئ لوحة معلوماتك الأولى"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "إغلاق الشريط الجانبي"
 
@@ -5956,7 +5956,7 @@ msgstr "المستوى"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "\"{operator}\" ليس عاملًا يفهمه هذا النموذج."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "فتح الشريط الجانبي"
 

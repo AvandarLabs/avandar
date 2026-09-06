@@ -1211,7 +1211,7 @@ msgstr "Protocole"
 msgid "Build your first dashboard"
 msgstr "Créer votre premier tableau de bord"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "Fermer la barre latérale"
 
@@ -6101,7 +6101,7 @@ msgstr "Niveau"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "« {operator} » n’est pas un opérateur compris par ce formulaire."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Ouvrir la barre latérale"
 

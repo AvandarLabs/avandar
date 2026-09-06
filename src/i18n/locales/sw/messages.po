@@ -1194,7 +1194,7 @@ msgstr "Itifaki"
 msgid "Build your first dashboard"
 msgstr "Tengeneza dashboard yako ya kwanza"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "Funga upande"
 
@@ -6035,7 +6035,7 @@ msgstr "Kiwango"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "\"{operator}\" si opereta ambayo fomu hii inaweza kuelewa."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Fungua upande wa sidebar"
 

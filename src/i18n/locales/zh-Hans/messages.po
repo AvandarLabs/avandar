@@ -1147,7 +1147,7 @@ msgstr "协议"
 msgid "Build your first dashboard"
 msgstr "创建你的第一个仪表板"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "关闭侧边栏"
 
@@ -5816,7 +5816,7 @@ msgstr "级别"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "“{operator}”不是此表单支持的运算符。"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "打开侧边栏"
 

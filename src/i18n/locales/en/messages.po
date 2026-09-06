@@ -1180,7 +1180,7 @@ msgstr "Protocol"
 msgid "Build your first dashboard"
 msgstr "Build your first dashboard"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "Close sidebar"
 
@@ -5964,7 +5964,7 @@ msgstr "Level"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "\"{operator}\" is not an operator this form understands."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Open sidebar"
 

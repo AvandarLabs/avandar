@@ -1198,7 +1198,7 @@ msgstr "Protocolo"
 msgid "Build your first dashboard"
 msgstr "Cree su primer dashboard"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "Cerrar barra lateral"
 
@@ -6053,7 +6053,7 @@ msgstr "Nivel"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "\"{operator}\" no es un operador compatible con este formulario."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Abrir barra lateral"
 
