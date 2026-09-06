@@ -365,14 +365,35 @@ Use these headings in this order, numbered, omitting any that would be empty.
 Numbers are stable for the life of the review so the reviewer can annotate a
 printout and cite `§3.2` back to you.
 
-Headings are factual navigation. Name the concrete subject and condition in
-plain language. Do not use wordplay, suspense, or a title whose meaning appears
-only after reading the section.
+Headings are factual navigation, not titles. A correct, specific, boring
+heading beats an elegant one every time; this is a reference document a
+reviewer navigates under time pressure, not an article they read for pleasure.
+Name the concrete subject and the condition in plain language, and never use
+wordplay, suspense, alliteration, or a phrase whose meaning only resolves after
+reading the section.
+
+Two failure modes, and the second is the one that survives review because it
+reads well:
+
+- **Vague:** the heading names a topic but not a claim, so it cannot be
+  distinguished from three neighbouring sections.
+- **Literary:** the heading is memorable and says nothing checkable. A heading
+  built on a metaphor ("as a durable transition"), an abstract noun phrase
+  ("Claim, then settle"), or a value judgement ("Visibility replaces a
+  boolean") names the author's framing rather than the mechanism.
 
 | Avoid | Use |
 | --- | --- |
 | `The 404 that means two things` | `Ambiguous 404 when getting a file from Drive` |
 | `A view's scope is the whole view` | `Picker views cannot combine Drive scopes` |
+| `Dashboard publication as a durable transition` | `Publishing a dashboard writes storage objects and the row in two steps` |
+| `Claim, then settle` | `A publish claims a revision, uploads objects, then commits visibility` |
+| `Visibility replaces a boolean` | `is_public becomes a three-state visibility column` |
+
+The test: read the heading alone and say what the section will assert. If the
+answer is "something about publishing", rename it. A heading may be a full
+clause and may run to a dozen words; length is not the constraint, and a
+shorter heading that has stopped being specific is worse.
 
 1. **Purpose.** The problem in the reader's terms and what "done" means. No
    file names, no module names. Two paragraphs at most, and it must **name
@@ -424,7 +445,10 @@ only after reading the section.
      concrete worked example giving actual inputs, the intermediate states and
      the output, the invariant the code maintains, and what breaks when that
      invariant is violated. Add a mermaid flowchart for branching logic and a
-     mermaid state diagram for anything with lifecycle states.
+     mermaid state diagram for anything with lifecycle states. When the
+     algorithm runs in several ordered steps or spans several tools, structure
+     the section per
+     [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline).
    - **Each constraint the strand has to respect,** including the failure mode
      it closes or is exposed to, and what the code can and cannot prove as a
      result. These are the paragraphs a reviewer most often disagrees with, so
@@ -482,63 +506,114 @@ cannot draw a conclusion from is decoration: cut it. Draw the dependency or
 data-flow direction, and when a directory tree is the clearest form for a
 layout decision, a fenced tree is fine alongside the graph.
 
-#### Size every diagram, do not let the renderer decide
+#### A diagram must stand alone
 
-A rendered diagram passes through **two** scalings before it reaches paper, and
-they multiply. Mermaid lays the diagram out inside its renderer's viewport
-(roughly 800px wide) and shrinks the whole drawing, type included, if it does
-not fit. The PDF tool then shrinks the resulting image again to the text block.
-Neither step is visible in the source, which is why an unsized diagram lands
-somewhere arbitrary: measured on this repo's own walkthrough, one diagram
-printed its labels at 3.2pt and another at 14.3pt, against 10.5pt body text.
+The caption adds emphasis. It is never what makes the diagram readable. Assume
+the reader looks at the picture first, before any surrounding prose, because
+that is what people do: if the drawing alone does not say what the parts are
+and how they relate, it has failed and no caption repairs it.
 
-Control both, and neither needs a renderer to check.
+That has one consequence that overrides every instinct toward tidiness:
 
-**1. Pin the type size in the source.** Put this line first inside every
-mermaid fence, changing only the config key to match the diagram type
-(`flowchart`, `sequence`, `state`, `er`):
+- **Label nodes and edges in full.** `supabase/schemas/ declares privileges`
+  beats `schemas`. `reconciler exits 1 on drift` beats `drift`. A verbose label
+  is not a defect to be trimmed; a label that only means something to someone
+  who already knows the system is.
+- **Label every edge that is not obvious from its endpoints.** An unlabelled
+  arrow asserts "related somehow", which is rarely the claim being made.
+- **A glossary is REQUIRED whenever any label is abbreviated.** If a node or
+  edge carries a single word, an acronym, an identifier, or any token a reader
+  outside the change would not resolve, the diagram is immediately followed by
+  a definition list naming every such label. Not in the caption prose, and not
+  further down the section: directly under the fence, so it is on the same page
+  as the drawing.
+- **Legends are welcome.** Line style, colour, or shape carrying meaning
+  (staged versus committed, synchronous versus deferred) needs a legend, either
+  as a glossary entry or as a `subgraph Legend` in the diagram itself.
+
+```markdown
+Where:
+
+- **staged** - objects uploaded under a transition claim, readable only by the
+  dashboard's editors.
+- **committed** - the generation `snapshot_revision` points at, readable by the
+  dashboard's audience.
+- **fence** - an `abort_publish` claim written over an abandoned `publish`.
+```
+
+Prefer the full label and no glossary. Reach for a short label plus a glossary
+only when the full one genuinely will not lay out, and never ship a short label
+with neither.
+
+#### A figure never spans two pages
+
+The drawing, its glossary, and its caption are one figure and must land on one
+page. A reader who has to turn the page to find out what a label means is doing
+the work the glossary was added to remove.
+
+`markdown-to-pdf` 0.9.0 and later enforce this: the italic paragraph after a
+mermaid fence is read as the caption, a `Where:` glossary between the two joins
+the same figure, and the drawing is re-fitted to the page minus whatever the
+explanation needs. So the mechanism is not your problem. The budget is.
+
+Every line of glossary and caption is a line the drawing does not get, and past
+about a third of the page the renderer starts shrinking the explanation's type
+instead. Both are worse than the alternative, which is a smaller figure:
+
+- **Keep a glossary to what the diagram actually abbreviates.** A glossary is
+  not a place to explain the mechanism; that is what the section's prose is
+  for. One line per abbreviated label.
+- **Keep a caption to one or two sentences.** It states what to notice, not
+  what the diagram shows.
+- **Split a figure that needs more than that.** Two figures, each with its own
+  short explanation, both fit. One figure with a nine-entry glossary does not,
+  and shrinks the drawing that the glossary exists to explain.
+
+#### Size a diagram by its shape, not by shrinking its type
+
+`markdown-to-pdf` 0.8.0 and later scale every diagram to fill the content box,
+bounded by the page height. That removed the old compounding-shrink problem:
+there is now exactly one scaling, the renderer gets a 2000px viewport so it
+does not pre-squash a wide drawing, and a diagram may take a whole page. Which
+it should, whenever the content earns it. **A full-page diagram is a good
+outcome, not an overrun.** Never trade a label's clarity for compactness.
+
+What the author still controls is the diagram's **aspect ratio**, and that is
+now the only thing that decides printed label size. The content box is about
+490pt wide by 690pt tall, so a portrait-ish diagram uses the whole page and
+prints its type at the largest scale available. A diagram much wider than tall
+is width-bound: it is scaled down until it fits the width, leaves most of the
+page height unused, and prints small type for no benefit.
+
+So the rule is about shape:
+
+- **Default to `flowchart TD`.** Depth costs nothing now: extra rows use the
+  height that a wide diagram would waste.
+- **Keep the widest row to two or three nodes,** even with verbose labels. This
+  is the same ceiling as before, but for a different reason: it is what keeps
+  the drawing portrait, not what keeps it inside a viewport.
+- **Use `LR` only for two or three nodes**, and never place two subgraphs side
+  by side. Two disconnected components are also laid out side by side; an
+  invisible `~~~` link between them stacks them instead.
+- **A `sequenceDiagram` stays legible to about three participants.** Beyond
+  that express the ordering as a vertical flowchart.
+- **Split rather than squeeze.** Two diagrams, each portrait and fully
+  labelled, both read; one wide diagram carrying the same content does not. A
+  before/after pair belongs in two fences.
+
+Type size no longer needs pinning, and the old `fontSize: '11px'` pin is now
+counterproductive: it shrinks labels relative to node padding and edge
+spacing, and since the whole drawing is then scaled up to the page, the only
+lasting effect is smaller text inside larger boxes. Omit the `%%{init}%%` line
+unless you are deliberately raising the label size relative to the drawing:
 
 ```
-%%{init: {'themeVariables': {'fontSize': '11px'}, 'flowchart': {'nodeSpacing': 25, 'rankSpacing': 25, 'padding': 4}}}%%
+%%{init: {'themeVariables': {'fontSize': '16px'}}}%%
 ```
 
-Measured, for a four-node vertical flowchart: mermaid's default prints labels
-at 14.3pt and fills 66% of the page; `fontSize: '11px'` prints at 9.7pt, and
-the spacing values bring it to 36%. Aim for labels a little under body text and
-a drawn height under half the text block. This is the part a reviewer can
-verify by inspection: the line is either there or it is not.
-
-**2. Keep the natural layout inside the viewport.** The pin sets the font, but
-it cannot survive the renderer's own shrink: a diagram too wide for the
-viewport is scaled down before the PDF tool ever sees it, so the two shrinks
-compound and the pinned size is silently lost. The same over-wide diagram
-printed at 3.2pt unpinned and still only 8.7pt pinned, squashed into a strip.
-Since you cannot render to check, keep the widest row inside these measured
-budgets:
-
-| Widest row | Labels | Natural width | Verdict |
-| --- | --- | --- | --- |
-| 1 node | any | 130-210pt | safe |
-| 2 nodes | up to ~20 chars | ~480pt | safe |
-| 3 nodes | up to ~20 chars | ~760pt | at the ceiling |
-| 4-5 nodes | short (<8 chars) | 580-670pt | at the ceiling |
-| 2 subgraphs side by side | any | 780pt+ | over: it will be squashed |
-
-So: **widest row of three, or two once labels run past about twenty
-characters.** Depth is cheap and width is not, so default to `flowchart TD` and
-use `LR` only for three or fewer short nodes. Never place two subgraphs side by
-side. Two disconnected components are also placed side by side, and an
-invisible `~~~` link between them stacks them instead.
-
-**3. Split rather than squeeze.** Two diagrams, each inside the budget, both
-read. One diagram carrying the same content does not. A before/after pair
-belongs in two fences.
-
-Two cautions from measuring this. `direction TB` inside a subgraph does not
-narrow a wide diagram; it changes the internal flow and nothing else, so the
-fix is always fewer nodes per row. And a `sequenceDiagram` is only legible with
-two participants: three already needs 650pt, five cannot fit at all, so express
-an ordering as a vertical flowchart instead.
+One caution carried over from measurement: `direction TB` inside a subgraph
+does not narrow a wide diagram, it only changes the internal flow, so the fix
+for a too-wide diagram is always fewer nodes per row.
 
 ### Screenshots
 
@@ -603,6 +678,49 @@ is unreadable to someone who cannot see the lines in question.
 - **Quote the excerpt, not the unit.** Five to fifteen lines, trimmed to what
   the paragraph is about. A whole function is a tour; the reader stops reading
   tours.
+- **Carry the enclosing scope down to the excerpt.** A trimmed excerpt with no
+  frame around it leaves the reader unable to say what runs it. They have a
+  printout and cannot open the file, so an excerpt beginning `return [` could
+  be in any of a hundred functions. Show every enclosing level as its signature
+  alone, elide the body with `...`, and indent the excerpt where it really
+  sits:
+
+  ````markdown
+  **File: `scripts/db/reconcile-privileges/PrivilegeSql/PrivilegeSql.ts`**
+
+  ```typescript {4,5}
+  function _getReplaySql(options: { scope: Scope; declarations: Declarations }): string {
+    ...
+    return [
+      "begin;",
+      _getStripSql(scope),
+      ...
+    ].join("\n");
+  }
+  ```
+  ````
+
+  Levels stack, so a method inside an exported object shows both:
+
+  ````markdown
+  ```typescript
+  export const PrivilegeSql = {
+    ...
+    getReplaySql(options: ReplayOptions): string {
+      ...
+      return [...];
+    },
+    ...
+  }
+  ```
+  ````
+
+  `...` on its own line is the elision. `// [18 lines]` is equally acceptable
+  and better when the amount omitted is itself the point. Elide anything the
+  paragraph does not discuss, including parameter destructuring and guard
+  clauses; the signature and the discussed lines are the whole budget. An
+  excerpt that already is a complete top-level statement, a `create table`, a
+  `grant`, a policy, needs no frame: it has no enclosing scope to lose.
 - **Point at the lines you mean** with the fence's highlight spec, so the eye
   lands on the two lines the paragraph is about rather than scanning the block:
 
@@ -639,6 +757,68 @@ is unreadable to someone who cannot see the lines in question.
   cut narration of the snippet, never the reasoning the snippet cannot show.
   Compression around a new snippet is the most reliable way to lose the
   provenance, the equivalence argument and the rejected alternative all at once.
+
+### Explaining a multi-step algorithm or pipeline
+
+A pipeline, a multi-pass algorithm, or a command that runs several tools in
+order needs a shape the ordinary section structure does not supply. Ordering
+the prose the way the code runs is the obvious choice and the wrong one: the
+reader holds every step unplaced until the last one lands, then re-reads from
+the top to attach them.
+[`references/pipeline-explanation.md`](references/pipeline-explanation.md) is a
+worked example of the structure below, annotated with which rule each part
+satisfies.
+
+Write it in three parts, in this order.
+
+**1. The structural fact, before any step.** Open with whatever reorganises the
+reader's model, and name the design they will otherwise assume. A reader
+meeting a privilege reconciler assumes a shadow database, because that is how
+`supabase db diff` works; the explanation opens by saying there is no shadow
+database and that the replay runs in a rolled-back transaction on the live
+connection. An accurate description that leaves the reader's wrong model
+standing will be read through that model.
+
+**2. The steps, in execution order, one heading each.** Name each step by the
+thing that runs it rather than by what it achieves: `supabase db diff -f
+<name>`, then `strip-noop-view-recreations`, then `supabase db reset`. A step
+named for its trigger can be found in the code and grepped for; a step named
+`Normalisation` cannot.
+
+Each step carries four things, and one that stops at the first two is
+narration:
+
+- What it does.
+- What it produces, and where that output goes.
+- Which defect exists in its absence.
+- What its position in the order depends on. When a step must follow another,
+  name which and why. When two are independent, say so.
+
+**3. One section per property the pipeline guarantees.** A step list states
+what happens and cannot state what holds afterwards, which is what a reviewer
+checks the design against. For each property, use it as the heading, then trace
+it to the specific steps that produce it.
+
+The properties are the reader's questions, and they are rarely "what runs
+first". "Why the same statements are not re-emitted on every run" and "why
+drift cannot reach a committed migration" are separate guarantees produced by
+different steps, and a single section covering both answers neither.
+
+Three rules apply throughout:
+
+- **Trace one traversal with real values.** The input, the intermediate states,
+  the output, per the algorithm bullet in section 3 of [Sections](#sections).
+  For a pipeline this is often a before and after pair of catalog reads, file
+  contents, or command output, quoted rather than described.
+- **State what each step deliberately does not do.** An unexplained exclusion
+  reads as an oversight, so a reviewer spends a comment asking about it.
+  "Functions and default privileges are deliberately not stripped, because
+  their declarations already name every grantee" closes the question that the
+  strip step opens.
+- **Give a two-column table to any step that compares two states.** Name each
+  side, how each is produced, and what each means. Prose that alternates
+  between two states across a paragraph forces the reader to track which one
+  each sentence is about.
 
 ### Flow and orientation
 
@@ -682,6 +862,10 @@ dependency, or failure, or connect the label directly to that reason.
 | Punchline contrast: `This looks redundant and is not.` | State why both statements are required. |
 | Editorial judgment: `The view is genuinely not capturable.` | State the blocking condition. |
 | Vague pronoun-led transition: `This has a consequence outside the code.` | Name the affected workflow or system. |
+| Singular-insight framing: `which is the single fact that explains the shape` | Drop the framing and state the fact: `schema files are read by the generator and applied to no database.` |
+| Merit or deserving language: `The third state earns its place through the SELECT rule.` | State what it does: `The SELECT rule is what makes draft different from workspace.` |
+| Essay scaffolding: `It is worth noting`, `The interesting question is`, `Two details carry weight`, `Notice that` outside a caption | Delete the scaffold and lead with the fact. |
+| Rule-of-three padding: three parallel clauses where one carries the claim | Keep the clause that is checkable, delete the cadence. |
 
 Captions follow the same rule. State what the diagram or screenshot proves;
 do not turn the caption into a slogan or punchline.
@@ -690,6 +874,15 @@ do not turn the caption into a slogan or punchline.
 
 Five passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
+
+Run them by dispatching a subagent, per
+[The style check runs in a subagent](#the-style-check-runs-in-a-subagent), and
+only after the content review has settled, per
+[The content review runs in a subagent](#the-content-review-runs-in-a-subagent).
+The author of a document is the worst reader of it: having just chosen every
+sentence, they read the intent rather than the text, and the tells in
+[Factual prose](#factual-prose) are exactly what an author cannot see in their
+own draft.
 
 1. **Find every fact the document states twice, and confirm the copies agree.**
    A walkthrough is full of deliberate duplication, and every instance of it is
@@ -713,17 +906,186 @@ class of defect that reading the document top to bottom does not.
 
 3. **Read only the headings and each section's first sentence.** If that alone
    does not tell the story of the change, the structure is wrong, and no detail
-   inside the sections will fix it.
+   inside the sections will fix it. For a section covering a pipeline or a
+   multi-step algorithm, confirm it opens on the structural fact rather than on
+   step one, and that each guarantee it claims has its own heading, per
+   [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline).
 
-4. **Look at the diagrams at print size,** per
-   [Size every diagram](#size-every-diagram-do-not-let-the-renderer-decide). A
-   diagram outside the budget is one to restructure, not to ship.
+4. **Cover the caption and read each diagram cold,** per
+   [A diagram must stand alone](#a-diagram-must-stand-alone). Every node and
+   edge label must resolve without the surrounding prose. Any label that is a
+   single word, an acronym, or a bare identifier requires a glossary directly
+   under the fence; a missing glossary is a defect, not a stylistic
+   preference. Then check the shape per
+   [Size a diagram by its shape](#size-a-diagram-by-its-shape-not-by-shrinking-its-type):
+   a diagram wider than it is tall wastes the page and prints small type. Then
+   check the budget per
+   [A figure never spans two pages](#a-figure-never-spans-two-pages): a long
+   glossary shrinks the drawing it exists to explain.
 
 5. **Audit the writing contract.** Read the headings without the body and
-   confirm each names its subject and condition. Check every solved-problem
-   section for `The Problem` and `The Solution`, every repository code excerpt
-   for its project-relative file label, and every paragraph and caption against
-   [Factual prose](#factual-prose).
+   confirm each names a checkable claim rather than a topic or a metaphor.
+   Check every solved-problem section for `The Problem` and `The Solution`,
+   every repository code excerpt for its project-relative file label AND its
+   enclosing signature, and every paragraph and caption against
+   [Factual prose](#factual-prose). Read the draft once looking only for the
+   tells in that table; they cluster at the start of sections and in the
+   sentence before a diagram.
+
+### The content review runs in a subagent
+
+A finished walkthrough is checked twice, by two subagents, in this order:
+content, then style. Content first, because a heading polished to state a claim
+that turns out to be false is worse than the vague heading it replaced, and
+because a sentence cut as a tell may have been the only place a caveat was
+recorded.
+
+The content review reads the draft for ACCURACY. Its question is never "does
+this read well", it is "is this true, and is it what the code does". Dispatch it
+with:
+
+- the absolute path of `-walkthrough.md`,
+- the branch and comparison the walkthrough describes, so it can read the diff
+  itself rather than trusting the prose,
+- authority to edit the walkthrough file, and to run read-only verification:
+  `git show` and `git diff` against the base, reads of the working tree and the
+  test suites, and read-only queries against a LOCAL database that already has
+  the change applied. Never a write, and never the production database.
+
+It applies its fixes to the markdown and returns every change with the evidence
+behind it. The parent then accepts or rejects each one: the subagent has read
+the code more recently, the author knows what the change was for, and neither
+alone is a good judge of a disputed claim.
+
+#### Verify against the sources, never against the document
+
+A claim cannot be checked by reading the sentence next to it. Every finding has
+to come from a primary source: the diff, the surrounding code the diff calls
+into, the tests that pin the behaviour, or a query against a local database.
+Where a claim asserts a privilege, a constraint, a default, or a count, run it.
+Where it asserts what the code used to do, read the base revision. A claim the
+reviewer cannot reach a source for is reported as unverified rather than
+accepted.
+
+#### The problem-to-solution join is the highest-yield check
+
+For every section carrying `The Problem` and `The Solution`, and for every pair
+that is implicit, ask one question: does the mechanism named in the solution
+actually close the failure named in the problem? A section can be accurate in
+both halves and wrong in the join, which is why this needs asking separately
+from checking the claims.
+
+The failure mode, from a real review. A section explained that a helper
+returning a whole roster was callable by `anon`, then presented a narrower
+signature as the fix. Both halves were true and the join was wrong: the
+signature was not what stopped `anon`, a `revoke ... from public` in the same
+hunk was, and the signature defended against a different caller entirely, one
+whose grant could not be revoked at all. No sentence in the section was false.
+
+So for each pair, report three things:
+
+- **The mechanism that actually does the work,** named exactly, and whether the
+  document names it. When one change defends against two callers, inputs, or
+  states, the document needs to separate them, because a reader who attributes
+  the fix to the wrong line will later remove the right one.
+- **Whether the solution eliminates the problem or reduces it.** A reduction
+  presented as an elimination is a defect. The same section was missing its
+  residual: a caller who already holds a user id can still test one membership
+  at a time, which is a large reduction and not a closure.
+- **What each half is about.** Two halves that quietly concern different actors
+  or different inputs are the shape this defect takes.
+
+#### Claims, snippets, and highlights
+
+Beyond the joins, check and fix:
+
+- **Every factual assertion**, against a source. Privileges, constraints,
+  defaults, orderings, and "X cannot happen because Y" are the ones that fail.
+- **Every number**, including counts of files, sections, values in an enum, and
+  entries in a list, against what is actually there.
+- **Every cross-file claim.** "Mirrored in TypeScript by `f`" requires that `f`
+  exists and still agrees.
+- **Snippet relevance.** The excerpt must contain the lines the paragraph
+  discusses, and its enclosing signature must be the scope those lines really
+  sit in. An excerpt whose paragraph discusses something not in it is the
+  defect.
+- **Highlight specs**, by counting the printed snippet's lines. A clause the
+  prose points at that spans two source lines needs both, and a spec naming
+  only the first shades half a claim.
+- **Decisions**, for a rejected alternative that is real and a stated reason
+  that is true.
+- **Open questions**, for whether the code has since answered one.
+- **Deliberately not handled**, for whether each gap is still a gap.
+
+Its remit stops at accuracy. It does not rewrite for tone, restructure a
+section, retitle a heading that is merely dull, or touch a diagram for
+legibility: those are the style check's, and doing them here costs the parent
+the ability to tell a correction from a preference. Where a claim is
+unrecoverable from the code, it adds an Open question rather than inventing a
+rationale.
+
+### The style check runs in a subagent
+
+The second and last review phase, dispatched once the content review's changes
+have been accepted or rejected. It reads the document against this contract and
+fixes what it finds, so the pass is done by a reader who did not choose the
+words.
+
+Dispatch it with:
+
+- the absolute path of `-walkthrough.md`,
+- the absolute path of this SKILL.md, told to read
+  [Sections](#sections), [Diagrams](#diagrams),
+  [Code alongside the prose](#code-alongside-the-prose),
+  [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline),
+  [Factual prose](#factual-prose), [Closing checks](#closing-checks) and
+  [Rules](#rules) before changing anything,
+- authority to edit the walkthrough file and nothing else.
+
+It returns the list of changes it made and anything it judged out of scope.
+
+**Its remit is style, never substance.** It may rewrite a heading, cut a tell,
+retitle a caption, add a missing glossary, reflow a diagram, and correct a
+highlight spec. It may not change a technical claim, add or remove a decision
+or an open question, or alter the meaning of any sentence. When a passage reads
+badly because the underlying claim is unclear, it reports that rather than
+guessing at a fix.
+
+#### The diagrams are checked visually, in a loop
+
+Every rule in [Diagrams](#diagrams) is about what a reader sees, and none of
+them can be verified by reading mermaid source. Overlapping labels, a node whose
+text breaks mid-identifier, an edge label sitting on top of an edge: all of them
+are invisible in the fence and obvious on the page. So the subagent renders and
+looks.
+
+The loop:
+
+1. Render the walkthrough to PDF with `markdown-to-pdf <file.md> --out <pdf>`.
+2. Rasterize the pages that carry diagrams (`pdftoppm -r 80 -png -f N -l N`)
+   and **look at each image**.
+3. Judge each diagram against three things, all of them visual:
+   - **No overlap.** No label over another label, over a node, or over an edge.
+   - **No awkward break.** A label must not break mid-word, mid-identifier, or
+     leave a single word stranded on its own line.
+   - **Legible type.** Diagram labels a little under body text, never so small
+     that the reader would lean in.
+4. Fix what failed and go back to step 1. Keep looping until every diagram
+   passes, then report how many rounds it took.
+
+**Only two levers are permitted, and the diagram's text content is not one of
+them.** The wording of every node and edge label is the author's and must
+survive the check byte for byte. What may change:
+
+- **Type size**, via a `%%{init: {'themeVariables': {'fontSize': '16px'}}}%%`
+  line, up or down.
+- **Layout**: `TD` versus `LR`, where a line breaks inside a label (`<br/>`),
+  node ordering, splitting one diagram into two, or spacing through
+  `nodeSpacing` and `rankSpacing`.
+
+If a diagram cannot be made legible by those two levers alone, the subagent
+says so and leaves it, rather than rewriting a label to make the problem go
+away.
 
 ### Rules
 
@@ -738,6 +1100,10 @@ class of defect that reading the document top to bottom does not.
   close, say so: that is where reviewer attention pays best.
 - Never restate the diff, never narrate file by file, and never explain a
   function whose name already does.
+- Never hand-wrap a code excerpt to fit the page. `markdown-to-pdf` 0.8.0 and
+  later break a long line at the measured column budget and mark the
+  continuation with `\u21b3`, so a manual break only adds a wrap the source does
+  not have. Quote the line as it is written.
 - No em dashes.
 
 ## Chat output
@@ -943,10 +1309,26 @@ Selected only by an explicit request. Read-only with respect to source.
 5. Where a decision's rationale is not recoverable from the code, say so
    rather than inventing one, and add it to Open questions.
 6. Write `-walkthrough.md`. Do not touch the transcript, the guides, the
-   reviewed state, or any source file.
-7. Report the section count and the prose word count, then end the response
-   with a table naming the walkthrough. One row is expected; the table is
-   there so the path stands out at the end of a long reply.
+   reviewed state, or any source file. When a strand is a pipeline or a
+   multi-pass algorithm, read
+   [`references/pipeline-explanation.md`](references/pipeline-explanation.md)
+   before writing that section.
+7. Enter the content review phase, by dispatching a subagent per
+   [The content review runs in a subagent](#the-content-review-runs-in-a-subagent).
+   It checks the draft for accuracy against the code, fixes what it finds, and
+   reports each change with its evidence. Read every change and accept or
+   reject it: a rejection is a normal outcome, and a change accepted without
+   reading it defeats the phase.
+8. Then run the style check, by dispatching a subagent per
+   [The style check runs in a subagent](#the-style-check-runs-in-a-subagent).
+   It applies [Closing checks](#closing-checks) and loops on the rendered PDF
+   until every diagram is visually legible. Do not skip it because the draft
+   looks finished: looking finished to its author is the condition the phase
+   exists to test.
+9. Report the section count, the prose word count, what the content review
+   changed and what you rejected, and what the style check changed, then end
+   the response with a table naming the walkthrough. One row is expected; the
+   table is there so the path stands out at the end of a long reply.
 
    ```markdown
    | Walkthrough | Location |
