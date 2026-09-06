@@ -12,7 +12,7 @@
  * EXECUTE on a new function to PUBLIC, so PostgREST serves such a helper to
  * `anon`, and a workspace id is not a secret: `anon` reads one off any public
  * dashboard row, which is enough for an unauthenticated caller to pull a whole
- * tenant's roster. See docs/audits/2026-08-19-catchup-audit.md, finding F-5.
+ * tenant's roster.
  *
  * This file pins both halves: no roster enumerator exists, and the predicate
  * that answers the question is reachable only by `authenticated` while the

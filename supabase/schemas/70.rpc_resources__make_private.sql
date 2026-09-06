@@ -21,8 +21,7 @@
  * app renders the same `ShareResourceButton` as datasets with
  * `resourceType="map"`, so General Access -> Private reaches this rpc with
  * 'map'; an unhandled arm falls through to the raise below and that resource
- * cannot be made private at all. See
- * docs/audits/2026-08-19-catchup-audit.md, finding F-6.
+ * cannot be made private at all.
  *
  * Does not touch `is_public`. For now, a published dashboard stays
  * world-readable after this runs, because the anon SELECT policy keys on

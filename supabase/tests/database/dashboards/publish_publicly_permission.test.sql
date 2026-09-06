@@ -371,7 +371,7 @@ select set_config(
 -- Read as `postgres`, not as `authenticated`. This asserts a fact about the
 -- fixture, not about who may call the helper: `util__get_auth_user_app_role`
 -- is an internal that only SECURITY DEFINER bodies reach, so its EXECUTE is
--- revoked from every Data API role (see the audit's F-7). `auth.uid()` reads
+-- revoked from every Data API role. `auth.uid()` reads
 -- `request.jwt.claims`, a transaction-local GUC that a `set role` does not
 -- disturb, so the answer is still the one this workspace owner would get.
 set local role postgres;

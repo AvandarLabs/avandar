@@ -14,8 +14,7 @@ select plan(31);
 -- plain `supabase db reset` and the reset inside `pnpm db:new-migration` both
 -- produce, the fixture insert would match zero rows, every later statement
 -- would then update or insert nothing, and `throws_ok` would report "caught:
--- no exception" eleven times with nothing wrong with the schema. See
--- docs/audits/2026-08-19-catchup-audit.md, finding F-8.
+-- no exception" eleven times with nothing wrong with the schema.
 insert into auth.users (id, email, aud, role)
 values (
   'f7000001-0000-4000-8000-000000000001'::uuid,

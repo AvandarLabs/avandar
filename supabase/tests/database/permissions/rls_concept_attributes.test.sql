@@ -9,7 +9,6 @@
  * Read directly the policies look correct, all four gating on
  * `workspace_id = any(array(select util__get_auth_user_workspaces()))`. This
  * file exists so that nothing silently narrows or drops that predicate later.
- * See docs/audits/2026-08-19-catchup-audit.md, finding F-4.
  *
  * The label/identifier trigger requires exactly one `is_label` attribute per
  * concept, so the second attribute here is deliberately not a label.

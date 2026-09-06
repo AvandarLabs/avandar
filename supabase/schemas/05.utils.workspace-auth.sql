@@ -70,8 +70,7 @@ execute on function public.util__get_auth_user_owned_workspaces () to authentica
  * the member list. Postgres grants EXECUTE on a new function to PUBLIC,
  * PostgREST then serves it to `anon`, and a workspace id is not a secret
  * (`anon` reads one off any public dashboard row), so such a helper would hand
- * a tenant's whole roster to anyone holding the publishable key. See
- * `docs/audits/2026-08-19-catchup-audit.md`, finding F-5.
+ * a tenant's whole roster to anyone holding the publishable key.
  *
  * `security definer` because a `with check` has to see membership rows the
  * caller's own RLS on `workspace_memberships` would hide.
