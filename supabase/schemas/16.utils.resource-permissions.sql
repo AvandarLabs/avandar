@@ -1006,7 +1006,34 @@ from
   authenticated,
   service_role;
 
-/** Applies map-specific visibility grants after workspace checks. */
+/**
+ * Whether a GIS grant lets the auth user SELECT one map row.
+ *
+ * `maps__auth_user_may_select` calls this after workspace membership and
+ * viewer-level access have already passed, so this decides the grant
+ * question alone. It takes the row's fields as arguments because that
+ * caller has already fetched them.
+ *
+ * A restricted map ignores workspace app roles and needs a share. On an
+ * unrestricted map a GIS app role of `editor` or above is deliberately
+ * NOT sufficient on its own, while a role below `editor` is. The editor
+ * role exists so a member can create their own maps, and without this
+ * rule granting it would also hand them read access to every
+ * colleague's map; such a member needs a share like anyone else. A
+ * viewer-tier role is the read-only consumption grant, so reading the
+ * workspace's unrestricted maps is what it is for.
+ * `util__auth_user_may_select_dataset` and
+ * `util__auth_user_may_select_dashboard` apply the same rule.
+ *
+ * A group share carrying `requires_app_access` additionally requires
+ * some GIS app role, which `util__auth_user_has_resource_share`
+ * enforces.
+ *
+ * The `coalesce` around the rank is defensive rather than a case that
+ * reaches here: a member with no GIS app role and no share has no
+ * effective role at all, so the caller's viewer-level check has already
+ * refused them.
+ */
 create or replace function public.maps__auth_user_may_select_grant (
   p_map_id uuid,
   p_workspace_id uuid,
