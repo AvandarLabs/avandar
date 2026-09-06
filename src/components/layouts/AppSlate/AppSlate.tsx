@@ -1,7 +1,7 @@
 import { Container, ContainerProps, Flex, Paper } from "@mantine/core";
 import { CSSProperties, ReactNode } from "react";
-import css from "@/components/layouts/AppLayout/AppLayout.module.css";
-import { AppToolbar } from "@/components/layouts/AppLayout/AppToolbar/AppToolbar";
+import css from "@/components/layouts/AppSlate/AppSlate.module.css";
+import { AppToolbar } from "@/components/layouts/AppSlate/AppToolbar/AppToolbar";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 
 /**
@@ -13,8 +13,8 @@ export const HEADER_DESKTOP_TITLEBAR_HEIGHT = 26;
 
 // Companion drag region to the one on the AppShell header. The AppShell's
 // header covers the top strip at full window width; this spacer extends the
-// drag zone down through the empty space AppLayout reserves above the main
-// content Paper, so the entire visible title-bar band on the main side is
+// drag zone down through the empty space AppSlate reserves above the slate
+// itself, so the entire visible title-bar band on the main side is
 // click-and-drag.
 const TITLEBAR_DRAG_REGION_STYLE: CSSProperties = {
   height: HEADER_DESKTOP_TITLEBAR_HEIGHT,
@@ -44,7 +44,7 @@ type Props = {
  * The layout for an app view. Used inside <AppShell> to render
  * the main app view.
  */
-export function AppLayout({
+export function AppSlate({
   children,
   floatingToolbar = false,
   title,
@@ -71,7 +71,7 @@ export function AppLayout({
           style={TITLEBAR_DRAG_REGION_STYLE}
         />
       ) : null}
-      <Paper className={css.paper}>
+      <Paper className={css.slate}>
         <Flex direction="column" mih={0} flex={1} gap={0}>
           <AppToolbar title={title} floatingToolbar={floatingToolbar}>
             {toolbarButtonSection}

@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Flex, ScrollArea } from "@mantine/core";
 import { Outlet, useMatchRoute } from "@tanstack/react-router";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ConceptNavbar } from "@/views/OntologyDesignerApp/ConceptNavbar";
 import { NewCaseTypeButton } from "@/views/OntologyDesignerApp/NewCaseTypeButton";
@@ -29,7 +29,7 @@ export function OntologyDesignerApp(): JSX.Element {
   const caseTypes = concepts ?? [];
 
   return (
-    <AppLayout
+    <AppSlate
       title={t`Case Manager`}
       toolbarButtonSection={<NewCaseTypeButton />}
       containerProps={showMasterDetail ? undefined : { p: "md" }}
@@ -50,6 +50,6 @@ export function OntologyDesignerApp(): JSX.Element {
       ) : (
         <Outlet />
       )}
-    </AppLayout>
+    </AppSlate>
   );
 }

@@ -1,4 +1,4 @@
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import css from "@/views/GisApp/GisApp.module.css";
 import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
 import { useGisApp } from "@/views/GisApp/useGisApp/useGisApp";
@@ -28,8 +28,8 @@ export function GisApp({ avaMap }: Props): ReactNode {
   useRequestSpatialExtension();
 
   return (
-    <AppLayout containerProps={{ className: css.canvas }}>
+    <AppSlate containerProps={{ className: css.canvas }}>
       <GisAppMapShell app={app} />
-    </AppLayout>
+    </AppSlate>
   );
 }

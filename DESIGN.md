@@ -1,6 +1,6 @@
 ---
 name: Avandar
-description: Cool-slate product UI for social-sector data work. Figtree, hairline elevation, one blue accent.
+description: Cool blue-gray product UI for social-sector data work. Figtree, hairline elevation, one blue accent.
 colors:
   primary: "#1563fe"
   primary-soft: "#edf6ff"
@@ -56,7 +56,7 @@ components:
     textColor: "{colors.primary-deep}"
     rounded: "{rounded.sm}"
     padding: "6px 12px"
-  canvas:
+  slate:
     backgroundColor: "{colors.raised}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
@@ -69,7 +69,9 @@ components:
 
 ## Overview
 
-Avandar is a **product** surface: authenticated workspace tools (data sources, explorer, dashboards, maps, case manager) inside a dark slate chrome. The main scene is a raised light canvas (`AppLayout` paper) sitting on `--mantine-navbar-background`. Pages that skip that canvas look like a different product.
+Avandar is a **product** surface: authenticated workspace tools (data sources, explorer, dashboards, maps, case manager) inside an app shell. The main scene is the **slate**: a raised light surface (`AppLayout` paper) floating on the dark shell background (`--mantine-navbar-background`). Pages that skip the slate look like a different product.
+
+The names for each region of the shell (slate, sidebar, gutter, chat aside, docked drawer) and the z-index tiers that keep them stacked correctly are in [`docs/app-shell-nomenclature.md`](docs/app-shell-nomenclature.md). Use those words here and in code. "Slate" is the raised view and never a color; the shell's dark blue-gray is not "slate".
 
 Identity: Figtree, cool blue-gray neutrals (`NEUTRAL_SHADES`), brand blue `#1563fe`. Hierarchy is hairline borders first, tight stacked shadows second. Density is comfortable-compact. Motion is 140–200ms ease-out, never choreographed page-load.
 
@@ -77,7 +79,7 @@ Identity: Figtree, cool blue-gray neutrals (`NEUTRAL_SHADES`), brand blue `#1563
 
 Restrained strategy. Body is tinted toward brand hue (`#f0f4f8`), not cream. Ink is `neutral.9` (`#102a43`). Chrome is `neutral.6` (`#486581`) with white labels. Primary is used for filled actions, current nav selection, and focus rings only.
 
-Semantic ramps live on the Mantine theme: `success`, `warning`, `danger`, `info`. Info callouts are for failures and warnings, not for "nothing selected." Empty canvases use a raised Paper, a light primary ThemeIcon, and dimmed body copy (`neutral` text, not washed gray-on-tint).
+Semantic ramps live on the Mantine theme: `success`, `warning`, `danger`, `info`. Info callouts are for failures and warnings, not for "nothing selected." Empty slates use a raised Paper, a light primary ThemeIcon, and dimmed body copy (`neutral` text, not washed gray-on-tint).
 
 Do not introduce a second accent in case management. Do not paint the detail pane with the chrome color.
 
@@ -89,15 +91,15 @@ No display serifs. No gradient text. `text-wrap: balance` on empty-state heading
 
 ## Elevation
 
-Surfaces: `--ava-surface-body` (page inside the canvas), `--ava-surface-raised` (cards, list panes sit on body), `--ava-surface-sunken` (hover on outline controls). Borders: `--ava-border-default` on every raised edge. Shadows: `xs` on small controls, `sm` on Paper/Card, `md` on menus.
+Surfaces: `--ava-surface-body` (page inside the slate), `--ava-surface-raised` (cards, list panes sit on body), `--ava-surface-sunken` (hover on outline controls). Borders: `--ava-border-default` on every raised edge. Shadows: `xs` on small controls, `sm` on Paper/Card, `md` on menus.
 
-The AppLayout paper uses a stronger edge (`neutral.7` + stacked shadow) so it reads as a window on the chrome. Inner list panes use `neutral.0` fill and a 1px `neutral.2` divider, matching Data Sources.
+The slate uses a stronger edge (`neutral.7` + stacked shadow) so it reads as floating on the shell rather than butted against it. Its shadow deliberately spills past the gutter onto the sidebar and the chat aside, which is why the slate is raised to `APP_SLATE_Z_INDEX`; clipping it back to the gutter is a bug. Inner list panes use `neutral.0` fill and a 1px `neutral.2` divider, matching Data Sources.
 
 Never pair a 1px border with a ≥16px blur shadow. Card radius tops out at `sm`/`md` (6–8px).
 
 ## Components
 
-- **App shell:** dark navbar, optional chat aside, light AppLayout canvas with toolbar (sidebar toggle, title, compact-sm light buttons, chat toggle). Case Manager's expanded Ask Avandar panel overlays the canvas (`OverlayTheme` backdrop + panel shadow) instead of growing the aside column.
+- **App shell:** dark sidebar, optional chat aside, and the light slate with its toolbar (sidebar toggle, title, compact-sm light buttons, chat toggle). The slate keeps an 8px gutter of shell background on all four sides. Case Manager's expanded Ask Avandar panel overlays the slate (`OverlayTheme` backdrop + panel shadow) instead of growing the aside column.
 - **Master-detail:** 240px min list pane + scrolling detail. List rows are `NavLinkList` with `inactiveHoverColor="neutral.1"` on a `neutral.0` pane so hover is visible. Active row uses primary filled.
 - **Toolbar actions:** `Button size="compact-sm" variant="light"` with a plus or settings icon, same as Data Sources / Dashboards.
 - **Empty states:** centered-ish Paper (`p="xxl"`, `maw={560|720}`), ThemeIcon `variant="light" color="primary"`, heading + dimmed sentence + one primary button. Not an info Alert/Callout.
@@ -109,14 +111,16 @@ Never pair a 1px border with a ≥16px blur shadow. Card radius tops out at `sm`
 
 **Do**
 
-- Put every case-manager view inside `AppLayout`.
+- Put every case-manager view inside `AppLayout` so it gets the slate.
 - Call a County a County. Call a case type a case type.
 - Use the Data Sources list pane as the spatial template for concept and individual lists.
 - Keep empty states instructional: what is this, what to do next.
 
 **Don't**
 
-- Leave AppShell.Main unpainted so the dark chrome shows through.
+- Leave AppShell.Main unpainted so the shell background shows through where the slate should be.
+- Take the gutter or the drop shadow off the slate, or let another layer clip them.
+- Say "slate" when you mean a color, or "canvas" when you mean the slate.
 - Use `Callout color="info"` for selection/empty.
 - Title a list "{name} Manager".
 - Say "entity", "profile manager", or "Sync data!" in the UI.

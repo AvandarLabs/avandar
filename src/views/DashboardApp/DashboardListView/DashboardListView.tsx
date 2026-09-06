@@ -10,7 +10,7 @@ import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardC
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -158,7 +158,7 @@ export function DashboardListView({
   const state = useDashboardListViewState({ dashboards, workspaceSlug });
 
   return (
-    <AppLayout
+    <AppSlate
       title={t`Dashboards`}
       toolbarButtonSection={
         <Button
@@ -188,6 +188,6 @@ export function DashboardListView({
           onOpenDashboard={state.onOpenDashboard}
         />
       )}
-    </AppLayout>
+    </AppSlate>
   );
 }

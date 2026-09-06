@@ -1,5 +1,5 @@
 /**
- * GisApp must sit inside AppLayout so the map uses the shared canvas Paper,
+ * GisApp must sit inside AppSlate so the map uses the shared slate Paper,
  * and it is the only place in the GIS view that asks for DuckDB Spatial.
  */
 import { Model } from "@avandar/models";
@@ -50,9 +50,9 @@ vi.mock("@/views/GisApp/GisAppMapShell", () => {
   };
 });
 
-vi.mock("@/components/layouts/AppLayout/AppLayout", () => {
+vi.mock("@/components/layouts/AppSlate/AppSlate", () => {
   return {
-    AppLayout: ({ children }: { children: ReactNode }) => {
+    AppSlate: ({ children }: { children: ReactNode }) => {
       return <main data-testid="app-layout">{children}</main>;
     },
   };

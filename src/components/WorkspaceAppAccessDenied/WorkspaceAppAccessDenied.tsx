@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Text, Title } from "@mantine/core";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 
 type Props = {
   appLabel?: string;
@@ -12,7 +12,7 @@ type Props = {
 export function WorkspaceAppAccessDenied({ appLabel }: Props): JSX.Element {
   const { t } = useLingui();
   return (
-    <AppLayout title={t`Access denied`}>
+    <AppSlate title={t`Access denied`}>
       <Container py="xxxl" size="md">
         <Title order={3}>
           <Trans>Access denied</Trans>
@@ -26,6 +26,6 @@ export function WorkspaceAppAccessDenied({ appLabel }: Props): JSX.Element {
           </Trans>
         </Text>
       </Container>
-    </AppLayout>
+    </AppSlate>
   );
 }

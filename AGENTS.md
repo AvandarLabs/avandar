@@ -5,6 +5,7 @@
 - Use `docs/` for architectural notes, design decisions, and checklists
   (for example `docs/<topic>.md`).
 - Granular workspace permissions: `docs/permissions-architecture.md`.
+- App shell, slate, and z-index nomenclature: `docs/app-shell-nomenclature.md`.
 - If Context7 MCP is configured, use it to reference the most up-to-date
   documentation of any library when you need it.
 

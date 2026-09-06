@@ -1,7 +1,7 @@
 import { Paper } from "@avandar/ui";
 import { Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import clsx from "clsx";
-import css from "@/components/CanvasEmptyState/CanvasEmptyState.module.css";
+import css from "@/components/AppSlateEmptyState/AppSlateEmptyState.module.css";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
  * Instructional empty canvas used when a master-detail view has nothing
  * selected, or a workspace surface has no records yet.
  */
-export function CanvasEmptyState({
+export function AppSlateEmptyState({
   title,
   message,
   icon,

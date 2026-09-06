@@ -41,28 +41,35 @@ import type {
 } from "@mantine/core";
 
 /**
- * AppShell main z-index.
- * This effectively sets our "base" z-index to be 200. This ensures the app
- * shell shows up above the sidebar on the left.
+ * Slate z-index: the raised view that floats on the app shell.
  *
- * This means any other content that must show up above the main app content
- * should be at a higher z-index than 200.
+ * Applied to the `AppSlate` paper, not to `AppShell.Main`. Mantine paints
+ * the navbar and the aside at `getDefaultZIndex("app") + 1`, so a slate left
+ * in normal flow sits under them and its drop shadow is chopped off at the
+ * sidebar edge. Lifting the paper puts the shadow on top of the shell without
+ * lifting `AppShell.Main`, whose box bleeds over the navbar and would swallow
+ * sidebar clicks.
+ *
+ * This value must stay below `getDefaultZIndex("modal")` (200), the tier
+ * Mantine gives `Drawer` and `Spotlight` and that we do not override. The
+ * slate z-index makes the slate a stacking context, so every surface meant to
+ * cover it has to outrank the slate rather than one of its descendants.
  */
-export const APP_SHELL_MAIN_Z_INDEX = 200;
+export const APP_SLATE_Z_INDEX = 150;
 
 /**
- * App chrome z-index. Floating toolbars and the mobile navbar live here:
- * above the main content area but always below modals, drawers, and any
- * overlay layer. Anchoring chrome to this token (instead of ad-hoc magic
- * numbers like `1000`) is what keeps things like the Send Feedback button
- * from punching through modal overlays.
+ * App chrome z-index. Floating toolbars, the mobile navbar, and the chat
+ * composer overlay live here: above the slate but always below modals,
+ * drawers, and any overlay layer. Anchoring chrome to this token (instead of
+ * ad-hoc magic numbers like `1000`) is what keeps things like the Send
+ * Feedback button from punching through modal overlays.
  */
 export const APP_CHROME_Z_INDEX = 250;
 
 /**
  * Modal z-index above all app chrome.
  *
- * Mantine's `getDefaultZIndex("modal")` is hardcoded to 201 and ignores
+ * Mantine's `getDefaultZIndex("modal")` is hardcoded to 200 and ignores
  * `theme.zIndex`, so defaults are set on `Modal` and `ModalsProvider`. The
  * value is intentionally well above `APP_CHROME_Z_INDEX` so future floating
  * UI added in the chrome tier cannot accidentally land above modals.
@@ -501,7 +508,7 @@ export const Theme = createTheme({
   other: {
     primaryColor: AVANDAR_BLUE_SHADES[PRIMARY_COLOR_LIGHT_SHADE],
     zIndex: {
-      appShellMain: APP_SHELL_MAIN_Z_INDEX,
+      appSlate: APP_SLATE_Z_INDEX,
       appChrome: APP_CHROME_Z_INDEX,
       floatingPanel: FLOATING_PANEL_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
@@ -553,7 +560,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       theme.other.navbar.activeHoverBackgroundColor,
     "--navbar-transition-duration": AnimationTheme.duration.fast,
 
-    "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
+    "--mantine-z-index-app-slate": String(theme.other.zIndex.appSlate),
     "--mantine-z-index-app-chrome": String(theme.other.zIndex.appChrome),
     "--mantine-z-index-floating-panel": String(
       theme.other.zIndex.floatingPanel,

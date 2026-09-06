@@ -16,7 +16,7 @@ import { Navbar } from "@/components/AppShell/Navbar/Navbar";
 import { ChatComposerOverlay } from "@/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay";
 import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
+import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppSlate/AppSlate";
 import { OfflineChatDownloadIndicator } from "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { ANIMATION_DURATION_MS } from "@/config/Theme/AnimationTheme/AnimationTheme";

@@ -72,9 +72,9 @@ vi.mock("@/clients/maps/AvaMapClient/AvaMapClient", () => {
   };
 });
 
-vi.mock("@/components/layouts/AppLayout/AppLayout", () => {
+vi.mock("@/components/layouts/AppSlate/AppSlate", () => {
   return {
-    AppLayout: ({
+    AppSlate: ({
       children,
       title,
       toolbarButtonSection,
