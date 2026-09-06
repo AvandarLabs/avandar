@@ -176,7 +176,7 @@ Ordered by blast radius per line, not by size.
 
 | Tier | Ref | Files | +Lines | Agent pass | Human pass | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1/F-2 accepted, F-3 open |
+| Guardrails | `review/t6-guardrails` | 47 | 3,480 | n/a | **done** | F-1 to F-3 accepted as-is |
 | SQL + privileges | `review/t1-sql` | 156 | 21,054 | **done** | not started | F-5 to F-9 all fixed |
 | Edge functions | `review/t2-edge` | 73 | 4,697 | not started | not started | Untrusted input reaches SQL |
 | Core / clients | `review/t2-core` | 816 | 82,768 | not started | not started | |
@@ -216,7 +216,7 @@ ground rule 2 that does not count as reviewed.
 Severity: **S1** data loss or cross-tenant exposure · **S2** incorrect
 behaviour users hit · **S3** latent defect or weakened guardrail · **S4** nit.
 
-### F-1 — `migrate` no longer gated on the e2e suite (S3, open)
+### F-1 — `migrate` no longer gated on the e2e suite (S3, accepted)
 
 **Where:** `.github/workflows/staging.yaml`, `.github/workflows/production.yaml`
 **From:** `chore/split-ci-tests`, merged `53b942067` on 08-19 12:44, the last
@@ -244,7 +244,7 @@ matters for schema safety. No change.
 
 **Status:** accepted, closed
 
-### F-2 — COOP/COEP dropped from `vercel.json`, COOP possibly over-removed (S3, open)
+### F-2 — COOP/COEP dropped from `vercel.json`, COOP possibly over-removed (S3, accepted)
 
 **Where:** `vercel.json`, `index.html`
 **From:** `3e37a1b61` "Let chat design case types…", 08-19 08:59, about an hour
@@ -284,7 +284,7 @@ revisited. No change.
 
 **Status:** accepted, closed
 
-### F-3 — `.gitignore` no longer ignores `.cursor/plans` (S4, open)
+### F-3 — `.gitignore` no longer ignores `.cursor/plans` (S4, accepted)
 
 **Where:** `.gitignore`
 
@@ -316,7 +316,7 @@ crunch window:
 - Dependency additions are all explained by shipped features (`pdfjs-dist`,
   `@dnd-kit/*`, `react-joyride`, `@duckdb/node-api`) plus a Supabase CLI bump.
 
-### F-4 — six new RLS-protected tables have no pgTAP coverage at all (S3, open)
+### F-4 — six new RLS-protected tables have no pgTAP coverage at all (S3, fixed)
 
 **Where:** `supabase/schemas/10.concepts.sql`, `20.concept_attributes.sql`,
 `20.datasets__pdf_file.sql`, and the individuals/attribute-mapping schemas
@@ -514,7 +514,7 @@ Verified: three assertions added to
 
 **Status:** fixed on `fix/audit-t1-sql`
 
-### F-7 — the window widened the `anon`-executable function surface, and the check that reports it cannot fail (S3, open)
+### F-7 — the window widened the `anon`-executable function surface, and the check that reports it cannot fail (S3, fixed)
 
 **Where:** `scripts/db/reconcile-privileges/reconcile-privileges.main.ts`
 **Tier:** t1-sql
