@@ -112,9 +112,8 @@ function _getDexieCrudClientExtensions<
 } {
   const { db, queries, mutations } = options.clientOptions;
   return {
-    additionalQueries:
-      queries ?
-        ({ clientLogger }) => {
+    additionalQueries: queries
+      ? ({ clientLogger }) => {
           return queries({
             logger: clientLogger,
             db,
@@ -122,9 +121,8 @@ function _getDexieCrudClientExtensions<
           });
         }
       : undefined,
-    additionalMutations:
-      mutations ?
-        ({ clientLogger }) => {
+    additionalMutations: mutations
+      ? ({ clientLogger }) => {
           return mutations({
             logger: clientLogger,
             db,

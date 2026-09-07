@@ -4,10 +4,10 @@ import { Label } from "recharts";
 import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { ScatterChartSeries } from "@mantine/charts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { ScatterChartSeries } from "@mantine/charts";
 
 type Props = {
   data: UnknownDataFrame;
@@ -93,44 +93,46 @@ export function ScatterChart({
       valueFormatter={formatChartNumber}
       xAxisProps={{
         ...xAxisProps,
-        children:
-          hasXLabel ?
-            <Label
-              value={xLabel}
-              position="insideBottom"
-              offset={-20}
-              fontSize={12}
-              fill={chartStyle?.xAxis?.labelColor}
-            />
-          : xAxisProps?.children,
+        children: hasXLabel ? (
+          <Label
+            value={xLabel}
+            position="insideBottom"
+            offset={-20}
+            fontSize={12}
+            fill={chartStyle?.xAxis?.labelColor}
+          />
+        ) : (
+          xAxisProps?.children
+        ),
       }}
       yAxisProps={{
         ...yAxisProps,
         // Widen to fit the rotated Y label.
         ...(hasYLabel ? { width: 80 } : {}),
-        children:
-          hasYLabel ?
-            <Label
-              value={yLabel}
-              position="insideLeft"
-              angle={-90}
-              textAnchor="middle"
-              offset={-5}
-              fontSize={12}
-              fill={chartStyle?.yAxis?.labelColor}
-            />
-          : yAxisProps?.children,
+        children: hasYLabel ? (
+          <Label
+            value={yLabel}
+            position="insideLeft"
+            angle={-90}
+            textAnchor="middle"
+            offset={-5}
+            fontSize={12}
+            fill={chartStyle?.yAxis?.labelColor}
+          />
+        ) : (
+          yAxisProps?.children
+        ),
       }}
       scatterChartProps={
-        hasXLabel || hasYLabel ?
-          {
-            margin: {
-              bottom: hasXLabel ? 40 : undefined,
-              left: hasYLabel ? 30 : undefined,
-              right: hasYLabel ? 5 : undefined,
-            },
-          }
-        : undefined
+        hasXLabel || hasYLabel
+          ? {
+              margin: {
+                bottom: hasXLabel ? 40 : undefined,
+                left: hasYLabel ? 30 : undefined,
+                right: hasYLabel ? 5 : undefined,
+              },
+            }
+          : undefined
       }
       {...restStyleProps}
     />

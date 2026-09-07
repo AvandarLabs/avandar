@@ -61,9 +61,9 @@ export function ExportSheetPreview({
         className={`${css.exportSheetPreviewBand} ${css.exportSheetPreviewHeader}`}
         style={_toStyle(page.headerMm, scale)}
       >
-        {text.title !== undefined ?
+        {text.title !== undefined ? (
           <span className={css.exportSheetPreviewText}>{text.title}</span>
-        : null}
+        ) : null}
       </div>
       <div
         className={`${css.exportSheetPreviewBand} ${css.exportSheetPreviewMapFrame}`}

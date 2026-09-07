@@ -1,8 +1,8 @@
 import {
-  HDX_API_BASE_URL, // prettier-ignore
+  HDX_API_BASE_URL, // oxfmt-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 import type {
-  SudanCholeraCatalogEntry, // prettier-ignore
+  SudanCholeraCatalogEntry, // oxfmt-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 
 /** One `catalog_entries__open_data` row for an API-backed resource. */

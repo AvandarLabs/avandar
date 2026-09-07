@@ -47,18 +47,16 @@ export function NuxTooltipFooter({
         <Trans>Close</Trans>
       </Button>
       <Group gap="xs" wrap="nowrap">
-        {hasBack ?
+        {hasBack ? (
           <Button {...backProps} variant="default" size="xs">
             <Trans>Back</Trans>
           </Button>
-        : null}
-        {hasNext ?
+        ) : null}
+        {hasNext ? (
           <Button {...primaryProps} size="xs">
-            {isLastStep ?
-              <Trans>Done</Trans>
-            : <Trans>Next</Trans>}
+            {isLastStep ? <Trans>Done</Trans> : <Trans>Next</Trans>}
           </Button>
-        : null}
+        ) : null}
       </Group>
     </Group>
   );

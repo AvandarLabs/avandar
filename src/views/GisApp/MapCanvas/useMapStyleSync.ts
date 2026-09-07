@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
-import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapInstance } from "@/views/GisApp/MapCanvas/useMapInstance";
 
 /**
  * Swaps the basemap style in place when it changes, leaving the map instance

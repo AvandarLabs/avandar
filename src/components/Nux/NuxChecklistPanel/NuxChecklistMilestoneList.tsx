@@ -44,9 +44,9 @@ export function NuxChecklistMilestoneList({
             isDone={isDone}
             isLocked={isLocked}
             lockedTooltip={
-              shareDashboardBlocked ?
-                t`You can't go to this step until you create a new dashboard.`
-              : undefined
+              shareDashboardBlocked
+                ? t`You can't go to this step until you create a new dashboard.`
+                : undefined
             }
             onOpen={() => {
               onOpenMilestone(milestone.key);

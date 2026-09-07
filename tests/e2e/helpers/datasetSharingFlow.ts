@@ -8,8 +8,8 @@ import {
   setGeneralAccess,
 } from "./shareModalFlow";
 import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
-import type { Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { Page } from "@playwright/test";
 
 /**
  * Uploads the California CSV sample, sets the dataset name, saves, and returns

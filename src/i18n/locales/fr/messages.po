@@ -300,11 +300,6 @@ msgstr "Paramètres du graphique"
 msgid "Discovery is not available in this context."
 msgstr "La découverte n'est pas disponible dans ce contexte."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Type a question and I will generate the SQL and run it on the canvas."
-msgstr "Tapez une question et je générerai le SQL et l'exécuterai sur le "
-"canevas."
-
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -407,6 +402,10 @@ msgstr "Développer"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
 msgstr "Encadré"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Process"
+msgstr "Traiter"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
@@ -1207,7 +1206,7 @@ msgstr "Protocole"
 msgid "Build your first dashboard"
 msgstr "Créer votre premier tableau de bord"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "Fermer la barre latérale"
 
@@ -1274,6 +1273,11 @@ msgstr "Réessayer"
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "La sous-requête JOIN à la position {index} n’a pas pu être "
 "resérialisée."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Type a question and I will generate the SQL and run it for you."
+msgstr "Saisissez une question et je générerai le SQL, puis l’exécuterai pour "
+"vous."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -1831,6 +1835,10 @@ msgstr "Clause de non-responsabilité concernant les limites (Toujours incluse)"
 msgid "Undo"
 msgstr "Annuler"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "One dataset is one tab."
+msgstr "Un jeu de données correspond à un onglet."
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "Recommandé si vous disposez d’environ 8 Go de RAM (paramètre par défaut "
@@ -2040,11 +2048,6 @@ msgstr "Ajouter un nouveau jeu de données"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Switch to Free plan"
 msgstr "Passer au plan gratuit"
-
-#. placeholder {0}: formatNumber(numSuccessRows)
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {0} rows"
-msgstr "{0} lignes analysées"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -2305,7 +2308,7 @@ msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "Aucune valeur n'a été retournée depuis {column}. Décrivez ce dont vous "
 "avez besoin à la place."
 
-#. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> : "."
+#. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
@@ -2459,11 +2462,6 @@ msgstr "Exact"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Discard"
 msgstr "Abandonner"
-
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool is available when Spatial finishes loading."
-msgstr "Cet outil est disponible une fois le chargement de Spatial terminé."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2670,12 +2668,6 @@ msgstr "PDF téléchargé."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "ID de l'espace de travail"
-
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "The layer configuration is saved. Retry after connectivity or the "
-"Spatial extension becomes available."
-msgstr "La configuration du calque est enregistrée. Réessayez lorsque la "
-"connectivité ou l’extension Spatial sera disponible."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -2895,6 +2887,12 @@ msgstr "votre ensemble de données"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "Couleur unique"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "Geometry support is still downloading. This can take a moment on a slow "
+"connection."
+msgstr "La prise en charge de la géométrie est en cours de téléchargement. Cela "
+"peut prendre un moment avec une connexion lente."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3488,6 +3486,12 @@ msgstr "Vos données sont résumées"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Marge intérieure"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "The layer configuration is saved. Try again once your connection is "
+"back, or reload the page."
+msgstr "La configuration du calque est enregistrée. Réessayez une fois la "
+"connexion rétablie, ou rechargez la page."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -4192,11 +4196,6 @@ msgstr "Aucun fichier sélectionné"
 msgid "Submit"
 msgstr "Soumettre"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr "Cet outil nécessite DuckDB Spatial, qui n’est pas disponible."
-
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "tableau de bord"
@@ -4205,6 +4204,10 @@ msgstr "tableau de bord"
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
 msgstr "{0} a été supprimé de ce navigateur."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Tab to import"
+msgstr "Onglet à importer"
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
@@ -5135,11 +5138,6 @@ msgstr "Obtenir une somme des valeurs"
 msgid "Type your answer..."
 msgstr "Tapez votre réponse..."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns are available when Spatial finishes loading."
-msgstr "Les colonnes de géométrie seront disponibles une fois le chargement de "
-"Spatial terminé."
-
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
 msgstr "Importer"
@@ -5191,6 +5189,10 @@ msgstr "Échec de la déconnexion"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
 msgstr "Vous vous êtes connecté avec succès à {0}"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "Geometry support is unavailable"
+msgstr "La prise en charge de la géométrie est indisponible"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5271,6 +5273,10 @@ msgstr "Aucune ligne"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "Most common"
 msgstr "Les plus courants"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr "Lecteurs partagés"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
@@ -5610,10 +5616,6 @@ msgstr "Développer l’inspecteur"
 msgid "Case Manager"
 msgstr "Gestionnaire de dossiers"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-msgid "The tab has a header row"
-msgstr "L’onglet comporte une ligne d’en-tête"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
 msgstr "Intégré"
@@ -5767,7 +5769,7 @@ msgstr "Classe {0} : {1} valeurs"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "Ignorer tous les filtres globaux : cette visualisation est non filtrée."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "Google Sheet"
 msgstr "Feuille Google"
 
@@ -5912,10 +5914,6 @@ msgstr "Certaines données doivent être saisies manuellement"
 #: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 msgid "Integer"
 msgstr "Entier"
-
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The results are on the canvas to the left."
-msgstr "Les résultats se trouvent sur le canevas à gauche."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
@@ -6099,7 +6097,7 @@ msgstr "Niveau"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "« {operator} » n’est pas un opérateur compris par ce formulaire."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Ouvrir la barre latérale"
 
@@ -6166,6 +6164,10 @@ msgstr "Ces données semblent contenir des informations sur la santé ou des "
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "Commencez par explorer votre espace de travail ou en téléchargeant "
 "votre premier jeu de données."
+
+#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
+msgid "Geometry support unavailable"
+msgstr "Prise en charge de la géométrie indisponible"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
@@ -6339,11 +6341,6 @@ msgstr "Limite de tableaux de bord partagés atteinte"
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "Zone tampon de {sourceName}"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-msgstr "Les colonnes de géométrie nécessitent DuckDB Spatial, qui n’est pas "
-"disponible."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -6733,6 +6730,12 @@ msgstr "Modèle de chat hors ligne prêt"
 msgid "Column description updated successfully!"
 msgstr "Description de la colonne mise à jour avec succès !"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs geometry support, which could not be loaded."
+msgstr "Cet outil nécessite la prise en charge de la géométrie, qui n'a pas pu "
+"être chargée."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "Enregistrez d'abord vos modifications : le PDF reflète le tableau de "
@@ -6741,10 +6744,6 @@ msgstr "Enregistrez d'abord vos modifications : le PDF reflète le tableau de "
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Units"
 msgstr "Unités"
-
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File failed to load"
-msgstr "Le fichier n'a pas pu être chargé"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
@@ -7057,10 +7056,18 @@ msgstr "Bienvenue dans le gestionnaire de vos sources de données. Sélectionnez
 "feuille de calcul sous la main ? <0>Téléchargez notre exemple</0> et "
 "utilisez-le."
 
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+msgid "Geometry unavailable"
+msgstr "Géométrie indisponible"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "Jeu de données des limites"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr "Partagés avec moi"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -7592,6 +7599,12 @@ msgstr "Cet espace de travail n’existe plus ou votre accès a été révoqué.
 "vous pensez qu’il s’agit d’une erreur, contactez le propriétaire de "
 "votre espace de travail."
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool turns on when geometry support finishes downloading."
+msgstr "Cet outil s'active une fois le téléchargement de la prise en charge de "
+"la géométrie terminé."
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
 msgstr "Vous seul avez accès à ce {resource}."
@@ -7629,6 +7642,10 @@ msgstr "Polygone"
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
 msgstr "Reprise du traitement de l'ensemble de données…"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Tab not found"
+msgstr "Onglet introuvable"
 
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
@@ -7831,7 +7848,6 @@ msgid "Current Plan"
 msgstr "Plan actuel"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "No rows were read successfully"
 msgstr "Aucune ligne n'a été lue avec succès"
 
@@ -7972,6 +7988,13 @@ msgstr "L’identifiant de l’espace de travail ne peut pas contenir d’espace
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "Saisissez votre texte ici"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
+"deleted. Pick the sheet again and choose a tab."
+msgstr "Cet onglet ne se trouve plus dans cette feuille de calcul. Il a "
+"peut-être été renommé ou supprimé. Sélectionnez à nouveau la feuille, "
+"puis choisissez un onglet."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8467,6 +8490,10 @@ msgstr "Déplaçons ces résultats vers un tableau de bord"
 msgid "Value"
 msgstr "Valeur"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query. Your results are ready."
+msgstr "J’ai exécuté la requête. Vos résultats sont prêts."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "You are currently subscribed to this plan."
 msgstr "Vous êtes actuellement abonné à ce plan."
@@ -8551,10 +8578,6 @@ msgid "You need to be signed in to ask the assistant. Kept the rule-based "
 "results."
 msgstr "Vous devez être connecté pour interroger l’assistant. Les résultats "
 "basés sur des règles ont été conservés."
-
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File loaded successfully"
-msgstr "Fichier chargé avec succès"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
@@ -8706,7 +8729,7 @@ msgstr "Adresse e-mail invalide"
 msgid "Not plotted yet"
 msgstr "Pas encore tracé"
 
-#. placeholder {0}: selectedDocument.name
+#. placeholder {0}: pickedSheet.spreadsheetName
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
 msgstr "Document sélectionné : {0}"
@@ -8799,10 +8822,6 @@ msgstr "Choisi d’après ce que nous avons détecté. Modifiez-le si le résult
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
 msgstr "Supprimer le groupe d'utilisateurs"
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-msgid "Spatial unavailable"
-msgstr "Données spatiales indisponibles"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
@@ -8972,6 +8991,10 @@ msgstr "HAVING utilise l’opérateur « {operator} », qui n’est pas pris en 
 msgid "Displaced"
 msgstr "Déplacé"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr "Mon Drive"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
 "Your subscription will be updated accordingly."
@@ -9115,6 +9138,11 @@ msgstr "Pour confirmer, tapez <0>{confirmationTarget}</0> ci-dessous :"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} et {groupClause}"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "These options need geometry support, which could not be loaded."
+msgstr "Ces options nécessitent la prise en charge de la géométrie, qui n'a pas "
+"pu être chargée."
+
 #: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
@@ -9203,11 +9231,6 @@ msgstr "Chargement..."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
 msgstr "Non renseigné"
-
-#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "Spatial is unavailable"
-msgstr "Les données spatiales sont indisponibles"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

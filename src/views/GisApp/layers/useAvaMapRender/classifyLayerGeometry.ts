@@ -153,8 +153,8 @@ function _makeSizeStops(options: {
   const valueColumnName = getPaintValueColumnName(layer);
   const values = features
     .map((feature) => {
-      return valueColumnName ?
-          feature.properties?.[valueColumnName]
+      return valueColumnName
+        ? feature.properties?.[valueColumnName]
         : undefined;
     })
     .filter(isNumber);
@@ -181,8 +181,8 @@ function _classifyLegend(options: {
   if (color.type === "single") {
     return { breaks: [], classIndexByFeatureId: new Map(), entries: [] };
   }
-  return color.type === "categorical" ?
-      _classifyCategories({ layer, features, color })
+  return color.type === "categorical"
+    ? _classifyCategories({ layer, features, color })
     : classifyLayerValues(
         features.map((feature, index) => {
           return {

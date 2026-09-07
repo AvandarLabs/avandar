@@ -20,9 +20,11 @@ export function RegisterView(): ReactElement {
       subtitle={t`Start your journey with us`}
       footer={<AuthFooter />}
     >
-      {IS_REGISTRATION_DISABLED ?
+      {IS_REGISTRATION_DISABLED ? (
         <DisabledRegistrationNotice />
-      : <RegistrationForm />}
+      ) : (
+        <RegistrationForm />
+      )}
     </AuthLayout>
   );
 }

@@ -27,6 +27,16 @@ export type GoogleDriveErrorCode =
    */
   | "file-not-accessible"
 
+  /**
+   * The workbook no longer has the tab a dataset points at.
+   *
+   * Not a transport failure, and it is a `GoogleDriveError` anyway so callers
+   * keep branching on one code set. A tab is stored by title, and a title is
+   * renameable, so this is what a rename looks like from here. Storing each
+   * tab's `gid` at import would make renames stop mattering.
+   */
+  | "sheet-not-found"
+
   /** The access token is expired or its grant was revoked. */
   | "google-auth-expired"
 
@@ -45,9 +55,9 @@ function _buildDriveErrorMessage(
   }>,
 ): string {
   const detail =
-    options.reason === undefined ?
-      `HTTP ${options.status}`
-    : `HTTP ${options.status}, reason "${options.reason}"`;
+    options.reason === undefined
+      ? `HTTP ${options.status}`
+      : `HTTP ${options.status}, reason "${options.reason}"`;
   return `Google Drive request failed (${options.code}): ${detail}.`;
 }
 

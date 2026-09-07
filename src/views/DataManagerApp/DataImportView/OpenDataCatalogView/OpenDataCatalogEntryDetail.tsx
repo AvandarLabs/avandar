@@ -54,9 +54,9 @@ export function OpenDataCatalogEntryDetail({
   }
 
   const metadataJson =
-    entry.metadata !== undefined ?
-      JSON.stringify(entry.metadata, undefined, 2)
-    : undefined;
+    entry.metadata !== undefined
+      ? JSON.stringify(entry.metadata, undefined, 2)
+      : undefined;
 
   return (
     <ScrollArea mah="70vh" type="scroll">
@@ -78,14 +78,12 @@ export function OpenDataCatalogEntryDetail({
                 size="lg"
                 loading={isAdding || isLoadingColumnMetadata}
                 data-disabled={
-                  (
-                    !isAddAllowed ||
-                    isAdding ||
-                    isLoadingColumnMetadata ||
-                    offline.isBlocked
-                  ) ?
-                    true
-                  : undefined
+                  !isAddAllowed ||
+                  isAdding ||
+                  isLoadingColumnMetadata ||
+                  offline.isBlocked
+                    ? true
+                    : undefined
                 }
                 aria-disabled={
                   !isAddAllowed ||
@@ -101,23 +99,23 @@ export function OpenDataCatalogEntryDetail({
           </OfflineGated>
         </Group>
 
-        {!isAddAllowed ?
+        {!isAddAllowed ? (
           <Text c="dimmed" size="sm">
             <Trans>
               You cannot add more datasets on your current plan. Upgrade to add
               this catalog dataset.
             </Trans>
           </Text>
-        : null}
+        ) : null}
 
-        {entry.description ?
+        {entry.description ? (
           <Stack gap={4}>
             <Text fw={600} size="sm">
               <Trans>Description</Trans>
             </Text>
             <Text size="sm">{entry.description}</Text>
           </Stack>
-        : null}
+        ) : null}
 
         <Stack gap={4}>
           <Text fw={600} size="sm">
@@ -126,14 +124,14 @@ export function OpenDataCatalogEntryDetail({
           <Text size="sm">{entry.externalOrganizationName}</Text>
         </Stack>
 
-        {entry.externalServiceName ?
+        {entry.externalServiceName ? (
           <Stack gap={4}>
             <Text fw={600} size="sm">
               <Trans>Service</Trans>
             </Text>
             <Text size="sm">{entry.externalServiceName}</Text>
           </Stack>
-        : null}
+        ) : null}
 
         <Stack gap={4}>
           <Text fw={600} size="sm">
@@ -146,7 +144,7 @@ export function OpenDataCatalogEntryDetail({
           </Text>
         </Stack>
 
-        {entry.sourceUrl ?
+        {entry.sourceUrl ? (
           <Stack gap={4}>
             <Text fw={600} size="sm">
               <Trans>Source URL</Trans>
@@ -155,9 +153,9 @@ export function OpenDataCatalogEntryDetail({
               {entry.sourceUrl}
             </Anchor>
           </Stack>
-        : null}
+        ) : null}
 
-        {entry.canonicalUrls && entry.canonicalUrls.length > 0 ?
+        {entry.canonicalUrls && entry.canonicalUrls.length > 0 ? (
           <Stack gap={4}>
             <Text fw={600} size="sm">
               <Trans>Canonical URLs</Trans>
@@ -172,37 +170,37 @@ export function OpenDataCatalogEntryDetail({
               })}
             </Stack>
           </Stack>
-        : null}
+        ) : null}
 
         <Group gap="xl" grow>
-          {entry.license ?
+          {entry.license ? (
             <Stack gap={4}>
               <Text fw={600} size="sm">
                 <Trans>License</Trans>
               </Text>
               <Text size="sm">{entry.license}</Text>
             </Stack>
-          : null}
-          {entry.updateFrequency ?
+          ) : null}
+          {entry.updateFrequency ? (
             <Stack gap={4}>
               <Text fw={600} size="sm">
                 <Trans>Update frequency</Trans>
               </Text>
               <Text size="sm">{entry.updateFrequency}</Text>
             </Stack>
-          : null}
+          ) : null}
         </Group>
 
-        {entry.notes ?
+        {entry.notes ? (
           <Stack gap={4}>
             <Text fw={600} size="sm">
               <Trans>Notes</Trans>
             </Text>
             <Text size="sm">{entry.notes}</Text>
           </Stack>
-        : null}
+        ) : null}
 
-        {metadataJson ?
+        {metadataJson ? (
           <Stack gap={4}>
             <Text fw={600} size="sm">
               <Trans>Raw metadata (JSON)</Trans>
@@ -216,7 +214,7 @@ export function OpenDataCatalogEntryDetail({
               {metadataJson}
             </Text>
           </Stack>
-        : null}
+        ) : null}
 
         <Button
           leftSection={<IconPlus size={18} />}

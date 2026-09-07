@@ -1,11 +1,11 @@
 import { propEq } from "@avandar/utils";
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
 import { Label } from "recharts";
+import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
+import type { XYSeries } from "$/models/vizs/SeriesConfig";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { CompositeChartSeries } from "@mantine/charts";
-import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { XYSeries } from "$/models/vizs/SeriesConfig";
 import type { ComponentProps } from "react";
 
 type Props = {
@@ -73,9 +73,9 @@ export function renderXYComposite({
           return {};
         }
         return {
-          ...(found.fillOpacity !== undefined ?
-            { fillOpacity: found.fillOpacity }
-          : {}),
+          ...(found.fillOpacity !== undefined
+            ? { fillOpacity: found.fillOpacity }
+            : {}),
           ...(found.stackId !== undefined ? { stackId: found.stackId } : {}),
         };
       }}
@@ -85,9 +85,9 @@ export function renderXYComposite({
           return {};
         }
         return {
-          ...(found.strokeWidth !== undefined ?
-            { strokeWidth: found.strokeWidth }
-          : {}),
+          ...(found.strokeWidth !== undefined
+            ? { strokeWidth: found.strokeWidth }
+            : {}),
           ...(found.curveType !== undefined ? { type: found.curveType } : {}),
           ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
         };
@@ -98,12 +98,12 @@ export function renderXYComposite({
           return {};
         }
         return {
-          ...(found.strokeWidth !== undefined ?
-            { strokeWidth: found.strokeWidth }
-          : {}),
-          ...(found.fillOpacity !== undefined ?
-            { fillOpacity: found.fillOpacity }
-          : {}),
+          ...(found.strokeWidth !== undefined
+            ? { strokeWidth: found.strokeWidth }
+            : {}),
+          ...(found.fillOpacity !== undefined
+            ? { fillOpacity: found.fillOpacity }
+            : {}),
           ...(found.curveType !== undefined ? { type: found.curveType } : {}),
           ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
         };
@@ -117,31 +117,33 @@ export function renderXYComposite({
       }}
       xAxisProps={{
         ...xAxisProps,
-        children:
-          hasXLabel ?
-            <Label
-              value={xLabelText}
-              position="insideBottom"
-              offset={-20}
-              fontSize={12}
-              fill={chartStyle?.xAxis?.labelColor}
-            />
-          : xAxisProps?.children,
+        children: hasXLabel ? (
+          <Label
+            value={xLabelText}
+            position="insideBottom"
+            offset={-20}
+            fontSize={12}
+            fill={chartStyle?.xAxis?.labelColor}
+          />
+        ) : (
+          xAxisProps?.children
+        ),
       }}
       yAxisProps={{
         ...yAxisProps,
-        children:
-          hasYLabel ?
-            <Label
-              value={yLabelText}
-              position="insideLeft"
-              angle={-90}
-              textAnchor="middle"
-              offset={-5}
-              fontSize={12}
-              fill={chartStyle?.yAxis?.labelColor}
-            />
-          : yAxisProps?.children,
+        children: hasYLabel ? (
+          <Label
+            value={yLabelText}
+            position="insideLeft"
+            angle={-90}
+            textAnchor="middle"
+            offset={-5}
+            fontSize={12}
+            fill={chartStyle?.yAxis?.labelColor}
+          />
+        ) : (
+          yAxisProps?.children
+        ),
       }}
       {...restStyleProps}
     />

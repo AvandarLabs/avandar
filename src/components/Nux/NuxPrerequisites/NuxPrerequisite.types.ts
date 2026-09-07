@@ -1,3 +1,4 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 /**
  * Types for NUX prerequisite strategies that judge milestone completion.
  */
@@ -5,7 +6,6 @@ import type {
   NuxEvent,
   NuxEventName,
 } from "@/components/Nux/NuxEvents/NuxEvents";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 /** Workspace artifact facts used for durable catch-up. */
 export type NuxPrerequisiteFacts = {

@@ -20,6 +20,8 @@ import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetPa
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import { notifyError } from "@/utils/notifications/notify";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   PreparedPublishSnapshot,
   PublishDatasets,
@@ -27,8 +29,6 @@ import type {
 } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
 import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { ILogger } from "@avandar/logger";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type SnapshotDatasetOptions = {
   availableColumns: readonly string[];
@@ -142,14 +142,14 @@ async function _getPublishDatasets(
 ): Promise<PublishDatasets> {
   const candidateIds = getDatasetIdsFromDashboardConfig(dashboard.config);
   const datasets =
-    candidateIds.length === 0 ?
-      []
-    : await DatasetClient.getAll({
-        where: {
-          id: { in: candidateIds as Dataset.Id[] },
-          workspace_id: { eq: dashboard.workspaceId },
-        },
-      });
+    candidateIds.length === 0
+      ? []
+      : await DatasetClient.getAll({
+          where: {
+            id: { in: candidateIds as Dataset.Id[] },
+            workspace_id: { eq: dashboard.workspaceId },
+          },
+        });
   const datasetIds = datasets.map(prop("id"));
   const resolvedIds = new Set(datasetIds);
   const missingIds = candidateIds.filter((datasetId) => {
@@ -180,14 +180,14 @@ export async function preparePublishSnapshot(
     allDatasetIds: datasetIds,
   });
   const columns =
-    datasetIds.length === 0 ?
-      []
-    : await DatasetColumnClient.getAll({
-        where: {
-          dataset_id: { in: datasetIds },
-          workspace_id: { eq: dashboard.workspaceId },
-        },
-      });
+    datasetIds.length === 0
+      ? []
+      : await DatasetColumnClient.getAll({
+          where: {
+            dataset_id: { in: datasetIds },
+            workspace_id: { eq: dashboard.workspaceId },
+          },
+        });
   const columnsByDataset = makeBucketRecord(columns, {
     key: "datasetId",
     valueKey: "name",

@@ -39,12 +39,12 @@ export function AnnotateMapTool({
           <IconPencil size={17} stroke={1.6} />
         </button>
       </Tooltip>
-      {isExpanded ?
+      {isExpanded ? (
         <AnnotateMapToolSubCluster
           mapToolMode={mapToolMode}
           onMapToolModeChange={onMapToolModeChange}
         />
-      : null}
+      ) : null}
     </>
   );
 }

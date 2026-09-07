@@ -1,9 +1,9 @@
+import { useEffect, useRef, useState } from "react";
+import { vi } from "vitest";
 /**
  * Shared map-tool harness for AnnotateMapTool tests.
  */
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { useEffect, useRef, useState } from "react";
-import { vi } from "vitest";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
 import { AnnotationFeatureInspector } from "@/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector";
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";
@@ -133,7 +133,7 @@ export function AnnotateHarness({
       <span data-testid="annotation-preview">
         {JSON.stringify(annotationPreviewVertices)}
       </span>
-      {editingFeature?.kind === "text" ?
+      {editingFeature?.kind === "text" ? (
         <AnnotationTextOverlay
           map={fakeMap.map}
           feature={editingFeature}
@@ -144,7 +144,7 @@ export function AnnotateHarness({
             setEditingTextFeatureId(undefined);
           }}
         />
-      : selectedFeature?.kind === "text" ?
+      ) : selectedFeature?.kind === "text" ? (
         <AnnotationTextOverlay
           map={fakeMap.map}
           feature={selectedFeature}
@@ -162,8 +162,8 @@ export function AnnotateHarness({
             setEditingTextFeatureId(selectedFeature.id);
           }}
         />
-      : null}
-      {selectedFeature && config.annotations.isVisible ?
+      ) : null}
+      {selectedFeature && config.annotations.isVisible ? (
         <AnnotationFeatureInspector
           feature={selectedFeature}
           onFeatureChange={replaceFeature}
@@ -177,7 +177,7 @@ export function AnnotateHarness({
             setSelectedFeatureId(undefined);
           }}
         />
-      : null}
+      ) : null}
     </>
   );
 }

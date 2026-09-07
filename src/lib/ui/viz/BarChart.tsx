@@ -6,8 +6,8 @@ import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarSeries } from "$/models/vizs/SeriesConfig";
+import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarProps } from "recharts";
 
 type Props = XYChartProps & {
@@ -133,9 +133,9 @@ export function BarChart({
           return {};
         }
         return {
-          ...(found.fillOpacity !== undefined ?
-            { fillOpacity: found.fillOpacity }
-          : {}),
+          ...(found.fillOpacity !== undefined
+            ? { fillOpacity: found.fillOpacity }
+            : {}),
           ...(found.stackId !== undefined ? { stackId: found.stackId } : {}),
         };
       }}
@@ -148,31 +148,33 @@ export function BarChart({
       }}
       xAxisProps={{
         ...xAxisProps,
-        children:
-          hasXLabel ?
-            <Label
-              value={xLabelText}
-              position="insideBottom"
-              offset={-20}
-              fontSize={12}
-              fill={chartStyle?.xAxis?.labelColor}
-            />
-          : xAxisProps?.children,
+        children: hasXLabel ? (
+          <Label
+            value={xLabelText}
+            position="insideBottom"
+            offset={-20}
+            fontSize={12}
+            fill={chartStyle?.xAxis?.labelColor}
+          />
+        ) : (
+          xAxisProps?.children
+        ),
       }}
       yAxisProps={{
         ...yAxisProps,
-        children:
-          hasYLabel ?
-            <Label
-              value={yLabelText}
-              position="insideLeft"
-              angle={-90}
-              textAnchor="middle"
-              offset={-5}
-              fontSize={12}
-              fill={chartStyle?.yAxis?.labelColor}
-            />
-          : yAxisProps?.children,
+        children: hasYLabel ? (
+          <Label
+            value={yLabelText}
+            position="insideLeft"
+            angle={-90}
+            textAnchor="middle"
+            offset={-5}
+            fontSize={12}
+            fill={chartStyle?.yAxis?.labelColor}
+          />
+        ) : (
+          yAxisProps?.children
+        ),
       }}
       {...restStyleProps}
     />

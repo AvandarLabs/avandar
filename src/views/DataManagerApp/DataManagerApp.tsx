@@ -4,7 +4,7 @@ import { Button, Flex, MantineTheme, ScrollArea } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Outlet, useNavigate } from "@tanstack/react-router";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar";
@@ -18,7 +18,7 @@ export function DataManagerApp(): JSX.Element {
   const { t } = useLingui();
 
   return (
-    <AppLayout
+    <AppSlate
       title={t`Data Sources`}
       toolbarButtonSection={
         <Button
@@ -44,7 +44,7 @@ export function DataManagerApp(): JSX.Element {
           <Outlet />
         </ScrollArea>
       </Flex>
-    </AppLayout>
+    </AppSlate>
   );
 }
 

@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import { fireEvent, render, screen } from "@/test-utils";
 import {
   createBoundLayer,
   createGeometryLayer,
-  duckDbInitialize,
+  duckDbEnsureSpatial,
   resetDataSectionFixtures,
   spatialAvailability,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
@@ -47,7 +47,7 @@ describe("DataSection geometry", () => {
     ).toHaveAttribute("data-combobox-disabled", "true");
     expect(
       screen.getByText(
-        "Geometry columns are available when Spatial finishes loading.",
+        "Geometry support is still downloading. This can take a moment on a slow connection.",
       ),
     ).toBeInTheDocument();
   });
@@ -65,26 +65,20 @@ describe("DataSection geometry", () => {
     ).toHaveAttribute("data-combobox-disabled", "true");
     expect(
       screen.getByText(
-        "Geometry columns need DuckDB Spatial, which is unavailable.",
+        "These options need geometry support, which could not be loaded.",
       ),
     ).toBeInTheDocument();
   });
 
-  it("starts Spatial detection while the geometry picker waits on it", async () => {
+  // `GisApp` requests the extension on mount, before the inspector can be
+  // opened, so the picker only reports the capability. Asking again here would
+  // re-request a memoized promise for a strict subset of the cases the view
+  // root already covers.
+  it("does not request Spatial while the geometry picker waits on it", () => {
     spatialAvailability.value = "loading";
 
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
 
-    await waitFor(() => {
-      expect(duckDbInitialize).toHaveBeenCalled();
-    });
-  });
-
-  it("does not start Spatial detection once the capability is known", () => {
-    spatialAvailability.value = "available";
-
-    render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
-
-    expect(duckDbInitialize).not.toHaveBeenCalled();
+    expect(duckDbEnsureSpatial).not.toHaveBeenCalled();
   });
 });

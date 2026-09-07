@@ -26,7 +26,7 @@ export function LayerStatusBadge({ viewState }: Props): ReactNode {
         color="warning"
         variant="light"
         size="xs"
-      >{t`Spatial unavailable`}</Badge>
+      >{t`Geometry unavailable`}</Badge>
     );
   }
   return (

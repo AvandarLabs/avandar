@@ -45,16 +45,16 @@ async function _queryWithRetries(
       column: options.column,
     });
     if ("values" in result) {
-      return result.values.length > 0 ?
-          { kind: "ready", values: result.values }
+      return result.values.length > 0
+        ? { kind: "ready", values: result.values }
         : { kind: "empty" };
     }
-    return attempt < MAX_DISCOVERY_ATTEMPTS ?
-        _queryWithRetries({ ...options, attempt: attempt + 1 })
+    return attempt < MAX_DISCOVERY_ATTEMPTS
+      ? _queryWithRetries({ ...options, attempt: attempt + 1 })
       : { kind: "error", error: result.error };
   } catch (error) {
-    return attempt < MAX_DISCOVERY_ATTEMPTS ?
-        _queryWithRetries({ ...options, attempt: attempt + 1 })
+    return attempt < MAX_DISCOVERY_ATTEMPTS
+      ? _queryWithRetries({ ...options, attempt: attempt + 1 })
       : {
           kind: "error",
           error: error instanceof Error ? error.message : options.fallbackError,
@@ -68,8 +68,8 @@ function _getUniqueMatch(
     startOptions: Readonly<StartDiscoveryParameters>;
   }>,
 ): string | undefined {
-  return options.result.kind === "ready" && !options.startOptions.multi ?
-      DiscoveryCandidateValues.getUniqueMatch({
+  return options.result.kind === "ready" && !options.startOptions.multi
+    ? DiscoveryCandidateValues.getUniqueMatch({
         candidateValues: options.startOptions.candidateValues,
         discoveredValues: options.result.values,
       })

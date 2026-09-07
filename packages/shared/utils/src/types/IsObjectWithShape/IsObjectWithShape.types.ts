@@ -12,8 +12,10 @@ import type { UnknownObject } from "@utils/types/common.types.ts";
  * @returns `true` if the object has a shape of a string keyed object,
  * `false` otherwise.
  */
-export type IsObjectWithShape<T extends UnknownObject> =
-  string extends keyof T ? false
-  : number extends keyof T ? false
-  : symbol extends keyof T ? false
-  : true;
+export type IsObjectWithShape<T extends UnknownObject> = string extends keyof T
+  ? false
+  : number extends keyof T
+    ? false
+    : symbol extends keyof T
+      ? false
+      : true;

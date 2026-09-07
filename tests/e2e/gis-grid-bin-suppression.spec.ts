@@ -13,6 +13,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "grid-bin-points.csv";
@@ -96,95 +97,100 @@ async function _clickSuppressedCell(page: Page): Promise<void> {
   );
 }
 
-test("bins points into cells and hides counts below the minimum", async ({
-  page,
-  e2eWorkerDb,
-}) => {
-  const admin = createSupabaseAdminClient();
-  const { primaryUser, workspaceSlug } = e2eWorkerDb;
-  let datasetId = "";
-  let mapId = "";
-  try {
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: workspaceSlug,
-    });
-    mapId = await seedAvaMap({
-      admin,
-      workspaceId,
-      ownerEmail: primaryUser.email,
-      name: MAP_NAME,
-    });
-    await signInWithEmailPassword(page, {
-      email: primaryUser.email,
-      password: primaryUser.password,
-      workspaceSlug,
-    });
-    datasetId = await importDatasetViaUi({
-      page,
-      workspaceSlug,
-      filePath: GIS_GRID_BIN_POINTS_CSV_PATH,
-      expectedRowCount: GIS_GRID_BIN_POINTS_ROW_COUNT,
-    });
-    await page.getByRole("link", { name: "Maps" }).click();
-    await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
-    const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
-    await mapRegion.getByRole("button", { name: "Add a layer" }).click();
-    await page.getByPlaceholder("Search data sources").click();
-    await page.getByRole("option", { name: DATASET_NAME }).click();
+test(
+  "bins points into cells and hides counts below the minimum",
+  { tag: E2E_ONLINE_TAG },
+  async ({ page, e2eWorkerDb }) => {
+    const admin = createSupabaseAdminClient();
+    const { primaryUser, workspaceSlug } = e2eWorkerDb;
+    let datasetId = "";
+    let mapId = "";
+    try {
+      const workspaceId = await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      });
+      mapId = await seedAvaMap({
+        admin,
+        workspaceId,
+        ownerEmail: primaryUser.email,
+        name: MAP_NAME,
+      });
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
+        workspaceSlug,
+      });
+      datasetId = await importDatasetViaUi({
+        page,
+        workspaceSlug,
+        filePath: GIS_GRID_BIN_POINTS_CSV_PATH,
+        expectedRowCount: GIS_GRID_BIN_POINTS_ROW_COUNT,
+      });
+      await page.getByRole("link", { name: "Maps" }).click();
+      await page
+        .getByRole("link", { name: `Open the map ${MAP_NAME}` })
+        .click();
+      const mapRegion = page.getByRole("region", {
+        name: new RegExp(MAP_NAME),
+      });
+      await mapRegion.getByRole("button", { name: "Add a layer" }).click();
+      await page.getByPlaceholder("Search data sources").click();
+      await page.getByRole("option", { name: DATASET_NAME }).click();
 
-    const inspector = page.getByRole("region", { name: "Layer" });
-    await expect(inspector.getByText("5 of 5 rows mapped")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-    await _selectOption(page, inspector, "Geometry", "Bin into a grid");
-    await expect(
-      inspector.getByRole("textbox", { name: "Cell size (meters)" }),
-    ).toBeVisible();
+      const inspector = page.getByRole("region", { name: "Layer" });
+      await expect(inspector.getByText("5 of 5 rows mapped")).toBeVisible({
+        timeout: LONG_WAIT,
+      });
+      await _selectOption(page, inspector, "Geometry", "Bin into a grid");
+      await expect(
+        inspector.getByRole("textbox", { name: "Cell size (meters)" }),
+      ).toBeVisible();
 
-    await inspector.getByRole("button", { name: /^Sensitivity/ }).click();
-    await _selectOption(page, inspector, "Handling", "Aggregate only");
-    await inspector
-      .getByRole("textbox", { name: "Suppress areas below" })
-      .fill("2");
+      await inspector.getByRole("button", { name: /^Sensitivity/ }).click();
+      await _selectOption(page, inspector, "Handling", "Aggregate only");
+      await inspector
+        .getByRole("textbox", { name: "Suppress areas below" })
+        .fill("2");
 
-    const legend = page.getByRole("region", { name: "Legend" });
-    await expect(legend.getByText("Suppressed")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-    await expect
-      .poll(
-        async () => {
-          return _summarizeCells(await _readCellProperties(page));
+      const legend = page.getByRole("region", { name: "Legend" });
+      await expect(legend.getByText("Suppressed")).toBeVisible({
+        timeout: LONG_WAIT,
+      });
+      await expect
+        .poll(
+          async () => {
+            return _summarizeCells(await _readCellProperties(page));
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toEqual({ cellCount: 2, suppressedCount: 1, reportedCounts: [4] });
+      const suppressedCell = (await _readCellProperties(page)).find(
+        (properties) => {
+          return properties["__avandar_state"] === "suppressed";
         },
-        { timeout: LONG_WAIT },
-      )
-      .toEqual({ cellCount: 2, suppressedCount: 1, reportedCounts: [4] });
-    const suppressedCell = (await _readCellProperties(page)).find(
-      (properties) => {
-        return properties["__avandar_state"] === "suppressed";
-      },
-    );
-    expect(suppressedCell).not.toHaveProperty("__avandar_contributor_count");
-    expect(suppressedCell).not.toHaveProperty("__avandar_value");
-    await expect(
-      page.getByRole("status", { name: "All changes saved" }),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
+      );
+      expect(suppressedCell).not.toHaveProperty("__avandar_contributor_count");
+      expect(suppressedCell).not.toHaveProperty("__avandar_value");
+      await expect(
+        page.getByRole("status", { name: "All changes saved" }),
+      ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-    await _clickSuppressedCell(page);
-    const featureInspector = page.getByRole("region", {
-      name: "Feature",
-      exact: true,
-    });
-    await expect(featureInspector).toBeVisible();
-    await expect(featureInspector).toContainText("suppressed");
-    await expect(featureInspector).not.toContainText(
-      "__avandar_contributor_count",
-    );
-  } finally {
-    await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
-    if (datasetId) {
-      await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      await _clickSuppressedCell(page);
+      const featureInspector = page.getByRole("region", {
+        name: "Feature",
+        exact: true,
+      });
+      await expect(featureInspector).toBeVisible();
+      await expect(featureInspector).toContainText("suppressed");
+      await expect(featureInspector).not.toContainText(
+        "__avandar_contributor_count",
+      );
+    } finally {
+      await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
+      if (datasetId) {
+        await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      }
     }
-  }
-});
+  },
+);

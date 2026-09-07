@@ -10,8 +10,8 @@ import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
 
 /**
- * E2E coverage for the chat-interactive-workflows feature
- * (`docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`).
+ * E2E coverage for the chat clarification workflow, where the LLM asks a
+ * question before it generates SQL.
  *
  * These tests mock the OpenRouter call routed through the supabase
  * edge function: every "chat/:workspaceId/messages" request is
@@ -418,8 +418,8 @@ test.describe("chat interactive workflows", () => {
     await mountMockChat({
       page,
       responder: (turnIndex) => {
-        return turnIndex > 0 ?
-            { assistantText: "State selected." }
+        return turnIndex > 0
+          ? { assistantText: "State selected." }
           : {
               assistantText: "Which state do you mean?",
               clarification: {

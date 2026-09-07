@@ -1,5 +1,6 @@
 /**
- * Moves every dashboard, dataset, and map a workspace member owns to a new owner.
+ * Moves every dashboard, dataset and map a workspace member owns to a new
+ * owner.
  *
  * Locks each selected resource before delegating so a concurrent transfer
  * cannot change its owner between selection and audit logging.

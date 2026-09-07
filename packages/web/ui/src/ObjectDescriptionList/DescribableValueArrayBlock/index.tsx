@@ -98,11 +98,12 @@ export function DescribableValueArrayBlock<
     ...moreRenderOptions,
   };
 
-  const customRenderedArrayContent =
-    renderArray ? renderArray(data as readonly T[], rootData) : undefined;
+  const customRenderedArrayContent = renderArray
+    ? renderArray(data as readonly T[], rootData)
+    : undefined;
 
   const contentBlock =
-    customRenderedArrayContent === undefined ?
+    customRenderedArrayContent === undefined ? (
       <Stack>
         <PrimitiveFieldValueArrayBlock
           values={primitiveValues}
@@ -133,7 +134,9 @@ export function DescribableValueArrayBlock<
           >)}
         />
       </Stack>
-    : customRenderedArrayContent;
+    ) : (
+      customRenderedArrayContent
+    );
 
   if (maxHeight === undefined) {
     return <>{contentBlock}</>;

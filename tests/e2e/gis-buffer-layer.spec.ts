@@ -15,6 +15,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const POINT_DATASET_NAME = "dated-points.csv";
@@ -177,94 +178,99 @@ async function _bindAggregatePointsToBoundaries(
   await _selectOption(page, inspector, "Boundary key column", "pcode");
 }
 
-test("buffers aggregate-only points as polygons with no point features", async ({
-  page,
-  e2eWorkerDb,
-}) => {
-  const admin = createSupabaseAdminClient();
-  const { primaryUser, workspaceSlug } = e2eWorkerDb;
-  const datasetIds: string[] = [];
-  let mapId = "";
-  try {
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: workspaceSlug,
-    });
-    mapId = await seedAvaMap({
-      admin,
-      workspaceId,
-      ownerEmail: primaryUser.email,
-      name: MAP_NAME,
-    });
-    await signInWithEmailPassword(page, {
-      email: primaryUser.email,
-      password: primaryUser.password,
-      workspaceSlug,
-    });
-    datasetIds.push(
-      await importDatasetViaUi({
-        page,
+test(
+  "buffers aggregate-only points as polygons with no point features",
+  { tag: E2E_ONLINE_TAG },
+  async ({ page, e2eWorkerDb }) => {
+    const admin = createSupabaseAdminClient();
+    const { primaryUser, workspaceSlug } = e2eWorkerDb;
+    const datasetIds: string[] = [];
+    let mapId = "";
+    try {
+      const workspaceId = await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      });
+      mapId = await seedAvaMap({
+        admin,
+        workspaceId,
+        ownerEmail: primaryUser.email,
+        name: MAP_NAME,
+      });
+      await signInWithEmailPassword(page, {
+        email: primaryUser.email,
+        password: primaryUser.password,
         workspaceSlug,
-        filePath: GIS_DATED_POINTS_CSV_PATH,
-        expectedRowCount: GIS_DATED_POINTS_ROW_COUNT,
-      }),
-    );
-    datasetIds.push(
-      await importDatasetViaUi({
-        page,
-        workspaceSlug,
-        filePath: GIS_PCODE_POLYGON_CSV_PATH,
-        expectedRowCount: GIS_PCODE_POLYGON_ROW_COUNT,
-      }),
-    );
-    await page.getByRole("link", { name: "Maps" }).click();
-    await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
-    const mapRegion = page.getByRole("region", { name: new RegExp(MAP_NAME) });
-    await mapRegion.getByRole("button", { name: "Add a layer" }).click();
-    await page.getByPlaceholder("Search data sources").click();
-    await page.getByRole("option", { name: POINT_DATASET_NAME }).click();
+      });
+      datasetIds.push(
+        await importDatasetViaUi({
+          page,
+          workspaceSlug,
+          filePath: GIS_DATED_POINTS_CSV_PATH,
+          expectedRowCount: GIS_DATED_POINTS_ROW_COUNT,
+        }),
+      );
+      datasetIds.push(
+        await importDatasetViaUi({
+          page,
+          workspaceSlug,
+          filePath: GIS_PCODE_POLYGON_CSV_PATH,
+          expectedRowCount: GIS_PCODE_POLYGON_ROW_COUNT,
+        }),
+      );
+      await page.getByRole("link", { name: "Maps" }).click();
+      await page
+        .getByRole("link", { name: `Open the map ${MAP_NAME}` })
+        .click();
+      const mapRegion = page.getByRole("region", {
+        name: new RegExp(MAP_NAME),
+      });
+      await mapRegion.getByRole("button", { name: "Add a layer" }).click();
+      await page.getByPlaceholder("Search data sources").click();
+      await page.getByRole("option", { name: POINT_DATASET_NAME }).click();
 
-    const inspector = page.getByRole("region", { name: "Layer" });
-    await expect(inspector.getByText("9 of 9 rows mapped")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-    await _bindAggregatePointsToBoundaries(page, inspector);
-    await inspector.getByRole("button", { name: /^Sensitivity/ }).click();
-    await _selectOption(page, inspector, "Handling", "Aggregate only");
-    await expect(
-      inspector.getByRole("combobox", { name: "Handling" }),
-    ).toHaveValue("Aggregate only");
-    await page
-      .getByRole("button", { name: "Buffer around a layer", exact: true })
-      .click();
-    await page.getByRole("button", { name: "Confirm" }).click();
-    await expect(_layerRow(page, BUFFER_LAYER_NAME)).toBeVisible({
-      timeout: MEDIUM_WAIT,
-    });
-    await _expectPolygonOnlyBuffer(page);
-    await expect(
-      page.getByRole("status", { name: "All changes saved" }),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
+      const inspector = page.getByRole("region", { name: "Layer" });
+      await expect(inspector.getByText("9 of 9 rows mapped")).toBeVisible({
+        timeout: LONG_WAIT,
+      });
+      await _bindAggregatePointsToBoundaries(page, inspector);
+      await inspector.getByRole("button", { name: /^Sensitivity/ }).click();
+      await _selectOption(page, inspector, "Handling", "Aggregate only");
+      await expect(
+        inspector.getByRole("combobox", { name: "Handling" }),
+      ).toHaveValue("Aggregate only");
+      await page
+        .getByRole("button", { name: "Buffer around a layer", exact: true })
+        .click();
+      await page.getByRole("button", { name: "Confirm" }).click();
+      await expect(_layerRow(page, BUFFER_LAYER_NAME)).toBeVisible({
+        timeout: MEDIUM_WAIT,
+      });
+      await _expectPolygonOnlyBuffer(page);
+      await expect(
+        page.getByRole("status", { name: "All changes saved" }),
+      ).toBeVisible({ timeout: MEDIUM_WAIT });
 
-    await page.reload();
-    await expect(_layerRow(page, BUFFER_LAYER_NAME)).toBeVisible({
-      timeout: LONG_WAIT,
-    });
-    await expect
-      .poll(
-        async () => {
-          return page.evaluate(() => {
-            return window.__avandarE2EMap?.loaded() === true;
-          });
-        },
-        { timeout: LONG_WAIT },
-      )
-      .toBe(true);
-    await _expectPolygonOnlyBuffer(page);
-  } finally {
-    await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
-    for (const datasetId of datasetIds) {
-      await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      await page.reload();
+      await expect(_layerRow(page, BUFFER_LAYER_NAME)).toBeVisible({
+        timeout: LONG_WAIT,
+      });
+      await expect
+        .poll(
+          async () => {
+            return page.evaluate(() => {
+              return window.__avandarE2EMap?.loaded() === true;
+            });
+          },
+          { timeout: LONG_WAIT },
+        )
+        .toBe(true);
+      await _expectPolygonOnlyBuffer(page);
+    } finally {
+      await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
+      for (const datasetId of datasetIds) {
+        await deleteDatasetAndShares({ supabaseAdminClient: admin, datasetId });
+      }
     }
-  }
-});
+  },
+);

@@ -2,9 +2,9 @@
  * useGisApp expands the inspector when an annotation is created or selected.
  */
 import { Model } from "@avandar/models";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { makeTextAnnotationFeature } from "@/views/GisApp/tools/makeAnnotationFeatureHelpers";

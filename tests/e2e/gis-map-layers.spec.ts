@@ -22,6 +22,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Locator, Page } from "@playwright/test";
 
 const DATASET_NAME = "small-california-covid-sample.csv";
@@ -80,141 +81,140 @@ async function _clickKnownFeature(page: Page): Promise<void> {
 }
 
 test.describe("GIS map layers", () => {
-  test("adds a layer, shows its data, and survives a reload", async ({
-    page,
-    e2eWorkerDb,
-  }) => {
-    const admin = createSupabaseAdminClient();
-    const { primaryUser, workspaceSlug } = e2eWorkerDb;
-    const seededMapIds: string[] = [];
-    let datasetId = "";
+  test(
+    "adds a layer, shows its data, and survives a reload",
+    { tag: E2E_ONLINE_TAG },
+    async ({ page, e2eWorkerDb }) => {
+      const admin = createSupabaseAdminClient();
+      const { primaryUser, workspaceSlug } = e2eWorkerDb;
+      const seededMapIds: string[] = [];
+      let datasetId = "";
 
-    try {
-      const workspaceId = await getWorkspaceIdBySlug({
-        supabaseAdminClient: admin,
-        slug: workspaceSlug,
-      });
-      const mapId = await seedAvaMap({
-        admin,
-        workspaceId,
-        ownerEmail: primaryUser.email,
-        name: MAP_NAME,
-      });
-      seededMapIds.push(mapId);
-
-      await signInWithEmailPassword(page, {
-        email: primaryUser.email,
-        password: primaryUser.password,
-        workspaceSlug,
-      });
-      await importDatasetViaUi({
-        page,
-        workspaceSlug,
-        filePath: SMALL_CALIFORNIA_CSV_PATH,
-        expectedRowCount: SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-        onDatasetCreated: (createdDatasetId) => {
-          datasetId = createdDatasetId;
-        },
-      });
-
-      await page.getByRole("link", { name: "Maps" }).click();
-      await page
-        .getByRole("link", { name: `Open the map ${MAP_NAME}` })
-        .click();
-
-      const mapRegion = page.getByRole("region", {
-        name: new RegExp(MAP_NAME),
-      });
-      await expect(mapRegion).toBeVisible();
-      await mapRegion.getByRole("button", { name: "Add a layer" }).click();
-      await page.getByPlaceholder("Search data sources").click();
-      await page.getByRole("option", { name: DATASET_NAME }).click();
-
-      const layerRow = _layerRow({ page, layerName: DATASET_NAME });
-      await expect(layerRow).toBeVisible({ timeout: MEDIUM_WAIT });
-
-      const layerInspector = page.getByRole("region", { name: "Layer" });
-      await expect(
-        layerInspector.getByRole("button", { name: "Latitude" }),
-      ).toBeVisible();
-      await expect(
-        layerInspector.getByRole("button", { name: "Longitude" }),
-      ).toBeVisible();
-
-      await expect(layerRow).toContainText("3 rows unmapped", {
-        timeout: LONG_WAIT,
-      });
-      await expect(
-        page.getByRole("status", { name: "All changes saved" }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-
-      await page.reload();
-      await expect(_layerRow({ page, layerName: DATASET_NAME })).toContainText(
-        "3 rows unmapped",
-        {
-          timeout: LONG_WAIT,
-        },
-      );
-      await expect(page.getByRole("textbox", { name: "Map name" })).toHaveValue(
-        MAP_NAME,
-      );
-
-      await page.getByRole("button", { name: "Basemap" }).click();
-      await page.getByRole("menuitem", { name: "Positron" }).click();
-      await expect(_layerRow({ page, layerName: DATASET_NAME })).toContainText(
-        "3 rows unmapped",
-        { timeout: MEDIUM_WAIT },
-      );
-
-      await page
-        .getByRole("button", {
-          name: `More actions for the layer ${DATASET_NAME}`,
-        })
-        .click();
-      await page.getByRole("menuitem", { name: "Duplicate" }).click();
-
-      const layersPanel = page.getByRole("region", { name: "Layers" });
-      const duplicatedLayerRow = _layerRow({
-        page,
-        layerName: `${DATASET_NAME} copy`,
-      });
-      await expect(duplicatedLayerRow).toBeVisible({ timeout: MEDIUM_WAIT });
-      await expect(layersPanel.getByRole("listitem")).toHaveCount(2);
-      await expect(duplicatedLayerRow).toContainText("3 rows unmapped", {
-        timeout: LONG_WAIT,
-      });
-      const rowsBefore = await layersPanel
-        .getByRole("listitem")
-        .allInnerTexts();
-      await duplicatedLayerRow
-        .getByRole("button", {
-          name: _buildLayerButtonNamePattern(`${DATASET_NAME} copy`),
-        })
-        .focus();
-      await page.keyboard.press("Alt+ArrowDown");
-      await expect
-        .poll(async () => {
-          return layersPanel.getByRole("listitem").allInnerTexts();
-        })
-        .toEqual([...rowsBefore].reverse());
-
-      await _clickKnownFeature(page);
-      await expect(
-        page.getByRole("region", { name: "Feature", exact: true }),
-      ).toContainText("Admin2");
-      await expect(
-        page.getByRole("region", { name: "Feature", exact: true }),
-      ).toContainText("Alameda");
-    } finally {
-      await deleteMapsByIds({ admin, mapIds: seededMapIds });
-      if (datasetId) {
-        await deleteDatasetAndShares({
+      try {
+        const workspaceId = await getWorkspaceIdBySlug({
           supabaseAdminClient: admin,
-          datasetId,
+          slug: workspaceSlug,
         });
+        const mapId = await seedAvaMap({
+          admin,
+          workspaceId,
+          ownerEmail: primaryUser.email,
+          name: MAP_NAME,
+        });
+        seededMapIds.push(mapId);
+
+        await signInWithEmailPassword(page, {
+          email: primaryUser.email,
+          password: primaryUser.password,
+          workspaceSlug,
+        });
+        await importDatasetViaUi({
+          page,
+          workspaceSlug,
+          filePath: SMALL_CALIFORNIA_CSV_PATH,
+          expectedRowCount: SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+          onDatasetCreated: (createdDatasetId) => {
+            datasetId = createdDatasetId;
+          },
+        });
+
+        await page.getByRole("link", { name: "Maps" }).click();
+        await page
+          .getByRole("link", { name: `Open the map ${MAP_NAME}` })
+          .click();
+
+        const mapRegion = page.getByRole("region", {
+          name: new RegExp(MAP_NAME),
+        });
+        await expect(mapRegion).toBeVisible();
+        await mapRegion.getByRole("button", { name: "Add a layer" }).click();
+        await page.getByPlaceholder("Search data sources").click();
+        await page.getByRole("option", { name: DATASET_NAME }).click();
+
+        const layerRow = _layerRow({ page, layerName: DATASET_NAME });
+        await expect(layerRow).toBeVisible({ timeout: MEDIUM_WAIT });
+
+        const layerInspector = page.getByRole("region", { name: "Layer" });
+        await expect(
+          layerInspector.getByRole("button", { name: "Latitude" }),
+        ).toBeVisible();
+        await expect(
+          layerInspector.getByRole("button", { name: "Longitude" }),
+        ).toBeVisible();
+
+        await expect(layerRow).toContainText("3 rows unmapped", {
+          timeout: LONG_WAIT,
+        });
+        await expect(
+          page.getByRole("status", { name: "All changes saved" }),
+        ).toBeVisible({ timeout: MEDIUM_WAIT });
+
+        await page.reload();
+        await expect(
+          _layerRow({ page, layerName: DATASET_NAME }),
+        ).toContainText("3 rows unmapped", {
+          timeout: LONG_WAIT,
+        });
+        await expect(
+          page.getByRole("textbox", { name: "Map name" }),
+        ).toHaveValue(MAP_NAME);
+
+        await page.getByRole("button", { name: "Basemap" }).click();
+        await page.getByRole("menuitem", { name: "Positron" }).click();
+        await expect(
+          _layerRow({ page, layerName: DATASET_NAME }),
+        ).toContainText("3 rows unmapped", { timeout: MEDIUM_WAIT });
+
+        await page
+          .getByRole("button", {
+            name: `More actions for the layer ${DATASET_NAME}`,
+          })
+          .click();
+        await page.getByRole("menuitem", { name: "Duplicate" }).click();
+
+        const layersPanel = page.getByRole("region", { name: "Layers" });
+        const duplicatedLayerRow = _layerRow({
+          page,
+          layerName: `${DATASET_NAME} copy`,
+        });
+        await expect(duplicatedLayerRow).toBeVisible({ timeout: MEDIUM_WAIT });
+        await expect(layersPanel.getByRole("listitem")).toHaveCount(2);
+        await expect(duplicatedLayerRow).toContainText("3 rows unmapped", {
+          timeout: LONG_WAIT,
+        });
+        const rowsBefore = await layersPanel
+          .getByRole("listitem")
+          .allInnerTexts();
+        await duplicatedLayerRow
+          .getByRole("button", {
+            name: _buildLayerButtonNamePattern(`${DATASET_NAME} copy`),
+          })
+          .focus();
+        await page.keyboard.press("Alt+ArrowDown");
+        await expect
+          .poll(async () => {
+            return layersPanel.getByRole("listitem").allInnerTexts();
+          })
+          .toEqual([...rowsBefore].reverse());
+
+        await _clickKnownFeature(page);
+        await expect(
+          page.getByRole("region", { name: "Feature", exact: true }),
+        ).toContainText("Admin2");
+        await expect(
+          page.getByRole("region", { name: "Feature", exact: true }),
+        ).toContainText("Alameda");
+      } finally {
+        await deleteMapsByIds({ admin, mapIds: seededMapIds });
+        if (datasetId) {
+          await deleteDatasetAndShares({
+            supabaseAdminClient: admin,
+            datasetId,
+          });
+        }
       }
-    }
-  });
+    },
+  );
 
   test("keeps map reading available on a narrow screen", async ({
     page,

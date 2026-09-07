@@ -8,11 +8,11 @@ import { match } from "ts-pattern";
 import { getDatasetColumnAssertions } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getDatasetColumnAssertions";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { Logger } from "@/utils/Logger";
-import type { RegistryOfArrays } from "@avandar/utils";
 import type { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { RegistryOfArrays } from "@avandar/utils";
 import type { Simplify } from "type-fest";
 
 async function _getAssertionsByMappingType({

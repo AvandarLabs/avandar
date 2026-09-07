@@ -77,7 +77,7 @@ function CaseTypeDraftCardContainer({
 /** Renders the pending case type draft above the composer. */
 export function CaseTypeDraftBlock(): React.ReactNode {
   const { pendingCaseTypeDraft } = ChatPanelStateManager.useState();
-  return pendingCaseTypeDraft ?
-      <CaseTypeDraftCardContainer draft={pendingCaseTypeDraft} />
-    : null;
+  return pendingCaseTypeDraft ? (
+    <CaseTypeDraftCardContainer draft={pendingCaseTypeDraft} />
+  ) : null;
 }

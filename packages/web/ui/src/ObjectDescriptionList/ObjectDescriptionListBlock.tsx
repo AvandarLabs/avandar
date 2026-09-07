@@ -53,9 +53,9 @@ export function ObjectDescriptionListBlock<
 
   if (getRenderableValue !== undefined) {
     const objAsSingleValue =
-      typeof getRenderableValue === "function" ?
-        getRenderableValue(data, rootData)
-      : data[getRenderableValue];
+      typeof getRenderableValue === "function"
+        ? getRenderableValue(data, rootData)
+        : data[getRenderableValue];
     return (
       <ValueItemContainer
         type="unknown"
@@ -70,8 +70,9 @@ export function ObjectDescriptionListBlock<
     );
   }
 
-  const customRenderedObject =
-    renderObject ? renderObject(data, rootData) : undefined;
+  const customRenderedObject = renderObject
+    ? renderObject(data, rootData)
+    : undefined;
 
   const orderedKeys = getOrderedKeys({
     allKeys: objectKeys(data),
@@ -81,20 +82,19 @@ export function ObjectDescriptionListBlock<
   });
 
   const contentBlock =
-    customRenderedObject !== undefined ?
+    customRenderedObject !== undefined ? (
       // only use the customRenderedObject if it's not `undefined`, otherwise
       // we fall back to using the default DescriptionList logic
       <>{customRenderedObject}</>
-    : <DescriptionList>
+    ) : (
+      <DescriptionList>
         {orderedKeys.map((key) => {
-          const customRenderedKeyContent =
-            renderObjectKeyValue ?
-              renderObjectKeyValue(key, data, rootData)
+          const customRenderedKeyContent = renderObjectKeyValue
+            ? renderObjectKeyValue(key, data, rootData)
             : undefined;
 
-          const customRenderedKeyLabel =
-            renderObjectKeyLabel ?
-              renderObjectKeyLabel(key, data, rootData)
+          const customRenderedKeyLabel = renderObjectKeyLabel
+            ? renderObjectKeyLabel(key, data, rootData)
             : undefined;
 
           // compute the child's render options to pass down
@@ -112,12 +112,14 @@ export function ObjectDescriptionListBlock<
             <DescriptionList.Item
               key={key}
               label={
-                customRenderedKeyLabel === undefined ?
-                  getObjectKeyTransformFn(renderObjectKeyTransform)(String(key))
-                : customRenderedKeyLabel
+                customRenderedKeyLabel === undefined
+                  ? getObjectKeyTransformFn(renderObjectKeyTransform)(
+                      String(key),
+                    )
+                  : customRenderedKeyLabel
               }
             >
-              {customRenderedKeyContent === undefined ?
+              {customRenderedKeyContent === undefined ? (
                 <ValueItemContainer
                   type="unknown"
                   value={data[key]}
@@ -125,11 +127,14 @@ export function ObjectDescriptionListBlock<
                   onSubmitChange={onSubmitChange}
                   {...childRenderOptions}
                 />
-              : customRenderedKeyContent}
+              ) : (
+                customRenderedKeyContent
+              )}
             </DescriptionList.Item>
           );
         })}
-      </DescriptionList>;
+      </DescriptionList>
+    );
 
   if (maxHeight === undefined) {
     return <>{contentBlock}</>;

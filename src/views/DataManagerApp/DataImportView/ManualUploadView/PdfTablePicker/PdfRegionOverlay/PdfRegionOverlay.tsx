@@ -154,9 +154,9 @@ export function PdfRegionOverlay({
       h={height}
       className={css.surface}
       aria-label={
-        interaction === "pick" ?
-          t`Click a point on the axis`
-        : t`Draw a region on the page`
+        interaction === "pick"
+          ? t`Click a point on the axis`
+          : t`Draw a region on the page`
       }
       onPointerDown={(event) => {
         startRef.current = localPoint(event);
@@ -195,7 +195,7 @@ export function PdfRegionOverlay({
         onRegionDrawn(_bboxFromDrag(start, end, mapping()));
       }}
     >
-      {preview ?
+      {preview ? (
         <Box
           pos="absolute"
           left={preview.left}
@@ -204,7 +204,7 @@ export function PdfRegionOverlay({
           h={preview.height}
           className={css.preview}
         />
-      : null}
+      ) : null}
       {markers.map((point, index) => {
         const cssPoint = _pdfToCss(point, mapping());
         return (

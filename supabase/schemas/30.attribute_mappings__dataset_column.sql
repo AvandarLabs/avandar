@@ -85,9 +85,6 @@ create policy "
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_attribute_mappings__dataset_column_set_updated_at before
 update on public.attribute_mappings__dataset_column for each row
 execute function public.util__set_updated_at ();
