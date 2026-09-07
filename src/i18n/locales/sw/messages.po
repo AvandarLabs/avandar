@@ -296,10 +296,6 @@ msgstr "Mipangilio ya chati"
 msgid "Discovery is not available in this context."
 msgstr "Utafutaji haupatikani katika muktadha huu."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Type a question and I will generate the SQL and run it on the canvas."
-msgstr "Andika swali na nitaunda SQL na kuikimbia kwenye canvas."
-
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -1262,6 +1258,10 @@ msgstr "Jaribu tena"
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "Hoja ndogo ya JOIN katika nafasi ya {index} haikuweza kusawazishwa "
 "upya."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Type a question and I will generate the SQL and run it for you."
+msgstr "Andika swali, nami nitaunda SQL na kuiendesha kwa ajili yako."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -5850,10 +5850,6 @@ msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
 msgid "Integer"
 msgstr "Nambari kamili"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The results are on the canvas to the left."
-msgstr "Matokeo yako kwenye turubai lililo upande wa kushoto."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "Jina la sehemu"
@@ -8396,6 +8392,10 @@ msgstr "Hebu tuhamishe matokeo haya kwenye dashibodi"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "Thamani"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query. Your results are ready."
+msgstr "Nimeendesha hoja. Matokeo yako yako tayari."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "You are currently subscribed to this plan."

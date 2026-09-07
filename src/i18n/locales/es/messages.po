@@ -298,10 +298,6 @@ msgstr "Configuraciones del gráfico"
 msgid "Discovery is not available in this context."
 msgstr "El descubrimiento no está disponible en este contexto."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Type a question and I will generate the SQL and run it on the canvas."
-msgstr "Escriba una pregunta y generaré el SQL y lo ejecutaré en el lienzo."
-
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -1265,6 +1261,10 @@ msgstr "Reintentar"
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "No se pudo volver a serializar la subconsulta JOIN en la posición "
 "{index}."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Type a question and I will generate the SQL and run it for you."
+msgstr "Escriba una pregunta y generaré el SQL y lo ejecutaré por usted."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -5867,10 +5867,6 @@ msgstr "Algunos datos deben ser ingresados manualmente"
 msgid "Integer"
 msgstr "Entero"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The results are on the canvas to the left."
-msgstr "Los resultados están en el lienzo de la izquierda."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "Nombre del campo"
@@ -8431,6 +8427,10 @@ msgstr "Pasemos estos resultados a un dashboard"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "Valor"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query. Your results are ready."
+msgstr "Ejecuté la consulta. Sus resultados están listos."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "You are currently subscribed to this plan."

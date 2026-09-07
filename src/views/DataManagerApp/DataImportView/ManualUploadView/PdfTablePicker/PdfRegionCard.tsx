@@ -168,7 +168,7 @@ export function PdfRegionCard({
                   ? "green"
                   : classification.confidence === "medium"
                     ? "yellow"
-                    : "gray"
+                    : "neutral"
               }
             >
               {classification.confidence}

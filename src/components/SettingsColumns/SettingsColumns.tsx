@@ -56,7 +56,7 @@ type Props = {
  *
  * The `columns` layout is driven purely by the container's width via
  * `auto-fit` + `minmax`, never by the viewport. That matters because the Data
- * Explorer canvas loses 380px the moment the AI chat panel opens, with no
+ * Explorer slate loses 380px the moment the AI chat panel opens, with no
  * viewport change at all, and because the same forms render inside the much
  * narrower dashboard settings panel.
  */

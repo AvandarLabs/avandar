@@ -12,7 +12,7 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   offlineModelRequired: string;
   sqlApprovalRequired: string;
   sqlSignInRequired: string;
-  sqlResultsOnCanvas: string;
+  sqlResultsReady: string;
   fallbackTitle: string;
   fallbackMessage: string;
   contextWindowExceeded: string;

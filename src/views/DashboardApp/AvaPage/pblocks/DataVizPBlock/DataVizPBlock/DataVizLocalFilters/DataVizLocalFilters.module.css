@@ -1,5 +1,5 @@
 .dataVizLocalFiltersContainer {
-  background: var(--mantine-color-gray-0);
-  border: 1px dashed var(--mantine-color-gray-3);
+  background: var(--ava-surface-body);
+  border: 1px dashed var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
 }

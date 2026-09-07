@@ -1,4 +1,4 @@
-import { mantineColorVar } from "@avandar/ui";
+import { cssAvaVar } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Alert,
@@ -103,8 +103,8 @@ export function SqlTabPanel({
             <Paper
               p="sm"
               style={{
-                backgroundColor: mantineColorVar("gray.0"),
-                border: `1px solid ${mantineColorVar("gray.3")}`,
+                backgroundColor: cssAvaVar("surface-body"),
+                border: `1px solid ${cssAvaVar("border-default")}`,
               }}
             >
               <AvaSqlBlock value={rawSql} readOnly minRows={6} />

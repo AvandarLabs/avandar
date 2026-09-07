@@ -36,7 +36,7 @@ function useDecisionLabels(): Record<ConsentAuditEntry.T["decision"], string> {
 const DECISION_COLOR: Record<ConsentAuditEntry.T["decision"], string> = {
   approved: "green",
   used_suggestion: "blue",
-  cancelled: "gray",
+  cancelled: "neutral",
   edited: "yellow",
 };
 

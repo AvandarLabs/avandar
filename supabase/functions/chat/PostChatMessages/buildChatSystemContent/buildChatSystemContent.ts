@@ -15,8 +15,8 @@ const REFINEMENT_HINTS =
  * Data Explorer surface: the prior SQL when the message reads as a refinement
  * of it, the prior runtime error when there is one to fix, and the columns the
  * user is currently looking at. That last block is the source of truth for
- * "what is on the canvas right now", because manual SQL edits and pill swaps
- * can make the visible columns diverge from the dataset schemas.
+ * which columns are visible right now, because manual SQL edits and pill
+ * swaps can make them diverge from the dataset schemas.
  */
 export function buildChatSystemContent(
   options: Readonly<{

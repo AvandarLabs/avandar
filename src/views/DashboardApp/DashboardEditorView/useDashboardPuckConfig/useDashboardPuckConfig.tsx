@@ -764,7 +764,7 @@ export function useDashboardPuckConfig(options: {
                 maw={maxWidth}
                 py={props.padding}
                 px="md"
-                bg={props.background === "subtle" ? "gray.0" : undefined}
+                bg={props.background === "subtle" ? "neutral.0" : undefined}
               >
                 <Stack gap="md">{_renderSlot(props.content)}</Stack>
               </Box>
@@ -1335,7 +1335,7 @@ export function useDashboardPuckConfig(options: {
                 ? "yellow"
                 : props.tone === "info"
                   ? "blue"
-                  : "gray";
+                  : "neutral";
 
             return (
               <Paper withBorder p="md" style={{ borderColor }}>

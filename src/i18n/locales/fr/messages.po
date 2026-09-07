@@ -300,11 +300,6 @@ msgstr "Paramètres du graphique"
 msgid "Discovery is not available in this context."
 msgstr "La découverte n'est pas disponible dans ce contexte."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Type a question and I will generate the SQL and run it on the canvas."
-msgstr "Tapez une question et je générerai le SQL et l'exécuterai sur le "
-"canevas."
-
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -1278,6 +1273,11 @@ msgstr "Réessayer"
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "La sous-requête JOIN à la position {index} n’a pas pu être "
 "resérialisée."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Type a question and I will generate the SQL and run it for you."
+msgstr "Saisissez une question et je générerai le SQL, puis l’exécuterai pour "
+"vous."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -5915,10 +5915,6 @@ msgstr "Certaines données doivent être saisies manuellement"
 msgid "Integer"
 msgstr "Entier"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The results are on the canvas to the left."
-msgstr "Les résultats se trouvent sur le canevas à gauche."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "Nom du champ"
@@ -8493,6 +8489,10 @@ msgstr "Déplaçons ces résultats vers un tableau de bord"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "Valeur"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query. Your results are ready."
+msgstr "J’ai exécuté la requête. Vos résultats sont prêts."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "You are currently subscribed to this plan."

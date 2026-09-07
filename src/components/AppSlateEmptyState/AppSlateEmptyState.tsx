@@ -13,7 +13,7 @@ type Props = {
 };
 
 /**
- * Instructional empty canvas used when a master-detail view has nothing
+ * Instructional empty slate used when a master-detail view has nothing
  * selected, or a workspace surface has no records yet.
  */
 export function AppSlateEmptyState({

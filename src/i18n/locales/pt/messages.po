@@ -297,10 +297,6 @@ msgstr "Configurações do gráfico"
 msgid "Discovery is not available in this context."
 msgstr "A descoberta não está disponível neste contexto."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Type a question and I will generate the SQL and run it on the canvas."
-msgstr "Digite uma pergunta e eu gerarei o SQL e o executarei na tela."
-
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -1266,6 +1262,10 @@ msgstr "Tentar novamente"
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "Não foi possível serializar novamente a subconsulta JOIN na posição "
 "{index}."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Type a question and I will generate the SQL and run it for you."
+msgstr "Digite uma pergunta e eu gerarei o SQL e o executarei para você."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -5852,10 +5852,6 @@ msgstr "Alguns dados devem ser inseridos manualmente"
 msgid "Integer"
 msgstr "Inteiro"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The results are on the canvas to the left."
-msgstr "Os resultados estão na tela à esquerda."
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "Nome do campo"
@@ -8408,6 +8404,10 @@ msgstr "Vamos mover estes resultados para um dashboard"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Value"
 msgstr "Valor"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query. Your results are ready."
+msgstr "Executei a consulta. Seus resultados estão prontos."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "You are currently subscribed to this plan."

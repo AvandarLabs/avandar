@@ -152,7 +152,7 @@ export async function applyChatModelTurnResponse(
   return applyChatTurnResponse({
     response: options.response,
     sqlApplied,
-    sqlResultsOnCanvas: options.copyRef.current.sqlResultsOnCanvas,
+    sqlResultsReady: options.copyRef.current.sqlResultsReady,
     handlers: {
       queueDashboardBlock: (block) => {
         if (

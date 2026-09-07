@@ -89,7 +89,7 @@ export function ManualEntryAttributesBlock({
         ) : (
           <>
             {attributeRows.length === 0 ? (
-              <Text c="gray">
+              <Text c="neutral.6">
                 <Trans>No fields have been added</Trans>
               </Text>
             ) : (
