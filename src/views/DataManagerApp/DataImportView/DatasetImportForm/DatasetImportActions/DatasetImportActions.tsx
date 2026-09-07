@@ -41,7 +41,9 @@ export function DatasetImportActions({
   validation,
 }: Readonly<DatasetImportActionsProps>): ReactNode {
   return (
-    <div className={css.bar}>
+    // `data-sticky-action-bar` is what the NUX checklist docks above; see
+    // `STICKY_ACTION_BAR_SELECTOR`.
+    <div className={css.bar} data-sticky-action-bar>
       <Stack gap="sm">
         <ErrorSummary
           isVisible={validation.isFormErrorSummaryVisible}

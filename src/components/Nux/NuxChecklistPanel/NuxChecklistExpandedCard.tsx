@@ -11,7 +11,11 @@ import type { ReactNode } from "react";
 type Props = {
   artifacts: NuxWorkspaceArtifacts | undefined;
   completedCount: number;
-  dockStyle: { readonly right: number; readonly zIndex: number };
+  dockStyle: {
+    readonly bottom: number;
+    readonly right: number;
+    readonly zIndex: number;
+  };
   markDone: (key: NuxProgress.MilestoneKey) => void;
   onOpenMilestone: (key: NuxProgress.MilestoneKey) => void;
   totalMilestoneCount: number;
@@ -37,7 +41,6 @@ export function NuxChecklistExpandedCard({
         padding="md"
         className={classes.nuxChecklistPanelDock}
         pos="fixed"
-        bottom={16}
         w={320}
         style={dockStyle}
         data-testid="nux-checklist"

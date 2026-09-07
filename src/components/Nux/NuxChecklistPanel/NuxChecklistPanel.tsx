@@ -2,6 +2,7 @@ import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { NuxChecklistDockButton } from "@/components/Nux/NuxChecklistPanel/NuxChecklistDockButton";
 import { NuxChecklistExpandedCard } from "@/components/Nux/NuxChecklistPanel/NuxChecklistExpandedCard";
+import { useNuxChecklistDockBottom } from "@/components/Nux/NuxChecklistPanel/useNuxChecklistDockBottom";
 import { useNuxChecklistDockRight } from "@/components/Nux/NuxChecklistPanel/useNuxChecklistDockRight";
 import { useNuxMarkDoneFollowUp } from "@/components/Nux/NuxChecklistPanel/useNuxMarkDoneFollowUp";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
@@ -31,7 +32,9 @@ export function NuxChecklistPanel({
   const { isHoldingCompletion, markDone, unmarkDone } =
     useNuxMarkDoneFollowUp();
   const dockRightPx = useNuxChecklistDockRight();
+  const dockBottomPx = useNuxChecklistDockBottom();
   const dockStyle = {
+    bottom: dockBottomPx,
     right: dockRightPx,
     zIndex: NUX_CHECKLIST_Z_INDEX,
   } as const;
