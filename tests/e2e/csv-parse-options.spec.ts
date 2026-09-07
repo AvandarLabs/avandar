@@ -12,6 +12,7 @@ import {
   parseDatasetIdFromDataManagerUrl,
 } from "./helpers/manualUploadCloudSyncFlow";
 import {
+  clearWorkspaceResourcesForE2E,
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
@@ -173,6 +174,17 @@ test.describe("CSV parsing options", () => {
       email: primaryUser.email,
       password: primaryUser.password,
       workspaceSlug,
+    });
+
+    // The empty state is an assertion, so the workspace has to actually be
+    // empty. The worker's workspace is shared, and a dataset left by whichever
+    // spec ran before this one would fail this line on run order alone.
+    await clearWorkspaceResourcesForE2E({
+      supabaseAdminClient: admin,
+      workspaceId: await getWorkspaceIdBySlug({
+        supabaseAdminClient: admin,
+        slug: workspaceSlug,
+      }),
     });
 
     await page.goto(`/${workspaceSlug}/data-manager/data-import`);
