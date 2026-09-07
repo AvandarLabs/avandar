@@ -124,7 +124,11 @@ export function PdfReviewGrid({
        */}
       {regionFlags.map((flag, index) => {
         return (
-          <Alert key={`${flag.reason}-${index}`} variant="light" color="neutral">
+          <Alert
+            key={`${flag.reason}-${index}`}
+            variant="light"
+            color="neutral"
+          >
             <Text size="xs">{flag.detail}</Text>
           </Alert>
         );

@@ -162,16 +162,13 @@ describe("applyChatTurnResponse", () => {
       handlers,
     });
 
-    expect(result.content).toEqual([
-      { type: "text", text: SQL_RESULTS_READY },
-    ]);
+    expect(result.content).toEqual([{ type: "text", text: SQL_RESULTS_READY }]);
   });
 
   it("replaces a SQL-announcement reply with the results pointer", async () => {
     const handlers = _createHandlers();
     const response = Model.make("ChatResponse", {
-      assistantText:
-        "Here is the SQL I ran. Results are ready.",
+      assistantText: "Here is the SQL I ran. Results are ready.",
       generatedSql: {
         prompt: "how many rows",
         sql: "select 1",
@@ -184,9 +181,7 @@ describe("applyChatTurnResponse", () => {
       handlers,
     });
 
-    expect(result.content).toEqual([
-      { type: "text", text: SQL_RESULTS_READY },
-    ]);
+    expect(result.content).toEqual([{ type: "text", text: SQL_RESULTS_READY }]);
   });
 
   it("persists chat-created case types", async () => {
