@@ -2,6 +2,7 @@ import { ComposerPrimitive } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
+import clsx from "clsx";
 import { useRef } from "react";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -45,7 +46,7 @@ export function Composer(): React.ReactNode {
       {...NuxAnchors.props(NuxAnchors.ids.chatComposer)}
     >
       <ComposerPrimitive.Root
-        className={css.composer}
+        className={clsx(css.composer, chatDisabled && css.composerDisabled)}
       >
         <ComposerPrimitive.Input
           ref={composerInputRef}
