@@ -150,7 +150,7 @@ async function _pickSheetInConnectorsTab(
   await page.getByRole("tab", { name: "Connectors" }).click();
 
   const pickButton = page.getByRole("button", {
-    name: /pick google sheet/i,
+    name: /pick a sheet/i,
   });
   await expect(pickButton).toBeVisible({ timeout: LONG_WAIT });
   await pickButton.click();
@@ -174,7 +174,7 @@ async function _expectImportedPreview(
   expectedDatasetName: string,
 ): Promise<void> {
   await expect(
-    page.getByText("These are the first", { exact: false }),
+    page.getByText("First", { exact: false }),
   ).toBeVisible({ timeout: LONG_WAIT });
 
   // The picked sheet's name, not the "Google Sheet" placeholder: a mutation
@@ -387,7 +387,7 @@ test.describe("Google Sheets connector", () => {
         // to pin. That the preview rendered at all means Google answered, the
         // CSV parsed, and the rows reached the form.
         await expect(
-          page.getByText("These are the first", { exact: false }),
+          page.getByText("First", { exact: false }),
         ).toBeVisible({ timeout: LONG_WAIT });
       } finally {
         await _cleanUpGoogleSheetImport(e2eWorkerDb);

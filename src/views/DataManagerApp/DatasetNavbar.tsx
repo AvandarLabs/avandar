@@ -1,100 +1,118 @@
 import { NavLinkList } from "@avandar/ui";
 import { makeBucketMap, prop } from "@avandar/utils";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Badge,
-  Box,
-  BoxProps,
   Group,
   Loader,
-  NavLinkProps,
-  ScrollArea,
+  Skeleton,
+  Stack,
   Text,
+  TextInput,
   Tooltip,
-  useMantineTheme,
 } from "@mantine/core";
-import { useMemo } from "react";
+import { IconDatabaseOff, IconSearch } from "@tabler/icons-react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { AppListPane } from "@/components/layouts/AppListPane/AppListPane";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
+import css from "@/views/DataManagerApp/DatasetNavbar.module.css";
+import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
+import { useDatasetSourceGroupLabels } from "@/views/DataManagerApp/useDatasetSourceLabels";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { NavLinkProps } from "@avandar/ui";
+
+/**
+ * Below this many datasets the list is short enough to read in one pass, so
+ * the filter field would cost a line and save nothing.
+ */
+const FILTER_VISIBLE_THRESHOLD = 8;
 
 type Props = {
   datasets: Dataset.T[];
   isLoading: boolean;
-} & BoxProps;
+};
+
+type DatasetGroup = {
+  sourceType: DatasetSource.SourceType;
+  links: ReadonlyArray<NavLinkProps & { key: string }>;
+};
 
 function makeDatasetLink(options: {
   workspaceSlug: string;
-  datasetId: Dataset.Id;
-  datasetName: string;
-  style?: NavLinkProps["style"];
-  label?: NavLinkProps["label"];
-  showOfflineBadge?: boolean;
-  isOfflineUnavailable?: boolean;
+  dataset: Dataset.T;
+  isOfflineUnavailable: boolean;
+  showOfflineBadge: boolean;
 }): NavLinkProps & { key: string } {
-  const {
-    workspaceSlug,
-    datasetId,
-    datasetName,
-    style,
-    label,
-    showOfflineBadge,
-    isOfflineUnavailable = false,
-  } = options;
+  const { workspaceSlug, dataset, isOfflineUnavailable, showOfflineBadge } =
+    options;
+
+  // `truncate` rather than `lineClamp`: a row is one line, and an ellipsis
+  // says "there is more of this name" where a hard clip does not. Note that
+  // `lineClamp` also needs the `-webkit-box` display it sets for itself, so
+  // pairing it with an explicit `display` silently disables it.
+  const nameText = (
+    <Text size="sm" component="span" truncate>
+      {dataset.name}
+    </Text>
+  );
+
   const link = {
     ...AppLinks.dataManagerDatasetView({
       workspaceSlug,
-      datasetId,
-      datasetName,
+      datasetId: dataset.id,
+      datasetName: dataset.name,
     }),
-    style,
-    label:
-      label ??
-      (isOfflineUnavailable ? (
-        <Tooltip label={<OfflineUnavailableTooltipLabel />}>
-          <Text size="sm" lineClamp={1} component="span" display="block">
-            {datasetName}
-          </Text>
+    className: css.datasetLink,
+    leftSection: <DatasetSourceIcon sourceType={dataset.sourceType} />,
+    label: isOfflineUnavailable ? (
+      <Tooltip label={<OfflineUnavailableTooltipLabel />}>{nameText}</Tooltip>
+    ) : showOfflineBadge ? (
+      <Group gap="xs" wrap="nowrap" justify="space-between">
+        {nameText}
+        <Tooltip label={<Trans>This dataset is fully available offline</Trans>}>
+          <Badge size="xs" color="teal" variant="light">
+            <Trans>Offline</Trans>
+          </Badge>
         </Tooltip>
-      ) : showOfflineBadge ? (
-        <Group gap="xs" wrap="nowrap" justify="space-between">
-          <Text size="sm" lineClamp={1}>
-            {datasetName}
-          </Text>
-          <Tooltip
-            label={<Trans>This dataset is fully available offline</Trans>}
-          >
-            <Badge size="xs" color="teal" variant="light">
-              <Trans>Offline</Trans>
-            </Badge>
-          </Tooltip>
-        </Group>
-      ) : (
-        datasetName
-      )),
+      </Group>
+    ) : (
+      nameText
+    ),
     // Surface the async-import lifecycle on each dataset entry. The
     // indicator self-hides when the row is `parseStatus === "ready"`.
-    rightSection: <DatasetParseStatusIndicator datasetId={datasetId} />,
+    rightSection: <DatasetParseStatusIndicator datasetId={dataset.id} />,
     disabled: isOfflineUnavailable,
   };
   return link as NavLinkProps & { key: string };
 }
 
+/**
+ * The master pane of Data Sources: every dataset in the workspace, grouped
+ * by where it came from.
+ *
+ * The grouping is withheld while the workspace has only one kind of source,
+ * because a single heading over every row labels nothing. The filter is
+ * withheld on the same principle while the list is short.
+ */
 export function DatasetNavbar({
   datasets,
   isLoading,
-  ...boxProps
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const workspace = useCurrentWorkspace();
   const workspaceSlug = workspace.slug;
+  const { t } = useLingui();
+  const sourceGroupLabels = useDatasetSourceGroupLabels();
   const [userProfile] = useCurrentUserProfile();
   const userId = userProfile?.userId;
+  const [filter, setFilter] = useState("");
+  const deferredFilter = useDeferredValue(filter);
 
   // Dataset ids with parquet cached locally for the current user/workspace.
   const [localDatasets = []] = LocalDatasetClient.useGetAll({
@@ -108,76 +126,123 @@ export function DatasetNavbar({
     return new Set(localDatasets.map(prop("datasetId")));
   }, [localDatasets]);
 
-  const theme = useMantineTheme();
-  const borderStyle = useMemo(() => {
-    return {
-      borderTopRightRadius: theme.radius.md,
-      borderBottomRightRadius: theme.radius.md,
-    };
-  }, [theme.radius]);
   const isOnline = useIsOnline();
 
-  const uploadedDatasetLinks = useMemo(() => {
-    const datasetsByType = makeBucketMap(datasets, {
+  const matchingDatasets = useMemo(() => {
+    const query = deferredFilter.trim().toLocaleLowerCase();
+    if (query === "") {
+      return datasets;
+    }
+    return datasets.filter((dataset) => {
+      return dataset.name.toLocaleLowerCase().includes(query);
+    });
+  }, [datasets, deferredFilter]);
+
+  const datasetGroups: readonly DatasetGroup[] = useMemo(() => {
+    const datasetsByType = makeBucketMap(matchingDatasets, {
       keyFn: prop("sourceType"),
     });
 
-    const datasetLinks = DatasetSource.SourceTypes.flatMap((sourceType) => {
-      return (datasetsByType.get(sourceType) ?? []).map((dataset) => {
-        const isOfflineUnavailable =
-          !isOnline && !localDatasetIds.has(dataset.id);
-
-        return makeDatasetLink({
-          workspaceSlug,
-          datasetId: dataset.id,
-          datasetName: dataset.name,
-          style: borderStyle,
-          showOfflineBadge: !isOnline && localDatasetIds.has(dataset.id),
-          isOfflineUnavailable,
-        });
-      });
+    return DatasetSource.SourceTypes.flatMap((sourceType) => {
+      const datasetsOfType = datasetsByType.get(sourceType) ?? [];
+      if (datasetsOfType.length === 0) {
+        return [];
+      }
+      return [
+        {
+          sourceType,
+          links: datasetsOfType.map((dataset) => {
+            return makeDatasetLink({
+              workspaceSlug,
+              dataset,
+              showOfflineBadge: !isOnline && localDatasetIds.has(dataset.id),
+              isOfflineUnavailable:
+                !isOnline && !localDatasetIds.has(dataset.id),
+            });
+          }),
+        },
+      ];
     });
+  }, [matchingDatasets, localDatasetIds, workspaceSlug, isOnline]);
 
-    return datasetLinks;
-  }, [datasets, borderStyle, localDatasetIds, workspaceSlug, isOnline]);
+  const isGrouped = datasetGroups.length > 1;
 
   const elements = {
-    emptyList() {
+    loading() {
       return (
-        <Box ta="center" py="md">
-          <Text>
-            <Trans>No datasets added yet</Trans>
-          </Text>
-        </Box>
+        <Stack gap={6} pt="xxs">
+          <Skeleton height={28} radius="sm" />
+          <Skeleton height={28} radius="sm" width="80%" />
+          <Skeleton height={28} radius="sm" width="65%" />
+        </Stack>
       );
     },
-    mainContent() {
+
+    empty() {
       return (
-        <NavLinkList
-          links={uploadedDatasetLinks}
-          pt="md"
-          pr="md"
-          gap="xs"
-          inactiveHoverColor="neutral.1"
-          h="100%"
-          style={{ minHeight: 0 }}
-        />
+        <Stack gap="xs" align="center" py="lg" px="xs" ta="center">
+          <IconDatabaseOff
+            size={22}
+            stroke={1.5}
+            aria-hidden
+            className={css.emptyIcon}
+          />
+          <Text size="sm" c="dimmed">
+            {datasets.length === 0 ? (
+              <Trans>No datasets yet</Trans>
+            ) : (
+              <Trans>No datasets match your filter</Trans>
+            )}
+          </Text>
+        </Stack>
       );
+    },
+
+    groups() {
+      return datasetGroups.map((group) => {
+        return (
+          <div key={group.sourceType} className={css.group}>
+            {isGrouped ? (
+              <Text component="h4" className={css.groupTitle}>
+                {sourceGroupLabels[group.sourceType]}
+              </Text>
+            ) : null}
+            <NavLinkList
+              links={group.links}
+              gap={6}
+              inactiveHoverColor="neutral.1"
+            />
+          </div>
+        );
+      });
     },
   };
 
   return (
-    <Box
-      bg="neutral.0"
-      style={{ minHeight: 0, alignSelf: "stretch" }}
-      {...boxProps}
+    <AppListPane
+      title={<Trans>Datasets</Trans>}
+      count={isLoading ? undefined : datasets.length}
+      action={isLoading ? <Loader size={14} /> : null}
+      filter={
+        datasets.length >= FILTER_VISIBLE_THRESHOLD ? (
+          <TextInput
+            aria-label={t`Filter datasets`}
+            placeholder={t`Filter datasets`}
+            leftSection={<IconSearch size={14} stroke={1.6} />}
+            size="xs"
+            value={filter}
+            onChange={(event) => {
+              setFilter(event.currentTarget.value);
+            }}
+          />
+        ) : null
+      }
     >
-      <ScrollArea h="100%" w="100%">
-        {isLoading ? <Loader /> : null}
-        {uploadedDatasetLinks.length === 0
-          ? elements.emptyList()
-          : elements.mainContent()}
-      </ScrollArea>
-    </Box>
+      {isLoading && datasets.length === 0
+        ? elements.loading()
+        : datasetGroups.length === 0
+          ? elements.empty()
+          : elements.groups()}
+    </AppListPane>
   );
 }

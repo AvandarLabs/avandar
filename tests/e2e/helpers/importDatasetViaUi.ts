@@ -27,14 +27,11 @@ export async function importDatasetViaUi(
     .setInputFiles(options.filePath);
   const rowCount = formatNumber(options.expectedRowCount, { locale: "en-US" });
   const parsedRowCount = page.getByText(new RegExp(`of ${rowCount}\\. Page`));
-  const uploadButton = uploadPanel.getByRole("button", {
-    name: "Upload",
-    exact: true,
-  });
-  if (!(await parsedRowCount.isVisible()) && (await uploadButton.isEnabled())) {
-    await uploadButton.click();
-  }
-  await expect(page.getByRole("alert", { name: "Data Preview" })).toBeVisible();
+  // Choosing the file parses it, so there is nothing to confirm between the
+  // two assertions below.
+  await expect(
+    page.getByRole("heading", { name: "Data preview" }),
+  ).toBeVisible({ timeout: MEDIUM_WAIT });
   await expect(parsedRowCount).toBeVisible({ timeout: MEDIUM_WAIT });
   await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
   const datasetId = parseDatasetIdFromDataManagerUrl({

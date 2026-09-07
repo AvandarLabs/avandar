@@ -1,7 +1,8 @@
 import { Model } from "@avandar/models";
 import { FloatingLoader, ObjectDescriptionList } from "@avandar/ui";
-import { assertIsDefined, matchLiteral, where } from "@avandar/utils";
+import { assertIsDefined, where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+import { useMemo } from "react";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -15,8 +16,13 @@ import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenData
 import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
-import type { ObjectKeyRenderOptionsMap } from "@avandar/ui";
 import type { SetOptional } from "type-fest";
+
+/**
+ * Caps the table at roughly a dozen rows before it starts scrolling, so a
+ * six-column dataset takes six rows of height rather than a fixed box.
+ */
+const COLUMN_TABLE_MAX_HEIGHT = 420;
 
 type DatasetWithColumnsAndSource = SetOptional<
   DatasetWithColumns,
@@ -36,76 +42,38 @@ type Props = {
   dataset: DatasetWithColumnsAndSource;
 };
 
-const EXCLUDED_DATASET_METADATA_KEYS = [
-  "id",
-  "name",
-  "description",
-  "workspaceId",
-  "ownerId",
-  "ownerProfileId",
-  "dateOfLastSync",
-] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
-
-// eslint-disable-next-line max-len
-function useDatasetMetadataRenderOptions(): ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource> {
-  const { t } = useLingui();
-  return {
-    createdAt: {
-      renderAsType: "date",
-    },
-    updatedAt: {
-      renderAsType: "date",
-    },
-    sourceType: {
-      renderValue: (value) => {
-        return matchLiteral(value, {
-          csv_file: t`CSV file`,
-          google_sheets: t`Google Sheets`,
-          open_data: t`Open Data`,
-          pdf_file: t`PDF file`,
-          virtual: t`Derived Dataset`,
-          xlsx_file: t`Excel file`,
-          _otherwise: value,
-        });
-      },
-    },
-    columns: {
-      renderAsTable: true,
-      maxHeight: 400,
-      editable: true,
-      itemRenderOptions: {
-        keyRenderOptions: {
-          description: {
-            renderAsType: "text",
-          },
-          createdAt: {
-            renderAsType: "date",
-          },
-          dataType: {
-            renderAsType: {
-              type: "text",
-              choices: AvaDataType.Types.map((type) => {
-                return {
-                  value: type,
-                  label: AvaDataType.toDisplayValue(type),
-                };
-              }),
-            },
-            renderValue: AvaDataType.toDisplayValue,
-          },
-        },
-        includeKeys: ["name", "dataType", "description"],
-      },
-    },
-    source: {
-      excludeKeys: ["createdAt", "id", "datasetId", "updatedAt", "workspaceId"],
-    },
-  } satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
-}
-
+/**
+ * The dataset's columns, with their detected types and descriptions, each
+ * row editable in place.
+ *
+ * This used to be one nested block inside a description list over the whole
+ * dataset record, which gave a column's name the same visual weight as the
+ * CSV escape character. The parse settings now live in the view's rail and
+ * the identity facts in its header, which leaves this the one thing in the
+ * metadata tab a user actually edits.
+ */
 export function DatasetMetadataList({ dataset }: Props): JSX.Element {
   const { t } = useLingui();
-  const datasetMetadataRenderOptions = useDatasetMetadataRenderOptions();
+
+  // Only the three shown columns get a header. Anything else falls back to
+  // the list's default, which title-cases the key.
+  const columnTableHeaders: Partial<Record<keyof DatasetColumn.T, string>> = {
+    name: t`Name`,
+    dataType: t`Type`,
+    description: t`Description`,
+  };
+
+  // The table derives its columns from the first row's own keys, so a
+  // dataset whose first column happens to have no description would drop the
+  // Description column for every other column too. Naming the key on every
+  // row keeps the table's shape a property of the model rather than of
+  // whichever column sorted first.
+  const columnRows = useMemo(() => {
+    return (dataset.columns ?? []).map((column) => {
+      return { ...column, description: column.description };
+    });
+  }, [dataset.columns]);
+
   const [dropLocalDataset] = LocalDatasetClient.useDropLocalDataset({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });
@@ -130,11 +98,33 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
   return (
     <>
       <ObjectDescriptionList
-        data={dataset}
-        dateFormat="MMMM D, YYYY"
-        includeKeys={["updatedAt", "sourceType", "..."]}
-        excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
-        keyRenderOptions={datasetMetadataRenderOptions}
+        data={columnRows}
+        renderAsTable
+        editable
+        maxHeight={COLUMN_TABLE_MAX_HEIGHT}
+        renderTableHeader={(key: keyof DatasetColumn.T) => {
+          return columnTableHeaders[key];
+        }}
+        itemRenderOptions={{
+          includeKeys: ["name", "dataType", "description"],
+          keyRenderOptions: {
+            description: {
+              renderAsType: "text",
+            },
+            dataType: {
+              renderAsType: {
+                type: "text",
+                choices: AvaDataType.Types.map((type) => {
+                  return {
+                    value: type,
+                    label: AvaDataType.toDisplayValue(type),
+                  };
+                }),
+              },
+              renderValue: AvaDataType.toDisplayValue,
+            },
+          },
+        }}
         onSubmitChange={async (value) => {
           if (Model.isOfModelType(value, "DatasetColumn")) {
             const datasetColumn = value as DatasetColumn.T;

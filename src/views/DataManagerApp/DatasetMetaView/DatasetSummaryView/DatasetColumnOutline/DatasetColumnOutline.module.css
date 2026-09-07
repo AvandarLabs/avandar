@@ -1,0 +1,40 @@
+.summaryLine {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--mantine-spacing-xs);
+  text-transform: uppercase;
+}
+
+.link {
+  border-radius: var(--mantine-radius-sm);
+  display: block;
+  padding: 3px 6px;
+  text-decoration: none;
+  transition: var(--ava-transition-interactive);
+}
+
+.link:hover {
+  background-color: var(--ava-surface-sunken);
+}
+
+.linkName {
+  color: var(--mantine-color-neutral-8);
+  flex: 1;
+  min-width: 0;
+}
+
+.linkType {
+  color: var(--mantine-color-neutral-5);
+  flex-shrink: 0;
+}
+
+.linkActive {
+  background-color: var(--mantine-color-primary-0);
+}
+
+.linkActive .linkName {
+  color: var(--mantine-color-primary-7);
+  font-weight: 600;
+}

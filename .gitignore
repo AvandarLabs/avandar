@@ -106,3 +106,4 @@ public/test-data/pdf/gate/imc-sudan-cholera-sitrep-1.pdf
 .impeccable/build/
 .impeccable/mocks/
 .impeccable/review/
+.impeccable/hook.cache.json

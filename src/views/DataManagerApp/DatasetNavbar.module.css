@@ -1,0 +1,43 @@
+.group + .group {
+  margin-top: var(--mantine-spacing-md);
+}
+
+/*
+ * Group headings mark a run of rows rather than title a section, so they are
+ * set as chrome: small, tracked, and dimmed, aligned with the row labels
+ * beneath them rather than with the row icons.
+ */
+.groupTitle {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  margin: 0 0 4px;
+  padding: var(--mantine-spacing-xs) 6px 0;
+  text-transform: uppercase;
+}
+
+.datasetLink {
+  border-radius: var(--mantine-radius-sm);
+}
+
+/*
+ * Mantine's nav-link body is a flex child with the default `min-width: auto`,
+ * which refuses to shrink below its text and so defeats the row's line clamp.
+ */
+.datasetLink :global(.mantine-NavLink-body) {
+  min-width: 0;
+}
+
+.datasetLink :global(.mantine-NavLink-section) {
+  color: var(--mantine-color-neutral-6);
+}
+
+.datasetLink[data-status="active"] :global(.mantine-NavLink-section) {
+  color: inherit;
+}
+
+.emptyIcon {
+  color: var(--mantine-color-neutral-5);
+}

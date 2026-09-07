@@ -1,16 +1,18 @@
 import { where } from "@avandar/utils";
-import { Trans } from "@lingui/react/macro";
-import { Box, Container, Divider, Stack, Text, Title } from "@mantine/core";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
+import { AppView } from "@/components/layouts/AppView/AppView";
+import { AppViewBody } from "@/components/layouts/AppView/AppViewBody";
+import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";
-import css from "@/views/DataManagerApp/DataImportView/DataImportView.module.css";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
 
 export function DataImportView(): JSX.Element {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [allDatasets = []] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
@@ -30,32 +32,31 @@ export function DataImportView(): JSX.Element {
   const [isLimitModalDismissed, setIsLimitModalDismissed] = useState(false);
 
   return (
-    <Container className={css.page} pt="xxl" px="lg">
-      <Stack gap="lg">
-        <header className={css.header}>
-          <Title order={2} fw={650}>
-            <Trans>Import data</Trans>
-          </Title>
-          <Text c="dimmed" size="sm" maw={520}>
-            <Trans>
-              Upload files, connect external sources, or browse open datasets to
-              add to your workspace.
-            </Trans>
-          </Text>
-        </header>
+    <AppView>
+      <AppViewHeader
+        title={t`Import data`}
+        description={
+          <Trans>
+            Upload a file, connect an external source, or browse the open data
+            catalog.
+          </Trans>
+        }
+      />
 
-        <Divider />
-
-        <Box className={css.panel}>
-          <DataImportTabs isAddAllowed={isAddAllowed} />
-        </Box>
-      </Stack>
+      {
+        // No rail here. Import is a task, not a record: there are no
+        // properties to park beside it, and the review step below wants every
+        // pixel of width for its preview grid.
+      }
+      <AppViewBody>
+        <DataImportTabs isAddAllowed={isAddAllowed} />
+      </AppViewBody>
 
       {
         // We did a backend check to see if the user is allowed to add more
         // datasets. If they're not, then we show a modal asking them to
         // upgrade. The modal is dismissable so the user can continue using
-        // the workspace (and switch workspaces) — uploads are still blocked
+        // the workspace (and switch workspaces): uploads are still blocked
         // via the disabled state in DataImportTabs. We still do a backend
         // check when the user tries to add a new dataset to avoid race
         // conditions where multiple users in the workspace might be adding
@@ -68,6 +69,6 @@ export function DataImportView(): JSX.Element {
           setIsLimitModalDismissed(true);
         }}
       />
-    </Container>
+    </AppView>
   );
 }

@@ -1,14 +1,20 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Group, RingProgress, Skeleton, Stack, Text } from "@mantine/core";
+import { Group, Skeleton, Stack, Text } from "@mantine/core";
+import clsx from "clsx";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import css from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.module.css";
 import { DateColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary";
 import { NumberColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary";
 import { TextColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary";
+import { formatColumnShare } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/formatColumnShare";
 import { SummaryTag } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/SummaryTag";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { ReactNode } from "react";
+
+/** Above this share of empty cells, the missing count is worth flagging. */
+const HIGH_MISSING_SHARE = 0.2;
 
 type Props = {
   datasetId: Dataset.Id;
@@ -23,6 +29,11 @@ type Props = {
  * type-specific stats) and renders the type-appropriate visualisation
  * below it.
  *
+ * Three parts, in order of how much a reader needs them: the counts, one
+ * sentence characterising the column, then the visual. The counts used to be
+ * a hero number with a progress ring beside it, which spent forty pixels of
+ * height and a saturated accent on two integers.
+ *
  * The visualisations live in three siblings (TextColumnSummary,
  * NumberColumnSummary, DateColumnSummary) so the per-type rendering
  * stays focused and the renderer doesn't grow a sprawling switch.
@@ -33,7 +44,7 @@ export function ColumnSummaryBody({
   dataType,
   totalRows,
 }: Props): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const [summary, isLoading, query] = DatasetQueryClient.useGetColumnSummary({
     datasetId,
@@ -51,8 +62,8 @@ export function ColumnSummaryBody({
   if (isLoading) {
     return (
       <Stack gap="sm">
-        <Skeleton height={20} width="70%" />
-        <Skeleton height={56} />
+        <Skeleton height={14} width="45%" />
+        <Skeleton height={48} radius="sm" />
       </Stack>
     );
   }
@@ -68,8 +79,9 @@ export function ColumnSummaryBody({
     );
   }
 
-  const sentence = _buildHeadlineSentence({ summary, totalRows });
-  const missingPct = totalRows > 0 ? summary.emptyValuesCount / totalRows : 0;
+  const sentence = _buildHeadlineSentence({ summary, totalRows, i18n });
+  const missingShare =
+    totalRows > 0 ? summary.emptyValuesCount / totalRows : 0;
 
   const typeSummary =
     summary.type === "text" ? (
@@ -85,44 +97,32 @@ export function ColumnSummaryBody({
     ) : null;
 
   return (
-    <Stack gap="md">
-      <Text size="sm" c="neutral.7" lh={1.6}>
-        {sentence}
-      </Text>
-
-      <Group gap="lg" align="center" wrap="wrap">
-        <Stack gap={0}>
-          <Text fw={650} size="xl" lh={1}>
-            {summary.distinctValuesCount.toLocaleString()}
-          </Text>
-          <Text size="xs" c="dimmed">
-            {t`Distinct values`}
-          </Text>
-        </Stack>
-        {missingPct > 0 ? (
-          <Group gap="xs" align="center">
-            <RingProgress
-              size={48}
-              thickness={5}
-              roundCaps
-              sections={[
-                {
-                  value: missingPct * 100,
-                  color: missingPct > 0.2 ? "yellow.6" : "neutral.4",
-                },
-              ]}
-            />
-            <Stack gap={0}>
-              <Text fw={650} size="sm" lh={1}>
-                {(missingPct * 100).toFixed(missingPct < 0.01 ? 2 : 1)}%
-              </Text>
-              <Text size="xs" c="dimmed">
-                <Trans>missing</Trans>
-              </Text>
-            </Stack>
-          </Group>
+    <Stack gap="sm">
+      <Group gap="xs" className={css.counts}>
+        <Text component="span" className={css.count}>
+          {t`${summary.distinctValuesCount.toLocaleString(i18n.locale)} distinct`}
+        </Text>
+        {missingShare > 0 ? (
+          <>
+            <span aria-hidden className={css.separator}>
+              ·
+            </span>
+            <Text
+              component="span"
+              className={clsx(
+                css.count,
+                missingShare > HIGH_MISSING_SHARE && css.countHighMissing,
+              )}
+            >
+              {t`${formatColumnShare(missingShare, i18n.locale)} missing`}
+            </Text>
+          </>
         ) : null}
       </Group>
+
+      <Text size="sm" c="neutral.7" lh={1.55}>
+        {sentence}
+      </Text>
 
       {typeSummary}
     </Stack>
@@ -143,8 +143,9 @@ export function ColumnSummaryBody({
 function _buildHeadlineSentence(args: {
   summary: ColumnSummary;
   totalRows: number;
+  i18n: { locale: string };
 }): React.ReactNode {
-  const { summary, totalRows } = args;
+  const { summary, totalRows, i18n } = args;
 
   if (summary.type === "number") {
     const numericLow = _fmtNum(summary.minValue);
@@ -187,7 +188,8 @@ function _buildHeadlineSentence(args: {
         <Trans>
           Heavily repeated:{" "}
           <SummaryTag>{top.value.slice(0, 1).join(", ")}</SummaryTag> appears in{" "}
-          <SummaryTag>{(share * 100).toFixed(0)}%</SummaryTag> of rows.
+          <SummaryTag>{formatColumnShare(share, i18n.locale)}</SummaryTag> of
+          rows.
         </Trans>
       );
     }
@@ -196,18 +198,19 @@ function _buildHeadlineSentence(args: {
         <Trans>
           Mostly unique:{" "}
           <SummaryTag>
-            {summary.distinctValuesCount.toLocaleString()}
+            {summary.distinctValuesCount.toLocaleString(i18n.locale)}
           </SummaryTag>{" "}
           distinct values across{" "}
-          <SummaryTag>{totalRows.toLocaleString()}</SummaryTag> rows.
+          <SummaryTag>{totalRows.toLocaleString(i18n.locale)}</SummaryTag> rows.
         </Trans>
       );
     }
     return (
       <Trans>
-        Most common value:{" "}
-        <SummaryTag>{top.value.slice(0, 2).join(", ")}</SummaryTag> (
-        {top.count.toLocaleString()} rows, {(share * 100).toFixed(0)}%).
+        The most common value is{" "}
+        <SummaryTag>{top.value.slice(0, 2).join(", ")}</SummaryTag>, in{" "}
+        <SummaryTag>{formatColumnShare(share, i18n.locale)}</SummaryTag> of
+        rows.
       </Trans>
     );
   }

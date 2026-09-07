@@ -16,7 +16,7 @@ import type { Page } from "@playwright/test";
  * There is no e2e flag in the app and no test-only branch in the hook.
  *
  * The stub fires its callback synchronously from `setVisible(true)`, so a
- * click on "Pick google sheet" *is* the pick.
+ * click on "Pick a sheet" *is* the pick.
  *
  * @param page The page to install into, before it navigates.
  * @param sheet The document the fake Picker hands back.

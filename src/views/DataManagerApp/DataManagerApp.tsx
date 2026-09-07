@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Button, Flex, MantineTheme, ScrollArea } from "@mantine/core";
+import { Button, Flex } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Outlet, useNavigate } from "@tanstack/react-router";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -33,24 +33,20 @@ export function DataManagerApp(): JSX.Element {
         </Button>
       }
     >
-      <Flex align="stretch" h="100%">
+      {
+        // The routed view owns its own scrolling so its header band can stay
+        // put while the content moves under it. Wrapping the outlet in a
+        // scroll container here would scroll the band away with it.
+      }
+      <Flex align="stretch" h="100%" mih={0}>
         <DatasetNavbar
-          miw={240}
           isLoading={isLoadingDatasets}
           datasets={allDatasets ?? []}
-          style={$datasetNavbarBorder}
         />
-        <ScrollArea h="100%" w="100%">
+        <Flex direction="column" flex={1} miw={0} mih={0}>
           <Outlet />
-        </ScrollArea>
+        </Flex>
       </Flex>
     </AppSlate>
   );
 }
-
-const $datasetNavbarBorder = (theme: MantineTheme) => {
-  return {
-    borderRight: `1px solid ${theme.colors.neutral[2]}`,
-    alignSelf: "stretch",
-  };
-};

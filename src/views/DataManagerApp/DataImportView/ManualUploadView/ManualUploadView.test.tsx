@@ -280,15 +280,10 @@ describe("ManualUploadView", () => {
       target: { files: [file] },
     });
 
+    // Choosing the file is the whole gesture: the parse starts on change,
+    // with no confirm step in between.
     await waitFor(() => {
-      const uploadBtn = screen.getByRole("button", { name: "Upload" });
-      expect(uploadBtn).not.toBeDisabled();
-    });
-
-    fireEvent.click(screen.getByRole("button", { name: "Upload" }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
+      expect(screen.getByText(/6 detected/)).toBeInTheDocument();
     });
 
     const expectedColumnNames = [
@@ -321,11 +316,11 @@ describe("ManualUploadView", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
+      expect(screen.getByText(/6 detected/)).toBeInTheDocument();
     });
   });
 
-  it("stops the upload and reparse spinners after an initialFile sniff finishes", async () => {
+  it("stops the parse and reparse spinners after an initialFile sniff finishes", async () => {
     const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
     const file = new File([csvBuffer], "preloaded.csv", {
       type: "text/csv",
@@ -338,19 +333,18 @@ describe("ManualUploadView", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
+      expect(screen.getByText(/6 detected/)).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("button", { name: "Upload" })).not.toHaveAttribute(
-      "data-loading",
-      "true",
-    );
+    expect(
+      screen.getByRole("button", { name: /replace the uploaded file/i }),
+    ).not.toBeDisabled();
     expect(
       screen.getByRole("button", { name: "Process data again" }),
     ).not.toHaveAttribute("data-loading", "true");
   });
 
-  it("does not keep the Upload button loading while a reparse is in flight", async () => {
+  it("keeps the reparse spinner off the file control", async () => {
     const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
     const file = new File([csvBuffer], "preloaded.csv", {
       type: "text/csv",
@@ -359,7 +353,7 @@ describe("ManualUploadView", () => {
     renderWithProviders(<ManualUploadView initialFile={file} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/6 columns were detected/)).toBeInTheDocument();
+      expect(screen.getByText(/6 detected/)).toBeInTheDocument();
     });
 
     startCsvImportMock.mockImplementation(() => {
@@ -375,9 +369,8 @@ describe("ManualUploadView", () => {
         screen.getByRole("button", { name: "Process data again" }),
       ).toHaveAttribute("data-loading", "true");
     });
-    expect(screen.getByRole("button", { name: "Upload" })).not.toHaveAttribute(
-      "data-loading",
-      "true",
-    );
+    expect(
+      screen.getByRole("button", { name: /replace the uploaded file/i }),
+    ).not.toHaveAttribute("data-loading", "true");
   });
 });

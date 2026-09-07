@@ -1,19 +1,21 @@
-import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
-  ActionIcon,
   Anchor,
   Button,
+  Collapse,
   Group,
-  ScrollArea,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
+import { IconChevronDown, IconPlus } from "@tabler/icons-react";
+import { AppViewRail } from "@/components/layouts/AppView/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Selected catalog entry, or none when nothing is selected. */
@@ -32,7 +34,14 @@ type Props = {
 };
 
 /**
- * Shows full metadata for one open-data catalog entry and an add action.
+ * Everything the catalog knows about one entry, and the one action on it.
+ *
+ * The provenance fields read as a labelled fact list rather than as nine
+ * bold-heading-plus-paragraph pairs, which is what turned a page of short
+ * values into a page of headings. There is one add button: the same action
+ * used to appear twice, once as an icon at the top and once as a button at
+ * the bottom, and a duplicated primary action makes a user check whether
+ * the two do the same thing.
  */
 export function OpenDataCatalogEntryDetail({
   entry,
@@ -40,14 +49,19 @@ export function OpenDataCatalogEntryDetail({
   isAdding,
   isLoadingColumnMetadata,
   onAddToWorkspace,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   const { t } = useLingui();
   const offline = useOfflineGate();
+  const [isRawMetadataOpen, rawMetadata] = useDisclosure(false);
+
   if (!entry) {
     return (
-      <Stack align="center" justify="center" mih={200} gap="xs">
-        <Text c="dimmed" ta="center">
-          <Trans>Select a dataset from the list to view its metadata.</Trans>
+      <Stack align="center" justify="center" mih={200} gap="xs" p="lg">
+        <Text c="dimmed" ta="center" size="sm" maw="34ch">
+          <Trans>
+            Pick a dataset on the left to read what it covers, who publishes
+            it, and how often it updates.
+          </Trans>
         </Text>
       </Stack>
     );
@@ -57,174 +71,119 @@ export function OpenDataCatalogEntryDetail({
     entry.metadata !== undefined
       ? JSON.stringify(entry.metadata, undefined, 2)
       : undefined;
+  const isAddBlocked =
+    !isAddAllowed || isAdding || isLoadingColumnMetadata || offline.isBlocked;
 
   return (
-    <ScrollArea mah="70vh" type="scroll">
-      <Stack gap="sm">
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
-          <Title order={4} lineClamp={3}>
-            {entry.displayName}
-          </Title>
+    <Stack gap="md" className={css.detail}>
+      <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
+        <Title order={4} lineClamp={3} className={css.detailTitle}>
+          {entry.displayName}
+        </Title>
+        <OfflineGated>
+          <Button
+            leftSection={<IconPlus size={16} />}
+            loading={isAdding || isLoadingColumnMetadata}
+            data-disabled={isAddBlocked || undefined}
+            aria-disabled={isAddBlocked}
+            aria-label={t`Add dataset to workspace`}
+            onClick={offline.guard(onAddToWorkspace)}
+          >
+            <Trans>Add to workspace</Trans>
+          </Button>
+        </OfflineGated>
+      </Group>
 
-          <OfflineGated>
-            <Tooltip
-              label={t`Add to your workspace`}
-              disabled={offline.isBlocked}
-            >
-              <ActionIcon
-                aria-label={t`Add dataset to workspace`}
-                color="primary"
-                variant="filled"
-                size="lg"
-                loading={isAdding || isLoadingColumnMetadata}
-                data-disabled={
-                  !isAddAllowed ||
-                  isAdding ||
-                  isLoadingColumnMetadata ||
-                  offline.isBlocked
-                    ? true
-                    : undefined
-                }
-                aria-disabled={
-                  !isAddAllowed ||
-                  isAdding ||
-                  isLoadingColumnMetadata ||
-                  offline.isBlocked
-                }
-                onClick={offline.guard(onAddToWorkspace)}
-              >
-                <IconPlus size={20} />
-              </ActionIcon>
-            </Tooltip>
-          </OfflineGated>
-        </Group>
+      {!isAddAllowed ? (
+        <Text c="danger.8" size="sm">
+          <Trans>
+            You cannot add more datasets on your current plan. Upgrade to add
+            this catalog dataset.
+          </Trans>
+        </Text>
+      ) : null}
 
-        {!isAddAllowed ? (
-          <Text c="dimmed" size="sm">
-            <Trans>
-              You cannot add more datasets on your current plan. Upgrade to add
-              this catalog dataset.
-            </Trans>
-          </Text>
-        ) : null}
+      {entry.description ? (
+        <Text size="sm" maw="70ch">
+          {entry.description}
+        </Text>
+      ) : null}
 
-        {entry.description ? (
-          <Stack gap={4}>
-            <Text fw={600} size="sm">
-              <Trans>Description</Trans>
-            </Text>
-            <Text size="sm">{entry.description}</Text>
-          </Stack>
-        ) : null}
-
-        <Stack gap={4}>
-          <Text fw={600} size="sm">
-            <Trans>Organization</Trans>
-          </Text>
-          <Text size="sm">{entry.externalOrganizationName}</Text>
-        </Stack>
-
+      <AppViewRail.Group>
+        <AppViewRail.Fact label={t`Organization`}>
+          {entry.externalOrganizationName}
+        </AppViewRail.Fact>
         {entry.externalServiceName ? (
-          <Stack gap={4}>
-            <Text fw={600} size="sm">
-              <Trans>Service</Trans>
-            </Text>
-            <Text size="sm">{entry.externalServiceName}</Text>
-          </Stack>
+          <AppViewRail.Fact label={t`Service`}>
+            {entry.externalServiceName}
+          </AppViewRail.Fact>
         ) : null}
-
-        <Stack gap={4}>
-          <Text fw={600} size="sm">
-            <Trans>Pipeline</Trans>
-          </Text>
-          <Text size="sm">
-            <Trans>
-              {entry.pipelineName} · run {entry.pipelineRunId}
-            </Trans>
-          </Text>
-        </Stack>
-
+        <AppViewRail.Fact label={t`Pipeline`}>
+          <Trans>
+            {entry.pipelineName} · run {entry.pipelineRunId}
+          </Trans>
+        </AppViewRail.Fact>
+        {entry.license ? (
+          <AppViewRail.Fact label={t`License`}>
+            {entry.license}
+          </AppViewRail.Fact>
+        ) : null}
+        {entry.updateFrequency ? (
+          <AppViewRail.Fact label={t`Updates`}>
+            {entry.updateFrequency}
+          </AppViewRail.Fact>
+        ) : null}
         {entry.sourceUrl ? (
-          <Stack gap={4}>
-            <Text fw={600} size="sm">
-              <Trans>Source URL</Trans>
-            </Text>
-            <Anchor href={entry.sourceUrl} size="sm" target="_blank">
+          <AppViewRail.Fact label={t`Source`}>
+            <Anchor href={entry.sourceUrl} size="xs" target="_blank">
               {entry.sourceUrl}
             </Anchor>
-          </Stack>
+          </AppViewRail.Fact>
         ) : null}
-
         {entry.canonicalUrls && entry.canonicalUrls.length > 0 ? (
-          <Stack gap={4}>
-            <Text fw={600} size="sm">
-              <Trans>Canonical URLs</Trans>
-            </Text>
-            <Stack gap={6}>
+          <AppViewRail.Fact label={t`Canonical`}>
+            <Stack gap={2}>
               {entry.canonicalUrls.map((url) => {
                 return (
-                  <Anchor key={url} href={url} size="sm" target="_blank">
+                  <Anchor key={url} href={url} size="xs" target="_blank">
                     {url}
                   </Anchor>
                 );
               })}
             </Stack>
-          </Stack>
+          </AppViewRail.Fact>
         ) : null}
-
-        <Group gap="xl" grow>
-          {entry.license ? (
-            <Stack gap={4}>
-              <Text fw={600} size="sm">
-                <Trans>License</Trans>
-              </Text>
-              <Text size="sm">{entry.license}</Text>
-            </Stack>
-          ) : null}
-          {entry.updateFrequency ? (
-            <Stack gap={4}>
-              <Text fw={600} size="sm">
-                <Trans>Update frequency</Trans>
-              </Text>
-              <Text size="sm">{entry.updateFrequency}</Text>
-            </Stack>
-          ) : null}
-        </Group>
-
         {entry.notes ? (
-          <Stack gap={4}>
-            <Text fw={600} size="sm">
-              <Trans>Notes</Trans>
-            </Text>
-            <Text size="sm">{entry.notes}</Text>
-          </Stack>
+          <AppViewRail.Fact label={t`Notes`}>{entry.notes}</AppViewRail.Fact>
         ) : null}
+      </AppViewRail.Group>
 
-        {metadataJson ? (
-          <Stack gap={4}>
-            <Text fw={600} size="sm">
-              <Trans>Raw metadata (JSON)</Trans>
-            </Text>
-            <Text
-              component="pre"
-              size="xs"
-              ff="monospace"
-              style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-            >
+      {metadataJson ? (
+        <Stack gap="xs" align="flex-start">
+          <Button
+            variant="subtle"
+            color="neutral"
+            size="compact-xs"
+            rightSection={
+              <IconChevronDown
+                size={14}
+                className={
+                  isRawMetadataOpen ? css.chevronOpen : css.chevronClosed
+                }
+              />
+            }
+            aria-expanded={isRawMetadataOpen}
+            onClick={rawMetadata.toggle}
+          >
+            <Trans>Raw metadata</Trans>
+          </Button>
+          <Collapse expanded={isRawMetadataOpen} w="100%">
+            <Text component="pre" size="xs" className={css.rawMetadata}>
               {metadataJson}
             </Text>
-          </Stack>
-        ) : null}
-
-        <Button
-          leftSection={<IconPlus size={18} />}
-          loading={isAdding || isLoadingColumnMetadata}
-          disabled={!isAddAllowed || isAdding || isLoadingColumnMetadata}
-          onClick={onAddToWorkspace}
-        >
-          <Trans>Add to workspace</Trans>
-        </Button>
-      </Stack>
-    </ScrollArea>
+          </Collapse>
+        </Stack>
+      ) : null}
+    </Stack>
   );
 }

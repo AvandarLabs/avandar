@@ -1,0 +1,36 @@
+/*
+ * A rule between columns instead of a 48px gap. On a fifty-column dataset
+ * the rules are what make the boundaries findable while scrolling; the gap
+ * alone left every section floating in the same field.
+ */
+.section {
+  padding-block: var(--mantine-spacing-lg);
+  scroll-margin-top: var(--mantine-spacing-lg);
+}
+
+.section + .section {
+  border-top: 1px solid var(--ava-border-default);
+}
+
+.section:first-child {
+  padding-top: 0;
+}
+
+.name {
+  font-size: var(--mantine-font-size-lg);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.type {
+  color: var(--mantine-color-neutral-6);
+  flex-shrink: 0;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,110 @@
+/*
+ * A two-pane browser split by one hairline. The panes are regions of the
+ * same surface, not two cards side by side, so nothing between the list and
+ * the entry it describes costs more than a pixel.
+ */
+.browser {
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: grid;
+  grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+  min-height: 22rem;
+  overflow: hidden;
+}
+
+@media (width <= 62em) {
+  .browser {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .browserList {
+    border-block-end: 1px solid var(--ava-border-default);
+    border-inline-end: none;
+  }
+}
+
+.browserList {
+  background-color: var(--ava-surface-body);
+  border-inline-end: 1px solid var(--ava-border-default);
+  max-height: 30rem;
+  overflow-y: auto;
+  padding: var(--mantine-spacing-xs);
+  scrollbar-width: thin;
+}
+
+.browserListTitle {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0 0 var(--mantine-spacing-xs);
+  padding-inline: 8px;
+  padding-top: 4px;
+  text-transform: uppercase;
+}
+
+.entryRow {
+  border-radius: var(--mantine-radius-sm);
+  display: block;
+  padding: 6px 8px;
+  transition: var(--ava-transition-interactive);
+  width: 100%;
+}
+
+.entryRow:hover {
+  background-color: var(--ava-surface-sunken);
+}
+
+.entryRowSelected {
+  color: var(--mantine-color-primary-7);
+}
+
+.entryRowSelected,
+.entryRowSelected:hover {
+  background-color: var(--mantine-color-primary-0);
+}
+
+.browserDetail {
+  max-height: 30rem;
+  min-width: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.detail {
+  padding: var(--mantine-spacing-md);
+}
+
+.detailTitle {
+  min-width: 0;
+}
+
+.rawMetadata {
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  font-family: var(--mantine-font-family-monospace);
+  margin: 0;
+  max-height: 16rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: var(--mantine-spacing-xs);
+  white-space: pre-wrap;
+}
+
+.chevronClosed,
+.chevronOpen {
+  transition: transform var(--ava-animation-duration-fast)
+    var(--ava-animation-easing-out);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevronClosed,
+  .chevronOpen {
+    transition: none;
+  }
+}

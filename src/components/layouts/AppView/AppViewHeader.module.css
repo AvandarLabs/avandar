@@ -1,0 +1,51 @@
+/*
+ * The header band. It carries the only hairline between the slate toolbar
+ * and the content, so the view reads as one surface rather than a stack of
+ * panels. Padding is deliberately asymmetric: `lg` inline to match the body
+ * gutter, but `sm` at the bottom so the fact line sits close to the title it
+ * describes.
+ */
+.header {
+  background-color: var(--ava-surface-raised);
+  border-bottom: 1px solid var(--ava-border-default);
+  flex-shrink: 0;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-lg)
+    var(--mantine-spacing-sm);
+}
+
+.titleRow {
+  min-height: 32px;
+}
+
+/*
+ * Shrink-to-fit rather than fill, so an inline-editable title keeps its edit
+ * affordance beside the name instead of parking it against the action group
+ * at the far end of the row.
+ */
+.title {
+  flex: 0 1 auto;
+  font-size: var(--mantine-h3-font-size);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 0;
+  min-width: 0;
+}
+
+.actions {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+
+.facts,
+.description {
+  margin: 4px 0 0;
+}
+
+.description {
+  max-width: 60ch;
+}
+
+.factSeparator {
+  padding: 0 0.4em;
+}

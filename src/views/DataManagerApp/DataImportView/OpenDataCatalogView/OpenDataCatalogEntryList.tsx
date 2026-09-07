@@ -1,6 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { Paper, Stack, Text, UnstyledButton } from "@mantine/core";
+import { Stack, Text, UnstyledButton } from "@mantine/core";
+import clsx from "clsx";
+import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Entries after optional fuzzy search. */
@@ -12,54 +15,47 @@ type Props = {
 };
 
 /**
- * Scrollable list of open-data catalog rows with selection styling.
+ * The catalog as a list of rows.
+ *
+ * Each row used to be its own bordered, shadowed card inside a bordered
+ * panel inside a bordered card. Selection is a fill and a weight change,
+ * which is both quieter and easier to spot than a border that only appears
+ * on one of thirty identical boxes.
  */
 export function OpenDataCatalogEntryList({
   displayedEntries,
   selectedId,
   onSelect,
-}: Props): JSX.Element {
+}: Props): ReactNode {
   if (displayedEntries.length === 0) {
     return (
-      <Text c="dimmed" size="sm">
+      <Text c="dimmed" size="sm" p="sm">
         <Trans>No datasets match your search.</Trans>
       </Text>
     );
   }
 
   return (
-    <Stack gap={6} mah={480} style={{ overflowY: "auto" }}>
+    <Stack gap={2} role="listbox" aria-orientation="vertical">
       {displayedEntries.map((entry) => {
         const isSelected = entry.id === selectedId;
         return (
           <UnstyledButton
             key={entry.id}
+            role="option"
+            aria-selected={isSelected}
+            className={clsx(css.entryRow, isSelected && css.entryRowSelected)}
             onClick={() => {
               onSelect(entry.id);
             }}
-            w="100%"
           >
-            <Paper
-              bg="white"
-              p="sm"
-              radius="md"
-              withBorder
-              bd={isSelected ? "1px solid neutral.4" : undefined}
-              shadow={isSelected ? "xs" : "none"}
-              style={{
-                transition: "all 0.2s ease-in-out",
-              }}
-            >
-              <Stack gap={4}>
-                <Text fw={600} lineClamp={2} size="sm">
-                  {entry.displayName}
-                </Text>
-                <Text c="dimmed" lineClamp={2} size="xs">
-                  {entry.externalOrganizationName}
-                  {entry.pipelineName ? ` · ${entry.pipelineName}` : ""}
-                </Text>
-              </Stack>
-            </Paper>
+            <Text size="sm" fw={isSelected ? 600 : 500} lineClamp={2}>
+              {entry.displayName}
+            </Text>
+            <Text c="dimmed" lineClamp={1} size="xs">
+              {entry.externalOrganizationName}
+              {entry.pipelineName ? ` · ${entry.pipelineName}` : ""}
+            </Text>
           </UnstyledButton>
         );
       })}

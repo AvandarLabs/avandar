@@ -1,4 +1,3 @@
-import { Callout } from "@avandar/ui";
 import { where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -6,8 +5,6 @@ import {
   BoxProps,
   Group,
   Loader,
-  Paper,
-  SimpleGrid,
   Stack,
   Text,
   TextInput,
@@ -31,6 +28,7 @@ import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
 import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
 import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";
+import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -48,6 +46,10 @@ type Props = BoxProps & {
 /**
  * Browse the public open-data catalog, search entries, inspect metadata, and
  * add a catalog dataset to the current workspace.
+ *
+ * A search field over a two-pane browser, split by a hairline. The two panes
+ * used to be bordered cards inside a bordered card inside the page's card,
+ * which cost four edges and four paddings to say "these are two lists".
  */
 export function OpenDataCatalogView({
   isAddAllowed,
@@ -87,11 +89,11 @@ export function OpenDataCatalogView({
   }, [catalogEntries]);
 
   const displayedEntries = useMemo(() => {
-    const q = debouncedSearch.trim();
-    if (!q) {
+    const query = debouncedSearch.trim();
+    if (!query) {
       return catalogEntries;
     }
-    return fuse.search(q).map((result) => {
+    return fuse.search(query).map((result) => {
       return result.item;
     });
   }, [catalogEntries, debouncedSearch, fuse]);
@@ -147,80 +149,67 @@ export function OpenDataCatalogView({
 
   return (
     <Box {...boxProps}>
-      <Stack gap="md">
-        <Text>
-          <Trans>
-            Search the data catalog to add open datasets to your workspace.
-          </Trans>
-        </Text>
-
-        <Callout color="warning" messageSize="sm">
-          <Text component="div" size="sm">
-            <Trans>
-              The public open data catalog is still in{" "}
-              <BetaBadge
-                size="xs"
-                style={{ verticalAlign: "text-bottom" }}
-                withTooltip={false}
-              />
-              <br />
-              We are adding more open datasets as users tell us which datasets
-              they want in Avandar. If there is a dataset you would like to see
-              here,{" "}
-              <UnstyledButton
-                type="button"
-                aria-label={t`Tell us which open dataset you want via feedback`}
-                display="inline"
-                p={0}
-                h="auto"
-                td="underline"
-                c="primary"
-                fz="sm"
-                fw={500}
-                style={{ verticalAlign: "baseline" }}
-                onClick={() => {
-                  openFeaturebaseFeedbackWidget({
-                    boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
-                  });
-                }}
-              >
-                tell us
-              </UnstyledButton>
-              !
-            </Trans>
-          </Text>
-        </Callout>
-
+      <Stack gap="sm">
         <TextInput
           aria-label={t`Search open data catalog`}
-          leftSection={<IconSearch size={18} />}
+          leftSection={<IconSearch size={16} stroke={1.6} />}
           onChange={(event) => {
             setSearch(event.currentTarget.value);
           }}
           placeholder={t`Search by name, organization, pipeline…`}
           value={search}
         />
+
+        <Text size="xs" c="dimmed" maw="70ch">
+          <Trans>
+            The catalog is still in{" "}
+            <BetaBadge
+              size="xs"
+              style={{ verticalAlign: "text-bottom" }}
+              withTooltip={false}
+            />{" "}
+            and grows as people tell us what they need. Missing a dataset?{" "}
+            <UnstyledButton
+              type="button"
+              aria-label={t`Tell us which open dataset you want via feedback`}
+              display="inline"
+              p={0}
+              h="auto"
+              td="underline"
+              c="primary"
+              fz="xs"
+              fw={500}
+              style={{ verticalAlign: "baseline" }}
+              onClick={() => {
+                openFeaturebaseFeedbackWidget({
+                  boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+                });
+              }}
+            >
+              tell us
+            </UnstyledButton>
+            .
+          </Trans>
+        </Text>
+
         {isLoadingCatalog ? (
           <Group justify="center" py="xl">
             <Loader />
           </Group>
         ) : (
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-            <Paper p="md" withBorder shadow="none">
-              <Stack gap={6}>
-                <Text fw={600} size="sm">
-                  <Trans>Catalog ({displayedEntries.length})</Trans>
-                </Text>
+          <div className={css.browser}>
+            <div className={css.browserList}>
+              <Text component="h4" className={css.browserListTitle}>
+                <Trans>Catalog ({displayedEntries.length})</Trans>
+              </Text>
+              <OpenDataCatalogEntryList
+                displayedEntries={displayedEntries}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
+            </div>
 
-                <OpenDataCatalogEntryList
-                  displayedEntries={displayedEntries}
-                  selectedId={selectedId}
-                  onSelect={setSelectedId}
-                />
-              </Stack>
-            </Paper>
-
-            <Paper p="md" withBorder shadow="none">
+            <div className={css.browserDetail}>
               <OpenDataCatalogEntryDetail
                 entry={selectedEntry}
                 isAddAllowed={isAddAllowed}
@@ -228,8 +217,8 @@ export function OpenDataCatalogView({
                 isLoadingColumnMetadata={isLoadingCatalogColumns}
                 onAddToWorkspace={onAddToWorkspace}
               />
-            </Paper>
-          </SimpleGrid>
+            </div>
+          </div>
         )}
       </Stack>
     </Box>

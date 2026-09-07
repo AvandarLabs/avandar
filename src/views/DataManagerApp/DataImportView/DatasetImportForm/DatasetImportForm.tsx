@@ -1,21 +1,22 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { useMemo } from "react";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { AppViewSection } from "@/components/layouts/AppView/AppViewSection";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
+import { DatasetImportActions } from "./DatasetImportActions/DatasetImportActions";
 import { DatasetImportFeedback } from "./DatasetImportFeedback/DatasetImportFeedback";
 import { DatasetImportFields } from "./DatasetImportFields";
 import { isPdfAwaitingSelection } from "./isPdfAwaitingSelection";
-import { SaveDatasetButton } from "./SaveDatasetButton";
 import { useDatasetImportCopy } from "./useDatasetImportCopy";
 import { useDatasetImportValidation } from "./useDatasetImportValidation";
 import { useImportedColumns } from "./useImportedColumns/useImportedColumns";
 import { useSaveDataset } from "./useSaveDataset/useSaveDataset";
+import type { DatasetImportActionsProps } from "./DatasetImportActions/DatasetImportActions";
 import type { DatasetImportFeedbackProps } from "./DatasetImportFeedback/DatasetImportFeedback";
 import type { DatasetImportFieldsProps } from "./DatasetImportFields";
 import type { DatasetImportFormProps } from "./DatasetImportForm.types";
-import type { SaveDatasetButtonProps } from "./SaveDatasetButton";
 import type { FormEventHandler, ReactNode } from "react";
 
 /**
@@ -30,10 +31,10 @@ type DatasetImportFormStateOptions = Omit<
 >;
 
 type DatasetImportFormState = {
+  actionProps: DatasetImportActionsProps;
   feedbackProps: DatasetImportFeedbackProps;
   fieldProps: DatasetImportFieldsProps;
   onSubmit: FormEventHandler<HTMLFormElement>;
-  saveButtonProps: SaveDatasetButtonProps;
 };
 
 function useDatasetImportFormState(
@@ -58,10 +59,10 @@ function useDatasetImportFormState(
   return {
     fieldProps: {
       ...validation,
-      nameLabel: t`Dataset Name`,
+      nameLabel: t`Dataset name`,
       namePlaceholder: t`Enter a name for this dataset`,
       descriptionLabel: t`Description`,
-      descriptionPlaceholder: t`Enter a description for this dataset`,
+      descriptionPlaceholder: t`What is in this dataset?`,
     },
     feedbackProps: {
       columns,
@@ -72,7 +73,6 @@ function useDatasetImportFormState(
       onRequestDataReparse: options.onRequestDataReparse,
       previewRows,
       sourceFile: options.sourceFile,
-      validation,
     },
     onSubmit: validation.form.onSubmit(
       offline.guard((values) => {
@@ -82,7 +82,9 @@ function useDatasetImportFormState(
         return validation.onValidationFailure(errors);
       },
     ),
-    saveButtonProps: {
+    actionProps: {
+      copy,
+      dataSourceMetadata: options.dataSourceMetadata,
       // Saving a PDF with no region picked would write a dataset with no
       // columns and no rows, so the button stays disabled until there is
       // something to save.
@@ -91,6 +93,8 @@ function useDatasetImportFormState(
         isPdfAwaitingSelection(options.dataSourceMetadata),
       isOfflineBlocked: offline.isBlocked,
       isSavePending,
+      onDataSourceMetadataChange: options.onDataSourceMetadataChange,
+      validation,
     },
   };
 }
@@ -100,6 +104,11 @@ function useDatasetImportFormState(
  * a data source. This is where the user can adjust settings, re-connect or
  * re-parse the data, preview the data, and (ultimately) finally save the
  * data source to their workspace.
+ *
+ * It reads top to bottom as the decision it is: name the thing, check what
+ * came out of the file, then keep it. The evidence sections carry no chrome
+ * of their own beyond a ruled heading, so the preview grid and the column
+ * table get the full width of the view.
  */
 export function DatasetImportForm({
   rows,
@@ -131,10 +140,12 @@ export function DatasetImportForm({
       {...NuxAnchors.props(NuxAnchors.ids.datasetImportForm)}
       onSubmit={state.onSubmit}
     >
-      <Stack>
-        <DatasetImportFields {...state.fieldProps} />
+      <Stack gap="xl">
+        <AppViewSection title={<Trans>Dataset details</Trans>}>
+          <DatasetImportFields {...state.fieldProps} />
+        </AppViewSection>
         <DatasetImportFeedback {...state.feedbackProps} />
-        <SaveDatasetButton {...state.saveButtonProps} />
+        <DatasetImportActions {...state.actionProps} />
       </Stack>
     </form>
   );
