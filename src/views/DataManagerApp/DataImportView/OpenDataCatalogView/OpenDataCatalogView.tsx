@@ -4,6 +4,7 @@ import {
   Box,
   BoxProps,
   Group,
+  Button,
   Loader,
   Stack,
   Text,
@@ -11,13 +12,14 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconWorldSearch } from "@tabler/icons-react";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
 import { uuid } from "$/lib/uuid";
 import { CatalogDatasetColumnClient } from "@/clients/catalog-entries/CatalogDatasetColumnClient";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
@@ -147,6 +149,44 @@ export function OpenDataCatalogView({
     });
   }
 
+  const requestDatasetButton = (
+    <Button
+      variant="default"
+      onClick={() => {
+        openFeaturebaseFeedbackWidget({
+          boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+        });
+      }}
+    >
+      <Trans>Request a dataset</Trans>
+    </Button>
+  );
+
+  // Nothing published yet. The search field and the two-pane browser are both
+  // affordances for choosing among things, so with nothing to choose they are
+  // dead chrome: a box that can only ever answer "no results" and a pane that
+  // asks the user to pick from an empty list. The activation state replaces
+  // all of it and carries the one move that does something, which is telling
+  // us what to publish next. Same rule the no-datasets route follows.
+  if (!isLoadingCatalog && catalogEntries.length === 0) {
+    return (
+      <Box {...boxProps}>
+        <AppSlateEmptyState
+          icon={<IconWorldSearch size={32} stroke={1.5} aria-hidden />}
+          title={t`Nothing in the catalog yet`}
+          message={
+            <Trans>
+              Avandar prepares public datasets and publishes them here. The
+              catalog grows from what people ask for, so tell us which one you
+              need.
+            </Trans>
+          }
+          action={requestDatasetButton}
+        />
+      </Box>
+    );
+  }
+
   return (
     <Box {...boxProps}>
       <Stack gap="sm">
@@ -198,26 +238,54 @@ export function OpenDataCatalogView({
           </Group>
         ) : (
           <div className={css.browser}>
-            <div className={css.browserList}>
-              <Text component="h4" className={css.browserListTitle}>
-                <Trans>Catalog ({displayedEntries.length})</Trans>
-              </Text>
-              <OpenDataCatalogEntryList
-                displayedEntries={displayedEntries}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-              />
-            </div>
+            {displayedEntries.length === 0 ? (
+              /*
+               * The catalog has entries; this query matched none of them. One
+               * message spanning the frame rather than a "no matches" note in
+               * the list beside a "pick one on the left" note in the detail:
+               * the second cannot be acted on, and two apologies for one
+               * situation read as two situations.
+               */
+              <div className={css.browserEmpty}>
+                <Text size="sm" c="dimmed" ta="center" maw="42ch">
+                  <Trans>
+                    No catalog dataset matches “{debouncedSearch.trim()}”.
+                  </Trans>
+                </Text>
+                <Button
+                  variant="subtle"
+                  size="compact-sm"
+                  onClick={() => {
+                    setSearch("");
+                  }}
+                >
+                  <Trans>Clear search</Trans>
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className={css.browserList}>
+                  <Text component="h4" className={css.browserListTitle}>
+                    <Trans>Catalog ({displayedEntries.length})</Trans>
+                  </Text>
+                  <OpenDataCatalogEntryList
+                    displayedEntries={displayedEntries}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                  />
+                </div>
 
-            <div className={css.browserDetail}>
-              <OpenDataCatalogEntryDetail
-                entry={selectedEntry}
-                isAddAllowed={isAddAllowed}
-                isAdding={isInsertPending}
-                isLoadingColumnMetadata={isLoadingCatalogColumns}
-                onAddToWorkspace={onAddToWorkspace}
-              />
-            </div>
+                <div className={css.browserDetail}>
+                  <OpenDataCatalogEntryDetail
+                    entry={selectedEntry}
+                    isAddAllowed={isAddAllowed}
+                    isAdding={isInsertPending}
+                    isLoadingColumnMetadata={isLoadingCatalogColumns}
+                    onAddToWorkspace={onAddToWorkspace}
+                  />
+                </div>
+              </>
+            )}
           </div>
         )}
       </Stack>

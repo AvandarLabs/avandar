@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import { Stack, Text, UnstyledButton } from "@mantine/core";
 import clsx from "clsx";
 import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
@@ -21,20 +20,16 @@ type Props = {
  * panel inside a bordered card. Selection is a fill and a weight change,
  * which is both quieter and easier to spot than a border that only appears
  * on one of thirty identical boxes.
+ *
+ * Only rendered when there is something to list. Which of the two empty
+ * situations applies, an unpublished catalog or a query that matched nothing,
+ * is the parent's to tell apart, and each wants a different answer.
  */
 export function OpenDataCatalogEntryList({
   displayedEntries,
   selectedId,
   onSelect,
 }: Props): ReactNode {
-  if (displayedEntries.length === 0) {
-    return (
-      <Text c="dimmed" size="sm" p="sm">
-        <Trans>No datasets match your search.</Trans>
-      </Text>
-    );
-  }
-
   return (
     <Stack gap={2} role="listbox" aria-orientation="vertical">
       {displayedEntries.map((entry) => {

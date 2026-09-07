@@ -963,6 +963,11 @@ msgstr "保持 SQL 不變"
 msgid "Remove User"
 msgstr "移除用戶"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Avandar prepares public datasets and publishes them here. The catalog "
+"grows from what people ask for, so tell us which one you need."
+msgstr "Avandar 會準備公開資料集並在此發佈。目錄內容會根據大家的需求逐步增加，請告訴我們您需要哪一個。"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "The current SQL contains parts the form could not represent. Continuing "
 "overwrites it with SQL generated from the form."
@@ -1892,6 +1897,7 @@ msgid "Dataset deleted successfully"
 msgstr "資料集已成功刪除"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "decimal"
 msgstr "小數"
 
@@ -2329,6 +2335,10 @@ msgstr "項目"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "限制更新失敗"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "whole number"
+msgstr "整數"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
@@ -3741,6 +3751,10 @@ msgstr "更新工作區名稱失敗"
 msgid "Export"
 msgstr "匯出"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Nothing in the catalog yet"
+msgstr "目錄中目前還沒有任何內容"
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Geometry must be rebound"
@@ -3997,10 +4011,6 @@ msgstr "標籤類型"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
 msgstr "在範圍內位移"
-
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
-msgid "Number"
-msgstr "數字"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4634,10 +4644,6 @@ msgstr "來自數據集"
 msgid "End (e.g. 2024-12-31)"
 msgstr "結束（例如：2024-12-31）"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
-msgid "No datasets match your search."
-msgstr "沒有資料集符合您的搜索。"
-
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
@@ -4971,6 +4977,11 @@ msgstr "同意"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
+
+#. placeholder {0}: debouncedSearch.trim()
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "No catalog dataset matches “{0}”."
+msgstr "目錄中沒有符合「{0}」的資料集。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5686,10 +5697,6 @@ msgstr "所有成員的 "
 msgid "Some data should be manually entered"
 msgstr "某些數據應手動輸入"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
-msgid "Integer"
-msgstr "整數"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "欄位名稱"
@@ -6037,6 +6044,10 @@ msgstr "粗糙度 ({0})"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
 msgid "{0} columns · {1} rows"
 msgstr "{0} 欄 · {1} 行"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Request a dataset"
+msgstr "申請資料集"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
@@ -7006,6 +7017,7 @@ msgstr "還沒有帳戶？"
 msgid "Dataset failed to load"
 msgstr "數據集加載失敗"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
 msgstr "小數"
@@ -7732,6 +7744,10 @@ msgstr "如果一個 {0} 有多個 {attributeName} 值，那麼..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "SELECT 中的未命名欄位運算式；已略過。"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Clear search"
+msgstr "清除搜尋"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add field"
@@ -7954,10 +7970,6 @@ msgstr "已取消"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Color ramp"
 msgstr "色階"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
-msgid "number"
-msgstr "數字"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -8698,6 +8710,7 @@ msgstr "筆劃 ({strokeWidth}px)"
 msgid "Publish to workspace"
 msgstr "發布至工作區"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "整數"

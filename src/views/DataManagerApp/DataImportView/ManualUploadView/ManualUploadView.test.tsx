@@ -299,8 +299,8 @@ describe("ManualUploadView", () => {
       expect(screen.getAllByText(name).length).toBeGreaterThan(0);
     });
     expect(screen.getAllByText("Text").length).toBe(2);
-    expect(screen.getAllByText("Number").length).toBe(2);
-    expect(screen.getAllByText("Integer").length).toBe(2);
+    expect(screen.getAllByText("Decimal").length).toBe(2);
+    expect(screen.getAllByText("Whole number").length).toBe(2);
   });
 
   it("automatically parses the file when initialFile is provided", async () => {

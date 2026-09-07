@@ -21,6 +21,10 @@ export function BetaBadge({
   const badge = (
     <Badge
       aria-label={t`Beta`}
+      // A span, not Badge's default div. Its only caller sets it inside a
+      // sentence, and that sentence is a paragraph: a div there is invalid
+      // HTML and React reports it as a hydration error.
+      component="span"
       color="warning.5"
       c="neutral.9"
       fw={700}

@@ -16,10 +16,10 @@ export function avaDataTypeLabel(dataType: AvaDataType.T): string {
       return t`Text`;
     },
     bigint: () => {
-      return t`Integer`;
+      return t`Whole number`;
     },
     double: () => {
-      return t`Number`;
+      return t`Decimal`;
     },
     time: () => {
       return t`Time`;

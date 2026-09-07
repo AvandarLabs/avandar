@@ -988,6 +988,12 @@ msgstr "احتفظ بـ SQL كما هو"
 msgid "Remove User"
 msgstr "إزالة المستخدم"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Avandar prepares public datasets and publishes them here. The catalog "
+"grows from what people ask for, so tell us which one you need."
+msgstr "تُعِدّ Avandar مجموعات البيانات العامة وتنشرها هنا. ينمو الكتالوج بناءً "
+"على ما يطلبه المستخدمون، لذا أخبرنا بمجموعة البيانات التي تحتاج إليها."
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "The current SQL contains parts the form could not represent. Continuing "
 "overwrites it with SQL generated from the form."
@@ -1943,6 +1949,7 @@ msgid "Dataset deleted successfully"
 msgstr "تم حذف مجموعة البيانات بنجاح"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "decimal"
 msgstr "عشري"
 
@@ -2389,6 +2396,10 @@ msgstr "العناصر"
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/useResourceShareMutations.ts
 msgid "Restriction update failed"
 msgstr "فشل تحديث القيود"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "whole number"
+msgstr "عدد صحيح"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
@@ -3843,6 +3854,10 @@ msgstr "فشل في تحديث اسم مساحة العمل"
 msgid "Export"
 msgstr "تصدير"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Nothing in the catalog yet"
+msgstr "لا توجد مجموعات بيانات في الكتالوج بعد"
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Geometry must be rebound"
@@ -4106,10 +4121,6 @@ msgstr "نوع التسمية"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
 msgstr "الإزاحة ضمن"
-
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
-msgid "Number"
-msgstr "رقم"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4753,10 +4764,6 @@ msgstr "من مجموعة البيانات"
 msgid "End (e.g. 2024-12-31)"
 msgstr "النهاية (على سبيل المثال 2024-12-31)"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
-msgid "No datasets match your search."
-msgstr "لا توجد مجموعات بيانات تتطابق مع بحثك."
-
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
@@ -5096,6 +5103,11 @@ msgstr "موافقة"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "أخبرنا عن مصدر بيانات {singularConceptName}..."
+
+#. placeholder {0}: debouncedSearch.trim()
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "No catalog dataset matches “{0}”."
+msgstr "لا تتطابق أي مجموعة بيانات في الكتالوج مع «{0}»."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5822,10 +5834,6 @@ msgstr "جميع الأعضاء في "
 msgid "Some data should be manually entered"
 msgstr "يجب إدخال بعض البيانات يدويًا"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
-msgid "Integer"
-msgstr "عدد صحيح"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "اسم الحقل"
@@ -6179,6 +6187,10 @@ msgstr "خشونة ({0})"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
 msgid "{0} columns · {1} rows"
 msgstr "{0} أعمدة · {1} صفوف"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Request a dataset"
+msgstr "طلب مجموعة بيانات"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
@@ -7170,6 +7182,7 @@ msgstr "لا تمتلك حسابًا بعد؟"
 msgid "Dataset failed to load"
 msgstr "فشل تحميل مجموعة البيانات"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
 msgstr "عشري"
@@ -7909,6 +7922,10 @@ msgstr "إذا كانت هناك قيم متعددة لـ {attributeName} لوا
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "تعبير عمود غير مُسمّى في SELECT؛ تم تخطيه."
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Clear search"
+msgstr "مسح البحث"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add field"
@@ -8137,10 +8154,6 @@ msgstr "تم الإلغاء"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Color ramp"
 msgstr "تدرج الألوان"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
-msgid "number"
-msgstr "رقم"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -8899,6 +8912,7 @@ msgstr "سمك الخط ({strokeWidth}px)"
 msgid "Publish to workspace"
 msgstr "النشر إلى مساحة العمل"
 
+#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "عدد صحيح"

@@ -4,12 +4,35 @@
  * the entry it describes costs more than a pixel.
  */
 .browser {
+  /*
+   * One number for the frame's height, so the no-matches region fills exactly
+   * the box the two panes would have occupied and the frame does not resize
+   * as a search narrows.
+   */
+  --catalog-browser-min-height: 22rem;
+
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
   display: grid;
   grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
-  min-height: 22rem;
+  min-height: var(--catalog-browser-min-height);
   overflow: hidden;
+}
+
+/*
+ * The no-matches state occupies the whole frame rather than the list column,
+ * so the browser keeps the size it had while listing and the message sits
+ * where the eye already is instead of hugging the left edge.
+ */
+.browserEmpty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+  grid-column: 1 / -1;
+  justify-content: center;
+  min-height: var(--catalog-browser-min-height);
+  padding: var(--mantine-spacing-xl);
 }
 
 @media (width <= 62em) {
