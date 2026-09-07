@@ -40,8 +40,8 @@ export function OnlineStorageAllowedCheckbox({
         isOfflineOnly ? (
           <Text component="span" size="xs" c="danger.8">
             <Trans>
-              {offlineOnlyTitle}: it will live only on this computer, and
-              nobody else on your team will be able to open it.
+              {offlineOnlyTitle}: it will live only on this computer, and nobody
+              else on your team will be able to open it.
             </Trans>
           </Text>
         ) : undefined

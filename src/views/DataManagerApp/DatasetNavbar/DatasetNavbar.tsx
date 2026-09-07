@@ -22,8 +22,8 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import css from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar.module.css";
-import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
+import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { NavLinkProps } from "@avandar/ui";
 

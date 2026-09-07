@@ -49,7 +49,12 @@ export function AppViewHeader({
 
   return (
     <header className={css.appViewHeader}>
-      <Group gap="sm" wrap="nowrap" align="center" className={css.appViewHeaderTitleRow}>
+      <Group
+        gap="sm"
+        wrap="nowrap"
+        align="center"
+        className={css.appViewHeaderTitleRow}
+      >
         {typeof title === "string" ? (
           <h3 className={css.appViewHeaderTitle}>{title}</h3>
         ) : (
@@ -71,7 +76,12 @@ export function AppViewHeader({
       </Group>
 
       {visibleFacts && visibleFacts.length > 0 ? (
-        <Text component="p" size="sm" c="dimmed" className={css.appViewHeaderFacts}>
+        <Text
+          component="p"
+          size="sm"
+          c="dimmed"
+          className={css.appViewHeaderFacts}
+        >
           {visibleFacts.map((fact, index) => {
             return (
               // The facts are a fixed, ordered list built by the view, so
@@ -90,7 +100,12 @@ export function AppViewHeader({
       ) : null}
 
       {description ? (
-        <Text component="p" size="sm" c="dimmed" className={css.appViewHeaderDescription}>
+        <Text
+          component="p"
+          size="sm"
+          c="dimmed"
+          className={css.appViewHeaderDescription}
+        >
           {description}
         </Text>
       ) : null}

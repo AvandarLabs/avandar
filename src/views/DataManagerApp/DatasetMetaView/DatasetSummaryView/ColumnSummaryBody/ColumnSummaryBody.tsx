@@ -80,8 +80,7 @@ export function ColumnSummaryBody({
   }
 
   const sentence = _buildHeadlineSentence({ summary, totalRows, i18n });
-  const missingShare =
-    totalRows > 0 ? summary.emptyValuesCount / totalRows : 0;
+  const missingShare = totalRows > 0 ? summary.emptyValuesCount / totalRows : 0;
 
   const typeSummary =
     summary.type === "text" ? (

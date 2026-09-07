@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { formatFileSize } from "@utils/numbers/formatFileSize/formatFileSize.ts";
+import { describe, expect, it } from "vitest";
 
 describe("formatFileSize", () => {
   it("reports whole bytes without a fraction", () => {

@@ -55,7 +55,12 @@ export function AppViewSection({
           </Text>
         ) : null}
         {actions ? (
-          <Group gap="xs" align="center" wrap="nowrap" className={css.appViewSectionActions}>
+          <Group
+            gap="xs"
+            align="center"
+            wrap="nowrap"
+            className={css.appViewSectionActions}
+          >
             {actions}
           </Group>
         ) : null}

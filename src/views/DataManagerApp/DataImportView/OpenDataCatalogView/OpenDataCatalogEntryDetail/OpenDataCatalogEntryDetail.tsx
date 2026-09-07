@@ -57,8 +57,8 @@ export function OpenDataCatalogEntryDetail({
       <Stack align="center" justify="center" mih={200} gap="xs" p="lg">
         <Text c="dimmed" ta="center" size="sm" maw="34ch">
           <Trans>
-            Pick a dataset on the left to read what it covers, who publishes
-            it, and how often it updates.
+            Pick a dataset on the left to read what it covers, who publishes it,
+            and how often it updates.
           </Trans>
         </Text>
       </Stack>
@@ -182,7 +182,11 @@ export function OpenDataCatalogEntryDetail({
             <Trans>Raw metadata</Trans>
           </Button>
           <Collapse expanded={isRawMetadataOpen} w="100%">
-            <Text component="pre" size="xs" className={css.openDataCatalogEntryDetailRawMetadata}>
+            <Text
+              component="pre"
+              size="xs"
+              className={css.openDataCatalogEntryDetailRawMetadata}
+            >
               {metadataJson}
             </Text>
           </Collapse>

@@ -50,9 +50,7 @@ export function DatasetSourceRail({
     if (!isNonNullish(value) || value === "") {
       return null;
     }
-    return (
-      <AppViewRail.Fact label={label}>{String(value)}</AppViewRail.Fact>
-    );
+    return <AppViewRail.Fact label={label}>{String(value)}</AppViewRail.Fact>;
   };
 
   const sourceFacts = match(source)
