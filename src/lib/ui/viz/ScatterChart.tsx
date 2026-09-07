@@ -147,13 +147,6 @@ export function ScatterChart({
               return formatChartNumber(value);
             }}
           />
-          {/*
-           * Legend is always rendered (matching scatter's prior behaviour):
-           * unlike Mantine's ScatterChart it reads names off the <Scatter>
-           * elements rather than indexing data[index], so it is safe when the
-           * series array shrinks, and a single-series scatter still shows its
-           * label.
-           */}
           <Legend {...styleProps.legendProps} />
           {scatterSeries.map((s, idx) => {
             return (
