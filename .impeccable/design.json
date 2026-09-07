@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-06T19:42:16Z",
+  "generatedAt": "2026-09-07T14:50:59Z",
   "title": "Design System: Avandar",
   "extensions": {
     "colorMeta": {
@@ -81,12 +81,12 @@
           "#243b53",
           "#334e68",
           "#486581",
-          "#627d98",
-          "#829ab1",
-          "#9fb3c8",
-          "#bcccdc",
-          "#d9e2ec",
-          "#f0f4f8"
+          "#637c95",
+          "#8094a9",
+          "#9cadbd",
+          "#bac6d2",
+          "#d9e0e7",
+          "#f8fafc"
         ]
       },
       "ink-soft": {
@@ -98,12 +98,12 @@
           "#243b53",
           "#334e68",
           "#486581",
-          "#627d98",
-          "#829ab1",
-          "#9fb3c8",
-          "#bcccdc",
-          "#d9e2ec",
-          "#f0f4f8"
+          "#637c95",
+          "#8094a9",
+          "#9cadbd",
+          "#bac6d2",
+          "#d9e0e7",
+          "#f8fafc"
         ]
       },
       "chrome": {
@@ -115,29 +115,29 @@
           "#243b53",
           "#334e68",
           "#486581",
-          "#627d98",
-          "#829ab1",
-          "#9fb3c8",
-          "#bcccdc",
-          "#d9e2ec",
-          "#f0f4f8"
+          "#637c95",
+          "#8094a9",
+          "#9cadbd",
+          "#bac6d2",
+          "#d9e0e7",
+          "#f8fafc"
         ]
       },
       "body": {
         "role": "neutral",
         "displayName": "Tinted Cool Paper",
-        "canonical": "#f0f4f8",
+        "canonical": "#f8fafc",
         "tonalRamp": [
           "#102a43",
           "#243b53",
           "#334e68",
           "#486581",
-          "#627d98",
-          "#829ab1",
-          "#9fb3c8",
-          "#bcccdc",
-          "#d9e2ec",
-          "#f0f4f8"
+          "#637c95",
+          "#8094a9",
+          "#9cadbd",
+          "#bac6d2",
+          "#d9e0e7",
+          "#f8fafc"
         ]
       },
       "raised": {
@@ -149,29 +149,29 @@
           "#243b53",
           "#334e68",
           "#486581",
-          "#627d98",
-          "#829ab1",
-          "#9fb3c8",
-          "#bcccdc",
-          "#d9e2ec",
-          "#f0f4f8"
+          "#637c95",
+          "#8094a9",
+          "#9cadbd",
+          "#bac6d2",
+          "#d9e0e7",
+          "#f8fafc"
         ]
       },
       "sunken": {
         "role": "neutral",
         "displayName": "Pale Steel",
-        "canonical": "#d9e2ec",
+        "canonical": "#d9e0e7",
         "tonalRamp": [
           "#102a43",
           "#243b53",
           "#334e68",
           "#486581",
-          "#627d98",
-          "#829ab1",
-          "#9fb3c8",
-          "#bcccdc",
-          "#d9e2ec",
-          "#f0f4f8"
+          "#637c95",
+          "#8094a9",
+          "#9cadbd",
+          "#bac6d2",
+          "#d9e0e7",
+          "#f8fafc"
         ]
       },
       "danger": {
@@ -407,7 +407,7 @@
       "refersTo": "button-default",
       "description": "White neutral action. The only button variant carrying a shadow at rest.",
       "html": "<button class=\"ds-btn-default\">Cancel</button>",
-      "css": ".ds-btn-default { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #ffffff; color: #243b53; height: 36px; padding: 0 18px; border: 1px solid rgba(16, 42, 67, 0.2); box-shadow: 0 1px 1px rgba(16, 42, 67, 0.08), 0 1px 2px rgba(16, 42, 67, 0.05); } .ds-btn-default:hover { background: #d9e2ec; } .ds-btn-default:focus-visible { outline: 2px solid rgba(16, 42, 67, 0.44); outline-offset: 2px; }"
+      "css": ".ds-btn-default { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #ffffff; color: #243b53; height: 36px; padding: 0 18px; border: 1px solid rgba(16, 42, 67, 0.2); box-shadow: 0 1px 1px rgba(16, 42, 67, 0.08), 0 1px 2px rgba(16, 42, 67, 0.05); } .ds-btn-default:hover { background: #d9e0e7; } .ds-btn-default:focus-visible { outline: 2px solid rgba(16, 42, 67, 0.44); outline-offset: 2px; }"
     },
     {
       "name": "Text Input",
@@ -415,7 +415,7 @@
       "refersTo": "input",
       "description": "Hairline field. Focus shifts the border tier; no glow, no ring offset.",
       "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Case type name\" />",
-      "css": ".ds-input { font-family: Figtree, sans-serif; font-size: 1rem; color: #102a43; background: #ffffff; height: 36px; padding: 0 12px; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; outline: none; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-input::placeholder { color: #829ab1; } .ds-input:focus { border-color: rgba(16, 42, 67, 0.44); }"
+      "css": ".ds-input { font-family: Figtree, sans-serif; font-size: 1rem; color: #102a43; background: #ffffff; height: 36px; padding: 0 12px; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; outline: none; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-input::placeholder { color: #8094a9; } .ds-input:focus { border-color: rgba(16, 42, 67, 0.44); }"
     },
     {
       "name": "Master-Detail Nav Rows",
@@ -423,7 +423,7 @@
       "refersTo": "nav-row-active",
       "description": "NavLinkList rows on a neutral.0 pane. Active is filled primary.5; inactive hover must be neutral.1 or it is invisible.",
       "html": "<div class=\"ds-navlist\"><a class=\"ds-navrow ds-navrow-active\">Cholera cases</a><a class=\"ds-navrow\">Households</a><a class=\"ds-navrow\">Water points</a></div>",
-      "css": ".ds-navlist { display: flex; flex-direction: column; gap: 2px; background: #f0f4f8; padding: 8px; border-radius: 6px; width: 240px; } .ds-navrow { font-family: Figtree, sans-serif; font-size: 0.875rem; font-weight: 500; color: #102a43; padding: 8px 12px; border-radius: 6px; text-decoration: none; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-navrow:hover { background: #d9e2ec; } .ds-navrow-active, .ds-navrow-active:hover { background: #2983ff; color: #ffffff; }"
+      "css": ".ds-navlist { display: flex; flex-direction: column; gap: 2px; background: #f8fafc; padding: 8px; border-radius: 6px; width: 240px; } .ds-navrow { font-family: Figtree, sans-serif; font-size: 0.875rem; font-weight: 500; color: #102a43; padding: 8px 12px; border-radius: 6px; text-decoration: none; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-navrow:hover { background: #d9e0e7; } .ds-navrow-active, .ds-navrow-active:hover { background: #2983ff; color: #ffffff; }"
     },
     {
       "name": "Card",
@@ -431,7 +431,7 @@
       "refersTo": "card",
       "description": "Sheet White on the tinted body ground. Border by default, sm shadow.",
       "html": "<div class=\"ds-card\"><div class=\"ds-card-title\">Suspected cases</div><div class=\"ds-card-body\">3,842 rows across 4 datasets.</div></div>",
-      "css": ".ds-card { font-family: Figtree, sans-serif; background: #ffffff; color: #102a43; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06); padding: 16px; max-width: 320px; } .ds-card-title { font-size: 0.875rem; font-weight: 500; margin-bottom: 4px; } .ds-card-body { font-size: 1rem; line-height: 1.55; color: #627d98; }"
+      "css": ".ds-card { font-family: Figtree, sans-serif; background: #ffffff; color: #102a43; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06); padding: 16px; max-width: 320px; } .ds-card-title { font-size: 0.875rem; font-weight: 500; margin-bottom: 4px; } .ds-card-body { font-size: 1rem; line-height: 1.55; color: #637c95; }"
     },
     {
       "name": "Empty State",
@@ -439,7 +439,7 @@
       "refersTo": "empty-state",
       "description": "The most important component in the system: where a new user learns what a surface is for. Never an info Callout.",
       "html": "<div class=\"ds-empty\"><div class=\"ds-empty-icon\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg></div><h2 class=\"ds-empty-title\">No case types yet</h2><p class=\"ds-empty-msg\">A case type describes the people or places you are tracking, like a Household or a Water Point.</p><button class=\"ds-empty-cta\">Create a case type</button></div>",
-      "css": ".ds-empty { font-family: Figtree, sans-serif; background: #ffffff; color: #102a43; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06); padding: 48px; max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; } .ds-empty-icon { width: 64px; height: 64px; border-radius: 12px; background: #edf6ff; color: #1563fe; display: flex; align-items: center; justify-content: center; } .ds-empty-title { font-size: 1.625rem; font-weight: 650; line-height: 1.3; margin: 0; text-wrap: balance; } .ds-empty-msg { font-size: 1rem; line-height: 1.55; color: #627d98; margin: -16px 0 0; max-width: 65ch; } .ds-empty-cta { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #1563fe; color: #ffffff; height: 36px; padding: 0 18px; border: none; } .ds-empty-cta:hover { background: #0b4aea; }"
+      "css": ".ds-empty { font-family: Figtree, sans-serif; background: #ffffff; color: #102a43; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06); padding: 48px; max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; } .ds-empty-icon { width: 64px; height: 64px; border-radius: 12px; background: #edf6ff; color: #1563fe; display: flex; align-items: center; justify-content: center; } .ds-empty-title { font-size: 1.625rem; font-weight: 650; line-height: 1.3; margin: 0; text-wrap: balance; } .ds-empty-msg { font-size: 1rem; line-height: 1.55; color: #637c95; margin: -16px 0 0; max-width: 65ch; } .ds-empty-cta { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #1563fe; color: #ffffff; height: 36px; padding: 0 18px; border: none; } .ds-empty-cta:hover { background: #0b4aea; }"
     },
     {
       "name": "Callout",
@@ -454,7 +454,7 @@
       "refersTo": "slate",
       "description": "Signature component. The raised view floating on the dark shell, framed by an 8px gutter, with the one asymmetric radius in the system (8px 8px 12px) and its own two-layer shadow.",
       "html": "<div class=\"ds-shell\"><div class=\"ds-slate\"><div class=\"ds-slate-toolbar\"><span class=\"ds-slate-title\">Case Manager</span><button class=\"ds-btn-light-inline\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg><span>New case type</span></button></div><div class=\"ds-slate-body\">View content scrolls here</div></div></div>",
-      "css": ".ds-shell { background: #486581; padding: 8px; border-radius: 10px; font-family: Figtree, sans-serif; } .ds-slate { background: #f0f4f8; border: 1px solid #334e68; border-radius: 8px 8px 12px; box-shadow: 0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%); overflow: hidden; } .ds-slate-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #ffffff; border-bottom: 1px solid rgba(16, 42, 67, 0.2); padding: 8px 12px; } .ds-slate-title { font-size: 0.875rem; font-weight: 500; color: #102a43; } .ds-btn-light-inline { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; gap: 6px; background: #edf6ff; color: #0b4aea; height: 26px; padding: 0 10px; border: 1px solid rgba(16, 42, 67, 0.2); } .ds-btn-light-inline:hover { background: #d8ebff; } .ds-slate-body { padding: 32px 16px; font-size: 1rem; color: #627d98; min-height: 96px; }"
+      "css": ".ds-shell { background: #486581; padding: 8px; border-radius: 10px; font-family: Figtree, sans-serif; } .ds-slate { background: #f8fafc; border: 1px solid #334e68; border-radius: 8px 8px 12px; box-shadow: 0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%); overflow: hidden; } .ds-slate-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #ffffff; border-bottom: 1px solid rgba(16, 42, 67, 0.2); padding: 8px 12px; } .ds-slate-title { font-size: 0.875rem; font-weight: 500; color: #102a43; } .ds-btn-light-inline { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; gap: 6px; background: #edf6ff; color: #0b4aea; height: 26px; padding: 0 10px; border: 1px solid rgba(16, 42, 67, 0.2); } .ds-btn-light-inline:hover { background: #d8ebff; } .ds-slate-body { padding: 32px 16px; font-size: 1rem; color: #637c95; min-height: 96px; }"
     }
   ],
   "narrative": {
