@@ -1007,10 +1007,6 @@ msgstr "Updated {0}"
 msgid "Request a data source connection via feedback"
 msgstr "Request a data source connection via feedback"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "This dataset has no description."
-msgstr "This dataset has no description."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
 msgstr "Password reset requires an internet connection."
@@ -4474,10 +4470,6 @@ msgstr "Go home"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Count how many rows there are in {datasetName}"
 
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Column name"
-#~ msgstr "Column name"
-
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View details for {0}"
@@ -6145,10 +6137,6 @@ msgstr "Donut style"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr "Member"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
-msgid "Add a description so teammates know what this dataset covers."
-msgstr "Add a description so teammates know what this dataset covers."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
@@ -8930,6 +8918,10 @@ msgstr "Publish to workspace"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "Whole number"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "No description yet. Add one so teammates know what this dataset covers."
+msgstr "No description yet. Add one so teammates know what this dataset covers."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."

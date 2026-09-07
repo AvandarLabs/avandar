@@ -149,7 +149,17 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
   const headerFacts = [
     sourceLabels[dataset.sourceType],
     isLoadingDatasetMeta || datasetMeta === undefined ? (
-      <Skeleton key="rows" height={12} width={72} display="inline-block" />
+      // A span, not the default div: the facts line is a paragraph, and a
+      // block element inside it is invalid HTML that React reports as a
+      // hydration error. `display="inline-block"` styles the box but does
+      // not change what the parser is allowed to nest.
+      <Skeleton
+        key="rows"
+        component="span"
+        height={12}
+        width={72}
+        display="inline-block"
+      />
     ) : (
       t`${datasetMeta.rows.toLocaleString(i18n.locale)} rows`
     ),
@@ -272,7 +282,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
                         textarea
                         onChange={setDatasetDescription}
                         isSaving={isUpdatePending}
-                        emptyDisplayText={t`This dataset has no description.`}
+                        emptyDisplayText={t`No description yet. Add one so teammates know what this dataset covers.`}
                         onSave={(newDescription) => {
                           const descriptionToSave =
                             newDescription.trim().length === 0

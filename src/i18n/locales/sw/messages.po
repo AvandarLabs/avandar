@@ -1017,10 +1017,6 @@ msgstr "Imesasishwa {0}"
 msgid "Request a data source connection via feedback"
 msgstr "Omba muunganisho wa chanzo cha data kupitia maoni"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "This dataset has no description."
-msgstr "Seti hii ya data haina maelezo."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
 msgstr "Kurekebisha nenosiri kunahitaji muunganisho wa intaneti."
@@ -4528,10 +4524,6 @@ msgstr "Nenda nyumbani"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Column name"
-#~ msgstr "Jina la safu wima"
-
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View details for {0}"
@@ -6213,10 +6205,6 @@ msgstr "Mtindo wa donut"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr "Mwanachama"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
-msgid "Add a description so teammates know what this dataset covers."
-msgstr "Ongeza maelezo ili wenzako wajue mkusanyiko huu wa data unahusu nini."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
@@ -9020,6 +9008,11 @@ msgstr "Chapisha kwenye nafasi ya kazi"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "Nambari kamili"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "No description yet. Add one so teammates know what this dataset covers."
+msgstr "Bado hakuna maelezo. Ongeza maelezo ili wenzako wa timu wajue data seti "
+"hii inahusu nini."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."

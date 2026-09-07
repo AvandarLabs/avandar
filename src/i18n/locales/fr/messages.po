@@ -1031,10 +1031,6 @@ msgstr "Mis à jour {0}"
 msgid "Request a data source connection via feedback"
 msgstr "Demander une connexion à une source de données via les retours"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "This dataset has no description."
-msgstr "Cet ensemble de données n'a pas de description."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
 msgstr "La réinitialisation du mot de passe nécessite une connexion Internet."
@@ -4578,10 +4574,6 @@ msgstr "Accéder à l’accueil"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Comptez combien de lignes il y a dans {datasetName}"
 
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Column name"
-#~ msgstr "Nom de colonne"
-
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View details for {0}"
@@ -6278,11 +6270,6 @@ msgstr "Style donut"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr "Membre"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
-msgid "Add a description so teammates know what this dataset covers."
-msgstr "Ajoutez une description afin que vos collègues sachent ce que couvre ce "
-"jeu de données."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
@@ -9125,6 +9112,11 @@ msgstr "Publier dans l’espace de travail"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "Nombre entier"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "No description yet. Add one so teammates know what this dataset covers."
+msgstr "Aucune description pour le moment. Ajoutez-en une afin que vos "
+"coéquipiers sachent ce que couvre ce jeu de données."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."

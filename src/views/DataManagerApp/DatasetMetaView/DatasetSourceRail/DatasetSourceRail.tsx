@@ -1,6 +1,5 @@
 import { formatDate } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Text } from "@mantine/core";
 import { match } from "ts-pattern";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
@@ -170,14 +169,6 @@ export function DatasetSourceRail({
           </AppViewRail.Fact>
         ) : null}
       </AppViewRail.Group>
-
-      {dataset.description ? null : (
-        <Text size="xs" c="dimmed" fs="italic">
-          <Trans>
-            Add a description so teammates know what this dataset covers.
-          </Trans>
-        </Text>
-      )}
     </AppViewRail>
   );
 }

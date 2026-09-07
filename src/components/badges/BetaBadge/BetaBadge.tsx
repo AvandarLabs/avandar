@@ -22,15 +22,15 @@ export function BetaBadge({
     <Badge
       aria-label={t`Beta`}
       color="warning.5"
-      c="dark.9"
+      c="neutral.9"
       fw={700}
       px="xs"
       lts="0.25em"
       style={{
-        zIndex: 9999,
-        boxShadow: mantineVar("shadow-lg"),
-        // not very performant but it's only a small badge so it's okay
-        transition: "all 0.3s ease-in-out",
+        // `xs` is the documented step for something this small. `lg` is a
+        // reserved tier, and spending it on the least elevated element in the
+        // view inverts the scale it belongs to.
+        boxShadow: mantineVar("shadow-xs"),
         ...style,
       }}
       {...props}

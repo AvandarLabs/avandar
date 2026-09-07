@@ -1006,10 +1006,6 @@ msgstr "تم التحديث {0}"
 msgid "Request a data source connection via feedback"
 msgstr "اطلب اتصال مصدر البيانات عبر التعليقات"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "This dataset has no description."
-msgstr "لا تحتوي مجموعة البيانات هذه على وصف."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
 msgstr "يتطلب إعادة تعيين كلمة المرور اتصالاً بالإنترنت."
@@ -4473,10 +4469,6 @@ msgstr "الانتقال إلى الصفحة الرئيسية"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "احسب عدد الصفوف الموجودة في {datasetName}"
 
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Column name"
-#~ msgstr "اسم العمود"
-
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View details for {0}"
@@ -6136,10 +6128,6 @@ msgstr "أسلوب الدونات"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr "العضو"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
-msgid "Add a description so teammates know what this dataset covers."
-msgstr "أضف وصفًا ليعرف أعضاء الفريق ما الذي تغطيه مجموعة البيانات هذه."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
@@ -8914,6 +8902,11 @@ msgstr "النشر إلى مساحة العمل"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "عدد صحيح"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "No description yet. Add one so teammates know what this dataset covers."
+msgstr "لا يوجد وصف حتى الآن. أضف وصفًا ليعرف أعضاء الفريق ما يغطيه مصدر "
+"البيانات هذا."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."

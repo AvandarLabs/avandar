@@ -1024,10 +1024,6 @@ msgstr "Atualizado {0}"
 msgid "Request a data source connection via feedback"
 msgstr "Solicite uma conexão de fonte de dados via feedback"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "This dataset has no description."
-msgstr "Este conjunto de dados não possui descrição."
-
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
 msgstr "A redefinição de senha requer uma conexão com a internet."
@@ -4535,10 +4531,6 @@ msgstr "Ir para a página inicial"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Conte quantas linhas existem em {datasetName}"
 
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#~ msgid "Column name"
-#~ msgstr "Nome da coluna"
-
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View details for {0}"
@@ -6220,11 +6212,6 @@ msgstr "Estilo de donut"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Member"
 msgstr "Membro"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
-msgid "Add a description so teammates know what this dataset covers."
-msgstr "Adicione uma descrição para que sua equipe saiba o que este conjunto de "
-"dados abrange."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
@@ -9038,6 +9025,11 @@ msgstr "Publicar no workspace"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "Número inteiro"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "No description yet. Add one so teammates know what this dataset covers."
+msgstr "Ainda não há uma descrição. Adicione uma para que os colegas de equipe "
+"saibam o que este conjunto de dados abrange."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."
