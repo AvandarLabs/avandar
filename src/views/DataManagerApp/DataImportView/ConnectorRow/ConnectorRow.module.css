@@ -1,4 +1,4 @@
-.row {
+.connectorRow {
   background-color: var(--ava-surface-body);
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
@@ -7,18 +7,18 @@
     var(--mantine-spacing-sm) var(--mantine-spacing-md);
 }
 
-.icon {
+.connectorRowIcon {
   align-items: center;
   color: var(--mantine-color-neutral-7);
   display: inline-flex;
   flex-shrink: 0;
 }
 
-.text {
+.connectorRowText {
   min-width: 0;
 }
 
-.action {
+.connectorRowAction {
   flex-shrink: 0;
   margin-inline-start: auto;
 }

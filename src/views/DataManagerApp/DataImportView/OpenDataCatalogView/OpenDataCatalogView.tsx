@@ -28,8 +28,8 @@ import {
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
-import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
-import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";
+import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail";
+import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList/OpenDataCatalogEntryList";
 import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -49,9 +49,9 @@ type Props = BoxProps & {
  * Browse the public open-data catalog, search entries, inspect metadata, and
  * add a catalog dataset to the current workspace.
  *
- * A search field over a two-pane browser, split by a hairline. The two panes
- * used to be bordered cards inside a bordered card inside the page's card,
- * which cost four edges and four paddings to say "these are two lists".
+ * A search field over a two-pane browser, split by a hairline. The panes are
+ * regions of one surface rather than bordered cards: nesting cards costs four
+ * edges and four paddings to say "these are two lists".
  */
 export function OpenDataCatalogView({
   isAddAllowed,
@@ -237,7 +237,7 @@ export function OpenDataCatalogView({
             <Loader />
           </Group>
         ) : (
-          <div className={css.browser}>
+          <div className={css.openDataCatalogViewBrowser}>
             {displayedEntries.length === 0 ? (
               /*
                * The catalog has entries; this query matched none of them. One
@@ -246,7 +246,7 @@ export function OpenDataCatalogView({
                * the second cannot be acted on, and two apologies for one
                * situation read as two situations.
                */
-              <div className={css.browserEmpty}>
+              <div className={css.openDataCatalogViewBrowserEmpty}>
                 <Text size="sm" c="dimmed" ta="center" maw="42ch">
                   <Trans>
                     No catalog dataset matches “{debouncedSearch.trim()}”.
@@ -264,8 +264,11 @@ export function OpenDataCatalogView({
               </div>
             ) : (
               <>
-                <div className={css.browserList}>
-                  <Text component="h4" className={css.browserListTitle}>
+                <div className={css.openDataCatalogViewBrowserList}>
+                  <Text
+                    component="h4"
+                    className={css.openDataCatalogViewBrowserListTitle}
+                  >
                     <Trans>Catalog ({displayedEntries.length})</Trans>
                   </Text>
                   <OpenDataCatalogEntryList
@@ -275,7 +278,7 @@ export function OpenDataCatalogView({
                   />
                 </div>
 
-                <div className={css.browserDetail}>
+                <div className={css.openDataCatalogViewBrowserDetail}>
                   <OpenDataCatalogEntryDetail
                     entry={selectedEntry}
                     isAddAllowed={isAddAllowed}

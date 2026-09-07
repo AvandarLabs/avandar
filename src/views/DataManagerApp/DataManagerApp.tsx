@@ -7,7 +7,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar";
+import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar";
 
 export function DataManagerApp(): JSX.Element {
   const workspace = useCurrentWorkspace();

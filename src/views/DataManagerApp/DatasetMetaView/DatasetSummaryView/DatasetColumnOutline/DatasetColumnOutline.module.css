@@ -1,4 +1,4 @@
-.summaryLine {
+.datasetColumnOutlineSummaryLine {
   color: var(--mantine-color-neutral-6);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -7,7 +7,7 @@
   text-transform: uppercase;
 }
 
-.link {
+.datasetColumnOutlineLink {
   border-radius: var(--mantine-radius-sm);
   display: block;
   padding: 3px 6px;
@@ -15,26 +15,26 @@
   transition: var(--ava-transition-interactive);
 }
 
-.link:hover {
+.datasetColumnOutlineLink:hover {
   background-color: var(--ava-surface-sunken);
 }
 
-.linkName {
+.datasetColumnOutlineLinkName {
   color: var(--mantine-color-neutral-8);
   flex: 1;
   min-width: 0;
 }
 
-.linkType {
+.datasetColumnOutlineLinkType {
   color: var(--mantine-color-neutral-5);
   flex-shrink: 0;
 }
 
-.linkActive {
+.datasetColumnOutlineLinkActive {
   background-color: var(--mantine-color-primary-0);
 }
 
-.linkActive .linkName {
+.datasetColumnOutlineLinkActive .datasetColumnOutlineLinkName {
   color: var(--mantine-color-primary-7);
   font-weight: 600;
 }

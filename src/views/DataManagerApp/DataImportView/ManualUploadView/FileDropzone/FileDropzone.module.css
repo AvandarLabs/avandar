@@ -3,41 +3,41 @@
  * is doing the same job the dashed line does on a paper form: marking where
  * something goes, rather than enclosing something that is already there.
  */
-.dropzone {
+.fileDropzone {
   background-color: var(--ava-surface-body);
   border: 1px dashed var(--ava-border-strong);
   border-radius: var(--mantine-radius-sm);
   transition: var(--ava-transition-interactive);
 }
 
-.dropzone:hover {
+.fileDropzone:hover {
   background-color: var(--ava-surface-sunken);
 }
 
-.dropzone[data-accept] {
+.fileDropzone[data-accept] {
   background-color: var(--mantine-color-primary-0);
   border-color: var(--mantine-color-primary-4);
   border-style: solid;
 }
 
-.dropzone[data-reject] {
+.fileDropzone[data-reject] {
   background-color: var(--mantine-color-danger-0);
   border-color: var(--mantine-color-danger-4);
   border-style: solid;
 }
 
-.inner {
+.fileDropzoneInner {
   padding: var(--mantine-spacing-xl) var(--mantine-spacing-lg);
 }
 
-.iconIdle {
+.fileDropzoneIconIdle {
   color: var(--mantine-color-neutral-5);
 }
 
-.iconAccept {
+.fileDropzoneIconAccept {
   color: var(--mantine-color-primary-6);
 }
 
-.iconReject {
+.fileDropzoneIconReject {
   color: var(--mantine-color-danger-6);
 }

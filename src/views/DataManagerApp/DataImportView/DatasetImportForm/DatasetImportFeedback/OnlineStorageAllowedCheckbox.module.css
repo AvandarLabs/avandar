@@ -1,8 +1,0 @@
-/*
- * Capped so the offline-only consequence wraps into a readable block instead
- * of stretching across the whole action bar and pushing the save button onto
- * its own line.
- */
-.checkbox {
-  max-width: 52ch;
-}

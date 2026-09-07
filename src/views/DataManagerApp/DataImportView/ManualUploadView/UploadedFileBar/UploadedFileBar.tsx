@@ -1,8 +1,8 @@
-import { MIMEType } from "@avandar/utils";
+import { MIMEType, formatFileSize } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, FileButton, Group, Text } from "@mantine/core";
-import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
 import css from "@/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.module.css";
+import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { ReactNode } from "react";
 
@@ -12,21 +12,6 @@ const ACCEPTED_MIME_TYPES = [
   MIMEType.APPLICATION_OPENXML_EXCEL,
   MIMEType.APPLICATION_PDF,
 ].join(",");
-
-/** Formats a byte count at the largest unit that keeps it under four digits. */
-function buildFileSizeLabel(bytes: number, locale: string): string {
-  const units = ["B", "KB", "MB", "GB"] as const;
-  let size = bytes;
-  let unitIndex = 0;
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size = size / 1024;
-    unitIndex = unitIndex + 1;
-  }
-  const rounded = size.toLocaleString(locale, {
-    maximumFractionDigits: unitIndex === 0 ? 0 : 1,
-  });
-  return `${rounded} ${units[unitIndex]}`;
-}
 
 type Props = {
   file: File;
@@ -57,15 +42,15 @@ export function UploadedFileBar({
   const { t, i18n } = useLingui();
 
   return (
-    <Group gap="sm" wrap="nowrap" className={css.bar}>
-      <span className={css.icon}>
+    <Group gap="sm" wrap="nowrap" className={css.uploadedFileBar}>
+      <span className={css.uploadedFileBarIcon}>
         <DatasetSourceIcon sourceType={sourceType} size={18} />
       </span>
-      <Text size="sm" fw={500} truncate className={css.name}>
+      <Text size="sm" fw={500} truncate className={css.uploadedFileBarName}>
         {file.name}
       </Text>
-      <Text size="xs" c="dimmed" className={css.size}>
-        {buildFileSizeLabel(file.size, i18n.locale)}
+      <Text size="xs" c="dimmed" className={css.uploadedFileBarSize}>
+        {formatFileSize(file.size, { locale: i18n.locale })}
       </Text>
       <FileButton
         accept={ACCEPTED_MIME_TYPES}

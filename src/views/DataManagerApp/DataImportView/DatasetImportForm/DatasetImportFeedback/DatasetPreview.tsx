@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
-import { AppViewSection } from "@/components/layouts/AppView/AppViewSection";
+import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { DatasetParseControls } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls";
 import { DatasetParseOptionsBar } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar";
 import { isPdfAwaitingSelection } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/isPdfAwaitingSelection";
@@ -46,8 +46,8 @@ export function DatasetPreview({
         <Stack gap="md">
           <Text size="sm" c="dimmed" maw="65ch">
             <Trans>
-              Draw a box around a table, chart, or block of text on the page,
-              or highlight a sentence. Avandar reads only what you mark.
+              Draw a box around a table, chart, or block of text on the page, or
+              highlight a sentence. Avandar reads only what you mark.
             </Trans>
           </Text>
           {/*

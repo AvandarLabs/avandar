@@ -1,4 +1,4 @@
-.bar {
+.uploadedFileBar {
   background-color: var(--ava-surface-body);
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
@@ -6,18 +6,18 @@
   padding: 6px var(--mantine-spacing-xs) 6px var(--mantine-spacing-sm);
 }
 
-.icon {
+.uploadedFileBarIcon {
   align-items: center;
   color: var(--mantine-color-neutral-6);
   display: inline-flex;
   flex-shrink: 0;
 }
 
-.name {
+.uploadedFileBarName {
   min-width: 0;
 }
 
-.size {
+.uploadedFileBarSize {
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   margin-inline-end: auto;

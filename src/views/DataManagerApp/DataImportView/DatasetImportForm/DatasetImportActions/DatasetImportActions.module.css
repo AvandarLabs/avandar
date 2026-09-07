@@ -4,7 +4,7 @@
  * the app-wide dropzone. The opaque background and the top hairline are what
  * keep the grid behind it from reading through.
  */
-.bar {
+.datasetImportActionsBar {
   background-color: var(--ava-surface-raised);
   border-top: 1px solid var(--ava-border-default);
   bottom: 0;
@@ -12,6 +12,6 @@
   position: sticky;
 }
 
-.saveButton {
+.datasetImportActionsSaveButton {
   margin-inline-start: auto;
 }

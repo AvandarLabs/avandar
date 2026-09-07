@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "react";
-import { getStickyActionBarIntrusionPx } from "@/lib/hooks/ui/useStickyActionBarInset/getStickyActionBarIntrusionPx";
 import { STICKY_ACTION_BAR_SELECTOR } from "@/config/AppShellLayout.constants";
+import { getStickyActionBarIntrusionPx } from "@/lib/hooks/ui/useStickyActionBarInset/getStickyActionBarIntrusionPx/getStickyActionBarIntrusionPx";
 
 /**
  * The CSS variable this hook publishes, in px, on the document element.
@@ -28,10 +28,10 @@ function _readTallestIntrusionPx(): number {
   document.querySelectorAll(STICKY_ACTION_BAR_SELECTOR).forEach((bar) => {
     tallest = Math.max(
       tallest,
-      getStickyActionBarIntrusionPx(
-        bar.getBoundingClientRect(),
-        window.innerHeight,
-      ),
+      getStickyActionBarIntrusionPx({
+        barRect: bar.getBoundingClientRect(),
+        viewportHeight: window.innerHeight,
+      }),
     );
   });
   return tallest;

@@ -33,9 +33,9 @@ export function ConnectorRow({
   action,
 }: Readonly<Props>): ReactNode {
   return (
-    <Group gap="sm" wrap="nowrap" className={css.row}>
-      <span className={css.icon}>{icon}</span>
-      <Stack gap={0} className={css.text}>
+    <Group gap="sm" wrap="nowrap" className={css.connectorRow}>
+      <span className={css.connectorRowIcon}>{icon}</span>
+      <Stack gap={0} className={css.connectorRowText}>
         <Text size="sm" fw={500}>
           {name}
         </Text>
@@ -43,7 +43,7 @@ export function ConnectorRow({
           {status}
         </Text>
       </Stack>
-      <div className={css.action}>{action}</div>
+      <div className={css.connectorRowAction}>{action}</div>
     </Group>
   );
 }

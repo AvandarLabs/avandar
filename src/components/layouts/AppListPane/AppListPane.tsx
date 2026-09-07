@@ -45,20 +45,22 @@ export function AppListPane({
   className,
 }: Readonly<Props>): ReactNode {
   return (
-    <div className={clsx(css.pane, className)}>
-      <div className={css.header}>
-        <div className={css.titleRow}>
-          <Text component="h3" className={css.title}>
+    <div className={clsx(css.appListPane, className)}>
+      <div className={css.appListPaneHeader}>
+        <div className={css.appListPaneTitleRow}>
+          <Text component="h3" className={css.appListPaneTitle}>
             {title}
           </Text>
           {count === undefined ? null : (
-            <Text className={css.count}>{count}</Text>
+            <Text className={css.appListPaneCount}>{count}</Text>
           )}
-          {action ? <div className={css.action}>{action}</div> : null}
+          {action ? (
+            <div className={css.appListPaneAction}>{action}</div>
+          ) : null}
         </div>
-        {filter ? <div className={css.filter}>{filter}</div> : null}
+        {filter ? <div className={css.appListPaneFilter}>{filter}</div> : null}
       </div>
-      <div className={css.body}>{children}</div>
+      <div className={css.appListPaneBody}>{children}</div>
     </div>
   );
 }

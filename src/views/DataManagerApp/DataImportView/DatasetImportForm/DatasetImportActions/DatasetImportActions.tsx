@@ -1,9 +1,9 @@
 import { Trans } from "@lingui/react/macro";
 import { Button, Group, Stack } from "@mantine/core";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
-import { ErrorSummary } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ErrorSummary";
-import { OnlineStorageAllowedCheckbox } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox";
 import css from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportActions/DatasetImportActions.module.css";
+import { ErrorSummary } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/ErrorSummary";
+import { OnlineStorageAllowedCheckbox } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox/OnlineStorageAllowedCheckbox";
 import type {
   DatasetImportFormProps,
   DataSourceMetadata,
@@ -12,7 +12,7 @@ import type { DatasetImportCopy } from "@/views/DataManagerApp/DataImportView/Da
 import type { DatasetImportValidation } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation";
 import type { ReactNode } from "react";
 
-export type DatasetImportActionsProps = {
+export type Props = {
   copy: DatasetImportCopy;
   dataSourceMetadata: DataSourceMetadata;
   disableSubmit: boolean | undefined;
@@ -28,8 +28,8 @@ export type DatasetImportActionsProps = {
  * still blocking the save, and the save itself.
  *
  * It sticks to the bottom of the scrolling review so the primary action is
- * reachable from any scroll position. Reviewing a wide dataset used to mean
- * scrolling two screens back down to find the button.
+ * reachable from any scroll position. Left in the flow, the button sits two
+ * screens below a wide dataset's review.
  */
 export function DatasetImportActions({
   copy,
@@ -39,11 +39,11 @@ export function DatasetImportActions({
   isSavePending,
   onDataSourceMetadataChange,
   validation,
-}: Readonly<DatasetImportActionsProps>): ReactNode {
+}: Readonly<Props>): ReactNode {
   return (
     // `data-sticky-action-bar` is what the NUX checklist docks above; see
     // `STICKY_ACTION_BAR_SELECTOR`.
-    <div className={css.bar} data-sticky-action-bar>
+    <div className={css.datasetImportActionsBar} data-sticky-action-bar>
       <Stack gap="sm">
         <ErrorSummary
           isVisible={validation.isFormErrorSummaryVisible}
@@ -59,7 +59,7 @@ export function DatasetImportActions({
           />
           <OfflineGated>
             <Button
-              className={css.saveButton}
+              className={css.datasetImportActionsSaveButton}
               loading={isSavePending}
               type="submit"
               disabled={disableSubmit}

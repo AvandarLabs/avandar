@@ -29,11 +29,11 @@ export async function uploadCaliforniaCsvDataset(options: {
     .locator('input[type="file"]')
     .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
 
-  await expect(
-    page.getByRole("heading", { name: "Data preview" }),
-  ).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
+  await expect(page.getByRole("heading", { name: "Data preview" })).toBeVisible(
+    {
+      timeout: MEDIUM_WAIT,
+    },
+  );
 
   await page.getByLabel("Dataset name").fill(datasetName);
 

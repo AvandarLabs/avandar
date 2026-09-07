@@ -3,6 +3,6 @@
  * header band, so it takes the space that a section heading would have taken
  * rather than adding to it.
  */
-.tabList {
+.datasetMetaViewTabList {
   margin-bottom: var(--mantine-spacing-lg);
 }

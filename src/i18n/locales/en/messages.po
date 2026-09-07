@@ -169,7 +169,7 @@ msgstr "Invite member"
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "JOIN entry at position {index} is not a plain table reference."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "This computer only"
 msgstr "This computer only"
 
@@ -410,7 +410,7 @@ msgstr "Style"
 msgid "Square"
 msgstr "Square"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "Notes"
@@ -436,7 +436,7 @@ msgstr "Connected as {0}"
 msgid "Llama 3.2 1B"
 msgstr "Llama 3.2 1B"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Datasets"
 msgstr "Datasets"
 
@@ -487,7 +487,7 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 msgstr "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "PDF file"
 
@@ -508,7 +508,7 @@ msgstr "Aggregations"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "No"
 msgstr "No"
 
@@ -841,7 +841,8 @@ msgstr "Pick both a latitude and a longitude column. One on its own plots every 
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Open data"
 msgstr "Open data"
 
@@ -1090,7 +1091,7 @@ msgstr "Could not load"
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "Only the people and groups listed below can access this {resource}."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -1124,7 +1125,7 @@ msgstr "Save as new dataset"
 msgid "From derived dataset"
 msgstr "From derived dataset"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Sheet"
 msgstr "Sheet"
 
@@ -1140,7 +1141,7 @@ msgstr "Single select"
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "However, we are not allowing new registrations at the moment."
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Derived dataset"
 msgstr "Derived dataset"
 
@@ -1224,7 +1225,7 @@ msgstr "Run a query first."
 msgid "Seat limit reached"
 msgstr "Seat limit reached"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "Pipeline"
 
@@ -1236,7 +1237,7 @@ msgstr "Could not unpublish dashboard"
 msgid "Where the fields come from"
 msgstr "Where the fields come from"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Offline"
 msgstr "Offline"
 
@@ -1279,7 +1280,7 @@ msgid "This case type failed to load"
 msgstr "This case type failed to load"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "CSV"
 msgstr "CSV"
 
@@ -1321,7 +1322,7 @@ msgstr "Copied"
 msgid "Measure distance and area"
 msgstr "Measure distance and area"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
 msgstr "Add to workspace"
 
@@ -1382,7 +1383,7 @@ msgstr "Close chat (⌘/)"
 msgid "Create failed"
 msgstr "Create failed"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata"
 msgstr "Raw metadata"
 
@@ -1586,7 +1587,7 @@ msgstr "A coordinate cannot be mapped when either latitude or longitude is "
 msgid "Your session has expired. Redirecting you to sign in."
 msgstr "Your session has expired. Redirecting you to sign in."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox/OnlineStorageAllowedCheckbox.tsx
 msgid "This dataset can be stored in the cloud."
 msgstr "This dataset can be stored in the cloud."
 
@@ -1624,7 +1625,7 @@ msgstr "Let's save your results now"
 msgid "Custom"
 msgstr "Custom"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Timestamp"
@@ -1822,7 +1823,7 @@ msgstr "Subtitle"
 msgid "Dataset updated successfully!"
 msgstr "Dataset updated successfully!"
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Excel file"
 msgstr "Excel file"
 
@@ -2248,7 +2249,7 @@ msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "No values were returned from {column}. Describe what you need instead."
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
 msgstr "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
@@ -2277,7 +2278,7 @@ msgstr "{0} / 3"
 msgid "Show details"
 msgstr "Show details"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 msgid "Boolean"
 msgstr "Boolean"
 
@@ -2315,7 +2316,7 @@ msgstr "Private datasets"
 msgid "Create case type"
 msgstr "Create case type"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Storage"
 msgstr "Storage"
 
@@ -2444,7 +2445,7 @@ msgid "Data Visualization"
 msgstr "Data Visualization"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "PDF"
 msgstr "PDF"
 
@@ -2565,7 +2566,7 @@ msgstr "{keyboardShortcut} to save"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
@@ -2652,11 +2653,11 @@ msgstr "Annotate, then export"
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}, {1}, and {2} are fixed for every workspace."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
 msgstr "Synced to the cloud"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
 "how often it updates."
 msgstr "Pick a dataset on the left to read what it covers, who publishes it, "
@@ -2853,7 +2854,7 @@ msgstr "Geometry support is still downloading. This can take a moment on a slow 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
@@ -2880,7 +2881,7 @@ msgstr "No attributes or dataset are configured."
 msgid "Column 8"
 msgstr "Column 8"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Could not summarize this column. The query may have failed for an "
 "unsupported value or a malformed cell."
 msgstr "Could not summarize this column. The query may have failed for an "
@@ -3277,7 +3278,7 @@ msgstr "Identity"
 msgid "Data source"
 msgstr "Data source"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
 msgstr "Last synced"
 
@@ -3327,7 +3328,7 @@ msgstr "ends with"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "e.g. cholera-outbreak-2024"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Refresh from Google Sheets"
 msgstr "Refresh from Google Sheets"
 
@@ -3353,7 +3354,7 @@ msgid "does not match pattern (legacy)"
 msgstr "does not match pattern (legacy)"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Derived"
 msgstr "Derived"
 
@@ -3676,7 +3677,7 @@ msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B (offline)"
 
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} distinct"
 msgstr "{0} distinct"
 
@@ -3730,7 +3731,7 @@ msgstr "{maxAllowed, plural, one {Your plan allows # shared or public "
 msgid "You are offline"
 msgstr "You are offline"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Filter datasets"
 msgstr "Filter datasets"
 
@@ -3748,7 +3749,7 @@ msgid "Failed to save to dashboard: {0}"
 msgstr "Failed to save to dashboard: {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
 msgstr "Header row"
 
@@ -3769,7 +3770,7 @@ msgid "Rose"
 msgstr "Rose"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "Are you sure you want to delete {0}?"
 
@@ -3812,7 +3813,7 @@ msgstr "Bar"
 msgid "No {conceptName} records yet"
 msgstr "No {conceptName} records yet"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "More dataset actions"
 
@@ -3934,7 +3935,7 @@ msgstr "Try a different lookup"
 msgid "Outline width"
 msgstr "Outline width"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "No values to summarize."
 msgstr "No values to summarize."
 
@@ -4112,7 +4113,7 @@ msgstr "Sized"
 msgid "Save to dashboard"
 msgstr "Save to dashboard"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "Added"
 
@@ -4160,7 +4161,7 @@ msgstr "Hex"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Tab"
 msgstr "Tab"
 
@@ -4225,7 +4226,7 @@ msgstr "Stroke width"
 msgid "and"
 msgstr "and"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox/OnlineStorageAllowedCheckbox.tsx
 msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
@@ -4374,7 +4375,7 @@ msgstr "Choose the maximum value"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: formatColumnShare(share, i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}</1> of rows."
 msgstr "Heavily repeated: <0>{0}</0> appears in <1>{1}</1> of rows."
 
@@ -4426,7 +4427,7 @@ msgstr "Anyone in {app}"
 msgid "Failed to delete dataset"
 msgstr "Failed to delete dataset"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "License"
 msgstr "License"
 
@@ -4454,13 +4455,13 @@ msgstr "Drop to import"
 msgid "Date range"
 msgstr "Date range"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "Add dataset to workspace"
 
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
 #. placeholder {1}: totalRows.toLocaleString(i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 
@@ -4595,7 +4596,7 @@ msgstr "Columns"
 msgid "Bright"
 msgstr "Bright"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Canonical"
 msgstr "Canonical"
 
@@ -4671,7 +4672,7 @@ msgstr "Import failed: {reason}"
 msgid "Timestamp format"
 msgstr "Timestamp format"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "File size"
 msgstr "File size"
 
@@ -4741,7 +4742,7 @@ msgstr "Remove failed"
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} deleted successfully"
@@ -4814,7 +4815,7 @@ msgstr "Select column"
 msgid "1"
 msgstr "1"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
 msgstr "Rows skipped"
 
@@ -5092,7 +5093,7 @@ msgstr "Clear Disputed status column"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Yes"
 msgstr "Yes"
 
@@ -5154,7 +5155,7 @@ msgid "Please try again. The PDF was not created."
 msgstr "Please try again. The PDF was not created."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Date format"
 msgstr "Date format"
 
@@ -5162,7 +5163,7 @@ msgstr "Date format"
 msgid "Share summary"
 msgstr "Share summary"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "Time"
@@ -5272,7 +5273,7 @@ msgid "Latitude must be between -90 and 90, and longitude must be between -180 "
 msgstr "Latitude must be between -90 and 90, and longitude must be between -180 "
 "and 180."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Access"
 msgstr "Access"
 
@@ -5447,7 +5448,7 @@ msgstr "Ask about your data..."
 msgid "Title"
 msgstr "Title"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "No datasets match your filter"
 msgstr "No datasets match your filter"
 
@@ -5566,7 +5567,7 @@ msgstr "Make internal"
 msgid "Detected"
 msgstr "Detected"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "Delete Dataset"
@@ -5588,7 +5589,7 @@ msgstr "Add series"
 msgid "{0} km"
 msgstr "{0} km"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
 msgstr "Date"
@@ -5685,7 +5686,7 @@ msgstr "Buffer needs a layer with compiled geometry, not latitude and longitude 
 msgid "Viewing only on this screen size."
 msgstr "Viewing only on this screen size."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Time format"
 msgstr "Time format"
 
@@ -5976,7 +5977,7 @@ msgstr "Y axis tick color"
 
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "{0} · run {1}"
 msgstr "{0} · run {1}"
 
@@ -6373,7 +6374,7 @@ msgstr "Close a valid ring that does not cross itself."
 msgid "1 layer"
 msgstr "1 layer"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Space"
 msgstr "Space"
 
@@ -6550,11 +6551,11 @@ msgid "Could not reach the assistant. Kept the rule-based results."
 msgstr "Could not reach the assistant. Kept the rule-based results."
 
 #. placeholder {0}: formatColumnShare(missingShare, i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} missing"
 msgstr "{0} missing"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Dataset deleted"
 msgstr "Dataset deleted"
 
@@ -6578,7 +6579,7 @@ msgstr "Connected"
 msgid "Only the owner can make this {resource} private."
 msgstr "Only the owner can make this {resource} private."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Updates"
 msgstr "Updates"
 
@@ -6773,7 +6774,7 @@ msgstr "Latitude and longitude must both be numbers."
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "Delete dataset"
@@ -6857,7 +6858,7 @@ msgid "Public queries are not supported for structured queries. Use raw SQL "
 msgstr "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "CSV file"
 msgstr "CSV file"
 
@@ -6933,7 +6934,7 @@ msgid "Form is an approximation"
 msgstr "Form is an approximation"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Restricted"
 msgstr "Restricted"
 
@@ -7085,7 +7086,7 @@ msgstr "We should join data into the same {conceptName} when…"
 msgid "Pay What You Want"
 msgstr "Pay What You Want"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Regions read"
 msgstr "Regions read"
 
@@ -7196,7 +7197,7 @@ msgstr "Don't have an account yet?"
 msgid "Dataset failed to load"
 msgstr "Dataset failed to load"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
 msgstr "Decimal"
@@ -7317,7 +7318,7 @@ msgstr "1 dataset"
 msgid "No numeric columns"
 msgstr "No numeric columns"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "Service"
 
@@ -7327,7 +7328,7 @@ msgid "This question is too large for the on-device model. Try a shorter "
 msgstr "This question is too large for the on-device model. Try a shorter "
 "question, or reconnect to use cloud chat."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "Original kept"
 
@@ -7375,7 +7376,8 @@ msgstr "People with access"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
 
@@ -7423,7 +7425,7 @@ msgstr "Qwen 2.5 3B (offline)"
 msgid "Collapse the legend"
 msgstr "Collapse the legend"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "No datasets yet"
 msgstr "No datasets yet"
 
@@ -7574,7 +7576,7 @@ msgstr "Tab not found"
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 
@@ -7725,7 +7727,7 @@ msgstr "Editor"
 msgid "Entered manually"
 msgstr "Entered manually"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "Organization"
 
@@ -7828,7 +7830,7 @@ msgid "Hide the tutorial"
 msgstr "Hide the tutorial"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Excel"
 msgstr "Excel"
 
@@ -8232,7 +8234,7 @@ msgstr "Add context, methodology, or a key takeaway."
 msgid "Add a table of the top 10 rows of {datasetName}"
 msgstr "Add a table of the top 10 rows of {datasetName}"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
 msgstr "This dataset is fully available offline"
 
@@ -8334,8 +8336,8 @@ msgid "Thank you for your interest!"
 msgstr "Thank you for your interest!"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Source"
@@ -8492,7 +8494,7 @@ msgstr "From your prompt:"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Delimiter"
 msgstr "Delimiter"
 
@@ -8593,9 +8595,9 @@ msgstr "Dataset saved"
 msgid "Low to High"
 msgstr "Low to High"
 
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "Text"
@@ -8928,7 +8930,7 @@ msgstr "Stroke ({strokeWidth}px)"
 msgid "Publish to workspace"
 msgstr "Publish to workspace"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "Whole number"
@@ -9249,7 +9251,7 @@ msgstr "+{0} more values tied at {1} rows"
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
 #. placeholder {1}: formatColumnShare(share, i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 

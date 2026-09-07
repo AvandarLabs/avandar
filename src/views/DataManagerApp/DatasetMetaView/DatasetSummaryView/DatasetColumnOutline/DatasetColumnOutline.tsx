@@ -1,9 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Anchor, Group, Stack, Text } from "@mantine/core";
 import clsx from "clsx";
-import { buildColumnSectionId } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/buildColumnSectionId";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.module.css";
 import { buildShortDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
+import { makeColumnSectionIdFromColumnName } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/makeColumnSectionIdFromColumnName";
 import type { ReactNode } from "react";
 
 type OutlineColumn = {
@@ -37,7 +37,7 @@ export function DatasetColumnOutline({
   return (
     <nav aria-label={t`Column outline`}>
       <Stack gap={2}>
-        <Text className={css.summaryLine}>
+        <Text className={css.datasetColumnOutlineSummaryLine}>
           <Trans>
             {columns.length} columns · {numRows.toLocaleString(i18n.locale)}{" "}
             rows
@@ -45,24 +45,32 @@ export function DatasetColumnOutline({
         </Text>
         {columns.map((column) => {
           const isActive = activeColumnName === column.name;
+          const sectionId = makeColumnSectionIdFromColumnName(column.name);
           return (
             <Anchor
               key={column.name}
-              href={`#${buildColumnSectionId(column.name)}`}
-              className={clsx(css.link, isActive && css.linkActive)}
+              href={`#${sectionId}`}
+              className={clsx(
+                css.datasetColumnOutlineLink,
+                isActive && css.datasetColumnOutlineLinkActive,
+              )}
               aria-current={isActive ? "true" : undefined}
               onClick={(event) => {
                 event.preventDefault();
                 document
-                  .getElementById(buildColumnSectionId(column.name))
+                  .getElementById(sectionId)
                   ?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             >
               <Group gap="xs" wrap="nowrap" align="baseline">
-                <Text size="xs" className={css.linkName} truncate>
+                <Text
+                  size="xs"
+                  className={css.datasetColumnOutlineLinkName}
+                  truncate
+                >
                   {column.name}
                 </Text>
-                <Text size="xs" className={css.linkType}>
+                <Text size="xs" className={css.datasetColumnOutlineLinkType}>
                   {buildShortDataTypeLabel(column.dataType, i18n)}
                 </Text>
               </Group>

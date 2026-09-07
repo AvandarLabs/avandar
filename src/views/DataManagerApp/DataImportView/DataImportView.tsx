@@ -5,8 +5,8 @@ import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/Sub
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { AppView } from "@/components/layouts/AppView/AppView";
-import { AppViewBody } from "@/components/layouts/AppView/AppViewBody";
-import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader";
+import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";

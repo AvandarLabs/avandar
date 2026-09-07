@@ -32,7 +32,7 @@ export function DatasetParseOptionsBar({
   isProcessing,
 }: Readonly<Props>): ReactNode {
   return (
-    <Group gap="sm" align="flex-end" className={css.bar}>
+    <Group gap="sm" align="flex-end" className={css.datasetParseOptionsBar}>
       <DatasetParseControls
         onDataSourceMetadataChange={onDataSourceMetadataChange}
         onRequestDataReparse={onRequestDataReparse}
@@ -42,7 +42,7 @@ export function DatasetParseOptionsBar({
         type="button"
         variant="default"
         size="compact-sm"
-        className={css.reparseButton}
+        className={css.datasetParseOptionsBarReparseButton}
         onClick={() => {
           return onRequestDataReparse(dataSourceMetadata.parseOptions);
         }}

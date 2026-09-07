@@ -1,4 +1,4 @@
-.pane {
+.appListPane {
   align-self: stretch;
   background-color: var(--ava-surface-body);
   border-inline-end: 1px solid var(--ava-border-default);
@@ -13,7 +13,7 @@
  * The header never scrolls: it is the label for the rows underneath, and a
  * label that scrolls away stops labelling anything.
  */
-.header {
+.appListPaneHeader {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -22,7 +22,7 @@
     var(--mantine-spacing-xs);
 }
 
-.titleRow {
+.appListPaneTitleRow {
   align-items: center;
   display: flex;
   gap: var(--mantine-spacing-xs);
@@ -30,7 +30,7 @@
   padding-inline-start: 6px;
 }
 
-.title {
+.appListPaneTitle {
   color: var(--mantine-color-neutral-9);
   font-size: var(--mantine-font-size-sm);
   font-weight: 600;
@@ -42,22 +42,22 @@
  * The count is set in tabular figures so a pane whose list is growing does
  * not jitter as the digits change width.
  */
-.count {
+.appListPaneCount {
   color: var(--mantine-color-neutral-6);
   font-size: var(--mantine-font-size-xs);
   font-variant-numeric: tabular-nums;
   line-height: 1.4;
 }
 
-.action {
+.appListPaneAction {
   margin-inline-start: auto;
 }
 
-.filter {
-  padding-inline: 2px;
+.appListPaneFilter {
+  padding-inline: var(--mantine-spacing-xxxs);
 }
 
-.body {
+.appListPaneBody {
   flex: 1;
   min-height: 0;
   overflow-y: auto;

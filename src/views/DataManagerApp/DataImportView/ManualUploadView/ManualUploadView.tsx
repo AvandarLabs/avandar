@@ -1,3 +1,4 @@
+import { isDefined } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Box, BoxProps, Stack, Text } from "@mantine/core";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -46,9 +47,9 @@ export function ManualUploadView({
   const manualUpload = useManualUploadParse(initialFile);
   const { uploadedFile, previewRows, dataSourceMetadata } = manualUpload;
   const hasParsedFile =
-    previewRows !== undefined &&
-    uploadedFile !== undefined &&
-    dataSourceMetadata !== undefined;
+    isDefined(previewRows) &&
+    isDefined(uploadedFile) &&
+    isDefined(dataSourceMetadata);
 
   return (
     <Box {...boxProps}>

@@ -78,9 +78,7 @@ describe("DatasetPreview for a PDF awaiting selection", () => {
       />,
     );
 
-    expect(
-      screen.getByText(/draw a box around a table/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/draw a box around a table/i)).toBeInTheDocument();
     // The generic empty state would be actively misleading here: it tells the
     // user their file contained nothing, when in fact they simply have not
     // chosen anything yet. Neither the empty grid nor the reparse control

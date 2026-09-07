@@ -1,7 +1,11 @@
 import { where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Center } from "@mantine/core";
-import { IconDatabaseSearch, IconFileImport, IconPlus } from "@tabler/icons-react";
+import {
+  IconDatabaseSearch,
+  IconFileImport,
+  IconPlus,
+} from "@tabler/icons-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
@@ -88,7 +92,7 @@ function DataManagerRoot(): JSX.Element {
               </Button>
             }
           />
-          )}
+        )}
       </Center>
     </AppView>
   );

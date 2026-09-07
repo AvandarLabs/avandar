@@ -29,9 +29,9 @@ export async function importDatasetViaUi(
   const parsedRowCount = page.getByText(new RegExp(`of ${rowCount}\\. Page`));
   // Choosing the file parses it, so there is nothing to confirm between the
   // two assertions below.
-  await expect(
-    page.getByRole("heading", { name: "Data preview" }),
-  ).toBeVisible({ timeout: MEDIUM_WAIT });
+  await expect(page.getByRole("heading", { name: "Data preview" })).toBeVisible(
+    { timeout: MEDIUM_WAIT },
+  );
   await expect(parsedRowCount).toBeVisible({ timeout: MEDIUM_WAIT });
   await ensureCloudStorageCheckedAndSaveDataset({ page, workspaceSlug });
   const datasetId = parseDatasetIdFromDataManagerUrl({

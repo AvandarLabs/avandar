@@ -3,8 +3,9 @@ import { prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
 import { useMemo } from "react";
+import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { AppViewSection } from "@/components/layouts/AppView/AppViewSection";
+import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -12,9 +13,9 @@ import type { ReactNode } from "react";
 
 /**
  * Caps the column table at roughly a dozen rows. A wide dataset scrolls
- * inside the section; a narrow one takes only the height it needs, instead
- * of the fixed 500px box that used to leave a five-column table sitting in
- * three hundred pixels of nothing.
+ * inside the section; a narrow one takes only the height it needs, so a
+ * five-column table does not sit in three hundred pixels of nothing. Do not
+ * swap this for a fixed height, which is what causes that.
  */
 const COLUMN_TABLE_MAX_HEIGHT = 380;
 
@@ -42,10 +43,9 @@ type Props = {
  * The two things a user checks before trusting an import: the rows that came
  * out, and the type Avandar gave each column.
  *
- * Both are plain sections rather than panels. What used to head them was an
- * informational callout carrying three sentences of instruction; the heading
- * and the count say the same thing in one line and leave the width to the
- * data.
+ * Both are plain sections rather than panels: a heading and a count say what
+ * an informational callout would take three sentences and a tinted panel to
+ * say, and leave the width to the data.
  */
 export function DatasetPreviewBlock({
   previewRows,
@@ -109,7 +109,9 @@ export function DatasetPreviewBlock({
               includeKeys: ["name", "dataType"],
               keyRenderOptions: {
                 dataType: {
-                  renderValue: AvaDataType.toDisplayValue,
+                  // Translated, so the review shows the same words in every
+                  // locale that the saved dataset will.
+                  renderValue: avaDataTypeLabel,
                 },
               },
             }}

@@ -33,10 +33,9 @@ async function expectExcelParsePreview(options: {
   sampleCellSubstring: string;
 }): Promise<void> {
   await expect(
-    options.page.getByText(
-      `First ${options.formattedRowCount} rows`,
-      { exact: false },
-    ),
+    options.page.getByText(`First ${options.formattedRowCount} rows`, {
+      exact: false,
+    }),
   ).toBeVisible({ timeout: LONG_WAIT });
 
   if (options.columnNames) {

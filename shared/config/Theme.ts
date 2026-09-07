@@ -17,10 +17,10 @@ export const AVANDAR_BLUE_SHADES = [
  * Shades 0 through 6 are derived rather than picked: they are even steps in
  * OKLab lightness between two fixed anchors, index 0 (`#f8fafc`, the ground
  * every view sits on) and index 6 (`#486581`, the shell and sidebar, which is
- * `PRIMARY_COLOR_LIGHT_SHADE`). Deriving them is what keeps the steps even.
- * The hand-picked ramp this replaced varied from 5.6 to 9.7 points of
- * lightness per step, so a hover built on one pair of shades read very
- * differently from the same hover built on another.
+ * `PRIMARY_COLOR_LIGHT_SHADE`). Deriving them is what keeps the steps even,
+ * and even steps are what make a hover built on one pair of shades read like
+ * the same hover built on another. Picking these by hand gives uneven steps
+ * and costs that consistency.
  *
  * Shades 7 through 9 stay hand-picked. `#102a43` is the body-text ink and the
  * hue the entire shadow and border system is tinted from, so it is a fixed

@@ -49,8 +49,8 @@ export function FileDropzone({
   return (
     <Dropzone
       accept={ACCEPTED_FILE_TYPES}
-      className={css.dropzone}
-      classNames={{ inner: css.inner }}
+      className={css.fileDropzone}
+      classNames={{ inner: css.fileDropzoneInner }}
       loading={isLoading}
       aria-label={t`Upload a file`}
       onDrop={(files) => {
@@ -72,7 +72,7 @@ export function FileDropzone({
             size={ICON_SIZE}
             stroke={1.4}
             aria-hidden
-            className={css.iconAccept}
+            className={css.fileDropzoneIconAccept}
           />
         </Dropzone.Accept>
         <Dropzone.Reject>
@@ -80,7 +80,7 @@ export function FileDropzone({
             size={ICON_SIZE}
             stroke={1.4}
             aria-hidden
-            className={css.iconReject}
+            className={css.fileDropzoneIconReject}
           />
         </Dropzone.Reject>
         <Dropzone.Idle>
@@ -88,7 +88,7 @@ export function FileDropzone({
             size={ICON_SIZE}
             stroke={1.4}
             aria-hidden
-            className={css.iconIdle}
+            className={css.fileDropzoneIconIdle}
           />
         </Dropzone.Idle>
 

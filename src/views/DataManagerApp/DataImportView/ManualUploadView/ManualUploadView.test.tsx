@@ -320,7 +320,7 @@ describe("ManualUploadView", () => {
     });
   });
 
-  it("stops the parse and reparse spinners after an initialFile sniff finishes", async () => {
+  it("re-enables the file control and clears the reparse spinner after an initialFile sniff finishes", async () => {
     const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
     const file = new File([csvBuffer], "preloaded.csv", {
       type: "text/csv",

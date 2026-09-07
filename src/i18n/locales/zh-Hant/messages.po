@@ -164,7 +164,7 @@ msgstr "邀請成員"
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "位置 {index} 的 JOIN 項目不是純資料表參照。"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "This computer only"
 msgstr "僅限此電腦"
 
@@ -400,7 +400,7 @@ msgstr "樣式"
 msgid "Square"
 msgstr "正方形"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "備註"
@@ -424,7 +424,7 @@ msgstr "以 {0} 身分連線"
 msgid "Llama 3.2 1B"
 msgstr "Llama 3.2 1B"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Datasets"
 msgstr "資料集"
 
@@ -474,7 +474,7 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 "Upgrade your plan, or unshare another dashboard, and try again."
 msgstr "您的方案不允許與其他人分享此儀表板。請升級方案，或取消分享另一個儀表板，然後再試一次。"
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "PDF 檔案"
 
@@ -494,7 +494,7 @@ msgstr "聚合"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "No"
 msgstr "否"
 
@@ -819,7 +819,8 @@ msgstr "請同時選取緯度和經度欄位。只選其中一個會將所有點
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Open data"
 msgstr "開放數據"
 
@@ -1058,7 +1059,7 @@ msgstr "無法載入"
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "只有下方列出的人員和群組可以存取此 {resource}。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "您當前的計劃無法添加更多數據集。升級以添加此目錄數據集。"
@@ -1090,7 +1091,7 @@ msgstr "另存為新數據集"
 msgid "From derived dataset"
 msgstr "來自衍生數據集"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Sheet"
 msgstr "工作表"
 
@@ -1106,7 +1107,7 @@ msgstr "單選"
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "不過，我們目前不允許新的註冊。"
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Derived dataset"
 msgstr "衍生資料集"
 
@@ -1190,7 +1191,7 @@ msgstr "請先執行查詢。"
 msgid "Seat limit reached"
 msgstr "已達到座位限制"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "管道"
 
@@ -1202,7 +1203,7 @@ msgstr "無法取消發布儀表板"
 msgid "Where the fields come from"
 msgstr "欄位來源"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Offline"
 msgstr "離線"
 
@@ -1243,7 +1244,7 @@ msgid "This case type failed to load"
 msgstr "此個案類型載入失敗"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "CSV"
 msgstr "CSV"
 
@@ -1284,7 +1285,7 @@ msgstr "已複製"
 msgid "Measure distance and area"
 msgstr "測量距離和面積"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
 msgstr "添加到工作區"
 
@@ -1343,7 +1344,7 @@ msgstr "關閉聊天 (⌘/)"
 msgid "Create failed"
 msgstr "創建失敗"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Raw metadata"
 msgstr "原始中繼資料"
 
@@ -1543,7 +1544,7 @@ msgstr "當緯度或經度為空時，無法繪製座標。"
 msgid "Your session has expired. Redirecting you to sign in."
 msgstr "您的工作階段已過期。正在將您重新導向至登入頁面。"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox/OnlineStorageAllowedCheckbox.tsx
 msgid "This dataset can be stored in the cloud."
 msgstr "此資料集可儲存至雲端。"
 
@@ -1581,7 +1582,7 @@ msgstr "現在來儲存您的結果"
 msgid "Custom"
 msgstr "自定義"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "時間戳"
@@ -1775,7 +1776,7 @@ msgstr "副標題"
 msgid "Dataset updated successfully!"
 msgstr "資料集已成功更新！"
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Excel file"
 msgstr "Excel 檔案"
 
@@ -2192,7 +2193,7 @@ msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "從 {column} 返回的值為空。請描述您需要的內容。"
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
 msgstr "範圍從 <0>{numericLow}</0> 到 <1>{numericHigh}</1>，平均 <2>{avg}</2>{0}"
@@ -2220,7 +2221,7 @@ msgstr "{0} / 3"
 msgid "Show details"
 msgstr "顯示詳細資料"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 msgid "Boolean"
 msgstr "布林值"
 
@@ -2256,7 +2257,7 @@ msgstr "私人資料集"
 msgid "Create case type"
 msgstr "建立個案類型"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Storage"
 msgstr "儲存空間"
 
@@ -2383,7 +2384,7 @@ msgid "Data Visualization"
 msgstr "數據可視化"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "PDF"
 msgstr "PDF"
 
@@ -2498,7 +2499,7 @@ msgstr "{keyboardShortcut} 以保存"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
@@ -2582,11 +2583,11 @@ msgstr "標註後再匯出"
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
 msgstr "已同步至雲端"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
 "how often it updates."
 msgstr "選取左側的資料集，以查看其涵蓋內容、發佈者及更新頻率。"
@@ -2775,7 +2776,7 @@ msgstr "幾何功能正在下載。在網路較慢時可能需要稍等。"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
@@ -2802,7 +2803,7 @@ msgstr "尚未設定屬性或資料集。"
 msgid "Column 8"
 msgstr "第 8 欄"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Could not summarize this column. The query may have failed for an "
 "unsupported value or a malformed cell."
 msgstr "無法總結此列。查詢可能因不支持的值或格式錯誤的單元格而失敗。"
@@ -3182,7 +3183,7 @@ msgstr "識別"
 msgid "Data source"
 msgstr "數據來源"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
 msgstr "上次同步時間"
 
@@ -3232,7 +3233,7 @@ msgstr "結尾為"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Refresh from Google Sheets"
 msgstr "從 Google Sheets 重新整理"
 
@@ -3258,7 +3259,7 @@ msgid "does not match pattern (legacy)"
 msgstr "不符合模式（舊版）"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Derived"
 msgstr "衍生"
 
@@ -3572,7 +3573,7 @@ msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B（離線）"
 
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} distinct"
 msgstr "{0} 個不同值"
 
@@ -3625,7 +3626,7 @@ msgstr "{maxAllowed, plural, one {您的方案允許 # 個已分享或公開的�
 msgid "You are offline"
 msgstr "您目前處於離線狀態"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Filter datasets"
 msgstr "篩選資料集"
 
@@ -3643,7 +3644,7 @@ msgid "Failed to save to dashboard: {0}"
 msgstr "儲存到儀表板失敗：{0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
 msgstr "標題列"
 
@@ -3664,7 +3665,7 @@ msgid "Rose"
 msgstr "玫瑰"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "您確定要刪除 {0} 嗎？"
 
@@ -3707,7 +3708,7 @@ msgstr "條"
 msgid "No {conceptName} records yet"
 msgstr "尚無 {conceptName} 記錄"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "More dataset actions"
 msgstr "更多資料集動作"
 
@@ -3825,7 +3826,7 @@ msgstr "嘗試其他查詢"
 msgid "Outline width"
 msgstr "外框寬度"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "No values to summarize."
 msgstr "沒有值可供總結。"
 
@@ -4000,7 +4001,7 @@ msgstr "已設定大小"
 msgid "Save to dashboard"
 msgstr "儲存到儀表板"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "新增時間"
 
@@ -4048,7 +4049,7 @@ msgstr "六邊形"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Tab"
 msgstr "索引標籤"
 
@@ -4113,7 +4114,7 @@ msgstr "筆畫寬度"
 msgid "and"
 msgstr "和"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox/OnlineStorageAllowedCheckbox.tsx
 msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}：此資料集只會存在於這台電腦上，團隊中的其他人都無法開啟。"
@@ -4258,7 +4259,7 @@ msgstr "選擇最大值"
 
 #. placeholder {0}: top.value.slice(0, 1).join(", ")
 #. placeholder {1}: formatColumnShare(share, i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}</1> of rows."
 msgstr "重複頻繁：<0>{0}</0> 出現在 <1>{1}</1> 的列中。"
 
@@ -4310,7 +4311,7 @@ msgstr "在 {app} 中的任何人"
 msgid "Failed to delete dataset"
 msgstr "刪除資料集失敗"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "License"
 msgstr "許可證"
 
@@ -4338,13 +4339,13 @@ msgstr "拖放以導入"
 msgid "Date range"
 msgstr "日期範圍"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "將資料集添加到工作區"
 
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
 #. placeholder {1}: totalRows.toLocaleString(i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "大部分唯一：<0>{0}</0> 在 <1>{1}</1> 行中有不同的值。"
 
@@ -4477,7 +4478,7 @@ msgstr "列"
 msgid "Bright"
 msgstr "明亮"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Canonical"
 msgstr "標準"
 
@@ -4551,7 +4552,7 @@ msgstr "導入失敗：{reason}"
 msgid "Timestamp format"
 msgstr "時間戳格式"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "File size"
 msgstr "檔案大小"
 
@@ -4619,7 +4620,7 @@ msgstr "移除失敗"
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} 刪除成功"
@@ -4691,7 +4692,7 @@ msgstr "選擇列"
 msgid "1"
 msgstr "1"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
 msgstr "略過的列數"
 
@@ -4962,7 +4963,7 @@ msgstr "清除有爭議狀態欄"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Yes"
 msgstr "是"
 
@@ -5023,7 +5024,7 @@ msgid "Please try again. The PDF was not created."
 msgstr "請再試一次。PDF未創建。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Date format"
 msgstr "日期格式"
 
@@ -5031,7 +5032,7 @@ msgstr "日期格式"
 msgid "Share summary"
 msgstr "分享摘要"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "時間"
@@ -5138,7 +5139,7 @@ msgid "Latitude must be between -90 and 90, and longitude must be between -180 "
 "and 180."
 msgstr "緯度必須介於 -90 和 90 之間，經度必須介於 -180 和 180 之間。"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Access"
 msgstr "存取權限"
 
@@ -5309,7 +5310,7 @@ msgstr "詢問您的數據..."
 msgid "Title"
 msgstr "標題"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "No datasets match your filter"
 msgstr "沒有符合篩選條件的資料集"
 
@@ -5427,7 +5428,7 @@ msgstr "設為內部"
 msgid "Detected"
 msgstr "已檢測到"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "刪除資料集"
@@ -5449,7 +5450,7 @@ msgstr "添加系列"
 msgid "{0} km"
 msgstr "{0} 公里"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
 msgstr "日期"
@@ -5542,7 +5543,7 @@ msgstr "緩衝區需要包含已編譯幾何資料的圖層，不能使用緯度
 msgid "Viewing only on this screen size."
 msgstr "僅在此螢幕尺寸下檢視。"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Time format"
 msgstr "時間格式"
 
@@ -5828,7 +5829,7 @@ msgstr "Y 軸刻度顏色"
 
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "{0} · run {1}"
 msgstr "{0} · 執行 {1}"
 
@@ -6219,7 +6220,7 @@ msgstr "閉合有效且不自我交叉的環。"
 msgid "1 layer"
 msgstr "1 個圖層"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Space"
 msgstr "空格"
 
@@ -6391,11 +6392,11 @@ msgid "Could not reach the assistant. Kept the rule-based results."
 msgstr "無法連線至助理。已保留規則式結果。"
 
 #. placeholder {0}: formatColumnShare(missingShare, i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} missing"
 msgstr "缺少 {0}"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Dataset deleted"
 msgstr "資料集已刪除"
 
@@ -6419,7 +6420,7 @@ msgstr "已連線"
 msgid "Only the owner can make this {resource} private."
 msgstr "只有擁有者可以將此 {resource} 設為私人。"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Updates"
 msgstr "更新"
 
@@ -6610,7 +6611,7 @@ msgstr "緯度和經度都必須是數字。"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "刪除資料集"
@@ -6689,7 +6690,7 @@ msgid "Public queries are not supported for structured queries. Use raw SQL "
 "instead."
 msgstr "結構化查詢不支援公共查詢。請改用原始 SQL。"
 
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "CSV file"
 msgstr "CSV 檔案"
 
@@ -6765,7 +6766,7 @@ msgid "Form is an approximation"
 msgstr "表單為近似結果"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Restricted"
 msgstr "受限"
 
@@ -6909,7 +6910,7 @@ msgstr "當…時，我們應將數據合併到同一 {conceptName}"
 msgid "Pay What You Want"
 msgstr "隨意支付"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Regions read"
 msgstr "已讀取的區域"
 
@@ -7017,7 +7018,7 @@ msgstr "還沒有帳戶？"
 msgid "Dataset failed to load"
 msgstr "數據集加載失敗"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
 msgstr "小數"
@@ -7137,7 +7138,7 @@ msgstr "1 個資料集"
 msgid "No numeric columns"
 msgstr "沒有數值欄"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "服務"
 
@@ -7146,7 +7147,7 @@ msgid "This question is too large for the on-device model. Try a shorter "
 "question, or reconnect to use cloud chat."
 msgstr "此問題對裝置上的模型來說太長。請嘗試縮短問題，或重新連線以使用雲端聊天。"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "已保留原始內容"
 
@@ -7194,7 +7195,8 @@ msgstr "有訪問權限的人"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
 
@@ -7238,7 +7240,7 @@ msgstr "Qwen 2.5 3B（離線）"
 msgid "Collapse the legend"
 msgstr "收合圖例"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "No datasets yet"
 msgstr "尚無資料集"
 
@@ -7385,7 +7387,7 @@ msgstr "找不到分頁"
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "涵蓋 <0>{0}</0>，從 <1>{1}</1> 到 <2>{2}</2>。"
 
@@ -7533,7 +7535,7 @@ msgstr "編輯者"
 msgid "Entered manually"
 msgstr "手動輸入"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "組織"
 
@@ -7636,7 +7638,7 @@ msgid "Hide the tutorial"
 msgstr "隱藏教學"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/useDatasetSourceLabels.ts
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Excel"
 msgstr "Excel"
 
@@ -8033,7 +8035,7 @@ msgstr "新增背景資訊、方法說明或關鍵重點。"
 msgid "Add a table of the top 10 rows of {datasetName}"
 msgstr "添加 {datasetName} 的前 10 行表格"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
 msgstr "此數據集完全可離線使用"
 
@@ -8130,8 +8132,8 @@ msgid "Thank you for your interest!"
 msgstr "感謝您的關注！"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Source"
@@ -8287,7 +8289,7 @@ msgstr "來自您的提示："
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Delimiter"
 msgstr "分隔符"
 
@@ -8384,9 +8386,9 @@ msgstr "資料集已儲存"
 msgid "Low to High"
 msgstr "低至高"
 
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "文本"
@@ -8710,7 +8712,7 @@ msgstr "筆劃 ({strokeWidth}px)"
 msgid "Publish to workspace"
 msgstr "發布至工作區"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "整數"
@@ -9025,7 +9027,7 @@ msgstr "+{0} 個值與 {1} 行相關聯"
 
 #. placeholder {0}: top.value.slice(0, 2).join(", ")
 #. placeholder {1}: formatColumnShare(share, i18n.locale)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "最常見的值是 <0>{0}</0>，出現在 <1>{1}</1> 的資料列中。"
 

@@ -25,9 +25,9 @@ export type DatasetImportFeedbackProps = {
 /**
  * What the parse produced: whether it worked, and what came out of it.
  *
- * The storage choice and the save action used to live here too. They belong
- * with the decision to keep the dataset, not with the evidence for it, so
- * they moved to the form's action bar.
+ * The storage choice and the save action are not here: they belong with the
+ * decision to keep the dataset, not with the evidence for it, so they live in
+ * the form's action bar.
  */
 export function DatasetImportFeedback({
   columns,

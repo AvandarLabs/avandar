@@ -2,7 +2,7 @@ import { Model } from "@avandar/models";
 import { FloatingLoader, ObjectDescriptionList } from "@avandar/ui";
 import { assertIsDefined, where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { useMemo } from "react";
+import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -46,11 +46,11 @@ type Props = {
  * The dataset's columns, with their detected types and descriptions, each
  * row editable in place.
  *
- * This used to be one nested block inside a description list over the whole
- * dataset record, which gave a column's name the same visual weight as the
- * CSV escape character. The parse settings now live in the view's rail and
- * the identity facts in its header, which leaves this the one thing in the
- * metadata tab a user actually edits.
+ * The parse settings live in the view's rail and the identity facts in its
+ * header, which leaves this the one thing in the metadata tab a user actually
+ * edits. Do not fold it back into a description list over the whole dataset
+ * record: that gives a column's name the same visual weight as the CSV escape
+ * character.
  */
 export function DatasetMetadataList({ dataset }: Props): JSX.Element {
   const { t } = useLingui();
@@ -68,11 +68,9 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
   // Description column for every other column too. Naming the key on every
   // row keeps the table's shape a property of the model rather than of
   // whichever column sorted first.
-  const columnRows = useMemo(() => {
-    return (dataset.columns ?? []).map((column) => {
-      return { ...column, description: column.description };
-    });
-  }, [dataset.columns]);
+  const columnRows = (dataset.columns ?? []).map((column) => {
+    return { ...column, description: column.description };
+  });
 
   const [dropLocalDataset] = LocalDatasetClient.useDropLocalDataset({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
@@ -117,11 +115,14 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
                 choices: AvaDataType.Types.map((type) => {
                   return {
                     value: type,
-                    label: AvaDataType.toDisplayValue(type),
+                    label: avaDataTypeLabel(type),
                   };
                 }),
               },
-              renderValue: AvaDataType.toDisplayValue,
+              // The translated counterpart, not `toDisplayValue`: this cell is
+              // read by the user, and the untranslated identifier would show
+              // English in every locale.
+              renderValue: avaDataTypeLabel,
             },
           },
         }}

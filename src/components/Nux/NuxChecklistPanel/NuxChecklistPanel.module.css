@@ -5,7 +5,9 @@
    * swallows every click on it. The inset is published app-wide by
    * `useStickyActionBarInset`; it is 0px when no bar is on screen.
    */
-  bottom: calc(var(--nux-dock-gap, 16px) + var(--ava-sticky-action-bar-inset, 0px));
+  bottom: calc(
+    var(--nux-dock-gap, 16px) + var(--ava-sticky-action-bar-inset, 0px)
+  );
 
   /*
    * Match AppShell's default aside transition (200ms ease) so the checklist

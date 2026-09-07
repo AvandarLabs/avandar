@@ -9,9 +9,9 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { AppView } from "@/components/layouts/AppView/AppView";
-import { AppViewBody } from "@/components/layouts/AppView/AppViewBody";
-import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader";
-import { AppViewSection } from "@/components/layouts/AppView/AppViewSection";
+import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
+import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
@@ -19,16 +19,16 @@ import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppR
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { useDatasetSourceLabels } from "@/views/DataManagerApp/useDatasetSourceLabels";
-import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu";
+import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
-import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/DatasetSourceRail/DatasetSourceRail";
+import css from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView.module.css";
+import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/DatasetSourceRail";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { DatasetColumnOutline } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
-import css from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView.module.css";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { ReactNode } from "react";
 
 const DATASET_TAB_IDS = ["dataset-metadata", "dataset-summary"] as const;
@@ -52,7 +52,19 @@ type Props = {
 export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
-  const sourceLabels = useDatasetSourceLabels();
+  // The user-facing name of every source type, keyed by the stored enum
+  // value. Inline because this view is the only thing that names a single
+  // dataset's origin.
+  const sourceLabels = useMemo((): Record<DatasetSource.SourceType, string> => {
+    return {
+      csv_file: t`CSV file`,
+      google_sheets: t`Google Sheets`,
+      open_data: t`Open data`,
+      pdf_file: t`PDF file`,
+      virtual: t`Derived dataset`,
+      xlsx_file: t`Excel file`,
+    };
+  }, [t]);
   const [appRoles] = useUserAppRoles();
   // True when the user has no data_sources app role; in that case the dataset
   // is visible only through a resource share. We mark it in the header; it
@@ -257,7 +269,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
           <Tabs
             tabIds={DATASET_TAB_IDS}
             value={activeTab}
-            classNames={{ list: css.tabList }}
+            classNames={{ list: css.datasetMetaViewTabList }}
             renderTabHeader={{
               "dataset-metadata": t`Metadata`,
               // The onboarding tutorial's first payoff points here. It has to
@@ -332,9 +344,11 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
                 );
               },
               "dataset-summary": () => {
-                return isLoadingFullDataset || !previewData || !datasetColumns
-                  ? null
-                  : <DatasetSummaryView datasetId={dataset.id} />;
+                return isLoadingFullDataset ||
+                  !previewData ||
+                  !datasetColumns ? null : (
+                  <DatasetSummaryView datasetId={dataset.id} />
+                );
               },
             }}
             onTabChange={(tabId) => {

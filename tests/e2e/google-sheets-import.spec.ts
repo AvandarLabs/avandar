@@ -173,9 +173,9 @@ async function _expectImportedPreview(
   page: Page,
   expectedDatasetName: string,
 ): Promise<void> {
-  await expect(
-    page.getByText("First", { exact: false }),
-  ).toBeVisible({ timeout: LONG_WAIT });
+  await expect(page.getByRole("heading", { name: "Data preview" })).toBeVisible(
+    { timeout: LONG_WAIT },
+  );
 
   // The picked sheet's name, not the "Google Sheet" placeholder: a mutation
   // that reads the name from state cannot see the pick that created it.
@@ -387,7 +387,7 @@ test.describe("Google Sheets connector", () => {
         // to pin. That the preview rendered at all means Google answered, the
         // CSV parsed, and the rows reached the form.
         await expect(
-          page.getByText("First", { exact: false }),
+          page.getByRole("heading", { name: "Data preview" }),
         ).toBeVisible({ timeout: LONG_WAIT });
       } finally {
         await _cleanUpGoogleSheetImport(e2eWorkerDb);
