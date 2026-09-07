@@ -1,7 +1,7 @@
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { NuxAnchor } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
 import type { MessageDescriptor } from "@lingui/core";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { Placement, Step } from "react-joyride";
 
 /**

@@ -1,7 +1,7 @@
 import { propIsDefined } from "@avandar/utils";
 import { useReducedMotion } from "@mantine/hooks";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useEffect } from "react";
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { clampTimeRangeToExtent } from "@/views/GisApp/shell/MapTimeSlider/clampTimeRangeToExtent/clampTimeRangeToExtent";
 import { MapTimeSliderBar } from "@/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar";
 import { shiftTimeRange } from "@/views/GisApp/shell/MapTimeSlider/shiftTimeRange/shiftTimeRange";
@@ -160,9 +160,9 @@ export function MapTimeSlider({
   return (
     <MapTimeSliderBar
       sliderValue={
-        extent === undefined ?
-          [0, SLIDER_MAX]
-        : _sliderValueFromTimeRange(timeRange, extent)
+        extent === undefined
+          ? [0, SLIDER_MAX]
+          : _sliderValueFromTimeRange(timeRange, extent)
       }
       prefersReducedMotion={prefersReducedMotion}
       startLabel={_clockLabel(timeRange?.start ?? extent?.start)}

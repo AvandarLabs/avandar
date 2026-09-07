@@ -49,9 +49,9 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
   }
 
   let nextXAxisKey =
-    currVizConfig.xAxisKey && colNames.has(currVizConfig.xAxisKey) ?
-      currVizConfig.xAxisKey
-    : undefined;
+    currVizConfig.xAxisKey && colNames.has(currVizConfig.xAxisKey)
+      ? currVizConfig.xAxisKey
+      : undefined;
   if (nextXAxisKey === undefined && nextSeries.length > 0) {
     const seriesKeys = new Set(
       nextSeries.map((s) => {

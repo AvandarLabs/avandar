@@ -74,8 +74,8 @@ function _resolveLabelColumnId(options: {
   const isLabelIncluded = included.some((attribute) => {
     return attribute.columnId === draft.labelColumnId;
   });
-  return isLabelIncluded && draft.labelColumnId ?
-      draft.labelColumnId
+  return isLabelIncluded && draft.labelColumnId
+    ? draft.labelColumnId
     : sourceDatasets[0]?.primaryKeyColumnId;
 }
 

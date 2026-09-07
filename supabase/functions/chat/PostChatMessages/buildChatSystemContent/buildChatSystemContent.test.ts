@@ -66,7 +66,7 @@ describe("buildChatSystemContent", () => {
     expect(content).toContain("Use the error to fix the query");
   });
 
-  it("describes the columns currently on the canvas", () => {
+  it("describes the columns currently in the results", () => {
     const content = buildChatSystemContent({
       ...BASE,
       lastResultColumns: [
@@ -80,7 +80,7 @@ describe("buildChatSystemContent", () => {
     expect(content).toContain("live result schema");
   });
 
-  it("omits the canvas columns when the result has none", () => {
+  it("omits the result columns when the result has none", () => {
     const content = buildChatSystemContent({
       ...BASE,
       lastResultColumns: [],

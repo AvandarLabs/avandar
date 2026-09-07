@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { INITIAL_NUX_STATE } from "@/components/Nux/NuxStateManager/initialNuxState";
 import { nuxActions } from "@/components/Nux/NuxStateManager/nuxActions/nuxActions";
-import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 
 const HYDRATED: NuxAppState = {
   ...INITIAL_NUX_STATE,

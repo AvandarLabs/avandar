@@ -3,12 +3,12 @@ import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePro
 import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { makeLegendPropsFromPosition } from "@/lib/ui/viz/legend/makeLegendPropsFromPosition/makeLegendPropsFromPosition";
-import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type {
   AxisRole,
   AxisRoles,
 } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { CSSProperties } from "react";
 import type {
   CartesianGridProps,
@@ -62,13 +62,13 @@ function _buildXAxisProps({
   const hasTickColor = xAxisStyle?.tickColor !== undefined;
   const hasRotation = rotation.tick !== undefined;
   const tick =
-    hasTickColor || hasRotation ?
-      {
-        ...TICK_DEFAULTS,
-        ...(hasTickColor ? { fill: xAxisStyle?.tickColor } : {}),
-        ...(rotation.tick ?? {}),
-      }
-    : undefined;
+    hasTickColor || hasRotation
+      ? {
+          ...TICK_DEFAULTS,
+          ...(hasTickColor ? { fill: xAxisStyle?.tickColor } : {}),
+          ...(rotation.tick ?? {}),
+        }
+      : undefined;
 
   return {
     ...baseXAxisProps,
@@ -98,9 +98,9 @@ function _buildYAxisProps({
     },
   });
   const tick =
-    yAxisStyle?.tickColor !== undefined ?
-      { ...TICK_DEFAULTS, fill: yAxisStyle.tickColor }
-    : undefined;
+    yAxisStyle?.tickColor !== undefined
+      ? { ...TICK_DEFAULTS, fill: yAxisStyle.tickColor }
+      : undefined;
 
   return {
     tickFormatter: _formatYAxisTick,
@@ -154,18 +154,18 @@ function _buildAxisLabels({
   yAxisStyle: Readonly<AxisStyle> | undefined;
 }>): Pick<ChartStyleProps, "xAxisLabel" | "yAxisLabel" | "styles"> {
   const xAxisLabel =
-    xAxisStyle?.label !== undefined && xAxisStyle.label !== "" ?
-      xAxisStyle.label
-    : undefined;
+    xAxisStyle?.label !== undefined && xAxisStyle.label !== ""
+      ? xAxisStyle.label
+      : undefined;
   const yAxisLabel =
-    yAxisStyle?.label !== undefined && yAxisStyle.label !== "" ?
-      yAxisStyle.label
-    : undefined;
+    yAxisStyle?.label !== undefined && yAxisStyle.label !== ""
+      ? yAxisStyle.label
+      : undefined;
   const axisLabelColor = xAxisStyle?.labelColor ?? yAxisStyle?.labelColor;
   const styles =
-    axisLabelColor !== undefined ?
-      { axisLabel: { fill: axisLabelColor } }
-    : undefined;
+    axisLabelColor !== undefined
+      ? { axisLabel: { fill: axisLabelColor } }
+      : undefined;
   return { xAxisLabel, yAxisLabel, styles };
 }
 

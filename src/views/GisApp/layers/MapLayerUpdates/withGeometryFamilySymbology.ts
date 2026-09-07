@@ -9,16 +9,14 @@ export function withGeometryFamilySymbology(
 ): MapLayer.Symbology {
   const { layer, family } = options;
   const color =
-    (
-      layer.symbology.type !== "heatmap" &&
-      layer.symbology.color.type === "single"
-    ) ?
-      layer.symbology.color
-    : { type: "single" as const, color: MapLayer.defaultSymbolColor };
+    layer.symbology.type !== "heatmap" &&
+    layer.symbology.color.type === "single"
+      ? layer.symbology.color
+      : { type: "single" as const, color: MapLayer.defaultSymbolColor };
   const stroke =
-    layer.symbology.type === "heatmap" ?
-      MapLayer.createDefaultFillSymbology().stroke
-    : layer.symbology.stroke;
+    layer.symbology.type === "heatmap"
+      ? MapLayer.createDefaultFillSymbology().stroke
+      : layer.symbology.stroke;
   if (family === "polygon") {
     return { ...MapLayer.createDefaultFillSymbology(), color, stroke };
   }

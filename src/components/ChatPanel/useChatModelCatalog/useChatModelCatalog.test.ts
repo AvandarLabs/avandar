@@ -1,6 +1,6 @@
 import { prop, propEq } from "@avandar/utils";
-import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { afterEach, describe, expect, it } from "vitest";
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { useChatModelCatalog } from "@/components/ChatPanel/useChatModelCatalog/useChatModelCatalog";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { renderHook, TestProviders } from "@/test-utils";

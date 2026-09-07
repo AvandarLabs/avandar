@@ -4,9 +4,9 @@ import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { DataExplorerSessionKeys } from "@/views/DataExplorerApp/DataExplorerSessionKeys";
+import type { User } from "$/models/User/User";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { AnyRouter } from "@tanstack/react-router";
-import type { User } from "$/models/User/User";
 
 /**
  * This function should be called from the root component of the app.

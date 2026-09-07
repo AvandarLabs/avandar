@@ -52,13 +52,13 @@ describe("applyQuoteProbeToParseOptions", () => {
     expect(quoteChar).toBe('"');
 
     const next =
-      quoteChar == null ? base : (
-        {
-          ...base,
-          quoteChar,
-          escapeChar: base.escapeChar ?? '"',
-        }
-      );
+      quoteChar == null
+        ? base
+        : {
+            ...base,
+            quoteChar,
+            escapeChar: base.escapeChar ?? '"',
+          };
 
     expect(next.quoteChar).toBe('"');
     expect(next.escapeChar).toBe('"');

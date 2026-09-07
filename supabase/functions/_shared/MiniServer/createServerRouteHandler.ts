@@ -92,24 +92,26 @@ export function createServerRouteHandler<
     // eplicit check for that at the type level and in the implementation.
     bodySchema: <NewBodySchema extends ValidBodySchema>(
       newBodySchema: NewBodySchema,
-    ): Method extends "GET" ? never
-    : ServerRouteHandler<
-        Method,
-        Path,
-        ReturnType,
-        PathParams,
-        QueryParams,
-        InferBody<NewBodySchema>,
-        IsJWTVerificationDisabled
-      > => {
+    ): Method extends "GET"
+      ? never
+      : ServerRouteHandler<
+          Method,
+          Path,
+          ReturnType,
+          PathParams,
+          QueryParams,
+          InferBody<NewBodySchema>,
+          IsJWTVerificationDisabled
+        > => {
       if (state.method === "GET") {
         throw new Error("GET methods do not support changing the body schema");
       }
 
       return createServerRouteHandler({
         ...state,
-        bodySchema:
-          isZodType(newBodySchema) ? newBodySchema : object(newBodySchema),
+        bodySchema: isZodType(newBodySchema)
+          ? newBodySchema
+          : object(newBodySchema),
 
         // if the body schema is changed AFTER we had already set the action,
         // then we need to reset the action to the not-implemented function
@@ -120,16 +122,17 @@ export function createServerRouteHandler<
           IsJWTVerificationDisabled,
           ReturnType
         >,
-      }) as Method extends "GET" ? never
-      : ServerRouteHandler<
-          Method,
-          Path,
-          ReturnType,
-          PathParams,
-          QueryParams,
-          InferBody<NewBodySchema>,
-          IsJWTVerificationDisabled
-        >;
+      }) as Method extends "GET"
+        ? never
+        : ServerRouteHandler<
+            Method,
+            Path,
+            ReturnType,
+            PathParams,
+            QueryParams,
+            InferBody<NewBodySchema>,
+            IsJWTVerificationDisabled
+          >;
     },
     querySchema: <
       NewQueryParamsSchemaShape extends
@@ -228,13 +231,13 @@ export function createDefaultRouteHandler<
   return createServerRouteHandler({
     method,
     path: path,
-    pathParamsSchema: (pathSchema ?
-      object(pathSchema)
-    : undefined) as ValidPathParamsSchema<PathParams>,
+    pathParamsSchema: (pathSchema
+      ? object(pathSchema)
+      : undefined) as ValidPathParamsSchema<PathParams>,
     querySchema: undefined,
-    bodySchema: (method === "GET" ? zUndefined() : (
-      record(string(), zNever())
-    )) as unknown as ZodType<
+    bodySchema: (method === "GET"
+      ? zUndefined()
+      : record(string(), zNever())) as unknown as ZodType<
       Method extends "GET" ? undefined : Record<string, never>,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       any

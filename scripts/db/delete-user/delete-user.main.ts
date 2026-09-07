@@ -1,11 +1,11 @@
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { createSupabaseAdminClient } from "$/db/supabase/createSupabaseAdminClient";
-import { Database } from "$/types/database.types";
 import { program } from "commander";
 import { loadProductionEnv } from "scripts/utils/loadProductionEnv";
 import { z } from "zod";
+import { createSupabaseAdminClient } from "$/db/supabase/createSupabaseAdminClient";
+import { Database } from "$/types/database.types";
 
 const RED = "\x1b[31m";
 const BLUE = "\x1b[34m";
@@ -13,12 +13,12 @@ const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
 const RESET = "\x1b[0m";
 
-const CLIOptionSchema = z.object({
+const CliOptionSchema = z.object({
   email: z.email(),
   prod: z.boolean().optional(),
 });
 
-function setupCLI() {
+function setupCli() {
   program
     .name("pnpm db:delete-user --")
     .description("Delete a user from Supabase by email")
@@ -94,9 +94,9 @@ async function confirmDelete(options: {
 }
 
 async function main() {
-  setupCLI();
+  setupCli();
   try {
-    const { email, prod } = CLIOptionSchema.parse(program.opts());
+    const { email, prod } = CliOptionSchema.parse(program.opts());
 
     if (prod) {
       loadProductionEnv();

@@ -138,12 +138,13 @@ export type ObjectKeyRenderOptionsMap<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData = T,
 > = {
-  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject ?
-    ObjectRenderOptions<NonNullable<T[K]>, RootData>
-  : NonNullable<T[K]> extends ReadonlyArray<infer ArrayType> ?
-    DescribableValueArrayRenderOptions<ArrayType, RootData>
-  : T[K] extends PrimitiveValue ? PrimitiveValueRenderOptions<T[K], RootData>
-  : PrimitiveValueRenderOptions<unknown, RootData>;
+  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject
+    ? ObjectRenderOptions<NonNullable<T[K]>, RootData>
+    : NonNullable<T[K]> extends ReadonlyArray<infer ArrayType>
+      ? DescribableValueArrayRenderOptions<ArrayType, RootData>
+      : T[K] extends PrimitiveValue
+        ? PrimitiveValueRenderOptions<T[K], RootData>
+        : PrimitiveValueRenderOptions<unknown, RootData>;
 };
 
 /**
@@ -283,14 +284,15 @@ export type ObjectRenderOptions<
    * may not know the literal keys, and you want to apply the same options
    * to all items.
    */
-  itemRenderOptions?: [T] extends (
-    [DescribableObjectOf<infer Item extends DescribableObject>]
-  ) ?
-    ObjectRenderOptions<Item, RootData>
-  : [T] extends [ReadonlyArray<infer Item>] ?
-    DescribableValueArrayRenderOptions<Item, RootData>
-  : [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T, RootData>
-  : PrimitiveValueRenderOptions<unknown, RootData>;
+  itemRenderOptions?: [T] extends [
+    DescribableObjectOf<infer Item extends DescribableObject>,
+  ]
+    ? ObjectRenderOptions<Item, RootData>
+    : [T] extends [ReadonlyArray<infer Item>]
+      ? DescribableValueArrayRenderOptions<Item, RootData>
+      : [T] extends [PrimitiveValue]
+        ? PrimitiveValueRenderOptions<T, RootData>
+        : PrimitiveValueRenderOptions<unknown, RootData>;
 };
 
 type BaseObjectArrayRenderOptions<
@@ -443,18 +445,17 @@ export type BaseDescribableValueArrayRenderOptions<
 export type DescribableValueArrayRenderOptions<
   T,
   RootData extends GenericRootData,
-> =
-  [T] extends [DescribableObject] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
+> = [T] extends [DescribableObject]
+  ? BaseDescribableValueArrayRenderOptions<T, RootData> &
       ObjectArrayRenderOptions<T, RootData>
-  : [T] extends [readonly unknown[]] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      NestedArrayRenderOptions<T, RootData>
-  : [T] extends [PrimitiveValue] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      PrimitiveValueRenderOptions<T, RootData>
-  : BaseDescribableValueArrayRenderOptions<T, RootData> &
-      PrimitiveValueRenderOptions<unknown, RootData>;
+  : [T] extends [readonly unknown[]]
+    ? BaseDescribableValueArrayRenderOptions<T, RootData> &
+        NestedArrayRenderOptions<T, RootData>
+    : [T] extends [PrimitiveValue]
+      ? BaseDescribableValueArrayRenderOptions<T, RootData> &
+          PrimitiveValueRenderOptions<T, RootData>
+      : BaseDescribableValueArrayRenderOptions<T, RootData> &
+          PrimitiveValueRenderOptions<unknown, RootData>;
 
 export type AnyDescribableValueRenderOptions =
   | PrimitiveValueRenderOptions<unknown, GenericRootData>
@@ -462,37 +463,41 @@ export type AnyDescribableValueRenderOptions =
   | DescribableValueArrayRenderOptions<unknown, GenericRootData>;
 
 export type _GetChildObjectsHelper<T extends GenericRootData> =
-  T extends DescribableObject ?
-    | T
-    | {
-        [K in keyof T]: T[K] extends infer V ?
-          V extends DescribableObject ? V | _GetChildObjectsHelper<V>
-          : V extends ReadonlyArray<infer U extends GenericRootData> ?
-            _GetChildObjectsHelper<U>
-          : V extends Array<infer U extends GenericRootData> ?
-            _GetChildObjectsHelper<U>
-          : never
+  T extends DescribableObject
+    ?
+        | T
+        | {
+            [K in keyof T]: T[K] extends infer V
+              ? V extends DescribableObject
+                ? V | _GetChildObjectsHelper<V>
+                : V extends ReadonlyArray<infer U extends GenericRootData>
+                  ? _GetChildObjectsHelper<U>
+                  : V extends Array<infer U extends GenericRootData>
+                    ? _GetChildObjectsHelper<U>
+                    : never
+              : never;
+          }[keyof T]
+    : T extends ReadonlyArray<infer U extends GenericRootData>
+      ? _GetChildObjectsHelper<U>
+      : T extends Array<infer U extends GenericRootData>
+        ? _GetChildObjectsHelper<U>
         : never;
-      }[keyof T]
-  : T extends ReadonlyArray<infer U extends GenericRootData> ?
-    _GetChildObjectsHelper<U>
-  : T extends Array<infer U extends GenericRootData> ? _GetChildObjectsHelper<U>
-  : never;
 
 /**
  * Utility function to get all the child objects of a given type. These are all
  * the types that could potentially be used in an `onSubmitChange` callback.
  */
 export type GetChildObjects<T extends GenericRootData> =
-  T extends DescribableObject ?
-    {
-      [K in keyof T]: T[K] extends infer V ?
-        V extends GenericRootData ?
-          _GetChildObjectsHelper<V>
-        : never
-      : never;
-    }[keyof T]
-  : T extends ReadonlyArray<infer U extends GenericRootData> ?
-    _GetChildObjectsHelper<U>
-  : T extends Array<infer U extends GenericRootData> ? _GetChildObjectsHelper<U>
-  : never;
+  T extends DescribableObject
+    ? {
+        [K in keyof T]: T[K] extends infer V
+          ? V extends GenericRootData
+            ? _GetChildObjectsHelper<V>
+            : never
+          : never;
+      }[keyof T]
+    : T extends ReadonlyArray<infer U extends GenericRootData>
+      ? _GetChildObjectsHelper<U>
+      : T extends Array<infer U extends GenericRootData>
+        ? _GetChildObjectsHelper<U>
+        : never;

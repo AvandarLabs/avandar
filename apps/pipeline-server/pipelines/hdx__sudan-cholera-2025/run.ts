@@ -1,12 +1,12 @@
 import {
-  buildOpenDataCatalogRow, // prettier-ignore
+  buildOpenDataCatalogRow, // oxfmt-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/buildOpenDataCatalogRow";
 import {
-  SUDAN_CHOLERA_CATALOG_ENTRIES, // prettier-ignore
+  SUDAN_CHOLERA_CATALOG_ENTRIES, // oxfmt-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 import { createClient } from "@supabase/supabase-js";
 import type {
-  SudanCholeraCatalogEntry, // prettier-ignore
+  SudanCholeraCatalogEntry, // oxfmt-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 import type { SupabaseClient } from "@supabase/supabase-js";
 

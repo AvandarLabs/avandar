@@ -35,14 +35,14 @@ export function PrivateResourcesPanel(): React.ReactNode {
         nameByUserId={nameByUserId}
         onReassign={setReassignUserId}
       />
-      {reassignUserId ?
+      {reassignUserId ? (
         <ReassignOwnerModal
           fromUserId={reassignUserId}
           onClose={() => {
             setReassignUserId(undefined);
           }}
         />
-      : null}
+      ) : null}
     </Stack>
   );
 }

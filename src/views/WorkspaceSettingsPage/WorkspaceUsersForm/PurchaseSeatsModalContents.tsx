@@ -66,16 +66,17 @@ export function PurchaseSeatsModalContents({
   return (
     <Stack>
       <Text size="sm">
-        {totalSeats === 1 ?
+        {totalSeats === 1 ? (
           <Trans>
             Your workspace has used all {currentSeatUsage} of its {totalSeats}{" "}
             seat.
           </Trans>
-        : <Trans>
+        ) : (
+          <Trans>
             Your workspace has used all {currentSeatUsage} of its {totalSeats}{" "}
             seats.
           </Trans>
-        }
+        )}
       </Text>
 
       <NumberInput
@@ -102,9 +103,11 @@ export function PurchaseSeatsModalContents({
             purchaseSeats({ seatsToAdd });
           }}
         >
-          {seatsToAdd === 1 ?
+          {seatsToAdd === 1 ? (
             <Trans>Purchase {seatsToAdd} seat</Trans>
-          : <Trans>Purchase {seatsToAdd} seats</Trans>}
+          ) : (
+            <Trans>Purchase {seatsToAdd} seats</Trans>
+          )}
         </Button>
       </Group>
 

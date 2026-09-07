@@ -15,8 +15,8 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { useEffect, useMemo, useState } from "react";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
@@ -105,7 +105,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   return (
     <Container py="md">
       <Stack>
-        {isShareOnlyAccess ?
+        {isShareOnlyAccess ? (
           <Alert color="blue" variant="light" title={t`Shared with you`}>
             <Text size="sm">
               <Trans>
@@ -113,7 +113,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               </Trans>
             </Text>
           </Alert>
-        : null}
+        ) : null}
         <Group justify="space-between" align="center" wrap="nowrap" w="100%">
           <Group
             gap="xs"
@@ -150,12 +150,10 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   minRows={1}
                   maxRows={2}
                   error={
-                    (
-                      datasetName.trim().length > 0 &&
-                      datasetName.trim().length < 2
-                    ) ?
-                      t`Dataset name must be at least 2 characters.`
-                    : undefined
+                    datasetName.trim().length > 0 &&
+                    datasetName.trim().length < 2
+                      ? t`Dataset name must be at least 2 characters.`
+                      : undefined
                   }
                   emptyDisplayText={t`Untitled dataset`}
                   displayTextProps={{
@@ -169,7 +167,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   lh="var(--mantine-h2-line-height)"
                 />
               </Box>
-              {(
+              {
                 // only show the button if the source dataset has an
                 // "isInCloudStorage" property
                 datasetWithColumnsAndSource.source &&
@@ -179,17 +177,17 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 // source types)
                 (dataset.sourceType === "csv_file" ||
                   dataset.sourceType === "xlsx_file" ||
-                  dataset.sourceType === "pdf_file")
-              ) ?
-                <Box style={{ flexShrink: 0 }}>
-                  <ToggleOfflineOnlyButton
-                    isInCloudStorage={
-                      datasetWithColumnsAndSource.source.isInCloudStorage
-                    }
-                    dataSource={datasetWithColumnsAndSource.source}
-                  />
-                </Box>
-              : null}
+                  dataset.sourceType === "pdf_file") ? (
+                  <Box style={{ flexShrink: 0 }}>
+                    <ToggleOfflineOnlyButton
+                      isInCloudStorage={
+                        datasetWithColumnsAndSource.source.isInCloudStorage
+                      }
+                      dataSource={datasetWithColumnsAndSource.source}
+                    />
+                  </Box>
+                ) : null
+              }
             </Group>
           </Group>
           <ShareResourceButton
@@ -228,9 +226,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                       emptyDisplayText={t`This dataset has no description.`}
                       onSave={(newDescription) => {
                         const descriptionToSave =
-                          newDescription.trim().length === 0 ?
-                            undefined
-                          : newDescription;
+                          newDescription.trim().length === 0
+                            ? undefined
+                            : newDescription;
 
                         updateDataset({
                           id: dataset.id,
@@ -250,21 +248,25 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     <Title order={5}>
                       <Trans>Data preview</Trans>
                     </Title>
-                    {isLoadingPreviewData ?
+                    {isLoadingPreviewData ? (
                       <Loader />
-                    : previewData && previewData ?
+                    ) : previewData && previewData ? (
                       <DataGrid
                         columnNames={datasetColumnNames}
                         data={previewData}
                       />
-                    : null}
+                    ) : null}
                   </Stack>
                 );
               },
               "dataset-summary": () => {
-                return isLoadingFullDataset || !previewData || !datasetColumns ?
-                    <Loader />
-                  : <DatasetSummaryView datasetId={dataset.id} />;
+                return isLoadingFullDataset ||
+                  !previewData ||
+                  !datasetColumns ? (
+                  <Loader />
+                ) : (
+                  <DatasetSummaryView datasetId={dataset.id} />
+                );
               },
             }}
             onTabChange={(tabId) => {
@@ -284,10 +286,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               edited the sheet and does not want to wait for the window to
               close.
             */}
-            {(
-              dataset.sourceType === "google_sheets" &&
-              sourceDataset?.__type === "GoogleSheetsDataset"
-            ) ?
+            {dataset.sourceType === "google_sheets" &&
+            sourceDataset?.__type === "GoogleSheetsDataset" ? (
               <Button
                 variant="default"
                 loading={isRefreshPending}
@@ -300,7 +300,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               >
                 <Trans>Refresh from Google Sheets</Trans>
               </Button>
-            : null}
+            ) : null}
 
             <Button
               color="danger"

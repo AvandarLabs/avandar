@@ -9,9 +9,9 @@ import {
 } from "@tabler/icons-react";
 import { VizTypeSelect } from "@/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect";
 import { QUERY_EDITOR_MODES } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -123,9 +123,11 @@ export function DataExplorerDrawerRail({
           aria-label={isCollapsed ? t`Expand drawer` : t`Collapse drawer`}
           onClick={onToggleCollapsed}
         >
-          {isCollapsed ?
+          {isCollapsed ? (
             <IconChevronUp size={16} />
-          : <IconChevronDown size={16} />}
+          ) : (
+            <IconChevronDown size={16} />
+          )}
         </ActionIcon>
       </Tooltip>
     </Group>

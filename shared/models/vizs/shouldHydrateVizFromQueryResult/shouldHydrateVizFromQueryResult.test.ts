@@ -1,6 +1,6 @@
+import { describe, expect, it } from "vitest";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult/shouldHydrateVizFromQueryResult.ts";
-import { describe, expect, it } from "vitest";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";

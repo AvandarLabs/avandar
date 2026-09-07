@@ -3,7 +3,7 @@
  *
  * On web this wraps duckdb-wasm in the browser. On desktop this is an IPC
  * client that talks to a native DuckDB instance running in the Bun main
- * process (Phase 2). Consumers depend only on this interface.
+ * process. Consumers depend only on this interface.
  */
 export interface DuckDbClient {
   runStructuredQuery<TRow extends Record<string, unknown>>(
@@ -21,12 +21,12 @@ export interface DuckDbClient {
 }
 
 /**
- * Phase 1 placeholder for the concrete structured-query AST.
+ * Placeholder for the concrete structured-query AST.
  *
  * The canonical type lives in `src/clients/DuckDbClient/`; importing it from a
- * `packages/shared/` package would create a `packages/` → `src/` cycle, so this
- * placeholder loosens the argument type to `unknown` until Phase 2 moves the
- * canonical type here.
+ * `packages/shared/` package would create a `packages/` to `src/` cycle, so
+ * this placeholder loosens the argument type to `unknown`. Moving the
+ * canonical type here is what removes the placeholder.
  */
 export type StructuredQuery = {
   readonly _placeholder: unknown;

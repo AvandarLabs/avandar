@@ -1,18 +1,18 @@
 /**
- *  RLS for `resource_shares`. Requires `16.utils.resource-permissions`.
+ * RLS for `resource_shares`. Requires `16.utils.resource-permissions`.
  *
- *  Resource admins may manage shares and tags. In other words, the admin of
- *  a resource (such as a dataset or a dashboard) can manage who to share it
- *  with.
+ * Resource admins may manage shares and tags. In other words, the admin of
+ * a resource (such as a dataset or a dashboard) can manage who to share it
+ * with.
  *
- *  The workspace-wide Settings-Admin grant on INSERT and UPDATE is gated on the
- *  resource NOT being private to its owner. Without that gate an admin could
- *  insert a share granting themselves admin on a private resource, which would
- *  make it non-private and readable: a two-statement self-escalation. The owner
- *  workspace-bound resource-admin path still lets the owner share their own
- *  private resource, which is how it stops being private.
+ * The workspace-wide Settings-Admin grant on INSERT and UPDATE is gated on the
+ * resource NOT being private to its owner. Without that gate an admin could
+ * insert a share granting themselves admin on a private resource, which would
+ * make it non-private and readable: a two-statement self-escalation. The owner
+ * workspace-bound resource-admin path still lets the owner share their own
+ * private resource, which is how it stops being private.
  *
- *  DELETE is deliberately not gated: removing a share can only reduce access.
+ * DELETE is deliberately not gated: removing a share can only reduce access.
  */
 create policy "Members can select resource_shares in their workspaces" on public.resource_shares for
 select

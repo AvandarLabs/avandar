@@ -1,5 +1,5 @@
-import type { LocalDatasetSourceFileType } from "@/models/LocalDataset/LocalDataset.types";
 import type { DatasetSourceType } from "$/models/datasets/DatasetSource/DatasetSource.types";
+import type { LocalDatasetSourceFileType } from "@/models/LocalDataset/LocalDataset.types";
 
 /**
  * Bridges the two vocabularies we use for "what kind of file is this":
