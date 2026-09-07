@@ -158,11 +158,14 @@ Structure that labels nothing is noise. Three rules, all live in
   that makes the most dangerous action the largest and lowest thing on screen.
 - **A long scrolling form gets a sticky action bar** so the primary action is
   reachable from any scroll position. See `DatasetImportActions`.
-- **A sticky action bar sets `data-sticky-action-bar`.** The bar and the NUX
-  checklist both live in the bottom-right corner, and the checklist is
-  `position: fixed`, so without the attribute the card sits on top of the
-  primary action and silently swallows every click on it. The attribute is
-  what `useNuxChecklistDockBottom` measures to lift the dock clear.
+- **A sticky action bar sets `data-sticky-action-bar`.** The bar shares the
+  bottom of the viewport with things that fix themselves there: the NUX
+  checklist docks in the same corner, and toasts are pinned `bottom-center`.
+  Without the attribute they sit on top of the primary action and silently
+  swallow clicks on it. `useStickyActionBarInset` measures whichever bar
+  reaches highest and publishes it as `--ava-sticky-action-bar-inset`, which
+  those elements add to their own offset in CSS. Anything new that pins itself
+  to the bottom of the viewport should do the same.
 
 ## Verifying a new view
 
@@ -173,8 +176,9 @@ Structure that labels nothing is noise. Three rules, all live in
 - The widest thing in the content column is as wide as the column.
 - Every heading has more space above it than below it.
 - The rail holds no actions and no app navigation.
-- Any sticky action bar carries `data-sticky-action-bar`, and the NUX
-  checklist clears it. `pnpm test:e2e nux-first-milestone.spec.ts` is the
-  regression guard: it is the only spec that runs with the checklist visible.
+- Any sticky action bar carries `data-sticky-action-bar`, and both the NUX
+  checklist and toasts clear it. `pnpm test:e2e nux-first-milestone.spec.ts`
+  is the regression guard: it is the only spec that runs with the checklist
+  visible.
 - `.claude/skills/impeccable/scripts/impeccable detect --json <paths>` is
   clean.

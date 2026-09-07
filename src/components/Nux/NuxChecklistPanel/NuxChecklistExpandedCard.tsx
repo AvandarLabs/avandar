@@ -6,16 +6,12 @@ import { NuxChecklistMilestoneList } from "@/components/Nux/NuxChecklistPanel/Nu
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel.module.css";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   artifacts: NuxWorkspaceArtifacts | undefined;
   completedCount: number;
-  dockStyle: {
-    readonly bottom: number;
-    readonly right: number;
-    readonly zIndex: number;
-  };
+  dockStyle: CSSProperties;
   markDone: (key: NuxProgress.MilestoneKey) => void;
   onOpenMilestone: (key: NuxProgress.MilestoneKey) => void;
   totalMilestoneCount: number;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getStickyActionBarIntrusionPx } from "@/components/Nux/NuxChecklistPanel/getStickyActionBarIntrusionPx/getStickyActionBarIntrusionPx";
+import { getStickyActionBarIntrusionPx } from "@/lib/hooks/ui/useStickyActionBarInset/getStickyActionBarIntrusionPx";
 
 describe("getStickyActionBarIntrusionPx", () => {
   it("measures from the viewport's bottom edge to the bar's top", () => {

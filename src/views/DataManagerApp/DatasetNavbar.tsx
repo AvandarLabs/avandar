@@ -63,12 +63,22 @@ function makeDatasetLink(options: {
     </Text>
   );
 
+  // Destination only, not the whole `AppLink`. Spreading it carried two
+  // fields a nav row must not have: `isAvailableOffline`, a routing fact that
+  // React rejects on the anchor it lands on, and `key`, which names the
+  // *route* and is therefore the same constant for every dataset, so a list
+  // of them all claimed one React key. The dataset's own id is the identity
+  // that distinguishes these rows.
+  const { to, params } = AppLinks.dataManagerDatasetView({
+    workspaceSlug,
+    datasetId: dataset.id,
+    datasetName: dataset.name,
+  });
+
   const link = {
-    ...AppLinks.dataManagerDatasetView({
-      workspaceSlug,
-      datasetId: dataset.id,
-      datasetName: dataset.name,
-    }),
+    key: dataset.id,
+    to,
+    params,
     className: css.datasetLink,
     leftSection: <DatasetSourceIcon sourceType={dataset.sourceType} />,
     label: isOfflineUnavailable ? (
