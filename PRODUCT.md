@@ -18,10 +18,6 @@ so avoid designing anything that would be expensive to make work in a desktop
 window: browser-chrome assumptions, tab-dependent flows, and anything that
 needs a URL bar or a browser-native affordance to make sense.
 
-## Register
-
-product
-
 ## Users
 
 Mission-driven teams in the social sector: public-health, humanitarian, and
