@@ -41,10 +41,19 @@ data, and roughly a third of the view's width spent on nothing.
    tinted            lit (raised)                        tinted
 ```
 
-Both flanks sit on `--ava-surface-body`; the working column is
-`--ava-surface-raised`. The content column is the only lit region on screen,
-which is the DESIGN.md north star ("one brightly lit precise surface") applied
-one level down.
+Both flanks sit on `--ava-surface-body` (`#f8fafc`); the working column is
+`--ava-surface-raised` (`#ffffff`). The content column is the only lit region
+on screen, which is the DESIGN.md north star ("one brightly lit precise
+surface") applied one level down.
+
+The step between them is small on purpose. The hairline is the boundary; the
+tone only says which side of it you are working on. A bigger step turns a
+full-height list pane into a gray panel.
+
+**Area decides which step a fill takes.** A large region reads as more tinted
+than a small one at the same value. Flanks take `--ava-surface-body`; a chip,
+a bar track, or a row hover takes `neutral.1`, because at flank strength the
+ground would swallow it.
 
 ## The pieces
 

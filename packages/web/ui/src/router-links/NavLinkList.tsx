@@ -21,7 +21,11 @@ type Props = {
    */
   activeColor?: MantineColor;
 
-  /** Color of inactive nav links when hovered */
+  /**
+   * Color of inactive nav links when hovered. Defaults one step below the
+   * ground every pane sits on, because a hover the same color as the pane
+   * is not a hover.
+   */
   inactiveHoverColor?: MantineColor;
   gap?: NavLinkProps["py"];
   showRightChevrons?: boolean;
@@ -51,7 +55,7 @@ export function NavLinkList({
   activeColor = "primary.5",
   gap = "sm",
   showRightChevrons = false,
-  inactiveHoverColor = "neutral.0",
+  inactiveHoverColor = "neutral.1",
   ...boxProps
 }: Props): JSX.Element {
   const navLinks = links.map((link) => {
