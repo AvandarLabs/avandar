@@ -1,6 +1,6 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { ComponentProps } from "react";

@@ -1,15 +1,17 @@
--- Daily and rolling seven-day active users, split by the runtime that emitted
--- the events.
---
--- The split by `client` is the only way to see desktop adoption separately, and
--- `runtimeMode` on chat events cannot substitute for it: a desktop build can
--- run cloud chat and the browser cannot run local chat at all.
---
--- The weekly figure is a rolling seven-day window ending on `activity_date`,
--- not a calendar week, so the two columns are comparable on any given day.
--- `event_category = 'engagement'` is what defines "active": importing a dataset
--- is activation, not engagement, and counting it here would make a one-time
--- setup look like a returning user.
+/**
+ * Daily and rolling seven-day active users, split by the runtime that emitted
+ * the events.
+ *
+ * The split by `client` is the only way to see desktop adoption separately, and
+ * `runtimeMode` on chat events cannot substitute for it: a desktop build can
+ * run cloud chat and the browser cannot run local chat at all.
+ *
+ * The weekly figure is a rolling seven-day window ending on `activity_date`,
+ * not a calendar week, so the two columns are comparable on any given day.
+ * `event_category = 'engagement'` is what defines "active": importing a dataset
+ * is activation, not engagement, and counting it here would make a one-time
+ * setup look like a returning user.
+ */
 create or replace view analytics.active_users as
 with
   daily_actives as (

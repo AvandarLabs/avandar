@@ -15,10 +15,11 @@ import type { IsObjectWithShape } from "@utils/types/IsObjectWithShape/IsObjectW
 export function objectFilter<T extends UnknownObject, V extends T[keyof T]>(
   obj: T,
   filterFn: (key: keyof T, value: T[keyof T]) => value is V,
-): IsObjectWithShape<T> extends true ?
-  { [K in keyof T as T[K] extends V ? K : never]: T[K] }
-: T extends Record<infer K, unknown> ? Record<K, V>
-: never;
+): IsObjectWithShape<T> extends true
+  ? { [K in keyof T as T[K] extends V ? K : never]: T[K] }
+  : T extends Record<infer K, unknown>
+    ? Record<K, V>
+    : never;
 export function objectFilter<T extends UnknownObject>(
   obj: T,
   filterFn: (key: keyof T, value: T[keyof T]) => boolean,

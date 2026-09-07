@@ -178,9 +178,9 @@ function createAuthClient(): AuthClient {
       PlatformRegistry.getImpls().authProvider.onAuthChange(
         (platformSession) => {
           const supabaseSession =
-            platformSession === undefined ? null : (
-              _platformSessionToSupabaseSession(platformSession)
-            );
+            platformSession === undefined
+              ? null
+              : _platformSessionToSupabaseSession(platformSession);
           const event: AuthChangeEvent =
             platformSession === undefined ? "SIGNED_OUT" : "SIGNED_IN";
           _desktopOnAuthChangeListeners.forEach((cb) => {

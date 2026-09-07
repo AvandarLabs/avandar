@@ -26,9 +26,11 @@ export function ChangePlanModalContents({ newPlan }: Props): JSX.Element {
             <Text size="lg" fw={600}>
               <Trans>Pay What You Want</Trans>
               <Text component="span" size="sm" fw={400} c="dimmed" ml="xs">
-                {p.planInterval === "month" ?
+                {p.planInterval === "month" ? (
                   <Trans>(Monthly billing)</Trans>
-                : <Trans>(Annual billing)</Trans>}
+                ) : (
+                  <Trans>(Annual billing)</Trans>
+                )}
               </Text>
             </Text>
           );
@@ -45,9 +47,11 @@ export function ChangePlanModalContents({ newPlan }: Props): JSX.Element {
             <Text size="lg" fw={600}>
               <Trans>{formattedPrice}/seat</Trans>
               <Text component="span" size="sm" fw={400} c="dimmed" ml="xs">
-                {p.planInterval === "year" ?
+                {p.planInterval === "year" ? (
                   <Trans>/month (paid yearly)</Trans>
-                : <Trans>/month</Trans>}
+                ) : (
+                  <Trans>/month</Trans>
+                )}
               </Text>
             </Text>
           );
@@ -65,11 +69,11 @@ export function ChangePlanModalContents({ newPlan }: Props): JSX.Element {
         <Text size="xl" fw={700} mb="xs">
           {newPlan.featurePlan.metadata.featurePlanName}
         </Text>
-        {newPlan.description ?
+        {newPlan.description ? (
           <Text size="sm" c="dimmed" mb="md">
             {newPlan.description}
           </Text>
-        : null}
+        ) : null}
         {elements.priceInfo()}
 
         <Divider my="md" />
@@ -82,7 +86,7 @@ export function ChangePlanModalContents({ newPlan }: Props): JSX.Element {
 
       <Paper shadow="xs" withBorder={false} bg="yellow.0">
         <Text c="yellow.9">
-          {newPlan.priceType === "custom" ?
+          {newPlan.priceType === "custom" ? (
             <strong>
               <Trans>
                 Upgrading to a &quot;Pay What You Want&quot; plan can only be
@@ -91,11 +95,12 @@ export function ChangePlanModalContents({ newPlan }: Props): JSX.Element {
                 The button below will take you there.
               </Trans>
             </strong>
-          : <Trans>
+          ) : (
+            <Trans>
               Please confirm that you would like to proceed with this plan
               change. Your subscription will be updated accordingly.
             </Trans>
-          }
+          )}
         </Text>
       </Paper>
     </Stack>

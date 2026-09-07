@@ -66,6 +66,22 @@ values (
   false
 );
 
+-- m1: a map in the same workspace, unrestricted and shared, mirroring d1.
+-- `rpc_resources__make_private` is declared resource-type generic and its two
+-- siblings (rpc_resources__transfer_ownership,
+-- rpc_workspaces__transfer_all_owned_resources) both handle maps, so the
+-- owner-driven make-private path has to work for a map as well.
+insert into public.maps (id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted)
+values (
+  'b1008001-0000-4000-8000-000000000001'::uuid,
+  'b1001001-0000-4000-8000-000000000001'::uuid,
+  'b1000001-0000-4000-8000-000000000001'::uuid,
+  'b1003001-0000-4000-8000-000000000001'::uuid,
+  'b1 shared map',
+  '{}'::jsonb,
+  false
+);
+
 -- Every share shape on d1: a user share to someone else, a group share, a
 -- workspace share, and the owner's own user share, which must survive.
 insert into public.resource_shares (id, workspace_id, resource_type, resource_id, principal_type, principal_id, role)
@@ -75,9 +91,11 @@ values
   ('b1006003-0000-4000-8000-000000000003'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'b1005001-0000-4000-8000-000000000001'::uuid, 'workspace', null, 'viewer'),
   ('b1006004-0000-4000-8000-000000000004'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'b1005001-0000-4000-8000-000000000001'::uuid, 'user', 'b1000001-0000-4000-8000-000000000001'::uuid, 'admin'),
   ('b1006005-0000-4000-8000-000000000005'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dataset', 'b1007001-0000-4000-8000-000000000001'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer'),
-  ('b1006006-0000-4000-8000-000000000006'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'b1005003-0000-4000-8000-000000000003'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer');
+  ('b1006006-0000-4000-8000-000000000006'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'dashboard', 'b1005003-0000-4000-8000-000000000003'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer'),
+  ('b1006007-0000-4000-8000-000000000007'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'map', 'b1008001-0000-4000-8000-000000000001'::uuid, 'workspace', null, 'viewer'),
+  ('b1006008-0000-4000-8000-000000000008'::uuid, 'b1001001-0000-4000-8000-000000000001'::uuid, 'map', 'b1008001-0000-4000-8000-000000000001'::uuid, 'user', 'b1000003-0000-4000-8000-000000000003'::uuid, 'viewer');
 
-select plan(20);
+select plan(23);
 
 select ok(
   has_function_privilege(
@@ -266,6 +284,37 @@ select is(
   ),
   true,
   'the dataset is now private to its owner'
+);
+
+-- === Maps work the same way. ===
+-- The GIS app renders the same ShareResourceButton with resourceType="map"
+-- (src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx), so
+-- the modal's General Access -> Private choice reaches this RPC with 'map'.
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"b1000001-0000-4000-8000-000000000001"}', true);
+
+select lives_ok(
+  $$select public.rpc_resources__make_private (
+      'map', 'b1008001-0000-4000-8000-000000000001'::uuid
+    )$$,
+  'maps go private too'
+);
+
+set local role postgres;
+
+select is(
+  (select count(*)::int from public.resource_shares
+    where resource_id = 'b1008001-0000-4000-8000-000000000001'::uuid),
+  0,
+  'the map''s workspace and user shares are gone'
+);
+
+select is(
+  public.util__is_resource_private_to_owner (
+    'map', 'b1008001-0000-4000-8000-000000000001'::uuid
+  ),
+  true,
+  'the map is now private to its owner'
 );
 
 -- === Idempotent on an already-private resource. ===

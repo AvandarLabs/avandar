@@ -145,9 +145,8 @@ export function getErrorMap({
 }): z.ZodErrorMap {
   return (issue) => {
     return {
-      message:
-        issue.message ?
-          `[${modelName}:${schemaName}] (${issue.code}) ${issue.message}`
+      message: issue.message
+        ? `[${modelName}:${schemaName}] (${issue.code}) ${issue.message}`
         : `[${modelName}:${schemaName}] (${issue.code})Error parsing schema.`,
     };
   };

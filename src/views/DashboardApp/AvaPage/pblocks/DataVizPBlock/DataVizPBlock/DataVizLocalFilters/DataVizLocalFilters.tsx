@@ -52,7 +52,7 @@ export function DataVizLocalFilters({ localFilters, state }: Props): ReactNode {
             <Trans>Filters for this chart</Trans>
           </Text>
         </Group>
-        {hasActiveValue ?
+        {hasActiveValue ? (
           <Button
             variant="subtle"
             size="compact-xs"
@@ -61,7 +61,7 @@ export function DataVizLocalFilters({ localFilters, state }: Props): ReactNode {
           >
             <Trans>Reset</Trans>
           </Button>
-        : null}
+        ) : null}
       </Group>
       <Group gap="xs" align="end" wrap="wrap">
         {localFilters.map((localFilter) => {

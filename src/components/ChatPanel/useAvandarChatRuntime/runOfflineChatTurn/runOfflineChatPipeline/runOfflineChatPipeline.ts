@@ -113,9 +113,9 @@ export async function runOfflineChatPipeline(
       clarification: {
         question: analyze.clarifyQuestion,
         responseShape:
-          options && options.length >= 2 ?
-            { kind: "fixed_options", options, multi: false }
-          : { kind: "free_text" },
+          options && options.length >= 2
+            ? { kind: "fixed_options", options, multi: false }
+            : { kind: "free_text" },
         turnNumber: 1,
       },
       phaseLabels,
@@ -136,9 +136,8 @@ export async function runOfflineChatPipeline(
     lastUserPrompt: args.lastUserPrompt,
   });
 
-  const sqlPromptSchema =
-    resolvedDataset ?
-      narrowOfflineSchema(args.schema, resolvedDataset.id)
+  const sqlPromptSchema = resolvedDataset
+    ? narrowOfflineSchema(args.schema, resolvedDataset.id)
     : args.schema;
 
   appendPhase(phaseLabels, args.copy.writingQuery, args.onPhase);
@@ -159,9 +158,8 @@ export async function runOfflineChatPipeline(
       { role: "user", content: args.lastUserPrompt },
     ],
     maxTokens: SQL_MAX_TOKENS,
-    onToken:
-      args.onPhase ?
-        (delta) => {
+    onToken: args.onPhase
+      ? (delta) => {
           if (
             delta.length > 0 &&
             !phaseLabels.includes(args.copy.generatingSql)

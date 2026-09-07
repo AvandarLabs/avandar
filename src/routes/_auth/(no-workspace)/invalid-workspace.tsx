@@ -4,7 +4,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { Logger } from "@/utils/Logger";
 import type { ReactElement } from "react";
@@ -40,7 +40,7 @@ function InvalidWorkspacePage() {
   }, [redirectReason]);
 
   return (
-    <AppLayout>
+    <AppSlate>
       <Container ta="center" fluid py="xxxl">
         <Stack gap="md">
           <Title order={1}>
@@ -73,6 +73,6 @@ function InvalidWorkspacePage() {
           </Group>
         </Stack>
       </Container>
-    </AppLayout>
+    </AppSlate>
   );
 }

@@ -1,6 +1,6 @@
-import { NgrokDevURLsManager } from "@fanout-server/NgrokDevURLsManager";
+import { NgrokDevUrlsManager } from "@fanout-server/NgrokDevUrlsManager";
 import z from "zod";
-import type { NgrokDevURLTarget } from "@fanout-server/NgrokDevURLsManager";
+import type { NgrokDevUrlTarget } from "@fanout-server/NgrokDevUrlsManager";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 const AddBodySchema = z.object({
@@ -57,7 +57,7 @@ async function _requireAdminAuth(options: {
   return undefined;
 }
 
-export async function onListNgrokURLs(
+export async function onListNgrokUrls(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<FastifyReply> {
@@ -66,24 +66,24 @@ export async function onListNgrokURLs(
     return authError;
   }
 
-  const targets: readonly NgrokDevURLTarget[] =
-    await NgrokDevURLsManager.readNgrokDevURLs();
+  const targets: readonly NgrokDevUrlTarget[] =
+    await NgrokDevUrlsManager.readNgrokDevUrls();
   return await reply.send({
     targets,
   });
 }
 
-export async function onAddNgrokURL(
+export async function onAddNgrokUrl(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<FastifyReply> {
   try {
     const body = AddBodySchema.parse(request.body);
     const normalizedURL: string = _stripTrailingSlash(body.url);
-    const targets: readonly NgrokDevURLTarget[] =
-      await NgrokDevURLsManager.readNgrokDevURLs();
+    const targets: readonly NgrokDevUrlTarget[] =
+      await NgrokDevUrlsManager.readNgrokDevUrls();
 
-    const existing: NgrokDevURLTarget | undefined = targets.find((target) => {
+    const existing: NgrokDevUrlTarget | undefined = targets.find((target) => {
       return target.url === normalizedURL;
     });
 
@@ -96,16 +96,16 @@ export async function onAddNgrokURL(
       });
     }
 
-    const newTarget: NgrokDevURLTarget = {
+    const newTarget: NgrokDevUrlTarget = {
       url: normalizedURL,
       dateAdded: new Date().toISOString(),
       lastAccessedDate: null,
     };
-    const updatedTargets: readonly NgrokDevURLTarget[] = [
+    const updatedTargets: readonly NgrokDevUrlTarget[] = [
       ...targets,
       newTarget,
     ];
-    await NgrokDevURLsManager.writeNgrokDevURLs({ targets: updatedTargets });
+    await NgrokDevUrlsManager.writeNgrokDevUrls({ targets: updatedTargets });
     return await reply.send({ targets: [newTarget] });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
@@ -124,7 +124,7 @@ export async function onAddNgrokURL(
   }
 }
 
-export async function onRemoveNgrokURL(
+export async function onRemoveNgrokUrl(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<FastifyReply> {
@@ -135,9 +135,9 @@ export async function onRemoveNgrokURL(
 
   try {
     const body = RemoveBodySchema.parse(request.body);
-    const targets: readonly NgrokDevURLTarget[] =
-      await NgrokDevURLsManager.readNgrokDevURLs();
-    const updatedTargets: readonly NgrokDevURLTarget[] = targets.filter(
+    const targets: readonly NgrokDevUrlTarget[] =
+      await NgrokDevUrlsManager.readNgrokDevUrls();
+    const updatedTargets: readonly NgrokDevUrlTarget[] = targets.filter(
       (target) => {
         return target.url !== body.url;
       },
@@ -151,7 +151,7 @@ export async function onRemoveNgrokURL(
       });
     }
 
-    await NgrokDevURLsManager.writeNgrokDevURLs({ targets: updatedTargets });
+    await NgrokDevUrlsManager.writeNgrokDevUrls({ targets: updatedTargets });
     return await reply.send({ targets: updatedTargets });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {

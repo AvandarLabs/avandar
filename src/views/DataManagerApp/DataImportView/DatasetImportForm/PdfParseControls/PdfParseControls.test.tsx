@@ -4,6 +4,9 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { fireEvent, render, screen } from "@/test-utils";
 import { PdfParseControls } from "./PdfParseControls";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { PdfFileLoadResult } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type {
   DataSourceMetadata,
@@ -13,9 +16,6 @@ import type {
   ExtractedTable,
   PdfRegion,
 } from "@/workers/pdfSniff/pdfSniff.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement } from "react";
 
 const REGION: PdfRegion = {

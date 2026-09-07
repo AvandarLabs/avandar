@@ -2,8 +2,8 @@ import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { GRADUATED_RAMPS } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedControls.constants";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -33,9 +33,9 @@ export function GraduatedRampSelect({
             color: {
               ...color,
               ramp:
-                value === "orange" ?
-                  GRADUATED_RAMPS.orange
-                : GRADUATED_RAMPS.blue,
+                value === "orange"
+                  ? GRADUATED_RAMPS.orange
+                  : GRADUATED_RAMPS.blue,
             },
           });
         });

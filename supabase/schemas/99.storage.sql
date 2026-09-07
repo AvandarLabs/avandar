@@ -1,44 +1,33 @@
 /**
- *  Declarative mirror of every policy on `storage.objects`.
+ * Declarative mirror of every policy on `storage.objects`.
  *
- *  This file creates nothing that the `_STORAGE`-prefixed migrations do not
- *  already create. It exists so `supabase db diff` knows these policies are
- *  intentional.
+ * This file creates nothing that the `_STORAGE`-prefixed migrations do not
+ * already create. It exists so `supabase db diff` knows these policies are
+ * intentional. Without it, diff compares the live database, which has the
+ * policies, against `supabase/schemas/`, which would not, and writes a
+ * migration that DROPS them. Four migrations did exactly that before this
+ * mirror existed, none of them recreating what they dropped, which left every
+ * database built from migrations alone with no `storage.objects` policies at
+ * all. `20260813214231_STORAGE-restore-dropped-object-policies.sql` repaired
+ * that timeline.
  *
- *  Without it, diff compares the live database (which has the policies) to
- *  supabase/schemas/ (which did not) and writes a migration that DROPS them.
- *  That has happened four times already:
+ * Do not assume a local database would surface the same damage. Measured on
+ * CLI v2.98.2, `db reset` does NOT wipe the storage schema, so the
+ * `[db.seed] sql_paths` replay is not what restores these policies.
  *
- *    20260121014515_offline_only_new_colname.sql          drops 4 (workspaces)
- *    20260123033949_updated_rls_for_dashboard_read.sql    drops 3 (published)
- *    20260329211118_added_open_datasets.sql               drops 3 (opendata)
- *    20260813155544_harden_transfer_ownership_...sql      drops 4 (workspaces)
+ * Buckets themselves are deliberately absent here: `insert into
+ * storage.buckets` is DML, which diff does not track. The `_STORAGE`
+ * migrations assert buckets instead.
  *
- *  None of those four recreate what they drop. Before
- *  20260813214231_STORAGE-restore-dropped-object-policies.sql repaired the
- *  timeline, a database built from migrations alone, which is every remote
- *  environment, ended with no storage.objects policies at all.
+ * Numbered 99 rather than 100 so it sorts LAST. Schema files are applied in
+ * lexicographic order, in which "100." sorts between "10." and "15.". That
+ * would place these policies ahead of `16.utils.resource-permissions.sql`,
+ * which defines the helpers they call, and the build would fail.
  *
- *  Local databases did not show the damage, but not for the reason the old
- *  supabase/seeds/ header claimed. Measured on CLI v2.98.2, `db reset` does
- *  NOT wipe the storage schema. The `[db.seed] sql_paths` replay appeared to
- *  be what restored the policies only because the migration timeline happened
- *  to end with all of them dropped, leaving the storage schema empty for the
- *  seed pass to repopulate.
+ * Requires `16.utils.resource-permissions`.
  *
- *  Buckets themselves are deliberately absent here: `insert into
- *  storage.buckets` is DML, which diff does not track. Buckets are asserted by
- *  the `_STORAGE` migrations instead.
- *
- *  Numbered 99 rather than 100 so it sorts LAST. Schema files are applied in
- *  lexicographic order, in which "100." sorts between "10." and "15.". That
- *  would place these policies ahead of 16.utils.resource-permissions.sql,
- *  which defines the helpers they call, and the build would fail.
- *
- *  Requires `16.utils.resource-permissions`.
- *
- *  Keep in sync with the `_STORAGE` migrations. `supabase db diff` must return
- *  empty; any output means this mirror has drifted.
+ * Keep in sync with the `_STORAGE` migrations. `supabase db diff` must return
+ * empty; any output means this mirror has drifted.
  */
 --
 -- Bucket `workspaces` (private). Gated on dataset-level access, not mere

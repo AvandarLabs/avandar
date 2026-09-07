@@ -6,9 +6,9 @@ import {
   rememberQueryableColumns,
 } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
-import type { QueryMediatorFactory as QueryMediatorFactoryType } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { QueryMediatorFactory as QueryMediatorFactoryType } from "@/clients/qetl/QueryMediator/QueryMediator";
 
 const DATASET_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";

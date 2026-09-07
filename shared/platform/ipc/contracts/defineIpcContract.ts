@@ -27,9 +27,9 @@
  * thread request and response types from the declaration site to every
  * `callIpc` and `IpcServer.handle` call site.
  *
- * `parseRequest` and `parseResponse` are identity casts in Phase 2; they
- * exist so a future runtime validator (e.g. a `zod` schema) can be dropped
- * in without changing call sites.
+ * `parseRequest` and `parseResponse` are identity casts for now; they exist
+ * so a runtime validator (a `zod` schema, say) can be dropped in later
+ * without changing call sites.
  */
 export type IpcContract<TRequest, TResponse> = {
   name: string;

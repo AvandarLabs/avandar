@@ -75,7 +75,7 @@ export function LocalFilterEditor({
             }
           }}
         />
-        {filter.mode !== "contains" ?
+        {filter.mode !== "contains" ? (
           <TextInput
             size="xs"
             placeholder={t`Values, comma-separated`}
@@ -84,13 +84,13 @@ export function LocalFilterEditor({
               updateFilter({ optionsRaw: event.currentTarget.value });
             }}
           />
-        : null}
+        ) : null}
         <TextInput
           size="xs"
           placeholder={
-            filter.mode === "select_multi" ?
-              t`Default values, comma-separated or JSON array`
-            : t`Default value (optional)`
+            filter.mode === "select_multi"
+              ? t`Default values, comma-separated or JSON array`
+              : t`Default value (optional)`
           }
           value={filter.defaultValue}
           onChange={(event) => {

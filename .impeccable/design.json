@@ -1,0 +1,551 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-06T19:42:16Z",
+  "title": "Design System: Avandar",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Brand Blue",
+        "canonical": "#1563fe",
+        "tonalRamp": [
+          "#143894",
+          "#103dbd",
+          "#0b4aea",
+          "#1563fe",
+          "#2983ff",
+          "#51a7ff",
+          "#89c7ff",
+          "#b9dcff",
+          "#d8ebff",
+          "#edf6ff"
+        ]
+      },
+      "primary-soft": {
+        "role": "primary",
+        "displayName": "Pale Blue Wash",
+        "canonical": "#edf6ff",
+        "tonalRamp": [
+          "#143894",
+          "#103dbd",
+          "#0b4aea",
+          "#1563fe",
+          "#2983ff",
+          "#51a7ff",
+          "#89c7ff",
+          "#b9dcff",
+          "#d8ebff",
+          "#edf6ff"
+        ]
+      },
+      "primary-active": {
+        "role": "primary",
+        "displayName": "Bright Blue",
+        "canonical": "#2983ff",
+        "tonalRamp": [
+          "#143894",
+          "#103dbd",
+          "#0b4aea",
+          "#1563fe",
+          "#2983ff",
+          "#51a7ff",
+          "#89c7ff",
+          "#b9dcff",
+          "#d8ebff",
+          "#edf6ff"
+        ]
+      },
+      "primary-deep": {
+        "role": "primary",
+        "displayName": "Deep Blue",
+        "canonical": "#0b4aea",
+        "tonalRamp": [
+          "#143894",
+          "#103dbd",
+          "#0b4aea",
+          "#1563fe",
+          "#2983ff",
+          "#51a7ff",
+          "#89c7ff",
+          "#b9dcff",
+          "#d8ebff",
+          "#edf6ff"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Deep Blue-Gray Ink",
+        "canonical": "#102a43",
+        "tonalRamp": [
+          "#102a43",
+          "#243b53",
+          "#334e68",
+          "#486581",
+          "#627d98",
+          "#829ab1",
+          "#9fb3c8",
+          "#bcccdc",
+          "#d9e2ec",
+          "#f0f4f8"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "#243b53",
+        "tonalRamp": [
+          "#102a43",
+          "#243b53",
+          "#334e68",
+          "#486581",
+          "#627d98",
+          "#829ab1",
+          "#9fb3c8",
+          "#bcccdc",
+          "#d9e2ec",
+          "#f0f4f8"
+        ]
+      },
+      "chrome": {
+        "role": "neutral",
+        "displayName": "Muted Steel Chrome",
+        "canonical": "#486581",
+        "tonalRamp": [
+          "#102a43",
+          "#243b53",
+          "#334e68",
+          "#486581",
+          "#627d98",
+          "#829ab1",
+          "#9fb3c8",
+          "#bcccdc",
+          "#d9e2ec",
+          "#f0f4f8"
+        ]
+      },
+      "body": {
+        "role": "neutral",
+        "displayName": "Tinted Cool Paper",
+        "canonical": "#f0f4f8",
+        "tonalRamp": [
+          "#102a43",
+          "#243b53",
+          "#334e68",
+          "#486581",
+          "#627d98",
+          "#829ab1",
+          "#9fb3c8",
+          "#bcccdc",
+          "#d9e2ec",
+          "#f0f4f8"
+        ]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Sheet White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#102a43",
+          "#243b53",
+          "#334e68",
+          "#486581",
+          "#627d98",
+          "#829ab1",
+          "#9fb3c8",
+          "#bcccdc",
+          "#d9e2ec",
+          "#f0f4f8"
+        ]
+      },
+      "sunken": {
+        "role": "neutral",
+        "displayName": "Pale Steel",
+        "canonical": "#d9e2ec",
+        "tonalRamp": [
+          "#102a43",
+          "#243b53",
+          "#334e68",
+          "#486581",
+          "#627d98",
+          "#829ab1",
+          "#9fb3c8",
+          "#bcccdc",
+          "#d9e2ec",
+          "#f0f4f8"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Signal Red",
+        "canonical": "#e53523",
+        "tonalRamp": [
+          "#a0140c",
+          "#b61f13",
+          "#cb2717",
+          "#e53523",
+          "#e64231",
+          "#e95a4c",
+          "#ef8075",
+          "#f6ada5",
+          "#ffd6d2",
+          "#ffebe8"
+        ]
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Signal Green",
+        "canonical": "#40cf5e",
+        "tonalRamp": [
+          "#168d36",
+          "#27a343",
+          "#31b74e",
+          "#40cf5e",
+          "#4dd269",
+          "#63d77c",
+          "#86e09a",
+          "#b1ebbe",
+          "#d9f6df",
+          "#eafcef"
+        ]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "Signal Amber",
+        "canonical": "#f1c617",
+        "tonalRamp": [
+          "#a58500",
+          "#bf9b00",
+          "#d7ae06",
+          "#f1c617",
+          "#f2c928",
+          "#f4d043",
+          "#f6db6d",
+          "#fae8a0",
+          "#fdf4ce",
+          "#fffae2"
+        ]
+      },
+      "info": {
+        "role": "tertiary",
+        "displayName": "Signal Cyan",
+        "canonical": "#3bc9e1",
+        "tonalRamp": [
+          "#00899d",
+          "#169eb3",
+          "#2bb1c8",
+          "#3bc9e1",
+          "#49cce2",
+          "#5dd2e6",
+          "#7edcec",
+          "#abe9f3",
+          "#d5f5fa",
+          "#e6fcff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title-lg": {
+        "displayName": "Title (large)",
+        "purpose": "Empty-state and page-level headings. The heaviest weight in the system."
+      },
+      "title-sm": {
+        "displayName": "Title (small)",
+        "purpose": "Slate toolbar titles and master-detail list rows. A heading by role, not by size."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All reading copy. Cap around 65ch in empty states and long prose."
+      }
+    },
+    "shadows": [
+      {
+        "name": "xs",
+        "value": "0 1px 1px rgba(16, 42, 67, 0.08), 0 1px 2px rgba(16, 42, 67, 0.05)",
+        "purpose": "Small controls and default-variant buttons. The only shadow a button carries at rest."
+      },
+      {
+        "name": "sm",
+        "value": "0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06)",
+        "purpose": "Paper and Card default. The everyday raised surface."
+      },
+      {
+        "name": "md",
+        "value": "0 2px 3px rgba(16, 42, 67, 0.1), 0 4px 10px rgba(16, 42, 67, 0.07)",
+        "purpose": "Menus, popovers, combobox dropdowns, notifications."
+      },
+      {
+        "name": "lg",
+        "value": "0 3px 4px rgba(16, 42, 67, 0.11), 0 8px 20px rgba(16, 42, 67, 0.08)",
+        "purpose": "Reserved. Rare in current UI."
+      },
+      {
+        "name": "xl",
+        "value": "0 4px 6px rgba(16, 42, 67, 0.12), 0 14px 32px rgba(16, 42, 67, 0.1)",
+        "purpose": "Reserved. Rare in current UI."
+      },
+      {
+        "name": "slate",
+        "value": "0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%)",
+        "purpose": "The slate only. Reads as floating on a dark field, so it is darker than the neutral-tinted scale. Deliberately spills past the gutter onto the sidebar and chat aside; clipping it is a bug."
+      },
+      {
+        "name": "overlay-panel",
+        "value": "0 25px 50px -12px rgb(15 23 42 / 35%), 0 0 0 1px rgb(255 255 255 / 50%) inset",
+        "purpose": "Modals and the import drop overlay. Deep lift plus a 1px inset white highlight. The one dramatic moment in the system."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-instant",
+        "value": "80ms",
+        "purpose": "Sub-perceptual state flips."
+      },
+      {
+        "name": "duration-fast",
+        "value": "140ms",
+        "purpose": "Color, background, and border changes. Menus, popovers, comboboxes, tooltips."
+      },
+      {
+        "name": "duration-normal",
+        "value": "200ms",
+        "purpose": "Box-shadow, transform, opacity. Empty-state entrance."
+      },
+      {
+        "name": "duration-moderate",
+        "value": "270ms",
+        "purpose": "Drawers and notifications."
+      },
+      {
+        "name": "duration-slow",
+        "value": "350ms",
+        "purpose": "Reserved for the largest surface changes."
+      },
+      {
+        "name": "duration-reduced",
+        "value": "120ms",
+        "purpose": "What every preset collapses to under prefers-reduced-motion."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The system default easing."
+      },
+      {
+        "name": "ease-out-soft",
+        "value": "cubic-bezier(0.33, 1, 0.68, 1)",
+        "purpose": "Gentler decelerate for larger travel."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.45, 0, 0.55, 1)",
+        "purpose": "Symmetric moves."
+      },
+      {
+        "name": "ease-spring",
+        "value": "cubic-bezier(0.2, 0.9, 0.25, 1.35)",
+        "purpose": "The ooze-in preset (280ms): panels arriving."
+      },
+      {
+        "name": "ease-swipe-out",
+        "value": "cubic-bezier(0.45, 0, 0.75, 0.6)",
+        "purpose": "The swipe-out preset (140ms, 12px upward travel): dismissals."
+      },
+      {
+        "name": "ease-pop",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "The pop-in preset (380ms, from scale(0.72) translateY(20px) with a 10px blur). Modal content only. The one expressive gesture in the system; do not spread it."
+      },
+      {
+        "name": "transition-interactive",
+        "value": "color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The default for anything clickable."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "xs",
+        "value": "36em"
+      },
+      {
+        "name": "sm",
+        "value": "48em"
+      },
+      {
+        "name": "md",
+        "value": "62em"
+      },
+      {
+        "name": "lg",
+        "value": "75em"
+      },
+      {
+        "name": "xl",
+        "value": "88em"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Filled brand-blue action. One per view where possible.",
+      "html": "<button class=\"ds-btn-primary\">Create dashboard</button>",
+      "css": ".ds-btn-primary { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #1563fe; color: #ffffff; height: 36px; padding: 0 18px; border: none; } .ds-btn-primary:hover { background: #0b4aea; } .ds-btn-primary:focus-visible { outline: 2px solid rgba(16, 42, 67, 0.44); outline-offset: 2px; } .ds-btn-primary:active { background: #103dbd; }"
+    },
+    {
+      "name": "Light Toolbar Button",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "The standard slate-toolbar action at compact-sm with a leading icon. Identical across Data Sources, Dashboards, and Case Manager.",
+      "html": "<button class=\"ds-btn-light\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg><span>New case type</span></button>",
+      "css": ".ds-btn-light { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; gap: 6px; background: #edf6ff; color: #0b4aea; height: 26px; padding: 0 10px; border: 1px solid rgba(16, 42, 67, 0.2); } .ds-btn-light:hover { background: #d8ebff; } .ds-btn-light:focus-visible { outline: 2px solid rgba(16, 42, 67, 0.44); outline-offset: 2px; }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "White neutral action. The only button variant carrying a shadow at rest.",
+      "html": "<button class=\"ds-btn-default\">Cancel</button>",
+      "css": ".ds-btn-default { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #ffffff; color: #243b53; height: 36px; padding: 0 18px; border: 1px solid rgba(16, 42, 67, 0.2); box-shadow: 0 1px 1px rgba(16, 42, 67, 0.08), 0 1px 2px rgba(16, 42, 67, 0.05); } .ds-btn-default:hover { background: #d9e2ec; } .ds-btn-default:focus-visible { outline: 2px solid rgba(16, 42, 67, 0.44); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Hairline field. Focus shifts the border tier; no glow, no ring offset.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Case type name\" />",
+      "css": ".ds-input { font-family: Figtree, sans-serif; font-size: 1rem; color: #102a43; background: #ffffff; height: 36px; padding: 0 12px; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; outline: none; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-input::placeholder { color: #829ab1; } .ds-input:focus { border-color: rgba(16, 42, 67, 0.44); }"
+    },
+    {
+      "name": "Master-Detail Nav Rows",
+      "kind": "nav",
+      "refersTo": "nav-row-active",
+      "description": "NavLinkList rows on a neutral.0 pane. Active is filled primary.5; inactive hover must be neutral.1 or it is invisible.",
+      "html": "<div class=\"ds-navlist\"><a class=\"ds-navrow ds-navrow-active\">Cholera cases</a><a class=\"ds-navrow\">Households</a><a class=\"ds-navrow\">Water points</a></div>",
+      "css": ".ds-navlist { display: flex; flex-direction: column; gap: 2px; background: #f0f4f8; padding: 8px; border-radius: 6px; width: 240px; } .ds-navrow { font-family: Figtree, sans-serif; font-size: 0.875rem; font-weight: 500; color: #102a43; padding: 8px 12px; border-radius: 6px; text-decoration: none; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-navrow:hover { background: #d9e2ec; } .ds-navrow-active, .ds-navrow-active:hover { background: #2983ff; color: #ffffff; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Sheet White on the tinted body ground. Border by default, sm shadow.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-title\">Suspected cases</div><div class=\"ds-card-body\">3,842 rows across 4 datasets.</div></div>",
+      "css": ".ds-card { font-family: Figtree, sans-serif; background: #ffffff; color: #102a43; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06); padding: 16px; max-width: 320px; } .ds-card-title { font-size: 0.875rem; font-weight: 500; margin-bottom: 4px; } .ds-card-body { font-size: 1rem; line-height: 1.55; color: #627d98; }"
+    },
+    {
+      "name": "Empty State",
+      "kind": "custom",
+      "refersTo": "empty-state",
+      "description": "The most important component in the system: where a new user learns what a surface is for. Never an info Callout.",
+      "html": "<div class=\"ds-empty\"><div class=\"ds-empty-icon\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg></div><h2 class=\"ds-empty-title\">No case types yet</h2><p class=\"ds-empty-msg\">A case type describes the people or places you are tracking, like a Household or a Water Point.</p><button class=\"ds-empty-cta\">Create a case type</button></div>",
+      "css": ".ds-empty { font-family: Figtree, sans-serif; background: #ffffff; color: #102a43; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06); padding: 48px; max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; } .ds-empty-icon { width: 64px; height: 64px; border-radius: 12px; background: #edf6ff; color: #1563fe; display: flex; align-items: center; justify-content: center; } .ds-empty-title { font-size: 1.625rem; font-weight: 650; line-height: 1.3; margin: 0; text-wrap: balance; } .ds-empty-msg { font-size: 1rem; line-height: 1.55; color: #627d98; margin: -16px 0 0; max-width: 65ch; } .ds-empty-cta { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #1563fe; color: #ffffff; height: 36px; padding: 0 18px; border: none; } .ds-empty-cta:hover { background: #0b4aea; }"
+    },
+    {
+      "name": "Callout",
+      "kind": "custom",
+      "description": "Wraps Mantine Alert at variant=light and defaults to danger. For load failures and warnings, never for 'nothing selected'.",
+      "html": "<div class=\"ds-callout\"><div class=\"ds-callout-icon\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 8v4M12 16h.01\"/></svg></div><div><div class=\"ds-callout-title\">Could not load dataset</div><div class=\"ds-callout-body\">The Google Sheet is no longer shared with this workspace.</div></div></div>",
+      "css": ".ds-callout { font-family: Figtree, sans-serif; display: flex; gap: 12px; background: #ffebe8; color: #a0140c; border-radius: 6px; padding: 16px; max-width: 520px; } .ds-callout-icon { flex: none; color: #e53523; } .ds-callout-title { font-size: 0.875rem; font-weight: 600; margin-bottom: 2px; } .ds-callout-body { font-size: 1rem; line-height: 1.55; }"
+    },
+    {
+      "name": "The Slate",
+      "kind": "custom",
+      "refersTo": "slate",
+      "description": "Signature component. The raised view floating on the dark shell, framed by an 8px gutter, with the one asymmetric radius in the system (8px 8px 12px) and its own two-layer shadow.",
+      "html": "<div class=\"ds-shell\"><div class=\"ds-slate\"><div class=\"ds-slate-toolbar\"><span class=\"ds-slate-title\">Case Manager</span><button class=\"ds-btn-light-inline\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg><span>New case type</span></button></div><div class=\"ds-slate-body\">View content scrolls here</div></div></div>",
+      "css": ".ds-shell { background: #486581; padding: 8px; border-radius: 10px; font-family: Figtree, sans-serif; } .ds-slate { background: #f0f4f8; border: 1px solid #334e68; border-radius: 8px 8px 12px; box-shadow: 0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%); overflow: hidden; } .ds-slate-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #ffffff; border-bottom: 1px solid rgba(16, 42, 67, 0.2); padding: 8px 12px; } .ds-slate-title { font-size: 0.875rem; font-weight: 500; color: #102a43; } .ds-btn-light-inline { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; gap: 6px; background: #edf6ff; color: #0b4aea; height: 26px; padding: 0 10px; border: 1px solid rgba(16, 42, 67, 0.2); } .ds-btn-light-inline:hover { background: #d8ebff; } .ds-slate-body { padding: 32px 16px; font-size: 1rem; color: #627d98; min-height: 96px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Public Observatory",
+    "overview": "A public observatory is research-grade apparatus that exists so people who could never afford one can use it. That is the whole brief. Avandar puts genuinely powerful data machinery (an ontology layer, in-browser DuckDB, query-time integration) in the hands of teams who were priced out of it, and the interface has to carry both halves at once: the precision that makes it credible, and the plainness that makes it usable by someone who is a public-health expert rather than a data engineer. Neither half may be sacrificed for the other. Cheapness of price must never read as cheapness of build.\n\nThe image is literal here. A dark surround with one brightly lit precise surface: the slate, a raised light view floating on the dark shell, its contents swapped as you navigate. Structure is drawn in hairlines, the way an instrument is marked, not in shadows and fills. The single blue marks only the thing you are actually looking at. And because the public is the point, every label is in the user's own nouns and every empty state teaches the next move: a visitor who is not an astronomer still has to be able to work the instrument.\n\nDensity is comfortable-compact. Motion is short and physical, never a choreographed page-load. The interface recedes so the work is visible; the brand lives in precision and restraint, not ornament.",
+    "keyCharacteristics": [
+      "One raised light slate on dark chrome, framed by an 8px gutter on all four sides",
+      "Hairline borders first, tight stacked shadows second",
+      "One family (Figtree), one accent (#1563fe), neutral carrying everything else",
+      "Plain-language nouns everywhere; no internal jargon reaches the UI",
+      "Instructional empty states, never an info Callout",
+      "Motion in the 140-200ms band for state, with three named presets for entrances"
+    ],
+    "rules": [
+      {
+        "name": "The One Blue Rule",
+        "section": "colors",
+        "body": "Neutral carries the interface; blue marks intent. In the current codebase color=\"neutral\" outnumbers color=\"primary\" by roughly six to one, and that ratio is the target, not an accident. If a screen needs a second accent to make sense, the hierarchy is wrong, not the palette."
+      },
+      {
+        "name": "The No Second Accent Rule",
+        "section": "colors",
+        "body": "The theme declares a secondary amber ramp (#f0b429 family) that no UI uses. It is dormant, not available. Do not reach for it to differentiate a feature area."
+      },
+      {
+        "name": "The Cool Ground Rule",
+        "section": "colors",
+        "body": "Every neutral is tinted toward the brand hue. Warm grays, creams, and sands are off-system, and a stock Mantine gray is not the same color as this system's neutral."
+      },
+      {
+        "name": "The Sizeless Heading Rule",
+        "section": "typography",
+        "body": "Semantic level and visual size are decoupled. Title order={2} is 26px in an empty state and 14px in a toolbar. Set the order for structure and screen readers, then set size for the context. Never pick the order to get a size."
+      },
+      {
+        "name": "The Balanced Heading Rule",
+        "section": "typography",
+        "body": "text-wrap: balance on empty-state headings, so a two-line title breaks evenly instead of leaving one orphaned word."
+      },
+      {
+        "name": "The Tablet Downshift Rule",
+        "section": "layout",
+        "body": "Avandar's UI is designed for desktop. Rather than reflowing at tablet widths, the whole system shrinks: --mantine-scale drops to 0.8 between 48em and 75em and 0.9 between 75em and 88em, which rescales every spacing, font size, radius, shadow, and shell width in one place. Never hand-tune a component for tablet."
+      },
+      {
+        "name": "The Gutter Rule",
+        "section": "layout",
+        "body": "The slate keeps its 8px frame of shell background on all four sides. Taking the gutter off, or letting a parent clip it, collapses the central metaphor."
+      },
+      {
+        "name": "The Hairline-Before-Shadow Rule",
+        "section": "elevation",
+        "body": "Elevation is a 1px token border plus a tight stacked shadow. Never a floating card on a void. If a surface is raised, it has a border."
+      },
+      {
+        "name": "The Paired-Token Rule",
+        "section": "elevation",
+        "body": "Always pair an --ava-border-* with the matching --ava-surface-* and an elevation step. Never hand-pick a neutral shade for an edge. This is what keeps elevation consistent across components and makes dark mode a token swap rather than a rewrite."
+      },
+      {
+        "name": "The Blur Ceiling Rule",
+        "section": "elevation",
+        "body": "Ordinary surfaces never pair a 1px border with a blur of 16px or more. The two documented exceptions are the slate and the overlay panel. If you are writing a third one, you are inventing a tier."
+      },
+      {
+        "name": "The Six-Pixel Default Rule",
+        "section": "shapes",
+        "body": "If you are setting a radius and have no specific reason, it is sm (6px). A control with a radius above md reads as a different product."
+      }
+    ],
+    "dos": [
+      "Do put every app view inside AppSlate so it gets the slate, the toolbar, and the gutter.",
+      "Do pair an --ava-border-* token with the matching --ava-surface-* token and an elevation step, rather than picking neutral shades by hand.",
+      "Do default to radius=\"sm\" (6px) and color=\"neutral\", and spend Brand Blue only on filled actions, current selection, and focus.",
+      "Do call a County a County and a case type a case type. Use the user's nouns in every label, placeholder, and empty state.",
+      "Do use the Data Sources list pane as the spatial template for any new master-detail surface.",
+      "Do keep empty states instructional: what this is, and the one next move.",
+      "Do let --mantine-scale handle tablet sizing.",
+      "Do use the shell vocabulary (slate, gutter, sidebar, chat aside) in code, comments, and design discussion."
+    ],
+    "donts": [
+      "Don't leave AppShell.Main unpainted so shell background shows through where the slate should be.",
+      "Don't take the gutter or the drop shadow off the slate, or let another layer clip them.",
+      "Don't say \"slate\" when you mean a color, or \"canvas\" when you mean the slate. \"Canvas\" means a real <canvas> element.",
+      "Don't use Callout color=\"info\" for a selection or empty state. Build an empty state instead.",
+      "Don't say \"entity\", \"profile manager\", \"concept\", or \"Sync data!\" in the UI, or title a list \"{name} Manager\".",
+      "Don't give list rows a left accent stripe, or a hover color equal to the pane background.",
+      "Don't introduce a second accent, reach for the dormant secondary amber ramp, or use a stock Mantine gray where the neutral ramp belongs.",
+      "Don't pair a 1px border with a blur of 16px or more outside the two documented exceptions (the slate and the overlay panel).",
+      "Don't use display serifs, gradient text, glass cards, or fluid clamp() display type.",
+      "Don't design against dark mode or promise it: the tokens exist but no toggle ships."
+    ]
+  }
+}

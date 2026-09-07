@@ -1,11 +1,11 @@
-import type { Model } from "@avandar/models";
-import type { ObjectPaths, UUID } from "@avandar/utils";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types.ts";
 import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Model } from "@avandar/models";
+import type { ObjectPaths, UUID } from "@avandar/utils";
 import type { SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 
 type ModelType = "Concept";

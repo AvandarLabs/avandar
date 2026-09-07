@@ -109,9 +109,9 @@ export function registerServerApiHandlers(
     return {
       apikey: supabaseAnonKey,
       "Content-Type": "application/json",
-      ...(accessToken !== undefined ?
-        { Authorization: `Bearer ${accessToken}` }
-      : {}),
+      ...(accessToken !== undefined
+        ? { Authorization: `Bearer ${accessToken}` }
+        : {}),
     };
   }
 

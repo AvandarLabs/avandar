@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import {
   coversColumns,
   makeIdentityTokensFromIdentity,
@@ -8,7 +9,6 @@ import {
   serves,
   unionColumnSets,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.ts";
-import { describe, expect, it } from "vitest";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { RelationCacheIdentity } from "$/models/relations/RelationCacheKey/RelationCacheKey.types.ts";
 

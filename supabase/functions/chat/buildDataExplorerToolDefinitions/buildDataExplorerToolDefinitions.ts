@@ -124,7 +124,7 @@ const CLARIFY_TOOL = {
 export function buildDataExplorerToolDefinitions(
   clarificationCapReached = false,
 ): DataExplorerToolDefinition[] {
-  return clarificationCapReached ?
-      [GENERATE_SQL_TOOL]
+  return clarificationCapReached
+    ? [GENERATE_SQL_TOOL]
     : [GENERATE_SQL_TOOL, CLARIFY_TOOL];
 }

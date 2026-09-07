@@ -5,11 +5,11 @@ import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateMana
 import { ClarificationAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { resolveClarificationAnswer } from "./resolveClarificationAnswer";
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ClarificationAnswerHandler } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /** Builds the submit handler for one pending clarification request. */
 export function useClarificationSubmission(
@@ -47,13 +47,13 @@ export function useClarificationSubmission(
       }
       const answerText = ClarificationAnswer.formatForThread(resolvedAnswer);
       runtime?.append(
-        isInternalDiscovery ?
-          {
-            role: "user",
-            content: [{ type: "text", text: answerText }],
-            metadata: DiscoveryContinuationMessage.metadata,
-          }
-        : answerText,
+        isInternalDiscovery
+          ? {
+              role: "user",
+              content: [{ type: "text", text: answerText }],
+              metadata: DiscoveryContinuationMessage.metadata,
+            }
+          : answerText,
       );
       return true;
     },

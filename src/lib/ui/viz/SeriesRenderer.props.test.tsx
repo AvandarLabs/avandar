@@ -98,6 +98,15 @@ const DATA = [
   { x: "c", v: 3, w: 3 },
 ];
 
+type LegendPropsHolder = {
+  legendProps?: {
+    verticalAlign?: string;
+    align?: string;
+    layout?: string;
+    width?: number;
+  };
+};
+
 function lastProps<T>(mock: ReturnType<typeof vi.fn>): T {
   const call = mock.mock.lastCall;
   if (call === undefined) {
@@ -225,17 +234,26 @@ describe("BarChart — chart-level settings reach Mantine", () => {
     expect(props.withYAxis).toBe(false);
   });
 
-  it("applies axis label via xAxisLabel and color via styles.axisLabel.fill", () => {
+  it("renders per-axis labels with independent colors via <Label> children", () => {
     renderBar({
       ...BAR_BASELINE,
-      chartStyle: { xAxis: { label: "Month", labelColor: "#ff0000" } },
+      chartStyle: {
+        xAxis: { label: "Month", labelColor: "#ff0000" },
+        yAxis: { label: "Revenue", labelColor: "#0000ff" },
+      },
     });
     const props = lastProps<{
       xAxisLabel?: string;
       styles?: { axisLabel?: { fill?: string } };
+      xAxisProps?: { children?: { props?: { value?: string; fill?: string } } };
+      yAxisProps?: { children?: { props?: { value?: string; fill?: string } } };
     }>(mantineBarChartMock);
-    expect(props.xAxisLabel).toBe("Month");
-    expect(props.styles?.axisLabel?.fill).toBe("#ff0000");
+    expect(props.xAxisLabel).toBeUndefined();
+    expect(props.styles?.axisLabel?.fill).toBeUndefined();
+    expect(props.xAxisProps?.children?.props?.value).toBe("Month");
+    expect(props.xAxisProps?.children?.props?.fill).toBe("#ff0000");
+    expect(props.yAxisProps?.children?.props?.value).toBe("Revenue");
+    expect(props.yAxisProps?.children?.props?.fill).toBe("#0000ff");
   });
 
   it("applies tick color via xAxisProps.tick.fill", () => {
@@ -277,10 +295,51 @@ describe("BarChart — chart-level settings reach Mantine", () => {
       ...BAR_BASELINE,
       chartStyle: { legend: { position: "bottom" } },
     });
-    const props = lastProps<{
-      legendProps?: { verticalAlign?: string; align?: string };
-    }>(mantineBarChartMock);
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
     expect(props.legendProps?.verticalAlign).toBe("bottom");
+    expect(props.legendProps?.align).toBe("center");
+  });
+
+  // A side legend also needs `layout` and `width`. Recharts sizes a
+  // horizontal legend to the full chart width and reserves that much
+  // plot space, which would collapse the plot to zero width for
+  // left/right.
+  it("gives a left legend a vertical layout and its own width", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { legend: { position: "left" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
+    expect(props.legendProps).toEqual({
+      verticalAlign: "middle",
+      align: "left",
+      layout: "vertical",
+      width: 120,
+    });
+  });
+
+  it("gives a right legend a vertical layout and its own width", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { legend: { position: "right" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
+    expect(props.legendProps).toEqual({
+      verticalAlign: "middle",
+      align: "right",
+      layout: "vertical",
+      width: 120,
+    });
+  });
+
+  it("leaves a horizontal legend without a width, so it keeps the full plot width", () => {
+    renderBar({
+      ...BAR_BASELINE,
+      chartStyle: { legend: { position: "top" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineBarChartMock);
+    expect(props.legendProps?.layout).toBeUndefined();
+    expect(props.legendProps?.width).toBeUndefined();
   });
 });
 
@@ -433,6 +492,33 @@ describe("RadarChart — series settings reach Mantine", () => {
     expect(
       lastProps<{ withLegend: boolean }>(mantineRadarChartMock).withLegend,
     ).toBe(false);
+  });
+
+  // Radar has no cartesian axes, so it cannot use `applyChartStyle`, but
+  // it shares the legend mapping and must place a side legend identically.
+  it("gives a side legend the same vertical layout as the cartesian charts", () => {
+    renderRadar({
+      ...RADAR_BASELINE,
+      chartStyle: { legend: { position: "left" } },
+    });
+    expect(
+      lastProps<LegendPropsHolder>(mantineRadarChartMock).legendProps,
+    ).toEqual({
+      verticalAlign: "middle",
+      align: "left",
+      layout: "vertical",
+      width: 120,
+    });
+  });
+
+  it("maps legend.position bottom without reserving a width", () => {
+    renderRadar({
+      ...RADAR_BASELINE,
+      chartStyle: { legend: { position: "bottom" } },
+    });
+    const props = lastProps<LegendPropsHolder>(mantineRadarChartMock);
+    expect(props.legendProps?.verticalAlign).toBe("bottom");
+    expect(props.legendProps?.width).toBeUndefined();
   });
 });
 

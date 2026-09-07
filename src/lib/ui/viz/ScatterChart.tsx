@@ -22,10 +22,10 @@ import {
 import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { UnknownDataFrame } from "@avandar/utils";
-import type { ScatterChartSeries } from "@mantine/charts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { ScatterChartSeries } from "@mantine/charts";
 
 type Props = {
   data: UnknownDataFrame;
@@ -85,7 +85,6 @@ export function ScatterChart({
   const yLabel = chartStyle?.yAxis?.label ?? derivedYLabel;
   const hasXLabel = xLabel !== undefined && xLabel !== "";
   const hasYLabel = yLabel !== undefined && yLabel !== "";
-
   return (
     <Box h={height} w="100%">
       <ResponsiveContainer width="100%" height="100%">

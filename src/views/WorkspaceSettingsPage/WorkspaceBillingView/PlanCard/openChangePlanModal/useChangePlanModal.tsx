@@ -2,8 +2,8 @@ import { useMutation } from "@avandar/query-hooks";
 import { useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { match } from "ts-pattern";
+import { SUPPORT_EMAIL } from "$/config/GlobalAppConfig";
 import { APIClient } from "@/clients/APIClient";
 import { SubscriptionClient } from "@/clients/SubscriptionClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -12,9 +12,9 @@ import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
 import { getPlanChangeQueriesToInvalidate } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/getPlanChangeQueriesToInvalidate/getPlanChangeQueriesToInvalidate";
 import { ChangePlanModalContents } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents";
-import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 
 function _featurePlanTypeToLevel(featurePlanType: FeaturePlanType): number {
   return match(featurePlanType)
@@ -106,26 +106,29 @@ export function useChangePlanModal(): (
     const isNativeFreeDowngrade = newPlan.priceType === "free";
     const newPlanName = newPlan.featurePlan.metadata.featurePlanName;
     const newPlanSubType =
-      newPlan.priceType === "seat_based" ?
-        newPlan.planInterval === "month" ?
-          t`Monthly`
-        : t`Annual`
-      : newPlan.priceType === "custom" ? t`Pay What You Want`
-      : t`Free`;
+      newPlan.priceType === "seat_based"
+        ? newPlan.planInterval === "month"
+          ? t`Monthly`
+          : t`Annual`
+        : newPlan.priceType === "custom"
+          ? t`Pay What You Want`
+          : t`Free`;
 
     const modalId = modals.openConfirmModal({
       title: (
         <Text size="xl" fw={600} span>
-          {isUpgradingPlan ?
-            t`Upgrading plan to ${newPlanName} (${newPlanSubType})`
-          : t`Changing plan to ${newPlanName} (${newPlanSubType})`}
+          {isUpgradingPlan
+            ? t`Upgrading plan to ${newPlanName} (${newPlanSubType})`
+            : t`Changing plan to ${newPlanName} (${newPlanSubType})`}
         </Text>
       ),
       labels: {
         confirm:
-          newPlan.priceType === "custom" ? t`Go to billing portal`
-          : isNativeFreeDowngrade ? t`Switch to Free plan`
-          : t`Update subscription`,
+          newPlan.priceType === "custom"
+            ? t`Go to billing portal`
+            : isNativeFreeDowngrade
+              ? t`Switch to Free plan`
+              : t`Update subscription`,
         cancel: t`Cancel`,
       },
       closeOnConfirm: false,

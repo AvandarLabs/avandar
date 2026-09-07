@@ -60,14 +60,12 @@ function _buildJoinOnClause(
 ): string {
   return predicates
     .map((p) => {
-      const left =
-        p.leftTable ?
-          `${quoteSqlIdentifier(p.leftTable)}.` +
+      const left = p.leftTable
+        ? `${quoteSqlIdentifier(p.leftTable)}.` +
           `${quoteSqlIdentifier(p.leftColumn)}`
         : quoteSqlIdentifier(p.leftColumn);
-      const right =
-        p.rightTable ?
-          `${quoteSqlIdentifier(p.rightTable)}.` +
+      const right = p.rightTable
+        ? `${quoteSqlIdentifier(p.rightTable)}.` +
           `${quoteSqlIdentifier(p.rightColumn)}`
         : quoteSqlIdentifier(p.rightColumn);
       return `${left} = ${right}`;

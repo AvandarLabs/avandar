@@ -94,8 +94,8 @@ export function normalizeCellValue(rawValue: string): string {
   const candidate = _stripThousandsSeparators(withoutPercent);
 
   if (NUMERIC_PATTERN.test(candidate)) {
-    return isAccountingNegative ?
-        `-${candidate.replace(/^-/u, "")}`
+    return isAccountingNegative
+      ? `-${candidate.replace(/^-/u, "")}`
       : candidate;
   }
 

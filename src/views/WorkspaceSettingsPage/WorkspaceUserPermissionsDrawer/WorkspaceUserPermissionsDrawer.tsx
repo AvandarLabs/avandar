@@ -4,8 +4,8 @@ import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceMemberPermissionsEditor } from "@/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor";
-import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
+import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
 
 type Props = {
   isOpen: boolean;
@@ -49,15 +49,15 @@ export function WorkspaceUserPermissionsDrawer({
       opened={isOpen}
       onClose={onClose}
       title={
-        member ?
+        member ? (
           <Title order={4}>{t`Edit access for ${member.displayName}`}</Title>
-        : null
+        ) : null
       }
       position="right"
       size="lg"
     >
-      {member ?
-        isEditorReady ?
+      {member ? (
+        isEditorReady ? (
           <WorkspaceMemberPermissionsEditor
             key={member.userId}
             member={member}
@@ -75,11 +75,12 @@ export function WorkspaceUserPermissionsDrawer({
             workspaceId={workspace.id}
             onClose={onClose}
           />
-        : <Center py="xl">
+        ) : (
+          <Center py="xl">
             <Loader />
           </Center>
-
-      : null}
+        )
+      ) : null}
     </Drawer>
   );
 }

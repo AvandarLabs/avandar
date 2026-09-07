@@ -32,9 +32,9 @@ export function usePublishDashboardMutation(
   return DashboardClient.usePublishDashboard({
     onSuccess: (updatedDashboard) => {
       notifySuccess(
-        currentDashboard.visibility === "draft" ?
-          t`Dashboard published!`
-        : t`Dashboard share settings updated.`,
+        currentDashboard.visibility === "draft"
+          ? t`Dashboard published!`
+          : t`Dashboard share settings updated.`,
       );
       void AnalyticsClient.logEvent({
         ...makeDashboardPublishAnalyticsEventFromDashboards({
