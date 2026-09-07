@@ -76,9 +76,8 @@ export function LineChart({
 
   const lineSeries = series as readonly LineSeries[];
 
-  // See BarChart: Mantine paints both axis labels with one shared
-  // `styles.axisLabel` fill, so we render per-axis <Label> children instead to
-  // honor independent X/Y label colors, reserving margins manually.
+  // Mantine shares one label fill across both axes. Use Recharts labels to
+  // preserve per-axis colors and reserve their margins.
   const {
     styles: _sharedAxisLabelStyle,
     xAxisLabel: _xAxisLabel,

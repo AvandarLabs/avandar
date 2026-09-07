@@ -42,8 +42,8 @@ export function renderXYComposite({
     return { name: s.key, label: s.label, color: s.color, type: s.renderAs };
   });
 
-  // Mantine collapses both axis labels into one shared `styles.axisLabel` fill.
-  // Render per-axis <Label> children with their own `fill`; reserve margins.
+  // Mantine shares one label fill across both axes. Use Recharts labels to
+  // preserve per-axis colors and reserve their margins.
   const {
     styles: _sharedAxisLabelStyle,
     xAxisLabel: _xAxisLabel,

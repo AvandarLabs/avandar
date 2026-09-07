@@ -95,12 +95,8 @@ export function BarChart({
 
   const barSeries = series as readonly BarSeries[];
 
-  // Bar/Line route labels through Mantine, which paints BOTH axis labels with a
-  // single `styles.axisLabel` fill (one shared `getStyles("axisLabel")`
-  // selector). To honor independent X/Y label colors we drop that shared
-  // mechanism and render our own per-axis <Label> children — the same approach
-  // AreaChart/BubbleChart already use. Margins are reserved manually because
-  // Mantine only reserves them when xAxisLabel/yAxisLabel are passed.
+  // Mantine shares one label fill across both axes. Use Recharts labels to
+  // preserve per-axis colors and reserve their margins.
   const {
     styles: _sharedAxisLabelStyle,
     xAxisLabel: _xAxisLabel,

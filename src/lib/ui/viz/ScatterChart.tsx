@@ -68,13 +68,8 @@ export function ScatterChart({
   const hasXLabel = xLabel !== undefined && xLabel !== "";
   const hasYLabel = yLabel !== undefined && yLabel !== "";
 
-  // Mantine paints both axis labels through a single `styles.axisLabel` fill
-  // (one shared `getStyles("axisLabel")` selector), so a per-axis label color
-  // would collapse into one. Drop that shared mechanism and render our own
-  // per-axis <Label> children with independent `fill`, matching AreaChart and
-  // BubbleChart. The label *text* keeps scatter's column-name fallback
-  // (`xLabel` / `yLabel`); only the color comes from `chartStyle`. Margins are
-  // reserved manually since Mantine only reserves them for its own labels.
+  // Mantine shares one label fill across both axes. Use Recharts labels to
+  // preserve per-axis colors, the column-name fallback, and reserved margins.
   const {
     styles: _sharedAxisLabelStyle,
     xAxisLabel: _xAxisLabel,

@@ -206,9 +206,6 @@ describe("BarChart — chart-level settings reach Mantine", () => {
       xAxisProps?: { children?: { props?: { value?: string; fill?: string } } };
       yAxisProps?: { children?: { props?: { value?: string; fill?: string } } };
     }>(mantineBarChartMock);
-    // Label text + color now ride on per-axis <Label> children, not Mantine's
-    // shared xAxisLabel / styles.axisLabel (which collapsed both axes to one
-    // color). Each axis keeps its own fill.
     expect(props.xAxisLabel).toBeUndefined();
     expect(props.styles?.axisLabel?.fill).toBeUndefined();
     expect(props.xAxisProps?.children?.props?.value).toBe("Month");
@@ -689,9 +686,6 @@ describe("ScatterChart: both axes are value axes", () => {
         children?: { props?: { value?: string } };
       };
     }>(mantineScatterChartMock);
-    // The label now rides on a single <Label> child; Mantine's own xAxisLabel
-    // and the Recharts `label` prop must both stay unset so it is not
-    // double-rendered.
     expect(props.xAxisProps?.children?.props?.value).toBe("Spend");
     expect(props.xAxisLabel).toBeUndefined();
     expect(props.xAxisProps?.label).toBeUndefined();
