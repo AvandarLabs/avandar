@@ -1,6 +1,7 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { BarChart as MantineBarChart } from "@mantine/charts";
 import { useMemo } from "react";
+import { Label } from "recharts";
 import { useBarChartStyleProps } from "@/lib/ui/viz/axis/useBarChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
@@ -88,10 +89,28 @@ export function BarChart({
       tooltipProps,
       styleProps,
       valueFormatter,
+      chartStyle,
     });
   }
 
   const barSeries = series as readonly BarSeries[];
+
+  // Mantine shares one label fill across both axes. Use Recharts labels to
+  // preserve per-axis colors and reserve their margins.
+  const {
+    styles: _sharedAxisLabelStyle,
+    xAxisLabel: _xAxisLabel,
+    yAxisLabel: _yAxisLabel,
+    xAxisProps,
+    yAxisProps,
+    ...restStyleProps
+  } = styleProps;
+
+  const xLabelText = chartStyle?.xAxis?.label;
+  const yLabelText = chartStyle?.yAxis?.label;
+  const hasXLabel = xLabelText !== undefined && xLabelText !== "";
+  const hasYLabel = yLabelText !== undefined && yLabelText !== "";
+
   return (
     <MantineBarChart
       h={height}
@@ -116,7 +135,44 @@ export function BarChart({
           ...(found.stackId !== undefined ? { stackId: found.stackId } : {}),
         };
       }}
-      {...styleProps}
+      barChartProps={{
+        margin: {
+          bottom: hasXLabel ? 30 : undefined,
+          left: hasYLabel ? 10 : undefined,
+          right: hasYLabel ? 5 : undefined,
+        },
+      }}
+      xAxisProps={{
+        ...xAxisProps,
+        children: hasXLabel ? (
+          <Label
+            value={xLabelText}
+            position="insideBottom"
+            offset={-20}
+            fontSize={12}
+            fill={chartStyle?.xAxis?.labelColor}
+          />
+        ) : (
+          xAxisProps?.children
+        ),
+      }}
+      yAxisProps={{
+        ...yAxisProps,
+        children: hasYLabel ? (
+          <Label
+            value={yLabelText}
+            position="insideLeft"
+            angle={-90}
+            textAnchor="middle"
+            offset={-5}
+            fontSize={12}
+            fill={chartStyle?.yAxis?.labelColor}
+          />
+        ) : (
+          yAxisProps?.children
+        ),
+      }}
+      {...restStyleProps}
     />
   );
 }
