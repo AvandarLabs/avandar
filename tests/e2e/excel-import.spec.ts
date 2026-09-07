@@ -76,13 +76,10 @@ test.describe("Excel manual upload", { tag: E2E_ONLINE_TAG }, () => {
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     const fileInput = uploadPanel.locator('input[type="file"]');
-    const uploadSubmitButton = uploadPanel.getByRole("button", {
-      name: "Upload",
-      exact: true,
-    });
 
+    // Choosing the file parses it: there is no confirm step between the pick
+    // and the preview.
     await fileInput.setInputFiles(CHOLERA_NYC_XLSX_PATH);
-    await uploadSubmitButton.click();
 
     await expectExcelParsePreview({
       page,
@@ -93,7 +90,6 @@ test.describe("Excel manual upload", { tag: E2E_ONLINE_TAG }, () => {
     });
 
     await fileInput.setInputFiles(CALIFORNIA_XLSX_PATH);
-    await uploadSubmitButton.click();
 
     await expectExcelParsePreview({
       page,
