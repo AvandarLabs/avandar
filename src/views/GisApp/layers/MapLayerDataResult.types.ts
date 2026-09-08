@@ -1,10 +1,10 @@
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapLayerSpatialDiagnostics } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.types";
 import type {
   PointAggregation,
   PointCoordinateAudit,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 /** Data returned by either a row-based or DuckDB Spatial map-layer query. */
 export type MapLayerDataResult =

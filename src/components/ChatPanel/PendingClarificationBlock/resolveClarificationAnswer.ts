@@ -1,11 +1,11 @@
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { ClarificationAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
+import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/chatClarify.types";
 import type { ClarificationSubmitAnswer } from "@/components/ChatPanel/ClarificationCard/ClarificationAnswerModule/ClarificationAnswer";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
-import type { User } from "$/models/User/User";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 async function _recordCancelledClarification(
   request: Readonly<ChatClarifyRequestWithAudit>,
@@ -37,8 +37,8 @@ async function _resolveCustomAnswer(
     await _recordCancelledClarification(request);
     return undefined;
   }
-  return typeof result.payload.text === "string" ?
-      { kind: "custom", text: result.payload.text }
+  return typeof result.payload.text === "string"
+    ? { kind: "custom", text: result.payload.text }
     : answer;
 }
 
@@ -56,8 +56,9 @@ async function _resolveDiscoveryAnswer(
   }>,
 ): Promise<ClarificationSubmitAnswer | undefined> {
   const { answer, request, userId, workspaceId } = parameters;
-  const answerValues =
-    Array.isArray(answer.value) ? answer.value : [answer.value];
+  const answerValues = Array.isArray(answer.value)
+    ? answer.value
+    : [answer.value];
   const result = await decideIfDataCanCrossBoundary({
     values: answerValues,
     sourceColumn: request.responseShape.column,
@@ -73,9 +74,8 @@ async function _resolveDiscoveryAnswer(
   const approvedValues = result.payload.values as readonly string[];
   return {
     kind: "preset",
-    value:
-      Array.isArray(answer.value) ?
-        [...approvedValues]
+    value: Array.isArray(answer.value)
+      ? [...approvedValues]
       : (approvedValues[0] ?? ""),
   };
 }

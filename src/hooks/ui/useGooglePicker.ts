@@ -1,5 +1,7 @@
 import { useQuery } from "@avandar/query-hooks";
 import { isNonEmptyArray, MIMEType, noop } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
@@ -8,9 +10,12 @@ import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type {
   GooglePickerAPI,
   GPicker,
+  GPickerDocsView,
   GPickerDocumentObject,
   GPickerResponseObject,
+  GPickerViewId,
 } from "@/lib/types/google-picker";
+import type { I18n } from "@lingui/core";
 
 function _getGooglePickerAPIKey(): string {
   const key = import.meta.env.VITE_GOOGLE_PICKER_API_KEY;
@@ -41,20 +46,66 @@ function _getGooglePickerAppId(): string {
 }
 
 /**
- * The Picker view that lists only Google Sheets.
+ * The navigation tab labels.
  *
- * Prefers a DocsView so LIST mode can be set: GRID needs thumbnail access
- * that `drive.file` does not grant. Falls back to `ViewId.SPREADSHEETS` when
- * DocsView is not a constructor, which is still a valid `addView` argument.
+ * `msg` descriptors resolved by the caller's `i18n` rather than `` t`…` ``,
+ * because these are consumed by a plain function outside any macro scope and
+ * `docs/rules/i18n.md` requires the extractable macro to stay at its own call
+ * site.
  */
-function _spreadsheetView(pickerAPI: GooglePickerAPI) {
+const VIEW_LABELS = {
+  myDrive: msg`My Drive`,
+  sharedWithMe: msg`Shared with me`,
+  sharedDrives: msg`Shared drives`,
+};
+
+/**
+ * The Picker's navigation, as one Sheets-only DocsView per tab.
+ *
+ * Three views rather than one, because a DocsView's scope is a property of the
+ * whole view: `setEnableDrives(true)` does not *add* shared drives to a view,
+ * it re-roots that view at the shared drives list, so a single view that
+ * reaches a shared drive is a view that cannot reach My Drive at all.
+ * Splitting the scopes across views is what the Picker's tabs are for,
+ * and it beats a single flat listing on legibility anyway: each tab browses as
+ * a folder hierarchy, and search still spans all of them regardless of which
+ * tab is open.
+ *
+ * Labels are set explicitly instead of left to Google, which derives a tab name
+ * from the view's options and would give two of these three the same one.
+ *
+ * The first view is deliberately left unfiltered rather than given
+ * `setOwnedByMe(true)`: it browses the My Drive hierarchy, and files someone
+ * else owns but has placed in your folders belong in that tree.
+ *
+ * Prefers DocsViews so LIST mode can be set: GRID needs thumbnail access that
+ * `drive.file` does not grant. Falls back to the bare `ViewId.SPREADSHEETS`
+ * when DocsView is not a constructor, which is still a valid `addView`
+ * argument, but is necessarily a single unlabelled tab with no way to set any
+ * of this.
+ */
+function _spreadsheetViews(
+  options: Readonly<{ pickerAPI: GooglePickerAPI; i18n: I18n }>,
+): Array<GPickerDocsView | GPickerViewId> {
+  const { pickerAPI, i18n } = options;
   if (typeof pickerAPI.DocsView !== "function") {
-    return pickerAPI.ViewId.SPREADSHEETS;
+    return [pickerAPI.ViewId.SPREADSHEETS];
   }
-  return new pickerAPI.DocsView(pickerAPI.ViewId.SPREADSHEETS)
-    .setMode(pickerAPI.DocsViewMode.LIST)
-    .setMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
-    .setIncludeFolders(true);
+  const makeSheetsView = () => {
+    return new pickerAPI.DocsView(pickerAPI.ViewId.SPREADSHEETS)
+      .setMode(pickerAPI.DocsViewMode.LIST)
+      .setMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
+      .setIncludeFolders(true);
+  };
+  return [
+    makeSheetsView().setLabel(i18n._(VIEW_LABELS.myDrive)),
+    makeSheetsView()
+      .setOwnedByMe(false)
+      .setLabel(i18n._(VIEW_LABELS.sharedWithMe)),
+    makeSheetsView()
+      .setEnableDrives(true)
+      .setLabel(i18n._(VIEW_LABELS.sharedDrives)),
+  ];
 }
 
 type UseGooglePickerOptions = {
@@ -91,6 +142,7 @@ export function useGooglePicker({
   isLoadingGoogleAuthState: boolean;
   selectedGoogleAccount: GoogleToken | undefined;
 } {
+  const { i18n } = useLingui();
   const [selectedAccount, setSelectedAccount] = useState<
     GoogleToken | undefined
   >();
@@ -128,9 +180,15 @@ export function useGooglePicker({
     ) {
       return undefined;
     }
+    const builder = new pickerAPI.PickerBuilder();
+    // Added in a loop because the tab order is the `addView` order, and a
+    // fluent chain cannot vary in length.
+    _spreadsheetViews({ pickerAPI, i18n }).forEach((view) => {
+      builder.addView(view);
+    });
+
     return (
-      new pickerAPI.PickerBuilder()
-        .addView(_spreadsheetView(pickerAPI))
+      builder
         .setOAuthToken(accessToken)
         .setDeveloperKey(_getGooglePickerAPIKey())
         .setAppId(_getGooglePickerAppId())
@@ -168,6 +226,7 @@ export function useGooglePicker({
     onCancel,
     onError,
     selectedAccount,
+    i18n,
   ]);
 
   const isLoadingGoogleAuthState = isLoadingUser || isLoadingTokens;

@@ -1,6 +1,6 @@
+import { describe, expect, it, vi } from "vitest";
 import { acquireOpenDataResource } from "$/open-data/acquireOpenDataResource.ts";
 import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
-import { describe, expect, it, vi } from "vitest";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import type { OpenDataHttp } from "$/open-data/CkanClient/CkanClient.types.ts";
 import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";

@@ -4,7 +4,7 @@ import { Container, Stack, Text, Title } from "@mantine/core";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -89,7 +89,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
 
   if (!isSettingsAdmin) {
     return (
-      <AppLayout title={t`Settings`}>
+      <AppSlate title={t`Settings`}>
         <Container py="xxxl" size="xl">
           <Title order={3}>
             <Trans>Access denied</Trans>
@@ -101,7 +101,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
             </Trans>
           </Text>
         </Container>
-      </AppLayout>
+      </AppSlate>
     );
   }
 
@@ -116,8 +116,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
               initialValue: workspace.name,
               label: t`Workspace Name`,
               validateFn: (value: string) => {
-                return value.trim() === "" ?
-                    t`Workspace name is required`
+                return value.trim() === ""
+                  ? t`Workspace name is required`
                   : undefined;
               },
             },
@@ -135,9 +135,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
             });
           }}
         />
-        {isCurrentUserTheWorkspaceOwner ?
+        {isCurrentUserTheWorkspaceOwner ? (
           <WorkspaceDangerZone workspace={workspace} />
-        : null}
+        ) : null}
       </Stack>
     );
   };
@@ -164,9 +164,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
   };
 
   return (
-    <AppLayout title={t`Settings`}>
+    <AppSlate title={t`Settings`}>
       <Container py="xxxl" size="xl">
-        {isCurrentUserTheWorkspaceOwner ?
+        {isCurrentUserTheWorkspaceOwner ? (
           <Tabs
             tabIds={OWNER_TAB_IDS}
             value={isOwnerTabId(tabName) ? tabName : "general"}
@@ -202,7 +202,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
             }}
           />
-        : <Tabs
+        ) : (
+          <Tabs
             tabIds={NON_OWNER_TAB_IDS}
             value={isNonOwnerTabId(tabName) ? tabName : "general"}
             onTabChange={navigateToTab}
@@ -233,8 +234,8 @@ export function WorkspaceSettingsPage(): JSX.Element {
               },
             }}
           />
-        }
+        )}
       </Container>
-    </AppLayout>
+    </AppSlate>
   );
 }

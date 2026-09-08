@@ -13,15 +13,15 @@ export function LowConfidenceMatchCallout({ guess }: Props): ReactNode {
   const { t } = useLingui();
   const [isDismissed, setIsDismissed] = useState(false);
   return isDismissed ? null : (
-      <Callout
-        color="warning"
-        withCloseButton
-        closeButtonLabel={t`Dismiss`}
-        onClose={() => {
-          setIsDismissed(true);
-        }}
-      >
-        {t`Latitude and longitude were matched from the column names ${guess.latitudeColumnName} and ${guess.longitudeColumnName}. Change them above if that is wrong.`}
-      </Callout>
-    );
+    <Callout
+      color="warning"
+      withCloseButton
+      closeButtonLabel={t`Dismiss`}
+      onClose={() => {
+        setIsDismissed(true);
+      }}
+    >
+      {t`Latitude and longitude were matched from the column names ${guess.latitudeColumnName} and ${guess.longitudeColumnName}. Change them above if that is wrong.`}
+    </Callout>
+  );
 }

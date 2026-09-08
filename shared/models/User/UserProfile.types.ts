@@ -1,6 +1,6 @@
-import type { UUID } from "@avandar/utils";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
+import type { UUID } from "@avandar/utils";
 
 export type UserProfileId = UUID<"UserProfile">;
 export type MembershipId = UUID<"Membership">;

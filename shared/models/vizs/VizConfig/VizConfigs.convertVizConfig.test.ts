@@ -1,6 +1,6 @@
 import { objectEntries } from "@avandar/utils";
-import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import { describe, expect, it } from "vitest";
+import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type {
   VizConfig,

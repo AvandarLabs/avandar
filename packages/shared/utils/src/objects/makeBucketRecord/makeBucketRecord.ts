@@ -21,13 +21,17 @@ export function makeBucketRecord<
   T,
   InK extends keyof T | undefined,
   ValueKey extends keyof T | undefined,
-  OutK extends undefined extends InK ? PropertyKey
-  : Extract<T[Extract<InK, PropertyKey>], PropertyKey> = undefined extends InK ?
-    string
-  : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
-  OutV extends undefined extends ValueKey ? unknown
-  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-  : T[Extract<ValueKey, PropertyKey>],
+  OutK extends (undefined extends InK
+    ? PropertyKey
+    : Extract<T[Extract<InK, PropertyKey>], PropertyKey>) =
+    undefined extends InK
+      ? string
+      : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
+  OutV extends (undefined extends ValueKey
+    ? unknown
+    : T[Extract<ValueKey, PropertyKey>]) = undefined extends ValueKey
+    ? T
+    : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   {

@@ -1,6 +1,6 @@
+import { describe, expect, it, vi } from "vitest";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema";
-import { describe, expect, it, vi } from "vitest";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
 const { fromMock } = vi.hoisted(() => {
@@ -99,9 +99,9 @@ describe("AvaMapClient.saveMapConfig", () => {
       saveCount += 1;
       return _createQuery({
         result:
-          saveCount === 1 ?
-            _createMapRow("2026-08-14T00:01:00.000Z")
-          : undefined,
+          saveCount === 1
+            ? _createMapRow("2026-08-14T00:01:00.000Z")
+            : undefined,
         error: saveCount === 1 ? undefined : { code: "PGRST116" },
       });
     });

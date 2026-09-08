@@ -2,8 +2,8 @@ import { Select } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
 import { VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
-import type { SelectData } from "@avandar/ui";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { SelectData } from "@avandar/ui";
 import type { ReactNode } from "react";
 
 type Props = {

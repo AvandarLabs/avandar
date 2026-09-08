@@ -12,8 +12,8 @@ function _withTimeColumn(
 ): MapLayer.T {
   const { layer, column } = options;
   if (column === undefined) {
-    return layer.timeColumn === undefined ?
-        layer
+    return layer.timeColumn === undefined
+      ? layer
       : { ...layer, timeColumn: undefined };
   }
   if (!isMapTimeColumn(column) || !hasQueryColumn({ layer, column })) {

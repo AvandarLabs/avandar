@@ -21,8 +21,8 @@ export function useDiscoveryResolver(): DiscoveryResolver {
           .map((row) => {
             const rowKeys = Object.keys(row);
             const value = rowKeys.length > 0 ? row[rowKeys[0]!] : undefined;
-            return value === null || value === undefined ?
-                undefined
+            return value === null || value === undefined
+              ? undefined
               : String(value);
           })
           .filter(isDefined)

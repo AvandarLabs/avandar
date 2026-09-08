@@ -99,9 +99,9 @@ export function pairByProximity({
       }, Number.POSITIVE_INFINITY);
 
     const ambiguityRatio =
-      Number.isFinite(runnerUp) && runnerUp > 0 ?
-        candidate.distance / runnerUp
-      : 0;
+      Number.isFinite(runnerUp) && runnerUp > 0
+        ? candidate.distance / runnerUp
+        : 0;
 
     pairs.push({
       value: candidate.valueItem.text,

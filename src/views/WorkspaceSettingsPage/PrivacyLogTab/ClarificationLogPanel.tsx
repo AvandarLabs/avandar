@@ -28,7 +28,7 @@ function useOutcomeLabels(): Record<ClarificationOutcome, string> {
 
 const OUTCOME_COLOR: Record<ClarificationOutcome, string> = {
   answered: "green",
-  cancelled: "gray",
+  cancelled: "neutral",
   cap_reached: "yellow",
   neutral_failure: "red",
 };
@@ -78,7 +78,7 @@ export function ClarificationLogPanel(): React.ReactNode {
         </Text>
       </Stack>
 
-      {entries.length === 0 ?
+      {entries.length === 0 ? (
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
             <Trans>
@@ -87,7 +87,8 @@ export function ClarificationLogPanel(): React.ReactNode {
             </Trans>
           </Text>
         </Card>
-      : <Table striped withTableBorder>
+      ) : (
+        <Table striped withTableBorder>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>
@@ -131,7 +132,7 @@ export function ClarificationLogPanel(): React.ReactNode {
                       color={
                         OUTCOME_COLOR[entry.outcome as ClarificationOutcome] ??
                         LEGACY_OUTCOME_COLOR[entry.outcome] ??
-                        "gray"
+                        "neutral"
                       }
                       size="sm"
                       variant="light"
@@ -142,23 +143,24 @@ export function ClarificationLogPanel(): React.ReactNode {
                     </Badge>
                   </Table.Td>
                   <Table.Td>
-                    {entry.timeToAnswerMs !== null ?
+                    {entry.timeToAnswerMs !== null ? (
                       <Text size="xs">
                         <Trans>
                           {Math.round(entry.timeToAnswerMs / 100) / 10}s
                         </Trans>
                       </Text>
-                    : <Text size="xs" c="dimmed">
+                    ) : (
+                      <Text size="xs" c="dimmed">
                         —
                       </Text>
-                    }
+                    )}
                   </Table.Td>
                 </Table.Tr>
               );
             })}
           </Table.Tbody>
         </Table>
-      }
+      )}
     </Stack>
   );
 }

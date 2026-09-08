@@ -7,13 +7,13 @@ import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/dete
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
 import { SessionSecret } from "@/components/privacy/privacy-helpers/SessionSecret";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   ConsentDecision,
   ConsentModalMode,
 } from "@/components/privacy/ConsentModal/ConsentModal";
 import type { BiasHit } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import type { PiiDetectionResult } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 export type CrossBoundaryContext =
   | "discovery_clarification"
@@ -126,12 +126,15 @@ function _openModal(args: {
 }): Promise<ConsentDecision> {
   return new Promise((resolve) => {
     const title =
-      args.mode === "clean" ? i18n._(msg`Send to AI?`)
-      : args.mode === "pii_warning" ? i18n._(msg`Personal data detected`)
-      : args.mode === "medical_strict" ?
-        i18n._(msg`Health information detected`)
-      : args.mode === "composite" ? i18n._(msg`Review before sending`)
-      : i18n._(msg`Consider rephrasing`);
+      args.mode === "clean"
+        ? i18n._(msg`Send to AI?`)
+        : args.mode === "pii_warning"
+          ? i18n._(msg`Personal data detected`)
+          : args.mode === "medical_strict"
+            ? i18n._(msg`Health information detected`)
+            : args.mode === "composite"
+              ? i18n._(msg`Review before sending`)
+              : i18n._(msg`Consider rephrasing`);
 
     let settled = false;
     const settle = (decision: ConsentDecision) => {
@@ -189,9 +192,9 @@ export async function decideIfDataCanCrossBoundary(
   });
 
   const biasInput =
-    typeof req.text === "string" && req.text.trim().length > 0 ?
-      req.text
-    : undefined;
+    typeof req.text === "string" && req.text.trim().length > 0
+      ? req.text
+      : undefined;
   const biasHits: BiasHit[] = biasInput ? detectBias(biasInput).hits : [];
 
   let mode = _chooseMode({ pii, biasHits });
@@ -266,9 +269,9 @@ export async function decideIfDataCanCrossBoundary(
   // suggestion into the outgoing text. The ack token must cover the
   // FINAL text the model will see, so we hash post-swap.
   const finalText =
-    decision.useSuggestion && biasHits[0]?.suggestion ?
-      biasHits[0].suggestion
-    : req.text;
+    decision.useSuggestion && biasHits[0]?.suggestion
+      ? biasHits[0].suggestion
+      : req.text;
 
   const ackToken = await _mintAckFor(req, finalText ?? "");
 

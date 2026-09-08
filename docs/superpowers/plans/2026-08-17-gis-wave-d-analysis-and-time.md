@@ -1562,7 +1562,7 @@ through the UI. `finally` cleanup. Timeout ≤ 45s.
 
 1. `gis-time-range.spec.ts` — bind time column, drag range, reload, outlier
    week gone.
-2. `gis-aoi-filter.spec.ts` — `PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1`; draw a
+2. `gis-aoi-filter.spec.ts` — tagged `@online`; draw a
    ring around 10,10; outlier gone; opt a second layer out.
 3. `gis-buffer-layer.spec.ts` — spatial; buffer the boundary layer; reload
    still shows a polygon source named Buffer of …; Aggregate only path does
@@ -1578,8 +1578,8 @@ through the UI. `finally` cleanup. Timeout ≤ 45s.
 
 ```bash
 pnpm test:e2e tests/e2e/gis-time-range.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-aoi-filter.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-buffer-layer.spec.ts
+pnpm test:e2e tests/e2e/gis-aoi-filter.spec.ts
+pnpm test:e2e tests/e2e/gis-buffer-layer.spec.ts
 pnpm test:e2e tests/e2e/gis-measure.spec.ts
 pnpm test:e2e tests/e2e/gis-goto.spec.ts
 pnpm test:e2e tests/e2e/gis-annotations.spec.ts

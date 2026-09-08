@@ -1,5 +1,5 @@
-import { ANALYTICS_EVENT_NAMES } from "$/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts";
 import { describe, expect, expectTypeOf, it } from "vitest";
+import { ANALYTICS_EVENT_NAMES } from "$/analytics/AnalyticsEvents/AnalyticsEvents.constants.ts";
 import type {
   AnalyticsEventPayloads,
   ChatTurnErrorClass,

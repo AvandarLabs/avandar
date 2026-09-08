@@ -30,7 +30,7 @@ declare module "@mantine/core" {
     /** Primary color */
     primaryColor: string;
     zIndex: {
-      appShellMain: number;
+      appSlate: number;
       appChrome: number;
       floatingPanel: number;
       modal: number;

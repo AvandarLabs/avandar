@@ -1,6 +1,6 @@
 import { objectKeys, prop } from "@avandar/utils";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it } from "vitest";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import {
   featureCollection,
   valueColumnId,

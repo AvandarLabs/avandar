@@ -3,8 +3,8 @@ import { ClassificationBreakHandles } from "@/views/GisApp/panels/LayerInspector
 import { GraduatedMethodControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls";
 import { GraduatedRampSelect } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect";
 import { NormalizationControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type GraduatedColor = Extract<MapLayer.Color, { type: "graduated" }>;
@@ -17,8 +17,8 @@ type Props = {
 };
 
 function _getClassCount(color: GraduatedColor): number {
-  return color.classification.method === "manual" ?
-      color.classification.breaks.length + 1
+  return color.classification.method === "manual"
+    ? color.classification.breaks.length + 1
     : color.classification.classCount;
 }
 
@@ -49,9 +49,9 @@ export function GraduatedControls({
         breaks={manualBreaks}
         onLayerChange={onLayerChange}
       />
-      {color.classification.method === "jenks" && classifiedCount > 5_000 ?
+      {color.classification.method === "jenks" && classifiedCount > 5_000 ? (
         <p>{t`Natural breaks used an evenly ranked sample of 5,000 values.`}</p>
-      : null}
+      ) : null}
     </>
   );
 }

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { uuidType } from "$/lib/zodHelpers.ts";
 import {
   BasemapSchema,
@@ -13,7 +14,6 @@ import {
   V4StandardLayerSchema,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV4Schema.ts";
 import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
-import { z } from "zod";
 
 /** Where a layer reads its disputed-status values from. */
 const DisputedStatusRefSchema = z.discriminatedUnion("type", [

@@ -1,17 +1,19 @@
--- Daily chat health: volume, the local versus cloud split, retry pressure,
--- outcome mix, and failure rate.
---
--- `local_messages_sent` is the only way to observe on-device chat. A local turn
--- never reaches the server, so it produces a `chat.message_sent` from the
--- client and nothing else, forever. Comparing it against `turns_completed` is
--- how the two runtimes are sized against each other.
---
--- Every column sourced from `chat.turn_completed` or `chat.turn_failed` stays
--- null or zero until server instrumentation records those events. The stable
--- columns let that instrumentation arrive without changing this view.
---
--- `avg_attempt_count` exposes how often the three-attempt escalation in
--- `PostChatMessages` fires, which is invisible today.
+/**
+ * Daily chat health: volume, the local versus cloud split, retry pressure,
+ * outcome mix, and failure rate.
+ *
+ * `local_messages_sent` is the only way to observe on-device chat. A local turn
+ * never reaches the server, so it produces a `chat.message_sent` from the
+ * client and nothing else, forever. Comparing it against `turns_completed` is
+ * how the two runtimes are sized against each other.
+ *
+ * Every column sourced from `chat.turn_completed` or `chat.turn_failed` stays
+ * null or zero until server instrumentation records those events. The stable
+ * columns let that instrumentation arrive without changing this view.
+ *
+ * `avg_attempt_count` exposes how often the three-attempt escalation in
+ * `PostChatMessages` fires, which is invisible today.
+ */
 create or replace view analytics.chat_health as
 with
   daily as (

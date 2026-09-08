@@ -60,26 +60,26 @@ async function _createServer(): Promise<FastifyInstance> {
   return server;
 }
 
-type NgrokDevURLTarget = Readonly<{
+type NgrokDevUrlTarget = Readonly<{
   url: string;
   dateAdded: string;
   lastAccessedDate: string | null;
 }>;
 
-const TARGET_A: NgrokDevURLTarget = {
+const TARGET_A: NgrokDevUrlTarget = {
   url: "https://a.example",
   dateAdded: "2026-01-01T00:00:00.000Z",
   lastAccessedDate: null,
 };
 
-const TARGET_B: NgrokDevURLTarget = {
+const TARGET_B: NgrokDevUrlTarget = {
   url: "https://b.example/base",
   dateAdded: "2026-01-02T00:00:00.000Z",
   lastAccessedDate: null,
 };
 
 function _mockNgrokTargetsJSON(options: {
-  targets: readonly NgrokDevURLTarget[];
+  targets: readonly NgrokDevUrlTarget[];
 }): void {
   const mockedReadFile = readFile as unknown as MockReadFile;
   mockedReadFile.mockResolvedValue(
@@ -176,14 +176,14 @@ describe("registerForwardingRoutes", () => {
       received: true,
       results: [
         {
-          devURL: TARGET_A.url,
-          forwardURL: "https://a.example/webhook/foo?x=1&y=2",
+          devUrl: TARGET_A.url,
+          forwardUrl: "https://a.example/webhook/foo?x=1&y=2",
           ok: true,
           status: 200,
         },
         {
-          devURL: TARGET_B.url,
-          forwardURL: "https://b.example/base/webhook/foo?x=1&y=2",
+          devUrl: TARGET_B.url,
+          forwardUrl: "https://b.example/base/webhook/foo?x=1&y=2",
           ok: true,
           status: 201,
         },
@@ -214,7 +214,7 @@ describe("registerForwardingRoutes", () => {
       }
     ).mock.calls[0]!;
     const parsed: unknown = JSON.parse(String(writtenContents));
-    const targets = (parsed as { targets: NgrokDevURLTarget[] }).targets;
+    const targets = (parsed as { targets: NgrokDevUrlTarget[] }).targets;
 
     expect(targets[0]).toMatchObject({ url: TARGET_A.url });
     expect(targets[1]).toMatchObject({ url: TARGET_B.url });
@@ -327,14 +327,14 @@ describe("registerForwardingRoutes", () => {
       received: true,
       results: [
         {
-          devURL: "https://a.example",
-          forwardURL: "https://a.example/err",
+          devUrl: "https://a.example",
+          forwardUrl: "https://a.example/err",
           ok: false,
           error: "boom",
         },
         {
-          devURL: "https://b.example",
-          forwardURL: "https://b.example/err",
+          devUrl: "https://b.example",
+          forwardUrl: "https://b.example/err",
           ok: true,
           status: 202,
         },
@@ -349,7 +349,7 @@ describe("registerForwardingRoutes", () => {
       }
     ).mock.calls[0]!;
     const parsed: unknown = JSON.parse(String(writtenContents));
-    const targets = (parsed as { targets: NgrokDevURLTarget[] }).targets;
+    const targets = (parsed as { targets: NgrokDevUrlTarget[] }).targets;
 
     expect(targets[0]).toMatchObject(TARGET_A);
     expect(targets[1]).toMatchObject({ url: "https://b.example" });
@@ -389,7 +389,7 @@ describe("registerForwardingRoutes", () => {
       }
     ).mock.calls[0]!;
     const parsed: unknown = JSON.parse(String(writtenContents));
-    const targets = (parsed as { targets: NgrokDevURLTarget[] }).targets;
+    const targets = (parsed as { targets: NgrokDevUrlTarget[] }).targets;
 
     expect(targets[0]).toMatchObject(TARGET_A);
     expect(targets[1]).toMatchObject({ url: "https://b.example" });

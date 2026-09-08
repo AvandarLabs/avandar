@@ -1,5 +1,5 @@
-import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
 
 /**
  * This model tracks the metadata of a locally-loaded dataset into the user's

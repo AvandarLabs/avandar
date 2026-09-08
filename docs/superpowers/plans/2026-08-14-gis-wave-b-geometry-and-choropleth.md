@@ -1673,11 +1673,15 @@ Expected: the existing focused GIS spec passes.
 
 - [x] **Step 2: Test Spatial flag opt-in before implementation**
 
-Add unit tests that normal E2E setup includes `disable-duckdb-spatial`, while
-`PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1` removes that flag even if it came from
-`.env.development`. Add a config predicate that also disables web-server reuse
-for a Spatial-enabled run, preventing connection to an already running Vite
-server with the old flag.
+Add unit tests that an offline E2E run adds `disable-duckdb-spatial`, while a
+normal run removes that flag even if it came from `.env.development`. Add a
+config predicate that also disables web-server reuse, preventing connection to
+an already running Vite server with the old flag.
+
+Superseded: this step originally opted *in* to Spatial through a
+`PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL` variable. The shipped design inverts it.
+Spatial is on for a bare `pnpm test:e2e`, and `pnpm test:e2e:offline` opts out.
+See `ensureE2EViteFeatureFlags.ts`.
 
 Run:
 
@@ -1689,15 +1693,16 @@ Expected before implementation: the opt-in test fails.
 
 - [x] **Step 3: Implement the isolated runner behavior**
 
-Normal Playwright behavior remains unchanged and offline-stable. Only this
-explicit environment variable enables network loading for Spatial specs:
+Playwright loads the Spatial extension by default, so these specs need no
+extra opt-in:
 
 ```bash
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
+pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
 ```
 
-In `playwright.config.ts`, set `reuseExistingServer` to false for this mode.
-Do not remove the normal suite's disable flag globally.
+In `playwright.config.ts`, set `reuseExistingServer` to false for the Vite
+server. Offline runs skip these specs by `grepInvert` on the `@online` tag
+rather than letting them time out.
 
 - [x] **Step 4: Create minimal deterministic fixtures**
 
@@ -1742,9 +1747,9 @@ fails in `seedAvaMap` before browser interaction. The migration histories also
 diverge, so this worktree did not mutate or reset the shared local database.
 
 ```bash
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-boundary-join.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-choropleth-suppression.spec.ts
+pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
+pnpm test:e2e tests/e2e/gis-boundary-join.spec.ts
+pnpm test:e2e tests/e2e/gis-choropleth-suppression.spec.ts
 ```
 
 Expected: each file passes independently within the configured local 45-second
@@ -1811,9 +1816,9 @@ Blocked by the same unapplied maps-table migration described in Task 17.
 
 ```bash
 pnpm test:e2e tests/e2e/gis-map-layers.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-boundary-join.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-choropleth-suppression.spec.ts
+pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
+pnpm test:e2e tests/e2e/gis-boundary-join.spec.ts
+pnpm test:e2e tests/e2e/gis-choropleth-suppression.spec.ts
 ```
 
 Expected: every file passes independently. Do not replace these commands with

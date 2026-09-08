@@ -1,9 +1,9 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it, vi } from "vitest";
 import { DashboardRouteResolver } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
-import type { IDashboardRouteUtils } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { IDashboardRouteUtils } from "@/clients/dashboards/DashboardRouteResolver/DashboardRouteResolver";
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 const WORKSPACE_ID = "22222222-2222-4222-8222-222222222222" as Workspace.Id;
@@ -150,8 +150,8 @@ describe("DashboardRouteResolver.makeDashboardRouteOutcomeFromPublicRoute", () =
         .fn()
         .mockImplementation(
           async (params: Readonly<{ visibility: "public" | "workspace" }>) => {
-            return params.visibility === "workspace" ?
-                [inaccessibleDashboard]
+            return params.visibility === "workspace"
+              ? [inaccessibleDashboard]
               : [];
           },
         ),

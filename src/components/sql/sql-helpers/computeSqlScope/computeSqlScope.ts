@@ -6,11 +6,11 @@
  */
 import { prop } from "@avandar/utils";
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type {
   SqlDisplayCatalog,
   SqlDisplaySegment,
 } from "@/components/sql/sql-helpers/sqlDisplay.types";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 export type SqlScope = {
   /** Datasets referenced anywhere in the SQL (catalog-resolved). */
@@ -65,22 +65,22 @@ export function computeSqlScope(input: {
   );
 
   const outOfScopeColumnTokens =
-    datasetIds.size > 0 ?
-      segments
-        .filter(
-          (seg): seg is Extract<SqlDisplaySegment, { kind: "column" }> => {
-            return seg.kind === "column" && !columnNames.has(seg.name);
-          },
-        )
-        .map((seg) => {
-          return {
-            name: seg.name,
-            start: seg.start,
-            end: seg.end,
-            raw: seg.raw,
-          };
-        })
-    : [];
+    datasetIds.size > 0
+      ? segments
+          .filter(
+            (seg): seg is Extract<SqlDisplaySegment, { kind: "column" }> => {
+              return seg.kind === "column" && !columnNames.has(seg.name);
+            },
+          )
+          .map((seg) => {
+            return {
+              name: seg.name,
+              start: seg.start,
+              end: seg.end,
+              raw: seg.raw,
+            };
+          })
+      : [];
 
   return { datasetIds, columnNames, outOfScopeColumnTokens };
 }

@@ -23,9 +23,11 @@ export function ActionIcon({
     <MantineActionIcon className={clsx(css.root, props.className)} {...props} />
   );
 
-  return tooltip ?
-      <Tooltip label={tooltip} {...tooltipProps}>
-        {iconButton}
-      </Tooltip>
-    : iconButton;
+  return tooltip ? (
+    <Tooltip label={tooltip} {...tooltipProps}>
+      {iconButton}
+    </Tooltip>
+  ) : (
+    iconButton
+  );
 }

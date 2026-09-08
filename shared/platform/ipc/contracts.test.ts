@@ -1,10 +1,10 @@
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts.ts";
 import { DatasetBlobContracts } from "$/platform/ipc/contracts/DatasetBlobContracts.ts";
 import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts";
 import { DuckDbContracts } from "$/platform/ipc/contracts/DuckDbContracts.ts";
 import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
 import { ServerApiContracts } from "$/platform/ipc/contracts/ServerApiContracts.ts";
-import { describe, expect, expectTypeOf, it } from "vitest";
 import type { IpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts";
 
 describe("defineIpcContract", () => {

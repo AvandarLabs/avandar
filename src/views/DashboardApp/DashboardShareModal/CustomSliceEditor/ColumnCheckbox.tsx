@@ -27,11 +27,11 @@ export function ColumnCheckbox({
           <Badge size="xs" variant="outline" color="neutral">
             {column.dataType}
           </Badge>
-          {isQueried ?
+          {isQueried ? (
             <Badge size="xs" variant="light" color="teal">
               <Trans>queried</Trans>
             </Badge>
-          : null}
+          ) : null}
         </Group>
       }
       checked={isSelected}

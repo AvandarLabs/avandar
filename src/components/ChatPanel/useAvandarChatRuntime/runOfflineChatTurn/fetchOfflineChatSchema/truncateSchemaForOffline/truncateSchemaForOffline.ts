@@ -26,9 +26,8 @@ export function truncateSchemaForOffline(
     preferredDatasetId !== undefined &&
     datasets.some(propEq("id", preferredDatasetId));
 
-  const orderedDatasetIds =
-    hasPreferred ?
-      [
+  const orderedDatasetIds = hasPreferred
+    ? [
         preferredDatasetId,
         ...datasets.map(prop("id")).filter((id) => {
           return id !== preferredDatasetId;
@@ -52,11 +51,11 @@ export function truncateSchemaForOffline(
   );
   // Keep dataset labels for table resolution when column metadata is empty.
   const trimmedDatasets: OfflineChatSchemaDataset[] =
-    datasetIdSet.size > 0 ?
-      datasets.filter((dataset) => {
-        return datasetIdSet.has(dataset.id);
-      })
-    : datasets;
+    datasetIdSet.size > 0
+      ? datasets.filter((dataset) => {
+          return datasetIdSet.has(dataset.id);
+        })
+      : datasets;
 
   const concepts = (schema.concepts ?? []).slice(0, MAX_DATASETS);
   const keptConceptIds = new Set(concepts.map(prop("id")));

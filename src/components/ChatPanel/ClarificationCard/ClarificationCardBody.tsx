@@ -2,9 +2,9 @@ import { match } from "ts-pattern";
 import { DiscoveryBody } from "./DiscoveryBody/DiscoveryBody";
 import { FixedOptionsBody } from "./FixedOptionsBody";
 import { FreeTextBody } from "./FreeTextBody";
+import type { ChatClarifyResponseShape } from "$/types/chat.types";
 import type { ClarificationAnswerHandler } from "./ClarificationAnswerModule/ClarificationAnswer";
 import type { DiscoveryResolver } from "@/components/ChatPanel/chatClarify.types";
-import type { ChatClarifyResponseShape } from "$/types/chat.types";
 
 type Props = {
   responseShape: ChatClarifyResponseShape;

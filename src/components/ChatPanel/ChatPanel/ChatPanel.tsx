@@ -14,10 +14,10 @@ import css from "./ChatPanel.module.css";
 /**
  * The right-side chat panel ("Ask Avandar") rendered inside the AppShell's
  * Aside slot. Owns the Assistant UI runtime and renders the thread + composer.
- * Case Manager composer layout overlays a wider panel on the canvas; the
+ * Case Manager composer layout overlays a wider panel on the slate; the
  * AppShell column stays docked. When the user asks a data question on the
  * Data Explorer page, the runtime pushes the generated SQL to
- * `DataExplorerStateManager` so the canvas re-runs automatically.
+ * `DataExplorerStateManager` so the query re-runs automatically.
  */
 export function ChatPanel(): React.ReactNode {
   const dispatch = ChatPanelStateManager.useDispatch();

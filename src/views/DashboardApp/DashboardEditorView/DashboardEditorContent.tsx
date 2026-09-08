@@ -1,6 +1,6 @@
 import { Flex } from "@mantine/core";
 import { Puck } from "@puckeditor/core";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { CanvasAgGridStyles } from "@/views/DashboardApp/DashboardEditorView/CanvasAgGridStyles";
 import { DashboardEditorToolbar } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorToolbar";
 import { DASHBOARD_EDITOR_INITIAL_PUCK_UI } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
@@ -8,10 +8,10 @@ import css from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.mo
 import { ShareOnlyAccessAlert } from "@/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert";
 import { useFullWidthCanvasViewport } from "@/views/DashboardApp/DashboardEditorView/useFullWidthCanvasViewport/useFullWidthCanvasViewport";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { DashboardEditorViewState } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
 import type { Data } from "@puckeditor/core";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactElement } from "react";
 
 type Props = {
@@ -31,16 +31,14 @@ export function DashboardEditorContent({
 
   return (
     <DashboardFilterStateManager.Provider>
-      <AppLayout floatingToolbar>
+      <AppSlate floatingToolbar>
         <Flex
           className={css.compactDashboardEditor}
           direction="column"
           h="100%"
           pt={40}
         >
-          {state.isShareOnlyAccess ?
-            <ShareOnlyAccessAlert />
-          : null}
+          {state.isShareOnlyAccess ? <ShareOnlyAccessAlert /> : null}
           <Puck
             key={state.editorRevision}
             metadata={state.metadata}
@@ -68,7 +66,7 @@ export function DashboardEditorContent({
             }}
           />
         </Flex>
-      </AppLayout>
+      </AppSlate>
     </DashboardFilterStateManager.Provider>
   );
 }

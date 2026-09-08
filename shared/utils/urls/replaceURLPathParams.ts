@@ -1,14 +1,15 @@
 type _URLParamNameExtractor<
   RoutePath extends `/${string}`,
   ParamNames extends readonly string[] = [],
-> =
-  RoutePath extends "/" ? ParamNames
-  : RoutePath extends `/${infer Head}/${infer Rest}` ?
-    Head extends `$${infer ParamName}` ?
-      [...ParamNames, ParamName, ..._URLParamNameExtractor<`/${Rest}`>]
-    : [...ParamNames, ..._URLParamNameExtractor<`/${Rest}`>]
-  : RoutePath extends `/$${infer ParamName}` ? [...ParamNames, ParamName]
-  : ParamNames;
+> = RoutePath extends "/"
+  ? ParamNames
+  : RoutePath extends `/${infer Head}/${infer Rest}`
+    ? Head extends `$${infer ParamName}`
+      ? [...ParamNames, ParamName, ..._URLParamNameExtractor<`/${Rest}`>]
+      : [...ParamNames, ..._URLParamNameExtractor<`/${Rest}`>]
+    : RoutePath extends `/$${infer ParamName}`
+      ? [...ParamNames, ParamName]
+      : ParamNames;
 
 type ValidPathParamValue = string | number;
 
