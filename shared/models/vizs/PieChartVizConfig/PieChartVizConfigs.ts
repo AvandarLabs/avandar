@@ -109,7 +109,7 @@ export const PieChartVizConfigs = {
         return vizConfig;
       })
       .with("funnel", (vizType): FunnelChartVizConfig => {
-        return { vizType, nameKey, valueKey };
+        return { vizType, nameKey, valueKey, seriesColors };
       })
       .with("radar", (vizType): RadarChartVizConfig => {
         const radarSeries: RadarSeries[] =
