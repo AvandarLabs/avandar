@@ -15,7 +15,7 @@ import type { ResolveDataTrigger } from "@puckeditor/core";
  *
  * The inner map is a `Partial<VizConfigRegistry>`, so each entry's config is
  * correlated with the viz type it is filed under: a bar config cannot be
- * stored under `"pie"`. The whole design rests on that correlation holding.
+ * stored under `"pie"`.
  */
 export type DataVizConfigMemory = Record<string, Partial<VizConfigRegistry>>;
 
