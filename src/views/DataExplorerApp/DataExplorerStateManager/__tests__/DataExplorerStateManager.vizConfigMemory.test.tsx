@@ -92,11 +92,11 @@ describe("Data Explorer viz config memory", () => {
       result.current[1].setActiveVizType("bar");
     });
 
-    const restored = result.current[0].vizConfig as BarChartVizConfig;
-    expect(restored.chartStyle?.legend?.position).toBe("left");
-    expect(restored.chartStyle?.grid?.color).toBe("#e0e0e0");
-    expect(restored.layout).toBe("stack");
-    expect(restored.withLegend).toBe(false);
+    const restoredVizConfig = result.current[0].vizConfig as BarChartVizConfig;
+    expect(restoredVizConfig.chartStyle?.legend?.position).toBe("left");
+    expect(restoredVizConfig.chartStyle?.grid?.color).toBe("#e0e0e0");
+    expect(restoredVizConfig.layout).toBe("stack");
+    expect(restoredVizConfig.withLegend).toBe(false);
   });
 
   it("falls back to converting when the target has no memory", () => {
@@ -113,9 +113,9 @@ describe("Data Explorer viz config memory", () => {
     // config and then applies structured hydration. Hydration prunes keys the
     // (empty) structured query cannot account for, which is why xAxisKey does
     // not survive here.
-    const converted = result.current[0].vizConfig;
-    expect(converted.vizType).toBe("line");
-    expect(converted).toStrictEqual({
+    const convertedVizConfig = result.current[0].vizConfig;
+    expect(convertedVizConfig.vizType).toBe("line");
+    expect(convertedVizConfig).toStrictEqual({
       vizType: "line",
       xAxisKey: undefined,
       series: [],
@@ -146,13 +146,13 @@ describe("Data Explorer viz config memory", () => {
     act(() => {
       result.current[1].setVizConfig(STYLED_BAR_CONFIG);
     });
-    const before = result.current[0];
+    const stateBeforeReselection = result.current[0];
 
     act(() => {
       result.current[1].setActiveVizType("bar");
     });
 
-    expect(result.current[0]).toBe(before);
+    expect(result.current[0]).toBe(stateBeforeReselection);
   });
 
   it("repairs a remembered config that names a dropped column", () => {
@@ -180,21 +180,18 @@ describe("Data Explorer viz config memory", () => {
       result.current[1].setActiveVizType("bar");
     });
 
-    const restored = result.current[0].vizConfig as BarChartVizConfig;
+    const restoredVizConfig = result.current[0].vizConfig as BarChartVizConfig;
 
     // The stale series key is gone.
-    const seriesKeys = restored.series.map((entry) => {
+    const seriesKeys = restoredVizConfig.series.map((entry) => {
       return entry.key;
     });
     expect(seriesKeys).not.toContain("revenue");
 
-    // ...and what is left is the remembered bar config repaired in place, not
-    // a fresh projection of the pie config. Only the remembered config can
-    // carry chartStyle, since a pie config has nowhere to hold it, so these
-    // assertions are what distinguish "restored and repaired" from "never
-    // remembered at all".
-    expect(restored.chartStyle?.grid?.color).toBe("#e0e0e0");
-    expect(restored.chartStyle?.legend?.position).toBe("left");
-    expect(restored.layout).toBe("stack");
+    // These values prove the remembered config was repaired: a fresh
+    // projection from pie cannot carry any of them.
+    expect(restoredVizConfig.chartStyle?.grid?.color).toBe("#e0e0e0");
+    expect(restoredVizConfig.chartStyle?.legend?.position).toBe("left");
+    expect(restoredVizConfig.layout).toBe("stack");
   });
 });

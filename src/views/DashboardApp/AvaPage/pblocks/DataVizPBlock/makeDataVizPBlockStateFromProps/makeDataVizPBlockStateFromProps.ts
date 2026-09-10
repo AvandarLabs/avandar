@@ -30,30 +30,19 @@ const DEFAULT_NL_QUERY: DataVizPBlockProps["nlQuery"] = {
 };
 
 /**
- * Pure data-rewrite used by the DataViz block's Puck `resolveData` hook.
- *
- * Keeps `vizType` and `vizConfig.vizType` in sync whenever the user picks a
- * different type from the top-level select: the outgoing config is
- * remembered under its own viz type, and the incoming one is restored from
- * memory when the user has been there before, falling back to
- * `VizConfigs.convertVizConfig` when they have not. Restoring is what makes
- * a bar -> pie -> bar round trip keep styling that a pie config cannot hold.
- *
- * Stays pure: the memory is passed in and the updated memory is returned,
- * so the mutable holder lives in the hook and this function remains
- * directly testable. Also fills in defaults for missing fields so older
- * saved blocks or freshly created ones always resolve to a fully-shaped
- * `DataVizPBlockProps`.
+ * Creates synchronized DataViz block props and type-specific config memory
+ * from the current props. Returns defaults for incomplete saved blocks and
+ * restores remembered settings when the visualization type changes.
  */
-export function resolveDataVizPBlockProps(input: {
+export function makeDataVizPBlockStateFromProps(options: {
   props: Partial<DataVizPBlockProps>;
   changed: ChangedFlags;
   trigger?: ResolveDataTrigger;
-  /** Puck's per-instance id, threaded in because the props type omits it. */
+  /** Identifies the Puck block whose config memory is being updated. */
   blockId: string;
   vizConfigMemory: DataVizConfigMemory;
 }): { props: DataVizPBlockProps; vizConfigMemory: DataVizConfigMemory } {
-  const { props, changed, trigger, blockId, vizConfigMemory } = input;
+  const { props, changed, trigger, blockId, vizConfigMemory } = options;
   // Puck's load pass marks every field `changed` because its resolver cache
   // is empty. Rewriting here would look like an unsaved edit, and seeding
   // memory from it would record a switch the user never made. Missing filter
@@ -75,28 +64,32 @@ export function resolveDataVizPBlockProps(input: {
   };
 
   if (changed.vizType && nextProps.vizConfig.vizType !== nextProps.vizType) {
-    const outgoing = nextProps.vizConfig;
-    const blockMemory = vizConfigMemory[blockId] ?? {};
-    const remembered = blockMemory[nextProps.vizType];
+    const outgoingVizConfig = nextProps.vizConfig;
+    const blockVizConfigMemory = vizConfigMemory[blockId] ?? {};
+    const rememberedVizConfig = blockVizConfigMemory[nextProps.vizType];
 
     // A remembered config can name columns the current query no longer
     // returns. `DataVizPBlock` runs `applyVizConfigFromQueryResult` on every
     // render, so it is reconciled there rather than here, where the result
     // columns are not available.
     nextProps.vizConfig =
-      remembered ?? VizConfigs.convertVizConfig(outgoing, nextProps.vizType);
+      rememberedVizConfig ??
+      VizConfigs.convertVizConfig(outgoingVizConfig, nextProps.vizType);
 
     // TypeScript widens the computed union key to `string` and so cannot see
-    // that `outgoing` lands under its own `vizType`. The key is taken from the
-    // value itself, so the correlation holds by construction.
-    const nextBlockMemory = {
-      ...blockMemory,
-      [outgoing.vizType]: outgoing,
+    // that the outgoing config lands under its own `vizType`. The key is taken
+    // from the value itself, so the correlation holds by construction.
+    const nextBlockVizConfigMemory = {
+      ...blockVizConfigMemory,
+      [outgoingVizConfig.vizType]: outgoingVizConfig,
     } as Partial<VizConfigRegistry>;
 
     return {
       props: nextProps,
-      vizConfigMemory: { ...vizConfigMemory, [blockId]: nextBlockMemory },
+      vizConfigMemory: {
+        ...vizConfigMemory,
+        [blockId]: nextBlockVizConfigMemory,
+      },
     };
   }
 

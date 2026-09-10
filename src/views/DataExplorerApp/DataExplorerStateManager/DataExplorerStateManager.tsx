@@ -200,22 +200,8 @@ export const DataExplorerStateManager = createAppStateManager({
     },
 
     /**
-     * Change the active visualization.
-     *
-     * Remembers the outgoing config under its own viz type, then restores
-     * what the user last had for the incoming one. Restoring is what makes
-     * a bar -> pie -> bar round trip keep the bar chart's axes, grid, and
-     * legend, none of which a pie config can carry.
-     *
-     * A remembered config can name columns the current query no longer
-     * returns, so it is reconciled against the latest result columns on the
-     * way back in. That repairs it in place instead of restoring something
-     * stale: surviving keys keep their styling and dropped ones are
-     * re-seeded. See `applyVizConfigFromQueryResult`.
-     *
-     * With nothing remembered, this falls back to converting the current
-     * config and applying structured `hydrateFromQuery`, which is what the
-     * first switch to any type does.
+     * Activates a visualization type while preserving its most recent config.
+     * Returns state with a restored or hydrated config for the selected type.
      */
     setActiveVizType: (state: DataExplorerAppState, newVizType: VizType) => {
       const { vizConfig, query, rawSql, vizConfigMemory, lastResultColumns } =
@@ -225,9 +211,9 @@ export const DataExplorerStateManager = createAppStateManager({
         return state;
       }
 
-      const remembered = vizConfigMemory[newVizType];
+      const rememberedVizConfig = vizConfigMemory[newVizType];
       const nextVizConfig =
-        remembered === undefined
+        rememberedVizConfig === undefined
           ? VizConfigs.hydrateFromQuery(
               VizConfigs.convertVizConfig(vizConfig, newVizType),
               query,
@@ -236,9 +222,9 @@ export const DataExplorerStateManager = createAppStateManager({
             // remembered config stands as-is until `syncVizFromQueryResult`
             // runs.
             lastResultColumns === undefined
-            ? remembered
+            ? rememberedVizConfig
             : applyVizConfigFromQueryResult({
-                vizConfig: remembered,
+                vizConfig: rememberedVizConfig,
                 rawSql,
                 query,
                 columns: lastResultColumns,
@@ -247,7 +233,7 @@ export const DataExplorerStateManager = createAppStateManager({
       // TypeScript widens the computed union key to `string` and so cannot see
       // that `vizConfig` lands under its own `vizType`. The key is taken from
       // the value itself, so the correlation holds by construction.
-      const nextMemory = {
+      const nextVizConfigMemory = {
         ...vizConfigMemory,
         [vizConfig.vizType]: vizConfig,
       } as Partial<VizConfigRegistry>;
@@ -255,7 +241,7 @@ export const DataExplorerStateManager = createAppStateManager({
       return {
         ...state,
         vizConfig: nextVizConfig,
-        vizConfigMemory: nextMemory,
+        vizConfigMemory: nextVizConfigMemory,
       };
     },
 

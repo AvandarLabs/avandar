@@ -6,14 +6,14 @@ import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import { resolveDataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
+import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
 import { useGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig";
 import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig";
 import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig";
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import type { DataVizConfigMemory } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveDataVizPBlockProps/resolveDataVizPBlockProps";
+import type { DataVizConfigMemory } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
 import type { Field, Fields } from "@puckeditor/core";
 import type { RefObject } from "react";
 
@@ -39,13 +39,7 @@ type DataVizPBlockConfigOptions = {
   localFiltersField: Field<DataVizPBlockProps["localFilters"]>;
   vizTypeLabel: string;
 
-  /**
-   * Mutable per-block viz config memory. A ref rather than state because
-   * `resolveData` is a Puck callback, not a render input: writing it must
-   * not re-render, and it has to survive the `useMemo` below rebuilding the
-   * config. The ref object identity is stable, so the rebuilt closure still
-   * sees earlier switches.
-   */
+  /** Stores per-block viz config memory across Puck data callbacks. */
   vizConfigMemoryRef: RefObject<DataVizConfigMemory>;
 };
 
@@ -79,7 +73,7 @@ function _getDataVizPBlockConfig(
     } as Fields<DataVizPBlockProps>,
     defaultProps,
     resolveData: (data, { changed, trigger }) => {
-      const { props, vizConfigMemory } = resolveDataVizPBlockProps({
+      const { props, vizConfigMemory } = makeDataVizPBlockStateFromProps({
         props: data.props,
         changed,
         trigger,
