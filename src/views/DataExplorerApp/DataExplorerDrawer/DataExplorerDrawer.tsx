@@ -9,9 +9,9 @@ import { QueryTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryT
 import { useDrawerDisclosure } from "@/views/DataExplorerApp/DataExplorerDrawer/useDrawerDisclosure";
 import { VizTabPanel } from "@/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
 import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { ReactNode, RefObject } from "react";
 
 /** The drawer's two sections. */

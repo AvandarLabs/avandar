@@ -3,6 +3,12 @@
 -- The point of instrumenting deletion in the database rather than the client is
 -- that it catches every path, so these tests delete rows directly, the way a
 -- script or a cascade would, with no client involved.
+--
+-- Every assertion selects its event by the fixture's own resource id and not by
+-- `event_name` alone. `usage_analytics_events` is not workspace-partitioned for
+-- reads here, so matching on the name alone counted every such event in the
+-- database: the assertions held only against a freshly reset one, and anyone
+-- who ran the suite after using the app locally saw `have: 15, want: 1`.
 
 \set ON_ERROR_STOP on
 
@@ -97,6 +103,7 @@ select is(
     select count(*)
     from public.usage_analytics_events
     where event_name = 'dataset.deleted'
+      and payload ->> 'datasetId' = 'ad007001-0000-4000-8000-000000000001'
   ),
   1::bigint,
   'deleting a dataset records exactly one dataset.deleted event'
@@ -107,6 +114,7 @@ select is(
     select payload
     from public.usage_analytics_events
     where event_name = 'dataset.deleted'
+      and payload ->> 'datasetId' = 'ad007001-0000-4000-8000-000000000001'
   ),
   jsonb_build_object(
     'datasetId', 'ad007001-0000-4000-8000-000000000001',
@@ -121,6 +129,7 @@ select is(
     select app::text
     from public.usage_analytics_events
     where event_name = 'dataset.deleted'
+      and payload ->> 'datasetId' = 'ad007001-0000-4000-8000-000000000001'
   ),
   'data_sources',
   'the dataset event is attributed to the data_sources app'
@@ -131,6 +140,7 @@ select is(
     select event_category::text
     from public.usage_analytics_events
     where event_name = 'dataset.deleted'
+      and payload ->> 'datasetId' = 'ad007001-0000-4000-8000-000000000001'
   ),
   'expansion',
   'dataset.deleted is categorised as expansion, the shrink bucket'
@@ -141,6 +151,7 @@ select is(
     select payload
     from public.usage_analytics_events
     where event_name = 'dashboard.deleted'
+      and payload ->> 'dashboardId' = 'ad005001-0000-4000-8000-000000000001'
   ),
   jsonb_build_object(
     'dashboardId', 'ad005001-0000-4000-8000-000000000001',
@@ -155,6 +166,7 @@ select is(
     select workspace_id
     from public.usage_analytics_events
     where event_name = 'dashboard.deleted'
+      and payload ->> 'dashboardId' = 'ad005001-0000-4000-8000-000000000001'
   ),
   'ad001001-0000-4000-8000-000000000001'::uuid,
   'the event is scoped to the deleted resource workspace'
@@ -168,6 +180,7 @@ select is(
     select user_id
     from public.usage_analytics_events
     where event_name = 'dashboard.deleted'
+      and payload ->> 'dashboardId' = 'ad005001-0000-4000-8000-000000000001'
   ),
   null,
   'a delete with no authenticated actor is still recorded, with a null user_id'

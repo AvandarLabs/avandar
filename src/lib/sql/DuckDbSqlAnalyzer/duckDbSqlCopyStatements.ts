@@ -101,11 +101,9 @@ export function getCopyRelationSourceIndexes(
       return [];
     }
     const copyDirection = getCopyDirection({ mutationIndex, tokens });
-    return (
-        copyDirection?.direction === "TO" &&
-          copyDirection.relationIndex !== undefined
-      ) ?
-        [copyDirection.relationIndex]
+    return copyDirection?.direction === "TO" &&
+      copyDirection.relationIndex !== undefined
+      ? [copyDirection.relationIndex]
       : [];
   });
 }

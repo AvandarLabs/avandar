@@ -29,19 +29,21 @@ export function notifyDevAlert(...messages: unknown[]): void {
 
             // if the string contains newlines, then split them into multiple
             // separate Text components, and wrap in a Stack
-            return strMsg.includes("\n") ?
-                <Stack key={messageIndex} gap="xxs">
-                  {strMsg.split("\n").map((line, lineIndex) => {
-                    return (
-                      <Text key={lineIndex} span>
-                        {expandTabsForHTML(line)}
-                      </Text>
-                    );
-                  })}
-                </Stack>
-              : <Text key={messageIndex} span>
-                  {expandTabsForHTML(strMsg)}
-                </Text>;
+            return strMsg.includes("\n") ? (
+              <Stack key={messageIndex} gap="xxs">
+                {strMsg.split("\n").map((line, lineIndex) => {
+                  return (
+                    <Text key={lineIndex} span>
+                      {expandTabsForHTML(line)}
+                    </Text>
+                  );
+                })}
+              </Stack>
+            ) : (
+              <Text key={messageIndex} span>
+                {expandTabsForHTML(strMsg)}
+              </Text>
+            );
           })}
         </Stack>
       ),

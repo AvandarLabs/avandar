@@ -3,12 +3,12 @@ import { t } from "@lingui/core/macro";
 import { appLabel } from "$/copy/appLabel";
 import { resourceTypeLabel } from "$/copy/resourceTypeLabel";
 import { getAppTypeFromResourceType } from "../getAppTypeFromResourceType/getAppTypeFromResourceType";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 /**
  * One run in the rendered summary line: a literal text segment or a labelled
@@ -105,13 +105,13 @@ function _makeGroupFragments(
     return [
       { kind: "text", text: t`all members of ` },
       { kind: "pill", label: groupName, variant: "group" },
-      ...(share.requiresAppAccess ?
-        [
-          { kind: "text" as const, text: t` who also have ` },
-          { kind: "pill" as const, label: app, variant: "app" as const },
-          { kind: "text" as const, text: t` access` },
-        ]
-      : []),
+      ...(share.requiresAppAccess
+        ? [
+            { kind: "text" as const, text: t` who also have ` },
+            { kind: "pill" as const, label: app, variant: "app" as const },
+            { kind: "text" as const, text: t` access` },
+          ]
+        : []),
     ];
   });
 }
@@ -125,9 +125,11 @@ function _makeJoinedFragmentSpans(
 ): SummarySpan[] {
   return fragments.flatMap((fragment, fragmentIndex) => {
     const separator =
-      fragmentIndex === 0 ? undefined
-      : fragmentIndex === fragments.length - 1 ? t`, and `
-      : ", ";
+      fragmentIndex === 0
+        ? undefined
+        : fragmentIndex === fragments.length - 1
+          ? t`, and `
+          : ", ";
     return [
       ...(separator ? [{ kind: "text" as const, text: separator }] : []),
       ...fragment,
@@ -162,9 +164,9 @@ function _makeSharedWithSpans(
       groupById: options.groupById,
       app,
     }),
-    ...(hasGeneralAccess ?
-      [buildGeneralAccessFragment(app, generalAccessRole)]
-    : []),
+    ...(hasGeneralAccess
+      ? [buildGeneralAccessFragment(app, generalAccessRole)]
+      : []),
   ];
 
   return [
@@ -197,32 +199,32 @@ export function buildShareSummary(
   const generalAccessRole = opts.workspaceShareRole ?? "viewer";
 
   const accessSpans =
-    userShares.length + groupShares.length === 0 ?
-      _makeNoDirectSharesSpans({
-        resource,
-        app,
-        hasGeneralAccess,
-        generalAccessRole,
-      })
-    : _makeSharedWithSpans({
-        resource,
-        app,
-        userShares,
-        groupShares,
-        userById: opts.userById,
-        groupById: opts.groupById,
-        hasGeneralAccess,
-        generalAccessRole,
-      });
+    userShares.length + groupShares.length === 0
+      ? _makeNoDirectSharesSpans({
+          resource,
+          app,
+          hasGeneralAccess,
+          generalAccessRole,
+        })
+      : _makeSharedWithSpans({
+          resource,
+          app,
+          userShares,
+          groupShares,
+          userById: opts.userById,
+          groupById: opts.groupById,
+          hasGeneralAccess,
+          generalAccessRole,
+        });
 
   return [
     ...accessSpans,
-    ...(opts.publication ?
-      _buildPublicationSpans({
-        publication: opts.publication,
-        workspaceName: opts.workspaceName,
-      })
-    : []),
+    ...(opts.publication
+      ? _buildPublicationSpans({
+          publication: opts.publication,
+          workspaceName: opts.workspaceName,
+        })
+      : []),
   ];
 }
 

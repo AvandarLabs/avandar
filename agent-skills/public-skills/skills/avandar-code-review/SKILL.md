@@ -1,10 +1,10 @@
 ---
 name: avandar-code-review
-description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by docstrings, files, naming, and/or tests (any subset, concatenatable).
+description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by comments, files, naming, and/or tests (any subset, concatenatable).
 metadata:
   author: jpsyx
-  version: "2.2.0"
-  tags: avandar, code-review, typescript, react, sql, conventions, style, docstrings, files, naming, tests
+  version: "2.4.0"
+  tags: avandar, code-review, typescript, react, sql, conventions, style, comments, files, naming, tests
 ---
 
 # Avandar Code Review
@@ -14,7 +14,7 @@ and style conventions. The core skill must make sense outside the
 Avandar product repo. On a **full review**, run the common-mistakes and
 general-checks sections, then only apply the language-specific and
 library-gated phases when the diff matches their gate. On a **focused
-review** (`docstrings`, `files`, `naming`, and/or `tests`), skip every
+review** (`comments`, `files`, `naming`, and/or `tests`), skip every
 phase and bullet outside the selected packs; see **Focused Reviews**.
 
 ## Public Core And Repo-Local Rules
@@ -101,20 +101,21 @@ Duplicate tokens collapse. The recognized pack tokens are:
 
 | Token | Pack |
 |-------|------|
-| `docstrings` | comments, comment blocks, and docstrings |
+| `comments` | every comment: docstrings, comment blocks, and inline comments |
+| `docstrings` | alias for `comments`, kept so the older token still works |
 | `files` | file hierarchy, directories, coupling, file names, single main export |
 | `naming` | variable, function, and module-object naming |
 | `tests` | test quality: tautologies, placeholders, observable behavior, e2e UI vs DB |
 
 Examples:
 
-- `avandar-code-review docstrings`
+- `avandar-code-review comments`
 - `avandar-code-review files`
 - `avandar-code-review naming`
 - `avandar-code-review tests`
 - `avandar-code-review files naming`
-- `avandar-code-review files naming docstrings`
-- `avandar-code-review files naming docstrings tests`
+- `avandar-code-review files naming comments`
+- `avandar-code-review files naming comments tests`
 
 If at least one pack token is present, this is a focused review:
 
@@ -140,15 +141,19 @@ Unknown extra words that are not pack tokens, mode names, or an explicit
 base branch do not start a focused review on their own. Ignore them when
 at least one pack token is present.
 
-### Pack: `docstrings`
+### Pack: `comments`
 
-Gate: the diff includes any source file that supports `/** ... */` and
-`//` comments (same gate as Phase: comments).
+Gate: the diff includes any source file that supports a block comment
+and a line comment (same gate as Phase: comments), which includes `.sql`.
 
 Apply **only**:
 
 - The entire **Phase: comments** checklist
   (`docs/code-reviews/comments-checklist.md`).
+- For a `.sql` file, the **Comments** section of
+  `docs/code-reviews/sql-checklist.md`, which is where the SQL comment
+  forms (`/** ... */` for declaration docstrings, `--` everywhere else)
+  are defined.
 - **Most Common Mistakes:** Planning comments.
 - **General Checks:** comments should not use em dashes; exported or
   public interfaces, constants, objects, functions, and classes should
@@ -185,9 +190,9 @@ Apply **only**:
 - From `docs/code-reviews/typescript-checklist.md`, only the file-layout
   bullets: do not add barrel files except in repo-approved directories;
   files that export only types use the `.types.ts` filename suffix;
-  acronyms longer than two letters in **file names** use PascalCase
-  (`Url`, `Sql`, not `URL`, `SQL`). Identifier acronyms belong to
-  `naming`, not this pack.
+  acronyms in **file and directory names** use PascalCase, whatever their
+  length (`Url`, `Sql`, `Cli`, `Io`, not `URL`, `SQL`, `CLI`, `IO`).
+  Identifier acronyms belong to `naming`, not this pack.
 
 Do not apply variable or function identifier naming, comment rules, or
 any other TypeScript / React / SQL / library rule.
@@ -213,11 +218,15 @@ Apply **only**:
   event handlers named `on...`, not `handle...`; conversion-function
   shapes including the retired `resolve` / `compute` / `build` /
   `create` prefixes and the copy-function exemption; React component
-  prop types named `Props`; preserve `e2e` or `E2E` casing exactly;
-  acronyms longer than two letters in **identifiers and type names**
-  use PascalCase; non-exported top-level helper functions prefixed with
-  `_`. File-name acronyms and the `.types.ts` suffix belong to `files`,
-  not this pack.
+  prop types named `Props`; acronyms in **identifiers and type names**
+  use PascalCase, whatever their length and with no exceptions (`Url`,
+  `Cli`, `Id`, `Db`, `Ci`, `Io`, `E2e`), while `UPPERCASE` constants and
+  env var names are unaffected; non-exported top-level helper functions
+  prefixed with `_`. File-name acronyms and the `.types.ts` suffix belong
+  to `files`, not this pack.
+
+Test names are not identifiers and belong to the `tests` pack, which
+judges them against what the test asserts. Do not flag them here.
 
 "Module naming" here means the identifier of an exported module object
 (PascalCase, `create*Module` builders, conversion methods on the
@@ -236,7 +245,8 @@ test naming). Same gate as Phase: tests.
 Apply **only**:
 
 - The entire **Phase: tests** checklist
-  (`docs/code-reviews/tests-checklist.md`): tautological and
+  (`docs/code-reviews/tests-checklist.md`): test names that describe
+  activity instead of the claim the test asserts, tautological and
   assertion-free tests, observable-behavior assertions, placeholder
   tests, runtime assertions that restate the type system, e2e specs
   that write the behavior under test through the database instead of
@@ -259,7 +269,7 @@ full-review lane.
 
 | Lane | Pack | Gate |
 |------|------|------|
-| `focused-docstrings` | `docstrings` | comments gate |
+| `focused-comments` | `comments` | comments gate |
 | `focused-files` | `files` | `.ts` / `.tsx` in the diff |
 | `focused-naming` | `naming` | `.ts` / `.tsx` in the diff |
 | `focused-tests` | `tests` | test-file gate (`*.test.*` / `*.spec.*`) |
@@ -457,7 +467,7 @@ modified by the author under review). Do not flag issues on context lines
    the phases inline in this agent.
 
    **Focused review:** the only phases that fire are the selected packs,
-   in this order (omit any pack the user did not name): `docstrings`,
+   in this order (omit any pack the user did not name): `comments`,
    `files`, `naming`, `tests`. Do not gate on extra-checklist or library
    presence. Skip the rest of this step.
 
@@ -607,7 +617,7 @@ system itself (declarations, assertions and escape hatches, absence,
 literal unions, readonly contracts) rather than naming, module and file
 structure, function shape, and import/export form. `comments` and
 `module` are small and mechanical, so they share one lane on a full
-review. A focused `docstrings` / `files` / `naming` review splits them
+review. A focused `comments` / `files` / `naming` review splits them
 into the `focused-*` lanes instead, because the point of those packs is
 to apply one subset in isolation. Each lane reads its full file slice as
 context but applies only its own rule lens.
@@ -791,6 +801,10 @@ Check these first because they are the most frequent review findings:
 ## General Checks
 
 - Comments should not use em dashes. Prefer a colon or a hyphen.
+- In SQL, a docstring on a `create type` / `table` / `view` / `function` /
+  `schema` uses a `/** ... */` block, never a run of `--` lines; every
+  other comment uses `--`. See the **Comments** section of
+  `docs/code-reviews/sql-checklist.md`.
 - Exported or public interfaces, constants, objects, functions, and classes
   should have block comments or docstrings.
 - Function docstrings should explain the function's purpose and output, not
@@ -914,12 +928,16 @@ SKILL file.
 
 ### Phase: comments
 
-- **Gate:** the diff includes any source file that supports both
-  `/** ... */` and `//` comments (TypeScript, TSX, JavaScript, JSX, most
-  C-family languages).
+- **Gate:** the diff includes any source file that supports both a block
+  comment and a line comment (TypeScript, TSX, JavaScript, JSX, most
+  C-family languages, and `.sql`).
 - **Reference:**
-  [`docs/code-reviews/comments-checklist.md`](docs/code-reviews/comments-checklist.md)
-- **Focused review:** this phase is the core of the `docstrings` pack.
+  [`docs/code-reviews/comments-checklist.md`](docs/code-reviews/comments-checklist.md).
+  For `.sql`, read `/** ... */` for "block comment" and `--` for "line
+  comment", and apply the **Comments** section of
+  [`docs/code-reviews/sql-checklist.md`](docs/code-reviews/sql-checklist.md)
+  alongside it.
+- **Focused review:** this phase is the core of the `comments` pack.
   See **Focused Reviews** for the extra comment bullets pulled from
   Most Common Mistakes, General Checks, and the TypeScript checklist.
 
@@ -997,6 +1015,10 @@ SKILL file.
 - **Gate:** the diff includes at least one `.sql` file.
 - **Reference:**
   [`docs/code-reviews/sql-checklist.md`](docs/code-reviews/sql-checklist.md)
+- **Covers:** naming, plus the SQL comment forms. A docstring on a
+  `create type` / `table` / `view` / `function` / `schema` uses a
+  `/** ... */` block; every other comment uses `--`, however many lines
+  it spans.
 
 ### Phase: tests
 
@@ -1009,7 +1031,11 @@ SKILL file.
 - **Focused review:** this phase is the core of the `tests` pack. See
   **Focused Reviews**. That pack applies this checklist only; it does
   not pull extra bullets from other phases.
-- **Covers:** tautological and assertion-free tests (for example
+- **Covers:** test names that state activity rather than what the test
+  asserts (a name built on "parses", "handles" or "works" survives the
+  deletion of the assertion itself, and a name promising more than the body
+  checks reports coverage that does not exist), tautological and
+  assertion-free tests (for example
   `expect(typeof x).toBe("function")`, which only fails if a symbol is deleted
   or renamed and stays green through any behavioral break), tests that assert
   implementation structure instead of observable behavior, placeholder tests,

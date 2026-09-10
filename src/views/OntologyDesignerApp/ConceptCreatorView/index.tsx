@@ -118,8 +118,8 @@ export function ConceptCreatorView(): JSX.Element {
         .concat(values.manualEntryAttributes)
         // set the title attribute
         .map((attribute) => {
-          return attribute.id === values.labelAttributeId ?
-              setValue(attribute, "isLabel", true)
+          return attribute.id === values.labelAttributeId
+            ? setValue(attribute, "isLabel", true)
             : attribute;
         });
       return {
@@ -241,13 +241,13 @@ export function ConceptCreatorView(): JSX.Element {
                   setAllowDatasetAttributes(e.currentTarget.checked);
                 }}
               />
-              {allowDatasetAttributes ?
+              {allowDatasetAttributes ? (
                 <DatasetColumnAttributesBlock
                   conceptId={conceptId}
                   conceptForm={conceptForm}
                   conceptName={conceptName.trim() || t`record`}
                 />
-              : null}
+              ) : null}
               {IS_MANUAL_DATA_DISABLED ? null : (
                 <Switch
                   label={t`Some data should be manually entered`}
@@ -278,21 +278,21 @@ export function ConceptCreatorView(): JSX.Element {
                   }}
                 />
               )}
-              {allowManualEntryAttributes ?
+              {allowManualEntryAttributes ? (
                 <ManualEntryAttributesBlock
                   conceptId={conceptId}
                   conceptForm={conceptForm}
                 />
-              : null}
+              ) : null}
 
               <Select
                 key={keys.labelAttributeId}
                 required
                 data={possibleLabelAttributes}
                 placeholder={
-                  attributes.length === 0 ?
-                    t`No fields have been configured yet`
-                  : t`Select a field`
+                  attributes.length === 0
+                    ? t`No fields have been configured yet`
+                    : t`Select a field`
                 }
                 label={t`What field should be used as a ${singularConceptName}'s name?`}
                 {...inputProps.labelAttributeId()}

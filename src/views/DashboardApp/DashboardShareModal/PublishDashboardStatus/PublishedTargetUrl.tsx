@@ -116,13 +116,14 @@ export function PublishedTargetUrl({
 
   return (
     <Group gap="xs" wrap="nowrap" align="center">
-      {isEditingUrl ?
+      {isEditingUrl ? (
         <VanitySlugField {...vanitySlug} urlPrefix={pathPrefix} />
-      : <Code w="100%" block className={css.publishDashboardStatusTargetUrl}>
+      ) : (
+        <Code w="100%" block className={css.publishDashboardStatusTargetUrl}>
           {targetUrl}
         </Code>
-      }
-      {isEditingUrl ?
+      )}
+      {isEditingUrl ? (
         <PublishedUrlEditorActions
           canSave={canSave}
           onSave={() => {
@@ -139,13 +140,14 @@ export function PublishedTargetUrl({
             setIsEditingUrl(false);
           }}
         />
-      : <ChangeUrlButton
+      ) : (
+        <ChangeUrlButton
           onClick={() => {
             slugAtEditStartRef.current = vanitySlug.slugInput;
             setIsEditingUrl(true);
           }}
         />
-      }
+      )}
       <ShareUrlActions url={targetUrl} />
     </Group>
   );

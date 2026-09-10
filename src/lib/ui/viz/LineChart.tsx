@@ -1,13 +1,14 @@
 import { formatDate, propEq } from "@avandar/utils";
 import { LineChart as MantineLineChart } from "@mantine/charts";
 import { useMemo } from "react";
+import { Label } from "recharts";
 import { useLineChartStyleProps } from "@/lib/ui/viz/axis/useLineChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
+import type { LineSeries } from "$/models/vizs/SeriesConfig";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { LineChartSeries } from "@mantine/charts";
-import type { LineSeries } from "$/models/vizs/SeriesConfig";
 import type { LineProps } from "recharts";
 
 type Props = XYChartProps;
@@ -69,10 +70,28 @@ export function LineChart({
       tooltipProps,
       styleProps,
       valueFormatter: formatChartNumber,
+      chartStyle,
     });
   }
 
   const lineSeries = series as readonly LineSeries[];
+
+  // Mantine shares one label fill across both axes. Use Recharts labels to
+  // preserve per-axis colors and reserve their margins.
+  const {
+    styles: _sharedAxisLabelStyle,
+    xAxisLabel: _xAxisLabel,
+    yAxisLabel: _yAxisLabel,
+    xAxisProps,
+    yAxisProps,
+    ...restStyleProps
+  } = styleProps;
+
+  const xLabelText = chartStyle?.xAxis?.label;
+  const yLabelText = chartStyle?.yAxis?.label;
+  const hasXLabel = xLabelText !== undefined && xLabelText !== "";
+  const hasYLabel = yLabelText !== undefined && yLabelText !== "";
+
   return (
     <MantineLineChart
       h={height}
@@ -95,13 +114,50 @@ export function LineChart({
           return {};
         }
         return {
-          ...(found.strokeWidth !== undefined ?
-            { strokeWidth: found.strokeWidth }
-          : {}),
+          ...(found.strokeWidth !== undefined
+            ? { strokeWidth: found.strokeWidth }
+            : {}),
           ...(found.withDots !== undefined ? { dot: found.withDots } : {}),
         };
       }}
-      {...styleProps}
+      lineChartProps={{
+        margin: {
+          bottom: hasXLabel ? 30 : undefined,
+          left: hasYLabel ? 10 : undefined,
+          right: hasYLabel ? 5 : undefined,
+        },
+      }}
+      xAxisProps={{
+        ...xAxisProps,
+        children: hasXLabel ? (
+          <Label
+            value={xLabelText}
+            position="insideBottom"
+            offset={-20}
+            fontSize={12}
+            fill={chartStyle?.xAxis?.labelColor}
+          />
+        ) : (
+          xAxisProps?.children
+        ),
+      }}
+      yAxisProps={{
+        ...yAxisProps,
+        children: hasYLabel ? (
+          <Label
+            value={yLabelText}
+            position="insideLeft"
+            angle={-90}
+            textAnchor="middle"
+            offset={-5}
+            fontSize={12}
+            fill={chartStyle?.yAxis?.labelColor}
+          />
+        ) : (
+          yAxisProps?.children
+        ),
+      }}
+      {...restStyleProps}
     />
   );
 }

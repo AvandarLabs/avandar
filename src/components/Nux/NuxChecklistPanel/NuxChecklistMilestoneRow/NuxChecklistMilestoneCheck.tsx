@@ -28,9 +28,7 @@ export function NuxChecklistMilestoneCheck({
         data-testid={`nux-milestone-check-${milestoneKey}`}
         onClick={onToggleDone}
       >
-        {isDone ?
-          <IconCheck size={12} />
-        : null}
+        {isDone ? <IconCheck size={12} /> : null}
       </ActionIcon>
     </Tooltip>
   );

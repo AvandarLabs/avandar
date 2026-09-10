@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
+import { useEffect, useMemo, useRef } from "react";
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
-import { useEffect, useMemo, useRef } from "react";
 import { notifyWarning } from "@/utils/notifications/notify";
 import type { VizRenderLimitKey } from "$/config/GlobalVizConfig";
 

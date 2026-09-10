@@ -4,11 +4,11 @@ import { withNewMembers } from "@avandar/modules";
 import { withQueryHooks } from "@avandar/query-hooks";
 import { matchLiteral } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import type { ILogger } from "@avandar/logger";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import type { Database } from "$/types/database.types";
+import type { ILogger } from "@avandar/logger";
 
 export type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -227,9 +227,9 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
             return _updateShareById(dbClient, existingId, {
               role: options.role,
               principalId:
-                options.principalType === "workspace" ?
-                  undefined
-                : (options.principalId ?? undefined),
+                options.principalType === "workspace"
+                  ? undefined
+                  : (options.principalId ?? undefined),
               requiresAppAccess: options.requiresAppAccess,
             });
           }

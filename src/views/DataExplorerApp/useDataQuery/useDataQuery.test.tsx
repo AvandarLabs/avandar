@@ -4,9 +4,9 @@
  * run that actually happened.
  */
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { renderHook, waitFor } from "@/test-utils";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";

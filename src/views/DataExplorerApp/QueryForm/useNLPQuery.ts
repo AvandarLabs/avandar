@@ -2,8 +2,8 @@ import { useMutation } from "@avandar/query-hooks";
 import { where } from "@avandar/utils";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import type { UseMutationResultTuple } from "@avandar/query-hooks";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { UseMutationResultTuple } from "@avandar/query-hooks";
 
 type UseNLPQueryVariables = {
   prompt: string;

@@ -24,8 +24,10 @@ export interface Register {}
  * Resolves the `Database` type registered by the consumer.
  * Falls back to `never` if no database has been registered.
  */
-export type RegisteredSupabaseDatabase =
-  Register extends { supabaseDatabase: infer DB extends UnknownObject } ? DB
+export type RegisteredSupabaseDatabase = Register extends {
+  supabaseDatabase: infer DB extends UnknownObject;
+}
+  ? DB
   : // eslint-disable-next-line @typescript-eslint/no-explicit-any
     any;
 
@@ -34,28 +36,23 @@ export type RegisteredSupabaseDatabase =
  * Falls back to `string` if no database has been registered.
  */
 export type RegisteredSupabaseDatabaseTableNames =
-  RegisteredSupabaseDatabase extends (
-    {
-      public: { Tables: infer T extends UnknownObject };
-    }
-  ) ?
-    keyof T
-  : string;
+  RegisteredSupabaseDatabase extends {
+    public: { Tables: infer T extends UnknownObject };
+  }
+    ? keyof T
+    : string;
 
 /**
  * Resolves a table's `Row` type from the registered database.
  */
 export type RegisteredSupabaseTableRow<
   TableName extends RegisteredSupabaseDatabaseTableNames,
-> =
-  RegisteredSupabaseDatabase extends (
-    {
-      public: {
-        Tables: Record<TableName, { Row: infer R extends UnknownObject }>;
-      };
-    }
-  ) ?
-    R
+> = RegisteredSupabaseDatabase extends {
+  public: {
+    Tables: Record<TableName, { Row: infer R extends UnknownObject }>;
+  };
+}
+  ? R
   : never;
 
 /**
@@ -64,15 +61,12 @@ export type RegisteredSupabaseTableRow<
  */
 export type RegisteredSupabaseTableInsert<
   TableName extends RegisteredSupabaseDatabaseTableNames,
-> =
-  RegisteredSupabaseDatabase extends (
-    {
-      public: {
-        Tables: Record<TableName, { Insert: infer I extends UnknownObject }>;
-      };
-    }
-  ) ?
-    I
+> = RegisteredSupabaseDatabase extends {
+  public: {
+    Tables: Record<TableName, { Insert: infer I extends UnknownObject }>;
+  };
+}
+  ? I
   : never;
 
 /**
@@ -81,13 +75,10 @@ export type RegisteredSupabaseTableInsert<
  */
 export type RegisteredSupabaseTableUpdate<
   TableName extends RegisteredSupabaseDatabaseTableNames,
-> =
-  RegisteredSupabaseDatabase extends (
-    {
-      public: {
-        Tables: Record<TableName, { Update: infer U extends UnknownObject }>;
-      };
-    }
-  ) ?
-    U
+> = RegisteredSupabaseDatabase extends {
+  public: {
+    Tables: Record<TableName, { Update: infer U extends UnknownObject }>;
+  };
+}
+  ? U
   : never;

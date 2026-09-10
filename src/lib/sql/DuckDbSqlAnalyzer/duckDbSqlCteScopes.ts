@@ -66,9 +66,9 @@ export function getCteAliases(tokens: readonly SqlToken[]): CteAlias[] {
         name: token.value.toLowerCase(),
         scopeStart: aliasIndex,
         scopeEnd:
-          relativeEndIndex === -1 ?
-            tokens.length
-          : aliasIndex + relativeEndIndex,
+          relativeEndIndex === -1
+            ? tokens.length
+            : aliasIndex + relativeEndIndex,
       },
     ];
   });

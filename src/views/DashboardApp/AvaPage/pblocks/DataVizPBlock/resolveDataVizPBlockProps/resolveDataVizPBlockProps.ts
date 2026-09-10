@@ -1,8 +1,8 @@
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { VizConfigRegistry } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { ResolveDataTrigger } from "@puckeditor/core";
-import type { VizConfigRegistry } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
  * The last config the user saw for each viz type, per DataViz block.

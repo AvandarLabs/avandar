@@ -15,21 +15,20 @@ type ValidMatchedValues<M extends ModelBase> =
   | Record<PropertyKey, unknown>;
 
 type ValidValueRecord<M extends ModelBase> = UnionToIntersection<
-  M extends any ?
-    {
-      [Mod in M as ModelType<Mod>]: ValidMatchedValues<Mod>;
-    }
-  : never
+  M extends any
+    ? {
+        [Mod in M as ModelType<Mod>]: ValidMatchedValues<Mod>;
+      }
+    : never
 >;
 
 type MappedValue<
   M extends ModelBase,
   FunctionRecord extends ValidValueRecord<M>,
-> =
-  M extends any ?
-    ModelType<M> extends keyof FunctionRecord ?
-      FunctionRecord[ModelType<M>] extends (model: M) => infer R ?
-        R
+> = M extends any
+  ? ModelType<M> extends keyof FunctionRecord
+    ? FunctionRecord[ModelType<M>] extends (model: M) => infer R
+      ? R
       : FunctionRecord[ModelType<M>]
     : never
   : never;

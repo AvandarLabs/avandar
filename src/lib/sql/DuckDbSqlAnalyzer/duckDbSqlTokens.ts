@@ -109,8 +109,8 @@ export function getStatementEndIndex(
   const relativeEndIndex = tokens.slice(statementIndex).findIndex((token) => {
     return token.value === ";";
   });
-  return relativeEndIndex === -1 ?
-      tokens.length
+  return relativeEndIndex === -1
+    ? tokens.length
     : statementIndex + relativeEndIndex;
 }
 

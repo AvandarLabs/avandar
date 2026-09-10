@@ -89,9 +89,9 @@ export function ShareAddPrincipalRow({
         onChange={setTarget}
         searchable
         nothingFoundMessage={
-          isEmptySource ?
-            t`No members or user groups yet. Invite members or create user groups in Workspace settings.`
-          : t`No matches`
+          isEmptySource
+            ? t`No members or user groups yet. Invite members or create user groups in Workspace settings.`
+            : t`No matches`
         }
         aria-label={t`Add people or user groups`}
       />

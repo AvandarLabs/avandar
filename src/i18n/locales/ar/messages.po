@@ -293,10 +293,6 @@ msgstr "إعدادات الرسم البياني"
 msgid "Discovery is not available in this context."
 msgstr "الاكتشاف غير متاح في هذا السياق."
 
-#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
-msgid "Type a question and I will generate the SQL and run it on the canvas."
-msgstr "اكتب سؤالاً وسأقوم بإنشاء SQL وتشغيله على اللوحة."
-
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -398,6 +394,10 @@ msgstr "توسيع"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Callout"
 msgstr "مربع تنبيه"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Process"
+msgstr "معالجة"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StyleSection.tsx
@@ -1175,7 +1175,7 @@ msgstr "البروتوكول"
 msgid "Build your first dashboard"
 msgstr "أنشئ لوحة معلوماتك الأولى"
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "إغلاق الشريط الجانبي"
 
@@ -1240,6 +1240,10 @@ msgstr "إعادة المحاولة"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي لـ JOIN في الموضع {index}."
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Type a question and I will generate the SQL and run it for you."
+msgstr "اكتب سؤالًا وسأُنشئ SQL وأُشغّله نيابةً عنك."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Range"
@@ -1786,6 +1790,10 @@ msgstr "إخلاء مسؤولية الحدود (مضمّن دائمًا)"
 msgid "Undo"
 msgstr "تراجع"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "One dataset is one tab."
+msgstr "كل مجموعة بيانات هي علامة تبويب واحدة."
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Recommended if you have about 8 GB RAM (default for most users)."
 msgstr "يوصى به إذا كانت لديك ذاكرة RAM بسعة 8 جيجابايت تقريبًا (الإعداد "
@@ -1989,11 +1997,6 @@ msgstr "إضافة مجموعة بيانات جديدة"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Switch to Free plan"
 msgstr "التحويل إلى خطة مجانية"
-
-#. placeholder {0}: formatNumber(numSuccessRows)
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Parsed {0} rows"
-msgstr "تم تحليل {0} صفوف"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -2246,7 +2249,7 @@ msgstr "أنواع الأعمدة المكتشفة لعمود واحد في \"{s
 msgid "No values were returned from {column}. Describe what you need instead."
 msgstr "لم يتم إرجاع أي قيم من {column}. وصف ما تحتاجه بدلاً من ذلك."
 
-#. placeholder {0}: Number.isFinite(summary.stdDev) ? <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> : "."
+#. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
@@ -2397,11 +2400,6 @@ msgstr "دقيق"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Discard"
 msgstr "تجاهل"
-
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool is available when Spatial finishes loading."
-msgstr "تتوفر هذه الأداة عند انتهاء تحميل Spatial."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
 msgid "A dark or satellite basemap may photocopy poorly."
@@ -2597,12 +2595,6 @@ msgstr "تم تنزيل PDF."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
-
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "The layer configuration is saved. Retry after connectivity or the "
-"Spatial extension becomes available."
-msgstr "تم حفظ إعدادات الطبقة. أعد المحاولة بعد استعادة الاتصال أو إتاحة "
-"Spatial extension."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -2818,6 +2810,12 @@ msgstr "مجموعة البيانات الخاصة بك"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Single color"
 msgstr "لون واحد"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "Geometry support is still downloading. This can take a moment on a slow "
+"connection."
+msgstr "لا يزال يجري تنزيل دعم الأشكال الهندسية. قد يستغرق ذلك بعض الوقت على "
+"اتصال بطيء."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
@@ -3397,6 +3395,12 @@ msgstr "تم تلخيص بياناتك"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "حشوة"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "The layer configuration is saved. Try again once your connection is "
+"back, or reload the page."
+msgstr "تم حفظ إعدادات الطبقة. أعد المحاولة بعد استعادة الاتصال، أو أعد تحميل "
+"الصفحة."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
@@ -4085,11 +4089,6 @@ msgstr "لا يوجد ملف محدد"
 msgid "Submit"
 msgstr "إرسال"
 
-#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "This tool needs DuckDB Spatial, which is unavailable."
-msgstr "تحتاج هذه الأداة إلى DuckDB Spatial، وهو غير متاح."
-
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "لوحة التحكم"
@@ -4098,6 +4097,10 @@ msgstr "لوحة التحكم"
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
 msgstr "{0} تم حذفه من هذا المتصفح."
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Tab to import"
+msgstr "علامة تبويب للاستيراد"
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
@@ -5007,10 +5010,6 @@ msgstr "احصل على مجموع القيم"
 msgid "Type your answer..."
 msgstr "اكتب إجابتك..."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns are available when Spatial finishes loading."
-msgstr "تتوفر أعمدة الأشكال الهندسية عند انتهاء Spatial من التحميل."
-
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
 msgstr "استيراد"
@@ -5062,6 +5061,10 @@ msgstr "فشل تسجيل الخروج"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "You have successfully connected to {0}"
 msgstr "لقد اتصلت بنجاح بـ {0}"
+
+#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
+msgid "Geometry support is unavailable"
+msgstr "دعم الأشكال الهندسية غير متاح"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -5142,6 +5145,10 @@ msgstr "لا توجد صفوف"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "Most common"
 msgstr "الأكثر شيوعًا"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared drives"
+msgstr "محركات الأقراص المشتركة"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H3"
@@ -5470,10 +5477,6 @@ msgstr "توسيع المفتش"
 msgid "Case Manager"
 msgstr "مدير الحالات"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
-msgid "The tab has a header row"
-msgstr "تحتوي علامة التبويب على صف عناوين"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
 msgstr "مدمج"
@@ -5624,7 +5627,7 @@ msgstr "الفئة {0}: {1} من القيم"
 msgid "Ignore all global filters: this visualization is unfiltered."
 msgstr "تجاهل جميع عوامل التصفية العالمية: هذه التصور غير مصفاة."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet.ts
 msgid "Google Sheet"
 msgstr "جدول Google"
 
@@ -5769,10 +5772,6 @@ msgstr "يجب إدخال بعض البيانات يدويًا"
 #: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 msgid "Integer"
 msgstr "عدد صحيح"
-
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The results are on the canvas to the left."
-msgstr "النتائج على اللوحة إلى اليسار."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
@@ -5953,7 +5952,7 @@ msgstr "المستوى"
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "\"{operator}\" ليس عاملًا يفهمه هذا النموذج."
 
-#: src/components/layouts/AppLayout/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
+#: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "فتح الشريط الجانبي"
 
@@ -6017,6 +6016,10 @@ msgstr "يبدو أن هذه البيانات تحتوي على معلومات �
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Get started by exploring your workspace or uploading your first dataset."
 msgstr "ابدأ باستكشاف مساحة العمل الخاصة بك أو رفع أول مجموعة بيانات لك."
+
+#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
+msgid "Geometry support unavailable"
+msgstr "دعم الأشكال الهندسية غير متاح"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stacked"
@@ -6190,10 +6193,6 @@ msgstr "تم بلوغ حد لوحات المعلومات المشتركة"
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "نطاق حول {sourceName}"
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
-msgid "Geometry columns need DuckDB Spatial, which is unavailable."
-msgstr "تتطلب أعمدة الأشكال الهندسية DuckDB Spatial، وهو غير متاح."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
@@ -6569,6 +6568,11 @@ msgstr "نموذج الدردشة غير المتصل جاهز"
 msgid "Column description updated successfully!"
 msgstr "تم تحديث وصف العمود بنجاح!"
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool needs geometry support, which could not be loaded."
+msgstr "تتطلب هذه الأداة دعم الأشكال الهندسية، وقد تعذّر تحميله."
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "احفظ تغييراتك أولاً: يعكس PDF لوحة التحكم المحفوظة."
@@ -6576,10 +6580,6 @@ msgstr "احفظ تغييراتك أولاً: يعكس PDF لوحة التحكم
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Units"
 msgstr "الوحدات"
-
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File failed to load"
-msgstr "فشل تحميل الملف"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove group"
@@ -6884,10 +6884,18 @@ msgid "Welcome to your data source manager. Pick a CSV or Excel file from your "
 msgstr "مرحبًا بك في مدير مصدر البيانات لديك. اختر ملف CSV أو Excel من جهاز "
 "الكمبيوتر. لا تملك جدول بيانات جاهزًا؟ <0>نزّل نموذجنا</0> واستخدمه."
 
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
+msgid "Geometry unavailable"
+msgstr "الأشكال الهندسية غير متاحة"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "مجموعة بيانات الحدود"
+
+#: src/hooks/ui/useGooglePicker.ts
+msgid "Shared with me"
+msgstr "تمت مشاركته معي"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause contains a \"{nodeType}\" node that the form does not "
@@ -7406,6 +7414,11 @@ msgid "This workspace no longer exists or your access has been revoked. If you "
 msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغاء وصولك إليها. إذا كنت تعتقد أن "
 "هذا حدث عن طريق الخطأ، فتواصل مع مالك مساحة العمل."
 
+#: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "This tool turns on when geometry support finishes downloading."
+msgstr "تصبح هذه الأداة متاحة عند انتهاء تنزيل دعم الأشكال الهندسية."
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "Only you have access to this {resource}."
 msgstr "لديك وحدك إمكانية الوصول إلى هذا {resource}."
@@ -7443,6 +7456,10 @@ msgstr "مضلع"
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Resuming dataset processing…"
 msgstr "جارٍ استئناف معالجة مجموعة البيانات…"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "Tab not found"
+msgstr "لم يتم العثور على علامة التبويب"
 
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
@@ -7643,7 +7660,6 @@ msgid "Current Plan"
 msgstr "الخطة الحالية"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "No rows were read successfully"
 msgstr "لم تتم قراءة أي صفوف بنجاح"
 
@@ -7783,6 +7799,12 @@ msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على م
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "أدخل نصك هنا"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
+msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
+"deleted. Pick the sheet again and choose a tab."
+msgstr "لم تعد علامة التبويب هذه موجودة في جدول البيانات. ربما تمت إعادة "
+"تسميتها أو حذفها. اختر الورقة مرة أخرى وحدد علامة تبويب."
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -8266,6 +8288,10 @@ msgstr "لننقل هذه النتائج إلى لوحة معلومات"
 msgid "Value"
 msgstr "قيمة"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query. Your results are ready."
+msgstr "شغّلت الاستعلام. نتائجك جاهزة."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "You are currently subscribed to this plan."
 msgstr "أنت مشترك حاليًا في هذه الخطة."
@@ -8348,10 +8374,6 @@ msgid "You need to be signed in to ask the assistant. Kept the rule-based "
 "results."
 msgstr "يجب تسجيل الدخول لطرح سؤال على المساعد. تم الاحتفاظ بالنتائج المستندة "
 "إلى القواعد."
-
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "File loaded successfully"
-msgstr "تم تحميل الملف بنجاح"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the block fields"
@@ -8501,7 +8523,7 @@ msgstr "عنوان البريد الإلكتروني غير صالح"
 msgid "Not plotted yet"
 msgstr "لم يتم رسمه بعد"
 
-#. placeholder {0}: selectedDocument.name
+#. placeholder {0}: pickedSheet.spreadsheetName
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Selected document: {0}"
 msgstr "المستند المحدد: {0}"
@@ -8589,10 +8611,6 @@ msgstr "تم الاختيار بناءً على ما اكتشفناه. بدّل�
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete user group"
 msgstr "احذف مجموعة المستخدمين"
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
-msgid "Spatial unavailable"
-msgstr "Spatial غير متاح"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Give the dashboard a name, then create it."
@@ -8759,6 +8777,10 @@ msgstr "يستخدم HAVING العامل \"{operator}\" الذي لا يدعمه
 msgid "Displaced"
 msgstr "مُزاح"
 
+#: src/hooks/ui/useGooglePicker.ts
+msgid "My Drive"
+msgstr "ملفاتي"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
 "Your subscription will be updated accordingly."
@@ -8898,6 +8920,10 @@ msgstr "لتأكيد، اكتب <0>{confirmationTarget}</0> أدناه:"
 msgid "{peopleClause} and {groupClause}"
 msgstr "{peopleClause} و{groupClause}"
 
+#: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
+msgid "These options need geometry support, which could not be loaded."
+msgstr "تتطلب هذه الخيارات دعم الأشكال الهندسية، وقد تعذّر تحميله."
+
 #: src/views/GisApp/GisAppMapShell.tsx
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "High"
@@ -8986,11 +9012,6 @@ msgstr "جارٍ التحميل..."
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Not reported"
 msgstr "لم يُبلّغ عنه"
-
-#: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
-#: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
-msgid "Spatial is unavailable"
-msgstr "Spatial غير متاح"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx

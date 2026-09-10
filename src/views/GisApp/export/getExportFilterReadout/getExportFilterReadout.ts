@@ -42,8 +42,9 @@ export function getExportFilterReadout(
   config: AvaMapConfig.T,
 ): ExportFilterReadout {
   return {
-    timeWindow:
-      config.timeRange ? _formatTimeWindow(config.timeRange) : undefined,
+    timeWindow: config.timeRange
+      ? _formatTimeWindow(config.timeRange)
+      : undefined,
     hasAoi: config.aoi !== undefined,
   };
 }

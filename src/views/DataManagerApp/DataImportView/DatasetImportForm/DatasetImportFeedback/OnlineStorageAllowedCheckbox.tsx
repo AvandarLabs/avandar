@@ -31,7 +31,7 @@ export function OnlineStorageAllowedCheckbox({
           <Text span>
             <Trans>This dataset can be stored in the cloud. </Trans>
           </Text>
-          {!dataSourceMetadata.onlineStorageAllowed ?
+          {!dataSourceMetadata.onlineStorageAllowed ? (
             <Callout mt="sm" title={offlineOnlyTitle} titleSize="xl">
               <Text c="red.8">
                 <Trans>
@@ -42,7 +42,7 @@ export function OnlineStorageAllowedCheckbox({
                 </Trans>
               </Text>
             </Callout>
-          : null}
+          ) : null}
         </>
       }
       checked={dataSourceMetadata.onlineStorageAllowed}

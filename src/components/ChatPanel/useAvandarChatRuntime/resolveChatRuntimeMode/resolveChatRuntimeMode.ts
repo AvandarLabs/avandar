@@ -9,9 +9,8 @@ export function resolveChatRuntimeMode(args: {
   selectedChatModelId?: string;
 }): ChatRuntimeMode {
   const hasDownloaded = LocalChatModelStore.hasAnyDownloaded();
-  const pickerLocalId =
-    args.selectedChatModelId ?
-      OfflineChatPickerModels.parseModelId(args.selectedChatModelId)
+  const pickerLocalId = args.selectedChatModelId
+    ? OfflineChatPickerModels.parseModelId(args.selectedChatModelId)
     : undefined;
 
   if (pickerLocalId && LocalChatModelStore.isDownloaded(pickerLocalId)) {

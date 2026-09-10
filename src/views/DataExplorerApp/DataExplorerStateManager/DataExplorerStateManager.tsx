@@ -13,10 +13,6 @@ import {
   isSameColumnSchema,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
-import type {
-  DataExplorerAppState,
-  OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -28,6 +24,10 @@ import type {
   VizConfigRegistry,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  DataExplorerAppState,
+  OpenDatasetInfo,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 // Re-exported INITIAL_DATA_EXPLORER_STATE lives in
 // DataExplorerAppState.types.ts so other consumers can import it without
@@ -227,21 +227,22 @@ export const DataExplorerStateManager = createAppStateManager({
 
       const remembered = vizConfigMemory[newVizType];
       const nextVizConfig =
-        remembered === undefined ?
-          VizConfigs.hydrateFromQuery(
-            VizConfigs.convertVizConfig(vizConfig, newVizType),
-            query,
-          )
-          // Without results there is nothing to reconcile against, so the
-          // remembered config stands as-is until `syncVizFromQueryResult`
-          // runs.
-        : lastResultColumns === undefined ? remembered
-        : applyVizConfigFromQueryResult({
-            vizConfig: remembered,
-            rawSql,
-            query,
-            columns: lastResultColumns,
-          });
+        remembered === undefined
+          ? VizConfigs.hydrateFromQuery(
+              VizConfigs.convertVizConfig(vizConfig, newVizType),
+              query,
+            )
+          : // Without results there is nothing to reconcile against, so the
+            // remembered config stands as-is until `syncVizFromQueryResult`
+            // runs.
+            lastResultColumns === undefined
+            ? remembered
+            : applyVizConfigFromQueryResult({
+                vizConfig: remembered,
+                rawSql,
+                query,
+                columns: lastResultColumns,
+              });
 
       // TypeScript widens the computed union key to `string` and so cannot see
       // that `vizConfig` lands under its own `vizType`. The key is taken from

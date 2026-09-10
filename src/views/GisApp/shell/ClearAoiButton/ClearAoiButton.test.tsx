@@ -1,8 +1,8 @@
+import { describe, expect, it, vi } from "vitest";
 /**
  * Map-level control that unsets the area-of-interest polygon.
  */
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { ClearAoiButton } from "@/views/GisApp/shell/ClearAoiButton/ClearAoiButton";
 

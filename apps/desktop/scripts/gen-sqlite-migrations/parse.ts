@@ -278,9 +278,9 @@ function _findFkReferences(sql: string): FkReference[] {
       return;
     }
     const schema =
-      rawSchema === undefined || rawSchema.toLowerCase() === "public" ?
-        undefined
-      : rawSchema;
+      rawSchema === undefined || rawSchema.toLowerCase() === "public"
+        ? undefined
+        : rawSchema;
     refs.push({ schema, table });
   });
   return refs;

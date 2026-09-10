@@ -1,5 +1,5 @@
-import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 import type { AppType, RoleLevel } from "$/models/Permissions/Permissions.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
@@ -101,9 +101,12 @@ export async function getRoleGroupIdFromAcceptedInvite(
   const baseMatrix = await _getBaseRoleMatrix(options);
   const overrides = RoleOverridesSchema.parse(options.invite.role_overrides);
   const mergedRoles =
-    overrides.length === 0 ?
-      baseMatrix
-    : Permissions.RolesMatrix.applyRoleOverridesToMatrix(baseMatrix, overrides);
+    overrides.length === 0
+      ? baseMatrix
+      : Permissions.RolesMatrix.applyRoleOverridesToMatrix(
+          baseMatrix,
+          overrides,
+        );
   if (Permissions.RolesMatrix.areRoleMatricesEqual(mergedRoles, baseMatrix)) {
     return baseGroupId;
   }

@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs";
 import { describe, expect, it } from "vitest";
+import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { SeriesAwareVizForm } from "./SeriesAwareVizForm";

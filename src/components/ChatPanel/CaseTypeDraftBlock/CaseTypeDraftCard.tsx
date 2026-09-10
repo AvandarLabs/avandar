@@ -57,9 +57,9 @@ export function CaseTypeDraftCard({
       };
     });
   const sourceCountLabel =
-    sourceGroups.length === 1 ?
-      t`1 dataset`
-    : t`${sourceGroups.length} datasets joined`;
+    sourceGroups.length === 1
+      ? t`1 dataset`
+      : t`${sourceGroups.length} datasets joined`;
 
   return (
     <Paper withBorder shadow="xs" radius="md" p="md" bg="blue.0">

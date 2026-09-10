@@ -12,9 +12,9 @@
 import { describe, expect, it } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { RenderHookResult } from "@testing-library/react";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { RenderHookResult } from "@testing-library/react";
 import type { ReactNode } from "react";
 
 const COLUMNS: readonly QueryResultColumn[] = [

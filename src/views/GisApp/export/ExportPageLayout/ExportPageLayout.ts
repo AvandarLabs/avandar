@@ -165,9 +165,9 @@ export const ExportPageLayout = {
   ): ExportPageGeometry => {
     const pageMm = _getPageMm(options.paper, options.orientation);
     const rest =
-      options.orientation === "landscape" ?
-        _fromLandscape(pageMm)
-      : _fromPortrait(pageMm);
+      options.orientation === "landscape"
+        ? _fromLandscape(pageMm)
+        : _fromPortrait(pageMm);
     return {
       pageMm,
       ...rest,

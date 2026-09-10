@@ -1,9 +1,9 @@
 /** Verifies that map navigation isolates stateful editor instances. */
 import { Model } from "@avandar/models";
 import { assertIsDefined } from "@avandar/utils";
+import { describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { User } from "$/models/User/User";

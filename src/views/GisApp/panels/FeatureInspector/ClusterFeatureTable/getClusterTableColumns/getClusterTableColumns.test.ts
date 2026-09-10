@@ -1,8 +1,8 @@
 import { Model } from "@avandar/models";
+import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { describe, expect, it } from "vitest";
 import { getClusterTableColumns } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumns/getClusterTableColumns";
 import { getClusterTableColumnsFromLeaves } from "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/getClusterTableColumnsFromLeaves/getClusterTableColumnsFromLeaves";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

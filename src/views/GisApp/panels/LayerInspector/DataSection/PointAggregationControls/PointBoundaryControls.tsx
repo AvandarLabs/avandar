@@ -2,10 +2,10 @@ import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { BoundaryColumnControls } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls";
-import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type PointAggregationBinding = Extract<
@@ -72,8 +72,9 @@ export function PointBoundaryControls({
           const option = options.find(({ dataset }) => {
             return dataset.id === datasetId;
           });
-          const boundary =
-            option ? _createBoundaryFromOption(option) : undefined;
+          const boundary = option
+            ? _createBoundaryFromOption(option)
+            : undefined;
           if (boundary) {
             updateBoundary(boundary);
           }

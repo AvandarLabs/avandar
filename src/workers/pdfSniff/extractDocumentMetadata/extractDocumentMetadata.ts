@@ -100,9 +100,9 @@ function _titleFromPage(page: PageGeometry): string | null {
   });
   const bodyMedian = bodySizes[Math.floor(bodySizes.length / 2)];
   const threshold =
-    bodyMedian === undefined ?
-      Math.max(...bandHeights)
-    : bodyMedian * TITLE_SIZE_RATIO;
+    bodyMedian === undefined
+      ? Math.max(...bandHeights)
+      : bodyMedian * TITLE_SIZE_RATIO;
 
   const titleLines = bandLines.filter((line) => {
     return _lineHeight(line.items) >= threshold;
@@ -158,9 +158,9 @@ export function extractDocumentMetadata(params: {
   const infoTitle =
     typeof params.info.Title === "string" ? params.info.Title.trim() : "";
   const title =
-    infoTitle.length > 0 && !_isFileName(infoTitle) ?
-      infoTitle
-    : _titleFromPage(params.page);
+    infoTitle.length > 0 && !_isFileName(infoTitle)
+      ? infoTitle
+      : _titleFromPage(params.page);
 
   const author =
     typeof params.info.Author === "string" ? params.info.Author.trim() : "";
@@ -172,9 +172,9 @@ export function extractDocumentMetadata(params: {
     .join(" ");
 
   const infoDate =
-    typeof params.info.CreationDate === "string" ?
-      PDF_DATE.exec(params.info.CreationDate)
-    : null;
+    typeof params.info.CreationDate === "string"
+      ? PDF_DATE.exec(params.info.CreationDate)
+      : null;
 
   const reportNumber = REPORT_NUMBER.exec(pageText);
 
@@ -182,9 +182,8 @@ export function extractDocumentMetadata(params: {
     title: title !== null && title.length > 0 ? title : null,
     organisation: author.length > 0 ? author : null,
     reportNumber: reportNumber ? reportNumber[1]! : null,
-    publishedAt:
-      infoDate ?
-        _iso(Number(infoDate[1]), Number(infoDate[2]), Number(infoDate[3]))
+    publishedAt: infoDate
+      ? _iso(Number(infoDate[1]), Number(infoDate[2]), Number(infoDate[3]))
       : _dateFromText(pageText),
   };
 }

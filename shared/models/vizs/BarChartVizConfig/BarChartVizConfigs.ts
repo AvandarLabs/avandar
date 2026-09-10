@@ -1,8 +1,10 @@
+import { match } from "ts-pattern";
+import { ChartLayout } from "$/models/vizs/ChartLayout.ts";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
-import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -32,13 +34,6 @@ const BAR_LAYOUT_OPTIONS = [
   { value: "percent", label: "100% stacked" },
 ] as const;
 
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const;
-
 const descriptors: VizSettingDescriptors<BarChartVizConfig, BarSeries> = {
   chart: [
     {
@@ -53,12 +48,7 @@ const descriptors: VizSettingDescriptors<BarChartVizConfig, BarSeries> = {
       group: "Legend",
       control: { kind: "switch" },
     },
-    {
-      key: "chartStyle.legend.position",
-      label: "Legend position",
-      group: "Legend",
-      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
-    },
+    makeLegendPositionDescriptor<BarChartVizConfig>(),
     ...makeAxisDescriptors<BarChartVizConfig>({
       axis: "xAxis",
       role: "category",
@@ -156,7 +146,7 @@ export const BarChartVizConfigs = {
     vizConfig: BarChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { xAxisKey, series, withLegend, chartStyle } = vizConfig;
+    const { xAxisKey, series, layout, withLegend, chartStyle } = vizConfig;
     const firstSeries = series[0];
     const pieAxes = { nameKey: xAxisKey, valueKey: firstSeries?.key };
     return match<VizType>(newVizType)
@@ -184,16 +174,16 @@ export const BarChartVizConfigs = {
           series: series.map((s) => {
             return convertSeriesRenderAs(s, "area");
           }) as XYSeries[],
-          layout: "default",
+          layout: ChartLayout.getAreaLayoutFromBarLayout(layout),
           withLegend,
           chartStyle,
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
         const scatterSeries =
-          xAxisKey !== undefined && firstSeries !== undefined ?
-            [{ xKey: xAxisKey, key: firstSeries.key }]
-          : [];
+          xAxisKey !== undefined && firstSeries !== undefined
+            ? [{ xKey: xAxisKey, key: firstSeries.key }]
+            : [];
         return { vizType, series: scatterSeries, chartStyle };
       })
       .with("pie", (vizType): PieChartVizConfig => {
@@ -209,9 +199,8 @@ export const BarChartVizConfigs = {
         return { vizType, ...pieAxes };
       })
       .with("radar", (vizType): RadarChartVizConfig => {
-        const radarSeries: RadarSeries[] =
-          firstSeries ?
-            [
+        const radarSeries: RadarSeries[] = firstSeries
+          ? [
               {
                 key: firstSeries.key,
                 label: firstSeries.label,
@@ -219,13 +208,25 @@ export const BarChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
+        return {
+          vizType,
+          nameKey: xAxisKey,
+          series: radarSeries,
+          withLegend,
+          chartStyle,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
-          xAxisKey !== undefined && firstSeries !== undefined ?
-            [{ xKey: xAxisKey, key: firstSeries.key, sizeKey: firstSeries.key }]
-          : [];
+          xAxisKey !== undefined && firstSeries !== undefined
+            ? [
+                {
+                  xKey: xAxisKey,
+                  key: firstSeries.key,
+                  sizeKey: firstSeries.key,
+                },
+              ]
+            : [];
         return { vizType, series: bubbleSeries, chartStyle };
       })
       .exhaustive(() => {

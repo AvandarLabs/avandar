@@ -88,8 +88,8 @@ export function isStagingIndividualsTableName(tableName: string): boolean {
 export function getTableNameFromRowNumberedViewName(
   viewName: string,
 ): string | undefined {
-  return viewName.startsWith(ROW_NUMBERED_VIEW_PREFIX) ?
-      viewName.slice(ROW_NUMBERED_VIEW_PREFIX.length)
+  return viewName.startsWith(ROW_NUMBERED_VIEW_PREFIX)
+    ? viewName.slice(ROW_NUMBERED_VIEW_PREFIX.length)
     : undefined;
 }
 
@@ -136,9 +136,8 @@ export function getParquetProjectionClauses(
   const projections = objectEntries(columnReplacements ?? {}).map(
     ([columnName, { alias, dataType }]) => {
       const outputName = alias ?? columnName;
-      const valueExpression =
-        dataType ?
-          `TRY_CAST("${columnName}" AS ${dataType})`
+      const valueExpression = dataType
+        ? `TRY_CAST("${columnName}" AS ${dataType})`
         : `"${columnName}"`;
       return {
         exclusion: `"${columnName}"`,
@@ -148,13 +147,13 @@ export function getParquetProjectionClauses(
   );
   return {
     excludeClause:
-      projections.length > 0 ?
-        `EXCLUDE (${projections.map(prop("exclusion")).join(", ")})`
-      : "",
+      projections.length > 0
+        ? `EXCLUDE (${projections.map(prop("exclusion")).join(", ")})`
+        : "",
     replaceClause:
-      projections.length > 0 ?
-        `, ${projections.map(prop("replacement")).join(", ")}`
-      : "",
+      projections.length > 0
+        ? `, ${projections.map(prop("replacement")).join(", ")}`
+        : "",
   };
 }
 
