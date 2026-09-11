@@ -2,11 +2,11 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildCsvFromDatastoreRecords } from "$/open-data/buildCsvFromDatastoreRecords";
 import { describe, expect, it } from "vitest";
+import { buildCsvFromDatastoreRecords } from "$/open-data/buildCsvFromDatastoreRecords";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { DuckDBConnection } from "@duckdb/node-api";
 import type { CkanDatastoreField } from "$/open-data/CkanClient/CkanClient.types";
+import type { DuckDBConnection } from "@duckdb/node-api";
 
 /**
  * This suite lives under `src/` rather than beside

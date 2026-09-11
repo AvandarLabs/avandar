@@ -1,7 +1,7 @@
 import { makeColorExpressionFromColor } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeColorExpressionFromColor";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import type { MapLayerSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 
 /** Makes the polygon fill followed by its independently sized outline. */
 export function makeFillLayerSpecsFromMapLayer(options: {
@@ -13,8 +13,9 @@ export function makeFillLayerSpecsFromMapLayer(options: {
   if (symbology.type !== "fill") {
     throw new Error("Fill symbology is required");
   }
-  const visibility =
-    layer.isVisible ? {} : { layout: { visibility: "none" as const } };
+  const visibility = layer.isVisible
+    ? {}
+    : { layout: { visibility: "none" as const } };
   const layerId = MapLayerIds.toLayerId(layer.id);
   return [
     {

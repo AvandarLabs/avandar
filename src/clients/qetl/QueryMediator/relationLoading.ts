@@ -15,16 +15,6 @@ import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegist
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { Logger } from "@/utils/Logger";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type {
-  AcquiredRelationBytes,
-  ColumnReplacement,
-  NeededColumnsByDatasetId,
-  QetlRunQuery,
-  RelationSource,
-} from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import type { ILogger } from "@avandar/logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -37,6 +27,16 @@ import type {
   RelationCacheProbeHit,
   RelationCacheProbeMiss,
 } from "$/models/relations/RelationCachePort/RelationCachePort.types";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type {
+  AcquiredRelationBytes,
+  ColumnReplacement,
+  NeededColumnsByDatasetId,
+  QetlRunQuery,
+  RelationSource,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import type { ILogger } from "@avandar/logger";
 
 type FetchRelationSourceOptions = {
   relationSource: RelationSource;
@@ -80,13 +80,12 @@ function _getColumnReplacements(
       const hasChangedDataType =
         column.dataType !==
         DuckDbDataTypeUtils.toAvaDataType(column.detectedDataType);
-      return hasChangedName || hasChangedDataType ?
-          {
+      return hasChangedName || hasChangedDataType
+        ? {
             originalName: column.originalName,
             alias: hasChangedName ? column.name : undefined,
-            dataType:
-              hasChangedDataType ?
-                DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType)
+            dataType: hasChangedDataType
+              ? DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType)
               : undefined,
           }
         : undefined;
@@ -135,19 +134,18 @@ function _lookupsForFetch(relationSources: readonly RelationSource[]) {
 
 function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
   return {
-    readGoogleSheetXlsx: async ({
+    readGoogleSheetTabCsv: async ({
       datasetId,
-      xlsxBytes,
-      sheet,
+      csvText,
     }: {
       datasetId: Dataset.Id;
-      xlsxBytes: Uint8Array<ArrayBuffer>;
-      sheet: string | undefined;
+      csvText: string;
     }) => {
-      const loaded = await DuckDbClient.loadXlsx({
+      // The same reader the import path uses, so a dataset's columns are typed
+      // the same whether the rows arrived at import or at query time.
+      const loaded = await DuckDbClient.loadCsv({
         tableName: datasetId,
-        fileBytes: xlsxBytes,
-        sheet,
+        fileText: csvText,
         datasetDuckDbLease,
       });
       return { parquetBlob: loaded.parquetData };
@@ -262,8 +260,8 @@ function _toGrowFromColumnsByDatasetId(
 ): Record<string, readonly string[] | "all"> {
   return Object.fromEntries(
     misses.flatMap((miss) => {
-      return miss.growFrom === undefined ?
-          []
+      return miss.growFrom === undefined
+        ? []
         : [[miss.key.relation.id, miss.growFrom.columns]];
     }),
   );

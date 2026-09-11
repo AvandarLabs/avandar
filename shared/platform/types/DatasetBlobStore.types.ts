@@ -1,8 +1,7 @@
 /**
  * Platform-agnostic store for dataset bulk data (parquet files, raw source
  * uploads). On web this wraps Dexie + optional Supabase Storage. On desktop
- * (Phase 2+) this wraps the local filesystem under the per-OS-user app data
- * directory.
+ * this wraps the local filesystem under the per-OS-user app data directory.
  */
 export interface DatasetBlobStore {
   /**

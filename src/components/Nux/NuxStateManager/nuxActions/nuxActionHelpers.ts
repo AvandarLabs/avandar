@@ -3,9 +3,9 @@ import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxS
 import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/NuxStepFactsStore";
 import { FIRST_DASHBOARD_MILESTONES } from "@/components/Nux/tutorials/firstDashboard/firstDashboard";
 import { getVisibleNuxSteps } from "@/components/Nux/tutorials/getVisibleNuxSteps/getVisibleNuxSteps";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 /** Drops `key` from a milestone-key list. */
 export function withoutMilestoneKey(
@@ -27,8 +27,8 @@ export function tutorialStatusAfterCompletions(
   if (state.status === "dismissed") {
     return "dismissed";
   }
-  return nuxSelectors.areAllMilestonesComplete(completedMilestones) ?
-      "completed"
+  return nuxSelectors.areAllMilestonesComplete(completedMilestones)
+    ? "completed"
     : "in_progress";
 }
 
@@ -111,16 +111,18 @@ export function completeNewMilestone(
       state.userUnmarkedMilestones,
       payload.key,
     ),
-    status:
-      isDismissed ? "dismissed"
-      : nuxSelectors.areAllMilestonesComplete(completedMilestones) ? "completed"
-      : "in_progress",
+    status: isDismissed
+      ? "dismissed"
+      : nuxSelectors.areAllMilestonesComplete(completedMilestones)
+        ? "completed"
+        : "in_progress",
     activeMilestoneKey:
       isActive && !hasPayoffStep ? undefined : state.activeMilestoneKey,
-    activeStepIndex:
-      hasPayoffStep ? lastStepIndex
-      : isActive ? 0
-      : state.activeStepIndex,
+    activeStepIndex: hasPayoffStep
+      ? lastStepIndex
+      : isActive
+        ? 0
+        : state.activeStepIndex,
     isPanelExpanded:
       !isDismissed &&
       !nuxSelectors.areAllMilestonesComplete(completedMilestones),

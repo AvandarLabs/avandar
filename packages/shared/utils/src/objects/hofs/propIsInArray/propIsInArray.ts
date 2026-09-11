@@ -13,10 +13,12 @@ import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.t
  */
 export function propIsInArray<
   T extends object,
-  K extends [ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>,
-  V extends K extends keyof T ? T[K]
-  : K extends ObjectPaths<T> ? PathValue<T, K>
-  : never,
+  K extends ([ObjectPaths<T>] extends [never] ? keyof T : ObjectPaths<T>),
+  V extends (K extends keyof T
+    ? T[K]
+    : K extends ObjectPaths<T>
+      ? PathValue<T, K>
+      : never),
 >(path: K, array: readonly V[]): (obj: T) => boolean {
   return (obj: T) => {
     return array.includes(getValue(obj, path));

@@ -33,9 +33,8 @@ export function splitArray<T>(
   const predicateIsFunction = typeof splitPredicate === "function";
 
   array.forEach((item) => {
-    const matchesPredicate =
-      predicateIsFunction ?
-        (splitPredicate as (value: T) => boolean)(item)
+    const matchesPredicate = predicateIsFunction
+      ? (splitPredicate as (value: T) => boolean)(item)
       : item === splitPredicate;
 
     if (allowSplitting && matchesPredicate) {

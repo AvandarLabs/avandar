@@ -1,5 +1,3 @@
-import type { Model } from "@avandar/models";
-import type { SwapDeep, UUID } from "@avandar/utils";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
@@ -7,6 +5,8 @@ import type {
   WorkspaceRole,
 } from "$/models/Workspace/Workspace.types.ts";
 import type { Json } from "$/types/database.types.ts";
+import type { Model } from "@avandar/models";
+import type { SwapDeep, UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 type ModelType = "WorkspaceInvite";

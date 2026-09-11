@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { where } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { useMemo } from "react";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";

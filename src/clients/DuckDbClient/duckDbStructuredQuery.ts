@@ -1,11 +1,13 @@
 import { objectEntries, prop } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
+import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   DuckDbColumnSchema,
@@ -13,8 +15,6 @@ import type {
   UnknownRow,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Knex } from "knex";
 
 const sql = knex({
@@ -76,9 +76,9 @@ function _getStructuredSelectFields(
       .map(prop("column_name")),
   );
   const columnNames =
-    selectColumnNames === "*" ?
-      tableColumns.map(prop("column_name"))
-    : selectColumnNames;
+    selectColumnNames === "*"
+      ? tableColumns.map(prop("column_name"))
+      : selectColumnNames;
   const columnNamesWithoutAggregations = columnNames.filter((colName) => {
     return aggregations[colName] === undefined;
   });

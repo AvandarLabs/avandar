@@ -1,4 +1,3 @@
-import type { ObjectPaths } from "@avandar/utils";
 /**
  * # Setting vs. control: viz settings nomenclature
  *
@@ -28,6 +27,7 @@ import type { ObjectPaths } from "@avandar/utils";
  * control widget the user clicks.
  */
 import type { RenderAs } from "$/models/vizs/SeriesConfig.ts";
+import type { ObjectPaths } from "@avandar/utils";
 
 /**
  * The groups a setting can be clustered under in a settings form.

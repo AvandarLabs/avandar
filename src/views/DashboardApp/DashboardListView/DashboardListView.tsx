@@ -4,13 +4,13 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useMemo } from "react";
+import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { getNuxWorkspaceArtifactsQueryKey } from "@/clients/NuxProgressClient/NuxProgressClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -19,10 +19,10 @@ import { DashboardGrid } from "@/views/DashboardApp/DashboardListView/DashboardG
 import { DashboardListEmptyState } from "@/views/DashboardApp/DashboardListView/DashboardListEmptyState";
 import { getDashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/getDashboardOfflineStatus";
 import { sortDashboardsForList } from "@/views/DashboardApp/DashboardListView/sortDashboardsForList/sortDashboardsForList";
-import type { DashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfile } from "$/models/User/UserProfile";
+import type { DashboardOfflineStatus } from "@/views/DashboardApp/DashboardListView/DashboardCard/DashboardCard";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -158,7 +158,7 @@ export function DashboardListView({
   const state = useDashboardListViewState({ dashboards, workspaceSlug });
 
   return (
-    <AppLayout
+    <AppSlate
       title={t`Dashboards`}
       toolbarButtonSection={
         <Button
@@ -174,19 +174,20 @@ export function DashboardListView({
       }
       containerProps={{ p: "md" }}
     >
-      {dashboards.length === 0 ?
+      {dashboards.length === 0 ? (
         <DashboardListEmptyState
           isCreatePending={state.isCreatePending}
           isCreateDisabled={state.isCreateDisabled}
           onCreateDashboard={state.onCreateDashboard}
         />
-      : <DashboardGrid
+      ) : (
+        <DashboardGrid
           dashboards={state.orderedDashboards}
           currentUserId={state.currentUserId}
           getOfflineStatus={state.getOfflineStatus}
           onOpenDashboard={state.onOpenDashboard}
         />
-      }
-    </AppLayout>
+      )}
+    </AppSlate>
   );
 }

@@ -15,9 +15,9 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
-import { uuid } from "$/lib/uuid";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
+import { uuid } from "$/lib/uuid";
 import { CatalogDatasetColumnClient } from "@/clients/catalog-entries/CatalogDatasetColumnClient";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -200,11 +200,12 @@ export function OpenDataCatalogView({
           placeholder={t`Search by name, organization, pipeline…`}
           value={search}
         />
-        {isLoadingCatalog ?
+        {isLoadingCatalog ? (
           <Group justify="center" py="xl">
             <Loader />
           </Group>
-        : <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+        ) : (
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
             <Paper p="md" withBorder shadow="none">
               <Stack gap={6}>
                 <Text fw={600} size="sm">
@@ -229,7 +230,7 @@ export function OpenDataCatalogView({
               />
             </Paper>
           </SimpleGrid>
-        }
+        )}
       </Stack>
     </Box>
   );

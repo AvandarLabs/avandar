@@ -8,6 +8,7 @@ import {
   unpublishDashboard,
 } from "@/clients/dashboards/DashboardClient/unpublishDashboard";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type {
   DashboardMutationConfig,
   DashboardMutationContext,
@@ -16,7 +17,6 @@ import type {
 } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
 import type { PublishedVisibility } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type ValidateDashboardSlugOptions = {
   config: DashboardMutationConfig;

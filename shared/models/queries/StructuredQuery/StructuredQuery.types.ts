@@ -1,5 +1,3 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import type {
   QueryColumnId,
@@ -11,6 +9,8 @@ import type {
   NestedSubquerySource,
   QueryJoin,
 } from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
+import type { Model } from "@avandar/models";
+import type { UUID } from "@avandar/utils";
 
 type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;

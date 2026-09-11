@@ -33,14 +33,14 @@ create type public.datasets__csv_file__date_format as (date_format text, timesta
  * authorization. RLS `WITH CHECK` does not reliably see `auth.uid()` for
  * `INSERT` from this PL/pgSQL body under `SECURITY INVOKER`.
  *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_dataset_source_type: The source type of the dataset
- * @param p_columns: The columns of the dataset
+ * @param p_dataset_id The id of the dataset to add.
+ * @param p_workspace_id The workspace id to add the dataset to.
+ * @param p_dataset_name The name of the dataset.
+ * @param p_dataset_description The description of the dataset.
+ * @param p_dataset_source_type The source type of the dataset.
+ * @param p_columns The columns of the dataset.
  *
- * @returns: The created dataset
+ * @returns The created dataset.
  *
  * TODO(jpsyx): add this function to a private schema
  */
@@ -132,3 +132,31 @@ end;
 $$ language plpgsql security definer
 set
   search_path = public;
+
+-- `authenticated` only. Nothing calls this directly; it is reached from
+-- the SECURITY INVOKER `rpc_datasets__add_*` wrappers, which run as the
+-- caller, so the caller needs EXECUTE here too.
+revoke
+execute on function public.rpc_datasets__add_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.datasets__source_type,
+  public.dataset_column_input[]
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_datasets__add_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.datasets__source_type,
+  public.dataset_column_input[]
+) to authenticated;

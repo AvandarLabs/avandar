@@ -1,7 +1,7 @@
+import { match } from "ts-pattern";
 import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
 import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
-import { makeLegendDescriptors } from "$/models/vizs/makeLegendDescriptors/makeLegendDescriptors.ts";
-import { match } from "ts-pattern";
+import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -23,9 +23,13 @@ import type {
 
 const descriptors: VizSettingDescriptors<RadarChartVizConfig, RadarSeries> = {
   chart: [
-    ...makeLegendDescriptors<RadarChartVizConfig>({
-      withVisibilityToggle: true,
-    }),
+    {
+      key: "withLegend",
+      label: "Show legend",
+      group: "Legend",
+      control: { kind: "switch" },
+    },
+    makeLegendPositionDescriptor<RadarChartVizConfig>(),
   ],
   series: [
     {
@@ -147,9 +151,9 @@ export const RadarChartVizConfigs = {
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
         const scatterSeries =
-          nameKey !== undefined && firstSeries !== undefined ?
-            [{ xKey: nameKey, key: firstSeries.key }]
-          : [];
+          nameKey !== undefined && firstSeries !== undefined
+            ? [{ xKey: nameKey, key: firstSeries.key }]
+            : [];
         return { vizType, series: scatterSeries, chartStyle };
       })
       .with("pie", (vizType): PieChartVizConfig => {
@@ -169,9 +173,15 @@ export const RadarChartVizConfigs = {
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
-          nameKey !== undefined && firstSeries !== undefined ?
-            [{ xKey: nameKey, key: firstSeries.key, sizeKey: firstSeries.key }]
-          : [];
+          nameKey !== undefined && firstSeries !== undefined
+            ? [
+                {
+                  xKey: nameKey,
+                  key: firstSeries.key,
+                  sizeKey: firstSeries.key,
+                },
+              ]
+            : [];
         return { vizType, series: bubbleSeries, chartStyle };
       })
       .exhaustive(() => {

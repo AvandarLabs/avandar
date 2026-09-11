@@ -44,9 +44,6 @@ supabase/snippets/
 # Deno (local type-check only; breaks Supabase edge bundler when committed)
 deno.lock
 
-# Cursor
-.cursor/.cursor/
-
 # Playwright
 /playwright/
 /playwright-report/
@@ -96,3 +93,16 @@ worktrees/
 # Gate fixtures we have no confirmed licence to redistribute. Fetched by
 # `pnpm fetch-gate-fixtures`; see public/test-data/pdf/gate/README.md.
 public/test-data/pdf/gate/imc-sudan-cholera-sitrep-1.pdf
+
+# Impeccable design skill.
+# Decisions are shared and committed: config.json (team workflow config),
+# design.json (the DESIGN.md sidecar), live/config.json (injection shape),
+# critique/ignore.md (shared suppressions). Everything below is per-machine
+# runtime state or regenerable output from a single run.
+.impeccable/config.local.json
+.impeccable/live/sessions/
+.impeccable/live/inject-journal.json
+.impeccable/live/roots.json
+.impeccable/build/
+.impeccable/mocks/
+.impeccable/review/

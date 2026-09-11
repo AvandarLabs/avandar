@@ -365,7 +365,7 @@ select is(
 );
 
 -- Pre-migration: bob (no data_sources) has nothing yet; the tag row alone
--- is invisible to util__resource_effective_role after Task 6's cleanup.
+-- is invisible to util__resource_effective_role once the tag tables are gone.
 select is(
   (
     select effective_role

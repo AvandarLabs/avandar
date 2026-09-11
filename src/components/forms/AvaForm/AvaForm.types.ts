@@ -27,11 +27,11 @@ export type FieldValidationFn<
  * value types.
  */
 export type ValuesOfFieldRecord<FieldSchemaRecord extends UnknownRecord> = {
-  [FieldKey in StringKeyOf<FieldSchemaRecord>]: "initialValue" extends (
-    keyof FieldSchemaRecord[FieldKey]
-  ) ?
-    FieldSchemaRecord[FieldKey]["initialValue"]
-  : never;
+  [
+    FieldKey in StringKeyOf<FieldSchemaRecord>
+  ]: "initialValue" extends keyof FieldSchemaRecord[FieldKey]
+    ? FieldSchemaRecord[FieldKey]["initialValue"]
+    : never;
 };
 
 export type GenericFormSchemaRecord<
