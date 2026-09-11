@@ -3,6 +3,7 @@ import { ChartLayout } from "$/models/vizs/ChartLayout.ts";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
@@ -58,24 +59,7 @@ const descriptors: VizSettingDescriptors<BarChartVizConfig, BarSeries> = {
       axis: "yAxis",
       role: "value",
     }),
-    {
-      key: "chartStyle.grid.color",
-      label: "Gridline color",
-      group: "Grid",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.grid.horizontal",
-      label: "Horizontal gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
-    {
-      key: "chartStyle.grid.vertical",
-      label: "Vertical gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
+    ...makeGridDescriptors<BarChartVizConfig>(),
   ],
   series: [
     {
