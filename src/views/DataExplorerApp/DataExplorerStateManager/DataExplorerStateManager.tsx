@@ -21,6 +21,7 @@ import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type {
   VizConfig,
+  VizConfigRegistry,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
 import type {
@@ -199,23 +200,49 @@ export const DataExplorerStateManager = createAppStateManager({
     },
 
     /**
-     * Change the active visualization.
-     *
-     * Converts the config and applies structured `hydrateFromQuery`.
-     * Result-based `hydrateFromQueryResult` runs in `DataExplorerApp` when
-     * query results are present (see `syncVizFromQueryResult`).
+     * Activates a visualization type while preserving its most recent config.
+     * Returns state with a restored or hydrated config for the selected type.
      */
     setActiveVizType: (state: DataExplorerAppState, newVizType: VizType) => {
-      const { vizConfig, query } = state;
+      const { vizConfig, query, rawSql, vizConfigMemory, lastResultColumns } =
+        state;
 
-      return setValue(
-        state,
-        "vizConfig",
-        VizConfigs.hydrateFromQuery(
-          VizConfigs.convertVizConfig(vizConfig, newVizType),
-          query,
-        ),
-      );
+      if (vizConfig.vizType === newVizType) {
+        return state;
+      }
+
+      const rememberedVizConfig = vizConfigMemory[newVizType];
+      const nextVizConfig =
+        rememberedVizConfig === undefined
+          ? VizConfigs.hydrateFromQuery(
+              VizConfigs.convertVizConfig(vizConfig, newVizType),
+              query,
+            )
+          : // Without results there is nothing to reconcile against, so the
+            // remembered config stands as-is until `syncVizFromQueryResult`
+            // runs.
+            lastResultColumns === undefined
+            ? rememberedVizConfig
+            : applyVizConfigFromQueryResult({
+                vizConfig: rememberedVizConfig,
+                rawSql,
+                query,
+                columns: lastResultColumns,
+              });
+
+      // TypeScript widens the computed union key to `string` and so cannot see
+      // that `vizConfig` lands under its own `vizType`. The key is taken from
+      // the value itself, so the correlation holds by construction.
+      const nextVizConfigMemory = {
+        ...vizConfigMemory,
+        [vizConfig.vizType]: vizConfig,
+      } as Partial<VizConfigRegistry>;
+
+      return {
+        ...state,
+        vizConfig: nextVizConfig,
+        vizConfigMemory: nextVizConfigMemory,
+      };
     },
 
     /**
