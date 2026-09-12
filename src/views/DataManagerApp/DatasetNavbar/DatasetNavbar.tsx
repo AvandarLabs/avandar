@@ -26,6 +26,7 @@ import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParse
 import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { NavLinkProps } from "@avandar/ui";
+import type { ReactNode } from "react";
 
 /**
  * Below this many datasets the list is short enough to read in one pass, so
@@ -117,7 +118,7 @@ function makeDatasetLink(
 export function DatasetNavbar({
   datasets,
   isLoading,
-}: Readonly<Props>): JSX.Element {
+}: Readonly<Props>): ReactNode {
   const workspace = useCurrentWorkspace();
   const workspaceSlug = workspace.slug;
   const { t } = useLingui();

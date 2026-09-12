@@ -12,6 +12,7 @@ import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmpt
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import type { ReactNode } from "react";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/data-manager/")({
   component: DataManagerRoot,
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/data-manager/")({
  * selection one: telling someone to choose from an empty list is the failure
  * this view exists to avoid.
  */
-function DataManagerRoot(): JSX.Element {
+function DataManagerRoot(): ReactNode {
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
