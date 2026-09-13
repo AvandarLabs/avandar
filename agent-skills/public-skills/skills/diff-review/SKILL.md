@@ -626,6 +626,44 @@ stack, or a flow gated behind a third-party credential the run does not hold.
 Save captures under `.difit/<stem>-walkthrough-assets/` and reference them
 with relative paths, so the links resolve from the markdown file itself.
 
+#### Name a UI element, show the UI element
+
+Naming a piece of interface creates vocabulary the reader is expected to carry
+for the rest of the document, and prose cannot install that vocabulary. A
+reader who cannot picture "the rail" reads every later sentence about it as a
+term of art they hold unresolved, and by the third such term they are
+reconstructing the screen instead of reviewing the change. So the first time
+the document names an element, show it. Together these captures are the
+document's visual glossary.
+
+Two forms work, and the choice is about how many terms are in play:
+
+- **A zoomed-in capture** of the element alone, when one term needs anchoring.
+  Crop to the element plus enough surrounding context to place it on the page.
+- **One full-page capture annotated with letters** (A, B, C) or arrows, when
+  several terms arrive together. Follow the image with a definition list
+  resolving every label, directly under it, the same way a diagram glossary
+  sits directly under its fence.
+
+Prefer the annotated full-page capture once a section introduces three or more
+names, because a reader separating "the rail" from "the slate" needs to see
+both in one frame.
+
+**A term is exempt only when it is obvious, never when it is merely
+guessable.** Two kinds qualify:
+
+| Kind | Examples |
+| --- | --- |
+| Visually self-evident | `Submit button`, `Edit icon`, `search field` |
+| Self-describing by position | `left sidebar`, `top-right menu`, `page footer` |
+
+Everything else gets an image. `Rail`, `slate`, `sticky action bar`, `dock`,
+and `pane` are exactly the cases this rule exists for: each is precise to the
+team and opaque to a reader who has not already built the picture. A house name
+for a region is never self-evident, however settled it feels internally. When
+you are unsure which side a term falls on, it falls on the side that gets a
+capture.
+
 ### Citations
 
 Where a decision, structure, or algorithm has academic or published precedent,
@@ -872,7 +910,7 @@ do not turn the caption into a slogan or punchline.
 
 ### Closing checks
 
-Five passes over the finished draft, before handing it over. Each catches a
+Six passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
 
 Run them by dispatching a subagent, per
@@ -931,6 +969,12 @@ own draft.
    [Factual prose](#factual-prose). Read the draft once looking only for the
    tells in that table; they cluster at the start of sections and in the
    sentence before a diagram.
+
+6. **List every UI element the document names,** and confirm each
+   non-obvious one has its zoomed-in or annotated capture, per
+   [Name a UI element, show the UI element](#name-a-ui-element-show-the-ui-element).
+   Report the misses rather than fixing them: this pass cannot drive the app,
+   so the author takes the capture.
 
 ### The content review runs in a subagent
 
@@ -1036,6 +1080,7 @@ Dispatch it with:
 - the absolute path of `-walkthrough.md`,
 - the absolute path of this SKILL.md, told to read
   [Sections](#sections), [Diagrams](#diagrams),
+  [Screenshots](#screenshots),
   [Code alongside the prose](#code-alongside-the-prose),
   [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline),
   [Factual prose](#factual-prose), [Closing checks](#closing-checks) and
