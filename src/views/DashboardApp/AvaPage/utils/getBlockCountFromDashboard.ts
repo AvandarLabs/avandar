@@ -1,5 +1,5 @@
-import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 /**
  * Counts the blocks on a dashboard, returning zero when the config carries

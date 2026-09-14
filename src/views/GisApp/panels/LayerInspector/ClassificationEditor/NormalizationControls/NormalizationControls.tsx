@@ -6,10 +6,10 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { NormalizationMultiplierSelect } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
-import type { I18n } from "@lingui/core";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { I18n } from "@lingui/core";
 import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
@@ -85,12 +85,10 @@ function _applyNormalizationSelection(options: {
       layer: current,
       color: {
         ...currentColor,
-        normalization:
-          selection ?
-            {
-              denominator:
-                selection.startsWith("boundary:") ?
-                  {
+        normalization: selection
+          ? {
+              denominator: selection.startsWith("boundary:")
+                ? {
                     type: "boundaryColumn",
                     column: selection.slice(9) as DatasetColumn.Id,
                   }
@@ -145,12 +143,12 @@ export function NormalizationControls({
           _applyNormalizationSelection({ selection, onLayerChange });
         }}
       />
-      {color.normalization ?
+      {color.normalization ? (
         <NormalizationMultiplierSelect
           multiplier={color.normalization.multiplier}
           onLayerChange={onLayerChange}
         />
-      : null}
+      ) : null}
     </>
   );
 }

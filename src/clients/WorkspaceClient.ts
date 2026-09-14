@@ -54,9 +54,8 @@ export const WorkspaceClient = createUsableServiceClient(
             // Subscription
             return {
               ...workspaceModel,
-              subscription:
-                workspace.subscription ?
-                  SubscriptionParsers.fromDBReadToModelRead(
+              subscription: workspace.subscription
+                ? SubscriptionParsers.fromDBReadToModelRead(
                     workspace.subscription,
                   )
                 : undefined,
@@ -130,9 +129,9 @@ export const WorkspaceClient = createUsableServiceClient(
               }
 
               const rowEmail =
-                membership.user_profile.user_id === session.user.id ?
-                  (session.user.email ?? "")
-                : "";
+                membership.user_profile.user_id === session.user.id
+                  ? (session.user.email ?? "")
+                  : "";
               const profile = UserProfileDBReadToModelReadSchema.parse({
                 ...membership.user_profile,
                 email: rowEmail,

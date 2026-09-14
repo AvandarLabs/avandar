@@ -74,9 +74,7 @@ export function NuxRootContents(): ReactNode {
         isOpen={celebration.isOpen}
         onClose={celebration.onClose}
       />
-      {state.activeMilestoneKey ?
-        <NuxTourLazy />
-      : null}
+      {state.activeMilestoneKey ? <NuxTourLazy /> : null}
     </>
   );
 }

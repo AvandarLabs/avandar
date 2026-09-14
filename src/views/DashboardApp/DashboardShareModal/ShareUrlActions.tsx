@@ -24,9 +24,7 @@ function CopyShareUrlButton({ url }: Readonly<{ url: string }>): ReactNode {
             onClick={copy}
             aria-label={t`Copy share link`}
           >
-            {copied ?
-              <IconCheck size={18} />
-            : <IconCopy size={18} />}
+            {copied ? <IconCheck size={18} /> : <IconCopy size={18} />}
           </ActionIcon>
         );
       }}

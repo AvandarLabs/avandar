@@ -1,6 +1,6 @@
 import { DragDropProvider } from "@dnd-kit/react";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { describe, expect, it, vi } from "vitest";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import { LayerRow } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRow";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";

@@ -5,8 +5,8 @@ import {
   RawDataRow,
   UUID,
 } from "@avandar/utils";
-import { Json } from "$/types/database.types.ts";
 import { z } from "zod";
+import { Json } from "$/types/database.types.ts";
 
 /**
  * Returns a Zod type that represents a branded UUID. This expects

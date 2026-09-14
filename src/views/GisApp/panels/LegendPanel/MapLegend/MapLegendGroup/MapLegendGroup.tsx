@@ -13,9 +13,9 @@ export function MapLegendGroup({ layer }: Props): ReactNode {
   return (
     <div className={css.mapLegendGroup}>
       <h3 className={css.mapLegendGroupTitle}>{title}</h3>
-      {layer.legend.units ?
+      {layer.legend.units ? (
         <div className={css.mapLegendGroupUnits}>{layer.legend.units}</div>
-      : null}
+      ) : null}
       <LayerLegendContent layer={layer} />
     </div>
   );

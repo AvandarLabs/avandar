@@ -8,8 +8,8 @@ import { NuxTourCaret } from "@/components/Nux/NuxTour/NuxTourCaret/NuxTourCaret
 import { nuxTourJoyrideStyles } from "@/components/Nux/NuxTour/nuxTourJoyrideStyles";
 import { onNuxTourJoyrideEvent } from "@/components/Nux/NuxTour/onNuxTourJoyrideEvent";
 import { NUX_CHECKLIST_Z_INDEX } from "@/config/Theme/Theme";
-import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
 import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxStep } from "@/components/Nux/tutorials/NuxTutorial.types";
 import type { ReactNode, RefObject } from "react";
 import type { Step } from "react-joyride";
 

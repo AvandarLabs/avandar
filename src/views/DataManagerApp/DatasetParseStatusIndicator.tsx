@@ -37,13 +37,15 @@ export function DatasetParseStatusIndicator({
   if (activeJob?.status === "running") {
     const eta = estimateRemainingTimeFromJob(activeJob);
     const remainingLabel =
-      eta === undefined ? undefined
-      : eta.kind === "lessThanMinute" ? t`less than a minute`
-      : eta.kind === "aboutMinute" ? t`about a minute`
-      : t`about ${eta.minutes} minutes`;
-    const tooltipLabel =
-      remainingLabel ?
-        t`Processing, ${remainingLabel} remaining`
+      eta === undefined
+        ? undefined
+        : eta.kind === "lessThanMinute"
+          ? t`less than a minute`
+          : eta.kind === "aboutMinute"
+            ? t`about a minute`
+            : t`about ${eta.minutes} minutes`;
+    const tooltipLabel = remainingLabel
+      ? t`Processing, ${remainingLabel} remaining`
       : t`Processing dataset…`;
     return (
       <Tooltip label={tooltipLabel}>

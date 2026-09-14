@@ -5,8 +5,8 @@ import { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOp
 import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";
 import { MapStatusContent } from "@/views/GisApp/panels/MapStatusCard/MapStatusContent";
 import { MapStatusIcon } from "@/views/GisApp/panels/MapStatusCard/MapStatusIcon";
-import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { ReactNode } from "react";
 
 type Props = {

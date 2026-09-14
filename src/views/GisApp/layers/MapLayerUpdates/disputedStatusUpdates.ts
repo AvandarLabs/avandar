@@ -16,8 +16,8 @@ function _withDisputedStatusColumn(
 ): MapLayer.T {
   const { layer, reference } = options;
   if (reference === undefined) {
-    return layer.disputedStatusColumn === undefined ?
-        layer
+    return layer.disputedStatusColumn === undefined
+      ? layer
       : {
           ...layer,
           disputedStatusColumn: undefined,

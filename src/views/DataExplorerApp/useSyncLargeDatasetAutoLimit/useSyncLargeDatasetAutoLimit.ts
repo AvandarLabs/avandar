@@ -38,9 +38,9 @@ export function useSyncLargeDatasetAutoLimit(opts: Options): void {
 
   const dataSource = query.dataSource;
   const datasetId =
-    dataSource !== undefined && Model.isOfModelType(dataSource, "Dataset") ?
-      dataSource.id
-    : undefined;
+    dataSource !== undefined && Model.isOfModelType(dataSource, "Dataset")
+      ? dataSource.id
+      : undefined;
 
   useEffect(
     function syncLargeDatasetAutoLimit() {

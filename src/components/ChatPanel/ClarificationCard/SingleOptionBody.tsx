@@ -27,12 +27,12 @@ export function SingleOptionBody({
         somethingElseLabel={somethingElseLabel()}
         onChange={answer.onOptionChange}
       />
-      {answer.isCustomSelected ?
+      {answer.isCustomSelected ? (
         <ClarificationCustomTextInput
           value={answer.customText}
           onChange={answer.onCustomTextChange}
         />
-      : null}
+      ) : null}
       <ClarificationAnswerActions
         canSubmit={answer.canSubmit}
         onConfirm={answer.onSubmitAnswer}

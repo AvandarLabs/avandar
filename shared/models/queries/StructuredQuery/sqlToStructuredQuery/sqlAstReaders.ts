@@ -199,12 +199,10 @@ export function isEmptyStringLiteral(node: unknown): boolean {
 
 /** The boolean a `bool` literal node carries, if it is one. */
 export function getBoolFromAstNode(node: unknown): boolean | undefined {
-  return (
-      isPlainObject(node) &&
-        node.type === "bool" &&
-        typeof node.value === "boolean"
-    ) ?
-      node.value
+  return isPlainObject(node) &&
+    node.type === "bool" &&
+    typeof node.value === "boolean"
+    ? node.value
     : undefined;
 }
 

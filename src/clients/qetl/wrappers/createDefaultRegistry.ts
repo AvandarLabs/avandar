@@ -10,9 +10,6 @@ import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsW
 import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
-import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
-import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
@@ -21,6 +18,9 @@ import type {
   AcquiredRelation,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
+import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
+import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
+import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
@@ -66,7 +66,7 @@ export type DefaultRegistryOptions = {
   getGoogleAccessToken?: GoogleSheetsWrapperOptions["getAccessToken"];
 
   /** Reads one Sheets tab under the caller's DuckDB lease. */
-  readGoogleSheetXlsx?: GoogleSheetsWrapperOptions["readXlsx"];
+  readGoogleSheetTabCsv?: GoogleSheetsWrapperOptions["readCsv"];
 
   /** Fetches one API-backed catalog resource through the open-data proxy. */
   fetchApiOpenDataResource?: (
@@ -91,13 +91,12 @@ export type DefaultRegistryOptions = {
  *
  * Every field below is chosen to preserve today's behaviour rather than to
  * describe the most capable source, because the only decision the mediator
- * makes from this record in Phase 1 is acquire versus push down, and all six
+ * makes from this record today is acquire versus push down, and all six
  * sources are acquire-only. Where a source is stricter than this record says,
  * its own wrapper still enforces it: Google Sheets caps a call at 10 MB and
- * shares a project-global quota, and its wrapper declares both. Specs 4 and 5
- * are what make per-source-type capabilities load-bearing, and that is when
- * this flattening has to be replaced by resolution finer than the relation
- * kind.
+ * shares a project-global quota, and its wrapper declares both. The first
+ * caller that needs capabilities differing per source type is what forces this
+ * flattening to be replaced by resolution finer than the relation kind.
  */
 const DATASET_CAPABILITIES = {
   /** One dataset row is one relation, including one Google Sheets tab. */
@@ -262,7 +261,7 @@ export function createDefaultRegistry(
       googleSheets: createGoogleSheetsWrapper({
         getSheetSource: options.getGoogleSheetsSource ?? _getGoogleSheetsSource,
         getAccessToken: options.getGoogleAccessToken ?? _getGoogleAccessToken,
-        readXlsx: options.readGoogleSheetXlsx,
+        readCsv: options.readGoogleSheetTabCsv,
       }),
     }),
     createConceptWrapper(),

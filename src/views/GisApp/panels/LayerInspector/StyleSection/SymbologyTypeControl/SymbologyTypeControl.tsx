@@ -3,9 +3,9 @@ import { Text } from "@mantine/core";
 import { SymbologyOptions } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions";
 import css from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.module.css";
 import { useSymbologyTypeChange } from "@/views/GisApp/panels/LayerInspector/StyleSection/useSymbologyTypeChange";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { AvailableSymbologyType } from "@/views/GisApp/panels/LayerInspector/StyleSection/SymbologyOptions/SymbologyOptions.constants";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
@@ -43,11 +43,11 @@ export function SymbologyTypeControl({
     return type === "cluster" || type === "heatmap" ? isDensityAvailable : true;
   };
   const hint =
-    layer.sensitivity.mode === "aggregateOnly" ?
-      t`Aggregate-only layers require an area-producing binding.`
-    : !isDensityAvailable ?
-      t`Cluster and Heat require a complete point-producing binding.`
-    : undefined;
+    layer.sensitivity.mode === "aggregateOnly"
+      ? t`Aggregate-only layers require an area-producing binding.`
+      : !isDensityAvailable
+        ? t`Cluster and Heat require a complete point-producing binding.`
+        : undefined;
   return (
     <div>
       <Text component="span" size="xs" fw={500} id="gis-symbology-label">
@@ -65,11 +65,11 @@ export function SymbologyTypeControl({
           onTypeChange={onTypeChange}
         />
       </div>
-      {hint ?
+      {hint ? (
         <Text component="p" size="xs" c="dimmed" id="gis-symbology-hint">
           {hint}
         </Text>
-      : null}
+      ) : null}
     </div>
   );
 }

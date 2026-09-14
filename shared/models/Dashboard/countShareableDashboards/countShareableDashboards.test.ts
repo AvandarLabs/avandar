@@ -1,5 +1,5 @@
-import { countShareableDashboards } from "$/models/Dashboard/countShareableDashboards/countShareableDashboards.ts";
 import { describe, expect, it } from "vitest";
+import { countShareableDashboards } from "$/models/Dashboard/countShareableDashboards/countShareableDashboards.ts";
 import type { DashboardVisibility } from "$/models/Dashboard/Dashboard.types.ts";
 
 const OWNER = "00000000-0000-4000-8000-0000000000a1";

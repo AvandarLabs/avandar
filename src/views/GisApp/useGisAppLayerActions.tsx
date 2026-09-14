@@ -5,8 +5,8 @@ import { modals } from "@mantine/modals";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 
 type GisAppLayerAction = (layerId: MapLayer.Id) => void;
 
@@ -66,9 +66,9 @@ function _getNearestSurvivingLayerId(
 ): MapLayer.Id | undefined {
   const { layers, deletedLayerId } = options;
   const deletedLayerIndex = layers.findIndex(propEq("id", deletedLayerId));
-  return deletedLayerIndex === -1 ? undefined : (
-      (layers[deletedLayerIndex + 1]?.id ?? layers[deletedLayerIndex - 1]?.id)
-    );
+  return deletedLayerIndex === -1
+    ? undefined
+    : (layers[deletedLayerIndex + 1]?.id ?? layers[deletedLayerIndex - 1]?.id);
 }
 
 /** Updates a selected layer and creates one from a chosen data source. */

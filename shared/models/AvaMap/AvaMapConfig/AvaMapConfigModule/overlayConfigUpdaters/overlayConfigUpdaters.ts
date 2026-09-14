@@ -216,9 +216,9 @@ export const overlayConfigUpdaters = {
     const nextLayers = [...config.layers];
     nextLayers.splice(sourceIndex + 1, 0, buffer);
     const annotationsZIndex =
-      config.annotationsZIndex > sourceIndex ?
-        config.annotationsZIndex + 1
-      : config.annotationsZIndex;
+      config.annotationsZIndex > sourceIndex
+        ? config.annotationsZIndex + 1
+        : config.annotationsZIndex;
     return { ...config, layers: nextLayers, annotationsZIndex };
   },
 };

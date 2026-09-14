@@ -1,16 +1,14 @@
 /**
  * Add a virtual dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__virtual.
  *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_raw_sql: The raw SQL query that generates the dataset
+ * @param p_dataset_id The id of the dataset to add.
+ * @param p_workspace_id The workspace id to add the dataset to.
+ * @param p_dataset_name The name of the dataset.
+ * @param p_dataset_description The description of the dataset.
+ * @param p_columns The columns of the dataset.
+ * @param p_raw_sql The raw SQL query that generates the dataset.
  *
- * @returns: The created dataset
+ * @returns The created dataset.
  */
 create or replace function public.rpc_datasets__add_virtual_dataset (
   p_dataset_id uuid,
@@ -45,3 +43,29 @@ begin
   return v_dataset;
 end;
 $$ language plpgsql security invoker;
+
+-- `authenticated` only, the one role that calls this as an rpc.
+revoke
+execute on function public.rpc_datasets__add_virtual_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  text
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_datasets__add_virtual_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  text
+) to authenticated;

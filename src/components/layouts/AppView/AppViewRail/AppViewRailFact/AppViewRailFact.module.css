@@ -1,0 +1,23 @@
+.appViewRailFact {
+  align-items: baseline;
+  display: grid;
+  gap: var(--mantine-spacing-xs);
+  grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr);
+  min-width: 0;
+}
+
+.appViewRailFactLabel {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.appViewRailFactValue {
+  color: var(--mantine-color-neutral-9);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.45;
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

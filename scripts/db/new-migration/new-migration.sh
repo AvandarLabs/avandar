@@ -16,9 +16,11 @@
 #   3. reconcile-privileges --append    adds the ACL migra cannot see
 #   4. reconcile-privileges             proves the result reproduces the schemas
 #
-# Steps 2 and 3 are reached ONLY from here. Neither is a package script, because
-# a migration is only ever complete after both have run: fixing one blind spot
-# without the other produces a migration that looks reviewed and is not.
+# None of these steps is a package script. Steps 2 and 3 are reached ONLY from
+# here, because a migration is only ever complete after both have run: fixing
+# one blind spot without the other produces a migration that looks reviewed and
+# is not. Step 4 is also run by `pnpm test:db`, which calls the shell script by
+# path.
 #
 # Step 3 needs the new migration already applied, because the question it asks
 # is "what does this migration set still owe?". Hence the resets around it.

@@ -16,8 +16,8 @@ import type { User } from "npm:@supabase/supabase-js@2";
 import type { z } from "npm:zod@4";
 
 export type ValidBodySchema = AnyZodType | Record<string, AnyZodType>;
-export type InferBody<T extends ValidBodySchema> =
-  T extends AnyZodType ? z.infer<T>
+export type InferBody<T extends ValidBodySchema> = T extends AnyZodType
+  ? z.infer<T>
   : MakeOptionalIfUndefined<{
       [K in keyof T]: z.infer<T[K]>;
     }>;
@@ -42,18 +42,16 @@ export type URLPathWithoutParams<Path extends URLPathPattern> =
 
 export type ValidQueryParamsSchemaShape<
   QueryParams extends ValidQueryParams | undefined,
-> =
-  QueryParams extends ValidQueryParams ?
-    MakeOptionalIfUndefined<{
+> = QueryParams extends ValidQueryParams
+  ? MakeOptionalIfUndefined<{
       [K in keyof QueryParams]: ValidQueryParamValueSchema;
     }>
   : Record<string, ValidQueryParamValueSchema>;
 
 export type QueryParamsSchema<
   QueryParams extends ValidQueryParams | undefined,
-> =
-  QueryParams extends ValidQueryParams ?
-    z.ZodObject<ValidQueryParamsSchemaShape<QueryParams>>
+> = QueryParams extends ValidQueryParams
+  ? z.ZodObject<ValidQueryParamsSchemaShape<QueryParams>>
   : undefined;
 
 /**
@@ -64,13 +62,14 @@ export type QueryParamsSchema<
 export type InferredRouteQueryParams<
   SchemaShape extends Record<string, ValidQueryParamValueSchema>,
 > = MakeOptionalIfUndefined<{
-  [K in keyof SchemaShape]: SchemaShape[K] extends (
-    z.ZodType<infer Output, infer Input>
-  ) ?
-    undefined extends Input ?
-      Output | undefined
-    : Output
-  : never;
+  [K in keyof SchemaShape]: SchemaShape[K] extends z.ZodType<
+    infer Output,
+    infer Input
+  >
+    ? undefined extends Input
+      ? Output | undefined
+      : Output
+    : never;
 }>;
 
 /**
@@ -108,8 +107,9 @@ export type HTTPMethodActionFnOptions<
   body: Body;
   request: Request;
   info: Deno.ServeHandlerInfo<Deno.NetAddr>;
-  supabaseClient: IsJWTVerificationDisabled extends true ? undefined
-  : AvaSupabaseClient;
+  supabaseClient: IsJWTVerificationDisabled extends true
+    ? undefined
+    : AvaSupabaseClient;
   supabaseAdminClient: AvaSupabaseClient;
   user: IsJWTVerificationDisabled extends true ? undefined : User;
 };
@@ -275,31 +275,31 @@ export type ServerRouteHandler<
 };
 
 export type MiniServerRoutesDef<RoutesAPI extends GenericRouteAPIRecord> = {
-  [RouteName in keyof RoutesAPI]: RouteName extends `/${string}` ?
-    {
-      [Method in Extract<
-        keyof RoutesAPI[RouteName],
-        HTTPMethod
-      >]: RoutesAPI[RouteName][Method] extends object ?
-        ServerRouteHandler<
-          Method,
-          RouteName,
-          RoutesAPI[RouteName][Method]["returnType"],
-          RoutesAPI[RouteName][Method]["pathParams"] extends object ?
-            RoutesAPI[RouteName][Method]["pathParams"]
-          : undefined,
-          RoutesAPI[RouteName][Method]["queryParams"] extends object ?
-            RoutesAPI[RouteName][Method]["queryParams"]
-          : undefined,
-          Method extends "GET" ? undefined
-          : "body" extends keyof RoutesAPI[RouteName][Method] ?
-            RoutesAPI[RouteName][Method]["body"]
-          : Record<string, never>,
-          boolean
-        >
-      : never;
-    }
-  : never;
+  [RouteName in keyof RoutesAPI]: RouteName extends `/${string}`
+    ? {
+        [
+          Method in Extract<keyof RoutesAPI[RouteName], HTTPMethod>
+        ]: RoutesAPI[RouteName][Method] extends object
+          ? ServerRouteHandler<
+              Method,
+              RouteName,
+              RoutesAPI[RouteName][Method]["returnType"],
+              RoutesAPI[RouteName][Method]["pathParams"] extends object
+                ? RoutesAPI[RouteName][Method]["pathParams"]
+                : undefined,
+              RoutesAPI[RouteName][Method]["queryParams"] extends object
+                ? RoutesAPI[RouteName][Method]["queryParams"]
+                : undefined,
+              Method extends "GET"
+                ? undefined
+                : "body" extends keyof RoutesAPI[RouteName][Method]
+                  ? RoutesAPI[RouteName][Method]["body"]
+                  : Record<string, never>,
+              boolean
+            >
+          : never;
+      }
+    : never;
 };
 
 export type MiniServerAPIDef<API extends GenericAPITypeDef> = {

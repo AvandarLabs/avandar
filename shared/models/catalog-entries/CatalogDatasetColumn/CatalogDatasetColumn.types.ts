@@ -1,7 +1,7 @@
-import type { UUID } from "@avandar/utils";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
+import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 export type CatalogDatasetColumnId = UUID<"CatalogDatasetColumn">;

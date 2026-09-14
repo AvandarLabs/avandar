@@ -1,14 +1,16 @@
--- Weekly registration cohorts against weekly sign-ins.
---
--- One row per (cohort week, weeks since registration), so week 0 is the
--- registration week itself and the ratio of `returning_users` to `cohort_size`
--- down a cohort is the retention curve.
---
--- `median_days_since_last_sign_in` comes from the `daysSinceLastSignIn` payload
--- that the `auth.users` update trigger records. It answers a different question
--- from the curve: not how many came back, but how long they stayed away. It is
--- null for week 0, where every sign-in is a first sign-in and the payload
--- field is null by design.
+/**
+ * Weekly registration cohorts against weekly sign-ins.
+ *
+ * One row per (cohort week, weeks since registration), so week 0 is the
+ * registration week itself and the ratio of `returning_users` to `cohort_size`
+ * down a cohort is the retention curve.
+ *
+ * `median_days_since_last_sign_in` comes from the `daysSinceLastSignIn` payload
+ * that the `auth.users` update trigger records. It answers a different question
+ * from the curve: not how many came back, but how long they stayed away. It is
+ * null for week 0, where every sign-in is a first sign-in and the payload
+ * field is null by design.
+ */
 create or replace view analytics.retention_cohorts as
 with
   cohorts as (

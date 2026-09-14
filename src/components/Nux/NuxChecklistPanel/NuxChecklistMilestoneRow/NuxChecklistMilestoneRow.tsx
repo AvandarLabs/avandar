@@ -70,14 +70,16 @@ export function NuxChecklistMilestoneRow({
         label={checkLabel}
         onToggleDone={onToggleDone}
       />
-      {lockedTooltip ?
+      {lockedTooltip ? (
         <Tooltip
           label={lockedTooltip}
           events={{ hover: true, focus: true, touch: false }}
         >
           {rowStart}
         </Tooltip>
-      : rowStart}
+      ) : (
+        rowStart
+      )}
     </Group>
   );
 }

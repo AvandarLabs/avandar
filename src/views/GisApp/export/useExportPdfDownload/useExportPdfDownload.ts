@@ -12,13 +12,13 @@ import { getExportFurnitureText } from "@/views/GisApp/export/getExportFurniture
 import { getExportMetersPerPixel } from "@/views/GisApp/export/getExportMetersPerPixel/getExportMetersPerPixel";
 import { makeExportMapSpec } from "@/views/GisApp/export/makeExportMapSpec/makeExportMapSpec";
 import { MapScale } from "@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { ExportPdfInput } from "@/views/GisApp/export/composeExportPdf/composeExportPdf";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { ExportPageGeometry } from "@/views/GisApp/export/ExportPageLayout/ExportPageLayout";
 import type { ExportFurnitureText } from "@/views/GisApp/export/getExportFurnitureText/getExportFurnitureText";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { I18n, MessageDescriptor } from "@lingui/core";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /**
  * How much of the printed map frame's width a scale label may claim, chosen
@@ -89,8 +89,8 @@ function _getScaleDescriptor(
   if (scale.kind === "varies") {
     return msg`Scale varies across this map`;
   }
-  return scale.meters >= 1000 ?
-      msg`${scale.meters / 1000} km`
+  return scale.meters >= 1000
+    ? msg`${scale.meters / 1000} km`
     : msg`${scale.meters} m`;
 }
 
@@ -100,9 +100,9 @@ function _getFilterReadoutDescriptors(
 ): MessageDescriptor[] {
   const readout = getExportFilterReadout(config);
   return [
-    readout.timeWindow !== undefined ?
-      msg`Dates: ${readout.timeWindow}`
-    : undefined,
+    readout.timeWindow !== undefined
+      ? msg`Dates: ${readout.timeWindow}`
+      : undefined,
     readout.hasAoi ? msg`Area of interest applied` : undefined,
   ].filter(isDefined);
 }

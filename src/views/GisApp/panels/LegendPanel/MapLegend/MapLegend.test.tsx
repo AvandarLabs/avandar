@@ -1,7 +1,7 @@
 import { prop } from "@avandar/utils";
+import { describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { MapLegend } from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegend";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";

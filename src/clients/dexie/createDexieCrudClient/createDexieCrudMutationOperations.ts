@@ -48,10 +48,11 @@ function _createInsertOperation<
       columnNames,
       ignoreDuplicates: onConflict?.ignoreDuplicates ?? false,
     };
-    return (
-        isPrimaryKeyConflictColumns(columnNames, context.table.schema.primKey)
-      ) ?
-        upsertRowByPrimaryKey(upsertOptions)
+    return isPrimaryKeyConflictColumns(
+      columnNames,
+      context.table.schema.primKey,
+    )
+      ? upsertRowByPrimaryKey(upsertOptions)
       : upsertRowByIndexedConflict(upsertOptions);
   };
 }
@@ -82,10 +83,11 @@ function _createBulkInsertOperation<
       columnNames,
       ignoreDuplicates: onConflict?.ignoreDuplicates ?? false,
     };
-    return (
-        isPrimaryKeyConflictColumns(columnNames, context.table.schema.primKey)
-      ) ?
-        upsertRowsByPrimaryKey(upsertOptions)
+    return isPrimaryKeyConflictColumns(
+      columnNames,
+      context.table.schema.primKey,
+    )
+      ? upsertRowsByPrimaryKey(upsertOptions)
       : upsertRowsByIndexedConflict(upsertOptions);
   };
 }

@@ -1,25 +1,23 @@
 /**
  * Add a CSV file dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__csv_file.
  *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_size_in_bytes: The size of the CSV file in bytes
- * @param p_rows_to_skip: The number of rows to skip
- * @param p_quote_char: The quote character of the CSV file
- * @param p_escape_char: The escape character of the CSV file
- * @param p_delimiter: The delimiter of the CSV file
- * @param p_newline_delimiter: The newline delimiter of the CSV file
- * @param p_comment_char: The comment character of the CSV file
- * @param p_has_header: Whether the CSV file has a header
- * @param p_date_format: the `date_format` and `timestamp_format` of the
- * CSV file.
+ * @param p_dataset_id The id of the dataset to add.
+ * @param p_workspace_id The workspace id to add the dataset to.
+ * @param p_dataset_name The name of the dataset.
+ * @param p_dataset_description The description of the dataset.
+ * @param p_columns The columns of the dataset.
+ * @param p_size_in_bytes The size of the CSV file in bytes.
+ * @param p_rows_to_skip The number of rows to skip.
+ * @param p_quote_char The quote character of the CSV file.
+ * @param p_escape_char The escape character of the CSV file.
+ * @param p_delimiter The delimiter of the CSV file.
+ * @param p_newline_delimiter The newline delimiter of the CSV file.
+ * @param p_comment_char The comment character of the CSV file.
+ * @param p_has_header Whether the CSV file has a header.
+ * @param p_date_format The `date_format` and `timestamp_format` of the CSV
+ *   file.
  *
- * @returns: The created dataset
+ * @returns The created dataset.
  */
 create or replace function public.rpc_datasets__add_csv_file_dataset (
   p_dataset_id uuid,
@@ -83,3 +81,47 @@ begin
   return v_dataset;
 end;
 $$ language plpgsql security invoker;
+
+-- `authenticated` only, the one role that calls this as an rpc.
+revoke
+execute on function public.rpc_datasets__add_csv_file_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  boolean,
+  bigint,
+  integer,
+  public.util__nullable_text,
+  public.util__nullable_text,
+  text,
+  text,
+  public.util__nullable_text,
+  boolean,
+  public.datasets__csv_file__date_format
+)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_datasets__add_csv_file_dataset (
+  uuid,
+  uuid,
+  text,
+  text,
+  public.dataset_column_input[],
+  boolean,
+  bigint,
+  integer,
+  public.util__nullable_text,
+  public.util__nullable_text,
+  text,
+  text,
+  public.util__nullable_text,
+  boolean,
+  public.datasets__csv_file__date_format
+) to authenticated;

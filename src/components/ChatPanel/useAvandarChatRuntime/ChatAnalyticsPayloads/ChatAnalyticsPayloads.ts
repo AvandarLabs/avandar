@@ -1,9 +1,9 @@
 import { excludeUndefinedShallow } from "@avandar/utils";
-import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { AnalyticsEventPayloads } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { ChatRuntimeMode } from "$/types/offlineChat.types";
+import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 
 type FromMessageOptions = {
   content: string;
@@ -37,11 +37,12 @@ function _fromDashboardBlock(
 ): AnalyticsEventPayloads["dashboard.block_added_via_chat"] {
   const dashboardId = options.pageContext.dashboardId;
   const editorData =
-    dashboardId === options.editorState.activeDashboardId ?
-      options.editorState.editorData
+    dashboardId === options.editorState.activeDashboardId
+      ? options.editorState.editorData
+      : undefined;
+  const blockCountAfter = editorData
+    ? editorData.content.length + 1
     : undefined;
-  const blockCountAfter =
-    editorData ? editorData.content.length + 1 : undefined;
 
   return excludeUndefinedShallow({
     blockKind: options.block.kind,

@@ -2,10 +2,10 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;

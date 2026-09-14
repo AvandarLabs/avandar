@@ -153,17 +153,15 @@ function useLegacyStoreUpdate(
   useEffect(
     function updateLegacyFitBoundsRequest() {
       const nextBounds: MapBounds | undefined =
-        (
-          southwestLongitude === undefined ||
-          southwestLatitude === undefined ||
-          northeastLongitude === undefined ||
-          northeastLatitude === undefined
-        ) ?
-          undefined
-        : [
-            [southwestLongitude, southwestLatitude],
-            [northeastLongitude, northeastLatitude],
-          ];
+        southwestLongitude === undefined ||
+        southwestLatitude === undefined ||
+        northeastLongitude === undefined ||
+        northeastLatitude === undefined
+          ? undefined
+          : [
+              [southwestLongitude, southwestLatitude],
+              [northeastLongitude, northeastLatitude],
+            ];
       store.update(nextBounds, { top, right, bottom, left });
     },
     [

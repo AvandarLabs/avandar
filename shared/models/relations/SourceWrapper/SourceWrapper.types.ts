@@ -1,4 +1,3 @@
-import type { ILogger } from "@avandar/logger";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type {
   RelationCapabilities,
@@ -7,6 +6,7 @@ import type {
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
 import type { RelationSchema } from "$/models/relations/RelationSchema/RelationSchema.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { ILogger } from "@avandar/logger";
 
 /**
  * Ambient identity and services a wrapper needs. Injected, never imported, so

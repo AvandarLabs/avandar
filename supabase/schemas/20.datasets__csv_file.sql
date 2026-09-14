@@ -95,9 +95,6 @@ create policy "User can delete datasets__csv_file in their workspace" on public.
   )
 );
 
-/**
- * Trigger the `updated_at` update
- */
 create trigger tr_datasets__csv_file__set_updated_at before
 update on public.datasets__csv_file for each row
 execute function public.util__set_updated_at ();

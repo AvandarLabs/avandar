@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Formats files changed on the current branch relative to its base branch.
 #
-# Runs prettier, eslint --fix, and stylelint --fix on files changed vs the
-# merge-base with origin/develop or origin/main.
+# Runs oxfmt, prettier (SQL only), eslint --fix, and stylelint --fix on files
+# changed vs the merge-base with origin/develop or origin/main.
 #
 # Usable in two contexts:
 #   1. Manually:  `pnpm format`
@@ -165,14 +165,36 @@ for f in "${EXISTING[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
-# Stage 6: prettier on everything
+# Stage 6: oxfmt on everything except SQL, prettier on the SQL
 #
-# `--ignore-unknown` lets prettier silently skip file types it doesn't
-# understand, so we can pass the full mixed list (ts, css, json, ...) in one
-# invocation. Errors are tolerated (`|| true`) so a single bad file doesn't
-# stop eslint/stylelint from running on the others.
+# The two formatters own disjoint languages. oxfmt handles JS/TS/JSON/CSS/
+# Markdown/YAML and silently skips anything it has no parser for, so the
+# mixed list can go in one invocation. Prettier is caged to SQL by
+# `.prettierignore`, and `prettier-plugin-sql` is the only plugin left.
+#
+# `--ignore-path .oxfmtignore` is not optional. Without it oxfmt falls back
+# to reading `.prettierignore`, which now starts with `*`, and would format
+# nothing at all. `.gitignore` is honoured regardless.
+#
+# Errors are tolerated (`|| true`) so a single bad file doesn't stop
+# eslint/stylelint from running on the others.
 # ---------------------------------------------------------------------------
-pnpm exec prettier --write --ignore-unknown --log-level warn "${EXISTING[@]}" >&2 || true
+OXFMT_FILES=()
+SQL_FILES=()
+for f in "${EXISTING[@]}"; do
+  case "$f" in
+    *.sql) SQL_FILES+=("$f") ;;
+    *) OXFMT_FILES+=("$f") ;;
+  esac
+done
+
+if [ ${#OXFMT_FILES[@]} -gt 0 ]; then
+  pnpm exec oxfmt --ignore-path .oxfmtignore "${OXFMT_FILES[@]}" >&2 || true
+fi
+
+if [ ${#SQL_FILES[@]} -gt 0 ]; then
+  pnpm exec prettier --write --log-level warn "${SQL_FILES[@]}" >&2 || true
+fi
 
 # ---------------------------------------------------------------------------
 # Stage 7: partition into JS/TS and CSS for the language-specific linters

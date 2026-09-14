@@ -18,7 +18,7 @@ export function MarkdownCodeHeader({
 
   return (
     <div className={css.markdownCodeHeaderRoot} data-markdown-code-header>
-      {displayLanguage ?
+      {displayLanguage ? (
         <Text
           component="span"
           size="xs"
@@ -27,7 +27,9 @@ export function MarkdownCodeHeader({
         >
           {displayLanguage}
         </Text>
-      : <span />}
+      ) : (
+        <span />
+      )}
       <CopyButton value={code} timeout={2000}>
         {({ copied, copy }) => {
           return (
@@ -39,9 +41,7 @@ export function MarkdownCodeHeader({
                 aria-label={t`Copy code`}
                 onClick={copy}
               >
-                {copied ?
-                  <IconCheck size={14} />
-                : <IconCopy size={14} />}
+                {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
               </ActionIcon>
             </Tooltip>
           );

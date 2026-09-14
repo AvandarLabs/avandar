@@ -1,5 +1,5 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { render, screen } from "@/test-utils";
 import {
   createBoundLayer,

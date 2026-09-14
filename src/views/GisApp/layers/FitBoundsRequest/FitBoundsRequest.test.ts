@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@/test-utils";
 import { FitBoundsRequest } from "./FitBoundsRequest";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { RenderHookResult } from "@testing-library/react";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 const FIRST_LAYER_ID = "layer-a" as MapLayer.Id;
 const SECOND_LAYER_ID = "layer-b" as MapLayer.Id;

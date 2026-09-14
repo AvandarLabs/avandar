@@ -40,9 +40,9 @@ export function hydrateRadarSeriesFromQueryResult<
   }
 
   let nextNameKey =
-    currVizConfig.nameKey && colNames.has(currVizConfig.nameKey) ?
-      currVizConfig.nameKey
-    : undefined;
+    currVizConfig.nameKey && colNames.has(currVizConfig.nameKey)
+      ? currVizConfig.nameKey
+      : undefined;
   if (nextNameKey === undefined && nextSeries.length > 0) {
     const seriesKeys = new Set(
       nextSeries.map((s) => {

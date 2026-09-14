@@ -1,8 +1,8 @@
 import { ILogger } from "@avandar/logger";
 import { constant } from "@avandar/utils";
-import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
+import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { Logger } from "@/utils/Logger";
 
 export function arrowFieldToQueryResultField(

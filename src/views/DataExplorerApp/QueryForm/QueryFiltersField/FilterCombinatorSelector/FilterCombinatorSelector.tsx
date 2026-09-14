@@ -25,9 +25,9 @@ export function FilterCombinatorSelector({
       data={options.map((option) => {
         const name = getOptionNameFromUnknown(option);
         const label =
-          isPlainObject(option) && "label" in option ?
-            String(option.label)
-          : name;
+          isPlainObject(option) && "label" in option
+            ? String(option.label)
+            : name;
         return { value: name, label };
       })}
       value={String(value ?? "AND")}

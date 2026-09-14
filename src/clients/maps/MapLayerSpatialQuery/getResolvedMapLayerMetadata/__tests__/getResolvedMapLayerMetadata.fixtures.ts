@@ -59,9 +59,8 @@ export function createBoundaryLayer(options: {
   measureColumn?: QueryColumn.T;
 }): MapLayer.T {
   const layer = MapLayer.createArea("Cases by district");
-  const aggregation: MapLayer.AreaAggregation =
-    options.measureColumn ?
-      {
+  const aggregation: MapLayer.AreaAggregation = options.measureColumn
+    ? {
         operation: "sum",
         measureColumn: options.measureColumn.id,
         outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),

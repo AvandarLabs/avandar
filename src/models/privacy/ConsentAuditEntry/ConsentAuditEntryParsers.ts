@@ -1,7 +1,7 @@
 import { makeParserRegistry } from "@avandar/clients";
 import { identity } from "@avandar/utils";
-import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
+import { uuidType } from "$/lib/zodHelpers";
 import {
   ConsentAuditContexts,
   ConsentAuditMedicalTiers,

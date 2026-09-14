@@ -1,8 +1,10 @@
+import { match } from "ts-pattern";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
-import { match } from "ts-pattern";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -33,13 +35,6 @@ const CURVE_TYPE_OPTIONS = [
   { value: "step", label: "Step" },
 ] as const;
 
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const;
-
 const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
   chart: [
     {
@@ -48,12 +43,7 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
       group: "Legend",
       control: { kind: "switch" },
     },
-    {
-      key: "chartStyle.legend.position",
-      label: "Legend position",
-      group: "Legend",
-      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
-    },
+    makeLegendPositionDescriptor<LineChartVizConfig>(),
     ...makeAxisDescriptors<LineChartVizConfig>({
       axis: "xAxis",
       role: "category",
@@ -63,24 +53,7 @@ const descriptors: VizSettingDescriptors<LineChartVizConfig, LineSeries> = {
       axis: "yAxis",
       role: "value",
     }),
-    {
-      key: "chartStyle.grid.color",
-      label: "Gridline color",
-      group: "Grid",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.grid.horizontal",
-      label: "Horizontal gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
-    {
-      key: "chartStyle.grid.vertical",
-      label: "Vertical gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
+    ...makeGridDescriptors<LineChartVizConfig>(),
   ],
   series: [
     {
@@ -194,9 +167,9 @@ export const LineChartVizConfigs = {
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
         const scatterSeries =
-          xAxisKey !== undefined && firstSeries !== undefined ?
-            [{ xKey: xAxisKey, key: firstSeries.key }]
-          : [];
+          xAxisKey !== undefined && firstSeries !== undefined
+            ? [{ xKey: xAxisKey, key: firstSeries.key }]
+            : [];
         return { vizType, series: scatterSeries, chartStyle };
       })
       .with("pie", (vizType): PieChartVizConfig => {
@@ -212,9 +185,8 @@ export const LineChartVizConfigs = {
         return { vizType, ...pieAxes };
       })
       .with("radar", (vizType): RadarChartVizConfig => {
-        const radarSeries: RadarSeries[] =
-          firstSeries ?
-            [
+        const radarSeries: RadarSeries[] = firstSeries
+          ? [
               {
                 key: firstSeries.key,
                 label: firstSeries.label,
@@ -222,13 +194,25 @@ export const LineChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
+        return {
+          vizType,
+          nameKey: xAxisKey,
+          series: radarSeries,
+          withLegend,
+          chartStyle,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =
-          xAxisKey !== undefined && firstSeries !== undefined ?
-            [{ xKey: xAxisKey, key: firstSeries.key, sizeKey: firstSeries.key }]
-          : [];
+          xAxisKey !== undefined && firstSeries !== undefined
+            ? [
+                {
+                  xKey: xAxisKey,
+                  key: firstSeries.key,
+                  sizeKey: firstSeries.key,
+                },
+              ]
+            : [];
         return { vizType, series: bubbleSeries, chartStyle };
       })
       .exhaustive(() => {

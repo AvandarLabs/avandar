@@ -27,8 +27,8 @@ export function usePdfAxisCalibration(): {
 
   const pick = (point: PdfPoint): void => {
     setPoints((currentPoints) => {
-      return currentPoints.length >= 2 ?
-          currentPoints
+      return currentPoints.length >= 2
+        ? currentPoints
         : [...currentPoints, point];
     });
   };

@@ -1,4 +1,3 @@
-import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
@@ -7,6 +6,7 @@ import type {
   ChatSessionSecretResponse,
   ConsentAck,
 } from "$/types/chat.types.ts";
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type ChatAPI = APITypeDef<
   "chat",

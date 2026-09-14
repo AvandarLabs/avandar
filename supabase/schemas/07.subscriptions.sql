@@ -1,6 +1,6 @@
--- Named 05z.* so this seeds after 05.utils.workspaces.sql: RLS below calls
--- public.util__get_auth_user_workspaces(), which that file defines.
--- Valid feature plan types for a subscription.
+-- Numbered after `05.utils.workspace-auth.sql`: the policy below calls
+-- `public.util__get_auth_user_workspaces()`, which that file defines.
+/** Valid feature plan types for a subscription. */
 create type public.subscriptions__feature_plan_type as enum('free', 'basic', 'premium');
 
 create type public.subscriptions__status as enum(
@@ -15,8 +15,10 @@ create type public.subscriptions__status as enum(
 
 create type public.subscriptions__update_status as enum('pending', 'completed');
 
--- Table representing existing susbscriptions which associates a subscription
--- to a workspace and a billing manager (the workspace owner).
+/**
+ * One subscription, tying a workspace to its billing manager (the workspace
+ * owner) and to the plan limits that workspace is entitled to.
+ */
 create table public.subscriptions (
   -- Primary key: Avandar subscription row id (not the Polar subscription id).
   id uuid primary key not null default gen_random_uuid(),

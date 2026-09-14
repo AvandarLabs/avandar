@@ -1,0 +1,43 @@
+/*
+ * The dashed edge is the one place the system draws a non-solid border. It
+ * is doing the same job the dashed line does on a paper form: marking where
+ * something goes, rather than enclosing something that is already there.
+ */
+.fileDropzone {
+  background-color: var(--ava-surface-body);
+  border: 1px dashed var(--ava-border-strong);
+  border-radius: var(--mantine-radius-sm);
+  transition: var(--ava-transition-interactive);
+}
+
+.fileDropzone:hover {
+  background-color: var(--ava-surface-sunken);
+}
+
+.fileDropzone[data-accept] {
+  background-color: var(--mantine-color-primary-0);
+  border-color: var(--mantine-color-primary-4);
+  border-style: solid;
+}
+
+.fileDropzone[data-reject] {
+  background-color: var(--mantine-color-danger-0);
+  border-color: var(--mantine-color-danger-4);
+  border-style: solid;
+}
+
+.fileDropzoneInner {
+  padding: var(--mantine-spacing-xl) var(--mantine-spacing-lg);
+}
+
+.fileDropzoneIconIdle {
+  color: var(--mantine-color-neutral-5);
+}
+
+.fileDropzoneIconAccept {
+  color: var(--mantine-color-primary-6);
+}
+
+.fileDropzoneIconReject {
+  color: var(--mantine-color-danger-6);
+}

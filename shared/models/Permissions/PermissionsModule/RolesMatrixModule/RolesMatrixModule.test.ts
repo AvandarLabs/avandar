@@ -1,6 +1,6 @@
+import { describe, expect, it } from "vitest";
 import { BUILTIN_ROLE_GROUP_NAMES } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
 import { RolesMatrixModule } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/RolesMatrixModule.ts";
-import { describe, expect, it } from "vitest";
 import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types.ts";
 
 describe("RolesMatrixModule", () => {

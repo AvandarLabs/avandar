@@ -1,5 +1,6 @@
--- This represents an open data dataset that exists in the Avandar public open
--- data catalog.
+/**
+ * One open data dataset published in the Avandar public open data catalog.
+ */
 create table public.catalog_entries__open_data (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
@@ -147,9 +148,6 @@ create policy "User can select open data catalog entries" on public.catalog_entr
 select
   to authenticated using (true);
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_open_data_catalog_entries__set_updated_at before
 update on public.catalog_entries__open_data for each row
 execute function public.util__set_updated_at ();

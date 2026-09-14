@@ -8,14 +8,14 @@ import {
   undefinedsToNullsDeep,
 } from "@avandar/utils";
 import { z } from "zod";
-import type { Expect } from "@avandar/utils";
-import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
   WorkspaceId,
   WorkspaceRead,
 } from "$/models/Workspace/Workspace.types.ts";
+import type { Expect } from "@avandar/utils";
+import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 import type { SetOptional } from "type-fest";
 
 export type WorkspaceModel = SupabaseCrudModelSpec<

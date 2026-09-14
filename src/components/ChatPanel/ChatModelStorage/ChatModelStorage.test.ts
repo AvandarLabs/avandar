@@ -1,5 +1,5 @@
-import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import { beforeEach, describe, expect, it } from "vitest";
+import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
 import {
   CHAT_MODEL_LOCAL_STORAGE_KEY,
   ChatModelStorage,

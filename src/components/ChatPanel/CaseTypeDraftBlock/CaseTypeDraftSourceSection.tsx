@@ -48,7 +48,7 @@ export function CaseTypeDraftSourceSection({
         <Text size="xs" fw={600} flex={1} className={css.columnHint}>
           {datasetName}
         </Text>
-        {canRemove ?
+        {canRemove ? (
           <Tooltip label={t`Remove this dataset`}>
             <ActionIcon
               size="sm"
@@ -62,7 +62,7 @@ export function CaseTypeDraftSourceSection({
               <IconTrash size={14} />
             </ActionIcon>
           </Tooltip>
-        : null}
+        ) : null}
       </Group>
 
       <Select
@@ -80,11 +80,12 @@ export function CaseTypeDraftSourceSection({
         }}
       />
 
-      {group.attributes.length === 0 ?
+      {group.attributes.length === 0 ? (
         <Text size="xs" c="dimmed">
           <Trans>No columns from this dataset.</Trans>
         </Text>
-      : group.attributes.map((attribute) => {
+      ) : (
+        group.attributes.map((attribute) => {
           return (
             <CaseTypeDraftAttributeRow
               key={attribute.columnId}
@@ -99,7 +100,7 @@ export function CaseTypeDraftSourceSection({
             />
           );
         })
-      }
+      )}
     </Stack>
   );
 }

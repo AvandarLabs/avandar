@@ -45,9 +45,8 @@ export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
       const firstNumericCol = queryColumns.find(QueryColumn.isNumeric);
       next = {
         ...next,
-        valueKey:
-          firstNumericCol ?
-            QueryColumn.getDerivedColumnName(firstNumericCol)
+        valueKey: firstNumericCol
+          ? QueryColumn.getDerivedColumnName(firstNumericCol)
           : undefined,
       };
     }
@@ -66,8 +65,9 @@ export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
       const nameCol = firstNonNumericCol ?? fallbackCol;
       next = {
         ...next,
-        nameKey:
-          nameCol ? QueryColumn.getDerivedColumnName(nameCol) : undefined,
+        nameKey: nameCol
+          ? QueryColumn.getDerivedColumnName(nameCol)
+          : undefined,
       };
     }
   }

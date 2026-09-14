@@ -59,11 +59,11 @@ export function NuxTooltip({
       maw={380}
     >
       <Stack gap="xs">
-        {step.title ?
+        {step.title ? (
           <Title order={4} size="h5">
             {step.title}
           </Title>
-        : null}
+        ) : null}
         <Text size="sm">{step.content}</Text>
         <NuxTooltipFooter
           backProps={backProps}

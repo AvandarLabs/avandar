@@ -386,9 +386,9 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
                       pathParams,
                       supabaseAdminClient: SupabaseAdmin,
                     });
-                    return response instanceof Response ? response : (
-                        responseSuccess(response)
-                      );
+                    return response instanceof Response
+                      ? response
+                      : responseSuccess(response);
                   }
 
                   const body = await parseBodyParams(req, bodySchema);
@@ -402,9 +402,9 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
                     queryParams,
                     supabaseAdminClient: SupabaseAdmin,
                   });
-                  return response instanceof Response ? response : (
-                      responseSuccess(response)
-                    );
+                  return response instanceof Response
+                    ? response
+                    : responseSuccess(response);
                 },
               });
             }

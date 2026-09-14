@@ -1,6 +1,6 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { User } from "$/models/User/User";
 import type { Database } from "$/types/database.types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const ScriptsUtil = {
   /**

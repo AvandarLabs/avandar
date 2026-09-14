@@ -4,7 +4,56 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(30);
+select plan(31);
+
+-- Own fixture, not a borrowed one.
+--
+-- Every insert below sources its workspace, owner and owner profile from
+-- `public.user_profiles`, pinned by id to the row this file creates. Do not
+-- relax that predicate to `limit 1`: on an unseeded database, which is what a
+-- plain `supabase db reset` and the reset inside `pnpm db:new-migration` both
+-- produce, the fixture insert would match zero rows, every later statement
+-- would then update or insert nothing, and `throws_ok` would report "caught:
+-- no exception" eleven times with nothing wrong with the schema.
+insert into auth.users (id, email, aud, role)
+values (
+  'f7000001-0000-4000-8000-000000000001'::uuid,
+  'transition_fence@test.dev',
+  'authenticated',
+  'authenticated'
+);
+
+insert into public.workspaces (id, owner_id, name, slug)
+values (
+  'f7001001-0000-4000-8000-000000000001'::uuid,
+  'f7000001-0000-4000-8000-000000000001'::uuid,
+  'transition fence ws',
+  'transition-fence-ws'
+);
+
+insert into public.workspace_memberships (id, workspace_id, user_id)
+values (
+  'f7002001-0000-4000-8000-000000000001'::uuid,
+  'f7001001-0000-4000-8000-000000000001'::uuid,
+  'f7000001-0000-4000-8000-000000000001'::uuid
+);
+
+insert into public.user_profiles (
+  id,
+  user_id,
+  workspace_id,
+  membership_id,
+  full_name,
+  display_name
+)
+values (
+  'f7003001-0000-4000-8000-000000000001'::uuid,
+  'f7000001-0000-4000-8000-000000000001'::uuid,
+  'f7001001-0000-4000-8000-000000000001'::uuid,
+  'f7002001-0000-4000-8000-000000000001'::uuid,
+  'Transition Fence',
+  'Transition Fence'
+);
 
 insert into public.dashboards (
   id,
@@ -22,7 +71,7 @@ select
   'transition fence fixture',
   '{}'::jsonb
 from public.user_profiles
-limit 1;
+where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid;
 
 -- The type, the five transition columns and the two CHECK constraints are not
 -- asserted structurally here. Every behavioural case below writes all five
@@ -403,7 +452,7 @@ select throws_ok(
       '{}'::jsonb,
       'publish'::public.dashboard_snapshot_transition_kind
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'partial transition states are rejected'
@@ -426,7 +475,7 @@ select throws_ok(
       gen_random_uuid(),
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'cleanup claims must revoke published visibility'
@@ -451,7 +500,7 @@ select throws_ok(
       'public'::public.dashboard_visibility,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'publish claims must preserve the prior audience boundary'
@@ -479,7 +528,7 @@ select throws_ok(
       'public'::public.dashboard_visibility,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'a transition revision cannot reuse the committed snapshot revision'
@@ -503,7 +552,7 @@ select throws_ok(
       'draft'::public.dashboard_visibility,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__snapshot_transition_consistent"',
   'a transition revision cannot use the reserved legacy sentinel'
@@ -523,7 +572,7 @@ select throws_ok(
       'draft'::public.dashboard_visibility,
       gen_random_uuid()
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__settled_snapshot_consistent"',
   'a settled draft cannot retain a snapshot revision'
@@ -541,7 +590,7 @@ select throws_ok(
       '{}'::jsonb,
       'workspace'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__settled_snapshot_consistent"',
   'a settled workspace dashboard requires a snapshot revision'
@@ -559,10 +608,31 @@ select throws_ok(
       '{}'::jsonb,
       'public'::public.dashboard_visibility
     from public.user_profiles
-    limit 1$$,
+    where user_profiles.id = 'f7003001-0000-4000-8000-000000000001'::uuid$$,
   '23514',
   'new row for relation "dashboards" violates check constraint "dashboards__settled_snapshot_consistent"',
   'a settled public dashboard requires a snapshot revision'
+);
+
+-- The DELETE policy in `17.rls.dashboards.sql` asks only for
+-- `snapshot_transition_kind = 'delete'` and relies on this constraint to supply
+-- the rest of the claim's shape. That reliance is only sound while the
+-- constraint is present AND validated: a NOT VALID constraint leaves
+-- pre-existing rows unchecked, so a malformed claim could survive and satisfy
+-- the policy. Dropping either property must fail here rather than silently
+-- widen who can remove a dashboard.
+select ok(
+  coalesce(
+    (
+      select convalidated
+      from pg_constraint
+      where
+        conrelid = 'public.dashboards'::regclass and
+        conname = 'dashboards__snapshot_transition_consistent'
+    ),
+    false
+  ),
+  'dashboards_delete_relies_on_the_claim_constraint'
 );
 
 select * from finish();

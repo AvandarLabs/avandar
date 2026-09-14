@@ -37,9 +37,8 @@ export function PointCoordinateSelect({
   if (points.type !== "latLngColumns") {
     return null;
   }
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const label = axis === "latitude" ? t`Latitude` : t`Longitude`;
   return (

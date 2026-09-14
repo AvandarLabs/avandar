@@ -343,9 +343,9 @@ export async function bestEffortPurgeE2EWorkspacesForOwners(options: {
           });
         } catch (cleanupError) {
           const message =
-            cleanupError instanceof Error ?
-              cleanupError.message
-            : String(cleanupError);
+            cleanupError instanceof Error
+              ? cleanupError.message
+              : String(cleanupError);
           console.warn(`[e2e] best-effort purge ${row.slug}: ${message}`);
         }
       }),

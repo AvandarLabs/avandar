@@ -51,8 +51,8 @@ function _hasSlugCollision(
   }>,
 ): boolean {
   const { dashboardId, existing } = options;
-  return dashboardId ?
-      (existing ?? []).find(propNotEq("id", dashboardId)) !== undefined
+  return dashboardId
+    ? (existing ?? []).find(propNotEq("id", dashboardId)) !== undefined
     : existing?.at(0) !== undefined;
 }
 

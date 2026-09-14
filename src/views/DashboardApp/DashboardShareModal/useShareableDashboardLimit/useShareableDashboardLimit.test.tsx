@@ -2,9 +2,9 @@ import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
-import type { ResourceSharingState } from "@/clients/permissions/ResourceShareClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Subscription } from "$/models/Subscription/Subscription";
+import type { ResourceSharingState } from "@/clients/permissions/ResourceShareClient";
 
 const DASHBOARD_ID = "11111111-2222-4333-8444-555555555555";
 const OWNER_ID = "owner-1";
@@ -75,9 +75,9 @@ vi.mock("@/clients/SubscriptionPermissionsClient", () => {
         // A disabled query never resolves, so the double must answer
         // `undefined` rather than a verdict the real hook would not have.
         return [
-          args.useQueryOptions?.enabled === false ?
-            undefined
-          : { allowed: mocks.isAllowed },
+          args.useQueryOptions?.enabled === false
+            ? undefined
+            : { allowed: mocks.isAllowed },
           false,
         ] as const;
       },

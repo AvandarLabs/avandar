@@ -1,6 +1,6 @@
 import { Model } from "@avandar/models";
-import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 import { describe, expect, it } from "vitest";
+import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { ConceptModel } from "$/models/ontology/Concept/Concept.types.ts";
 

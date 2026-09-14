@@ -4,7 +4,7 @@ import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 
 /**
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_auth/(no-workspace)/")({
 function CreateFirstWorkspacePage() {
   const { t } = useLingui();
   return (
-    <AppLayout>
+    <AppSlate>
       <Container py="xxxl">
         <Stack>
           <Title ta="center" order={1}>
@@ -56,6 +56,6 @@ function CreateFirstWorkspacePage() {
           </Paper>
         </Stack>
       </Container>
-    </AppLayout>
+    </AppSlate>
   );
 }

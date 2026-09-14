@@ -36,8 +36,9 @@ export function ChatModelPicker({
   useRegisterResolvedModelId({ assistantClient, resolvedModelId });
 
   const selectedModel = models.find(propEq("id", resolvedModelId));
-  const tooltipLabel =
-    selectedModel ? t`Using ${selectedModel.name}` : t`Choose a model`;
+  const tooltipLabel = selectedModel
+    ? t`Using ${selectedModel.name}`
+    : t`Choose a model`;
 
   return (
     <ChatModelPickerView

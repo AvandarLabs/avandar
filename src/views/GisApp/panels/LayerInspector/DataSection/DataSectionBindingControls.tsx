@@ -5,10 +5,10 @@ import { CoordinateBindingControls } from "@/views/GisApp/panels/LayerInspector/
 import { GeometryColumnControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryColumnControls";
 import { GridBinControls } from "@/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls";
 import { PointAggregationControls } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointAggregationControls";
-import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
-import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
 type Props = {

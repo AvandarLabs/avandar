@@ -9,8 +9,8 @@
  * changes the viz" guarantee.
  */
 import { getValue } from "@avandar/utils";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it, vi } from "vitest";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { fireEvent, render, screen, within } from "@/test-utils";

@@ -1,6 +1,6 @@
 import { matchLiteral, prop } from "@avandar/utils";
-import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { DashboardFilterMode } from "$/types/dashboard.types";
+import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 
@@ -99,8 +99,8 @@ function _parseLocalFilterDefaultValue(
 
   try {
     const parsedValue = JSON.parse(options.defaultValue) as unknown;
-    return Array.isArray(parsedValue) ?
-        parsedValue.filter((value): value is string => {
+    return Array.isArray(parsedValue)
+      ? parsedValue.filter((value): value is string => {
           return typeof value === "string";
         })
       : _parseLocalFilterOptions(options.defaultValue);

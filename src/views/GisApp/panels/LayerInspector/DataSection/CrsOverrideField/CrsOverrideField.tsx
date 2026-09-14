@@ -52,9 +52,9 @@ function _getPresetData(i18n: I18n): Array<{ value: string; label: string }> {
 export function CrsOverrideField({ sourceCrs, onChange }: Props): ReactNode {
   const { i18n, t } = useLingui();
   const presetValue =
-    sourceCrs !== undefined && PRESET_CODES.includes(sourceCrs) ?
-      String(sourceCrs)
-    : null;
+    sourceCrs !== undefined && PRESET_CODES.includes(sourceCrs)
+      ? String(sourceCrs)
+      : null;
   return (
     <>
       <Select

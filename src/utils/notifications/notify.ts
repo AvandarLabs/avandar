@@ -30,9 +30,9 @@ export function notifySuccess(
   titleOrOptions: string | { title?: string; message?: string },
 ): void {
   const content =
-    typeof titleOrOptions === "string" ?
-      { title: titleOrOptions }
-    : titleOrOptions;
+    typeof titleOrOptions === "string"
+      ? { title: titleOrOptions }
+      : titleOrOptions;
   notify({
     ...content,
     defaultTitle: i18n._(DEFAULT_SUCCESS_TITLE),
@@ -50,9 +50,9 @@ export function notifyError(
   message?: string,
 ): void {
   const content =
-    typeof titleOrOptions === "string" ?
-      { title: titleOrOptions, message }
-    : titleOrOptions;
+    typeof titleOrOptions === "string"
+      ? { title: titleOrOptions, message }
+      : titleOrOptions;
   notify({
     ...content,
     defaultTitle: i18n._(DEFAULT_ERROR_TITLE),
@@ -69,9 +69,9 @@ export function notifyWarning(
   titleOrOptions: string | { title?: string; message?: string },
 ): void {
   const content =
-    typeof titleOrOptions === "string" ?
-      { title: titleOrOptions }
-    : titleOrOptions;
+    typeof titleOrOptions === "string"
+      ? { title: titleOrOptions }
+      : titleOrOptions;
   notify({
     ...content,
     defaultTitle: i18n._(DEFAULT_WARNING_TITLE),

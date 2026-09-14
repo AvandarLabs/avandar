@@ -1,8 +1,8 @@
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type {
   AnalyticsApp,
   ServerAnalyticsEvent,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types.ts";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 type LogAnalyticsEventOptions = ServerAnalyticsEvent & {
   supabaseAdminClient: AvaSupabaseClient;

@@ -1,0 +1,17 @@
+/*
+ * Sticks to the bottom of whichever region scrolls the review: the view body
+ * on the Data Sources page, the modal body when the flow is launched from
+ * the app-wide dropzone. The opaque background and the top hairline are what
+ * keep the grid behind it from reading through.
+ */
+.datasetImportActionsBar {
+  background-color: var(--ava-surface-raised);
+  border-top: 1px solid var(--ava-border-default);
+  bottom: 0;
+  padding-block: var(--mantine-spacing-sm);
+  position: sticky;
+}
+
+.datasetImportActionsSaveButton {
+  margin-inline-start: auto;
+}

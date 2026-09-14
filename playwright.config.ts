@@ -2,9 +2,16 @@ import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
+import { E2EPreflight } from "./tests/e2e/setup/E2EPreflight";
 import {
+  E2E_NO_THIRD_PARTY_FLAG,
+  E2E_THIRD_PARTY_TAG,
+  E2eThirdPartyMode,
+} from "./tests/e2e/setup/E2eThirdPartyMode/E2eThirdPartyMode";
+import {
+  E2E_ONLINE_TAG,
   ensureE2EViteFeatureFlags,
-  shouldReuseE2EViteServer,
+  isE2EOfflineMode,
 } from "./tests/e2e/setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
@@ -19,6 +26,22 @@ const parsedBaseUrl = new URL(baseUrl);
 const vitePort =
   parsedBaseUrl.port || (parsedBaseUrl.protocol === "https:" ? "443" : "80");
 const isCI = !!process.env.CI;
+
+// The app servers below are started for this run, but Supabase is not, so it
+// is the one thing that has to already be up.
+const supabaseUrl =
+  process.env.VITE_SUPABASE_API_URL ??
+  process.env.SUPABASE_URL ??
+  "http://127.0.0.1:54321";
+
+// Both checks run here, while the config is still evaluating, because this is
+// the last moment before Playwright starts `webServer`: from `globalSetup` the
+// run's own Vite is already on the port and every run would fail.
+E2EPreflight.assertDevServerPortIsFree({
+  host: parsedBaseUrl.hostname,
+  port: Number(vitePort),
+});
+E2EPreflight.assertSupabaseApiIsRunning(`${supabaseUrl}/rest/v1/`);
 
 /**
  * Ensures e2e runs with flags required by share-modal and shared-with-me specs.
@@ -36,6 +59,41 @@ function mergeE2EFeatureFlags(): string {
 
 const e2eFeatureFlags = mergeE2EFeatureFlags();
 
+// Rejected rather than silently resolved: a third-party spec exists to reach a
+// real service over the network, which is the one thing an offline run has
+// declared it cannot do, so the pair can only be a mistake.
+if (isE2EOfflineMode() && E2eThirdPartyMode.isRequested()) {
+  throw new Error(
+    "PLAYWRIGHT_E2E_OFFLINE and PLAYWRIGHT_E2E_THIRD_PARTY are contradictory: " +
+      "the third-party specs exist to reach a real service over the network.",
+  );
+}
+
+// Same reasoning: a run told to leave the third-party specs out cannot also be
+// the run that exists to exercise them.
+if (E2eThirdPartyMode.isExcluded() && E2eThirdPartyMode.isRequested()) {
+  throw new Error(
+    `${E2E_NO_THIRD_PARTY_FLAG} and PLAYWRIGHT_E2E_THIRD_PARTY are ` +
+      "contradictory: one drops the third-party specs and the other runs " +
+      "only them.",
+  );
+}
+
+/**
+ * The tags this run excludes, as one pattern, or `undefined` to exclude none.
+ */
+function buildGrepInvert(): RegExp | undefined {
+  const excludedTags = [
+    ...(isE2EOfflineMode() ? [E2E_ONLINE_TAG] : []),
+    ...(isE2EOfflineMode() || E2eThirdPartyMode.isExcluded()
+      ? [E2E_THIRD_PARTY_TAG]
+      : []),
+  ];
+  return excludedTags.length > 0
+    ? new RegExp(excludedTags.join("|"))
+    : undefined;
+}
+
 /**
  * Per-test ceiling:
  * - 45s locally so failures surface quickly
@@ -47,8 +105,14 @@ export default defineConfig({
   testDir: "tests/e2e",
   testMatch: "**/*.spec.ts",
 
-  // Default `workers: 1`; raising it is safe: each worker gets its own
-  // `e2e-test-workspace-w{n}` slug via the worker-scoped `e2eWorkerDb` fixture.
+  // Stays at one worker intentionally. The `freshBrowserPage` fixture exists
+  // if any spec needs a cold process.
+  // Making tests parallelizable would need work beyond just increasing worker
+  // number. The two accounts in `e2e-credentials.ts` are shared by every
+  // worker, and `e2eWorkerDb`'s teardown deletes them and sweeps the
+  // `e2e-org-%` workspaces they own, both scoped by user rather than by the
+  // per-worker slug. Concurrent workers would therefore delete each other's
+  // user mid-test.
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -71,16 +135,54 @@ export default defineConfig({
     contextOptions: { reducedMotion: "reduce" },
     ...devices["Desktop Chrome"],
   },
-  webServer: {
-    command: `pnpm exec vite --host ${parsedBaseUrl.hostname} --port ${vitePort}`,
-    env: {
-      ...(process.env as Record<string, string>),
-      VITE_FEATURE_FLAGS: e2eFeatureFlags,
+  webServer: [
+    {
+      command: `pnpm exec vite --host ${parsedBaseUrl.hostname} --port ${vitePort}`,
+      env: {
+        ...(process.env as Record<string, string>),
+        VITE_FEATURE_FLAGS: e2eFeatureFlags,
+      },
+      url: baseUrl,
+      // Never reuse. This server carries `enable-shared-with-me` and
+      // `VITE_OFFLINE_CHAT_MOCK=true`, which no `pnpm dev` server is ever
+      // started with, so an existing one is configured differently from the
+      // app these specs describe. The port is checked above instead, because
+      // Playwright's own message here recommends setting this back to `true`.
+      reuseExistingServer: false,
+      timeout: 180_000,
     },
-    url: baseUrl,
-    reuseExistingServer: shouldReuseE2EViteServer(isCI),
-    timeout: 180_000,
-  },
+    {
+      // Edge Functions back workspace creation, slug validation and billing.
+      // Started here so `pnpm test:e2e` needs nothing running beforehand;
+      // Playwright stops whatever it started when the run ends.
+      command: "pnpm fns:serve",
+      url: `${supabaseUrl}/functions/v1/healthz`,
+      // Safe to reuse, unlike Vite: this server takes no E2E-specific flags,
+      // so one already serving `healthz` is the same server this would start.
+      // `healthz` is a real readiness check rather than a port probe, which
+      // matters because a dead runtime leaves Kong answering 503 on this URL
+      // while the `fns:serve` process still looks alive.
+      reuseExistingServer: true,
+      timeout: 180_000,
+    },
+  ],
+  // Narrows the run to the tagged specs, so `pnpm test:e2e:third-party` is how
+  // you exercise the live paths without waiting for the whole suite. Their
+  // missing-credential handling turns loud in the same mode; see
+  // `E2eThirdPartyMode.requireEnv`.
+  grep: E2eThirdPartyMode.isRequested()
+    ? new RegExp(E2E_THIRD_PARTY_TAG)
+    : undefined,
+  // An offline run excludes both: the `@online` specs need a network-fetched
+  // DuckDB extension, and the `@third-party` ones need a real service.
+  // Excluding them beats letting them time out. `--no-third-party` excludes
+  // only the latter, so a blocking job cannot reach a third party even if its
+  // credentials turn up in the environment.
+  //
+  // A default run includes the third-party specs and lets each skip itself when
+  // its credentials are absent, which is what keeps a full run green on a
+  // machine that was never given them.
+  grepInvert: buildGrepInvert(),
   globalSetup: "./tests/e2e/setup/globalSetup.ts",
   globalTeardown: "./tests/e2e/setup/globalTeardown.ts",
 });

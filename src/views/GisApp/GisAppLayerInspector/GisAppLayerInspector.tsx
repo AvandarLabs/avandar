@@ -22,9 +22,9 @@ export function GisAppLayerInspector({
       layer={app.selectedLayer}
       layers={app.mapConfig.layers}
       viewState={
-        app.selectedLayerId ?
-          app.layerViewStates.get(app.selectedLayerId)
-        : undefined
+        app.selectedLayerId
+          ? app.layerViewStates.get(app.selectedLayerId)
+          : undefined
       }
       inspectorView={app.inspectorView}
       onInspectorViewChange={app.onInspectorViewChange}

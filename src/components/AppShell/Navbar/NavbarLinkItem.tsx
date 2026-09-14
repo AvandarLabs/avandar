@@ -21,7 +21,7 @@ export function NavbarLinkItem({
   const label = (
     <>
       <Box mr="xs">{icon}</Box>
-      <Text span fw={500} className={css.collapsibleText}>
+      <Text span fw={500}>
         {link.label()}
       </Text>
     </>
@@ -34,11 +34,13 @@ export function NavbarLinkItem({
       align="center"
       className={css.navbarLinkPill}
     >
-      {isUtility ?
+      {isUtility ? (
         <Group gap={0} wrap="nowrap">
           {label}
         </Group>
-      : label}
+      ) : (
+        label
+      )}
     </Flex>
   );
 

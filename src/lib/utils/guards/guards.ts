@@ -14,8 +14,9 @@ export function or<T, Predicates extends Array<(value: any) => value is any>>(
   value: T,
   ...predicates: Predicates
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): value is Predicates[number] extends (value: any) => value is infer R ? T & R
-: never {
+): value is Predicates[number] extends ((value: any) => value is infer R)
+  ? T & R
+  : never {
   return predicates.some((predicate) => {
     return predicate(value);
   });

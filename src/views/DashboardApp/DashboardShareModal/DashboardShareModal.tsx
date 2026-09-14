@@ -11,9 +11,9 @@ import { PublishingSection } from "@/views/DashboardApp/DashboardShareModal/Publ
 import { ShareableLimitReachedModal } from "@/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/ShareableLimitReachedModal";
 import { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
 import { useShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ShareResourcePublishing } from "@/components/permissions/ShareResourceModal/ShareResourceModal.types";
 import type { ShareableDashboardLimit } from "@/views/DashboardApp/DashboardShareModal/useShareableDashboardLimit/useShareableDashboardLimit";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { ReactNode } from "react";
 
 type PublishingControl = ReturnType<typeof useDashboardPublishingControl>;
@@ -70,13 +70,15 @@ function _getPublishBlockedReason(
   const { isOffline, hasUnsavedChanges, isBlockedByLimit, publishing, copy } =
     options;
 
-  const otherBlockedReason =
-    isOffline ? copy.offline
-    : hasUnsavedChanges ? copy.unsavedChanges
-    : publishing.normalisedSlug && publishing.hasPendingSlugCheck ?
-      copy.slugChecking
-    : publishing.normalisedSlug && publishing.isSlugRejected ? copy.slugRejected
-    : undefined;
+  const otherBlockedReason = isOffline
+    ? copy.offline
+    : hasUnsavedChanges
+      ? copy.unsavedChanges
+      : publishing.normalisedSlug && publishing.hasPendingSlugCheck
+        ? copy.slugChecking
+        : publishing.normalisedSlug && publishing.isSlugRejected
+          ? copy.slugRejected
+          : undefined;
 
   const isBlockedByPlan = otherBlockedReason === undefined && isBlockedByLimit;
 
@@ -113,12 +115,12 @@ function usePublishBlockedReason(
       slugChecking: t`Checking whether that custom URL is available.`,
       slugRejected: t`Fix the custom URL before publishing.`,
       planLimit:
-        maxAllowed === undefined ?
-          t`Your plan does not allow sharing more dashboards.`
-        : plural(maxAllowed, {
-            one: "Your plan allows # shared or public dashboard.",
-            other: "Your plan allows # shared or public dashboards.",
-          }),
+        maxAllowed === undefined
+          ? t`Your plan does not allow sharing more dashboards.`
+          : plural(maxAllowed, {
+              one: "Your plan allows # shared or public dashboard.",
+              other: "Your plan allows # shared or public dashboards.",
+            }),
     },
   });
 }
@@ -234,10 +236,9 @@ export function DashboardShareModal({
         publishing={_getPublishingProps({
           publishing,
           blocked,
-          publicOptionDisabledReason:
-            canPublishPublicly ? undefined : (
-              t`Only workspace admins can publish to the web.`
-            ),
+          publicOptionDisabledReason: canPublishPublicly
+            ? undefined
+            : t`Only workspace admins can publish to the web.`,
           onUpgrade: () => {
             setIsUpgradeModalOpened(true);
           },

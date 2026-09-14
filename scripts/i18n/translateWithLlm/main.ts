@@ -80,9 +80,9 @@ export async function main(): Promise<void> {
     options.locales.length > 0 ? options.locales : allLocales;
 
   const scopeNote =
-    options.scopes.length > 0 ?
-      ` scoped to [${options.scopes.join(", ")}]`
-    : "";
+    options.scopes.length > 0
+      ? ` scoped to [${options.scopes.join(", ")}]`
+      : "";
   console.log(
     `Translating into: ${targetLocales.join(", ")} via model ${model}${scopeNote}` +
       (options.dryRun ? " (dry-run)" : ""),

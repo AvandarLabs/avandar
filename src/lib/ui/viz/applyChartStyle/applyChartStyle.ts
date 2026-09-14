@@ -2,12 +2,13 @@ import { matchLiteral } from "@avandar/utils";
 import { makeAxisScalePropsFromBounds } from "@/lib/ui/viz/axis/makeAxisScalePropsFromBounds/makeAxisScalePropsFromBounds";
 import { makeTickRotationFromAngle } from "@/lib/ui/viz/axis/makeTickRotationFromAngle/makeTickRotationFromAngle";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
+import { makeLegendPropsFromPosition } from "@/lib/ui/viz/legend/makeLegendPropsFromPosition/makeLegendPropsFromPosition";
 import type { AxisStyle, ChartStyle } from "$/models/vizs/ChartStyle.types";
 import type {
   AxisRole,
   AxisRoles,
 } from "$/models/vizs/getAxisRolesFromVizType/getAxisRolesFromVizType";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { CSSProperties } from "react";
 import type {
   CartesianGridProps,
@@ -61,13 +62,13 @@ function _buildXAxisProps({
   const hasTickColor = xAxisStyle?.tickColor !== undefined;
   const hasRotation = rotation.tick !== undefined;
   const tick =
-    hasTickColor || hasRotation ?
-      {
-        ...TICK_DEFAULTS,
-        ...(hasTickColor ? { fill: xAxisStyle?.tickColor } : {}),
-        ...(rotation.tick ?? {}),
-      }
-    : undefined;
+    hasTickColor || hasRotation
+      ? {
+          ...TICK_DEFAULTS,
+          ...(hasTickColor ? { fill: xAxisStyle?.tickColor } : {}),
+          ...(rotation.tick ?? {}),
+        }
+      : undefined;
 
   return {
     ...baseXAxisProps,
@@ -97,9 +98,9 @@ function _buildYAxisProps({
     },
   });
   const tick =
-    yAxisStyle?.tickColor !== undefined ?
-      { ...TICK_DEFAULTS, fill: yAxisStyle.tickColor }
-    : undefined;
+    yAxisStyle?.tickColor !== undefined
+      ? { ...TICK_DEFAULTS, fill: yAxisStyle.tickColor }
+      : undefined;
 
   return {
     tickFormatter: _formatYAxisTick,
@@ -145,28 +146,6 @@ function _buildGridProps(
   return { gridProps, gridColor: gridStyle?.color };
 }
 
-function _buildLegendProps(
-  legendStyle: Readonly<NonNullable<ChartStyle["legend"]>> | undefined,
-): Pick<ChartStyleProps, "legendProps"> {
-  const legendPosition = legendStyle?.position ?? "top";
-  return {
-    legendProps: {
-      verticalAlign: matchLiteral(legendPosition, {
-        top: "top" as const,
-        bottom: "bottom" as const,
-        left: "middle" as const,
-        right: "middle" as const,
-      }),
-      align: matchLiteral(legendPosition, {
-        top: "center" as const,
-        bottom: "center" as const,
-        left: "left" as const,
-        right: "right" as const,
-      }),
-    },
-  };
-}
-
 function _buildAxisLabels({
   xAxisStyle,
   yAxisStyle,
@@ -175,18 +154,18 @@ function _buildAxisLabels({
   yAxisStyle: Readonly<AxisStyle> | undefined;
 }>): Pick<ChartStyleProps, "xAxisLabel" | "yAxisLabel" | "styles"> {
   const xAxisLabel =
-    xAxisStyle?.label !== undefined && xAxisStyle.label !== "" ?
-      xAxisStyle.label
-    : undefined;
+    xAxisStyle?.label !== undefined && xAxisStyle.label !== ""
+      ? xAxisStyle.label
+      : undefined;
   const yAxisLabel =
-    yAxisStyle?.label !== undefined && yAxisStyle.label !== "" ?
-      yAxisStyle.label
-    : undefined;
+    yAxisStyle?.label !== undefined && yAxisStyle.label !== ""
+      ? yAxisStyle.label
+      : undefined;
   const axisLabelColor = xAxisStyle?.labelColor ?? yAxisStyle?.labelColor;
   const styles =
-    axisLabelColor !== undefined ?
-      { axisLabel: { fill: axisLabelColor } }
-    : undefined;
+    axisLabelColor !== undefined
+      ? { axisLabel: { fill: axisLabelColor } }
+      : undefined;
   return { xAxisLabel, yAxisLabel, styles };
 }
 
@@ -198,8 +177,8 @@ function _buildAxisLabels({
  *
  * Not for radar, pie, or funnel. Every field it produces (`withXAxis`,
  * `xAxisProps`, `yAxisProps`, grid, axis labels) describes an x/y plot, and
- * those three have no cartesian axes. Radar takes the one piece that does
- * apply to it, `chartStyle.legend.position`, straight from the config.
+ * those three have no cartesian axes. Radar shares the one piece that
+ * does apply to it through `makeLegendPropsFromPosition`.
  */
 export function applyChartStyle(
   options: Readonly<ApplyChartStyleOptions> = {},
@@ -231,7 +210,7 @@ export function applyChartStyle(
       role: axisRoles.y,
     }),
     ..._buildGridProps(style?.grid),
-    ..._buildLegendProps(style?.legend),
+    legendProps: makeLegendPropsFromPosition(style?.legend?.position),
     ..._buildAxisLabels({ xAxisStyle, yAxisStyle }),
   };
 }

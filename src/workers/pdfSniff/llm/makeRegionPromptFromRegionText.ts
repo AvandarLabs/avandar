@@ -32,13 +32,13 @@ export function makeRegionPromptFromRegionText(params: {
     "- Do not infer, estimate or combine figures. Extract only what is stated.",
     "- Return [] if there are no measurements.",
     "",
-    params.ruleResults.length > 0 ?
-      `Already extracted (do not repeat these): ${JSON.stringify(
-        params.ruleResults.map((measurement) => {
-          return { metric: measurement.metric, value: measurement.value };
-        }),
-      )}`
-    : "",
+    params.ruleResults.length > 0
+      ? `Already extracted (do not repeat these): ${JSON.stringify(
+          params.ruleResults.map((measurement) => {
+            return { metric: measurement.metric, value: measurement.value };
+          }),
+        )}`
+      : "",
     "",
     "Text:",
     params.regionText,

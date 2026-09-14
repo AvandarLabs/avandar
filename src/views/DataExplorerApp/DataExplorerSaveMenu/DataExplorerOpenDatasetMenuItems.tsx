@@ -38,7 +38,7 @@ export function DataExplorerOpenDatasetMenuItems(): ReactNode {
   }
   return (
     <>
-      {state.openDataset.virtualDatasetId ?
+      {state.openDataset.virtualDatasetId ? (
         <Menu.Item
           disabled={!state.rawSql || isSavingOver}
           onClick={() => {
@@ -54,7 +54,7 @@ export function DataExplorerOpenDatasetMenuItems(): ReactNode {
         >
           <Trans>Save: {state.openDataset.name}</Trans>
         </Menu.Item>
-      : null}
+      ) : null}
       <DataExplorerDeleteDatasetMenuItem
         isDeletingDataset={isDeletingDataset}
         onDelete={(datasetId) => {

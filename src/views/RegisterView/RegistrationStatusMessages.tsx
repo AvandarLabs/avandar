@@ -14,19 +14,19 @@ export function RegistrationStatusMessages({
 }: Readonly<Props>): ReactElement {
   return (
     <>
-      {!isOnline ?
+      {!isOnline ? (
         <Alert color="yellow" variant="light">
           <Trans>Registration requires an internet connection.</Trans>
         </Alert>
-      : null}
-      {isRegistrationSuccess ?
+      ) : null}
+      {isRegistrationSuccess ? (
         <Text mt="lg" c="green">
           <Trans>
             Please check your email for a confirmation link. It may take a few
             minutes to arrive.
           </Trans>
         </Text>
-      : null}
+      ) : null}
     </>
   );
 }

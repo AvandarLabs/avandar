@@ -20,23 +20,26 @@ export function append<SeedItemType>(
   elements: SeedItemType[] | SeedItemType,
 ): <
   T extends UnknownArray,
-  ItemType extends SeedItemType extends T[number] ? SeedItemType
-  : ItemTypeError<SeedItemType, T[number]>,
-  ReturnType extends ItemType extends ItemTypeError<SeedItemType, T[number]> ?
-    Simplify<ItemTypeError<SeedItemType, T[number]>>
-  : T,
+  ItemType extends (SeedItemType extends T[number]
+    ? SeedItemType
+    : ItemTypeError<SeedItemType, T[number]>),
+  ReturnType extends (ItemType extends ItemTypeError<SeedItemType, T[number]>
+    ? Simplify<ItemTypeError<SeedItemType, T[number]>>
+    : T),
 >(
   array: T,
 ) => ReturnType {
   return <
     T extends UnknownArray,
-    ValidatedItemType extends SeedItemType extends T[number] ? SeedItemType
-    : ItemTypeError<SeedItemType, T[number]>,
-    ReturnType extends ValidatedItemType extends (
-      ItemTypeError<SeedItemType, T[number]>
-    ) ?
-      Simplify<ItemTypeError<SeedItemType, T[number]>>
-    : T,
+    ValidatedItemType extends (SeedItemType extends T[number]
+      ? SeedItemType
+      : ItemTypeError<SeedItemType, T[number]>),
+    ReturnType extends (ValidatedItemType extends ItemTypeError<
+      SeedItemType,
+      T[number]
+    >
+      ? Simplify<ItemTypeError<SeedItemType, T[number]>>
+      : T),
   >(
     array: T,
   ) => {

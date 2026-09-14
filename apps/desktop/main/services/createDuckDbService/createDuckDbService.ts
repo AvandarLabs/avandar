@@ -4,9 +4,9 @@
  * Wraps the `duckdb` Node binding (same package `@avandar/etl` uses) so
  * the desktop shell can run analytical SQL against an on-disk DuckDB file
  * without paying the duckdb-wasm tax in the webview. The IPC handlers in
- * `apps/desktop/main/ipc/duckdb.ts` are the only consumer in Phase 2; the
- * webview adapter (`shared/platform/desktop/DesktopDuckDbClient.ts`) calls
- * those handlers through the typed contracts.
+ * `apps/desktop/main/ipc/duckdb.ts` are the only consumer; the webview
+ * adapter (`shared/platform/desktop/DesktopDuckDbClient.ts`) calls those
+ * handlers through the typed contracts.
  *
  * API surface intentionally mirrors what `DuckDbContracts.runRawQuery`
  * promises across the wire: a single `runRawQuery<TRow>(sql, params)` plus

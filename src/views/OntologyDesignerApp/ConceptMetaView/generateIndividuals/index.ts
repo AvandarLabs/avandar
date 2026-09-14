@@ -35,8 +35,8 @@ export async function generateIndividuals(
 
   const datasetColumnMappings = allAttributes
     .map((attribute) => {
-      return attribute.mapping.type === "dataset_column" ?
-          attribute.mapping
+      return attribute.mapping.type === "dataset_column"
+        ? attribute.mapping
         : undefined;
     })
     .filter(isDefined);

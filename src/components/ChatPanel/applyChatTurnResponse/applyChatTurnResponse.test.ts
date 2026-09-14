@@ -1,10 +1,10 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it, vi } from "vitest";
 import { applyChatTurnResponse } from "./applyChatTurnResponse";
-import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";
 
-const SQL_RESULTS_ON_CANVAS = "The results are on the canvas to the left.";
+const SQL_RESULTS_READY = "I ran the query. Your results are ready.";
 
 function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
   return {
@@ -17,11 +17,11 @@ function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
 }
 
 function _applyChatTurnResponse(
-  options: Readonly<Omit<ApplyChatTurnResponseOptions, "sqlResultsOnCanvas">>,
+  options: Readonly<Omit<ApplyChatTurnResponseOptions, "sqlResultsReady">>,
 ): ReturnType<typeof applyChatTurnResponse> {
   return applyChatTurnResponse({
     ...options,
-    sqlResultsOnCanvas: SQL_RESULTS_ON_CANVAS,
+    sqlResultsReady: SQL_RESULTS_READY,
   });
 }
 
@@ -146,7 +146,7 @@ describe("applyChatTurnResponse", () => {
     ]);
   });
 
-  it("points at the canvas when SQL was applied and the assistant text is empty", async () => {
+  it("points at the results when SQL was applied and the assistant text is empty", async () => {
     const handlers = _createHandlers();
     const response = Model.make("ChatResponse", {
       assistantText: "",
@@ -162,16 +162,13 @@ describe("applyChatTurnResponse", () => {
       handlers,
     });
 
-    expect(result.content).toEqual([
-      { type: "text", text: SQL_RESULTS_ON_CANVAS },
-    ]);
+    expect(result.content).toEqual([{ type: "text", text: SQL_RESULTS_READY }]);
   });
 
-  it("replaces a SQL-announcement reply with the canvas pointer", async () => {
+  it("replaces a SQL-announcement reply with the results pointer", async () => {
     const handlers = _createHandlers();
     const response = Model.make("ChatResponse", {
-      assistantText:
-        "Here is the SQL I ran. Results are on the canvas to the left.",
+      assistantText: "Here is the SQL I ran. Results are ready.",
       generatedSql: {
         prompt: "how many rows",
         sql: "select 1",
@@ -184,9 +181,7 @@ describe("applyChatTurnResponse", () => {
       handlers,
     });
 
-    expect(result.content).toEqual([
-      { type: "text", text: SQL_RESULTS_ON_CANVAS },
-    ]);
+    expect(result.content).toEqual([{ type: "text", text: SQL_RESULTS_READY }]);
   });
 
   it("persists chat-created case types", async () => {

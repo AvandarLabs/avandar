@@ -12,9 +12,11 @@ function _isKeyExcluded(
   const { excludeKeySet, excludeKeysPattern } = options;
   const isInExcludeKeySet = excludeKeySet.has(key);
   const isExcludedByKeyPattern =
-    excludeKeysPattern instanceof RegExp ? excludeKeysPattern.test(key)
-    : excludeKeysPattern !== undefined ? key.startsWith(excludeKeysPattern)
-    : false;
+    excludeKeysPattern instanceof RegExp
+      ? excludeKeysPattern.test(key)
+      : excludeKeysPattern !== undefined
+        ? key.startsWith(excludeKeysPattern)
+        : false;
   return isInExcludeKeySet || isExcludedByKeyPattern;
 }
 

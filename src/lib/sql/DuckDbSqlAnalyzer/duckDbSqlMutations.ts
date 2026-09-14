@@ -71,11 +71,11 @@ function _getRelationIndexAfterKeyword(
       return !isKeywordToken({ token, keywords: modifiers });
     });
   const relationIndex =
-    modifierOffset === -1 ?
-      options.endIndex
-    : keywordIndex + modifierOffset + 1;
-  return options.tokens[relationIndex]?.kind === "identifier" ?
-      relationIndex
+    modifierOffset === -1
+      ? options.endIndex
+      : keywordIndex + modifierOffset + 1;
+  return options.tokens[relationIndex]?.kind === "identifier"
+    ? relationIndex
     : undefined;
 }
 
@@ -114,8 +114,8 @@ function _getAlterRenameDestinationIndex(
   ) {
     return undefined;
   }
-  return options.tokens[renameIndex + 2]?.kind === "identifier" ?
-      renameIndex + 2
+  return options.tokens[renameIndex + 2]?.kind === "identifier"
+    ? renameIndex + 2
     : undefined;
 }
 
@@ -127,13 +127,11 @@ function _getNonCopyRelationIndex(
     return mutationIndex + 1;
   }
   if (mutationKeyword === "TRUNCATE") {
-    return (
-        isKeywordToken({
-          token: tokens[mutationIndex + 1],
-          keywords: "TABLE",
-        })
-      ) ?
-        mutationIndex + 2
+    return isKeywordToken({
+      token: tokens[mutationIndex + 1],
+      keywords: "TABLE",
+    })
+      ? mutationIndex + 2
       : mutationIndex + 1;
   }
   if (["DELETE", "INSERT", "MERGE"].includes(mutationKeyword)) {
@@ -180,9 +178,9 @@ function _buildMutationTargetAnalysis(
     return { indexes: [relationIndex], isComplete: false };
   }
   const renameDestinationIndex =
-    mutationKeyword === "ALTER" ?
-      _getAlterRenameDestinationIndex({ tokens, relationIndex, endIndex })
-    : undefined;
+    mutationKeyword === "ALTER"
+      ? _getAlterRenameDestinationIndex({ tokens, relationIndex, endIndex })
+      : undefined;
   return {
     indexes: [
       relationIndex,
@@ -212,12 +210,10 @@ function _getCopyMutationTargets(
     copyDirection.relationIndex !== undefined ||
     (copyDirection.direction === "TO" && hasQueryRelation);
   const indexes =
-    (
-      copyDirection.direction === "FROM" &&
-      copyDirection.relationIndex !== undefined
-    ) ?
-      [copyDirection.relationIndex]
-    : [];
+    copyDirection.direction === "FROM" &&
+    copyDirection.relationIndex !== undefined
+      ? [copyDirection.relationIndex]
+      : [];
   return { indexes, isComplete };
 }
 

@@ -71,8 +71,8 @@ function UpdatePasswordPage() {
     },
     validate: {
       confirmPassword: (value: string, formValues: { password: string }) => {
-        return value !== formValues.password ?
-            t`Passwords do not match`
+        return value !== formValues.password
+          ? t`Passwords do not match`
           : undefined;
       },
     },
@@ -111,9 +111,7 @@ function UpdatePasswordPage() {
         />
         <Button type="submit" disabled={isPasswordUpdatePending}>
           <Trans>Update password</Trans>
-          {isPasswordUpdatePending ?
-            <Loader />
-          : null}
+          {isPasswordUpdatePending ? <Loader /> : null}
         </Button>
       </Stack>
     </form>

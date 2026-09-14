@@ -12,11 +12,11 @@ export function buildRelativeImageURL(relativePath: string): string {
     );
   }
 
-  const fixedPath =
-    relativePath.startsWith("/") ? relativePath : `/${relativePath}`;
-  const fixedDomain =
-    process.env.RESEND_SITE_IMG_URL?.endsWith("/") ?
-      process.env.RESEND_SITE_IMG_URL.slice(0, -1)
+  const fixedPath = relativePath.startsWith("/")
+    ? relativePath
+    : `/${relativePath}`;
+  const fixedDomain = process.env.RESEND_SITE_IMG_URL?.endsWith("/")
+    ? process.env.RESEND_SITE_IMG_URL.slice(0, -1)
     : process.env.RESEND_SITE_IMG_URL;
   return `${fixedDomain}${fixedPath}`;
 }

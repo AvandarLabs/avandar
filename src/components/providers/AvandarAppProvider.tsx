@@ -8,6 +8,7 @@ import {
   NOTIFICATIONS_Z_INDEX,
   Theme,
 } from "@/config/Theme";
+import { useStickyActionBarInset } from "@/lib/hooks/ui/useStickyActionBarInset/useStickyActionBarInset";
 import { notifyError } from "@/utils/notifications/notify";
 import type { I18nMessages } from "@avandar/ui";
 
@@ -82,6 +83,12 @@ function useAvandarUIMessages(): I18nMessages {
  */
 export function AvandarAppProvider({ children }: Props): ReactNode {
   const i18nMessages = useAvandarUIMessages();
+
+  // Publishes how far a view's sticky action bar reaches up the viewport, for
+  // anything fixed to the bottom of it to clear. Mounted here because the
+  // toast container is mounted here, and a toast at `bottom-center` lands on
+  // the action bar of whichever view is open.
+  useStickyActionBarInset();
 
   return (
     <AvaUiProvider

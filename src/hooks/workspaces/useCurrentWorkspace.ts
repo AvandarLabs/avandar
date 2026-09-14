@@ -33,8 +33,9 @@ export function useCurrentWorkspace(): Workspace.WithSubscription {
 
   // after a fetch, the query cache is the source of truth if
   // we find a workspace with the necessary slug
-  const workspaceFromCache =
-    isSuccess ? userWorkspaces?.find(propEq("slug", workspaceSlug)) : undefined;
+  const workspaceFromCache = isSuccess
+    ? userWorkspaces?.find(propEq("slug", workspaceSlug))
+    : undefined;
 
   // If the query is done and the workspace isn't found, the user
   // lost access to this workspace. Navigate in an effect to avoid

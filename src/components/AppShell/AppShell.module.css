@@ -21,7 +21,7 @@
 /*
  * Keep main in normal document order below the fixed navbar/aside. Raising
  * z-index here forced a pointer-events: none / .main > * workaround that
- * broke nested canvas clicks (e.g. Data Explorer grid).
+ * broke nested content clicks (e.g. Data Explorer grid).
  */
 .main {
   position: relative;
@@ -29,7 +29,7 @@
 
 /*
  * Composer mode grows the aside with an inline width so it overlays the
- * canvas. Include width in the same transition Mantine already runs on
+ * slate. Include width in the same transition Mantine already runs on
  * transform/top/height.
  */
 .aside {

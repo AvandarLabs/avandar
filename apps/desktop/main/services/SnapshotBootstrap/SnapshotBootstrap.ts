@@ -104,10 +104,9 @@ export async function bootstrapSnapshotIfNeeded(
  */
 function _listLocalTables(db: AvaSqliteDatabase): Set<string> {
   const rows = db
-    .query<
-      { name: string },
-      []
-    >("select name from sqlite_master where type='table'")
+    .query<{ name: string }, []>(
+      "select name from sqlite_master where type='table'",
+    )
     .all();
   return new Set(
     rows.map((row) => {
@@ -118,10 +117,9 @@ function _listLocalTables(db: AvaSqliteDatabase): Set<string> {
 
 function _readRowCount(db: AvaSqliteDatabase, table: string): number {
   const row = db
-    .query<
-      { c: number },
-      []
-    >(`select count(*) as c from "${table.replaceAll('"', '""')}"`)
+    .query<{ c: number }, []>(
+      `select count(*) as c from "${table.replaceAll('"', '""')}"`,
+    )
     .get();
   return row?.c ?? 0;
 }
@@ -146,10 +144,9 @@ function _readGeneratedColumnNames(
 ): Set<string> {
   const { db, table } = options;
   const columns = db
-    .query<
-      { hidden: number; name: string },
-      []
-    >(`pragma table_xinfo(${_quoteIdent(table)});`)
+    .query<{ hidden: number; name: string }, []>(
+      `pragma table_xinfo(${_quoteIdent(table)});`,
+    )
     .all();
   return new Set(
     columns.flatMap((column) => {

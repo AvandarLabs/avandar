@@ -1,10 +1,3 @@
-import type {
-  DatasetDuckDbLease,
-  PublicSnapshotDuckDbOwner,
-} from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type { UnknownObject } from "@avandar/utils";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
@@ -16,6 +9,13 @@ import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFile
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { PrincipalKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { RelationCachePort } from "$/models/relations/RelationCachePort/RelationCachePort.types";
+import type {
+  DatasetDuckDbLease,
+  PublicSnapshotDuckDbOwner,
+} from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type { UnknownObject } from "@avandar/utils";
 
 /** A column whose stored name or type differs from the source data. */
 export type ColumnReplacement = {

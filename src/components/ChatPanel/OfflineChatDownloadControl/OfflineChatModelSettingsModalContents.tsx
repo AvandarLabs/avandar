@@ -2,8 +2,8 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Group, Select, Stack, Text } from "@mantine/core";
 import { useForceUpdate } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useCallback, useEffect, useState } from "react";
+import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
 import { ModelPickerCopy } from "@/lib/localModels/ModelPickerCopy/ModelPickerCopy";
@@ -137,8 +137,9 @@ export function OfflineChatModelSettingsModalContents({
   const selectedModelCopy = getLocalChatModelCopy(selectedModel);
   const modelSelectData = LocalChatModel.Catalog.values.map((model) => {
     const modelCopy = getLocalChatModelCopy(model);
-    const downloadedSuffix =
-      LocalChatModelStore.isDownloaded(model.id) ? t` · downloaded` : "";
+    const downloadedSuffix = LocalChatModelStore.isDownloaded(model.id)
+      ? t` · downloaded`
+      : "";
     return {
       value: model.id,
       label: ModelPickerCopy.formatLabel({
@@ -150,8 +151,9 @@ export function OfflineChatModelSettingsModalContents({
     };
   });
 
-  const downloadButtonLabel =
-    isSelectedDownloaded ? t`Re-download` : t`Download`;
+  const downloadButtonLabel = isSelectedDownloaded
+    ? t`Re-download`
+    : t`Download`;
 
   const controlsDisabled = isBusy || deletingModelId !== undefined;
 

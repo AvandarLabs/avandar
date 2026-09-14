@@ -55,11 +55,11 @@ export function WorkspaceLanguageTab(): JSX.Element {
                       <Text c="dimmed" size="sm">
                         ({meta.englishName})
                       </Text>
-                      {meta.direction === "rtl" ?
+                      {meta.direction === "rtl" ? (
                         <Text c="dimmed" size="xs">
                           RTL
                         </Text>
-                      : null}
+                      ) : null}
                     </Group>
                   }
                 />

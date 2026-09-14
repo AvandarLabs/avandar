@@ -1,60 +1,81 @@
-import { EditableDisplayText, Paper, Tabs } from "@avandar/ui";
-import { prop, where } from "@avandar/utils";
+import { EditableDisplayText, Tabs, Tooltip } from "@avandar/ui";
+import { formatDate, prop, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  Group,
-  Loader,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { useNavigate } from "@tanstack/react-router";
-import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { Badge, Box, Skeleton, Stack } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { AppView } from "@/components/layouts/AppView/AppView";
+import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
+import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
-import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
+import css from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView.module.css";
+import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/DatasetSourceRail";
+import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
+import { DatasetColumnOutline } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
-import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { ReactNode } from "react";
+
+const DATASET_TAB_IDS = ["dataset-metadata", "dataset-summary"] as const;
+
+type DatasetTabId = (typeof DATASET_TAB_IDS)[number];
 
 type Props = {
   dataset: Dataset.T;
 };
 
 /**
- * A view of the metadata for a dataset.
+ * Everything Avandar knows about one dataset.
+ *
+ * The layout follows the frame every detail view in the app uses: a header
+ * band naming the record and stating the handful of facts that identify it,
+ * a rail carrying reference material, and a content column that holds only
+ * what the user came to read. What lives in the rail changes with the tab:
+ * how the file was parsed while reading metadata, the column outline while
+ * reading the summary.
  */
-export function DatasetMetaView({ dataset }: Props): JSX.Element {
-  const { t } = useLingui();
-  const navigate = useNavigate();
+export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
+  const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
+  // The user-facing name of every source type, keyed by the stored enum
+  // value. Inline because this view is the only thing that names a single
+  // dataset's origin.
+  const sourceLabels = useMemo((): Record<DatasetSource.SourceType, string> => {
+    return {
+      csv_file: t`CSV file`,
+      google_sheets: t`Google Sheets`,
+      open_data: t`Open data`,
+      pdf_file: t`PDF file`,
+      virtual: t`Derived dataset`,
+      xlsx_file: t`Excel file`,
+    };
+  }, [t]);
   const [appRoles] = useUserAppRoles();
   // True when the user has no data_sources app role; in that case the dataset
-  // is visible only through a resource share. We surface this with a soft
-  // informational banner; it never blocks rendering.
+  // is visible only through a resource share. We mark it in the header; it
+  // never blocks rendering.
   const isShareOnlyAccess = !!appRoles && !appRoles.data_sources;
-  const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
-    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
-  });
-  const [refreshGoogleSheetDataset, isRefreshPending] =
-    useRefreshGoogleSheetDataset();
+
+  const [activeTab, setActiveTab] = useState<DatasetTabId>("dataset-metadata");
+  const [activeColumnName, setActiveColumnName] = useState<
+    string | undefined
+  >();
+
   const [sourceDataset, isLoadingSourceDataset] =
     DatasetClient.useGetSourceDataset({
       datasetId: dataset.id,
@@ -68,6 +89,17 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     });
   const [datasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
+  const [datasetMeta, isLoadingDatasetMeta] =
+    DatasetQueryClient.useGetDatasetMeta({
+      datasetId: dataset.id,
+      workspaceId: workspace.id,
+      useQueryOptions: {
+        staleTime: Infinity,
+        refetchOnMount: false,
+        retry: false,
+        refetchOnWindowFocus: false,
+      },
+    });
   const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
@@ -89,6 +121,19 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
   const isLoadingFullDataset = isLoadingPreviewData || isLoadingDatasetColumns;
   const datasetColumnNames = datasetColumns?.map(prop("name")) ?? [];
+
+  // Temporal columns arrive from DuckDB as epoch milliseconds, so the grid
+  // has to be told which ones to format. Without this a date column reads as
+  // "1,579,651,200,000", which is the preview's whole job failing quietly.
+  const dateColumnNames = useMemo(() => {
+    return new Set(
+      (datasetColumns ?? [])
+        .filter((column) => {
+          return AvaDataType.isTemporal(column.dataType);
+        })
+        .map(prop("name")),
+    );
+  }, [datasetColumns]);
   const [datasetName, setDatasetName] = useState(dataset.name);
   const [datasetDescription, setDatasetDescription] = useState(
     dataset.description ?? "",
@@ -102,106 +147,129 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     setDatasetDescription(dataset.description ?? "");
   }, [dataset.description, dataset.id]);
 
-  return (
-    <Container py="md">
-      <Stack>
-        {isShareOnlyAccess ?
-          <Alert color="blue" variant="light" title={t`Shared with you`}>
-            <Text size="sm">
-              <Trans>
-                You can view this dataset because it was shared with you.
-              </Trans>
-            </Text>
-          </Alert>
-        : null}
-        <Group justify="space-between" align="center" wrap="nowrap" w="100%">
-          <Group
-            gap="xs"
-            align="center"
-            wrap="nowrap"
-            miw={0}
-            style={{ flex: 1 }}
-          >
-            <Group
-              gap="xxs"
-              align="center"
-              wrap="nowrap"
-              miw={0}
-              style={{ flex: 1 }}
-            >
-              <Box miw={0} style={{ flex: 1 }}>
-                <EditableDisplayText
-                  name={t`dataset name`}
-                  value={datasetName}
-                  onChange={setDatasetName}
-                  onSave={(newName) => {
-                    updateDataset({
-                      id: dataset.id,
-                      data: {
-                        name: newName.trim(),
-                      },
-                    });
-                  }}
-                  onCancel={() => {
-                    setDatasetName(dataset.name);
-                  }}
-                  isSaving={isUpdatePending}
-                  isSaveDisabled={datasetName.trim().length < 2}
-                  minRows={1}
-                  maxRows={2}
-                  error={
-                    (
-                      datasetName.trim().length > 0 &&
-                      datasetName.trim().length < 2
-                    ) ?
-                      t`Dataset name must be at least 2 characters.`
-                    : undefined
-                  }
-                  emptyDisplayText={t`Untitled dataset`}
-                  displayTextProps={{
-                    fw: "var(--mantine-h2-font-weight)",
-                    fz: "var(--mantine-h2-font-size)",
-                    lh: "var(--mantine-h2-line-height)",
-                    m: 0,
-                  }}
-                  fw="var(--mantine-h2-font-weight)"
-                  fz="var(--mantine-h2-font-size)"
-                  lh="var(--mantine-h2-line-height)"
-                />
-              </Box>
-              {(
-                // only show the button if the source dataset has an
-                // "isInCloudStorage" property
-                datasetWithColumnsAndSource.source &&
-                "isInCloudStorage" in datasetWithColumnsAndSource.source &&
-                // this toggle is currently only supported for CSV, Excel, and
-                // PDF datasets (i.e. the manually-uploaded, parquet-backed
-                // source types)
-                (dataset.sourceType === "csv_file" ||
-                  dataset.sourceType === "xlsx_file" ||
-                  dataset.sourceType === "pdf_file")
-              ) ?
-                <Box style={{ flexShrink: 0 }}>
-                  <ToggleOfflineOnlyButton
-                    isInCloudStorage={
-                      datasetWithColumnsAndSource.source.isInCloudStorage
-                    }
-                    dataSource={datasetWithColumnsAndSource.source}
-                  />
-                </Box>
-              : null}
-            </Group>
-          </Group>
-          <ShareResourceButton
-            resourceName={dataset.name}
-            resourceType="dataset"
-            resourceId={dataset.id}
-          />
-        </Group>
+  const canToggleOfflineOnly =
+    datasetWithColumnsAndSource.source !== undefined &&
+    "isInCloudStorage" in datasetWithColumnsAndSource.source &&
+    // This toggle is currently only supported for CSV, Excel, and PDF
+    // datasets (the manually-uploaded, parquet-backed source types).
+    (dataset.sourceType === "csv_file" ||
+      dataset.sourceType === "xlsx_file" ||
+      dataset.sourceType === "pdf_file");
 
-        <Paper>
+  const numColumns = datasetColumns?.length ?? datasetMeta?.columns.length;
+
+  const headerFacts = [
+    sourceLabels[dataset.sourceType],
+    isLoadingDatasetMeta || datasetMeta === undefined ? (
+      // A span, not the default div: the facts line is a paragraph, and a
+      // block element inside it is invalid HTML that React reports as a
+      // hydration error. `display="inline-block"` styles the box but does
+      // not change what the parser is allowed to nest.
+      <Skeleton
+        key="rows"
+        component="span"
+        height={12}
+        width={72}
+        display="inline-block"
+      />
+    ) : (
+      t`${datasetMeta.rows.toLocaleString(i18n.locale)} rows`
+    ),
+    numColumns === undefined ? undefined : t`${numColumns} columns`,
+    t`Updated ${formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })}`,
+  ];
+
+  const rail =
+    activeTab === "dataset-summary" ? (
+      <DatasetColumnOutline
+        columns={datasetMeta?.columns ?? []}
+        numRows={datasetMeta?.rows ?? 0}
+        activeColumnName={activeColumnName}
+      />
+    ) : (
+      <DatasetSourceRail
+        dataset={dataset}
+        source={datasetWithColumnsAndSource.source}
+      />
+    );
+
+  return (
+    <AppView>
+      <AppViewHeader
+        title={
+          <EditableDisplayText
+            name={t`dataset name`}
+            value={datasetName}
+            onChange={setDatasetName}
+            onSave={(newName) => {
+              updateDataset({
+                id: dataset.id,
+                data: { name: newName.trim() },
+              });
+            }}
+            onCancel={() => {
+              setDatasetName(dataset.name);
+            }}
+            isSaving={isUpdatePending}
+            isSaveDisabled={datasetName.trim().length < 2}
+            minRows={1}
+            maxRows={2}
+            error={
+              datasetName.trim().length > 0 && datasetName.trim().length < 2
+                ? t`Dataset name must be at least 2 characters.`
+                : undefined
+            }
+            emptyDisplayText={t`Untitled dataset`}
+            displayTextProps={{ fz: "inherit", fw: "inherit", m: 0 }}
+            fz="inherit"
+            fw="inherit"
+          />
+        }
+        facts={headerFacts}
+        actions={
+          <>
+            {isShareOnlyAccess ? (
+              <Tooltip
+                label={t`You can view this dataset because it was shared with you.`}
+              >
+                <Badge variant="light" color="neutral" size="sm">
+                  <Trans>Shared with you</Trans>
+                </Badge>
+              </Tooltip>
+            ) : null}
+            {canToggleOfflineOnly &&
+            datasetWithColumnsAndSource.source !== undefined &&
+            "isInCloudStorage" in datasetWithColumnsAndSource.source ? (
+              <ToggleOfflineOnlyButton
+                isInCloudStorage={
+                  datasetWithColumnsAndSource.source.isInCloudStorage
+                }
+                dataSource={datasetWithColumnsAndSource.source}
+              />
+            ) : null}
+            <ShareResourceButton
+              resourceName={dataset.name}
+              resourceType="dataset"
+              resourceId={dataset.id}
+            />
+            <DatasetActionsMenu
+              dataset={dataset}
+              googleSheetSource={
+                sourceDataset?.__type === "GoogleSheetsDataset"
+                  ? sourceDataset
+                  : undefined
+              }
+            />
+          </>
+        }
+      />
+
+      <ActiveColumnContext.Provider value={setActiveColumnName}>
+        <AppViewBody rail={rail}>
           <Tabs
-            tabIds={["dataset-metadata", "dataset-summary"] as const}
+            tabIds={DATASET_TAB_IDS}
+            value={activeTab}
+            classNames={{ list: css.datasetMetaViewTabList }}
             renderTabHeader={{
               "dataset-metadata": t`Metadata`,
               // The onboarding tutorial's first payoff points here. It has to
@@ -218,56 +286,73 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             renderTabPanel={{
               "dataset-metadata": () => {
                 return (
-                  <Stack>
-                    <EditableDisplayText
-                      name={t`description`}
-                      value={datasetDescription}
-                      textarea
-                      onChange={setDatasetDescription}
-                      isSaving={isUpdatePending}
-                      emptyDisplayText={t`This dataset has no description.`}
-                      onSave={(newDescription) => {
-                        const descriptionToSave =
-                          newDescription.trim().length === 0 ?
-                            undefined
-                          : newDescription;
+                  <Stack gap="xl">
+                    <Box maw="72ch">
+                      <EditableDisplayText
+                        name={t`description`}
+                        value={datasetDescription}
+                        textarea
+                        onChange={setDatasetDescription}
+                        isSaving={isUpdatePending}
+                        emptyDisplayText={t`No description yet. Add one so teammates know what this dataset covers.`}
+                        onSave={(newDescription) => {
+                          const descriptionToSave =
+                            newDescription.trim().length === 0
+                              ? undefined
+                              : newDescription;
 
-                        updateDataset({
-                          id: dataset.id,
-                          data: {
-                            description: descriptionToSave,
-                          },
-                        });
-                      }}
-                      onCancel={() => {
-                        setDatasetDescription(dataset.description ?? "");
-                      }}
-                    />
-
-                    <DatasetMetadataList
-                      dataset={datasetWithColumnsAndSource}
-                    />
-                    <Title order={5}>
-                      <Trans>Data preview</Trans>
-                    </Title>
-                    {isLoadingPreviewData ?
-                      <Loader />
-                    : previewData && previewData ?
-                      <DataGrid
-                        columnNames={datasetColumnNames}
-                        data={previewData}
+                          updateDataset({
+                            id: dataset.id,
+                            data: { description: descriptionToSave },
+                          });
+                        }}
+                        onCancel={() => {
+                          setDatasetDescription(dataset.description ?? "");
+                        }}
                       />
-                    : null}
+                    </Box>
+
+                    <AppViewSection
+                      title={<Trans>Columns</Trans>}
+                      meta={numColumns === undefined ? undefined : numColumns}
+                    >
+                      <DatasetMetadataList
+                        dataset={datasetWithColumnsAndSource}
+                      />
+                    </AppViewSection>
+
+                    <AppViewSection
+                      title={<Trans>Data preview</Trans>}
+                      meta={
+                        previewData === undefined
+                          ? undefined
+                          : t`First ${previewData.length} rows`
+                      }
+                    >
+                      {isLoadingPreviewData ? (
+                        <Skeleton height={320} radius="sm" />
+                      ) : previewData ? (
+                        <DataGrid
+                          columnNames={datasetColumnNames}
+                          data={previewData}
+                          dateColumns={dateColumnNames}
+                          dateFormat="YYYY-MM-DD"
+                        />
+                      ) : null}
+                    </AppViewSection>
                   </Stack>
                 );
               },
               "dataset-summary": () => {
-                return isLoadingFullDataset || !previewData || !datasetColumns ?
-                    <Loader />
-                  : <DatasetSummaryView datasetId={dataset.id} />;
+                return isLoadingFullDataset ||
+                  !previewData ||
+                  !datasetColumns ? null : (
+                  <DatasetSummaryView datasetId={dataset.id} />
+                );
               },
             }}
             onTabChange={(tabId) => {
+              setActiveTab(tabId);
               if (tabId === "dataset-summary") {
                 NuxEvents.emit("dataset.summaryOpened", {
                   datasetId: dataset.id,
@@ -275,73 +360,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               }
             }}
           />
-
-          <Group mt="lg">
-            {/*
-              Google Sheets is the one source type whose rows can change under
-              the dataset without anyone re-importing it. The freshness check is
-              throttled, so this is the escape hatch for a user who has just
-              edited the sheet and does not want to wait for the window to
-              close.
-            */}
-            {(
-              dataset.sourceType === "google_sheets" &&
-              sourceDataset?.__type === "GoogleSheetsDataset"
-            ) ?
-              <Button
-                variant="default"
-                loading={isRefreshPending}
-                onClick={() => {
-                  refreshGoogleSheetDataset({
-                    datasetId: dataset.id,
-                    sourceDataset,
-                  });
-                }}
-              >
-                <Trans>Refresh from Google Sheets</Trans>
-              </Button>
-            : null}
-
-            <Button
-              color="danger"
-              onClick={() => {
-                modals.openConfirmModal({
-                  title: t`Delete dataset`,
-                  children: (
-                    <Text>
-                      <Trans>
-                        Are you sure you want to delete {dataset.name}?
-                      </Trans>
-                    </Text>
-                  ),
-                  labels: { confirm: t`Delete`, cancel: t`Cancel` },
-                  confirmProps: {
-                    color: "danger",
-                    loading: isDeletePending,
-                  },
-                  onConfirm: () => {
-                    deleteDataset(
-                      { id: dataset.id },
-                      {
-                        onSuccess: () => {
-                          navigate(AppLinks.dataManagerHome(workspace.slug));
-                          notifications.show({
-                            title: t`Dataset deleted`,
-                            message: t`${dataset.name} deleted successfully`,
-                            color: "green",
-                          });
-                        },
-                      },
-                    );
-                  },
-                });
-              }}
-            >
-              <Trans>Delete Dataset</Trans>
-            </Button>
-          </Group>
-        </Paper>
-      </Stack>
-    </Container>
+        </AppViewBody>
+      </ActiveColumnContext.Provider>
+    </AppView>
   );
 }

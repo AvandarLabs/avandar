@@ -86,11 +86,11 @@ async function _drainSaveQueue(options: DrainSaveQueueInput): Promise<void> {
   queue.isSaveRunning = false;
   if (queue.isMounted) {
     options.setSaveState(
-      didSaveSucceed ?
-        queue.editCount === revisionAtStart ?
-          "saved"
-        : "unsaved"
-      : "failed",
+      didSaveSucceed
+        ? queue.editCount === revisionAtStart
+          ? "saved"
+          : "unsaved"
+        : "failed",
     );
   }
 }

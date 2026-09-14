@@ -149,9 +149,9 @@ function _seriesRows(
   return ticks.map((tick) => {
     const vertex = _nearestVertex(vertices, _centerX(tick));
     const value =
-      vertex === undefined ? 0 : (
-        Math.max(0, Math.round(applyCalibration(calibration, vertex.y)))
-      );
+      vertex === undefined
+        ? 0
+        : Math.max(0, Math.round(applyCalibration(calibration, vertex.y)));
     return {
       week: tick.text.trim(),
       value: String(value),

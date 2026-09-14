@@ -1,0 +1,39 @@
+.datasetParseOptionsBar {
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  row-gap: var(--mantine-spacing-xs);
+}
+
+/*
+ * The re-parse action stays on the trailing edge however many settings the
+ * source type contributes, so it lands in the same place for a CSV with two
+ * and a spreadsheet with five.
+ */
+.datasetParseOptionsBarReparseButton {
+  margin-inline-start: auto;
+}
+
+/*
+ * The settings are chrome for the preview under them, so they are set at the
+ * compact scale rather than the form scale used for the fields the user is
+ * actually filling in.
+ */
+.datasetParseOptionsBar :global(.mantine-InputWrapper-label) {
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+}
+
+.datasetParseOptionsBar :global(.mantine-NumberInput-root),
+.datasetParseOptionsBar :global(.mantine-TextInput-root) {
+  width: calc(9rem * var(--mantine-scale));
+}
+
+.datasetParseOptionsBar :global(.mantine-Select-root) {
+  width: calc(13rem * var(--mantine-scale));
+}
+
+.datasetParseOptionsBar :global(.mantine-Checkbox-root) {
+  padding-bottom: var(--mantine-spacing-xs);
+}

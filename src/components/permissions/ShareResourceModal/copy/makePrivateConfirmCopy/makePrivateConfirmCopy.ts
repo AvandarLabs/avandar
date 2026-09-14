@@ -42,17 +42,21 @@ export function makePrivateConfirmCopy({
   isPubliclyPublished,
 }: Readonly<MakePrivateConfirmCopyOptions>): MakePrivateConfirmCopy {
   const peopleClause =
-    numUsers === 0 ? undefined
-    : numUsers === 1 ? t`1 person`
-    : t`${numUsers} people`;
+    numUsers === 0
+      ? undefined
+      : numUsers === 1
+        ? t`1 person`
+        : t`${numUsers} people`;
   const groupClause =
-    numGroups === 0 ? undefined
-    : numGroups === 1 ? t`1 group`
-    : t`${numGroups} groups`;
+    numGroups === 0
+      ? undefined
+      : numGroups === 1
+        ? t`1 group`
+        : t`${numGroups} groups`;
   const shareClause =
-    isDefined(peopleClause) && isDefined(groupClause) ?
-      t`${peopleClause} and ${groupClause}`
-    : (peopleClause ?? groupClause);
+    isDefined(peopleClause) && isDefined(groupClause)
+      ? t`${peopleClause} and ${groupClause}`
+      : (peopleClause ?? groupClause);
   const sentences = [
     isDefined(shareClause) ? t`${shareClause} will lose access.` : undefined,
     losesWorkspaceAccess ? t`Everyone in ${app} will lose access.` : undefined,
@@ -61,12 +65,12 @@ export function makePrivateConfirmCopy({
     // Revoking shares does not unpublish, so "only you will be able to open
     // it" is simply false for a public resource, and stating it first would
     // make the true sentence read as a correction of the one above it.
-    isPubliclyPublished ?
-      t`"${resourceName}" will still be public: anyone with the link keeps access until you unpublish it.`
-    : undefined,
-    isPubliclyPublished ?
-      t`Among signed-in people, only you will be able to open it. You can share it again at any time.`
-    : t`Only you will be able to open it. You can share it again at any time.`,
+    isPubliclyPublished
+      ? t`"${resourceName}" will still be public: anyone with the link keeps access until you unpublish it.`
+      : undefined,
+    isPubliclyPublished
+      ? t`Among signed-in people, only you will be able to open it. You can share it again at any time.`
+      : t`Only you will be able to open it. You can share it again at any time.`,
   ].filter(isDefined);
 
   return {

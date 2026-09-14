@@ -1,13 +1,13 @@
 import { uuid } from "$/lib/uuid";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type {
-  GlobalFilterSubscription,
-  LocalFilter,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  GlobalFilterSubscription,
+  LocalFilter,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 /**
  * Fallback prompt used when the Data Explorer's `state.nlPrompt` is empty

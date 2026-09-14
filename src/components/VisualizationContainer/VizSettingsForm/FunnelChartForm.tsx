@@ -2,17 +2,17 @@ import { makeSelectOptions, Select } from "@avandar/ui";
 import { isDefined, propPasses } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
 } from "@/components/SettingsColumns/SettingsColumns";
 import type { UnknownDataFrame } from "@avandar/utils";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
 
 type Props = {
   fields: readonly QueryResultColumn[];
@@ -77,9 +77,9 @@ export function FunnelChartForm({
             value={nameKey}
             disabled={fieldOptions.length === 0}
             placeholder={
-              fieldOptions.length === 0 ?
-                t`No columns are available`
-              : t`Select a column`
+              fieldOptions.length === 0
+                ? t`No columns are available`
+                : t`Select a column`
             }
             onChange={(field) => {
               onConfigChange({ ...config, nameKey: field ?? undefined });
@@ -93,9 +93,9 @@ export function FunnelChartForm({
             value={valueKey}
             disabled={numericFieldOptions.length === 0}
             placeholder={
-              numericFieldOptions.length === 0 ?
-                t`There are no numeric columns`
-              : t`Select a column`
+              numericFieldOptions.length === 0
+                ? t`There are no numeric columns`
+                : t`Select a column`
             }
             onChange={(field) => {
               onConfigChange({ ...config, valueKey: field ?? undefined });
@@ -104,23 +104,23 @@ export function FunnelChartForm({
         </Stack>
       ),
     },
-    sliceNames.length > 0 ?
-      {
-        id: "slice-colors",
-        title: t`Slice colors`,
-        content: (
-          <SliceColorFields
-            sliceNames={sliceNames}
-            seriesColors={config.seriesColors}
-            onSeriesColorsChange={(
-              nextSeriesColors: Record<string, string>,
-            ) => {
-              onConfigChange({ ...config, seriesColors: nextSeriesColors });
-            }}
-          />
-        ),
-      }
-    : undefined,
+    sliceNames.length > 0
+      ? {
+          id: "slice-colors",
+          title: t`Slice colors`,
+          content: (
+            <SliceColorFields
+              sliceNames={sliceNames}
+              seriesColors={config.seriesColors}
+              onSeriesColorsChange={(
+                nextSeriesColors: Record<string, string>,
+              ) => {
+                onConfigChange({ ...config, seriesColors: nextSeriesColors });
+              }}
+            />
+          ),
+        }
+      : undefined,
   ].filter(isDefined);
 
   return <SettingsColumns groups={groups} layout={layout} />;

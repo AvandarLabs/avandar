@@ -1,9 +1,9 @@
 import { isGeometryFamily } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
-import type { MapLayerSpatialDiagnostics } from "../MapLayerSpatialQuery.types";
-import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { MapLayerSpatialDiagnostics } from "../MapLayerSpatialQuery.types";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 type ParsedMapLayerSpatialResult = {
   featureCollection: GeoJSON.FeatureCollection;
@@ -45,8 +45,8 @@ function _pickNumericDiagnostic<Key extends string>(
   key: Key,
 ): Partial<Record<Key, number>> {
   const value = diagnostics[key];
-  return typeof value === "number" ?
-      ({ [key]: value } as Partial<Record<Key, number>>)
+  return typeof value === "number"
+    ? ({ [key]: value } as Partial<Record<Key, number>>)
     : {};
 }
 
@@ -56,13 +56,11 @@ function _pickStringArrayDiagnostic<Key extends string>(
   key: Key,
 ): Partial<Record<Key, string[]>> {
   const value = diagnostics[key];
-  return (
-      Array.isArray(value) &&
-        value.every((sample) => {
-          return typeof sample === "string";
-        })
-    ) ?
-      ({ [key]: value } as Partial<Record<Key, string[]>>)
+  return Array.isArray(value) &&
+    value.every((sample) => {
+      return typeof sample === "string";
+    })
+    ? ({ [key]: value } as Partial<Record<Key, string[]>>)
     : {};
 }
 

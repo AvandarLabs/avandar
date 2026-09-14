@@ -2,14 +2,14 @@ import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
-import type { CompileOptions } from "../compileMapLayerSpatialQuery.types";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ResolvedMapLayerMetadata } from "../../MapLayerSpatialQuery.types";
+import type { CompileOptions } from "../compileMapLayerSpatialQuery.types";
 
 /** Unit square used by AOI compiler tests. */
 export const SAMPLE_AOI: AvaMapConfig.AoiPolygon = {
@@ -153,13 +153,13 @@ export function createGridBinLayerFixture(options: {
   const layer = {
     ...fixture.layer,
     sensitivity:
-      options.minCellCount === undefined ?
-        { mode: "exact" as const }
-      : {
-          mode: "aggregateOnly" as const,
-          minCellCount: options.minCellCount,
-          minGeoLevel: "hex",
-        },
+      options.minCellCount === undefined
+        ? { mode: "exact" as const }
+        : {
+            mode: "aggregateOnly" as const,
+            minCellCount: options.minCellCount,
+            minGeoLevel: "hex",
+          },
     geoBinding: {
       type: "binPointsToGrid" as const,
       grid: options.grid,

@@ -22,7 +22,7 @@ import type {
 } from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
 
 /** Public model namespace for a map's editable configuration. */
-// prettier-ignore
+// oxfmt-ignore
 export {
   AvaMapConfigModule as AvaMapConfig,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/AvaMapConfigModule.ts";

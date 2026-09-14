@@ -1,6 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { IconInbox, IconListDetails } from "@tabler/icons-react";
-import { CanvasEmptyState } from "@/components/CanvasEmptyState/CanvasEmptyState";
+import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -22,7 +22,7 @@ export function IndividualSelectionEmptyState({
 
   if (hasRecords) {
     return (
-      <CanvasEmptyState
+      <AppSlateEmptyState
         icon={<IconListDetails size={32} stroke={1.5} aria-hidden />}
         title={t`Select a ${conceptName}`}
         message={t`Pick one from the list to see its details.`}
@@ -31,7 +31,7 @@ export function IndividualSelectionEmptyState({
   }
 
   return (
-    <CanvasEmptyState
+    <AppSlateEmptyState
       icon={<IconInbox size={32} stroke={1.5} aria-hidden />}
       title={t`No ${conceptName} records yet`}
       message={

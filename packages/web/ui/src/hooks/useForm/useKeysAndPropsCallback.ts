@@ -3,8 +3,10 @@ import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
 import type { Simplify } from "type-fest";
 
-type GetPathTail<Path, PathHead extends string> =
-  Path extends `${PathHead}.${infer Tail}` ? Tail : never;
+type GetPathTail<
+  Path,
+  PathHead extends string,
+> = Path extends `${PathHead}.${infer Tail}` ? Tail : never;
 
 /**
  * These are the same options from `form.getInputProps`.
@@ -49,18 +51,19 @@ export type GetKeyAndPropsFn<
   FormPath extends ObjectPaths<FormValues> = ObjectPaths<FormValues>,
 > = <
   BasePathOrFullPaths extends readonly FormPath[] | (string & FormPath),
-  PathTail extends BasePathOrFullPaths extends string ?
-    GetPathTail<FormPath, BasePathOrFullPaths>
-  : never = never,
+  PathTail extends (BasePathOrFullPaths extends string
+    ? GetPathTail<FormPath, BasePathOrFullPaths>
+    : never) = never,
 >(
   basePathOrFullPaths: BasePathOrFullPaths,
   pathTails?: readonly PathTail[],
 ) => [
-  keys: BasePathOrFullPaths extends string ? Record<PathTail, string>
-  : Record<BasePathOrFullPaths[number], string>,
-  inputProps: BasePathOrFullPaths extends string ?
-    Record<PathTail, GetInputPropsFn>
-  : Record<BasePathOrFullPaths[number], GetInputPropsFn>,
+  keys: BasePathOrFullPaths extends string
+    ? Record<PathTail, string>
+    : Record<BasePathOrFullPaths[number], string>,
+  inputProps: BasePathOrFullPaths extends string
+    ? Record<PathTail, GetInputPropsFn>
+    : Record<BasePathOrFullPaths[number], GetInputPropsFn>,
 ];
 
 export function useKeysAndPropsCallback<

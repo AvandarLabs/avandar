@@ -8,7 +8,7 @@ const VARIANT_COLOR: Record<
 > = {
   user: "blue",
   group: "violet",
-  workspace: "gray",
+  workspace: "neutral",
   app: "teal",
   role: "orange",
 };

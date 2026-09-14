@@ -12,10 +12,11 @@ function _roundCubeCoordinates(q: number, r: number): { q: number; r: number } {
   const rDifference = Math.abs(initialR - r);
   const qIsLargest = qDifference > yDifference && qDifference > rDifference;
   const roundedQ = qIsLargest ? -roundedY - initialR : initialQ;
-  const roundedR =
-    qIsLargest ? initialR
-    : yDifference <= rDifference ? -initialQ - roundedY
-    : initialR;
+  const roundedR = qIsLargest
+    ? initialR
+    : yDifference <= rDifference
+      ? -initialQ - roundedY
+      : initialR;
   return { q: roundedQ, r: roundedR };
 }
 

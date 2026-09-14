@@ -1,5 +1,5 @@
-import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/DatasetSource";
 import { match } from "ts-pattern";
+import { requiresOriginalFileRetention } from "$/models/datasets/DatasetSource/DatasetSource";
 import { runBackgroundParquetTranscoding } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
 import { sniffPdfFile } from "@/clients/datasets/pdfSniff";
 import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
@@ -10,6 +10,9 @@ import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { getDatasetSourceTypeFromSourceFileType } from "@/models/LocalDataset/getDatasetSourceTypeFromSourceFileType/getDatasetSourceTypeFromSourceFileType";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   DuckDbColumnSchema,
@@ -26,9 +29,6 @@ import type {
 } from "@/models/LocalDataset/LocalDataset.types";
 import type { PdfSniffResult } from "@/workers/pdfSniff.worker/pdfSniff.worker";
 import type { ILogger } from "@avandar/logger";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { UserId } from "$/models/User/User.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Per-file ceiling for the source-bytes cache. Files above this don't
@@ -253,8 +253,8 @@ async function _downloadCloudDataset(
   const logger = baseLogger.appendName("fetchCloudDatasetToLocalStorage");
   logger.log("Fetching cloud dataset to local storage", params);
   const parquetData = await DatasetParquetStorageClient.downloadDataset(params);
-  return parquetData ?
-      LocalDatasetClient.insert({
+  return parquetData
+    ? LocalDatasetClient.insert({
         data: {
           ...params,
           parquetData,
@@ -583,9 +583,9 @@ function _makeDropLocalDataset(
     const logger = context.logger.appendName("dropLocalDataset");
     const { retainedOriginal } = await dropLocalDatasetData(params.datasetId);
     logger.log(
-      retainedOriginal ?
-        "Dropped local dataset's derived data, keeping its retained original"
-      : "Dropping local dataset",
+      retainedOriginal
+        ? "Dropped local dataset's derived data, keeping its retained original"
+        : "Dropping local dataset",
       params,
     );
     await DuckDbClient.dropTableViewAndFile({

@@ -9,13 +9,13 @@ function _isNuxStepVisible(options: {
   facts: NuxStepFacts;
 }): boolean {
   const { when } = options.step;
-  return when === undefined ? true : (
-      matchLiteral(when, {
+  return when === undefined
+    ? true
+    : matchLiteral(when, {
         explorerHasQueryResults: options.facts.explorerHasQueryResults,
         explorerHasNoQueryResults: !options.facts.explorerHasQueryResults,
         generalAccessIsWorkspace: options.facts.generalAccessIsWorkspace,
-      })
-    );
+      });
 }
 
 /**

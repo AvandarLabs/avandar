@@ -8,15 +8,15 @@ import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].se
 import { CreateFreeSubscription } from "@sbfn/subscriptions/create-free.ts";
 import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
-import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
-import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
+import { Subscription } from "$/models/Subscription/Subscription.ts";
+import type { User } from "$/models/User/User.ts";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
 } from "@sbfn/subscriptions/SubscriptionsRoutes.types.ts";
-import type { User } from "$/models/User/User.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
@@ -155,9 +155,9 @@ export const SubscriptionsRoutes = defineRoutes<SubscriptionsAPI>(
           // since Polar rejects test domains like test@test.com
           const devOverride = getDevOverrideEmail();
           const emailForPolar =
-            Deno.env.get("MODE") === "development" && devOverride ?
-              devOverride
-            : checkoutEmail;
+            Deno.env.get("MODE") === "development" && devOverride
+              ? devOverride
+              : checkoutEmail;
 
           const checkout = await PolarClient.createCheckoutSession({
             avandarMetadata: {

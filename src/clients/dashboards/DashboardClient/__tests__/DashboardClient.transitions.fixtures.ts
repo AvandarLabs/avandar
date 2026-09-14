@@ -9,8 +9,8 @@ import {
   DASHBOARD,
   SNAPSHOT_REVISION,
 } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
-import type { VisibilityState } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { VisibilityState } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 
 type MockClientConfig = {
   clientLogger: {
@@ -99,8 +99,8 @@ const { updateTransitionState } = vi.hoisted(() => {
     ): void => {
       const { updateModel, visibilityState } = options;
       const stringValue = (key: string) => {
-        return typeof updateModel[key] === "string" ?
-            updateModel[key]
+        return typeof updateModel[key] === "string"
+          ? updateModel[key]
           : undefined;
       };
       if ("snapshotTransitionKind" in updateModel) {
@@ -154,9 +154,9 @@ const { createUpdateMock } = vi.hoisted(() => {
         if ("snapshotRevision" in updateModel) {
           visibilityState.shouldUpdateSnapshotRevision = true;
           visibilityState.pendingSnapshotRevision =
-            typeof updateModel.snapshotRevision === "string" ?
-              updateModel.snapshotRevision
-            : undefined;
+            typeof updateModel.snapshotRevision === "string"
+              ? updateModel.snapshotRevision
+              : undefined;
         }
         if ("snapshotTransitionKind" in updateModel) {
           updateTransitionState({ visibilityState, updateModel });

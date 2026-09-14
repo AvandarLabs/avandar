@@ -1,5 +1,5 @@
-import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 import type { AxisStyle } from "$/models/vizs/ChartStyle.types";
+import type { ValueExtent } from "@/lib/ui/viz/axis/getValueExtentFromSeries/getValueExtentFromSeries";
 
 /** Maximum number of ticks generated for an explicit interval. */
 const MAX_GENERATED_TICKS = 100;
@@ -34,8 +34,8 @@ type DomainResolution =
   | ConcreteDomain;
 
 function _finiteOrUndefined(value: number | undefined): number | undefined {
-  return typeof value === "number" && Number.isFinite(value) ?
-      value
+  return typeof value === "number" && Number.isFinite(value)
+    ? value
     : undefined;
 }
 
@@ -116,14 +116,12 @@ function _buildDomain({
     explicitMin !== undefined || explicitMax !== undefined;
   const overflow = hasExplicitBound ? { allowDataOverflow: true } : {};
   const derivedLow =
-    extent === undefined ? undefined
-    : extent.min >= 0 ? 0
-    : extent.min;
+    extent === undefined ? undefined : extent.min >= 0 ? 0 : extent.min;
   const low = explicitMin ?? derivedLow;
   const high = explicitMax ?? extent?.max;
 
-  return low === undefined || high === undefined || low >= high ?
-      {
+  return low === undefined || high === undefined || low >= high
+    ? {
         kind: "props",
         props: {
           domain: [explicitMin ?? "auto", explicitMax ?? "auto"],
@@ -150,9 +148,9 @@ function _buildConcreteDomain({
   }
 
   const resolvedHigh =
-    explicitMax !== undefined ? high : (
-      low + Math.ceil((high - low) / interval) * interval
-    );
+    explicitMax !== undefined
+      ? high
+      : low + Math.ceil((high - low) / interval) * interval;
   const ticks = _buildTickLattice({ low, resolvedHigh, interval });
 
   return {
@@ -171,7 +169,7 @@ export function makeAxisScalePropsFromBounds({
   extent: Readonly<ValueExtent> | undefined;
 }>): AxisScaleProps {
   const resolution = _buildDomain({ axis, extent });
-  return resolution.kind === "props" ?
-      resolution.props
+  return resolution.kind === "props"
+    ? resolution.props
     : _buildConcreteDomain(resolution);
 }

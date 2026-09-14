@@ -5,12 +5,12 @@ import {
 import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
 import { ipcSqliteTransport } from "$/RdbCrudClient/ipcSqliteTransport.ts";
+import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 import type {
   AnySupabaseCrudModelSpec,
   ClientReturningOnlyPromises,
   SupabaseCrudClient,
 } from "@avandar/clients";
-import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 import type { EmptyObject } from "type-fest";
 
 /**

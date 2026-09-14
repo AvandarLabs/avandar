@@ -101,9 +101,9 @@ export function PillEditPopover({
   }
 
   const options: Option[] =
-    pill.kind === "dataset" ?
-      _buildDatasetOptions(catalog)
-    : _buildColumnOptions(catalog, sql);
+    pill.kind === "dataset"
+      ? _buildDatasetOptions(catalog)
+      : _buildColumnOptions(catalog, sql);
 
   const ungrouped = options.filter((opt) => {
     return opt.group === undefined;

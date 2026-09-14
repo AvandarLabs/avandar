@@ -1,14 +1,14 @@
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { describe, expect, it } from "vitest";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { renderHook } from "@/test-utils";
 import { useImportedColumns } from "./useImportedColumns";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type {
   CsvFileLoadResult,
   XlsxFileLoadResult,
 } from "../../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
 import type { DataSourceMetadata } from "../DatasetImportForm.types";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 
 const DATASET_ID = "11111111-1111-1111-1111-111111111111" as Dataset.Id;
 
@@ -98,18 +98,37 @@ function _googleSheetsMetadata(
     datasetLoadResult: {
       datasetId: DATASET_ID,
       numRows: 1,
-      spreadsheetName: "sheet-name",
-      availableSheetNames: ["Colombia", "Kenya"],
-      sheetLoadMetadata: {
-        type: "xlsx",
-        id: "00000000-0000-4000-8000-000000000003" as XlsxFileLoadResult["id"],
-        xlsxName: "google-sheet.xlsx",
-        numRows: 1,
-        columns,
-        tableName: "temp_google_sheet_table",
-        sheet: "Kenya",
-        parquetData: new Blob(),
+      type: "csv",
+      id: "00000000-0000-4000-8000-000000000003" as CsvFileLoadResult["id"],
+      csvName: "google-sheet - Kenya.csv",
+      tableName: "temp_google_sheet_table",
+      numRejectedRows: 0,
+      errors: { rejectedScans: [], rejectedRows: [] },
+      columns,
+      csvSniff: {
+        Delimiter: ",",
+        Quote: '"',
+        Escape: '"',
+        NewLineDelimiter: "\n",
+        Comment: "#",
+        SkipRows: 0,
+        HasHeader: true,
+        Columns: [],
+        DateFormat: null,
+        TimestampFormat: null,
+        UserArguments: "",
+        Prompt: "",
+        table_name: "temp_google_sheet_table",
       },
+      parquetData: new Blob(),
+      spreadsheetName: "sheet-name",
+      availableTabs: [
+        { sheetId: 1, title: "Colombia", index: 0 },
+        { sheetId: 2, title: "Kenya", index: 1 },
+      ],
+      sheetId: 2,
+      sheetName: "Kenya",
+      previewRows: [],
     },
   };
 }

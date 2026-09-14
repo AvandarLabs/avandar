@@ -1,8 +1,8 @@
 import {
-  buildOpenDataCatalogRow, // prettier-ignore
+  buildOpenDataCatalogRow, // oxfmt-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/buildOpenDataCatalogRow";
 import {
-  SUDAN_CHOLERA_CATALOG_ENTRIES, // prettier-ignore
+  SUDAN_CHOLERA_CATALOG_ENTRIES, // oxfmt-ignore
 } from "@pipelines/hdx__sudan-cholera-2025/sudanCholeraCatalogEntries";
 import { describe, expect, it } from "vitest";
 

@@ -17,11 +17,15 @@
  * Owner-only. A non-owner resource admin who ran this would delete their own
  * share and lock themselves out on the spot, so they are refused, not warned.
  *
+ * Handles every `resource_type`, and every arm has to stay handled. The GIS
+ * app renders the same `ShareResourceButton` as datasets with
+ * `resourceType="map"`, so General Access -> Private reaches this rpc with
+ * 'map'; an unhandled arm falls through to the raise below and that resource
+ * cannot be made private at all.
+ *
  * Does not touch `is_public`. For now, a published dashboard stays
  * world-readable after this runs, because the anon SELECT policy keys on
  * `is_public` alone; publishing is a separate control.
- *
- * @returns void. Nothing about a newly private resource is worth returning.
  */
 create or replace function public.rpc_resources__make_private (
   p_resource_type public.resource_type,
@@ -46,6 +50,12 @@ begin
     into v_owner_id, v_workspace_id
     from public.datasets ds
     where ds.id = p_resource_id
+    for update;
+  elsif p_resource_type = 'map' then
+    select m.owner_id, m.workspace_id
+    into v_owner_id, v_workspace_id
+    from public.maps m
+    where m.id = p_resource_id
     for update;
   else
     raise exception 'unsupported resource type: %', p_resource_type;
@@ -78,8 +88,12 @@ begin
     update public.dashboards
        set is_restricted = true
      where id = p_resource_id;
-  else
+  elsif p_resource_type = 'dataset' then
     update public.datasets
+       set is_restricted = true
+     where id = p_resource_id;
+  else
+    update public.maps
        set is_restricted = true
      where id = p_resource_id;
   end if;

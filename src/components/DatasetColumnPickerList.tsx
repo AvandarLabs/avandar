@@ -22,8 +22,8 @@ import {
   Title,
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
-import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -165,9 +165,9 @@ export function DatasetColumnPickerList({
       );
 
       const nextIdx =
-        currColumnIdx + 1 >= remainingColumns.length ?
-          currColumnIdx - 1
-        : currColumnIdx + 1;
+        currColumnIdx + 1 >= remainingColumns.length
+          ? currColumnIdx - 1
+          : currColumnIdx + 1;
 
       const nextColumn = remainingColumns[nextIdx];
       if (nextColumn) {
@@ -289,9 +289,7 @@ export function DatasetColumnPickerList({
                     {...segmentedControlProps}
                   />
                 </Flex>
-                {idx < datasetColumnItems.length - 1 ?
-                  <Divider />
-                : null}
+                {idx < datasetColumnItems.length - 1 ? <Divider /> : null}
               </Fragment>
             );
           })}

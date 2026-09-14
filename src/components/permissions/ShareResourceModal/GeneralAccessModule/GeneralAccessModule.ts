@@ -33,14 +33,11 @@ type GeneralAccessShareState = {
 function _getGeneralAccessValueFromShareState(
   options: Readonly<GeneralAccessShareState>,
 ): GeneralAccessValue {
-  const restrictedValue =
-    (
-      _doesNonOwnerHaveAccess({
-        shares: options.shares,
-        ownerId: options.ownerId,
-      })
-    ) ?
-      "restricted"
+  const restrictedValue = _doesNonOwnerHaveAccess({
+    shares: options.shares,
+    ownerId: options.ownerId,
+  })
+    ? "restricted"
     : "private";
   return options.isRestricted ? restrictedValue : "workspace";
 }
@@ -63,9 +60,9 @@ function _getGeneralAccessValueFromResourceState(
   // dashboard is Restricted when the whole internet can read it: the anon
   // policy and the `is_public` short-circuit in
   // `util__auth_user_may_select_dashboard` both fire before shares are read.
-  return options.isPublicSelected ? "public" : (
-      _getGeneralAccessValueFromShareState(options)
-    );
+  return options.isPublicSelected
+    ? "public"
+    : _getGeneralAccessValueFromShareState(options);
 }
 
 function _makeDropdownOptionsFromLabels(
@@ -90,15 +87,15 @@ function _makeDropdownOptionsFromLabels(
     },
     { value: "restricted", label: options.labels.restricted, disabled: false },
     { value: "workspace", label: options.labels.workspace, disabled: false },
-    ...(options.isPublicOptionAvailable ?
-      [
-        {
-          value: "public" as const,
-          label: options.labels.public,
-          disabled: options.isPublicOptionDisabled,
-        },
-      ]
-    : []),
+    ...(options.isPublicOptionAvailable
+      ? [
+          {
+            value: "public" as const,
+            label: options.labels.public,
+            disabled: options.isPublicOptionDisabled,
+          },
+        ]
+      : []),
   ];
 }
 

@@ -9,13 +9,11 @@
  * ON DELETE NO ACTION, so a member who owns resources cannot otherwise be
  * removed from the workspace.
  *
- * Updates `owner_profile_id` as well as `owner_id`. Both tables declare
- * Each resource table declares `owner_profile_id uuid not null` referencing
- * `user_profiles` with
- * ON DELETE NO ACTION, so moving `owner_id` alone would leave that FK pointing
- * at the departing member and the removal would stay blocked while this
- * function appeared to succeed. Dashboards, datasets, and maps all enforce
- * this owner-profile relationship.
+ * Updates `owner_profile_id` as well as `owner_id`. Dashboards, datasets and
+ * maps each declare `owner_profile_id uuid not null` referencing
+ * `user_profiles` with ON DELETE NO ACTION, so moving `owner_id` alone would
+ * leave that FK pointing at the departing member. The removal would stay
+ * blocked while this function appeared to succeed.
  *
  * @param p_new_owner_id Must already be a member of the resource's workspace.
  */

@@ -32,9 +32,8 @@ export function PointInputControls({
   updatePoints,
 }: Props): ReactNode {
   const { t } = useLingui();
-  const dataSourceId =
-    layer.source.dataSource ?
-      Model.getTypedId(layer.source.dataSource)
+  const dataSourceId = layer.source.dataSource
+    ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const { points } = binding;
   if (points.type === "geometryColumn") {

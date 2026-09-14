@@ -7,17 +7,17 @@ import {
   EMPTY_DISPUTED_STATUS_VALUES,
 } from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
 import {
-  QueryColumn, // prettier-ignore
+  QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import {
-  StructuredQuery, // prettier-ignore
+  StructuredQuery, // oxfmt-ignore
 } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import type {
   AreaGeoBinding,
-  GeoBindingColumnNames, // prettier-ignore
+  GeoBindingColumnNames, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
-  FillSymbology, // prettier-ignore
+  FillSymbology, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type {
   AggregateOnlyMapLayerRead,
@@ -26,7 +26,7 @@ import type {
   StandardMapLayerRead,
 } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 import type {
-  QueryDataSource, // prettier-ignore
+  QueryDataSource, // oxfmt-ignore
 } from "$/models/queries/QueryDataSource/QueryDataSource.ts";
 
 /** Fallback symbol color when the author has not picked one. */
@@ -187,12 +187,13 @@ export const MapLayerModule = {
     return {
       ...layer,
       sensitivity,
-      geoBinding:
-        _isAreaGeoBinding(layer.geoBinding) ? layer.geoBinding : undefined,
+      geoBinding: _isAreaGeoBinding(layer.geoBinding)
+        ? layer.geoBinding
+        : undefined,
       symbology:
-        layer.symbology.type === "fill" ?
-          layer.symbology
-        : _createDefaultFillSymbology(),
+        layer.symbology.type === "fill"
+          ? layer.symbology
+          : _createDefaultFillSymbology(),
     } as AggregateOnlyMapLayerRead;
   },
 
@@ -242,8 +243,8 @@ export const MapLayerModule = {
 
     const latitudeColumnName = findColumnName(geoBinding.latitude);
     const longitudeColumnName = findColumnName(geoBinding.longitude);
-    return latitudeColumnName && longitudeColumnName ?
-        { type: "latLngColumns", latitudeColumnName, longitudeColumnName }
+    return latitudeColumnName && longitudeColumnName
+      ? { type: "latLngColumns", latitudeColumnName, longitudeColumnName }
       : undefined;
   },
 
@@ -257,18 +258,18 @@ export const MapLayerModule = {
    */
   toPopupColumnNames: (layer: MapLayerRead): string[] | "all" => {
     const { columnIds } = layer.popup;
-    return columnIds === "all" ? "all" : (
-        columnIds
+    return columnIds === "all"
+      ? "all"
+      : columnIds
           .map((columnId) => {
             const column = layer.source.queryColumns.find(
               propEq("id", columnId),
             );
-            return column ?
-                QueryColumn.getDerivedColumnName(column)
+            return column
+              ? QueryColumn.getDerivedColumnName(column)
               : undefined;
           })
-          .filter(isDefined)
-      );
+          .filter(isDefined);
   },
 
   /**
@@ -292,8 +293,8 @@ export const MapLayerModule = {
       propEq("id", reference.column),
     );
     const name = column ? QueryColumn.getDerivedColumnName(column) : undefined;
-    return name && !popupNames.includes(name) ?
-        [...popupNames, name]
+    return name && !popupNames.includes(name)
+      ? [...popupNames, name]
       : popupNames;
   },
 };

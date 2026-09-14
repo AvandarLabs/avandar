@@ -57,10 +57,10 @@ export const ChatModelStorage = {
       propEq("id", defaultModelId),
     );
 
-    return (
-      isCandidateAvailable ? candidateModelId
-      : isDefaultAvailable ? defaultModelId
-      : (availableModels[0]?.id ?? defaultModelId)
-    );
+    return isCandidateAvailable
+      ? candidateModelId
+      : isDefaultAvailable
+        ? defaultModelId
+        : (availableModels[0]?.id ?? defaultModelId);
   },
 };

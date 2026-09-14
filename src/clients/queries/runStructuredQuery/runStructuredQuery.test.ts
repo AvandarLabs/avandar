@@ -1,9 +1,9 @@
 import { Model } from "@avandar/models";
 import { prop, sortObjList } from "@avandar/utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";

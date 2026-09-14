@@ -31,9 +31,9 @@ export function makeHeatmapLayerSpecFromMapLayer({
     throw new Error("Heatmap weight requires a resolved value column name");
   }
   const heatmapWeight: ExpressionSpecification | 1 =
-    symbology.weight && valueColumnName !== undefined ?
-      ["to-number", ["get", valueColumnName], 0]
-    : 1;
+    symbology.weight && valueColumnName !== undefined
+      ? ["to-number", ["get", valueColumnName], 0]
+      : 1;
   return {
     id: MapLayerIds.toLayerId(layer.id),
     type: "heatmap",

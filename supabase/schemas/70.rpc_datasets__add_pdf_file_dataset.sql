@@ -1,26 +1,26 @@
 /**
  * Add a PDF file dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__pdf_file.
  *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_is_in_cloud_storage: Whether the raw file is stored in cloud storage
- * @param p_size_in_bytes: The size of the source PDF in bytes
- * @param p_has_original_file: Whether the original PDF was retained
- * @param p_regions: The regions extracted from the PDF, each with its own
- *   shape, geometry and shape-specific options
- * @param p_output_mode: How several regions combine into one dataset
- * @param p_llm_model: Which model produced any model-extracted rows, or null
- *   when the rows came from rules alone
- * @param p_page_range_start: First page detection was limited to, inclusive and zero-based
- * @param p_page_range_end: Last page detection was limited to, inclusive and zero-based
- * @param p_fingerprint: Snapshot of what was extracted at import time
+ * @param p_dataset_id The id of the dataset to add.
+ * @param p_workspace_id The workspace id to add the dataset to.
+ * @param p_dataset_name The name of the dataset.
+ * @param p_dataset_description The description of the dataset.
+ * @param p_columns The columns of the dataset.
+ * @param p_is_in_cloud_storage Whether the raw file is stored in cloud storage.
+ * @param p_size_in_bytes The size of the source PDF in bytes.
+ * @param p_has_original_file Whether the original PDF was retained.
+ * @param p_regions The regions extracted from the PDF, each with its own shape,
+ *   geometry and shape-specific options.
+ * @param p_output_mode How several regions combine into one dataset.
+ * @param p_llm_model Which model produced any model-extracted rows, or null
+ *   when the rows came from rules alone.
+ * @param p_page_range_start First page detection was limited to, inclusive and
+ *   zero-based.
+ * @param p_page_range_end Last page detection was limited to, inclusive and
+ *   zero-based.
+ * @param p_fingerprint Snapshot of what was extracted at import time.
  *
- * @returns: The created dataset
+ * @returns The created dataset.
  */
 create or replace function public.rpc_datasets__add_pdf_file_dataset (
   p_dataset_id uuid,

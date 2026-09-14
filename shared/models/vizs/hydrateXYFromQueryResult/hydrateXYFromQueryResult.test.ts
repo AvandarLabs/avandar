@@ -1,5 +1,5 @@
-import { hydrateXYFromQueryResult } from "$/models/vizs/hydrateXYFromQueryResult/hydrateXYFromQueryResult.ts";
 import { describe, expect, it } from "vitest";
+import { hydrateXYFromQueryResult } from "$/models/vizs/hydrateXYFromQueryResult/hydrateXYFromQueryResult.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 function cols(

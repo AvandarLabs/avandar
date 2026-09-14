@@ -1,7 +1,7 @@
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { Argument, Command } from "commander";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
 import { z } from "zod";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 
 const httpMethodChoices = [
@@ -158,10 +158,9 @@ async function main() {
   const { data, error } = await AvaSupabase.db().functions.invoke(
     fullFunctionName,
     {
-      body:
-        isBodyEmpty ?
-          parsedMethod === "GET" ?
-            undefined
+      body: isBodyEmpty
+        ? parsedMethod === "GET"
+          ? undefined
           : JSON.stringify({})
         : bodyParams,
       method: parsedMethod,

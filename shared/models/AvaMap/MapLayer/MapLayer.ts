@@ -24,14 +24,14 @@ import type {
   ColorSpec as ColorSpecType,
   FillSymbology as FillSymbologyType,
   HeatmapSymbology as HeatmapSymbologyType,
-  LayerSymbology, // prettier-ignore
+  LayerSymbology, // oxfmt-ignore
   LayerValueRef as LayerValueRefType,
   NormalizationConfig as NormalizationConfigType,
   StrokeSpec as StrokeSpecType,
 } from "$/models/AvaMap/MapLayer/LayerSymbology.types.ts";
 import type {
   LegendBreak as LegendBreakType,
-  LegendConfig, // prettier-ignore
+  LegendConfig, // oxfmt-ignore
   LegendEntry as LegendEntryType,
   SizeLegendStop as SizeLegendStopType,
 } from "$/models/AvaMap/MapLayer/LegendConfig.types.ts";
@@ -44,7 +44,7 @@ import type {
   StandardMapLayerRead,
 } from "$/models/AvaMap/MapLayer/MapLayer.types.ts";
 import type {
-  SensitivityPolicy, // prettier-ignore
+  SensitivityPolicy, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/SensitivityPolicy.types.ts";
 
 export {
@@ -61,7 +61,7 @@ export { LEGEND_ENTRY_TYPES } from "$/models/AvaMap/MapLayer/LegendConfig.types.
 
 /** Public model namespace for map layers, related types, and constructors. */
 export {
-  MapLayerModule as MapLayer, // prettier-ignore
+  MapLayerModule as MapLayer, // oxfmt-ignore
 } from "$/models/AvaMap/MapLayer/MapLayerModule/MapLayerModule.ts";
 
 export namespace MapLayer {

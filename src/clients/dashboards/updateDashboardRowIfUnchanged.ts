@@ -31,25 +31,25 @@ export async function updateDashboardRowIfUnchanged(
     .eq("updated_at", dashboard.updatedAt);
 
   updateQuery =
-    dashboard.snapshotRevision === undefined ?
-      updateQuery.is("snapshot_revision", null)
-    : updateQuery.eq("snapshot_revision", dashboard.snapshotRevision);
+    dashboard.snapshotRevision === undefined
+      ? updateQuery.is("snapshot_revision", null)
+      : updateQuery.eq("snapshot_revision", dashboard.snapshotRevision);
 
   updateQuery =
-    dashboard.snapshotTransitionKind === undefined ?
-      updateQuery.is("snapshot_transition_kind", null)
-    : updateQuery.eq(
-        "snapshot_transition_kind",
-        dashboard.snapshotTransitionKind,
-      );
+    dashboard.snapshotTransitionKind === undefined
+      ? updateQuery.is("snapshot_transition_kind", null)
+      : updateQuery.eq(
+          "snapshot_transition_kind",
+          dashboard.snapshotTransitionKind,
+        );
 
   updateQuery =
-    dashboard.snapshotTransitionRevision === undefined ?
-      updateQuery.is("snapshot_transition_revision", null)
-    : updateQuery.eq(
-        "snapshot_transition_revision",
-        dashboard.snapshotTransitionRevision,
-      );
+    dashboard.snapshotTransitionRevision === undefined
+      ? updateQuery.is("snapshot_transition_revision", null)
+      : updateQuery.eq(
+          "snapshot_transition_revision",
+          dashboard.snapshotTransitionRevision,
+        );
   const { data } = await updateQuery.select("*").throwOnError();
   return data.at(0);
 }

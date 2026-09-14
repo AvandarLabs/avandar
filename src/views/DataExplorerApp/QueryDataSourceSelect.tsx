@@ -13,13 +13,13 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import type { SelectData, SelectOptionGroup, SelectProps } from "@avandar/ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   QueryDataSource,
   QueryDataSourceId,
 } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { UserId } from "$/models/User/User.types";
+import type { SelectData, SelectOptionGroup, SelectProps } from "@avandar/ui";
 
 type Props = {
   value?: QueryDataSource | null;
@@ -210,13 +210,13 @@ export function QueryDataSourceSelect({
         return (
           <Group justify="space-between" wrap="nowrap">
             <Text size="sm">{option.label}</Text>
-            {unqueryableOfflineIds.has(option.value as QueryDataSourceId) ?
+            {unqueryableOfflineIds.has(option.value as QueryDataSourceId) ? (
               <Tooltip label={<OfflineUnavailableTooltipLabel />}>
                 <Badge size="xs" color="red" variant="light">
                   <Trans>Not offline</Trans>
                 </Badge>
               </Tooltip>
-            : null}
+            ) : null}
           </Group>
         );
       }}

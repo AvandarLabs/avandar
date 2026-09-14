@@ -11,13 +11,13 @@ import { useGeneralAccessControl } from "../useGeneralAccessControl";
 import { makeDisplaySharesFromSharingState } from "./makeDisplaySharesFromSharingState";
 import { makeShareRowCallbacks } from "./makeShareRowCallbacks";
 import { useResourceShareMutations } from "./useResourceShareMutations";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import type { SummarySpan } from "../buildShareSummary/buildShareSummary";
 import type { DisplayShare } from "../SharePrincipalList";
 import type { ShareResourcePublishing } from "../ShareResourceModal.types";
 import type { ShareRowCallbacks } from "./makeShareRowCallbacks";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
 /** One entry in the "add a person or group" combobox. */
 type PrincipalOption = { value: string; label: string };
@@ -133,9 +133,8 @@ export function useShareResourceModalState(
       );
     });
 
-  const displayShares =
-    sharingState ?
-      makeDisplaySharesFromSharingState({
+  const displayShares = sharingState
+    ? makeDisplaySharesFromSharingState({
         sharingState,
         resourceType,
         resourceId,
@@ -148,9 +147,8 @@ export function useShareResourceModalState(
       })
     : [];
 
-  const summarySpans =
-    sharingState ?
-      buildShareSummary({
+  const summarySpans = sharingState
+    ? buildShareSummary({
         shares: directShares,
         isRestricted: sharingState.isRestricted,
         workspaceShareRole: workspaceShare?.role ?? null,

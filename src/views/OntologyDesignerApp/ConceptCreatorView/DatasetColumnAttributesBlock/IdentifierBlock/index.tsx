@@ -53,8 +53,9 @@ export function IdentifierBlock({
   // single dataset: keep the clear instructional sentence + one select
   if (sourceDatasets.length <= 1) {
     const sourcedDataset = sourceDatasets[0]?.dataset;
-    const fieldOptions =
-      sourcedDataset ? (fieldOptionsByDatasetId[sourcedDataset.id] ?? []) : [];
+    const fieldOptions = sourcedDataset
+      ? (fieldOptionsByDatasetId[sourcedDataset.id] ?? [])
+      : [];
     return (
       <Stack>
         <Text>
@@ -160,13 +161,15 @@ export function IdentifierBlock({
                 `sourceDatasets.${idx}.primaryKeyColumnId`,
               )}
             />
-            {idx !== sourceDatasets.length - 1 ?
+            {idx !== sourceDatasets.length - 1 ? (
               <Text fw={500} size="lg" aria-hidden>
-                {idx > 0 ?
+                {idx > 0 ? (
                   <Trans>and is also equal to...</Trans>
-                : <Trans>is equal to...</Trans>}
+                ) : (
+                  <Trans>is equal to...</Trans>
+                )}
               </Text>
-            : null}
+            ) : null}
           </Stack>
         );
       })}

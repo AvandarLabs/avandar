@@ -1,7 +1,7 @@
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { NuxEventName } from "@/components/Nux/NuxEvents/NuxEvents";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 type Options = {
   completedMilestones: readonly NuxProgress.MilestoneKey[];

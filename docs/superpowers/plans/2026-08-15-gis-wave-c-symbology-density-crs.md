@@ -1177,10 +1177,10 @@ timeout ≤ 45s.
    increases (`window.__avandarE2EMap.getZoom()`).
 4. `gis-heatmap.spec.ts` — Heat symbology; click the heat; feature inspector
    does not open.
-5. `gis-grid-bin-suppression.spec.ts` — `PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1`;
+5. `gis-grid-bin-suppression.spec.ts` — tagged `@online`;
    bin points, Aggregate only min count above some cells; suppressed legend
    key; popup/inspect on a suppressed cell does not show a raw count.
-6. `gis-geometry-crs.spec.ts` — `PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1`;
+6. `gis-geometry-crs.spec.ts` — tagged `@online`;
    geometry column in EPSG:3857 web-mercator WKT; set source CRS 3857;
    features render; reload keeps CRS.
 
@@ -1196,8 +1196,8 @@ pnpm test:e2e tests/e2e/gis-point-classification.spec.ts
 pnpm test:e2e tests/e2e/gis-coordinate-validation.spec.ts
 pnpm test:e2e tests/e2e/gis-cluster.spec.ts
 pnpm test:e2e tests/e2e/gis-heatmap.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-grid-bin-suppression.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-geometry-crs.spec.ts
+pnpm test:e2e tests/e2e/gis-grid-bin-suppression.spec.ts
+pnpm test:e2e tests/e2e/gis-geometry-crs.spec.ts
 ```
 
 - [ ] **Step 3: Optional commit** `test(gis): cover wave c symbology and density`
@@ -1234,9 +1234,9 @@ pnpm build
 
 ```bash
 pnpm test:e2e tests/e2e/gis-map-layers.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-boundary-join.spec.ts
-PLAYWRIGHT_ENABLE_DUCKDB_SPATIAL=1 pnpm test:e2e tests/e2e/gis-choropleth-suppression.spec.ts
+pnpm test:e2e tests/e2e/gis-geometry-column.spec.ts
+pnpm test:e2e tests/e2e/gis-boundary-join.spec.ts
+pnpm test:e2e tests/e2e/gis-choropleth-suppression.spec.ts
 ```
 
 Then the six Task 17 files.

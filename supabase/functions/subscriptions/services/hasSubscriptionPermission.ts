@@ -1,10 +1,10 @@
 import { camelCaseKeysShallow, matchLiteral, prop } from "@avandar/utils";
 import { countShareableDashboards } from "$/models/Dashboard/countShareableDashboards/countShareableDashboards.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Tables } from "$/types/database.types.ts";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 type SubscriptionPermissionOptions = {
   permissionType: Subscription.Permission;
@@ -30,19 +30,19 @@ export async function hasSubscriptionPermission(
   const { permissionType, supabaseAdminClient, userId } = options;
 
   const dbSubscription =
-    options.subscriptionId !== undefined ?
-      await _loadSubscriptionByIdOrPolarId({
-        supabaseAdminClient,
-        subscriptionId: options.subscriptionId,
-      })
-    : (
-        await supabaseAdminClient
-          .from("subscriptions")
-          .select("*")
-          .eq("workspace_id", options.workspaceId)
-          .maybeSingle()
-          .throwOnError()
-      ).data;
+    options.subscriptionId !== undefined
+      ? await _loadSubscriptionByIdOrPolarId({
+          supabaseAdminClient,
+          subscriptionId: options.subscriptionId,
+        })
+      : (
+          await supabaseAdminClient
+            .from("subscriptions")
+            .select("*")
+            .eq("workspace_id", options.workspaceId)
+            .maybeSingle()
+            .throwOnError()
+        ).data;
 
   if (dbSubscription === null) {
     return false;

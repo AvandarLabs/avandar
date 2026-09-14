@@ -23,12 +23,12 @@ import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
-import type { ConceptRelationMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
-import type { DuckDBConnection } from "@duckdb/node-api";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ConceptRelationMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
+import type { DuckDBConnection } from "@duckdb/node-api";
 
 const DATASET_A = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const DATASET_B = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb" as Dataset.Id;
@@ -328,7 +328,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     ]);
   });
 
-  // The grain claim, asserted as the spec's own one-query proof. `101` is
+  // The grain claim, asserted with a single query. `101` is
   // contributed to by both datasets, which is exactly the input that makes the
   // concatenating implementation return two rows for one individual.
   it("keeps one row per individual when two datasets contribute to it", async () => {

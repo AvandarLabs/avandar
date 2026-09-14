@@ -340,9 +340,8 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
     // user is looking at.
     const { info } = await doc.getMetadata();
     const firstReadPage = pages[0];
-    const documentMetadata =
-      firstReadPage ?
-        extractDocumentMetadata({
+    const documentMetadata = firstReadPage
+      ? extractDocumentMetadata({
           page: firstReadPage,
           info: (info ?? {}) as Record<string, unknown>,
         })
@@ -360,9 +359,8 @@ self.addEventListener("message", async (event: MessageEvent<unknown>) => {
     _post({
       type: "error",
       reason: isPasswordError ? "password_required" : "unknown",
-      message:
-        isPasswordError ?
-          "This PDF is password protected. Enter its password to continue."
+      message: isPasswordError
+        ? "This PDF is password protected. Enter its password to continue."
         : message,
     });
   } finally {

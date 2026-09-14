@@ -102,9 +102,11 @@ const consentAuditEntryClient = createDexieCrudClient({
             warningDismissed:
               input.decision === "cancelled" ? warningShown : [],
             suggestionUsed:
-              input.decision === "used_suggestion" ? true
-              : warningShown.includes("bias") ? false
-              : null,
+              input.decision === "used_suggestion"
+                ? true
+                : warningShown.includes("bias")
+                  ? false
+                  : null,
             patternLocale: "en",
             detectorVersion: "1.0.0",
             medicalTierTriggeredBy: input.isMedical ? "column" : null,

@@ -12,6 +12,43 @@
   - `table_name__*` for table-specific (e.g. `profiles__get_active`).
 - Triggers: `tr__table_name__*`.
 
+## Comments
+
+- **Docstrings use a `/** ... */` block.** A docstring is the comment that
+  documents a declaration: `create type`, `create table`, `create view`,
+  `create function`, or `create schema`. Never write one as a run of `--`
+  lines.
+
+  ```sql
+  /**
+   * Publication state of a dashboard. `dashboards.is_public` is generated
+   * from this column for read-side compatibility.
+   */
+  create type public.dashboard_visibility as enum('draft', 'workspace', 'public');
+  ```
+
+- **Everything else uses `--`,** however many lines it spans. That covers
+  comments inside a statement (a column, a constraint, a `case` arm, a policy
+  predicate) and notes attached to `grant`, `revoke`, `alter`,
+  `create index`, `create trigger`, and `create policy`. A statement body is
+  the SQL analogue of a function body, where the TypeScript rules already say
+  to use line comments.
+- **A file with no single main object may open with one `/** ... */` file
+  header.** A collection of RLS policies or of sibling helpers qualifies; a
+  file named after the one table or function it declares does not, and its
+  whole-file context belongs in that object's docstring. Note that
+  `prettier-plugin-sql` deletes the blank line between two comment blocks, so
+  a file header sits directly above the first docstring rather than detached
+  from it.
+- **Document enum values under an `Enum values:` heading,** one paragraph per
+  value, when the value names are not self-explanatory. Put any caveat about
+  changing the type under a trailing `Note:`. See
+  `supabase/schemas/00.enum.datasets__pdf_region_shape.sql` for the canonical
+  shape.
+- Keep comment lines at 80 characters or fewer, and do not use em dashes.
+- `@param name Description.` and `@returns Description.` are the tag forms.
+  Omit a tag that only restates the signature or the summary line.
+
 ## Declarative schema file numbering
 
 Files in `supabase/schemas/` are named `NN.<descriptive_name>.sql` and are

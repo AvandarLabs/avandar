@@ -73,6 +73,8 @@ type of the asserted value for the rest of the scope.
 
 | Export                | Description                                                                     |
 | --------------------- | ------------------------------------------------------------------------------- |
+| `formatFileSize`      | Formats a byte count at the largest unit that keeps it under four digits        |
+| `FormatFileSizeOptions` | Options accepted by `formatFileSize`                                         |
 | `formatNumber`        | Formats a number with locale, precision, sign display, and grouping options     |
 | `FormatNumberOptions` | Options accepted by `formatNumber`                                              |
 | `SignDisplay`         | The `signDisplay` option type                                                   |

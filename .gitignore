@@ -44,9 +44,6 @@ supabase/snippets/
 # Deno (local type-check only; breaks Supabase edge bundler when committed)
 deno.lock
 
-# Cursor
-.cursor/.cursor/
-
 # Playwright
 /playwright/
 /playwright-report/
@@ -96,3 +93,25 @@ worktrees/
 # Gate fixtures we have no confirmed licence to redistribute. Fetched by
 # `pnpm fetch-gate-fixtures`; see public/test-data/pdf/gate/README.md.
 public/test-data/pdf/gate/imc-sudan-cholera-sitrep-1.pdf
+
+# Impeccable design skill.
+# The engine is a ~12MB prebuilt binary, one copy per agent directory, and it
+# is per-platform (darwin-arm64 here, useless to anyone on Linux). It is never
+# built locally: `pnpm skills:update` downloads it, and failing that the
+# committed `scripts/impeccable` launcher fetches the release matching its
+# `VERSION` file, checks it against the published sha256, and caches it in
+# ~/.impeccable/bin/<version>/ on first use. So a clone without it self-heals.
+**/skills/impeccable/scripts/bin/
+
+# Decisions are shared and committed: config.json (team workflow config),
+# design.json (the DESIGN.md sidecar), live/config.json (injection shape),
+# critique/ignore.md (shared suppressions). Everything below is per-machine
+# runtime state or regenerable output from a single run.
+.impeccable/config.local.json
+.impeccable/live/sessions/
+.impeccable/live/inject-journal.json
+.impeccable/live/roots.json
+.impeccable/build/
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/hook.cache.json

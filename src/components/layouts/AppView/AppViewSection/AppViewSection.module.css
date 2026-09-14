@@ -1,0 +1,40 @@
+/*
+ * A section's rhythm is deliberately lopsided: generous above the heading,
+ * tight below it. The gap between two sections comes from the parent stack
+ * (`xl`), so a section only owns the 12px that binds its label to its body.
+ */
+.appViewSection {
+  min-width: 0;
+}
+
+.appViewSectionHeadingRow {
+  border-bottom: 1px solid var(--ava-border-default);
+  min-height: 28px;
+  padding-bottom: var(--mantine-spacing-xs);
+}
+
+.appViewSectionTitle {
+  color: var(--mantine-color-neutral-9);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.appViewSectionMeta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.appViewSectionActions {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+
+.appViewSectionBody {
+  margin-top: var(--mantine-spacing-sm);
+  min-width: 0;
+}

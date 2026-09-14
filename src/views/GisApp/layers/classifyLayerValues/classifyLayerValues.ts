@@ -145,14 +145,14 @@ export function classifyLayerValues(
     });
   const distinctValueCount = new Set(sortedNumbers).size;
   const requestedCount =
-    options.classification.method === "manual" ?
-      options.classification.breaks.length + 1
-    : options.classification.classCount;
+    options.classification.method === "manual"
+      ? options.classification.breaks.length + 1
+      : options.classification.classCount;
   const classCount = Math.min(requestedCount, distinctValueCount);
   const { cuts, didSample } =
-    classCount === 0 ?
-      { cuts: [], didSample: false }
-    : _makeCuts(sortedNumbers, options.classification, classCount);
+    classCount === 0
+      ? { cuts: [], didSample: false }
+      : _makeCuts(sortedNumbers, options.classification, classCount);
   const breaks = classCount === 0 ? [] : _buildBreaks(cuts);
   const classIndexByFeatureId = new Map<string, number>();
   const counts = Array.from({ length: breaks.length }, () => {
@@ -189,8 +189,10 @@ export function classifyLayerValues(
     distinctValueCount,
     didSample,
     recommendation:
-      distinctValueCount === 0 ? "noData"
-      : distinctValueCount === 1 ? "singleColor"
-      : "classified",
+      distinctValueCount === 0
+        ? "noData"
+        : distinctValueCount === 1
+          ? "singleColor"
+          : "classified",
   };
 }

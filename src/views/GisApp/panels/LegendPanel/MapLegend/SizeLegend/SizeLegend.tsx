@@ -22,9 +22,9 @@ export function SizeLegend({ sizeStops }: Props): ReactNode {
   const firstLabel = sizeStops.at(0)?.label ?? "";
   const lastLabel = sizeStops.at(-1)?.label ?? "";
   const accessibleLabel =
-    sizeStops.length === 1 ?
-      t`Symbol size ${firstLabel}`
-    : t`Symbol sizes from ${firstLabel} to ${lastLabel}`;
+    sizeStops.length === 1
+      ? t`Symbol size ${firstLabel}`
+      : t`Symbol sizes from ${firstLabel} to ${lastLabel}`;
 
   return (
     <svg

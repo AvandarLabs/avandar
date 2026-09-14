@@ -26,7 +26,7 @@ export function PrivateResourceRow({
       <Table.Td>{privateResourceCount.privateDatasetCount}</Table.Td>
       <Table.Td>{privateResourceCount.privateMapCount}</Table.Td>
       <Table.Td>
-        {hasPrivateResources ?
+        {hasPrivateResources ? (
           <Button
             size="compact-sm"
             variant="subtle"
@@ -36,7 +36,7 @@ export function PrivateResourceRow({
           >
             <Trans>Reassign</Trans>
           </Button>
-        : null}
+        ) : null}
       </Table.Td>
     </Table.Tr>
   );

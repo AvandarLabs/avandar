@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
  * that the wire format the two sides agree on actually round-trips,
  * which is what the live integration depends on.
  *
- * If the server-side file changes, this test won't catch it directly,
- * but it locks in the spec-defined shape.
+ * If the server-side file changes, this test will not catch it directly, but
+ * it locks in the agreed wire shape.
  */
 
 const TEXT_ENCODER = new TextEncoder();

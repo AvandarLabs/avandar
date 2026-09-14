@@ -8,9 +8,9 @@ describe("buildManualDuckDbBundles", () => {
     const selected = await duckdb.selectBundle(bundles);
     expect(selected.pthreadWorker).toBeNull();
     expect(selected.mainModule).toBe(
-      (await duckdb.getPlatformFeatures()).wasmExceptions ?
-        bundles.eh?.mainModule
-      : bundles.mvp.mainModule,
+      (await duckdb.getPlatformFeatures()).wasmExceptions
+        ? bundles.eh?.mainModule
+        : bundles.mvp.mainModule,
     );
   });
 });

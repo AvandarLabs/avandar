@@ -1,5 +1,5 @@
-import { uuid } from "$/lib/uuid";
 import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { DisputedBoundary } from "@/views/GisApp/layers/DisputedBoundary/DisputedBoundary";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";

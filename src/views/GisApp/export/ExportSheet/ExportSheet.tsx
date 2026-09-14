@@ -5,9 +5,9 @@ import { ExportSheetControls } from "@/views/GisApp/export/ExportSheet/ExportShe
 import { ExportSheetNotices } from "@/views/GisApp/export/ExportSheet/ExportSheetNotices";
 import { ExportSheetPreview } from "@/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview";
 import { useExportPdfDownload } from "@/views/GisApp/export/useExportPdfDownload/useExportPdfDownload";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -90,11 +90,11 @@ export function ExportSheet({
         >
           {t`Download PDF`}
         </Button>
-        {status === "error" && errorMessage !== undefined ?
+        {status === "error" && errorMessage !== undefined ? (
           <Text size="sm" c="red">
             {errorMessage}
           </Text>
-        : null}
+        ) : null}
       </Stack>
     </Drawer>
   );

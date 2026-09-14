@@ -19,6 +19,7 @@ import {
   isDatasetParquetInStorage,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteFeatureFlags";
 import type { Page } from "@playwright/test";
 
 /**
@@ -32,10 +33,9 @@ async function expectExcelParsePreview(options: {
   sampleCellSubstring: string;
 }): Promise<void> {
   await expect(
-    options.page.getByText(
-      `These are the first ${options.formattedRowCount} rows`,
-      { exact: false },
-    ),
+    options.page.getByText(`First ${options.formattedRowCount} rows`, {
+      exact: false,
+    }),
   ).toBeVisible({ timeout: LONG_WAIT });
 
   if (options.columnNames) {
@@ -53,7 +53,7 @@ async function expectExcelParsePreview(options: {
   ).toBeVisible({ timeout: SHORT_WAIT });
 }
 
-test.describe("Excel manual upload", () => {
+test.describe("Excel manual upload", { tag: E2E_ONLINE_TAG }, () => {
   // Runs in its own fresh browser process (see `freshBrowserPage`): the large
   // XLSX (17k+ rows) DuckDB-WASM parse is slow enough that, on an aged shared
   // process late in the run, it can exceed its timeout. A clean process removes
@@ -75,13 +75,10 @@ test.describe("Excel manual upload", () => {
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     const fileInput = uploadPanel.locator('input[type="file"]');
-    const uploadSubmitButton = uploadPanel.getByRole("button", {
-      name: "Upload",
-      exact: true,
-    });
 
+    // Choosing the file parses it: there is no confirm step between the pick
+    // and the preview.
     await fileInput.setInputFiles(CHOLERA_NYC_XLSX_PATH);
-    await uploadSubmitButton.click();
 
     await expectExcelParsePreview({
       page,
@@ -92,7 +89,6 @@ test.describe("Excel manual upload", () => {
     });
 
     await fileInput.setInputFiles(CALIFORNIA_XLSX_PATH);
-    await uploadSubmitButton.click();
 
     await expectExcelParsePreview({
       page,

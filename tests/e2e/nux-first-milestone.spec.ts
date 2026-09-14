@@ -142,9 +142,6 @@ test.describe("onboarding tutorial, add_dataset milestone", () => {
       await uploadPanel
         .locator('input[type="file"]')
         .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-      await uploadPanel
-        .getByRole("button", { name: "Upload", exact: true })
-        .click();
 
       // The parse-success callout, not the toast of the same news: the toast
       // auto-dismisses and this has to stay true while the tour catches up.
@@ -152,14 +149,18 @@ test.describe("onboarding tutorial, add_dataset milestone", () => {
         SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
       );
       await expect(
-        page.getByText(`These are the first ${formattedRowCount} rows`, {
+        page.getByText(`First ${formattedRowCount} rows`, {
           exact: false,
         }),
       ).toBeVisible({ timeout: LONG_WAIT });
 
-      // Tooltip 2 waits for a target that only has content after parsing.
-      await tourTooltip.getByRole("button", { name: "Next" }).click();
-      await expect(tourTooltip.getByText("Name it and save")).toBeVisible({
+      // Tooltip 2 arrives on its own. Tooltip 1 is anchor-gated on the import
+      // form, and `getAutoAdvanceStepIndex` moves the tour on as soon as that
+      // anchor is in the document: the user parsed a file, so the tour follows
+      // them rather than waiting for a click. There is no Next to press here
+      // either way, because tooltip 2 is event-gated on `dataset.saved` and
+      // `NuxTooltip` renders no Next button for an event-gated step.
+      await expect(tourTooltip.getByText("Save it")).toBeVisible({
         timeout: MEDIUM_WAIT,
       });
 
@@ -170,7 +171,7 @@ test.describe("onboarding tutorial, add_dataset milestone", () => {
 
       // Tooltip 3 is the payoff, on a different route.
       await expect(
-        tourTooltip.getByText("It profiled your data for you"),
+        tourTooltip.getByText("Your data is summarized"),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 
       // The checklist survived two route changes and recorded the milestone.

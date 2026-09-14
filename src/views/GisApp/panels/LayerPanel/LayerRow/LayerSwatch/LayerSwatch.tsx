@@ -8,9 +8,11 @@ type Props = { symbology: MapLayer.Symbology };
 /** Shows a miniature of the layer's point or proportional symbol. */
 export function LayerSwatch({ symbology }: Props): ReactNode {
   const variantClassName =
-    symbology.type === "circle" ? css["layerSwatch--point"]
-    : symbology.type === "proportionalSymbol" ? css["layerSwatch--sized"]
-    : undefined;
+    symbology.type === "circle"
+      ? css["layerSwatch--point"]
+      : symbology.type === "proportionalSymbol"
+        ? css["layerSwatch--sized"]
+        : undefined;
   if (symbology.type === "heatmap") {
     return (
       <span
@@ -22,9 +24,11 @@ export function LayerSwatch({ symbology }: Props): ReactNode {
   }
   const color = symbology.color;
   const swatchColor =
-    color.type === "single" ? color.color
-    : color.type === "graduated" ? color.ramp[0]
-    : (color.categories[0]?.color ?? color.other.color);
+    color.type === "single"
+      ? color.color
+      : color.type === "graduated"
+        ? color.ramp[0]
+        : (color.categories[0]?.color ?? color.other.color);
 
   return (
     <span

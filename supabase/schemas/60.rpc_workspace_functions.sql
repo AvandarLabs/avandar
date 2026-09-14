@@ -1,12 +1,11 @@
 /**
  * Create a new workspace and assign the current user as the owner.
- * 
- * @param p_workspace_name: The name of the workspace
- * @param p_workspace_slug: The slug of the workspace
- * @param p_full_name: The full name of the owner
- * @param p_display_name: The display name of the owner
- * 
- * @returns: The created workspace
+ *
+ * @param p_workspace_name The name of the workspace.
+ * @param p_workspace_slug The slug of the workspace.
+ * @param p_full_name The full name of the owner.
+ * @param p_display_name The display name of the owner.
+ * @returns The created workspace.
  */
 create or replace function public.rpc_workspaces__create_with_owner (
   p_workspace_name text,
@@ -66,3 +65,15 @@ begin
   return v_workspace;
 end;
 $$ language plpgsql security invoker;
+
+-- `authenticated` only, the one role that calls this as an rpc.
+revoke
+execute on function public.rpc_workspaces__create_with_owner (text, text, text, text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.rpc_workspaces__create_with_owner (text, text, text, text) to authenticated;

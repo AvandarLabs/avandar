@@ -1,6 +1,6 @@
+import { describe, expect, it } from "vitest";
 /** Behavioral tests for hidden chat view-change events. */
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
-import { describe, expect, it } from "vitest";
 import { ChatViewEvent } from "./ChatViewEvent";
 import type { ThreadMessageLike } from "@assistant-ui/react";
 

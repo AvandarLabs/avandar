@@ -1,7 +1,7 @@
 import { Modal } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.module.css";
 import { NuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel";
@@ -109,11 +109,11 @@ function _renderPanel(
             onDecline={vi.fn()}
           />
           <NuxCompletionModal isOpen={false} onClose={vi.fn()} />
-          {extras.withOpenProductModal === true ?
+          {extras.withOpenProductModal === true ? (
             <Modal opened onClose={vi.fn()} title="Share">
               Publish
             </Modal>
-          : null}
+          ) : null}
           {children}
           <NuxChecklistStateProbe />
         </NuxStateManager.Provider>

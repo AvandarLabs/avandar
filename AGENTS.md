@@ -5,6 +5,10 @@
 - Use `docs/` for architectural notes, design decisions, and checklists
   (for example `docs/<topic>.md`).
 - Granular workspace permissions: `docs/permissions-architecture.md`.
+- App shell, slate, and z-index nomenclature: `docs/app-shell-nomenclature.md`.
+- How a view inside the slate is laid out (header band, content column,
+  properties rail, section rhythm): `docs/design/app-view-layout.md`. Read it
+  before building or restyling any app view.
 - If Context7 MCP is configured, use it to reference the most up-to-date
   documentation of any library when you need it.
 
@@ -113,6 +117,46 @@ Implement functionality using red/green TDD.
 ## Supabase
 
 - To update the schema or data models, use the `supabase-declarative-schema` skill.
+
+### Check the switch BEFORE any database command
+
+This is a stop condition, not a preference. On any branch other than `develop`,
+before running `pnpm db:new-migration`, `pnpm db:reset`, `pnpm test:db`,
+`supabase start`, `supabase stop`, or `supabase db diff`:
+
+1. Run `ava supabase status`.
+2. Confirm it reports this worktree on its own switched project, not on the
+   shared `avandar` stack. The first line reads yellow when the switch state is
+   wrong for the branch.
+3. If it is not switched, run `ava supabase switch` and re-check. Do not run the
+   command you were about to run until status reads green.
+
+**Never run any of those commands from a worktree while it points at the shared
+`avandar` stack.** They stop, rebuild, or reset the one stack that every
+unswitched worktree is using, so the blast radius is every other branch in
+progress, not just this one.
+
+Restarting the shared stack afterwards is not guaranteed to work. Docker can
+hold the host port a torn-down container released, and `supabase start` then
+fails with `port is already allocated` while nothing on the host is listening
+on it. The only remedy at that point is restarting Docker, which takes every
+other local Supabase project down as well. A missing `ava supabase switch` has
+therefore already cost a working stack, not just a bad migration.
+
+`ava` is built from this repo, not installed separately. If it is not on
+`PATH`, run `pnpm build:ava-cli`, which builds `apps/ava-cli` and symlinks it
+next to `pnpm`. Do not fall back to the shared stack because the binary is
+missing, and do not hand-edit `supabase/config.toml` to fake a switch: git
+hooks reject a branch-scoped config, and a half-switched worktree points some
+tools at one project and some at another.
+
+A switch rewrites `supabase/config.toml` with a branch project id and its own
+ports. That file must never be staged. Commit the files your change touched by
+path rather than with `git add -A`, and run `ava supabase restore` before any
+authorized merge to `develop`.
+
+### Migrations
+
 - Always run `pnpm db:reset` immediately before `pnpm db:new-migration`, so the
   diff is taken against a database built only from this branch's migrations.
   All worktrees share the standard `avandar` stack until they switch. Each
@@ -169,6 +213,17 @@ Implement functionality using red/green TDD.
 
 ## Styling & UI
 
+- Before editing anything under `src/components/layouts/`, or adding a view
+  under `src/views/` or `src/routes/`, read `docs/design/app-view-layout.md`
+  and the Named Rules in `DESIGN.md`. The design detector cannot know the
+  placement rule: it sees the file you wrote, never the place a fact belonged.
+- Load the `impeccable` skill when the work creates a new surface or replaces
+  an existing one. Not for a restyle, a behavior fix, or an a11y attribute:
+  the design detector already scans every UI edit for those, and the skill
+  costs roughly 15k tokens of setup before it does anything.
+- The design detector is installed per machine through a gitignored settings
+  file, so never read its silence as a pass. A teammate's checkout or CI may
+  not run it at all.
 - Ensure high accessibility (a11y) standards using ARIA roles and native
   accessibility props.
 - Use Mantine themes tokens and style prop shorthands (e.g. `c`, `mt`, `pd`,

@@ -47,9 +47,6 @@ async function _openCsvPreview(
   });
   const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
   await uploadPanel.locator('input[type="file"]').setInputFiles(csvPath);
-  await uploadPanel
-    .getByRole("button", { name: "Upload", exact: true })
-    .click();
 }
 
 async function _assertSummaryRowCount(page: Page): Promise<void> {
@@ -117,7 +114,7 @@ test.describe("CSV with quoted fields after sniff sample", () => {
     });
     await expect(
       page.getByText(
-        `These are the first ${formatImportPreviewRowCount(LATE_QUOTES_EXPECTED_ROW_COUNT)} rows`,
+        `First ${formatImportPreviewRowCount(LATE_QUOTES_EXPECTED_ROW_COUNT)} rows`,
         { exact: false },
       ),
     ).toBeVisible({ timeout: LONG_WAIT });

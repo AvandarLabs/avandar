@@ -14,6 +14,7 @@ import {
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { DashboardSnapshotTransition } from "@/clients/dashboards/DashboardSnapshotTransition/DashboardSnapshotTransition";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type {
   DashboardMutationContext,
   PreparedPublishSnapshot,
@@ -24,7 +25,6 @@ import type {
 import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { ILogger } from "@avandar/logger";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type PublishUpdateModelOptions = {
   dashboard: Dashboard.T;
@@ -37,9 +37,8 @@ function _getPublishUpdateModel(
   options: Readonly<PublishUpdateModelOptions>,
 ): Partial<Dashboard.T> {
   const { dashboard, params, publishConfig, snapshotRevision } = options;
-  const nextConfig =
-    params.publishConfig ?
-      DashboardSliceBuilder.writeDashboardPublishConfig({
+  const nextConfig = params.publishConfig
+    ? DashboardSliceBuilder.writeDashboardPublishConfig({
         dashboardConfig: dashboard.config,
         publishConfig,
       })
@@ -48,9 +47,9 @@ function _getPublishUpdateModel(
     visibility: params.visibility,
     snapshotRevision,
     ...CLEAR_SNAPSHOT_TRANSITION,
-    ...(params.slug ?
-      { slug: params.slug.action === "set" ? params.slug.value : undefined }
-    : {}),
+    ...(params.slug
+      ? { slug: params.slug.action === "set" ? params.slug.value : undefined }
+      : {}),
     ...(nextConfig ? { config: nextConfig } : {}),
   };
 }
@@ -83,9 +82,11 @@ async function _validatePublishSlug(
   }>,
 ): Promise<void> {
   const slugToValidate =
-    options.params.slug?.action === "set" ? options.params.slug.value
-    : options.params.slug?.action === "clear" ? undefined
-    : options.dashboard.slug;
+    options.params.slug?.action === "set"
+      ? options.params.slug.value
+      : options.params.slug?.action === "clear"
+        ? undefined
+        : options.dashboard.slug;
   if (slugToValidate === undefined) {
     return;
   }

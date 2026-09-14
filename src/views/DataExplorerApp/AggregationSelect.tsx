@@ -3,9 +3,9 @@ import { propIsInArray } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useUncontrolled } from "@mantine/hooks";
 import { AvaDataType as AvaDataTypeFns } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { SelectOption, SelectProps } from "@avandar/ui";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { SelectOption, SelectProps } from "@avandar/ui";
 
 type Props = {
   dataType: AvaDataType.T;

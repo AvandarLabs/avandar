@@ -1,11 +1,11 @@
 import { objectValuesMap } from "@avandar/utils";
-import { uuid } from "$/lib/uuid";
 import * as arrow from "apache-arrow";
+import { uuid } from "$/lib/uuid";
 import { arrowFieldToQueryResultField } from "@/clients/DuckDbClient/arrowFieldToQueryResultField";
 import { Logger } from "@/utils/Logger";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { ILogger } from "@avandar/logger";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 function _toJsValueFromArrowValue(value: unknown): unknown {
   if (typeof value === "bigint") {

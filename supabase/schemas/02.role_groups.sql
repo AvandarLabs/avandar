@@ -1,8 +1,10 @@
--- Named role preset per workspace: built-ins (Global Admin/Editor/Viewer) and
--- custom groups. Members reference one group via workspace_memberships.role_group_id;
--- per-app levels come from role_group_app_roles.
--- `is_builtin` marks groups that were seeded by `util__seed_builtin_role_groups_for_workspace`
--- when the workspace was created.
+/**
+ * Named role preset per workspace: the built-in Global Admin, Editor and
+ * Viewer groups, plus any custom ones. Members reference one group through
+ * `workspace_memberships.role_group_id`, and the per-app levels come from
+ * `role_group_app_roles`. `is_builtin` marks the groups that
+ * `util__seed_builtin_role_groups_for_workspace` seeded with the workspace.
+ */
 create table public.role_groups (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,

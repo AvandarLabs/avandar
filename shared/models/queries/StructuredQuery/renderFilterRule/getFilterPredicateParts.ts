@@ -40,9 +40,10 @@ export function getFilterPredicateParts(
     column,
     leftSide: foldCase ? `lower(${column})` : column,
     placeholder:
-      dataType !== undefined && AvaDataType.isTemporal(dataType) ?
-        `CAST(? AS ${_getCastTargetFromDataType(dataType)})`
-      : foldCase ? "lower(?)"
-      : "?",
+      dataType !== undefined && AvaDataType.isTemporal(dataType)
+        ? `CAST(? AS ${_getCastTargetFromDataType(dataType)})`
+        : foldCase
+          ? "lower(?)"
+          : "?",
   };
 }

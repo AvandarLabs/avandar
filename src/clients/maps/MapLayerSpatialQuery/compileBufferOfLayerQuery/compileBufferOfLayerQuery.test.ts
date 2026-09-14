@@ -1,8 +1,8 @@
+import { describe, expect, it } from "vitest";
 /**
  * Buffer-of-layer compilation for compileMapLayerSpatialQuery.
  */
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { describe, expect, it } from "vitest";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import {
   createGeometryLayerFixture,

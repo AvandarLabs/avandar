@@ -6,8 +6,8 @@ import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useNuxExplorerSaveMenu } from "@/components/Nux/NuxTour/useNuxExplorerSaveMenu";
 import { DataExplorerOpenDatasetMenuItems } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems";
 import { DataExplorerSaveAsMenuItems } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveAsMenuItems";
-import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -37,11 +37,11 @@ export function DataExplorerSaveMenu({
   const isSaveDisabled =
     queryResultData.length === 0 || savableSql === undefined;
   const runAQueryFirstHint =
-    savableSql === undefined ?
+    savableSql === undefined ? (
       <Tooltip label={t`Run a query first.`}>
         <IconInfoCircle size={16} />
       </Tooltip>
-    : null;
+    ) : null;
   return (
     <Menu
       shadow="md"

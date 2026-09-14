@@ -220,9 +220,9 @@ export function assembleQuantities(items: readonly TextItem[]): QuantitySplit {
         })
         .join(" "),
       value:
-        factor !== 1 && NUMERIC.test(normalized) ?
-          _scaled(normalized, factor)
-        : normalized,
+        factor !== 1 && NUMERIC.test(normalized)
+          ? _scaled(normalized, factor)
+          : normalized,
       unit,
       item: head,
       bbox: _runBBox(run),

@@ -4,8 +4,8 @@ import {
   finishCleanupTransition,
   recoverTransition,
 } from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardSnapshotTransitions";
-import type { DashboardMutationContext } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardMutationContext } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
 
 /** Returns a dashboard to draft and empties every snapshot bucket. */
 export async function unpublishDashboard(
@@ -29,13 +29,13 @@ export async function unpublishDashboard(
     return resumedDashboard;
   }
   const dashboardForClaim =
-    initialDashboard.snapshotTransitionKind === undefined ?
-      initialDashboard
-    : await recoverTransition({
-        context: options.context,
-        dashboard: initialDashboard,
-        logger,
-      });
+    initialDashboard.snapshotTransitionKind === undefined
+      ? initialDashboard
+      : await recoverTransition({
+          context: options.context,
+          dashboard: initialDashboard,
+          logger,
+        });
   assertIsDefined(dashboardForClaim, { name: "dashboard" });
   const claimedDashboard = await createTransitionClaim({
     context: options.context,
@@ -71,13 +71,13 @@ export async function fullDeleteDashboard(
     return;
   }
   const dashboardForClaim =
-    initialDashboard.snapshotTransitionKind === undefined ?
-      initialDashboard
-    : await recoverTransition({
-        context: options.context,
-        dashboard: initialDashboard,
-        logger,
-      });
+    initialDashboard.snapshotTransitionKind === undefined
+      ? initialDashboard
+      : await recoverTransition({
+          context: options.context,
+          dashboard: initialDashboard,
+          logger,
+        });
   if (dashboardForClaim === undefined) {
     return;
   }

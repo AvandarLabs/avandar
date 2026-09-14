@@ -17,6 +17,8 @@ import {
   probeStorageRelationCache,
 } from "@/clients/qetl/QueryMediator/relationLoading";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type {
@@ -27,8 +29,6 @@ import type {
   RunQetlQueryOptions,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { UnknownObject } from "@avandar/utils";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 function _hasFiniteColumnSet(
   neededByDatasetId: NeededColumnsByDatasetId,
@@ -120,9 +120,9 @@ async function _loadQueryRelations(
       relationCache: runnerOptions.relationCache,
     });
   const relationSources =
-    uncachedDatasetIds.length > 0 ?
-      await getRelationSources(uncachedDatasetIds)
-    : [];
+    uncachedDatasetIds.length > 0
+      ? await getRelationSources(uncachedDatasetIds)
+      : [];
   const fetchedRelationBytes = await fetchRelationBytes({
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
     growFromColumnsByDatasetId,
@@ -164,8 +164,8 @@ async function _runLeasedQuery<RowObject extends UnknownObject>(
     publicSnapshotDuckDbOwner: runnerOptions.publicSnapshotDuckDbOwner,
     signal: queryOptions.signal,
   };
-  return queryOptions.returnType === "parquet" ?
-      DuckDbClient.runRawQuery(queryOptions.rawSql, {
+  return queryOptions.returnType === "parquet"
+    ? DuckDbClient.runRawQuery(queryOptions.rawSql, {
         ...duckDbQueryOptions,
         returnType: "parquet",
       })
@@ -251,9 +251,8 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
     datasetIds: namedDatasetIds,
     conceptRelations,
   });
-  const leaseDatasetIds =
-    options.queryOptions.datasetDuckDbLease ?
-      queryDependencies
+  const leaseDatasetIds = options.queryOptions.datasetDuckDbLease
+    ? queryDependencies
     : ((await options.runnerOptions.getDuckDbLeaseDatasetIds?.(
         queryDependencies,
       )) ?? queryDependencies);

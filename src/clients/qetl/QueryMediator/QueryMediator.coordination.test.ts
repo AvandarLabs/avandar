@@ -215,8 +215,8 @@ function _configureVirtualDependencyMocks(workspaceId: string): void {
   });
   getTableOrViewNamesMock.mockResolvedValue([]);
   runRawQueryMock.mockImplementation(async (_sql, options) => {
-    return options?.returnType === "parquet" ?
-        new Blob(["evaluated"])
+    return options?.returnType === "parquet"
+      ? new Blob(["evaluated"])
       : { data: [] };
   });
 }
@@ -276,8 +276,8 @@ function _configureVirtualSiblingQueries(
     if (rawSql.includes("'second'")) {
       options.state.hasSecondQueryStarted = true;
     }
-    return queryOptions?.returnType === "parquet" ?
-        new Blob(["virtual"])
+    return queryOptions?.returnType === "parquet"
+      ? new Blob(["virtual"])
       : { data: [] };
   });
 }
@@ -318,8 +318,8 @@ describe("QueryMediator DuckDB coordination", () => {
       await import("@/clients/qetl/QueryMediator/QueryMediator");
     const qetlClient = QueryMediatorFactory.create({
       getQueryDependencies: async (rawSql) => {
-        return rawSql.includes(VIRTUAL_DATASET_ID) ?
-            [VIRTUAL_DATASET_ID]
+        return rawSql.includes(VIRTUAL_DATASET_ID)
+          ? [VIRTUAL_DATASET_ID]
           : [DATASET_ID];
       },
       getDuckDbLeaseDatasetIds: async () => {
@@ -361,8 +361,8 @@ describe("QueryMediator DuckDB coordination", () => {
       await import("@/clients/qetl/QueryMediator/QueryMediator");
     const qetlClient = QueryMediatorFactory.create({
       getQueryDependencies: async (rawSql) => {
-        return rawSql.includes(VIRTUAL_DATASET_ID) ?
-            [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID]
+        return rawSql.includes(VIRTUAL_DATASET_ID)
+          ? [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID]
           : [DATASET_ID];
       },
       getDuckDbLeaseDatasetIds: async () => {

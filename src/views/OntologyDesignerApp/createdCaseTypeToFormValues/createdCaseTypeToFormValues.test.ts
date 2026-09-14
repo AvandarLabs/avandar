@@ -1,9 +1,9 @@
+import { describe, expect, it } from "vitest";
 /**
  * Chat-created case types must become the same form payload the concept
  * creator submits: identity column as identifier, requested label, mappings.
  */
 import { uuid } from "$/lib/uuid";
-import { describe, expect, it } from "vitest";
 import { createdCaseTypeToFormValues } from "./createdCaseTypeToFormValues";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";

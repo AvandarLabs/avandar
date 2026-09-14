@@ -19,15 +19,17 @@ export function LayerVisibilityButton({
       size="sm"
       aria-pressed={isVisible}
       aria-label={
-        isVisible ?
-          t`Hide the layer ${layerName}`
-        : t`Show the layer ${layerName}`
+        isVisible
+          ? t`Hide the layer ${layerName}`
+          : t`Show the layer ${layerName}`
       }
       onClick={onClick}
     >
-      {isVisible ?
+      {isVisible ? (
         <IconEye size={15} stroke={1.5} />
-      : <IconEyeOff size={15} stroke={1.5} />}
+      ) : (
+        <IconEyeOff size={15} stroke={1.5} />
+      )}
     </ActionIcon>
   );
 }

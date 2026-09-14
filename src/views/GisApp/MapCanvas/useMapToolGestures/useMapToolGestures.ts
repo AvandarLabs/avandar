@@ -1,8 +1,8 @@
 import { noop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
+import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { attachAnnotateGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAnnotateGestures";
 import { attachEraseGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachEraseGestures";
 import {
@@ -79,8 +79,8 @@ function _attachGesturesForMode(
 }
 
 function _toolKey(mapToolMode: MapToolMode): string {
-  return mapToolMode.type === "annotate" ?
-      `annotate:${mapToolMode.kind}`
+  return mapToolMode.type === "annotate"
+    ? `annotate:${mapToolMode.kind}`
     : mapToolMode.type;
 }
 

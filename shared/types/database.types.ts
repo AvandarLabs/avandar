@@ -2026,10 +2026,6 @@ export type Database = {
       }
       util__get_auth_user_workspaces: { Args: never; Returns: string[] }
       util__get_user_id_by_email: { Args: { p_email: string }; Returns: string }
-      util__get_workspace_members: {
-        Args: { workspace_id: string }
-        Returns: string[]
-      }
       util__has_non_owner_share: {
         Args: {
           p_owner_id: string
@@ -2048,6 +2044,10 @@ export type Database = {
       }
       util__is_settings_admin: {
         Args: { p_workspace_id: string }
+        Returns: boolean
+      }
+      util__is_workspace_member: {
+        Args: { p_user_id: string; p_workspace_id: string }
         Returns: boolean
       }
       util__log_analytics_event: {

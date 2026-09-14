@@ -3,13 +3,13 @@ import { getSimplificationToleranceFromZoomBand } from "../getSimplificationTole
 import { makeGeometryExpressionFromValueExpression } from "../makeGeometryExpressionFromValueExpression/makeGeometryExpressionFromValueExpression";
 import { makeSourceCrsTransformFromGeometrySql } from "../makeSourceCrsTransformFromGeometrySql/makeSourceCrsTransformFromGeometrySql";
 import { MapLayerSpatialFeatureProperties } from "../MapLayerSpatialQuery.constants";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type {
   MapLayerSpatialQueryPlan,
   ResolvedMapLayerMetadata,
 } from "../MapLayerSpatialQuery.types";
 import type { CompileOptions } from "./compileMapLayerSpatialQuery.types";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /**
  * Shared SQL fragment builders used by every spatial-layer compiler.
@@ -88,13 +88,11 @@ export function makePointExpressionFromBinding(
       sourceCrs: points.sourceCrs,
     });
   }
-  const latitude =
-    points.latitude ?
-      metadata.sourceColumnNames.get(points.latitude)
+  const latitude = points.latitude
+    ? metadata.sourceColumnNames.get(points.latitude)
     : undefined;
-  const longitude =
-    points.longitude ?
-      metadata.sourceColumnNames.get(points.longitude)
+  const longitude = points.longitude
+    ? metadata.sourceColumnNames.get(points.longitude)
     : undefined;
   if (!latitude || !longitude) {
     throw new Error("Both point coordinate columns are required");
@@ -132,13 +130,13 @@ export function makeSuppressedAreaFeatureSql(options: {
 }): string {
   const properties = MapLayerSpatialFeatureProperties;
   const keyPair =
-    options.keySql === undefined ?
-      ""
-    : `, '${properties.boundaryKey}', ${options.keySql}`;
+    options.keySql === undefined
+      ? ""
+      : `, '${properties.boundaryKey}', ${options.keySql}`;
   const disputedStatusPair =
-    options.disputedStatusSql === undefined ?
-      ""
-    : `, '${properties.disputedStatus}', ${options.disputedStatusSql}`;
+    options.disputedStatusSql === undefined
+      ? ""
+      : `, '${properties.disputedStatus}', ${options.disputedStatusSql}`;
   return `json_object('type', 'Feature', 'geometry', json(ST_AsGeoJSON(${options.geometrySql})),
     'properties', CASE WHEN state = 'suppressed' THEN json_object(
         '${properties.featureId}', ${options.featureIdSql}${keyPair},

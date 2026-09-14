@@ -42,9 +42,9 @@ export function CustomBasemapFields({
       <TextInput
         label={t`URL template`}
         description={
-          kind === "wms" ?
-            t`Include the bbox-epsg-3857 placeholder where the server expects the bounding box.`
-          : t`Include the z, x and y placeholders where the server expects the tile index.`
+          kind === "wms"
+            ? t`Include the bbox-epsg-3857 placeholder where the server expects the bounding box.`
+            : t`Include the z, x and y placeholders where the server expects the tile index.`
         }
         value={url}
         onChange={(event) => {

@@ -1,6 +1,6 @@
 import type { AreaAggregationOutputId } from "$/models/AvaMap/MapLayer/GeoBinding.types.ts";
 import type {
-  DatasetColumn, // prettier-ignore
+  DatasetColumn, // oxfmt-ignore
 } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 

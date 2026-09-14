@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { notifySuccess } from "@/utils/notifications/notify";
@@ -11,10 +12,9 @@ import {
   getDashboardTitleFromPuckData,
   useDashboardPuckConfig,
 } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import "@puckeditor/core/puck.css";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ReactElement } from "react";
 
 type Props = {

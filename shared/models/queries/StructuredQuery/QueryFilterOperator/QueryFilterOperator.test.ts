@@ -1,5 +1,5 @@
-import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 import { describe, expect, it } from "vitest";
+import { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilterOperator/QueryFilterOperator.ts";
 
 describe("QueryFilterOperator.getForDataType", () => {
   it("offers text operators for varchar and not numeric ranges", () => {

@@ -32,8 +32,14 @@ export function ConceptNavbar({
         conceptId: concept.id,
         conceptName: concept.name,
       });
+      // Named fields rather than the whole `AppLink`: its `isAvailableOffline`
+      // is a routing fact, and spreading it forwards the flag to the anchor
+      // the row renders as, where React rejects it. This link's `key` is
+      // already per-concept, so it carries over as it is.
       return {
-        ...appLink,
+        key: appLink.key,
+        to: appLink.to,
+        params: appLink.params,
         label: appLink.label(),
       };
     });
@@ -41,9 +47,10 @@ export function ConceptNavbar({
 
   return (
     <Box className={clsx(css.pane, className)} {...boxProps}>
-      {isLoading ?
+      {isLoading ? (
         <Loader m="md" size="sm" />
-      : <ScrollArea h="100%" w="100%">
+      ) : (
+        <ScrollArea h="100%" w="100%">
           <NavLinkList
             pt="md"
             links={conceptLinks}
@@ -53,7 +60,7 @@ export function ConceptNavbar({
             inactiveHoverColor="neutral.1"
           />
         </ScrollArea>
-      }
+      )}
     </Box>
   );
 }

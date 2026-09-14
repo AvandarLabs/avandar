@@ -318,9 +318,9 @@ export class NodeDuckDb {
     }>(`DESCRIBE SELECT * FROM read_parquet('${escaped}')`);
     const firstCount = countRows[0]?.c;
     const rowCount =
-      typeof firstCount === "bigint" ?
-        Number(firstCount)
-      : Number(firstCount ?? 0);
+      typeof firstCount === "bigint"
+        ? Number(firstCount)
+        : Number(firstCount ?? 0);
     const columnNames = describeRows.map((row) => {
       return row.column_name;
     });

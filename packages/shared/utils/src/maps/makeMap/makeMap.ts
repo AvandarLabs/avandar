@@ -20,11 +20,16 @@ export function makeMap<
   T,
   InK extends keyof T | undefined,
   ValueKey extends keyof T | undefined,
-  OutK extends undefined extends InK ? unknown : T[Extract<InK, PropertyKey>] =
-    undefined extends InK ? T : T[Extract<InK, PropertyKey>],
-  OutV extends undefined extends ValueKey ? unknown
-  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-  : T[Extract<ValueKey, PropertyKey>],
+  OutK extends (undefined extends InK
+    ? unknown
+    : T[Extract<InK, PropertyKey>]) = undefined extends InK
+    ? T
+    : T[Extract<InK, PropertyKey>],
+  OutV extends (undefined extends ValueKey
+    ? unknown
+    : T[Extract<ValueKey, PropertyKey>]) = undefined extends ValueKey
+    ? T
+    : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   {

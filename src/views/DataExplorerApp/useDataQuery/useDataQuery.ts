@@ -1,11 +1,16 @@
 import { Model } from "@avandar/models";
 import { useQuery } from "@avandar/query-hooks";
 import { prop, sortObjList } from "@avandar/utils";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { match } from "ts-pattern";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { useDataQueryAnalytics } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
 import { useDataQueryRunRecorder } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder";
+import type {
+  QueryAnalyticsSurface,
+  UserQueryAnalyticsTrigger,
+} from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   RunStructuredQueryResult,
@@ -13,11 +18,6 @@ import type {
 } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
-import type {
-  QueryAnalyticsSurface,
-  UserQueryAnalyticsTrigger,
-} from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 type UseDataQueryOptions = {
   query: StructuredQuery.Partial;
@@ -156,9 +156,11 @@ function _buildQuerySourceMeta(
   return {
     source: rawSql === undefined ? "structured" : "rawSql",
     dataSourceType:
-      dataSource === undefined ? "none"
-      : Model.isOfModelType(dataSource, "Dataset") ? "dataset"
-      : "entity",
+      dataSource === undefined
+        ? "none"
+        : Model.isOfModelType(dataSource, "Dataset")
+          ? "dataset"
+          : "entity",
   };
 }
 

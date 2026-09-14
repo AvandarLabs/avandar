@@ -27,16 +27,15 @@ function VanitySlugInput({
   onChange,
 }: Readonly<Omit<VanitySlugFieldProps, "urlPrefix">>): ReactNode {
   const { t } = useLingui();
-  const rightSection =
-    !normalisedSlug ? null
-    : hasPendingCheck ? <Loader size="xs" />
-    : isAccepted ?
-      <IconCheck
-        size={18}
-        color="var(--mantine-color-teal-6)"
-        aria-label={t`Custom URL is available`}
-      />
-    : null;
+  const rightSection = !normalisedSlug ? null : hasPendingCheck ? (
+    <Loader size="xs" />
+  ) : isAccepted ? (
+    <IconCheck
+      size={18}
+      color="var(--mantine-color-teal-6)"
+      aria-label={t`Custom URL is available`}
+    />
+  ) : null;
   return (
     <TextInput
       className={css.vanitySlugFieldInput}

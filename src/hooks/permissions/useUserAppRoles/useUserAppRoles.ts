@@ -26,10 +26,11 @@ export function useUserAppRoles(): readonly [
     },
   });
 
-  const roles =
-    !workspaceAndUserLoaded ? undefined
-    : isLoading ? undefined
-    : (data ?? Permissions.RolesMatrix.Builtins.EmptyMatrix);
+  const roles = !workspaceAndUserLoaded
+    ? undefined
+    : isLoading
+      ? undefined
+      : (data ?? Permissions.RolesMatrix.Builtins.EmptyMatrix);
 
   return [roles, workspaceAndUserLoaded && isLoading] as const;
 }

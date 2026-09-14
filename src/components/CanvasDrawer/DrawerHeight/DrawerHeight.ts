@@ -41,17 +41,20 @@ type KeyResizeOptions = AvailableHeightOptions & {
 };
 
 function _getMaxHeight(availableHeight: number): number | undefined {
-  return availableHeight <= 0 ? undefined : (
-      Math.max(MIN_HEIGHT, Math.round(availableHeight * MAX_AVAILABLE_FRACTION))
-    );
+  return availableHeight <= 0
+    ? undefined
+    : Math.max(
+        MIN_HEIGHT,
+        Math.round(availableHeight * MAX_AVAILABLE_FRACTION),
+      );
 }
 
 function _clamp({ requestedHeight, availableHeight }: ClampOptions): number {
   const maxHeight = _getMaxHeight(availableHeight);
   const flooredHeight = Math.max(MIN_HEIGHT, Math.round(requestedHeight));
-  return maxHeight === undefined ? flooredHeight : (
-      Math.min(flooredHeight, maxHeight)
-    );
+  return maxHeight === undefined
+    ? flooredHeight
+    : Math.min(flooredHeight, maxHeight);
 }
 
 function _getHeightForKey({
@@ -65,15 +68,19 @@ function _getHeightForKey({
   // `key` is an open DOM string rather than a closed union, so there is no
   // exhaustiveness for `matchLiteral` to enforce here.
   const requestedHeight =
-    key === "ArrowUp" ? currentHeight + step
-    : key === "ArrowDown" ? currentHeight - step
-    : key === "Home" ? Number.MAX_SAFE_INTEGER
-    : key === "End" ? 0
-    : undefined;
+    key === "ArrowUp"
+      ? currentHeight + step
+      : key === "ArrowDown"
+        ? currentHeight - step
+        : key === "Home"
+          ? Number.MAX_SAFE_INTEGER
+          : key === "End"
+            ? 0
+            : undefined;
 
-  return requestedHeight === undefined ? undefined : (
-      _clamp({ requestedHeight, availableHeight })
-    );
+  return requestedHeight === undefined
+    ? undefined
+    : _clamp({ requestedHeight, availableHeight });
 }
 
 /**

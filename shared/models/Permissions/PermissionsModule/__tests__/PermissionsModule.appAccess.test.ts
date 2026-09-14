@@ -1,5 +1,5 @@
-import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { describe, expect, it } from "vitest";
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 import type {
   AppType,
   PermissionKey,

@@ -1,11 +1,11 @@
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { SharePrincipalRow } from "./SharePrincipalRow/SharePrincipalRow";
+import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type {
   ResourceShareRow,
   ResourceType,
 } from "@/clients/permissions/ResourceShareClient";
-import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 /**
  * One share row enriched with the resolved display name and a marker that

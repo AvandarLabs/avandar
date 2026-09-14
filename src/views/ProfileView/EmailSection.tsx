@@ -41,7 +41,7 @@ export function EmailSection({ email }: Props): JSX.Element {
           <Trans>Used to sign in to your account.</Trans>
         </Text>
       </Stack>
-      {isEditing ?
+      {isEditing ? (
         <InputTextForm
           required
           hideLabel
@@ -60,7 +60,8 @@ export function EmailSection({ email }: Props): JSX.Element {
             }
           }}
         />
-      : <Group justify="space-between" wrap="nowrap" gap="md">
+      ) : (
+        <Group justify="space-between" wrap="nowrap" gap="md">
           <Text size="sm" style={{ wordBreak: "break-all" }}>
             {email}
           </Text>
@@ -68,7 +69,7 @@ export function EmailSection({ email }: Props): JSX.Element {
             <Trans>Change</Trans>
           </Button>
         </Group>
-      }
+      )}
     </Stack>
   );
 }

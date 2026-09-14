@@ -52,7 +52,7 @@ export function GeneratedPromptBanner(): JSX.Element | null {
       >
         {nlPrompt}
       </Text>
-      {rawSql ?
+      {rawSql ? (
         <Popover position="bottom-end" withArrow shadow="md" width={420}>
           <Popover.Target>
             <UnstyledButton c="primary.7" className={css.showSqlButton}>
@@ -70,7 +70,7 @@ export function GeneratedPromptBanner(): JSX.Element | null {
             </Stack>
           </Popover.Dropdown>
         </Popover>
-      : null}
+      ) : null}
     </Group>
   );
 }

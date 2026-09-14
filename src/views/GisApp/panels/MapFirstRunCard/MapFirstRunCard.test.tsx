@@ -1,6 +1,6 @@
 import { Model } from "@avandar/models";
-import { uuid } from "$/lib/uuid";
 import { describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { fireEvent, render, screen } from "@/test-utils";
 import { MapFirstRunCard } from "@/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

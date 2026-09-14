@@ -150,8 +150,8 @@ export const AvaMapConfigModule = {
   ): AvaMapConfigRead => {
     const { config, layerId } = options;
     const nextLayers = config.layers.filter(propNotEq("id", layerId));
-    return nextLayers.length === config.layers.length ?
-        config
+    return nextLayers.length === config.layers.length
+      ? config
       : { ...config, layers: nextLayers };
   },
 
@@ -258,8 +258,8 @@ export const AvaMapConfigModule = {
   ): AvaMapConfigRead => {
     const { config, bookmarkId } = options;
     const nextBookmarks = config.bookmarks.filter(propNotEq("id", bookmarkId));
-    return nextBookmarks.length === config.bookmarks.length ?
-        config
+    return nextBookmarks.length === config.bookmarks.length
+      ? config
       : { ...config, bookmarks: nextBookmarks };
   },
 

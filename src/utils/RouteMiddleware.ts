@@ -5,13 +5,13 @@ import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
-import type { ResourceType } from "@/clients/UserClient";
-import type { QueryClient } from "@tanstack/react-query";
 import type {
   PermissionKey,
   RoleLevel,
 } from "$/models/Permissions/Permissions.types";
 import type { User } from "$/models/User/User";
+import type { ResourceType } from "@/clients/UserClient";
+import type { QueryClient } from "@tanstack/react-query";
 
 /**
  * Optional fallback for `checkUserPermissions` that lets a user reach a
@@ -105,9 +105,9 @@ async function _checkUserPermissions(
     params: { workspaceSlug: context.workspaceSlug },
     search: {
       app:
-        typeof permissionOptions.appLabel === "function" ?
-          permissionOptions.appLabel()
-        : permissionOptions.appLabel,
+        typeof permissionOptions.appLabel === "function"
+          ? permissionOptions.appLabel()
+          : permissionOptions.appLabel,
     },
   });
 }

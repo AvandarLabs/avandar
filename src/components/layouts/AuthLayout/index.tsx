@@ -1,7 +1,7 @@
 import { Paper } from "@avandar/ui";
 import { Box, Container, Stack, Text, Title } from "@mantine/core";
 import { CSSProperties, ReactNode } from "react";
-import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
+import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppSlate/AppSlate";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 
 const TITLEBAR_DRAG_REGION_STYLE: CSSProperties = {
@@ -27,24 +27,24 @@ export function AuthLayout({
 
   return (
     <Stack gap={0} mih="100dvh">
-      {isDesktopPlatform ?
+      {isDesktopPlatform ? (
         <Box
           aria-hidden
           className="electrobun-webkit-app-region-drag"
           style={TITLEBAR_DRAG_REGION_STYLE}
         />
-      : null}
+      ) : null}
       <Container size={512} py="xxl">
         <Stack>
           <Title ta="center" order={1}>
             {title}
           </Title>
 
-          {subtitle ?
+          {subtitle ? (
             <Text ta="center" className="space-x-2" c="dimmed">
               {subtitle}
             </Text>
-          : null}
+          ) : null}
 
           <Paper>{children}</Paper>
 

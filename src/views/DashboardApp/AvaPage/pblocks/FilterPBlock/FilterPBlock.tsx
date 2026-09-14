@@ -70,9 +70,11 @@ export function FilterPBlock({
     useFilterPBlockAnalytics({ filterId, mode, puck });
 
   const operator: "equals" | "in" | "contains" =
-    mode === "select_multi" ? "in"
-    : mode === "contains" ? "contains"
-    : "equals";
+    mode === "select_multi"
+      ? "in"
+      : mode === "contains"
+        ? "contains"
+        : "equals";
 
   const initialValue = useMemo(() => {
     if (mode === "select_multi") {
@@ -126,7 +128,7 @@ export function FilterPBlock({
         <Text size="sm" fw={600} c="neutral.9">
           {label}
         </Text>
-        {mode === "select_multi" ?
+        {mode === "select_multi" ? (
           <MultiSelect
             placeholder={t`All`}
             data={options}
@@ -138,7 +140,7 @@ export function FilterPBlock({
               logFilterChanged(value.length === 0);
             }}
           />
-        : mode === "contains" ?
+        ) : mode === "contains" ? (
           <TextInput
             placeholder={t`Contains…`}
             value={(filterState?.value as string) ?? ""}
@@ -150,7 +152,8 @@ export function FilterPBlock({
               scheduleContainsAnalytics(event.currentTarget.value);
             }}
           />
-        : <Select
+        ) : (
+          <Select
             placeholder={t`All`}
             data={options}
             clearable
@@ -164,7 +167,7 @@ export function FilterPBlock({
               logFilterChanged(value === null);
             }}
           />
-        }
+        )}
       </Stack>
     </Paper>
   );

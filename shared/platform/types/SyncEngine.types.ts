@@ -1,9 +1,8 @@
 /**
  * Platform-agnostic sync engine surface.
  *
- * On web (Phase 1) this is a no-op stub — web behavior is unchanged.
- * On desktop (Phase 3) this is the real outbox-based engine running in Bun
- * main.
+ * On web this is a no-op stub, so web behavior is unchanged. On desktop this
+ * is the real outbox-based engine running in Bun main.
  */
 export interface SyncEngine {
   enqueue(mutation: SyncMutation): Promise<void>;

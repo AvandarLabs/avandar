@@ -120,9 +120,8 @@ export function AvaTextInput<
         // update the synced values
         fieldsToSyncTo.forEach((syncedField) => {
           if (!form.isTouched(syncedField.fieldKey)) {
-            const newSyncedValue =
-              syncedField.transform ?
-                syncedField.transform(newValue)
+            const newSyncedValue = syncedField.transform
+              ? syncedField.transform(newValue)
               : newValue;
 
             // set the synced value in the form

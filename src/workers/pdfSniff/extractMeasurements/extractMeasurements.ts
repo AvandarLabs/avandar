@@ -231,9 +231,9 @@ type Fragment = {
 function _fragments(sentence: string): readonly Fragment[] {
   const clauseCount = [...sentence.matchAll(SUBJECT_CLAUSE_GLOBAL)].length;
   const fallback =
-    clauseCount === 1 ?
-      (SUBJECT_CLAUSE.exec(sentence)?.[1]?.trim() ?? null)
-    : null;
+    clauseCount === 1
+      ? (SUBJECT_CLAUSE.exec(sentence)?.[1]?.trim() ?? null)
+      : null;
 
   const bounds: Array<{ start: number; end: number }> = [];
   let start = 0;
@@ -307,10 +307,7 @@ export function extractMeasurements(sentence: string): readonly Measurement[] {
         subject: _fragmentAt(fragments, match.index ?? 0)?.subject ?? null,
         metric: isPercent && metric.length === 0 ? "percentage" : metric,
         value: _parseNumber(rawNumber!) * scale,
-        unit:
-          currency ? "usd"
-          : isPercent ? "percent"
-          : "n",
+        unit: currency ? "usd" : isPercent ? "percent" : "n",
         sourceText: sentence.trim(),
       });
     }

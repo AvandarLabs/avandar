@@ -23,9 +23,9 @@ export const ChatPageContextModule = {
     const { openDatasetId, lastSql, lastResultColumns, lastError } =
       options ?? {};
     const resultColumns =
-      lastResultColumns && lastResultColumns.length > 0 ?
-        lastResultColumns
-      : undefined;
+      lastResultColumns && lastResultColumns.length > 0
+        ? lastResultColumns
+        : undefined;
     return Model.make("ChatPageContext", {
       app: "data-explorer",
       ...(openDatasetId ? { openDatasetId } : {}),

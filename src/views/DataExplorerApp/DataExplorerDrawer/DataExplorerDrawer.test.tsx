@@ -15,8 +15,8 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen } from "@/test-utils";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { UnknownDataFrame } from "@avandar/utils";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 // The query editors need the router and dataset clients, and both are covered
 // by their own tests. Stub them so these tests stay about the drawer.

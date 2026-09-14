@@ -79,9 +79,6 @@ create policy "User can DELETE individuals in their workspace" on public.individ
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_individuals__set_updated_at before
 update on public.individuals for each row
 execute function public.util__set_updated_at ();

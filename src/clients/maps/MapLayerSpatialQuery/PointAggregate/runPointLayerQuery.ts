@@ -6,12 +6,12 @@ import {
   POINT_AGGREGATE_MAX_CELLS,
   POINT_AGGREGATE_ROW_THRESHOLD,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   PointAggregation,
   PointCoordinateAudit,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
 /** Result column carrying how many cells a grid resolution would produce. */
 export const POINT_AGGREGATE_CELL_COUNT_COLUMN = "point_aggregate_cell_count";
@@ -94,11 +94,11 @@ async function _countCells(
     `SELECT count(*) AS ${POINT_AGGREGATE_CELL_COUNT_COLUMN} FROM (${_compileAggregate(options, cellsAcross)}) AS point_aggregate_cells`,
   );
   const count = result.data[0]?.[POINT_AGGREGATE_CELL_COUNT_COLUMN];
-  return (
-    typeof count === "bigint" ? Number(count)
-    : typeof count === "number" ? count
-    : 0
-  );
+  return typeof count === "bigint"
+    ? Number(count)
+    : typeof count === "number"
+      ? count
+      : 0;
 }
 
 /**

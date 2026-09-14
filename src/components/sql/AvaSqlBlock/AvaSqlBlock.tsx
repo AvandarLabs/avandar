@@ -126,14 +126,13 @@ function _AvaSqlBlockInner({
           );
         })}
       </code>
-      {outOfScopeSet.size > 0 ?
+      {outOfScopeSet.size > 0 ? (
         <div className={css.errorNotice} data-testid="ava-sql-out-of-scope">
-          {outOfScopeSet.size === 1 ?
-            `1 column is not in the current dataset scope.`
-          : `${outOfScopeSet.size} columns are not in the current dataset scope.`
-          }
+          {outOfScopeSet.size === 1
+            ? `1 column is not in the current dataset scope.`
+            : `${outOfScopeSet.size} columns are not in the current dataset scope.`}
         </div>
-      : null}
+      ) : null}
     </pre>
   );
 }

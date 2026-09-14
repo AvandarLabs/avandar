@@ -1,9 +1,9 @@
 import { MIMEType, prop } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
-import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 
 type CollectDatasetIdsOptions = {
   bucket: SnapshotBucketName;
@@ -160,8 +160,8 @@ async function _collectDatasetIdsFromOffset(
       return file.name.slice(0, -".parquet".length);
     }) as Dataset.Id[];
   const allDatasetIds = collectedDatasetIds.concat(pageIds);
-  return data.length < pageSize ?
-      allDatasetIds
+  return data.length < pageSize
+    ? allDatasetIds
     : _collectDatasetIdsFromOffset({
         ...options,
         offset: offset + pageSize,

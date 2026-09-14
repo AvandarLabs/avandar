@@ -46,8 +46,8 @@ export function useLocalFilterState(
     return makeObject(localFilters, {
       key: "id",
       valueFn: (localFilter) => {
-        return localFilter.id in overrides ?
-            overrides[localFilter.id]
+        return localFilter.id in overrides
+          ? overrides[localFilter.id]
           : initialValues[localFilter.id];
       },
     });

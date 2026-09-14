@@ -1,11 +1,11 @@
 import { objectKeys } from "@avandar/utils";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import { CLUSTER_AUTO_THRESHOLD } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer.constants";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapInstanceRefs } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { LatestMapValues } from "@/views/GisApp/MapCanvas/useLatestMapValues";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 const { eventHandlers, mapConstructorMock, mapLibreMapMock } = vi.hoisted(
   () => {

@@ -30,8 +30,13 @@ export const AvaDataTypeModule = {
   toDisplayValue: (avaDataType: AvaDataType.T): string => {
     return matchLiteral(avaDataType, {
       varchar: "Text",
-      bigint: "Integer",
-      double: "Number",
+      // "Whole number" and "Decimal" rather than "Integer" and "Number": the
+      // words a user reads for a column's type are the same everywhere they
+      // appear, and "Number" told them nothing that distinguished it from
+      // "Integer". Kept in step with `avaDataTypeLabel` and
+      // `buildFullDataTypeLabel`.
+      bigint: "Whole number",
+      double: "Decimal",
       time: "Time",
       date: "Date",
       timestamp: "Timestamp",

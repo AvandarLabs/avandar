@@ -71,11 +71,11 @@ export async function fetchOfflineChatSchema(
         ConceptClient.getAll(where("workspace_id", "eq", args.workspace.id)),
       ]);
       const attributes =
-        concepts.length === 0 ?
-          []
-        : await ConceptAttributeClient.getAll(
-            where("workspace_id", "eq", args.workspace.id),
-          );
+        concepts.length === 0
+          ? []
+          : await ConceptAttributeClient.getAll(
+              where("workspace_id", "eq", args.workspace.id),
+            );
       const schema: OfflineChatSchema = {
         ..._mapDatasets(datasetRows),
         ..._mapConcepts(concepts, attributes),

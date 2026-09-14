@@ -8,8 +8,8 @@ import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoo
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 function _parquetBlobWithType(parquetBlob: Blob): Blob {
-  return parquetBlob.type === MIMEType.APPLICATION_PARQUET ?
-      parquetBlob
+  return parquetBlob.type === MIMEType.APPLICATION_PARQUET
+    ? parquetBlob
     : new Blob([parquetBlob], { type: MIMEType.APPLICATION_PARQUET });
 }
 

@@ -4,7 +4,7 @@ begin;
 
 set search_path to extensions, public;
 
--- Regression lock for the P1 private-resource narrowing.
+-- Regression lock for the narrowed Settings-Admin short-circuit.
 --
 -- Narrowing the Settings-Admin short-circuit in util__resource_effective_role
 -- is only sufficient because both may_select_* helpers gate on
@@ -12,8 +12,6 @@ set search_path to extensions, public;
 -- util__can_manage_workspace_settings bypass. If that statement order ever
 -- changes, admins regain read access to private resources and nothing else in
 -- the suite would notice. Hence this file.
---
--- See docs/superpowers/specs/2026-08-13-private-resource-permissions-hardening-design.md
 
 -- owner = a4000001, settings admin = a4000002
 insert into auth.users (id, email, aud, role)

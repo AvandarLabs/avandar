@@ -9,9 +9,9 @@
  * only a test on the emitted SQL and on the table's lifetime can hold it.
  */
 import { Model } from "@avandar/models";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";

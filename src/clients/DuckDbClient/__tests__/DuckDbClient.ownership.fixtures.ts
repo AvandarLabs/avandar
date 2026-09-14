@@ -4,9 +4,9 @@
  * registered before the DuckDB module graph loads.
  */
 import { expect, vi } from "vitest";
-import type { PublicSnapshotDuckDbOwner } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PublicSnapshotDuckDbOwner } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 
 export const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 export const SECOND_DATASET_ID =

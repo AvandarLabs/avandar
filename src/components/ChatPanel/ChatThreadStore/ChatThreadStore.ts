@@ -36,8 +36,8 @@ function _stripTrailingViewEvents(
   const lastCommittedIndex = messages.findLastIndex((message) => {
     return !_isViewChangeMessage(message);
   });
-  return lastCommittedIndex < 0 ?
-      []
+  return lastCommittedIndex < 0
+    ? []
     : [...messages.slice(0, lastCommittedIndex + 1)];
 }
 

@@ -1,26 +1,25 @@
-import { Callout } from "@avandar/ui";
 import { where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
   BoxProps,
   Group,
+  Button,
   Loader,
-  Paper,
-  SimpleGrid,
   Stack,
   Text,
   TextInput,
   UnstyledButton,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { IconSearch } from "@tabler/icons-react";
-import { uuid } from "$/lib/uuid";
+import { IconSearch, IconWorldSearch } from "@tabler/icons-react";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
+import { uuid } from "$/lib/uuid";
 import { CatalogDatasetColumnClient } from "@/clients/catalog-entries/CatalogDatasetColumnClient";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
@@ -29,8 +28,9 @@ import {
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
-import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
-import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";
+import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail";
+import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList/OpenDataCatalogEntryList";
+import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -48,6 +48,10 @@ type Props = BoxProps & {
 /**
  * Browse the public open-data catalog, search entries, inspect metadata, and
  * add a catalog dataset to the current workspace.
+ *
+ * A search field over a two-pane browser, split by a hairline. The panes are
+ * regions of one surface rather than bordered cards: nesting cards costs four
+ * edges and four paddings to say "these are two lists".
  */
 export function OpenDataCatalogView({
   isAddAllowed,
@@ -87,11 +91,11 @@ export function OpenDataCatalogView({
   }, [catalogEntries]);
 
   const displayedEntries = useMemo(() => {
-    const q = debouncedSearch.trim();
-    if (!q) {
+    const query = debouncedSearch.trim();
+    if (!query) {
       return catalogEntries;
     }
-    return fuse.search(q).map((result) => {
+    return fuse.search(query).map((result) => {
       return result.item;
     });
   }, [catalogEntries, debouncedSearch, fuse]);
@@ -145,91 +149,148 @@ export function OpenDataCatalogView({
     });
   }
 
+  const requestDatasetButton = (
+    <Button
+      variant="default"
+      onClick={() => {
+        openFeaturebaseFeedbackWidget({
+          boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+        });
+      }}
+    >
+      <Trans>Request a dataset</Trans>
+    </Button>
+  );
+
+  // Nothing published yet. The search field and the two-pane browser are both
+  // affordances for choosing among things, so with nothing to choose they are
+  // dead chrome: a box that can only ever answer "no results" and a pane that
+  // asks the user to pick from an empty list. The activation state replaces
+  // all of it and carries the one move that does something, which is telling
+  // us what to publish next. Same rule the no-datasets route follows.
+  if (!isLoadingCatalog && catalogEntries.length === 0) {
+    return (
+      <Box {...boxProps}>
+        <AppSlateEmptyState
+          icon={<IconWorldSearch size={32} stroke={1.5} aria-hidden />}
+          title={t`Nothing in the catalog yet`}
+          message={
+            <Trans>
+              Avandar prepares public datasets and publishes them here. The
+              catalog grows from what people ask for, so tell us which one you
+              need.
+            </Trans>
+          }
+          action={requestDatasetButton}
+        />
+      </Box>
+    );
+  }
+
   return (
     <Box {...boxProps}>
-      <Stack gap="md">
-        <Text>
-          <Trans>
-            Search the data catalog to add open datasets to your workspace.
-          </Trans>
-        </Text>
-
-        <Callout color="warning" messageSize="sm">
-          <Text component="div" size="sm">
-            <Trans>
-              The public open data catalog is still in{" "}
-              <BetaBadge
-                size="xs"
-                style={{ verticalAlign: "text-bottom" }}
-                withTooltip={false}
-              />
-              <br />
-              We are adding more open datasets as users tell us which datasets
-              they want in Avandar. If there is a dataset you would like to see
-              here,{" "}
-              <UnstyledButton
-                type="button"
-                aria-label={t`Tell us which open dataset you want via feedback`}
-                display="inline"
-                p={0}
-                h="auto"
-                td="underline"
-                c="primary"
-                fz="sm"
-                fw={500}
-                style={{ verticalAlign: "baseline" }}
-                onClick={() => {
-                  openFeaturebaseFeedbackWidget({
-                    boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
-                  });
-                }}
-              >
-                tell us
-              </UnstyledButton>
-              !
-            </Trans>
-          </Text>
-        </Callout>
-
+      <Stack gap="sm">
         <TextInput
           aria-label={t`Search open data catalog`}
-          leftSection={<IconSearch size={18} />}
+          leftSection={<IconSearch size={16} stroke={1.6} />}
           onChange={(event) => {
             setSearch(event.currentTarget.value);
           }}
           placeholder={t`Search by name, organization, pipeline…`}
           value={search}
         />
-        {isLoadingCatalog ?
+
+        <Text size="xs" c="dimmed" maw="70ch">
+          <Trans>
+            The catalog is still in{" "}
+            <BetaBadge
+              size="xs"
+              style={{ verticalAlign: "text-bottom" }}
+              withTooltip={false}
+            />{" "}
+            and grows as people tell us what they need. Missing a dataset?{" "}
+            <UnstyledButton
+              type="button"
+              aria-label={t`Tell us which open dataset you want via feedback`}
+              display="inline"
+              p={0}
+              h="auto"
+              td="underline"
+              c="primary"
+              fz="xs"
+              fw={500}
+              style={{ verticalAlign: "baseline" }}
+              onClick={() => {
+                openFeaturebaseFeedbackWidget({
+                  boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+                });
+              }}
+            >
+              tell us
+            </UnstyledButton>
+            .
+          </Trans>
+        </Text>
+
+        {isLoadingCatalog ? (
           <Group justify="center" py="xl">
             <Loader />
           </Group>
-        : <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-            <Paper p="md" withBorder shadow="none">
-              <Stack gap={6}>
-                <Text fw={600} size="sm">
-                  <Trans>Catalog ({displayedEntries.length})</Trans>
+        ) : (
+          <div className={css.openDataCatalogViewBrowser}>
+            {displayedEntries.length === 0 ? (
+              /*
+               * The catalog has entries; this query matched none of them. One
+               * message spanning the frame rather than a "no matches" note in
+               * the list beside a "pick one on the left" note in the detail:
+               * the second cannot be acted on, and two apologies for one
+               * situation read as two situations.
+               */
+              <div className={css.openDataCatalogViewBrowserEmpty}>
+                <Text size="sm" c="dimmed" ta="center" maw="42ch">
+                  <Trans>
+                    No catalog dataset matches “{debouncedSearch.trim()}”.
+                  </Trans>
                 </Text>
+                <Button
+                  variant="subtle"
+                  size="compact-sm"
+                  onClick={() => {
+                    setSearch("");
+                  }}
+                >
+                  <Trans>Clear search</Trans>
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className={css.openDataCatalogViewBrowserList}>
+                  <Text
+                    component="h4"
+                    className={css.openDataCatalogViewBrowserListTitle}
+                  >
+                    <Trans>Catalog ({displayedEntries.length})</Trans>
+                  </Text>
+                  <OpenDataCatalogEntryList
+                    displayedEntries={displayedEntries}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                  />
+                </div>
 
-                <OpenDataCatalogEntryList
-                  displayedEntries={displayedEntries}
-                  selectedId={selectedId}
-                  onSelect={setSelectedId}
-                />
-              </Stack>
-            </Paper>
-
-            <Paper p="md" withBorder shadow="none">
-              <OpenDataCatalogEntryDetail
-                entry={selectedEntry}
-                isAddAllowed={isAddAllowed}
-                isAdding={isInsertPending}
-                isLoadingColumnMetadata={isLoadingCatalogColumns}
-                onAddToWorkspace={onAddToWorkspace}
-              />
-            </Paper>
-          </SimpleGrid>
-        }
+                <div className={css.openDataCatalogViewBrowserDetail}>
+                  <OpenDataCatalogEntryDetail
+                    entry={selectedEntry}
+                    isAddAllowed={isAddAllowed}
+                    isAdding={isInsertPending}
+                    isLoadingColumnMetadata={isLoadingCatalogColumns}
+                    onAddToWorkspace={onAddToWorkspace}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </Stack>
     </Box>
   );

@@ -109,9 +109,8 @@ export async function sniffCsvWithDuckDb(
     userHints,
   });
   return {
-    parseOptions:
-      file ?
-        await applyQuoteProbeToParseOptions({
+    parseOptions: file
+      ? await applyQuoteProbeToParseOptions({
           file,
           sniffQuoteToken: sniffRow.Quote,
           parseOptions: mergedParseOptions,
@@ -133,28 +132,27 @@ export function getCsvSniffResult(
   const { lastSniffRow, parseOptions, rejectedScans, tableColumns, tableName } =
     options;
   const scan = rejectedScans[0];
-  return (
-    scan ?
-      buildDuckDbCsvSniffResultFromRejectScan({
+  return scan
+    ? buildDuckDbCsvSniffResultFromRejectScan({
         tableName,
         scan,
         commentChar: parseOptions.commentChar,
       })
-    : lastSniffRow ?
-      buildDuckDbCsvSniffResultFromSniffRow({
-        tableName,
-        sniffRow: lastSniffRow,
-        parseOptions,
-      })
-    : buildDuckDbCsvSniffResultFromResolved({
-        tableName,
-        parseOptions,
-        columns: tableColumns.map((column) => {
-          return { name: column.column_name, type: column.column_type };
-        }),
-        userArguments: buildReadCsvArgList({ parseOptions, mode: "load" }).join(
-          ", ",
-        ),
-      })
-  );
+    : lastSniffRow
+      ? buildDuckDbCsvSniffResultFromSniffRow({
+          tableName,
+          sniffRow: lastSniffRow,
+          parseOptions,
+        })
+      : buildDuckDbCsvSniffResultFromResolved({
+          tableName,
+          parseOptions,
+          columns: tableColumns.map((column) => {
+            return { name: column.column_name, type: column.column_type };
+          }),
+          userArguments: buildReadCsvArgList({
+            parseOptions,
+            mode: "load",
+          }).join(", "),
+        });
 }

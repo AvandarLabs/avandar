@@ -1,6 +1,6 @@
-import { createServerApiClient } from "$/ServerApiClient";
-import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 import { Simplify } from "type-fest";
+import { createServerApiClient } from "$/ServerApiClient";
+import { ValidUrlQueryParamValue } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString";
 import type {
   API,
   APIBody,
@@ -27,14 +27,15 @@ type HTTPRequestOptions<
     method: Method;
     route: Route;
     body?: APIBody<Route, Method>;
-  } & (APIPathParams<Route, Method> extends Record<string, string | number> ?
-    { pathParams: APIPathParams<Route, Method> }
-  : { pathParams?: undefined }) &
-    (APIQueryParams<Route, Method> extends (
-      Record<string, ValidURLQueryParamValue>
-    ) ?
-      { queryParams: APIQueryParams<Route, Method> }
-    : { queryParams?: undefined })
+  } & (APIPathParams<Route, Method> extends Record<string, string | number>
+    ? { pathParams: APIPathParams<Route, Method> }
+    : { pathParams?: undefined }) &
+    (APIQueryParams<Route, Method> extends Record<
+      string,
+      ValidUrlQueryParamValue
+    >
+      ? { queryParams: APIQueryParams<Route, Method> }
+      : { queryParams?: undefined })
 >;
 
 async function sendHTTPRequest<
