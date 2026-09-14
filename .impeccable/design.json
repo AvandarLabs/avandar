@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-07T14:50:59Z",
+  "generatedAt": "2026-09-14T11:47:28Z",
   "title": "Design System: Avandar",
   "extensions": {
     "colorMeta": {
@@ -482,7 +482,7 @@
       {
         "name": "The Cool Ground Rule",
         "section": "colors",
-        "body": "Every neutral is tinted toward the brand hue. Warm grays, creams, and sands are off-system, and a stock Mantine gray is not the same color as this system's neutral."
+        "body": "Every neutral is tinted toward the brand hue. Warm grays, creams, and sands are off-system. Mantine's stock gray ramp is untinted and is not this system's neutral. The app contains no stock gray at all, and that is worth keeping true: a gray appearing anywhere is a regression, not a shade choice.\n\nAt the top of the ramp the two are now nearly the same value (gray.0 is #f8f9fa, neutral.0 is #f8fafc), so index 0 is no longer where the difference shows. That makes converting by index more dangerous, not less: the ramps diverge through the middle and the dark end, so a gray.6 is a different color from a neutral.6 even though their zeroes match. Convert by role: a panel ground is --ava-surface-body, a recessed fill is neutral.1, and any 1px edge is --ava-border-default or --ava-border-strong."
       },
       {
         "name": "The Sizeless Heading Rule",
@@ -517,7 +517,7 @@
       {
         "name": "The Blur Ceiling Rule",
         "section": "elevation",
-        "body": "Ordinary surfaces never pair a 1px border with a blur of 16px or more. The two documented exceptions are the slate and the overlay panel. If you are writing a third one, you are inventing a tier."
+        "body": "Ordinary surfaces never pair a 1px border with a blur of 16px or more. The two documented exceptions are the slate and the overlay panel, both of which are floating on something dark and both of which are specified above. If you are writing a third one, you are inventing a tier."
       },
       {
         "name": "The Six-Pixel Default Rule",
