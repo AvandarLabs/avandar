@@ -99,8 +99,7 @@ export function ChatEmptyState(): React.ReactNode {
         <Text size="sm" c="neutral.6" lh={1.5}>
           {context.app === "data-explorer" ? (
             <Trans>
-              Type a question and I will generate the SQL and run it for
-              you.
+              Type a question and I will generate the SQL and run it for you.
             </Trans>
           ) : context.app === "dashboards" ? (
             <Trans>
