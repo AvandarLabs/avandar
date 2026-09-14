@@ -200,6 +200,8 @@ The app is a fixed full-height shell, not a scrolling page. `AppSlate` occupies 
 
 **Master-detail.** The dominant view pattern: a list pane with a 240px minimum beside a scrolling detail region. Data Sources is the spatial template; Case Manager and the ontology views follow it.
 
+**Inside a view.** How the detail region itself is laid out (the header band and its facts line, the content column, the properties rail, the section rhythm) and the placement rule that decides which of the three any given fact belongs in are defined in [`docs/design/app-view-layout.md`](docs/design/app-view-layout.md), along with the `AppView` primitives that implement them. Read it before building or restyling any app view.
+
 **Spacing.** A nine-step scale from 2px to 64px, every step multiplied by `--mantine-scale`. The everyday steps are `xs` (8px, the gutter), `sm` (12px), `md` (16px), and `lg` (24px). `xxl` (48px) is the empty-state panel padding.
 
 **Breakpoints.** `xs` 36em, `sm` 48em, `md` 62em, `lg` 75em, `xl` 88em, em-based to match Mantine's convention.
