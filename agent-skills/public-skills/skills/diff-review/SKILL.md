@@ -880,6 +880,58 @@ structural, not more words.
 - **Check the structure by reading only the headings and each section's first
   sentence.** That pass is part of [Closing checks](#closing-checks).
 
+### How much to explain
+
+There is no word limit. A walkthrough is long when the change has many ideas in
+it and short when it has few, so any cap punishes the document that had the
+most to say and lets a padded one through under the number. What a cap reaches
+for is proportion, and proportion is measurable directly: a passage should be
+as long as what the reviewer would otherwise get wrong, and no longer.
+
+**The deletion test.** For any passage, ask what a competent reviewer would
+conclude if it were not there. If they would conclude the same thing, it is
+narration and comes out, however true it is. If they would conclude something
+false, or could not reach a conclusion at all, it stays, at whatever length the
+correction takes. The test runs per passage, never per document: a section that
+earns four paragraphs sits beside one that earns a sentence, and the document
+is correct.
+
+What material earns, once it passes that test:
+
+| The passage covers | Earns |
+| --- | --- |
+| A unit whose name and signature already say it | Nothing |
+| A mechanism the reviewer can read off the diff | One sentence, and only where a later passage depends on it |
+| A constraint whose violation would be a defect | The failure mode, what the code proves, and what it does not |
+| A decision | The choice, the rejected alternative, the reason, and the evidence that would reverse it |
+| A behaviour-preserving rewrite | The whole equivalence argument, boundary cases included |
+| An algorithm that is not evident on one read | A worked example with real values, however long that runs |
+
+Both failures are quiet, which is why neither shows up without being looked
+for:
+
+- **Under-explained reads as brisk.** The reviewer reconstructs from the diff
+  something the author already knew. The tell is a claim the reader cannot
+  check without opening a file the document does not quote.
+- **Over-explained reads as thorough.** The tells are a paragraph after a
+  snippet that narrates the snippet, a second example that varies nothing from
+  the first, a sentence that restates the section's own heading, and any
+  sentence that would survive its own deletion.
+
+Two redirects, for passages that fail the test but are worth keeping somewhere:
+
+- **Explanation that belongs in the code.** When a passage says why a line is
+  written that way, and every future reader of that file needs the same answer,
+  the walkthrough is the wrong home: put it in the code and let the walkthrough
+  cite it. A walkthrough is read once, by this reviewer, for this change.
+- **Explanation that answers a question nobody asked.** True and unasked is
+  still padding. The questions a walkthrough owes answers to are the ones in
+  [Sections](#sections); past those, the author is enjoying the topic.
+
+A figure's legend is part of the figure, not prose. Never shorten a section by
+trimming a glossary entry or a caption: the entry exists because a label needs
+resolving, and cutting it breaks the figure rather than tightening the section.
+
 ### Factual prose
 
 Every sentence contributes one of six things: a technical fact, evidence, a
@@ -910,7 +962,7 @@ do not turn the caption into a slogan or punchline.
 
 ### Closing checks
 
-Six passes over the finished draft, before handing it over. Each catches a
+Seven passes over the finished draft, before handing it over. Each catches a
 class of defect that reading the document top to bottom does not.
 
 Run them by dispatching a subagent, per
@@ -975,6 +1027,13 @@ own draft.
    [Name a UI element, show the UI element](#name-a-ui-element-show-the-ui-element).
    Report the misses rather than fixing them: this pass cannot drive the app,
    so the author takes the capture.
+
+7. **Run the deletion test on every section,** per
+   [How much to explain](#how-much-to-explain): name what a reviewer would get
+   wrong if the section were not there. A section that cannot produce that
+   answer is narration and comes out, whatever its subject. Run it on the
+   longest sections first, where the answer is least likely to cover the whole
+   length.
 
 ### The content review runs in a subagent
 
@@ -1082,6 +1141,7 @@ Dispatch it with:
   [Sections](#sections), [Diagrams](#diagrams),
   [Screenshots](#screenshots),
   [Code alongside the prose](#code-alongside-the-prose),
+  [How much to explain](#how-much-to-explain),
   [Explaining a multi-step algorithm or pipeline](#explaining-a-multi-step-algorithm-or-pipeline),
   [Factual prose](#factual-prose), [Closing checks](#closing-checks) and
   [Rules](#rules) before changing anything,
@@ -1134,9 +1194,9 @@ away.
 
 ### Rules
 
-- Target 1,200 to 3,000 words of prose. Hard cap 4,000, excluding diagrams,
-  code excerpts, and sources. Length tracks the number of ideas in the change,
-  never its file count.
+- Length is earned per passage and is never capped. It tracks the number of
+  ideas in the change, never its file count and never a word count. See
+  [How much to explain](#how-much-to-explain).
 - Quote code as evidence for a claim, never as a tour: see
   [Code alongside the prose](#code-alongside-the-prose).
 - Every rationale must stand on its own without the old code in view. "We used
@@ -1370,8 +1430,9 @@ Selected only by an explicit request. Read-only with respect to source.
    until every diagram is visually legible. Do not skip it because the draft
    looks finished: looking finished to its author is the condition the phase
    exists to test.
-9. Report the section count, the prose word count, what the content review
-   changed and what you rejected, and what the style check changed, then end
+9. Report the section count, what the content review changed and what you
+   rejected, what the style check changed, and any section the deletion test
+   shortened or removed, then end
    the response with a table naming the walkthrough. One row is expected; the
    table is there so the path stands out at the end of a long reply.
 
