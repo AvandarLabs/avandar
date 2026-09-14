@@ -1,5 +1,4 @@
 import { getCurrentUrl, navigateToExternalUrl } from "@avandar/browser-utils";
-import { Callout } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   Box,
@@ -12,6 +11,7 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
+import { IconBrandGoogleDrive } from "@tabler/icons-react";
 import { useCallback } from "react";
 import { APIClient } from "@/clients/APIClient";
 import {
@@ -21,6 +21,7 @@ import {
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { Logger } from "@/utils/Logger";
 import { notifyError } from "@/utils/notifications/notify";
+import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { useLoadGoogleSheet } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/useLoadGoogleSheet/useLoadGoogleSheet";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -53,6 +54,12 @@ function _openGooglePicker(params: {
 
 /**
  * Google Sheets picker plus the dataset import form after a sheet is sniffed.
+ *
+ * The available services read as a list of rows rather than as loose text and
+ * buttons, so a second connector is a second row instead of a second layout.
+ * The note about which services are coming sits at the end as a dimmed line:
+ * it is a standing advisory, and a warning panel on every visit trains people
+ * to stop reading warning panels.
  */
 export function GoogleSheetsImportView({
   onSaveSuccess,
@@ -104,14 +111,120 @@ export function GoogleSheetsImportView({
     !picker &&
     (isLoadingAPI || !selectedGoogleAccount);
 
+  const onConnect = async (): Promise<void> => {
+    try {
+      const { authorizeURL } = await APIClient.get({
+        queryParams: { redirectURL: getCurrentUrl() },
+        route: "google-auth/auth-url",
+      });
+
+      navigateToExternalUrl(authorizeURL);
+    } catch (error) {
+      Logger.error(error, {
+        devMsg: "Error while fetching Google auth URL",
+      });
+      notifyError(
+        t`Google authentication error`,
+        t`There was an error while trying to authenticate with Google Sheets.`,
+      );
+    }
+  };
+
+  const connectorStatus = isGoogleAuthenticated ? (
+    selectedGoogleAccount ? (
+      <Trans>Connected as {selectedGoogleAccount.google_email}</Trans>
+    ) : (
+      <Trans>Connected</Trans>
+    )
+  ) : (
+    <Trans>Import one tab of a spreadsheet in your Google Drive</Trans>
+  );
+
+  const connectorAction = isLoadingGoogleAuthState ? (
+    <Loader size="xs" />
+  ) : isGoogleAuthenticated ? (
+    isPreparingPicker ? (
+      <Loader size="xs" />
+    ) : (
+      <Button
+        variant="default"
+        size="compact-sm"
+        onClick={() => {
+          _openGooglePicker({
+            picker,
+            onUnavailable: notifyPickerCouldNotOpen,
+          });
+        }}
+      >
+        <Trans>Pick a sheet</Trans>
+      </Button>
+    )
+  ) : (
+    <Button
+      size="compact-sm"
+      onClick={() => {
+        void onConnect();
+      }}
+    >
+      <Trans>Connect</Trans>
+    </Button>
+  );
+
   return (
     <Box {...props}>
-      <Stack align="flex-start" gap="md">
-        <Callout color="warning" messageSize="sm">
-          <Text component="div" size="sm">
+      <Stack gap="xl">
+        <Stack gap="sm">
+          <ConnectorRow
+            icon={<IconBrandGoogleDrive size={20} stroke={1.6} aria-hidden />}
+            name={<Trans>Google Sheets</Trans>}
+            status={connectorStatus}
+            action={connectorAction}
+          />
+
+          {pickedSheet ? (
+            <Group gap="sm" align="flex-end" wrap="wrap">
+              <Text size="sm">
+                <Trans>Selected document: {pickedSheet.spreadsheetName}</Trans>
+              </Text>
+              {googleSheetLoad.isListingTabs ? <Loader size="xs" /> : null}
+            </Group>
+          ) : null}
+
+          {pickedSheet && hasTabChoice ? (
+            <Group align="flex-end" gap="sm">
+              <Select
+                label={t`Tab to import`}
+                description={t`One dataset is one tab.`}
+                data={(availableTabs ?? []).map((tab) => {
+                  return { value: String(tab.sheetId), label: tab.title };
+                })}
+                value={
+                  googleSheetLoad.selectedTabId === undefined
+                    ? null
+                    : String(googleSheetLoad.selectedTabId)
+                }
+                onChange={(value) => {
+                  if (value !== null) {
+                    googleSheetLoad.setSelectedTabId(Number(value));
+                  }
+                }}
+              />
+              <Button
+                variant="default"
+                onClick={googleSheetLoad.onProcessSelectedTab}
+                loading={googleSheetLoad.isLoadingSheet}
+              >
+                <Trans>Process</Trans>
+              </Button>
+            </Group>
+          ) : pickedSheet && googleSheetLoad.isLoadingSheet ? (
+            <Loader size="xs" />
+          ) : null}
+
+          <Text size="xs" c="dimmed" maw="65ch">
             <Trans>
-              New connectors are being added every month. If there is a database
-              or service you use that you need to connect to,{" "}
+              New connectors are added every month. If there is a database or
+              service you need,{" "}
               <UnstyledButton
                 type="button"
                 aria-label={t`Request a data source connection via feedback`}
@@ -120,7 +233,7 @@ export function GoogleSheetsImportView({
                 h="auto"
                 td="underline"
                 c="primary"
-                fz="sm"
+                fz="xs"
                 fw={500}
                 style={{ verticalAlign: "baseline" }}
                 onClick={() => {
@@ -129,110 +242,12 @@ export function GoogleSheetsImportView({
                   });
                 }}
               >
-                please let us know so we can prioritize it
+                tell us so we can prioritize it
               </UnstyledButton>
               .
             </Trans>
           </Text>
-        </Callout>
-
-        {isLoadingGoogleAuthState ? (
-          <Loader />
-        ) : isGoogleAuthenticated ? (
-          <>
-            {selectedGoogleAccount ? (
-              <Text>
-                <Trans>
-                  You have successfully connected to{" "}
-                  {selectedGoogleAccount.google_email}
-                </Trans>
-              </Text>
-            ) : null}
-
-            {isPreparingPicker ? (
-              <Loader />
-            ) : (
-              <Button
-                onClick={() => {
-                  _openGooglePicker({
-                    picker,
-                    onUnavailable: notifyPickerCouldNotOpen,
-                  });
-                }}
-              >
-                <Trans>Pick google sheet</Trans>
-              </Button>
-            )}
-
-            {pickedSheet ? (
-              <>
-                <Text>
-                  <Trans>
-                    Selected document: {pickedSheet.spreadsheetName}
-                  </Trans>
-                </Text>
-                {googleSheetLoad.isListingTabs ? <Loader /> : null}
-                {hasTabChoice ? (
-                  <Group align="flex-end" gap="sm">
-                    <Select
-                      label={t`Tab to import`}
-                      description={t`One dataset is one tab.`}
-                      data={(availableTabs ?? []).map((tab) => {
-                        return { value: String(tab.sheetId), label: tab.title };
-                      })}
-                      value={
-                        googleSheetLoad.selectedTabId === undefined
-                          ? null
-                          : String(googleSheetLoad.selectedTabId)
-                      }
-                      onChange={(value) => {
-                        if (value !== null) {
-                          googleSheetLoad.setSelectedTabId(Number(value));
-                        }
-                      }}
-                    />
-                    <Button
-                      onClick={googleSheetLoad.onProcessSelectedTab}
-                      loading={googleSheetLoad.isLoadingSheet}
-                    >
-                      <Trans>Process</Trans>
-                    </Button>
-                  </Group>
-                ) : googleSheetLoad.isLoadingSheet ? (
-                  <Loader />
-                ) : null}
-              </>
-            ) : null}
-          </>
-        ) : (
-          <Button
-            fullWidth
-            size="md"
-            variant="filled"
-            onClick={async () => {
-              try {
-                const { authorizeURL } = await APIClient.get({
-                  queryParams: {
-                    redirectURL: getCurrentUrl(),
-                  },
-                  route: "google-auth/auth-url",
-                });
-
-                navigateToExternalUrl(authorizeURL);
-              } catch (error) {
-                Logger.error(error, {
-                  devMsg: "Error while fetching Google auth URL",
-                });
-                notifyError(
-                  t`Google authentication error`,
-                  t`There was an error while trying to authenticate with Google Sheets.`,
-                );
-              }
-            }}
-          >
-            <Trans>Connect to Google Sheets</Trans>
-          </Button>
-        )}
+        </Stack>
 
         {previewRows && dataSourceMetadata && pickedSheet ? (
           <DatasetImportForm

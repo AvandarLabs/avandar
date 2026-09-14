@@ -456,7 +456,7 @@ describe("GoogleSheetsImportView", () => {
     renderWithProviders(<GoogleSheetsImportView />);
 
     expect(
-      screen.queryByRole("button", { name: /pick google sheet/i }),
+      screen.queryByRole("button", { name: /pick a sheet/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -468,7 +468,7 @@ describe("GoogleSheetsImportView", () => {
     });
 
     renderWithProviders(<GoogleSheetsImportView />);
-    fireEvent.click(screen.getByRole("button", { name: /pick google sheet/i }));
+    fireEvent.click(screen.getByRole("button", { name: /pick a sheet/i }));
 
     expect(notifyErrorMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -509,7 +509,7 @@ describe("GoogleSheetsImportView", () => {
 
     // The form rendering is what says the import finished; there is no toast.
     await waitFor(() => {
-      expect(screen.getByText(/2 columns were detected/)).toBeInTheDocument();
+      expect(screen.getByText(/2 detected/)).toBeInTheDocument();
     });
     expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledWith({
       fileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
@@ -529,7 +529,7 @@ describe("GoogleSheetsImportView", () => {
     // The second tab's three columns, read out of the CSV that tab returned.
     // The first tab has two, so this cannot pass having read the wrong tab.
     await waitFor(() => {
-      expect(screen.getByText(/3 columns were detected/)).toBeInTheDocument();
+      expect(screen.getByText(/3 detected/)).toBeInTheDocument();
     });
 
     expect(getGoogleSheetTabCsvExportMock).toHaveBeenCalledTimes(1);
@@ -553,7 +553,7 @@ describe("GoogleSheetsImportView", () => {
     await _clickProcess();
 
     await waitFor(() => {
-      expect(screen.getByText(/2 columns were detected/)).toBeInTheDocument();
+      expect(screen.getByText(/2 detected/)).toBeInTheDocument();
     });
 
     expect(vi.mocked(APIClient.get).mock.calls).not.toContainEqual(
@@ -595,7 +595,7 @@ describe("GoogleSheetsImportView", () => {
     await _clickProcess();
 
     expect(
-      await screen.findByText("These are the first", { exact: false }),
+      await screen.findByText("First", { exact: false }),
     ).toBeInTheDocument();
   });
 
@@ -722,7 +722,7 @@ describe("GoogleSheetsImportView", () => {
       );
     });
     // The failure is the whole outcome: no form ever renders behind the toast.
-    expect(screen.queryByText(/columns were detected/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/detected/)).not.toBeInTheDocument();
   });
 
   it("tells the user to re-pick when the per-file grant is gone", async () => {
@@ -763,7 +763,7 @@ describe("GoogleSheetsImportView", () => {
       renderWithProviders(<GoogleSheetsImportView />);
 
       const button = screen.getByRole("button", {
-        name: /connect to google sheets/i,
+        name: /^connect$/i,
       });
 
       expect(button).toBeEnabled();

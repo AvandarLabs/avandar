@@ -1,11 +1,12 @@
-import { FileUploadForm } from "@avandar/ui";
-import { MIMEType } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Box, BoxProps, Stack } from "@mantine/core";
+import { isDefined } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
+import { Box, BoxProps, Stack, Text } from "@mantine/core";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
+import { FileDropzone } from "@/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone";
+import { UploadedFileBar } from "@/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar";
 import { useManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -31,7 +32,11 @@ type Props = BoxProps & {
 };
 
 /**
- * Spreadsheet picker plus the dataset import form after a file is sniffed.
+ * The manual import flow: choose a file, then review and name what came out
+ * of it.
+ *
+ * The file target and the review form occupy the same place in the layout
+ * one after the other, so the view always has exactly one thing to do next.
  */
 export function ManualUploadView({
   initialFile,
@@ -39,32 +44,47 @@ export function ManualUploadView({
   onSaveSuccess,
   ...boxProps
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
   const manualUpload = useManualUploadParse(initialFile);
   const { uploadedFile, previewRows, dataSourceMetadata } = manualUpload;
+  const hasParsedFile =
+    isDefined(previewRows) &&
+    isDefined(uploadedFile) &&
+    isDefined(dataSourceMetadata);
 
   return (
     <Box {...boxProps}>
-      <Stack align="flex-start">
+      <Stack gap="xl">
         <Box {...NuxAnchors.props(NuxAnchors.ids.datasetUploadForm)}>
-          <FileUploadForm
-            label={t`Upload a file`}
-            description={t`Select an Excel, CSV or PDF file from your computer to import`}
-            placeholder={t`Select file`}
-            accept={[
-              MIMEType.TEXT_CSV,
-              MIMEType.APPLICATION_MS_EXCEL,
-              MIMEType.APPLICATION_OPENXML_EXCEL,
-              MIMEType.APPLICATION_PDF,
-            ]}
-            fullWidth
-            isSubmitting={
-              manualUpload.isLoadingFile && previewRows === undefined
-            }
-            onSubmit={manualUpload.onFileSubmit}
-          />
+          {hasParsedFile ? (
+            <UploadedFileBar
+              file={uploadedFile}
+              sourceType={dataSourceMetadata.sourceType}
+              isBusy={manualUpload.isLoadingFile}
+              onReplace={manualUpload.onFileSubmit}
+            />
+          ) : (
+            <Stack gap="xs">
+              <FileDropzone
+                isLoading={manualUpload.isLoadingFile}
+                onSelect={manualUpload.onFileSubmit}
+              />
+              {/*
+                Where the file is read is a real question for a team handling
+                sensitive data, and the answer is a selling point rather than
+                a disclaimer. It sits under the target because that is the
+                moment the question comes up.
+              */}
+              <Text size="xs" c="dimmed">
+                <Trans>
+                  Avandar reads the file in your browser. Nothing leaves this
+                  device until you save the dataset.
+                </Trans>
+              </Text>
+            </Stack>
+          )}
         </Box>
-        {previewRows && uploadedFile && dataSourceMetadata ? (
+
+        {hasParsedFile ? (
           <DatasetImportForm
             key={dataSourceMetadata.datasetLoadResult.id}
             initialDatasetName={uploadedFile.name}
