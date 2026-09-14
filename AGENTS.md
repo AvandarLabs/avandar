@@ -210,6 +210,17 @@ authorized merge to `develop`.
 
 ## Styling & UI
 
+- Before editing anything under `src/components/layouts/`, or adding a view
+  under `src/views/` or `src/routes/`, read `docs/design/app-view-layout.md`
+  and the Named Rules in `DESIGN.md`. The design detector cannot know the
+  placement rule: it sees the file you wrote, never the place a fact belonged.
+- Load the `impeccable` skill when the work creates a new surface or replaces
+  an existing one. Not for a restyle, a behavior fix, or an a11y attribute:
+  the design detector already scans every UI edit for those, and the skill
+  costs roughly 15k tokens of setup before it does anything.
+- The design detector is installed per machine through a gitignored settings
+  file, so never read its silence as a pass. A teammate's checkout or CI may
+  not run it at all.
 - Ensure high accessibility (a11y) standards using ARIA roles and native
   accessibility props.
 - Use Mantine themes tokens and style prop shorthands (e.g. `c`, `mt`, `pd`,
