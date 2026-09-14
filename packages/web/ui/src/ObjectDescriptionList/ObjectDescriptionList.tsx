@@ -7,15 +7,26 @@ import type {
 } from "./ObjectDescriptionList.types";
 import type { ObjectDescriptionListBlockProps } from "./ObjectDescriptionListBlock";
 
+/**
+ * `Omit` collapses a union to the keys its members share, which would drop
+ * every option that only one branch of the render-option unions declares
+ * (`editable` and `renderTableHeader` on the table branch, `titleKey` and
+ * `defaultExpanded` on the list branch). Distributing keeps each branch's
+ * own options callable from the root component.
+ */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
 type DescribableObjectProps<
   T extends DescribableObject,
   RootData extends GenericRootData,
-> = Omit<ObjectDescriptionListBlockProps<T, RootData>, "rootData">;
+> = DistributiveOmit<ObjectDescriptionListBlockProps<T, RootData>, "rootData">;
 
-type DescribableValueArrayProps<T, RootData extends GenericRootData> = Omit<
-  DescribableValueArrayBlockProps<T, RootData>,
-  "rootData"
->;
+type DescribableValueArrayProps<
+  T,
+  RootData extends GenericRootData,
+> = DistributiveOmit<DescribableValueArrayBlockProps<T, RootData>, "rootData">;
 
 type Props<T extends GenericRootData> = T extends DescribableObject
   ? DescribableObjectProps<T, T>

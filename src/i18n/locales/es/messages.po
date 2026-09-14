@@ -17,6 +17,11 @@ msgstr ""
 msgid "Changes to your payment method can be made in your"
 msgstr "Los cambios en su método de pago se pueden realizar en su"
 
+#. placeholder {0}: datasetMeta.rows.toLocaleString(i18n.locale)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "{0} rows"
+msgstr "{0} filas"
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "Cerrar panel de chat"
@@ -103,11 +108,6 @@ msgstr "comienza con"
 msgid "Run a query to see results."
 msgstr "Ejecuta una consulta para ver los resultados."
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Select an Excel, CSV or PDF file from your computer to import"
-msgstr "Seleccione un archivo de Excel, CSV o PDF de su computadora para "
-"importarlo"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Inicio (por ejemplo, 2024-01-01)"
@@ -173,6 +173,10 @@ msgstr "Invitar miembro"
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "La entrada JOIN en la posición {index} no es una referencia simple a "
 "una tabla."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "This computer only"
+msgstr "Solo en esta computadora"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -251,11 +255,9 @@ msgstr "Preguntar a Avandar"
 msgid "An error occurred while loading the file"
 msgstr "Ocurrió un error al cargar el archivo"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "Source URL"
-msgstr "URL de origen"
-
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
 msgstr "Tipo"
 
@@ -414,7 +416,7 @@ msgstr "Estilo"
 msgid "Square"
 msgstr "Cuadrado"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "Notas"
@@ -431,9 +433,18 @@ msgstr "Los tipos de columna detectados para {changedCount} columnas en "
 msgid "Geometry"
 msgstr "Geometría"
 
+#. placeholder {0}: selectedGoogleAccount.google_email
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Connected as {0}"
+msgstr "Conectado como {0}"
+
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Llama 3.2 1B"
 msgstr "Llama 3.2 1B"
+
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Datasets"
+msgstr "Conjuntos de datos"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
@@ -482,7 +493,7 @@ msgid "Your plan does not allow sharing this dashboard with anyone else. "
 msgstr "Su plan no permite compartir este dashboard con nadie más. Actualice su "
 "plan o deje de compartir otro dashboard y vuelva a intentarlo."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "PDF file"
 msgstr "Archivo PDF"
 
@@ -503,6 +514,7 @@ msgstr "Agregaciones"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "No"
 msgstr "No"
 
@@ -774,13 +786,13 @@ msgstr "¿Ocultar el tutorial?"
 msgid "Google Picker error"
 msgstr "Error de Google Picker"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
-msgid "No datasets added yet"
-msgstr "No se han agregado conjuntos de datos aún"
-
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Layer name"
 msgstr "Nombre de la capa"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Pick a sheet"
+msgstr "Seleccione una hoja"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Fixing query…"
@@ -840,6 +852,8 @@ msgstr "Seleccione una columna de latitud y otra de longitud. Usar solo una "
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Open data"
 msgstr "Abrir datos"
 
@@ -888,6 +902,13 @@ msgstr " registros"
 msgid "Something else…"
 msgstr "Algo más…"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "The catalog is still in <0/> and grows as people tell us what they need. "
+"Missing a dataset? <1>tell us</1>."
+msgstr "El catálogo aún está en <0/> y crece a medida que las personas nos "
+"indican lo que necesitan. ¿No encuentra un conjunto de datos? "
+"<1>Cuéntenos</1>."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Cambiando el plan a {newPlanName} ({newPlanSubType})"
@@ -934,11 +955,6 @@ msgstr "Mapa"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Table"
 msgstr "Tabla"
-
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-msgid "Search the data catalog to add open datasets to your workspace."
-msgstr "Busca en el catálogo de datos para agregar conjuntos de datos abiertos "
-"a tu espacio de trabajo."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "First tick value"
@@ -988,6 +1004,13 @@ msgstr "Mantener SQL tal como está"
 msgid "Remove User"
 msgstr "Eliminar usuario"
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Avandar prepares public datasets and publishes them here. The catalog "
+"grows from what people ask for, so tell us which one you need."
+msgstr "Avandar prepara conjuntos de datos públicos y los publica aquí. El "
+"catálogo crece según lo que las personas solicitan, así que díganos "
+"cuál necesita."
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/OverwriteSqlAlert/OverwriteSqlAlert.tsx
 msgid "The current SQL contains parts the form could not represent. Continuing "
 "overwrites it with SQL generated from the form."
@@ -995,18 +1018,16 @@ msgstr "El SQL actual contiene partes que el formulario no pudo representar. Si 
 "continúa, se reemplazará por SQL generado a partir del formulario."
 
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
+#. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Updated {0}"
 msgstr "Actualizado {0}"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Request a data source connection via feedback"
 msgstr "Solicitar una conexión de fuente de datos a través de comentarios"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-msgid "This dataset has no description."
-msgstr "Este conjunto de datos no tiene descripción."
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset requires an internet connection."
@@ -1036,10 +1057,6 @@ msgstr "Aún no hay capas."
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
 msgstr "Estrecho"
-
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "Column info"
-msgstr "Información de la columna"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default: \"Only what's "
@@ -1075,6 +1092,12 @@ msgstr "No se pudo cargar este registro"
 msgid "Saved datasets"
 msgstr "Conjuntos de datos guardados"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "Avandar reads the file in your browser. Nothing leaves this device until "
+"you save the dataset."
+msgstr "Avandar lee el archivo en su navegador. Nada sale de este dispositivo "
+"hasta que guarde el conjunto de datos."
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"
@@ -1085,7 +1108,7 @@ msgid "Only the people and groups listed below can access this {resource}."
 msgstr "Solo las personas y los grupos que aparecen a continuación pueden "
 "acceder a este {resource}."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "No puedes agregar más conjuntos de datos en tu plan actual. Actualiza "
@@ -1119,6 +1142,10 @@ msgstr "Guardar como nuevo conjunto de datos"
 msgid "From derived dataset"
 msgstr "Desde conjunto de datos derivado"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Sheet"
+msgstr "Hoja"
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Publicado en el espacio de trabajo"
@@ -1132,16 +1159,9 @@ msgid "However, we are not allowing new registrations at the moment."
 msgstr "Sin embargo, no estamos permitiendo nuevas inscripciones en este "
 "momento."
 
-#. placeholder {0}: options.numPreviewRows
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-msgid "These are the first {0} rows of your dataset. Check to see if the data "
-"is correct. If they are not, it's possible your dataset does not start "
-"on the first row or the CSV uses a different delimiter. Try adjusting "
-"those settings here."
-msgstr "Estas son las primeras {0} filas de tu conjunto de datos. Verifica si "
-"los datos son correctos. Si no lo son, es posible que tu conjunto de "
-"datos no comience en la primera fila o que el CSV use un delimitador "
-"diferente. Intenta ajustar esas configuraciones aquí."
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "Derived dataset"
+msgstr "Conjunto de datos derivado"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1223,7 +1243,7 @@ msgstr "Ejecute una consulta primero."
 msgid "Seat limit reached"
 msgstr "Límite de asientos alcanzado"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Pipeline"
 msgstr "Canalización"
 
@@ -1235,7 +1255,7 @@ msgstr "No se pudo dejar de publicar el dashboard"
 msgid "Where the fields come from"
 msgstr "De dónde provienen los campos"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Offline"
 msgstr "Sin conexión"
 
@@ -1266,10 +1286,6 @@ msgstr "No se pudo volver a serializar la subconsulta JOIN en la posición "
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Escriba una pregunta y generaré el SQL y lo ejecutaré por usted."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
-msgid "Range"
-msgstr "Rango"
-
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Ingresa el correo electrónico"
@@ -1284,6 +1300,7 @@ msgid "This case type failed to load"
 msgstr "No se pudo cargar este tipo de caso"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "CSV"
 msgstr "CSV"
 
@@ -1327,7 +1344,7 @@ msgstr "Copiado"
 msgid "Measure distance and area"
 msgstr "Medir distancia y área"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Add to workspace"
 msgstr "Agregar al espacio de trabajo"
 
@@ -1340,6 +1357,8 @@ msgid "Your dashboard is published at:"
 msgstr "Tu tablero está publicado en:"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1386,6 +1405,10 @@ msgstr "Cerrar chat (⌘/)"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Create failed"
 msgstr "Creación fallida"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+msgid "Raw metadata"
+msgstr "Metadatos sin procesar"
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
@@ -1510,6 +1533,10 @@ msgid "A {conceptName} can include columns from different datasets. Choose "
 msgstr "Un {conceptName} puede incluir columnas de diferentes conjuntos de "
 "datos. Elija qué columnas desea agregar como campos."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
+msgid "Replace the uploaded file"
+msgstr "Reemplazar el archivo cargado"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "Ask the dashboard's owner to share it with you."
 msgstr "Solicite al propietario del panel que lo comparta con usted."
@@ -1556,10 +1583,6 @@ msgid "ORDER BY references multiple columns; the form keeps only the first."
 msgstr "ORDER BY hace referencia a varias columnas; el formulario conserva solo "
 "la primera."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "missing"
-msgstr "faltante"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "One standard deviation around the mean"
 msgstr "Una desviación estándar alrededor de la media"
@@ -1591,12 +1614,9 @@ msgstr "No se puede asignar una coordenada cuando la latitud o la longitud "
 msgid "Your session has expired. Redirecting you to sign in."
 msgstr "Su sesión ha expirado. Se le redirigirá para iniciar sesión."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
-msgid "Select a region on the page to see data. Draw a box around a table, "
-"chart or block of text, or highlight a sentence."
-msgstr "Seleccione una región de la página para ver los datos. Dibuje un cuadro "
-"alrededor de una tabla, gráfico o bloque de texto, o resalte una "
-"oración."
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox/OnlineStorageAllowedCheckbox.tsx
+msgid "This dataset can be stored in the cloud."
+msgstr "Este conjunto de datos se puede almacenar en la nube."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 12"
@@ -1632,7 +1652,7 @@ msgstr "Guardemos sus resultados ahora"
 msgid "Custom"
 msgstr "Personalizado"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
 msgstr "Marca de tiempo"
@@ -1735,14 +1755,6 @@ msgstr "{0} suprimidos"
 msgid "All columns"
 msgstr "Todas las columnas"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "New connectors are being added every month. If there is a database or "
-"service you use that you need to connect to, <0>please let us know so we "
-"can prioritize it</0>."
-msgstr "Cada mes se agregan nuevos conectores. Si necesita conectarse a una "
-"base de datos o servicio que utiliza, <0>háganoslo saber para que "
-"podamos priorizarlo</0>."
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data Summary"
 msgstr "Resumen de datos"
@@ -1840,11 +1852,10 @@ msgid "Subtitle"
 msgstr "Subtítulo"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 msgid "Dataset updated successfully!"
 msgstr "¡Conjunto de datos actualizado con éxito!"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Excel file"
 msgstr "Archivo de Excel"
 
@@ -1934,10 +1945,6 @@ msgid "There is no text in this region to send. Kept the rule-based results."
 msgstr "No hay texto en esta región para enviar. Se conservaron los resultados "
 "basados en reglas."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "Select a dataset from the list to view its metadata."
-msgstr "Selecciona un conjunto de datos de la lista para ver sus metadatos."
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
 msgstr "Mediano"
@@ -1958,15 +1965,6 @@ msgstr "Filas de estos bloques"
 msgid "Chat"
 msgstr "Chat"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-msgid "The public open data catalog is still in <0/><1/>We are adding more open "
-"datasets as users tell us which datasets they want in Avandar. If there "
-"is a dataset you would like to see here, <2>tell us</2>!"
-msgstr "El catálogo de datos abiertos públicos aún está en <0/><1/>Estamos "
-"agregando más conjuntos de datos abiertos a medida que los usuarios nos "
-"dicen qué conjuntos de datos desean en Avandar. Si hay un conjunto de "
-"datos que te gustaría ver aquí, <2>dínoslo</2>!"
-
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
@@ -1983,6 +1981,7 @@ msgid "Dataset deleted successfully"
 msgstr "Conjunto de datos eliminado con éxito"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "decimal"
 msgstr "decimal"
 
@@ -2011,7 +2010,6 @@ msgid "Opacity"
 msgstr "Opacidad"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Open Data"
 msgstr "Datos Abiertos"
 
@@ -2023,6 +2021,7 @@ msgstr "Radio"
 msgid "Sort & limit"
 msgstr "Ordenar y limitar"
 
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Add new dataset"
 msgstr "Agregar nuevo conjunto de datos"
@@ -2288,7 +2287,7 @@ msgstr "No se devolvieron valores de {column}. Describe lo que necesitas en su "
 "lugar."
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
 "<2>{avg}</2>{0}"
 msgstr "Rangos de <0>{numericLow}</0> a <1>{numericHigh}</1>, promediando "
@@ -2317,7 +2316,7 @@ msgstr "{0} / 3"
 msgid "Show details"
 msgstr "Mostrar detalles"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 msgid "Boolean"
 msgstr "Booleano"
 
@@ -2355,6 +2354,10 @@ msgstr "Conjuntos de datos privados"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Create case type"
 msgstr "Crear tipo de caso"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Storage"
+msgstr "Almacenamiento"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Publish it"
@@ -2433,6 +2436,10 @@ msgstr "Elementos"
 msgid "Restriction update failed"
 msgstr "La actualización de restricción falló"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
+msgid "whole number"
+msgstr "número entero"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Exact"
 msgstr "Exacto"
@@ -2459,10 +2466,6 @@ msgstr "Utiliza el Explorador de Datos para analizar tus conjuntos de datos, "
 msgid "Roles & Permissions"
 msgstr "Roles y permisos"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Connect to Google Sheets"
-msgstr "Conectar a Google Sheets"
-
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr "Apilado al 100%"
@@ -2484,6 +2487,7 @@ msgid "Data Visualization"
 msgstr "Visualización de datos"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "PDF"
 msgstr "PDF"
 
@@ -2576,6 +2580,7 @@ msgstr "Sin ponderación"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/config/AppLinks/AppLinks.tsx
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportView.tsx
 msgid "Import data"
 msgstr "Importar datos"
@@ -2605,7 +2610,7 @@ msgstr "{keyboardShortcut} para guardar"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
@@ -2673,6 +2678,10 @@ msgstr "Generar una consulta para configurar esta visualización."
 msgid "Select a column"
 msgstr "Selecciona una columna"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "{numColumns} columns"
+msgstr "{numColumns} columnas"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Normal"
 msgstr "Normal"
@@ -2687,6 +2696,16 @@ msgstr "Anotar, luego exportar"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}, {1} y {2} son fijos para cada espacio de trabajo."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Synced to the cloud"
+msgstr "Sincronizado con la nube"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
+"how often it updates."
+msgstr "Seleccione un conjunto de datos a la izquierda para consultar su "
+"contenido, quién lo publica y con qué frecuencia se actualiza."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
@@ -2836,10 +2855,6 @@ msgstr "E"
 msgid "Column 5"
 msgstr "Columna 5"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
-msgid "Enter a description for this dataset"
-msgstr "Ingrese una descripción para este conjunto de datos"
-
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
 msgstr "Contorno"
@@ -2886,7 +2901,7 @@ msgstr "El soporte de geometría se está descargando. Puede tardar un momento "
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
@@ -2913,7 +2928,7 @@ msgstr "No hay atributos ni conjuntos de datos configurados."
 msgid "Column 8"
 msgstr "Columna 8"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Could not summarize this column. The query may have failed for an "
 "unsupported value or a malformed cell."
 msgstr "No se pudo resumir esta columna. La consulta puede haber fallado debido "
@@ -2928,6 +2943,7 @@ msgstr "Dibuja un cuadro alrededor de una tabla, gráfico, mapa o bloque de "
 msgid "Data scope"
 msgstr "Alcance de datos"
 
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Data preview"
 msgstr "Previsualización de datos"
@@ -3129,6 +3145,10 @@ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
 msgstr "{0} (~{1} MB) será eliminado de este navegador para liberar espacio. "
 "Puedes descargarlo nuevamente más tarde."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
+msgid "Drop a file here, or click to browse"
+msgstr "Suelte un archivo aquí o haga clic para buscarlo"
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
 msgstr "Ir al Explorador de Datos"
@@ -3140,11 +3160,6 @@ msgstr "Gráfico de radar"
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistDockButton.tsx
 msgid "Get started {completedCount}/{totalMilestoneCount}"
 msgstr "Comenzar {completedCount}/{totalMilestoneCount}"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-msgid "Scroll up to the fields above, or use the list below."
-msgstr "Desplácese hacia arriba a los campos anteriores, o use la lista a "
-"continuación."
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Each point moves by the same amount every time this map is opened, so a "
@@ -3317,13 +3332,13 @@ msgstr "Identidad"
 msgid "Data source"
 msgstr "Fuente de datos"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Last synced"
+msgstr "Última sincronización"
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
 msgstr "Importe una hoja de cálculo a Avandar."
-
-#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
-msgid "No dataset selected"
-msgstr "No se ha seleccionado ningún conjunto de datos"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "description"
@@ -3367,7 +3382,7 @@ msgstr "termina con"
 msgid "e.g. cholera-outbreak-2024"
 msgstr "p. ej. brote-de-colera-2024"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Refresh from Google Sheets"
 msgstr "Actualizar desde Google Sheets"
 
@@ -3393,15 +3408,9 @@ msgid "does not match pattern (legacy)"
 msgstr "no coincide con el patrón (heredado)"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Derived"
 msgstr "Derivado"
-
-#. placeholder {0}: columns.length
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "{0} columns were detected. Review the column info below to make sure "
-"they are correct."
-msgstr "{0} columnas fueron detectadas. Revisa la información de las columnas a "
-"continuación para asegurarte de que sean correctas."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "text"
@@ -3422,10 +3431,6 @@ msgstr "Valores predeterminados, separados por comas o arreglo JSON"
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Confirm Action"
 msgstr "Confirmar acción"
-
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "Data Preview"
-msgstr "Vista previa de datos"
 
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "No dashboards to show"
@@ -3475,13 +3480,6 @@ msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
 msgstr "Pídeme que agregue un gráfico a este tablero. Elegiré un tipo de "
 "visualización, escribiré el SQL y colocaré un bloque en la página."
 
-#. placeholder {0}: top.value.slice(0, 2).join(", ")
-#. placeholder {1}: top.count.toLocaleString()
-#. placeholder {2}: (share * 100).toFixed(0)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Most common value: <0>{0}</0> ({1} rows, {2}%)."
-msgstr "Valor más común: <0>{0}</0> ({1} filas, {2}%)."
-
 #: src/views/DashboardApp/DashboardEditorView/DashboardEditorView.tsx
 msgid "Dashboard saved successfully!"
 msgstr "¡Panel guardado exitosamente!"
@@ -3504,6 +3502,12 @@ msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "Publicar solo las columnas que su tablero lee. Más restringido, más "
 "privado."
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "New connectors are added every month. If there is a database or service "
+"you need, <0>tell us so we can prioritize it</0>."
+msgstr "Se agregan nuevos conectores cada mes. Si necesita una base de datos o "
+"un servicio, <0>cuéntenos para que podamos priorizarlo</0>."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "Global Admin"
 msgstr "Administrador global"
@@ -3523,6 +3527,10 @@ msgstr "No hay valores"
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "Aclaración {turnNumber} de 3"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
+msgid "Fix the fields above, then save."
+msgstr "Corrija los campos anteriores y luego guarde."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
@@ -3568,6 +3576,10 @@ msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "Seleccione columnas y agregue restricciones de fila (enum, rango de "
 "números, rango de fechas)."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
+msgid "Replace"
+msgstr "Reemplazar"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "WKT"
 msgstr "WKT"
@@ -3589,6 +3601,12 @@ msgstr "Procesando conjunto de datos…"
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Modelo de chat sin conexión listo. Haz clic para cambiar o volver a "
 "descargar."
+
+#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
+msgid "Upload a file, connect an external source, or browse the open data "
+"catalog."
+msgstr "Cargue un archivo, conecte una fuente externa o explore el catálogo de "
+"datos abiertos."
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
@@ -3717,6 +3735,11 @@ msgstr "Comienza tu viaje con nosotros"
 msgid "Qwen 2.5 7B (offline)"
 msgstr "Qwen 2.5 7B (offline)"
 
+#. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
+msgid "{0} distinct"
+msgstr "{0} distintos"
+
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "QR code"
 msgstr "Código QR"
@@ -3769,9 +3792,17 @@ msgstr "{maxAllowed, plural, one {Su plan permite # dashboard compartido o "
 msgid "You are offline"
 msgstr "Estás sin conexión"
 
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Filter datasets"
+msgstr "Filtrar conjuntos de datos"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Draft case type"
 msgstr "Tipo de caso en borrador"
+
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Import one tab of a spreadsheet in your Google Drive"
+msgstr "Importar una pestaña de una hoja de cálculo en su Google Drive"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -3779,6 +3810,7 @@ msgid "Failed to save to dashboard: {0}"
 msgstr "Error al guardar en el panel: {0}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
 msgstr "Fila de encabezado"
 
@@ -3799,7 +3831,7 @@ msgid "Rose"
 msgstr "Rosa"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Are you sure you want to delete {0}?"
 msgstr "¿Está seguro de que desea eliminar {0}?"
 
@@ -3842,6 +3874,10 @@ msgstr "Barra"
 msgid "No {conceptName} records yet"
 msgstr "Aún no hay registros de {conceptName}"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+msgid "More dataset actions"
+msgstr "Más acciones del conjunto de datos"
+
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
 msgstr "¿Eliminar el panel?"
@@ -3881,6 +3917,10 @@ msgstr "Error al actualizar el nombre del espacio de trabajo"
 #: src/views/GisApp/shell/MapTopBar/MapOutputActions/MapOutputActions.tsx
 msgid "Export"
 msgstr "Exportar"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Nothing in the catalog yet"
+msgstr "Aún no hay nada en el catálogo"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
@@ -3957,7 +3997,7 @@ msgstr "Prueba una búsqueda diferente"
 msgid "Outline width"
 msgstr "Ancho del contorno"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "No values to summarize."
 msgstr "No hay valores para resumir."
 
@@ -4116,6 +4156,10 @@ msgstr "No disponible sin conexión"
 msgid "Back to the login page"
 msgstr "Volver a la página de inicio de sesión"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "Dataset details"
+msgstr "Detalles del conjunto de datos"
+
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "1 filter"
 msgstr "1 filtro"
@@ -4134,6 +4178,10 @@ msgstr "Dimensionado"
 msgid "Save to dashboard"
 msgstr "Guardar en el panel"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Added"
+msgstr "Agregado"
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm.tsx
 msgid "Label type"
 msgstr "Tipo de etiqueta"
@@ -4141,10 +4189,6 @@ msgstr "Tipo de etiqueta"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
 msgstr "Desplazar dentro de"
-
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
-msgid "Number"
-msgstr "Número"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -4182,6 +4226,7 @@ msgstr "Hexágono"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Tab"
 msgstr "Pestaña"
 
@@ -4246,6 +4291,12 @@ msgstr "Ancho del trazo"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "and"
 msgstr "y"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox/OnlineStorageAllowedCheckbox.tsx
+msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
+"on your team will be able to open it."
+msgstr "{offlineOnlyTitle}: solo estará disponible en esta computadora y nadie "
+"más de su equipo podrá abrirlo."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -4324,13 +4375,6 @@ msgstr "El formulario solo admite consultas SELECT."
 msgid "Disclaimer"
 msgstr "Aviso"
 
-#. placeholder {0}: top.value.slice(0, 1).join(", ")
-#. placeholder {1}: (share * 100).toFixed(0)
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}%</1> of rows."
-msgstr "Repetido con frecuencia: <0>{0}</0> aparece en <1>{1}%</1> de las "
-"filas."
-
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
 msgstr "Logo"
@@ -4395,6 +4439,12 @@ msgstr "Anotar el mapa"
 msgid "Choose the maximum value"
 msgstr "Elige el valor máximo"
 
+#. placeholder {0}: top.value.slice(0, 1).join(", ")
+#. placeholder {1}: formatColumnShare(share, i18n.locale)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
+msgid "Heavily repeated: <0>{0}</0> appears in <1>{1}</1> of rows."
+msgstr "Muy repetido: <0>{0}</0> aparece en <1>{1}</1> de las filas."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay yearly"
 msgstr "Pagar anualmente"
@@ -4443,7 +4493,7 @@ msgstr "Cualquiera en {app}"
 msgid "Failed to delete dataset"
 msgstr "No se pudo eliminar el conjunto de datos"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "License"
 msgstr "Licencia"
 
@@ -4459,6 +4509,10 @@ msgstr "¿Cuál es el promedio de {averageColumn} en {datasetName}?"
 msgid "Draw a region on the page"
 msgstr "Dibuje una región en la página"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Connect"
+msgstr "Conectar"
+
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "Drop to import"
 msgstr "Suelta para importar"
@@ -4467,13 +4521,13 @@ msgstr "Suelta para importar"
 msgid "Date range"
 msgstr "Rango de fechas"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "Agregar conjunto de datos al espacio de trabajo"
 
-#. placeholder {0}: summary.distinctValuesCount.toLocaleString()
-#. placeholder {1}: totalRows.toLocaleString()
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
+#. placeholder {1}: totalRows.toLocaleString(i18n.locale)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Mostly unique: <0>{0}</0> distinct values across <1>{1}</1> rows."
 msgstr "Mayormente único: <0>{0}</0> valores distintos en <1>{1}</1> filas."
 
@@ -4528,17 +4582,22 @@ msgstr "La descarga del modelo offline falló"
 msgid "Point geometry column"
 msgstr "Columna de geometría de puntos"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
+msgid "That file type is not supported"
+msgstr "Ese tipo de archivo no es compatible"
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "Etiqueta, por ejemplo, Región"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Select file"
-msgstr "Seleccionar archivo"
-
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} m"
 msgstr "{lengthValue} m"
+
+#. placeholder {0}: options.numColumns
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
+msgid "{0} detected"
+msgstr "{0} detectado"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete this workspace"
@@ -4595,14 +4654,20 @@ msgstr "Rango de números"
 msgid "Replace URL"
 msgstr "Reemplazar URL"
 
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Columns"
 msgstr "Columnas"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Bright"
 msgstr "Brillante"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+msgid "Canonical"
+msgstr "Canónico"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link can view this {resource}. People and groups below "
@@ -4631,10 +4696,6 @@ msgstr "La cláusula WHERE compara \"{columnName}\" con una expresión que no es
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryEncodingSelect.tsx
 msgid "WKB"
 msgstr "WKB"
-
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "Add to your workspace"
-msgstr "Agregar a tu espacio de trabajo"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
@@ -4680,6 +4741,10 @@ msgstr "Importación fallida: {reason}"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
 msgstr "Formato de marca de tiempo"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "File size"
+msgstr "Tamaño del archivo"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Labelled graphic (map, chart, tiles)"
@@ -4747,7 +4812,7 @@ msgstr "Eliminar fallido"
 #. placeholder {0}: concept.name
 #. placeholder {0}: dataset.name
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
 msgid "{0} deleted successfully"
 msgstr "{0} eliminado con éxito"
@@ -4771,10 +4836,6 @@ msgstr "Desde el conjunto de datos"
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "Fin (por ejemplo, 2024-12-31)"
-
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList.tsx
-msgid "No datasets match your search."
-msgstr "No hay conjuntos de datos que coincidan con tu búsqueda."
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -4825,6 +4886,10 @@ msgstr "Seleccionar columna"
 msgid "1"
 msgstr "1"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Rows skipped"
+msgstr "Filas omitidas"
+
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
 msgstr "Aún no se ha publicado. Los usuarios con acceso de solo lectura no "
@@ -4833,10 +4898,6 @@ msgstr "Aún no se ha publicado. Los usuarios con acceso de solo lectura no "
 #: src/components/ChatPanel/ClarificationCard/MultiOptionList.tsx
 msgid "Pick one or more"
 msgstr "Elige una o más"
-
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "Column Name"
-msgstr "Nombre de columna"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
@@ -5067,6 +5128,10 @@ msgstr "Seleccionar columnas"
 msgid "You cannot publish while there are unsaved changes. Save first."
 msgstr "No puedes publicar mientras haya cambios no guardados. Guarda primero."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
+msgid "CSV, Excel, or PDF. One file at a time."
+msgstr "CSV, Excel o PDF. Un archivo a la vez."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Eliminar espacio de trabajo"
@@ -5105,6 +5170,7 @@ msgstr "Borrar columna de estado de disputa"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Yes"
 msgstr "Sí"
 
@@ -5120,6 +5186,11 @@ msgstr "Consentimiento"
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Cuéntanos de dónde debería provenir la información de "
 "{singularConceptName}..."
+
+#. placeholder {0}: debouncedSearch.trim()
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "No catalog dataset matches “{0}”."
+msgstr "Ningún conjunto de datos del catálogo coincide con “{0}”."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -5143,11 +5214,6 @@ msgstr "Política de privacidad"
 msgid "Sign out failed"
 msgstr "Error al cerrar sesión"
 
-#. placeholder {0}: selectedGoogleAccount.google_email
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "You have successfully connected to {0}"
-msgstr "Te has conectado con éxito a {0}"
-
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Geometry support is unavailable"
 msgstr "El soporte de geometría no está disponible"
@@ -5167,6 +5233,7 @@ msgid "Please try again. The PDF was not created."
 msgstr "Por favor, inténtelo de nuevo. El PDF no fue creado."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Date format"
 msgstr "Formato de fecha"
 
@@ -5174,7 +5241,7 @@ msgstr "Formato de fecha"
 msgid "Share summary"
 msgstr "Compartir resumen"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Time"
 msgstr "Hora"
@@ -5227,10 +5294,6 @@ msgstr "Volver a los paneles"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "No rows"
 msgstr "Sin filas"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
-msgid "Most common"
-msgstr "Más común"
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "Shared drives"
@@ -5288,6 +5351,10 @@ msgstr "Propietario"
 msgid "Latitude must be between -90 and 90, and longitude must be between -180 "
 "and 180."
 msgstr "La latitud debe estar entre -90 y 90, y la longitud entre -180 y 180."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Access"
+msgstr "Acceso"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Number of rows to skip"
@@ -5401,18 +5468,9 @@ msgstr "Error al guardar el conjunto de datos: {0}"
 msgid "No columns yet"
 msgstr "Aún no hay columnas"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "Raw metadata (JSON)"
-msgstr "Metadatos en bruto (JSON)"
-
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
 msgstr "Borrar anotaciones"
-
-#. placeholder {0}: previewRows.length
-#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-msgid "These are the first {0} rows of your dataset."
-msgstr "Estas son las primeras {0} filas de tu conjunto de datos."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
@@ -5470,6 +5528,10 @@ msgstr "Pregunta sobre tus datos..."
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Title"
 msgstr "Título"
+
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "No datasets match your filter"
+msgstr "Ningún conjunto de datos coincide con su filtro"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
@@ -5587,7 +5649,7 @@ msgstr "Hacer interno"
 msgid "Detected"
 msgstr "Detectado"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete Dataset"
 msgstr "Eliminar conjunto de datos"
@@ -5609,7 +5671,7 @@ msgstr "Agregar series"
 msgid "{0} km"
 msgstr "{0} km"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
 msgstr "Fecha"
@@ -5706,6 +5768,10 @@ msgstr "La herramienta de área de influencia requiere una capa con geometría "
 msgid "Viewing only on this screen size."
 msgstr "Solo se muestra en este tamaño de pantalla."
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Time format"
+msgstr "Formato de hora"
+
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 msgid "Select aggregation"
 msgstr "Seleccionar agregación"
@@ -5761,10 +5827,6 @@ msgstr "Compartir falló"
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "Measure readout"
 msgstr "Lectura de medición"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary.tsx
-msgid "Timespan"
-msgstr "Período de tiempo"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Upper bound"
@@ -5863,10 +5925,6 @@ msgstr "todos los miembros de "
 msgid "Some data should be manually entered"
 msgstr "Algunos datos deben ser ingresados manualmente"
 
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
-msgid "Integer"
-msgstr "Entero"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "Nombre del campo"
@@ -5908,7 +5966,7 @@ msgstr "Bajo"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Description"
 msgstr "Descripción"
@@ -5922,10 +5980,6 @@ msgid "Some datasets are not synced online yet or failed to publish. "
 "{errorMessage}"
 msgstr "Algunos conjuntos de datos aún no se han sincronizado en línea o no se "
 "pudieron publicar. {errorMessage}"
-
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "Update frequency"
-msgstr "Frecuencia de actualización"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this chart"
@@ -5942,6 +5996,10 @@ msgstr "Tipografía"
 #: src/components/AppErrorBoundary/GenericError.tsx
 msgid "Something went wrong"
 msgstr "Algo salió mal"
+
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
+msgid "Select a dataset"
+msgstr "Seleccione un conjunto de datos"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -6004,11 +6062,11 @@ msgstr "Color de las marcas del eje Y"
 
 #. placeholder {0}: entry.pipelineName
 #. placeholder {1}: entry.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "{0} · run {1}"
 msgstr "{0} · ejecutar {1}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "Procesar datos nuevamente"
 
@@ -6220,11 +6278,15 @@ msgstr "Elemento de lista"
 msgid "Roughness ({0})"
 msgstr "Rugosidad ({0})"
 
-#. placeholder {0}: meta.columns.length
-#. placeholder {1}: meta.rows.toLocaleString()
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
+#. placeholder {0}: columns.length
+#. placeholder {1}: numRows.toLocaleString(i18n.locale)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
 msgid "{0} columns · {1} rows"
 msgstr "{0} columnas · {1} filas"
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Request a dataset"
+msgstr "Solicitar un conjunto de datos"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
@@ -6400,6 +6462,10 @@ msgstr "Cierre un anillo válido que no se cruce consigo mismo."
 msgid "1 layer"
 msgstr "1 capa"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Space"
+msgstr "Espacio"
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Pick what they can do"
 msgstr "Elija qué pueden hacer"
@@ -6521,10 +6587,6 @@ msgstr "Instantánea del tablero"
 msgid "Signing you back in…"
 msgstr "Iniciando sesión nuevamente…"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
-msgid "No region selected yet"
-msgstr "Aún no se ha seleccionado ninguna región"
-
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls.tsx
 msgid "Natural breaks"
 msgstr "Intervalos naturales"
@@ -6580,7 +6642,12 @@ msgid "Could not reach the assistant. Kept the rule-based results."
 msgstr "No se pudo conectar con el asistente. Se conservaron los resultados "
 "basados en reglas."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#. placeholder {0}: formatColumnShare(missingShare, i18n.locale)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
+msgid "{0} missing"
+msgstr "Falta {0}"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 msgid "Dataset deleted"
 msgstr "Conjunto de datos eliminado"
 
@@ -6596,9 +6663,17 @@ msgstr "Iniciar recorrido"
 msgid "Can't save dataset"
 msgstr "No se puede guardar el conjunto de datos"
 
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+msgid "Connected"
+msgstr "Conectado"
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the owner can make this {resource} private."
 msgstr "Solo el propietario puede hacer privado este {resource}."
+
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+msgid "Updates"
+msgstr "Actualizaciones"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
@@ -6625,10 +6700,6 @@ msgstr "Mapas"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "Importar conjunto de datos"
-
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-msgid "Pick google sheet"
-msgstr "Seleccionar hoja de Google"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
 msgid "Symbol sizes from {firstLabel} to {lastLabel}"
@@ -6702,7 +6773,6 @@ msgstr "Ponderar por"
 
 #. placeholder {0}: err.message
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 msgid "There was an error on update: {0}"
 msgstr "Hubo un error en la actualización: {0}"
 
@@ -6732,6 +6802,15 @@ msgstr "Configuraciones de visualización"
 msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini (sin conexión)"
 
+#. placeholder {0}: options.numPreviewRows
+#. placeholder {0}: previewData.length
+#. placeholder {0}: previewRows.length
+#: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "First {0} rows"
+msgstr "Primeras {0} filas"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Data processing failed"
 msgstr "El procesamiento de datos falló"
@@ -6757,10 +6836,6 @@ msgstr "Este conjunto de datos es grande, por lo que aplicamos un límite de 100
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "Cualquier persona con el enlace"
-
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
-msgid "This dataset can be stored in the cloud. "
-msgstr "Este conjunto de datos se puede almacenar en la nube."
 
 #. placeholder {0}: dataRows.length
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -6795,7 +6870,7 @@ msgstr "La latitud y la longitud deben ser números."
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Delete dataset"
 msgstr "Eliminar conjunto de datos"
@@ -6882,7 +6957,7 @@ msgid "Public queries are not supported for structured queries. Use raw SQL "
 msgstr "Las consultas públicas no son compatibles con las consultas "
 "estructuradas. Utilice SQL en bruto en su lugar."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "CSV file"
 msgstr "Archivo CSV"
 
@@ -6899,17 +6974,12 @@ msgid "Boundary match report"
 msgstr "Informe de coincidencias de límites"
 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Dataset Name"
 msgstr "Nombre del conjunto de datos"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copy share link"
 msgstr "Copiar enlace para compartir"
-
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
-msgid "Canonical URLs"
-msgstr "URLs canónicas"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "Leave empty when the geometry is already WGS 84."
@@ -6956,7 +7026,6 @@ msgid "Custom URL is available"
 msgstr "URL personalizada disponible"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of rows"
 msgstr "Número de filas"
 
@@ -6965,6 +7034,7 @@ msgid "Form is an approximation"
 msgstr "El formulario es una aproximación"
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Restricted"
 msgstr "Restringido"
 
@@ -6978,7 +7048,7 @@ msgid "This dashboard is not published yet. Use the button below to publish it "
 msgstr "Este dashboard aún no se ha publicado. Use el botón de abajo para "
 "publicarlo para la audiencia que eligió."
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
 msgid "Upload a file"
 msgstr "Cargar un archivo"
 
@@ -7038,6 +7108,12 @@ msgstr "Solo usted podrá abrirlo. Puede volver a compartirlo en cualquier "
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
 msgstr "Agregado a \"{dashboardName}\""
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
+msgid "No rows were read successfully. Adjust the parse settings below, or "
+"check that the file is not empty."
+msgstr "No se leyó ninguna fila correctamente. Ajuste la configuración de "
+"análisis a continuación o compruebe que el archivo no esté vacío."
 
 #: src/routes/signin.tsx
 msgid "Welcome back!"
@@ -7111,14 +7187,13 @@ msgstr "Debemos unir datos en el mismo {conceptName} cuando…"
 msgid "Pay What You Want"
 msgstr "Paga lo que quieras"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Regions read"
+msgstr "Regiones leídas"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar layout"
 msgstr "Diseño de barras"
-
-#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
-msgid "Please select a dataset from the left sidebar, or create a new one."
-msgstr "Por favor, selecciona un conjunto de datos de la barra lateral "
-"izquierda, o crea uno nuevo."
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Limit to app access"
@@ -7208,6 +7283,10 @@ msgstr "Grupo de usuarios eliminado"
 msgid "(Monthly billing)"
 msgstr "(Facturación mensual)"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+msgid "What to read"
+msgstr "Qué leer"
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
 msgid "Symbol size {firstLabel}"
 msgstr "Tamaño de símbolo {firstLabel}"
@@ -7220,6 +7299,7 @@ msgstr "¿Aún no tienes una cuenta?"
 msgid "Dataset failed to load"
 msgstr "El conjunto de datos no se pudo cargar"
 
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Decimal"
 msgstr "Decimal"
@@ -7307,6 +7387,10 @@ msgstr "No se pudo publicar el tablero"
 msgid "Fiord"
 msgstr "Fiordo"
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+msgid "Choose what to read"
+msgstr "Elija qué leer"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "Reescritura sugerida:"
@@ -7336,7 +7420,7 @@ msgstr "1 conjunto de datos"
 msgid "No numeric columns"
 msgstr "Sin columnas numéricas"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Service"
 msgstr "Servicio"
 
@@ -7346,6 +7430,10 @@ msgid "This question is too large for the on-device model. Try a shorter "
 msgstr "Esta pregunta es demasiado extensa para el modelo en el dispositivo. "
 "Intente formular una pregunta más breve o vuelva a conectarse para usar "
 "el chat en la nube."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Original kept"
+msgstr "Original conservado"
 
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "{lengthValue} km"
@@ -7391,7 +7479,9 @@ msgstr "Personas con acceso"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
 
@@ -7405,7 +7495,6 @@ msgstr "Ninguna de las regiones seleccionadas ha producido filas todavía, por "
 msgid "Name for {columnLabel}"
 msgstr "Nombre para {columnLabel}"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/OnlineStorageAllowedCheckbox.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset will no longer be stored online and can only be accessed as "
 "long as it is on your personal computer. Nobody on your team will be "
@@ -7440,6 +7529,10 @@ msgstr "Qwen 2.5 3B (sin conexión)"
 msgid "Collapse the legend"
 msgstr "Contraer la leyenda"
 
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "No datasets yet"
+msgstr "Aún no hay conjuntos de datos"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
 msgstr "Mensaje de chat"
@@ -7453,7 +7546,6 @@ msgstr "Error al guardar el conjunto de datos"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
-#: src/views/DataManagerApp/DatasetMetaView/EditDatasetView.tsx
 #: src/views/ProfileView/DisplayNameSection.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -7592,7 +7684,7 @@ msgstr "No se encontró la pestaña"
 #. placeholder {0}: summary.datasetCoverage
 #. placeholder {1}: summary.oldestDate || "earliest"
 #. placeholder {2}: summary.mostRecentDate || "latest"
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Covers <0>{0}</0>, from <1>{1}</1> through <2>{2}</2>."
 msgstr "Cubre <0>{0}</0>, desde <1>{1}</1> hasta <2>{2}</2>."
 
@@ -7745,7 +7837,7 @@ msgstr "Editor"
 msgid "Entered manually"
 msgstr "Ingresado manualmente"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
 msgid "Organization"
 msgstr "Organización"
 
@@ -7789,10 +7881,6 @@ msgstr "Comprar {seatsToAdd} asientos"
 msgid "Current Plan"
 msgstr "Plan actual"
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-msgid "No rows were read successfully"
-msgstr "No se leyeron filas con éxito"
-
 #: shared/copy/resourceTypeLabel.ts
 msgid "map"
 msgstr "mapa"
@@ -7804,6 +7892,10 @@ msgstr "Nuevo grupo de usuarios"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Keep that chart somewhere you can come back to."
 msgstr "Guarde ese gráfico en un lugar al que pueda volver."
+
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
+msgid "Bring in your first dataset"
+msgstr "Incorpore su primer conjunto de datos"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -7817,6 +7909,10 @@ msgstr "Ninguna de las anteriores"
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "Isochrone from a point"
 msgstr "Isochrona desde un punto"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
+msgid "Avandar can import CSV, Excel, and PDF files."
+msgstr "Avandar puede importar archivos CSV, Excel y PDF."
 
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
@@ -7845,6 +7941,7 @@ msgid "Hide the tutorial"
 msgstr "Ocultar el tutorial"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Excel"
 msgstr "Excel"
 
@@ -7955,6 +8052,10 @@ msgstr "Si hay múltiples valores de {attributeName} para un {0}, entonces..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Expresión de columna sin nombre en SELECT; se omitió."
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "Clear search"
+msgstr "Borrar búsqueda"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Add field"
@@ -8030,9 +8131,13 @@ msgstr "Para cada conjunto de datos, seleccione la columna que identifica de "
 "forma única un {conceptName}. Usamos esas columnas para combinar las "
 "filas en un solo registro."
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
 msgid "Column outline"
 msgstr "Esquema de columna"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
+msgid "What is in this dataset?"
+msgstr "¿Qué contiene este conjunto de datos?"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Nothing selected yet"
@@ -8125,6 +8230,7 @@ msgid "Breaks must be finite and strictly increasing."
 msgstr "Los intervalos deben ser finitos y estar estrictamente en orden "
 "ascendente."
 
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Dataset name"
 msgstr "Nombre del conjunto de datos"
@@ -8134,7 +8240,6 @@ msgid "Source column"
 msgstr "Columna de origen"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DataSummaryView.tsx
 msgid "Number of columns"
 msgstr "Número de columnas"
 
@@ -8186,10 +8291,6 @@ msgstr "Cancelado"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Color ramp"
 msgstr "Escala de color"
-
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
-msgid "number"
-msgstr "número"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -8254,7 +8355,7 @@ msgstr "Agregue contexto, metodología o una conclusión clave."
 msgid "Add a table of the top 10 rows of {datasetName}"
 msgstr "Agrega una tabla de las 10 filas principales de {datasetName}"
 
-#: src/views/DataManagerApp/DatasetNavbar.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "This dataset is fully available offline"
 msgstr "Este conjunto de datos está completamente disponible sin conexión"
 
@@ -8356,6 +8457,8 @@ msgid "Thank you for your interest!"
 msgstr "¡Gracias por tu interés!"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Source"
@@ -8389,6 +8492,13 @@ msgstr "Solo lo que se consulta (recomendado)"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Untitled"
 msgstr "Sin título"
+
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
+msgid "Draw a box around a table, chart, or block of text on the page, or "
+"highlight a sentence. Avandar reads only what you mark."
+msgstr "Dibuje un cuadro alrededor de una tabla, un gráfico o un bloque de "
+"texto en la página, o resalte una oración. Avandar solo lee lo que "
+"marque."
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Previewing this dashboard"
@@ -8507,6 +8617,7 @@ msgstr "De tu solicitud:"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Delimiter"
 msgstr "Delimitador"
 
@@ -8608,9 +8719,9 @@ msgstr "Conjunto de datos guardado"
 msgid "Low to High"
 msgstr "De menor a mayor"
 
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
-#: src/views/DataExplorerApp/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "Texto"
@@ -8633,7 +8744,7 @@ msgid "HAVING uses aggregate {funcName} on a complex argument; mapping kept the 
 msgstr "HAVING usa la función de agregación {funcName} en un argumento "
 "complejo; la asignación mantuvo el predicado como etiqueta."
 
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/SaveDatasetButton.tsx
+#: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportActions/DatasetImportActions.tsx
 msgid "Save Dataset"
 msgstr "Guardar conjunto de datos"
 
@@ -8682,16 +8793,6 @@ msgstr "(Mensaje no enviado.)"
 msgid "No workspace was found"
 msgstr "No se encontró ningún espacio de trabajo"
 
-#. placeholder {0}: options.numColumns
-#: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-msgid "{0} columns were detected. Review the column info below to make sure "
-"they are correct. If they are not, change the import options above and "
-"click Upload again."
-msgstr "Se detectaron {0} columnas. Revise la información de las columnas a "
-"continuación para asegurarse de que sean correctas. Si no lo son, "
-"cambie las opciones de importación arriba y haga clic en Cargar "
-"nuevamente."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save\" to open the menu."
 msgstr "Haga clic en «Guardar» para abrir el menú."
@@ -8720,12 +8821,6 @@ msgid "Every workspace member who can open the {app} app gets this role on this 
 msgstr "Cada miembro del espacio de trabajo que pueda abrir la aplicación {app} "
 "obtiene este rol en este {resource}, además de lo que aparezca a "
 "continuación."
-
-#: src/views/DataManagerApp/DataImportView/DataImportView.tsx
-msgid "Upload files, connect external sources, or browse open datasets to add "
-"to your workspace."
-msgstr "Sube archivos, conecta fuentes externas o explora conjuntos de datos "
-"abiertos para agregar a tu espacio de trabajo."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -8912,10 +9007,6 @@ msgstr "Límite de conjunto de datos alcanzado"
 msgid "Case type deleted"
 msgstr "Tipo de caso eliminado"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody.tsx
-msgid "Distinct values"
-msgstr "Valores distintos"
-
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING usa el operador \"{operator}\", que no es compatible con el "
@@ -8936,7 +9027,6 @@ msgstr "Por favor, confirma que deseas proceder con este cambio de plan. Tu "
 "suscripción se actualizará en consecuencia."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Derived Dataset"
 msgstr "Conjunto de datos derivado"
 
@@ -8968,9 +9058,15 @@ msgstr "Trazado ({strokeWidth}px)"
 msgid "Publish to workspace"
 msgstr "Publicar en el espacio de trabajo"
 
+#: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
 msgstr "Número entero"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+msgid "No description yet. Add one so teammates know what this dataset covers."
+msgstr "Aún no hay una descripción. Agrega una para que tus compañeros sepan "
+"qué abarca este conjunto de datos."
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Select a data source to add filters."
@@ -9002,6 +9098,14 @@ msgstr "Archivo CSV o Excel"
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
 msgstr "SELECT hace referencia a la columna \"{columnName}\", que no está "
 "presente en el conjunto de datos."
+
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
+msgid "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the "
+"open data catalog. Everything else in Avandar builds on what you import "
+"here."
+msgstr "Cargue un archivo CSV, Excel o PDF, conecte una hoja de cálculo de "
+"Google o explore el catálogo de datos abiertos. Todo lo demás en "
+"Avandar se basa en lo que importe aquí."
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
@@ -9060,6 +9164,12 @@ msgstr "Opacidad del relleno"
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Show the title on the page"
 msgstr "Mostrar el título en la página"
+
+#: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
+msgid "Pick one from the list to review its columns, preview its rows, and read "
+"a summary of what is in it."
+msgstr "Seleccione uno de la lista para revisar sus columnas, obtener una vista "
+"previa de sus filas y leer un resumen de su contenido."
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -9266,11 +9376,17 @@ msgstr "El conjunto de datos se guardó, pero no se pudo cargar el archivo "
 msgid "Add a tile service"
 msgstr "Agregar un servicio de teselas"
 
-#. placeholder {0}: top.value.length - 5
-#. placeholder {1}: top.count.toLocaleString()
+#. placeholder {0}: top.value.length - MAX_BARS
+#. placeholder {1}: top.count.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary.tsx
 msgid "+{0} more values tied at {1} rows"
 msgstr "+{0} valores más empatados en {1} filas"
+
+#. placeholder {0}: top.value.slice(0, 2).join(", ")
+#. placeholder {1}: formatColumnShare(share, i18n.locale)
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
+msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
+msgstr "El valor más común es <0>{0}</0>, en <1>{1}</1> de las filas."
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Data key column"

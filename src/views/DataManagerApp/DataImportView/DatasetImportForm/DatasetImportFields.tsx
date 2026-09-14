@@ -1,4 +1,4 @@
-import { TextInput } from "@mantine/core";
+import { SimpleGrid, TextInput } from "@mantine/core";
 import type { DatasetImportFormValues } from "./DatasetImportForm.types";
 import type { UseFormReturnType } from "@mantine/form";
 import type { ReactNode, RefObject } from "react";
@@ -16,6 +16,10 @@ export type DatasetImportFieldsProps = {
 /**
  * The two text fields the user fills in. Both refs are held by the validation
  * hook, which focuses whichever field a failed submit names first.
+ *
+ * They sit side by side rather than stacked: two short single-line fields
+ * stacked full-width across a wide view leave the eye travelling further
+ * than the content justifies.
  */
 export function DatasetImportFields({
   descriptionInputRef,
@@ -27,7 +31,7 @@ export function DatasetImportFields({
   namePlaceholder,
 }: Readonly<DatasetImportFieldsProps>): ReactNode {
   return (
-    <>
+    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" maw={880}>
       <TextInput
         ref={nameInputRef}
         key={form.key("name")}
@@ -43,6 +47,6 @@ export function DatasetImportFields({
         placeholder={descriptionPlaceholder}
         {...form.getInputProps("description")}
       />
-    </>
+    </SimpleGrid>
   );
 }

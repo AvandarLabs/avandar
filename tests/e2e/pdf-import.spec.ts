@@ -27,8 +27,8 @@ const PARSE_FAILURE_TITLE = "Data processing failed";
 const PARSE_FAILURE_MESSAGE = "No rows were read successfully";
 
 /** Copy from `DatasetPreview` for the PDF needs-selection state. */
-const NO_REGION_TITLE = "No region selected yet";
-const NO_REGION_MESSAGE = "Select a region on the page to see data";
+const NO_REGION_TITLE = "Choose what to read";
+const NO_REGION_MESSAGE = "Draw a box around a table, chart, or block of text";
 
 /**
  * The choropleth panel on page 1 of the OCHA update, in PDF points measured
@@ -211,9 +211,6 @@ test.describe("PDF manual upload", () => {
     await uploadPanel
       .locator('input[type="file"]')
       .setInputFiles(FRONTIERS_PERU_PDF_PATH);
-    await uploadPanel
-      .getByRole("button", { name: "Upload", exact: true })
-      .click();
 
     // Reaching this alert proves the dropzone accepted the file, the MIME
     // mapping resolved it to `pdf_file`, and the worker returned geometry.
@@ -278,9 +275,6 @@ test.describe("PDF manual upload", () => {
     await uploadPanel
       .locator('input[type="file"]')
       .setInputFiles(OCHA_SUDAN_CHOLERA_PDF_PATH);
-    await uploadPanel
-      .getByRole("button", { name: "Upload", exact: true })
-      .click();
 
     await expect(page.getByText(NO_REGION_TITLE)).toBeVisible({
       timeout: LONG_WAIT,

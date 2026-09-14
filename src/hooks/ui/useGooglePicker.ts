@@ -149,6 +149,21 @@ export function useGooglePicker({
   const [user, isLoadingUser] = useCurrentUserProfile();
   const [tokens, isLoadingTokens] = useQuery({
     queryKey: ["getGoogleTokens"],
+
+    // Never written to disk. The response carries the account's Google access
+    // and refresh tokens in plaintext, and the persisted cache would hold them
+    // for `PERSIST_MAX_AGE_MS`.
+    meta: { persist: false },
+
+    // Never served stale either, for two reasons. Connecting an account leaves
+    // the page entirely (`onConnect` navigates to Google and the callback
+    // redirects back), so nothing on this side can invalidate the query, and a
+    // cached empty list would survive the round trip and keep offering
+    // `Connect` to an account that is already connected. The route also exists
+    // to hand back a *valid* access token, refreshing anything within five
+    // minutes of expiry, which a cache measured in minutes quietly undoes.
+    staleTime: 0,
+
     queryFn: async () => {
       // TODO(jpsyx): you could actually have multiple!!!
       // A user can connect multiple google accounts to their account.

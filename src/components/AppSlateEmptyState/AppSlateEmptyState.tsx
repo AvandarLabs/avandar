@@ -1,4 +1,3 @@
-import { Paper } from "@avandar/ui";
 import { Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import clsx from "clsx";
 import css from "@/components/AppSlateEmptyState/AppSlateEmptyState.module.css";
@@ -15,6 +14,12 @@ type Props = {
 /**
  * Instructional empty slate used when a master-detail view has nothing
  * selected, or a workspace surface has no records yet.
+ *
+ * It sits flush on whichever surface the region behind it paints, with no
+ * card of its own. The region is already the object; a bordered box inside
+ * it would draw an edge with the same fill on both sides, which reads as a
+ * seam rather than as lift. The 48px of air, the 720px measure, and the
+ * centered icon are what mark this as a state rather than as content.
  */
 export function AppSlateEmptyState({
   title,
@@ -24,21 +29,27 @@ export function AppSlateEmptyState({
   className,
 }: Readonly<Props>): ReactNode {
   return (
-    <Paper p="xxl" maw={720} mx="auto" className={clsx(css.panel, className)}>
-      <Stack gap="lg" align="center" ta="center">
-        {icon ? (
-          <ThemeIcon size={64} radius="xl" variant="light">
-            {icon}
-          </ThemeIcon>
-        ) : null}
-        <Stack gap="xs">
-          <Title order={2} fw={650}>
-            {title}
-          </Title>
-          <Text c="dimmed">{message}</Text>
-        </Stack>
-        {action}
+    <Stack
+      align="center"
+      className={clsx(css.emptyState, className)}
+      gap="lg"
+      maw={720}
+      mx="auto"
+      p="xxl"
+      ta="center"
+    >
+      {icon ? (
+        <ThemeIcon size={64} radius="xl" variant="light">
+          {icon}
+        </ThemeIcon>
+      ) : null}
+      <Stack gap="xs">
+        <Title order={2} fw={650}>
+          {title}
+        </Title>
+        <Text c="dimmed">{message}</Text>
       </Stack>
-    </Paper>
+      {action}
+    </Stack>
   );
 }

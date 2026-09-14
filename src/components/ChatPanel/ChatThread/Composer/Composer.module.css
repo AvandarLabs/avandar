@@ -20,6 +20,18 @@
   border-color: var(--ava-border-focus);
 }
 
+/*
+ * Flush with the panel's disabled ground rather than raised above it. A
+ * white fill and a hairline are the system's "type here" cue, and this
+ * field cannot take a click. A surface token rather than `transparent`,
+ * so the fill stays opaque and keeps its meaning through a theme swap:
+ * see the note on `.shell` in ChatPanel.module.css for the bug a
+ * translucent disabled state caused here.
+ */
+.composerDisabled {
+  background: var(--ava-surface-body);
+}
+
 .composerInput {
   background: transparent;
   border: 0;

@@ -23,7 +23,6 @@ export function NuxChecklistDockButton({
       <Button
         className={classes.nuxChecklistPanelDock}
         pos="fixed"
-        bottom={16}
         style={dockStyle}
         size="compact-sm"
         rightSection={<IconChevronRight size={14} />}

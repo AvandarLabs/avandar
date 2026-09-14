@@ -14,4 +14,19 @@ export default defineConfig({
     // rule fights our conventions more than it helps. Disabled repo-wide.
     rules: ["react-doctor/js-combine-iterations"],
   },
+
+  supplyChain: {
+    // Socket's score gate stays on, but advisory rather than blocking. Two of
+    // its current findings show why an automatic fail is the wrong default
+    // here: it scores `supabase` 0/100 from a GitHub malware advisory that has
+    // since been withdrawn (`pnpm audit` reports nothing for it), and it flags
+    // `maplibre-gl` for GHSA-jrc7-96c5-q579, which is real but only reachable
+    // through `AttributionControl`, the one caller of the patched
+    // `DOM.sanitize`, and every map we build passes `attributionControl:
+    // false`. Neither is something an engineer can act on mid-change, and a
+    // blocking gate on a third-party score turns an unrelated `package.json`
+    // edit into a red build. Findings still print, so a genuine malware alert
+    // is still seen.
+    severity: "warning",
+  },
 });

@@ -8,9 +8,9 @@ colors:
   primary-deep: "#0b4aea"
   ink: "#102a43"
   ink-soft: "#243b53"
-  body: "#f0f4f8"
+  body: "#f8fafc"
   raised: "#ffffff"
-  sunken: "#d9e2ec"
+  sunken: "#d9e0e7"
   chrome: "#486581"
   chrome-ink: "#ffffff"
   border: "rgba(16, 42, 67, 0.2)"
@@ -94,9 +94,7 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
   empty-state:
-    backgroundColor: "{colors.raised}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.sm}"
     padding: "48px"
     width: "720px"
 ---
@@ -141,10 +139,16 @@ A restrained cool palette: one brand blue against a ten-step blue-gray ramp, wit
 
 - **Deep Blue-Gray Ink** (`#102a43`): all body text (`neutral.9`).
 - **Soft Ink** (`#243b53`): text on `default`-variant buttons (`neutral.8`).
-- **Muted Steel Chrome** (`#486581`): the shell background and sidebar (`neutral.6`), with white labels on top. The dark field the slate floats on.
-- **Tinted Cool Paper** (`#f0f4f8`): the body surface, including the slate itself (`neutral.0`). Tinted toward the brand hue, never cream.
-- **Sheet White** (`#ffffff`): raised surfaces (cards, panels, menus, empty states) sitting on Tinted Cool Paper.
-- **Pale Steel** (`#d9e2ec`): sunken state, the hover fill on `subtle` and `default` controls, and panel headers (`neutral.1`).
+- **Muted Steel Chrome** (`#486581`): the shell background and sidebar (`neutral.6`), with white labels on top. The dark field the slate floats on, and the darker of the two anchors the ramp is derived from.
+- **Tinted Cool Paper** (`#f8fafc`): the body surface, including the slate itself (`neutral.0`). The ground every view sits on, and the lighter of the two anchors the ramp is derived from. Tinted toward the brand hue, never cream.
+- **Sheet White** (`#ffffff`): raised surfaces (cards, panels, menus) sitting on Tinted Cool Paper.
+- **Pale Steel** (`#d9e0e7`): sunken state, the hover fill on `subtle` and `default` controls, panel headers, and any fill small enough that the ground would swallow it (`neutral.1`).
+
+### How the ramp is built
+
+Shades 0 through 6 are derived, not picked: even steps in OKLab lightness between `#f8fafc` at index 0 and `#486581` at index 6 (`neutral.6` is the primary shade). That is what makes a hover built on one pair of shades read like the same hover built on another. Shades 7 through 9 stay hand-picked, because `#102a43` is the body-text ink and the hue every border and shadow is tinted from; it is a fixed brand value rather than an output.
+
+If you regenerate the ramp, interpolate in a perceptually uniform space. Even steps in sRGB are not even steps to the eye, and looking evenly spaced is the ramp's entire job.
 
 ### Semantic
 
@@ -156,7 +160,9 @@ Four ramps live on the theme: `success` (`#40cf5e`), `warning` (`#f1c617`), `dan
 
 **The No Second Accent Rule.** The theme declares a `secondary` amber ramp (`#f0b429` family) that no UI uses. It is dormant, not available. Do not reach for it to differentiate a feature area.
 
-**The Cool Ground Rule.** Every neutral is tinted toward the brand hue. Warm grays, creams, and sands are off-system. Mantine's stock `gray` ramp is untinted and is not this system's `neutral`: `gray.0` (`#f8f9fa`) and `neutral.0` (`#f0f4f8`) are visibly different grounds. **The app contains no stock `gray` at all**, and that is worth keeping true: a `gray` appearing anywhere is a regression, not a shade choice. The two ramps do not step alike, so a `gray.N` is never converted by index. Convert by role instead: a panel ground is `--ava-surface-body`, a recessed fill is `neutral.1`, and any 1px edge is `--ava-border-default` or `--ava-border-strong`.
+**The Cool Ground Rule.** Every neutral is tinted toward the brand hue. Warm grays, creams, and sands are off-system. Mantine's stock `gray` ramp is untinted and is not this system's `neutral`. **The app contains no stock `gray` at all**, and that is worth keeping true: a `gray` appearing anywhere is a regression, not a shade choice.
+
+At the top of the ramp the two are now nearly the same value (`gray.0` is `#f8f9fa`, `neutral.0` is `#f8fafc`), so index 0 is no longer where the difference shows. That makes converting by index more dangerous, not less: the ramps diverge through the middle and the dark end, so a `gray.6` is a different color from a `neutral.6` even though their zeroes match. Convert by role: a panel ground is `--ava-surface-body`, a recessed fill is `neutral.1`, and any 1px edge is `--ava-border-default` or `--ava-border-strong`.
 
 ### Dark mode: built, not shipped
 
@@ -192,7 +198,9 @@ The app is a fixed full-height shell, not a scrolling page. `AppSlate` occupies 
 
 **Master-detail.** The dominant view pattern: a list pane with a 240px minimum beside a scrolling detail region. Data Sources is the spatial template; Case Manager and the ontology views follow it.
 
-**Spacing.** A nine-step scale from 2px to 64px, every step multiplied by `--mantine-scale`. The everyday steps are `xs` (8px, the gutter), `sm` (12px), `md` (16px), and `lg` (24px). `xxl` (48px) is the empty-state panel padding.
+**Inside a view.** How the detail region itself is laid out (the header band and its facts line, the content column, the properties rail, the section rhythm) and the placement rule that decides which of the three any given fact belongs in are defined in [`docs/design/app-view-layout.md`](docs/design/app-view-layout.md), along with the `AppView` primitives that implement them. Read it before building or restyling any app view.
+
+**Spacing.** A nine-step scale from 2px to 64px, every step multiplied by `--mantine-scale`. The everyday steps are `xs` (8px, the gutter), `sm` (12px), `md` (16px), and `lg` (24px). `xxl` (48px) is the empty-state padding.
 
 **Breakpoints.** `xs` 36em, `sm` 48em, `md` 62em, `lg` 75em, `xl` 88em, em-based to match Mantine's convention.
 
@@ -206,7 +214,11 @@ The app is a fixed full-height shell, not a scrolling page. `AppSlate` occupies 
 
 This is a hairline system with shadow as reinforcement, not a shadow system. A crisp 1px border is what tells the eye "this is a distinct surface"; the shadow only adds "and it is sitting above the background." Surfaces step through tonal layers (`body` to `raised` to `overlay`), and borders come in three tiers.
 
-**Surface steps (light).** `--ava-surface-body` `#f0f4f8` (the slate and page ground) → `--ava-surface-raised` `#ffffff` (cards, panels, list panes) → `--ava-surface-overlay` `#ffffff` (menus, modals). `--ava-surface-sunken` `#d9e2ec` is the hover fill on outline and subtle controls, and also serves panel headers.
+**Surface steps (light).** `--ava-surface-body` `#f8fafc` (the slate ground, the master list pane, and a detail view's properties rail) → `--ava-surface-raised` `#ffffff` (the content column, cards, panels, menus) → `--ava-surface-overlay` `#ffffff` (menus, modals). `--ava-surface-sunken` `#d9e0e7` is the hover fill on outline and subtle controls, and also serves panel headers.
+
+The step from body to raised is deliberately small (1.05:1, about 4.6 points of lightness). It is not trying to be a visible boundary on its own: the hairline is the boundary, and the tone says which side of it you are working on. A larger step turns a full-height list pane into a gray panel, which is what the previous `#f0f4f8` did.
+
+**Area decides which step a fill takes.** A large region reads as more tinted than a small one at the same value, so the two want different steps to sit at the same apparent level. Full-height flanks take `--ava-surface-body`; a chip, a bar track, or any fill small enough for the ground to swallow takes `neutral.1`.
 
 **Border tiers.** `--ava-border-default` for the everyday edge (cards, panels, inputs, dropdowns, dividers); `--ava-border-strong` only when default washes out against a tinted surface or a divider must read as a structural break; `--ava-border-focus` for focus rings and active fields, never decoratively.
 
@@ -228,6 +240,8 @@ Every step is a stacked pair: one tight low-offset layer plus one softer, larger
 **The Hairline-Before-Shadow Rule.** Elevation is a 1px token border plus a tight stacked shadow. Never a floating card on a void. If a surface is raised, it has a border.
 
 **The Paired-Token Rule.** Always pair an `--ava-border-*` with the matching `--ava-surface-*` and an elevation step. Never hand-pick a neutral shade for an edge. This is what keeps elevation consistent across components and makes dark mode a token swap rather than a rewrite.
+
+**The Real-Step Rule.** An edge needs a tonal step under it. If the fill is the same token on both sides, the border and shadow are drawing a seam, not elevation, and the surface should be flush instead. The usual way this goes wrong is a `Paper` inheriting a ground that has since been repainted: check what the parent fills before boxing anything.
 
 **The Blur Ceiling Rule.** Ordinary surfaces never pair a 1px border with a blur of 16px or more. The two documented exceptions are the slate and the overlay panel, both of which are floating on something dark and both of which are specified above. If you are writing a third one, you are inventing a tier.
 
@@ -278,10 +292,12 @@ Tighter radii than Mantine's defaults, and a rectilinear form language throughou
 
 The single most important component in the system, because it is where a new user learns what a surface is for.
 
-- A raised Paper, `p="xxl"` (48px), `maw={720}`, centered.
+- Flush on whichever surface the region behind it paints: no fill, no border, no shadow. `p="xxl"` (48px), `maw={720}`, centered.
 - An optional 64px `ThemeIcon` at `radius="xl"`, `variant="light"`, inheriting primary.
 - A 650-weight heading, then one dimmed sentence, then at most one action.
 - It enters with an 8px rise and fade over 200ms, and does not animate at all under `prefers-reduced-motion`.
+
+The air, the measure, and the icon are what mark this as a state rather than as content; a card would add nothing. A detail region already paints `--ava-surface-raised`, so boxing the empty state in a raised `Paper` drew a bordered, shadowed edge with `#ffffff` on both sides of it. That reads as a seam, not as lift. Flush also means the same component is correct on the tinted body surface, which is where the views that have not moved to `AppView` yet still put it.
 
 ### Callouts
 

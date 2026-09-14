@@ -45,7 +45,7 @@ The two current implementations, side by side:
 
 | | `ManualUploadView` | `GoogleSheetsImportView` |
 | --- | --- | --- |
-| Source picker | `FileUploadForm` | `useGooglePicker`, then a tab dropdown |
+| Source picker | `FileDropzone`, collapsing to `UploadedFileBar` | `ConnectorRow`, `useGooglePicker`, then a tab dropdown |
 | Loader hook | `useManualUploadParse` over `useLoadManualUploadFile` | `useLoadGoogleSheet` |
 | Retained source | `uploadedFile` | `pickedSheet` plus the chosen tab |
 | Gate | `previewRows && uploadedFile && dataSourceMetadata` | `previewRows && dataSourceMetadata && pickedSheet` |
@@ -55,6 +55,16 @@ PDF; the Sheets path has one source format and one hook. Split only when a
 view has that much to branch over.
 
 ## Rules
+
+**Choosing the source is the whole gesture.** Picking a file parses it; there
+is no confirm step in between, because by the time a user has chosen a file
+they have already made the decision a confirm button would ask them to make
+again. The same holds for a connector: picking a sheet imports it.
+
+**Layout follows [`docs/design/app-view-layout.md`](../../../../docs/design/app-view-layout.md).**
+An import view renders sections, not cards, and states what the parse
+produced in a section heading and its count rather than in an informational
+callout.
 
 **Preview rows come from the sniff, never from a query.** The dataset table
 named after `datasetId` is written by the background parquet transcoding, not
@@ -119,6 +129,8 @@ drives real workbook bytes through a real sniff for this reason, and the
 1. Copy `GoogleSheetsImportView` if the source is remote, `ManualUploadView`
    if it is local, and keep the field names above. A remote source that has
    sub-parts (tabs, sheets, tables) lists them first and imports one.
+   A remote source's picker is a `ConnectorRow`, so a new service is a new
+   row rather than a new layout.
 2. Add the `DataSourceMetadata` and `ParseOptions` members for the source in
    [`DatasetImportForm.types.ts`](DatasetImportForm/DatasetImportForm.types.ts)
    and [`useSaveDataset`](DatasetImportForm/useSaveDataset/useSaveDataset.ts).

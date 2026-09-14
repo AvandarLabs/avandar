@@ -22,4 +22,19 @@ describe("AppSlateEmptyState", () => {
       screen.getByRole("button", { name: "Open case type" }),
     ).toBeInTheDocument();
   });
+
+  it("sits flush on the surface behind it, with no card of its own", () => {
+    const { container } = render(
+      <AppSlateEmptyState
+        title="Nothing in the catalog yet"
+        message="Avandar prepares public datasets and publishes them here."
+      />,
+    );
+
+    // The empty state fills a region that already paints its own surface, so
+    // a bordered, shadowed box around it would draw an edge with no tonal
+    // step on either side of it.
+    expect(container.querySelector("[data-with-border]")).toBeNull();
+    expect(container.querySelector(".mantine-Paper-root")).toBeNull();
+  });
 });

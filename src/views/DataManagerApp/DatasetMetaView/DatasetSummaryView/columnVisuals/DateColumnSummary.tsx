@@ -19,11 +19,7 @@ export function DateColumnSummary({ summary }: Props): ReactNode {
   const { oldestDate, mostRecentDate, datasetCoverage } = summary;
 
   return (
-    <Stack gap="sm">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-        <Trans>Timespan</Trans>
-      </Text>
-
+    <Stack gap="xs">
       <Box pos="relative" px={6}>
         <Box h={4} bg="neutral.1" style={{ borderRadius: 2 }} />
         <Box pos="absolute" top={-3} left={0}>

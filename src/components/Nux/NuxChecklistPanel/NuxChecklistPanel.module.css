@@ -1,7 +1,21 @@
 .nuxChecklistPanelDock {
   /*
-   * Match AppShell's default aside transition (200ms ease) so the checklist
-   * slides in step with the chat panel.
+   * Clear a view's sticky action bar. Both dock in the bottom-right corner,
+   * and the card is fixed, so without this it sits on the primary action and
+   * swallows every click on it. The inset is published app-wide by
+   * `useStickyActionBarInset`; it is 0px when no bar is on screen.
    */
-  transition: right 200ms ease;
+  bottom: calc(
+    var(--nux-dock-gap, 16px) + var(--ava-sticky-action-bar-inset, 0px)
+  );
+
+  /*
+   * Match AppShell's default aside transition (200ms ease) so the checklist
+   * slides in step with the chat panel. `bottom` rides the same curve, so
+   * lifting the dock over a sticky action bar reads as the same motion
+   * rather than a jump.
+   */
+  transition:
+    right 200ms ease,
+    bottom 200ms ease;
 }

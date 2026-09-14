@@ -32,8 +32,14 @@ export function ConceptNavbar({
         conceptId: concept.id,
         conceptName: concept.name,
       });
+      // Named fields rather than the whole `AppLink`: its `isAvailableOffline`
+      // is a routing fact, and spreading it forwards the flag to the anchor
+      // the row renders as, where React rejects it. This link's `key` is
+      // already per-concept, so it carries over as it is.
       return {
-        ...appLink,
+        key: appLink.key,
+        to: appLink.to,
+        params: appLink.params,
         label: appLink.label(),
       };
     });
