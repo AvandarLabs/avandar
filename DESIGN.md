@@ -94,9 +94,7 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
   empty-state:
-    backgroundColor: "{colors.raised}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.sm}"
     padding: "48px"
     width: "720px"
 ---
@@ -143,7 +141,7 @@ A restrained cool palette: one brand blue against a ten-step blue-gray ramp, wit
 - **Soft Ink** (`#243b53`): text on `default`-variant buttons (`neutral.8`).
 - **Muted Steel Chrome** (`#486581`): the shell background and sidebar (`neutral.6`), with white labels on top. The dark field the slate floats on, and the darker of the two anchors the ramp is derived from.
 - **Tinted Cool Paper** (`#f8fafc`): the body surface, including the slate itself (`neutral.0`). The ground every view sits on, and the lighter of the two anchors the ramp is derived from. Tinted toward the brand hue, never cream.
-- **Sheet White** (`#ffffff`): raised surfaces (cards, panels, menus, empty states) sitting on Tinted Cool Paper.
+- **Sheet White** (`#ffffff`): raised surfaces (cards, panels, menus) sitting on Tinted Cool Paper.
 - **Pale Steel** (`#d9e0e7`): sunken state, the hover fill on `subtle` and `default` controls, panel headers, and any fill small enough that the ground would swallow it (`neutral.1`).
 
 ### How the ramp is built
@@ -202,7 +200,7 @@ The app is a fixed full-height shell, not a scrolling page. `AppSlate` occupies 
 
 **Inside a view.** How the detail region itself is laid out (the header band and its facts line, the content column, the properties rail, the section rhythm) and the placement rule that decides which of the three any given fact belongs in are defined in [`docs/design/app-view-layout.md`](docs/design/app-view-layout.md), along with the `AppView` primitives that implement them. Read it before building or restyling any app view.
 
-**Spacing.** A nine-step scale from 2px to 64px, every step multiplied by `--mantine-scale`. The everyday steps are `xs` (8px, the gutter), `sm` (12px), `md` (16px), and `lg` (24px). `xxl` (48px) is the empty-state panel padding.
+**Spacing.** A nine-step scale from 2px to 64px, every step multiplied by `--mantine-scale`. The everyday steps are `xs` (8px, the gutter), `sm` (12px), `md` (16px), and `lg` (24px). `xxl` (48px) is the empty-state padding.
 
 **Breakpoints.** `xs` 36em, `sm` 48em, `md` 62em, `lg` 75em, `xl` 88em, em-based to match Mantine's convention.
 
@@ -242,6 +240,8 @@ Every step is a stacked pair: one tight low-offset layer plus one softer, larger
 **The Hairline-Before-Shadow Rule.** Elevation is a 1px token border plus a tight stacked shadow. Never a floating card on a void. If a surface is raised, it has a border.
 
 **The Paired-Token Rule.** Always pair an `--ava-border-*` with the matching `--ava-surface-*` and an elevation step. Never hand-pick a neutral shade for an edge. This is what keeps elevation consistent across components and makes dark mode a token swap rather than a rewrite.
+
+**The Real-Step Rule.** An edge needs a tonal step under it. If the fill is the same token on both sides, the border and shadow are drawing a seam, not elevation, and the surface should be flush instead. The usual way this goes wrong is a `Paper` inheriting a ground that has since been repainted: check what the parent fills before boxing anything.
 
 **The Blur Ceiling Rule.** Ordinary surfaces never pair a 1px border with a blur of 16px or more. The two documented exceptions are the slate and the overlay panel, both of which are floating on something dark and both of which are specified above. If you are writing a third one, you are inventing a tier.
 
@@ -292,10 +292,12 @@ Tighter radii than Mantine's defaults, and a rectilinear form language throughou
 
 The single most important component in the system, because it is where a new user learns what a surface is for.
 
-- A raised Paper, `p="xxl"` (48px), `maw={720}`, centered.
+- Flush on whichever surface the region behind it paints: no fill, no border, no shadow. `p="xxl"` (48px), `maw={720}`, centered.
 - An optional 64px `ThemeIcon` at `radius="xl"`, `variant="light"`, inheriting primary.
 - A 650-weight heading, then one dimmed sentence, then at most one action.
 - It enters with an 8px rise and fade over 200ms, and does not animate at all under `prefers-reduced-motion`.
+
+The air, the measure, and the icon are what mark this as a state rather than as content; a card would add nothing. A detail region already paints `--ava-surface-raised`, so boxing the empty state in a raised `Paper` drew a bordered, shadowed edge with `#ffffff` on both sides of it. That reads as a seam, not as lift. Flush also means the same component is correct on the tinted body surface, which is where the views that have not moved to `AppView` yet still put it.
 
 ### Callouts
 

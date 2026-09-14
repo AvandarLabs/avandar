@@ -44,8 +44,9 @@ function DataManagerRoot(): ReactNode {
   const hasDatasets = (allDatasets?.length ?? 0) > 0;
 
   // Inside `AppView` so the detail region keeps the lit content surface it
-  // has once a dataset is picked. Left outside it, the whole slate read as
-  // one field of the tinted body surface with a lone white panel on it.
+  // has once a dataset is picked. Left outside it, this one route sat on the
+  // tinted body surface while every other Data Sources view painted the
+  // split, so the ground changed under the user on the first selection.
   return (
     <AppView>
       <Center flex={1} p="lg" mih={0} style={{ overflow: "auto" }}>

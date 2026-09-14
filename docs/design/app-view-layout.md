@@ -15,7 +15,9 @@ Data Sources is the reference implementation. Copy it.
 **One surface per depth.** The slate is the raised object. Everything inside
 it is a region of that one surface, separated by hairlines and a single tonal
 step. A `Paper` inside the slate is a bug unless the thing it wraps genuinely
-floats: an empty state, a modal, a menu, the NUX card.
+floats: a modal, a menu, the NUX card. An empty state does not float. It
+fills a region that already paints its own surface, so it sits flush and
+lets the air, the measure, and the icon mark it as a state.
 
 What this replaces: a page whose title sat in a `Container` inside a `Paper`
 inside the slate, with each block introduced by a tinted informational
@@ -102,7 +104,7 @@ everywhere is what makes a page read as undifferentiated.
 | `md` | 16px | Form fields in one group; header band block padding |
 | `lg` | 24px | The single content gutter; between sibling blocks in a section |
 | `xl` | 32px | Between sections |
-| `xxl` | 48px | Empty-state panel padding only |
+| `xxl` | 48px | Empty-state padding only |
 
 **One gutter, and only one.** `AppViewBody` pays 24px inline. Nothing inside
 it adds padding around itself; siblings add space between themselves. That is

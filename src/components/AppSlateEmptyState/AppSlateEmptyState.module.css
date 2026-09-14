@@ -1,4 +1,4 @@
-.panel {
+.emptyState {
   animation: slate-empty-in var(--ava-animation-duration-normal)
     var(--ava-animation-easing-out);
 }
@@ -16,7 +16,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel {
+  .emptyState {
     animation: none;
   }
 }

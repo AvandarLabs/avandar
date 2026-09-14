@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-14T11:47:28Z",
+  "generatedAt": "2026-09-14T12:07:14Z",
   "title": "Design System: Avandar",
   "extensions": {
     "colorMeta": {
@@ -437,9 +437,9 @@
       "name": "Empty State",
       "kind": "custom",
       "refersTo": "empty-state",
-      "description": "The most important component in the system: where a new user learns what a surface is for. Never an info Callout.",
+      "description": "The most important component in the system: where a new user learns what a surface is for. Sits flush on whichever surface the region behind it paints, with no fill, border, or shadow of its own. Never an info Callout.",
       "html": "<div class=\"ds-empty\"><div class=\"ds-empty-icon\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg></div><h2 class=\"ds-empty-title\">No case types yet</h2><p class=\"ds-empty-msg\">A case type describes the people or places you are tracking, like a Household or a Water Point.</p><button class=\"ds-empty-cta\">Create a case type</button></div>",
-      "css": ".ds-empty { font-family: Figtree, sans-serif; background: #ffffff; color: #102a43; border: 1px solid rgba(16, 42, 67, 0.2); border-radius: 6px; box-shadow: 0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06); padding: 48px; max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; } .ds-empty-icon { width: 64px; height: 64px; border-radius: 12px; background: #edf6ff; color: #1563fe; display: flex; align-items: center; justify-content: center; } .ds-empty-title { font-size: 1.625rem; font-weight: 650; line-height: 1.3; margin: 0; text-wrap: balance; } .ds-empty-msg { font-size: 1rem; line-height: 1.55; color: #637c95; margin: -16px 0 0; max-width: 65ch; } .ds-empty-cta { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #1563fe; color: #ffffff; height: 36px; padding: 0 18px; border: none; } .ds-empty-cta:hover { background: #0b4aea; }"
+      "css": ".ds-empty { font-family: Figtree, sans-serif; color: #102a43; padding: 48px; max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; } .ds-empty-icon { width: 64px; height: 64px; border-radius: 12px; background: #edf6ff; color: #1563fe; display: flex; align-items: center; justify-content: center; } .ds-empty-title { font-size: 1.625rem; font-weight: 650; line-height: 1.3; margin: 0; text-wrap: balance; } .ds-empty-msg { font-size: 1rem; line-height: 1.55; color: #637c95; margin: -16px 0 0; max-width: 65ch; } .ds-empty-cta { font-family: Figtree, sans-serif; font-weight: 500; font-size: 0.875rem; border-radius: 6px; cursor: pointer; transition: color 140ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms cubic-bezier(0.16, 1, 0.3, 1); background: #1563fe; color: #ffffff; height: 36px; padding: 0 18px; border: none; } .ds-empty-cta:hover { background: #0b4aea; }"
     },
     {
       "name": "Callout",
@@ -513,6 +513,11 @@
         "name": "The Paired-Token Rule",
         "section": "elevation",
         "body": "Always pair an --ava-border-* with the matching --ava-surface-* and an elevation step. Never hand-pick a neutral shade for an edge. This is what keeps elevation consistent across components and makes dark mode a token swap rather than a rewrite."
+      },
+      {
+        "name": "The Real-Step Rule",
+        "section": "elevation",
+        "body": "An edge needs a tonal step under it. If the fill is the same token on both sides, the border and shadow are drawing a seam, not elevation, and the surface should be flush instead. The usual way this goes wrong is a Paper inheriting a ground that has since been repainted: check what the parent fills before boxing anything."
       },
       {
         "name": "The Blur Ceiling Rule",
