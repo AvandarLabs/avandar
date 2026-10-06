@@ -355,6 +355,10 @@ msgstr "Weka safu zilizochapishwa"
 msgid "From PDF"
 msgstr "Kutoka PDF"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Avandar {appVersion}"
+msgstr "Avandar {appVersion}"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "Pakia Excel"
@@ -4070,6 +4074,10 @@ msgstr "ni mojawapo ya"
 msgid "New map"
 msgstr "Ramani mpya"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Current version"
+msgstr "Toleo la sasa"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
@@ -5482,6 +5490,10 @@ msgstr "Unganisha na mipaka"
 msgid "You need edit access on this resource to share or publish it."
 msgstr "Unahitaji ruhusa ya kuhariri rasilimali hii ili kuishiriki au "
 "kuichapisha."
+
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Show current version"
+msgstr "Onyesha toleo la sasa"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Orientation"

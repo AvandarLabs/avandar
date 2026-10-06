@@ -359,6 +359,10 @@ msgstr "Conserver les colonnes imprimées"
 msgid "From PDF"
 msgstr "Depuis un PDF"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Avandar {appVersion}"
+msgstr "Avandar {appVersion}"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "Télécharger Excel"
@@ -4118,6 +4122,10 @@ msgstr "correspond à l’une des valeurs suivantes"
 msgid "New map"
 msgstr "Nouvelle carte"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Current version"
+msgstr "Version actuelle"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
@@ -5544,6 +5552,10 @@ msgstr "Joindre aux limites"
 msgid "You need edit access on this resource to share or publish it."
 msgstr "Vous devez disposer d’un accès en modification à cette ressource pour "
 "la partager ou la publier."
+
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Show current version"
+msgstr "Afficher la version actuelle"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Orientation"
