@@ -30,7 +30,7 @@ export async function resolveReleaseVersion(
   return assumeYes
     ? suggested
     : promptForVersion({
-        message: "Which version are you releasing?",
+        message: "What version number do you want for this release?",
         defaultValue: suggested,
         label: "The release version",
       });

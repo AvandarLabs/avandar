@@ -3,7 +3,7 @@ import { Outlet } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { makeMainNavbarLinksFromPermissions } from "@/components/layouts/RootLayout/makeMainNavbarLinksFromPermissions";
-import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
+import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions";
 import { WorkspaceLayoutContents } from "@/components/layouts/RootLayout/WorkspaceLayoutContents";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";

@@ -352,6 +352,10 @@ msgstr "الاحتفاظ بالأعمدة المطبوعة"
 msgid "From PDF"
 msgstr "من PDF"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Avandar {appVersion}"
+msgstr "Avandar {appVersion}"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "تحميل Excel"
@@ -4015,6 +4019,10 @@ msgstr "أيٌّ من"
 msgid "New map"
 msgstr "خريطة جديدة"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Current version"
+msgstr "الإصدار الحالي"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
@@ -5411,6 +5419,10 @@ msgstr "الربط بالحدود"
 #: src/components/permissions/useShareButtonState.ts
 msgid "You need edit access on this resource to share or publish it."
 msgstr "تحتاج إلى صلاحية التعديل على هذا المورد لمشاركته أو نشره."
+
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Show current version"
+msgstr "عرض الإصدار الحالي"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Orientation"
