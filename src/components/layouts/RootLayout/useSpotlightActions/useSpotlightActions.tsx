@@ -1,10 +1,12 @@
 import { clearOpfs } from "@avandar/browser-utils";
+import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import {
   SpotlightActionData,
   SpotlightActionGroupData,
 } from "@mantine/spotlight";
-import { IconDatabase, IconTrash } from "@tabler/icons-react";
+import { IconDatabase, IconInfoCircle, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -13,10 +15,13 @@ import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
 
+/** Returns workspace navigation, app information, and development commands. */
 export function useSpotlightActions(
   workspaceSlug: string,
 ): Array<SpotlightActionData | SpotlightActionGroupData> {
   const router = useRouter();
+  const { t } = useLingui();
+  const appVersion = import.meta.env.VITE_APP_VERSION;
 
   const navigationActions = useMemo(() => {
     const spotlightLinks = [
@@ -132,6 +137,23 @@ export function useSpotlightActions(
   }, []);
 
   return useMemo(() => {
-    return [...navigationActions, ...devActions];
-  }, [navigationActions, devActions]);
+    return [
+      ...navigationActions,
+      {
+        id: "show-current-version",
+        label: t`Show current version`,
+        description: t`Avandar ${appVersion}`,
+        leftSection: <IconInfoCircle size={24} stroke={1.5} />,
+        onClick: () => {
+          notifications.show({
+            id: "app-version",
+            title: t`Current version`,
+            message: t`Avandar ${appVersion}`,
+            autoClose: false,
+          });
+        },
+      },
+      ...devActions,
+    ];
+  }, [navigationActions, devActions, t, appVersion]);
 }

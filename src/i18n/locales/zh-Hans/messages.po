@@ -341,6 +341,10 @@ msgstr "保留打印的列"
 msgid "From PDF"
 msgstr "来自 PDF"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Avandar {appVersion}"
+msgstr "Avandar {appVersion}"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "上传 Excel"
@@ -3908,6 +3912,10 @@ msgstr "是以下任一项"
 msgid "New map"
 msgstr "新建地图"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Current version"
+msgstr "当前版本"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
@@ -5280,6 +5288,10 @@ msgstr "连接到边界"
 #: src/components/permissions/useShareButtonState.ts
 msgid "You need edit access on this resource to share or publish it."
 msgstr "您需要拥有此资源的编辑权限，才能分享或发布它。"
+
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Show current version"
+msgstr "显示当前版本"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Orientation"

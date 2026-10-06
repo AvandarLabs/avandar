@@ -357,6 +357,10 @@ msgstr "Manter as colunas impressas"
 msgid "From PDF"
 msgstr "Do PDF"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Avandar {appVersion}"
+msgstr "Avandar {appVersion}"
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "Carregar Excel"
@@ -4077,6 +4081,10 @@ msgstr "é qualquer um de"
 msgid "New map"
 msgstr "Novo mapa"
 
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Current version"
+msgstr "Versão atual"
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 "placeholder."
@@ -5489,6 +5497,10 @@ msgstr "Vincular aos limites"
 msgid "You need edit access on this resource to share or publish it."
 msgstr "Você precisa ter acesso de edição a este recurso para compartilhá-lo ou "
 "publicá-lo."
+
+#: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
+msgid "Show current version"
+msgstr "Mostrar versão atual"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Orientation"
