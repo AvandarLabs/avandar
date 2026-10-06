@@ -176,7 +176,7 @@ export const GIS_DATED_POINTS_ROW_COUNT = 9;
 /** Parsed row count of {@link GIS_PCODE_POLYGON_CSV_PATH}. */
 export const GIS_PCODE_POLYGON_ROW_COUNT = 1;
 
-/** Directory of Wave E export/disputed-boundary GIS fixtures. */
+/** Directory of the export and disputed-boundary GIS fixtures. */
 const GIS_WAVE_E_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-e");
 
 /**

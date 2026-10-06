@@ -47,6 +47,11 @@ function _getCopyDescriptors(error: unknown): CopyDescriptors {
         title: msg`Google Sheet is not available`,
         message: msg`Avandar cannot open this Google Sheet. It may have been deleted, or its access may have been removed. Pick the sheet again to restore access.`,
       };
+    case "sheet-not-found":
+      return {
+        title: msg`Tab not found`,
+        message: msg`That tab is no longer in this spreadsheet. It may have been renamed or deleted. Pick the sheet again and choose a tab.`,
+      };
     case "google-auth-expired":
       return {
         title: msg`Your Google connection expired`,

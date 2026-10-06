@@ -61,7 +61,7 @@ export function PiiWarningPanel({
             ? "red"
             : pii.severity === "warning"
               ? "yellow"
-              : "gray"
+              : "neutral"
         }
       />
 

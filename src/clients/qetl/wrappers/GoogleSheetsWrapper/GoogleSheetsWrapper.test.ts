@@ -38,27 +38,42 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
+const TAB_LIST_BODY = JSON.stringify({
+  sheets: [
+    { properties: { sheetId: 0, title: "Colombia", index: 0 } },
+    { properties: { sheetId: 77, title: "Kenya", index: 1 } },
+  ],
+});
+
+/** Answers the version read, the tab list, and the per-tab CSV download. */
+function _driveFetch(version: string) {
+  return async (url: string): Promise<Response> => {
+    if (url.includes("fields=version")) {
+      return new Response(JSON.stringify({ version }), { status: 200 });
+    }
+    if (url.includes("sheets.googleapis.com")) {
+      return new Response(TAB_LIST_BODY, { status: 200 });
+    }
+    const gid = new URL(url).searchParams.get("gid") ?? "0";
+    return new Response(`city\r\ntab-${gid}\r\n`, { status: 200 });
+  };
+}
+
 describe("GoogleSheetsWrapper", () => {
   it("acquires the named tab as parquet and reports the Drive version", async () => {
     const parquetBlob = new Blob(["sheet-parquet"]);
-    const readXlsx = vi.fn().mockResolvedValue({ parquetBlob });
+    const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
     const getSheetSource = vi.fn().mockResolvedValue({
       googleDocumentId: "1sheetFileId",
       sheetName: "Kenya",
       googleAccountId: "google-account-1",
     });
     const getAccessToken = vi.fn().mockResolvedValue("ya29.test-token");
-    const driveFetch = vi.fn(async (url: string) => {
-      if (url.includes("fields=version")) {
-        return new Response(JSON.stringify({ version: "42" }), { status: 200 });
-      }
-      return new Response(Uint8Array.from([0x50, 0x4b]), { status: 200 });
-    });
     const wrapper = createGoogleSheetsWrapper({
       getSheetSource,
       getAccessToken,
-      readXlsx,
-      driveFetch,
+      readCsv,
+      driveFetch: _driveFetch("42"),
     });
 
     const acquired = await wrapper.acquire!(
@@ -66,9 +81,12 @@ describe("GoogleSheetsWrapper", () => {
       CONTEXT,
     );
 
-    expect(readXlsx).toHaveBeenCalledWith(
-      expect.objectContaining({ sheet: "Kenya" }),
-    );
+    // The stored tab's gid, not the first tab's: the CSV names the gid it came
+    // from, so a download that ignored the tab cannot satisfy this.
+    expect(readCsv).toHaveBeenCalledWith({
+      datasetId: DATASET_REF.id,
+      csvText: "city\r\ntab-77\r\n",
+    });
     expect(acquired).toEqual({
       ref: DATASET_REF,
       parquetBlob,
@@ -76,8 +94,8 @@ describe("GoogleSheetsWrapper", () => {
     });
   });
 
-  it("passes a null stored tab through so the reader uses the first sheet", async () => {
-    const readXlsx = vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) });
+  it("reads the first tab when the stored tab is null", async () => {
+    const readCsv = vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) });
     const wrapper = createGoogleSheetsWrapper({
       getSheetSource: async () => {
         return {
@@ -89,22 +107,16 @@ describe("GoogleSheetsWrapper", () => {
       getAccessToken: async () => {
         return "ya29.test-token";
       },
-      readXlsx,
-      driveFetch: async (url) => {
-        if (url.includes("fields=version")) {
-          return new Response(JSON.stringify({ version: "1" }), {
-            status: 200,
-          });
-        }
-        return new Response(Uint8Array.from([0x50, 0x4b]), { status: 200 });
-      },
+      readCsv,
+      driveFetch: _driveFetch("1"),
     });
 
     await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
 
-    expect(readXlsx).toHaveBeenCalledWith(
-      expect.objectContaining({ sheet: undefined }),
-    );
+    expect(readCsv).toHaveBeenCalledWith({
+      datasetId: DATASET_REF.id,
+      csvText: "city\r\ntab-0\r\n",
+    });
   });
 
   it("describes a sheet from its stored columns", async () => {

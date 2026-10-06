@@ -1,5 +1,5 @@
 import { useMutation } from "@avandar/query-hooks";
-import { DangerousActionButton, Paper } from "@avandar/ui";
+import { DangerousActionButton } from "@avandar/ui";
 import { assertIsDefined, MIMEType, where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Card, FileButton, Group, Stack, Text } from "@mantine/core";
@@ -183,12 +183,10 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
                 you confirm, the dataset will be synced with this data.
               </Trans>
             </Text>
-            <Paper>
-              <DatasetPreviewBlock
-                previewRows={previewData}
-                columns={datasetColumns}
-              />
-            </Paper>
+            <DatasetPreviewBlock
+              previewRows={previewData}
+              columns={datasetColumns}
+            />
           </Stack>
         ),
         labels: { confirm: t`Confirm`, cancel: t`Back` },

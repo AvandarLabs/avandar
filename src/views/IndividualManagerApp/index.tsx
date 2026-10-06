@@ -1,6 +1,6 @@
 import { Flex, ScrollArea } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { EditCaseTypeButton } from "@/views/IndividualManagerApp/EditCaseTypeButton";
 import { IndividualNavbar } from "@/views/IndividualManagerApp/IndividualNavbar";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -11,11 +11,11 @@ type Props = {
 
 /**
  * Records workspace for one case type: list pane plus a detail outlet,
- * on the same AppLayout canvas as Data Sources.
+ * on the same slate as Data Sources.
  */
 export function IndividualManagerApp({ concept }: Props): JSX.Element {
   return (
-    <AppLayout
+    <AppSlate
       title={concept.name}
       toolbarButtonSection={<EditCaseTypeButton concept={concept} />}
     >
@@ -25,6 +25,6 @@ export function IndividualManagerApp({ concept }: Props): JSX.Element {
           <Outlet />
         </ScrollArea>
       </Flex>
-    </AppLayout>
+    </AppSlate>
   );
 }

@@ -38,9 +38,6 @@ create table public.user_nux_progress (
 -- Enable row level security
 alter table public.user_nux_progress enable row level security;
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr__user_nux_progress__set_updated_at before
 update on public.user_nux_progress for each row
 execute function public.util__set_updated_at ();

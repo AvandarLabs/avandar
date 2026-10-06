@@ -1,0 +1,136 @@
+/**
+ * Marks a spec that talks to a real third-party service over the network.
+ *
+ * The tag does not decide whether the spec runs. It decides what a **missing
+ * credential** means, which differs by how the run was invoked:
+ *
+ * | Run | Tagged specs | A missing env var |
+ * | --- | --- | --- |
+ * | `pnpm test:e2e` | included | skipped, with the names in the reason |
+ * | `pnpm test:e2e --no-third-party` | excluded | n/a |
+ * | `pnpm test:e2e:third-party` | the only ones that run | hard failure |
+ * | `pnpm test:e2e:offline` | excluded | n/a |
+ *
+ * The asymmetry is the point. A full run should not go red on a machine that
+ * was never given the credentials, and CI holds none, so there it skips. But a
+ * run invoked to exercise the third party specifically must not report green
+ * having quietly skipped the one spec that touches it, because that is the same
+ * green as a run that really reached the service.
+ *
+ * A tagged spec still has to earn its place: it is the only thing that can
+ * catch a third party changing its contract, which every stubbed spec passes
+ * straight through. See `docs/google-sheets-e2e.md` for that argument in full.
+ */
+export const E2E_THIRD_PARTY_TAG = "@third-party";
+
+/**
+ * The flag that drops the third-party specs from a run that could have run
+ * them. Accepted by `pnpm test:e2e` through
+ * `scripts/test-runners/run-e2e.ts`, which turns it into
+ * `PLAYWRIGHT_E2E_NO_THIRD_PARTY`; Playwright's own CLI rejects options it does
+ * not define, so the flag cannot be read from `process.argv` here.
+ */
+export const E2E_NO_THIRD_PARTY_FLAG = "--no-third-party";
+
+/**
+ * The part of Playwright's `test` object this module needs.
+ *
+ * Taken as a parameter rather than imported, so this module stays loadable by
+ * Vitest: its own unit tests pass a fake and assert both branches, and nothing
+ * here has to reach into the Playwright runner.
+ */
+export type E2eTestSkip = Readonly<{
+  skip: (condition: boolean, description: string) => void;
+}>;
+
+/** The requested variables that are unset or empty, in the order asked for. */
+function _getMissingEnv<Name extends string>(
+  variableNames: readonly Name[],
+): readonly Name[] {
+  return variableNames.filter((name) => {
+    return !(process.env[name] ?? "").trim();
+  });
+}
+
+/**
+ * How a run treats the specs tagged {@link E2E_THIRD_PARTY_TAG}: whether it
+ * asked for them, whether it excludes them, and what their credentials mean.
+ */
+export const E2eThirdPartyMode = {
+  /**
+   * True when the run was invoked to exercise the third-party specs.
+   *
+   * Set by `pnpm test:e2e:third-party` and
+   * `./scripts/test-runners/run-all-tests.sh --e2e-third-party`. It both
+   * narrows the run to the tagged specs and makes a missing credential fail
+   * rather than skip.
+   */
+  isRequested(): boolean {
+    return process.env.PLAYWRIGHT_E2E_THIRD_PARTY === "1";
+  },
+
+  /**
+   * True when the run was told to leave the third-party specs out entirely.
+   *
+   * Stronger than the default skip-on-missing-credential behavior, and that is
+   * the point: a blocking job must not reach a third party even if someone
+   * gives it the credentials, whether deliberately or by adding an `E2E_*`
+   * variable to a workflow that shares its `env:` with the gate. The PR gate
+   * and both deploy workflows therefore run
+   * `pnpm test:e2e --no-third-party`, which cannot become a live network call
+   * by a change to the environment alone.
+   */
+  isExcluded(): boolean {
+    return process.env.PLAYWRIGHT_E2E_NO_THIRD_PARTY === "1";
+  },
+
+  /**
+   * The requested variables that are unset or empty, in the order asked for.
+   *
+   * Empty counts as missing: that is what a workflow gives an unset secret,
+   * and what an env file line with nothing after the `=` gives, and neither is
+   * a usable credential.
+   */
+  getMissingEnv: _getMissingEnv,
+
+  /**
+   * Reads the credentials a third-party spec needs, or ends the test.
+   *
+   * Fails when the run asked for the third-party specs by name, skips
+   * otherwise. See {@link E2E_THIRD_PARTY_TAG} for why those are different.
+   *
+   * @param options.test The spec's `test` object, used to skip.
+   * @param options.variableNames Env var names the spec cannot run without.
+   * @returns Each requested name mapped to its value, when all are present.
+   */
+  requireEnv<Name extends string>(
+    options: Readonly<{ test: E2eTestSkip; variableNames: readonly Name[] }>,
+  ): Record<Name, string> {
+    const { test, variableNames } = options;
+    const missing = _getMissingEnv(variableNames);
+
+    if (missing.length > 0) {
+      const names = missing.join(", ");
+      const isOrAre = missing.length > 1 ? "are" : "is";
+      if (E2eThirdPartyMode.isRequested()) {
+        throw new Error(
+          `This run asked for the third-party specs but ${names} ${isOrAre} ` +
+            "not set. Set them in `.env.development` or the environment, or " +
+            "run `pnpm test:e2e`, where a spec missing its credentials skips.",
+        );
+      }
+      test.skip(true, `Set ${names} to run this against the real service.`);
+
+      // Playwright's `test.skip(true, …)` aborts the test by throwing, so this
+      // is unreachable in a real run. It is here so a `test` that does not
+      // abort cannot fall through and read the credentials that are missing.
+      throw new Error(`Skipped: ${names} ${isOrAre} not set.`);
+    }
+
+    return Object.fromEntries(
+      variableNames.map((name) => {
+        return [name, (process.env[name] ?? "").trim()];
+      }),
+    ) as Record<Name, string>;
+  },
+};

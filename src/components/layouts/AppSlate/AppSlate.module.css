@@ -1,0 +1,30 @@
+/*
+ * The slate: the raised view that floats on the app shell. It stops short of
+ * the shell edges so a gutter of shell background frames it, and the stacked
+ * shadow is what reads as "floating".
+ *
+ * The z-index is load-bearing, not decoration. Mantine paints the navbar and
+ * the aside above content left in normal flow, so without it the shadow is
+ * clipped into a hard vertical line at the sidebar edge. Raise the slate
+ * itself and never AppShell.Main: Main's box bleeds over the navbar, so
+ * lifting it puts transparent padding over the sidebar and swallows its
+ * clicks. The z-index also makes the slate a stacking context, so every
+ * overlay is layered against this one value: see APP_SLATE_Z_INDEX in
+ * src/config/Theme/Theme.ts.
+ */
+.slate {
+  border: 1px solid var(--mantine-color-neutral-7);
+  border-radius: 8px 8px 12px;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 20%),
+    0 8px 24px rgb(0 0 0 / 25%);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  padding: 0;
+  position: relative;
+  z-index: var(--mantine-z-index-app-slate);
+}

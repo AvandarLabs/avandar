@@ -1,4 +1,4 @@
--- This is a valid Avandar data type
+/** The narrowed set of column data types Avandar exposes to users. */
 create type public.datasets__ava_data_type as enum(
   'boolean',
   'bigint',
@@ -9,6 +9,10 @@ create type public.datasets__ava_data_type as enum(
   'varchar'
 );
 
+/**
+ * Every column data type DuckDB can report when it parses a dataset, before
+ * it is narrowed to a `datasets__ava_data_type`.
+ */
 create type public.datasets__duckdb_data_type as enum(
   'BOOLEAN',
   'TINYINT',

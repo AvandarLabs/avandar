@@ -5,10 +5,9 @@ begin;
 set search_path to extensions, public;
 
 -- `draft` is the state in which the owner has not yet decided the dashboard is
--- ready for anyone else. P2 gave the state that product meaning and P3 shipped
--- the publishing control, but the rule lived only in the client: RLS still let
--- a viewer SELECT the whole row, `config` jsonb included, for a dashboard the
--- UI refused to open. This file locks the rule into
+-- ready for anyone else. Do not leave that rule to the client alone: RLS would
+-- otherwise let a viewer SELECT the whole row, `config` jsonb included, for a
+-- dashboard the UI refuses to open. This file locks the rule into
 -- `public.util__auth_user_may_select_dashboard`.
 --
 -- The rule: past the owner and settings-admin short-circuits, a draft needs

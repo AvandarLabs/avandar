@@ -78,8 +78,11 @@ function useVizConfigSchemas() {
         series: SeriesArraySchema,
       }),
       ScatterPlotConfigSchema: object({
+        // `looseObject` (not `object`) so per-series `label` / `color` survive
+        // the parse — `object` strips unknown keys, dropping them before the
+        // renderer sees them. Matches SeriesArraySchema used by XY / radar.
         series: array(
-          object({ key: string().min(1), xKey: string().min(1) }),
+          looseObject({ key: string().min(1), xKey: string().min(1) }),
         ).min(1, { error: t`Add at least one X / Y series` }),
       }),
       PieChartConfigSchema: object({
@@ -95,8 +98,10 @@ function useVizConfigSchemas() {
         series: SeriesArraySchema,
       }),
       BubbleChartConfigSchema: object({
+        // `looseObject` so per-series `label` / `color` survive the parse; see
+        // ScatterPlotConfigSchema above.
         series: array(
-          object({
+          looseObject({
             key: string().min(1),
             xKey: string().min(1),
             sizeKey: string().min(1),

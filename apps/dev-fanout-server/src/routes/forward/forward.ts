@@ -1,10 +1,10 @@
 import { isArray, isDefined, objectValuesMap } from "@avandar/utils";
-import { NgrokDevURLsManager } from "@fanout-server/NgrokDevURLsManager";
+import { NgrokDevUrlsManager } from "@fanout-server/NgrokDevUrlsManager";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 type FanoutResult = Readonly<{
-  devURL: string;
-  forwardURL: string;
+  devUrl: string;
+  forwardUrl: string;
   ok: boolean;
   status?: number;
   error?: string;
@@ -110,25 +110,25 @@ function _buildForwardedRequestHeaders(options: {
 async function _sendForwardedRequest(options: {
   /**
    * The dev URL registered in the `ngrok-dev-urls.json` file that is used as
-   * the base of the `forwardURL` parameter.
+   * the base of the `forwardUrl` parameter.
    */
-  readonly devURL: string;
+  readonly devUrl: string;
   /**
    * The full URL to forward the request to, including the full path and
    * search params.
    */
-  readonly forwardURL: string;
+  readonly forwardUrl: string;
   readonly method: string;
   readonly headers: Record<string, string>;
   readonly body?: Buffer;
 }): Promise<FanoutExecutionResult> {
-  const { devURL, method, headers, forwardURL } = options;
+  const { devUrl, method, headers, forwardUrl } = options;
   const isBodyAllowed: boolean = !["GET", "HEAD"].includes(method);
   const body: Buffer | undefined = isBodyAllowed ? options.body : undefined;
 
   try {
     // send the request to the target URL
-    const res: Response = await fetch(forwardURL, {
+    const res: Response = await fetch(forwardUrl, {
       method,
       headers: {
         ...headers,
@@ -141,8 +141,8 @@ async function _sendForwardedRequest(options: {
     return {
       shouldMarkAccessed: _shouldMarkAccessedFromStatus(res.status),
       result: {
-        devURL,
-        forwardURL,
+        devUrl,
+        forwardUrl,
         ok: res.ok,
         status: res.status,
       },
@@ -154,8 +154,8 @@ async function _sendForwardedRequest(options: {
     return {
       shouldMarkAccessed: false,
       result: {
-        devURL,
-        forwardURL,
+        devUrl,
+        forwardUrl,
         ok: false,
         error: message,
       },
@@ -175,16 +175,16 @@ async function _fanoutToDevURLs(options: {
   const fanouts: Array<Promise<FanoutExecutionResult>> = devTargets.map(
     (target) => {
       // clone dev URL in order to append path + search params to it
-      const forwardURL = new URL(target.url);
-      forwardURL.pathname = _joinURLPaths({
-        basePath: forwardURL.pathname,
+      const forwardUrl = new URL(target.url);
+      forwardUrl.pathname = _joinURLPaths({
+        basePath: forwardUrl.pathname,
         suffixPath: request.pathname,
       });
-      forwardURL.search = request.search;
+      forwardUrl.search = request.search;
 
       return _sendForwardedRequest({
-        devURL: target.url,
-        forwardURL: forwardURL.toString(),
+        devUrl: target.url,
+        forwardUrl: forwardUrl.toString(),
         headers,
         method: request.method,
         body: request.body,
@@ -200,7 +200,7 @@ export async function onFanoutRequest(
   reply: FastifyReply,
 ): Promise<FastifyReply> {
   try {
-    const devURLs = await NgrokDevURLsManager.readNgrokDevURLs();
+    const devUrls = await NgrokDevUrlsManager.readNgrokDevUrls();
     const body: Buffer | undefined =
       request.body instanceof Buffer ? request.body : undefined;
 
@@ -213,7 +213,7 @@ export async function onFanoutRequest(
     );
     const executions: readonly FanoutExecutionResult[] = await _fanoutToDevURLs(
       {
-        devTargets: devURLs,
+        devTargets: devUrls,
         request: {
           method: request.method,
           pathname: forwardedPathname,
@@ -229,13 +229,13 @@ export async function onFanoutRequest(
         return execution.shouldMarkAccessed;
       })
       .map((execution) => {
-        return execution.result.devURL;
+        return execution.result.devUrl;
       });
 
     const uniqueURLsToMarkAccessed: readonly string[] = [
       ...new Set(urlsToMarkAccessed),
     ];
-    await NgrokDevURLsManager.setLastAccessedDates({
+    await NgrokDevUrlsManager.setLastAccessedDates({
       urls: uniqueURLsToMarkAccessed,
       lastAccessedDate: new Date().toISOString(),
     });

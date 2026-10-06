@@ -83,9 +83,7 @@ export type ChatGeneratedDashboardBlock =
 
 /**
  * The shape of a clarification request the LLM may emit instead of, or
- * before, generating SQL. See
- * `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
- * for the design.
+ * before, generating SQL.
  */
 export type ChatClarifyResponseShape =
   | { kind: "free_text"; placeholder?: string }

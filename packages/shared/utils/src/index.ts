@@ -18,6 +18,8 @@ export type { FormattableTimezone } from "@utils/dates/formatDate/formatDate.ts"
 export { parseDate } from "@utils/dates/parseDate/parseDate.ts";
 
 // numbers
+export { formatFileSize } from "@utils/numbers/formatFileSize/formatFileSize.ts";
+export type { FormatFileSizeOptions } from "@utils/numbers/formatFileSize/formatFileSize.ts";
 export { formatNumber } from "@utils/numbers/formatNumber/formatNumber.ts";
 export type {
   FormatNumberOptions,

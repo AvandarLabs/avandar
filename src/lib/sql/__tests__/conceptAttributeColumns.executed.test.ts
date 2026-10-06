@@ -328,7 +328,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     ]);
   });
 
-  // The grain claim, asserted as the spec's own one-query proof. `101` is
+  // The grain claim, asserted with a single query. `101` is
   // contributed to by both datasets, which is exactly the input that makes the
   // concatenating implementation return two rows for one individual.
   it("keeps one row per individual when two datasets contribute to it", async () => {

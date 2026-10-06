@@ -43,16 +43,13 @@ describe("makeDatasetImportedPayloadFromSaveResult", () => {
     ).toEqual(fixture.expected);
   });
 
-  it("reads Google Sheets columns from sheet metadata", () => {
+  it("reads Google Sheets columns from the load result", () => {
     expect(
       makeDatasetImportedPayloadFromSaveResult({
         datasetId: "dataset-3",
         source: {
           sourceType: "google_sheets",
-          datasetLoadResult: {
-            numRows: 7,
-            sheetLoadMetadata: { columns: [{}, {}, {}, {}] },
-          },
+          datasetLoadResult: { numRows: 7, columns: [{}, {}, {}, {}] },
         },
         isFirstInWorkspace: false,
       }),

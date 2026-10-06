@@ -131,9 +131,6 @@ create policy "User can delete datasets__pdf_file in their workspace" on public.
   )
 );
 
-/**
- * Trigger the `updated_at` update
- */
 create trigger tr_datasets__pdf_file__set_updated_at before
 update on public.datasets__pdf_file for each row
 execute function public.util__set_updated_at ();

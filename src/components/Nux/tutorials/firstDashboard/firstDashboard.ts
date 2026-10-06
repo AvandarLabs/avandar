@@ -41,7 +41,7 @@ export const FIRST_DASHBOARD_MILESTONES: readonly NuxMilestone[] = [
     steps: [
       {
         anchor: NuxAnchors.ids.datasetUploadForm,
-        spotlightPadding: { top: 0, right: 12, bottom: 30, left: 12 },
+        spotlightPadding: { top: 20, right: 12, bottom: 20, left: 12 },
         title: msg`Start with a spreadsheet`,
         body: msg`Welcome to your data source manager. Pick a CSV or Excel file from your computer. No spreadsheet handy? <0>Download our sample</0> and use that.`,
         placement: "right",
@@ -53,7 +53,7 @@ export const FIRST_DASHBOARD_MILESTONES: readonly NuxMilestone[] = [
         anchor: NuxAnchors.ids.datasetImportForm,
         title: msg`Save it`,
         body: msg`Avandar read your file and already figured out what each column contains. Give the dataset a name, then save.`,
-        spotlightPadding: { top: 0, right: 16, bottom: 24, left: 16 },
+        spotlightPadding: { top: 12, right: 16, bottom: 24, left: 16 },
         placement: "left",
         // Data Sources scrolls a nested pane to the form and ignores
         // spotlightPadding. This leaves the upload field's label in view.

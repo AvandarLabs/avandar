@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { CreateMapButton } from "@/views/GisApp/MapListView/CreateMapButton";
 import { EmptyMapList } from "@/views/GisApp/MapListView/EmptyMapList";
@@ -15,7 +15,7 @@ export function MapListView({ avaMaps, workspaceSlug }: Props): ReactNode {
   const canManageMaps = useHasPermission("gis__can_manage_maps");
 
   return (
-    <AppLayout
+    <AppSlate
       title={t`Maps`}
       toolbarButtonSection={
         canManageMaps ? <CreateMapButton workspaceSlug={workspaceSlug} /> : null
@@ -27,6 +27,6 @@ export function MapListView({ avaMaps, workspaceSlug }: Props): ReactNode {
       ) : (
         <MapGrid avaMaps={avaMaps} workspaceSlug={workspaceSlug} />
       )}
-    </AppLayout>
+    </AppSlate>
   );
 }

@@ -2,11 +2,10 @@ import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts
 
 /**
  * Filesystem-backed `DatasetBlobStore` contracts. Bytes are transported as
- * base64 strings over Electrobun's stdin/stdout IPC; for files >50MB Phase
- * 3 may introduce a streaming variant. The Bun-main handlers live in
+ * base64 strings over Electrobun's stdin/stdout IPC, so files over 50MB will
+ * need a streaming variant. The Bun-main handlers live in
  * `apps/desktop/main/ipc/dataset-blob.ts` and call into
- * `apps/desktop/main/services/FileSystemDatasetBlobStore.ts` (Phase 2 Task
- * 12).
+ * `apps/desktop/main/services/FileSystemDatasetBlobStore.ts`.
  */
 export const DatasetBlobContracts = {
   put: defineIpcContract<
@@ -29,7 +28,7 @@ export const DatasetBlobContracts = {
     { key: string },
     {
       // null (not undefined) because the JSON wire envelope drops undefined
-      // properties, and matches the Phase 1 `DatasetBlobStore.stat` return.
+      // properties, and matches the `DatasetBlobStore.stat` return.
       stat: {
         sizeBytes: number;
         mtimeMs: number;

@@ -169,57 +169,43 @@ export function DatasetParseControls({
     })
     .with({ sourceType: "google_sheets" }, (googleSheetsProps) => {
       const { parseOptions, datasetLoadResult } = googleSheetsProps;
-      const sheetOptions = datasetLoadResult.availableSheetNames.map(
-        (sheetName) => {
-          return { value: sheetName, label: sheetName };
-        },
-      );
-      const hasSingleSheet = sheetOptions.length === 1;
+      const tabOptions = datasetLoadResult.availableTabs.map((tab) => {
+        return { value: String(tab.sheetId), label: tab.title };
+      });
+      const hasSingleTab = tabOptions.length === 1;
 
-      // No rows-to-skip control here, unlike the CSV and XLSX branches. Sheets
-      // reads through `read_xlsx`, which cannot express a row skip without the
-      // sheet's exact used range, and a Google Sheets user can delete preamble
-      // rows in the sheet itself.
+      // No header control, and no rows-to-skip control. A tab arrives as CSV,
+      // and DuckDB's CSV sniffer decides the header itself.
       return (
-        <>
-          <Tooltip
-            label={t`There is only one tab in this spreadsheet.`}
-            disabled={!hasSingleSheet}
-          >
-            <Select
-              label={t`Tab`}
-              data={sheetOptions}
-              value={
-                parseOptions.sheetName ??
-                datasetLoadResult.sheetLoadMetadata.sheet ??
-                null
+        <Tooltip
+          label={t`There is only one tab in this spreadsheet.`}
+          disabled={!hasSingleTab}
+        >
+          <Select
+            label={t`Tab`}
+            data={tabOptions}
+            value={String(parseOptions.sheetId ?? datasetLoadResult.sheetId)}
+            disabled={hasSingleTab}
+            onChange={(value) => {
+              const tab = datasetLoadResult.availableTabs.find((candidate) => {
+                return String(candidate.sheetId) === value;
+              });
+              if (!tab) {
+                return;
               }
-              disabled={hasSingleSheet}
-              onChange={(value) => {
-                return onDataSourceMetadataChange({
-                  ...googleSheetsProps,
-                  parseOptions: {
-                    ...parseOptions,
-                    sheetName: value ?? undefined,
-                  },
-                });
-              }}
-            />
-          </Tooltip>
-          <Checkbox
-            label={t`The tab has a header row`}
-            checked={parseOptions.hasHeader ?? true}
-            onChange={(event) => {
+              // Both are recorded: the gid is what the export URL addresses,
+              // and the title is what a saved dataset shows a human.
               return onDataSourceMetadataChange({
                 ...googleSheetsProps,
                 parseOptions: {
                   ...parseOptions,
-                  hasHeader: event.currentTarget.checked,
+                  sheetId: tab.sheetId,
+                  sheetName: tab.title,
                 },
               });
             }}
           />
-        </>
+        </Tooltip>
       );
     })
     .exhaustive(() => {

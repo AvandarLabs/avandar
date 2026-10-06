@@ -49,6 +49,14 @@ export function AvandarQueryClientProvider({
           // would mean a cold reload could replay a stale error or a
           // never-resolving loading spinner forever.
           shouldDehydrateQuery: (query) => {
+            // `persist: false` opts a query out of disk entirely. It exists
+            // for answers that must not outlive the tab: a credential whose
+            // plaintext would otherwise sit in IndexedDB for
+            // `PERSIST_MAX_AGE_MS`, and connection state whose stale copy
+            // would be read as the live one after a full page load.
+            if (query.meta?.persist === false) {
+              return false;
+            }
             return query.state.status === "success";
           },
         },

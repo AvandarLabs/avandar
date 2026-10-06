@@ -14,7 +14,7 @@ type ChatPanelState = {
   isOpen: boolean;
   isAvailable: boolean;
   /**
-   * `composer` overlays a wider Ask Avandar panel on the canvas. The AppShell
+   * `composer` overlays a wider Ask Avandar panel on the slate. The AppShell
    * aside column stays at its docked width so the page does not shrink.
    */
   layout: ChatPanelLayout;

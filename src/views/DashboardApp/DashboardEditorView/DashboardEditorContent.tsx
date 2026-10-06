@@ -1,6 +1,6 @@
 import { Flex } from "@mantine/core";
 import { Puck } from "@puckeditor/core";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { CanvasAgGridStyles } from "@/views/DashboardApp/DashboardEditorView/CanvasAgGridStyles";
 import { DashboardEditorToolbar } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorToolbar";
 import { DASHBOARD_EDITOR_INITIAL_PUCK_UI } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView.constants";
@@ -31,7 +31,7 @@ export function DashboardEditorContent({
 
   return (
     <DashboardFilterStateManager.Provider>
-      <AppLayout floatingToolbar>
+      <AppSlate floatingToolbar>
         <Flex
           className={css.compactDashboardEditor}
           direction="column"
@@ -66,7 +66,7 @@ export function DashboardEditorContent({
             }}
           />
         </Flex>
-      </AppLayout>
+      </AppSlate>
     </DashboardFilterStateManager.Provider>
   );
 }

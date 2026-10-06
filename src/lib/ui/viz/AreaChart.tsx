@@ -128,6 +128,7 @@ export function AreaChart({
       tooltipProps: { labelFormatter },
       styleProps,
       valueFormatter: formatChartNumber,
+      chartStyle,
     });
   }
 
@@ -215,9 +216,7 @@ export function AreaChart({
               }
             />
           ) : null}
-          {withLegend ? (
-            <Legend {...styleProps.legendProps} verticalAlign="top" />
-          ) : null}
+          {withLegend ? <Legend {...styleProps.legendProps} /> : null}
           <Tooltip
             labelFormatter={labelFormatter}
             formatter={(value: unknown) => {

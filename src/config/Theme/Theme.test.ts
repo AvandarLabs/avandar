@@ -1,10 +1,10 @@
-import { defaultVariantColorsResolver } from "@mantine/core";
+import { defaultVariantColorsResolver, getDefaultZIndex } from "@mantine/core";
 import { describe, expect, it } from "vitest";
 import {
   ANIMATION_PRESET,
   AnimationTheme,
   APP_CHROME_Z_INDEX,
-  APP_SHELL_MAIN_Z_INDEX,
+  APP_SLATE_Z_INDEX,
   cssVariablesResolver,
   MODAL_ABOVE_NUX_TOUR_Z_INDEX,
   MODAL_ROOT_Z_INDEX,
@@ -18,11 +18,23 @@ import {
 import { NEUTRAL_SHADES } from "../../../shared/config/Theme";
 
 describe("Theme modal stacking", () => {
-  it("orders app shell → chrome → modal → popover → notifications", () => {
-    expect(APP_CHROME_Z_INDEX).toBeGreaterThan(APP_SHELL_MAIN_Z_INDEX);
+  it("orders slate → chrome → modal → popover → notifications", () => {
+    expect(APP_CHROME_Z_INDEX).toBeGreaterThan(APP_SLATE_Z_INDEX);
     expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(APP_CHROME_Z_INDEX);
     expect(POPOVER_Z_INDEX).toBeGreaterThan(MODAL_ROOT_Z_INDEX);
     expect(NOTIFICATIONS_Z_INDEX).toBeGreaterThan(POPOVER_Z_INDEX);
+  });
+
+  it("lifts the slate over the shell so its drop shadow is not clipped", () => {
+    // Mantine paints the navbar and aside one above the AppShell tier.
+    expect(APP_SLATE_Z_INDEX).toBeGreaterThan(getDefaultZIndex("app") + 1);
+  });
+
+  it("keeps the slate under every Mantine overlay default", () => {
+    // The slate z-index makes the slate a stacking context, so anything
+    // meant to cover it (Drawer, Spotlight, and the rest of Mantine's
+    // untouched "modal" tier) has to outrank it.
+    expect(APP_SLATE_Z_INDEX).toBeLessThan(getDefaultZIndex("modal"));
   });
 
   it("clears the onboarding tour tooltip, not only its overlay", () => {
@@ -51,9 +63,17 @@ describe("Theme modal stacking", () => {
     );
   });
 
-  it("exposes the chrome tier on theme.other.zIndex", () => {
+  it("exposes the slate and chrome tiers on theme.other.zIndex", () => {
+    expect(Theme.other.zIndex.appSlate).toBe(APP_SLATE_Z_INDEX);
     expect(Theme.other.zIndex.appChrome).toBe(APP_CHROME_Z_INDEX);
     expect(Theme.other.zIndex.modal).toBe(MODAL_ROOT_Z_INDEX);
+  });
+
+  it("publishes the slate tier as a CSS variable for AppSlate", () => {
+    const resolved = cssVariablesResolver(Theme);
+    expect(resolved.variables["--mantine-z-index-app-slate"]).toBe(
+      String(APP_SLATE_Z_INDEX),
+    );
   });
 });
 

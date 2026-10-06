@@ -26,6 +26,10 @@ ENV_FILES=(
 # Names allowed to be empty (optional flags, unset-by-design in CI).
 ALLOW_EMPTY_ENV_VAR_NAMES=(
   VITE_FEATURE_FLAGS
+  E2E_GOOGLE_SHEET_ID
+  E2E_GOOGLE_REFRESH_TOKEN
+  E2E_GOOGLE_SHEET_NAME
+  E2E_GOOGLE_EMAIL
 )
 
 # Returns 0 if key is listed in ALLOW_EMPTY_ENV_VAR_NAMES.

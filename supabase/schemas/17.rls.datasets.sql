@@ -1,13 +1,13 @@
 /**
- *  RLS for `datasets`. Requires `16.utils.resource-permissions`.
- * 
- *  Resource CRUD matrix (effective role on the row):
- *    viewer: SELECT
- *    editor: SELECT, INSERT (new row in workspace), UPDATE
- *    admin: SELECT, INSERT, UPDATE, DELETE
- * 
- *  SELECT also uses `util__auth_user_may_select_dataset` so workspace editors
- *  cannot read other members' unrestricted rows without an explicit share.
+ * RLS for `datasets`. Requires `16.utils.resource-permissions`.
+ *
+ * Resource CRUD matrix (effective role on the row):
+ *   viewer: SELECT
+ *   editor: SELECT, INSERT (new row in workspace), UPDATE
+ *   admin: SELECT, INSERT, UPDATE, DELETE
+ *
+ * SELECT also uses `util__auth_user_may_select_dataset` so workspace editors
+ * cannot read other members' unrestricted rows without an explicit share.
  */
 -- The inline owner short-circuit lets the row owner pass SELECT RLS without the
 -- helper re-fetching the row. Required so `INSERT ... RETURNING *` works for
@@ -47,11 +47,9 @@ with
       'dataset'::public.resource_type,
       public.datasets.id
     ) and
-    public.datasets.owner_id = any (
-      array(
-        select
-          public.util__get_workspace_members (public.datasets.workspace_id)
-      )
+    public.util__is_workspace_member (
+      public.datasets.workspace_id,
+      public.datasets.owner_id
     )
   );
 

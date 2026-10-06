@@ -1,7 +1,6 @@
 /**
- * This table is used to track the versions and metadata of dexie dbs users have
- * on the frontend. This gives us an idea of which schemas have upgraded and
- * which dbs may now be stale.
+ * Versions and metadata of the Dexie databases users hold in the browser, so
+ * we can tell which schemas have upgraded and which databases are now stale.
  */
 create table public.dexie_dbs (
   -- Primary key

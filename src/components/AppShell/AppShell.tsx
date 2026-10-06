@@ -16,7 +16,7 @@ import { Navbar } from "@/components/AppShell/Navbar/Navbar";
 import { ChatComposerOverlay } from "@/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay";
 import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
+import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppSlate/AppSlate";
 import { OfflineChatDownloadIndicator } from "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { ANIMATION_DURATION_MS } from "@/config/Theme/AnimationTheme/AnimationTheme";
@@ -49,7 +49,7 @@ const ASIDE_COMPOSER_WIDTH = "min(64vw, 960px)";
 
 /**
  * DOM id on the AppShell's main content area. Components that need to scope
- * an overlay (drawer, popover, etc.) to the main canvas, without covering
+ * an overlay (drawer, popover, etc.) to the slate, without covering
  * the side navbar or the chat panel Aside, can target this element.
  */
 export const APP_SHELL_MAIN_ID = "ava-app-shell-main";

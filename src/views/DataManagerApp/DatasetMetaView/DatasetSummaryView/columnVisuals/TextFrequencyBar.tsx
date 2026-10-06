@@ -31,7 +31,11 @@ export function TextFrequencyBar({
           {count.toLocaleString()} · {shareLabel}
         </Text>
       </Group>
-      <Box h={6} bg="neutral.0" style={{ borderRadius: 3, overflow: "hidden" }}>
+      {/*
+        The track has to be visible for the fill to read as a proportion of
+        it, so it takes `neutral.1` rather than the ground's `neutral.0`.
+      */}
+      <Box h={6} bg="neutral.1" style={{ borderRadius: 3, overflow: "hidden" }}>
         <Box
           h="100%"
           w={`${widthPercent}%`}

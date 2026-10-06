@@ -18,8 +18,8 @@ function _toBindings(params: unknown[]): SQLQueryBindings[] {
 /**
  * Registers the `rdb.run`, `rdb.query`, and `rdb.transaction` IPC
  * handlers on `server`, bound to the given bun:sqlite database. The
- * webview's `createSqliteCrudClient` (Phase 2 Task 8) calls these via
- * `callIpc` to read and write the local metadata DB.
+ * webview's `createSqliteCrudClient` calls these via `callIpc` to read and
+ * write the local metadata DB.
  *
  * Every handler treats `req.params` as positional bind arguments and
  * never interpolates them into the SQL string; the caller is

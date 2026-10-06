@@ -6,6 +6,68 @@ unit/integration (Vitest) rules see [`testing.md`](testing.md). The
 review-agent form of these rules is in
 [`../code-reviews/references/e2e-tests.md`](../code-reviews/references/e2e-tests.md).
 
+## A third-party spec skips by default and fails only when asked for
+
+A spec that reaches a real third-party service is tagged with
+`E2E_THIRD_PARTY_TAG` (`@third-party`, from
+`tests/e2e/setup/E2eThirdPartyMode/`). The tag does not decide whether the spec
+runs. It decides what a **missing credential** means:
+
+| Command                                                          | Runs                                                   | A missing env var on a tagged spec                 |
+| ---------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------- |
+| `pnpm test:e2e`                                                  | everything, tagged specs included                      | **skipped**, with the variable names in the reason |
+| `pnpm test:e2e --no-third-party`                                 | everything except `@third-party`                       | n/a, the tagged specs never start                  |
+| `pnpm test:e2e:third-party`                                      | only the tagged specs                                  | **hard failure**                                   |
+| `pnpm test:e2e:offline`                                          | everything except `@online` and `@third-party`         | n/a                                                |
+| `./scripts/test-runners/run-all-tests.sh --e2e-third-party`      | the unit suites, then only the tagged specs            | hard failure                                       |
+| `./scripts/test-runners/run-all-tests.sh --e2e-skip-third-party` | the unit suites, then everything except `@third-party` | n/a                                                |
+| `./scripts/test-runners/run-all-tests.sh --e2e-offline`          | the unit suites, then the specs that need no network   | n/a                                                |
+
+Read credentials with `E2eThirdPartyMode.requireEnv({ test, variableNames })`, which
+applies that asymmetry for you. Never read `process.env` for them directly in a
+spec, or you lose it.
+
+The asymmetry is the point. A full run must not go red on a machine that was
+never given the credentials, and CI holds none, so there the tagged specs skip
+and the gate stays about the change under review. But a run invoked to exercise
+the third party specifically must not report green having quietly skipped the
+one spec that touches it: that is the same green as a run which really reached
+the service, and it is the failure mode this whole arrangement exists to
+prevent.
+
+### What this asks of a blocking job
+
+**A blocking job runs `pnpm test:e2e --no-third-party`.** The PR gate and both
+deploy workflows do, which drops the tagged specs from the run outright rather
+than relying on the credentials being absent. Skipping-for-want-of-credentials
+is a property of the environment, and a job that gates a merge or a deploy
+should not be one `E2E_*` variable away from making live network calls: those
+can fail because somebody else's service is down, their quota ran out, or a
+standing credential was revoked. The flag makes that impossible to reach by
+changing the environment alone.
+
+Keep the second guard too: **do not put third-party credentials into a blocking
+job's `env:`.** The flag and the absent credentials are independent, and neither
+should be the only thing standing between the gate and a third party.
+
+If a live check is wanted in CI, give it its own scheduled or
+manually-dispatched job running `pnpm test:e2e:third-party`, where a missing
+credential is loud and a failure blocks nothing.
+
+Tag a spec only when it earns it: it is the only kind that catches the third
+party changing its contract, which every stubbed spec passes straight through.
+Anything the stub can prove belongs in an untagged spec.
+
+## Name a spec after what it asserts
+
+A spec name says what is true when it passes, never what it does on the way
+there. "parses", "handles" and "works" name activity and survive the deletion
+of the assertion itself. The rule and its checks live in
+[`testing.md`](testing.md#name-a-test-after-what-it-asserts) and apply here
+unchanged, with one thing e2e makes easier to get wrong: a spec that drives a
+long UI flow is tempting to name after the flow. Name it after the one thing
+its assertions require at the end.
+
 ## Diagnose a flake before fixing it
 
 An intermittent failure has a mechanism: an aged-process slowdown, a cold-start

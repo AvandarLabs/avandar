@@ -11,19 +11,19 @@
 }
 
 .exportSheetPreviewHeader {
-  border-bottom: 1px solid var(--mantine-color-gray-4);
+  border-bottom: 1px solid var(--ava-border-strong);
 }
 
 .exportSheetPreviewFooter {
-  border-top: 1px solid var(--mantine-color-gray-4);
+  border-top: 1px solid var(--ava-border-strong);
 }
 
 .exportSheetPreviewLegend {
-  border: 1px dashed var(--mantine-color-gray-4);
+  border: 1px dashed var(--ava-border-strong);
 }
 
 .exportSheetPreviewMapFrame {
-  background: var(--mantine-color-gray-2);
+  background: var(--mantine-color-neutral-1);
 }
 
 .exportSheetPreviewText {

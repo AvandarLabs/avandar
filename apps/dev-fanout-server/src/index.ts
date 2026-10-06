@@ -1,5 +1,5 @@
 import { registerForwardRoute } from "@fanout-server/routes/forward";
-import { registerNgrokURLRoutes } from "@fanout-server/routes/ngrok-url";
+import { registerNgrokUrlRoutes } from "@fanout-server/routes/ngrok-url";
 import Fastify from "fastify";
 
 function _getPort(): number {
@@ -36,7 +36,7 @@ async function main(): Promise<void> {
     return { ok: true };
   });
   await server.register(registerForwardRoute);
-  await server.register(registerNgrokURLRoutes);
+  await server.register(registerNgrokUrlRoutes);
 
   // start server listening
   const host: string = _getHost();

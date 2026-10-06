@@ -6,12 +6,12 @@ import { NuxChecklistMilestoneList } from "@/components/Nux/NuxChecklistPanel/Nu
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel.module.css";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   artifacts: NuxWorkspaceArtifacts | undefined;
   completedCount: number;
-  dockStyle: { readonly right: number; readonly zIndex: number };
+  dockStyle: CSSProperties;
   markDone: (key: NuxProgress.MilestoneKey) => void;
   onOpenMilestone: (key: NuxProgress.MilestoneKey) => void;
   totalMilestoneCount: number;
@@ -37,7 +37,6 @@ export function NuxChecklistExpandedCard({
         padding="md"
         className={classes.nuxChecklistPanelDock}
         pos="fixed"
-        bottom={16}
         w={320}
         style={dockStyle}
         data-testid="nux-checklist"

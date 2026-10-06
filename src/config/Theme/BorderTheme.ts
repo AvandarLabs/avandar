@@ -1,7 +1,8 @@
 /** RGB components of neutral[9], used for hairline borders. */
 const NEUTRAL_RGB = "16, 42, 67";
 
-const NEUTRAL_LIGHT_RGB = "217, 226, 236";
+/** RGB components of neutral[1], used for hairline borders in dark mode. */
+const NEUTRAL_LIGHT_RGB = "217, 224, 231";
 
 /** Tighter radii than Mantine defaults (6–8px for most UI). */
 const THEME_RADIUS = {

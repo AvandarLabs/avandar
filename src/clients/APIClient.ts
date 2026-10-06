@@ -1,6 +1,6 @@
 import { Simplify } from "type-fest";
 import { createServerApiClient } from "$/ServerApiClient";
-import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
+import { ValidUrlQueryParamValue } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString";
 import type {
   API,
   APIBody,
@@ -32,7 +32,7 @@ type HTTPRequestOptions<
     : { pathParams?: undefined }) &
     (APIQueryParams<Route, Method> extends Record<
       string,
-      ValidURLQueryParamValue
+      ValidUrlQueryParamValue
     >
       ? { queryParams: APIQueryParams<Route, Method> }
       : { queryParams?: undefined })

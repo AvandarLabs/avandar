@@ -103,6 +103,7 @@ export const FunnelChartVizConfigs = {
           vizType,
           nameKey,
           valueKey,
+          seriesColors,
           isDonut: false,
           withLabels: true,
           labelsType: "value",

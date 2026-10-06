@@ -1,6 +1,6 @@
 .root {
-  background: var(--mantine-color-gray-0);
-  border: 1px solid var(--mantine-color-gray-3);
+  background: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
   font-family: var(--mantine-font-family-monospace);
   font-size: var(--mantine-font-size-sm);
@@ -57,9 +57,9 @@
 }
 
 :global(.sqlPill--column) {
-  background: var(--mantine-color-gray-1);
-  border: 1px solid var(--mantine-color-gray-4);
-  color: var(--mantine-color-gray-9);
+  background: var(--mantine-color-neutral-1);
+  border: 1px solid var(--ava-border-default);
+  color: var(--mantine-color-neutral-9);
 }
 
 :global(.sqlPill--error) {

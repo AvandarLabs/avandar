@@ -78,7 +78,7 @@ export function SharePrincipalRow({
         <Tooltip
           label={t`The owner always has admin access. To change owner, use the ${resource} settings.`}
         >
-          <Badge variant="light" color="gray" tabIndex={0}>
+          <Badge variant="light" color="neutral" tabIndex={0}>
             <Trans>Owner</Trans>
           </Badge>
         </Tooltip>
@@ -123,7 +123,7 @@ export function SharePrincipalRow({
         <Tooltip label={t`Remove access for ${name}.`}>
           <ActionIcon
             variant="subtle"
-            color="gray"
+            color="neutral"
             disabled={isReadOnly}
             onClick={onRemove}
             aria-label={t`Remove access for ${displayName}`}

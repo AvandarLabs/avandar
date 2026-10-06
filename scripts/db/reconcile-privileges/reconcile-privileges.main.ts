@@ -59,18 +59,36 @@
  * - Managed for default privileges: only schemas named by an
  *   `alter default privileges` declaration.
  *
- * Anything undeclared is unmanaged, which is why the run also reports functions
- * that no schema file revokes. A function is the one object class Postgres will
- * not let you deny by default: it grants EXECUTE to `PUBLIC` on creation and
- * `alter default privileges` cannot suppress it, so a function nobody revoked
- * is
- * a function `anon` can call.
+ * Anything undeclared is unmanaged, which is why the run also FAILS on a
+ * function that no schema file revokes. A function is the one object class
+ * Postgres will not let you deny by default: it grants EXECUTE to `PUBLIC` on
+ * creation and `alter default privileges` cannot suppress it, so a function
+ * nobody revoked is a function `anon` can call, so the check exits 1 in gate
+ * mode. Do not soften it back to a warning: a warning nothing reads lets a
+ * `security definer` helper that returns another tenant's member ids sit in
+ * the `anon` surface with `test:db` green over it.
  *
  * USAGE
  *
- *   pnpm db:validate-privileges                 # gate; exit 1 on drift
- *   pnpm db:validate-privileges --sql           # print only the SQL it wants
- *   pnpm db:validate-privileges --db-url <url>  # gate another environment
+ * Deliberately not a package script. Every failure it reports is fixed by
+ * `pnpm db:new-migration`, never by re-running this, so exposing it in
+ * `package.json` would offer a re-check that cannot see the fix: a schema-file
+ * edit does not change `supabase/migrations/`, and this gate measures the
+ * migrations. `pnpm test:db` calls the shell script by path, and so should any
+ * other caller.
+ *
+ *   SH=./scripts/db/reconcile-privileges/reconcile-privileges.sh
+ *   pnpm exec $SH                 # gate; exit 1 on drift
+ *   pnpm exec $SH --sql           # print only the SQL it wants
+ *   pnpm exec $SH --db-url <url>  # gate a remote environment
+ *
+ * `pnpm exec`, not a bare path: this runs through `vite-node`, which only
+ * resolves with `node_modules/.bin` on PATH. `pnpm test:db` and
+ * `pnpm db:new-migration` get that for free, being package scripts themselves.
+ *
+ * `--db-url` is the one use with no enclosing workflow: there is no
+ * `db:new-migration` for staging or production, so an ACL audit of a deployed
+ * database runs this directly.
  *
  * `--append` writes the SQL into a migration, and it refuses to run outside
  * `pnpm db:new-migration`. On its own it would skip the no-op view strip that
@@ -83,73 +101,18 @@
  * `supabase test db`, which is exactly that.
  */
 
-import { appendFileSync, readdirSync, readFileSync, statSync } from "node:fs";
-import path from "node:path";
 import {
   getLocalDatabaseConfigFromRepoRoot,
   makeSqlRunner,
-} from "../lib/PsqlUtils/PsqlUtils";
+} from "../utils/PsqlUtils/PsqlUtils";
 import { PrivilegeReconciliation } from "./PrivilegeReconciliation/PrivilegeReconciliation";
+import { PrivilegeSql } from "./PrivilegeSql/PrivilegeSql";
+import { SupabaseFiles } from "./SupabaseFiles/SupabaseFiles";
 import type {
   AclEntry,
-  AclKind,
   Declarations,
 } from "./PrivilegeReconciliation/PrivilegeReconciliation";
-
-// ASCII unit separator. Object names can contain dots, quotes, and
-// parentheses, so the delimiter has to be something an identifier cannot hold.
-const FIELD_SEPARATOR = "\u001f";
-const PROBE_TABLE_PREFIX = "__acl_probe_";
-
-function _quoteSqlLiteral(value: string): string {
-  return `'${value.replace(/'/gu, "''")}'`;
-}
-
-/** `values ('a'),('b')`, or a form that yields no rows for an empty list. */
-function _toValuesList(names: readonly string[]): string {
-  if (names.length === 0) {
-    return "select null::text where false";
-  }
-  return `values ${names
-    .map((name) => {
-      return `(${_quoteSqlLiteral(name)})`;
-    })
-    .join(",")}`;
-}
-
-/**
- * Schema files in the order the Supabase CLI applies them.
- *
- * `[db.migrations] schema_paths` is empty in this repo, and the CLI's
- * documented
- * default for that is every file under `supabase/schemas/` in lexicographic
- * order. That order is load-bearing: `00.default_privileges.sql` has to run
- * before the files whose relations it keeps private.
- */
-function _getOrderedSchemaFiles(repoRoot: string): string[] {
-  const schemasDir = path.join(repoRoot, "supabase", "schemas");
-  const walk = (dir: string): string[] => {
-    return readdirSync(dir)
-      .sort()
-      .flatMap((name) => {
-        const full = path.join(dir, name);
-        if (statSync(full).isDirectory()) {
-          return walk(full);
-        }
-        return name.endsWith(".sql") ? [full] : [];
-      });
-  };
-  return walk(schemasDir);
-}
-
-type Scope = Readonly<{
-  /** Schemas whose relations, columns, and functions we declare. */
-  relationSchemas: readonly string[];
-  /** Schemas whose own ACL we declare (the ones the schema files create). */
-  schemaAclSchemas: readonly string[];
-  /** Schemas whose default privileges we declare. */
-  defaultAclSchemas: readonly string[];
-}>;
+import type { Scope } from "./PrivilegeSql/PrivilegeSql";
 
 function _getScopeFromDeclarations(
   declarations: Readonly<Declarations>,
@@ -159,247 +122,6 @@ function _getScopeFromDeclarations(
     schemaAclSchemas: declarations.createdSchemas,
     defaultAclSchemas: declarations.defaultAclSchemas,
   };
-}
-
-/**
- * Reads every managed ACL out of the catalogs as one row per
- * (object, column, grantee, privilege).
- *
- * A NULL `proacl` is expanded through `acldefault`, because for a function NULL
- * does not mean "no privileges": it means Postgres's built-in EXECUTE to
- * `PUBLIC` applies. Leaving it NULL would hide the single most important
- * exposure this script exists to catch. A NULL `relacl`, `attacl`, or `nspacl`
- * genuinely does mean owner-only, so those stay unexpanded.
- */
-function _getSnapshotSql(scope: Scope): string {
-  const grantee = `case when a.grantee = 0 then 'PUBLIC' else a.grantee::regrole::text end`;
-  return `
-with rel_schemas (nspname) as (${_toValuesList(scope.relationSchemas)}),
-acl_schemas (nspname) as (${_toValuesList(scope.schemaAclSchemas)}),
-def_schemas (nspname) as (${_toValuesList(scope.defaultAclSchemas)}),
-entries as (
-  select 'relation'::text as kind,
-         format('%I.%I', n.nspname, c.relname) as object,
-         ''::text as col,
-         ${grantee} as grantee,
-         a.privilege_type::text as privilege,
-         a.is_grantable as is_grantable
-    from pg_class c
-    join pg_namespace n on n.oid = c.relnamespace
-    join rel_schemas rs on rs.nspname = n.nspname
-   cross join lateral aclexplode(c.relacl) a
-   where c.relkind in ('r', 'p', 'v', 'm', 'S')
-     and strpos(c.relname, '${PROBE_TABLE_PREFIX}') <> 1
-  union all
-  select 'column',
-         format('%I.%I', n.nspname, c.relname),
-         format('%I', att.attname),
-         ${grantee},
-         a.privilege_type::text,
-         a.is_grantable
-    from pg_attribute att
-    join pg_class c on c.oid = att.attrelid
-    join pg_namespace n on n.oid = c.relnamespace
-    join rel_schemas rs on rs.nspname = n.nspname
-   cross join lateral aclexplode(att.attacl) a
-   where att.attnum > 0 and not att.attisdropped
-     and strpos(c.relname, '${PROBE_TABLE_PREFIX}') <> 1
-  union all
-  select 'function',
-         format('%I.%I(%s)', n.nspname, p.proname,
-                pg_get_function_identity_arguments(p.oid)),
-         '',
-         ${grantee},
-         a.privilege_type::text,
-         a.is_grantable
-    from pg_proc p
-    join pg_namespace n on n.oid = p.pronamespace
-    join rel_schemas rs on rs.nspname = n.nspname
-   cross join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
-  union all
-  select 'schema', format('%I', n.nspname), '',
-         ${grantee}, a.privilege_type::text, a.is_grantable
-    from pg_namespace n
-    join acl_schemas s on s.nspname = n.nspname
-   cross join lateral aclexplode(n.nspacl) a
-  union all
-  select 'default', format('%I|%s', dn.nspname, d.defaclobjtype), '',
-         ${grantee}, a.privilege_type::text, a.is_grantable
-    from pg_default_acl d
-    join pg_namespace dn on dn.oid = d.defaclnamespace
-    join def_schemas ds on ds.nspname = dn.nspname
-   cross join lateral aclexplode(d.defaclacl) a
-   where d.defaclrole = 'postgres'::regrole
-)
-select concat_ws(chr(31),
-                 kind, object, col, grantee, privilege, is_grantable::text)
-  from entries
- where grantee in ('PUBLIC', 'anon', 'authenticated', 'service_role')
- order by 1;
-`;
-}
-
-function _parseSnapshot(output: string): AclEntry[] {
-  return output
-    .split("\n")
-    .filter((line) => {
-      return line.includes(FIELD_SEPARATOR);
-    })
-    .map((line) => {
-      const [
-        kind = "",
-        object = "",
-        column = "",
-        grantee = "",
-        privilege = "",
-        grantable = "",
-      ] = line.trim().split(FIELD_SEPARATOR);
-      return {
-        kind: kind as AclKind,
-        object,
-        column,
-        grantee,
-        privilege,
-        isGrantable: grantable === "true" || grantable === "t",
-      };
-    });
-}
-
-/**
- * Removes every managed relation, column, and schema privilege, leaving the
- * state a freshly created object has. Functions and default privileges are left
- * alone on purpose; see the file header.
- */
-function _getStripSql(scope: Scope): string {
-  return `
-do $$
-declare
-  target record;
-begin
-  for target in
-    select format('%I.%I', n.nspname, c.relname) as object,
-           case when c.relkind = 'S' then 'sequence' else 'table' end as object_kind
-      from pg_class c
-      join pg_namespace n on n.oid = c.relnamespace
-     where n.nspname in (select * from (${_toValuesList(scope.relationSchemas)}) v)
-       and c.relkind in ('r', 'p', 'v', 'm', 'S')
-  loop
-    execute format(
-      'revoke all privileges on %s %s from public, anon, authenticated, service_role',
-      target.object_kind, target.object);
-  end loop;
-
-  for target in
-    select format('%I.%I', n.nspname, c.relname) as object,
-           att.attname as column_name
-      from pg_attribute att
-      join pg_class c on c.oid = att.attrelid
-      join pg_namespace n on n.oid = c.relnamespace
-     where n.nspname in (select * from (${_toValuesList(scope.relationSchemas)}) v)
-       and att.attnum > 0 and not att.attisdropped and att.attacl is not null
-  loop
-    execute format(
-      'revoke all privileges (%I) on table %s from public, anon, authenticated, service_role',
-      target.column_name, target.object);
-  end loop;
-
-  for target in
-    select n.nspname as schema_name
-      from pg_namespace n
-     where n.nspname in (select * from (${_toValuesList(scope.schemaAclSchemas)}) v)
-  loop
-    execute format(
-      'revoke all privileges on schema %I from public, anon, authenticated, service_role',
-      target.schema_name);
-  end loop;
-end
-$$;
-`;
-}
-
-/**
- * Fails the transaction unless a freshly created relation in every managed
- * schema arrives with no privileges for any Data API grantee.
- *
- * This is the one assumption the replay rests on. Asserting it means a future
- * default privilege turns this script into a loud failure instead of a
- * confidently wrong answer.
- */
-function _getFreshRelationAssertionSql(scope: Scope): string {
-  return `
-do $$
-declare
-  target record;
-  probe text;
-  leaked text;
-begin
-  for target in
-    select n.nspname as schema_name
-      from pg_namespace n
-     where n.nspname in (select * from (${_toValuesList(scope.relationSchemas)}) v)
-  loop
-    probe := format('%I.%I', target.schema_name,
-                    '${PROBE_TABLE_PREFIX}' || replace(target.schema_name, '"', ''));
-    execute format('create table %s (probe_column integer)', probe);
-    select string_agg(distinct
-             case when a.grantee = 0 then 'PUBLIC' else a.grantee::regrole::text end, ', ')
-      into leaked
-      from pg_class c
-     cross join lateral aclexplode(c.relacl) a
-     where c.oid = probe::regclass
-       and (a.grantee = 0
-            or a.grantee::regrole::text in ('anon', 'authenticated', 'service_role'));
-    if leaked is not null then
-      raise exception
-        'A new table in schema % is created with privileges for %. reconcile-privileges assumes new relations start private; supabase/schemas/00.default_privileges.sql no longer guarantees that. Fix the declaration or update this script.',
-        target.schema_name, leaked;
-    end if;
-    execute format('drop table %s', probe);
-  end loop;
-end
-$$;
-`;
-}
-
-/**
- * Functions in a managed schema that no schema file revokes.
- *
- * The declared signatures are resolved with `to_regprocedure` rather than
- * compared as text. Postgres renders an identity argument list with parameter
- * names (`p_map_id uuid`) while a declaration writes bare types (`uuid`), and
- * it
- * schema-qualifies a type only when `search_path` makes it necessary. Resolving
- * to an OID sidesteps all of that; a signature Postgres cannot resolve becomes
- * NULL and is simply ignored.
- *
- * This matters because a function is the one object class Postgres will not let
- * you deny by default: it grants EXECUTE to `PUBLIC` on creation, and
- * `alter default privileges` cannot suppress that. A function nobody revoked is
- * a function `anon` can call.
- */
-function _getUndeclaredFunctionsSql(
-  options: Readonly<{ scope: Scope; declaredSignatures: readonly string[] }>,
-): string {
-  const { scope, declaredSignatures } = options;
-  const declared =
-    declaredSignatures.length === 0
-      ? "select null::oid where false"
-      : `select to_regprocedure(sig)::oid as oid_ from (values ${declaredSignatures
-          .map((signature) => {
-            return `(${_quoteSqlLiteral(signature)})`;
-          })
-          .join(
-            ",",
-          )}) as declared (sig) where to_regprocedure(sig) is not null`;
-  return `
-select format('%I.%I(%s)', n.nspname, p.proname,
-              pg_get_function_identity_arguments(p.oid))
-  from pg_proc p
-  join pg_namespace n on n.oid = p.pronamespace
- where n.nspname in (select * from (${_toValuesList(scope.relationSchemas)}) v)
-   and p.oid not in (${declared})
- order by 1;
-`;
 }
 
 function _getErrorMessage(error: unknown): string {
@@ -412,26 +134,6 @@ function _getErrorMessage(error: unknown): string {
   return String(error);
 }
 
-/**
- * The ACL a from-scratch build of `supabase/schemas/` produces, measured by
- * replaying the declarations in a rolled-back transaction.
- */
-function _getReplaySql(
-  options: Readonly<{ scope: Scope; declarations: Readonly<Declarations> }>,
-): string {
-  const { scope, declarations } = options;
-  return [
-    "begin;",
-    _getStripSql(scope),
-    ...declarations.statements.map((statement) => {
-      return `${statement};`;
-    }),
-    _getFreshRelationAssertionSql(scope),
-    _getSnapshotSql(scope),
-    "rollback;",
-  ].join("\n");
-}
-
 function _getDeclaredSnapshot(
   options: Readonly<{
     runSql: (sql: string) => string;
@@ -440,7 +142,9 @@ function _getDeclaredSnapshot(
   }>,
 ): AclEntry[] {
   const { runSql, scope, declarations } = options;
-  return _parseSnapshot(runSql(_getReplaySql({ scope, declarations })));
+  return PrivilegeSql.parseSnapshot(
+    runSql(PrivilegeSql.getReplaySql({ scope, declarations })),
+  );
 }
 
 type CliOptions = {
@@ -468,30 +172,30 @@ function _getCliOptions(argv: readonly string[]): CliOptions {
   };
 }
 
-function _getNewestMigrationPath(repoRoot: string): string {
-  const migrationsDir = path.join(repoRoot, "supabase", "migrations");
-  const newest = readdirSync(migrationsDir)
-    .filter((name) => {
-      return name.endsWith(".sql");
-    })
-    .sort()
-    .at(-1);
-  if (newest === undefined) {
-    throw new Error("No migrations found.");
-  }
-  return path.join(migrationsDir, newest);
-}
+type ReportUndeclaredFunctionsOptions = Readonly<{
+  runSql: (sql: string) => string;
+  scope: Scope;
+  declarations: Readonly<Declarations>;
+  /** Selects the wording only. The caller decides the exit code. */
+  isBlocking: boolean;
+}>;
 
+/**
+ * Reports every function in scope that no schema file revokes, and returns how
+ * many there are. A non-zero count is a gate failure: `PUBLIC` keeps the
+ * EXECUTE Postgres grants on creation, so `anon` can call each one.
+ *
+ * Callers pass `isBlocking: false` under `--append`, because appending cannot
+ * close the gap: a function with no declaration produces no statement to
+ * append, and `pnpm db:new-migration` ends with a gate run that stops the
+ * developer there.
+ */
 function _reportUndeclaredFunctions(
-  options: Readonly<{
-    runSql: (sql: string) => string;
-    scope: Scope;
-    declarations: Readonly<Declarations>;
-  }>,
+  options: ReportUndeclaredFunctionsOptions,
 ): number {
-  const { runSql, scope, declarations } = options;
+  const { runSql, scope, declarations, isBlocking } = options;
   const undeclared = runSql(
-    _getUndeclaredFunctionsSql({
+    PrivilegeSql.getUndeclaredFunctionsSql({
       scope,
       declaredSignatures: declarations.revokedFunctionSignatures,
     }),
@@ -504,83 +208,177 @@ function _reportUndeclaredFunctions(
       return line !== "";
     });
   if (undeclared.length > 0) {
+    const label = isBlocking ? "UNDECLARED FUNCTIONS" : "WARNING";
     console.log(
-      `\nWARNING: ${undeclared.length} function(s) are not revoked by any schema file, so PUBLIC keeps the EXECUTE that Postgres grants on creation:`,
+      `\n${label}: ${undeclared.length} function(s) are not revoked by any schema file, so PUBLIC keeps the EXECUTE that Postgres grants on creation, which means \`anon\` can call them:`,
     );
     undeclared.forEach((signature) => {
       console.log(`  ${signature}`);
     });
+    console.log(
+      "\nGive each one an explicit `revoke execute on function ... from public, anon, authenticated, service_role;` in its schema file, followed by a `grant` for every role that genuinely needs it. Roles that need it are: any role named by a policy that calls the function (a policy expression is evaluated as the calling role), any role that calls it as an rpc, and any role that runs a statement whose SECURITY INVOKER trigger calls it. A trigger function itself needs no grant.",
+    );
   }
   return undeclared.length;
 }
 
-function _appendStatementsToMigration(
-  options: Readonly<{ migrationFile: string; statements: readonly string[] }>,
-): void {
-  const { migrationFile, statements } = options;
-  const block = [
-    "",
-    "-- Privileges that `supabase db diff` cannot see: default, schema, column,",
-    "-- and view grants. Appended by `pnpm db:new-migration` from what",
-    "-- `supabase/schemas/` declares. Do not hand-edit; re-run the command.",
-    ...statements,
-    "",
-  ].join("\n");
-  appendFileSync(migrationFile, block);
-  console.log(
-    `Appended ${statements.length} statement(s) to ${path.basename(migrationFile)}.`,
-  );
-}
-
-function main(): void {
-  const { isAppend, isSqlOnly, isDebugSql, databaseUrl, explicitFile } =
-    _getCliOptions(process.argv.slice(2));
+/**
+ * Refuses `--append` outside `pnpm db:new-migration`, which is the only place
+ * it is a correct step. Exits 1 rather than returning, so no caller can carry
+ * on with a half-finished migration.
+ */
+function _assertAppendRunsInsidePipeline(isAppend: boolean): void {
   if (isAppend && process.env.AVANDAR_MIGRATION_PIPELINE !== "1") {
     console.error(
       "--append is a step inside `pnpm db:new-migration`, not a command to run on its own: alone it skips the no-op view strip that must precede it and the re-verification that must follow, so it leaves a migration that looks finished and is not. Run `pnpm db:new-migration <name>`.",
     );
     process.exit(1);
   }
+}
 
+/**
+ * Runs one snapshot read and exits 1 with `whatFailed` in the message if it
+ * throws. Both snapshots need identical failure handling and neither has a
+ * useful fallback, so a caught error is the end of the run.
+ */
+function _readSnapshotOrExit(
+  options: Readonly<{ whatFailed: string; read: () => AclEntry[] }>,
+): AclEntry[] {
+  const { whatFailed, read } = options;
+  try {
+    return read();
+  } catch (error) {
+    console.error(`Could not ${whatFailed}: ${_getErrorMessage(error)}`);
+    process.exit(1);
+  }
+}
+
+type FinishOptions = Readonly<{
+  isAppend: boolean;
+  repoRoot: string;
+  explicitFile: string | undefined;
+  runSql: (sql: string) => string;
+  scope: Scope;
+  declarations: Readonly<Declarations>;
+  statements: readonly string[];
+}>;
+
+/**
+ * Ends a run whose privileges already match the declarations. Exits 1 when a
+ * function is still undeclared, which is the gate's only remaining failure.
+ */
+function _finishWithoutDrift(options: FinishOptions): void {
+  const { isAppend, runSql, scope, declarations } = options;
+  console.log(
+    "The database's privileges match supabase/schemas/ exactly. Nothing to do.",
+  );
+  const undeclared = _reportUndeclaredFunctions({
+    runSql,
+    scope,
+    declarations,
+    isBlocking: !isAppend,
+  });
+  if (undeclared > 0 && !isAppend) {
+    process.exit(1);
+  }
+}
+
+/**
+ * Ends a run that owes statements: prints them, then either appends them to
+ * the newest migration under `--append` or exits 1 as a gate failure.
+ */
+function _finishWithDrift(options: FinishOptions): void {
+  const {
+    isAppend,
+    repoRoot,
+    explicitFile,
+    runSql,
+    scope,
+    declarations,
+    statements,
+  } = options;
+  console.log("\nStatements needed to match supabase/schemas/:\n");
+  statements.forEach((statement) => {
+    console.log(`  ${statement}`);
+  });
+  const undeclared = _reportUndeclaredFunctions({
+    runSql,
+    scope,
+    declarations,
+    isBlocking: !isAppend,
+  });
+
+  if (!isAppend) {
+    console.log(
+      "\nDRIFT: the migrations do not reproduce the declared privileges. Run `pnpm db:new-migration <name>` to generate a migration that includes the statements above.",
+    );
+    process.exit(1);
+  }
+
+  SupabaseFiles.appendStatementsToMigration({
+    migrationFile:
+      explicitFile ?? SupabaseFiles.getNewestMigrationPath(repoRoot),
+    statements,
+  });
+  if (undeclared > 0) {
+    console.log(
+      "The append is complete, but the functions listed above still have no declaration. The verification step that follows will fail until they do.",
+    );
+  }
+}
+
+/**
+ * Everything a run needs before it can compare anything: where the repo is,
+ * how to reach the database, and what `supabase/schemas/` declares.
+ */
+function _getRunContext(databaseUrl: string | undefined): {
+  repoRoot: string;
+  runSql: (sql: string) => string;
+  declarations: Declarations;
+  scope: Scope;
+} {
   const repoRoot = process.cwd();
   const runSql = makeSqlRunner({
     ...getLocalDatabaseConfigFromRepoRoot(repoRoot),
     databaseUrl,
   });
-
   const declarations = PrivilegeReconciliation.getDeclarationsFromSchemaFiles(
-    _getOrderedSchemaFiles(repoRoot).map((file) => {
-      return readFileSync(file, "utf8");
-    }),
+    SupabaseFiles.getOrderedSchemaFiles(repoRoot).map(SupabaseFiles.readFile),
   );
-  const scope = _getScopeFromDeclarations(declarations);
+  return {
+    repoRoot,
+    runSql,
+    declarations,
+    scope: _getScopeFromDeclarations(declarations),
+  };
+}
+
+function main(): void {
+  const { isAppend, isSqlOnly, isDebugSql, databaseUrl, explicitFile } =
+    _getCliOptions(process.argv.slice(2));
+  _assertAppendRunsInsidePipeline(isAppend);
+
+  const { repoRoot, runSql, declarations, scope } = _getRunContext(databaseUrl);
 
   if (isDebugSql) {
-    console.log(_getReplaySql({ scope, declarations }));
+    console.log(PrivilegeSql.getReplaySql({ scope, declarations }));
     return;
   }
 
-  const actual = (() => {
-    try {
-      return _parseSnapshot(runSql(_getSnapshotSql(scope)));
-    } catch (error) {
-      console.error(
-        `Could not read privileges from the local database: ${_getErrorMessage(error)}`,
+  const actual = _readSnapshotOrExit({
+    whatFailed: "read privileges from the local database",
+    read: () => {
+      return PrivilegeSql.parseSnapshot(
+        runSql(PrivilegeSql.getSnapshotSql(scope)),
       );
-      process.exit(1);
-    }
-  })();
-
-  const declared = (() => {
-    try {
+    },
+  });
+  const declared = _readSnapshotOrExit({
+    whatFailed: "replay the declarations from supabase/schemas/",
+    read: () => {
       return _getDeclaredSnapshot({ runSql, scope, declarations });
-    } catch (error) {
-      console.error(
-        `Could not replay the declarations from supabase/schemas/: ${_getErrorMessage(error)}`,
-      );
-      process.exit(1);
-    }
-  })();
+    },
+  });
 
   const { surplus, missing, statements } = PrivilegeReconciliation.reconcile({
     actual,
@@ -597,31 +395,20 @@ function main(): void {
       `surplus: ${surplus.length} · missing: ${missing.length}`,
   );
 
+  const finishOptions = {
+    isAppend,
+    repoRoot,
+    explicitFile,
+    runSql,
+    scope,
+    declarations,
+    statements,
+  };
   if (statements.length === 0) {
-    console.log(
-      "The database's privileges match supabase/schemas/ exactly. Nothing to do.",
-    );
-    _reportUndeclaredFunctions({ runSql, scope, declarations });
+    _finishWithoutDrift(finishOptions);
     return;
   }
-
-  console.log("\nStatements needed to match supabase/schemas/:\n");
-  statements.forEach((statement) => {
-    console.log(`  ${statement}`);
-  });
-  _reportUndeclaredFunctions({ runSql, scope, declarations });
-
-  if (!isAppend) {
-    console.log(
-      "\nDRIFT: the migrations do not reproduce the declared privileges. Run `pnpm db:new-migration <name>` to generate a migration that includes the statements above.",
-    );
-    process.exit(1);
-  }
-
-  _appendStatementsToMigration({
-    migrationFile: explicitFile ?? _getNewestMigrationPath(repoRoot),
-    statements,
-  });
+  _finishWithDrift(finishOptions);
 }
 
 main();

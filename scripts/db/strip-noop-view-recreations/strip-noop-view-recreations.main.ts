@@ -57,7 +57,7 @@ import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import {
   getLocalDatabaseConfigFromRepoRoot,
   makeSqlRunner,
-} from "../lib/PsqlUtils/PsqlUtils";
+} from "../utils/PsqlUtils/PsqlUtils";
 import { NoopViewRecreations } from "./NoopViewRecreations/NoopViewRecreations";
 import type {
   CreateViewStatement,

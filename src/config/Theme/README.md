@@ -45,7 +45,7 @@ second** (not large diffuse blurs).
 
 | Token                   | Light mode      | Use                                           |
 | ----------------------- | --------------- | --------------------------------------------- |
-| `--ava-surface-body`    | App background  | Page canvas behind content                    |
+| `--ava-surface-body`    | App background  | Page surface behind content                   |
 | `--ava-surface-raised`  | White           | Cards, panels, floating tab indicator         |
 | `--ava-surface-overlay` | White           | Modals, menus, dropdowns                      |
 | `--ava-surface-sunken`  | Slightly darker | Inset areas, subtle hover on outline controls |
@@ -147,12 +147,30 @@ Use in `*.module.css` under `src/components/AppShell/`, not in feature views.
 
 ## Z-index
 
-| Constant                 | Value | Use                |
-| ------------------------ | ----- | ------------------ |
-| `APP_SHELL_MAIN_Z_INDEX` | 200   | Main content shell |
-| `MODAL_ROOT_Z_INDEX`     | 300   | Modals above shell |
+One tier per layer, all declared in `Theme.ts`. Never write a bare number.
 
-Anything above the main app must be **> 200**. Modals use 300 by default.
+| Constant                       | Value | Use                                                     |
+| ------------------------------ | ----- | ------------------------------------------------------- |
+| (Mantine `AppShell` default)   | 100   | Shell header; its sidebar and chat aside paint at 101    |
+| `APP_SLATE_Z_INDEX`            | 150   | The slate (`AppSlate` paper)                             |
+| (Mantine overlay default)      | 200   | `Drawer`, `Spotlight`: not overridden                    |
+| `APP_CHROME_Z_INDEX`           | 250   | Floating toolbars, mobile sidebar, chat composer overlay |
+| `FLOATING_PANEL_Z_INDEX`       | 300   | Floating surfaces that must clear app chrome             |
+| `MODAL_ROOT_Z_INDEX`           | 400   | Modals; `NUX_TOUR_Z_INDEX` shares this layer             |
+| `NUX_CHECKLIST_Z_INDEX`        | 401   | "Get started" card, above the tour overlay               |
+| `MODAL_ABOVE_NUX_TOUR_Z_INDEX` | 403   | Modals that interrupt the tour                           |
+| `POPOVER_Z_INDEX`              | 500   | Menus, popovers, comboboxes, tooltips                    |
+| `NOTIFICATIONS_Z_INDEX`        | 10000 | Toasts                                                   |
+
+The slate tier is bounded on both sides: above the shell so the slate drop
+shadow is not clipped at the sidebar edge, and below 200 so Mantine's own
+overlay defaults still cover it. `Theme.test.ts` asserts both. See
+[`docs/app-shell-nomenclature.md`](../../../docs/app-shell-nomenclature.md).
+
+In CSS modules, read the tiers as variables: `--mantine-z-index-app-slate`,
+`--mantine-z-index-app-chrome`, `--mantine-z-index-floating-panel`,
+`--mantine-z-index-modal`, `--mantine-z-index-popover`,
+`--mantine-z-index-notifications`.
 
 ## TypeScript access
 

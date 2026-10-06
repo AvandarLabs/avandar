@@ -1,4 +1,4 @@
--- This represents an open data dataset that has been added to a workspace.
+/** An open data dataset that has been added to a workspace. */
 create table public.datasets__open_data (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
@@ -73,9 +73,6 @@ create policy "User can delete datasets__open_data in their workspace" on public
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_datasets__open_data__set_updated_at before
 update on public.datasets__open_data for each row
 execute function public.util__set_updated_at ();

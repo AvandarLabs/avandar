@@ -30,9 +30,6 @@ update,
 delete on table public.workspace_memberships to authenticated,
 service_role;
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_workspace_memberships__set_updated_at before
 update on public.workspace_memberships for each row
 execute function public.util__set_updated_at ();

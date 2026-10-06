@@ -32,19 +32,19 @@ type MockMkdir = typeof mkdir & {
 const AUTH_SECRET = "test-secret";
 const AUTH_HEADER = `Bearer ${AUTH_SECRET}`;
 
-type NgrokDevURLTarget = Readonly<{
+type NgrokDevUrlTarget = Readonly<{
   url: string;
   dateAdded: string;
   lastAccessedDate: string | null;
 }>;
 
-const TARGET_A: NgrokDevURLTarget = {
+const TARGET_A: NgrokDevUrlTarget = {
   url: "https://a.example",
   dateAdded: "2026-01-01T00:00:00.000Z",
   lastAccessedDate: null,
 };
 
-const TARGET_B: NgrokDevURLTarget = {
+const TARGET_B: NgrokDevUrlTarget = {
   url: "https://b.example/base",
   dateAdded: "2026-01-02T00:00:00.000Z",
   lastAccessedDate: "2026-01-03T00:00:00.000Z",
@@ -81,18 +81,18 @@ function _expectIsISOTimestampOrNull(value: unknown): void {
 }
 
 async function _createServer(): Promise<FastifyInstance> {
-  const { registerNgrokURLRoutes } = await import("./");
+  const { registerNgrokUrlRoutes } = await import("./");
 
   const server: FastifyInstance = Fastify({
     logger: false,
   });
 
-  await server.register(registerNgrokURLRoutes);
+  await server.register(registerNgrokUrlRoutes);
   return server;
 }
 
-function _mockNgrokDevURLsJSON(options: {
-  targets: readonly NgrokDevURLTarget[];
+function _mockNgrokDevUrlsJson(options: {
+  targets: readonly NgrokDevUrlTarget[];
 }): void {
   const mockedReadFile = readFile as unknown as MockReadFile;
   mockedReadFile.mockResolvedValue(
@@ -102,7 +102,7 @@ function _mockNgrokDevURLsJSON(options: {
   );
 }
 
-function _mockNgrokDevURLsJSONMissing(): void {
+function _mockNgrokDevUrlsJsonMissing(): void {
   const mockedReadFile = readFile as unknown as MockReadFile;
 
   const error = new Error("missing") as Error & { code: string };
@@ -110,7 +110,7 @@ function _mockNgrokDevURLsJSONMissing(): void {
   mockedReadFile.mockRejectedValue(error);
 }
 
-describe("registerNgrokURLRoutes", () => {
+describe("registerNgrokUrlRoutes", () => {
   let server: FastifyInstance | undefined = undefined;
 
   beforeEach(async () => {
@@ -138,7 +138,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("returns 401 when `list` is missing auth", async () => {
-    _mockNgrokDevURLsJSON({ targets: [] });
+    _mockNgrokDevUrlsJson({ targets: [] });
     server = await _createServer();
 
     const res = await server.inject({
@@ -150,7 +150,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("returns 401 when `list` is called without an incorrect bearer token", async () => {
-    _mockNgrokDevURLsJSON({ targets: [] });
+    _mockNgrokDevUrlsJson({ targets: [] });
     server = await _createServer();
 
     const res = await server.inject({
@@ -165,7 +165,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("lists all targets", async () => {
-    _mockNgrokDevURLsJSON({
+    _mockNgrokDevUrlsJson({
       targets: [TARGET_A, TARGET_B],
     });
     server = await _createServer();
@@ -208,7 +208,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("lists empty when the file does not exist", async () => {
-    _mockNgrokDevURLsJSONMissing();
+    _mockNgrokDevUrlsJsonMissing();
     server = await _createServer();
 
     const res = await server.inject({
@@ -224,7 +224,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("adds a URL and persists it", async () => {
-    _mockNgrokDevURLsJSON({
+    _mockNgrokDevUrlsJson({
       targets: [TARGET_A],
     });
     server = await _createServer();
@@ -261,7 +261,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("strips trailing slashes when adding a URL", async () => {
-    _mockNgrokDevURLsJSON({
+    _mockNgrokDevUrlsJson({
       targets: [TARGET_A],
     });
     server = await _createServer();
@@ -298,7 +298,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("returns 409 when adding a duplicate URL", async () => {
-    _mockNgrokDevURLsJSON({
+    _mockNgrokDevUrlsJson({
       targets: [TARGET_A],
     });
     server = await _createServer();
@@ -334,7 +334,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("returns 401 for `remove` when the bearer token does not match", async () => {
-    _mockNgrokDevURLsJSON({
+    _mockNgrokDevUrlsJson({
       targets: [TARGET_A, { ...TARGET_B, url: "https://b.example" }],
     });
     server = await _createServer();
@@ -356,7 +356,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("removes a URL and persists it", async () => {
-    _mockNgrokDevURLsJSON({
+    _mockNgrokDevUrlsJson({
       targets: [TARGET_A, { ...TARGET_B, url: "https://b.example" }],
     });
     server = await _createServer();
@@ -392,7 +392,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("returns 404 when removing a URL that does not exist", async () => {
-    _mockNgrokDevURLsJSON({
+    _mockNgrokDevUrlsJson({
       targets: [TARGET_A],
     });
     server = await _createServer();
@@ -428,7 +428,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   it("returns 400 for an invalid URL body", async () => {
-    _mockNgrokDevURLsJSON({ targets: [] });
+    _mockNgrokDevUrlsJson({ targets: [] });
     server = await _createServer();
 
     const res = await server.inject({

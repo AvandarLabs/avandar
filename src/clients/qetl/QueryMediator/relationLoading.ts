@@ -134,19 +134,18 @@ function _lookupsForFetch(relationSources: readonly RelationSource[]) {
 
 function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
   return {
-    readGoogleSheetXlsx: async ({
+    readGoogleSheetTabCsv: async ({
       datasetId,
-      xlsxBytes,
-      sheet,
+      csvText,
     }: {
       datasetId: Dataset.Id;
-      xlsxBytes: Uint8Array<ArrayBuffer>;
-      sheet: string | undefined;
+      csvText: string;
     }) => {
-      const loaded = await DuckDbClient.loadXlsx({
+      // The same reader the import path uses, so a dataset's columns are typed
+      // the same whether the rows arrived at import or at query time.
+      const loaded = await DuckDbClient.loadCsv({
         tableName: datasetId,
-        fileBytes: xlsxBytes,
-        sheet,
+        fileText: csvText,
         datasetDuckDbLease,
       });
       return { parquetBlob: loaded.parquetData };

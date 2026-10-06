@@ -1,0 +1,24 @@
+.columnSummaryBodyCounts {
+  gap: 0;
+}
+
+/*
+ * Tabular figures so the counts of a long list of columns line up down the
+ * page instead of drifting with the digit widths.
+ */
+.columnSummaryBodyCount {
+  color: var(--mantine-color-neutral-6);
+  font-size: var(--mantine-font-size-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.columnSummaryBodyCountHighMissing {
+  color: var(--mantine-color-warning-8);
+  font-weight: 500;
+}
+
+.columnSummaryBodySeparator {
+  color: var(--mantine-color-neutral-4);
+  padding: 0 0.4em;
+}

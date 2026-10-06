@@ -94,6 +94,20 @@ export interface GPickerDocsView {
   setIncludeFolders(included: boolean): GPickerDocsView;
 
   /**
+   * Sets the text of the view's navigation tab, overriding the label Google
+   * derives from the view's own options. Also becomes
+   * `ResponseObject.viewToken[GPickerViewToken.LABEL]`.
+   *
+   * Inherited from `View` rather than declared on `DocsView`, and typed here as
+   * returning a `GPickerDocsView` (the real method returns `this`) so it can
+   * sit anywhere in a `DocsView` chain.
+   *
+   * @param label The tab label.
+   * @returns The DocsView instance (for chaining).
+   */
+  setLabel(label: string): GPickerDocsView;
+
+  /**
    * Sets the MIME types included in the view. Use commas to separate types.
    * If not set, all MIME types are displayed.
    * @param mimeTypes Comma-separated MIME types.

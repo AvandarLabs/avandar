@@ -15,8 +15,7 @@ import { MEDIUM_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
 
 /**
- * E2E coverage for unified chat sessions
- * (docs/superpowers/specs/2026-08-17-unified-chat-sessions-design.md).
+ * E2E coverage for unified chat sessions.
  *
  * Mocks the chat edge function the same way as chat-interactive-workflows:
  * every chat messages POST is fulfilled from the test so the thread content

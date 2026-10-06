@@ -13,10 +13,10 @@ import type { EmptyObject } from "type-fest";
  * Model spec for `createRdbCrudClient`.
  *
  * Mirrors `createSupabaseCrudClient`'s options object structurally minus the
- * `dbClient` field — the umbrella factory injects the registered Supabase
- * client (Phase 1) or the SQLite client (Phase 2) per platform. Defined
- * structurally rather than via `Omit<Parameters<…>>` so generic inference
- * propagates `M` cleanly through `createRdbCrudClient(spec)` calls.
+ * `dbClient` field: the umbrella factory injects the registered Supabase
+ * client on web or the SQLite client on desktop. Defined structurally rather
+ * than via `Omit<Parameters<…>>` so generic inference propagates `M` cleanly
+ * through `createRdbCrudClient(spec)` calls.
  */
 export type RdbCrudModelSpec<
   M extends AnySupabaseCrudModelSpec,

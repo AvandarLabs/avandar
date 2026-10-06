@@ -85,9 +85,6 @@ create policy "User can delete datasets__google_sheets in their workspace" on pu
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_datasets__google_sheets__set_updated_at before
 update on public.datasets__google_sheets for each row
 execute function public.util__set_updated_at ();

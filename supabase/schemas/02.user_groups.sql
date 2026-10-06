@@ -1,6 +1,8 @@
--- Workspace-scoped tag groups used to label members. Membership links users
--- to groups; the granular permissions surface grants resource access through
--- `resource_shares` rows where principal_type = 'user_group'.
+/**
+ * Workspace-scoped tag groups used to label members. Membership links users to
+ * groups, and the granular permissions surface grants resource access through
+ * `resource_shares` rows where `principal_type = 'user_group'`.
+ */
 create table public.user_groups (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,

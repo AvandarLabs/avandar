@@ -194,9 +194,9 @@ describe("combineRegions", () => {
   });
 
   /**
-   * The spec's rule for this shape: "Selecting the OCHA pillars in
-   * observations mode contributes their embedded figures (573, subject
-   * Surveillance, early detection and case management) and drops the prose."
+   * The rule for this shape: selecting the OCHA pillars in observations mode
+   * contributes their embedded figures (573, subject Surveillance, early
+   * detection and case management) and drops the prose.
    *
    * Mapping the first field's paragraph into `value` instead would put a
    * sentence in a numeric column, which is a column that lies.

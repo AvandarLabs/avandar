@@ -40,8 +40,9 @@ function DatasetMetaErrorView({ error }: ErrorComponentProps) {
   }, [error]);
 
   return (
-    <Center h="50%">
+    <Center flex={1} p="lg">
       <Callout
+        maw={520}
         title={t`Dataset failed to load`}
         message={t`The dataset failed to load. Please try again later or reach out to support.`}
       />

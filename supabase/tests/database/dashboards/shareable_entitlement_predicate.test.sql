@@ -4,10 +4,10 @@ begin;
 
 set search_path to extensions, public;
 
--- `subscriptions.max_shareable_dashboards_allowed` has existed since the
--- billing work but nothing ever read it, so a free workspace could publish as
--- many dashboards as it liked. P4 makes the limit real, and this file pins the
--- two read-only foundations it is built on:
+-- `subscriptions.max_shareable_dashboards_allowed` is enforced by the
+-- entitlement triggers in `18.entitlements.dashboards.sql`. Without them a free
+-- workspace could publish as many dashboards as it liked, so this file pins the
+-- two read-only foundations the enforcement is built on:
 --
 --   `util__dashboard_counts_as_shareable`, which decides what counts against
 --   the cap, and

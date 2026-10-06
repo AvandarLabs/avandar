@@ -1,7 +1,10 @@
 import { match } from "ts-pattern";
+import { ChartLayout } from "$/models/vizs/ChartLayout.ts";
 import { hydrateXYSeriesFromQuery } from "$/models/vizs/hydrateXYSeriesFromQuery.ts";
 import { hydrateXYSeriesFromQueryResult } from "$/models/vizs/hydrateXYSeriesFromQueryResult.ts";
 import { makeAxisDescriptors } from "$/models/vizs/makeAxisDescriptors/makeAxisDescriptors.ts";
+import { makeGridDescriptors } from "$/models/vizs/makeGridDescriptors/makeGridDescriptors.ts";
+import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
 import { convertSeriesRenderAs } from "$/models/vizs/SeriesConfig.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -40,13 +43,6 @@ const AREA_LAYOUT_OPTIONS = [
   { value: "split", label: "Split (+/-)" },
 ] as const;
 
-const LEGEND_POSITION_OPTIONS = [
-  { value: "top", label: "Top" },
-  { value: "bottom", label: "Bottom" },
-  { value: "left", label: "Left" },
-  { value: "right", label: "Right" },
-] as const;
-
 const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
   chart: [
     {
@@ -61,12 +57,7 @@ const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
       group: "Legend",
       control: { kind: "switch" },
     },
-    {
-      key: "chartStyle.legend.position",
-      label: "Legend position",
-      group: "Legend",
-      control: { kind: "segmented", options: LEGEND_POSITION_OPTIONS },
-    },
+    makeLegendPositionDescriptor<AreaChartVizConfig>(),
     ...makeAxisDescriptors<AreaChartVizConfig>({
       axis: "xAxis",
       role: "category",
@@ -76,24 +67,7 @@ const descriptors: VizSettingDescriptors<AreaChartVizConfig, AreaSeries> = {
       axis: "yAxis",
       role: "value",
     }),
-    {
-      key: "chartStyle.grid.color",
-      label: "Gridline color",
-      group: "Grid",
-      control: { kind: "color" },
-    },
-    {
-      key: "chartStyle.grid.horizontal",
-      label: "Horizontal gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
-    {
-      key: "chartStyle.grid.vertical",
-      label: "Vertical gridlines",
-      group: "Grid",
-      control: { kind: "switch" },
-    },
+    ...makeGridDescriptors<AreaChartVizConfig>(),
   ],
   series: [
     {
@@ -180,7 +154,7 @@ export const AreaChartVizConfigs = {
     vizConfig: AreaChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const { xAxisKey, series, withLegend, chartStyle } = vizConfig;
+    const { xAxisKey, series, layout, withLegend, chartStyle } = vizConfig;
     const firstSeries = series[0];
     const pieAxes = { nameKey: xAxisKey, valueKey: firstSeries?.key };
     return match<VizType>(newVizType)
@@ -194,7 +168,7 @@ export const AreaChartVizConfigs = {
           series: series.map((s) => {
             return convertSeriesRenderAs(s, "bar");
           }) as XYSeries[],
-          layout: "group",
+          layout: ChartLayout.getBarLayoutFromAreaLayout(layout),
           withLegend,
           chartStyle,
         };
@@ -242,7 +216,13 @@ export const AreaChartVizConfigs = {
               },
             ]
           : [];
-        return { vizType, nameKey: xAxisKey, series: radarSeries, chartStyle };
+        return {
+          vizType,
+          nameKey: xAxisKey,
+          series: radarSeries,
+          withLegend,
+          chartStyle,
+        };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
         const bubbleSeries =

@@ -249,8 +249,9 @@ needs no grant at all: Postgres checks `EXECUTE` when the trigger is created, no
 when it fires. A function named inside an RLS policy DOES need it, because a
 policy expression is evaluated as the calling role.
 
-`pnpm db:validate-privileges` prints every function in a managed schema that no
-schema file revokes. Treat that list as a to-do, not as noise.
+`scripts/db/reconcile-privileges/reconcile-privileges.sh` prints every function
+in a managed schema that no schema file revokes, and `pnpm test:db` runs it.
+Treat that list as a to-do, not as noise.
 
 ### What `supabase db diff` can and cannot see
 
@@ -316,9 +317,13 @@ Two independent gates, both wired into `pnpm test:db`:
    `aclexplode`; `information_schema.column_privileges` also expands
    table-level privileges onto every column and cannot prove explicit-column
    parity.
-2. `pnpm db:validate-privileges` fails when a migrations-built database does not
-   reproduce what `supabase/schemas/` declares. Point it at any environment with
-   `--db-url <url>` to check staging or production for hand-made drift.
+2. `scripts/db/reconcile-privileges/reconcile-privileges.sh` fails when a
+   migrations-built database does not reproduce what `supabase/schemas/`
+   declares. `pnpm test:db` runs it against the local stack. To check staging
+   or production for hand-made drift, the one case with no enclosing workflow,
+   run `pnpm exec ./scripts/db/reconcile-privileges/reconcile-privileges.sh
+   --db-url <url>`. Use `pnpm exec` rather than a bare path: the script runs
+   through `vite-node`, which needs `node_modules/.bin` on PATH.
 
 Do not edit an already-applied migration. Correct a historical ACL by fixing the
 declarative state and running `pnpm db:new-migration`.
@@ -371,9 +376,12 @@ last two exist because `db diff` alone is not enough:
    privileges migra cannot see, including the grants a brand-new view needs.
 4. `reconcile-privileges` re-checks and fails if any drift remains.
 
-Steps 2 and 3 have no package script of their own on purpose. `db:new-migration`
-is the only entry point that fixes a migration, so there is no way to run half of
-it and end up with a migration that looks finished and is not.
+None of these steps has a package script of its own on purpose.
+`db:new-migration` is the only entry point that fixes a migration, so there is
+no way to run half of it and end up with a migration that looks finished and is
+not. Step 4 is not exposed either: every failure it reports is fixed by running
+`db:new-migration`, so a standalone re-check would only re-measure migrations
+the fix has not reached yet.
 
 Read the result, but do not hand-complete it. If the ACL is wrong, the fix
 belongs in `supabase/schemas/` or in the reconcile script, not in the migration.

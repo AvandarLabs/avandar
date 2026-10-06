@@ -2,7 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Container, Divider, Loader, Stack, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
@@ -29,16 +29,16 @@ export function ProfileView(): JSX.Element {
 
   if (!user || !userProfile || isProfileLoading) {
     return (
-      <AppLayout title={t`Profile`}>
+      <AppSlate title={t`Profile`}>
         <Container size={560} py="xxxl">
           <Loader />
         </Container>
-      </AppLayout>
+      </AppSlate>
     );
   }
 
   return (
-    <AppLayout title={t`Profile`}>
+    <AppSlate title={t`Profile`}>
       <Container size={560} py="xxxl">
         <Stack gap="xxl">
           <Stack gap={4}>
@@ -79,6 +79,6 @@ export function ProfileView(): JSX.Element {
           <TutorialSection />
         </Stack>
       </Container>
-    </AppLayout>
+    </AppSlate>
   );
 }

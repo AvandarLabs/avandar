@@ -27,7 +27,7 @@
 
 /* Nested groups: indent and mark depth with a rail rather than more tint. */
 .queryFiltersField :global(.ruleGroup) :global(.ruleGroup) {
-  background: var(--mantine-color-gray-0);
+  background: var(--ava-surface-body);
   border-left: 2px solid var(--mantine-color-blue-4);
   margin-left: var(--mantine-spacing-sm);
 }
@@ -53,7 +53,7 @@
 /* One rule per row, wrapping to a second line in narrow hosts. */
 .queryFiltersField :global(.rule) {
   align-items: center;
-  border-bottom: 1px solid var(--mantine-color-gray-2);
+  border-bottom: 1px solid var(--ava-border-default);
   display: flex;
   flex-wrap: wrap;
   gap: var(--mantine-spacing-xs);

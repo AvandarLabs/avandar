@@ -49,7 +49,7 @@
 }
 
 .mapLegendGroupKeyNoData {
-  background-color: var(--mantine-color-gray-4);
+  background-color: var(--mantine-color-neutral-2);
 }
 
 .mapLegendGroupKeySuppressed {
@@ -70,5 +70,5 @@
 }
 
 [data-mantine-color-scheme="dark"] .mapLegendGroupKeyNoData {
-  background-color: var(--mantine-color-gray-7);
+  background-color: var(--mantine-color-neutral-7);
 }

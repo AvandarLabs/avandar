@@ -218,7 +218,7 @@ describe("DatasetImportForm", () => {
       screen.queryByText("Data processed successfully"),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByText("These are the first 1 rows of your dataset.", {
+      screen.getByText("First 1 rows", {
         exact: false,
       }),
     ).toBeInTheDocument();
@@ -319,7 +319,7 @@ describe("DatasetImportForm", () => {
       </I18nProvider>,
     );
 
-    const warningRegex = /This dataset will no longer be stored online/i;
+    const warningRegex = /it will live only on this computer/i;
     const onlineStorageCheckbox = screen.getByLabelText(
       /This dataset can be stored in the cloud/i,
     );

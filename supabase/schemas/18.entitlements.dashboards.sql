@@ -12,13 +12,12 @@
  * The unconditional `public` arm is load-bearing. A public dashboard is
  * world-readable through the anon policy regardless of its share rows, so
  * letting `is_restricted` hide it from the count would let a free workspace
- * publish unlimited dashboards to the open internet. See the umbrella design
- * section 4.2.
+ * publish unlimited dashboards to the open internet.
  *
  * Mirrored in TypeScript by `countShareableDashboards` in
- * `shared/models/Dashboard/countShareableDashboards/countShareableDashboards.ts`,
- * which is what the `can_publish_shareable_dashboard` branch of the
- * subscriptions edge function calls. The two definitions exist because Postgres
+ * `shared/models/Dashboard/countShareableDashboards/`, which is what the
+ * `can_publish_shareable_dashboard` branch of the subscriptions edge function
+ * calls. The two definitions exist because Postgres
  * cannot call TypeScript; they are pinned by pgTAP and by vitest respectively,
  * and a change to either arm of the table above must be made in both.
  *
@@ -223,15 +222,13 @@ $$;
  * `after` rather than `before`, and that is load-bearing rather than
  * stylistic. `util__dashboard_counts_as_shareable` re-reads the dashboard row
  * from the table instead of taking it as an argument, so a `before` trigger
- * judges the row as it still is rather than as it is about to become. Both
- * triggers were rebuilt as `before` (returning NEW, since a `before` trigger
- * that returns null cancels the row) and
- * `shareable_entitlement_triggers.test.sql` was rerun: it gets the answer
- * backwards in both directions at once. Publishing a second dashboard on a free
- * plan stops being refused, because the guard still sees the draft; and six
- * narrowing cases, unpublishing among them, start raising, because the guard
- * still sees the published row it is in the middle of retracting. Raising from
- * an `after` trigger still aborts the whole statement.
+ * would judge the row as it still is rather than as it is about to become,
+ * which gets the answer backwards in both directions at once. Publishing a
+ * second dashboard on a free plan would stop being refused, because the guard
+ * would still see the draft; and narrowing cases, unpublishing among them,
+ * would start raising, because the guard would still see the published row
+ * being retracted. `shareable_entitlement_triggers.test.sql` pins both
+ * directions. Raising from an `after` trigger still aborts the whole statement.
  *
  * SECURITY DEFINER so that it can reach the guard, whose execute is revoked
  * from every role. The guard makes its own decision about the caller and does

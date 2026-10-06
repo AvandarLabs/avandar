@@ -28,7 +28,7 @@ function useOutcomeLabels(): Record<ClarificationOutcome, string> {
 
 const OUTCOME_COLOR: Record<ClarificationOutcome, string> = {
   answered: "green",
-  cancelled: "gray",
+  cancelled: "neutral",
   cap_reached: "yellow",
   neutral_failure: "red",
 };
@@ -132,7 +132,7 @@ export function ClarificationLogPanel(): React.ReactNode {
                       color={
                         OUTCOME_COLOR[entry.outcome as ClarificationOutcome] ??
                         LEGACY_OUTCOME_COLOR[entry.outcome] ??
-                        "gray"
+                        "neutral"
                       }
                       size="sm"
                       variant="light"

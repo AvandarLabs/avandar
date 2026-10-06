@@ -142,9 +142,6 @@ test.describe("onboarding tutorial, add_dataset milestone", () => {
       await uploadPanel
         .locator('input[type="file"]')
         .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
-      await uploadPanel
-        .getByRole("button", { name: "Upload", exact: true })
-        .click();
 
       // The parse-success callout, not the toast of the same news: the toast
       // auto-dismisses and this has to stay true while the tour catches up.
@@ -152,7 +149,7 @@ test.describe("onboarding tutorial, add_dataset milestone", () => {
         SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
       );
       await expect(
-        page.getByText(`These are the first ${formattedRowCount} rows`, {
+        page.getByText(`First ${formattedRowCount} rows`, {
           exact: false,
         }),
       ).toBeVisible({ timeout: LONG_WAIT });

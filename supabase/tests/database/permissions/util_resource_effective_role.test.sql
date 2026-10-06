@@ -1296,8 +1296,7 @@ select is(
 );
 
 -- ---------------------------------------------------------------------------
--- P1: Settings Admins do not get access to resources private to their owner.
--- See docs/superpowers/specs/2026-08-13-private-resource-permissions-hardening-design.md
+-- Settings Admins do not get access to resources private to their owner.
 -- ---------------------------------------------------------------------------
 set local role postgres;
 
@@ -1322,7 +1321,8 @@ values (
   null
 );
 
--- Same, but public. Public is never private (spec 4.2).
+-- Same, but public. A public dashboard is never private, whatever
+-- `is_restricted` says, because the anon policy already exposes it.
 insert into public.dashboards (
   id, workspace_id, owner_id, owner_profile_id, name, config, is_restricted,
   visibility, snapshot_revision

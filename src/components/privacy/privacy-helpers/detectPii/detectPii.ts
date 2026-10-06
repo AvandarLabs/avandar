@@ -22,7 +22,7 @@ export type PiiPatternHit = {
 export type PiiDetectionResult = {
   severity: PiiSeverity;
   hits: PiiPatternHit[];
-  /** True when the spec's medical-strict tier applies. */
+  /** True when the medical-strict tier applies. */
   isMedical: boolean;
 };
 

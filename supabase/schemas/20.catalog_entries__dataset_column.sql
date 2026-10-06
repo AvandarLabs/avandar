@@ -1,5 +1,6 @@
--- Table: catalog_entries__dataset_column
--- Represents the link between catalog_entries (open data sources) and their dataset columns
+/**
+ * Links a catalog entry (an open data source) to one of its dataset columns.
+ */
 create table if not exists catalog_entries__dataset_column (
   id uuid primary key default gen_random_uuid(),
   catalog_entry_id uuid not null references catalog_entries__open_data (id) on delete cascade,
@@ -52,9 +53,6 @@ create policy "User can select catalog dataset columns" on catalog_entries__data
 select
   to authenticated using (true);
 
-/**
- * Trigger the `updated_at` update.
- */
 create trigger tr_catalog_entries__dataset_column__set_updated_at before
 update on catalog_entries__dataset_column for each row
 execute function public.util__set_updated_at ();

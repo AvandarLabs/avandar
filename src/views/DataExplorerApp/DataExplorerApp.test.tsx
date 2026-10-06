@@ -52,9 +52,9 @@ vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
   };
 });
 
-vi.mock("@/components/layouts/AppLayout/AppLayout", () => {
+vi.mock("@/components/layouts/AppSlate/AppSlate", () => {
   return {
-    AppLayout: ({
+    AppSlate: ({
       children,
       toolbarButtonSection,
     }: {

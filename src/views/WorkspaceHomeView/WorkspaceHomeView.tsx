@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
+import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
@@ -37,7 +37,7 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
   };
 
   return (
-    <AppLayout title={workspace.name}>
+    <AppSlate title={workspace.name}>
       <Container ta="left" py={{ base: "xl", md: "xxl", xl: "xxxl" }} size="lg">
         <Stack gap="xl">
           <Stack gap="xs">
@@ -134,6 +134,6 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
           </Stack>
         </Stack>
       </Container>
-    </AppLayout>
+    </AppSlate>
   );
 }

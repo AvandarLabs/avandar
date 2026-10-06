@@ -26,7 +26,7 @@ import type { ChatModelAdapter } from "@assistant-ui/react";
  * shape, posts to the `chat/:workspaceId/messages` edge function along with
  * the current page context, and renders the assistant reply. If the model
  * called `generateSql`, the SQL and prompt are pushed into
- * `DataExplorerStateManager`, which causes the canvas to re-run the query
+ * `DataExplorerStateManager`, which causes the Explorer to re-run the query
  * automatically through the existing `useDataQuery` pipeline.
  *
  * Returns the local runtime plus `startNewChat`, which aborts in-flight
@@ -69,7 +69,7 @@ export function useAvandarChatRuntime(): {
     offlineModelRequired: t`You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.`,
     sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
     sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
-    sqlResultsOnCanvas: t`The results are on the canvas to the left.`,
+    sqlResultsReady: t`I ran the query. Your results are ready.`,
     fallbackTitle: t`Chat request failed`,
     fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
     replying: t`Replying…`,
@@ -103,7 +103,7 @@ export function useAvandarChatRuntime(): {
         offlineModelRequired: t`You are offline. Download an offline chat model using the cloud icon next to the composer before asking data questions.`,
         sqlApprovalRequired: t`SQL was not applied. Approve the assumed filter values to run this query.`,
         sqlSignInRequired: t`SQL was not applied. Sign in to approve filter values.`,
-        sqlResultsOnCanvas: t`The results are on the canvas to the left.`,
+        sqlResultsReady: t`I ran the query. Your results are ready.`,
         fallbackTitle: t`Chat request failed`,
         fallbackMessage: t`The cloud assistant is unreachable. Use your downloaded on-device model for this message?`,
         replying: t`Replying…`,

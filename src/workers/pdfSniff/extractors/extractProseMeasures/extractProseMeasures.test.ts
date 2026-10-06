@@ -55,9 +55,9 @@ describe("extractProseMeasures", () => {
   });
 
   it("reports a coverage flag when many numerals went unread", () => {
-    // The signal Task 18 uses to decide whether to offer the model. A region
-    // dense with numbers that yielded almost nothing is exactly the case
-    // rules handle badly.
+    // The flag callers read to decide whether to offer the model instead of
+    // the rules. A region dense with numbers that yielded almost nothing is
+    // exactly the case the rules handle badly.
     const result = extractProseMeasures(
       region([
         "Between 12 and 15, then 18, 21, 24, 27, 30, 33, 36, 39, 42 and 45.",

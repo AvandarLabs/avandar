@@ -34,7 +34,7 @@ export function MatchCaseToggle({
     <Tooltip label={t`Match case`} withinPortal>
       <ActionIcon
         variant={matchCase ? "filled" : "subtle"}
-        color={matchCase ? "blue" : "gray"}
+        color={matchCase ? "blue" : "neutral"}
         size="md"
         aria-label={t`Match case`}
         aria-pressed={matchCase}

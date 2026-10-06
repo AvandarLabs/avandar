@@ -4,7 +4,7 @@ import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts
  * RDB (SQLite via `bun:sqlite` in Bun main) IPC contracts. The webview
  * issues these calls through `callIpc` from `createSqliteCrudClient`; Bun
  * main registers handlers via `IpcServer.handle` in
- * `apps/desktop/main/ipc/rdb.ts` (Phase 2 Task 8).
+ * `apps/desktop/main/ipc/rdb.ts`.
  */
 export const RdbContracts = {
   run: defineIpcContract<

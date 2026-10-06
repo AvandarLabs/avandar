@@ -64,11 +64,20 @@ begin
 end;
 $$;
 
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.datasets__prevent_workspace_id_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 create trigger tr__datasets__prevent_workspace_id_change before
 update of workspace_id on public.datasets for each row
 execute function public.datasets__prevent_workspace_id_change ();
 
--- Trigger the `updated_at` update
 create trigger tr_datasets__set_updated_at before
 update on public.datasets for each row
 execute function public.util__set_updated_at ();

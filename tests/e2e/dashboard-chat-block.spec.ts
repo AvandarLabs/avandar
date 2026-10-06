@@ -79,10 +79,7 @@ test.describe("dashboard chat → P-block", () => {
     await uploadPanel
       .locator('input[type="file"]')
       .setInputFiles(CALIFORNIA_CSV_PATH);
-    await uploadPanel
-      .getByRole("button", { name: "Upload", exact: true })
-      .click();
-    await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
+    await expect(page.getByText(/First \d+ rows/)).toBeVisible({
       timeout: LONG_WAIT,
     });
 

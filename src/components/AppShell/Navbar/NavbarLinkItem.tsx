@@ -21,7 +21,7 @@ export function NavbarLinkItem({
   const label = (
     <>
       <Box mr="xs">{icon}</Box>
-      <Text span fw={500} className={css.collapsibleText}>
+      <Text span fw={500}>
         {link.label()}
       </Text>
     </>

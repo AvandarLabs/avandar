@@ -64,7 +64,7 @@ button {
   --mantine-navbar-active-hover-background: ;
 
   /* z-indexes */
-  --mantine-z-index-app-shell-main: ;
+  --mantine-z-index-app-slate: ;
   --mantine-z-index-app-chrome: ;
   --mantine-z-index-floating-panel: ;
   --mantine-z-index-modal: ;
@@ -87,4 +87,25 @@ button {
   --ava-animate-pop-in-from-filter: ;
   --ava-animate-origin-x: ;
   --ava-animate-origin-y: ;
+}
+
+/*
+ * Toasts clear a view's sticky action bar.
+ *
+ * Notifications are pinned `bottom-center` app-wide, which is the same corner
+ * a sticky action bar occupies, so an arriving toast covered the control the
+ * user was about to press. `--ava-sticky-action-bar-inset` is published by
+ * `useStickyActionBarInset` and is 0px whenever no bar is on screen, which
+ * leaves the default position untouched everywhere else.
+ *
+ * Mantine sets `bottom` through a zero-specificity `:where()` selector, so
+ * naming the static class and the position attribute is enough to win without
+ * `!important`.
+ */
+.mantine-Notifications-root[data-position="bottom-center"],
+.mantine-Notifications-root[data-position="bottom-left"],
+.mantine-Notifications-root[data-position="bottom-right"] {
+  bottom: calc(
+    var(--mantine-spacing-md) + var(--ava-sticky-action-bar-inset, 0px)
+  );
 }

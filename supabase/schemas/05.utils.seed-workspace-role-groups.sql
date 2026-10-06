@@ -173,9 +173,7 @@ from
 grant
 execute on function public.util__seed_builtin_role_groups_for_workspace (uuid) to service_role;
 
-/**
- * After each workspace row is created, seed built-in role groups for it.
- */
+/** After each workspace row is created, seeds its built-in role groups. */
 create or replace function public.tr_workspaces__seed_builtin_role_groups () returns trigger language plpgsql security definer
 set
   search_path = public as $$
@@ -184,6 +182,16 @@ begin
   return new;
 end;
 $$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.tr_workspaces__seed_builtin_role_groups ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
 
 create trigger tr_workspaces__seed_builtin_role_groups
 after insert on public.workspaces for each row

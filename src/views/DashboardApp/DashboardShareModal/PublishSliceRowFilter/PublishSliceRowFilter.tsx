@@ -58,8 +58,8 @@ export function PublishSliceRowFilter({
       p="xs"
       style={{
         borderRadius: 6,
-        border: "1px solid var(--mantine-color-gray-3)",
-        background: "var(--mantine-color-gray-0)",
+        border: "1px solid var(--ava-border-default)",
+        background: "var(--ava-surface-body)",
       }}
     >
       <Group justify="space-between" mb={4}>

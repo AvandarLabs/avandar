@@ -103,10 +103,10 @@ vi.mock("@puckeditor/core", async () => {
   return { Puck: PuckMock, createUsePuck };
 });
 
-vi.mock("@/components/layouts/AppLayout/AppLayout", async () => {
+vi.mock("@/components/layouts/AppSlate/AppSlate", async () => {
   const { Fragment, createElement } = await import("react");
   return {
-    AppLayout: function AppLayoutMock({
+    AppSlate: function AppSlateMock({
       children,
     }: {
       children: ReactElement;

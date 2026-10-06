@@ -148,7 +148,7 @@ describe("getConceptRelationPlansFromSql", () => {
     expect(plans[0]?.externalIds).toEqual(["p1", "p2"]);
   });
 
-  // The highest-risk line in the spec. Without this a `concept_<uuid>` from
+  // The highest-risk case in this file. Without this a `concept_<uuid>` from
   // another workspace is planned and loaded from a session that may not read
   // it.
   it("refuses a concept that does not belong to the caller's workspace", async () => {

@@ -7,10 +7,10 @@ export type ApplyChatTurnResponseOptions = {
   response: ChatResponse.T;
   sqlApplied: boolean;
   /**
-   * Shown when generated SQL was applied to the canvas and the model did
-   * not provide other assistant prose.
+   * Shown when generated SQL was applied and ran, and the model did not
+   * provide other assistant prose.
    */
-  sqlResultsOnCanvas: string;
+  sqlResultsReady: string;
   handlers: {
     queueDashboardBlock: (
       block: NonNullable<ChatResponse.T["dashboardBlock"]>,
@@ -34,7 +34,7 @@ type AssistantThreadTextOptions = {
   assistantText: string;
   hasGeneratedSql: boolean;
   sqlApplied: boolean;
-  sqlResultsOnCanvas: string;
+  sqlResultsReady: string;
 };
 
 function _stripSqlFences(text: string): string {
@@ -49,21 +49,21 @@ function _buildAssistantThreadText(
   options: Readonly<AssistantThreadTextOptions>,
 ): string {
   const withoutSql = _stripSqlFences(options.assistantText);
-  const shouldUseCanvasCopy =
+  const shouldUseResultsReadyCopy =
     options.hasGeneratedSql &&
     options.sqlApplied &&
     (withoutSql.length === 0 || _isSqlAnnouncement(withoutSql));
-  return shouldUseCanvasCopy ? options.sqlResultsOnCanvas : withoutSql;
+  return shouldUseResultsReadyCopy ? options.sqlResultsReady : withoutSql;
 }
 
 /**
  * Maps a `ChatResponse` (cloud or offline-shaped) into assistant-ui content and
- * dispatches canvas / panel side effects.
+ * dispatches Explorer / panel side effects.
  */
 export async function applyChatTurnResponse(
   options: Readonly<ApplyChatTurnResponseOptions>,
 ): Promise<ChatModelRunResult> {
-  const { response, handlers, sqlApplied, sqlResultsOnCanvas } = options;
+  const { response, handlers, sqlApplied, sqlResultsReady } = options;
 
   if (response.dashboardBlock) {
     handlers.queueDashboardBlock(response.dashboardBlock);
@@ -102,7 +102,7 @@ export async function applyChatTurnResponse(
           assistantText: response.assistantText,
           hasGeneratedSql: Boolean(response.generatedSql),
           sqlApplied,
-          sqlResultsOnCanvas,
+          sqlResultsReady,
         }),
       },
     ],

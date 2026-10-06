@@ -1,5 +1,5 @@
 import { formatNumber } from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { Box, Group, Stack, Text } from "@mantine/core";
 import { NumberColumnStat } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnStat";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
@@ -48,12 +48,8 @@ export function NumberColumnSummary({ summary, dataType }: Props): ReactNode {
       : 100;
 
   return (
-    <Stack gap="sm">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-        <Trans>Range</Trans>
-      </Text>
-
-      <Box pos="relative" h={48} px={8}>
+    <Stack gap="xs">
+      <Box pos="relative" h={44} px={8}>
         <Box
           pos="absolute"
           top={20}

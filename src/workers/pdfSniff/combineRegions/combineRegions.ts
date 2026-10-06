@@ -262,8 +262,8 @@ export function combineRegions(params: {
         return;
       }
 
-      // The row's "value" is prose, which the spec settles: non-numeric
-      // content has no place in this schema. Selecting the OCHA pillars in
+      // The row's "value" is prose, and non-numeric content has no place in
+      // this schema. Selecting the OCHA pillars in
       // observations mode contributes their embedded figures and drops the
       // prose, so the row's text is mined for measurements instead of being
       // poured into a numeric column. Every other column is scanned, not just

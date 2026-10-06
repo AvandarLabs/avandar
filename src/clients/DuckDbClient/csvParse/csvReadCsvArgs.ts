@@ -21,7 +21,6 @@ export function buildReadCsvArgList(options: {
     delimiter,
     quoteChar,
     escapeChar,
-    newlineDelimiter,
     commentChar,
     hasHeader,
     dateFormat,
@@ -41,9 +40,19 @@ export function buildReadCsvArgList(options: {
     escapeChar != null
       ? `escape='${_escapeSqlSingleQuotedLiteral(escapeChar)}'`
       : "",
-    newlineDelimiter != null
-      ? `new_line='${_escapeSqlSingleQuotedLiteral(newlineDelimiter)}'`
-      : "",
+    // No `new_line`, deliberately. DuckDB-WASM's CSV reader **hangs** on
+    // `new_line='\r\n'`: the `COPY` neither returns nor throws, the staging
+    // parquet is never written, and the failure surfaces much later as
+    // `TProtocolException: Invalid data` from the read of a file that was never
+    // created. Verified by importing a CRLF file with and without this
+    // argument. Every spreadsheet export uses CRLF, so passing it back was a
+    // hang for the most ordinary CSV there is.
+    //
+    // Nothing is lost by omitting it: the reader detects the line ending
+    // itself, which is where the sniffed value came from in the first place,
+    // and no UI lets a user choose one. The sniffed value is still recorded on
+    // the dataset.
+    "",
     commentChar != null
       ? `comment='${_escapeSqlSingleQuotedLiteral(commentChar)}'`
       : "",
@@ -102,11 +111,7 @@ export function buildSniffCsvConstraintArgs(
     );
   }
 
-  if (parseOptions.newlineDelimiter != null) {
-    args.push(
-      `new_line='${_escapeSqlSingleQuotedLiteral(parseOptions.newlineDelimiter)}'`,
-    );
-  }
+  // No `new_line` here either. See the note in `buildReadCsvArgList`.
 
   if (parseOptions.commentChar != null) {
     args.push(

@@ -17,8 +17,8 @@ export function findRepoRoot(
   while (true) {
     // The monorepo root is the directory holding both markers.
     const hasWorkspaceFile = existsSync(join(dir, "pnpm-workspace.yaml"));
-    const hasAvaCLI = existsSync(join(dir, "apps/ava-cli/package.json"));
-    if (hasWorkspaceFile && hasAvaCLI) {
+    const hasAvaCli = existsSync(join(dir, "apps/ava-cli/package.json"));
+    if (hasWorkspaceFile && hasAvaCli) {
       return dir;
     }
 
