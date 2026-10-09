@@ -10,12 +10,14 @@ import {
   buildSqlNotAppliedAssistantText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { shouldQueueDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/shouldQueueDashboardBlock/shouldQueueDashboardBlock";
+import { waitForAppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import {
   buildGeneratedSqlAssumptionAckText,
   reviewGeneratedSqlAssumptions,
 } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError } from "@/utils/notifications/notify";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
@@ -28,6 +30,7 @@ import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import type { AppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelRunResult } from "@assistant-ui/react";
@@ -115,18 +118,44 @@ async function reviewAndApplySql(
 }
 
 /**
+ * How the applied SQL's query ended. Only the Data Explorer runs applied SQL,
+ * so on any other page there is no run to wait for.
+ */
+async function _getAppliedSqlOutcome(
+  options: Readonly<
+    Pick<
+      ApplyChatModelTurnResponseOptions,
+      "currentPageContext" | "workspaceId"
+    >
+  > & { sql: string },
+): Promise<AppliedSqlOutcome> {
+  return options.currentPageContext.app === "data-explorer"
+    ? await waitForAppliedSqlOutcome({
+        queryCache: AvaQueryClient.getQueryCache(),
+        workspaceId: options.workspaceId,
+        rawSql: options.sql,
+      })
+    : "unknown";
+}
+
+/**
  * Applies SQL, dashboard blocks, and clarifications from a chat response
  * to the live page, or returns assistant text when SQL cannot be applied.
  */
 export async function applyChatModelTurnResponse(
   options: Readonly<ApplyChatModelTurnResponseOptions>,
 ): Promise<ChatModelRunResult> {
-  const sqlApplied = options.response.generatedSql
-    ? await reviewAndApplySql({
-        ...options,
-        sql: options.response.generatedSql.sql,
-      })
+  const generatedSql = options.response.generatedSql?.sql;
+  const sqlApplied = generatedSql
+    ? await reviewAndApplySql({ ...options, sql: generatedSql })
     : false;
+  if (options.isGenerationStale()) {
+    return { content: [] };
+  }
+  const sqlOutcome =
+    sqlApplied && generatedSql
+      ? await _getAppliedSqlOutcome({ ...options, sql: generatedSql })
+      : undefined;
   if (options.isGenerationStale()) {
     return { content: [] };
   }
@@ -151,8 +180,13 @@ export async function applyChatModelTurnResponse(
 
   return applyChatTurnResponse({
     response: options.response,
-    sqlApplied,
-    sqlResultsReady: options.copyRef.current.sqlResultsReady,
+    sqlOutcome,
+    sqlOutcomeCopy: {
+      rows: options.copyRef.current.sqlResultsReady,
+      empty: options.copyRef.current.sqlResultsEmpty,
+      failed: options.copyRef.current.sqlQueryFailed,
+      unknown: options.copyRef.current.sqlQueryApplied,
+    },
     handlers: {
       queueDashboardBlock: (block) => {
         if (

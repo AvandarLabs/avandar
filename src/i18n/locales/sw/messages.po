@@ -2182,6 +2182,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Hitilafu isiyotarajiwa imetokea. Unaweza kujaribu tena au urudi kwenye "
 "ukurasa wa mwanzo."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "Nimeendesha hoja, lakini haikurudisha safu yoyote."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Hifadhi URL"
@@ -2556,6 +2560,10 @@ msgstr "Latitudo iko nje ya masafa halali, lakini ingekuwa longitudo halali, na 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Sasisho linapatikana"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "Nimeendesha hoja, lakini imeshindwa."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -5128,6 +5136,10 @@ msgstr "CSV, Excel, au PDF. Faili moja kwa wakati mmoja."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Futa workspace"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "Nimetumia hoja katika Mchambuzi wa Data."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."

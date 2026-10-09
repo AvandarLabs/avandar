@@ -5,6 +5,12 @@ import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { ApplyChatTurnResponseOptions } from "./applyChatTurnResponse";
 
 const SQL_RESULTS_READY = "I ran the query. Your results are ready.";
+const SQL_OUTCOME_COPY: ApplyChatTurnResponseOptions["sqlOutcomeCopy"] = {
+  rows: SQL_RESULTS_READY,
+  empty: "I ran the query, but it returned no rows.",
+  failed: "I ran the query, but it failed.",
+  unknown: "I applied the query in the Data Explorer.",
+};
 
 function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
   return {
@@ -17,11 +23,11 @@ function _createHandlers(): ApplyChatTurnResponseOptions["handlers"] {
 }
 
 function _applyChatTurnResponse(
-  options: Readonly<Omit<ApplyChatTurnResponseOptions, "sqlResultsReady">>,
+  options: Readonly<Omit<ApplyChatTurnResponseOptions, "sqlOutcomeCopy">>,
 ): ReturnType<typeof applyChatTurnResponse> {
   return applyChatTurnResponse({
     ...options,
-    sqlResultsReady: SQL_RESULTS_READY,
+    sqlOutcomeCopy: SQL_OUTCOME_COPY,
   });
 }
 
@@ -46,7 +52,7 @@ describe("applyChatTurnResponse", () => {
 
     const result = await _applyChatTurnResponse({
       response,
-      sqlApplied: false,
+      sqlOutcome: undefined,
       handlers,
     });
 
@@ -73,7 +79,7 @@ describe("applyChatTurnResponse", () => {
 
     const result = await _applyChatTurnResponse({
       response,
-      sqlApplied: false,
+      sqlOutcome: undefined,
       handlers,
     });
 
@@ -106,7 +112,7 @@ describe("applyChatTurnResponse", () => {
 
     const result = await _applyChatTurnResponse({
       response,
-      sqlApplied: true,
+      sqlOutcome: "rows",
       handlers,
     });
 
@@ -137,7 +143,7 @@ describe("applyChatTurnResponse", () => {
 
     const result = await _applyChatTurnResponse({
       response,
-      sqlApplied: true,
+      sqlOutcome: "rows",
       handlers,
     });
 
@@ -146,7 +152,7 @@ describe("applyChatTurnResponse", () => {
     ]);
   });
 
-  it("points at the results when SQL was applied and the assistant text is empty", async () => {
+  it("points at the results when the applied SQL returned rows and the assistant text is empty", async () => {
     const handlers = _createHandlers();
     const response = Model.make("ChatResponse", {
       assistantText: "",
@@ -158,14 +164,14 @@ describe("applyChatTurnResponse", () => {
 
     const result = await _applyChatTurnResponse({
       response,
-      sqlApplied: true,
+      sqlOutcome: "rows",
       handlers,
     });
 
     expect(result.content).toEqual([{ type: "text", text: SQL_RESULTS_READY }]);
   });
 
-  it("replaces a SQL-announcement reply with the results pointer", async () => {
+  it("replaces a SQL-announcement reply with the results pointer when the applied SQL returned rows", async () => {
     const handlers = _createHandlers();
     const response = Model.make("ChatResponse", {
       assistantText: "Here is the SQL I ran. Results are ready.",
@@ -177,12 +183,40 @@ describe("applyChatTurnResponse", () => {
 
     const result = await _applyChatTurnResponse({
       response,
-      sqlApplied: true,
+      sqlOutcome: "rows",
       handlers,
     });
 
     expect(result.content).toEqual([{ type: "text", text: SQL_RESULTS_READY }]);
   });
+
+  it.each([
+    ["returned no rows", "empty"],
+    ["failed", "failed"],
+    ["had no observed outcome", "unknown"],
+  ] as const)(
+    "does not point at results when the applied SQL %s",
+    async (_label, sqlOutcome) => {
+      const handlers = _createHandlers();
+      const response = Model.make("ChatResponse", {
+        assistantText: "",
+        generatedSql: {
+          prompt: "how many rows",
+          sql: "select count(*) from deaths",
+        },
+      });
+
+      const result = await _applyChatTurnResponse({
+        response,
+        sqlOutcome,
+        handlers,
+      });
+
+      expect(result.content).toEqual([
+        { type: "text", text: SQL_OUTCOME_COPY[sqlOutcome] },
+      ]);
+    },
+  );
 
   it("persists chat-created case types", async () => {
     const handlers = _createHandlers();
@@ -206,7 +240,7 @@ describe("applyChatTurnResponse", () => {
 
     await _applyChatTurnResponse({
       response,
-      sqlApplied: false,
+      sqlOutcome: undefined,
       handlers,
     });
 
@@ -236,7 +270,7 @@ describe("applyChatTurnResponse", () => {
 
     await _applyChatTurnResponse({
       response,
-      sqlApplied: false,
+      sqlOutcome: undefined,
       handlers,
     });
 
@@ -254,7 +288,7 @@ describe("applyChatTurnResponse", () => {
 
     await _applyChatTurnResponse({
       response,
-      sqlApplied: false,
+      sqlOutcome: undefined,
       handlers,
     });
 
@@ -274,7 +308,7 @@ describe("applyChatTurnResponse", () => {
 
     const result = await _applyChatTurnResponse({
       response,
-      sqlApplied: true,
+      sqlOutcome: "rows",
       handlers,
     });
 
