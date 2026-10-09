@@ -123,7 +123,10 @@ async function reviewAndApplySql(
  */
 async function _getAppliedSqlOutcome(
   options: Readonly<
-    Pick<ApplyChatModelTurnResponseOptions, "currentPageContext" | "workspaceId">
+    Pick<
+      ApplyChatModelTurnResponseOptions,
+      "currentPageContext" | "workspaceId"
+    >
   > & { sql: string },
 ): Promise<AppliedSqlOutcome> {
   return options.currentPageContext.app === "data-explorer"

@@ -1,4 +1,4 @@
-import { matchLiteral } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { isWorkspaceRawSqlDataQueryKey } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Query, QueryCache } from "@tanstack/react-query";
@@ -48,16 +48,20 @@ function _getSettledOutcome(
   query: Query | undefined,
 ): AppliedSqlOutcome | undefined {
   return query && query.state.fetchStatus === "idle"
-    ? matchLiteral(query.state.status, {
-        pending: undefined,
-        error: "failed" as const,
-        success: () => {
+    ? match(query.state.status)
+        .with("pending", () => {
+          return undefined;
+        })
+        .with("error", (): AppliedSqlOutcome => {
+          return "failed";
+        })
+        .with("success", (): AppliedSqlOutcome => {
           // The cache types every query's data as unknown; a
           // `useDataQuery` query always holds a `QueryResult`.
           const result = query.state.data as QueryResult.T | undefined;
           return (result?.numRows ?? 0) > 0 ? "rows" : "empty";
-        },
-      })
+        })
+        .exhaustive()
     : undefined;
 }
 
