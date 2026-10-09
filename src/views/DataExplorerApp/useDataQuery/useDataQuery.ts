@@ -1,6 +1,6 @@
 import { Model } from "@avandar/models";
 import { useQuery } from "@avandar/query-hooks";
-import { prop, sortObjList } from "@avandar/utils";
+import { isPlainObject, prop, sortObjList } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
@@ -18,6 +18,7 @@ import type {
 } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryAnalytics/DataQueryRunMetadata.types";
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
+import type { QueryKey } from "@tanstack/react-query";
 
 type UseDataQueryOptions = {
   query: StructuredQuery.Partial;
@@ -51,6 +52,28 @@ type UseDataQueryOptions = {
     }
 ) &
   StructuredQueryAuth;
+
+/** Marks the position of the raw SQL in a `useDataQuery` query key. */
+const RAW_SQL_KEY_MARKER = "rawSql";
+
+/**
+ * Whether `queryKey` belongs to a `useDataQuery` run of `rawSql` against
+ * `workspaceId`. Lets code outside the hook find the query the Data Explorer
+ * started for a given statement without rebuilding the rest of the key.
+ */
+export function isWorkspaceRawSqlDataQueryKey(
+  queryKey: QueryKey,
+  options: Readonly<{ workspaceId: string; rawSql: string }>,
+): boolean {
+  const [queryAuth, , rawSqlMarker, keyRawSql] = queryKey;
+  return (
+    rawSqlMarker === RAW_SQL_KEY_MARKER &&
+    keyRawSql === options.rawSql &&
+    isPlainObject(queryAuth) &&
+    queryAuth.auth === "workspace" &&
+    queryAuth.workspaceId === options.workspaceId
+  );
+}
 
 type RunDataQueryOptions = {
   auth: StructuredQueryAuth;
@@ -201,10 +224,11 @@ export function useDataQuery(
 
   const queryResult = useQuery({
     enabled: !!dataSource || !!rawSql,
+    // `isWorkspaceRawSqlDataQueryKey` reads the first four positions.
     queryKey: [
       queryAuth,
       query,
-      "rawSql",
+      RAW_SQL_KEY_MARKER,
       rawSql,
       "dataSource",
       dataSource,

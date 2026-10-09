@@ -39,9 +39,9 @@ import {
 import { act, render, waitFor } from "@testing-library/react";
 import { useEffect } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
 import { Route as WorkspaceRootRoute } from "@/routes/_auth/$workspaceSlug/route";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
@@ -63,10 +63,7 @@ const DATASET_B_ID = "b2222222-2222-4222-8222-222222222222" as Dataset.Id;
 const WORKSPACE_A_QUESTION = "cuantos casos hay por region en alpha";
 const WORKSPACE_B_QUESTION = "cuantos casos hay en beta";
 
-function _makeWorkspace(
-  id: string,
-  slug: string,
-): Workspace.WithSubscription {
+function _makeWorkspace(id: string, slug: string): Workspace.WithSubscription {
   return Model.make("Workspace", {
     id: id as Workspace.Id,
     ownerId: USER_ID,
@@ -329,7 +326,9 @@ function _createTestRouter(initialPath: string) {
     },
     path: "$workspaceSlug",
     // The production route's own component and remount policy, so a fix in
-    // either one is what this test observes.
+    // either one is what this test observes. Both options are typed for the
+    // production route's place in the app's route tree, which this test tree
+    // does not reproduce, so neither can be proven assignable here.
     component: WorkspaceRootRoute.options.component as RouteComponent,
     remountDeps: WorkspaceRootRoute.options.remountDeps as never,
   });
@@ -377,6 +376,8 @@ async function _renderAppAt(initialPath: string): Promise<TestRouter> {
 
 /** Switches workspace like the navbar switcher, then opens the Explorer. */
 async function _switchToWorkspaceB(router: TestRouter): Promise<void> {
+  // `navigate` is typed against the app's registered router, whose route tree
+  // this test router does not share, so its options are cast.
   await act(async () => {
     await router.navigate({
       to: "/$workspaceSlug",
@@ -492,9 +493,9 @@ beforeEach(() => {
   AvaQueryClient.clear();
   apiPostMock.mockReset();
   runQueryMock.mockReset();
-  for (const key of Object.keys(harness)) {
+  Object.keys(harness).forEach((key) => {
     delete harness[key as keyof typeof harness];
-  }
+  });
 });
 
 afterEach(() => {

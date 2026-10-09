@@ -77,9 +77,16 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
     return AppLinks.profile(workspace.slug);
   }, [workspace.slug]);
 
+  // The contents are keyed by workspace so a switch remounts every
+  // workspace-scoped store below them. Do not remove the key: the workspace
+  // switcher only changes `$workspaceSlug`, which the router does not remount
+  // on, so the Data Explorer query, the chat thread and its persisted copy,
+  // the dashboard editor and the tutorial would carry one workspace's state
+  // into the next.
   return (
     <WorkspaceI18nProvider locale={locale}>
       <WorkspaceLayoutContents
+        key={workspace.id}
         workspace={workspace}
         profileLink={profileLink}
         mainNavBarLinks={mainNavBarLinks}

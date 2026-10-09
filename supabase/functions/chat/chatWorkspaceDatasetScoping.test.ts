@@ -1,3 +1,4 @@
+import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 /**
  * The chat turn's dataset context must be scoped to the workspace in the
  * request path, even for a user who can see the same dataset in another
@@ -16,7 +17,6 @@
  * real so that filter is what is under test.
  */
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
-import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 import { buildSqlSystemPrompt } from "@sbfn/chat/utils/buildSqlSystemPrompt/buildSqlSystemPrompt.ts";
 import { describe, expect, it } from "vitest";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";

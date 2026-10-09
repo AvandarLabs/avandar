@@ -2157,6 +2157,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخرى أو العودة إلى الصفحة "
 "الرئيسية."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "شغّلت الاستعلام، لكنه لم يُرجع أي صفوف."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "حفظ عنوان URL"
@@ -2520,6 +2524,10 @@ msgstr "خط العرض خارج النطاق الصالح، لكنه سيكون
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "يتوفر تحديث"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "شغّلت الاستعلام، لكنه فشل."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -5062,6 +5070,10 @@ msgstr "CSV أو Excel أو PDF. ملف واحد في كل مرة."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "حذف مساحة العمل"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "طبّقت الاستعلام في مستكشف البيانات."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
