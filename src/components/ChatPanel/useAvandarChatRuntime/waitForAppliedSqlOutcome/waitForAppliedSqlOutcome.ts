@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { isWorkspaceRawSqlDataQueryKey } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import { isWorkspaceRawSqlDataQueryKey } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Query, QueryCache } from "@tanstack/react-query";
 
