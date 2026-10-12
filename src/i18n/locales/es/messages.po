@@ -2192,6 +2192,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Ocurrió un error inesperado. Puede intentarlo de nuevo o volver al "
 "inicio."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "Ejecuté la consulta, pero no devolvió ninguna fila."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Guardar URL"
@@ -2563,6 +2567,10 @@ msgstr "La latitud está fuera del rango válido, pero sería una longitud váli
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Actualización disponible"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "Ejecuté la consulta, pero falló."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -5143,6 +5151,10 @@ msgstr "CSV, Excel o PDF. Un archivo a la vez."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Eliminar espacio de trabajo"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "Apliqué la consulta en el Explorador de datos."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."

@@ -4,6 +4,7 @@ import { prop, sortObjList } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
+import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import { useDataQueryAnalytics } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryAnalytics";
 import { useDataQueryRunRecorder } from "@/views/DataExplorerApp/useDataQueryAnalytics/useDataQueryRunRecorder/useDataQueryRunRecorder";
 import type {
@@ -201,10 +202,11 @@ export function useDataQuery(
 
   const queryResult = useQuery({
     enabled: !!dataSource || !!rawSql,
+    // `isWorkspaceRawSqlDataQueryKey` reads the first four positions.
     queryKey: [
       queryAuth,
       query,
-      "rawSql",
+      RAW_SQL_KEY_MARKER,
       rawSql,
       "dataSource",
       dataSource,
