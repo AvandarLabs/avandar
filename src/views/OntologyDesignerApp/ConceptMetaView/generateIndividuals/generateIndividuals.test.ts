@@ -185,6 +185,39 @@ function _getRunSqlStatements(): string[] {
   });
 }
 
+/**
+ * Makes `forEachQueryPageMock` invoke its callback once with a single page
+ * holding the given rows, as if the staging table had exactly that content.
+ */
+function _mockSinglePage(
+  data: Array<{ external_id: string; name: string }>,
+): void {
+  forEachQueryPageMock.mockImplementation(
+    async (options: {
+      callback: (page: {
+        data: Array<{ external_id: string; name: string }>;
+        numRows: number;
+        totalRows: number;
+        totalPages: number;
+        pageNum: number;
+        nextPage: number | undefined;
+        prevPage: number | undefined;
+      }) => Promise<void>;
+    }) => {
+      await options.callback({
+        data,
+        numRows: data.length,
+        totalRows: data.length,
+        totalPages: 1,
+        pageNum: 0,
+        nextPage: undefined,
+        prevPage: undefined,
+      });
+      return { numPages: 1, numRows: data.length };
+    },
+  );
+}
+
 describe("generateIndividuals", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -262,30 +295,7 @@ describe("generateIndividuals", () => {
   });
 
   it("never includes id, status, assigned_to, created_at, or updated_at in an upsert payload", async () => {
-    forEachQueryPageMock.mockImplementation(
-      async (options: {
-        callback: (page: {
-          data: Array<{ external_id: string; name: string }>;
-          numRows: number;
-          totalRows: number;
-          totalPages: number;
-          pageNum: number;
-          nextPage: number | undefined;
-          prevPage: number | undefined;
-        }) => Promise<void>;
-      }) => {
-        await options.callback({
-          data: [{ external_id: "ext-1", name: "Jane Doe" }],
-          numRows: 1,
-          totalRows: 1,
-          totalPages: 1,
-          pageNum: 0,
-          nextPage: undefined,
-          prevPage: undefined,
-        });
-        return { numPages: 1, numRows: 1 };
-      },
-    );
+    _mockSinglePage([{ external_id: "ext-1", name: "Jane Doe" }]);
 
     await generateIndividuals(_makeConcept());
 
@@ -315,30 +325,7 @@ describe("generateIndividuals", () => {
         updatedAt: "2026-08-19T00:00:00.000Z",
       },
     ]);
-    forEachQueryPageMock.mockImplementation(
-      async (options: {
-        callback: (page: {
-          data: Array<{ external_id: string; name: string }>;
-          numRows: number;
-          totalRows: number;
-          totalPages: number;
-          pageNum: number;
-          nextPage: number | undefined;
-          prevPage: number | undefined;
-        }) => Promise<void>;
-      }) => {
-        await options.callback({
-          data: [{ external_id: "ext-1", name: "Jane Doe" }],
-          numRows: 1,
-          totalRows: 1,
-          totalPages: 1,
-          pageNum: 0,
-          nextPage: undefined,
-          prevPage: undefined,
-        });
-        return { numPages: 1, numRows: 1 };
-      },
-    );
+    _mockSinglePage([{ external_id: "ext-1", name: "Jane Doe" }]);
 
     await generateIndividuals(_makeConcept());
 

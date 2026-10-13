@@ -26,6 +26,76 @@ import type {
   StagedIndividualRow,
 } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividuals/diffStagedIndividuals";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
+/**
+ * Reads every existing individual for a concept and keys it by `external_id`
+ * for the sync diff. A Map, not a plain object: `external_id` comes from
+ * arbitrary source-dataset values, which must never be trusted as an object
+ * key.
+ */
+async function _getExistingIndividualsByExternalId(
+  conceptId: Concept.Id,
+): Promise<Map<string, ExistingIndividual>> {
+  const existingIndividuals = await IndividualClient.getAll(
+    where("concept_id", "eq", conceptId),
+  );
+  return new Map<string, ExistingIndividual>(
+    existingIndividuals.map((individual) => {
+      return [
+        individual.externalId,
+        {
+          id: individual.id,
+          name: individual.name,
+          missingFromSourceAt: individual.missingFromSourceAt,
+        },
+      ];
+    }),
+  );
+}
+
+/**
+ * Diffs one staged page against the concept's existing individuals and
+ * upserts only the rows that changed. Matched external ids are recorded onto
+ * `matchedExternalIds` so the caller can sweep newly-stale individuals once
+ * every page has been processed.
+ */
+async function _diffAndUpsertPage(options: {
+  stagedRows: readonly StagedIndividualRow[];
+  existingByExternalId: ReadonlyMap<string, ExistingIndividual>;
+  matchedExternalIds: Set<string>;
+  workspaceId: Workspace.Id;
+  conceptId: Concept.Id;
+}): Promise<void> {
+  const {
+    stagedRows,
+    existingByExternalId,
+    matchedExternalIds,
+    workspaceId,
+    conceptId,
+  } = options;
+  const diffResult = diffStagedIndividualsPage({
+    stagedRows,
+    existingByExternalId,
+    workspaceId,
+    conceptId,
+  });
+  diffResult.matchedExternalIds.forEach((externalId) => {
+    matchedExternalIds.add(externalId);
+  });
+  if (diffResult.rowsToWrite.length === 0) {
+    return;
+  }
+  await IndividualClient.crudFunctions.bulkInsert({
+    data: diffResult.rowsToWrite,
+    upsert: true,
+    onConflict: {
+      columnNames: ["external_id", "concept_id"],
+      ignoreDuplicates: false,
+    },
+    logger: Logger,
+  });
+}
 
 /**
  * Run a basic Qetl pipeline to generate individuals.
@@ -97,22 +167,8 @@ export async function generateIndividuals(
 
   // Read every existing individual for this concept before touching DuckDB,
   // so a failure here never creates a staging table that then needs cleanup.
-  const existingIndividuals = await IndividualClient.getAll(
-    where("concept_id", "eq", concept.id),
-  );
-  const existingByExternalId = new Map<string, ExistingIndividual>(
-    // A Map, not a plain object: external_id comes from arbitrary
-    // source-dataset values, which must never be trusted as an object key.
-    existingIndividuals.map((individual) => {
-      return [
-        individual.externalId,
-        {
-          id: individual.id,
-          name: individual.name,
-          missingFromSourceAt: individual.missingFromSourceAt,
-        },
-      ];
-    }),
+  const existingByExternalId = await _getExistingIndividualsByExternalId(
+    concept.id,
   );
 
   // The rows are staged under a prefixed name rather than the concept's bare
@@ -174,29 +230,17 @@ export async function generateIndividuals(
   const matchedExternalIds = new Set<string>();
 
   try {
-    const jobSummary = await DuckDbClient.forEachQueryPage<StagedIndividualRow>({
+    const jobSummary = await DuckDbClient.forEachQueryPage<
+      StagedIndividualRow
+    >({
       query: { tableName: stagingTableName, castTimestampsToISO: true },
       callback: async (page) => {
-        const diffResult = diffStagedIndividualsPage({
+        await _diffAndUpsertPage({
           stagedRows: page.data,
           existingByExternalId,
+          matchedExternalIds,
           workspaceId: concept.workspaceId,
           conceptId: concept.id,
-        });
-        diffResult.matchedExternalIds.forEach((externalId) => {
-          matchedExternalIds.add(externalId);
-        });
-        if (diffResult.rowsToWrite.length === 0) {
-          return;
-        }
-        await IndividualClient.crudFunctions.bulkInsert({
-          data: diffResult.rowsToWrite,
-          upsert: true,
-          onConflict: {
-            columnNames: ["external_id", "concept_id"],
-            ignoreDuplicates: false,
-          },
-          logger: Logger,
         });
       },
     });
