@@ -1,4 +1,4 @@
-import { isDefined, prop, where } from "@avandar/utils";
+import { isDefined, prop, propEq, where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AttributeMappingClient } from "@/clients/ontology/AttributeMappingClient";
@@ -56,13 +56,7 @@ async function _getFullConcept(concept: Concept.T): Promise<BuildableConcept> {
   });
   const datasetIds = [
     ...new Set(
-      mappings
-        .filter((mapping) => {
-          return mapping.type === "dataset_column";
-        })
-        .map((mapping) => {
-          return mapping.datasetId;
-        }),
+      mappings.filter(propEq("type", "dataset_column")).map(prop("datasetId")),
     ),
   ];
   const datasets =
@@ -74,9 +68,7 @@ async function _getFullConcept(concept: Concept.T): Promise<BuildableConcept> {
     conceptAttributes.map((attribute) => {
       return {
         ...attribute,
-        mapping: mappings.find((mapping) => {
-          return mapping.conceptAttributeId === attribute.id;
-        }),
+        mapping: mappings.find(propEq("conceptAttributeId", attribute.id)),
       };
     }),
   );

@@ -70,6 +70,7 @@ const ATTRIBUTE_ID = uuid<ConceptAttributeId>();
 
 function _makeFormValues(): ConceptFormSubmitValues {
   return {
+    __type: "Concept",
     id: CONCEPT_ID,
     workspaceId: WORKSPACE_ID,
     name: "Facility",
@@ -81,6 +82,7 @@ function _makeFormValues(): ConceptFormSubmitValues {
     manualEntryAttributes: [],
     attributes: [
       {
+        __type: "ConceptAttribute",
         id: ATTRIBUTE_ID,
         conceptId: CONCEPT_ID,
         name: "Facility name",
@@ -103,7 +105,7 @@ function _makeFormValues(): ConceptFormSubmitValues {
         },
       },
     ],
-  } as unknown as ConceptFormSubmitValues;
+  };
 }
 
 describe("insertConceptFromFormValues", () => {
