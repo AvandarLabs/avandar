@@ -1016,7 +1016,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      pull-requests: read
+      pull-requests: write
     steps:
       - uses: amannn/action-semantic-pull-request@v6
         env:
