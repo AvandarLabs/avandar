@@ -3,7 +3,8 @@
 **Status:** Draft
 **Date:** 2026-10-12
 **Roadmap:** P5.6 in `docs/production-plan-world-humanitarian-day.md`
-(P5.8, P5.9 added alongside it for two related, explicitly out-of-scope gaps)
+(P5.8, P5.9, P5.10 added alongside it for three related, explicitly
+out-of-scope gaps)
 **Parents:** `docs/ontology-architecture.md` sections 6 and 13
 
 > Code blocks in this document are illustrative. The repository is the
@@ -46,7 +47,8 @@ Separately, Sync today is a manual, invisible action: a user must know to
 click "Sync records" (even for a brand-new concept with zero individuals),
 and the only feedback while it runs is a spinner on that one button. Section
 6 covers the UX side of this change: renaming the action, triggering it
-automatically on concept creation, and giving it a real progress indicator.
+automatically on concept creation, and giving it a real, unified progress
+indicator shared with the app's other long-running background tasks.
 
 ## 2. Scope
 
@@ -65,8 +67,14 @@ automatically on concept creation, and giving it a real progress indicator.
 5. Rename the sync action to make clear it refreshes from source data, run it
    automatically on concept creation instead of requiring a manual click, and
    show real progress for both the automatic and manual runs, via a
-   generalized version of the existing offline-model-download progress
-   indicator (section 6).
+   generalized progress indicator (section 6).
+6. Unify that generalized indicator with the two other progress systems in
+   the codebase today - `OfflineChatEngineStore`/`OfflineChatDownloadIndicator`
+   (offline-model download, already floating) and `DatasetUploadProgressStore`
+   (dataset upload, inline-only, no floating UI) - into one store and one
+   floating component (section 6). After this change there is exactly one
+   progress system; neither of the other two survives as a separate
+   implementation.
 
 **Out**
 
@@ -79,18 +87,18 @@ automatically on concept creation, and giving it a real progress indicator.
   status should become, archiving it, or surfacing it in any UI. This design
   only records the fact and the timestamp. Tracked separately as **P5.9** in
   the roadmap (added alongside this spec - it wasn't tracked before).
-- The NULL-label crash and the partial-page-failure/no-atomicity issue also
-  listed in `docs/ontology-architecture.md` section 16. Separate, pre-existing
-  bugs, not part of this change. The NULL-label crash is now tracked as
-  **P5.8** in the roadmap (also added alongside this spec); the no-atomicity
-  issue is covered as a known limitation in section 7 below rather than as
-  its own roadmap line, since it's a property of the page-by-page upsert
-  design generally, not a bug with an obvious fix.
+- The NULL-label crash, also listed in `docs/ontology-architecture.md`
+  section 16. A separate, pre-existing bug, not part of this change, now
+  tracked as **P5.8** in the roadmap (added alongside this spec).
+- Deciding whether Sync should become atomic (roll back every page if any
+  page fails) instead of keeping today's page-by-page, no-atomicity behavior
+  (also listed in section 16, and explained in section 7 below). That's a
+  real, undecided product/engineering choice, not a settled "won't fix" -
+  it's now tracked as **P5.10** in the roadmap (added alongside this
+  revision) so the choice gets made deliberately. This change keeps today's
+  non-atomic behavior either way; it doesn't implement P5.10.
 - Status sets (P5b.1), assignment (P5c.3), comments (P5c.2). This change is a
   precondition for those, not an implementation of any of them.
-- Migrating `DatasetUploadProgressStore` (a separate, already-generic upload
-  progress store with no floating UI) onto the new indicator from section 6.
-  It isn't broken and nobody asked for it to move.
 
 `docs/production-plan-world-humanitarian-day.md` is the one authoritative
 roadmap for QETL, permissions, and ontology/case-management (confirmed: no
@@ -236,23 +244,41 @@ This is why the progress store needs to support more than one concurrent
 task from the start, not as a hypothetical: `applyCreatedCaseTypes.ts` awaits
 `insertConceptFromFormValues` sequentially per case type, but because the
 sync *it* triggers is not awaited, a chat session creating three case types
-in a row can have all three background syncs in flight at once.
+in a row can have all three background syncs in flight at once - and, after
+this section's unification, a dataset upload or a model download can be in
+flight on top of that.
 
-**Generalized progress indicator**, replacing the single-purpose
-`OfflineChatDownloadIndicator` (`src/components/OfflineChatDownloadIndicator/`)
-and its bespoke, single-slot `OfflineChatEngineStore`:
+**One shared progress system, replacing all three that exist or would
+otherwise exist.** Today there are two independent, incompatible progress
+implementations, and this design was about to add a third:
 
-- A new shared store, keyed by an opaque task id, built on the same
-  `createExternalStore` factory `DatasetUploadProgressStore` already uses
-  (`src/lib/utils/state/createExternalStore.ts`), rather than inventing a
-  third pattern. Each entry is one of:
+| | `OfflineChatEngineStore` | `DatasetUploadProgressStore` | sync, pre-unification |
+|---|---|---|---|
+| Built on | hand-rolled singleton class | `createExternalStore` | would have been a new one |
+| Keyed by | nothing (one resident model) | `datasetId` | would have been e.g. `conceptId` |
+| Shown as | floating (`AppShell.tsx`) | inline, on one dataset's detail page only | would have needed its own UI |
+| Error state | yes, persists (`{kind:"error"}`) | yes, but cleared in the same `finally` as success - visible for at most an instant | n/a |
+
+Instead, this change builds **one** store and **one** floating component, and
+every one of these call sites (plus any future one) uses it:
+
+- A new shared store, keyed by an opaque task id, built on `createExternalStore`
+  (`src/lib/utils/state/createExternalStore.ts`). Structurally this is
+  `DatasetUploadProgressStore` generalized - same `Map`-of-entries shape, same
+  factory - not a new pattern, which is also the proof that the factory is
+  sufficient here even though `OfflineChatEngineStore` separately needed a
+  hand-rolled class (its own code comments explain that was for genuinely
+  mutable single-instance state, which an opaque-id-keyed `Map` doesn't
+  need). Each entry is one of:
   - `{ status: "indeterminate", label, detail? }`
   - `{ status: "determinate", label, current, total, detail? }`
   - `{ status: "error", label, message }`
 
   Call sites get `startTask(label) -> id`, `updateTask(id, patch)`,
   `finishTask(id)` (removes the entry), and `failTask(id, message)` (moves it
-  to `"error"`, left for the user to dismiss).
+  to `"error"`, left for the user to dismiss). `current`/`total` is generic
+  enough to represent either byte counts (upload) or row/page counts (sync);
+  no field is upload- or sync-specific.
 - One floating UI component, mounted once in `AppShell.tsx` exactly where
   `OfflineChatDownloadIndicator` is today, renders one panel per live task
   (stacked), each a label plus a Mantine `Progress` bar (indeterminate or
@@ -262,8 +288,8 @@ and its bespoke, single-slot `OfflineChatEngineStore`:
   when a download begins, updates it with real progress, and finishes or
   fails it. Same visible behavior as today (including its existing "do not
   refresh or close this tab" copy, passed through as `detail`), plus one
-  real change: today's store has no error state at all, so a failed download
-  currently just vanishes; after this change it stays visible until
+  real change: today's store has no error state that survives, so a failed
+  download currently just vanishes; after this change it stays visible until
   dismissed.
 - `generateIndividuals` manages its own task end-to-end: start it
   `"indeterminate"` ("Refreshing {conceptName} records…") while staging and
@@ -275,11 +301,37 @@ and its bespoke, single-slot `OfflineChatEngineStore`:
   for free. The button keeps its own local loading/disabled state in
   addition (to stop a double-click); it isn't replaced by the floating
   indicator, it's complemented by it.
-
-**Out of scope for this generalization:** migrating
-`DatasetUploadProgressStore`'s own consumers onto the new floating component
-(noted in section 2) - it already uses the right store factory, and giving
-it a floating UI nobody asked for is a separate change.
+- **`DatasetUploadProgressStore` is deleted, not kept alongside the new
+  store.** `startDatasetUpload.ts`
+  (`src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts`)
+  is the only writer today; it keeps its existing module-level
+  `Map<DatasetId, Promise<void>>` dedup check (`getInProgressUpload`'s
+  current job - "is this dataset already uploading?" - a domain concern
+  specific to upload call sites, not a display concern, so it isn't folded
+  into the opaque-id-keyed display store), but every call that today touches
+  `DatasetUploadProgressStore`
+  (`startUpload`/`setUploadedBytes`/`markCompleted`/`markError`/`removeUpload`)
+  is replaced with the shared store's
+  `startTask`/`updateTask`/`finishTask`/`failTask`, using `uploadedBytes`/
+  `totalBytes` as `current`/`total`. `ToggleOfflineOnlyButton.tsx` - the only
+  reader today, via `useIsDatasetUploadInProgress`/`useUploadPercent` - drops
+  both hooks and its inline `Loader`/80px `Progress` bar; it keeps a local
+  disabled state while its own call to `startDatasetUpload` is in flight (the
+  same pattern the sync button above already uses), and the actual progress
+  is now visible only in the floating indicator. `useSaveDataset.ts`'s
+  already-fire-and-forget post-save upload (`_startDatasetUploadIfAllowed`)
+  gains visible progress for the first time anywhere in the app - today it's
+  invisible unless the user happens to be on that exact dataset's detail
+  page, since that page was the only reader. `DatasetUploadProgressStore.ts`,
+  `useIsDatasetUploadInProgress.ts`, and `useUploadPercent.ts` are deleted
+  outright once nothing imports them.
+- One behavior change applies uniformly to every migrated call site, not
+  just chat download: today, a failed upload calls `markError` and then
+  `removeUpload` in the same `finally`, so the error is visible for at most
+  an instant and the user relies on a separate `notifyError` toast to learn
+  it failed; after unification, a failed upload becomes a dismissible error
+  panel in the floating indicator, exactly like a failed download or a
+  failed sync.
 
 ## 7. Error handling
 
@@ -293,7 +345,10 @@ it a floating UI nobody asked for is a separate change.
   some don't) until the next successful sync. This change doesn't fix that,
   but it does make a retry after a partial failure cheaper: the
   already-committed pages now produce no-op rows on the next attempt instead
-  of being rewritten again.
+  of being rewritten again. Whether to keep this behavior or make Sync atomic
+  (roll back every page if any page fails) is an undecided product/
+  engineering choice, now tracked as **P5.10** in the roadmap rather than
+  left implicit.
 - A page with zero rows to write skips the `bulkInsert` call entirely rather
   than sending an empty array.
 - The final stale-sweep is skipped entirely (no call at all) when nothing is
@@ -350,6 +405,18 @@ payloads, which is how this bug shipped. New coverage needed:
    on the new store: still renders its existing indeterminate/determinate/
    warning copy for a download, plus one new case - a failed download now
    renders a dismissible error instead of disappearing.
+8. `startDatasetUpload`/`ToggleOfflineOnlyButton` as a regression check after
+   migrating off `DatasetUploadProgressStore`: the existing in-flight dedup
+   (a second call for the same `datasetId` while one is already uploading
+   still returns the same promise) still works; a successful upload reports
+   `current`/`total` in bytes to the shared store and finishes the task; a
+   failed upload now surfaces as a dismissible error in the floating
+   indicator instead of vanishing the instant `finally` runs, which is
+   today's behavior; the button's own disabled state during upload is
+   unchanged.
+9. No remaining import of `DatasetUploadProgressStore`,
+   `useIsDatasetUploadInProgress`, or `useUploadPercent` anywhere in the
+   repo once the migration lands - all three files are deleted.
 
 ## 9. Exit criteria
 
@@ -378,6 +445,17 @@ payloads, which is how this bug shipped. New coverage needed:
   indicator instead of vanishing silently.
 - The manual "Refresh" click and the automatic first sync report progress
   through the identical code path - no duplicated progress logic.
+- A dataset upload (triggered either by confirming "allow online syncing" or
+  automatically after saving a dataset) shows in the same floating indicator
+  as sync and offline-model-download tasks, with correct byte-based progress,
+  and `ToggleOfflineOnlyButton` no longer renders its own inline progress bar.
+- A failed dataset upload surfaces as a dismissible error in the floating
+  indicator instead of vanishing the instant it fails, as it does today.
+- Uploading a dataset, refreshing a concept's records, and downloading an
+  offline model at the same time shows three independent panels in the one
+  floating indicator, each progressing and finishing independently.
+- `DatasetUploadProgressStore.ts`, `useIsDatasetUploadInProgress.ts`, and
+  `useUploadPercent.ts` no longer exist in the repo.
 
 ## 10. Files
 
@@ -411,6 +489,18 @@ src/components/OfflineChatDownloadIndicator/
 src/hooks/localChatModels/
   useOfflineChatEngineStatus.ts        replaced or adapted to the new store
 
+src/clients/storage/DatasetParquetStorageClient/
+  DatasetUploadProgressStore.ts        deleted, replaced by the shared task store
+  useIsDatasetUploadInProgress.ts      deleted
+  useUploadPercent.ts                  deleted
+  startDatasetUpload.ts                writes to the shared task store instead;
+                                        keeps its own per-dataset in-flight dedup map
+
+src/views/DataManagerApp/DatasetMetaView/
+  ToggleOfflineOnlyButton.tsx          drops inline Loader/Progress bar and the two
+                                        deleted hooks; keeps its local disabled state
+  ToggleOfflineOnlyButton.test.tsx     (new) regression coverage for section 8.8
+
 src/components/AppShell/
   AppShell.tsx                         mounts the new floating component
 
@@ -418,7 +508,7 @@ supabase/tests/database/
   individuals__sync_upsert_contract.test.sql   real-Postgres upsert contract (section 8.4)
 ```
 
-docs/production-plan-world-humanitarian-day.md also gains two new roadmap
+docs/production-plan-world-humanitarian-day.md also gains three new roadmap
 items alongside this spec (not implemented by it): **P5.8** (the NULL-label
-sync crash) and **P5.9** (deciding what a stale individual's product
-behavior should be).
+sync crash), **P5.9** (deciding what a stale individual's product behavior
+should be), and **P5.10** (deciding whether Sync should become atomic).

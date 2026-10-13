@@ -224,6 +224,12 @@ re-writes all rows (no incremental sync).
   `external_id` leaves every source dataset: delete it, let a user archive it,
   or something else. P5.6 only flags the row (`missing_from_source_at`) and
   defers this decision; nothing surfaces the flag in any UI yet.
+- P5.10 `[NEW]` Decide whether Sync should stay page-by-page with no
+  cross-page atomicity (today's behavior, kept as-is by P5.6: a mid-sync
+  failure leaves some individuals updated and some not, until the next
+  successful sync) or become atomic - wrapping a full sync in rollback so a
+  failure leaves every individual exactly as it was before that sync started.
+  Not decided or implemented by P5.6.
 - `[Depends on: touches P2/P0 for materialization; BLOCKS: P5b, P5c case-mgmt]`
 
 ### P5b. Configurable TBox (workspace-configurable schema)
