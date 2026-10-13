@@ -7,6 +7,8 @@ const { notificationsShowMock } = vi.hoisted(() => {
   return { notificationsShowMock: vi.fn() };
 });
 
+const UPDATE_CHECK_INTERVAL_MS = 30 * 60 * 1000;
+
 vi.mock("@mantine/notifications", () => {
   return { notifications: { show: notificationsShowMock } };
 });
@@ -93,12 +95,23 @@ describe("registerOfflineServiceWorker", () => {
   });
 
   it("checks for a new deployment on the polling interval", () => {
-    vi.advanceTimersByTime(15 * 60 * 1000);
+    vi.advanceTimersByTime(UPDATE_CHECK_INTERVAL_MS);
 
     expect(updateMock).toHaveBeenCalledTimes(1);
   });
 
-  it("checks for a new deployment when the tab becomes visible again", () => {
+  it("ignores a tab-focus event before a full interval has passed since the last check", () => {
+    Object.defineProperty(document, "visibilityState", {
+      value: "visible",
+      configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("checks again on a tab-focus event once a full interval has passed", () => {
+    vi.setSystemTime(Date.now() + UPDATE_CHECK_INTERVAL_MS);
     Object.defineProperty(document, "visibilityState", {
       value: "visible",
       configurable: true,
@@ -131,7 +144,7 @@ describe("registerOfflineServiceWorker", () => {
     const waitingWorker = _makeFakeWaitingWorker();
     Object.defineProperty(registration, "waiting", { value: waitingWorker });
 
-    vi.advanceTimersByTime(15 * 60 * 1000);
+    vi.advanceTimersByTime(UPDATE_CHECK_INTERVAL_MS);
 
     expect(notificationsShowMock).toHaveBeenCalledWith(
       expect.objectContaining({ id: "service-worker-update-available" }),

@@ -4,7 +4,7 @@ import { createElement } from "react";
 import { registerSW } from "virtual:pwa-register";
 import { ServiceWorkerUpdateNotification } from "@/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification";
 
-const UPDATE_CHECK_INTERVAL_MS = 15 * 60 * 1000;
+const UPDATE_CHECK_INTERVAL_MS = 30 * 60 * 1000;
 const UPDATE_NOTIFICATION_ID = "service-worker-update-available";
 
 /**
@@ -59,13 +59,22 @@ function _showUpdateNotification(options: UpdateNotificationOptions): void {
 /**
  * Checks for a new deployed version on an interval and whenever the tab
  * regains focus, so an open tab notices a release without needing a manual
- * reload to trigger the browser's own (much less frequent) check. Each tick
+ * reload to trigger the browser's own (much less frequent) check. Each check
  * also re-shows the update notification if one is still pending: closing the
  * notification only dismisses it, it does not cancel the update, so a tab
  * left open keeps getting reminded instead of sitting on stale code forever.
+ *
+ * A tab-focus event only triggers a check if a full interval has passed
+ * since the last one. Without this, switching away and back to the tab
+ * (common when someone is mid-task elsewhere) would re-show a just-dismissed
+ * notification immediately, which is more interruption than an open update
+ * warrants.
  */
 function _pollForUpdates(options: UpdateNotificationOptions): void {
+  let lastCheckedAt = Date.now();
+
   const _checkNow = () => {
+    lastCheckedAt = Date.now();
     options.registration.update().catch(() => {
       // A failed check (offline, flaky network) just retries on the next
       // tick or the next tab focus; nothing to surface to the user.
@@ -77,7 +86,9 @@ function _pollForUpdates(options: UpdateNotificationOptions): void {
 
   setInterval(_checkNow, UPDATE_CHECK_INTERVAL_MS);
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
+    const hasIntervalElapsed =
+      Date.now() - lastCheckedAt >= UPDATE_CHECK_INTERVAL_MS;
+    if (document.visibilityState === "visible" && hasIntervalElapsed) {
       _checkNow();
     }
   });
