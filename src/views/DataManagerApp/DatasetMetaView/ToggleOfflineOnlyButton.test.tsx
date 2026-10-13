@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { render, screen } from "@/test-utils";
 import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
@@ -21,7 +21,7 @@ const DATA_SOURCE = {
   datasetId: "dataset-1",
 } as unknown as CsvFileDataset.T;
 
-function renderWithQueryClient(ui: ReactNode): ReturnType<typeof render> {
+function _renderWithQueryClient(ui: ReactNode): ReturnType<typeof render> {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -56,7 +56,7 @@ describe("ToggleOfflineOnlyButton", () => {
   it("does not render an inline progress bar while a task is live in TaskProgressStore", () => {
     TaskProgressStore.startTask("Uploading dataset");
 
-    renderWithQueryClient(
+    _renderWithQueryClient(
       <ToggleOfflineOnlyButton
         isInCloudStorage={false}
         dataSource={DATA_SOURCE}

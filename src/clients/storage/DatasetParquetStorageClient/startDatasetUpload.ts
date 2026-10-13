@@ -14,9 +14,9 @@ import {
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { notifyError } from "@/utils/notifications/notify";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore";
+import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";

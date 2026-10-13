@@ -1,5 +1,9 @@
 import { objectValuesMap } from "@avandar/utils";
-import type { AnyFunction, IExternalStore } from "@avandar/utils";
+import type {
+  AnyFunction,
+  AnyFunctionWithReturn,
+  IExternalStore,
+} from "@avandar/utils";
 
 /**
  * Creates an external store that can be used with React's
@@ -18,7 +22,7 @@ import type { AnyFunction, IExternalStore } from "@avandar/utils";
 export function createExternalStore<
   T,
   Getters extends Record<string, AnyFunction>,
-  Updaters extends Record<string, AnyFunction>,
+  Updaters extends Record<string, AnyFunctionWithReturn<unknown>>,
 >({
   initialState,
   builder,

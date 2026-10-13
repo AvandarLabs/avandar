@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 
 describe("TaskProgressStore", () => {
   it("starts a task in the indeterminate state with the given label", () => {

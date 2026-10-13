@@ -1,9 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Progress, Text } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import css from "./TaskProgressIndicator.module.css";
-import type { TaskEntry, TaskId } from "@/lib/utils/state/TaskProgressStore";
+import type { TaskEntry, TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 
 type Props = {
   id: TaskId;

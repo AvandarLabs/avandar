@@ -3,8 +3,8 @@ import { useEffect, useRef } from "react";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 
 /**
  * Bridges offline chat model download status into `TaskProgressStore`, so

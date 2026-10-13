@@ -18,8 +18,8 @@ import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSql
 import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { Logger } from "@/utils/Logger";
 import {
   diffStagedIndividualsPage,

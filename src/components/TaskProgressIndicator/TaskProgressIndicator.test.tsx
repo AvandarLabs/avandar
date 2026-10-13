@@ -2,7 +2,7 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { render, screen } from "@/test-utils";
 import { TaskProgressIndicator } from "./TaskProgressIndicator";
 

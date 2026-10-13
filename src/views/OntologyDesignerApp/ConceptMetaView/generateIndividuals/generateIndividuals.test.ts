@@ -14,7 +14,7 @@ import { uuid } from "$/lib/uuid";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {

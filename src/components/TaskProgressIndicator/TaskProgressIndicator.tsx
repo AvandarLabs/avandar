@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { TaskPanel } from "./TaskPanel";
 import css from "./TaskProgressIndicator.module.css";
 
