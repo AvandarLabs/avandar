@@ -15,7 +15,9 @@ export function buildChangesetMarkdown(
 ): string {
   const { packageNames, bump, summary } = input;
   const frontmatterLines = packageNames
-    .map((packageName) => `"${packageName}": ${bump}`)
+    .map((packageName) => {
+      return `"${packageName}": ${bump}`;
+    })
     .join("\n");
   return `---\n${frontmatterLines}\n---\n\n${summary}\n`;
 }

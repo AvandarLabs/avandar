@@ -43,7 +43,7 @@ function runGh(args: string[]): string {
   }).trim();
 }
 
-/** Whether `ancestorSha` is an ancestor of `descendantSha`, i.e. a true fast-forward. */
+/** Whether ancestorSha is an ancestor of descendantSha (fast-forward). */
 function isAncestor(ancestorSha: string, descendantSha: string): boolean {
   try {
     execFileSync(
@@ -82,7 +82,10 @@ function loadPackageDirToName(): Map<string, string> {
   return packageDirToName;
 }
 
-/** Reads the current version's major digit from any one fixed-group package, since they're locked together. */
+/**
+ * Reads the current version's major digit from any one fixed-group
+ * package, since they're locked together.
+ */
 function readCurrentMajorVersion(
   packageDirToName: Map<string, string>,
 ): number {
@@ -97,10 +100,11 @@ function readCurrentMajorVersion(
 }
 
 function hasManualChangeset(changedFiles: string[]): boolean {
-  return changedFiles.some(
-    (filePath) =>
-      filePath.startsWith(".changeset/") && filePath.endsWith(".md"),
-  );
+  return changedFiles.some((filePath) => {
+    return (
+      filePath.startsWith(".changeset/") && filePath.endsWith(".md")
+    );
+  });
 }
 
 function writeChangesetFile(
@@ -116,7 +120,10 @@ function writeChangesetFile(
   );
 }
 
-/** Resolves each commit to its merged PR, bucketing commits with none (a direct push). */
+/**
+ * Resolves each commit to its merged PR, bucketing commits with none
+ * (a direct push).
+ */
 function partitionCommitsByPullRequest(commitShas: string[]): {
   prNumbers: Set<number>;
   unassociatedShas: string[];
@@ -134,7 +141,9 @@ function partitionCommitsByPullRequest(commitShas: string[]): {
     if (matchedNumbers.length === 0) {
       unassociatedShas.push(sha);
     } else {
-      matchedNumbers.forEach((number) => prNumbers.add(number));
+      matchedNumbers.forEach((number) => {
+        prNumbers.add(number);
+      });
     }
   }
   return { prNumbers, unassociatedShas };
