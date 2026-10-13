@@ -1,6 +1,6 @@
 export type ConventionalCommitTitle = {
   type: string;
-  scope: string | null;
+  scope: string | undefined;
   breaking: boolean;
   description: string;
 };
@@ -10,22 +10,23 @@ const CONVENTIONAL_COMMIT_TITLE_PATTERN =
 
 /**
  * Parses a PR title as a Conventional Commit header
- * (`type(scope)!: description`), or returns null when it does not match.
+ * (`type(scope)!: description`), or returns undefined when it does not
+ * match.
  */
 export function parseConventionalCommitTitle(
   title: string,
-): ConventionalCommitTitle | null {
+): ConventionalCommitTitle | undefined {
   const match = CONVENTIONAL_COMMIT_TITLE_PATTERN.exec(title.trim());
   if (!match) {
-    return null;
+    return undefined;
   }
   const [, type, , scope, breakingMarker, description] = match;
   if (type === undefined || description === undefined) {
-    return null;
+    return undefined;
   }
   return {
     type,
-    scope: scope ?? null,
+    scope,
     breaking: breakingMarker === "!",
     description,
   };

@@ -1,4 +1,4 @@
-import { branchNameToCommitType } from "../branchNameToCommitType/branchNameToCommitType";
+import { getCommitTypeFromBranchName } from "../getCommitTypeFromBranchName/getCommitTypeFromBranchName";
 import { parseConventionalCommitTitle } from "../parseConventionalCommitTitle/parseConventionalCommitTitle";
 
 export type SemverBump = "patch" | "minor" | "major";
@@ -23,13 +23,13 @@ function _baseBumpForType(type: string): SemverBump {
  * Caps an inferred major bump to minor while the repo is pre-1.0, since
  * nothing here should cross 0.x to 1.0.0 without a human deciding to.
  */
-export function inferBumpType(input: InferBumpTypeInput): SemverBump {
-  const { prTitle, prBody, branchName, currentMajorVersion } = input;
+export function inferBumpType(options: InferBumpTypeInput): SemverBump {
+  const { prTitle, prBody, branchName, currentMajorVersion } = options;
 
   const parsedTitle = parseConventionalCommitTitle(prTitle);
-  const type = parsedTitle?.type ?? branchNameToCommitType(branchName);
+  const type = parsedTitle?.type ?? getCommitTypeFromBranchName(branchName);
 
-  if (type === null || type === undefined) {
+  if (type === undefined) {
     return "patch";
   }
 

@@ -10,7 +10,7 @@ describe("inferBumpType", () => {
     ["chore: bump deps", 0, "patch"],
     ["refactor: simplify", 2, "patch"],
   ] as const)(
-    "infers %s bump for title %s at major %i",
+    'title "%s" at major %i infers a %s bump',
     (prTitle, currentMajorVersion, expectedBump) => {
       expect(
         inferBumpType({

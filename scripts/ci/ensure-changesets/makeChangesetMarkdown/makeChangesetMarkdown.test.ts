@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildChangesetMarkdown } from "./buildChangesetMarkdown";
+import { makeChangesetMarkdown } from "./makeChangesetMarkdown";
 
-describe("buildChangesetMarkdown", () => {
-  it("builds frontmatter and body for a single package", () => {
-    const markdown = buildChangesetMarkdown({
+describe("makeChangesetMarkdown", () => {
+  it("produces one frontmatter line and the summary body for a single package", () => {
+    const markdown = makeChangesetMarkdown({
       packageNames: ["@avandar/ui"],
       bump: "patch",
       summary: "Fix button alignment (#123)",
@@ -14,7 +14,7 @@ describe("buildChangesetMarkdown", () => {
   });
 
   it("lists every package on its own frontmatter line, in order", () => {
-    const markdown = buildChangesetMarkdown({
+    const markdown = makeChangesetMarkdown({
       packageNames: ["@avandar/ui", "@avandar/utils"],
       bump: "minor",
       summary: "Add new hook (#124)",

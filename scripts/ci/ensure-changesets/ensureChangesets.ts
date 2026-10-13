@@ -8,14 +8,14 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 
-import { buildChangesetMarkdown } from "./buildChangesetMarkdown/buildChangesetMarkdown";
-import { changedFilesToPackageNames } from "./changedFilesToPackageNames/changedFilesToPackageNames";
+import { getPackageNamesFromChangedFiles } from "./getPackageNamesFromChangedFiles/getPackageNamesFromChangedFiles";
 import { inferBumpType } from "./inferBumpType/inferBumpType";
 import type { SemverBump } from "./inferBumpType/inferBumpType";
+import { makeChangesetMarkdown } from "./makeChangesetMarkdown/makeChangesetMarkdown";
 
 const REPO_ROOT = process.cwd();
 const CHANGESET_DIR = join(REPO_ROOT, ".changeset");
-const PACKAGE_TIERS = ["node", "shared", "web"];
+const PACKAGE_TIERS = ["node", "shared", "web"] as const;
 const ZERO_SHA = "0000000000000000000000000000000000000000";
 
 type MergedPullRequest = {
@@ -25,18 +25,18 @@ type MergedPullRequest = {
   branchName: string;
 };
 
-function warn(message: string): void {
+function _warn(message: string): void {
   console.log(`::warning::${message}`);
 }
 
-function runGit(args: string[]): string {
+function _runGit(args: string[]): string {
   return execFileSync("git", args, {
     cwd: REPO_ROOT,
     encoding: "utf8",
   }).trim();
 }
 
-function runGh(args: string[]): string {
+function _runGh(args: string[]): string {
   return execFileSync("gh", args, {
     cwd: REPO_ROOT,
     encoding: "utf8",
@@ -44,7 +44,11 @@ function runGh(args: string[]): string {
 }
 
 /** Whether ancestorSha is an ancestor of descendantSha (fast-forward). */
-function isAncestor(ancestorSha: string, descendantSha: string): boolean {
+function _isAncestor(options: {
+  ancestorSha: string;
+  descendantSha: string;
+}): boolean {
+  const { ancestorSha, descendantSha } = options;
   try {
     execFileSync(
       "git",
@@ -58,36 +62,36 @@ function isAncestor(ancestorSha: string, descendantSha: string): boolean {
 }
 
 /** Maps each `packages/<tier>/<name>` directory to its package.json name. */
-function loadPackageDirToName(): Map<string, string> {
-  const packageDirToName = new Map<string, string>();
-  for (const tier of PACKAGE_TIERS) {
+function _loadPackageDirToName(): Map<string, string> {
+  const packageDirEntries = PACKAGE_TIERS.flatMap((tier) => {
     const tierDir = join(REPO_ROOT, "packages", tier);
     if (!existsSync(tierDir)) {
-      continue;
+      return [];
     }
-    for (const packageDirName of readdirSync(tierDir)) {
-      const packageJsonPath = join(tierDir, packageDirName, "package.json");
-      if (!existsSync(packageJsonPath)) {
-        continue;
-      }
-      const packageJson = JSON.parse(
-        readFileSync(packageJsonPath, "utf8"),
-      ) as { name: string };
-      packageDirToName.set(
-        `packages/${tier}/${packageDirName}`,
-        packageJson.name,
-      );
-    }
-  }
-  return packageDirToName;
+    return readdirSync(tierDir)
+      .map((packageDirName): [string, string] | undefined => {
+        const packageJsonPath = join(tierDir, packageDirName, "package.json");
+        if (!existsSync(packageJsonPath)) {
+          return undefined;
+        }
+        const packageJson = JSON.parse(
+          readFileSync(packageJsonPath, "utf8"),
+        ) as { name: string };
+        return [`packages/${tier}/${packageDirName}`, packageJson.name];
+      })
+      .filter((entry): entry is [string, string] => {
+        return entry !== undefined;
+      });
+  });
+  return new Map(packageDirEntries);
 }
 
 /**
  * Reads the current version's major digit from any one fixed-group
  * package, since they're locked together.
  */
-function readCurrentMajorVersion(
-  packageDirToName: Map<string, string>,
+function _readCurrentMajorVersion(
+  packageDirToName: ReadonlyMap<string, string>,
 ): number {
   const [firstPackageDir] = packageDirToName.keys();
   if (firstPackageDir === undefined) {
@@ -99,24 +103,23 @@ function readCurrentMajorVersion(
   return Number(packageJson.version.split(".")[0]);
 }
 
-function hasManualChangeset(changedFiles: string[]): boolean {
+function _hasManualChangeset(changedFiles: string[]): boolean {
   return changedFiles.some((filePath) => {
-    return (
-      filePath.startsWith(".changeset/") && filePath.endsWith(".md")
-    );
+    return filePath.startsWith(".changeset/") && filePath.endsWith(".md");
   });
 }
 
-function writeChangesetFile(
-  changesetPath: string,
-  packageNames: string[],
-  bump: SemverBump,
-  summary: string,
-): void {
+function _writeChangesetFile(options: {
+  changesetPath: string;
+  packageNames: readonly string[];
+  bump: SemverBump;
+  summary: string;
+}): void {
+  const { changesetPath, packageNames, bump, summary } = options;
   mkdirSync(CHANGESET_DIR, { recursive: true });
   writeFileSync(
     changesetPath,
-    buildChangesetMarkdown({ packageNames, bump, summary }),
+    makeChangesetMarkdown({ packageNames, bump, summary }),
   );
 }
 
@@ -124,34 +127,42 @@ function writeChangesetFile(
  * Resolves each commit to its merged PR, bucketing commits with none
  * (a direct push).
  */
-function partitionCommitsByPullRequest(commitShas: string[]): {
+function _partitionCommitsByPullRequest(commitShas: string[]): {
   prNumbers: Set<number>;
   unassociatedShas: string[];
 } {
-  const prNumbers = new Set<number>();
-  const unassociatedShas: string[] = [];
-  for (const sha of commitShas) {
-    const output = runGh([
+  const commitPullRequestNumbers = commitShas.map((sha) => {
+    const output = _runGh([
       "api",
       `repos/${process.env.GITHUB_REPOSITORY}/commits/${sha}/pulls`,
       "--jq",
       ".[] | select(.merged_at != null) | .number",
     ]);
-    const matchedNumbers = output.split("\n").filter(Boolean).map(Number);
-    if (matchedNumbers.length === 0) {
-      unassociatedShas.push(sha);
-    } else {
-      matchedNumbers.forEach((number) => {
-        prNumbers.add(number);
-      });
-    }
-  }
+    return {
+      sha,
+      prNumbers: output.split("\n").filter(Boolean).map(Number),
+    };
+  });
+
+  const prNumbers = new Set(
+    commitPullRequestNumbers.flatMap((commit) => {
+      return commit.prNumbers;
+    }),
+  );
+  const unassociatedShas = commitPullRequestNumbers
+    .filter((commit) => {
+      return commit.prNumbers.length === 0;
+    })
+    .map((commit) => {
+      return commit.sha;
+    });
+
   return { prNumbers, unassociatedShas };
 }
 
-function fetchPullRequest(number: number): MergedPullRequest {
+function _fetchPullRequest(number: number): MergedPullRequest {
   const pullRequest = JSON.parse(
-    runGh(["api", `repos/${process.env.GITHUB_REPOSITORY}/pulls/${number}`]),
+    _runGh(["api", `repos/${process.env.GITHUB_REPOSITORY}/pulls/${number}`]),
   ) as { title: string; body: string | null; head: { ref: string } };
   return {
     number,
@@ -161,8 +172,8 @@ function fetchPullRequest(number: number): MergedPullRequest {
   };
 }
 
-function fetchPullRequestFiles(number: number): string[] {
-  return runGh([
+function _fetchPullRequestFiles(number: number): string[] {
+  return _runGh([
     "api",
     `repos/${process.env.GITHUB_REPOSITORY}/pulls/${number}/files`,
     "--paginate",
@@ -173,30 +184,31 @@ function fetchPullRequestFiles(number: number): string[] {
     .filter(Boolean);
 }
 
-function processPullRequest(
-  prNumber: number,
-  packageDirToName: Map<string, string>,
-  currentMajorVersion: number,
-): boolean {
+function _processPullRequest(options: {
+  prNumber: number;
+  packageDirToName: ReadonlyMap<string, string>;
+  currentMajorVersion: number;
+}): boolean {
+  const { prNumber, packageDirToName, currentMajorVersion } = options;
   const changesetPath = join(CHANGESET_DIR, `auto-pr-${prNumber}.md`);
   if (existsSync(changesetPath)) {
     return false;
   }
 
-  const changedFiles = fetchPullRequestFiles(prNumber);
-  if (hasManualChangeset(changedFiles)) {
+  const changedFiles = _fetchPullRequestFiles(prNumber);
+  if (_hasManualChangeset(changedFiles)) {
     return false;
   }
 
-  const packageNames = changedFilesToPackageNames(
-    changedFiles,
+  const packageNames = getPackageNamesFromChangedFiles({
+    changedFilePaths: changedFiles,
     packageDirToName,
-  );
+  });
   if (packageNames.length === 0) {
     return false;
   }
 
-  const pullRequest = fetchPullRequest(prNumber);
+  const pullRequest = _fetchPullRequest(prNumber);
   const bump = inferBumpType({
     prTitle: pullRequest.title,
     prBody: pullRequest.body,
@@ -204,42 +216,43 @@ function processPullRequest(
     currentMajorVersion,
   });
 
-  writeChangesetFile(
+  _writeChangesetFile({
     changesetPath,
     packageNames,
     bump,
-    `${pullRequest.title} (#${prNumber})`,
-  );
+    summary: `${pullRequest.title} (#${prNumber})`,
+  });
   return true;
 }
 
-function processUnassociatedCommit(
-  sha: string,
-  packageDirToName: Map<string, string>,
-  currentMajorVersion: number,
-): boolean {
+function _processUnassociatedCommit(options: {
+  sha: string;
+  packageDirToName: ReadonlyMap<string, string>;
+  currentMajorVersion: number;
+}): boolean {
+  const { sha, packageDirToName, currentMajorVersion } = options;
   const shortSha = sha.slice(0, 7);
   const changesetPath = join(CHANGESET_DIR, `auto-commit-${shortSha}.md`);
   if (existsSync(changesetPath)) {
     return false;
   }
 
-  const changedFiles = runGit(["diff", "--name-only", `${sha}^`, sha])
+  const changedFiles = _runGit(["diff", "--name-only", `${sha}^`, sha])
     .split("\n")
     .filter(Boolean);
-  if (hasManualChangeset(changedFiles)) {
+  if (_hasManualChangeset(changedFiles)) {
     return false;
   }
 
-  const packageNames = changedFilesToPackageNames(
-    changedFiles,
+  const packageNames = getPackageNamesFromChangedFiles({
+    changedFilePaths: changedFiles,
     packageDirToName,
-  );
+  });
   if (packageNames.length === 0) {
     return false;
   }
 
-  const subject = runGit(["log", "-1", "--format=%s", sha]);
+  const subject = _runGit(["log", "-1", "--format=%s", sha]);
   const bump = inferBumpType({
     prTitle: subject,
     prBody: "",
@@ -247,75 +260,88 @@ function processUnassociatedCommit(
     currentMajorVersion,
   });
 
-  writeChangesetFile(
+  _writeChangesetFile({
     changesetPath,
     packageNames,
     bump,
-    `${subject} (${shortSha})`,
-  );
+    summary: `${subject} (${shortSha})`,
+  });
   return true;
 }
 
-function main(): void {
+function _main(): void {
   const beforeSha = process.env.BEFORE_SHA;
   const afterSha = process.env.AFTER_SHA;
 
   if (!beforeSha || !afterSha || beforeSha === ZERO_SHA) {
-    warn(
+    _warn(
       "No usable push range (new branch or missing SHAs); skipping auto-changeset generation.",
     );
     return;
   }
 
-  if (!isAncestor(beforeSha, afterSha)) {
-    warn(
+  if (!_isAncestor({ ancestorSha: beforeSha, descendantSha: afterSha })) {
+    _warn(
       "Push range is not a fast-forward (force-push); skipping auto-changeset generation.",
     );
     return;
   }
 
-  const commitShas = runGit(["log", "--format=%H", `${beforeSha}..${afterSha}`])
+  const commitShas = _runGit([
+    "log",
+    "--format=%H",
+    `${beforeSha}..${afterSha}`,
+  ])
     .split("\n")
     .filter(Boolean);
   if (commitShas.length === 0) {
     return;
   }
 
-  const packageDirToName = loadPackageDirToName();
-  const currentMajorVersion = readCurrentMajorVersion(packageDirToName);
+  const packageDirToName = _loadPackageDirToName();
+  const currentMajorVersion = _readCurrentMajorVersion(packageDirToName);
   const { prNumbers, unassociatedShas } =
-    partitionCommitsByPullRequest(commitShas);
+    _partitionCommitsByPullRequest(commitShas);
 
-  const descriptions: string[] = [];
-
-  for (const prNumber of prNumbers) {
-    if (processPullRequest(prNumber, packageDirToName, currentMajorVersion)) {
-      descriptions.push(`#${prNumber}`);
-    }
-  }
-  for (const sha of unassociatedShas) {
-    if (
-      processUnassociatedCommit(sha, packageDirToName, currentMajorVersion)
-    ) {
-      descriptions.push(sha.slice(0, 7));
-    }
-  }
+  const prDescriptions = [...prNumbers]
+    .filter((prNumber) => {
+      return _processPullRequest({
+        prNumber,
+        packageDirToName,
+        currentMajorVersion,
+      });
+    })
+    .map((prNumber) => {
+      return `#${prNumber}`;
+    });
+  const commitDescriptions = unassociatedShas
+    .filter((sha) => {
+      return _processUnassociatedCommit({
+        sha,
+        packageDirToName,
+        currentMajorVersion,
+      });
+    })
+    .map((sha) => {
+      return sha.slice(0, 7);
+    });
+  const descriptions = [...prDescriptions, ...commitDescriptions];
 
   if (descriptions.length === 0) {
     return;
   }
 
-  runGit(["add", ".changeset"]);
-  runGit([
+  _runGit(["add", ".changeset"]);
+  _runGit([
     "commit",
     "-m",
     `chore: add changesets for ${descriptions.join(", ")} [skip deploy]`,
   ]);
-  runGit(["push", "origin", "HEAD:develop"]);
+  _runGit(["push", "origin", "HEAD:develop"]);
 }
 
 try {
-  main();
+  _main();
 } catch (error) {
-  warn(`Auto-changeset generation failed: ${(error as Error).message}`);
+  _warn(`Auto-changeset generation failed: ${(error as Error).message}`);
 }
