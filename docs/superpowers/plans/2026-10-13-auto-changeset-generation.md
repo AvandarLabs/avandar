@@ -218,7 +218,7 @@ export type ConventionalCommitType = (typeof CONVENTIONAL_COMMIT_TYPES)[number];
 export function branchNameToCommitType(
   branchName: string,
 ): ConventionalCommitType | null {
-  const [prefix] = branchName.split("/");
+  const [prefix = ""] = branchName.split("/");
   return (CONVENTIONAL_COMMIT_TYPES as readonly string[]).includes(prefix)
     ? (prefix as ConventionalCommitType)
     : null;
