@@ -4,16 +4,19 @@
 **Date:** 2026-10-13
 **Author:** pablo@avandarlabs.com (brainstormed with Claude).
 **Related:**
-[`docs/qetl-architecture.md`](../../qetl-architecture.md) section 10 (the
+[`docs/qetl-architecture.md`](../../../qetl-architecture.md) section 10 (the
 general "adding a new connector" checklist, written against a hypothetical
 `postgres_table` source type - this spec fills that hypothetical in for real),
-[`docs/superpowers/specs/2026-08-18-qetl-google-sheets-design.md`](2026-08-18-qetl-google-sheets-design.md)
+[`docs/superpowers/specs/2026-08-18-qetl-google-sheets-design.md`](../2026-08-18-qetl-google-sheets-design.md)
 (the first external connector, the one this spec deliberately does not copy
 for credential storage),
-[`src/views/DataManagerApp/DataImportView/CLAUDE.md`](../../../src/views/DataManagerApp/DataImportView/CLAUDE.md)
+[`src/views/DataManagerApp/DataImportView/CLAUDE.md`](../../../../src/views/DataManagerApp/DataImportView/CLAUDE.md)
 (the "sniffed import view" shape every connector's frontend must follow),
-[`docs/permissions-architecture.md`](../../permissions-architecture.md) (app
-roles, used below instead of a new per-resource share type).
+[`docs/permissions-architecture.md`](../../../permissions-architecture.md) (app
+roles, used below instead of a new per-resource share type),
+[`postgres-connector-option-a-prototype.html`](postgres-connector-option-a-prototype.html)
+(the confirmed frontend shape, Option A of three explored - open it directly
+in a browser; see section 7.4a).
 
 ---
 
@@ -501,11 +504,20 @@ restatement of them.
      `require`, label). Submitting it calls `test-and-save`.
    - If the workspace has one or more saved connections: the row's action is
      a `Select` of `"<name> - <host>:<port>/<database>"` options plus a
-     trailing `"+ New connection"` sentinel, defaulting to the
+     trailing `"+ Add a new database"` sentinel, defaulting to the
      most-recently-verified connection (`last_verified_at`). Picking an
      existing one calls `GET .../tables` directly, skipping the form.
-     Picking "New connection" opens the same form as the zero-connections
-     case.
+     Picking "Add a new database" opens the same form as the
+     zero-connections case.
+   - **Copy uses the connector's own noun, never the generic word
+     "connection."** `database_connections` is the right name for the
+     backend entity (section 5.1) - a connection is genuinely what
+     `MySQL`/`MSSQL`/`Snowflake` connectors will all persist as, too - but a
+     user never sees that word. Postgres's saved items read "database"
+     ("Use this database", "Add a new database", "2 saved databases
+     available"); the next connector picks its own noun the same way Sheets
+     already does ("sheet"/"spreadsheet", never "connection" either). This
+     is the exact wording confirmed in the chosen prototype, section 7.4a.
    - Both paths converge on the same next state once tables come back: a
      schema-qualified, searchable table/view picker (Mantine `Select` with
      `searchable`, grouped by schema via `group` - real databases run to
@@ -600,6 +612,43 @@ not re-entered per table.
   picker, `PasswordInput`'s native masking (never a bespoke masked text
   field), and the picker must support typeahead given realistic table counts
   in the hundreds.
+
+### 7.4a Prototype: the confirmed shape, as a file
+
+Three interaction shapes for the connection step were prototyped and
+compared with the user before writing 7.4 above: (A) the connection form and
+the saved-item choice expand inline under one `ConnectorRow`, same as the
+Sheets tab picker; (B) every saved connection gets its own row; (C) the
+row's action becomes a compact `Select`, with a new connection opening in an
+anchored popover instead of inline. **Option A was chosen** - it is the
+direct extension of the shape this file already mandates ("a new service is
+a new row rather than a new layout," copy `GoogleSheetsImportView`), and it
+keeps the Connectors tab's one-row-per-service invariant that B breaks and
+that C has no reason to abandon yet either.
+
+[`postgres-connector-option-a-prototype.html`](postgres-connector-option-a-prototype.html)
+is that chosen shape, colocated with this spec so it can be opened directly
+(no Claude account needed) when frontend implementation starts. It is a
+static, self-contained HTML/CSS/vanilla-JS mock, not real app code - a
+reference for layout, states and copy, not something to adapt or import.
+Open it in a browser; the control bar across the top (clearly set off from
+the simulated app below it) steps through every state and error case:
+
+- No connection -> choosing a saved database or starting a new one ->
+  connection form open -> connecting (loading) -> connection-level error
+  (`auth_failed` / `unreachable` / `ssl_required`, one inline, field-adjacent
+  message each, per section 7 item 2) -> connected, picking a table or view
+  (searchable, grouped by schema) -> previewing (`DatasetImportForm`).
+- A "Saved connections exist" toggle shows both the first-time (bare
+  connect action) and returning-user (pick-or-add) cases from section 7.4's
+  "States" bullet.
+
+The prototype also fixes the exact copy convention from section 7 item 2:
+the saved-item affordances read **"Use this database"** and **"Add a new
+database"** (not "...connection"), and the saved-database chooser heading
+reads "Use a saved database." Treat these three strings, plus the
+per-schema/table picker copy, as the literal strings to ship, not
+placeholders to rephrase.
 
 ---
 

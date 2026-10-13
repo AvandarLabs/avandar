@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postgres connector — Option A prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&display=swap">
+<style>
+  :root{
+    --primary:#1563fe; --primary-active:#2983ff; --primary-deep:#0b4aea; --primary-soft:#edf6ff;
+    --ink:#102a43; --ink-soft:#243b53; --chrome:#486581; --chrome-edge:#37516c;
+    --body:#f8fafc; --raised:#ffffff; --sunken:#d9e0e7;
+    --border:rgba(16,42,67,.2); --border-strong:rgba(16,42,67,.32); --border-focus:rgba(16,42,67,.44);
+    --danger:#e53523; --danger-text:#8a2a1d;
+    --shadow-xs:0 1px 1px rgba(16,42,67,.08), 0 1px 2px rgba(16,42,67,.05);
+    --shadow-slate:0 1px 2px rgba(0,0,0,.20), 0 8px 24px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;font-family:'Figtree',sans-serif;color:var(--ink);background:var(--body);}
+
+  .proto-bar{background:var(--raised);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;flex-direction:column;gap:10px;}
+  .proto-title{font-size:14px;font-weight:650;color:var(--ink);display:flex;align-items:center;gap:8px;}
+  .proto-badge{font-size:11px;font-weight:650;color:#1a7a35;background:#e4f8e8;border:1px solid rgba(64,207,94,.4);border-radius:4px;padding:2px 6px;text-transform:uppercase;letter-spacing:.03em;}
+  .proto-desc{font-size:12.5px;color:var(--ink-soft);opacity:.85;max-width:72ch;}
+  .proto-controls{display:flex;flex-wrap:wrap;align-items:center;gap:20px;padding-top:2px;}
+  .proto-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .proto-label{font-size:11px;font-weight:650;color:var(--ink-soft);opacity:.7;text-transform:uppercase;letter-spacing:.04em;margin-right:2px;}
+  .proto-check{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-soft);}
+  .seg-btn{font-family:inherit;font-size:12.5px;font-weight:500;color:var(--ink-soft);background:var(--body);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;}
+  .seg-btn.active{background:var(--primary-soft);color:var(--primary-deep);border-color:var(--primary);}
+
+  .shell{background:var(--chrome);display:flex;min-height:calc(100vh - 110px);}
+  .gutter{flex:1;padding:8px;display:flex;}
+  .slate{flex:1;background:var(--raised);border:1px solid var(--chrome-edge);border-radius:8px 8px 12px 8px;box-shadow:var(--shadow-slate);display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+  .slate-toolbar{height:48px;flex-shrink:0;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);font-size:14px;font-weight:500;}
+  .tabs{display:flex;gap:24px;border-bottom:1px solid var(--border);padding:0 24px;flex-shrink:0;}
+  .tab{padding:12px 0;font-size:14px;font-weight:500;color:var(--ink-soft);opacity:.65;border-bottom:2px solid transparent;}
+  .tab.active{color:var(--primary-deep);opacity:1;border-bottom-color:var(--primary);font-weight:650;}
+  .tab-panel{flex:1;overflow:auto;padding:24px;}
+
+  .stack-xl{display:flex;flex-direction:column;gap:32px;}
+  .stack-sm{display:flex;flex-direction:column;gap:12px;}
+
+  .connector-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .connector-icon{width:36px;height:36px;border-radius:6px;background:var(--primary-soft);color:var(--primary-deep);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .connector-main{flex:1;min-width:0;}
+  .connector-name{font-size:14px;font-weight:500;color:var(--ink);}
+  .connector-status{font-size:13px;color:var(--ink-soft);opacity:.8;margin-top:2px;}
+  .connector-action{flex-shrink:0;}
+
+  .btn{font-family:inherit;height:30px;padding:0 14px;border-radius:6px;font-weight:500;font-size:13px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid transparent;white-space:nowrap;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-default{background:var(--raised);color:var(--ink-soft);border-color:var(--border);box-shadow:var(--shadow-xs);}
+
+  .panel{border-top:1px solid var(--border);margin-top:4px;padding-top:16px;display:flex;flex-direction:column;gap:16px;}
+  .panel-label{font-size:12px;font-weight:650;color:var(--ink-soft);opacity:.75;text-transform:uppercase;letter-spacing:.03em;}
+
+  .saved-row{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--border);border-radius:6px;}
+  .saved-icon{width:28px;height:28px;border-radius:6px;background:var(--body);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .saved-main{flex:1;min-width:0;}
+  .saved-name{font-size:13.5px;font-weight:500;}
+  .saved-meta{font-size:12px;color:var(--ink-soft);opacity:.75;margin-top:1px;}
+  .chooser-divider{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--ink-soft);opacity:.6;}
+  .chooser-divider::before,.chooser-divider::after{content:"";flex:1;height:1px;background:var(--border);}
+  .link-back{font-family:inherit;background:none;border:none;color:var(--primary-deep);font-size:12.5px;font-weight:500;cursor:pointer;padding:0;align-self:flex-start;}
+
+  .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+  .form-grid.is-loading{opacity:.55;pointer-events:none;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:12.5px;font-weight:500;color:var(--ink-soft);}
+  .field .optional{font-weight:400;opacity:.6;}
+  .input{height:34px;border-radius:6px;border:1px solid var(--border);background:var(--raised);padding:0 10px;font-size:13.5px;color:var(--ink);font-family:inherit;width:100%;}
+  .input:focus{outline:none;border-color:var(--border-focus);}
+  .field.has-error .input{border-color:var(--danger);}
+  .field-error{font-size:12px;color:var(--danger-text);}
+  .form-actions{display:flex;justify-content:flex-end;gap:8px;}
+
+  .spinner{width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion: reduce){.spinner{animation:none;}}
+
+  .picker-meta{font-size:12.5px;color:var(--ink-soft);opacity:.75;}
+  .search-wrap{position:relative;}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-soft);opacity:.6;display:flex;}
+  .search-input{padding-left:32px;}
+  .table-list{max-height:280px;overflow:auto;border:1px solid var(--border);border-radius:6px;padding:6px;}
+  .schema-group{display:flex;flex-direction:column;}
+  .schema-label{font-size:11px;font-weight:650;color:var(--ink-soft);opacity:.65;text-transform:uppercase;letter-spacing:.04em;padding:8px 8px 4px;}
+  .table-row{width:100%;text-align:left;display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;cursor:pointer;font-size:13.5px;background:none;border:none;font-family:inherit;color:var(--ink);}
+  .table-row:hover{background:var(--sunken);}
+  .table-row .ico{color:var(--ink-soft);opacity:.7;display:flex;flex-shrink:0;}
+  .table-name{flex:1;}
+  .kind-tag{font-size:10.5px;font-weight:650;padding:1px 6px;border-radius:4px;background:var(--sunken);color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;}
+  .no-results{font-size:13px;color:var(--ink-soft);opacity:.7;padding:12px 8px;}
+
+  .section{display:flex;flex-direction:column;gap:12px;}
+  .section-title-row{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;}
+  .section-title{font-size:16px;font-weight:650;}
+  .section-meta{font-size:12.5px;color:var(--ink-soft);opacity:.7;}
+  .preview-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:6px;}
+  .preview-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .preview-table th{padding:8px 12px;background:var(--body);font-weight:500;color:var(--ink-soft);border-bottom:1px solid var(--border);text-align:left;}
+  .preview-table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+  .preview-table tr:last-child td{border-bottom:none;}
+
+  .footnote{font-size:12px;color:var(--ink-soft);opacity:.7;max-width:65ch;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+  // Static, self-contained prototype for the Postgres connector's frontend
+  // shape (Option A). Not real app code: it exists so an implementer can
+  // open this file and click through every state and error case described
+  // in the spec's section 7, without needing a Claude account. Inputs are
+  // uncontrolled (never written back to `state`) on purpose, since the
+  // control bar drives every state transition this file is meant to show.
+
+  var SAVED = [
+    { id: 'prod', label: 'Production analytics', hostLabel: 'db.prod.internal:5432', meta: 'Used 2 days ago' },
+    { id: 'staging', label: 'Staging', hostLabel: 'db.staging.internal:5432', meta: 'Used 3 weeks ago' },
+  ];
+
+  var TABLES = [
+    { schema: 'public', name: 'customers', kind: 'table' },
+    { schema: 'public', name: 'orders', kind: 'table' },
+    { schema: 'public', name: 'order_items', kind: 'table' },
+    { schema: 'public', name: 'monthly_revenue', kind: 'view' },
+    { schema: 'analytics', name: 'events', kind: 'table' },
+    { schema: 'analytics', name: 'active_users_7d', kind: 'view' },
+    { schema: 'analytics', name: 'funnel_conversion', kind: 'view' },
+    { schema: 'reporting', name: 'exports_log', kind: 'table' },
+  ];
+
+  var state = {
+    step: 'idle', // 'idle' | 'form' | 'connecting' | 'picker' | 'preview'
+    hasSaved: true,
+    formMode: 'choose', // 'choose' | 'new'
+    errorKind: 'none', // 'none' | 'auth' | 'host' | 'ssl'
+    activeLabel: '',
+    tableQuery: '',
+    selectedTable: null,
+  };
+
+  function isIdle() { return state.step === 'idle'; }
+  function isFormPanel() { return state.step === 'form' || state.step === 'connecting'; }
+  function isLoading() { return state.step === 'connecting' && state.errorKind === 'none'; }
+  function showChooser() { return isFormPanel() && state.hasSaved && state.formMode === 'choose'; }
+  function showNewForm() { return isFormPanel() && (!state.hasSaved || state.formMode === 'new'); }
+  function showPicker() { return state.step === 'picker' || state.step === 'preview'; }
+  function showPreview() { return state.step === 'preview'; }
+
+  function iconDatabase() {
+    return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path></svg>';
+  }
+  function iconDatabaseSmall() {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path></svg>';
+  }
+  function iconSheets() {
+    return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>';
+  }
+  function iconSearch() {
+    return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>';
+  }
+  function iconView() {
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  }
+  function iconTable() {
+    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18M3 14h18M9 4v16"></path></svg>';
+  }
+
+  function rowStatus() {
+    if (isIdle()) {
+      return state.hasSaved
+        ? '2 saved databases available'
+        : 'Connect to a Postgres database or view, then choose which table or view to import.';
+    }
+    if (isFormPanel()) return 'Setting up a connection';
+    return 'Connected as ' + (state.activeLabel || 'Production analytics');
+  }
+
+  function rowActionLabel() {
+    if (isIdle()) return 'Connect';
+    if (isFormPanel()) return 'Cancel';
+    return 'Change database';
+  }
+
+  function renderControlBar() {
+    function seg(active) { return active ? 'seg-btn active' : 'seg-btn'; }
+    return '' +
+      '<div class="proto-bar">' +
+        '<div class="proto-title">Prototype — Option A: Inline expansion <span class="proto-badge">Chosen</span></div>' +
+        '<div class="proto-desc">One PostgreSQL row, the same shape as the Google Sheets row above it. The connection form, the saved-database choice and the table/view picker all expand inline beneath that one row. Use the controls below to step through it; none of this bar is part of the product.</div>' +
+        '<div class="proto-controls">' +
+          '<div class="proto-group">' +
+            '<span class="proto-label">Step</span>' +
+            '<button type="button" class="' + seg(state.step === 'idle') + '" onclick="goIdle()">No connection</button>' +
+            '<button type="button" class="' + seg(state.step === 'form') + '" onclick="goForm()">Form open</button>' +
+            '<button type="button" class="' + seg(state.step === 'connecting') + '" onclick="goConnecting()">Connecting</button>' +
+            '<button type="button" class="' + seg(state.step === 'picker') + '" onclick="goPicker()">Table picker</button>' +
+            '<button type="button" class="' + seg(state.step === 'preview') + '" onclick="goPreview()">Preview</button>' +
+          '</div>' +
+          '<div class="proto-group">' +
+            '<label class="proto-check"><input type="checkbox" ' + (state.hasSaved ? 'checked' : '') + ' onchange="toggleHasSaved()"> Saved databases exist</label>' +
+          '</div>' +
+          '<div class="proto-group">' +
+            '<span class="proto-label">Simulate error</span>' +
+            '<button type="button" class="' + seg(state.errorKind === 'none') + '" onclick="setErrorKind(\'none\')">None</button>' +
+            '<button type="button" class="' + seg(state.errorKind === 'auth') + '" onclick="setErrorKind(\'auth\')">Auth failed</button>' +
+            '<button type="button" class="' + seg(state.errorKind === 'host') + '" onclick="setErrorKind(\'host\')">Host unreachable</button>' +
+            '<button type="button" class="' + seg(state.errorKind === 'ssl') + '" onclick="setErrorKind(\'ssl\')">SSL required</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderChooserPanel() {
+    var rows = SAVED.map(function (c) {
+      return '' +
+        '<div class="saved-row">' +
+          '<div class="saved-icon">' + iconDatabaseSmall() + '</div>' +
+          '<div class="saved-main">' +
+            '<div class="saved-name">' + c.label + '</div>' +
+            '<div class="saved-meta">' + c.hostLabel + ' · ' + c.meta + '</div>' +
+          '</div>' +
+          '<button type="button" class="btn btn-default" onclick="useDatabase(\'' + c.id + '\')">Use this database</button>' +
+        '</div>';
+    }).join('');
+    return '' +
+      '<div class="panel">' +
+        '<div class="panel-label">Use a saved database</div>' +
+        rows +
+        '<div class="chooser-divider"><span>or</span></div>' +
+        '<button type="button" class="btn btn-default" style="align-self:flex-start" onclick="onAddNewClick()">+ Add a new database</button>' +
+      '</div>';
+  }
+
+  function renderFormPanel() {
+    var hostError = state.errorKind === 'host' ? "Couldn't reach this host. Check the address and that this network can reach it." : '';
+    var authError = state.errorKind === 'auth' ? 'Incorrect username or password.' : '';
+    var sslError = state.errorKind === 'ssl' ? 'This server requires SSL. Set SSL mode to Require or Verify full.' : '';
+    var hostFieldClass = state.errorKind === 'host' ? 'field has-error' : 'field';
+    var userFieldClass = state.errorKind === 'auth' ? 'field has-error' : 'field';
+    var passFieldClass = state.errorKind === 'auth' ? 'field has-error' : 'field';
+    var sslFieldClass = state.errorKind === 'ssl' ? 'field has-error' : 'field';
+    var formGridClass = isLoading() ? 'form-grid is-loading' : 'form-grid';
+
+    return '' +
+      '<div class="panel">' +
+        (state.hasSaved ? '<button type="button" class="link-back" onclick="onBackToChooser()">← Use a saved database instead</button>' : '') +
+        '<div class="' + formGridClass + '">' +
+          '<div class="field" style="grid-column: span 2">' +
+            '<label for="f-label">Label <span class="optional">(optional)</span></label>' +
+            '<input id="f-label" class="input" type="text" placeholder="e.g. Production analytics">' +
+          '</div>' +
+          '<div class="' + hostFieldClass + '">' +
+            '<label for="f-host">Host</label>' +
+            '<input id="f-host" class="input" type="text" placeholder="db.example.com">' +
+            (hostError ? '<div class="field-error">' + hostError + '</div>' : '') +
+          '</div>' +
+          '<div class="field">' +
+            '<label for="f-port">Port</label>' +
+            '<input id="f-port" class="input" type="text" placeholder="5432">' +
+          '</div>' +
+          '<div class="field">' +
+            '<label for="f-db">Database</label>' +
+            '<input id="f-db" class="input" type="text" placeholder="postgres">' +
+          '</div>' +
+          '<div class="' + userFieldClass + '">' +
+            '<label for="f-user">Username</label>' +
+            '<input id="f-user" class="input" type="text" placeholder="reporting_reader">' +
+          '</div>' +
+          '<div class="' + passFieldClass + '">' +
+            '<label for="f-pass">Password</label>' +
+            '<input id="f-pass" class="input" type="password" placeholder="••••••••">' +
+            (authError ? '<div class="field-error">' + authError + '</div>' : '') +
+          '</div>' +
+          '<div class="' + sslFieldClass + '">' +
+            '<label for="f-ssl">SSL mode</label>' +
+            '<select id="f-ssl" class="input">' +
+              '<option>Prefer</option><option>Require</option><option>Verify full</option><option>Disable</option>' +
+            '</select>' +
+            (sslError ? '<div class="field-error">' + sslError + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button type="button" class="btn btn-default" onclick="onCancelForm()">Cancel</button>' +
+          '<button type="button" class="btn btn-primary" onclick="onTestConnect()">' +
+            (isLoading() ? '<span class="spinner"></span>' : '') +
+            'Test &amp; connect' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderTableGroups() {
+    var q = (state.tableQuery || '').trim().toLowerCase();
+    var filtered = TABLES.filter(function (t) {
+      return !q || (t.schema + '.' + t.name).toLowerCase().indexOf(q) !== -1;
+    });
+    if (filtered.length === 0) {
+      return '<div class="no-results">No tables or views match "' + state.tableQuery + '".</div>';
+    }
+    var bySchema = {};
+    var order = [];
+    filtered.forEach(function (t) {
+      if (!bySchema[t.schema]) { bySchema[t.schema] = []; order.push(t.schema); }
+      bySchema[t.schema].push(t);
+    });
+    return order.map(function (schema) {
+      var rows = bySchema[schema].map(function (t) {
+        var isView = t.kind === 'view';
+        return '' +
+          '<button type="button" class="table-row" onclick="pickTable(\'' + t.schema + '\',\'' + t.name + '\',\'' + t.kind + '\')">' +
+            '<span class="ico">' + (isView ? iconView() : iconTable()) + '</span>' +
+            '<span class="table-name">' + t.name + '</span>' +
+            (isView ? '<span class="kind-tag">View</span>' : '') +
+          '</button>';
+      }).join('');
+      return '<div class="schema-group"><div class="schema-label">' + schema + '</div>' + rows + '</div>';
+    }).join('');
+  }
+
+  function renderPickerPanel() {
+    return '' +
+      '<div class="panel">' +
+        '<div class="picker-meta">' + TABLES.length + ' tables and views · 3 schemas</div>' +
+        '<div class="search-wrap">' +
+          '<span class="search-icon">' + iconSearch() + '</span>' +
+          '<input id="table-search-input" class="input search-input" type="text" placeholder="Search tables and views" value="' + state.tableQuery + '" oninput="handleSearchInput(this.value)">' +
+        '</div>' +
+        '<div class="table-list" id="table-list-container">' + renderTableGroups() + '</div>' +
+      '</div>';
+  }
+
+  function renderPreviewSection() {
+    var t = state.selectedTable || TABLES[0];
+    var label = t.schema + '.' + t.name;
+    return '' +
+      '<div class="section">' +
+        '<div class="section-title-row">' +
+          '<div class="section-title">Preview</div>' +
+          '<div class="section-meta">' + label + ' · first 50 rows</div>' +
+        '</div>' +
+        '<div class="field" style="max-width:360px">' +
+          '<label for="f-dsname">Dataset name</label>' +
+          '<input id="f-dsname" class="input" type="text" value="' + label + '">' +
+        '</div>' +
+        '<div class="preview-table-wrap">' +
+          '<table class="preview-table">' +
+            '<thead><tr><th>id</th><th>name</th><th>created_at</th><th>status</th></tr></thead>' +
+            '<tbody>' +
+              '<tr><td>1001</td><td>Acme Housing Collective</td><td>2026-02-11</td><td>active</td></tr>' +
+              '<tr><td>1002</td><td>Riverbend Family Services</td><td>2026-03-04</td><td>active</td></tr>' +
+              '<tr><td>1003</td><td>Northgate Youth Alliance</td><td>2026-03-19</td><td>inactive</td></tr>' +
+              '<tr><td>1004</td><td>Prairie Health Partners</td><td>2026-04-02</td><td>active</td></tr>' +
+            '</tbody>' +
+          '</table>' +
+        '</div>' +
+        '<div class="form-actions">' +
+          '<button type="button" class="btn btn-default">Cancel</button>' +
+          '<button type="button" class="btn btn-primary">Save dataset</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderApp() {
+    var expansion = '';
+    if (showChooser()) expansion = renderChooserPanel();
+    else if (showNewForm()) expansion = renderFormPanel();
+    else if (showPicker()) expansion = renderPickerPanel();
+
+    document.getElementById('root').innerHTML = '' +
+      renderControlBar() +
+      '<div class="shell"><div class="gutter"><div class="slate">' +
+        '<div class="slate-toolbar">Add data</div>' +
+        '<div class="tabs">' +
+          '<div class="tab">Upload</div>' +
+          '<div class="tab active">Connectors</div>' +
+          '<div class="tab">Open data</div>' +
+        '</div>' +
+        '<div class="tab-panel"><div class="stack-xl">' +
+          '<div class="stack-sm">' +
+            '<div class="connector-row">' +
+              '<div class="connector-icon">' + iconSheets() + '</div>' +
+              '<div class="connector-main">' +
+                '<div class="connector-name">Google Sheets</div>' +
+                '<div class="connector-status">Import one tab of a spreadsheet in your Google Drive</div>' +
+              '</div>' +
+              '<div class="connector-action"><button type="button" class="btn btn-default">Connect</button></div>' +
+            '</div>' +
+            '<div class="connector-row">' +
+              '<div class="connector-icon">' + iconDatabase() + '</div>' +
+              '<div class="connector-main">' +
+                '<div class="connector-name">PostgreSQL</div>' +
+                '<div class="connector-status">' + rowStatus() + '</div>' +
+              '</div>' +
+              '<div class="connector-action"><button type="button" class="btn btn-default" onclick="onRowAction()">' + rowActionLabel() + '</button></div>' +
+            '</div>' +
+            expansion +
+          '</div>' +
+          (showPreview() ? renderPreviewSection() : '') +
+          '<div class="footnote">New connectors are added every month. If there is a database or service you need, tell us so we can prioritize it.</div>' +
+        '</div></div>' +
+      '</div></div></div>';
+  }
+
+  function goIdle() { state.step = 'idle'; state.errorKind = 'none'; renderApp(); }
+  function goForm() { state.step = 'form'; state.formMode = state.hasSaved ? 'choose' : 'new'; renderApp(); }
+  function goConnecting() { state.step = 'connecting'; renderApp(); }
+  function goPicker() { state.step = 'picker'; state.activeLabel = state.activeLabel || 'Production analytics'; state.selectedTable = null; renderApp(); }
+  function goPreview() { state.step = 'preview'; state.activeLabel = state.activeLabel || 'Production analytics'; state.selectedTable = state.selectedTable || TABLES[0]; renderApp(); }
+  function toggleHasSaved() { state.hasSaved = !state.hasSaved; renderApp(); }
+  function setErrorKind(k) { state.errorKind = k; renderApp(); }
+
+  function onRowAction() {
+    if (isIdle()) {
+      state.step = 'form'; state.formMode = state.hasSaved ? 'choose' : 'new'; state.errorKind = 'none';
+    } else if (isFormPanel()) {
+      state.step = 'idle'; state.errorKind = 'none';
+    } else {
+      state.step = 'idle'; state.errorKind = 'none'; state.selectedTable = null;
+    }
+    renderApp();
+  }
+  function useDatabase(id) {
+    var c = SAVED.filter(function (s) { return s.id === id; })[0];
+    state.step = 'picker'; state.activeLabel = c ? c.label : ''; state.selectedTable = null; state.tableQuery = '';
+    renderApp();
+  }
+  function onAddNewClick() { state.formMode = 'new'; renderApp(); }
+  function onBackToChooser() { state.formMode = 'choose'; state.errorKind = 'none'; renderApp(); }
+  function onTestConnect() { state.step = 'connecting'; renderApp(); }
+  function onCancelForm() { state.step = 'idle'; state.errorKind = 'none'; renderApp(); }
+  function pickTable(schema, name, kind) {
+    state.selectedTable = { schema: schema, name: name, kind: kind };
+    state.step = 'preview';
+    renderApp();
+  }
+  function handleSearchInput(value) {
+    state.tableQuery = value;
+    var container = document.getElementById('table-list-container');
+    if (container) container.innerHTML = renderTableGroups();
+  }
+
+  renderApp();
+</script>
+</body>
+</html>
