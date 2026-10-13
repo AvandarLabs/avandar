@@ -187,7 +187,14 @@ upfront escape hatch (e.g. no network access at release time).
 
 ## Testing
 
-Following the repo's existing patterns:
+**No test may call the real OpenAI API.** Every path that reaches
+`generateReleaseNotes` in a test takes an injected `fetchImpl` (the
+`translateWithLlm` pattern) returning a canned response; the real
+`globalThis.fetch` default is never exercised in the test suite. This is a
+hard requirement, not a style preference: a forgotten mock means a test run
+silently spends real API credits.
+
+Following the repo's existing patterns otherwise:
 
 - Fake `ReleaseCommands` (as in `runPreflight.test.ts`) for
   `publishReleaseNotes` orchestration tests, covering all six outcomes.
