@@ -405,7 +405,7 @@ function _startDatasetUploadIfAllowed(
  * this is fired without sequencing after `_startDatasetUploadIfAllowed`.
  *
  * Unlike the parquet upload (which reports its own progress/error state via
- * `DatasetUploadProgressStore`), a failed original upload has no other
+ * `TaskProgressStore`), a failed original upload has no other
  * surface, so a failure here is routed through `notifyError` directly. The
  * dataset itself was already saved successfully by this point, so the
  * message is careful to say only the original failed to sync.
