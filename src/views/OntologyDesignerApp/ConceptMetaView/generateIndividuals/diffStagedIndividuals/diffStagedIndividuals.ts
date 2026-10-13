@@ -8,7 +8,7 @@ export type StagedIndividualRow = {
   name: string;
 };
 
-/** The subset of an existing individual's fields the sync diff needs. */
+/** The fields the sync diff reads, plus the row's identity for the caller. */
 export type ExistingIndividual = {
   id: IndividualId;
   name: string;
@@ -23,6 +23,25 @@ export type IndividualUpsertRow = {
   name: string;
   missing_from_source_at: string | null;
 };
+
+/** Builds an `IndividualUpsertRow` for the given identity and sync fields. */
+function _buildUpsertRow(options: {
+  workspaceId: Workspace.Id;
+  conceptId: Concept.Id;
+  externalId: string;
+  name: string;
+  missingFromSourceAt: string | null;
+}): IndividualUpsertRow {
+  const { workspaceId, conceptId, externalId, name, missingFromSourceAt } =
+    options;
+  return {
+    workspace_id: workspaceId,
+    concept_id: conceptId,
+    external_id: externalId,
+    name,
+    missing_from_source_at: missingFromSourceAt,
+  };
+}
 
 /**
  * Diffs one page of staged individuals against the concept's existing
@@ -57,13 +76,15 @@ export function diffStagedIndividualsPage(options: {
       return;
     }
 
-    rowsToWrite.push({
-      workspace_id: workspaceId,
-      concept_id: conceptId,
-      external_id: row.external_id,
-      name: row.name,
-      missing_from_source_at: null,
-    });
+    rowsToWrite.push(
+      _buildUpsertRow({
+        workspaceId,
+        conceptId,
+        externalId: row.external_id,
+        name: row.name,
+        missingFromSourceAt: null,
+      }),
+    );
   });
 
   return { rowsToWrite, matchedExternalIds };
@@ -95,13 +116,15 @@ export function getNewlyStaleIndividuals(options: {
       return;
     }
 
-    staleRows.push({
-      workspace_id: workspaceId,
-      concept_id: conceptId,
-      external_id: externalId,
-      name: existing.name,
-      missing_from_source_at: nowIso,
-    });
+    staleRows.push(
+      _buildUpsertRow({
+        workspaceId,
+        conceptId,
+        externalId,
+        name: existing.name,
+        missingFromSourceAt: nowIso,
+      }),
+    );
   });
 
   return staleRows;
