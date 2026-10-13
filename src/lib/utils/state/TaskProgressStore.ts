@@ -74,12 +74,18 @@ export const TaskProgressStore = createExternalStore({
           tasks.delete(taskId);
         },
 
-        /** Moves a task to the error state, keeping its last known label. */
+        /**
+         * Moves a task to the error state, keeping its last known label.
+         * No-ops if the task already finished.
+         */
         failTask: (taskId: TaskId, message: string): void => {
           const existingEntry = tasks.get(taskId);
+          if (!existingEntry) {
+            return;
+          }
           tasks.set(taskId, {
             status: "error",
-            label: existingEntry?.label ?? "",
+            label: existingEntry.label,
             message,
           });
         },

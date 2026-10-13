@@ -69,6 +69,15 @@ describe("TaskProgressStore", () => {
     TaskProgressStore.finishTask(taskId);
   });
 
+  it("does nothing when failing a task id that was already finished", () => {
+    const taskId = TaskProgressStore.startTask("Refreshing Facility records");
+    TaskProgressStore.finishTask(taskId);
+
+    TaskProgressStore.failTask(taskId, "Network error");
+
+    expect(TaskProgressStore.getTask(taskId)).toBeUndefined();
+  });
+
   it("gives two tasks started back to back distinct ids and independent state", () => {
     const firstTaskId = TaskProgressStore.startTask("First task");
     const secondTaskId = TaskProgressStore.startTask("Second task");
