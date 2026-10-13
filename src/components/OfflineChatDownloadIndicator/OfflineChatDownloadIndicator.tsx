@@ -1,71 +1,63 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Progress, Text } from "@mantine/core";
+import { t } from "@lingui/core/macro";
+import { useEffect, useRef } from "react";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
-import css from "./OfflineChatDownloadIndicator.module.css";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import type { TaskId } from "@/lib/utils/state/TaskProgressStore";
+
+const DO_NOT_CLOSE_TAB_WARNING = t`Do not refresh or close this tab or else the download will be canceled.`;
 
 /**
- * Floating panel anchored to the bottom-left while an offline chat model
- * (WebLLM) is downloading or initializing.
+ * Bridges offline chat model download status into `TaskProgressStore`, so
+ * `TaskProgressIndicator` renders it. Renders no markup of its own.
  */
-export function OfflineChatDownloadIndicator(): JSX.Element | null {
-  const { t } = useLingui();
+export function OfflineChatDownloadIndicator(): null {
   const getLocalChatModelCopy = useLocalChatModelCopy();
   const status = useOfflineChatEngineStatus();
+  const taskIdRef = useRef<TaskId | undefined>(undefined);
 
-  if (status.kind !== "downloading") {
-    return null;
-  }
+  useEffect(() => {
+    if (status.kind === "downloading") {
+      const model = LocalChatModel.Catalog.find(status.modelId);
+      const modelCopy = getLocalChatModelCopy(model);
+      const label = t`Downloading ${modelCopy.displayName} for offline chat`;
+      const percent = Math.round(
+        Math.min(1, Math.max(0, status.progress)) * 100,
+      );
 
-  const model = LocalChatModel.Catalog.find(status.modelId);
-  const modelCopy = getLocalChatModelCopy(model);
-  const message = t`Downloading ${modelCopy.displayName} for offline chat`;
-  const progressPercent = Math.round(
-    Math.min(100, Math.max(0, status.progress * 100)),
-  );
-  const overallLabel =
-    progressPercent > 0 ? `${progressPercent}%` : t`Starting…`;
+      if (taskIdRef.current === undefined) {
+        taskIdRef.current = TaskProgressStore.startTask(label);
+      }
+      TaskProgressStore.updateTask(taskIdRef.current, {
+        status: "determinate",
+        label,
+        current: percent,
+        total: 100,
+        detail: DO_NOT_CLOSE_TAB_WARNING,
+      });
+      return;
+    }
 
-  return (
-    <div
-      className={css.offlineChatDownloadIndicator}
-      role="status"
-      aria-live="polite"
-      aria-label={message}
-    >
-      <div className={css.offlineChatDownloadIndicatorTitleRow}>
-        <p className={css.offlineChatDownloadIndicatorTitle}>
-          {modelCopy.displayName}
-        </p>
-        <Text size="xs" c="neutral.7" fw={600}>
-          {overallLabel}
-        </Text>
-      </div>
+    if (status.kind === "error") {
+      if (taskIdRef.current === undefined) {
+        const model = LocalChatModel.Catalog.find(status.modelId);
+        const modelCopy = getLocalChatModelCopy(model);
+        taskIdRef.current = TaskProgressStore.startTask(
+          t`Downloading ${modelCopy.displayName} for offline chat`,
+        );
+      }
+      TaskProgressStore.failTask(taskIdRef.current, status.message);
+      taskIdRef.current = undefined;
+      return;
+    }
 
-      <Text
-        size="xs"
-        c="danger"
-        fw={600}
-        className={css.offlineChatDownloadIndicatorWarning}
-      >
-        <Trans>
-          Do not refresh or close this tab or else the download will be
-          canceled.
-        </Trans>
-      </Text>
+    // "ready" or "idle": nothing left to report.
+    if (taskIdRef.current !== undefined) {
+      TaskProgressStore.finishTask(taskIdRef.current);
+      taskIdRef.current = undefined;
+    }
+  }, [status, getLocalChatModelCopy]);
 
-      <Progress
-        value={progressPercent}
-        size="sm"
-        radius="xl"
-        color="primary"
-        aria-label={overallLabel}
-      />
-
-      <Text size="xs" className={css.offlineChatDownloadIndicatorStatus}>
-        <Trans>Preparing model files…</Trans>
-      </Text>
-    </div>
-  );
+  return null;
 }
