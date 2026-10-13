@@ -12,11 +12,21 @@ function _createFakeGit(
   return {
     repoRoot: "/fake/repo",
     dryRun: false,
-    readGit: (args) => readGitByArgs[args.join(" ")],
-    tryGit: () => ({ ok: true, stdout: "", stderr: "" }),
-    readCommand: () => ({ ok: true, stdout: "", stderr: "" }),
-    mutate: () => ({ ok: true, stdout: "", stderr: "" }),
-    mutateQuietly: () => ({ ok: true, stdout: "", stderr: "" }),
+    readGit: (args) => {
+      return readGitByArgs[args.join(" ")];
+    },
+    tryGit: () => {
+      return { ok: true, stdout: "", stderr: "" };
+    },
+    readCommand: () => {
+      return { ok: true, stdout: "", stderr: "" };
+    },
+    mutate: () => {
+      return { ok: true, stdout: "", stderr: "" };
+    },
+    mutateQuietly: () => {
+      return { ok: true, stdout: "", stderr: "" };
+    },
   };
 }
 
