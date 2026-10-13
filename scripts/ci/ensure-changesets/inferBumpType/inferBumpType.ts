@@ -13,7 +13,7 @@ export type InferBumpTypeInput = {
 const MINOR_TYPES: ReadonlySet<string> = new Set(["feat"]);
 const BREAKING_CHANGE_FOOTER_PATTERN = /^BREAKING CHANGE:/m;
 
-function baseBumpForType(type: string): SemverBump {
+function _baseBumpForType(type: string): SemverBump {
   return MINOR_TYPES.has(type) ? "minor" : "patch";
 }
 
@@ -37,7 +37,7 @@ export function inferBumpType(input: InferBumpTypeInput): SemverBump {
     (parsedTitle?.breaking ?? false) ||
     BREAKING_CHANGE_FOOTER_PATTERN.test(prBody);
 
-  const bump: SemverBump = isBreaking ? "major" : baseBumpForType(type);
+  const bump: SemverBump = isBreaking ? "major" : _baseBumpForType(type);
 
   return bump === "major" && currentMajorVersion === 0 ? "minor" : bump;
 }
