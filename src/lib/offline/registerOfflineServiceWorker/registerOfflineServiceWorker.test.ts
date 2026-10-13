@@ -1,5 +1,7 @@
+import { fireEvent, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { registerOfflineServiceWorker } from "@/lib/offline/registerServiceWorker/registerServiceWorker";
+import { registerOfflineServiceWorker } from "@/lib/offline/registerOfflineServiceWorker/registerOfflineServiceWorker";
+import { render } from "@/test-utils";
 import { registerSW as registerSWMock } from "@/test-utils/virtualPwaRegisterStub";
 import type { ReactElement } from "react";
 
@@ -9,43 +11,58 @@ const { notificationsShowMock } = vi.hoisted(() => {
 
 const UPDATE_CHECK_INTERVAL_MS = 30 * 60 * 1000;
 
-vi.mock("@mantine/notifications", () => {
-  return { notifications: { show: notificationsShowMock } };
+vi.mock("@mantine/notifications", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@mantine/notifications")>();
+  return {
+    ...actual,
+    notifications: { ...actual.notifications, show: notificationsShowMock },
+  };
 });
 
-type FakeWaitingWorker = ServiceWorker & { activate: () => void };
+type FakeWaitingWorker = {
+  state: ServiceWorkerState;
+  addEventListener: (type: string, listener: () => void) => void;
+  activate: () => void;
+};
+
+type FakeRegistration = {
+  update: () => Promise<void>;
+  waiting: FakeWaitingWorker | undefined;
+};
 
 /** Minimal double for the subset of `ServiceWorker` this module reads. */
 function _makeFakeWaitingWorker(): FakeWaitingWorker {
   const listeners: Array<() => void> = [];
-  const worker = {
-    state: "installed" as ServiceWorkerState,
-    addEventListener: (_type: string, listener: EventListener) => {
-      listeners.push(listener as () => void);
+  const worker: FakeWaitingWorker = {
+    state: "installed",
+    addEventListener: (_type, listener) => {
+      listeners.push(listener);
     },
     activate: () => {
-      worker.state = "activated" as ServiceWorkerState;
+      worker.state = "activated";
       listeners.forEach((listener) => {
         listener();
       });
     },
   };
-  return worker as unknown as FakeWaitingWorker;
+  return worker;
 }
 
-/** Extracts the `onUpdate` callback passed into the rendered notification. */
-function _getOnUpdateFromNotification(): () => void {
+/** Clicks the "Update now" button in the most recently shown notification. */
+function _clickUpdateButton(): void {
   const lastCall = notificationsShowMock.mock.calls.at(-1)?.[0] as {
-    message: ReactElement<{ onUpdate: () => void }>;
+    message: ReactElement;
   };
-  return lastCall.message.props.onUpdate;
+  render(lastCall.message);
+  fireEvent.click(screen.getByRole("button", { name: /update now/i }));
 }
 
 describe("registerOfflineServiceWorker", () => {
   let updateMock: ReturnType<typeof vi.fn>;
   let updateServiceWorkerMock: ReturnType<typeof vi.fn>;
   let reloadMock: ReturnType<typeof vi.fn>;
-  let registration: ServiceWorkerRegistration;
+  let registration: FakeRegistration;
   let onNeedRefresh: () => void;
 
   beforeEach(async () => {
@@ -63,14 +80,14 @@ describe("registerOfflineServiceWorker", () => {
       (options: {
         onRegisteredSW?: (
           url: string,
-          reg: ServiceWorkerRegistration | undefined,
+          reg: FakeRegistration | undefined,
         ) => void;
         onNeedRefresh?: () => void;
       }) => {
         registration = {
           update: updateMock,
           waiting: undefined,
-        } as unknown as ServiceWorkerRegistration;
+        };
         onNeedRefresh = options.onNeedRefresh ?? (() => {});
         // The real `registerSW` only calls `onRegisteredSW` after its own
         // `wb.register().then(...)` resolves, once the function has already
@@ -131,18 +148,17 @@ describe("registerOfflineServiceWorker", () => {
 
   it("does not reload before the waiting worker finishes activating", () => {
     const waitingWorker = _makeFakeWaitingWorker();
-    Object.defineProperty(registration, "waiting", { value: waitingWorker });
+    registration.waiting = waitingWorker;
     onNeedRefresh();
 
-    _getOnUpdateFromNotification()();
+    _clickUpdateButton();
 
     expect(updateServiceWorkerMock).toHaveBeenCalledTimes(1);
     expect(reloadMock).not.toHaveBeenCalled();
   });
 
-  it("re-shows the notification on the next poll tick while dismissed but still pending", () => {
-    const waitingWorker = _makeFakeWaitingWorker();
-    Object.defineProperty(registration, "waiting", { value: waitingWorker });
+  it("shows the notification again on a poll tick while a waiting worker is still pending", () => {
+    registration.waiting = _makeFakeWaitingWorker();
 
     vi.advanceTimersByTime(UPDATE_CHECK_INTERVAL_MS);
 
@@ -153,9 +169,9 @@ describe("registerOfflineServiceWorker", () => {
 
   it("reloads the page once the waiting worker activates after being accepted", () => {
     const waitingWorker = _makeFakeWaitingWorker();
-    Object.defineProperty(registration, "waiting", { value: waitingWorker });
+    registration.waiting = waitingWorker;
     onNeedRefresh();
-    _getOnUpdateFromNotification()();
+    _clickUpdateButton();
 
     waitingWorker.activate();
 

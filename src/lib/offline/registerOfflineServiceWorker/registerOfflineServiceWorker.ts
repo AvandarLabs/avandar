@@ -1,8 +1,9 @@
 import { t } from "@lingui/core/macro";
 import { notifications } from "@mantine/notifications";
+import { noop } from "@avandar/utils";
 import { createElement } from "react";
 import { registerSW } from "virtual:pwa-register";
-import { ServiceWorkerUpdateNotification } from "@/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification";
+import { ServiceWorkerUpdateNotification } from "@/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification";
 
 const UPDATE_CHECK_INTERVAL_MS = 30 * 60 * 1000;
 const UPDATE_NOTIFICATION_ID = "service-worker-update-available";
@@ -38,7 +39,9 @@ type UpdateNotificationOptions = {
  * still pending, and shows it again once that worker is gone from the
  * screen (dismissed) but still `registration.waiting`.
  */
-function _showUpdateNotification(options: UpdateNotificationOptions): void {
+function _showUpdateNotification(
+  options: Readonly<UpdateNotificationOptions>,
+): void {
   notifications.show({
     id: UPDATE_NOTIFICATION_ID,
     title: t`Update available`,
@@ -70,15 +73,14 @@ function _showUpdateNotification(options: UpdateNotificationOptions): void {
  * notification immediately, which is more interruption than an open update
  * warrants.
  */
-function _pollForUpdates(options: UpdateNotificationOptions): void {
+function _pollForUpdates(options: Readonly<UpdateNotificationOptions>): void {
   let lastCheckedAt = Date.now();
 
   const _checkNow = () => {
     lastCheckedAt = Date.now();
-    options.registration.update().catch(() => {
-      // A failed check (offline, flaky network) just retries on the next
-      // tick or the next tab focus; nothing to surface to the user.
-    });
+    // A failed check (offline, flaky network) just retries on the next tick
+    // or the next tab focus; nothing to surface to the user.
+    options.registration.update().catch(noop);
     if (options.registration.waiting) {
       _showUpdateNotification(options);
     }
