@@ -12,6 +12,25 @@
 - If Context7 MCP is configured, use it to reference the most up-to-date
   documentation of any library when you need it.
 
+## Commit and PR titles
+
+- PR titles (and commit messages, where a PR is not squash-merged) must
+  follow Conventional Commits, using the same six prefixes already used for
+  branch names: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`.
+- Format: `type(optional-scope)!: subject`. Use `!` after the type, or a
+  `BREAKING CHANGE:` footer in the PR body, for a breaking change.
+  - `feat`: a new capability (bumps the minor version).
+  - `fix`, `refactor`, `chore`, `docs`, `test`: everything else (bumps the
+    patch version).
+  - `!` or a `BREAKING CHANGE:` footer: a breaking change. This bumps the
+    major version once an `@avandar/*` package reaches `1.0.0`; before that
+    it bumps the minor version instead, since nothing should cross `0.x` to
+    `1.0.0` without a human deciding that on purpose.
+- This is enforced in CI by `lint-pr-title` in `pr-develop.yaml`. It's also
+  what `release-packages.yaml`'s auto-changeset step reads to infer the
+  semver bump for a `packages/**` change, so a developer never has to run
+  `pnpm changeset` by hand.
+
 ## Scope
 
 - Only implement what is requested. Do not fix other bugs, clean up any other
