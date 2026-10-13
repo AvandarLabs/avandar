@@ -20,6 +20,9 @@ export function parseConventionalCommitTitle(
     return null;
   }
   const [, type, , scope, breakingMarker, description] = match;
+  if (type === undefined || description === undefined) {
+    return null;
+  }
   return {
     type,
     scope: scope ?? null,
