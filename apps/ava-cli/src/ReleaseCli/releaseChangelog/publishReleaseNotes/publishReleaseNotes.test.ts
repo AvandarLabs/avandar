@@ -1,4 +1,4 @@
-import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes";
+import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type {
   CommandResult,
@@ -97,7 +97,7 @@ function _fetchImpl(): typeof fetch {
     text: async () => {
       return "";
     },
-  } as unknown as Response) as unknown as typeof fetch;
+  } as Response) as unknown as typeof fetch;
 }
 
 const EMPTY_BULLETS_RESPONSE = {
@@ -120,7 +120,7 @@ function _emptyBulletsFetchImpl(): typeof fetch {
     text: async () => {
       return "";
     },
-  } as unknown as Response) as unknown as typeof fetch;
+  } as Response) as unknown as typeof fetch;
 }
 
 describe("publishReleaseNotes", () => {

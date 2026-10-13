@@ -1,6 +1,6 @@
-import { generateReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/generateReleaseNotes";
+import { generateReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/generateReleaseNotes/generateReleaseNotes";
 import { describe, expect, it, vi } from "vitest";
-import type { ReleaseChangelogCommitInput } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits";
+import type { ReleaseChangelogCommitInput } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 
 function _commit(
   overrides: Partial<ReleaseChangelogCommitInput> = {},

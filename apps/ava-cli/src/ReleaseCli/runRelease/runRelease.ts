@@ -1,5 +1,5 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes";
+import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { readVersionAtRevision } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import {
   suggestNextVersion,
@@ -15,16 +15,18 @@ import {
   printVersionReference,
 } from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers";
 import {
-  assertTagIsUnused,
-  bumpDevelopToNextVersion,
-  commitReleaseVersionOnDevelop,
   confirmCiVerdict,
   confirmReleasePlan,
   printReleaseSummary,
-  publishMainAndTag,
   reportReleaseNotesOutcome,
+} from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseConfirmationStages";
+import {
+  assertTagIsUnused,
+  bumpDevelopToNextVersion,
+  commitReleaseVersionOnDevelop,
+  publishMainAndTag,
   updateLocalMainRef,
-} from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers";
+} from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 import {
   resolveNextVersion,
   resolveReleaseVersion,
@@ -33,7 +35,7 @@ import { printSuccess, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 import type { PreflightResult } from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
-import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers";
+import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 
 /** Everything `ava release` accepts, already parsed. */
 export type ReleaseOptions = {
@@ -124,22 +126,25 @@ export async function runRelease(
   await _publishReleaseNotesIfEnabled(git, { skipChangelog, dryRun, plan });
 }
 
+/** Options accepted by {@link _publishReleaseNotesIfEnabled}. */
+type PublishReleaseNotesIfEnabledOptions = Readonly<{
+  skipChangelog: boolean;
+  dryRun: boolean;
+  plan: ReleasePlan;
+  /**
+   * The commit to diff from, when `plan.releaseTag` does not exist yet
+   * (a dry-run preview).
+   */
+  headRevisionOverride?: string;
+}>;
+
 /**
  * Generates and publishes this release's GitHub release notes, unless
  * `--skip-changelog` was passed, reporting the outcome either way.
  */
 async function _publishReleaseNotesIfEnabled(
   git: ReleaseCommands,
-  options: Readonly<{
-    skipChangelog: boolean;
-    dryRun: boolean;
-    plan: ReleasePlan;
-    /**
-     * The commit to diff from, when `plan.releaseTag` does not exist yet
-     * (a dry-run preview).
-     */
-    headRevisionOverride?: string;
-  }>,
+  options: PublishReleaseNotesIfEnabledOptions,
 ): Promise<void> {
   const { skipChangelog, dryRun, plan, headRevisionOverride } = options;
   if (skipChangelog) {
@@ -152,7 +157,10 @@ async function _publishReleaseNotesIfEnabled(
       ? { headRevision: headRevisionOverride, skipExistenceChecks: true }
       : {}),
   });
-  reportReleaseNotesOutcome(outcome, plan.releaseVersion, dryRun);
+  reportReleaseNotesOutcome(outcome, {
+    releaseVersion: plan.releaseVersion,
+    dryRun,
+  });
 }
 
 /** The repo the release operates on, or a thrown error naming the problem. */

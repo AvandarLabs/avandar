@@ -2,9 +2,9 @@ import { AvaEnv } from "@ava-cli/AvaEnv/AvaEnv";
 import { describeCommandFailure } from "@ava-cli/ReleaseCli/describeCommandFailure/describeCommandFailure";
 import {
   collectReleaseChangelogCommits,
-  resolvePreviousReleaseTag,
-} from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits";
-import { generateReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/generateReleaseNotes";
+  getPreviousReleaseTagFromTag,
+} from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
+import { generateReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/generateReleaseNotes/generateReleaseNotes";
 import { RELEASE_CHANGELOG_MODEL } from "@ava-cli/ReleaseCli/releaseChangelog/releaseChangelogConfig";
 import {
   getGitHubRepoSlug,
@@ -14,12 +14,12 @@ import {
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 
 export type PublishReleaseNotesOutcome =
-  | Readonly<{ kind: "published"; url: string }>
-  | Readonly<{ kind: "previewed"; notes: string }>
-  | Readonly<{ kind: "already-exists"; url: string }>
-  | Readonly<{ kind: "no-changes" }>
-  | Readonly<{ kind: "tag-not-found" }>
-  | Readonly<{ kind: "failed"; reason: string }>;
+  | { kind: "published"; url: string }
+  | { kind: "previewed"; notes: string }
+  | { kind: "already-exists"; url: string }
+  | { kind: "no-changes" }
+  | { kind: "tag-not-found" }
+  | { kind: "failed"; reason: string };
 
 /** The `url` field of a `gh release view --json url` response, if parseable. */
 function _parseReleaseUrl(stdout: string): string | undefined {
@@ -46,6 +46,55 @@ function _releaseUrl(
     : releaseTag;
 }
 
+/** Options accepted by {@link publishReleaseNotes}. */
+export type PublishReleaseNotesOptions = Readonly<{
+  releaseTag: string;
+  /**
+   * The commit to diff from the previous tag, when it differs from
+   * `releaseTag` itself. Only a `--dry-run` preview needs this: the tag
+   * does not exist yet, so the develop commit that would become the
+   * release stands in for it.
+   */
+  headRevision?: string;
+  dryRun: boolean;
+  /**
+   * Skips the "does this tag exist" and "does it already have a release"
+   * checks. Only a `--dry-run` preview sets this, since in that case the
+   * tag is intentionally not created yet.
+   */
+  skipExistenceChecks?: boolean;
+  /** Overrides `fetch` for the OpenAI call. For tests. */
+  fetchImpl?: typeof fetch;
+}>;
+
+/**
+ * Checks whether `releaseTag` exists and whether it already has a GitHub
+ * Release, returning the outcome to short-circuit on, or `undefined` to
+ * continue with generating notes.
+ */
+function _checkExistingRelease(
+  git: ReleaseCommands,
+  releaseTag: string,
+): PublishReleaseNotesOutcome | undefined {
+  if (!localTagExists(git, releaseTag) && !remoteTagExists(git, releaseTag)) {
+    return { kind: "tag-not-found" };
+  }
+  const viewResult = git.readCommand("gh", [
+    "release",
+    "view",
+    releaseTag,
+    "--json",
+    "url",
+  ]);
+  if (viewResult.ok) {
+    return {
+      kind: "already-exists",
+      url: _releaseUrl(git, releaseTag, _parseReleaseUrl(viewResult.stdout)),
+    };
+  }
+  return undefined;
+}
+
 /**
  * Generates and publishes a GitHub Release's notes for `releaseTag`.
  *
@@ -57,25 +106,7 @@ function _releaseUrl(
  */
 export async function publishReleaseNotes(
   git: ReleaseCommands,
-  options: Readonly<{
-    releaseTag: string;
-    /**
-     * The commit to diff from the previous tag, when it differs from
-     * `releaseTag` itself. Only a `--dry-run` preview needs this: the tag
-     * does not exist yet, so the develop commit that would become the
-     * release stands in for it.
-     */
-    headRevision?: string;
-    dryRun: boolean;
-    /**
-     * Skips the "does this tag exist" and "does it already have a release"
-     * checks. Only a `--dry-run` preview sets this, since in that case the
-     * tag is intentionally not created yet.
-     */
-    skipExistenceChecks?: boolean;
-    /** Overrides `fetch` for the OpenAI call. For tests. */
-    fetchImpl?: typeof fetch;
-  }>,
+  options: PublishReleaseNotesOptions,
 ): Promise<PublishReleaseNotesOutcome> {
   const { releaseTag, dryRun, fetchImpl } = options;
   const headRevision = options.headRevision ?? releaseTag;
@@ -84,25 +115,13 @@ export async function publishReleaseNotes(
   git.tryGit(["fetch", "--quiet", "--tags", "origin"]);
 
   if (!skipExistenceChecks) {
-    if (!localTagExists(git, releaseTag) && !remoteTagExists(git, releaseTag)) {
-      return { kind: "tag-not-found" };
-    }
-    const viewResult = git.readCommand("gh", [
-      "release",
-      "view",
-      releaseTag,
-      "--json",
-      "url",
-    ]);
-    if (viewResult.ok) {
-      return {
-        kind: "already-exists",
-        url: _releaseUrl(git, releaseTag, _parseReleaseUrl(viewResult.stdout)),
-      };
+    const existingOutcome = _checkExistingRelease(git, releaseTag);
+    if (existingOutcome !== undefined) {
+      return existingOutcome;
     }
   }
 
-  const previousTag = resolvePreviousReleaseTag(git, releaseTag);
+  const previousTag = getPreviousReleaseTagFromTag(git, releaseTag);
   const commits = collectReleaseChangelogCommits(git, {
     previousTag,
     headRevision,

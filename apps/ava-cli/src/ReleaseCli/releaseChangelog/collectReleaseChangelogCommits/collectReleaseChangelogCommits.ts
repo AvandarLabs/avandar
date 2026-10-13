@@ -2,12 +2,6 @@ import { shortSha } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import { MAX_DIFF_CHARS_PER_COMMIT } from "@ava-cli/ReleaseCli/releaseChangelog/releaseChangelogConfig";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 
-/**
- * Resolves which commits belong in a release's generated notes: the real
- * (non-housekeeping) commits between the previous version tag and this
- * release.
- */
-
 /** Every `vX.Y.Z` tag that exists locally, oldest first. */
 export function listSortedReleaseTags(git: ReleaseCommands): string[] {
   const output = git.readGit(["tag", "--list", "v*", "--sort=v:refname"]);
@@ -29,16 +23,17 @@ export function listSortedReleaseTags(git: ReleaseCommands): string[] {
  * Returns `undefined` when there is no earlier tag at all (the first-ever
  * release).
  */
-export function resolvePreviousReleaseTag(
+export function getPreviousReleaseTagFromTag(
   git: ReleaseCommands,
   releaseTag: string,
 ): string | undefined {
   const tags = listSortedReleaseTags(git);
   const index = tags.indexOf(releaseTag);
-  if (index === -1) {
-    return tags.at(-1);
-  }
-  return index === 0 ? undefined : tags[index - 1];
+  return index === -1
+    ? tags.at(-1)
+    : index === 0
+      ? undefined
+      : tags[index - 1];
 }
 
 /** One commit's data as handed to the LLM that drafts release notes. */
@@ -58,19 +53,11 @@ const HOUSEKEEPING_SUBJECT_PATTERNS = [
 
 const LOG_FIELD_SEPARATOR = "\x1f";
 
-/** Whether a commit subject is release-flow housekeeping, not real content. */
-function _isHousekeepingSubject(subject: string): boolean {
-  return HOUSEKEEPING_SUBJECT_PATTERNS.some((pattern) => {
-    return pattern.test(subject);
-  });
-}
-
 /** Truncates a diff to a fixed budget so one commit can't bloat the prompt. */
 function _truncateDiff(diff: string): string {
-  if (diff.length <= MAX_DIFF_CHARS_PER_COMMIT) {
-    return diff;
-  }
-  return `${diff.slice(0, MAX_DIFF_CHARS_PER_COMMIT)}\n… [diff truncated]`;
+  return diff.length <= MAX_DIFF_CHARS_PER_COMMIT
+    ? diff
+    : `${diff.slice(0, MAX_DIFF_CHARS_PER_COMMIT)}\n… [diff truncated]`;
 }
 
 /**
@@ -110,7 +97,12 @@ export function collectReleaseChangelogCommits(
         : undefined;
     })
     .filter((entry): entry is { sha: string; subject: string } => {
-      return entry !== undefined && !_isHousekeepingSubject(entry.subject);
+      return (
+        entry !== undefined &&
+        !HOUSEKEEPING_SUBJECT_PATTERNS.some((pattern) => {
+          return pattern.test(entry.subject);
+        })
+      );
     })
     .map(({ sha, subject }) => {
       const stat = git.readGit(["show", "--stat", "--format=", sha]) ?? "";

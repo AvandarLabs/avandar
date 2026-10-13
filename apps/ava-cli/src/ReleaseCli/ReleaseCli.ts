@@ -1,5 +1,5 @@
 import { GetProdVersionCli } from "@ava-cli/ReleaseCli/GetProdVersionCli";
-import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli";
+import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import {
   findUnknownReleaseFlags,
   wantsHelp,

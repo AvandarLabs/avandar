@@ -1,6 +1,6 @@
-import { renderReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes";
+import { renderReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes/renderReleaseNotes";
 import { describe, expect, it } from "vitest";
-import type { ReleaseNoteBullet } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes";
+import type { ReleaseNoteBullet } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes/renderReleaseNotes";
 
 function _bullet(overrides: Partial<ReleaseNoteBullet>): ReleaseNoteBullet {
   return {

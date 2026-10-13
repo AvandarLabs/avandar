@@ -1,8 +1,8 @@
 import {
   collectReleaseChangelogCommits,
   listSortedReleaseTags,
-  resolvePreviousReleaseTag,
-} from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits";
+  getPreviousReleaseTagFromTag,
+} from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { MAX_DIFF_CHARS_PER_COMMIT } from "@ava-cli/ReleaseCli/releaseChangelog/releaseChangelogConfig";
 import { describe, expect, it } from "vitest";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
@@ -48,28 +48,28 @@ describe("listSortedReleaseTags", () => {
   });
 });
 
-describe("resolvePreviousReleaseTag", () => {
+describe("getPreviousReleaseTagFromTag", () => {
   it("returns the tag right before an existing release tag", () => {
     const git = _createFakeGit({
       [TAG_LIST_ARGS]: "v0.12.0\nv0.12.1\nv0.13.0",
     });
-    expect(resolvePreviousReleaseTag(git, "v0.12.1")).toBe("v0.12.0");
+    expect(getPreviousReleaseTagFromTag(git, "v0.12.1")).toBe("v0.12.0");
   });
 
   it("returns undefined for the oldest known tag", () => {
     const git = _createFakeGit({ [TAG_LIST_ARGS]: "v0.12.0\nv0.12.1" });
-    expect(resolvePreviousReleaseTag(git, "v0.12.0")).toBeUndefined();
+    expect(getPreviousReleaseTagFromTag(git, "v0.12.0")).toBeUndefined();
   });
 
   it("falls back to the most recent existing tag when the target doesn't exist yet", () => {
     // This is the --dry-run preview case: the new tag has not been created.
     const git = _createFakeGit({ [TAG_LIST_ARGS]: "v0.12.0\nv0.12.1" });
-    expect(resolvePreviousReleaseTag(git, "v0.13.0")).toBe("v0.12.1");
+    expect(getPreviousReleaseTagFromTag(git, "v0.13.0")).toBe("v0.12.1");
   });
 
   it("returns undefined when there are no tags at all", () => {
     const git = _createFakeGit({ [TAG_LIST_ARGS]: "" });
-    expect(resolvePreviousReleaseTag(git, "v0.1.0")).toBeUndefined();
+    expect(getPreviousReleaseTagFromTag(git, "v0.1.0")).toBeUndefined();
   });
 });
 

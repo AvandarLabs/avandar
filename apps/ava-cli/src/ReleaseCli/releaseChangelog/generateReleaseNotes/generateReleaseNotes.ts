@@ -6,9 +6,9 @@ import {
 } from "@ava-cli/ReleaseCli/releaseChangelog/releaseChangelogConfig";
 import {
   renderReleaseNotes,
-} from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes";
-import type { ReleaseChangelogCommitInput } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits";
-import type { ReleaseNoteBullet } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes";
+} from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes/renderReleaseNotes";
+import type { ReleaseChangelogCommitInput } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
+import type { ReleaseNoteBullet } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes/renderReleaseNotes";
 
 function _isReleaseNoteBullet(value: unknown): value is ReleaseNoteBullet {
   if (typeof value !== "object" || value === null) {
@@ -59,22 +59,25 @@ function _buildSystemPrompt(releaseVersion: string): string {
   ].join("\n");
 }
 
+/** Options accepted by {@link generateReleaseNotes}. */
+export type GenerateReleaseNotesOptions = Readonly<{
+  releaseVersion: string;
+  commits: readonly ReleaseChangelogCommitInput[];
+  apiKey: string;
+  model: string;
+  /**
+   * Overrides `fetch`. Tests must always pass this: see the
+   * no-real-API-calls rule.
+   */
+  fetchImpl?: typeof fetch;
+}>;
+
 /**
  * Turns a release's filtered commits into rendered release-note markdown via
  * one OpenAI Chat Completions call.
  */
 export async function generateReleaseNotes(
-  options: Readonly<{
-    releaseVersion: string;
-    commits: readonly ReleaseChangelogCommitInput[];
-    apiKey: string;
-    model: string;
-    /**
-     * Overrides `fetch`. Tests must always pass this: see the
-     * no-real-API-calls rule.
-     */
-    fetchImpl?: typeof fetch;
-  }>,
+  options: Readonly<GenerateReleaseNotesOptions>,
 ): Promise<string> {
   const { releaseVersion, commits, apiKey, model } = options;
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;

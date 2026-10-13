@@ -1,6 +1,6 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits";
-import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes";
+import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
+import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 import { promptForVersion } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
@@ -105,6 +105,10 @@ async function _runReleaseNotes(
   }
 }
 
+/**
+ * `ava release notes`: generate and publish GitHub release notes for an
+ * existing release tag.
+ */
 export const ReleaseNotesCli = Acclimate.createCLI("notes")
   .description(
     "Generate and publish GitHub release notes for an existing release tag, via an LLM.",

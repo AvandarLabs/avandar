@@ -39,7 +39,7 @@ export function renderReleaseNotes(
 
   const groupOrder: string[] = [];
   const bulletsByGroup = new Map<string, ReleaseNoteBullet[]>();
-  for (const bullet of bullets) {
+  bullets.forEach((bullet) => {
     const existing = bulletsByGroup.get(bullet.group);
     if (existing === undefined) {
       groupOrder.push(bullet.group);
@@ -47,7 +47,7 @@ export function renderReleaseNotes(
     } else {
       existing.push(bullet);
     }
-  }
+  });
 
   const groupsWithTwoOrMore = groupOrder.filter((group) => {
     return (bulletsByGroup.get(group)?.length ?? 0) >= 2;
