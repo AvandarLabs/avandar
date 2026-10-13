@@ -2208,6 +2208,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Une erreur inattendue s’est produite. Vous pouvez réessayer ou "
 "retourner à l’accueil."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "J’ai exécuté la requête, mais elle n’a renvoyé aucune ligne."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Enregistrer l’URL"
@@ -2585,6 +2589,10 @@ msgstr "La latitude est en dehors de la plage valide, mais serait une longitude 
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Mise à jour disponible"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "J’ai exécuté la requête, mais elle a échoué."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -5185,6 +5193,10 @@ msgstr "CSV, Excel ou PDF. Un seul fichier à la fois."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Supprimer l’espace de travail"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "J’ai appliqué la requête dans l’Explorateur de données."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."

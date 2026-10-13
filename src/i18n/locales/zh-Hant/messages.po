@@ -2103,6 +2103,10 @@ msgstr "工作區名稱是必填的"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "發生未預期的錯誤。您可以再試一次，或返回首頁。"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "我已執行查詢，但沒有傳回任何列。"
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "儲存網址"
@@ -2453,6 +2457,10 @@ msgstr "緯度超出有效範圍，但若作為經度則有效，反之亦然。
 #: src/lib/offline/registerServiceWorker.ts
 msgid "Update available"
 msgstr "有可用的更新"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "我已執行查詢，但查詢失敗。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -4936,6 +4944,10 @@ msgstr "CSV、Excel 或 PDF。一次一個檔案。"
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "刪除工作區"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "我已在數據探索器中套用該查詢。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
