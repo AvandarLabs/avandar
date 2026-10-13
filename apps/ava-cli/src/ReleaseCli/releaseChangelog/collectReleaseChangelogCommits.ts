@@ -52,8 +52,8 @@ export type ReleaseChangelogCommitInput = Readonly<{
 
 /** Commits `ava release` generates itself: never real release-note material. */
 const HOUSEKEEPING_SUBJECT_PATTERNS = [
-  /^Release: v\d+\.\d+\.\d+ \[skip deploy\]$/,
-  /^Bump version to \d+\.\d+\.\d+-dev \[skip deploy\]$/,
+  /^Release: v\d+\.\d+\.\d+(?: \[skip deploy\])?$/,
+  /^Bump version to \d+\.\d+\.\d+-dev(?: \[skip deploy\])?$/,
 ];
 
 const LOG_FIELD_SEPARATOR = "\x1f";

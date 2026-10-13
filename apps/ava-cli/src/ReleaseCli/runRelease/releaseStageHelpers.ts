@@ -154,6 +154,7 @@ export async function confirmReleasePlan(
 export function reportReleaseNotesOutcome(
   outcome: PublishReleaseNotesOutcome,
   releaseVersion: string,
+  dryRun: boolean,
 ): void {
   const retryHint = `Retry publishing release notes: ava release notes --version ${releaseVersion}`;
 
@@ -170,20 +171,25 @@ export function reportReleaseNotesOutcome(
       );
       return;
     case "already-exists":
+      // Retrying would just hit this same outcome again: `ava release
+      // notes` refuses to overwrite an existing release's notes.
       printWarn(
         `Release notes already exist for v${releaseVersion}: ${outcome.url}`,
       );
-      printWarn(retryHint);
       return;
     case "tag-not-found":
       printWarn(
         `Could not find tag v${releaseVersion} to publish release notes for.`,
       );
-      printWarn(retryHint);
+      if (!dryRun) {
+        printWarn(retryHint);
+      }
       return;
     case "failed":
       printWarn(`Could not publish release notes: ${outcome.reason}`);
-      printWarn(retryHint);
+      if (!dryRun) {
+        printWarn(retryHint);
+      }
       return;
   }
 }

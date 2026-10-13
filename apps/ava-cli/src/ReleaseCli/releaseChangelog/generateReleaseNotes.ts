@@ -1,5 +1,6 @@
 import {
   OPENAI_CHAT_COMPLETIONS_URL,
+  RELEASE_CHANGELOG_FETCH_TIMEOUT_MS,
   RELEASE_CHANGELOG_REASONING_EFFORT,
   RELEASE_NOTE_GROUPS,
 } from "@ava-cli/ReleaseCli/releaseChangelog/releaseChangelogConfig";
@@ -16,6 +17,7 @@ function _isReleaseNoteBullet(value: unknown): value is ReleaseNoteBullet {
   const candidate = value as Partial<Record<keyof ReleaseNoteBullet, unknown>>;
   return (
     typeof candidate.group === "string" &&
+    (RELEASE_NOTE_GROUPS as readonly string[]).includes(candidate.group) &&
     typeof candidate.text === "string" &&
     Array.isArray(candidate.commits) &&
     candidate.commits.every((commit) => {
@@ -95,6 +97,7 @@ export async function generateReleaseNotes(
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
+    signal: AbortSignal.timeout(RELEASE_CHANGELOG_FETCH_TIMEOUT_MS),
     body: JSON.stringify({
       model,
       reasoning_effort: RELEASE_CHANGELOG_REASONING_EFFORT,

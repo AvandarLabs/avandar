@@ -101,28 +101,58 @@ export async function runRelease(
     originMainSha,
   });
 
-  if (!skipChangelog) {
-    // On a dry run `releaseCommitSha` is undefined (nothing was tagged), so
-    // the develop-side commit stands in for the tag, and the existence
-    // checks (which only make sense for a tag that actually exists) are
-    // skipped.
-    const releaseNotesOutcome = await publishReleaseNotes(git, {
-      releaseTag: plan.releaseTag,
-      dryRun,
-      ...(releaseCommitSha === undefined
-        ? { headRevision: releaseSha, skipExistenceChecks: true }
-        : {}),
-    });
-    reportReleaseNotesOutcome(releaseNotesOutcome, plan.releaseVersion);
-  }
-
-  // A dry run pushes nothing, so there is nothing left to do.
+  // A dry run pushes nothing. There is no later point in the function to
+  // preview the changelog from, so it happens here, using the develop-side
+  // commit as a stand-in for the tag that was never actually created.
   if (releaseCommitSha === undefined) {
+    await _publishReleaseNotesIfEnabled(git, {
+      skipChangelog,
+      dryRun,
+      plan,
+      headRevisionOverride: releaseSha,
+    });
     return;
   }
+
   updateLocalMainRef(git, { releaseCommitSha, localMainSha, originMainSha });
   bumpDevelopToNextVersion(git, plan);
   printReleaseSummary(git, { plan, releaseSha });
+
+  // Runs last, after develop is already bumped back to a working -dev
+  // version: a slow or failing OpenAI/gh call here must never delay getting
+  // the repo back into a usable state for the next release.
+  await _publishReleaseNotesIfEnabled(git, { skipChangelog, dryRun, plan });
+}
+
+/**
+ * Generates and publishes this release's GitHub release notes, unless
+ * `--skip-changelog` was passed, reporting the outcome either way.
+ */
+async function _publishReleaseNotesIfEnabled(
+  git: ReleaseCommands,
+  options: Readonly<{
+    skipChangelog: boolean;
+    dryRun: boolean;
+    plan: ReleasePlan;
+    /**
+     * The commit to diff from, when `plan.releaseTag` does not exist yet
+     * (a dry-run preview).
+     */
+    headRevisionOverride?: string;
+  }>,
+): Promise<void> {
+  const { skipChangelog, dryRun, plan, headRevisionOverride } = options;
+  if (skipChangelog) {
+    return;
+  }
+  const outcome = await publishReleaseNotes(git, {
+    releaseTag: plan.releaseTag,
+    dryRun,
+    ...(headRevisionOverride !== undefined
+      ? { headRevision: headRevisionOverride, skipExistenceChecks: true }
+      : {}),
+  });
+  reportReleaseNotesOutcome(outcome, plan.releaseVersion, dryRun);
 }
 
 /** The repo the release operates on, or a thrown error naming the problem. */

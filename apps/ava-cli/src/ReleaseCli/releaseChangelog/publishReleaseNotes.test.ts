@@ -100,6 +100,29 @@ function _fetchImpl(): typeof fetch {
   } as unknown as Response) as unknown as typeof fetch;
 }
 
+const EMPTY_BULLETS_RESPONSE = {
+  choices: [
+    {
+      message: {
+        content: JSON.stringify({ bullets: [] }),
+      },
+    },
+  ],
+};
+
+function _emptyBulletsFetchImpl(): typeof fetch {
+  return vi.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => {
+      return EMPTY_BULLETS_RESPONSE;
+    },
+    text: async () => {
+      return "";
+    },
+  } as unknown as Response) as unknown as typeof fetch;
+}
+
 describe("publishReleaseNotes", () => {
   const originalApiKey = process.env.OPENAI_API_KEY;
 
@@ -107,7 +130,11 @@ describe("publishReleaseNotes", () => {
     process.env.OPENAI_API_KEY = "test-key";
   });
   afterEach(() => {
-    process.env.OPENAI_API_KEY = originalApiKey;
+    if (originalApiKey === undefined) {
+      delete process.env.OPENAI_API_KEY;
+    } else {
+      process.env.OPENAI_API_KEY = originalApiKey;
+    }
   });
 
   it("returns tag-not-found when the tag doesn't exist anywhere", async () => {
@@ -177,6 +204,18 @@ describe("publishReleaseNotes", () => {
       releaseTag: "v0.13.0",
       dryRun: false,
       fetchImpl: _fetchImpl(),
+    });
+
+    expect(outcome).toEqual({ kind: "no-changes" });
+  });
+
+  it("returns no-changes when the model returns zero bullets", async () => {
+    const git = _createFakeGit();
+
+    const outcome = await publishReleaseNotes(git, {
+      releaseTag: "v0.13.0",
+      dryRun: false,
+      fetchImpl: _emptyBulletsFetchImpl(),
     });
 
     expect(outcome).toEqual({ kind: "no-changes" });

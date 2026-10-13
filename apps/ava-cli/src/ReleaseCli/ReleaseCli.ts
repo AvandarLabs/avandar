@@ -26,7 +26,8 @@ Options
   --version, -v  X.Y.Z to release. Asked for when omitted.
   --next, -n     X.Y.Z develop moves to; gains -dev. Asked for when omitted.
   --yes, -y      Take every suggestion and skip confirmations.
-  --dry-run      Print every mutating command and run none of them.
+  --dry-run      Print every mutating command and run none of them. Still
+                 makes one real OpenAI call to preview the release notes.
   --skip-ci-check  Do not check develop's staging CI.
   --skip-changelog  Do not generate or publish GitHub release notes.
   --help, -h     This text.`;

@@ -37,3 +37,10 @@ export const RELEASE_NOTE_GROUPS = [
   "Chores",
   "Nits",
 ] as const;
+
+/**
+ * How long to wait for the OpenAI call before giving up. A release can
+ * include many commits and a non-trivial amount of diff context, but this
+ * step must not be able to hang the release indefinitely.
+ */
+export const RELEASE_CHANGELOG_FETCH_TIMEOUT_MS = 90_000;

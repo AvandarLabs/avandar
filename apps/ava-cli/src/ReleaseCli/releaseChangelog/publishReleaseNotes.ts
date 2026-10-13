@@ -127,6 +127,10 @@ export async function publishReleaseNotes(
     };
   }
 
+  if (notes.trim().length === 0) {
+    return { kind: "no-changes" };
+  }
+
   if (dryRun) {
     return { kind: "previewed", notes };
   }
@@ -139,6 +143,7 @@ export async function publishReleaseNotes(
     releaseTag,
     "--notes",
     notes,
+    "--verify-tag",
   ]);
   if (!createResult.ok) {
     return {

@@ -29,7 +29,7 @@ function _fakeResponse(body: unknown, ok = true, status = 200): Response {
 }
 
 describe("generateReleaseNotes", () => {
-  it("never calls the real global fetch — every call goes through fetchImpl", async () => {
+  it("never calls the real global fetch: every call goes through fetchImpl", async () => {
     const fetchImpl = vi.fn().mockResolvedValue(
       _fakeResponse({
         choices: [
@@ -44,7 +44,7 @@ describe("generateReleaseNotes", () => {
           },
         ],
       }),
-    );
+    ) as unknown as typeof fetch;
     const globalFetchSpy = vi.spyOn(globalThis, "fetch");
 
     const notes = await generateReleaseNotes({
@@ -72,7 +72,7 @@ describe("generateReleaseNotes", () => {
       commits: [],
       apiKey: "secret-key",
       model: "the-model",
-      fetchImpl,
+      fetchImpl: fetchImpl as unknown as typeof fetch,
     });
 
     const [url, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
@@ -95,7 +95,7 @@ describe("generateReleaseNotes", () => {
         commits: [],
         apiKey: "k",
         model: "m",
-        fetchImpl,
+        fetchImpl: fetchImpl as unknown as typeof fetch,
       }),
     ).rejects.toThrow(/OpenAI request failed \(429\)/);
   });
@@ -113,7 +113,7 @@ describe("generateReleaseNotes", () => {
         commits: [],
         apiKey: "k",
         model: "m",
-        fetchImpl,
+        fetchImpl: fetchImpl as unknown as typeof fetch,
       }),
     ).rejects.toThrow(/bullets array/);
   });

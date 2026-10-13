@@ -107,6 +107,29 @@ describe("ava release notes", () => {
     expect(process.exitCode).toBe(1);
   });
 
+  it("prints an informational message for no-changes without exiting non-zero", async () => {
+    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
+      kind: "no-changes",
+    });
+
+    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+
+    expect(_loggedText(logSpy)).toContain("nothing to publish");
+    expect(process.exitCode).toBeUndefined();
+  });
+
+  it("errors when publishing fails", async () => {
+    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
+      kind: "failed",
+      reason: "network error",
+    });
+
+    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+
+    expect(_loggedText(logSpy)).toContain("network error");
+    expect(process.exitCode).toBe(1);
+  });
+
   it("prints the preview on a dry run without exiting non-zero", async () => {
     vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
       kind: "previewed",
