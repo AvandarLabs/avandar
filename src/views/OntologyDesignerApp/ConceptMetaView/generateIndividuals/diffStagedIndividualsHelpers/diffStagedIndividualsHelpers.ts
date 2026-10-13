@@ -1,3 +1,4 @@
+import { isDefined } from "@avandar/utils";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -59,33 +60,34 @@ export function diffStagedIndividualsPage(options: {
 }): { rowsToWrite: IndividualUpsertRow[]; matchedExternalIds: string[] } {
   const { stagedRows, existingByExternalId, workspaceId, conceptId } =
     options;
-  const rowsToWrite: IndividualUpsertRow[] = [];
-  const matchedExternalIds: string[] = [];
 
-  stagedRows.forEach((row) => {
-    const existing = existingByExternalId.get(row.external_id);
-    if (existing) {
-      matchedExternalIds.push(row.external_id);
-    }
+  const matchedExternalIds = stagedRows
+    .filter((row) => {
+      return existingByExternalId.has(row.external_id);
+    })
+    .map((row) => {
+      return row.external_id;
+    });
 
-    const isUnchanged =
-      existing !== undefined &&
-      existing.name === row.name &&
-      existing.missingFromSourceAt === undefined;
-    if (isUnchanged) {
-      return;
-    }
-
-    rowsToWrite.push(
-      _buildUpsertRow({
+  const rowsToWrite = stagedRows
+    .map((row) => {
+      const existing = existingByExternalId.get(row.external_id);
+      const isUnchanged =
+        existing !== undefined &&
+        existing.name === row.name &&
+        existing.missingFromSourceAt === undefined;
+      if (isUnchanged) {
+        return undefined;
+      }
+      return _buildUpsertRow({
         workspaceId,
         conceptId,
         externalId: row.external_id,
         name: row.name,
         missingFromSourceAt: null,
-      }),
-    );
-  });
+      });
+    })
+    .filter(isDefined);
 
   return { rowsToWrite, matchedExternalIds };
 }
@@ -108,24 +110,21 @@ export function getNewlyStaleIndividuals(options: {
     conceptId,
     nowIso,
   } = options;
-  const staleRows: IndividualUpsertRow[] = [];
 
-  existingByExternalId.forEach((existing, externalId) => {
-    const isAlreadyFlagged = existing.missingFromSourceAt !== undefined;
-    if (matchedExternalIds.has(externalId) || isAlreadyFlagged) {
-      return;
-    }
-
-    staleRows.push(
-      _buildUpsertRow({
+  const staleRows = [...existingByExternalId.entries()]
+    .filter(([externalId, existing]) => {
+      const isAlreadyFlagged = existing.missingFromSourceAt !== undefined;
+      return !matchedExternalIds.has(externalId) && !isAlreadyFlagged;
+    })
+    .map(([externalId, existing]) => {
+      return _buildUpsertRow({
         workspaceId,
         conceptId,
         externalId,
         name: existing.name,
         missingFromSourceAt: nowIso,
-      }),
-    );
-  });
+      });
+    });
 
   return staleRows;
 }

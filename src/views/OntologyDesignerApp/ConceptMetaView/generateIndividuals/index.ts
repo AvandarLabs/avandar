@@ -4,6 +4,7 @@ import {
   hasDefinedProps,
   isDefined,
   makeBucketRecord,
+  makeMap,
   makeObject,
   objectValuesMap,
   prop,
@@ -24,12 +25,18 @@ import { Logger } from "@/utils/Logger";
 import {
   diffStagedIndividualsPage,
   getNewlyStaleIndividuals,
-} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividuals/diffStagedIndividuals";
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
 import type {
   ExistingIndividual,
   StagedIndividualRow,
-} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividuals/diffStagedIndividuals";
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
+import type {
+  DatasetColumnMapping,
+  DatasetColumnMappingId,
+} from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { SetDefined } from "@avandar/utils";
@@ -69,26 +76,21 @@ async function _getExistingIndividualsByExternalId(
   const existingIndividuals = await IndividualClient.getAll(
     where("concept_id", "eq", conceptId),
   );
-  return new Map<string, ExistingIndividual>(
-    existingIndividuals.map((individual) => {
-      return [
-        individual.externalId,
-        {
-          id: individual.id,
-          name: individual.name,
-          missingFromSourceAt: individual.missingFromSourceAt,
-        },
-      ];
-    }),
-  );
+  return makeMap(existingIndividuals, {
+    key: "externalId",
+    valueFn: (individual) => {
+      return {
+        id: individual.id,
+        name: individual.name,
+        missingFromSourceAt: individual.missingFromSourceAt,
+      };
+    },
+  });
 }
 
 /**
- * Diffs one staged page against the concept's existing individuals and
- * upserts only the rows that changed. Matched external ids are recorded onto
- * `matchedExternalIds` so the caller can sweep newly-stale individuals once
- * every page has been processed. Also switches the sync's progress task to
- * determinate, reporting this page's position among the staged table's pages.
+ * Diffs one staged page against the concept's existing individuals, upserting
+ * only the rows that changed, and reports this page's progress.
  */
 async function _diffAndUpsertPage(options: {
   stagedRows: readonly StagedIndividualRow[];
@@ -144,18 +146,29 @@ async function _diffAndUpsertPage(options: {
 }
 
 /**
- * Resolves the source-dataset mappings, stages individuals into DuckDB, and
- * diffs/upserts them page by page. Split out of {@link generateIndividuals} so
- * that function can start and finish the sync's progress task around the
- * whole operation, including failures during mapping resolution.
+ * The dataset-column mapping lookups needed to build the staging SQL: which
+ * mappings identify an individual, which one supplies its label, and the
+ * dataset columns and column lists each of those mappings resolves to.
  */
-async function _runGenerateIndividuals(
+type IndividualSourceMappings = {
+  identifierMappings: DatasetColumnMapping[];
+  labelMapping: DatasetColumnMapping;
+  titleColumn: DatasetColumnRead;
+  titleDatasetPrimaryKeyColumn: DatasetColumnRead;
+  mappingColumnsLookup: Record<DatasetColumnMappingId, DatasetColumnRead>;
+  neededColumnsByDatasetId: Record<Dataset.Id, string[]>;
+};
+
+/**
+ * Resolves a concept's identifier and label attributes down to the dataset
+ * columns they map to, returning everything the staging SQL needs to select
+ * external ids and names from those columns.
+ */
+async function _resolveIndividualSourceMappings(
   concept: BuildableConcept,
-  taskId: TaskId,
-): Promise<void> {
+): Promise<IndividualSourceMappings> {
   const entConfig = Concept.bind(concept);
 
-  // 1. Figure out what source datasets we need to query.
   const identifierAttributes = entConfig.getIdentifierAttributes();
   const labelAttribute = entConfig.getLabelAttribute();
   const allAttributes = [...identifierAttributes, labelAttribute];
@@ -187,7 +200,7 @@ async function _runGenerateIndividuals(
     },
   });
 
-  // 2. Get the dataset columns to use for external IDs and the individual title
+  // Get the dataset columns to use for external IDs and the individual title
   const identifierMappings = datasetColumnMappings.filter((mapping) => {
     return identifierAttributes.some(propEq("id", mapping.conceptAttributeId));
   });
@@ -215,16 +228,35 @@ async function _runGenerateIndividuals(
     },
   );
 
-  // Read every existing individual for this concept before touching DuckDB,
-  // so a failure here never creates a staging table that then needs cleanup.
-  const existingByExternalId = await _getExistingIndividualsByExternalId(
-    concept.id,
-  );
+  return {
+    identifierMappings,
+    labelMapping,
+    titleColumn,
+    titleDatasetPrimaryKeyColumn,
+    mappingColumnsLookup,
+    neededColumnsByDatasetId,
+  };
+}
 
-  // The rows are staged under a prefixed name rather than the concept's bare
-  // id, because a bare UUID in a table name always means a dataset. See
-  // `getStagingIndividualsTableName`.
-  const stagingTableName = getStagingIndividualsTableName(concept.id);
+/**
+ * Builds and runs the `CREATE TABLE AS SELECT` that stages a concept's
+ * individuals into DuckDB under `stagingTableName`, keyed by external id with
+ * one resolved name column.
+ */
+async function _stageIndividuals(options: {
+  workspaceId: Workspace.Id;
+  stagingTableName: string;
+  mappings: IndividualSourceMappings;
+}): Promise<void> {
+  const { workspaceId, stagingTableName, mappings } = options;
+  const {
+    identifierMappings,
+    labelMapping,
+    titleColumn,
+    titleDatasetPrimaryKeyColumn,
+    mappingColumnsLookup,
+    neededColumnsByDatasetId,
+  } = mappings;
 
   // Spelling out the columns is what keeps this from downloading whole
   // datasets. The statement below is a `CREATE TABLE AS SELECT`, and column
@@ -272,10 +304,37 @@ async function _runGenerateIndividuals(
         externalIdColumn: "external_id",
       }),
     }),
-    workspaceId: concept.workspaceId,
+    workspaceId,
     neededColumnsByDatasetId,
   });
   Logger.log("Successfully generated all individuals. Starting diff/upsert...");
+}
+
+/**
+ * Runs the sync for one concept once its progress task already exists.
+ */
+async function _runGenerateIndividuals(
+  concept: BuildableConcept,
+  taskId: TaskId,
+): Promise<void> {
+  const mappings = await _resolveIndividualSourceMappings(concept);
+
+  // Read every existing individual for this concept before touching DuckDB,
+  // so a failure here never creates a staging table that then needs cleanup.
+  const existingByExternalId = await _getExistingIndividualsByExternalId(
+    concept.id,
+  );
+
+  // The rows are staged under a prefixed name rather than the concept's bare
+  // id, because a bare UUID in a table name always means a dataset. See
+  // `getStagingIndividualsTableName`.
+  const stagingTableName = getStagingIndividualsTableName(concept.id);
+
+  await _stageIndividuals({
+    workspaceId: concept.workspaceId,
+    stagingTableName,
+    mappings,
+  });
 
   const matchedExternalIds = new Set<string>();
 
@@ -333,10 +392,8 @@ async function _runGenerateIndividuals(
 }
 
 /**
- * Runs a basic Qetl pipeline to generate individuals for a concept, reporting
- * its progress through {@link TaskProgressStore}: indeterminate while
- * resolving mappings and staging, determinate per page once diffing begins,
- * and finished or failed in lockstep with the sync itself.
+ * Runs the Qetl pipeline to generate individuals for a concept, reporting
+ * progress through {@link TaskProgressStore} for the lifetime of the call.
  */
 export async function generateIndividuals(
   concept: BuildableConcept,

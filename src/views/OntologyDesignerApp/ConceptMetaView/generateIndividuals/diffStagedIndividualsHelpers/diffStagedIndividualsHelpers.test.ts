@@ -6,8 +6,8 @@ import { uuid } from "$/lib/uuid";
 import {
   diffStagedIndividualsPage,
   getNewlyStaleIndividuals,
-} from "./diffStagedIndividuals";
-import type { ExistingIndividual } from "./diffStagedIndividuals";
+} from "./diffStagedIndividualsHelpers";
+import type { ExistingIndividual } from "./diffStagedIndividualsHelpers";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
