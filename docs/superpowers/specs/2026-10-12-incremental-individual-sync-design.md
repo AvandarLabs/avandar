@@ -3,6 +3,7 @@
 **Status:** Draft
 **Date:** 2026-10-12
 **Roadmap:** P5.6 in `docs/production-plan-world-humanitarian-day.md`
+(P5.8, P5.9 added alongside it for two related, explicitly out-of-scope gaps)
 **Parents:** `docs/ontology-architecture.md` sections 6 and 13
 
 > Code blocks in this document are illustrative. The repository is the
@@ -41,6 +42,12 @@ default); section 13 explains why this has to land before any per-case
 capability (status workflow, assignment, comments) can safely store state
 without Sync erasing it.
 
+Separately, Sync today is a manual, invisible action: a user must know to
+click "Sync records" (even for a brand-new concept with zero individuals),
+and the only feedback while it runs is a spinner on that one button. Section
+6 covers the UX side of this change: renaming the action, triggering it
+automatically on concept creation, and giving it a real progress indicator.
+
 ## 2. Scope
 
 **In**
@@ -55,6 +62,11 @@ without Sync erasing it.
 4. Detect an individual whose `external_id` no longer appears in any source
    dataset, and flag it (without deleting it or touching `status`); clear the
    flag if it reappears on a later sync.
+5. Rename the sync action to make clear it refreshes from source data, run it
+   automatically on concept creation instead of requiring a manual click, and
+   show real progress for both the automatic and manual runs, via a
+   generalized version of the existing offline-model-download progress
+   indicator (section 6).
 
 **Out**
 
@@ -65,12 +77,26 @@ without Sync erasing it.
   already satisfied by the existing architecture.
 - Deciding what a stale (missing-from-source) individual's case-workflow
   status should become, archiving it, or surfacing it in any UI. This design
-  only records the fact and the timestamp.
+  only records the fact and the timestamp. Tracked separately as **P5.9** in
+  the roadmap (added alongside this spec - it wasn't tracked before).
 - The NULL-label crash and the partial-page-failure/no-atomicity issue also
   listed in `docs/ontology-architecture.md` section 16. Separate, pre-existing
-  bugs, not part of this change.
+  bugs, not part of this change. The NULL-label crash is now tracked as
+  **P5.8** in the roadmap (also added alongside this spec); the no-atomicity
+  issue is covered as a known limitation in section 7 below rather than as
+  its own roadmap line, since it's a property of the page-by-page upsert
+  design generally, not a bug with an obvious fix.
 - Status sets (P5b.1), assignment (P5c.3), comments (P5c.2). This change is a
   precondition for those, not an implementation of any of them.
+- Migrating `DatasetUploadProgressStore` (a separate, already-generic upload
+  progress store with no floating UI) onto the new indicator from section 6.
+  It isn't broken and nobody asked for it to move.
+
+`docs/production-plan-world-humanitarian-day.md` is the one authoritative
+roadmap for QETL, permissions, and ontology/case-management (confirmed: no
+other `docs/production-plan*.md` or `docs/roadmap*.md` file exists;
+`docs/ontology-architecture.md` section 17 is an index back to this file and
+to `docs/superpowers/specs/`, not a second roadmap).
 
 ## 3. Approaches
 
@@ -112,7 +138,7 @@ check is then enforced atomically by Postgres instead of by a prior read.
   stored, which either means sending that whole set into the RPC in one call
   (losing today's page-by-page streaming) or running a second statement with
   the same shape as approach A's final sweep. The atomicity win doesn't
-  currently matter: Sync already has no cross-page atomicity (section 6),
+  currently matter: Sync already has no cross-page atomicity (section 7),
   and nothing else writes individual rows concurrently with Sync today.
 
 Recommendation: **A**. The scale here (case counts, not source-row counts)
@@ -127,7 +153,8 @@ client it already lives in.
 status text not null default 'active',
 -- ...
 -- Set when this individual's external_id stops appearing in any source
--- dataset on a sync; cleared if it reappears. NULL means it is present.
+-- dataset on a sync. Clear the timestamp if it reappears. NULL means it
+-- is present.
 missing_from_source_at timestamptz,
 ```
 
@@ -169,23 +196,115 @@ Replacing steps 2-3 of today's `generateIndividuals`:
 Every write in steps 3-4 goes through the same
 `IndividualClient.crudFunctions.bulkInsert({ upsert: true, onConflict: { columnNames: ["external_id", "concept_id"], ignoreDuplicates: false } })`
 call used today, just with the narrower, pre-filtered payload shape above.
+`generateIndividuals` is the only call site in the repo that reaches through
+`crudFunctions` instead of the top-level, Model-shaped `bulkInsert` - that's
+deliberate, not an oddity: `page.data` already comes out of
+`DuckDbClient.forEachQueryPage` in DB shape (snake_case), matching
+`crudFunctions.bulkInsert`'s `DBInsert` input directly. The top-level
+`bulkInsert` would first convert that same data to the camelCase `Insert`
+shape just so its parser could convert it straight back - pure overhead for
+data that's already correctly shaped.
 
 The diff in steps 3-4 is pure (existing map + staged rows in, rows-to-write
 out), so it belongs in its own small, independently unit-tested function(s)
 rather than inline in `generateIndividuals` - final naming/shape is a plan
 decision, not a design decision.
 
-## 6. Error handling
+## 6. UI: trigger and progress indicator
 
-- Unchanged from today: no cross-page atomicity (a failed page leaves earlier
-  pages written); the label-resolves-to-NULL crash is untouched. Both are
-  pre-existing, out of scope (section 2).
+**Button rename.** `SyncRecordsButton` (`CaseTypeActions.tsx:36-85`) relabels
+from "Sync records" to "Refresh {conceptName} records" (e.g. "Refresh
+Facility records"), via the Lingui `t` macro interpolating `concept.name` as
+a plain variable. The plural lands on "records," not on the concept's name,
+so this reads correctly regardless of what the concept is called, with no
+pluralization logic needed.
+
+**Automatic first sync.** `insertConceptFromFormValues`
+(`src/views/OntologyDesignerApp/insertConceptFromFormValues/`) is the one
+function both creation paths already share - the form path
+(`useSubmitConceptCreatorForm.ts`, which navigates to the concept's page on
+success) and the chat path (`applyCreatedCaseTypes.ts`, which does not
+navigate). Once it persists the concept and its attributes/mappings (the
+"three writes" in `docs/ontology-architecture.md` section 5.1), it calls
+`generateIndividuals(concept)` **without awaiting it**: concept creation
+resolves immediately, and the first sync runs in the background. The call is
+guarded with its own `.catch(...)` so a failure can't become an unhandled
+promise rejection; the failure is reported through the progress store below
+instead.
+
+This is why the progress store needs to support more than one concurrent
+task from the start, not as a hypothetical: `applyCreatedCaseTypes.ts` awaits
+`insertConceptFromFormValues` sequentially per case type, but because the
+sync *it* triggers is not awaited, a chat session creating three case types
+in a row can have all three background syncs in flight at once.
+
+**Generalized progress indicator**, replacing the single-purpose
+`OfflineChatDownloadIndicator` (`src/components/OfflineChatDownloadIndicator/`)
+and its bespoke, single-slot `OfflineChatEngineStore`:
+
+- A new shared store, keyed by an opaque task id, built on the same
+  `createExternalStore` factory `DatasetUploadProgressStore` already uses
+  (`src/lib/utils/state/createExternalStore.ts`), rather than inventing a
+  third pattern. Each entry is one of:
+  - `{ status: "indeterminate", label, detail? }`
+  - `{ status: "determinate", label, current, total, detail? }`
+  - `{ status: "error", label, message }`
+
+  Call sites get `startTask(label) -> id`, `updateTask(id, patch)`,
+  `finishTask(id)` (removes the entry), and `failTask(id, message)` (moves it
+  to `"error"`, left for the user to dismiss).
+- One floating UI component, mounted once in `AppShell.tsx` exactly where
+  `OfflineChatDownloadIndicator` is today, renders one panel per live task
+  (stacked), each a label plus a Mantine `Progress` bar (indeterminate or
+  determinate), or an error panel with a dismiss button for the `"error"`
+  entries.
+- `OfflineChatDownloadIndicator` becomes a thin adapter: it starts a task
+  when a download begins, updates it with real progress, and finishes or
+  fails it. Same visible behavior as today (including its existing "do not
+  refresh or close this tab" copy, passed through as `detail`), plus one
+  real change: today's store has no error state at all, so a failed download
+  currently just vanishes; after this change it stays visible until
+  dismissed.
+- `generateIndividuals` manages its own task end-to-end: start it
+  `"indeterminate"` ("Refreshing {conceptName} records…") while staging and
+  reading existing individuals, switch to `"determinate"` once page-by-page
+  upserting begins (`current`/`total` from the staged table's row or page
+  count), and finish or fail it in the same `finally`/`catch` that already
+  drops the staging table. Both the manual button click and the automatic
+  first sync go through this one function, so both get progress reporting
+  for free. The button keeps its own local loading/disabled state in
+  addition (to stop a double-click); it isn't replaced by the floating
+  indicator, it's complemented by it.
+
+**Out of scope for this generalization:** migrating
+`DatasetUploadProgressStore`'s own consumers onto the new floating component
+(noted in section 2) - it already uses the right store factory, and giving
+it a floating UI nobody asked for is a separate change.
+
+## 7. Error handling
+
+- Unchanged from today: no cross-page atomicity. Each page is its own
+  `bulkInsert` call, each call is its own PostgREST request, and each request
+  is its own Postgres transaction - there is no transaction wrapping the
+  whole sync. If page 6 of 10 fails (a network error, or the pre-existing
+  label-resolves-to-NULL crash, now tracked as P5.8), pages 1-5 are already
+  committed and pages 7-10 never run: the concept is left in a
+  partially-synced state (some individuals reflect the latest source data,
+  some don't) until the next successful sync. This change doesn't fix that,
+  but it does make a retry after a partial failure cheaper: the
+  already-committed pages now produce no-op rows on the next attempt instead
+  of being rewritten again.
 - A page with zero rows to write skips the `bulkInsert` call entirely rather
   than sending an empty array.
 - The final stale-sweep is skipped entirely (no call at all) when nothing is
   newly stale.
+- The automatic first sync (section 6) runs detached from concept creation;
+  its failure is reported to the progress store (`failTask`) and does not
+  propagate anywhere else. A concept that fails its first sync is left
+  exactly as a concept that was created and never manually synced - zero
+  individuals, "Refresh" still available.
 
-## 7. Testing
+## 8. Testing
 
 `generateIndividuals.test.ts` today mocks `bulkInsert` away and only tests
 the staging-table-naming regression; it asserts nothing about upsert
@@ -219,12 +338,28 @@ payloads, which is how this bug shipped. New coverage needed:
    are unchanged and `name` updated - is the direct equivalent of the
    replay already done by hand on 2026-10-09 (`docs/ontology-architecture.md`
    section 13), just checked in instead of ad hoc.
+5. The new progress store: `startTask`/`updateTask`/`finishTask`/`failTask`
+   transitions produce the expected entry; two concurrently started tasks
+   get distinct ids and don't clobber each other's state.
+6. `insertConceptFromFormValues`: the returned promise resolves before a
+   deliberately-deferred mock of `generateIndividuals` resolves (proves the
+   sync isn't awaited); a rejection from that background call reaches
+   `failTask` rather than throwing out of `insertConceptFromFormValues` or
+   becoming an unhandled rejection.
+7. `OfflineChatDownloadIndicator` as a regression check after being rebuilt
+   on the new store: still renders its existing indeterminate/determinate/
+   warning copy for a download, plus one new case - a failed download now
+   renders a dismissible error instead of disappearing.
 
-## 8. Exit criteria
+## 9. Exit criteria
 
 - Running Sync twice in a row with no source changes leaves every existing
   individual's `id`, `status`, `assigned_to`, and `updated_at` unchanged, and
-  issues no writes for already-synced rows.
+  issues no writes for already-synced rows. This only proves anything if the
+  seeded individual's `status` and `assigned_to` are set to values *other
+  than* the defaults (e.g. `status = 'confirmed'`, `assigned_to` a real user
+  id) before the sync runs - checking against already-default values would
+  pass even if the old clobbering behavior regressed.
 - A new row in the source produces a new individual with `status = 'active'`,
   `assigned_to = NULL`.
 - A changed label value updates `name` (and, via the existing trigger,
@@ -233,8 +368,18 @@ payloads, which is how this bug shipped. New coverage needed:
   `missing_from_source_at` set once; it is left alone on subsequent syncs
   while still absent, and cleared if it reappears.
 - No RPC, no new raw-SQL write path, no change to RLS policies.
+- The sync action reads "Refresh {conceptName} records" for any concept
+  name, including ones a naive "+s" would mangle (e.g. "Facility").
+- Creating a concept (either path) triggers its first sync automatically;
+  concept creation resolves without waiting for that sync to finish.
+- Three concepts created back to back (chat path) can show three concurrent
+  progress panels, each labeled with its own concept's name.
+- A failed background sync surfaces as a dismissible error in the floating
+  indicator instead of vanishing silently.
+- The manual "Refresh" click and the automatic first sync report progress
+  through the identical code path - no duplicated progress logic.
 
-## 9. Files
+## 10. Files
 
 ```text
 supabase/schemas/
@@ -246,10 +391,34 @@ shared/models/ontology/Individual/
   IndividualParsers.ts                 DBReadSchema + missing_from_source_at
 
 src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/
-  index.ts                            narrowed staging SQL, diff-driven upsert, stale sweep
+  index.ts                            narrowed staging SQL, diff-driven upsert,
+                                       stale sweep, owns its own progress task
   generateIndividuals.test.ts          + upsert-payload and no-op-skip coverage
   (new) diff helper file(s) for the pure existing-vs-staged comparison, + unit tests
 
+src/views/OntologyDesignerApp/ConceptMetaView/
+  CaseTypeActions.tsx                  button label -> "Refresh {conceptName} records"
+
+src/views/OntologyDesignerApp/insertConceptFromFormValues/
+  insertConceptFromFormValues.ts       fire-and-forget first sync, .catch -> failTask
+
+src/lib/utils/state/ (or wherever the new generic store lands - a plan decision)
+  (new) task progress store, built on createExternalStore               + unit tests
+  (new) floating progress indicator component, multi-task                + tests
+
+src/components/OfflineChatDownloadIndicator/
+  OfflineChatDownloadIndicator.tsx     rebuilt as a thin adapter over the new store
+src/hooks/localChatModels/
+  useOfflineChatEngineStatus.ts        replaced or adapted to the new store
+
+src/components/AppShell/
+  AppShell.tsx                         mounts the new floating component
+
 supabase/tests/database/
-  individuals__sync_upsert_contract.test.sql   real-Postgres upsert contract (section 7.4)
+  individuals__sync_upsert_contract.test.sql   real-Postgres upsert contract (section 8.4)
 ```
+
+docs/production-plan-world-humanitarian-day.md also gains two new roadmap
+items alongside this spec (not implemented by it): **P5.8** (the NULL-label
+sync crash) and **P5.9** (deciding what a stale individual's product
+behavior should be).
