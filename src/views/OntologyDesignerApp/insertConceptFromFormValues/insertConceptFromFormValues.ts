@@ -1,4 +1,4 @@
-import { hasDefinedProps, isDefined, prop, where } from "@avandar/utils";
+import { isDefined, prop, where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AttributeMappingClient } from "@/clients/ontology/AttributeMappingClient";
@@ -6,7 +6,10 @@ import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClien
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { hasPropKeys } from "@/lib/utils/guards/guards";
 import { Logger } from "@/utils/Logger";
-import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
+import {
+  generateIndividuals,
+  getAttributesWithMapping,
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -67,18 +70,16 @@ async function _getFullConcept(concept: Concept.T): Promise<BuildableConcept> {
       ? await DatasetClient.getAll(where("id", "in", datasetIds))
       : [];
 
-  const attributesWithMappings = conceptAttributes
-    .map((attribute) => {
+  const attributesWithMappings = getAttributesWithMapping(
+    conceptAttributes.map((attribute) => {
       return {
         ...attribute,
         mapping: mappings.find((mapping) => {
           return mapping.conceptAttributeId === attribute.id;
         }),
       };
-    })
-    .filter((attribute) => {
-      return hasDefinedProps(attribute, "mapping");
-    });
+    }),
+  );
 
   return { ...concept, datasets, attributes: attributesWithMappings };
 }
@@ -92,6 +93,7 @@ function _syncNewConceptInBackground(concept: Concept.T): void {
     .catch((error: unknown) => {
       Logger.error(error, {
         msg: "Failed to auto-sync records for a newly created concept",
+        conceptId: concept.id,
       });
     });
 }

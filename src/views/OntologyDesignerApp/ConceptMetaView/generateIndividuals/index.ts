@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import {
   assertIsDefined,
+  hasDefinedProps,
   isDefined,
   makeBucketRecord,
   makeObject,
@@ -28,8 +29,33 @@ import type {
   ExistingIndividual,
   StagedIndividualRow,
 } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividuals/diffStagedIndividuals";
+import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { SetDefined } from "@avandar/utils";
+import type { SetRequired } from "type-fest";
+
+/**
+ * Narrows a concept's attributes down to the ones with a resolved mapping:
+ * the shape {@link generateIndividuals} and {@link BuildableConcept} require.
+ * Shared by the manual "Refresh" button and the auto-sync path that runs
+ * right after a concept is created, so both agree on what counts as ready to
+ * sync.
+ */
+export function getAttributesWithMapping<
+  TAttribute extends { mapping?: AttributeMapping },
+>(
+  attributes: readonly TAttribute[],
+): Array<SetRequired<TAttribute, "mapping"> & SetDefined<TAttribute, "mapping">> {
+  return attributes.filter(
+    (
+      attribute,
+    ): attribute is SetRequired<TAttribute, "mapping"> &
+      SetDefined<TAttribute, "mapping"> => {
+      return hasDefinedProps(attribute, "mapping");
+    },
+  );
+}
 
 /**
  * Reads every existing individual for a concept and keys it by `external_id`

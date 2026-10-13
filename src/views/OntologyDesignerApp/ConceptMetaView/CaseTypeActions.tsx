@@ -10,7 +10,10 @@ import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
-import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
+import {
+  generateIndividuals,
+  getAttributesWithMapping,
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
 import { ViewRecordsButton } from "@/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ReactNode } from "react";
@@ -51,9 +54,9 @@ function SyncRecordsButton({ concept, fullConcept }: Props): ReactNode {
           });
           return;
         }
-        const mappedAttributes = fullConcept.attributes.filter((attribute) => {
-          return hasDefinedProps(attribute, "mapping");
-        });
+        const mappedAttributes = getAttributesWithMapping(
+          fullConcept.attributes,
+        );
         setIsGeneratingIndividuals(true);
         try {
           await generateIndividuals({

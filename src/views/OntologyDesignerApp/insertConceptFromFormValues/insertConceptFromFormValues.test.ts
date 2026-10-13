@@ -48,7 +48,16 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
 vi.mock(
   "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index",
   () => {
-    return { generateIndividuals: generateIndividualsMock };
+    return {
+      generateIndividuals: generateIndividualsMock,
+      getAttributesWithMapping: (
+        attributes: ReadonlyArray<{ mapping?: unknown }>,
+      ) => {
+        return attributes.filter((attribute) => {
+          return attribute.mapping !== undefined;
+        });
+      },
+    };
   },
 );
 vi.mock("@/utils/Logger", () => {
