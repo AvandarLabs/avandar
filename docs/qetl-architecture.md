@@ -246,6 +246,44 @@ enough for the incoming payload, retry once, then throw
 `RelationCacheWriteFailed`. The legacy `LocalDataset` table (imported Parquet
 for offline use) has its own unrelated eviction.
 
+### Whole-relation caching with column slices, not row slices
+
+The design rules out slicing a relation by *rows* (Baldacci-style dices,
+predicate fragments, data cubes) and keeps slicing by *columns* on purpose. A
+cached entry therefore holds every row of a relation, possibly only some of its
+columns. The relation-cache design
+([2026-08-18-qetl-relation-cache-design.md](superpowers/specs/2026-08-18-qetl-relation-cache-design.md))
+states both halves: row-level fragments and predicate containment are out of
+scope ("this spec adds no reuse tier above exact identity plus set
+containment"), and the column reuse rule is "hit when `cachedColumns ⊇
+neededColumns`", because "set containment on strings is linear and exact,
+unlike predicate containment".
+
+| | Row slicing (Baldacci dice / cube) | Column slicing (what is built) |
+|---|---|---|
+| A cached entry is | rows matching a predicate, possibly pre-aggregated | every row, a subset of the columns |
+| "Can the cache answer this query?" | predicate containment, which is hard in general and risks wrong answers | string set containment (`cached ⊇ needed`), exact and cheap |
+| Getting it wrong | silently wrong or missing rows | a SQL "unknown column" error, which is loud |
+| Decision | rejected | kept, with monotone growth: a partial miss fetches the union of columns and replaces the narrower entry |
+
+So "whole relation" in the registry design means "acquire every row", as
+opposed to pushing the query down to the source and caching its result. That is
+why the column projection design's own background says "every query pays for
+whole-relation Parquet". Dropping unneeded columns does not break that model,
+because rows stay intact (a projection must never use `DISTINCT`, so duplicate
+rows are not collapsed), and only one entry per relation and principal is ever
+live, so two partial projections never have to be joined back together.
+
+**Known deviation.** The relation-cache design required raw SQL to need
+`"all"` columns, because the analyzer cannot tell which relation a bare column
+belongs to; projection could then only fail wide. The built
+`getNeededColumnsFromQuery` instead guesses columns from SQL tokens, and the
+confirmed failures in section 13 (an alias without `AS`, a typed literal, a
+multi-dataset statement) come from that guessing. Restoring the fail-wide
+guarantee, by returning `"all"` whenever attribution is ambiguous, is roadmap
+item P0.9 in
+[production-plan-world-humanitarian-day.md](production-plan-world-humanitarian-day.md).
+
 ## 7. DuckDB coordination rules
 
 Every DuckDB load, drop, and raw or structured query in the app goes through
