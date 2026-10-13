@@ -79,7 +79,7 @@ function SyncRecordsButton({ concept, fullConcept }: Props): ReactNode {
         }
       }}
     >
-      <Trans>Sync records</Trans>
+      {t`Refresh ${concept.name} records`}
     </Button>
   );
 }
