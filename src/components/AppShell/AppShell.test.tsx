@@ -11,12 +11,10 @@ vi.mock("@/components/AppShell/Navbar/Navbar", () => {
 });
 
 vi.mock(
-  "@/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator",
+  "@/hooks/localChatModels/useOfflineChatDownloadBridge/useOfflineChatDownloadBridge",
   () => {
     return {
-      OfflineChatDownloadIndicator: () => {
-        return null;
-      },
+      useOfflineChatDownloadBridge: () => {},
     };
   },
 );

@@ -1,10 +1,7 @@
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
-import { render, screen } from "@/test-utils";
-import { OfflineChatDownloadIndicator } from "./OfflineChatDownloadIndicator";
+import { renderHook, TestProviders } from "@/test-utils";
+import { useOfflineChatDownloadBridge } from "./useOfflineChatDownloadBridge";
 import type { OfflineChatManagerStatus } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 
 let mockStatus: OfflineChatManagerStatus = { kind: "idle" };
@@ -18,35 +15,20 @@ vi.mock("@/hooks/localChatModels/useOfflineChatEngineStatus", () => {
 });
 
 function _renderBridge(): void {
-  render(
-    <I18nProvider i18n={i18n}>
-      <AvandarAppProvider>
-        <OfflineChatDownloadIndicator />
-      </AvandarAppProvider>
-    </I18nProvider>,
+  renderHook(
+    () => {
+      return useOfflineChatDownloadBridge();
+    },
+    { wrapper: TestProviders },
   );
 }
 
-describe("OfflineChatDownloadIndicator", () => {
+describe("useOfflineChatDownloadBridge", () => {
   afterEach(() => {
     mockStatus = { kind: "idle" };
     TaskProgressStore.getAllTasks().forEach(({ id }) => {
       TaskProgressStore.finishTask(id);
     });
-  });
-
-  it("renders nothing itself", () => {
-    mockStatus = {
-      kind: "downloading",
-      modelId: "qwen-1.5b",
-      progress: 0.42,
-    };
-    // `AvandarAppProvider` (Mantine) always injects its own `<style>` tag
-    // into the render container regardless of what's rendered inside it, so
-    // the container itself is never literally empty. Assert instead that
-    // the component's own former markup (its status panel) is gone.
-    _renderBridge();
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("starts a determinate task reporting the download's progress", () => {
@@ -68,28 +50,21 @@ describe("OfflineChatDownloadIndicator", () => {
 
   it("finishes the task once the engine becomes ready", () => {
     mockStatus = { kind: "downloading", modelId: "qwen-1.5b", progress: 0.9 };
-    const { rerender } = render(
-      <I18nProvider i18n={i18n}>
-        <AvandarAppProvider>
-          <OfflineChatDownloadIndicator />
-        </AvandarAppProvider>
-      </I18nProvider>,
+    const { rerender } = renderHook(
+      () => {
+        return useOfflineChatDownloadBridge();
+      },
+      { wrapper: TestProviders },
     );
     expect(TaskProgressStore.getAllTasks()).toHaveLength(1);
 
     mockStatus = { kind: "ready", modelId: "qwen-1.5b" };
-    rerender(
-      <I18nProvider i18n={i18n}>
-        <AvandarAppProvider>
-          <OfflineChatDownloadIndicator />
-        </AvandarAppProvider>
-      </I18nProvider>,
-    );
+    rerender();
 
     expect(TaskProgressStore.getAllTasks()).toHaveLength(0);
   });
 
-  it("fails the task, leaving a dismissible error, when the engine errors", () => {
+  it("fails the task, keeping the error message, when the engine errors", () => {
     mockStatus = {
       kind: "error",
       modelId: "qwen-1.5b",

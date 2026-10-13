@@ -21,8 +21,8 @@ export function TaskPanel({ id, entry }: Props): JSX.Element {
   return (
     <div
       className={css.taskProgressPanel}
-      role="status"
-      aria-live="polite"
+      role={entry.status === "error" ? "alert" : "status"}
+      aria-live={entry.status === "error" ? undefined : "polite"}
       aria-label={entry.label}
     >
       <div className={css.taskProgressTitleRow}>
@@ -34,7 +34,7 @@ export function TaskPanel({ id, entry }: Props): JSX.Element {
             variant="subtle"
             size="sm"
             color="neutral"
-            aria-label={t`Dismiss`}
+            aria-label={t`Dismiss ${entry.label}`}
             onClick={() => {
               TaskProgressStore.finishTask(id);
             }}
