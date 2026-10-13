@@ -46,7 +46,7 @@ describe("registerOfflineServiceWorker", () => {
   let registration: ServiceWorkerRegistration;
   let onNeedRefresh: () => void;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.useFakeTimers();
     vi.stubEnv("DEV", false);
 
@@ -69,13 +69,21 @@ describe("registerOfflineServiceWorker", () => {
           update: updateMock,
           waiting: undefined,
         } as unknown as ServiceWorkerRegistration;
-        options.onRegisteredSW?.("/sw.js", registration);
         onNeedRefresh = options.onNeedRefresh ?? (() => {});
+        // The real `registerSW` only calls `onRegisteredSW` after its own
+        // `wb.register().then(...)` resolves, once the function has already
+        // returned `updateServiceWorker` to its caller. Deferring this to a
+        // microtask matches that, since the source code's `onRegisteredSW`
+        // closes over `updateServiceWorker` before it exists synchronously.
+        queueMicrotask(() => {
+          options.onRegisteredSW?.("/sw.js", registration);
+        });
         return updateServiceWorkerMock;
       },
     );
 
     registerOfflineServiceWorker();
+    await Promise.resolve();
   });
 
   afterEach(() => {
@@ -117,6 +125,17 @@ describe("registerOfflineServiceWorker", () => {
 
     expect(updateServiceWorkerMock).toHaveBeenCalledTimes(1);
     expect(reloadMock).not.toHaveBeenCalled();
+  });
+
+  it("re-shows the notification on the next poll tick while dismissed but still pending", () => {
+    const waitingWorker = _makeFakeWaitingWorker();
+    Object.defineProperty(registration, "waiting", { value: waitingWorker });
+
+    vi.advanceTimersByTime(15 * 60 * 1000);
+
+    expect(notificationsShowMock).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "service-worker-update-available" }),
+    );
   });
 
   it("reloads the page once the waiting worker activates after being accepted", () => {
