@@ -1,7 +1,7 @@
 import { useMutation } from "@avandar/query-hooks";
 import { ActionIcon } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -9,8 +9,6 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
 import { deleteRetainedOriginalFromCloud } from "@/clients/storage/DatasetOriginalFileStorageClient/deleteRetainedOriginalFromCloud/deleteRetainedOriginalFromCloud";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
-import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
@@ -92,13 +90,8 @@ export function ToggleOfflineOnlyButton({
     },
   });
 
-  const isUploadPending = useIsDatasetUploadInProgress(dataSource.datasetId);
-  const uploadPercent = useUploadPercent(dataSource.datasetId);
-
   const onClick = offline.guard(() => {
-    const isPending = isMakeOfflinePending || isUploadPending;
-
-    if (isPending) {
+    if (isMakeOfflinePending) {
       return;
     }
 
@@ -110,7 +103,7 @@ export function ToggleOfflineOnlyButton({
       },
       confirmProps: {
         color: isInCloudStorage ? "danger" : undefined,
-        loading: isPending,
+        loading: isMakeOfflinePending,
       },
       children: isInCloudStorage ? (
         <Text c="red.8">
@@ -143,45 +136,29 @@ export function ToggleOfflineOnlyButton({
     });
   });
 
-  const isPending = isMakeOfflinePending || isUploadPending;
-
   return (
-    <Stack gap={4} align="center">
-      <OfflineGated isBlocked={offline.isBlocked}>
-        <ActionIcon
-          tooltip={
-            isUploadPending
-              ? t`Syncing dataset online...`
-              : isInCloudStorage
-                ? t`This dataset is synced online. Click to make offline-only.`
-                : t`This dataset is offline-only. Click to allow online syncing.`
-          }
-          variant="default"
-          color="neutral"
-          aria-label={
-            isInCloudStorage ? t`Make offline-only` : t`Allow online syncing`
-          }
-          data-disabled={isPending || offline.isBlocked || undefined}
-          aria-disabled={isPending || offline.isBlocked}
-          onClick={onClick}
-        >
-          {isUploadPending ? (
-            <Loader size={20} />
-          ) : isInCloudStorage ? (
-            <ThemeIcon variant="transparent" c="blue">
-              <IconWorld size={20} />
-            </ThemeIcon>
-          ) : (
-            <ThemeIcon variant="transparent" c="neutral.4">
-              <IconWorldOff size={20} />
-            </ThemeIcon>
-          )}
-        </ActionIcon>
-      </OfflineGated>
-
-      {isUploadPending && uploadPercent !== undefined ? (
-        <Progress value={uploadPercent} w={80} size={4} />
-      ) : null}
-    </Stack>
+    <OfflineGated isBlocked={offline.isBlocked}>
+      <ActionIcon
+        tooltip={
+          isInCloudStorage
+            ? t`This dataset is synced online. Click to make offline-only.`
+            : t`This dataset is offline-only. Click to allow online syncing.`
+        }
+        variant="default"
+        color="neutral"
+        aria-label={
+          isInCloudStorage ? t`Make offline-only` : t`Allow online syncing`
+        }
+        data-disabled={isMakeOfflinePending || offline.isBlocked || undefined}
+        aria-disabled={isMakeOfflinePending || offline.isBlocked}
+        onClick={onClick}
+      >
+        {isInCloudStorage ? (
+          <IconWorld size={20} />
+        ) : (
+          <IconWorldOff size={20} />
+        )}
+      </ActionIcon>
+    </OfflineGated>
   );
 }
