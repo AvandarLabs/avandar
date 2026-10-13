@@ -1,4 +1,5 @@
 import { GetProdVersionCli } from "@ava-cli/ReleaseCli/GetProdVersionCli";
+import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli";
 import {
   findUnknownReleaseFlags,
   wantsHelp,
@@ -50,6 +51,7 @@ type ReleaseCliArgs = {
  */
 export const ReleaseCli = Acclimate.createCLI("release")
   .addCommand("get-prod-version", GetProdVersionCli)
+  .addCommand("notes", ReleaseNotesCli)
   .description(
     "Release the Avandar app: main becomes an exact copy of develop (a " +
       "straight cut, never a merge, so it cannot conflict), tagged " +
