@@ -15,7 +15,6 @@ import {
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import type { IAcclimateCLI } from "@avandar/acclimate";
 
 const USAGE = `ava release notes: publish GitHub release notes for an existing release.
 
@@ -106,7 +105,7 @@ async function _runReleaseNotes(
   }
 }
 
-export const ReleaseNotesCli: IAcclimateCLI = Acclimate.createCLI("notes")
+export const ReleaseNotesCli = Acclimate.createCLI("notes")
   .description(
     "Generate and publish GitHub release notes for an existing release tag, via an LLM.",
   )

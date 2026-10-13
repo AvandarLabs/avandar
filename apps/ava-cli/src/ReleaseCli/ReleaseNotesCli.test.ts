@@ -45,7 +45,7 @@ describe("ava release notes", () => {
     vi.mocked(findRepoRootModule.findRepoRoot).mockReturnValue(undefined);
     process.argv.push("--help");
 
-    await ReleaseNotesCli.state.action?.({ dryRun: false });
+    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
 
     expect(_loggedText(logSpy)).toContain("ava release notes");
     expect(process.exitCode).toBeUndefined();
