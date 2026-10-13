@@ -1,0 +1,47 @@
+.taskProgressIndicator {
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  left: 16px;
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+  position: fixed;
+  z-index: 200;
+}
+
+.taskProgressPanel {
+  background: var(--mantine-color-white);
+  border: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+  max-width: 360px;
+  min-width: 280px;
+  padding: var(--mantine-spacing-sm);
+}
+
+.taskProgressTitleRow {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  justify-content: space-between;
+  margin-bottom: var(--mantine-spacing-xs);
+}
+
+.taskProgressLabel {
+  color: var(--mantine-color-neutral-9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.taskProgressDetail {
+  color: var(--mantine-color-neutral-6);
+  line-height: 1.35;
+  margin-top: var(--mantine-spacing-xs);
+}
+
+.taskProgressErrorMessage {
+  color: var(--mantine-color-danger-7, var(--mantine-color-red-7));
+  line-height: 1.35;
+}

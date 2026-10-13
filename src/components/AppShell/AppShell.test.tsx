@@ -21,6 +21,14 @@ vi.mock(
   },
 );
 
+vi.mock("@/components/TaskProgressIndicator/TaskProgressIndicator", () => {
+  return {
+    TaskProgressIndicator: () => {
+      return null;
+    },
+  };
+});
+
 describe("AppShell", () => {
   it("renders without a Nux.Provider when there is no current workspace", () => {
     render(
