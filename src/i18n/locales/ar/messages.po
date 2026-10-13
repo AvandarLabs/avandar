@@ -2521,7 +2521,7 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 "the reverse."
 msgstr "خط العرض خارج النطاق الصالح، لكنه سيكون خط طول صالحًا، والعكس صحيح."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerServiceWorker/registerServiceWorker.ts
 msgid "Update available"
 msgstr "يتوفر تحديث"
 
@@ -2979,8 +2979,8 @@ msgid "Annotation text:"
 msgstr "نص التعليق:"
 
 #: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "يتوفر إصدار جديد. حدّث الصفحة للتحديث."
+#~ msgid "A new version is available. Refresh to update."
+#~ msgstr "يتوفر إصدار جديد. حدّث الصفحة للتحديث."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4155,6 +4155,10 @@ msgstr "إرسال"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "لوحة التحكم"
+
+#: src/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr ""
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
@@ -6492,6 +6496,10 @@ msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "تاريخ الإنتاج (مضمّن دائمًا)"
+
+#: src/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"

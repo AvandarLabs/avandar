@@ -2557,7 +2557,7 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 msgstr "Latitudo iko nje ya masafa halali, lakini ingekuwa longitudo halali, na "
 "kinyume chake."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerServiceWorker/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Sasisho linapatikana"
 
@@ -3020,8 +3020,8 @@ msgid "Annotation text:"
 msgstr "Maandishi ya maelezo:"
 
 #: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "Toleo jipya linapatikana. Onyesha upya ili kusasisha."
+#~ msgid "A new version is available. Refresh to update."
+#~ msgstr "Toleo jipya linapatikana. Onyesha upya ili kusasisha."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4210,6 +4210,10 @@ msgstr "Wasilisha"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "dashibodi"
+
+#: src/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr ""
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
@@ -6574,6 +6578,10 @@ msgstr "Tafadhali ingia tena ili kuendelea."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "Tarehe ya utayarishaji (Hujumuishwa kila wakati)"
+
+#: src/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"

@@ -1,0 +1,91 @@
+import { t } from "@lingui/core/macro";
+import { notifications } from "@mantine/notifications";
+import { createElement } from "react";
+import { registerSW } from "virtual:pwa-register";
+import { ServiceWorkerUpdateNotification } from "@/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification";
+
+const UPDATE_CHECK_INTERVAL_MS = 15 * 60 * 1000;
+const UPDATE_NOTIFICATION_ID = "service-worker-update-available";
+
+/**
+ * Reloads the page once `waitingWorker` finishes activating, rather than as
+ * soon as skipWaiting is requested. Workbox's generated service worker still
+ * runs its activate step (cache cleanup) after `skipWaiting()`, so reloading
+ * earlier can hand the fresh page back to the still-active old worker.
+ */
+function _reloadOnceActivated(waitingWorker: ServiceWorker): void {
+  if (waitingWorker.state === "activated") {
+    window.location.reload();
+    return;
+  }
+
+  waitingWorker.addEventListener("statechange", () => {
+    if (waitingWorker.state === "activated") {
+      window.location.reload();
+    }
+  });
+}
+
+/**
+ * Checks for a new deployed version on an interval and whenever the tab
+ * regains focus, so an open tab notices a release without needing a manual
+ * reload to trigger the browser's own (much less frequent) check.
+ */
+function _pollForUpdates(registration: ServiceWorkerRegistration): void {
+  const _checkNow = () => {
+    registration.update().catch(() => {
+      // A failed check (offline, flaky network) just retries on the next
+      // tick or the next tab focus; nothing to surface to the user.
+    });
+  };
+
+  setInterval(_checkNow, UPDATE_CHECK_INTERVAL_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      _checkNow();
+    }
+  });
+}
+
+/**
+ * Registers the PWA service worker in production builds and shows a
+ * dismissible notification once a new deployed version is ready. The user
+ * decides when to update: accepting it reloads only the tab that accepted,
+ * and every other open tab keeps running on its current session undisturbed.
+ * No-op in dev mode.
+ */
+export function registerOfflineServiceWorker(): void {
+  if (import.meta.env.DEV) {
+    return;
+  }
+
+  let registration: ServiceWorkerRegistration | undefined;
+
+  const updateServiceWorker = registerSW({
+    immediate: true,
+    onRegisteredSW(_swScriptUrl, swRegistration) {
+      registration = swRegistration;
+      if (registration) {
+        _pollForUpdates(registration);
+      }
+    },
+    onNeedRefresh() {
+      const waitingWorker = registration?.waiting ?? undefined;
+
+      notifications.show({
+        id: UPDATE_NOTIFICATION_ID,
+        title: t`Update available`,
+        autoClose: false,
+        withCloseButton: true,
+        message: createElement(ServiceWorkerUpdateNotification, {
+          onUpdate: () => {
+            if (waitingWorker) {
+              _reloadOnceActivated(waitingWorker);
+            }
+            void updateServiceWorker();
+          },
+        }),
+      });
+    },
+  });
+}

@@ -2564,7 +2564,7 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 msgstr "La latitud está fuera del rango válido, pero sería una longitud válida, "
 "y viceversa."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerServiceWorker/registerServiceWorker.ts
 msgid "Update available"
 msgstr "Actualización disponible"
 
@@ -3028,8 +3028,8 @@ msgid "Annotation text:"
 msgstr "Texto de anotación:"
 
 #: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "Hay una nueva versión disponible. Actualice la página para instalarla."
+#~ msgid "A new version is available. Refresh to update."
+#~ msgstr "Hay una nueva versión disponible. Actualice la página para instalarla."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4222,6 +4222,10 @@ msgstr "Enviar"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "tablero"
+
+#: src/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr ""
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
@@ -6593,6 +6597,10 @@ msgstr "Por favor, inicie sesión nuevamente para continuar."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "Fecha de producción (Siempre incluida)"
+
+#: src/lib/offline/registerServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"

@@ -20,7 +20,7 @@ import { AvaRouter } from "@/config/AvaRouter";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { AvandarI18nProvider } from "@/i18n/AvandarI18nProvider";
-import { registerOfflineServiceWorker } from "@/lib/offline/registerServiceWorker";
+import { registerOfflineServiceWorker } from "@/lib/offline/registerServiceWorker/registerServiceWorker";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
 AGGridModuleRegistry.registerModules([AllCommunityModule]);
