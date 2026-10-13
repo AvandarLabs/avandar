@@ -1,3 +1,4 @@
+import { GetProdVersionCli } from "@ava-cli/ReleaseCli/GetProdVersionCli";
 import {
   findUnknownReleaseFlags,
   wantsHelp,
@@ -6,13 +7,14 @@ import { runRelease } from "@ava-cli/ReleaseCli/runRelease/runRelease";
 import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
-const USAGE = `ava release — publish a new release of the Avandar app.
+const USAGE = `ava release: publish a new release of the Avandar app.
 
   main becomes an exact copy of develop (a straight cut, never a merge, so it
   cannot conflict), tagged vX.Y.Z. develop then moves on to the next -dev
   version. Run it from develop, with a clean tree and nothing unpushed.
 
 Usage
+  ava release get-prod-version                  print the version on origin/main
   ava release                                   ask for both versions
   ava release --version 0.11.0                  ask only for the next version
   ava release --version 0.11.0 --next 0.11.1 --yes
@@ -44,6 +46,7 @@ type ReleaseCliArgs = {
  * than through `askIfEmpty`.
  */
 export const ReleaseCli = Acclimate.createCLI("release")
+  .addCommand("get-prod-version", GetProdVersionCli)
   .description(
     "Release the Avandar app: main becomes an exact copy of develop (a " +
       "straight cut, never a merge, so it cannot conflict), tagged " +
