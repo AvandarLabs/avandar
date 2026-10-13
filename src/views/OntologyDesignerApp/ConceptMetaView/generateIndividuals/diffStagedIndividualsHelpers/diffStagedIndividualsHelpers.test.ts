@@ -7,10 +7,10 @@ import {
   diffStagedIndividualsPage,
   getNewlyStaleIndividuals,
 } from "./diffStagedIndividualsHelpers";
-import type { ExistingIndividual } from "./diffStagedIndividualsHelpers";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ExistingIndividual } from "./diffStagedIndividualsHelpers";
 
 const WORKSPACE_ID = uuid<Workspace.Id>();
 const CONCEPT_ID = uuid<Concept.Id>();

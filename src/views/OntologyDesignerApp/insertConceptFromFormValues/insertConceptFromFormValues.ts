@@ -11,8 +11,8 @@ import {
   getAttributesWithMapping,
 } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 

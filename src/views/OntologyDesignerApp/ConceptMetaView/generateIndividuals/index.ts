@@ -1,4 +1,3 @@
-import { t } from "@lingui/core/macro";
 import {
   assertIsDefined,
   hasDefinedProps,
@@ -12,6 +11,7 @@ import {
   sqlTemplate,
   where,
 } from "@avandar/utils";
+import { t } from "@lingui/core/macro";
 import { Concept } from "$/models/ontology/Concept/Concept";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -20,15 +20,10 @@ import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClie
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { Logger } from "@/utils/Logger";
 import {
   diffStagedIndividualsPage,
   getNewlyStaleIndividuals,
-} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
-import type {
-  ExistingIndividual,
-  StagedIndividualRow,
 } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -39,6 +34,11 @@ import type {
 } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import type {
+  ExistingIndividual,
+  StagedIndividualRow,
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
 import type { SetDefined } from "@avandar/utils";
 import type { SetRequired } from "type-fest";
 
@@ -53,7 +53,9 @@ export function getAttributesWithMapping<
   TAttribute extends { mapping?: AttributeMapping },
 >(
   attributes: readonly TAttribute[],
-): Array<SetRequired<TAttribute, "mapping"> & SetDefined<TAttribute, "mapping">> {
+): Array<
+  SetRequired<TAttribute, "mapping"> & SetDefined<TAttribute, "mapping">
+> {
   return attributes.filter(
     (
       attribute,
@@ -339,24 +341,24 @@ async function _runGenerateIndividuals(
   const matchedExternalIds = new Set<string>();
 
   try {
-    const jobSummary = await DuckDbClient.forEachQueryPage<
-      StagedIndividualRow
-    >({
-      query: { tableName: stagingTableName, castTimestampsToISO: true },
-      callback: async (page) => {
-        await _diffAndUpsertPage({
-          stagedRows: page.data,
-          existingByExternalId,
-          matchedExternalIds,
-          workspaceId: concept.workspaceId,
-          conceptId: concept.id,
-          taskId,
-          conceptName: concept.name,
-          pageNum: page.pageNum,
-          totalPages: page.totalPages,
-        });
+    const jobSummary = await DuckDbClient.forEachQueryPage<StagedIndividualRow>(
+      {
+        query: { tableName: stagingTableName, castTimestampsToISO: true },
+        callback: async (page) => {
+          await _diffAndUpsertPage({
+            stagedRows: page.data,
+            existingByExternalId,
+            matchedExternalIds,
+            workspaceId: concept.workspaceId,
+            conceptId: concept.id,
+            taskId,
+            conceptName: concept.name,
+            pageNum: page.pageNum,
+            totalPages: page.totalPages,
+          });
+        },
       },
-    });
+    );
 
     Logger.log(`Finished upserting all pages`, jobSummary);
 

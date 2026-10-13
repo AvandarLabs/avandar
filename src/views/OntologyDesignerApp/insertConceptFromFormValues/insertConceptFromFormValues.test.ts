@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { insertConceptFromFormValues } from "./insertConceptFromFormValues";
-import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 const {
   conceptInsertMock,
@@ -94,7 +94,10 @@ function _makeFormValues(): ConceptFormSubmitValues {
         allowManualEdit: false,
         isArray: false,
         mappings: {
-          manualEntry: { type: "manual_entry", conceptAttributeId: ATTRIBUTE_ID },
+          manualEntry: {
+            type: "manual_entry",
+            conceptAttributeId: ATTRIBUTE_ID,
+          },
           datasetColumn: {
             type: "dataset_column",
             conceptAttributeId: ATTRIBUTE_ID,

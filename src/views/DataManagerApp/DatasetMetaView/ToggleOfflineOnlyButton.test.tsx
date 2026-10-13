@@ -5,7 +5,7 @@ import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgr
 import { render, screen } from "@/test-utils";
 import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
@@ -21,7 +21,7 @@ const DATA_SOURCE = {
   datasetId: "dataset-1",
 } as unknown as CsvFileDataset.T;
 
-function _renderWithQueryClient(ui: ReactNode): ReturnType<typeof render> {
+function _renderWithQueryClient(ui: ReactElement): ReturnType<typeof render> {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },

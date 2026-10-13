@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { renderHook, TestProviders } from "@/test-utils";
 import { useOfflineChatDownloadBridge } from "./useOfflineChatDownloadBridge";

@@ -34,9 +34,7 @@ describe("TaskProgressIndicator", () => {
 
     _renderIndicator();
 
-    expect(
-      screen.getByText("Refreshing Facility records"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Refreshing Facility records")).toBeInTheDocument();
     expect(screen.getByText("Uploading dataset")).toBeInTheDocument();
     expect(screen.getAllByRole("status")).toHaveLength(2);
   });

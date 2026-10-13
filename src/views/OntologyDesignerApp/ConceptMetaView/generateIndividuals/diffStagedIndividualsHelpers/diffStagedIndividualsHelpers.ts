@@ -58,8 +58,7 @@ export function diffStagedIndividualsPage(options: {
   workspaceId: Workspace.Id;
   conceptId: Concept.Id;
 }): { rowsToWrite: IndividualUpsertRow[]; matchedExternalIds: string[] } {
-  const { stagedRows, existingByExternalId, workspaceId, conceptId } =
-    options;
+  const { stagedRows, existingByExternalId, workspaceId, conceptId } = options;
 
   const matchedExternalIds = stagedRows
     .filter((row) => {

@@ -16,10 +16,10 @@ import {
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import { notifyError } from "@/utils/notifications/notify";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
 
 /**
  * Tracks uploads already in flight, keyed by dataset id, so a second call for
