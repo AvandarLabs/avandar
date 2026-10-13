@@ -98,8 +98,9 @@ job's existing permissions (`contents: write`, `pull-requests: write`) and
 `fetch-depth: 0` checkout already cover what this step needs.
 
 The step runs a new script, `scripts/ci/ensure-changesets/ensureChangesets.ts`,
-executed directly via Node's native TypeScript support (no `$/`/`@/` aliases
-needed, so no `tsx` or Vite runner required). The bump-inference logic is
+executed via `pnpm vite-script` (this repo's existing `vite-node`-based script
+runner), since this repo's sibling modules use extensionless relative imports
+that plain Node ESM cannot resolve on its own. The bump-inference logic is
 split into small, independently testable pure functions alongside it (exact
 module layout is finalized during planning), following this repo's pattern of
 colocating a tested module with its test file (see `scripts/db/*` for

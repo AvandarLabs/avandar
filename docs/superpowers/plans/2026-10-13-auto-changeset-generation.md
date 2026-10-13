@@ -821,7 +821,7 @@ function processUnassociatedCommit(
     return false;
   }
 
-  const changedFiles = runGit(["show", "--name-only", "--format=", sha])
+  const changedFiles = runGit(["diff", "--name-only", `${sha}^`, sha])
     .split("\n")
     .filter(Boolean);
   if (hasManualChangeset(changedFiles)) {
