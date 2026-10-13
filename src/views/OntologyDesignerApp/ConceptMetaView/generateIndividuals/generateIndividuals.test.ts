@@ -9,11 +9,12 @@
  * only a test on the emitted SQL and on the table's lifetime can hold it.
  */
 import { Model } from "@avandar/models";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
 import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
@@ -230,6 +231,12 @@ describe("generateIndividuals", () => {
     getAllIndividualsMock.mockResolvedValue([]);
   });
 
+  afterEach(() => {
+    TaskProgressStore.getAllTasks().forEach(({ id }) => {
+      TaskProgressStore.finishTask(id);
+    });
+  });
+
   it("stages the rows under a prefixed table name, never the concept's bare id", async () => {
     await generateIndividuals(_makeConcept());
 
@@ -359,5 +366,66 @@ describe("generateIndividuals", () => {
         missing_from_source_at: expect.any(String),
       }),
     ]);
+  });
+
+  it("finishes its progress task after a successful sync", async () => {
+    forEachQueryPageMock.mockResolvedValue({ numPages: 0, numRows: 0 });
+
+    await generateIndividuals(_makeConcept());
+
+    expect(TaskProgressStore.getAllTasks()).toEqual([]);
+  });
+
+  it("fails its progress task, keeping the error message, when the sync throws", async () => {
+    forEachQueryPageMock.mockRejectedValue(new Error("upsert exploded"));
+
+    await expect(generateIndividuals(_makeConcept())).rejects.toThrow(
+      "upsert exploded",
+    );
+
+    const tasks = TaskProgressStore.getAllTasks();
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0]!.entry).toMatchObject({
+      status: "error",
+      message: "upsert exploded",
+    });
+  });
+
+  it("reports determinate progress using the staged page's position and total", async () => {
+    let observedEntry: unknown;
+    forEachQueryPageMock.mockImplementation(
+      async (options: {
+        callback: (page: {
+          data: Array<{ external_id: string; name: string }>;
+          numRows: number;
+          totalRows: number;
+          totalPages: number;
+          pageNum: number;
+          nextPage: number | undefined;
+          prevPage: number | undefined;
+        }) => Promise<void>;
+      }) => {
+        await options.callback({
+          data: [{ external_id: "ext-1", name: "Jane Doe" }],
+          numRows: 1,
+          totalRows: 1,
+          totalPages: 3,
+          pageNum: 1,
+          nextPage: 2,
+          prevPage: 0,
+        });
+        const [task] = TaskProgressStore.getAllTasks();
+        observedEntry = task?.entry;
+        return { numPages: 1, numRows: 1 };
+      },
+    );
+
+    await generateIndividuals(_makeConcept());
+
+    expect(observedEntry).toMatchObject({
+      status: "determinate",
+      current: 2,
+      total: 3,
+    });
   });
 });

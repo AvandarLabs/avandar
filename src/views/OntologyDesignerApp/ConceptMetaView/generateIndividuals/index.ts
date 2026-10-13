@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import {
   assertIsDefined,
   isDefined,
@@ -16,6 +17,8 @@ import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSql
 import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore";
+import type { TaskId } from "@/lib/utils/state/TaskProgressStore";
 import { Logger } from "@/utils/Logger";
 import {
   diffStagedIndividualsPage,
@@ -58,7 +61,8 @@ async function _getExistingIndividualsByExternalId(
  * Diffs one staged page against the concept's existing individuals and
  * upserts only the rows that changed. Matched external ids are recorded onto
  * `matchedExternalIds` so the caller can sweep newly-stale individuals once
- * every page has been processed.
+ * every page has been processed. Also switches the sync's progress task to
+ * determinate, reporting this page's position among the staged table's pages.
  */
 async function _diffAndUpsertPage(options: {
   stagedRows: readonly StagedIndividualRow[];
@@ -66,6 +70,10 @@ async function _diffAndUpsertPage(options: {
   matchedExternalIds: Set<string>;
   workspaceId: Workspace.Id;
   conceptId: Concept.Id;
+  taskId: TaskId;
+  conceptName: string;
+  pageNum: number;
+  totalPages: number;
 }): Promise<void> {
   const {
     stagedRows,
@@ -73,7 +81,19 @@ async function _diffAndUpsertPage(options: {
     matchedExternalIds,
     workspaceId,
     conceptId,
+    taskId,
+    conceptName,
+    pageNum,
+    totalPages,
   } = options;
+
+  TaskProgressStore.updateTask(taskId, {
+    status: "determinate",
+    label: t`Refreshing ${conceptName} records…`,
+    current: pageNum + 1,
+    total: totalPages,
+  });
+
   const diffResult = diffStagedIndividualsPage({
     stagedRows,
     existingByExternalId,
@@ -98,10 +118,14 @@ async function _diffAndUpsertPage(options: {
 }
 
 /**
- * Run a basic Qetl pipeline to generate individuals.
+ * Resolves the source-dataset mappings, stages individuals into DuckDB, and
+ * diffs/upserts them page by page. Split out of {@link generateIndividuals} so
+ * that function can start and finish the sync's progress task around the
+ * whole operation, including failures during mapping resolution.
  */
-export async function generateIndividuals(
+async function _runGenerateIndividuals(
   concept: BuildableConcept,
+  taskId: TaskId,
 ): Promise<void> {
   const entConfig = Concept.bind(concept);
 
@@ -241,6 +265,10 @@ export async function generateIndividuals(
           matchedExternalIds,
           workspaceId: concept.workspaceId,
           conceptId: concept.id,
+          taskId,
+          conceptName: concept.name,
+          pageNum: page.pageNum,
+          totalPages: page.totalPages,
         });
       },
     });
@@ -275,5 +303,28 @@ export async function generateIndividuals(
       }),
       workspaceId: concept.workspaceId,
     });
+  }
+}
+
+/**
+ * Runs a basic Qetl pipeline to generate individuals for a concept, reporting
+ * its progress through {@link TaskProgressStore}: indeterminate while
+ * resolving mappings and staging, determinate per page once diffing begins,
+ * and finished or failed in lockstep with the sync itself.
+ */
+export async function generateIndividuals(
+  concept: BuildableConcept,
+): Promise<void> {
+  const taskId = TaskProgressStore.startTask(
+    t`Refreshing ${concept.name} records…`,
+  );
+
+  try {
+    await _runGenerateIndividuals(concept, taskId);
+    TaskProgressStore.finishTask(taskId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    TaskProgressStore.failTask(taskId, message);
+    throw error;
   }
 }
