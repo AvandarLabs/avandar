@@ -21,6 +21,7 @@ import {
   printDetails,
   printHeading,
 } from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers";
+import type { PublishReleaseNotesOutcome } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes";
 import {
   printError,
   printInfo,
@@ -138,6 +139,52 @@ export async function confirmReleasePlan(
     !(await promptToConfirm(`Release ${releaseVersion}?`))
   ) {
     throw new Error("Aborted.");
+  }
+}
+
+/**
+ * Reports the outcome of generating and publishing this release's GitHub
+ * release notes, called right after the tag and main are pushed (or, on a
+ * dry run, right after the preview would have been generated).
+ *
+ * A failure here never fails the release: main and the tag are already live
+ * by the time this runs, so the only thing left to do is tell the user how
+ * to retry the one step that didn't finish.
+ */
+export function reportReleaseNotesOutcome(
+  outcome: PublishReleaseNotesOutcome,
+  releaseVersion: string,
+): void {
+  const retryHint = `Retry publishing release notes: ava release notes --version ${releaseVersion}`;
+
+  switch (outcome.kind) {
+    case "published":
+      return;
+    case "previewed":
+      printHeading("Release notes (preview)");
+      printInfo(outcome.notes);
+      return;
+    case "no-changes":
+      printInfo(
+        "No commits found since the previous tag; no release notes to publish.",
+      );
+      return;
+    case "already-exists":
+      printWarn(
+        `Release notes already exist for v${releaseVersion}: ${outcome.url}`,
+      );
+      printWarn(retryHint);
+      return;
+    case "tag-not-found":
+      printWarn(
+        `Could not find tag v${releaseVersion} to publish release notes for.`,
+      );
+      printWarn(retryHint);
+      return;
+    case "failed":
+      printWarn(`Could not publish release notes: ${outcome.reason}`);
+      printWarn(retryHint);
+      return;
   }
 }
 

@@ -1,4 +1,5 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes";
 import { readVersionAtRevision } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import {
   suggestNextVersion,
@@ -21,6 +22,7 @@ import {
   confirmReleasePlan,
   printReleaseSummary,
   publishMainAndTag,
+  reportReleaseNotesOutcome,
   updateLocalMainRef,
 } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers";
 import {
@@ -64,7 +66,7 @@ type SatisfiedPreflight = Extract<PreflightResult, { ok: true }>;
 export async function runRelease(
   options: Readonly<ReleaseOptions>,
 ): Promise<void> {
-  const { yes, dryRun, skipCiCheck } = options;
+  const { yes, dryRun, skipCiCheck, skipChangelog } = options;
 
   const git = createReleaseCommands({ repoRoot: _requireRepoRoot(), dryRun });
   if (dryRun) {
@@ -98,6 +100,22 @@ export async function runRelease(
     releaseSha,
     originMainSha,
   });
+
+  if (!skipChangelog) {
+    // On a dry run `releaseCommitSha` is undefined (nothing was tagged), so
+    // the develop-side commit stands in for the tag, and the existence
+    // checks (which only make sense for a tag that actually exists) are
+    // skipped.
+    const releaseNotesOutcome = await publishReleaseNotes(git, {
+      releaseTag: plan.releaseTag,
+      dryRun,
+      ...(releaseCommitSha === undefined
+        ? { headRevision: releaseSha, skipExistenceChecks: true }
+        : {}),
+    });
+    reportReleaseNotesOutcome(releaseNotesOutcome, plan.releaseVersion);
+  }
+
   // A dry run pushes nothing, so there is nothing left to do.
   if (releaseCommitSha === undefined) {
     return;
