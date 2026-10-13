@@ -45,6 +45,8 @@ export type ReleaseOptions = {
   dryRun: boolean;
   /** Skip the staging CI check. */
   skipCiCheck: boolean;
+  /** Skip generating and publishing GitHub release notes. */
+  skipChangelog: boolean;
 };
 
 /** A preflight that passed, so its refs are known. */

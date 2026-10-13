@@ -15,6 +15,7 @@ const USAGE = `ava release: publish a new release of the Avandar app.
 
 Usage
   ava release get-prod-version                  print the version on origin/main
+  ava release notes --version 0.13.3            (re-)publish release notes
   ava release                                   ask for both versions
   ava release --version 0.11.0                  ask only for the next version
   ava release --version 0.11.0 --next 0.11.1 --yes
@@ -26,6 +27,7 @@ Options
   --yes, -y      Take every suggestion and skip confirmations.
   --dry-run      Print every mutating command and run none of them.
   --skip-ci-check  Do not check develop's staging CI.
+  --skip-changelog  Do not generate or publish GitHub release notes.
   --help, -h     This text.`;
 
 /** The parsed `ava release` options, as Acclimate hands them to the action. */
@@ -35,6 +37,7 @@ type ReleaseCliArgs = {
   yes: boolean;
   dryRun: boolean;
   skipCiCheck: boolean;
+  skipChangelog: boolean;
 };
 
 /**
@@ -97,6 +100,14 @@ export const ReleaseCli = Acclimate.createCLI("release")
       "Do not check whether develop's staging CI passed for the commit being " +
       "released.",
   })
+  .addOption({
+    name: "--skip-changelog",
+    type: "boolean",
+    required: false,
+    defaultValue: false,
+    description:
+      "Do not generate or publish GitHub release notes for this release.",
+  })
   .action((args: Readonly<ReleaseCliArgs>) => {
     // Acclimate neither implements --help nor rejects unknown options, and
     // this command is far too consequential to run on a mistyped flag.
@@ -124,6 +135,7 @@ export const ReleaseCli = Acclimate.createCLI("release")
       yes: args.yes,
       dryRun: args.dryRun,
       skipCiCheck: args.skipCiCheck,
+      skipChangelog: args.skipChangelog,
     }).catch((error: unknown) => {
       printError(error instanceof Error ? error.message : String(error));
       process.exitCode = 1;
