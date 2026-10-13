@@ -1,9 +1,5 @@
 import { objectValuesMap } from "@avandar/utils";
-import type {
-  AnyFunction,
-  AnyFunctionWithReturn,
-  IExternalStore,
-} from "@avandar/utils";
+import type { AnyFunction, IExternalStore } from "@avandar/utils";
 
 /**
  * Creates an external store that can be used with React's
@@ -14,14 +10,15 @@ import type {
  *
  * All functions in `updaters` can mutate the state and will automatically
  * notify all subscribers (all components that call `useSyncExternalStore`)
- * that the stored state has changed.
+ * that the stored state has changed. An updater may also return a value
+ * (e.g. an id it generated), which is passed through to the caller.
  *
  * @returns An external store
  */
 export function createExternalStore<
   T,
   Getters extends Record<string, AnyFunction>,
-  Updaters extends Record<string, AnyFunctionWithReturn<void>>,
+  Updaters extends Record<string, AnyFunction>,
 >({
   initialState,
   builder,
@@ -46,8 +43,9 @@ export function createExternalStore<
   // wrap all updater functions with a call to notify subscribers
   const wrappedUpdaters = objectValuesMap(updaters, (updater) => {
     return (...args: unknown[]) => {
-      updater(...args);
+      const returnValue = updater(...args);
       _notifySubscribers();
+      return returnValue;
     };
   }) as Updaters;
 
