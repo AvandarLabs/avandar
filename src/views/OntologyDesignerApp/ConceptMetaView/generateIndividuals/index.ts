@@ -17,8 +17,15 @@ import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClie
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { Logger } from "@/utils/Logger";
+import {
+  diffStagedIndividualsPage,
+  getNewlyStaleIndividuals,
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividuals/diffStagedIndividuals";
+import type {
+  ExistingIndividual,
+  StagedIndividualRow,
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividuals/diffStagedIndividuals";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
-import type { Individual } from "$/models/ontology/Individual/Individual";
 
 /**
  * Run a basic Qetl pipeline to generate individuals.
@@ -76,18 +83,6 @@ export async function generateIndividuals(
       identifierMappingsByDatasetId[titleColumn.datasetId]!.id
     ]!;
 
-  // The rows are staged under a prefixed name rather than the concept's bare
-  // id, because a bare UUID in a table name always means a dataset. See
-  // `getStagingIndividualsTableName`.
-  const stagingTableName = getStagingIndividualsTableName(concept.id);
-
-  // Spelling out the columns is what keeps this from downloading whole
-  // datasets. The statement below is a `CREATE TABLE AS SELECT`, and column
-  // inference reads a top-level select list, which that shape does not have,
-  // so every relation it names would otherwise be acquired as `"all"`.
-  // Generating individuals reads exactly two columns per contributing dataset:
-  // the identifier the spine is keyed by, and the label the title is picked
-  // from.
   const neededColumnsByDatasetId = objectValuesMap(
     makeBucketRecord(
       datasetColumnMappings.map((mapping) => {
@@ -100,6 +95,40 @@ export async function generateIndividuals(
     },
   );
 
+  // Read every existing individual for this concept before touching DuckDB,
+  // so a failure here never creates a staging table that then needs cleanup.
+  const existingIndividuals = await IndividualClient.getAll(
+    where("concept_id", "eq", concept.id),
+  );
+  const existingByExternalId = new Map<string, ExistingIndividual>(
+    // A Map, not a plain object: external_id comes from arbitrary
+    // source-dataset values, which must never be trusted as an object key.
+    existingIndividuals.map((individual) => {
+      return [
+        individual.externalId,
+        {
+          id: individual.id,
+          name: individual.name,
+          missingFromSourceAt: individual.missingFromSourceAt,
+        },
+      ];
+    }),
+  );
+
+  // The rows are staged under a prefixed name rather than the concept's bare
+  // id, because a bare UUID in a table name always means a dataset. See
+  // `getStagingIndividualsTableName`.
+  const stagingTableName = getStagingIndividualsTableName(concept.id);
+
+  // Spelling out the columns is what keeps this from downloading whole
+  // datasets. The statement below is a `CREATE TABLE AS SELECT`, and column
+  // inference reads a top-level select list, which that shape does not have,
+  // so every relation it names would otherwise be acquired as `"all"`.
+  // Generating individuals reads exactly two columns per contributing dataset:
+  // the identifier the spine is keyed by, and the label the title is picked
+  // from. The staged table itself carries only `external_id` and `name`;
+  // every other column the diff needs (workspace_id, concept_id) is already a
+  // plain JS value and does not need a DuckDB round-trip.
   await WorkspaceQuerySession.runQuery({
     rawSql: sqlTemplate(`
       DROP TABLE IF EXISTS "$stagingTableName$";
@@ -115,20 +144,11 @@ export async function generateIndividuals(
 
         -- Get all names and join the tables together
         SELECT
-          gen_random_uuid() AS id,
-          NOW() as created_at,
-          NOW() as updated_at,
-          '$workspaceId$' AS workspace_id,
-          '$conceptId$' AS concept_id,
-          NULL::UUID AS assigned_to,
-          'active' AS status,
           external_id,
           $titleSelector$
         FROM external_ids
       );
     `).parse({
-      workspaceId: concept.workspaceId,
-      conceptId: concept.id,
       stagingTableName,
       externalIdSelectors: identifierMappings
         .map((mapping) => {
@@ -149,21 +169,28 @@ export async function generateIndividuals(
     workspaceId: concept.workspaceId,
     neededColumnsByDatasetId,
   });
-  Logger.log("Successfully generated all individuals. Starting upsert...");
+  Logger.log("Successfully generated all individuals. Starting diff/upsert...");
 
-  // 3. Now upload all data to Supabase
-  // TODO(jpsyx): NOTE: this will do an upsert on all rows. There is definitely
-  // optimization that can be done to only upsert new rows or rows that have
-  // a new name. There is no need to upsert rows that already exist and have
-  // not changed.
+  const matchedExternalIds = new Set<string>();
+
   try {
-    const jobSummary = await DuckDbClient.forEachQueryPage<
-      Individual.T<"DBRead">
-    >({
+    const jobSummary = await DuckDbClient.forEachQueryPage<StagedIndividualRow>({
       query: { tableName: stagingTableName, castTimestampsToISO: true },
       callback: async (page) => {
+        const diffResult = diffStagedIndividualsPage({
+          stagedRows: page.data,
+          existingByExternalId,
+          workspaceId: concept.workspaceId,
+          conceptId: concept.id,
+        });
+        diffResult.matchedExternalIds.forEach((externalId) => {
+          matchedExternalIds.add(externalId);
+        });
+        if (diffResult.rowsToWrite.length === 0) {
+          return;
+        }
         await IndividualClient.crudFunctions.bulkInsert({
-          data: page.data,
+          data: diffResult.rowsToWrite,
           upsert: true,
           onConflict: {
             columnNames: ["external_id", "concept_id"],
@@ -175,6 +202,25 @@ export async function generateIndividuals(
     });
 
     Logger.log(`Finished upserting all pages`, jobSummary);
+
+    const staleRows = getNewlyStaleIndividuals({
+      existingByExternalId,
+      matchedExternalIds,
+      workspaceId: concept.workspaceId,
+      conceptId: concept.id,
+      nowIso: new Date().toISOString(),
+    });
+    if (staleRows.length > 0) {
+      await IndividualClient.crudFunctions.bulkInsert({
+        data: staleRows,
+        upsert: true,
+        onConflict: {
+          columnNames: ["external_id", "concept_id"],
+          ignoreDuplicates: false,
+        },
+        logger: Logger,
+      });
+    }
   } finally {
     // Postgres holds the individuals once the upsert is done, so nothing reads
     // the staging table afterwards. Dropped in a `finally` rather than after

@@ -27,6 +27,7 @@ import type {
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
+import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -35,12 +36,14 @@ const {
   forEachQueryPageMock,
   getAllDatasetColumnsMock,
   bulkInsertMock,
+  getAllIndividualsMock,
 } = vi.hoisted(() => {
   return {
     runQueryMock: vi.fn(),
     forEachQueryPageMock: vi.fn(),
     getAllDatasetColumnsMock: vi.fn(),
     bulkInsertMock: vi.fn(),
+    getAllIndividualsMock: vi.fn(),
   };
 });
 
@@ -55,7 +58,10 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
 });
 vi.mock("@/clients/ontology/IndividualClient", () => {
   return {
-    IndividualClient: { crudFunctions: { bulkInsert: bulkInsertMock } },
+    IndividualClient: {
+      getAll: getAllIndividualsMock,
+      crudFunctions: { bulkInsert: bulkInsertMock },
+    },
   };
 });
 
@@ -188,6 +194,7 @@ describe("generateIndividuals", () => {
     ]);
     forEachQueryPageMock.mockResolvedValue({ numPages: 0, numRows: 0 });
     runQueryMock.mockResolvedValue({ data: [], fields: [], numRows: 0 });
+    getAllIndividualsMock.mockResolvedValue([]);
   });
 
   it("stages the rows under a prefixed table name, never the concept's bare id", async () => {
@@ -251,6 +258,119 @@ describe("generateIndividuals", () => {
     const createSql = _getRunSqlStatements()[0]!;
     expect(DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(createSql)).toEqual([
       DATASET_ID,
+    ]);
+  });
+
+  it("never includes id, status, assigned_to, created_at, or updated_at in an upsert payload", async () => {
+    forEachQueryPageMock.mockImplementation(
+      async (options: {
+        callback: (page: {
+          data: Array<{ external_id: string; name: string }>;
+          numRows: number;
+          totalRows: number;
+          totalPages: number;
+          pageNum: number;
+          nextPage: number | undefined;
+          prevPage: number | undefined;
+        }) => Promise<void>;
+      }) => {
+        await options.callback({
+          data: [{ external_id: "ext-1", name: "Jane Doe" }],
+          numRows: 1,
+          totalRows: 1,
+          totalPages: 1,
+          pageNum: 0,
+          nextPage: undefined,
+          prevPage: undefined,
+        });
+        return { numPages: 1, numRows: 1 };
+      },
+    );
+
+    await generateIndividuals(_makeConcept());
+
+    expect(bulkInsertMock).toHaveBeenCalledTimes(1);
+    const [{ data }] = bulkInsertMock.mock.calls[0]!;
+    (data as Array<Record<string, unknown>>).forEach((row) => {
+      expect(row).not.toHaveProperty("id");
+      expect(row).not.toHaveProperty("status");
+      expect(row).not.toHaveProperty("assigned_to");
+      expect(row).not.toHaveProperty("created_at");
+      expect(row).not.toHaveProperty("updated_at");
+    });
+  });
+
+  it("skips the upsert entirely when every staged row is unchanged", async () => {
+    getAllIndividualsMock.mockResolvedValue([
+      {
+        id: uuid<IndividualId>(),
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalId: "ext-1",
+        name: "Jane Doe",
+        status: "active",
+        assignedTo: undefined,
+        missingFromSourceAt: undefined,
+        createdAt: "2026-08-19T00:00:00.000Z",
+        updatedAt: "2026-08-19T00:00:00.000Z",
+      },
+    ]);
+    forEachQueryPageMock.mockImplementation(
+      async (options: {
+        callback: (page: {
+          data: Array<{ external_id: string; name: string }>;
+          numRows: number;
+          totalRows: number;
+          totalPages: number;
+          pageNum: number;
+          nextPage: number | undefined;
+          prevPage: number | undefined;
+        }) => Promise<void>;
+      }) => {
+        await options.callback({
+          data: [{ external_id: "ext-1", name: "Jane Doe" }],
+          numRows: 1,
+          totalRows: 1,
+          totalPages: 1,
+          pageNum: 0,
+          nextPage: undefined,
+          prevPage: undefined,
+        });
+        return { numPages: 1, numRows: 1 };
+      },
+    );
+
+    await generateIndividuals(_makeConcept());
+
+    expect(bulkInsertMock).not.toHaveBeenCalled();
+  });
+
+  it("flags an individual absent from every staged page as missing from source", async () => {
+    getAllIndividualsMock.mockResolvedValue([
+      {
+        id: uuid<IndividualId>(),
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalId: "ext-gone",
+        name: "Ghost Record",
+        status: "active",
+        assignedTo: undefined,
+        missingFromSourceAt: undefined,
+        createdAt: "2026-08-19T00:00:00.000Z",
+        updatedAt: "2026-08-19T00:00:00.000Z",
+      },
+    ]);
+    forEachQueryPageMock.mockResolvedValue({ numPages: 0, numRows: 0 });
+
+    await generateIndividuals(_makeConcept());
+
+    expect(bulkInsertMock).toHaveBeenCalledTimes(1);
+    const [{ data }] = bulkInsertMock.mock.calls[0]!;
+    expect(data).toEqual([
+      expect.objectContaining({
+        external_id: "ext-gone",
+        missing_from_source_at: expect.any(String),
+      }),
     ]);
   });
 });
