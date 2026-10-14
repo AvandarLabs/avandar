@@ -62,8 +62,13 @@ Implement functionality using red/green TDD.
 
 ## Comments
 
-- Do not use em dashes (—). Prefer a colon for explanations, or a hyphen (-)
-  as a short dash for aside explanations where you would have used an em dash.
+- Do not use em dashes (—). Prefer:
+  - Periods to separate clauses.
+  - A colon if the second clause is an explanation
+  - A hyphen (-) as a short dash for interjected explanations where an em dash
+    would have been grammatically correct otherwise.
+- Do not use semi-colons where a period would be clearer by creating distinct
+  sentences.
 - Use block comments or docstrings to document exported or public interfaces,
   constants, objects, functions, and classes.
 - Comments must describe the code as it exists today, not the external plan

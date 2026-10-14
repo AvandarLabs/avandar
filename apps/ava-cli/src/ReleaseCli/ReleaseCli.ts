@@ -3,6 +3,7 @@ import {
   findUnknownReleaseFlags,
   wantsHelp,
 } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
+import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import { runRelease } from "@ava-cli/ReleaseCli/runRelease/runRelease";
 import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
@@ -15,6 +16,7 @@ const USAGE = `ava release: publish a new release of the Avandar app.
 
 Usage
   ava release get-prod-version                  print the version on origin/main
+  ava release notes --version 0.13.3            (re-)publish release notes
   ava release                                   ask for both versions
   ava release --version 0.11.0                  ask only for the next version
   ava release --version 0.11.0 --next 0.11.1 --yes
@@ -24,8 +26,10 @@ Options
   --version, -v  X.Y.Z to release. Asked for when omitted.
   --next, -n     X.Y.Z develop moves to; gains -dev. Asked for when omitted.
   --yes, -y      Take every suggestion and skip confirmations.
-  --dry-run      Print every mutating command and run none of them.
+  --dry-run      Print every mutating command and run none of them. Still
+                 makes one real OpenAI call to preview the release notes.
   --skip-ci-check  Do not check develop's staging CI.
+  --skip-changelog  Do not generate or publish GitHub release notes.
   --help, -h     This text.`;
 
 /** The parsed `ava release` options, as Acclimate hands them to the action. */
@@ -35,6 +39,7 @@ type ReleaseCliArgs = {
   yes: boolean;
   dryRun: boolean;
   skipCiCheck: boolean;
+  skipChangelog: boolean;
 };
 
 /**
@@ -47,6 +52,7 @@ type ReleaseCliArgs = {
  */
 export const ReleaseCli = Acclimate.createCLI("release")
   .addCommand("get-prod-version", GetProdVersionCli)
+  .addCommand("notes", ReleaseNotesCli)
   .description(
     "Release the Avandar app: main becomes an exact copy of develop (a " +
       "straight cut, never a merge, so it cannot conflict), tagged " +
@@ -97,6 +103,14 @@ export const ReleaseCli = Acclimate.createCLI("release")
       "Do not check whether develop's staging CI passed for the commit being " +
       "released.",
   })
+  .addOption({
+    name: "--skip-changelog",
+    type: "boolean",
+    required: false,
+    defaultValue: false,
+    description:
+      "Do not generate or publish GitHub release notes for this release.",
+  })
   .action((args: Readonly<ReleaseCliArgs>) => {
     // Acclimate neither implements --help nor rejects unknown options, and
     // this command is far too consequential to run on a mistyped flag.
@@ -124,6 +138,7 @@ export const ReleaseCli = Acclimate.createCLI("release")
       yes: args.yes,
       dryRun: args.dryRun,
       skipCiCheck: args.skipCiCheck,
+      skipChangelog: args.skipChangelog,
     }).catch((error: unknown) => {
       printError(error instanceof Error ? error.message : String(error));
       process.exitCode = 1;

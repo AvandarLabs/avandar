@@ -1,4 +1,5 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { readVersionAtRevision } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import {
   suggestNextVersion,
@@ -14,15 +15,18 @@ import {
   printVersionReference,
 } from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers";
 import {
-  assertTagIsUnused,
-  bumpDevelopToNextVersion,
-  commitReleaseVersionOnDevelop,
   confirmCiVerdict,
   confirmReleasePlan,
   printReleaseSummary,
+  reportReleaseNotesOutcome,
+} from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseConfirmationStages";
+import {
+  assertTagIsUnused,
+  bumpDevelopToNextVersion,
+  commitReleaseVersionOnDevelop,
   publishMainAndTag,
   updateLocalMainRef,
-} from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers";
+} from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 import {
   resolveNextVersion,
   resolveReleaseVersion,
@@ -31,7 +35,7 @@ import { printSuccess, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 import type { PreflightResult } from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
-import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers";
+import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 
 /** Everything `ava release` accepts, already parsed. */
 export type ReleaseOptions = {
@@ -45,6 +49,8 @@ export type ReleaseOptions = {
   dryRun: boolean;
   /** Skip the staging CI check. */
   skipCiCheck: boolean;
+  /** Skip generating and publishing GitHub release notes. */
+  skipChangelog: boolean;
 };
 
 /** A preflight that passed, so its refs are known. */
@@ -62,7 +68,7 @@ type SatisfiedPreflight = Extract<PreflightResult, { ok: true }>;
 export async function runRelease(
   options: Readonly<ReleaseOptions>,
 ): Promise<void> {
-  const { yes, dryRun, skipCiCheck } = options;
+  const { yes, dryRun, skipCiCheck, skipChangelog } = options;
 
   const git = createReleaseCommands({ repoRoot: _requireRepoRoot(), dryRun });
   if (dryRun) {
@@ -96,13 +102,65 @@ export async function runRelease(
     releaseSha,
     originMainSha,
   });
-  // A dry run pushes nothing, so there is nothing left to do.
+
+  // A dry run pushes nothing. There is no later point in the function to
+  // preview the changelog from, so it happens here, using the develop-side
+  // commit as a stand-in for the tag that was never actually created.
   if (releaseCommitSha === undefined) {
+    await _publishReleaseNotesIfEnabled(git, {
+      skipChangelog,
+      dryRun,
+      plan,
+      headRevisionOverride: releaseSha,
+    });
     return;
   }
+
   updateLocalMainRef(git, { releaseCommitSha, localMainSha, originMainSha });
   bumpDevelopToNextVersion(git, plan);
   printReleaseSummary(git, { plan, releaseSha });
+
+  // Runs last, after develop is already bumped back to a working -dev
+  // version: a slow or failing OpenAI/gh call here must never delay getting
+  // the repo back into a usable state for the next release.
+  await _publishReleaseNotesIfEnabled(git, { skipChangelog, dryRun, plan });
+}
+
+/** Options accepted by {@link _publishReleaseNotesIfEnabled}. */
+type PublishReleaseNotesIfEnabledOptions = Readonly<{
+  skipChangelog: boolean;
+  dryRun: boolean;
+  plan: ReleasePlan;
+  /**
+   * The commit to diff from, when `plan.releaseTag` does not exist yet
+   * (a dry-run preview).
+   */
+  headRevisionOverride?: string;
+}>;
+
+/**
+ * Generates and publishes this release's GitHub release notes, unless
+ * `--skip-changelog` was passed, reporting the outcome either way.
+ */
+async function _publishReleaseNotesIfEnabled(
+  git: ReleaseCommands,
+  options: PublishReleaseNotesIfEnabledOptions,
+): Promise<void> {
+  const { skipChangelog, dryRun, plan, headRevisionOverride } = options;
+  if (skipChangelog) {
+    return;
+  }
+  const outcome = await publishReleaseNotes(git, {
+    releaseTag: plan.releaseTag,
+    dryRun,
+    ...(headRevisionOverride !== undefined
+      ? { headRevision: headRevisionOverride, skipExistenceChecks: true }
+      : {}),
+  });
+  reportReleaseNotesOutcome(outcome, {
+    releaseVersion: plan.releaseVersion,
+    dryRun,
+  });
 }
 
 /** The repo the release operates on, or a thrown error naming the problem. */
