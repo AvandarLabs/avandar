@@ -14,6 +14,7 @@ import {
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
+import { match } from "ts-pattern";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 
 const USAGE = `ava release notes: publish GitHub release notes for an existing release.
@@ -76,33 +77,36 @@ async function _runReleaseNotes(
     dryRun: args.dryRun,
   });
 
-  switch (outcome.kind) {
-    case "tag-not-found":
+  match(outcome)
+    .with({ kind: "tag-not-found" }, () => {
       throw new Error(
         `No release tag ${releaseTag} exists locally or on origin.`,
       );
-    case "already-exists":
+    })
+    .with({ kind: "already-exists" }, (matchedOutcome) => {
       throw new Error(
-        `Release notes already exist for ${releaseTag}: ${outcome.url}`,
+        `Release notes already exist for ${releaseTag}: ${matchedOutcome.url}`,
       );
-    case "no-changes":
+    })
+    .with({ kind: "no-changes" }, () => {
       printInfo(`No commits found for ${releaseTag}; nothing to publish.`);
-      return;
-    case "previewed":
+    })
+    .with({ kind: "previewed" }, (matchedOutcome) => {
       printInfo(
-        `Preview for ${releaseTag} (dry run, nothing published):\n\n${outcome.notes}`,
+        `Preview for ${releaseTag} (dry run, nothing published):\n\n${matchedOutcome.notes}`,
       );
-      return;
-    case "published":
+    })
+    .with({ kind: "published" }, (matchedOutcome) => {
       printSuccess(
-        `Published release notes for ${releaseTag}: ${outcome.url}`,
+        `Published release notes for ${releaseTag}: ${matchedOutcome.url}`,
       );
-      return;
-    case "failed":
+    })
+    .with({ kind: "failed" }, (matchedOutcome) => {
       throw new Error(
-        `Could not publish release notes for ${releaseTag}: ${outcome.reason}`,
+        `Could not publish release notes for ${releaseTag}: ${matchedOutcome.reason}`,
       );
-  }
+    })
+    .exhaustive();
 }
 
 /**
