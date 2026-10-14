@@ -1,6 +1,6 @@
+import { noop } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
 import { notifications } from "@mantine/notifications";
-import { noop } from "@avandar/utils";
 import { createElement } from "react";
 import { registerSW } from "virtual:pwa-register";
 import { ServiceWorkerUpdateNotification } from "@/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification";

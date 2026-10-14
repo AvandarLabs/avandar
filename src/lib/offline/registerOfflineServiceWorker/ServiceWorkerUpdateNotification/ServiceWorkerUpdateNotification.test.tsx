@@ -1,7 +1,7 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { render } from "@/test-utils";
 import { ServiceWorkerUpdateNotification } from "@/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification";
+import { render } from "@/test-utils";
 
 describe("ServiceWorkerUpdateNotification", () => {
   it("calls onUpdate when the update button is clicked", () => {
