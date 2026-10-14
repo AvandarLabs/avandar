@@ -62,9 +62,7 @@ const QUERY: string = `query($owner:String!,$name:String!,$sha:String!) {
   } } }
 }`;
 
-function _isHuman(
-  actor: Readonly<ReleaseActor> | undefined,
-): actor is ReleaseActor {
+function _isHuman(actor: Readonly<ReleaseActor> | undefined): boolean {
   return (
     actor !== undefined &&
     actor.__typename === "User" &&
@@ -95,11 +93,12 @@ function _buildPullCredit(
       pull.reviews.nodes
         .filter(propNotEq("state", "PENDING"))
         .map(prop("author"))
+        .filter(isDefined)
         .filter(_isHuman)
         .map(prop("login")),
     ),
   ];
-  const merger = _isHuman(pull.mergedBy) ? pull.mergedBy.login : undefined;
+  const merger = _isHuman(pull.mergedBy) ? pull.mergedBy?.login : undefined;
   const separateReviewers = reviewers.filter((login) => {
     return login !== merger;
   });
@@ -138,6 +137,7 @@ function _buildCredit(
       );
     })
     .map(prop("user"))
+    .filter(isDefined)
     .filter(_isHuman);
   if (authors.length === 0) {
     throw new Error(
