@@ -65,13 +65,11 @@ describe("generateReleaseNotes", () => {
   });
 
   it("sends the API key as a bearer token and the model in the body", async () => {
-    const fetchImpl = vi
-      .fn()
-      .mockResolvedValue(
-        _fakeResponse({
-          choices: [{ message: { content: '{"bullets":[]}' } }],
-        }),
-      );
+    const fetchImpl = vi.fn().mockResolvedValue(
+      _fakeResponse({
+        choices: [{ message: { content: '{"bullets":[]}' } }],
+      }),
+    );
 
     await generateReleaseNotes({
       releaseVersion: "0.14.0",
