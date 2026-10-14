@@ -2454,7 +2454,7 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 "the reverse."
 msgstr "纬度超出有效范围，但作为经度有效；反之亦然。"
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerOfflineServiceWorker/registerOfflineServiceWorker.ts
 msgid "Update available"
 msgstr "有可用更新"
 
@@ -2897,10 +2897,6 @@ msgstr "已隐藏 {0} 个区域"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "注释文本："
-
-#: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "有新版本可用。刷新以更新。"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4046,6 +4042,10 @@ msgstr "提交"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "仪表板"
+
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr "新版本已准备就绪。立即更新，或关闭此提示稍后更新。"
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
@@ -6347,6 +6347,10 @@ msgstr "请重新登录以继续。"
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "生成日期（始终包含）"
+
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr "立即更新"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
