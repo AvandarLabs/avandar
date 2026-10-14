@@ -7,11 +7,10 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-
 import { getPackageNamesFromChangedFiles } from "./getPackageNamesFromChangedFiles/getPackageNamesFromChangedFiles";
 import { inferBumpType } from "./inferBumpType/inferBumpType";
-import type { SemverBump } from "./inferBumpType/inferBumpType";
 import { makeChangesetMarkdown } from "./makeChangesetMarkdown/makeChangesetMarkdown";
+import type { SemverBump } from "./inferBumpType/inferBumpType";
 
 const REPO_ROOT = process.cwd();
 const CHANGESET_DIR = join(REPO_ROOT, ".changeset");

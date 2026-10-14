@@ -30,14 +30,12 @@ describe("parseConventionalCommitTitle", () => {
   });
 
   it("marks a scoped title with a trailing ! as breaking", () => {
-    expect(parseConventionalCommitTitle("feat(core)!: drop old api")).toEqual(
-      {
-        type: "feat",
-        scope: "core",
-        breaking: true,
-        description: "drop old api",
-      },
-    );
+    expect(parseConventionalCommitTitle("feat(core)!: drop old api")).toEqual({
+      type: "feat",
+      scope: "core",
+      breaking: true,
+      description: "drop old api",
+    });
   });
 
   it("returns undefined for a title with no Conventional Commit type", () => {
