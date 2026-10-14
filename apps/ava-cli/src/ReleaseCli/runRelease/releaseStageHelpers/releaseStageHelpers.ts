@@ -1,16 +1,12 @@
-import { checkDevelopCi } from "@ava-cli/ReleaseCli/checkDevelopCi";
-import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus";
 import {
   createReleaseCommit,
   findWorktreeForBranch,
-  getGitHubRepoSlug,
   localTagExists,
   readTreeSha,
   remoteTagExists,
   revParse,
   shortSha,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
-import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
   RELEASE_SOURCE_BRANCH,
@@ -18,22 +14,23 @@ import {
 } from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
 import {
   printDetail,
-  printDetails,
   printHeading,
 } from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers";
 import {
   printError,
-  printInfo,
   printSuccess,
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 
 /**
- * The individual stages of a release, in the order `runRelease` calls them.
+ * The git/GitHub-mutating stages of a release, in the order `runRelease`
+ * calls them.
  *
- * Each stage is self-contained and throws with a message that says exactly what
- * has and has not happened, so a failure half-way through is recoverable.
+ * Each stage is self-contained and throws with a message that says exactly
+ * what has and has not happened, so a failure half-way through is
+ * recoverable. The read-only confirmation and reporting stages that sit
+ * between these live in `releaseConfirmationStages.ts`.
  */
 
 /** The versions and tag a release is being cut with. */
@@ -60,84 +57,6 @@ export function assertTagIsUnused(
     throw new Error(
       `Tag ${releaseTag} already exists on origin, so ${releaseVersion} has been released.`,
     );
-  }
-}
-
-/**
- * Report the staging CI verdict for the commit being released, and ask before
- * proceeding on anything other than a pass.
- */
-export async function confirmCiVerdict(
-  git: ReleaseCommands,
-  options: Readonly<{ commitSha: string; assumeYes: boolean; skip: boolean }>,
-): Promise<void> {
-  const { commitSha, assumeYes, skip } = options;
-
-  if (skip) {
-    printWarn("Skipping the staging CI check.");
-    return;
-  }
-  printHeading("CI");
-  const ciStatus = checkDevelopCi(git, {
-    commitSha,
-    branch: RELEASE_SOURCE_BRANCH,
-  });
-  const verdict = `${describeCiStatus(ciStatus)} (${shortSha(commitSha)})`;
-
-  if (ciStatus.kind === "passed") {
-    printSuccess(verdict);
-    return;
-  }
-  printWarn(verdict);
-  if (!assumeYes && !(await promptToConfirm("Release anyway?"))) {
-    throw new Error("Aborted.");
-  }
-}
-
-/** Print what the release will do, then take the last chance to stop. */
-export async function confirmReleasePlan(
-  git: ReleaseCommands,
-  options: Readonly<{
-    plan: ReleasePlan;
-    originDevelopSha: string;
-    originMainSha: string;
-    assumeYes: boolean;
-  }>,
-): Promise<void> {
-  const { plan, originDevelopSha, originMainSha, assumeYes } = options;
-  const { developVersion, releaseVersion, nextVersion, releaseTag } = plan;
-
-  printHeading("Plan");
-  printDetails([
-    [
-      `1. ${RELEASE_SOURCE_BRANCH}:`,
-      `${developVersion} to ${releaseVersion}, pushed`,
-    ],
-    [
-      `2. ${RELEASE_TARGET_BRANCH}:`,
-      `set to ${RELEASE_SOURCE_BRANCH}@${shortSha(originDevelopSha)}'s tree, tagged ${releaseTag}`,
-    ],
-    [
-      `3. ${RELEASE_SOURCE_BRANCH}:`,
-      `${releaseVersion} to ${toDevVersion(nextVersion)}, pushed`,
-    ],
-  ]);
-
-  if (readTreeSha(git, originDevelopSha) === readTreeSha(git, originMainSha)) {
-    printWarn(
-      `${RELEASE_SOURCE_BRANCH} and ${RELEASE_TARGET_BRANCH} already have identical content: this release ships no changes.`,
-    );
-  }
-  printWarn(
-    `Pushing ${RELEASE_TARGET_BRANCH} deploys production and migrates the production database.`,
-  );
-
-  if (
-    !git.dryRun &&
-    !assumeYes &&
-    !(await promptToConfirm(`Release ${releaseVersion}?`))
-  ) {
-    throw new Error("Aborted.");
   }
 }
 
@@ -298,32 +217,6 @@ export function bumpDevelopToNextVersion(
       `Set ${RELEASE_SOURCE_BRANCH} to ${devVersion} and push it yourself.`,
     );
   }
-}
-
-/** Report what was released, with links to the run and the tag. */
-export function printReleaseSummary(
-  git: ReleaseCommands,
-  options: Readonly<{ plan: ReleasePlan; releaseSha: string }>,
-): void {
-  const { plan, releaseSha } = options;
-  const { releaseVersion, nextVersion, releaseTag } = plan;
-
-  printHeading(`Released ${releaseVersion}`);
-  printSuccess(
-    `${RELEASE_TARGET_BRANCH} = ${RELEASE_SOURCE_BRANCH}@${shortSha(releaseSha)}, tagged ${releaseTag}`,
-  );
-  printSuccess(`${RELEASE_SOURCE_BRANCH} = ${toDevVersion(nextVersion)}`);
-
-  const repoSlug = getGitHubRepoSlug(git);
-  if (repoSlug === undefined) {
-    return;
-  }
-  printInfo(
-    `Production run: https://github.com/${repoSlug}/actions/workflows/production.yaml`,
-  );
-  printInfo(
-    `Tag:            https://github.com/${repoSlug}/releases/tag/${releaseTag}`,
-  );
 }
 
 /** Set the root package.json version and commit it on the current branch. */

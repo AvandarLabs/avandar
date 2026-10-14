@@ -19,6 +19,7 @@ export const RELEASE_FLAGS = [
   "-y",
   "--dry-run",
   "--skip-ci-check",
+  "--skip-changelog",
   "--help",
   "-h",
 ] as const;
