@@ -1,10 +1,12 @@
-import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import * as publishReleaseNotesModule from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
+import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import * as findRepoRootModule from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes");
+vi.mock(
+  "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes",
+);
 vi.mock("@ava-cli/utils/findRepoRoot");
 
 function _loggedText(logSpy: ReturnType<typeof vi.spyOn>): string {

@@ -1,9 +1,9 @@
 import { GetProdVersionCli } from "@ava-cli/ReleaseCli/GetProdVersionCli";
-import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import {
   findUnknownReleaseFlags,
   wantsHelp,
 } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
+import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import { runRelease } from "@ava-cli/ReleaseCli/runRelease/runRelease";
 import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";

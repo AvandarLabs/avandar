@@ -1,11 +1,11 @@
 import { checkDevelopCi } from "@ava-cli/ReleaseCli/checkDevelopCi";
 import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus";
-import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   getGitHubRepoSlug,
   readTreeSha,
   shortSha,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
+import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
   RELEASE_SOURCE_BRANCH,
@@ -15,14 +15,14 @@ import {
   printDetails,
   printHeading,
 } from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers";
-import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
-import type { PublishReleaseNotesOutcome } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import {
   printInfo,
   printSuccess,
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import type { PublishReleaseNotesOutcome } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
+import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 
 /**
  * The read-only confirmation and reporting stages of a release: these never

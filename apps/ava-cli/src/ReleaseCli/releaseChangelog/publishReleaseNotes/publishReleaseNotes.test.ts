@@ -170,7 +170,9 @@ describe("publishReleaseNotes", () => {
   });
 
   it("returns already-exists without calling gh release create", async () => {
-    const mutateSpy = vi.fn().mockReturnValue({ ok: true, stdout: "", stderr: "" });
+    const mutateSpy = vi
+      .fn()
+      .mockReturnValue({ ok: true, stdout: "", stderr: "" });
     const git = {
       ..._createFakeGit({
         ghReleaseView: {
@@ -222,7 +224,9 @@ describe("publishReleaseNotes", () => {
   });
 
   it("previews notes on a dry run without calling gh release create", async () => {
-    const mutateSpy = vi.fn().mockReturnValue({ ok: true, stdout: "", stderr: "" });
+    const mutateSpy = vi
+      .fn()
+      .mockReturnValue({ ok: true, stdout: "", stderr: "" });
     const git = { ..._createFakeGit(), mutate: mutateSpy };
 
     const outcome = await publishReleaseNotes(git, {

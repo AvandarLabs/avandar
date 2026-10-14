@@ -4,9 +4,7 @@ import {
   RELEASE_CHANGELOG_REASONING_EFFORT,
   RELEASE_NOTE_GROUPS,
 } from "@ava-cli/ReleaseCli/releaseChangelog/releaseChangelogConfig";
-import {
-  renderReleaseNotes,
-} from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes/renderReleaseNotes";
+import { renderReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes/renderReleaseNotes";
 import type { ReleaseChangelogCommitInput } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import type { ReleaseNoteBullet } from "@ava-cli/ReleaseCli/releaseChangelog/renderReleaseNotes/renderReleaseNotes";
 
@@ -52,7 +50,7 @@ function _buildSystemPrompt(releaseVersion: string): string {
     'Return a JSON object shaped as {"bullets": [{"group": "...", "text": "...", "commits": ["<short sha>", ...]}]}.',
     "Rules:",
     '- If a commit\'s subject is already a clear, short, human-readable description, reuse it close to verbatim as "text", with "commits" set to that one commit\'s short SHA.',
-    '- If a commit\'s subject is unclear, too terse, or overly long, write your own 1-2 sentence summary from its diff instead, with "commits" set to that one commit\'s short SHA.',
+    "- If a commit's subject is unclear, too terse, or overly long, write your own 1-2 sentence summary from its diff instead, with \"commits\" set to that one commit's short SHA.",
     '- Bundle nit-level commits (typo fixes, formatting, comment-only changes, lint fixes) into one bullet per cluster, "group": "Nits", a short "text" like "Numerous typo fixes", and "commits" listing every contributing short SHA.',
     `- Pick exactly one "group" per bullet from: ${RELEASE_NOTE_GROUPS.join(", ")}.`,
     "- Return only the JSON object, no commentary.",

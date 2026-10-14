@@ -1,13 +1,11 @@
-import { shortSha } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import { MAX_DIFF_CHARS_PER_COMMIT } from "@ava-cli/ReleaseCli/releaseChangelog/releaseChangelogConfig";
+import { shortSha } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 
 /** Every `vX.Y.Z` tag that exists locally, oldest first. */
 export function listSortedReleaseTags(git: ReleaseCommands): string[] {
   const output = git.readGit(["tag", "--list", "v*", "--sort=v:refname"]);
-  return output === undefined || output.length === 0
-    ? []
-    : output.split("\n");
+  return output === undefined || output.length === 0 ? [] : output.split("\n");
 }
 
 /**
@@ -29,11 +27,7 @@ export function getPreviousReleaseTagFromTag(
 ): string | undefined {
   const tags = listSortedReleaseTags(git);
   const index = tags.indexOf(releaseTag);
-  return index === -1
-    ? tags.at(-1)
-    : index === 0
-      ? undefined
-      : tags[index - 1];
+  return index === -1 ? tags.at(-1) : index === 0 ? undefined : tags[index - 1];
 }
 
 /** One commit's data as handed to the LLM that drafts release notes. */
@@ -76,7 +70,9 @@ export function collectReleaseChangelogCommits(
 ): ReleaseChangelogCommitInput[] {
   const { previousTag, headRevision } = options;
   const range =
-    previousTag !== undefined ? `${previousTag}..${headRevision}` : headRevision;
+    previousTag !== undefined
+      ? `${previousTag}..${headRevision}`
+      : headRevision;
 
   const log = git.readGit([
     "log",

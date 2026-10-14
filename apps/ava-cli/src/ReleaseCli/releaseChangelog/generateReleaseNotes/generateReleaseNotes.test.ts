@@ -37,7 +37,11 @@ describe("generateReleaseNotes", () => {
             message: {
               content: JSON.stringify({
                 bullets: [
-                  { group: "Features", text: "Did a thing", commits: ["abc1234"] },
+                  {
+                    group: "Features",
+                    text: "Did a thing",
+                    commits: ["abc1234"],
+                  },
                 ],
               }),
             },
@@ -64,7 +68,9 @@ describe("generateReleaseNotes", () => {
     const fetchImpl = vi
       .fn()
       .mockResolvedValue(
-        _fakeResponse({ choices: [{ message: { content: '{"bullets":[]}' } }] }),
+        _fakeResponse({
+          choices: [{ message: { content: '{"bullets":[]}' } }],
+        }),
       );
 
     await generateReleaseNotes({

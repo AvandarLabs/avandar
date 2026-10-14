@@ -22,9 +22,7 @@ describe("renderReleaseNotes", () => {
       _bullet({ group: "Fixes", text: "Fix A" }),
       _bullet({ group: "Chores", text: "Chore A" }),
     ];
-    expect(renderReleaseNotes(bullets)).toBe(
-      "- Feature A\n- Fix A\n- Chore A",
-    );
+    expect(renderReleaseNotes(bullets)).toBe("- Feature A\n- Fix A\n- Chore A");
   });
 
   it("flattens when only one group has 2+ bullets", () => {
