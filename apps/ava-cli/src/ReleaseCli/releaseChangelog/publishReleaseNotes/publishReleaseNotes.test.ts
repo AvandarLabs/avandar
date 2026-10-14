@@ -5,6 +5,32 @@ import type {
   ReleaseCommands,
 } from "@ava-cli/ReleaseCli/createReleaseCommands";
 
+const GITHUB_CREDITS_RESPONSE: CommandResult = {
+  ok: true,
+  stdout: JSON.stringify({
+    data: {
+      repository: {
+        object: {
+          authors: {
+            nodes: [
+              {
+                name: "Human",
+                user: { login: "jpsyx", __typename: "User" },
+              },
+            ],
+            pageInfo: { hasNextPage: false },
+          },
+          associatedPullRequests: {
+            nodes: [],
+            pageInfo: { hasNextPage: false },
+          },
+        },
+      },
+    },
+  }),
+  stderr: "",
+};
+
 type FakeGitOptions = Readonly<{
   tags?: string;
   ghReleaseView?: CommandResult;
@@ -59,7 +85,7 @@ function _createFakeGit(options: FakeGitOptions = {}): ReleaseCommands {
       if (command === "gh" && args[0] === "release" && args[1] === "view") {
         return ghReleaseView;
       }
-      return { ok: true, stdout: "", stderr: "" };
+      return GITHUB_CREDITS_RESPONSE;
     },
     mutate: (command, args) => {
       if (command === "gh" && args[0] === "release" && args[1] === "create") {
@@ -137,6 +163,85 @@ describe("publishReleaseNotes", () => {
     }
   });
 
+  it("updates an existing release body without changing its title or tag", async () => {
+    const git = _createFakeGit({
+      ghReleaseView: {
+        ok: true,
+        stdout: '{"url":"https://github.com/org/repo/releases/tag/v0.13.0"}',
+        stderr: "",
+      },
+    });
+    const mutate = vi.spyOn(git, "mutate");
+    const outcome = await publishReleaseNotes(git, {
+      releaseTag: "v0.13.0",
+      dryRun: false,
+      update: true,
+      fetchImpl: _fetchImpl(),
+    });
+    expect(outcome.kind).toBe("published");
+    expect(mutate).toHaveBeenCalledTimes(1);
+    expect(mutate).toHaveBeenCalledWith("gh", [
+      "release",
+      "edit",
+      "v0.13.0",
+      "--notes",
+      expect.stringContaining("by @jpsyx"),
+    ]);
+  });
+
+  it("previews updates without mutating the release", async () => {
+    const git = _createFakeGit({
+      ghReleaseView: {
+        ok: true,
+        stdout: '{"url":"https://github.com/org/repo/releases/tag/v0.13.0"}',
+        stderr: "",
+      },
+    });
+    const mutate = vi.spyOn(git, "mutate");
+    const outcome = await publishReleaseNotes(git, {
+      releaseTag: "v0.13.0",
+      dryRun: true,
+      update: true,
+      fetchImpl: _fetchImpl(),
+    });
+    expect(outcome.kind).toBe("previewed");
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it("refuses an update when GitHub cannot find the release", async () => {
+    const git = _createFakeGit();
+    const mutate = vi.spyOn(git, "mutate");
+    const outcome = await publishReleaseNotes(git, {
+      releaseTag: "v0.13.0",
+      dryRun: false,
+      update: true,
+      fetchImpl: _fetchImpl(),
+    });
+    expect(outcome.kind).toBe("failed");
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it("never publishes when GitHub attribution is unavailable", async () => {
+    const git = _createFakeGit();
+    const readCommand = git.readCommand;
+    vi.spyOn(git, "readCommand").mockImplementation((command, args) => {
+      return args[0] === "api"
+        ? { ok: false, stdout: "", stderr: "API unavailable" }
+        : readCommand(command, args);
+    });
+    const mutate = vi.spyOn(git, "mutate");
+    const outcome = await publishReleaseNotes(git, {
+      releaseTag: "v0.13.0",
+      dryRun: false,
+      fetchImpl: _fetchImpl(),
+    });
+    expect(outcome).toEqual({
+      kind: "failed",
+      reason: expect.stringContaining("API unavailable"),
+    });
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
   it("returns tag-not-found when the tag doesn't exist anywhere", async () => {
     const git = _createFakeGit({
       localTagExistsResult: { ok: false, stdout: "", stderr: "" },
@@ -211,7 +316,7 @@ describe("publishReleaseNotes", () => {
     expect(outcome).toEqual({ kind: "no-changes" });
   });
 
-  it("returns no-changes when the model returns zero bullets", async () => {
+  it("fails when the model omits release commits", async () => {
     const git = _createFakeGit();
 
     const outcome = await publishReleaseNotes(git, {
@@ -220,7 +325,7 @@ describe("publishReleaseNotes", () => {
       fetchImpl: _emptyBulletsFetchImpl(),
     });
 
-    expect(outcome).toEqual({ kind: "no-changes" });
+    expect(outcome.kind).toBe("failed");
   });
 
   it("previews notes on a dry run without calling gh release create", async () => {
@@ -235,7 +340,11 @@ describe("publishReleaseNotes", () => {
       fetchImpl: _fetchImpl(),
     });
 
-    expect(outcome).toEqual({ kind: "previewed", notes: "- Did a thing" });
+    expect(outcome).toEqual({
+      kind: "previewed",
+      notes:
+        "- Did a thing ([`sha1full`](https://github.com/AvandarLabs/avandar/commit/sha1full) by @jpsyx)",
+    });
     expect(mutateSpy).not.toHaveBeenCalled();
   });
 

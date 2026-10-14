@@ -47,7 +47,11 @@ describe("ava release notes", () => {
     vi.mocked(findRepoRootModule.findRepoRoot).mockReturnValue(undefined);
     process.argv.push("--help");
 
-    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: false,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain("ava release notes");
     expect(process.exitCode).toBeUndefined();
@@ -56,14 +60,22 @@ describe("ava release notes", () => {
   it("fails outside the repository", async () => {
     vi.mocked(findRepoRootModule.findRepoRoot).mockReturnValue(undefined);
 
-    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: false,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain("repository");
     expect(process.exitCode).toBe(1);
   });
 
   it("rejects an invalid version before calling publishReleaseNotes", async () => {
-    await ReleaseNotesCli.state.action?.({ version: "v0.13.3", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "v0.13.3",
+      dryRun: false,
+      update: false,
+    });
 
     expect(
       publishReleaseNotesModule.publishReleaseNotes,
@@ -78,10 +90,31 @@ describe("ava release notes", () => {
       url: "https://github.com/org/repo/releases/tag/v0.13.3",
     });
 
-    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: false,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain(
       "https://github.com/org/repo/releases/tag/v0.13.3",
+    );
+    expect(process.exitCode).toBeUndefined();
+  });
+
+  it("passes update and dry-run through to the publisher", async () => {
+    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
+      kind: "previewed",
+      notes: "preview",
+    });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.4",
+      dryRun: true,
+      update: true,
+    });
+    expect(publishReleaseNotesModule.publishReleaseNotes).toHaveBeenCalledWith(
+      expect.anything(),
+      { releaseTag: "v0.13.4", dryRun: true, update: true },
     );
     expect(process.exitCode).toBeUndefined();
   });
@@ -92,7 +125,11 @@ describe("ava release notes", () => {
       url: "https://github.com/org/repo/releases/tag/v0.13.3",
     });
 
-    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: false,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain("already exist");
     expect(process.exitCode).toBe(1);
@@ -103,7 +140,11 @@ describe("ava release notes", () => {
       kind: "tag-not-found",
     });
 
-    await ReleaseNotesCli.state.action?.({ version: "9.9.9", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "9.9.9",
+      dryRun: false,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain("No release tag");
     expect(process.exitCode).toBe(1);
@@ -114,7 +155,11 @@ describe("ava release notes", () => {
       kind: "no-changes",
     });
 
-    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: false,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain("nothing to publish");
     expect(process.exitCode).toBeUndefined();
@@ -126,7 +171,11 @@ describe("ava release notes", () => {
       reason: "network error",
     });
 
-    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: false });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: false,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain("network error");
     expect(process.exitCode).toBe(1);
@@ -138,7 +187,11 @@ describe("ava release notes", () => {
       notes: "- Did a thing",
     });
 
-    await ReleaseNotesCli.state.action?.({ version: "0.13.3", dryRun: true });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: true,
+      update: false,
+    });
 
     expect(_loggedText(logSpy)).toContain("Did a thing");
     expect(process.exitCode).toBeUndefined();

@@ -52,6 +52,15 @@ describe("generateReleaseNotes", () => {
     const globalFetchSpy = vi.spyOn(globalThis, "fetch");
 
     const notes = await generateReleaseNotes({
+      credits: new Map([
+        [
+          "abc1234",
+          {
+            url: "https://github.com/org/repo/commit/abc1234full",
+            credit: "by @jpsyx",
+          },
+        ],
+      ]),
       releaseVersion: "0.14.0",
       commits: [_commit()],
       apiKey: "test-key",
@@ -59,7 +68,9 @@ describe("generateReleaseNotes", () => {
       fetchImpl,
     });
 
-    expect(notes).toBe("- Did a thing");
+    expect(notes).toBe(
+      "- Did a thing ([`abc1234`](https://github.com/org/repo/commit/abc1234full) by @jpsyx)",
+    );
     expect(fetchImpl).toHaveBeenCalledTimes(1);
     expect(globalFetchSpy).not.toHaveBeenCalled();
   });
@@ -72,6 +83,15 @@ describe("generateReleaseNotes", () => {
     );
 
     await generateReleaseNotes({
+      credits: new Map([
+        [
+          "abc1234",
+          {
+            url: "https://github.com/org/repo/commit/abc1234full",
+            credit: "by @jpsyx",
+          },
+        ],
+      ]),
       releaseVersion: "0.14.0",
       commits: [],
       apiKey: "secret-key",
@@ -95,6 +115,15 @@ describe("generateReleaseNotes", () => {
 
     await expect(
       generateReleaseNotes({
+        credits: new Map([
+          [
+            "abc1234",
+            {
+              url: "https://github.com/org/repo/commit/abc1234full",
+              credit: "by @jpsyx",
+            },
+          ],
+        ]),
         releaseVersion: "0.14.0",
         commits: [],
         apiKey: "k",
@@ -113,6 +142,15 @@ describe("generateReleaseNotes", () => {
 
     await expect(
       generateReleaseNotes({
+        credits: new Map([
+          [
+            "abc1234",
+            {
+              url: "https://github.com/org/repo/commit/abc1234full",
+              credit: "by @jpsyx",
+            },
+          ],
+        ]),
         releaseVersion: "0.14.0",
         commits: [],
         apiKey: "k",

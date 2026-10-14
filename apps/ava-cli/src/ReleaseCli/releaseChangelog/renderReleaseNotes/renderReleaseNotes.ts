@@ -1,3 +1,5 @@
+import type { ReleaseCredit } from "../makeReleaseCreditsFromCommits/makeReleaseCreditsFromCommits";
+
 /** One cleaned-up change in a generated release note. */
 export type ReleaseNoteBullet = Readonly<{
   /** One of the fixed vocabulary in `RELEASE_NOTE_GROUPS`. */
@@ -8,16 +10,24 @@ export type ReleaseNoteBullet = Readonly<{
 }>;
 
 /** One bullet's rendered markdown line. */
-function _renderBullet(bullet: ReleaseNoteBullet): string {
-  const hashSuffix =
-    bullet.commits.length > 1
-      ? ` (${bullet.commits
-          .map((sha) => {
-            return `\`${sha}\``;
-          })
-          .join(", ")})`
-      : "";
-  return `- ${bullet.text}${hashSuffix}`;
+function _renderBullet(
+  options: Readonly<{
+    bullet: ReleaseNoteBullet;
+    credits: ReadonlyMap<string, ReleaseCredit>;
+  }>,
+): string {
+  const { bullet, credits } = options;
+  if (bullet.commits.length === 0) {
+    throw new Error("Release bullet has no commits");
+  }
+  const sources = [...new Set(bullet.commits)].map((sha) => {
+    const source = credits.get(sha);
+    if (source === undefined) {
+      throw new Error(`Unknown release commit: ${sha}`);
+    }
+    return `[\`${sha}\`](${source.url}) ${source.credit}`;
+  });
+  return `- ${bullet.text} (${sources.join("; ")})`;
 }
 
 /**
@@ -31,8 +41,12 @@ function _renderBullet(bullet: ReleaseNoteBullet): string {
  * once there is real clustering in at least two categories.
  */
 export function renderReleaseNotes(
-  bullets: readonly ReleaseNoteBullet[],
+  options: Readonly<{
+    bullets: readonly ReleaseNoteBullet[];
+    credits: ReadonlyMap<string, ReleaseCredit>;
+  }>,
 ): string {
+  const { bullets, credits } = options;
   if (bullets.length === 0) {
     return "";
   }
@@ -53,13 +67,22 @@ export function renderReleaseNotes(
     return (bulletsByGroup.get(group)?.length ?? 0) >= 2;
   });
   if (groupsWithTwoOrMore.length < 2) {
-    return bullets.map(_renderBullet).join("\n");
+    return bullets
+      .map((bullet) => {
+        return _renderBullet({ bullet, credits });
+      })
+      .join("\n");
   }
 
   return groupOrder
     .map((group) => {
       const groupBullets = bulletsByGroup.get(group) ?? [];
-      return [`## ${group}`, ...groupBullets.map(_renderBullet)].join("\n");
+      return [
+        `## ${group}`,
+        ...groupBullets.map((bullet) => {
+          return _renderBullet({ bullet, credits });
+        }),
+      ].join("\n");
     })
     .join("\n\n");
 }

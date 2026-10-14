@@ -26,11 +26,13 @@ const USAGE = `ava release notes: publish GitHub release notes for an existing r
 
 Usage
   ava release notes --version 0.13.3             publish notes for v0.13.3
+  ava release notes --version 0.13.4 --update   replace existing notes
   ava release notes                               ask for a version
   ava release notes --version 0.13.3 --dry-run   preview without publishing
 
 Options
   --version, -v  X.Y.Z to publish notes for. Asked for when omitted.
+  --update       Replace notes on an existing release, preserving other metadata.
   --dry-run      Generate and print the notes, but do not publish them.
   --help, -h     This text.`;
 
@@ -38,6 +40,7 @@ Options
 type ReleaseNotesCliArgs = {
   version?: string;
   dryRun: boolean;
+  update?: boolean;
 };
 
 /** Asks which released version to publish notes for; defaults to latest. */
@@ -75,6 +78,7 @@ async function _runReleaseNotes(
   const outcome = await publishReleaseNotes(git, {
     releaseTag,
     dryRun: args.dryRun,
+    update: args.update,
   });
 
   match(outcome)
@@ -124,6 +128,13 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
     required: false,
     description:
       "The X.Y.Z version to publish notes for. Asked for when omitted.",
+  })
+  .addOption({
+    name: "--update",
+    type: "boolean",
+    required: false,
+    defaultValue: false,
+    description: "Replace the notes of an existing GitHub Release.",
   })
   .addOption({
     name: "--dry-run",
