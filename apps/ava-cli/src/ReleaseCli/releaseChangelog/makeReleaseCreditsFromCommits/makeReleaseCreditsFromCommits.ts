@@ -127,7 +127,9 @@ function _buildCredit(
     if (pull.author === undefined) {
       throw new Error(`Missing PR author for ${sha}`);
     }
-    return _buildPullCredit({ pull, authorLogin: pull.author.login });
+    return _isHuman(pull.author)
+      ? `by @${pull.author.login}`
+      : _buildPullCredit({ pull, authorLogin: pull.author.login });
   }
   const authors = metadata.authors.nodes
     .filter((author) => {
@@ -173,7 +175,7 @@ function _readMetadata(
   return response.data.repository.object;
 }
 
-/** Looks up PR submitters and human review/merge participation for commits. */
+/** Credits authors, including human review/merge participation for AI PRs. */
 export function makeReleaseCreditsFromCommits(
   options: Readonly<{
     git: ReleaseCommands;

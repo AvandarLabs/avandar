@@ -69,7 +69,7 @@ function _createGit(metadata: unknown): ReleaseCommands {
 }
 
 describe("makeReleaseCreditsFromCommits", () => {
-  it("credits the human PR submitter despite AI coauthors", () => {
+  it("credits only the human PR submitter despite AI coauthors", () => {
     expect(
       makeReleaseCreditsFromCommits({
         git: _createGit(_createMetadata()),
@@ -78,8 +78,22 @@ describe("makeReleaseCreditsFromCommits", () => {
       }).get("abc1234"),
     ).toEqual({
       url: "https://github.com/org/repo/commit/abc1234full",
-      credit: "by @jpsyx, reviewed and merged by @jpsyx",
+      credit: "by @jpsyx",
     });
+  });
+  it("omits other human reviewers and mergers for a human submitter", () => {
+    expect(
+      makeReleaseCreditsFromCommits({
+        git: _createGit(
+          _createMetadata({
+            reviewer: { login: "reviewer", __typename: "User" },
+            merger: { login: "maintainer", __typename: "User" },
+          }),
+        ),
+        repoSlug: "org/repo",
+        commits: [COMMIT],
+      }).get("abc1234")?.credit,
+    ).toBe("by @jpsyx");
   });
   it("credits an AI submitter and combines human review and merge credits", () => {
     expect(
