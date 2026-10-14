@@ -11,6 +11,9 @@ import {
   localTagExists,
   remoteTagExists,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
+import { makeReleaseCreditsFromCommits } from "../makeReleaseCreditsFromCommits/makeReleaseCreditsFromCommits";
+import type { ReleaseChangelogCommitInput } from "../collectReleaseChangelogCommits/collectReleaseChangelogCommits";
+import type { ReleaseCredit } from "../makeReleaseCreditsFromCommits/makeReleaseCreditsFromCommits";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 
 export type PublishReleaseNotesOutcome =
@@ -57,6 +60,8 @@ export type PublishReleaseNotesOptions = Readonly<{
    */
   headRevision?: string;
   dryRun: boolean;
+  /** Replace the body of an existing release, preserving its other metadata. */
+  update?: boolean;
   /**
    * Skips the "does this tag exist" and "does it already have a release"
    * checks. Only a `--dry-run` preview sets this, since in that case the
@@ -72,10 +77,13 @@ export type PublishReleaseNotesOptions = Readonly<{
  * Release, returning the outcome to short-circuit on, or `undefined` to
  * continue with generating notes.
  */
-function _checkExistingRelease(
-  git: ReleaseCommands,
-  releaseTag: string,
-): PublishReleaseNotesOutcome | undefined {
+function _checkExistingRelease({
+  git,
+  releaseTag,
+  update = false,
+}: Readonly<{ git: ReleaseCommands; releaseTag: string; update?: boolean }>):
+  | PublishReleaseNotesOutcome
+  | undefined {
   if (!localTagExists(git, releaseTag) && !remoteTagExists(git, releaseTag)) {
     return { kind: "tag-not-found" };
   }
@@ -86,13 +94,56 @@ function _checkExistingRelease(
     "--json",
     "url",
   ]);
-  if (viewResult.ok) {
+  if (viewResult.ok && !update) {
     return {
       kind: "already-exists",
       url: _releaseUrl(git, releaseTag, _parseReleaseUrl(viewResult.stdout)),
     };
   }
+  if (!viewResult.ok && update) {
+    return {
+      kind: "failed",
+      reason: `Cannot update release ${releaseTag}: ${describeCommandFailure(viewResult, "release not found")}`,
+    };
+  }
   return undefined;
+}
+
+function _getCredits(
+  options: Readonly<{
+    git: ReleaseCommands;
+    commits: readonly ReleaseChangelogCommitInput[];
+  }>,
+): Map<string, ReleaseCredit> {
+  const { git, commits } = options;
+  const repoSlug = getGitHubRepoSlug(git);
+  if (repoSlug === undefined) {
+    throw new Error("Cannot determine GitHub repository for release credits");
+  }
+  return makeReleaseCreditsFromCommits({ git, repoSlug, commits });
+}
+
+function _buildPublishArgs({
+  releaseTag,
+  notes,
+  update = false,
+}: Readonly<{
+  releaseTag: string;
+  notes: string;
+  update?: boolean;
+}>): string[] {
+  return update
+    ? ["release", "edit", releaseTag, "--notes", notes]
+    : [
+        "release",
+        "create",
+        releaseTag,
+        "--title",
+        releaseTag,
+        "--notes",
+        notes,
+        "--verify-tag",
+      ];
 }
 
 /**
@@ -115,7 +166,11 @@ export async function publishReleaseNotes(
   git.tryGit(["fetch", "--quiet", "--tags", "origin"]);
 
   if (!skipExistenceChecks) {
-    const existingOutcome = _checkExistingRelease(git, releaseTag);
+    const existingOutcome = _checkExistingRelease({
+      git,
+      releaseTag,
+      update: options.update,
+    });
     if (existingOutcome !== undefined) {
       return existingOutcome;
     }
@@ -132,7 +187,9 @@ export async function publishReleaseNotes(
 
   let notes: string;
   try {
+    const credits = _getCredits({ git, commits });
     notes = await generateReleaseNotes({
+      credits,
       releaseVersion: releaseTag.replace(/^v/, ""),
       commits,
       apiKey: AvaEnv.requireVar("OPENAI_API_KEY"),
@@ -154,16 +211,10 @@ export async function publishReleaseNotes(
     return { kind: "previewed", notes };
   }
 
-  const createResult = git.mutate("gh", [
-    "release",
-    "create",
-    releaseTag,
-    "--title",
-    releaseTag,
-    "--notes",
-    notes,
-    "--verify-tag",
-  ]);
+  const createResult = git.mutate(
+    "gh",
+    _buildPublishArgs({ releaseTag, notes, update: options.update }),
+  );
   if (!createResult.ok) {
     return {
       kind: "failed",
