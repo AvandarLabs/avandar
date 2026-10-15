@@ -846,10 +846,9 @@ itself (a compromised Postgres superuser can still call
 separate secrets service unless the app's own code is also compromised).
 That is real, worth doing, and explicitly not this change.
 
-Six Linear issues to track, listed below. **Not yet filed as of this
-revision:** Linear access for this session is still waiting on OAuth
-authorization (the authorization link was sent separately); file all six
-once that completes, and replace this note with the created issue links.
+Six items to track, filed in Linear as of this revision. Three are new
+issues; the other three were already tracked under existing, broader issues,
+so each got a linking comment instead of a duplicate.
 
 1. **Evaluate and, if justified, adopt a dedicated secrets manager for
    connector credentials.** Scope: compare the options above against
@@ -858,21 +857,27 @@ once that completes, and replace this note with the created issue links.
    compromised); if adopted, `db_connections__postgres.vault_secret_id`
    becomes an external secret reference instead of a Vault id, with a
    migration path for any secrets already created under this spec.
+   [AVA-371](https://linear.app/avandar/issue/AVA-371) (new).
 2. **Connection management UI: edit, rotate, and delete a saved Postgres
    connection.** v1 only creates connections (section 2, "Out"). Rotating a
    compromised password or decommissioning a server currently requires a
    new connection row and leaves the old one orphaned.
+   [AVA-372](https://linear.app/avandar/issue/AVA-372) (new).
 3. **Predicate and aggregate pushdown, starting from Postgres.** Postgres is
    the first source type where pushdown is straightforward to implement
    (section 2); scope this as part of designing the capability-driven
    planner `docs/qetl-architecture.md` section 9 already names as
    not-yet-built, not as a Postgres-only special case.
+   [AVA-210](https://linear.app/avandar/issue/AVA-210) (existing; linked via
+   comment).
 4. **Freshness detection across non-Sheets sources, including Postgres.**
    Same known gap named in architecture doc section 13. For Postgres
    specifically, evaluate `pg_stat_user_tables` counters, an `xmin`-based
    watermark, or requiring a `updated_at` column/trigger as an opt-in
    `freshnessSignal` - but this is blocked on the same planner gap as
    pushdown above, since a signal nothing consumes buys nothing.
+   [AVA-213](https://linear.app/avandar/issue/AVA-213) (existing; linked via
+   comment).
 5. **Paging large Postgres tables past the configured
    `maxRowsPerCall`/`maxBytesPerCall` ceiling**, instead of failing the
    acquisition outright (section 2, section 5.4). Requires building the
@@ -880,6 +885,7 @@ once that completes, and replace this note with the created issue links.
    (`RelationCapabilities.types.ts` declares the kind; no wrapper or mediator
    code implements it today), so scope this as a shared mediator capability,
    not a Postgres-only fetch loop.
+   [AVA-373](https://linear.app/avandar/issue/AVA-373) (new).
 6. **Retrofit `tokens__google` onto Supabase Vault.** Once this spec enables
    Vault (section 5.2) for Postgres credentials, `tokens__google.access_token`
    /`.refresh_token` can move off plain-text columns onto the same
@@ -887,3 +893,5 @@ once that completes, and replace this note with the created issue links.
    section 5.2 declines to repeat for this feature. Explicitly out of scope
    for *this* change (different table, already in production use, its own
    migration and rollout risk), but newly cheap to do once Vault exists.
+   [AVA-173](https://linear.app/avandar/issue/AVA-173) (existing; linked via
+   comment).
