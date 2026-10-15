@@ -10,15 +10,6 @@ vi.mock("@/components/AppShell/Navbar/Navbar", () => {
   };
 });
 
-vi.mock(
-  "@/hooks/localChatModels/useOfflineChatDownloadBridge/useOfflineChatDownloadBridge",
-  () => {
-    return {
-      useOfflineChatDownloadBridge: () => {},
-    };
-  },
-);
-
 vi.mock("@/components/JobProgressPanel/JobProgressPanel", () => {
   return {
     JobProgressPanel: () => {

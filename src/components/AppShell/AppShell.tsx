@@ -20,7 +20,6 @@ import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppSlate/Ap
 import { JobProgressPanel } from "@/components/JobProgressPanel/JobProgressPanel";
 import { APP_CHROME_Z_INDEX } from "@/config/Theme";
 import { ANIMATION_DURATION_MS } from "@/config/Theme/AnimationTheme/AnimationTheme";
-import { useOfflineChatDownloadBridge } from "@/hooks/localChatModels/useOfflineChatDownloadBridge/useOfflineChatDownloadBridge";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -110,7 +109,6 @@ function AppShellComponent({
   const isMobileViewSize = useIsMobileSize() ?? false;
   const platformType = usePlatformInfo();
   const isDesktopPlatform = platformType === "desktop";
-  useOfflineChatDownloadBridge();
 
   // We use mod+/ instead of mod+J because Chrome and Firefox both bind
   // mod+J to the Downloads window at the browser/OS layer and the keydown
