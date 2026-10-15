@@ -273,13 +273,6 @@ export function PostgresConnectorImportView({
           ) : null}
 
           {!showForm && load.isLoadingPreview ? <Loader size="xs" /> : null}
-
-          <Text size="xs" c="dimmed" maw="65ch">
-            <Trans>
-              New connectors are added every month. If there is a database or
-              service you need, tell us so we can prioritize it.
-            </Trans>
-          </Text>
         </Stack>
 
         {load.previewRows && load.dataSourceMetadata ? (

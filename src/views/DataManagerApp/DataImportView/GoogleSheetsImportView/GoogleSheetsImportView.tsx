@@ -9,15 +9,10 @@ import {
   Select,
   Stack,
   Text,
-  UnstyledButton,
 } from "@mantine/core";
 import { IconBrandGoogleDrive } from "@tabler/icons-react";
 import { useCallback } from "react";
 import { APIClient } from "@/clients/APIClient";
-import {
-  FEATUREBASE_FEATURE_REQUEST_BOARD,
-  openFeaturebaseFeedbackWidget,
-} from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { Logger } from "@/utils/Logger";
 import { notifyError } from "@/utils/notifications/notify";
@@ -220,33 +215,6 @@ export function GoogleSheetsImportView({
           ) : pickedSheet && googleSheetLoad.isLoadingSheet ? (
             <Loader size="xs" />
           ) : null}
-
-          <Text size="xs" c="dimmed" maw="65ch">
-            <Trans>
-              New connectors are added every month. If there is a database or
-              service you need,{" "}
-              <UnstyledButton
-                type="button"
-                aria-label={t`Request a data source connection via feedback`}
-                display="inline"
-                p={0}
-                h="auto"
-                td="underline"
-                c="primary"
-                fz="xs"
-                fw={500}
-                style={{ verticalAlign: "baseline" }}
-                onClick={() => {
-                  openFeaturebaseFeedbackWidget({
-                    boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
-                  });
-                }}
-              >
-                tell us so we can prioritize it
-              </UnstyledButton>
-              .
-            </Trans>
-          </Text>
         </Stack>
 
         {previewRows && dataSourceMetadata && pickedSheet ? (

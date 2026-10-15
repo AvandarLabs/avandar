@@ -1,11 +1,53 @@
 import { Tabs } from "@avandar/ui";
-import { useLingui } from "@lingui/react/macro";
-import { Stack } from "@mantine/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Stack, Text, UnstyledButton } from "@mantine/core";
+import {
+  FEATUREBASE_FEATURE_REQUEST_BOARD,
+  openFeaturebaseFeedbackWidget,
+} from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";
 import { PostgresConnectorImportView } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+/**
+ * Standing advisory for the Connectors tab, shared across every connector
+ * row rather than owned by any one of them - duplicating it per-connector
+ * would repeat the same sentence once for every connector this tab ever
+ * grows to hold.
+ */
+function ConnectorsAdvisory(): JSX.Element {
+  const { t } = useLingui();
+  return (
+    <Text size="xs" c="dimmed" maw="65ch">
+      <Trans>
+        New connectors are added every month. If there is a database or
+        service you need,{" "}
+        <UnstyledButton
+          type="button"
+          aria-label={t`Request a data source connection via feedback`}
+          display="inline"
+          p={0}
+          h="auto"
+          td="underline"
+          c="primary"
+          fz="xs"
+          fw={500}
+          style={{ verticalAlign: "baseline" }}
+          onClick={() => {
+            openFeaturebaseFeedbackWidget({
+              boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+            });
+          }}
+        >
+          tell us so we can prioritize it
+        </UnstyledButton>
+        .
+      </Trans>
+    </Text>
+  );
+}
 
 type Props = {
   isAddAllowed: boolean;
@@ -44,6 +86,7 @@ export function DataImportTabs({
             <Stack gap="xl" pt="lg">
               <GoogleSheetsImportView onSaveSuccess={onSaveSuccess} />
               <PostgresConnectorImportView onSaveSuccess={onSaveSuccess} />
+              <ConnectorsAdvisory />
             </Stack>
           );
         },
