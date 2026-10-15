@@ -9,8 +9,9 @@ import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/Po
  * field (spec section 8's non-optional row). None of these should ever
  * reach a raw query string or a connection string built by concatenation -
  * this file proves each field reaches the driver only as a discrete,
- * untouched property on a structured config object (`PostgresConnectionConfig`),
- * never stitched into text anywhere in the call chain.
+ * untouched property on a structured config object
+ * (`PostgresConnectionConfig`), never stitched into text anywhere in the
+ * call chain.
  */
 const INJECTION_PAYLOAD = "'; select pg_sleep(5); --";
 
@@ -89,7 +90,8 @@ describe("createPostgresConnector - field parameterization", () => {
 
     const context: ExternalDatasetConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // Not exercised by this connector method - only the admin client matters here.
+      // Not exercised by this connector method - only the admin client
+      // matters here.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       supabaseClient: undefined as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

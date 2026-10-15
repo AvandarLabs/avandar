@@ -27,7 +27,10 @@ export type ExternalDatasetRelation = {
  */
 export type ExternalDatasetPreviewColumn = {
   columnName: string;
-  /** The source database's own type name, e.g. Postgres's `information_schema.columns.data_type`. */
+  /**
+   * The source database's own type name, e.g. Postgres's
+   * `information_schema.columns.data_type`.
+   */
   sourceType: string;
 };
 
@@ -56,9 +59,15 @@ export class ExternalDatasetError extends Error {
  */
 export type ExternalDatasetConnectorContext = {
   workspaceId: string;
-  /** User-scoped client (the caller's own session) - for the app-role check only. Never used to touch Vault or open a live connection. */
+  /**
+   * User-scoped client (the caller's own session) - for the app-role check
+   * only. Never used to touch Vault or open a live connection.
+   */
   supabaseClient: AvaSupabaseClient;
-  /** Service-role client - the only client allowed to read/write `db_connections`, `db_connections__postgres`, and Vault. */
+  /**
+   * Service-role client - the only client allowed to read/write
+   * `db_connections`, `db_connections__postgres`, and Vault.
+   */
   supabaseAdminClient: SupabaseClient<Database>;
 };
 
@@ -82,7 +91,10 @@ export type ExternalDatasetConnector = {
     columns: ExternalDatasetPreviewColumn[];
     previewRows: Array<Record<string, unknown>>;
   }>;
-  /** Returns the full relation as CSV text - what `acquire` calls (spec section 5.4a). */
+  /**
+   * Returns the full relation as CSV text - what `acquire` calls (spec
+   * section 5.4a).
+   */
   getRelationRows: (
     context: ExternalDatasetConnectorContext,
     connectionId: string,

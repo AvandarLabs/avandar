@@ -9,11 +9,17 @@ import {
   type ExternalDatasetConnectorContext,
 } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
 import { object, string } from "zod";
-import type { ExternalDatasetErrorResponse } from "@sbfn/external-datasets/ExternalDatasetRoutes.types.ts";
-import type { ExternalDatasetsAPI } from "@sbfn/external-datasets/ExternalDatasetRoutes.types.ts";
+import type {
+  ExternalDatasetErrorResponse,
+  ExternalDatasetsAPI,
+} from "@sbfn/external-datasets/ExternalDatasetRoutes.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
-/** `{ workspaceId, connectionId?, ...connectorFields }` - spec section 5.4's route table. Connector-specific fields are validated by the connector itself. */
+/**
+ * `{ workspaceId, connectionId?, ...connectorFields }` - spec section 5.4's
+ * route table. Connector-specific fields are validated by the connector
+ * itself.
+ */
 const testAndSaveBodySchema = object({
   workspaceId: string(),
   connectionId: string().optional(),
@@ -74,7 +80,12 @@ export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsAPI>(
         schema: { connectorType: string() },
       })
         .bodySchema(testAndSaveBodySchema)
-        .action(async ({ pathParams, body, supabaseClient, supabaseAdminClient }) => {
+        .action(async ({
+          pathParams,
+          body,
+          supabaseClient,
+          supabaseAdminClient,
+        }) => {
           const connector = getConnector(pathParams.connectorType);
 
           const workspaceId = body.connectionId

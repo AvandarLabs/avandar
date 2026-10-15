@@ -1,4 +1,5 @@
 import { number, object, string } from "zod";
+import type { z } from "zod";
 
 /**
  * `test-and-save`'s body shape for the `postgres` connector type (spec
@@ -23,4 +24,6 @@ export const postgresTestAndSaveInputSchema = object({
   ),
 });
 
-export type PostgresTestAndSaveInput = typeof postgresTestAndSaveInputSchema._output;
+export type PostgresTestAndSaveInput = z.infer<
+  typeof postgresTestAndSaveInputSchema
+>;

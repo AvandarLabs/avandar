@@ -16,7 +16,10 @@ export type PostgresConnectionConfig = {
   ssl: false | "require";
 };
 
-/** Minimal row shape from `db_connections__postgres` plus the decrypted secret. */
+/**
+ * Minimal row shape from `db_connections__postgres` plus the decrypted
+ * secret.
+ */
 export type DecryptedPostgresConnection = {
   host: string;
   port: number;

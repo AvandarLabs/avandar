@@ -51,7 +51,10 @@ function _toRelation(row: {
   };
 }
 
-/** A single CSV field, quoted only when it needs to be (a comma, quote, or newline is present). */
+/**
+ * A single CSV field, quoted only when it needs to be (a comma, quote, or
+ * newline is present).
+ */
 function _csvField(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
@@ -154,7 +157,11 @@ export function createPostgresConnector(
     return data;
   }
 
-  /** Opens a live connection for an already-saved connection, re-checking SSRF every time (spec section 5.2 item 4 - never trust a stored host as still-safe). */
+  /**
+   * Opens a live connection for an already-saved connection, re-checking
+   * SSRF every time (spec section 5.2 item 4 - never trust a stored host
+   * as still-safe).
+   */
   async function _openSavedConnection(
     context: ExternalDatasetConnectorContext,
     connectionId: string,
@@ -191,7 +198,11 @@ export function createPostgresConnector(
     return rows.map(_toRelation);
   }
 
-  /** Re-checks the schema/table pair against the live catalog (spec section 5.2 item 5) - never trust that a previously-picked relation still exists. */
+  /**
+   * Re-checks the schema/table pair against the live catalog (spec section
+   * 5.2 item 5) - never trust that a previously-picked relation still
+   * exists.
+   */
   async function _assertRelationStillExists(
     sql: PostgresSql,
     schemaName: string,

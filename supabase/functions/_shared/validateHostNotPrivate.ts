@@ -59,7 +59,8 @@ export function isPrivateOrLoopbackAddress(address: string): boolean {
       return true; // 192.168.0.0/16 private
     }
     if (a === 169 && b === 254) {
-      return true; // 169.254.0.0/16 link-local (includes the cloud-metadata address)
+      // 169.254.0.0/16 link-local (includes the cloud-metadata address)
+      return true;
     }
     if (a === 0) {
       return true; // 0.0.0.0/8 "this network"
