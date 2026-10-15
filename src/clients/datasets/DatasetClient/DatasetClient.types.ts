@@ -1,4 +1,5 @@
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import type {
@@ -6,6 +7,7 @@ import type {
   PdfRegion,
   PdfTableFingerprint,
 } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
+import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import type { CompositeTypes } from "$/types/database.types";
@@ -93,6 +95,14 @@ export type GoogleSheetsDatasetInsertParams = BaseDatasetInsertParams & {
   sheetName?: string;
 };
 
+/** Parameters for creating a Postgres table/view-backed dataset. */
+export type PostgresTableDatasetInsertParams = BaseDatasetInsertParams & {
+  connectionId: DatabaseConnection.Id;
+  schemaName: string;
+  tableName: string;
+  relationKind: PostgresTableDataset.RelationKind;
+};
+
 /**
  * The generated CRUD operations that the extra mutations and queries reuse.
  *
@@ -130,6 +140,9 @@ export type DatasetMutationRecord = {
     params: Readonly<
       BaseDatasetInsertParams & { catalogEntryId: OpenDataCatalogEntry.Id }
     >,
+  ) => Promise<Dataset.T>;
+  insertPostgresTableDataset: (
+    params: Readonly<PostgresTableDatasetInsertParams>,
   ) => Promise<Dataset.T>;
   fullDelete: (params: Readonly<{ id: Dataset.Id }>) => Promise<void>;
 };

@@ -56,6 +56,7 @@ export const DatasetSourceModule = {
     "google_sheets",
     "open_data",
     "pdf_file",
+    "postgres_table",
     "virtual",
     "xlsx_file",
   ),
@@ -74,6 +75,7 @@ export const DatasetSourceModule = {
       OpenDataDataset: "open_data",
       GoogleSheetsDataset: "google_sheets",
       PdfFileDataset: "pdf_file",
+      PostgresTableDataset: "postgres_table",
       VirtualDataset: "virtual",
       XlsxFileDataset: "xlsx_file",
     } as const);
