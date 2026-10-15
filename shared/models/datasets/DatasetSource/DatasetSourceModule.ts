@@ -44,7 +44,7 @@ function _canBeOfflineOnly(
     .with("csv_file", "xlsx_file", "pdf_file", () => {
       return true;
     })
-    .with("google_sheets", "open_data", "virtual", () => {
+    .with("google_sheets", "open_data", "virtual", "postgres_table", () => {
       return false;
     })
     .exhaustive();

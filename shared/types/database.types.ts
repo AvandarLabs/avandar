@@ -820,6 +820,64 @@ export type Database = {
           },
         ]
       }
+      datasets__postgres_table: {
+        Row: {
+          connection_id: string
+          created_at: string
+          dataset_id: string
+          id: string
+          relation_kind: Database["public"]["Enums"]["datasets__postgres_table_relation_kind"]
+          schema_name: string
+          table_name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string
+          dataset_id: string
+          id?: string
+          relation_kind: Database["public"]["Enums"]["datasets__postgres_table_relation_kind"]
+          schema_name: string
+          table_name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string
+          dataset_id?: string
+          id?: string
+          relation_kind?: Database["public"]["Enums"]["datasets__postgres_table_relation_kind"]
+          schema_name?: string
+          table_name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__postgres_table_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "db_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__postgres_table_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__postgres_table_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       datasets__virtual: {
         Row: {
           created_at: string
@@ -915,6 +973,101 @@ export type Database = {
           },
           {
             foreignKeyName: "datasets__xlsx_file_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      db_connections: {
+        Row: {
+          connection_type: Database["public"]["Enums"]["db_connections__connection_type"]
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          connection_type: Database["public"]["Enums"]["db_connections__connection_type"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          connection_type?: Database["public"]["Enums"]["db_connections__connection_type"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "db_connections_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      db_connections__postgres: {
+        Row: {
+          connection_id: string
+          created_at: string
+          database_name: string
+          host: string
+          last_verified_at: string | null
+          port: number
+          ssl_mode: Database["public"]["Enums"]["db_connections__postgres_ssl_mode"]
+          updated_at: string
+          username: string
+          vault_secret_id: string
+          workspace_id: string
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string
+          database_name: string
+          host: string
+          last_verified_at?: string | null
+          port: number
+          ssl_mode?: Database["public"]["Enums"]["db_connections__postgres_ssl_mode"]
+          updated_at?: string
+          username: string
+          vault_secret_id: string
+          workspace_id: string
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string
+          database_name?: string
+          host?: string
+          last_verified_at?: string | null
+          port?: number
+          ssl_mode?: Database["public"]["Enums"]["db_connections__postgres_ssl_mode"]
+          updated_at?: string
+          username?: string
+          vault_secret_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "db_connections__postgres_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: true
+            referencedRelation: "db_connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "db_connections__postgres_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1813,6 +1966,38 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_datasets__add_postgres_table_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_connection_id: string
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_relation_kind: Database["public"]["Enums"]["datasets__postgres_table_relation_kind"]
+          p_schema_name: string
+          p_table_name: string
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          is_restricted: boolean
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_datasets__add_virtual_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -1875,6 +2060,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      rpc_db_connections__get_decrypted_secret: {
+        Args: { p_vault_secret_id: string }
+        Returns: string
       }
       rpc_resources__make_private: {
         Args: {
@@ -2185,6 +2374,7 @@ export type Database = {
         | "labelled_graphic"
         | "repeating_blocks"
         | "prose_measures"
+      datasets__postgres_table_relation_kind: "table" | "view"
       datasets__source_type:
         | "csv_file"
         | "google_sheets"
@@ -2192,6 +2382,9 @@ export type Database = {
         | "open_data"
         | "xlsx_file"
         | "pdf_file"
+        | "postgres_table"
+      db_connections__connection_type: "postgres"
+      db_connections__postgres_ssl_mode: "disable" | "require"
       nux_status: "not_started" | "in_progress" | "completed" | "dismissed"
       resource_type: "dashboard" | "dataset" | "map"
       role_level: "viewer" | "editor" | "admin"
@@ -2440,6 +2633,7 @@ export const Constants = {
         "repeating_blocks",
         "prose_measures",
       ],
+      datasets__postgres_table_relation_kind: ["table", "view"],
       datasets__source_type: [
         "csv_file",
         "google_sheets",
@@ -2447,7 +2641,10 @@ export const Constants = {
         "open_data",
         "xlsx_file",
         "pdf_file",
+        "postgres_table",
       ],
+      db_connections__connection_type: ["postgres"],
+      db_connections__postgres_ssl_mode: ["disable", "require"],
       nux_status: ["not_started", "in_progress", "completed", "dismissed"],
       resource_type: ["dashboard", "dataset", "map"],
       role_level: ["viewer", "editor", "admin"],

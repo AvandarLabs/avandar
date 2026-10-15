@@ -1,0 +1,94 @@
+/**
+ * A saved, reusable connection to an external data source, shared by every
+ * workspace member - the generic half of the `db_connections` /
+ * `db_connections__<type>` split, mirroring the `datasets` /
+ * `datasets__<type>` pattern one layer up. A second connector type
+ * (MySQL, MSSQL, ...) only ever adds a new satellite table and a new
+ * `db_connections__connection_type` enum value, never a new "connections"
+ * concept.
+ *
+ * Not a per-resource shareable item like a dataset or dashboard - a
+ * connection is infrastructure configuration, so it is gated by app role
+ * (`data_sources`) rather than `util__auth_user_can_access_resource`.
+ */
+create table public.db_connections (
+  -- Primary key
+  id uuid primary key default gen_random_uuid(),
+  -- Workspace this connection belongs to
+  workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
+  -- Which connector type this connection is for. The actual connection
+  -- details live in the matching `db_connections__<type>` satellite table.
+  connection_type public.db_connections__connection_type not null,
+  -- User-chosen label, e.g. "Prod reporting replica"
+  name text not null,
+  -- User who created this connection
+  created_by uuid references auth.users (id) on update cascade on delete set null,
+  -- Timestamps
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Enable row level security
+alter table public.db_connections enable row level security;
+
+-- Data API privileges.
+grant
+select
+,
+  insert,
+update,
+delete on table public.db_connections to authenticated,
+service_role;
+
+-- Policies
+create policy "User can select db_connections in their workspace" on public.db_connections for
+select
+  to authenticated using (
+    public.util__auth_user_meets_min_app_role (
+      public.db_connections.workspace_id,
+      'data_sources'::public.app_type,
+      'viewer'::public.role_level
+    )
+  );
+
+create policy "User can insert db_connections in their workspace" on public.db_connections for insert to authenticated
+with
+  check (
+    public.util__auth_user_meets_min_app_role (
+      public.db_connections.workspace_id,
+      'data_sources'::public.app_type,
+      'editor'::public.role_level
+    )
+  );
+
+create policy "User can update db_connections in their workspace" on public.db_connections
+for update
+  to authenticated using (
+    public.util__auth_user_meets_min_app_role (
+      public.db_connections.workspace_id,
+      'data_sources'::public.app_type,
+      'editor'::public.role_level
+    )
+  )
+with
+  check (
+    public.util__auth_user_meets_min_app_role (
+      public.db_connections.workspace_id,
+      'data_sources'::public.app_type,
+      'editor'::public.role_level
+    )
+  );
+
+create policy "User can delete db_connections in their workspace" on public.db_connections for delete to authenticated using (
+  public.util__auth_user_meets_min_app_role (
+    public.db_connections.workspace_id,
+    'data_sources'::public.app_type,
+    'admin'::public.role_level
+  )
+);
+
+create trigger tr_db_connections__set_updated_at before
+update on public.db_connections for each row
+execute function public.util__set_updated_at ();
+
+create index idx_db_connections__workspace on public.db_connections (workspace_id);
