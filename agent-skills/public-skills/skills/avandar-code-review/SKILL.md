@@ -3,8 +3,8 @@ name: avandar-code-review
 description: Use when reviewing code changes, pull requests, or local diffs against Avandar's TypeScript, React, SQL, naming, documentation, and immutability conventions. Also use for focused Auto reviews when the user says avandar-code-review followed by comments, files, naming, and/or tests (any subset, concatenatable).
 metadata:
   author: jpsyx
-  version: "2.4.0"
-  tags: avandar, code-review, typescript, react, sql, conventions, style, comments, files, naming, tests
+  version: "2.5.0"
+  tags: avandar, code-review, typescript, react, sql, conventions, style, comments, files, naming, tests, architecture, code-smells
 ---
 
 # Avandar Code Review
@@ -584,6 +584,7 @@ below for a focused review.
 |------|--------------|------|
 | `common-and-general` | Most Common Mistakes + General Checks (this file) | full review (always) |
 | `comments-and-module` | comments + module hierarchy | full review; diff has `.ts`/`.tsx` |
+| `code-smells` | code-smells-checklist | full review; diff has `.ts`/`.tsx` |
 | `typescript` | typescript-checklist | full review; diff has `.ts`/`.tsx` |
 | `types` | types-checklist | full review; diff has `.ts`/`.tsx` |
 | `functional-style` | functional-style-checklist | full review; diff has `.ts`/`.tsx` |
@@ -979,6 +980,18 @@ SKILL file.
 - **Focused review:** this phase is the core of the `files` pack. See
   **Focused Reviews** for the extra file-layout bullets pulled from
   General Checks and the TypeScript checklist.
+
+### Phase: code smells
+
+- **Gate:** the diff includes at least one `.ts` or `.tsx` file.
+- **Reference:**
+  [`docs/code-reviews/code-smells-checklist.md`](docs/code-reviews/code-smells-checklist.md)
+- **Covers:** logical and architectural antipatterns, such as a one-off
+  integration between two modules routed through a bridge/adapter
+  mounted on a shared, global, or app-root component instead of a
+  direct dependency between the two modules that actually need each
+  other. This phase judges *where logic lives and why*, never naming,
+  file layout, or syntax shape.
 
 ### Phase: React components
 
