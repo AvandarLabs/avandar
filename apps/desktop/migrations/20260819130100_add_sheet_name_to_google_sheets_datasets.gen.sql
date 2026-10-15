@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20260819060213_add_sheet_name_to_google_sheets_datasets.sql by
+-- Generated from supabase/migrations/20260819130100_add_sheet_name_to_google_sheets_datasets.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 1

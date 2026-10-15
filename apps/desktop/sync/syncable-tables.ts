@@ -155,6 +155,9 @@ export const EXCLUDED_TABLES = [
   "resource_shares",
   // Web GIS maps are not mirrored to desktop SQLite yet.
   "maps",
+  // Web-only first-run tutorial/onboarding progress; nothing the desktop
+  // needs to render offline.
+  "user_nux_progress",
 ] as const;
 
 /**

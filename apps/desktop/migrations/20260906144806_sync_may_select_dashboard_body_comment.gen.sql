@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20260817183942_add_rpc_add_pdf_file_dataset.sql by
+-- Generated from supabase/migrations/20260906144806_sync_may_select_dashboard_body_comment.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 0
