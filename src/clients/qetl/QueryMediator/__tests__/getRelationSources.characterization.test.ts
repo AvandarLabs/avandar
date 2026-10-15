@@ -18,6 +18,7 @@ const OPEN_DATA_ID = "44444444-4444-4444-8444-444444444444" as Dataset.Id;
 const GOOGLE_SHEETS_ID = "55555555-5555-4555-8555-555555555555" as Dataset.Id;
 const MISSING_ID = "66666666-6666-4666-8666-666666666666" as Dataset.Id;
 const LOADED_ID = "77777777-7777-4777-8777-777777777777" as Dataset.Id;
+const POSTGRES_TABLE_ID = "88888888-8888-4888-8888-888888888888" as Dataset.Id;
 
 const {
   datasetGetAllMock,
@@ -26,6 +27,7 @@ const {
   virtualGetAllMock,
   openDataGetAllMock,
   googleSheetsGetAllMock,
+  postgresTableGetAllMock,
   getTableOrViewNamesMock,
 } = vi.hoisted(() => {
   return {
@@ -35,6 +37,7 @@ const {
     virtualGetAllMock: vi.fn(),
     openDataGetAllMock: vi.fn(),
     googleSheetsGetAllMock: vi.fn(),
+    postgresTableGetAllMock: vi.fn(),
     getTableOrViewNamesMock: vi.fn(),
   };
 });
@@ -77,6 +80,12 @@ vi.mock("@/clients/datasets/source-datasets/GoogleSheetsDatasetClient", () => {
   };
 });
 
+vi.mock("@/clients/datasets/source-datasets/PostgresTableDatasetClient", () => {
+  return {
+    PostgresTableDatasetClient: _withCacheChain(postgresTableGetAllMock),
+  };
+});
+
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   return { DuckDbClient: { getTableOrViewNames: getTableOrViewNamesMock } };
 });
@@ -90,6 +99,7 @@ beforeEach(() => {
   virtualGetAllMock.mockResolvedValue([]);
   openDataGetAllMock.mockResolvedValue([]);
   googleSheetsGetAllMock.mockResolvedValue([]);
+  postgresTableGetAllMock.mockResolvedValue([]);
   getTableOrViewNamesMock.mockResolvedValue([]);
 });
 
@@ -193,6 +203,32 @@ describe("getRelationSources", () => {
 
     expect(result).toEqual([
       { dataset, sourceType: "google_sheets", sourceDataset },
+    ]);
+  });
+
+  it("pairs a postgres_table dataset with its source record", async () => {
+    const dataset = {
+      id: POSTGRES_TABLE_ID,
+      name: "postgres table dataset",
+      sourceType: "postgres_table" as const,
+      workspaceId: "workspace-1",
+    };
+    const sourceDataset = {
+      datasetId: POSTGRES_TABLE_ID,
+      connectionId: "connection-1",
+      schemaName: "public",
+      tableName: "customers",
+      relationKind: "table" as const,
+    };
+    datasetGetAllMock.mockResolvedValue([dataset]);
+    postgresTableGetAllMock.mockResolvedValue([sourceDataset]);
+
+    const { getRelationSources } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await getRelationSources([POSTGRES_TABLE_ID]);
+
+    expect(result).toEqual([
+      { dataset, sourceType: "postgres_table", sourceDataset },
     ]);
   });
 

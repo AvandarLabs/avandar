@@ -60,11 +60,22 @@ export type ExternalDatasetsAPI = APITypeDef<
           connectionId: string;
           relationId: string;
         };
-        // CSV text, returned as a raw Response (text/csv) - not JSON, so the
-        // wrapper transcodes it client-side exactly like Google Sheets does
-        // (spec section 5.4's route table). An error still comes back as
-        // the plain `ExternalDatasetErrorResponse` object, same as every
-        // other route.
+        // The handler returns a raw `Response` with `Content-Type: text/csv`
+        // - `ValidReturnType` (`MiniServer/api.types.ts`) only allows
+        // `Record<string, unknown> | void | Response` here, so this must
+        // stay `Response`, matching the one other route in this codebase
+        // that also returns raw bytes (`open-data`'s
+        // `/catalog-entries/:catalogEntryId/resource`, same `returnType:
+        // Response`). That precedent is never called through
+        // `APIClient`/`supabase.functions.invoke` for exactly this reason:
+        // `functions.invoke`'s own content-type-based parsing resolves
+        // `text/csv` to a plain string, not a `Response` object, so a caller
+        // going through it could never get a real `Response` back no matter
+        // what this type says. `acquirePostgresTableRelation.ts` instead
+        // does its own authenticated `fetch`, mirroring
+        // `fetchOpenDataCatalogResource.ts`, and reads the body itself. An
+        // error response is still JSON (MiniServer's default wrapping), so
+        // it comes back as the usual `ExternalDatasetErrorResponse` shape.
         returnType: Response | ExternalDatasetErrorResponse;
       };
     };

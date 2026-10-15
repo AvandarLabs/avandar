@@ -117,6 +117,16 @@ async function _getSnapshotDatasetBlob(
   if (dataset.sourceType === "open_data") {
     return await _downloadOpenDataSnapshot(dataset);
   }
+  // `google_sheets` and `postgres_table` fall through to here for an
+  // `all_columns` slice with no row filters: neither has a stored Storage
+  // blob to download (both are live-acquired, never uploaded), so this call
+  // throws (`throwIfNotFound: true`). This is a known, already-documented gap
+  // (`docs/qetl-architecture.md` section 13: "Snapshot publishing of an
+  // `all_columns` slice fails over Google Sheets, no Storage object exists"),
+  // and `postgres_table` inherits it unchanged rather than silently papering
+  // over it here - fixing it is shared work across every live-acquired
+  // source, not a Postgres-specific fix, so it belongs in that gap's own
+  // follow-up, not folded into this connector.
   return await DatasetParquetStorageClient.downloadDataset({
     workspaceId,
     datasetId: dataset.id,

@@ -18,6 +18,7 @@ import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
+import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type {
   PrincipalKey,
   RelationCacheKey,
@@ -110,11 +111,27 @@ function _isGoogleSheetsRelationSource(
   return relationSource.sourceType === "google_sheets";
 }
 
+function _isPostgresTableRelationSource(
+  relationSource: Readonly<RelationSource>,
+): relationSource is Extract<RelationSource, { sourceType: "postgres_table" }> {
+  return relationSource.sourceType === "postgres_table";
+}
+
 function _googleSheetsSourceByDatasetId(
   relationSources: readonly RelationSource[],
 ): Record<string, GoogleSheetsDataset.T> {
   return Object.fromEntries(
     relationSources.filter(_isGoogleSheetsRelationSource).map((source) => {
+      return [source.dataset.id, source.sourceDataset];
+    }),
+  );
+}
+
+function _postgresTableSourceByDatasetId(
+  relationSources: readonly RelationSource[],
+): Record<string, PostgresTableDataset.T> {
+  return Object.fromEntries(
+    relationSources.filter(_isPostgresTableRelationSource).map((source) => {
       return [source.dataset.id, source.sourceDataset];
     }),
   );
@@ -129,6 +146,7 @@ function _lookupsForFetch(relationSources: readonly RelationSource[]) {
       }),
     ),
     googleSheetsByDatasetId: _googleSheetsSourceByDatasetId(relationSources),
+    postgresTableByDatasetId: _postgresTableSourceByDatasetId(relationSources),
   };
 }
 
@@ -143,6 +161,23 @@ function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
     }) => {
       // The same reader the import path uses, so a dataset's columns are typed
       // the same whether the rows arrived at import or at query time.
+      const loaded = await DuckDbClient.loadCsv({
+        tableName: datasetId,
+        fileText: csvText,
+        datasetDuckDbLease,
+      });
+      return { parquetBlob: loaded.parquetData };
+    },
+    readPostgresTableCsv: async ({
+      datasetId,
+      csvText,
+    }: {
+      datasetId: Dataset.Id;
+      csvText: string;
+    }) => {
+      // Same reasoning as `readGoogleSheetTabCsv`: query-time acquisition
+      // reads through the same CSV->Parquet loader the import path used, so
+      // a dataset's columns are typed identically either way.
       const loaded = await DuckDbClient.loadCsv({
         tableName: datasetId,
         fileText: csvText,
@@ -198,6 +233,15 @@ function _createRegistryForFetch(
       if (!source) {
         throw new Error(
           `Google Sheets dataset '${id}' is not among the relations to fetch`,
+        );
+      }
+      return source;
+    },
+    getPostgresTableSource: async (id) => {
+      const source = lookups.postgresTableByDatasetId[id];
+      if (!source) {
+        throw new Error(
+          `Postgres table dataset '${id}' is not among the relations to fetch`,
         );
       }
       return source;

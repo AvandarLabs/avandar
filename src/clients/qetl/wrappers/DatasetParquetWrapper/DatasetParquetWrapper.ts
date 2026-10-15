@@ -283,7 +283,7 @@ async function _fetchParquetFromSource(
     .with("open_data", () => {
       return _downloadOpenDataParquet(dataset, apiOptions);
     })
-    .with("virtual", "google_sheets", (sourceType) => {
+    .with("virtual", "google_sheets", "postgres_table", (sourceType) => {
       throw new Error(
         `Dataset '${ref.id}' is a ${sourceType} dataset, which the dataset Parquet wrapper does not acquire`,
       );
