@@ -202,11 +202,11 @@ with a 4-app role matrix. No lightweight external-guest concept exists.
 
 ### P5. Ontology Designer refactor (rename + DL model)
 **Current state:** Clean TBox/ABox split already exists
-(`OntologyDesignerApp` = TBox, `IndividualManagerApp` = ABox), and P5.1 below
-has shipped. Gaps vs a real DL/ontology model: **no roles (object properties)
+(`OntologyDesignerApp` = TBox, `IndividualManagerApp` = ABox), and P5.1 and P5.6
+below have shipped. Individual sync is incremental and preserves case-workflow
+state. Gaps vs a real DL/ontology model: **no roles (object properties)
 between concepts**, no class hierarchy/subsumption, `manual_entry` mapping
-unimplemented, concept delete doesn't cascade, generation is in-browser and
-re-writes all rows (no incremental sync).
+unimplemented, concept delete doesn't cascade.
 
 - P5.1 `[DONE]` Renamed internal domain to DL nomenclature across models,
   clients, views, routes and the database. **Internal
@@ -223,10 +223,30 @@ re-writes all rows (no incremental sync).
   just merged from datasets.
 - P5.5 `[FIX]` Cascade delete of a concept to its individuals + their
   attribute assertions.
-- P5.6 `[REFACTOR]` Incremental individual generation (stop full re-upsert every
-  sync) and move heavy generation off the main browser thread / onto QETL.
+- P5.6 `[DONE]` Incremental, state-preserving individual generation. Merged
+  `feat/incremental-gen` in [PR #301](https://github.com/AvandarLabs/avandar/pull/301)
+  on 2026-10-15 ([AVA-242](https://linear.app/avandar/issue/AVA-242)). Sync skips
+  unchanged rows, preserves existing IDs, statuses, and assignments, and flags
+  individuals missing from source data without deleting them. New case types
+  refresh automatically, with shared progress reporting for refreshes, dataset
+  uploads, and offline-model downloads. Heavy query work already runs through
+  QETL with DuckDB in a Web Worker. P5.8-P5.10 remain separate follow-ups.
 - P5.7 `[NEW]` Configurable **TBox** (see P5b below) - statuses, allowed
   values, relations are workspace-configurable.
+- P5.8 `[FIX]` Sync crashes a whole run when a case type's label resolves to
+  NULL for a key (a multi-dataset case type with a key uncovered by the label
+  mapping, or whose label cells are all NULL) - partial writes from earlier
+  pages already landed before the crash. Not fixed by P5.6.
+- P5.9 `[NEW]` Decide the product behavior for an individual whose
+  `external_id` leaves every source dataset: delete it, let a user archive it,
+  or something else. P5.6 only flags the row (`missing_from_source_at`) and
+  defers this decision; nothing surfaces the flag in any UI yet.
+- P5.10 `[NEW]` Decide whether Sync should stay page-by-page with no
+  cross-page atomicity (today's behavior, kept as-is by P5.6: a mid-sync
+  failure leaves some individuals updated and some not, until the next
+  successful sync) or become atomic - wrapping a full sync in rollback so a
+  failure leaves every individual exactly as it was before that sync started.
+  Not decided or implemented by P5.6.
 - `[Depends on: touches P2/P0 for materialization; BLOCKS: P5b, P5c case-mgmt]`
 
 ### P5b. Configurable TBox (workspace-configurable schema)
