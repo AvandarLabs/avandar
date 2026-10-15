@@ -281,6 +281,15 @@ this project** (`db.vault` is present but commented out in
    structural improvement over the Google token precedent: there is no RLS
    policy on the secret itself to get wrong, because the client-reachable
    tables never contain the plaintext, only a `uuid` pointing at it.
+
+   This is the first time Vault enters this repo's declarative schema at
+   all. The `supabase-declarative-schema` skill today documents the
+   migration-vs-declarative split only for Storage (`storage.objects`/
+   `storage.buckets`); it has no equivalent section for Vault. Vault's
+   split mirrors Storage's closely enough to use the same precedent, but
+   it is not yet written down anywhere an implementer can follow -
+   section 6, row 0 below makes adding that section an explicit backend
+   task, not an assumption.
 2. `db_connections__postgres.vault_secret_id` stores the id Vault
    returns from `vault.create_secret(password, name, description)`. The
    secret payload is the password alone - host/port/database/username are
@@ -505,14 +514,22 @@ moment authorization completes, before any sheet is picked). `relations`
 "refresh" later, and must therefore stay the one read path, per section 4's
 table.
 
-**Google Sheets does not move onto this endpoint as part of this change.**
-Its access model differs in kind, not just in route shape: a sheet is read
-with the *user's own* Google OAuth grant, fetched directly, where a Postgres
+**Google Sheets does not move onto this endpoint as part of this change -**
+but that is a scoping decision for *this* spec, not a permanent architectural
+split, and it is tracked as future work (section 9, item 7) precisely because
+leaving `supabase/functions/google-sheets/` as a second, parallel proxy
+indefinitely defeats the point of unifying on one endpoint. Its access model
+differs from Postgres in kind, not just in route shape: a sheet is read with
+the *user's own* Google OAuth grant, fetched directly, where a Postgres
 connection is a *shared workspace secret* a server must broker on the
-caller's behalf. `external-datasets` is built connector-agnostic from day
-one specifically so a future connector - including a reworked Sheets, should
-its credential model ever change - can register into it without a second
-redesign, but only `postgres` ships an implementation now.
+caller's behalf. `external-datasets` is built connector-agnostic from day one
+specifically so a reworked Sheets implementation can register into it
+without a second redesign - `ExternalDatasetConnector`'s methods are already
+generic enough (`testAndSaveConnection` takes an arbitrary
+`connectorFields` object; nothing assumes a password-shaped secret), so
+migrating Sheets is expected to mean writing a `createGoogleSheetsConnector`
+implementation and retiring the old edge function, not changing the
+interface itself. Only `postgres` ships an implementation now.
 
 ### 5.4a How this plugs into the mediator (nothing new, by design)
 
@@ -591,6 +608,7 @@ this spec adds (marked **new**).
 
 | # | File | Change |
 | --- | --- | --- |
+| 0 | `.claude/skills/supabase-declarative-schema/SKILL.md` **(new section)** | Add a "Vault" section mirroring the existing "Storage" section: enabling Vault is a `supabase/config.toml` `[db.vault]` config toggle (not schema or migration); individual secrets are created at runtime via `vault.create_secret()` from application code, same as a bucket row is DML `db diff` never tracks; but any `security definer` function/grant/revoke wrapping `vault.decrypted_secrets` (row 5 below) is DDL and must be mirrored into `supabase/schemas/`, exactly like Storage's policies, or `db diff` will propose dropping it. Do this before writing rows 4-6. |
 | 1 | `supabase/schemas/00.enum.db_connections__connection_type.sql` **(new)** | enum `'postgres'` |
 | 2 | `supabase/schemas/00.enum.db_connections__postgres_ssl_mode.sql` **(new)** | enum `'disable' \| 'require'` |
 | 3 | `supabase/schemas/00.enum.datasets__postgres_table_relation_kind.sql` **(new)** | enum `'table' \| 'view'` |
@@ -630,9 +648,12 @@ through a `security definer` RPC or through direct table operations in the
 edge function using `SupabaseAdmin` is an implementation choice, not a
 contract detail the frontend needs to know about - the frontend only ever
 calls the HTTP route in section 5.4. Prefer whichever the
-`supabase-declarative-schema` skill's current guidance recommends for
-writing a Vault secret from server-side code; follow that skill, don't
-improvise here.
+`supabase-declarative-schema` skill's guidance recommends for writing a
+Vault secret from server-side code once row 0 has added that guidance;
+follow the skill, don't improvise here. As of this revision that guidance
+does not exist yet - the skill documents the Storage migration/declarative
+split only - so row 0 is a precondition for rows 4-6, not just a
+documentation nice-to-have.
 
 ## 7. Frontend task list
 
@@ -846,7 +867,7 @@ itself (a compromised Postgres superuser can still call
 separate secrets service unless the app's own code is also compromised).
 That is real, worth doing, and explicitly not this change.
 
-Six items to track, filed in Linear as of this revision. Three are new
+Seven items to track, filed in Linear as of this revision. Four are new
 issues; the other three were already tracked under existing, broader issues,
 so each got a linking comment instead of a duplicate.
 
@@ -895,3 +916,13 @@ so each got a linking comment instead of a duplicate.
    migration and rollout risk), but newly cheap to do once Vault exists.
    [AVA-173](https://linear.app/avandar/issue/AVA-173) (existing; linked via
    comment).
+7. **Migrate Google Sheets onto the unified `external-datasets` proxy**
+   (section 5.4), retiring `supabase/functions/google-sheets/` as a separate
+   edge function. Not done as part of this spec because Sheets' access model
+   (the user's own Google OAuth grant, fetched directly) differs in kind from
+   Postgres's shared workspace secret, but `ExternalDatasetConnector` is
+   already generic enough that this is expected to mean writing a
+   `createGoogleSheetsConnector` implementation, not redesigning the
+   interface. Leaving two parallel proxy endpoints indefinitely defeats the
+   point of unifying on one.
+   [AVA-374](https://linear.app/avandar/issue/AVA-374) (new).
