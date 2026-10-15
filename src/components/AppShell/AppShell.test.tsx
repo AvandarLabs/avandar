@@ -19,7 +19,7 @@ vi.mock("@/components/JobProgressPanel/JobProgressPanel", () => {
 });
 
 describe("AppShell", () => {
-  it("renders without a Nux.Provider when there is no current workspace", () => {
+  it("renders its children without crashing when there is no current workspace", () => {
     render(
       <AppShell navbarLinks={[]} showChatPanel={false}>
         <p>workspace-less shell</p>
