@@ -394,7 +394,7 @@ async function _runGenerateIndividuals(
 }
 
 /**
- * Runs the Qetl pipeline to generate individuals for a concept, reporting
+ * Runs the QETL pipeline to generate individuals for a concept, reporting
  * progress through {@link JobProgressStore} for the lifetime of the call.
  */
 export async function generateIndividuals(
