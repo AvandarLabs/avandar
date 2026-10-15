@@ -1,0 +1,68 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
+import { render, screen } from "@/test-utils";
+import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
+import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
+import type { ReactElement, ReactNode } from "react";
+
+vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
+  return {
+    useCurrentWorkspace: () => {
+      return { id: "ws-1", slug: "ws-1" };
+    },
+  };
+});
+
+const DATA_SOURCE = {
+  __type: "CsvFileDataset",
+  id: "source-1",
+  datasetId: "dataset-1",
+} as unknown as CsvFileDataset.T;
+
+function _renderWithQueryClient(ui: ReactElement): ReturnType<typeof render> {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+
+  return render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => {
+      return (
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      );
+    },
+  });
+}
+
+describe("ToggleOfflineOnlyButton", () => {
+  beforeEach(() => {
+    vi.spyOn(DatasetParquetStorageClient, "startDatasetUpload").mockReturnValue(
+      new Promise(() => {}), // left pending for this test
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    JobProgressStore.getAllJobs().forEach(({ id }) => {
+      JobProgressStore.finishJob(id);
+    });
+  });
+
+  it("does not render an inline progress bar while a job is live in JobProgressStore", () => {
+    JobProgressStore.startJob("Uploading dataset");
+
+    _renderWithQueryClient(
+      <ToggleOfflineOnlyButton
+        isInCloudStorage={false}
+        dataSource={DATA_SOURCE}
+      />,
+    );
+
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+});

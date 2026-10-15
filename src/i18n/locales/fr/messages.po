@@ -2586,7 +2586,7 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 msgstr "La latitude est en dehors de la plage valide, mais serait une longitude "
 "valide, et inversement."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerOfflineServiceWorker/registerOfflineServiceWorker.ts
 msgid "Update available"
 msgstr "Mise à jour disponible"
 
@@ -3051,11 +3051,6 @@ msgstr "{0} zones masquées"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "Texte de l'annotation :"
-
-#: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "Une nouvelle version est disponible. Actualisez la page pour effectuer "
-"la mise à jour."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -3941,6 +3936,11 @@ msgstr "Paiement réussi !"
 msgid "Answered"
 msgstr "Répondu"
 
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {0} records…"
+msgstr "Actualisation de {0} enregistrements…"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr "Droit"
@@ -4004,10 +4004,6 @@ msgstr "Le nom du jeu de données doit comporter moins de {maxDatasetNameLength}
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4258 - ETRS89"
 msgstr "4258 - ETRS89"
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Preparing model files…"
-msgstr "Préparation des fichiers du modèle…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -4258,6 +4254,11 @@ msgstr "Soumettre"
 #: shared/copy/resourceTypeLabel.ts
 msgid "dashboard"
 msgstr "tableau de bord"
+
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr "Une nouvelle version est disponible. Mettez à jour maintenant ou fermez "
+"cette fenêtre pour effectuer la mise à jour plus tard."
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
@@ -4696,10 +4697,6 @@ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from 
 msgstr "Un raisonnement plus avancé que le modèle 1.5B, avec un téléchargement "
 "modéré. Une bonne amélioration par rapport à la gamme de 8 Go."
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Starting…"
-msgstr "Démarrage…"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "Plage de nombres"
@@ -5018,7 +5015,7 @@ msgstr "Ajouter un champ à remplir manuellement"
 msgid "Upgrade plan"
 msgstr "Passer à un forfait supérieur"
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "Ne rafraîchissez pas et ne fermez pas cet onglet, sinon le "
 "téléchargement sera annulé."
@@ -5307,6 +5304,11 @@ msgstr "Partager le résumé"
 msgid "Time"
 msgstr "Temps"
 
+#. placeholder {0}: entry.label
+#: src/components/JobProgressPanel/JobProgressIndicator.tsx
+msgid "Dismiss {0}"
+msgstr "Ignorer {0}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is false"
 msgstr "est faux"
@@ -5334,6 +5336,10 @@ msgstr "Jeu de données ajouté"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
 msgstr "Optionnel"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Syncing dataset online"
+msgstr "Synchronisation du jeu de données en ligne"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
@@ -5375,10 +5381,6 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 msgstr "Chaque série est une colonne numérique tracée sur la valeur radiale. "
 "Les valeurs sont regroupées par l'axe de catégorie "
 "(\"{axisKeyValue}\")."
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
-msgid "Sync records"
-msgstr "Synchroniser les enregistrements"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -5808,6 +5810,10 @@ msgstr "Vide"
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "Tous"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline chat model"
+msgstr "Téléchargement du modèle de chat hors ligne"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6645,6 +6651,10 @@ msgstr "Veuillez vous reconnecter pour continuer."
 msgid "Production date (Always included)"
 msgstr "Date de production (Toujours incluse)"
 
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr "Mettre à jour maintenant"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"
 msgstr "Moyenne"
@@ -6694,11 +6704,6 @@ msgstr "La requête de la couche a échoué. Cela signifie généralement que le
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Your name"
 msgstr "Votre nom"
-
-#. placeholder {0}: modelCopy.displayName
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Downloading {0} for offline chat"
-msgstr "Téléchargement de {0} pour le chat hors ligne"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
@@ -7212,6 +7217,10 @@ msgstr "Le propriétaire a toujours un accès administrateur. Pour changer de "
 msgid "Loading datasets…"
 msgstr "Chargement des ensembles de données…"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {conceptName} records…"
+msgstr "Actualisation des enregistrements de {conceptName}…"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Loading private resources"
 msgstr "Chargement des ressources privées"
@@ -7232,6 +7241,11 @@ msgstr "Rayon minimal"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "Accès refusé"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Refresh {0} records"
+msgstr "Actualiser {0} enregistrements"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "join key"
@@ -8654,10 +8668,6 @@ msgstr "Gradué"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr "Veuillez réessayer. Votre tableau de bord est toujours publié."
-
-#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "Syncing dataset online..."
-msgstr "Synchronisation de l'ensemble de données en ligne..."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."

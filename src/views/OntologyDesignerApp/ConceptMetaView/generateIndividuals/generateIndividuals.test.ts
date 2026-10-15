@@ -9,12 +9,13 @@
  * only a test on the emitted SQL and on the table's lifetime can hold it.
  */
 import { Model } from "@avandar/models";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
+import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   DatasetColumnId,
@@ -27,6 +28,7 @@ import type {
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
+import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -35,12 +37,14 @@ const {
   forEachQueryPageMock,
   getAllDatasetColumnsMock,
   bulkInsertMock,
+  getAllIndividualsMock,
 } = vi.hoisted(() => {
   return {
     runQueryMock: vi.fn(),
     forEachQueryPageMock: vi.fn(),
     getAllDatasetColumnsMock: vi.fn(),
     bulkInsertMock: vi.fn(),
+    getAllIndividualsMock: vi.fn(),
   };
 });
 
@@ -55,7 +59,10 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
 });
 vi.mock("@/clients/ontology/IndividualClient", () => {
   return {
-    IndividualClient: { crudFunctions: { bulkInsert: bulkInsertMock } },
+    IndividualClient: {
+      getAll: getAllIndividualsMock,
+      crudFunctions: { bulkInsert: bulkInsertMock },
+    },
   };
 });
 
@@ -179,6 +186,39 @@ function _getRunSqlStatements(): string[] {
   });
 }
 
+/**
+ * Makes `forEachQueryPageMock` invoke its callback once with a single page
+ * holding the given rows, as if the staging table had exactly that content.
+ */
+function _mockSinglePage(
+  data: Array<{ external_id: string; name: string }>,
+): void {
+  forEachQueryPageMock.mockImplementation(
+    async (options: {
+      callback: (page: {
+        data: Array<{ external_id: string; name: string }>;
+        numRows: number;
+        totalRows: number;
+        totalPages: number;
+        pageNum: number;
+        nextPage: number | undefined;
+        prevPage: number | undefined;
+      }) => Promise<void>;
+    }) => {
+      await options.callback({
+        data,
+        numRows: data.length,
+        totalRows: data.length,
+        totalPages: 1,
+        pageNum: 0,
+        nextPage: undefined,
+        prevPage: undefined,
+      });
+      return { numPages: 1, numRows: data.length };
+    },
+  );
+}
+
 describe("generateIndividuals", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -188,6 +228,13 @@ describe("generateIndividuals", () => {
     ]);
     forEachQueryPageMock.mockResolvedValue({ numPages: 0, numRows: 0 });
     runQueryMock.mockResolvedValue({ data: [], fields: [], numRows: 0 });
+    getAllIndividualsMock.mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    JobProgressStore.getAllJobs().forEach(({ id }) => {
+      JobProgressStore.finishJob(id);
+    });
   });
 
   it("stages the rows under a prefixed table name, never the concept's bare id", async () => {
@@ -252,5 +299,133 @@ describe("generateIndividuals", () => {
     expect(DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(createSql)).toEqual([
       DATASET_ID,
     ]);
+  });
+
+  it("never includes id, status, assigned_to, created_at, or updated_at in an upsert payload", async () => {
+    _mockSinglePage([{ external_id: "ext-1", name: "Jane Doe" }]);
+
+    await generateIndividuals(_makeConcept());
+
+    expect(bulkInsertMock).toHaveBeenCalledTimes(1);
+    const [{ data }] = bulkInsertMock.mock.calls[0]!;
+    (data as Array<Record<string, unknown>>).forEach((row) => {
+      expect(row).not.toHaveProperty("id");
+      expect(row).not.toHaveProperty("status");
+      expect(row).not.toHaveProperty("assigned_to");
+      expect(row).not.toHaveProperty("created_at");
+      expect(row).not.toHaveProperty("updated_at");
+    });
+  });
+
+  it("skips the upsert entirely when every staged row is unchanged", async () => {
+    getAllIndividualsMock.mockResolvedValue([
+      {
+        id: uuid<IndividualId>(),
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalId: "ext-1",
+        name: "Jane Doe",
+        status: "active",
+        assignedTo: undefined,
+        missingFromSourceAt: undefined,
+        createdAt: "2026-08-19T00:00:00.000Z",
+        updatedAt: "2026-08-19T00:00:00.000Z",
+      },
+    ]);
+    _mockSinglePage([{ external_id: "ext-1", name: "Jane Doe" }]);
+
+    await generateIndividuals(_makeConcept());
+
+    expect(bulkInsertMock).not.toHaveBeenCalled();
+  });
+
+  it("flags an individual absent from every staged page as missing from source", async () => {
+    getAllIndividualsMock.mockResolvedValue([
+      {
+        id: uuid<IndividualId>(),
+        workspaceId: WORKSPACE_ID,
+        conceptId: CONCEPT_ID,
+        externalId: "ext-gone",
+        name: "Ghost Record",
+        status: "active",
+        assignedTo: undefined,
+        missingFromSourceAt: undefined,
+        createdAt: "2026-08-19T00:00:00.000Z",
+        updatedAt: "2026-08-19T00:00:00.000Z",
+      },
+    ]);
+    forEachQueryPageMock.mockResolvedValue({ numPages: 0, numRows: 0 });
+
+    await generateIndividuals(_makeConcept());
+
+    expect(bulkInsertMock).toHaveBeenCalledTimes(1);
+    const [{ data }] = bulkInsertMock.mock.calls[0]!;
+    expect(data).toEqual([
+      expect.objectContaining({
+        external_id: "ext-gone",
+        missing_from_source_at: expect.any(String),
+      }),
+    ]);
+  });
+
+  it("finishes its progress job after a successful sync", async () => {
+    forEachQueryPageMock.mockResolvedValue({ numPages: 0, numRows: 0 });
+
+    await generateIndividuals(_makeConcept());
+
+    expect(JobProgressStore.getAllJobs()).toEqual([]);
+  });
+
+  it("fails its progress job, keeping the error message, when the sync throws", async () => {
+    forEachQueryPageMock.mockRejectedValue(new Error("upsert exploded"));
+
+    await expect(generateIndividuals(_makeConcept())).rejects.toThrow(
+      "upsert exploded",
+    );
+
+    const jobs = JobProgressStore.getAllJobs();
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.entry).toMatchObject({
+      status: "error",
+      message: "upsert exploded",
+    });
+  });
+
+  it("reports determinate progress using the staged page's position and total", async () => {
+    let observedEntry: unknown;
+    forEachQueryPageMock.mockImplementation(
+      async (options: {
+        callback: (page: {
+          data: Array<{ external_id: string; name: string }>;
+          numRows: number;
+          totalRows: number;
+          totalPages: number;
+          pageNum: number;
+          nextPage: number | undefined;
+          prevPage: number | undefined;
+        }) => Promise<void>;
+      }) => {
+        await options.callback({
+          data: [{ external_id: "ext-1", name: "Jane Doe" }],
+          numRows: 1,
+          totalRows: 1,
+          totalPages: 3,
+          pageNum: 1,
+          nextPage: 2,
+          prevPage: 0,
+        });
+        const [job] = JobProgressStore.getAllJobs();
+        observedEntry = job?.entry;
+        return { numPages: 1, numRows: 1 };
+      },
+    );
+
+    await generateIndividuals(_makeConcept());
+
+    expect(observedEntry).toMatchObject({
+      status: "determinate",
+      current: 2,
+      total: 3,
+    });
   });
 });

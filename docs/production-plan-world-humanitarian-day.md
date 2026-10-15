@@ -227,6 +227,20 @@ re-writes all rows (no incremental sync).
   sync) and move heavy generation off the main browser thread / onto QETL.
 - P5.7 `[NEW]` Configurable **TBox** (see P5b below) - statuses, allowed
   values, relations are workspace-configurable.
+- P5.8 `[FIX]` Sync crashes a whole run when a case type's label resolves to
+  NULL for a key (a multi-dataset case type with a key uncovered by the label
+  mapping, or whose label cells are all NULL) - partial writes from earlier
+  pages already landed before the crash. Not fixed by P5.6.
+- P5.9 `[NEW]` Decide the product behavior for an individual whose
+  `external_id` leaves every source dataset: delete it, let a user archive it,
+  or something else. P5.6 only flags the row (`missing_from_source_at`) and
+  defers this decision; nothing surfaces the flag in any UI yet.
+- P5.10 `[NEW]` Decide whether Sync should stay page-by-page with no
+  cross-page atomicity (today's behavior, kept as-is by P5.6: a mid-sync
+  failure leaves some individuals updated and some not, until the next
+  successful sync) or become atomic - wrapping a full sync in rollback so a
+  failure leaves every individual exactly as it was before that sync started.
+  Not decided or implemented by P5.6.
 - `[Depends on: touches P2/P0 for materialization; BLOCKS: P5b, P5c case-mgmt]`
 
 ### P5b. Configurable TBox (workspace-configurable schema)
