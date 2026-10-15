@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { PostgresDatabaseConnectionParsers } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnectionParsers.ts";
-import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection.ts";
+import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection.ts";
+import type {
+  PostgresDatabaseConnection,
+  VaultSecretId,
+} from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 function _dbRow(
   overrides: Partial<PostgresDatabaseConnection.T<"DBRead">> = {},
@@ -40,16 +45,26 @@ describe("PostgresDatabaseConnectionParsers", () => {
   });
 
   it("refuses to build an insert payload from client code", () => {
+    const insert: PostgresDatabaseConnection.T<"Insert"> = {
+      __type: "PostgresDatabaseConnection",
+      connectionId: "11111111-1111-4111-8111-111111111111" as DatabaseConnection.Id,
+      databaseName: "reporting",
+      host: "db.example.org",
+      port: 5432,
+      sslMode: "require",
+      username: "readonly_user",
+      vaultSecretId: "22222222-2222-4222-8222-222222222222" as VaultSecretId,
+      workspaceId: "33333333-3333-4333-8333-333333333333" as Workspace.Id,
+    };
+
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      PostgresDatabaseConnectionParsers.fromModelInsertToDBInsert({} as any);
+      PostgresDatabaseConnectionParsers.fromModelInsertToDBInsert(insert);
     }).toThrow(/external-datasets edge function/);
   });
 
   it("refuses to build an update payload from client code", () => {
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      PostgresDatabaseConnectionParsers.fromModelUpdateToDBUpdate({} as any);
+      PostgresDatabaseConnectionParsers.fromModelUpdateToDBUpdate({});
     }).toThrow(/external-datasets edge function/);
   });
 });

@@ -3,10 +3,10 @@ import type { PostgresDatabaseConnectionModel } from "$/models/DatabaseConnectio
 
 /**
  * One satellite-table model per `DatabaseConnectionType`, mirroring
- * `DatasetSourceRegistry` one layer up (design spec section 5.1/5.5). A
- * second connector type (MySQL, MSSQL, ...) only ever adds a new key here
- * plus a new `db_connections__connection_type` enum value, never a new
- * "connections" concept.
+ * `DatasetSourceRegistry` one layer up. A second connector type (MySQL,
+ * MSSQL, ...) only ever adds a new key here plus a new
+ * `db_connections__connection_type` enum value, never a new "connections"
+ * concept.
  */
 export type DatabaseConnectionSourceRegistry<
   K extends "Read" | "Insert" | "Update" = "Read",

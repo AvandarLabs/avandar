@@ -2,9 +2,9 @@
  * Returns the decrypted password behind a saved Postgres connection's Vault
  * secret, by the `vault_secret_id` stored on `db_connections__postgres`.
  *
- * This is the only code path allowed to read `vault.decrypted_secrets`
- * (design spec section 5.2 item 3): `security definer`, and restricted to
- * `service_role` by the revoke/grant pair below - `anon` and `authenticated`
+ * This is the only code path allowed to read `vault.decrypted_secrets`:
+ * `security definer`, and restricted to `service_role` by the revoke/grant
+ * pair below - `anon` and `authenticated`
  * have no EXECUTE grant on this function at all, so even a bug that let an
  * unauthorized caller reach it could not leak a password to the browser.
  * Called from the `external-datasets` edge function using `SupabaseAdmin`,

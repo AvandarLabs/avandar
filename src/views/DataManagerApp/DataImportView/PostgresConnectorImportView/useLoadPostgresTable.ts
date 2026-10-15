@@ -1,5 +1,5 @@
 import { useMutation } from "@avandar/query-hooks";
-import { MIMEType } from "@avandar/utils";
+import { MIMEType, propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useState } from "react";
 import { uuid } from "$/lib/uuid";
@@ -8,11 +8,12 @@ import { DatabaseConnectionClient } from "@/clients/connections/DatabaseConnecti
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { Logger } from "@/utils/Logger";
-import { getPostgresConnectorImportErrorCopy } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy";
+import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy";
 import type { PostgresDatabaseConnectionWithDetails } from "@/clients/connections/DatabaseConnectionClient";
 import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
+import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type {
@@ -31,7 +32,7 @@ export type PostgresConnectionFormValues = {
   databaseName: string;
   username: string;
   password: string;
-  sslMode: "disable" | "require";
+  sslMode: PostgresDatabaseConnection.SslMode;
 };
 
 /**
@@ -84,12 +85,21 @@ export type PostgresTableLoad = {
   onRequestDataReparse: (parseOptions: FileParseOptions) => Promise<void>;
 };
 
-/** `"<name> - <host>:<port>/<database>"`, per spec section 7 item 2. */
-export function formatSavedConnectionLabel(
-  details: PostgresDatabaseConnectionWithDetails,
-): string {
-  const { connection, postgres } = details;
-  return `${connection.name} - ${postgres.host}:${postgres.port}/${postgres.databaseName}`;
+const POSTGRES_RELATION_KINDS = [
+  "table",
+  "view",
+] as const satisfies readonly PostgresTableDataset.RelationKind[];
+
+/**
+ * Whether the `external-datasets` proxy reported a relation kind this
+ * connector actually understands - its `kind` field is a plain `string`
+ * shared across every connector type, so a connector-specific caller must
+ * validate it before narrowing.
+ */
+function _isPostgresRelationKind(
+  kind: string,
+): kind is PostgresTableDataset.RelationKind {
+  return (POSTGRES_RELATION_KINDS as readonly string[]).includes(kind);
 }
 
 /**
@@ -110,8 +120,8 @@ function _mostRecentConnection(
  * Owns the Postgres connector's connection picker/form state, the picked
  * relation, and the fetched preview. Mirrors `useLoadGoogleSheet`'s shape
  * (`DataImportView/CLAUDE.md`), with one structural difference: a saved
- * connection is reusable across many imports (section 5.1), so this hook
- * also owns picking *which* connection, not just which relation.
+ * connection is reusable across many imports, so this hook also owns
+ * picking *which* connection, not just which relation.
  *
  * IMPORTANT: this does **not** save the dataset to the backend database;
  * that's `useSaveDataset`.
@@ -157,7 +167,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     },
     onError: (error) => {
       Logger.error(error, { devMsg: "Failed to list Postgres relations" });
-      const copy = getPostgresConnectorImportErrorCopy({
+      const copy = postgresConnectorImportErrorCopy({
         code: undefined,
         i18n,
       });
@@ -167,22 +177,24 @@ export function useLoadPostgresTable(): PostgresTableLoad {
 
   // Defaults the picker to the most-recently-verified saved connection, and
   // eagerly lists its tables, so a returning user sees the table picker
-  // without an extra click (section 7.4's confirmed states).
-  useEffect(() => {
-    if (selectedConnectionId !== undefined || !savedConnections) {
-      return;
-    }
-    if (savedConnections.length === 0) {
-      setSelectedConnectionId("new");
-      return;
-    }
-    const mostRecent = _mostRecentConnection(savedConnections);
-    if (mostRecent) {
-      setSelectedConnectionId(mostRecent.connection.id);
-      listRelations({ connectionId: mostRecent.connection.id });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [savedConnections]);
+  // without an extra click.
+  useEffect(
+    function selectMostRecentConnectionOnLoad() {
+      if (selectedConnectionId !== undefined || !savedConnections) {
+        return;
+      }
+      if (savedConnections.length === 0) {
+        setSelectedConnectionId("new");
+        return;
+      }
+      const mostRecent = _mostRecentConnection(savedConnections);
+      if (mostRecent) {
+        setSelectedConnectionId(mostRecent.connection.id);
+        listRelations({ connectionId: mostRecent.connection.id });
+      }
+    },
+    [savedConnections, selectedConnectionId, listRelations],
+  );
 
   const [submitConnectionForm, isTestingConnection] = useMutation({
     mutationFn: async (
@@ -241,7 +253,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
         error instanceof Error && "code" in error
           ? (error as { code: ExternalDatasetErrorCode }).code
           : undefined;
-      const copy = getPostgresConnectorImportErrorCopy({ code, i18n });
+      const copy = postgresConnectorImportErrorCopy({ code, i18n });
       setConnectionError({ code, ...copy });
     },
   });
@@ -277,10 +289,10 @@ export function useLoadPostgresTable(): PostgresTableLoad {
           type: "csv",
           id: uuid(),
           csvName: `${schemaName}.${tableName}.csv`,
-          // The real Postgres table/view name (section 5.5) - there is no
-          // local DuckDB view to name at import time (unlike Sheets,
-          // nothing here calls `DuckDbClient.loadCsv`; that only happens
-          // later, at acquire time, in `acquirePostgresTableRelation`).
+          // The real Postgres table/view name - there is no local DuckDB
+          // view to name at import time (unlike Sheets, nothing here calls
+          // `DuckDbClient.loadCsv`; that only happens later, at acquire
+          // time, in `acquirePostgresTableRelation`).
           tableName,
           numRejectedRows: 0,
           errors: { rejectedScans: [], rejectedRows: [] },
@@ -332,7 +344,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     },
     onError: (error) => {
       Logger.error(error, { devMsg: "Failed to preview Postgres relation" });
-      const copy = getPostgresConnectorImportErrorCopy({
+      const copy = postgresConnectorImportErrorCopy({
         code: undefined,
         i18n,
       });
@@ -364,20 +376,19 @@ export function useLoadPostgresTable(): PostgresTableLoad {
   const onSelectRelation = useCallback(
     (relationId: string) => {
       setSelectedRelationId(relationId);
-      const relation = relations?.find((candidate) => {
-        return candidate.relationId === relationId;
-      });
+      const relation = relations?.find(propEq("relationId", relationId));
       if (
         !relation ||
         selectedConnectionId === undefined ||
-        selectedConnectionId === "new"
+        selectedConnectionId === "new" ||
+        !_isPostgresRelationKind(relation.kind)
       ) {
         return;
       }
       previewRelation({
         connectionId: selectedConnectionId,
         relationId,
-        relationKind: relation.kind as PostgresTableDataset.RelationKind,
+        relationKind: relation.kind,
       });
     },
     [previewRelation, relations, selectedConnectionId],
@@ -393,16 +404,14 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       ) {
         return;
       }
-      const relation = relations?.find((candidate) => {
-        return candidate.relationId === selectedRelationId;
-      });
-      if (!relation) {
+      const relation = relations?.find(propEq("relationId", selectedRelationId));
+      if (!relation || !_isPostgresRelationKind(relation.kind)) {
         return;
       }
       previewRelation({
         connectionId: selectedConnectionId,
         relationId: selectedRelationId,
-        relationKind: relation.kind as PostgresTableDataset.RelationKind,
+        relationKind: relation.kind,
       });
     },
     [previewRelation, relations, selectedConnectionId, selectedRelationId],

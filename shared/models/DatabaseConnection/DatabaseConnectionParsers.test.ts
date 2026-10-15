@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DatabaseConnectionParsers } from "$/models/DatabaseConnection/DatabaseConnectionParsers.ts";
 import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 function _dbRow(
   overrides: Partial<DatabaseConnection.T<"DBRead">> = {},
@@ -18,7 +19,7 @@ function _dbRow(
 }
 
 describe("DatabaseConnectionParsers", () => {
-  it("reads a connection row", () => {
+  it("maps a connection row's snake_case fields to the camelCase model", () => {
     const model = DatabaseConnectionParsers.fromDBReadToModelRead(_dbRow());
 
     expect(model.name).toBe("Prod reporting replica");
@@ -34,16 +35,21 @@ describe("DatabaseConnectionParsers", () => {
   });
 
   it("refuses to build an insert payload from client code", () => {
+    const insert: DatabaseConnection.T<"Insert"> = {
+      __type: "DatabaseConnection",
+      connectionType: "postgres",
+      name: "Unused",
+      workspaceId: "33333333-3333-4333-8333-333333333333" as Workspace.Id,
+    };
+
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      DatabaseConnectionParsers.fromModelInsertToDBInsert({} as any);
+      DatabaseConnectionParsers.fromModelInsertToDBInsert(insert);
     }).toThrow(/external-datasets edge function/);
   });
 
   it("refuses to build an update payload from client code", () => {
     expect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      DatabaseConnectionParsers.fromModelUpdateToDBUpdate({} as any);
+      DatabaseConnectionParsers.fromModelUpdateToDBUpdate({});
     }).toThrow(/external-datasets edge function/);
   });
 });

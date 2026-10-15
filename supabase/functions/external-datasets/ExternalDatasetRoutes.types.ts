@@ -9,7 +9,7 @@ export type ExternalDatasetErrorResponse = {
   error: { code: ExternalDatasetErrorCode; message: string };
 };
 
-export type ExternalDatasetsAPI = APITypeDef<
+export type ExternalDatasetsApi = APITypeDef<
   "external-datasets",
   [
     "/:connectorType/connections/test-and-save",

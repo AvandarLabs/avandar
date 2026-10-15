@@ -7,9 +7,9 @@
  * insert, update, or delete another workspace's rows, and `anon` must not
  * reach the table at all. Mirrors `rls_datasets__pdf_file.test.sql` exactly -
  * this table is gated by `util__auth_user_can_access_resource('dataset', ...)`
- * the same way every other `datasets__<type>` satellite table is (design
- * spec section 5.1), unlike `db_connections`/`db_connections__postgres`
- * (app-role gated, tested separately in `rls_db_connections.test.sql`).
+ * the same way every other `datasets__<type>` satellite table is, unlike
+ * `db_connections`/`db_connections__postgres` (app-role gated, tested
+ * separately in `rls_db_connections.test.sql`).
  */
 begin;
 

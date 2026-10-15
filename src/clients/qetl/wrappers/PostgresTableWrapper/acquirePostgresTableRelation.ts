@@ -10,15 +10,15 @@ import type { SourceVersion } from "$/models/relations/RelationCapabilities/Rela
  * separate access token to thread through: the
  * edge function call carries the caller's own Supabase session, and the
  * edge function itself resolves the connection's decrypted password from
- * Vault server-side (spec section 5.2) - this module never sees a credential.
+ * Vault server-side - this module never sees a credential.
  */
 export type PostgresRelationCsvReader<TRelation> = (
   params: Readonly<{ csvText: string }>,
 ) => Promise<TRelation>;
 
 /**
- * One acquired Postgres relation. No `sourceVersion`: `freshnessSignal` is
- * `"none"` for v1 (spec section 5.3).
+ * One acquired Postgres relation. No `sourceVersion`: there is no freshness
+ * signal to report yet.
  */
 export type AcquiredPostgresTableRelation<TRelation> = {
   relation: TRelation;
@@ -45,7 +45,7 @@ export type PostgresRowsFetch = (
  * connection credential, and imports no client singleton, so the wrapper
  * that eventually calls it keeps `WrapperContext` as the only source of
  * identity. `relationId` is encoded as `` `${schemaName}.${tableName}` ``,
- * per spec section 5.4.
+ * matching how the edge function's `relations` route reports it.
  *
  * This route returns raw CSV text (`Content-Type: text/csv`), not a JSON
  * object, so it is fetched directly rather than through

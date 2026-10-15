@@ -47,7 +47,7 @@ export type PostgresTableWrapperOptions = {
 };
 
 /**
- * Capability record for the Postgres connector, per design spec section 5.3.
+ * Capability record for the Postgres connector.
  *
  * Bounded (not `"unbounded"`, unlike Sheets): an arbitrary customer table can
  * be far larger than a Sheets export, and both the edge function and the
@@ -66,7 +66,7 @@ const CAPABILITIES = {
   /** A relation is downloaded whole, as CSV, same as Sheets. */
   acquisitionUnit: { kind: "whole-relation" },
 
-  /** No pushdown in v1 (spec section 2, roadmapped as future work). */
+  /** No predicate or aggregate pushdown yet; a future revision can add it. */
   predicatePushdown: "none",
   aggregatePushdown: false,
   wholeRelationAcquirable: "yes",
@@ -80,7 +80,10 @@ const CAPABILITIES = {
    */
   maxBytesPerCall: 100 * 1024 * 1024,
 
-  /** Omitted for v1 (spec section 5.4a); future work is section 9. */
+  /**
+   * No freshness signal yet; a future revision can detect server-side
+   * changes.
+   */
   freshnessSignal: "none",
 
   /** A Postgres table has no positional identity; row order is not stable. */
@@ -161,7 +164,8 @@ export function createPostgresTableWrapper(
       return await _acquirePostgresTable({ ref, wrapperOptions });
     },
 
-    // `readFreshness` intentionally omitted: `freshnessSignal` is `"none"`
-    // for v1 (spec section 5.4a, section 9 roadmaps real freshness detection).
+    // `readFreshness` intentionally omitted: `freshnessSignal` is `"none"`,
+    // so there is nothing yet to report; a future revision can add real
+    // freshness detection here.
   };
 }

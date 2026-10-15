@@ -48,10 +48,10 @@ type IDatabaseConnectionClient = ServiceClient<"DatabaseConnectionClient"> &
 
 /**
  * Read/list only, deliberately. `db_connections` and its satellite tables
- * grant `insert`/`update`/`delete` to `service_role` only (design spec
- * section 5.2/5.4) - only the `external-datasets` edge function may create
- * or change a saved connection, since only it can create the matching Vault
- * secret. Do not add a write method here, even for internal convenience.
+ * grant `insert`/`update`/`delete` to `service_role` only - only the
+ * `external-datasets` edge function may create or change a saved connection,
+ * since only it can create the matching Vault secret. Do not add a write
+ * method here, even for internal convenience.
  */
 function createDatabaseConnectionClient(): WithLogger<
   WithQueryHooks<

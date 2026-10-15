@@ -2065,6 +2065,10 @@ export type Database = {
         Args: { p_description: string; p_name: string; p_secret: string }
         Returns: string
       }
+      rpc_db_connections__delete_vault_secret: {
+        Args: { p_secret_id: string }
+        Returns: undefined
+      }
       rpc_db_connections__get_decrypted_secret: {
         Args: { p_vault_secret_id: string }
         Returns: string

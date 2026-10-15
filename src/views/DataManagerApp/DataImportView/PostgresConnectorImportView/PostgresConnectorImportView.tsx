@@ -1,27 +1,14 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Box,
-  BoxProps,
-  Button,
-  Group,
-  Loader,
-  NumberInput,
-  PasswordInput,
-  Select,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { makeBucketMap } from "@avandar/utils";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { Box, BoxProps, Button, Loader, Select, Stack } from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
-import {
-  formatSavedConnectionLabel,
-  useLoadPostgresTable,
-} from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
-import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
-import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
+import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
+import { formatSavedConnectionLabel } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/formatSavedConnectionLabel";
+import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
+import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
 
@@ -53,8 +40,7 @@ const EMPTY_FORM_VALUES: PostgresConnectionFormValues = {
  * verbatim (`DataImportView/CLAUDE.md`) - the only genuinely new
  * composition is the schema-grouped relation picker, because a database's
  * shape (many relations, organized by schema, in one server) differs from a
- * spreadsheet's (a few tabs, flat, in one document). See design spec
- * section 7.4.
+ * spreadsheet's (a few tabs, flat, in one document).
  */
 export function PostgresConnectorImportView({
   onSaveSuccess,
@@ -71,11 +57,11 @@ export function PostgresConnectorImportView({
   const connectorStatus = load.isLoadingSavedConnections ? (
     <Loader size="xs" />
   ) : hasSavedConnections ? (
-    <Trans>
-      {load.savedConnections?.length} saved{" "}
-      {load.savedConnections?.length === 1 ? "database" : "databases"}{" "}
-      available
-    </Trans>
+    <Plural
+      value={load.savedConnections?.length ?? 0}
+      one="# saved database available"
+      other="# saved databases available"
+    />
   ) : (
     <Trans>Import a table or view from a database your organization runs</Trans>
   );
@@ -124,19 +110,16 @@ export function PostgresConnectorImportView({
 
   // Mantine's grouped `Select` data shape is `{group, items}[]`, not a flat
   // list with an inline `group` key per item - real databases run to
-  // hundreds of tables across many schemas (spec section 7 item 2), so
-  // this cannot be the same small, ungrouped `Select` the Sheets tab
-  // picker uses.
-  const relationsBySchema = new Map<
-    string,
-    Array<{ value: string; label: string }>
-  >();
-  for (const relation of load.relations ?? []) {
-    const schemaName = relation.relationId.split(".")[0] ?? "";
-    const items = relationsBySchema.get(schemaName) ?? [];
-    items.push({ value: relation.relationId, label: relation.label });
-    relationsBySchema.set(schemaName, items);
-  }
+  // hundreds of tables across many schemas, so this cannot be the same
+  // small, ungrouped `Select` the Sheets tab picker uses.
+  const relationsBySchema = makeBucketMap(load.relations ?? [], {
+    keyFn: (relation) => {
+      return relation.relationId.split(".")[0] ?? "";
+    },
+    valueFn: (relation) => {
+      return { value: relation.relationId, label: relation.label };
+    },
+  });
   const relationOptions = [...relationsBySchema.entries()].map(
     ([group, items]) => {
       return { group, items };
@@ -155,105 +138,15 @@ export function PostgresConnectorImportView({
           />
 
           {showForm ? (
-            <Stack gap="sm" maw="420px">
-              <TextInput
-                label={t`Label`}
-                placeholder={t`Prod reporting replica`}
-                value={formValues.name}
-                onChange={(event) => {
-                  setFormValues({
-                    ...formValues,
-                    name: event.currentTarget.value,
-                  });
-                }}
-              />
-              <TextInput
-                label={t`Host`}
-                value={formValues.host}
-                onChange={(event) => {
-                  setFormValues({
-                    ...formValues,
-                    host: event.currentTarget.value,
-                  });
-                }}
-              />
-              <Group grow>
-                <NumberInput
-                  label={t`Port`}
-                  value={formValues.port}
-                  onChange={(value) => {
-                    setFormValues({
-                      ...formValues,
-                      port: typeof value === "number" ? value : 5432,
-                    });
-                  }}
-                />
-                <Select
-                  label={t`SSL mode`}
-                  data={[
-                    { value: "require", label: t`Require` },
-                    { value: "disable", label: t`Disable` },
-                  ]}
-                  value={formValues.sslMode}
-                  onChange={(value) => {
-                    if (value === "require" || value === "disable") {
-                      setFormValues({ ...formValues, sslMode: value });
-                    }
-                  }}
-                />
-              </Group>
-              <TextInput
-                label={t`Database`}
-                value={formValues.databaseName}
-                onChange={(event) => {
-                  setFormValues({
-                    ...formValues,
-                    databaseName: event.currentTarget.value,
-                  });
-                }}
-              />
-              <TextInput
-                label={t`Username`}
-                value={formValues.username}
-                onChange={(event) => {
-                  setFormValues({
-                    ...formValues,
-                    username: event.currentTarget.value,
-                  });
-                }}
-              />
-              <PasswordInput
-                label={t`Password`}
-                value={formValues.password}
-                onChange={(event) => {
-                  setFormValues({
-                    ...formValues,
-                    password: event.currentTarget.value,
-                  });
-                }}
-              />
-              <Text size="xs" c="dimmed">
-                <Trans>
-                  The database user should ideally have read-only access to
-                  the table or view you plan to import.
-                </Trans>
-              </Text>
-              {load.connectionError ? (
-                <Text size="sm" c="error" role="alert">
-                  {load.connectionError.message}
-                </Text>
-              ) : null}
-              <Group>
-                <Button
-                  loading={load.isTestingConnection}
-                  onClick={() => {
-                    load.onSubmitConnectionForm(formValues);
-                  }}
-                >
-                  <Trans>Connect</Trans>
-                </Button>
-              </Group>
-            </Stack>
+            <PostgresConnectionForm
+              formValues={formValues}
+              onFormValuesChange={setFormValues}
+              connectionError={load.connectionError}
+              isTestingConnection={load.isTestingConnection}
+              onSubmit={() => {
+                load.onSubmitConnectionForm(formValues);
+              }}
+            />
           ) : null}
 
           {!showForm && load.isLoadingRelations ? <Loader size="xs" /> : null}
@@ -286,9 +179,10 @@ export function PostgresConnectorImportView({
             parseOptions={load.dataSourceMetadata.parseOptions}
             onSaveSuccess={onSaveSuccess}
             onDataSourceMetadataChange={(metadata) => {
-              load.setDataSourceMetadata(
-                metadata as PostgresTableDataSourceMetadata,
-              );
+              if (metadata.sourceType !== "postgres_table") {
+                return;
+              }
+              load.setDataSourceMetadata(metadata);
             }}
             isProcessing={load.isLoadingPostgresTable}
             onRequestDataReparse={load.onRequestDataReparse}

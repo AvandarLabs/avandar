@@ -21,9 +21,9 @@ export type ExternalDatasetRelation = {
  * (`src/clients/DuckDbClient/DuckDbClient.types.ts`) - edge functions only
  * resolve `$/` (`shared/`) and `@sbfn/` (`supabase/functions/`), so they
  * cannot import from `src/`. The real, DuckDB-typed schema is derived once
- * the `rows` route's CSV is transcoded client-side (spec section 5.4a),
- * exactly like Google Sheets; this preview type exists only to describe
- * what the picker shows before that happens.
+ * the `rows` route's CSV is transcoded client-side, exactly like Google
+ * Sheets; this preview type exists only to describe what the picker shows
+ * before that happens.
  */
 export type ExternalDatasetPreviewColumn = {
   columnName: string;
@@ -42,6 +42,7 @@ export type ExternalDatasetErrorCode =
   | "too_large"
   | "unknown";
 
+/** A connector failure with a specific, user-facing reason attached. */
 export class ExternalDatasetError extends Error {
   constructor(
     public readonly code: ExternalDatasetErrorCode,
@@ -53,9 +54,9 @@ export class ExternalDatasetError extends Error {
 
 /**
  * Everything a connector implementation needs from the caller, resolved
- * once per request by `ExternalDatasetRoutes.ts` before dispatching into
- * the registry (spec section 5.4a traces exactly where this sits relative
- * to the mediator - nowhere; the mediator never learns any of this exists).
+ * once per request by `ExternalDatasetRoutes.ts` before dispatching into the
+ * registry. The QETL mediator never learns any of this exists - this
+ * context lives entirely at the HTTP boundary, one layer below it.
  */
 export type ExternalDatasetConnectorContext = {
   workspaceId: string;
@@ -91,10 +92,7 @@ export type ExternalDatasetConnector = {
     columns: ExternalDatasetPreviewColumn[];
     previewRows: Array<Record<string, unknown>>;
   }>;
-  /**
-   * Returns the full relation as CSV text - what `acquire` calls (spec
-   * section 5.4a).
-   */
+  /** Returns the full relation as CSV text - what `acquire` calls. */
   getRelationRows: (
     context: ExternalDatasetConnectorContext,
     connectionId: string,

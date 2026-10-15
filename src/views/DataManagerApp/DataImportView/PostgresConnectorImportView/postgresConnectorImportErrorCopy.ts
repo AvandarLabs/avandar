@@ -1,3 +1,4 @@
+import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import type { ExternalDatasetErrorCode } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector";
 import type { I18n, MessageDescriptor } from "@lingui/core";
@@ -27,35 +28,29 @@ const GENERIC_FAILURE: CopyDescriptors = {
  * never reach the catalogs.
  */
 function _getCopyDescriptors(code: ExternalDatasetErrorCode): CopyDescriptors {
-  switch (code) {
-    case "auth_failed":
-      return {
-        title: msg`Authentication failed`,
-        message: msg`The username or password was not accepted. Check the credentials and try again.`,
-      };
-    case "unreachable":
-      return {
-        title: msg`Database is unreachable`,
-        message: msg`Avandar could not reach that host and port. Check the address and that the server allows connections from Avandar.`,
-      };
-    case "ssl_required":
-      return {
-        title: msg`A secure connection is required`,
-        message: msg`This server requires SSL. Set SSL mode to "Require" and try again.`,
-      };
-    case "timeout":
-      return {
-        title: msg`Connection timed out`,
-        message: msg`The database did not respond in time. Check the address and try again.`,
-      };
-    case "too_large":
-      return {
-        title: msg`This table is too large to import`,
-        message: msg`This table has more rows than Avandar can import at once. Try a smaller table or view.`,
-      };
-    case "unknown":
-      return GENERIC_FAILURE;
-  }
+  return matchLiteral(code, {
+    auth_failed: {
+      title: msg`Authentication failed`,
+      message: msg`The username or password was not accepted. Check the credentials and try again.`,
+    },
+    unreachable: {
+      title: msg`Database is unreachable`,
+      message: msg`Avandar could not reach that host and port. Check the address and that the server allows connections from Avandar.`,
+    },
+    ssl_required: {
+      title: msg`A secure connection is required`,
+      message: msg`This server requires SSL. Set SSL mode to "Require" and try again.`,
+    },
+    timeout: {
+      title: msg`Connection timed out`,
+      message: msg`The database did not respond in time. Check the address and try again.`,
+    },
+    too_large: {
+      title: msg`This table is too large to import`,
+      message: msg`This table has more rows than Avandar can import at once. Try a smaller table or view.`,
+    },
+    unknown: GENERIC_FAILURE,
+  });
 }
 
 /**
@@ -68,7 +63,7 @@ function _getCopyDescriptors(code: ExternalDatasetErrorCode): CopyDescriptors {
  *   returned, and the reactive `i18n` from `useLingui()`.
  * @returns The notification title and message.
  */
-export function getPostgresConnectorImportErrorCopy(
+export function postgresConnectorImportErrorCopy(
   params: Readonly<{
     code: ExternalDatasetErrorCode | undefined;
     i18n: I18n;

@@ -11,14 +11,14 @@ import {
 import { object, string } from "zod";
 import type {
   ExternalDatasetErrorResponse,
-  ExternalDatasetsAPI,
+  ExternalDatasetsApi,
 } from "@sbfn/external-datasets/ExternalDatasetRoutes.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 /**
- * `{ workspaceId, connectionId?, ...connectorFields }` - spec section 5.4's
- * route table. Connector-specific fields are validated by the connector
- * itself.
+ * `{ workspaceId, connectionId?, ...connectorFields }` - every connector
+ * type's route body carries this shared shape; connector-specific fields are
+ * validated by the connector itself.
  */
 const testAndSaveBodySchema = object({
   workspaceId: string(),
@@ -28,11 +28,10 @@ const testAndSaveBodySchema = object({
 /**
  * Looks up the workspace a saved connection belongs to, through the
  * **user-scoped** client so `db_connections`'s own RLS (`'editor'`+ on
- * `data_sources`, per spec section 5.1) is what actually gates this -
- * there is no separate app-role check to duplicate here, because the
- * lookup itself already fails for anyone without sufficient access.
- * Never distinguishes "doesn't exist" from "no permission" in its error -
- * both look identical to the caller.
+ * `data_sources`) is what actually gates this - there is no separate
+ * app-role check to duplicate here, because the lookup itself already fails
+ * for anyone without sufficient access. Never distinguishes "doesn't exist"
+ * from "no permission" in its error - both look identical to the caller.
  */
 async function _getOwningWorkspaceId(
   supabaseClient: AvaSupabaseClient,
@@ -55,14 +54,14 @@ async function _getOwningWorkspaceId(
 
 /**
  * Converts a connector failure into the route table's closed error shape
- * (spec section 5.4: `{ error: { code, message } }`). Returned as a plain
- * object, not a `Response` with its own status code - MiniServer wraps any
- * non-`Response` return in a 200 via `responseSuccess` either way, so the
- * domain-specific failure lives entirely in the body's own `error` field,
- * not the transport status. An error this function does not recognize
- * (anything but `ExternalDatasetError`) is rethrown so MiniServer's own
- * catch-all still produces a real 500, instead of this masking a genuine
- * bug as a tidy `{error: {...}}` response.
+ * (`{ error: { code, message } }`). Returned as a plain object, not a
+ * `Response` with its own status code - MiniServer wraps any non-`Response`
+ * return in a 200 via `responseSuccess` either way, so the domain-specific
+ * failure lives entirely in the body's own `error` field, not the transport
+ * status. An error this function does not recognize (anything but
+ * `ExternalDatasetError`) is rethrown so MiniServer's own catch-all still
+ * produces a real 500, instead of this masking a genuine bug as a tidy
+ * `{error: {...}}` response.
  */
 function _toErrorResult(error: unknown): ExternalDatasetErrorResponse {
   if (error instanceof ExternalDatasetError) {
@@ -71,7 +70,40 @@ function _toErrorResult(error: unknown): ExternalDatasetErrorResponse {
   throw error;
 }
 
-export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsAPI>(
+/**
+ * Resolves the connector and per-request context shared by every route that
+ * acts on an already-saved connection (`relations`, `preview`, `rows`):
+ * looks up the connector by type, derives the owning workspace from the
+ * connection itself, and assembles the context object every connector method
+ * takes. `test-and-save` does not use this - it may not have a
+ * `connectionId` yet, so its workspace resolution branches differently.
+ */
+async function _resolveConnectorContext(
+  pathParams: { connectorType: string; connectionId: string },
+  supabaseClient: AvaSupabaseClient,
+  supabaseAdminClient: ExternalDatasetConnectorContext["supabaseAdminClient"],
+): Promise<{
+  connector: ReturnType<typeof getConnector>;
+  context: ExternalDatasetConnectorContext;
+}> {
+  const connector = getConnector(pathParams.connectorType);
+  const workspaceId = await _getOwningWorkspaceId(
+    supabaseClient,
+    pathParams.connectionId,
+  );
+  return {
+    connector,
+    context: { workspaceId, supabaseClient, supabaseAdminClient },
+  };
+}
+
+/**
+ * The `external-datasets` proxy's route table: test-and-save a connection,
+ * list its relations, preview one, and read its full rows as CSV - all
+ * dispatched through {@link getConnector} to the connector type named in
+ * the path.
+ */
+export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsApi>(
   "external-datasets",
   {
     "/:connectorType/connections/test-and-save": {
@@ -120,16 +152,11 @@ export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsAPI>(
         schema: { connectorType: string(), connectionId: string() },
       }).action(
         async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const connector = getConnector(pathParams.connectorType);
-          const workspaceId = await _getOwningWorkspaceId(
-            supabaseClient,
-            pathParams.connectionId,
-          );
-          const context: ExternalDatasetConnectorContext = {
-            workspaceId,
+          const { connector, context } = await _resolveConnectorContext(
+            pathParams,
             supabaseClient,
             supabaseAdminClient,
-          };
+          );
 
           try {
             const relations = await connector.listRelations(
@@ -154,16 +181,11 @@ export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsAPI>(
           },
         }).action(
           async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-            const connector = getConnector(pathParams.connectorType);
-            const workspaceId = await _getOwningWorkspaceId(
-              supabaseClient,
-              pathParams.connectionId,
-            );
-            const context: ExternalDatasetConnectorContext = {
-              workspaceId,
+            const { connector, context } = await _resolveConnectorContext(
+              pathParams,
               supabaseClient,
               supabaseAdminClient,
-            };
+            );
 
             try {
               return await connector.previewRelation(
@@ -187,16 +209,11 @@ export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsAPI>(
         },
       }).action(
         async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const connector = getConnector(pathParams.connectorType);
-          const workspaceId = await _getOwningWorkspaceId(
-            supabaseClient,
-            pathParams.connectionId,
-          );
-          const context: ExternalDatasetConnectorContext = {
-            workspaceId,
+          const { connector, context } = await _resolveConnectorContext(
+            pathParams,
             supabaseClient,
             supabaseAdminClient,
-          };
+          );
 
           try {
             const csv = await connector.getRelationRows(

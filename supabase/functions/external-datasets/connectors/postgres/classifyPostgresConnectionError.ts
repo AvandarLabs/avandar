@@ -1,12 +1,31 @@
 import type { ExternalDatasetErrorCode } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
 
+function _getErrorCode(error: unknown): string | undefined {
+  if (
+    error !== null &&
+    typeof error === "object" &&
+    "code" in error &&
+    typeof error.code === "string"
+  ) {
+    return error.code;
+  }
+  return undefined;
+}
+
+function _getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
+
 /**
- * Maps a thrown connection/query error to the route table's closed error-code
- * set (spec section 5.4), so `test-and-save` and every other route can
- * return a specific, user-facing reason instead of one generic failure.
- * Unrecognized shapes fall back to `"unknown"` rather than guessing - a
- * wrong-but-confident code (e.g. reporting `auth_failed` for what was
- * actually a timeout) would send the user chasing the wrong fix.
+ * Maps a thrown connection/query error to the route table's closed
+ * error-code set, so `test-and-save` and every other route can return a
+ * specific, user-facing reason instead of one generic failure. Unrecognized
+ * shapes fall back to `"unknown"` rather than guessing - a wrong-but-confident
+ * code (e.g. reporting `auth_failed` for what was actually a timeout) would
+ * send the user chasing the wrong fix.
  */
 export function classifyPostgresConnectionError(
   error: unknown,
@@ -50,23 +69,4 @@ export function classifyPostgresConnectionError(
   }
 
   return "unknown";
-}
-
-function _getErrorCode(error: unknown): string | undefined {
-  if (
-    error !== null &&
-    typeof error === "object" &&
-    "code" in error &&
-    typeof error.code === "string"
-  ) {
-    return error.code;
-  }
-  return undefined;
-}
-
-function _getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return String(error);
 }

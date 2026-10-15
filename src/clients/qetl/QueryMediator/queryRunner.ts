@@ -15,7 +15,7 @@ import {
   fetchRelationBytes,
   loadRelationBytes,
   probeStorageRelationCache,
-} from "@/clients/qetl/QueryMediator/relationLoading";
+} from "@/clients/qetl/QueryMediator/relationLoading/relationLoading";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";

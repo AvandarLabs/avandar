@@ -1,10 +1,10 @@
 /**
  * Rotates an existing Vault secret's value in place (same secret id,
  * new plaintext), for the "rotate this connection's credential" path of
- * `test-and-save` (design spec section 5.4: `connectionId` present means
- * rotate). Updating in place, rather than creating a new secret and
- * repointing `vault_secret_id`, avoids leaving an orphaned secret behind
- * on every rotation.
+ * `test-and-save` (triggered when the caller already has a `connectionId`
+ * to rotate rather than create anew). Updating in place, rather than
+ * creating a new secret and repointing `vault_secret_id`, avoids leaving an
+ * orphaned secret behind on every rotation.
  *
  * Same access rule as the create path: `vault.update_secret` is never
  * reachable directly, only through this `security definer` wrapper,

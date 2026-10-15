@@ -1,17 +1,17 @@
+import { propEq } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-import { createPostgresConnector } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector.ts";
+import { createPostgresConnector } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import type { ExternalDatasetConnectorContext } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
 import type { PostgresConnectionConfig } from "@sbfn/external-datasets/connectors/postgres/PostgresConnectionConfig.ts";
-import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/PostgresSql.ts";
+import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/PostgresSql.types.ts";
 
 /**
  * SQL-injection-shaped payloads for every `test-and-save` connection-form
- * field (spec section 8's non-optional row). None of these should ever
- * reach a raw query string or a connection string built by concatenation -
- * this file proves each field reaches the driver only as a discrete,
- * untouched property on a structured config object
- * (`PostgresConnectionConfig`), never stitched into text anywhere in the
- * call chain.
+ * field. None of these should ever reach a raw query string or a connection
+ * string built by concatenation - this file proves each field reaches the
+ * driver only as a discrete, untouched property on a structured config
+ * object (`PostgresConnectionConfig`), never stitched into text anywhere in
+ * the call chain.
  */
 const INJECTION_PAYLOAD = "'; select pg_sleep(5); --";
 
@@ -128,9 +128,9 @@ describe("createPostgresConnector - field parameterization", () => {
 
     // The Vault RPC received the password as a bound parameter value, not
     // embedded in any query text.
-    const createSecretCall = rpcCalls.find((call) => {
-      return call.name === "rpc_db_connections__create_vault_secret";
-    });
+    const createSecretCall = rpcCalls.find(
+      propEq("name", "rpc_db_connections__create_vault_secret"),
+    );
     expect(createSecretCall?.params.p_secret).toBe(INJECTION_PAYLOAD);
 
     // The persisted row carries the raw payload as a plain object property,

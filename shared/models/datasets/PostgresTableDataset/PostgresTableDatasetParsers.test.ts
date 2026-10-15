@@ -20,7 +20,7 @@ function _dbRow(
 }
 
 describe("PostgresTableDatasetParsers", () => {
-  it("reads a table row", () => {
+  it("maps a table-kind row's fields", () => {
     const model = PostgresTableDatasetParsers.fromDBReadToModelRead(_dbRow());
 
     expect(model.connectionId).toBe("11111111-1111-4111-8111-111111111111");
@@ -29,7 +29,7 @@ describe("PostgresTableDatasetParsers", () => {
     expect(model.relationKind).toBe("table");
   });
 
-  it("reads a view row", () => {
+  it("maps a view-kind row's fields", () => {
     const model = PostgresTableDatasetParsers.fromDBReadToModelRead(
       _dbRow({ relation_kind: "view", table_name: "active_customers" }),
     );

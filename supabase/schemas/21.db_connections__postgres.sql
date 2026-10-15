@@ -1,9 +1,9 @@
 /**
  * Postgres-specific connection details - the satellite half of the
- * `db_connections` / `db_connections__postgres` split (design spec section
- * 5.1). Host/port/database/username are operational metadata visible to any
- * workspace editor, same sensitivity tier as `datasets__google_sheets`'s
- * plain `google_document_id` column; only the password lives behind Vault.
+ * `db_connections` / `db_connections__postgres` split. Host/port/database/
+ * username are operational metadata visible to any workspace editor, same
+ * sensitivity tier as `datasets__google_sheets`'s plain `google_document_id`
+ * column; only the password lives behind Vault.
  */
 create table public.db_connections__postgres (
   -- One row per postgres connection, keyed to its generic `db_connections` row.
@@ -17,8 +17,8 @@ create table public.db_connections__postgres (
   database_name text not null,
   username text not null,
   ssl_mode public.db_connections__postgres_ssl_mode not null default 'require',
-  -- Points at the Vault secret holding the password alone (design spec
-  -- section 5.2) - never the password itself. Deliberately not a foreign
+  -- Points at the Vault secret holding the password alone - never the
+  -- password itself. Deliberately not a foreign
   -- key: `vault.secrets` is owned by the Vault extension, not this
   -- application's schema, so this column trusts the single write path
   -- (the `external-datasets` edge function via the security-definer

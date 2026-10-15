@@ -123,53 +123,60 @@ async function _seedSavedConnection(options: {
     throw new Error(`vault secret seed failed: ${secretError?.message}`);
   }
 
-  const { data: connection, error: connectionError } = await admin
-    .from("db_connections")
-    .insert({
-      workspace_id: workspaceId,
-      connection_type: "postgres",
-      name: "E2E reporting replica",
-    })
-    .select("id")
-    .single();
-  if (connectionError || !connection) {
-    throw new Error(`db_connections seed failed: ${connectionError?.message}`);
-  }
+  // From here, a failure must roll back whatever already succeeded (the
+  // Vault secret at minimum) before rethrowing, so a mid-seed failure never
+  // leaves a row behind that the caller has no id to clean up.
+  try {
+    const { data: connection, error: connectionError } = await admin
+      .from("db_connections")
+      .insert({
+        workspace_id: workspaceId,
+        connection_type: "postgres",
+        name: "E2E reporting replica",
+      })
+      .select("id")
+      .single();
+    if (connectionError || !connection) {
+      throw new Error(`db_connections seed failed: ${connectionError?.message}`);
+    }
 
-  const { error: postgresError } = await admin
-    .from("db_connections__postgres")
-    .insert({
-      connection_id: connection.id,
-      workspace_id: workspaceId,
-      host: "db.e2e-fixture.invalid",
-      port: 5432,
-      database_name: "reporting",
-      username: "readonly_user",
-      ssl_mode: "require",
-      vault_secret_id: secretId,
-      last_verified_at: new Date().toISOString(),
+    const { error: postgresError } = await admin
+      .from("db_connections__postgres")
+      .insert({
+        connection_id: connection.id,
+        workspace_id: workspaceId,
+        host: "db.e2e-fixture.invalid",
+        port: 5432,
+        database_name: "reporting",
+        username: "readonly_user",
+        ssl_mode: "require",
+        vault_secret_id: secretId,
+        last_verified_at: new Date().toISOString(),
+      });
+    if (postgresError) {
+      await admin.from("db_connections").delete().eq("id", connection.id);
+      throw new Error(`db_connections__postgres seed failed: ${postgresError.message}`);
+    }
+
+    return { connectionId: connection.id, vaultSecretId: secretId };
+  } catch (error) {
+    await admin.rpc("rpc_db_connections__delete_vault_secret", {
+      p_secret_id: secretId,
     });
-  if (postgresError) {
-    throw new Error(`db_connections__postgres seed failed: ${postgresError.message}`);
+    throw error;
   }
-
-  return { connectionId: connection.id, vaultSecretId: secretId };
 }
 
 /**
- * Deletes the seeded `db_connections`/`db_connections__postgres` rows.
- * Deliberately does **not** delete the Vault secret itself - v1 has no
- * delete path for one (connection management, including delete/rotate, is
- * out of scope for this feature and tracked as future work, AVA-372), so
- * there is no RPC to call. The orphaned `vault.secrets` row is inert once
- * nothing references its id, and this is an ephemeral local/CI database
- * that gets rebuilt from migrations regularly - not a real hygiene problem.
+ * Deletes the seeded `db_connections`/`db_connections__postgres` rows and
+ * the Vault secret they point at, so nothing from this test outlives it.
  */
 async function _cleanUpSavedConnection(options: {
   admin: AvaSupabaseDBClient;
   connectionId: string;
+  vaultSecretId: string;
 }): Promise<void> {
-  const { admin, connectionId } = options;
+  const { admin, connectionId, vaultSecretId } = options;
 
   // Children before the parent: `db_connections__postgres.connection_id` is
   // a foreign key onto `db_connections.id`.
@@ -178,6 +185,9 @@ async function _cleanUpSavedConnection(options: {
     .delete()
     .eq("connection_id", connectionId);
   await admin.from("db_connections").delete().eq("id", connectionId);
+  await admin.rpc("rpc_db_connections__delete_vault_secret", {
+    p_secret_id: vaultSecretId,
+  });
 }
 
 test.describe("Postgres connector", () => {
@@ -190,12 +200,15 @@ test.describe("Postgres connector", () => {
       supabaseAdminClient: admin,
       slug: e2eWorkerDb.workspaceSlug,
     });
-    const { connectionId } = await _seedSavedConnection({
-      admin,
-      workspaceId,
-    });
 
+    let connectionId: string | undefined;
+    let vaultSecretId: string | undefined;
     try {
+      ({ connectionId, vaultSecretId } = await _seedSavedConnection({
+        admin,
+        workspaceId,
+      }));
+
       await _stubExternalDatasetsRoutes(page);
 
       await signInWithEmailPassword(page, {
@@ -208,8 +221,8 @@ test.describe("Postgres connector", () => {
       await page.getByRole("tab", { name: "Connectors" }).click();
 
       // The most-recently-verified saved connection is picked automatically
-      // and its relations are listed eagerly (section 7.4's confirmed
-      // states) - no click needed to reach the table picker.
+      // and its relations are listed eagerly - no click needed to reach the
+      // table picker.
       const relationSelect = page.getByRole("combobox", {
         name: "Table or view to import",
       });
@@ -248,7 +261,9 @@ test.describe("Postgres connector", () => {
         supabaseAdminClient: admin,
         workspaceId,
       });
-      await _cleanUpSavedConnection({ admin, connectionId });
+      if (connectionId && vaultSecretId) {
+        await _cleanUpSavedConnection({ admin, connectionId, vaultSecretId });
+      }
     }
   });
 });

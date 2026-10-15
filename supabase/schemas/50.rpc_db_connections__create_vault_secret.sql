@@ -1,7 +1,7 @@
 /**
  * Creates a new Vault secret holding a connector's credential (the password
- * alone, per design spec section 5.2 item 2), returning the secret's id to
- * store in `db_connections__postgres.vault_secret_id`.
+ * alone), returning the secret's id to store in
+ * `db_connections__postgres.vault_secret_id`.
  *
  * `vault.create_secret` lives in the `vault` schema, which is never exposed
  * over the Data API (that is the entire point of Vault - every access goes

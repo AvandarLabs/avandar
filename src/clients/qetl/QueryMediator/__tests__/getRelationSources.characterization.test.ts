@@ -2,13 +2,14 @@
  * Characterization tests for the source-type dispatch in
  * `getRelationSources.ts`. These pin the pairing of each source type to its
  * source record, including `google_sheets` now that acquisition is wired.
+ *
+ * `probeRelationCache` (also exported from `getRelationSources.ts`) has its
+ * own suite in the sibling `probeRelationCache.test.ts`: it never touches
+ * these per-source-type client mocks, only the DuckDB table listing.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  clearQueryableRelationColumns,
-  rememberQueryableColumns,
-} from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { clearQueryableRelationColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const CSV_ID = "11111111-1111-4111-8111-111111111111" as Dataset.Id;
@@ -17,7 +18,6 @@ const VIRTUAL_ID = "33333333-3333-4333-8333-333333333333" as Dataset.Id;
 const OPEN_DATA_ID = "44444444-4444-4444-8444-444444444444" as Dataset.Id;
 const GOOGLE_SHEETS_ID = "55555555-5555-4555-8555-555555555555" as Dataset.Id;
 const MISSING_ID = "66666666-6666-4666-8666-666666666666" as Dataset.Id;
-const LOADED_ID = "77777777-7777-4777-8777-777777777777" as Dataset.Id;
 const POSTGRES_TABLE_ID = "88888888-8888-4888-8888-888888888888" as Dataset.Id;
 
 const {
@@ -28,7 +28,6 @@ const {
   openDataGetAllMock,
   googleSheetsGetAllMock,
   postgresTableGetAllMock,
-  getTableOrViewNamesMock,
 } = vi.hoisted(() => {
   return {
     datasetGetAllMock: vi.fn(),
@@ -38,7 +37,6 @@ const {
     openDataGetAllMock: vi.fn(),
     googleSheetsGetAllMock: vi.fn(),
     postgresTableGetAllMock: vi.fn(),
-    getTableOrViewNamesMock: vi.fn(),
   };
 });
 
@@ -86,10 +84,6 @@ vi.mock("@/clients/datasets/source-datasets/PostgresTableDatasetClient", () => {
   };
 });
 
-vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
-  return { DuckDbClient: { getTableOrViewNames: getTableOrViewNamesMock } };
-});
-
 beforeEach(() => {
   vi.clearAllMocks();
   clearQueryableRelationColumns();
@@ -100,7 +94,6 @@ beforeEach(() => {
   openDataGetAllMock.mockResolvedValue([]);
   googleSheetsGetAllMock.mockResolvedValue([]);
   postgresTableGetAllMock.mockResolvedValue([]);
-  getTableOrViewNamesMock.mockResolvedValue([]);
 });
 
 describe("getRelationSources", () => {
@@ -456,53 +449,5 @@ describe("getRelationSources", () => {
         sourceDataset: openDataSourceDataset,
       },
     ]);
-  });
-});
-
-describe("probeRelationCache", () => {
-  it("returns an empty array without calling any client for an empty request", async () => {
-    const { probeRelationCache } =
-      await import("@/clients/qetl/QueryMediator/getRelationSources");
-
-    const result = await probeRelationCache([]);
-
-    expect(result).toEqual([]);
-    expect(getTableOrViewNamesMock).not.toHaveBeenCalled();
-  });
-
-  it("returns only the dependencies not already loaded as DuckDB tables", async () => {
-    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-
-    const { probeRelationCache } =
-      await import("@/clients/qetl/QueryMediator/getRelationSources");
-    const result = await probeRelationCache([LOADED_ID, MISSING_ID]);
-
-    expect(result).toEqual([MISSING_ID]);
-  });
-
-  it("treats a present table as a miss when its loaded columns do not cover the request", async () => {
-    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-    rememberQueryableColumns(LOADED_ID, ["a"]);
-
-    const { probeRelationCache } =
-      await import("@/clients/qetl/QueryMediator/getRelationSources");
-    const result = await probeRelationCache([LOADED_ID], {
-      [LOADED_ID]: ["a", "b"],
-    });
-
-    expect(result).toEqual([LOADED_ID]);
-  });
-
-  it("still serves a present table whose loaded columns cover the request", async () => {
-    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-    rememberQueryableColumns(LOADED_ID, ["a", "b"]);
-
-    const { probeRelationCache } =
-      await import("@/clients/qetl/QueryMediator/getRelationSources");
-    const result = await probeRelationCache([LOADED_ID], {
-      [LOADED_ID]: ["a"],
-    });
-
-    expect(result).toEqual([]);
   });
 });

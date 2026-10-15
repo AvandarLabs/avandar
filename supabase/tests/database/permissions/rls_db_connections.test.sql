@@ -9,16 +9,15 @@
  * these two tables are gated by app role on `data_sources`
  * (`util__auth_user_meets_min_app_role`) for reads, since a connection is
  * infrastructure configuration shared workspace-wide, not a per-resource
- * shareable item (design spec section 5.1). A workspace owner always
- * satisfies any minimum app role, so the insider/outsider pair below uses
- * workspace ownership directly, the same shortcut
- * `util__auth_user_meets_min_app_role` itself takes.
+ * shareable item. A workspace owner always satisfies any minimum app role,
+ * so the insider/outsider pair below uses workspace ownership directly, the
+ * same shortcut `util__auth_user_meets_min_app_role` itself takes.
  *
- * `authenticated` has no insert/update/delete grant on either table at all
- * (section 6 row 19: writes only happen through the `external-datasets`
- * edge function's `service_role` client, because `vault_secret_id` is not a
- * foreign key and nothing else stops a direct insert/update from pointing a
- * row at a Vault secret it never created). The insider-write tests below
+ * `authenticated` has no insert/update/delete grant on either table at all:
+ * writes only happen through the `external-datasets` edge function's
+ * `service_role` client, because `vault_secret_id` is not a foreign key and
+ * nothing else stops a direct insert/update from pointing a row at a Vault
+ * secret it never created. The insider-write tests below
  * prove this holds even for a legitimate member of the *owning* workspace,
  * not just an outsider - RLS row-filtering alone cannot express this, since
  * the hole it closes is a row that is otherwise perfectly in-workspace.
@@ -81,8 +80,8 @@ on conflict (connection_id) do nothing;
 
 -- Non-owner members of workspace A (the owning workspace), at distinct
 -- `data_sources` app-role levels, to prove the SELECT policy's minimum role
--- is actually enforced and not just satisfied by every candidate's
--- owner-bypass (per design spec section 5.1: `'editor'`, not `'viewer'`).
+-- is actually enforced (requires `'editor'`, not `'viewer'`) and not just
+-- satisfied by every candidate's owner-bypass.
 insert into auth.users (id, email, aud, role)
 values
   ('0c010003-0000-4000-8000-000000000003'::uuid, 'dbconn_viewer_member@test.dev', 'authenticated', 'authenticated'),
@@ -462,8 +461,7 @@ select throws_ok (
 );
 
 -- 13. A viewer-level data_sources member (not the owner) cannot select
--- db_connections - the minimum role is 'editor', per design spec section
--- 5.1, not 'viewer'.
+-- db_connections - the minimum role is 'editor', not 'viewer'.
 select lives_ok (
   $t13$
   set local role authenticated;

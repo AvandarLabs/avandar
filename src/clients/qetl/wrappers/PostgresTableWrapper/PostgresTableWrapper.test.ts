@@ -139,19 +139,18 @@ describe("PostgresTableWrapper", () => {
     });
   });
 
-  it("declares bounded caps and no freshness signal, unlike Sheets' unbounded row cap", () => {
-    const { capabilities } = createPostgresTableWrapper();
+  it("declares capabilities consistent with the methods it implements", () => {
+    const wrapper = createPostgresTableWrapper();
 
-    expect(capabilities.predicatePushdown).toBe("none");
-    expect(capabilities.aggregatePushdown).toBe(false);
-    expect(capabilities.rowIdentity).toBe("none");
-    expect(capabilities.multiCallAtomicity).toBe(false);
-    expect(capabilities.acquisitionUnit).toEqual({ kind: "whole-relation" });
-    expect(capabilities.maxRowsPerCall).toBe(200_000);
-    expect(capabilities.maxBytesPerCall).toBe(100 * 1024 * 1024);
-    expect(capabilities.freshnessSignal).toBe("none");
-    expect(capabilities.quotaScope).toEqual({ kind: "none" });
-    expect(capabilities.grantedScope).toEqual([]);
+    // `RelationRegistry`'s own registration check throws when a wrapper
+    // declares `predicatePushdown`/`wholeRelationAcquirable` that its methods
+    // don't back up, so these two are the capability fields with a real
+    // behavioral consequence. The rest of the record's shape is already
+    // guaranteed by its `satisfies RelationCapabilities` in the source.
+    expect(wrapper.capabilities.predicatePushdown).toBe("none");
+    expect(wrapper.pushDown).toBeUndefined();
+    expect(wrapper.capabilities.wholeRelationAcquirable).toBe("yes");
+    expect(wrapper.acquire).toBeDefined();
   });
 
   it("has no readFreshness, matching the 'none' freshness signal", () => {

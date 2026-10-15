@@ -1,3 +1,5 @@
+import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection.ts";
+
 /**
  * A Postgres connection's parameters as a structured object - never a
  * connection-string/URL built by interpolating these fields into one piece
@@ -25,10 +27,11 @@ export type DecryptedPostgresConnection = {
   port: number;
   databaseName: string;
   username: string;
-  sslMode: "disable" | "require";
+  sslMode: PostgresDatabaseConnection.SslMode;
   password: string;
 };
 
+/** Converts a decrypted connection row into the driver's own config shape. */
 export function toPostgresConnectionConfig(
   connection: DecryptedPostgresConnection,
 ): PostgresConnectionConfig {

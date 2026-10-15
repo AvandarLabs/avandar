@@ -6,8 +6,8 @@
  *
  * This is a validation/display helper - the actual queries this connector
  * runs build their identifiers through the Postgres driver's own tagged
- * template (`sql(name)`), per spec section 5.2 item 5. Never build a SQL
- * string by concatenating this function's output into a query yourself.
+ * template (`sql(name)`). Never build a SQL string by concatenating this
+ * function's output into a query yourself.
  *
  * Quoting unconditionally (rather than only when the name needs it) means
  * there is exactly one code path to get right, and a crafted name cannot
