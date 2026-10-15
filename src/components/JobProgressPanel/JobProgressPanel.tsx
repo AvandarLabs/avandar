@@ -1,13 +1,13 @@
 import { useSyncExternalStore } from "react";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
-import { JobPanel } from "./JobPanel";
-import css from "./JobProgressIndicator.module.css";
+import { JobProgressIndicator } from "./JobProgressIndicator";
+import css from "./JobProgressPanel.module.css";
 
 /**
- * Floating stack of progress panels, one per job live in
+ * Floating panel holding one {@link JobProgressIndicator} per job live in
  * {@link JobProgressStore}. Renders nothing when no job is in flight.
  */
-export function JobProgressIndicator(): JSX.Element | null {
+export function JobProgressPanel(): JSX.Element | null {
   useSyncExternalStore(
     JobProgressStore.subscribe,
     JobProgressStore.getSnapshot,
@@ -20,9 +20,9 @@ export function JobProgressIndicator(): JSX.Element | null {
   }
 
   return (
-    <div className={css.jobProgressIndicator}>
+    <div className={css.jobProgressPanel}>
       {jobs.map(({ id, entry }) => {
-        return <JobPanel key={id} id={id} entry={entry} />;
+        return <JobProgressIndicator key={id} id={id} entry={entry} />;
       })}
     </div>
   );

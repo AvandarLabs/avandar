@@ -1,4 +1,4 @@
-.jobProgressIndicator {
+.jobProgressPanel {
   bottom: 16px;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   z-index: 200;
 }
 
-.jobProgressPanel {
+.jobProgressIndicator {
   background: var(--mantine-color-white);
   border: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
   border-radius: var(--mantine-radius-md);

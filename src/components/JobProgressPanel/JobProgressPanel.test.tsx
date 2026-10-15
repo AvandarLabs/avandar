@@ -4,19 +4,19 @@ import { afterEach, describe, expect, it } from "vitest";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { render, screen } from "@/test-utils";
-import { JobProgressIndicator } from "./JobProgressIndicator";
+import { JobProgressPanel } from "./JobProgressPanel";
 
-function _renderIndicator(): void {
+function _renderPanel(): void {
   render(
     <I18nProvider i18n={i18n}>
       <AvandarAppProvider>
-        <JobProgressIndicator />
+        <JobProgressPanel />
       </AvandarAppProvider>
     </I18nProvider>,
   );
 }
 
-describe("JobProgressIndicator", () => {
+describe("JobProgressPanel", () => {
   afterEach(() => {
     JobProgressStore.getAllJobs().forEach(({ id }) => {
       JobProgressStore.finishJob(id);
@@ -24,15 +24,15 @@ describe("JobProgressIndicator", () => {
   });
 
   it("renders nothing when no job is live", () => {
-    _renderIndicator();
+    _renderPanel();
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("renders one panel per live job, each labeled", () => {
+  it("renders one indicator per live job, each labeled", () => {
     JobProgressStore.startJob("Refreshing Facility records");
     JobProgressStore.startJob("Uploading dataset");
 
-    _renderIndicator();
+    _renderPanel();
 
     expect(screen.getByText("Refreshing Facility records")).toBeInTheDocument();
     expect(screen.getByText("Uploading dataset")).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("JobProgressIndicator", () => {
       total: 4,
     });
 
-    _renderIndicator();
+    _renderPanel();
 
     expect(screen.getByRole("progressbar")).toHaveAttribute(
       "aria-valuenow",
@@ -60,7 +60,7 @@ describe("JobProgressIndicator", () => {
     const jobId = JobProgressStore.startJob("Uploading dataset");
     JobProgressStore.failJob(jobId, "Network error");
 
-    _renderIndicator();
+    _renderPanel();
 
     expect(screen.getByText("Network error")).toBeInTheDocument();
     screen.getByRole("button", { name: /dismiss/i }).click();

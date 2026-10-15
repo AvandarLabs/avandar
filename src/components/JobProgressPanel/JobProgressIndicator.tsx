@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Progress, Text } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
-import css from "./JobProgressIndicator.module.css";
+import css from "./JobProgressPanel.module.css";
 import type {
   JobEntry,
   JobId,
@@ -14,16 +14,15 @@ type Props = {
 };
 
 /**
- * One floating panel for a single live job tracked by
- * {@link JobProgressStore}: an indeterminate or determinate progress bar, or
- * a dismissible error message.
+ * One indicator for a single live job tracked by {@link JobProgressStore}: an
+ * indeterminate or determinate progress bar, or a dismissible error message.
  */
-export function JobPanel({ id, entry }: Props): JSX.Element {
+export function JobProgressIndicator({ id, entry }: Props): JSX.Element {
   const { t } = useLingui();
 
   return (
     <div
-      className={css.jobProgressPanel}
+      className={css.jobProgressIndicator}
       role={entry.status === "error" ? "alert" : "status"}
       aria-live={entry.status === "error" ? undefined : "polite"}
       aria-label={entry.label}

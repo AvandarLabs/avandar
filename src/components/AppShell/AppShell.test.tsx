@@ -19,9 +19,9 @@ vi.mock(
   },
 );
 
-vi.mock("@/components/JobProgressIndicator/JobProgressIndicator", () => {
+vi.mock("@/components/JobProgressPanel/JobProgressPanel", () => {
   return {
-    JobProgressIndicator: () => {
+    JobProgressPanel: () => {
       return null;
     },
   };

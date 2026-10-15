@@ -23,7 +23,7 @@ function buildDownloadingLabel(
 
 /**
  * Bridges offline chat model download status into `JobProgressStore`, so
- * `JobProgressIndicator` renders it. Pure side-effect wiring: it returns
+ * `JobProgressPanel` renders it. Pure side-effect wiring: it returns
  * nothing.
  */
 export function useOfflineChatDownloadBridge(): void {
