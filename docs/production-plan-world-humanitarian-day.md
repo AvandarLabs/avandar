@@ -104,6 +104,17 @@ branching**. `google_sheets` extraction throws "not supported".
   stopgap" path.
 - P0.8 `[NEW]` Live-source dice extractors (feeds P6 connectors): pluggable
   extractor interface for non-parquet sources.
+- P0.9 `[FIX]` **Restore the column-projection safety guarantee for raw SQL.**
+  The relation-cache design
+  (`docs/superpowers/specs/2026-08-18-qetl-relation-cache-design.md`, section
+  10.1) required raw SQL to need `"all"` columns, so projection could only fail
+  wide. The built `getNeededColumnsFromQuery` instead guesses columns from SQL
+  tokens and fails narrow: an alias written without `AS`, a typed literal such
+  as `TIMESTAMP '...'`, and unqualified columns in a multi-dataset statement
+  each make a cold-cache query fail with a DuckDB binder error (reproduced; see
+  `docs/qetl-architecture.md`, known gaps). Fix: return `"all"` for a relation
+  whenever attribution is ambiguous or a name does not match a known column,
+  so inference can only over-fetch, never under-fetch.
 - `[BLOCKS: P1 (partly), P2 cross-querying, P5 case-mgmt queries, P6 connectors, P3 dashboard perf]`
 
 ### P1. Query DSL - JSON-first, LLM-facing

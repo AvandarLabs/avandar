@@ -12,7 +12,14 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   offlineModelRequired: string;
   sqlApprovalRequired: string;
   sqlSignInRequired: string;
+  /** The applied SQL's query returned rows. */
   sqlResultsReady: string;
+  /** The applied SQL's query succeeded with no rows. */
+  sqlResultsEmpty: string;
+  /** The applied SQL's query failed. */
+  sqlQueryFailed: string;
+  /** The SQL was applied but no query outcome was observed. */
+  sqlQueryApplied: string;
   fallbackTitle: string;
   fallbackMessage: string;
   contextWindowExceeded: string;

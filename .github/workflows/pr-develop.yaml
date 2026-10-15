@@ -2,6 +2,7 @@ name: PR Checks on Develop
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, edited]
     branches:
       - develop
 
@@ -13,6 +14,29 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
+  # Validates that the PR title follows this repo's Conventional Commit
+  # format (see AGENTS.md). release-packages.yaml's auto-changeset step
+  # reads the title to infer the npm version bump for packages/** changes,
+  # so a malformed title must never reach develop.
+  lint-pr-title:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            refactor
+            chore
+            docs
+            test
+          requireScope: false
+
   # ESLint and TypeScript checks.
   lint-typecheck:
     runs-on: ubuntu-latest

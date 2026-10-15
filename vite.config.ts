@@ -89,7 +89,14 @@ export default defineConfig(({ mode }) => {
             eslintPlugin(),
             nodePolyfills(),
             VitePWA({
-              registerType: "autoUpdate",
+              // Do not switch this to "autoUpdate": paired with
+              // `workbox.clientsClaim`, that activates a new deploy on every
+              // open tab the instant any one of them notices it, including
+              // tabs mid-import or mid-query in DuckDB. "prompt" leaves a new
+              // worker waiting until `registerServiceWorker.ts` explicitly
+              // accepts it (via the update notification), and only the tab
+              // that accepted it reloads.
+              registerType: "prompt",
               injectRegister: false,
               workbox: {
                 globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
@@ -187,6 +194,15 @@ export default defineConfig(({ mode }) => {
           ],
     resolve: {
       alias: {
+        // `vite-plugin-pwa` (which provides this virtual module) is excluded
+        // from the plugin list in test mode below, so nothing else resolves
+        // it for `registerServiceWorker.ts`'s tests.
+        ...(mode === "test"
+          ? {
+              "virtual:pwa-register":
+                "/src/test-utils/virtualPwaRegisterStub.ts",
+            }
+          : {}),
         "@": "/src",
         $: "/shared",
         "@clients": "/packages/shared/clients/src",

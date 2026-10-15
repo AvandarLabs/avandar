@@ -2157,6 +2157,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخرى أو العودة إلى الصفحة "
 "الرئيسية."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "شغّلت الاستعلام، لكنه لم يُرجع أي صفوف."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "حفظ عنوان URL"
@@ -2517,9 +2521,13 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 "the reverse."
 msgstr "خط العرض خارج النطاق الصالح، لكنه سيكون خط طول صالحًا، والعكس صحيح."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerOfflineServiceWorker/registerOfflineServiceWorker.ts
 msgid "Update available"
 msgstr "يتوفر تحديث"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "شغّلت الاستعلام، لكنه فشل."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2969,10 +2977,6 @@ msgstr "تم حجب {0} من المناطق"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "نص التعليق:"
-
-#: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "يتوفر إصدار جديد. حدّث الصفحة للتحديث."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4148,6 +4152,10 @@ msgstr "إرسال"
 msgid "dashboard"
 msgstr "لوحة التحكم"
 
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr "يتوفر إصدار جديد. حدّث الآن، أو أغلق هذه النافذة وحدّث لاحقًا."
+
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
@@ -5062,6 +5070,10 @@ msgstr "CSV أو Excel أو PDF. ملف واحد في كل مرة."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "حذف مساحة العمل"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "طبّقت الاستعلام في مستكشف البيانات."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
@@ -6480,6 +6492,10 @@ msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "تاريخ الإنتاج (مضمّن دائمًا)"
+
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr "التحديث الآن"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"

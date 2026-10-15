@@ -2182,6 +2182,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Hitilafu isiyotarajiwa imetokea. Unaweza kujaribu tena au urudi kwenye "
 "ukurasa wa mwanzo."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "Nimeendesha hoja, lakini haikurudisha safu yoyote."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Hifadhi URL"
@@ -2553,9 +2557,13 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 msgstr "Latitudo iko nje ya masafa halali, lakini ingekuwa longitudo halali, na "
 "kinyume chake."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerOfflineServiceWorker/registerOfflineServiceWorker.ts
 msgid "Update available"
 msgstr "Sasisho linapatikana"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "Nimeendesha hoja, lakini imeshindwa."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -3010,10 +3018,6 @@ msgstr "Maeneo {0} yamefichwa"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "Maandishi ya maelezo:"
-
-#: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "Toleo jipya linapatikana. Onyesha upya ili kusasisha."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4203,6 +4207,11 @@ msgstr "Wasilisha"
 msgid "dashboard"
 msgstr "dashibodi"
 
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr "Toleo jipya liko tayari. Sasisha sasa, au funga ujumbe huu na usasishe "
+"baadaye."
+
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
@@ -5128,6 +5137,10 @@ msgstr "CSV, Excel, au PDF. Faili moja kwa wakati mmoja."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Futa workspace"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "Nimetumia hoja katika Mchambuzi wa Data."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
@@ -6562,6 +6575,10 @@ msgstr "Tafadhali ingia tena ili kuendelea."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "Tarehe ya utayarishaji (Hujumuishwa kila wakati)"
+
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr "Sasisha sasa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"

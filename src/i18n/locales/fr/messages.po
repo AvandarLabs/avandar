@@ -2208,6 +2208,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "Une erreur inattendue s’est produite. Vous pouvez réessayer ou "
 "retourner à l’accueil."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "J’ai exécuté la requête, mais elle n’a renvoyé aucune ligne."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Enregistrer l’URL"
@@ -2582,9 +2586,13 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 msgstr "La latitude est en dehors de la plage valide, mais serait une longitude "
 "valide, et inversement."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerOfflineServiceWorker/registerOfflineServiceWorker.ts
 msgid "Update available"
 msgstr "Mise à jour disponible"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "J’ai exécuté la requête, mais elle a échoué."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -3043,11 +3051,6 @@ msgstr "{0} zones masquées"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "Texte de l'annotation :"
-
-#: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "Une nouvelle version est disponible. Actualisez la page pour effectuer "
-"la mise à jour."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4251,6 +4254,11 @@ msgstr "Soumettre"
 msgid "dashboard"
 msgstr "tableau de bord"
 
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr "Une nouvelle version est disponible. Mettez à jour maintenant ou fermez "
+"cette fenêtre pour effectuer la mise à jour plus tard."
+
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
@@ -5185,6 +5193,10 @@ msgstr "CSV, Excel ou PDF. Un seul fichier à la fois."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Supprimer l’espace de travail"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "J’ai appliqué la requête dans l’Explorateur de données."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
@@ -6632,6 +6644,10 @@ msgstr "Veuillez vous reconnecter pour continuer."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "Date de production (Toujours incluse)"
+
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr "Mettre à jour maintenant"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"

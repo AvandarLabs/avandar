@@ -2155,6 +2155,10 @@ msgstr "Workspace name is required"
 msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "An unexpected error occurred. You can try again, or return home."
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it returned no rows."
+msgstr "I ran the query, but it returned no rows."
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Save URL"
@@ -2517,9 +2521,13 @@ msgid "Latitude is outside the valid range but would be a valid longitude, and "
 msgstr "Latitude is outside the valid range but would be a valid longitude, and "
 "the reverse."
 
-#: src/lib/offline/registerServiceWorker.ts
+#: src/lib/offline/registerOfflineServiceWorker/registerOfflineServiceWorker.ts
 msgid "Update available"
 msgstr "Update available"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I ran the query, but it failed."
+msgstr "I ran the query, but it failed."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -2969,10 +2977,6 @@ msgstr "{0} areas suppressed"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
 msgstr "Annotation text:"
-
-#: src/lib/offline/registerServiceWorker.ts
-msgid "A new version is available. Refresh to update."
-msgstr "A new version is available. Refresh to update."
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen an X axis"
@@ -4150,6 +4154,10 @@ msgstr "Submit"
 msgid "dashboard"
 msgstr "dashboard"
 
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "A new version is ready. Update now, or close this and update later."
+msgstr "A new version is ready. Update now, or close this and update later."
+
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 msgid "{0} was deleted from this browser."
@@ -5066,6 +5074,10 @@ msgstr "CSV, Excel, or PDF. One file at a time."
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Delete workspace"
 msgstr "Delete workspace"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "I applied the query in the Data Explorer."
+msgstr "I applied the query in the Data Explorer."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Not published yet."
@@ -6491,6 +6503,10 @@ msgstr "Please log in again to continue."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Production date (Always included)"
 msgstr "Production date (Always included)"
+
+#: src/lib/offline/registerOfflineServiceWorker/ServiceWorkerUpdateNotification/ServiceWorkerUpdateNotification.tsx
+msgid "Update now"
+msgstr "Update now"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "Mean"

@@ -15,6 +15,7 @@ describe("findUnknownReleaseFlags", () => {
       "--yes",
       "--dry-run",
       "--skip-ci-check",
+      "--skip-changelog",
     ];
 
     expect(findUnknownReleaseFlags(argv)).toEqual([]);
