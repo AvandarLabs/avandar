@@ -3839,6 +3839,11 @@ msgstr "تمت عملية الدفع بنجاح!"
 msgid "Answered"
 msgstr "تم الرد"
 
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {0} records…"
+msgstr "جارٍ تحديث {0} من السجلات…"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr "مستقيم"
@@ -3900,10 +3905,6 @@ msgstr "يجب أن يكون اسم مجموعة البيانات أقل من {m
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4258 - ETRS89"
 msgstr "4258 - ETRS89"
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Preparing model files…"
-msgstr "جارٍ إعداد ملفات النموذج…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -4588,10 +4589,6 @@ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from 
 msgstr "استدلال أقوى من 1.5B مع تنزيل متوسط الحجم. ترقية جيدة مقارنةً بفئة 8 "
 "GB."
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Starting…"
-msgstr "جارٍ البدء…"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "نطاق الأرقام"
@@ -4905,7 +4902,7 @@ msgstr "إضافة حقل مُعبّأ يدويًا"
 msgid "Upgrade plan"
 msgstr "ترقية الخطة"
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "لا تقم بتحديث أو إغلاق هذه التبويب وإلا سيتم إلغاء التحميل."
 
@@ -5184,6 +5181,11 @@ msgstr "مشاركة الملخص"
 msgid "Time"
 msgstr "الوقت"
 
+#. placeholder {0}: entry.label
+#: src/components/JobProgressPanel/JobProgressIndicator.tsx
+msgid "Dismiss {0}"
+msgstr "تجاهل {0}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is false"
 msgstr "خطأ"
@@ -5211,6 +5213,10 @@ msgstr "تمت إضافة مجموعة البيانات"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
 msgstr "اختياري"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Syncing dataset online"
+msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
@@ -5251,10 +5257,6 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "كل سلسلة هي عمود رقمي مرسوم على القيمة الشعاعية. يتم تجميع القيم حسب "
 "محور الفئة (\"{axisKeyValue}\")."
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
-msgid "Sync records"
-msgstr "مزامنة السجلات"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -5673,6 +5675,10 @@ msgstr "فارغ"
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "الكل"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline chat model"
+msgstr "جارٍ تنزيل نموذج الدردشة للعمل دون اتصال"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6545,11 +6551,6 @@ msgstr "فشل استعلام الطبقة. يعني هذا عادةً أن مج
 msgid "Your name"
 msgstr "اسمك"
 
-#. placeholder {0}: modelCopy.displayName
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Downloading {0} for offline chat"
-msgstr "تحميل {0} للدردشة غير المتصلة"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
 msgstr "عمود الحالة المتنازع عليها"
@@ -7046,6 +7047,10 @@ msgstr "المالك لديه دائمًا وصول إداري. لتغيير ا�
 msgid "Loading datasets…"
 msgstr "جارٍ تحميل مجموعات البيانات…"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {conceptName} records…"
+msgstr "جارٍ تحديث سجلات {conceptName}…"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Loading private resources"
 msgstr "جارٍ تحميل الموارد الخاصة"
@@ -7066,6 +7071,11 @@ msgstr "أصغر نصف قطر"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "تم رفض الوصول"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Refresh {0} records"
+msgstr "تحديث {0} من السجلات"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "join key"
@@ -8460,10 +8470,6 @@ msgstr "متدرج"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr "يرجى المحاولة مرة أخرى. لا تزال لوحة المعلومات منشورة."
-
-#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "Syncing dataset online..."
-msgstr "جارٍ مزامنة مجموعة البيانات عبر الإنترنت..."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."

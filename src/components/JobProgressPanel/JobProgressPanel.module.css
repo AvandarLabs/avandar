@@ -1,20 +1,26 @@
-.offlineChatDownloadIndicator {
-  background: var(--mantine-color-white);
-  border: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
-  border-radius: var(--mantine-radius-md);
+.jobProgressPanel {
   bottom: 16px;
-  box-shadow: var(--mantine-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
   left: 16px;
-  max-height: min(50vh, 360px);
-  max-width: 360px;
-  min-width: 280px;
+  max-height: min(70vh, 480px);
   overflow-y: auto;
-  padding: var(--mantine-spacing-sm);
   position: fixed;
   z-index: 200;
 }
 
-.offlineChatDownloadIndicatorTitleRow {
+.jobProgressIndicator {
+  background: var(--mantine-color-white);
+  border: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+  max-width: 360px;
+  min-width: 280px;
+  padding: var(--mantine-spacing-sm);
+}
+
+.jobProgressTitleRow {
   align-items: center;
   display: flex;
   gap: var(--mantine-spacing-xs);
@@ -22,23 +28,20 @@
   margin-bottom: var(--mantine-spacing-xs);
 }
 
-.offlineChatDownloadIndicatorTitle {
+.jobProgressLabel {
   color: var(--mantine-color-neutral-9);
-  font-size: var(--mantine-font-size-sm);
-  font-weight: 600;
-  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.offlineChatDownloadIndicatorWarning {
-  line-height: 1.35;
-  margin-bottom: var(--mantine-spacing-xs);
-}
-
-.offlineChatDownloadIndicatorStatus {
+.jobProgressDetail {
   color: var(--mantine-color-neutral-6);
   line-height: 1.35;
   margin-top: var(--mantine-spacing-xs);
+}
+
+.jobProgressErrorMessage {
+  color: var(--mantine-color-danger-7, var(--mantine-color-red-7));
+  line-height: 1.35;
 }
