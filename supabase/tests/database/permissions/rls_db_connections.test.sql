@@ -1,20 +1,27 @@
 \set ON_ERROR_STOP on
 
 /**
- * Cross-tenant RLS for `db_connections` and `db_connections__postgres`.
+ * Cross-tenant RLS for `db_connections` and `db_connections__postgres`, plus
+ * the write-lockdown invariant that replaces per-op RLS policies for insert/
+ * update/delete on both tables.
  *
  * Unlike `datasets__pdf_file` (gated by `util__auth_user_can_access_resource`),
  * these two tables are gated by app role on `data_sources`
- * (`util__auth_user_meets_min_app_role`), since a connection is
+ * (`util__auth_user_meets_min_app_role`) for reads, since a connection is
  * infrastructure configuration shared workspace-wide, not a per-resource
  * shareable item (design spec section 5.1). A workspace owner always
  * satisfies any minimum app role, so the insider/outsider pair below uses
  * workspace ownership directly, the same shortcut
  * `util__auth_user_meets_min_app_role` itself takes.
  *
- * Locks both tables' four policies each: a member of one workspace must not
- * read, insert, update, or delete another workspace's rows, and `anon` must
- * not reach either table at all.
+ * `authenticated` has no insert/update/delete grant on either table at all
+ * (section 6 row 19: writes only happen through the `external-datasets`
+ * edge function's `service_role` client, because `vault_secret_id` is not a
+ * foreign key and nothing else stops a direct insert/update from pointing a
+ * row at a Vault secret it never created). The insider-write tests below
+ * prove this holds even for a legitimate member of the *owning* workspace,
+ * not just an outsider - RLS row-filtering alone cannot express this, since
+ * the hole it closes is a row that is otherwise perfectly in-workspace.
  */
 begin;
 
@@ -72,7 +79,7 @@ values (
 )
 on conflict (connection_id) do nothing;
 
-select plan(12);
+select plan(18);
 
 -- 1. A member of the owning workspace reads the db_connections row.
 select lives_ok (
@@ -140,8 +147,8 @@ select throws_ok (
   'an outsider cannot insert a db_connections row into another workspace'
 );
 
--- 4. An outsider's UPDATE is filtered by RLS, so the row is untouched.
-select lives_ok (
+-- 4. An outsider's UPDATE is rejected outright - no grant at all, not just RLS.
+select throws_ok (
   $t4$
   set local role authenticated;
   select set_config(
@@ -152,22 +159,14 @@ select lives_ok (
   update public.db_connections
   set name = 'renamed by outsider'
   where id = '0c014001-0000-4000-8000-000000000001'::uuid;
-  reset role;
-  do $chk$
-  begin
-    if (
-      select count(*)::int from public.db_connections t
-      where t.id = '0c014001-0000-4000-8000-000000000001'::uuid and t.name = 'ws a connection'
-    ) <> 1 then
-      raise exception 'an outsider updated a db_connections row';
-    end if;
-  end $chk$;
   $t4$,
+  '42501',
+  null,
   'an outsider cannot update a db_connections row in another workspace'
 );
 
--- 5. An outsider's DELETE is filtered by RLS, so the row survives.
-select lives_ok (
+-- 5. An outsider's DELETE is rejected outright - no grant at all, not just RLS.
+select throws_ok (
   $t5$
   set local role authenticated;
   select set_config(
@@ -176,18 +175,67 @@ select lives_ok (
     true
   );
   delete from public.db_connections where id = '0c014001-0000-4000-8000-000000000001'::uuid;
-  reset role;
-  do $chk$
-  begin
-    if (
-      select count(*)::int from public.db_connections t
-      where t.id = '0c014001-0000-4000-8000-000000000001'::uuid
-    ) <> 1 then
-      raise exception 'an outsider deleted a db_connections row';
-    end if;
-  end $chk$;
   $t5$,
+  '42501',
+  null,
   'an outsider cannot delete a db_connections row in another workspace'
+);
+
+-- 4b. An insider (own workspace, correct workspace_id) still cannot insert
+-- directly - only service_role may write db_connections at all.
+select throws_ok (
+  $t4b$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010001-0000-4000-8000-000000000001","role":"authenticated"}',
+    true
+  );
+  insert into public.db_connections (workspace_id, connection_type, name, created_by)
+  values (
+    '0c011001-0000-4000-8000-000000000001'::uuid,
+    'postgres'::public.db_connections__connection_type,
+    'insider direct insert',
+    '0c010001-0000-4000-8000-000000000001'::uuid
+  );
+  $t4b$,
+  '42501',
+  null,
+  'an insider cannot insert a db_connections row directly, even in their own workspace'
+);
+
+-- 4c. An insider cannot update their own db_connections row directly either.
+select throws_ok (
+  $t4c$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010001-0000-4000-8000-000000000001","role":"authenticated"}',
+    true
+  );
+  update public.db_connections
+  set name = 'renamed by insider'
+  where id = '0c014001-0000-4000-8000-000000000001'::uuid;
+  $t4c$,
+  '42501',
+  null,
+  'an insider cannot update a db_connections row directly, even their own'
+);
+
+-- 4d. An insider cannot delete their own db_connections row directly either.
+select throws_ok (
+  $t4d$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010001-0000-4000-8000-000000000001","role":"authenticated"}',
+    true
+  );
+  delete from public.db_connections where id = '0c014001-0000-4000-8000-000000000001'::uuid;
+  $t4d$,
+  '42501',
+  null,
+  'an insider cannot delete a db_connections row directly, even their own'
 );
 
 -- 6. Anonymous callers cannot reach db_connections through the Data API at all.
@@ -245,8 +293,8 @@ select lives_ok (
   'a user outside the workspace reads no db_connections__postgres rows'
 );
 
--- 9. An outsider's UPDATE on db_connections__postgres is filtered by RLS.
-select lives_ok (
+-- 9. An outsider's UPDATE on db_connections__postgres is rejected outright.
+select throws_ok (
   $t9$
   set local role authenticated;
   select set_config(
@@ -257,22 +305,14 @@ select lives_ok (
   update public.db_connections__postgres
   set host = 'evil.example.org'
   where connection_id = '0c014001-0000-4000-8000-000000000001'::uuid;
-  reset role;
-  do $chk$
-  begin
-    if (
-      select count(*)::int from public.db_connections__postgres t
-      where t.connection_id = '0c014001-0000-4000-8000-000000000001'::uuid and t.host = 'db.example.org'
-    ) <> 1 then
-      raise exception 'an outsider updated a db_connections__postgres row';
-    end if;
-  end $chk$;
   $t9$,
+  '42501',
+  null,
   'an outsider cannot update a db_connections__postgres row in another workspace'
 );
 
--- 10. An outsider's DELETE on db_connections__postgres is filtered by RLS.
-select lives_ok (
+-- 10. An outsider's DELETE on db_connections__postgres is rejected outright.
+select throws_ok (
   $t10$
   set local role authenticated;
   select set_config(
@@ -281,18 +321,72 @@ select lives_ok (
     true
   );
   delete from public.db_connections__postgres where connection_id = '0c014001-0000-4000-8000-000000000001'::uuid;
-  reset role;
-  do $chk$
-  begin
-    if (
-      select count(*)::int from public.db_connections__postgres t
-      where t.connection_id = '0c014001-0000-4000-8000-000000000001'::uuid
-    ) <> 1 then
-      raise exception 'an outsider deleted a db_connections__postgres row';
-    end if;
-  end $chk$;
   $t10$,
+  '42501',
+  null,
   'an outsider cannot delete a db_connections__postgres row in another workspace'
+);
+
+-- 9b. The security hole this fix closes: an insider cannot "adopt" a row by
+-- inserting their own workspace_id with someone else's vault_secret_id -
+-- or any vault_secret_id - directly. Only service_role, via the edge
+-- function's own vault.create_secret() call, may write this table.
+select throws_ok (
+  $t9b$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010001-0000-4000-8000-000000000001","role":"authenticated"}',
+    true
+  );
+  insert into public.db_connections__postgres (connection_id, workspace_id, host, port, database_name, username, vault_secret_id)
+  values (
+    gen_random_uuid(),
+    '0c011001-0000-4000-8000-000000000001'::uuid,
+    'insider.example.org',
+    5432,
+    'insider_db',
+    'insider_user',
+    gen_random_uuid()
+  );
+  $t9b$,
+  '42501',
+  null,
+  'an insider cannot insert a db_connections__postgres row directly, even in their own workspace'
+);
+
+-- 9c. An insider cannot update their own db_connections__postgres row directly.
+select throws_ok (
+  $t9c$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010001-0000-4000-8000-000000000001","role":"authenticated"}',
+    true
+  );
+  update public.db_connections__postgres
+  set host = 'renamed-by-insider.example.org'
+  where connection_id = '0c014001-0000-4000-8000-000000000001'::uuid;
+  $t9c$,
+  '42501',
+  null,
+  'an insider cannot update a db_connections__postgres row directly, even their own'
+);
+
+-- 9d. An insider cannot delete their own db_connections__postgres row directly.
+select throws_ok (
+  $t9d$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010001-0000-4000-8000-000000000001","role":"authenticated"}',
+    true
+  );
+  delete from public.db_connections__postgres where connection_id = '0c014001-0000-4000-8000-000000000001'::uuid;
+  $t9d$,
+  '42501',
+  null,
+  'an insider cannot delete a db_connections__postgres row directly, even their own'
 );
 
 -- 11. An outsider cannot insert a db_connections__postgres row either.

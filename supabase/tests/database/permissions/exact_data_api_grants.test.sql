@@ -32,6 +32,8 @@ with public_tables as (
     table_name not in (
       'catalog_entries__dataset_column',
       'catalog_entries__open_data',
+      'db_connections',
+      'db_connections__postgres',
       'subscriptions',
       'usage_analytics_events',
       'user_group_memberships',
@@ -67,6 +69,8 @@ with public_tables as (
     table_name in (
       'catalog_entries__dataset_column',
       'catalog_entries__open_data',
+      'db_connections',
+      'db_connections__postgres',
       'subscriptions',
       'usage_analytics_events'
     )

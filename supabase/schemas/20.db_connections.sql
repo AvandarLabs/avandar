@@ -31,14 +31,22 @@ create table public.db_connections (
 -- Enable row level security
 alter table public.db_connections enable row level security;
 
--- Data API privileges.
+-- Data API privileges. `authenticated` is select-only: every write to this
+-- table happens through the `external-datasets` edge function's
+-- `service_role` client, never a direct Data API insert/update/delete,
+-- because `vault_secret_id` (on the satellite table) is not a foreign key
+-- and has no way to verify which connection actually created the Vault
+-- secret it points at. Allowing a direct authenticated insert/update would
+-- let any workspace editor "adopt" another workspace's vault_secret_id they
+-- can legitimately read as a viewer there, decrypting that workspace's
+-- password through this one's connection - RLS isolates rows by
+-- workspace_id, but it cannot stop a row from pointing at a secret it
+-- never created.
 grant
-select
-,
-  insert,
-update,
-delete on table public.db_connections to authenticated,
+select on table public.db_connections to authenticated,
 service_role;
+
+grant insert, update, delete on table public.db_connections to service_role;
 
 -- Policies
 create policy "User can select db_connections in their workspace" on public.db_connections for
@@ -50,42 +58,6 @@ select
       'viewer'::public.role_level
     )
   );
-
-create policy "User can insert db_connections in their workspace" on public.db_connections for insert to authenticated
-with
-  check (
-    public.util__auth_user_meets_min_app_role (
-      public.db_connections.workspace_id,
-      'data_sources'::public.app_type,
-      'editor'::public.role_level
-    )
-  );
-
-create policy "User can update db_connections in their workspace" on public.db_connections
-for update
-  to authenticated using (
-    public.util__auth_user_meets_min_app_role (
-      public.db_connections.workspace_id,
-      'data_sources'::public.app_type,
-      'editor'::public.role_level
-    )
-  )
-with
-  check (
-    public.util__auth_user_meets_min_app_role (
-      public.db_connections.workspace_id,
-      'data_sources'::public.app_type,
-      'editor'::public.role_level
-    )
-  );
-
-create policy "User can delete db_connections in their workspace" on public.db_connections for delete to authenticated using (
-  public.util__auth_user_meets_min_app_role (
-    public.db_connections.workspace_id,
-    'data_sources'::public.app_type,
-    'admin'::public.role_level
-  )
-);
 
 create trigger tr_db_connections__set_updated_at before
 update on public.db_connections for each row

@@ -36,14 +36,16 @@ create table public.db_connections__postgres (
 -- Enable row level security
 alter table public.db_connections__postgres enable row level security;
 
--- Data API privileges.
+-- Data API privileges. `authenticated` is select-only, same reasoning as
+-- `db_connections` above: `vault_secret_id` has no way to verify which
+-- connection created the Vault secret it references, so every write must
+-- go through the edge function's `service_role` client, never a direct
+-- Data API insert/update/delete.
 grant
-select
-,
-  insert,
-update,
-delete on table public.db_connections__postgres to authenticated,
+select on table public.db_connections__postgres to authenticated,
 service_role;
+
+grant insert, update, delete on table public.db_connections__postgres to service_role;
 
 -- Policies
 create policy "User can select db_connections__postgres in their workspace" on public.db_connections__postgres for
@@ -55,42 +57,6 @@ select
       'viewer'::public.role_level
     )
   );
-
-create policy "User can insert db_connections__postgres in their workspace" on public.db_connections__postgres for insert to authenticated
-with
-  check (
-    public.util__auth_user_meets_min_app_role (
-      public.db_connections__postgres.workspace_id,
-      'data_sources'::public.app_type,
-      'editor'::public.role_level
-    )
-  );
-
-create policy "User can update db_connections__postgres in their workspace" on public.db_connections__postgres
-for update
-  to authenticated using (
-    public.util__auth_user_meets_min_app_role (
-      public.db_connections__postgres.workspace_id,
-      'data_sources'::public.app_type,
-      'editor'::public.role_level
-    )
-  )
-with
-  check (
-    public.util__auth_user_meets_min_app_role (
-      public.db_connections__postgres.workspace_id,
-      'data_sources'::public.app_type,
-      'editor'::public.role_level
-    )
-  );
-
-create policy "User can delete db_connections__postgres in their workspace" on public.db_connections__postgres for delete to authenticated using (
-  public.util__auth_user_meets_min_app_role (
-    public.db_connections__postgres.workspace_id,
-    'data_sources'::public.app_type,
-    'admin'::public.role_level
-  )
-);
 
 create trigger tr_db_connections__postgres__set_updated_at before
 update on public.db_connections__postgres for each row
