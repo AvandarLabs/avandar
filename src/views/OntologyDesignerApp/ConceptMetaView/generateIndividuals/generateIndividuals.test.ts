@@ -14,8 +14,8 @@ import { uuid } from "$/lib/uuid";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
-import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
+import { generateIndividuals } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   DatasetColumnId,
@@ -232,8 +232,8 @@ describe("generateIndividuals", () => {
   });
 
   afterEach(() => {
-    TaskProgressStore.getAllTasks().forEach(({ id }) => {
-      TaskProgressStore.finishTask(id);
+    JobProgressStore.getAllJobs().forEach(({ id }) => {
+      JobProgressStore.finishJob(id);
     });
   });
 
@@ -368,24 +368,24 @@ describe("generateIndividuals", () => {
     ]);
   });
 
-  it("finishes its progress task after a successful sync", async () => {
+  it("finishes its progress job after a successful sync", async () => {
     forEachQueryPageMock.mockResolvedValue({ numPages: 0, numRows: 0 });
 
     await generateIndividuals(_makeConcept());
 
-    expect(TaskProgressStore.getAllTasks()).toEqual([]);
+    expect(JobProgressStore.getAllJobs()).toEqual([]);
   });
 
-  it("fails its progress task, keeping the error message, when the sync throws", async () => {
+  it("fails its progress job, keeping the error message, when the sync throws", async () => {
     forEachQueryPageMock.mockRejectedValue(new Error("upsert exploded"));
 
     await expect(generateIndividuals(_makeConcept())).rejects.toThrow(
       "upsert exploded",
     );
 
-    const tasks = TaskProgressStore.getAllTasks();
-    expect(tasks).toHaveLength(1);
-    expect(tasks[0]!.entry).toMatchObject({
+    const jobs = JobProgressStore.getAllJobs();
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.entry).toMatchObject({
       status: "error",
       message: "upsert exploded",
     });
@@ -414,8 +414,8 @@ describe("generateIndividuals", () => {
           nextPage: 2,
           prevPage: 0,
         });
-        const [task] = TaskProgressStore.getAllTasks();
-        observedEntry = task?.entry;
+        const [job] = JobProgressStore.getAllJobs();
+        observedEntry = job?.entry;
         return { numPages: 1, numRows: 1 };
       },
     );

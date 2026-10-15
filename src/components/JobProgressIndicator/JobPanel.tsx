@@ -1,35 +1,35 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Progress, Text } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
-import css from "./TaskProgressIndicator.module.css";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
+import css from "./JobProgressIndicator.module.css";
 import type {
-  TaskEntry,
-  TaskId,
-} from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+  JobEntry,
+  JobId,
+} from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 
 type Props = {
-  id: TaskId;
-  entry: TaskEntry;
+  id: JobId;
+  entry: JobEntry;
 };
 
 /**
- * One floating panel for a single live task tracked by
- * {@link TaskProgressStore}: an indeterminate or determinate progress bar, or
+ * One floating panel for a single live job tracked by
+ * {@link JobProgressStore}: an indeterminate or determinate progress bar, or
  * a dismissible error message.
  */
-export function TaskPanel({ id, entry }: Props): JSX.Element {
+export function JobPanel({ id, entry }: Props): JSX.Element {
   const { t } = useLingui();
 
   return (
     <div
-      className={css.taskProgressPanel}
+      className={css.jobProgressPanel}
       role={entry.status === "error" ? "alert" : "status"}
       aria-live={entry.status === "error" ? undefined : "polite"}
       aria-label={entry.label}
     >
-      <div className={css.taskProgressTitleRow}>
-        <Text size="sm" fw={600} className={css.taskProgressLabel}>
+      <div className={css.jobProgressTitleRow}>
+        <Text size="sm" fw={600} className={css.jobProgressLabel}>
           {entry.label}
         </Text>
         {entry.status === "error" ? (
@@ -39,7 +39,7 @@ export function TaskPanel({ id, entry }: Props): JSX.Element {
             color="neutral"
             aria-label={t`Dismiss ${entry.label}`}
             onClick={() => {
-              TaskProgressStore.finishTask(id);
+              JobProgressStore.finishJob(id);
             }}
           >
             <IconX size={14} />
@@ -67,12 +67,12 @@ export function TaskPanel({ id, entry }: Props): JSX.Element {
       ) : null}
 
       {entry.status !== "error" && entry.detail ? (
-        <Text size="xs" className={css.taskProgressDetail}>
+        <Text size="xs" className={css.jobProgressDetail}>
           {entry.detail}
         </Text>
       ) : null}
       {entry.status === "error" ? (
-        <Text size="xs" className={css.taskProgressErrorMessage}>
+        <Text size="xs" className={css.jobProgressErrorMessage}>
           {entry.message}
         </Text>
       ) : null}

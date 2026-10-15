@@ -19,9 +19,9 @@ vi.mock(
   },
 );
 
-vi.mock("@/components/TaskProgressIndicator/TaskProgressIndicator", () => {
+vi.mock("@/components/JobProgressIndicator/JobProgressIndicator", () => {
   return {
-    TaskProgressIndicator: () => {
+    JobProgressIndicator: () => {
       return null;
     },
   };

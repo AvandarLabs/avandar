@@ -1,4 +1,4 @@
-.taskProgressIndicator {
+.jobProgressIndicator {
   bottom: 16px;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   z-index: 200;
 }
 
-.taskProgressPanel {
+.jobProgressPanel {
   background: var(--mantine-color-white);
   border: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
   border-radius: var(--mantine-radius-md);
@@ -20,7 +20,7 @@
   padding: var(--mantine-spacing-sm);
 }
 
-.taskProgressTitleRow {
+.jobProgressTitleRow {
   align-items: center;
   display: flex;
   gap: var(--mantine-spacing-xs);
@@ -28,20 +28,20 @@
   margin-bottom: var(--mantine-spacing-xs);
 }
 
-.taskProgressLabel {
+.jobProgressLabel {
   color: var(--mantine-color-neutral-9);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.taskProgressDetail {
+.jobProgressDetail {
   color: var(--mantine-color-neutral-6);
   line-height: 1.35;
   margin-top: var(--mantine-spacing-xs);
 }
 
-.taskProgressErrorMessage {
+.jobProgressErrorMessage {
   color: var(--mantine-color-danger-7, var(--mantine-color-red-7));
   line-height: 1.35;
 }

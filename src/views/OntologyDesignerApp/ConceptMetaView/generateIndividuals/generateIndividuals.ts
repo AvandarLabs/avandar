@@ -19,7 +19,7 @@ import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSql
 import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { Logger } from "@/utils/Logger";
 import {
   diffStagedIndividualsPage,
@@ -34,7 +34,7 @@ import type {
 } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import type {
   ExistingIndividual,
   StagedIndividualRow,
@@ -100,7 +100,7 @@ async function _diffAndUpsertPage(options: {
   matchedExternalIds: Set<string>;
   workspaceId: Workspace.Id;
   conceptId: Concept.Id;
-  taskId: TaskId;
+  jobId: JobId;
   conceptName: string;
   pageNum: number;
   totalPages: number;
@@ -111,13 +111,13 @@ async function _diffAndUpsertPage(options: {
     matchedExternalIds,
     workspaceId,
     conceptId,
-    taskId,
+    jobId,
     conceptName,
     pageNum,
     totalPages,
   } = options;
 
-  TaskProgressStore.updateTask(taskId, {
+  JobProgressStore.updateJob(jobId, {
     status: "determinate",
     label: t`Refreshing ${conceptName} records…`,
     current: pageNum + 1,
@@ -313,11 +313,11 @@ async function _stageIndividuals(options: {
 }
 
 /**
- * Runs the sync for one concept once its progress task already exists.
+ * Runs the sync for one concept once its progress job already exists.
  */
 async function _runGenerateIndividuals(
   concept: BuildableConcept,
-  taskId: TaskId,
+  jobId: JobId,
 ): Promise<void> {
   const mappings = await _resolveIndividualSourceMappings(concept);
 
@@ -351,7 +351,7 @@ async function _runGenerateIndividuals(
             matchedExternalIds,
             workspaceId: concept.workspaceId,
             conceptId: concept.id,
-            taskId,
+            jobId,
             conceptName: concept.name,
             pageNum: page.pageNum,
             totalPages: page.totalPages,
@@ -395,21 +395,21 @@ async function _runGenerateIndividuals(
 
 /**
  * Runs the Qetl pipeline to generate individuals for a concept, reporting
- * progress through {@link TaskProgressStore} for the lifetime of the call.
+ * progress through {@link JobProgressStore} for the lifetime of the call.
  */
 export async function generateIndividuals(
   concept: BuildableConcept,
 ): Promise<void> {
-  const taskId = TaskProgressStore.startTask(
+  const jobId = JobProgressStore.startJob(
     t`Refreshing ${concept.name} records…`,
   );
 
   try {
-    await _runGenerateIndividuals(concept, taskId);
-    TaskProgressStore.finishTask(taskId);
+    await _runGenerateIndividuals(concept, jobId);
+    JobProgressStore.finishJob(jobId);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    TaskProgressStore.failTask(taskId, message);
+    JobProgressStore.failJob(jobId, message);
     throw error;
   }
 }

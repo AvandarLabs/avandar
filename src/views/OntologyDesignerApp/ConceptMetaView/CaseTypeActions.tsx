@@ -13,7 +13,7 @@ import { notifySuccess } from "@/utils/notifications/notify";
 import {
   generateIndividuals,
   getAttributesWithMapping,
-} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals";
 import { ViewRecordsButton } from "@/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ReactNode } from "react";

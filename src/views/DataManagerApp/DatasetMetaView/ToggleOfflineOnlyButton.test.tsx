@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { render, screen } from "@/test-utils";
 import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
@@ -48,13 +48,13 @@ describe("ToggleOfflineOnlyButton", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-    TaskProgressStore.getAllTasks().forEach(({ id }) => {
-      TaskProgressStore.finishTask(id);
+    JobProgressStore.getAllJobs().forEach(({ id }) => {
+      JobProgressStore.finishJob(id);
     });
   });
 
-  it("does not render an inline progress bar while a task is live in TaskProgressStore", () => {
-    TaskProgressStore.startTask("Uploading dataset");
+  it("does not render an inline progress bar while a job is live in JobProgressStore", () => {
+    JobProgressStore.startJob("Uploading dataset");
 
     _renderWithQueryClient(
       <ToggleOfflineOnlyButton

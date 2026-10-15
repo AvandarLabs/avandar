@@ -3,8 +3,8 @@ import { useEffect, useRef } from "react";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { useLocalChatModelCopy } from "@/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy";
 import { useOfflineChatEngineStatus } from "@/hooks/localChatModels/useOfflineChatEngineStatus";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
+import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 
 /**
  * Looks up the catalog entry and localized copy for `modelId`, and builds
@@ -22,17 +22,17 @@ function buildDownloadingLabel(
 }
 
 /**
- * Bridges offline chat model download status into `TaskProgressStore`, so
- * `TaskProgressIndicator` renders it. Pure side-effect wiring: it returns
+ * Bridges offline chat model download status into `JobProgressStore`, so
+ * `JobProgressIndicator` renders it. Pure side-effect wiring: it returns
  * nothing.
  */
 export function useOfflineChatDownloadBridge(): void {
   const getLocalChatModelCopy = useLocalChatModelCopy();
   const status = useOfflineChatEngineStatus();
-  const taskIdRef = useRef<TaskId | undefined>(undefined);
+  const jobIdRef = useRef<JobId | undefined>(undefined);
 
   useEffect(
-    function syncOfflineChatDownloadTask() {
+    function syncOfflineChatDownloadJob() {
       if (status.kind === "downloading") {
         const label = buildDownloadingLabel(
           status.modelId,
@@ -43,10 +43,10 @@ export function useOfflineChatDownloadBridge(): void {
           Math.min(1, Math.max(0, status.progress)) * 100,
         );
 
-        if (taskIdRef.current === undefined) {
-          taskIdRef.current = TaskProgressStore.startTask(label);
+        if (jobIdRef.current === undefined) {
+          jobIdRef.current = JobProgressStore.startJob(label);
         }
-        TaskProgressStore.updateTask(taskIdRef.current, {
+        JobProgressStore.updateJob(jobIdRef.current, {
           status: "determinate",
           label,
           current: percent,
@@ -54,31 +54,31 @@ export function useOfflineChatDownloadBridge(): void {
           detail: doNotCloseTabWarning,
         });
       } else if (status.kind === "error") {
-        if (taskIdRef.current === undefined) {
-          taskIdRef.current = TaskProgressStore.startTask(
+        if (jobIdRef.current === undefined) {
+          jobIdRef.current = JobProgressStore.startJob(
             buildDownloadingLabel(status.modelId, getLocalChatModelCopy),
           );
         }
-        TaskProgressStore.failTask(taskIdRef.current, status.message);
-        taskIdRef.current = undefined;
-      } else if (taskIdRef.current !== undefined) {
+        JobProgressStore.failJob(jobIdRef.current, status.message);
+        jobIdRef.current = undefined;
+      } else if (jobIdRef.current !== undefined) {
         // "ready" or "idle": nothing left to report.
-        TaskProgressStore.finishTask(taskIdRef.current);
-        taskIdRef.current = undefined;
+        JobProgressStore.finishJob(jobIdRef.current);
+        jobIdRef.current = undefined;
       }
     },
     [status, getLocalChatModelCopy],
   );
 
-  // Separate, mount-lifecycle-only effect: finishes any task still tracked
+  // Separate, mount-lifecycle-only effect: finishes any job still tracked
   // when this hook unmounts, so an active download never orphans its entry
-  // in the shared `TaskProgressStore`. Kept apart from the status effect
+  // in the shared `JobProgressStore`. Kept apart from the status effect
   // above so it does not also fire between status updates.
-  useEffect(function finishTrackedTaskOnUnmount() {
+  useEffect(function finishTrackedJobOnUnmount() {
     return () => {
-      if (taskIdRef.current !== undefined) {
-        TaskProgressStore.finishTask(taskIdRef.current);
-        taskIdRef.current = undefined;
+      if (jobIdRef.current !== undefined) {
+        JobProgressStore.finishJob(jobIdRef.current);
+        jobIdRef.current = undefined;
       }
     };
   }, []);

@@ -4,6 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
+import { useState } from "react";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
@@ -34,6 +35,7 @@ export function ToggleOfflineOnlyButton({
   const workspace = useCurrentWorkspace();
   const offline = useOfflineGate();
   const sourceType = DatasetSource.getSourceType(dataSource);
+  const [isUploadPending, setIsUploadPending] = useState(false);
 
   const [makeOfflineOnly, isMakeOfflinePending] = useMutation({
     mutationFn: async (datasetIdToDelete: DatasetId) => {
@@ -90,8 +92,10 @@ export function ToggleOfflineOnlyButton({
     },
   });
 
+  const isPending = isMakeOfflinePending || isUploadPending;
+
   const onClick = offline.guard(() => {
-    if (isMakeOfflinePending) {
+    if (isPending) {
       return;
     }
 
@@ -103,7 +107,7 @@ export function ToggleOfflineOnlyButton({
       },
       confirmProps: {
         color: isInCloudStorage ? "danger" : undefined,
-        loading: isMakeOfflinePending,
+        loading: isPending,
       },
       children: isInCloudStorage ? (
         <Text c="red.8">
@@ -126,11 +130,18 @@ export function ToggleOfflineOnlyButton({
         if (isInCloudStorage) {
           return makeOfflineOnly(dataSource.datasetId);
         } else {
+          setIsUploadPending(true);
           return DatasetParquetStorageClient.startDatasetUpload({
             workspaceId: workspace.id,
             datasetId: dataSource.datasetId,
             sourceType,
-          });
+          })
+            .catch(() => {
+              // startDatasetUpload already reports the failure to the user.
+            })
+            .finally(() => {
+              setIsUploadPending(false);
+            });
         }
       },
     });
@@ -149,8 +160,8 @@ export function ToggleOfflineOnlyButton({
         aria-label={
           isInCloudStorage ? t`Make offline-only` : t`Allow online syncing`
         }
-        data-disabled={isMakeOfflinePending || offline.isBlocked || undefined}
-        aria-disabled={isMakeOfflinePending || offline.isBlocked}
+        data-disabled={isPending || offline.isBlocked || undefined}
+        aria-disabled={isPending || offline.isBlocked}
         onClick={onClick}
       >
         {isInCloudStorage ? (

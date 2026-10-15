@@ -14,18 +14,18 @@ import {
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { notifyError } from "@/utils/notifications/notify";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { TaskId } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 
 /**
  * Tracks uploads already in flight, keyed by dataset id, so a second call for
  * the same dataset reuses the first call's promise instead of starting a
- * duplicate upload. Separate from `TaskProgressStore`, which is keyed by an
- * opaque task id and knows nothing about datasets.
+ * duplicate upload. Separate from `JobProgressStore`, which is keyed by an
+ * opaque job id and knows nothing about datasets.
  */
 const _uploadsInProgress = new Map<DatasetId, Promise<void>>();
 
@@ -52,9 +52,9 @@ async function _resumableParquetBlobUpload(options: {
   workspaceId: Workspace.Id;
   datasetId: DatasetId;
   parquetBlob: Blob;
-  taskId: TaskId;
+  jobId: JobId;
 }): Promise<void> {
-  const { workspaceId, datasetId, parquetBlob, taskId } = options;
+  const { workspaceId, datasetId, parquetBlob, jobId } = options;
 
   const endpoint = `${AvaSupabase.getAPIURL()}/storage/v1/upload/resumable`;
   const objectPath = getDatasetParquetStoragePath({ workspaceId, datasetId });
@@ -91,7 +91,7 @@ async function _resumableParquetBlobUpload(options: {
   });
 
   uppy.on("upload-progress", (_file, progress) => {
-    TaskProgressStore.updateTask(taskId, {
+    JobProgressStore.updateJob(jobId, {
       status: "determinate",
       label: t`Syncing dataset online`,
       current: progress.bytesUploaded,
@@ -145,16 +145,16 @@ async function _uploadDatasetToSupabase(options: {
   datasetId: DatasetId;
   parquetBlob: Blob;
   sourceType: DatasetSource.SourceType;
-  taskId: TaskId;
+  jobId: JobId;
 }): Promise<void> {
-  const { workspaceId, datasetId, parquetBlob, sourceType, taskId } = options;
+  const { workspaceId, datasetId, parquetBlob, sourceType, jobId } = options;
 
   if (parquetBlob.size > DIRECT_UPLOAD_MAX_BYTES) {
     await _resumableParquetBlobUpload({
       workspaceId,
       datasetId,
       parquetBlob,
-      taskId,
+      jobId,
     });
   } else {
     await _oneShotParquetBlobUpload({
@@ -164,7 +164,7 @@ async function _uploadDatasetToSupabase(options: {
     });
   }
 
-  TaskProgressStore.updateTask(taskId, {
+  JobProgressStore.updateJob(jobId, {
     status: "determinate",
     label: t`Syncing dataset online`,
     current: parquetBlob.size,
@@ -247,7 +247,7 @@ export async function startDatasetUpload(options: {
   }
 
   const parquetBlob = localDataset.parquetData;
-  const taskId = TaskProgressStore.startTask(t`Syncing dataset online`);
+  const jobId = JobProgressStore.startJob(t`Syncing dataset online`);
 
   const makeUploadPromise = async (): Promise<void> => {
     try {
@@ -255,14 +255,14 @@ export async function startDatasetUpload(options: {
         ...options,
         parquetBlob,
         sourceType,
-        taskId,
+        jobId,
       });
-      TaskProgressStore.finishTask(taskId);
+      JobProgressStore.finishJob(jobId);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
 
-      TaskProgressStore.failTask(taskId, errorMessage);
+      JobProgressStore.failJob(jobId, errorMessage);
       notifyError({
         title: t`Unable to sync dataset online`,
         message: errorMessage,

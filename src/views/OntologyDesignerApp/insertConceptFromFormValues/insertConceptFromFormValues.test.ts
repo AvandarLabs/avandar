@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { insertConceptFromFormValues } from "./insertConceptFromFormValues";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
@@ -46,7 +46,7 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return { DatasetClient: { getAll: datasetGetAllMock } };
 });
 vi.mock(
-  "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index",
+  "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals",
   () => {
     return {
       generateIndividuals: generateIndividualsMock,
@@ -135,8 +135,8 @@ describe("insertConceptFromFormValues", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
-    TaskProgressStore.getAllTasks().forEach(({ id }) => {
-      TaskProgressStore.finishTask(id);
+    JobProgressStore.getAllJobs().forEach(({ id }) => {
+      JobProgressStore.finishJob(id);
     });
   });
 

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { TaskProgressStore } from "@/lib/utils/state/TaskProgressStore/TaskProgressStore";
+import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { renderHook, TestProviders } from "@/test-utils";
 import { useOfflineChatDownloadBridge } from "./useOfflineChatDownloadBridge";
 import type { OfflineChatManagerStatus } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
@@ -26,12 +26,12 @@ function _renderBridge(): void {
 describe("useOfflineChatDownloadBridge", () => {
   afterEach(() => {
     mockStatus = { kind: "idle" };
-    TaskProgressStore.getAllTasks().forEach(({ id }) => {
-      TaskProgressStore.finishTask(id);
+    JobProgressStore.getAllJobs().forEach(({ id }) => {
+      JobProgressStore.finishJob(id);
     });
   });
 
-  it("starts a determinate task reporting the download's progress", () => {
+  it("starts a determinate job reporting the download's progress", () => {
     mockStatus = {
       kind: "downloading",
       modelId: "qwen-1.5b",
@@ -39,16 +39,16 @@ describe("useOfflineChatDownloadBridge", () => {
     };
     _renderBridge();
 
-    const tasks = TaskProgressStore.getAllTasks();
-    expect(tasks).toHaveLength(1);
-    expect(tasks[0]!.entry).toMatchObject({
+    const jobs = JobProgressStore.getAllJobs();
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.entry).toMatchObject({
       status: "determinate",
       current: 42,
       total: 100,
     });
   });
 
-  it("finishes the task once the engine becomes ready", () => {
+  it("finishes the job once the engine becomes ready", () => {
     mockStatus = { kind: "downloading", modelId: "qwen-1.5b", progress: 0.9 };
     const { rerender } = renderHook(
       () => {
@@ -56,15 +56,15 @@ describe("useOfflineChatDownloadBridge", () => {
       },
       { wrapper: TestProviders },
     );
-    expect(TaskProgressStore.getAllTasks()).toHaveLength(1);
+    expect(JobProgressStore.getAllJobs()).toHaveLength(1);
 
     mockStatus = { kind: "ready", modelId: "qwen-1.5b" };
     rerender();
 
-    expect(TaskProgressStore.getAllTasks()).toHaveLength(0);
+    expect(JobProgressStore.getAllJobs()).toHaveLength(0);
   });
 
-  it("fails the task, keeping the error message, when the engine errors", () => {
+  it("fails the job, keeping the error message, when the engine errors", () => {
     mockStatus = {
       kind: "error",
       modelId: "qwen-1.5b",
@@ -72,9 +72,9 @@ describe("useOfflineChatDownloadBridge", () => {
     };
     _renderBridge();
 
-    const tasks = TaskProgressStore.getAllTasks();
-    expect(tasks).toHaveLength(1);
-    expect(tasks[0]!.entry).toMatchObject({
+    const jobs = JobProgressStore.getAllJobs();
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.entry).toMatchObject({
       status: "error",
       message: "Download failed",
     });

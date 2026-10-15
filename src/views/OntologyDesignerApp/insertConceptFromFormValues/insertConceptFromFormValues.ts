@@ -9,7 +9,7 @@ import { Logger } from "@/utils/Logger";
 import {
   generateIndividuals,
   getAttributesWithMapping,
-} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/index";
+} from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
