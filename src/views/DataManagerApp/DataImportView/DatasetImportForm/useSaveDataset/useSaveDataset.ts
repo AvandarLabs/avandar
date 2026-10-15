@@ -93,11 +93,21 @@ export type GoogleSheetsParseOptions = {
   // replaced, but no control offers it yet.
 };
 
+export type PostgresTableParseOptions = {
+  type: "postgres_table";
+
+  // No further options. A table/view is read with a capped `SELECT *`
+  // (section 5.4 of the connector spec) - there is no delimiter, header, or
+  // skip-rows concept to vary, same reasoning `GoogleSheetsParseOptions`
+  // gives for its own near-empty shape.
+};
+
 export type FileParseOptions =
   | CsvParseOptions
   | XlsxParseOptions
   | PdfParseOptions
-  | GoogleSheetsParseOptions;
+  | GoogleSheetsParseOptions
+  | PostgresTableParseOptions;
 
 function _duckDbColumnsToImportedColumns(
   columns: readonly DuckDbColumnSchema[],
@@ -248,6 +258,27 @@ async function _saveGoogleSheetsDataset(
   });
 }
 
+async function _savePostgresTableDataset(
+  options: Readonly<{
+    context: DatasetInsertContext;
+    payload: Extract<DataSourceMetadata, { sourceType: "postgres_table" }>;
+  }>,
+): Promise<Dataset.T> {
+  const { connectionId, datasetLoadResult } = options.payload;
+  const { columns, relationKind, schemaName, tableName } = datasetLoadResult;
+  return DatasetClient.insertPostgresTableDataset({
+    connectionId,
+    schemaName,
+    tableName,
+    relationKind,
+    columns: _duckDbColumnsToImportedColumns(columns).map(snakeCaseKeysShallow),
+    datasetDescription: options.context.datasetDescription,
+    datasetId: datasetLoadResult.datasetId,
+    datasetName: options.context.datasetName,
+    workspaceId: options.context.workspaceId,
+  });
+}
+
 async function _saveXlsxDataset(
   options: Readonly<{
     context: DatasetInsertContext;
@@ -374,6 +405,9 @@ function _saveDatasetFromValues(
     .with({ sourceType: "pdf_file" }, (payload) => {
       return _savePdfDataset({ context, payload });
     })
+    .with({ sourceType: "postgres_table" }, (payload) => {
+      return _savePostgresTableDataset({ context, payload });
+    })
     .exhaustive();
 }
 
@@ -386,6 +420,7 @@ function _startDatasetUploadIfAllowed(
 ): void {
   if (
     options.params.sourceType === "google_sheets" ||
+    options.params.sourceType === "postgres_table" ||
     !options.params.onlineStorageAllowed
   ) {
     return;
@@ -419,6 +454,7 @@ function _startOriginalFileUploadIfAllowed(
 ): void {
   if (
     options.params.sourceType === "google_sheets" ||
+    options.params.sourceType === "postgres_table" ||
     !options.params.onlineStorageAllowed
   ) {
     return;
