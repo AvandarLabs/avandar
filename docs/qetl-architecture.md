@@ -400,6 +400,44 @@ sharing, the `datasets` RLS, and every dataset consumer (its own per-type table
 and that table's RLS are row 2). Ordered checklist, using a
 hypothetical `postgres_table` reached through a server-side proxy:
 
+The hypothetical below is no longer hypothetical: the real Postgres connector
+is designed in
+[`docs/superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md`](superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md),
+with this checklist's rows filled in under the real file names (that spec's
+section 6/7). Two things it needed that this checklist does not cover, because
+every existing source type has at most a per-dataset or per-user credential:
+
+### 10.1 Reusable connections: a new sibling entity above datasets
+
+A source type whose credential is reusable across more than one dataset (a
+Postgres server holding many tables, unlike one Google Sheets OAuth grant
+which Google itself already models as a reusable entity) needs a new entity
+one layer above `datasets`, not a new field on it: a generic `*_connections`
+table carrying the common shape (workspace, type, label, timestamps) plus one
+`*_connections__<type>` satellite per connection type, mirroring the existing
+`datasets` / `datasets__<type>` split exactly. The per-type dataset table
+gains a foreign key to the connection (`on delete restrict`, not `cascade`:
+deleting a connection out from under a live dataset must be an explicit,
+informed action, never an implicit side effect of deleting the connection).
+Gate the connection tables by **app role**
+(`util__auth_user_meets_min_app_role`), not by the per-resource sharing every
+`datasets__<type>` table uses - a connection is infrastructure configuration
+a workspace editor manages, not a document one teammate shares with another.
+See the Postgres spec's section 5.1 for the worked example
+(`db_connections` / `db_connections__postgres`).
+
+### 10.2 A credential storage tier stronger than a plain column
+
+Every source type so far either has no stored secret (`csv_file`, `virtual`)
+or stores one in a plain column gated only by RLS (`tokens__google`). A
+reusable connection's credential is higher-value (one password unlocks every
+table on a server, not one user's own OAuth grant) and needs a storage tier
+where there is no RLS policy on the secret itself to get wrong: Supabase
+Vault (`pgsodium`-backed `vault.create_secret`/`vault.decrypted_secrets`,
+grantable only to `service_role`). See the Postgres spec's section 5.2 for
+the full design, including the SSRF and identifier-quoting requirements that
+come with proxying a connection to an arbitrary user-supplied host.
+
 | # | File | Change | Caught by |
 | --- | --- | --- | --- |
 | 1 | `supabase/schemas/10.datasets.sql` | add the value to `datasets__source_type` | inherent |
@@ -417,7 +455,7 @@ hypothetical `postgres_table` reached through a server-side proxy:
 | 13 | `src/clients/datasets/SourceDatasetClient.ts` | registry entry | compiler |
 | 14 | `src/clients/datasets/DatasetClient/createDatasetQueries.ts` | `getSourceDataset` arm | compiler |
 | 15 | `src/clients/datasets/DatasetClient/createDatasetMutations.ts`, `DatasetClient.types.ts`, `DatasetClient.ts` | insert mutation and its registration | inherent |
-| 16 | new server proxy, for example `supabase/functions/postgres-table/` | keeps credentials server-side | inherent |
+| 16 | new server proxy - the real Postgres connector registers a connector implementation into a shared `supabase/functions/external-datasets/` edge function rather than creating a single-purpose one; see the Postgres spec section 5.4 for why | keeps credentials server-side | inherent |
 | 17 | new browser client, for example `src/lib/postgresTable/` | calls the proxy, returns bytes | inherent |
 | 18 | new `src/clients/qetl/wrappers/PostgresTableWrapper/` | `SourceWrapper` with `capabilities` and `acquire`, plus tests | inherent |
 | 19 | `src/clients/qetl/QueryMediator/QueryMediator.types.ts` | `RelationSource` arm | compiler (through row 20) |
@@ -539,6 +577,8 @@ means traced through the source but not run.
   [relation cache](superpowers/specs/2026-08-18-qetl-relation-cache-design.md),
   [concept relations](superpowers/specs/2026-08-18-qetl-concept-relations-design.md),
   [Google Sheets](superpowers/specs/2026-08-18-qetl-google-sheets-design.md),
+  [Postgres connector](superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md)
+  (also the worked example behind section 10.1/10.2 above),
   [open data APIs](superpowers/specs/2026-08-19-qetl-open-data-apis-design.md),
   [column projection](superpowers/specs/2026-08-19-qetl-column-projection-design.md),
   and the [decisions log](superpowers/specs/2026-08-18-qetl-spec-decisions-log.md).

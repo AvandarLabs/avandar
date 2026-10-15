@@ -233,6 +233,30 @@ authorized merge to `develop`.
 - Use `clsx` for conditional classes
 - Never use TailwindCSS. We are trying to deprecate it.
 
+## Copy and nomenclature
+
+- Write user-facing copy for the user's mental model of what they are doing,
+  not for the codebase's internal nomenclature, even where the two words
+  genuinely differ. Low-tech does not mean non-tech: the audience includes
+  people who are comfortable using software day to day but have no reason to
+  know this codebase's entity names.
+- Concretely: a Postgres `db_connections` row is the right name for
+  that backend entity, because a "connection" is genuinely what
+  `MySQL`/`MSSQL`/`Snowflake` connectors will all persist as too - but a user
+  never sees that word. They are "adding a database," not "creating a
+  connection," even though the latter is technically what happens. Pick the
+  noun that matches what the user believes they are doing, and let each
+  connector or feature choose its own (a spreadsheet connector says
+  "sheet"/"spreadsheet"; a database connector says "database"), rather than
+  reusing one internal term everywhere for consistency's sake.
+- This is a copy rule, not a rename: it governs what a label, placeholder, or
+  error message says, never what a table, column, type, or variable is
+  called. Keep the internal name and the user-facing word different on
+  purpose when they diverge; do not rename the internal entity to chase the
+  copy, and do not leak the internal name into the UI to avoid picking a
+  separate word.
+- See `DESIGN.md`'s Do's and Don'ts for the matching design-system rule.
+
 ## Internationalization
 
 - **All displayable frontend text must be translated.** Any string a user can

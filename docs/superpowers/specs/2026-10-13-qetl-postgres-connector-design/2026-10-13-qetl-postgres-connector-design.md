@@ -62,13 +62,24 @@ The Postgres connector's "testing your connection and listing tables" step
 and "fetching a preview" step are exactly the kind of multi-second,
 can-fail operation that store was built for. **Do not build a second
 one-off loading/error-store for this connector.** If `feat/incremental-gen`
-has merged by the time the frontend work starts, use that store (the
+has merged by the time the frontend work starts, use that store directly (the
 existing `ConnectorRow`'s own inline `Loader`/error affordances, described in
 section 7.4 below, stay as-is for the fast, in-form states; the floating
 indicator is for the connect-and-list-tables round trip specifically). If it
-has not merged yet, ship with a local `isConnecting` boolean exactly like
-`GoogleSheetsImportView` does today, and leave a one-line TODO pointing at
-this section.
+has not merged yet, **copy the files directly into this branch rather than
+building a placeholder:** `src/lib/utils/state/TaskProgressStore/TaskProgressStore.ts`,
+`src/lib/utils/state/createExternalStore.ts`, and
+`src/components/TaskProgressIndicator/TaskPanel.tsx`, wired into this
+branch's own `src/components/AppShell/AppShell.tsx` the same way
+`feat/incremental-gen` wires it. `feat/incremental-gen` will merge to
+`develop` before this branch does, so the copy is temporary: once this
+branch rebases onto a `develop` that already has the real files, the copies
+collide and resolve as duplicates (trivial to delete, since they are
+byte-identical or near-identical), not as a design conflict. This is better
+than a local `isConnecting` boolean plus a TODO, because it lets the
+connecting/listing-tables states actually be built and tested against the
+real floating-indicator UI from day one, instead of against a throwaway
+stand-in that would need its own follow-up migration later.
 
 ---
 
@@ -107,8 +118,8 @@ every time it changes.
 5. The frontend "Connectors" tab gets a second `ConnectorRow`, built to the
    same "sniffed import view" shape as `GoogleSheetsImportView`.
 
-**Out (tracked as future work in section 9, with Linear issues opened per
-the user's request)**
+**Out (tracked as future work in section 9, with Linear issues to be filed
+per the user's request)**
 
 - A third-party secrets manager (Infisical, Doppler, AWS/GCP/Azure Secrets
   Manager, HashiCorp Vault) in front of or instead of Supabase Vault.
@@ -125,10 +136,28 @@ the user's request)**
   it "the vocabulary for a planner that does not exist yet." Shipping real
   pushdown for one source type ahead of that planner would make the
   mediator's behavior depend on which source type a query happens to touch.
+  Tracked as future work, section 9.
 - Freshness detection (same known gap every non-Sheets source has today;
-  `sourceVersion` stays `undefined`, per architecture doc section 13).
+  `sourceVersion` stays `undefined`, per architecture doc section 13). It is
+  at least partially feasible for Postgres specifically - unlike a flat file,
+  a live server can be asked cheaply (`pg_stat_user_tables` counters, an
+  `xmin`-based watermark, or a dedicated `updated_at`/trigger column, none of
+  which exist generically across arbitrary customer tables so none can be
+  the *default* `freshnessSignal` v1 declares) - but building a planner that
+  actually consumes a freshness signal is the bigger, shared gap named above,
+  not a Postgres-specific one. Tracked as future work, section 9.
 - Paging very large tables across multiple acquisition calls. v1 fetches the
-  whole relation in one call, capped (section 5.3), same shape as Sheets.
+  whole relation in one call, capped by `maxRowsPerCall`/`maxBytesPerCall`
+  (section 5.3); exceeding the cap now fails the acquisition outright
+  (section 5.4) rather than silently returning a partial table. This is
+  intentionally distinct from pushdown above: pushdown is about sending a
+  *query* (a filter, an aggregate) to the source; paging is about splitting
+  *one relation's full acquisition* across several `acquire` calls
+  (`AcquisitionUnit`'s `"paged"` kind, `RelationCapabilities.types.ts`) - a
+  capability declared in the type system today but implemented by zero
+  wrappers and zero mediator code, so adding it for Postgres would mean
+  building the mediator's paging consumer for the first time, not flipping a
+  flag on an existing one. Tracked as future work, section 9.
 
 ## 3. Review: where this fits `docs/qetl-architecture.md`
 
@@ -141,7 +170,7 @@ different checklist. Two things that checklist does not cover, because its
 hypothetical connector had one dataset's worth of credentials and this one
 has a reusable, multi-dataset credential:
 
-1. A new entity (`database_connections` / `database_connections__postgres`)
+1. A new entity (`db_connections` / `db_connections__postgres`)
    that no existing row in that checklist creates or touches. Section 5.1.
 2. A credential storage mechanism stronger than any existing `datasets__*`
    table uses. Section 5.2.
@@ -180,22 +209,22 @@ Snowflake...) only ever adds a new satellite table and a new enum value,
 never a new "connections" concept.
 
 ```
-database_connections                     (generic, one row per saved connection)
+db_connections                     (generic, one row per saved connection)
   id                uuid primary key
   workspace_id      uuid references workspaces(id)
-  connection_type   database_connections__connection_type enum, 'postgres' for now
+  connection_type   db_connections__connection_type enum, 'postgres' for now
   name              text          -- user-chosen label, e.g. "Prod reporting replica"
   created_by        uuid references auth.users(id)
   created_at, updated_at
 
-database_connections__postgres            (satellite, one row per postgres connection)
-  connection_id     uuid primary key references database_connections(id) on delete cascade
+db_connections__postgres            (satellite, one row per postgres connection)
+  connection_id     uuid primary key references db_connections(id) on delete cascade
   workspace_id      uuid references workspaces(id)   -- denormalized, same reasoning as datasets__google_sheets.workspace_id
   host              text
   port              integer
   database_name     text
   username          text
-  ssl_mode          database_connections__postgres_ssl_mode enum ('disable' | 'require'); v1 offers only these two, see section 9
+  ssl_mode          db_connections__postgres_ssl_mode enum ('disable' | 'require'); v1 offers only these two, see section 9
   vault_secret_id   uuid           -- points at the encrypted password, see 5.2; NOT the password itself
   last_verified_at  timestamptz    -- set on every successful test-and-save or table listing; drives "last connected" UI copy
   created_at, updated_at
@@ -204,7 +233,7 @@ datasets__postgres_table                  (satellite, one row per imported datas
   id                uuid primary key
   dataset_id        uuid unique references datasets(id) on delete cascade
   workspace_id      uuid references workspaces(id)
-  connection_id     uuid references database_connections(id) on delete restrict  -- restrict, not cascade: deleting a connection with live datasets must be an explicit, informed action (out of scope for v1 UI, but the FK must not silently orphan a queryable dataset)
+  connection_id     uuid references db_connections(id) on delete restrict  -- restrict, not cascade: deleting a connection with live datasets must be an explicit, informed action (out of scope for v1 UI, but the FK must not silently orphan a queryable dataset)
   schema_name       text
   table_name        text
   relation_kind     datasets__postgres_table_relation_kind enum ('table' | 'view')
@@ -216,7 +245,7 @@ RLS: `datasets__postgres_table` follows `datasets__google_sheets` exactly -
 select/insert/update/delete, because it hangs off a `dataset_id` that
 already has a granular, shareable permission entity.
 
-`database_connections` and `database_connections__postgres` are **not**
+`db_connections` and `db_connections__postgres` are **not**
 per-resource shareable items in v1 (a connection is infrastructure
 configuration, not a document someone shares with one teammate). Gate them
 by **app role** instead, using the existing helper rather than inventing a
@@ -252,7 +281,7 @@ this project** (`db.vault` is present but commented out in
    structural improvement over the Google token precedent: there is no RLS
    policy on the secret itself to get wrong, because the client-reachable
    tables never contain the plaintext, only a `uuid` pointing at it.
-2. `database_connections__postgres.vault_secret_id` stores the id Vault
+2. `db_connections__postgres.vault_secret_id` stores the id Vault
    returns from `vault.create_secret(password, name, description)`. The
    secret payload is the password alone - host/port/database/username are
    operational metadata visible to any workspace editor (same sensitivity
@@ -289,16 +318,27 @@ this project** (`db.vault` is present but commented out in
 5. The picked `schema_name`/`table_name` come from a dropdown populated by
    a catalog query (`information_schema.tables`/`pg_catalog`), but they
    still arrive at the edge function as a client-supplied string. Re-check
-   the pair against the live catalog at acquire time (not just at pick
-   time - the table may have been dropped or renamed since), and build the
-   `SELECT` with a proper identifier-quoting helper (the Postgres driver's
-   own `sql` tagged-template / identifier-escaping function - never string
-   concatenation), so a crafted schema or table name cannot inject SQL.
+   the pair against the live catalog at acquire time - i.e. every time
+   `acquire`/the `rows` or `preview` route runs (section 5.4a), not only once
+   at pick time in the picker UI - the table may have been dropped or
+   renamed since it was picked - and build the `SELECT` with a proper
+   identifier-quoting helper (the Postgres driver's own `sql` tagged-template
+   / identifier-escaping function - never string concatenation), so a
+   crafted schema or table name cannot inject SQL. This is not optional
+   hardening to defer: section 8 requires explicit SQL-injection test
+   coverage for this helper and for every connection-form field before the
+   feature ships, not just a correctness review.
 6. Document, in the connection form's copy, that the database user supplied
    should ideally have read-only access to the one table or view being
    imported. We cannot enforce this from outside the user's database, but
    the UI should say it plainly (least-privilege is the user's
-   responsibility to grant, ours to ask for).
+   responsibility to grant, ours to ask for). This copy, like every other
+   user-facing string in this feature, follows the general copy rule now
+   documented in `AGENTS.md`'s "Copy and nomenclature" section and in
+   `DESIGN.md`'s Do's and Don'ts: write for the user's mental model, not the
+   schema's, even where the two words genuinely differ (see section 7's
+   "database," not "connection," rule below for the concrete instance that
+   prompted writing the general rule down).
 
 ### 5.3 The `SourceWrapper` capability contract
 
@@ -351,28 +391,104 @@ a live catalog read, so describing a relation never opens a connection.
 `readFreshness` is omitted entirely for v1 (capability says `"none"`;
 `SourceWrapper.readFreshness` is optional for exactly this case).
 
-### 5.4 The server proxy: the literal frontend/backend seam
+### 5.4 The server proxy: one unified endpoint, not a Postgres-only edge function
 
-New edge function, `supabase/functions/postgres-connections/`, Deno + the
-existing `MiniServer` routing (`defineRoutes`, same as every other function).
-Needs a real Postgres wire-protocol client, which nothing in this repo has
-today (every existing edge function talks to Postgres only through
-PostgREST, via `@supabase/postgrest-js`) - add one
-(`jsr:@db/postgres` is the common choice for Deno; `postgres` (porsager) also
-runs under Deno and is already used indirectly in this repo via `knex`'s
-dependency tree for the web app's own tooling, though not for a direct wire
-connection - either is acceptable, the implementer picks one and every
-caller goes through this one module).
+**Do not add a single-purpose `supabase/functions/postgres-connections/`
+edge function.** Every future database connector (MySQL, MSSQL, Snowflake...)
+would otherwise repeat this exact route shape in its own edge function - the
+same "parallel, one-off architecture" section 0 already rules out for the
+mediator, just recreated one layer down at the HTTP boundary. Build one
+connector-agnostic entry point instead, so adding a connector after this one
+is a new implementation registered into an existing function, never a new
+edge function:
+
+`supabase/functions/external-datasets/`, Deno + the existing `MiniServer`
+routing (`defineRoutes`, same as every other function). Needs a real
+Postgres wire-protocol client, which nothing in this repo has today (every
+existing edge function talks to Postgres only through PostgREST, via
+`@supabase/postgrest-js`) - add one (`jsr:@db/postgres` is the common choice
+for Deno; `postgres` (porsager) also runs under Deno - either is acceptable,
+the implementer picks one and every caller goes through this one module).
+**Neither `knex` nor `kysely` belongs here**: `knex` already lives in this
+repo (`shared/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts`),
+but only as a dialect-aware SQL-*string* assembler for DuckDB/SQLite, never
+as a live connection to an external database - a different job from this
+proxy's. The entire SQL surface this connector ever runs is two fixed shapes
+(a catalog listing query and a capped, identifier-quoted `SELECT *`), which
+is exactly what the Deno-native driver's own `sql` tagged template already
+handles safely (section 5.2 item 5). A query builder would add a
+dependency, a dialect-translation step, and a second identifier-quoting
+mechanism to keep in sync with the driver's own, for zero queries that
+actually need a builder's expressiveness (no filters, no joins, no dynamic
+predicates).
+
+Every route takes a `connectorType` path segment (`'postgres'` for this
+spec) and dispatches to one of a small set of registered connector
+implementations - the same registry shape `createDefaultRegistry.ts` already
+uses for `SourceWrapper`s (section 6, row 24), applied one layer down:
+
+```ts
+// supabase/functions/external-datasets/connectors/ExternalDatasetConnector.ts
+export type ExternalDatasetConnectorType = "postgres"; // widens per future connector
+
+/** One pickable child object under a connection - a table/view, a sheet tab. */
+export type ExternalDatasetRelation = {
+  relationId: string; // opaque to callers; postgres encodes "schema.table"
+  label: string;       // what the picker shows, e.g. "public.customers"
+  kind: string;         // connector-specific, e.g. "table" | "view"
+};
+
+export type ExternalDatasetConnector = {
+  testAndSaveConnection: (input: UnknownObject) => Promise<{
+    connectionId: string;
+    relations: ExternalDatasetRelation[];
+  }>;
+  listRelations: (connectionId: string) => Promise<ExternalDatasetRelation[]>;
+  previewRelation: (
+    connectionId: string,
+    relationId: string,
+  ) => Promise<{ columns: DuckDbColumnSchema[]; previewRows: UnknownObject[] }>;
+  getRelationRows: (connectionId: string, relationId: string) => Promise<string>; // CSV text
+};
+
+// connectorRegistry.ts
+const CONNECTORS: Record<ExternalDatasetConnectorType, ExternalDatasetConnector> = {
+  postgres: createPostgresConnector(/* ... */),
+};
+```
+
+**The unified layer vocabulary, reused rather than invented.** Every
+external connector this codebase has or will have has the same two layers:
+Google Sheets has a file (the spreadsheet) and, under it, many sheets/tabs;
+Postgres has a database (the connection) and, under it, many tables and
+views. Rather than coin a fresh pair of words (or ship a placeholder like
+"layer2"), this spec reuses vocabulary this codebase already has for exactly
+this shape (`docs/qetl-architecture.md` section 2): the child object a user
+ultimately picks as one dataset is already called a **relation** everywhere
+else here (`RelationRef`, `RelationCapabilities`, `acquisitionUnit`), and the
+reusable, authenticate-once parent above it is a **connection** - already
+this spec's own name for the Postgres entity (section 5.1), and the natural
+generic word for "the thing set up once, then picked from repeatedly." So
+the path reads `.../connections/:connectionId/relations[/:relationId/...]`,
+never `.../tables` and never a bespoke "layer2."
 
 | Route | In | Out (success) | Out (failure) |
 | --- | --- | --- | --- |
-| `POST /postgres-connections/test-and-save` | `{ workspaceId, connectionId?, name, host, port, databaseName, username, password, sslMode }`. `connectionId` present means "rotate this connection's credential," absent means "create a new one." | `{ connectionId, tables: PostgresTableRef[] }` | `{ error: { code: "auth_failed" \| "unreachable" \| "ssl_required" \| "timeout" \| "unknown", message } }` |
-| `GET /postgres-connections/:connectionId/tables` | - | `{ tables: PostgresTableRef[] }` | same error shape |
-| `GET /postgres-connections/:connectionId/preview` | `?schema=&table=` | `{ columns: DuckDbColumnSchema[], previewRows: UnknownObject[] }`, row count bounded by the existing `GlobalAppConfig.dataManagerApp.maxPreviewRows` | same error shape |
-| `GET /postgres-connections/:connectionId/rows` | `?schema=&table=` | the full (capped) relation as CSV text, read the same way `GoogleSheetsRoutes.ts` returns sheet rows today, so the wrapper transcodes it client-side exactly like Sheets does - **not** a second transcoding path | same error shape |
+| `POST /external-datasets/:connectorType/connections/test-and-save` | `{ workspaceId, connectionId?, ...connectorFields }` - for `postgres`: `{ name, host, port, databaseName, username, password, sslMode }`. `connectionId` present means "rotate this connection's credential," absent means "create a new one." | `{ connectionId, relations: ExternalDatasetRelation[] }` | `{ error: { code: "auth_failed" \| "unreachable" \| "ssl_required" \| "timeout" \| "unknown", message } }` |
+| `GET /external-datasets/:connectorType/connections/:connectionId/relations` | - | `{ relations: ExternalDatasetRelation[] }` | same error shape |
+| `GET /external-datasets/:connectorType/connections/:connectionId/relations/:relationId/preview` | - | `{ columns: DuckDbColumnSchema[], previewRows: UnknownObject[] }`, row count bounded by the existing `GlobalAppConfig.dataManagerApp.maxPreviewRows` | same error shape |
+| `GET /external-datasets/:connectorType/connections/:connectionId/relations/:relationId/rows` | - | the full relation as CSV text, capped per section 5.3's `maxRowsPerCall`/`maxBytesPerCall` - **exceeding the cap fails the request with a distinct `too_large` error rather than silently truncating rows** (a silently truncated analytics table is a correctness bug wearing a success response), read the same way `GoogleSheetsRoutes.ts` returns sheet rows today, so the wrapper transcodes it client-side exactly like Sheets does - **not** a second transcoding path | same error shape, plus `too_large` |
+
+For `postgres`, `relationId` is `` `${schemaName}.${tableName}` ``; the
+postgres connector implementation parses it back into the pair for every
+catalog re-check and `SELECT` (section 5.2 item 5 still governs how that
+pair gets quoted - encoding it into one path segment does not change what
+gets escaped or how):
 
 ```ts
-type PostgresTableRef = {
+// Internal to the postgres connector implementation only; never a
+// cross-connector type.
+type PostgresRelationRef = {
   schemaName: string;
   tableName: string;
   kind: "table" | "view";
@@ -383,10 +499,50 @@ type PostgresTableRef = {
 design means the connection row and its encrypted secret are written **as
 soon as the test succeeds**, independent of whether the user ever picks or
 saves a dataset from it (mirrors Google: the OAuth token is saved the
-moment authorization completes, before any sheet is picked). `tables` and
-`preview` never write. `rows` never writes either; it is what `acquire`
-calls, is called again by "refresh" later, and must therefore stay the one
-read path, per section 4's table.
+moment authorization completes, before any sheet is picked). `relations`
+(list) and `preview` never write. `rows` never writes either; it is what
+`acquire` calls (section 5.4a names exactly where), is called again by
+"refresh" later, and must therefore stay the one read path, per section 4's
+table.
+
+**Google Sheets does not move onto this endpoint as part of this change.**
+Its access model differs in kind, not just in route shape: a sheet is read
+with the *user's own* Google OAuth grant, fetched directly, where a Postgres
+connection is a *shared workspace secret* a server must broker on the
+caller's behalf. `external-datasets` is built connector-agnostic from day
+one specifically so a future connector - including a reworked Sheets, should
+its credential model ever change - can register into it without a second
+redesign, but only `postgres` ships an implementation now.
+
+### 5.4a How this plugs into the mediator (nothing new, by design)
+
+Asked directly: **no mediator code changes for this feature, and that is the
+point, not a gap.** `QueryMediator`/`queryRunner.ts` never learns Postgres
+exists. The one call site that matters is
+`_fetchRelationSource` in `src/clients/qetl/QueryMediator/relationLoading.ts`,
+which already calls `await wrapper.acquire(...)` for every relation kind
+today, Postgres included once row 22 (section 6) exists - that line of code
+does not change. What resolves `wrapper` to the Postgres implementation is
+`_createDatasetWrapper`'s `delegateFor` in
+`src/clients/qetl/wrappers/createDefaultRegistry.ts`: it reads the dataset's
+stored `source_type` and runs `match(dataset.sourceType).with(...).exhaustive()`
+- section 6 row 24 is the one new arm this feature adds to that match.
+Because the match is `.exhaustive()`, widening `datasets__source_type` with
+`postgres_table` (row 7) and *not* adding that arm is a **compiler error**,
+not a silent gap - this is the enforcement mechanism, not a convention
+someone has to remember.
+
+So the full call chain, start to finish: the mediator calls
+`wrapper.acquire` exactly as it always has -> the composite wrapper's
+`delegateFor` reads `dataset.sourceType === "postgres_table"` and resolves to
+`PostgresTableWrapper` (compiler-forced wiring, row 24) -> its `acquire`
+calls `GET /external-datasets/postgres/connections/:connectionId/relations/:relationId/rows`
+(section 5.4) -> the edge function returns CSV -> the wrapper transcodes
+CSV to Parquet exactly like `GoogleSheetsWrapper.acquire` does today -> the
+mediator caches the resulting bytes same as any other source. Every step in
+that chain already exists as a pattern; this spec's rows 22-26 in section 6
+are what builds the one new link (the Postgres-specific half), not a new
+kind of link.
 
 ### 5.5 Frontend-facing shared types
 
@@ -435,27 +591,27 @@ this spec adds (marked **new**).
 
 | # | File | Change |
 | --- | --- | --- |
-| 1 | `supabase/schemas/00.enum.database_connections__connection_type.sql` **(new)** | enum `'postgres'` |
-| 2 | `supabase/schemas/00.enum.database_connections__postgres_ssl_mode.sql` **(new)** | enum `'disable' \| 'require'` |
+| 1 | `supabase/schemas/00.enum.db_connections__connection_type.sql` **(new)** | enum `'postgres'` |
+| 2 | `supabase/schemas/00.enum.db_connections__postgres_ssl_mode.sql` **(new)** | enum `'disable' \| 'require'` |
 | 3 | `supabase/schemas/00.enum.datasets__postgres_table_relation_kind.sql` **(new)** | enum `'table' \| 'view'` |
-| 4 | `supabase/schemas/20.database_connections.sql` **(new)** | generic table, RLS per section 5.1 |
-| 5 | `supabase/schemas/21.database_connections__postgres.sql` **(new)** | satellite table, RLS per section 5.1; enable Vault (`db.vault` in `supabase/config.toml`, per section 5.2) |
-| 6 | `supabase/schemas/50.rpc_database_connections__test_and_save.sql` or equivalent **(new, or this may live entirely in the edge function with direct table writes via `SupabaseAdmin` - implementer's call, see note below)** | persists connection + Vault secret |
+| 4 | `supabase/schemas/20.db_connections.sql` **(new)** | generic table, RLS per section 5.1 |
+| 5 | `supabase/schemas/21.db_connections__postgres.sql` **(new)** | satellite table, RLS per section 5.1; enable Vault (`db.vault` in `supabase/config.toml`, per section 5.2) |
+| 6 | `supabase/schemas/50.rpc_db_connections__test_and_save.sql` or equivalent **(new, or this may live entirely in the edge function with direct table writes via `SupabaseAdmin` - implementer's call, see note below)** | persists connection + Vault secret |
 | 7 | `supabase/schemas/10.datasets.sql` | add `postgres_table` to `datasets__source_type` |
 | 8 | new `supabase/schemas/22.datasets__postgres_table.sql` | per-type table, RLS per section 5.1 |
 | 9 | new `supabase/schemas/70.rpc_datasets__add_postgres_table_dataset.sql` | RPC calling `rpc_datasets__add_dataset`, same shape as the Sheets RPC |
 | 10 | `supabase/migrations/` | `pnpm db:new-migration` - **read `docs/qetl-architecture.md`'s migration note and this repo's `CLAUDE.md` Supabase section first**: `ava supabase switch` before anything, `pnpm db:reset` immediately before `db:new-migration` |
 | 11 | `shared/types/database.types.ts` | `pnpm db:gen-types` |
-| 12 | `apps/desktop/migrations/<stem>.gen.sql` + `apps/desktop/sync/syncable-tables.ts` | `pnpm desktop:sqlite:gen-migrations`; decide whether `database_connections`/`database_connections__postgres` belong in `ACTIVE_TABLES` - probably **not** synced to the offline desktop SQLite copy, since the secret pointer is meaningless offline and the desktop shell cannot proxy a live Postgres connection either; `datasets__postgres_table` likely should sync so the dataset's own metadata is visible offline even though acquisition will fail there (same situation Sheets is already in offline) |
+| 12 | `apps/desktop/migrations/<stem>.gen.sql` + `apps/desktop/sync/syncable-tables.ts` | `pnpm desktop:sqlite:gen-migrations`; decide whether `db_connections`/`db_connections__postgres` belong in `ACTIVE_TABLES` - probably **not** synced to the offline desktop SQLite copy, since the secret pointer is meaningless offline and the desktop shell cannot proxy a live Postgres connection either; `datasets__postgres_table` likely should sync so the dataset's own metadata is visible offline even though acquisition will fail there (same situation Sheets is already in offline) |
 | 13 | new `shared/models/datasets/PostgresTableDataset/` | model, parsers, namespace, same files as `GoogleSheetsDataset/` |
-| 14 | new `shared/models/DatabaseConnection/` (or `shared/models/connections/DatabaseConnection/`) **(new)** | generic connection model, following the `Dataset`/`DatasetSource` split: a `DatabaseConnection` base model plus a `DatabaseConnectionSource` registry for `database_connections__postgres`, mirroring `DatasetSourceRegistry` |
+| 14 | new `shared/models/DatabaseConnection/` (or `shared/models/connections/DatabaseConnection/`) **(new)** | generic connection model, following the `Dataset`/`DatasetSource` split: a `DatabaseConnection` base model plus a `DatabaseConnectionSource` registry for `db_connections__postgres`, mirroring `DatasetSourceRegistry` |
 | 15 | `shared/models/datasets/DatasetSource/DatasetSource.types.ts` | registry entry, `ImportableDatasetSourceType` stays inclusive of it |
 | 16 | `shared/models/datasets/DatasetSource/DatasetSourceModule.ts` | exhaustive match arm |
 | 17 | `shared/models/datasets/DatasetSource/requiresOriginalFileRetention/requiresOriginalFileRetention.ts` | `postgres_table` does not retain an original file (no file was ever uploaded) |
 | 18 | new `src/clients/datasets/source-datasets/PostgresTableDatasetClient.ts` | CRUD client, same shape as `GoogleSheetsDatasetClient.ts` |
 | 19 | new `src/clients/connections/DatabaseConnectionClient.ts` **(new)** | CRUD client for the generic connection row (read/list only from the client; writes happen through the edge function, section 5.4, not through a direct insert, because only the edge function can create the Vault secret) |
 | 20 | `src/clients/datasets/SourceDatasetClient.ts`, `DatasetClient/createDatasetQueries.ts`, `createDatasetMutations.ts` | registry entry, `getSourceDataset` arm, insert mutation |
-| 21 | new `supabase/functions/postgres-connections/` | the proxy, section 5.4. Needs the Postgres driver dependency (section 5.4), the SSRF host-validation helper (section 5.2 item 4), and the identifier-quoting helper (section 5.2 item 5) - put the latter two in `supabase/functions/_shared/` since any future DB connector (MySQL, MSSQL) will need the same SSRF check and a similar identifier-quoting rule |
+| 21 | new `supabase/functions/external-datasets/`, with a `postgres` connector implementation registered into it (section 5.4) | the unified proxy and its one `postgres` implementation - **not** a Postgres-only edge function. Needs the Postgres driver dependency (section 5.4), the SSRF host-validation helper (section 5.2 item 4), and the identifier-quoting helper (section 5.2 item 5) - put the latter two in `supabase/functions/_shared/` since any future DB connector (MySQL, MSSQL) will need the same SSRF check and a similar identifier-quoting rule |
 | 22 | new `src/clients/qetl/wrappers/PostgresTableWrapper/` | `SourceWrapper`, section 5.3, plus `GoogleSheetsWrapper.test.ts`-shaped unit tests |
 | 23 | `src/clients/qetl/QueryMediator/QueryMediator.types.ts`, `getRelationSources.ts` | `RelationSource` arm, reader function |
 | 24 | `src/clients/qetl/wrappers/createDefaultRegistry.ts` | options field, delegate, `match` arm |
@@ -504,20 +660,25 @@ restatement of them.
      `require`, label). Submitting it calls `test-and-save`.
    - If the workspace has one or more saved connections: the row's action is
      a `Select` of `"<name> - <host>:<port>/<database>"` options plus a
-     trailing `"+ Add a new database"` sentinel, defaulting to the
+     trailing `"+ New database"` sentinel, defaulting to the
      most-recently-verified connection (`last_verified_at`). Picking an
-     existing one calls `GET .../tables` directly, skipping the form.
-     Picking "Add a new database" opens the same form as the
+     existing one calls `GET .../relations` directly, skipping the form.
+     Picking "New database" opens the same form as the
      zero-connections case.
    - **Copy uses the connector's own noun, never the generic word
-     "connection."** `database_connections` is the right name for the
+     "connection."** `db_connections` is the right name for the
      backend entity (section 5.1) - a connection is genuinely what
      `MySQL`/`MSSQL`/`Snowflake` connectors will all persist as, too - but a
      user never sees that word. Postgres's saved items read "database"
-     ("Use this database", "Add a new database", "2 saved databases
+     ("Use this database", "New database", "2 saved databases
      available"); the next connector picks its own noun the same way Sheets
      already does ("sheet"/"spreadsheet", never "connection" either). This
-     is the exact wording confirmed in the chosen prototype, section 7.4a.
+     is the exact wording confirmed in the chosen prototype, section 7.4a,
+     and it is now the general rule, not a one-off: write for the user's
+     mental model of what they are doing ("adding a database"), not for the
+     internal nomenclature ("creating a connection record"), per the "Copy
+     and nomenclature" section added to `AGENTS.md` and the matching
+     Do/Don't pair added to `DESIGN.md`.
    - Both paths converge on the same next state once tables come back: a
      schema-qualified, searchable table/view picker (Mantine `Select` with
      `searchable`, grouped by schema via `group` - real databases run to
@@ -644,7 +805,7 @@ the simulated app below it) steps through every state and error case:
   "States" bullet.
 
 The prototype also fixes the exact copy convention from section 7 item 2:
-the saved-item affordances read **"Use this database"** and **"Add a new
+the saved-item affordances read **"Use this database"** and **"New
 database"** (not "...connection"), and the saved-database chooser heading
 reads "Use a saved database." Treat these three strings, plus the
 per-schema/table picker copy, as the literal strings to ship, not
@@ -664,7 +825,8 @@ Following `docs/qetl-architecture.md` section 12's own table shape:
 | RLS: workspace isolation on all three new/changed tables, including the negative cases `docs/rules/sql.md` requires (outside-workspace select/insert/update/delete all denied, viewer cannot write) | new pgTAP files under `supabase/tests/database/permissions/` |
 | Vault secret is never selectable by `anon`/`authenticated` | a pgTAP test asserting `has_column_privilege` is false for those roles on `vault.decrypted_secrets`, plus a test that the edge function's own un-authenticated/under-privileged request is refused before any decrypt is attempted |
 | SSRF guard refuses loopback/private/link-local targets | unit test on the shared host-validation helper (section 6, row 21), covering at minimum `127.0.0.1`, `169.254.169.254`, `10.0.0.0/8`, a DNS name that resolves to one of those |
-| Identifier-quoting helper refuses/escapes a crafted schema or table name | unit test, including a name containing a double quote and a name containing a statement-terminating `;` |
+| **SQL injection: identifier-quoting helper refuses/escapes a crafted schema or table name** (section 5.2 item 5) | unit test covering, at minimum: a name containing a double quote (`"`), a name containing a statement-terminating `;` (`users"; drop table db_connections; --`), a name containing a line comment (`--`) or block comment (`/*`), a name that is itself a reserved keyword, and a name containing a Unicode or null-byte lookalike for a quote character |
+| **SQL injection: connection-form value fields never reach a raw query or connection string unparameterized** (host, port, `databaseName`, username, password, `name`) | unit test on `test-and-save`'s input handling, asserting each field is passed to the driver only as a bound parameter/value, never concatenated into SQL or into a shell-style connection string, using injection-shaped payloads in each field (`'; select pg_sleep(5); --`, etc.) |
 
 ---
 
@@ -684,17 +846,44 @@ itself (a compromised Postgres superuser can still call
 separate secrets service unless the app's own code is also compromised).
 That is real, worth doing, and explicitly not this change.
 
-Two Linear issues opened to track it (see the session's Linear activity for
-the created issue links):
+Six Linear issues to track, listed below. **Not yet filed as of this
+revision:** Linear access for this session is still waiting on OAuth
+authorization (the authorization link was sent separately); file all six
+once that completes, and replace this note with the created issue links.
 
 1. **Evaluate and, if justified, adopt a dedicated secrets manager for
    connector credentials.** Scope: compare the options above against
    Supabase Vault specifically for the gap Vault does not close (rotation,
    independent audit trail, blast radius if the Postgres instance itself is
-   compromised); if adopted, `database_connections__postgres.vault_secret_id`
+   compromised); if adopted, `db_connections__postgres.vault_secret_id`
    becomes an external secret reference instead of a Vault id, with a
    migration path for any secrets already created under this spec.
 2. **Connection management UI: edit, rotate, and delete a saved Postgres
    connection.** v1 only creates connections (section 2, "Out"). Rotating a
    compromised password or decommissioning a server currently requires a
    new connection row and leaves the old one orphaned.
+3. **Predicate and aggregate pushdown, starting from Postgres.** Postgres is
+   the first source type where pushdown is straightforward to implement
+   (section 2); scope this as part of designing the capability-driven
+   planner `docs/qetl-architecture.md` section 9 already names as
+   not-yet-built, not as a Postgres-only special case.
+4. **Freshness detection across non-Sheets sources, including Postgres.**
+   Same known gap named in architecture doc section 13. For Postgres
+   specifically, evaluate `pg_stat_user_tables` counters, an `xmin`-based
+   watermark, or requiring a `updated_at` column/trigger as an opt-in
+   `freshnessSignal` - but this is blocked on the same planner gap as
+   pushdown above, since a signal nothing consumes buys nothing.
+5. **Paging large Postgres tables past the configured
+   `maxRowsPerCall`/`maxBytesPerCall` ceiling**, instead of failing the
+   acquisition outright (section 2, section 5.4). Requires building the
+   mediator's `"paged"` `AcquisitionUnit` consumer for the first time
+   (`RelationCapabilities.types.ts` declares the kind; no wrapper or mediator
+   code implements it today), so scope this as a shared mediator capability,
+   not a Postgres-only fetch loop.
+6. **Retrofit `tokens__google` onto Supabase Vault.** Once this spec enables
+   Vault (section 5.2) for Postgres credentials, `tokens__google.access_token`
+   /`.refresh_token` can move off plain-text columns onto the same
+   infrastructure at comparatively low cost, closing the exact precedent gap
+   section 5.2 declines to repeat for this feature. Explicitly out of scope
+   for *this* change (different table, already in production use, its own
+   migration and rollout risk), but newly cheap to do once Vault exists.
