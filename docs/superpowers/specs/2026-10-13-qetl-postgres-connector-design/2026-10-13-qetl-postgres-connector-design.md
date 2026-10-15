@@ -42,44 +42,41 @@ specifically, a reusable "connection" entity - it proposes it as a sibling
 to the existing `datasets` / `datasets__<type>` pattern, applied one layer
 up, not as a parallel system.
 
-### 0.1 Review of `feat/incremental-gen`
+### 0.1 `feat/incremental-gen` has merged: use `JobProgressStore` directly
 
-Read as requested. That branch's current tip
-(`2026-10-12-incremental-individual-sync-design.md`) is about
-`generateIndividuals` and ontology sync (narrowing the upsert columns a
-concept's "Sync records" writes, plus a renamed action and a progress UI). It
-does not touch `datasets`, any `datasets__<type>` table, `DatasetSource`,
-`SourceWrapper`, the registry, or any file this spec changes. **No merge
-conflict and no design conflict**; the two branches are free to land in
-either order.
+`feat/incremental-gen` merged to `develop` and this branch has merged
+`develop` in - this is no longer a forward-looking contingency, it is code
+already in this branch. It did not touch `datasets`, any `datasets__<type>`
+table, `DatasetSource`, `SourceWrapper`, the registry, or any other file this
+spec changes, and the merge was conflict-free.
 
-One part of it is worth reusing once it merges, not duplicating now: section
-6 of that spec adds a generalized, multi-task progress store
-(`startTask`/`updateTask`/`finishTask`/`failTask`, built on
-`createExternalStore`, rendered as one floating panel in `AppShell.tsx`)
-specifically so more than one thing can report progress on screen at once.
+What it actually shipped, read directly from the merged code rather than
+from the design doc that proposed it: a generalized, multi-job progress
+store, **`JobProgressStore`**
+(`src/lib/utils/state/JobProgressStore/JobProgressStore.ts`, built on the
+existing `createExternalStore`), with `startJob`/`updateJob`/`finishJob`/
+`failJob` and an indeterminate/determinate/error `JobEntry` union, rendered
+by **`JobProgressPanel`**
+(`src/components/JobProgressPanel/JobProgressPanel.tsx`, one
+`JobProgressIndicator` per live job) as a floating panel already mounted in
+`src/components/AppShell/AppShell.tsx`. It already has three real callers to
+pattern-match against: `startDatasetUpload.ts` (dataset cloud sync),
+`OfflineChatEngineStore` (offline model download), and `generateIndividuals`
+(ontology record sync) - none of them Postgres-specific, confirming this is
+the shared store section 0 says it is, not a one-off for its first caller.
+
+**Do not build a second one-off loading/error-store for this connector.**
 The Postgres connector's "testing your connection and listing tables" step
 and "fetching a preview" step are exactly the kind of multi-second,
-can-fail operation that store was built for. **Do not build a second
-one-off loading/error-store for this connector.** If `feat/incremental-gen`
-has merged by the time the frontend work starts, use that store directly (the
-existing `ConnectorRow`'s own inline `Loader`/error affordances, described in
-section 7.4 below, stay as-is for the fast, in-form states; the floating
-indicator is for the connect-and-list-tables round trip specifically). If it
-has not merged yet, **copy the files directly into this branch rather than
-building a placeholder:** `src/lib/utils/state/TaskProgressStore/TaskProgressStore.ts`,
-`src/lib/utils/state/createExternalStore.ts`, and
-`src/components/TaskProgressIndicator/TaskPanel.tsx`, wired into this
-branch's own `src/components/AppShell/AppShell.tsx` the same way
-`feat/incremental-gen` wires it. `feat/incremental-gen` will merge to
-`develop` before this branch does, so the copy is temporary: once this
-branch rebases onto a `develop` that already has the real files, the copies
-collide and resolve as duplicates (trivial to delete, since they are
-byte-identical or near-identical), not as a design conflict. This is better
-than a local `isConnecting` boolean plus a TODO, because it lets the
-connecting/listing-tables states actually be built and tested against the
-real floating-indicator UI from day one, instead of against a throwaway
-stand-in that would need its own follow-up migration later.
+can-fail operation `JobProgressStore` was built for: call
+`JobProgressStore.startJob`/`updateJob`/`finishJob`/`failJob` the same way
+`startDatasetUpload.ts` does (section 7, row referencing `ConnectorRow`'s
+connect-and-list-tables flow). The existing `ConnectorRow`'s own inline
+`Loader`/error affordances, described in section 7.4 below, stay as-is for
+the fast, in-form states; the floating indicator is for the
+connect-and-list-tables round trip specifically, the same split
+`startDatasetUpload.ts` already draws between its own inline state and the
+job it registers.
 
 ---
 
@@ -715,6 +712,16 @@ restatement of them.
      list) is the proof it works, and a failure surfaces inline under the
      form with the entered values retained (never clear the form on error -
      the user should be able to fix one field, e.g. the port, and resubmit).
+   - **`JobProgressStore` wiring** (section 0.1): wrap the `test-and-save`
+     call the same way `startDatasetUpload.ts` wraps its upload -
+     `JobProgressStore.startJob(t\`Connecting to database\`)` right before the
+     call, `updateJob` if the round trip is long enough to report a detail
+     string (e.g. "Listing tables..."), `finishJob` on success, `failJob`
+     with the connector's own error copy (previous bullet) on failure. This
+     is the floating panel's job; the form's own inline `Loader`/error state
+     (previous bullets) still owns the fast, in-form feedback - both are
+     live at once, same as `startDatasetUpload.ts`'s own inline upload
+     progress alongside its `JobProgressStore` entry.
    - Connection-level failures (`auth_failed`, `unreachable`, `ssl_required`,
      `timeout`) each get distinct, specific copy, all through Lingui's `t`
      macro/`<Trans>`, not a single generic "Could not connect" string -
