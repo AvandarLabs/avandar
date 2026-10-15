@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Tooltip } from "@mantine/core";
 import {
   IconBrandGoogle,
+  IconDatabase,
   IconFileTypeCsv,
   IconFileTypePdf,
   IconFileTypeXls,
@@ -70,6 +71,14 @@ export function SourceBadge({
           return <IconFileTypePdf {...props} color="#666" />;
         },
         tooltip: t`From PDF`,
+      };
+    })
+    .with("postgres_table", () => {
+      return {
+        Icon: (props: React.ComponentProps<typeof IconDatabase>) => {
+          return <IconDatabase {...props} color="#336791" />;
+        },
+        tooltip: t`From a database`,
       };
     })
     .exhaustive(() => {
