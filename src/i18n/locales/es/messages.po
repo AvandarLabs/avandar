@@ -3902,6 +3902,11 @@ msgstr "¡Pago exitoso!"
 msgid "Answered"
 msgstr "Respondido"
 
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {0} records…"
+msgstr "Actualizando {0} registros…"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Straight"
 msgstr "Recto"
@@ -3964,10 +3969,6 @@ msgstr "El nombre del conjunto de datos debe tener menos de "
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "4258 - ETRS89"
 msgstr "4258 - ETRS89"
-
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Preparing model files…"
-msgstr "Preparando los archivos del modelo…"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Re-run query"
@@ -4659,10 +4660,6 @@ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from 
 msgstr "Razonamiento más sólido que 1.5B con una descarga moderada. Un buen "
 "salto desde el nivel de 8 GB."
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Starting…"
-msgstr "Iniciando…"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "Rango de números"
@@ -4981,7 +4978,7 @@ msgstr "Agregar un campo completado manualmente"
 msgid "Upgrade plan"
 msgstr "Actualizar plan"
 
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Do not refresh or close this tab or else the download will be canceled."
 msgstr "No actualices ni cierres esta pestaña, de lo contrario la descarga se "
 "cancelará."
@@ -5267,6 +5264,11 @@ msgstr "Compartir resumen"
 msgid "Time"
 msgstr "Hora"
 
+#. placeholder {0}: entry.label
+#: src/components/JobProgressPanel/JobProgressIndicator.tsx
+msgid "Dismiss {0}"
+msgstr "Descartar {0}"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is false"
 msgstr "es falso"
@@ -5294,6 +5296,10 @@ msgstr "Conjunto de datos agregado"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
 msgstr "Opcional"
+
+#: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
+msgid "Syncing dataset online"
+msgstr "Sincronizando el conjunto de datos en línea"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
@@ -5334,10 +5340,6 @@ msgid "Each series is a numeric column plotted on the radial value. Values are "
 "grouped by the category axis (\"{axisKeyValue}\")."
 msgstr "Cada serie es una columna numérica trazada en el valor radial. Los "
 "valores se agrupan por el eje de categoría (\"{axisKeyValue}\")."
-
-#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
-msgid "Sync records"
-msgstr "Sincronizar registros"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -5762,6 +5764,10 @@ msgstr "Vacío"
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "Todo"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline chat model"
+msgstr "Descargando el modelo de chat sin conexión"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6649,11 +6655,6 @@ msgstr "La consulta de la capa falló. Por lo general, esto significa que el "
 msgid "Your name"
 msgstr "Su nombre"
 
-#. placeholder {0}: modelCopy.displayName
-#: src/components/OfflineChatDownloadIndicator/OfflineChatDownloadIndicator.tsx
-msgid "Downloading {0} for offline chat"
-msgstr "Descargando {0} para chat offline"
-
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Disputed status column"
 msgstr "Columna de estado de disputa"
@@ -7162,6 +7163,10 @@ msgstr "El propietario siempre tiene acceso de administrador. Para cambiar de "
 msgid "Loading datasets…"
 msgstr "Cargando conjuntos de datos…"
 
+#: src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.ts
+msgid "Refreshing {conceptName} records…"
+msgstr "Actualizando los registros de {conceptName}…"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesPanel.tsx
 msgid "Loading private resources"
 msgstr "Cargando recursos privados"
@@ -7182,6 +7187,11 @@ msgstr "Radio mínimo"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Access denied"
 msgstr "Acceso denegado"
+
+#. placeholder {0}: concept.name
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions.tsx
+msgid "Refresh {0} records"
+msgstr "Actualizar {0} registros"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
 msgid "join key"
@@ -8598,10 +8608,6 @@ msgstr "Graduado"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr "Inténtalo de nuevo. Tu panel sigue publicado."
-
-#: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
-msgid "Syncing dataset online..."
-msgstr "Sincronizando el conjunto de datos en línea..."
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Add a series to choose which numeric column drives the chart."
