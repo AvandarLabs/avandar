@@ -97,7 +97,7 @@ async function _getExistingIndividualsByExternalId(
 async function _diffAndUpsertPage(options: {
   stagedRows: readonly StagedIndividualRow[];
   existingByExternalId: ReadonlyMap<string, ExistingIndividual>;
-  matchedExternalIds: Set<string>;
+  externalIdsSeenInSync: Set<string>;
   workspaceId: Workspace.Id;
   conceptId: Concept.Id;
   jobId: JobId;
@@ -108,7 +108,7 @@ async function _diffAndUpsertPage(options: {
   const {
     stagedRows,
     existingByExternalId,
-    matchedExternalIds,
+    externalIdsSeenInSync,
     workspaceId,
     conceptId,
     jobId,
@@ -131,7 +131,7 @@ async function _diffAndUpsertPage(options: {
     conceptId,
   });
   diffResult.matchedExternalIds.forEach((externalId) => {
-    matchedExternalIds.add(externalId);
+    externalIdsSeenInSync.add(externalId);
   });
   if (diffResult.rowsToWrite.length === 0) {
     return;
@@ -338,7 +338,7 @@ async function _runGenerateIndividuals(
     mappings,
   });
 
-  const matchedExternalIds = new Set<string>();
+  const externalIdsSeenInSync = new Set<string>();
 
   try {
     const jobSummary = await DuckDbClient.forEachQueryPage<StagedIndividualRow>(
@@ -348,7 +348,7 @@ async function _runGenerateIndividuals(
           await _diffAndUpsertPage({
             stagedRows: page.data,
             existingByExternalId,
-            matchedExternalIds,
+            externalIdsSeenInSync,
             workspaceId: concept.workspaceId,
             conceptId: concept.id,
             jobId,
@@ -364,7 +364,7 @@ async function _runGenerateIndividuals(
 
     const staleRows = getNewlyStaleIndividuals({
       existingByExternalId,
-      matchedExternalIds,
+      externalIdsSeenInSync,
       workspaceId: concept.workspaceId,
       conceptId: concept.id,
       nowIso: new Date().toISOString(),

@@ -117,7 +117,7 @@ describe("getNewlyStaleIndividuals", () => {
   it("flags an existing individual whose external_id was not matched this sync", () => {
     const staleRows = getNewlyStaleIndividuals({
       existingByExternalId: new Map([["ext-1", _makeExisting()]]),
-      matchedExternalIds: new Set(),
+      externalIdsSeenInSync: new Set(),
       workspaceId: WORKSPACE_ID,
       conceptId: CONCEPT_ID,
       nowIso: NOW_ISO,
@@ -142,7 +142,7 @@ describe("getNewlyStaleIndividuals", () => {
           _makeExisting({ missingFromSourceAt: "2026-10-01T00:00:00.000Z" }),
         ],
       ]),
-      matchedExternalIds: new Set(),
+      externalIdsSeenInSync: new Set(),
       workspaceId: WORKSPACE_ID,
       conceptId: CONCEPT_ID,
       nowIso: NOW_ISO,
@@ -154,7 +154,7 @@ describe("getNewlyStaleIndividuals", () => {
   it("does not flag an individual that was matched this sync", () => {
     const staleRows = getNewlyStaleIndividuals({
       existingByExternalId: new Map([["ext-1", _makeExisting()]]),
-      matchedExternalIds: new Set(["ext-1"]),
+      externalIdsSeenInSync: new Set(["ext-1"]),
       workspaceId: WORKSPACE_ID,
       conceptId: CONCEPT_ID,
       nowIso: NOW_ISO,

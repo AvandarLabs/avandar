@@ -94,17 +94,21 @@ export function diffStagedIndividualsPage(options: {
 /**
  * Builds the final-sweep rows for individuals whose `external_id` was not
  * seen in any staged page of the current sync and are not already flagged.
+ *
+ * `externalIdsSeenInSync` is the union of every page's staged `external_id`s
+ * across the whole sync run (accumulated by the caller across all calls to
+ * `diffStagedIndividualsPage`), not just the ids matched on one page.
  */
 export function getNewlyStaleIndividuals(options: {
   existingByExternalId: ReadonlyMap<string, ExistingIndividual>;
-  matchedExternalIds: ReadonlySet<string>;
+  externalIdsSeenInSync: ReadonlySet<string>;
   workspaceId: Workspace.Id;
   conceptId: Concept.Id;
   nowIso: string;
 }): IndividualUpsertRow[] {
   const {
     existingByExternalId,
-    matchedExternalIds,
+    externalIdsSeenInSync,
     workspaceId,
     conceptId,
     nowIso,
@@ -113,7 +117,7 @@ export function getNewlyStaleIndividuals(options: {
   const staleRows = [...existingByExternalId.entries()]
     .filter(([externalId, existing]) => {
       const isAlreadyFlagged = existing.missingFromSourceAt !== undefined;
-      return !matchedExternalIds.has(externalId) && !isAlreadyFlagged;
+      return !externalIdsSeenInSync.has(externalId) && !isAlreadyFlagged;
     })
     .map(([externalId, existing]) => {
       return _buildUpsertRow({
