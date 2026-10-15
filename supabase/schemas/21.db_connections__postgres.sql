@@ -54,7 +54,7 @@ select
     public.util__auth_user_meets_min_app_role (
       public.db_connections__postgres.workspace_id,
       'data_sources'::public.app_type,
-      'viewer'::public.role_level
+      'editor'::public.role_level
     )
   );
 

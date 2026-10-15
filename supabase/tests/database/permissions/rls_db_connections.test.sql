@@ -79,7 +79,43 @@ values (
 )
 on conflict (connection_id) do nothing;
 
-select plan(18);
+-- Non-owner members of workspace A (the owning workspace), at distinct
+-- `data_sources` app-role levels, to prove the SELECT policy's minimum role
+-- is actually enforced and not just satisfied by every candidate's
+-- owner-bypass (per design spec section 5.1: `'editor'`, not `'viewer'`).
+insert into auth.users (id, email, aud, role)
+values
+  ('0c010003-0000-4000-8000-000000000003'::uuid, 'dbconn_viewer_member@test.dev', 'authenticated', 'authenticated'),
+  ('0c010004-0000-4000-8000-000000000004'::uuid, 'dbconn_editor_member@test.dev', 'authenticated', 'authenticated')
+on conflict (id) do nothing;
+
+insert into public.role_groups (id, workspace_id, name, is_builtin)
+values
+  ('0c015001-0000-4000-8000-000000000001'::uuid, '0c011001-0000-4000-8000-000000000001'::uuid, 'dbconn viewer-only group', false),
+  ('0c015002-0000-4000-8000-000000000002'::uuid, '0c011001-0000-4000-8000-000000000001'::uuid, 'dbconn editor group', false)
+on conflict (id) do nothing;
+
+insert into public.role_group_app_roles (role_group_id, app, role)
+values
+  ('0c015001-0000-4000-8000-000000000001'::uuid, 'data_sources'::public.app_type, 'viewer'::public.role_level),
+  ('0c015002-0000-4000-8000-000000000002'::uuid, 'data_sources'::public.app_type, 'editor'::public.role_level)
+on conflict do nothing;
+
+insert into public.workspace_memberships (id, workspace_id, user_id, role_group_id)
+values
+  ('0c012003-0000-4000-8000-000000000003'::uuid, '0c011001-0000-4000-8000-000000000001'::uuid, '0c010003-0000-4000-8000-000000000003'::uuid, '0c015001-0000-4000-8000-000000000001'::uuid),
+  ('0c012004-0000-4000-8000-000000000004'::uuid, '0c011001-0000-4000-8000-000000000001'::uuid, '0c010004-0000-4000-8000-000000000004'::uuid, '0c015002-0000-4000-8000-000000000002'::uuid)
+on conflict (id) do nothing;
+
+insert into public.user_profiles (
+  id, user_id, workspace_id, membership_id, full_name, display_name
+)
+values
+  ('0c013003-0000-4000-8000-000000000003'::uuid, '0c010003-0000-4000-8000-000000000003'::uuid, '0c011001-0000-4000-8000-000000000001'::uuid, '0c012003-0000-4000-8000-000000000003'::uuid, 'Viewer Member', 'Viewer Member'),
+  ('0c013004-0000-4000-8000-000000000004'::uuid, '0c010004-0000-4000-8000-000000000004'::uuid, '0c011001-0000-4000-8000-000000000001'::uuid, '0c012004-0000-4000-8000-000000000004'::uuid, 'Editor Member', 'Editor Member')
+on conflict (id) do nothing;
+
+select plan(22);
 
 -- 1. A member of the owning workspace reads the db_connections row.
 select lives_ok (
@@ -423,6 +459,97 @@ select throws_ok (
   '42501',
   null,
   'anon cannot select db_connections__postgres'
+);
+
+-- 13. A viewer-level data_sources member (not the owner) cannot select
+-- db_connections - the minimum role is 'editor', per design spec section
+-- 5.1, not 'viewer'.
+select lives_ok (
+  $t13$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010003-0000-4000-8000-000000000003","role":"authenticated"}',
+    true
+  );
+  do $chk$
+  begin
+    if (
+      select count(*)::int from public.db_connections t
+      where t.id = '0c014001-0000-4000-8000-000000000001'::uuid
+    ) <> 0 then
+      raise exception 'a viewer-level member selected a db_connections row';
+    end if;
+  end $chk$;
+  $t13$,
+  'a viewer-level data_sources member cannot select db_connections (requires editor)'
+);
+
+-- 14. An editor-level data_sources member (not the owner) can select
+-- db_connections - proves the role check actually passes at the documented
+-- threshold, not just rejects below it.
+select lives_ok (
+  $t14$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010004-0000-4000-8000-000000000004","role":"authenticated"}',
+    true
+  );
+  do $chk$
+  begin
+    if (
+      select count(*)::int from public.db_connections t
+      where t.id = '0c014001-0000-4000-8000-000000000001'::uuid
+    ) <> 1 then
+      raise exception 'an editor-level member could not select a db_connections row';
+    end if;
+  end $chk$;
+  $t14$,
+  'an editor-level data_sources member can select db_connections'
+);
+
+-- 15. Same viewer-vs-editor distinction on db_connections__postgres.
+select lives_ok (
+  $t15$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010003-0000-4000-8000-000000000003","role":"authenticated"}',
+    true
+  );
+  do $chk$
+  begin
+    if (
+      select count(*)::int from public.db_connections__postgres t
+      where t.connection_id = '0c014001-0000-4000-8000-000000000001'::uuid
+    ) <> 0 then
+      raise exception 'a viewer-level member selected a db_connections__postgres row';
+    end if;
+  end $chk$;
+  $t15$,
+  'a viewer-level data_sources member cannot select db_connections__postgres (requires editor)'
+);
+
+select lives_ok (
+  $t16$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c010004-0000-4000-8000-000000000004","role":"authenticated"}',
+    true
+  );
+  do $chk$
+  begin
+    if (
+      select count(*)::int from public.db_connections__postgres t
+      where t.connection_id = '0c014001-0000-4000-8000-000000000001'::uuid
+    ) <> 1 then
+      raise exception 'an editor-level member could not select a db_connections__postgres row';
+    end if;
+  end $chk$;
+  $t16$,
+  'an editor-level data_sources member can select db_connections__postgres'
 );
 
 select * from finish ();
