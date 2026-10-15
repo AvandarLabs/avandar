@@ -2061,9 +2061,17 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_db_connections__create_vault_secret: {
+        Args: { p_description: string; p_name: string; p_secret: string }
+        Returns: string
+      }
       rpc_db_connections__get_decrypted_secret: {
         Args: { p_vault_secret_id: string }
         Returns: string
+      }
+      rpc_db_connections__update_vault_secret: {
+        Args: { p_new_secret: string; p_secret_id: string }
+        Returns: undefined
       }
       rpc_resources__make_private: {
         Args: {
