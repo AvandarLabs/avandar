@@ -6,9 +6,7 @@
       {
         "rule": "layout-transition",
         "value": "*",
-        "files": [
-          "src/components/AppShell/AppShell.module.css"
-        ],
+        "files": ["src/components/AppShell/AppShell.module.css"],
         "createdAt": "2026-10-15T14:27:01.252Z",
         "reason": "pre-existing, predates this session; width is intentionally included alongside transform/top/height per the comment above (Composer mode grows the aside inline to overlay the slate), and a prefers-reduced-motion fallback already disables the transition entirely"
       }

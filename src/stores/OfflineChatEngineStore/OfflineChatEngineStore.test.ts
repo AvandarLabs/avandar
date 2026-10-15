@@ -68,12 +68,10 @@ describe("OfflineChatEngineStore", () => {
 
   it("starts a determinate job reporting the download's progress", async () => {
     const { engine } = _makeControllableEngine();
-    createOfflineChatEngineMock.mockImplementation(
-      ({ onDownloadProgress }) => {
-        onDownloadProgress?.({ text: "", progress: 0.42 });
-        return engine;
-      },
-    );
+    createOfflineChatEngineMock.mockImplementation(({ onDownloadProgress }) => {
+      onDownloadProgress?.({ text: "", progress: 0.42 });
+      return engine;
+    });
 
     void OfflineChatEngineStore.ensureEngine("qwen-1.5b");
 

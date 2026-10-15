@@ -4,8 +4,8 @@ import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgress
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { createOfflineChatEngine } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/createOfflineChatEngine";
 import { deleteLocalChatModelCache } from "@/stores/OfflineChatEngineStore/deleteLocalChatModelCache/deleteLocalChatModelCache";
-import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import type { OfflineChatEngine } from "$/types/offlineChat.types";
+import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 
 export type OfflineChatManagerStatus =
   | { kind: "idle" }
