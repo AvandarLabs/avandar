@@ -3,6 +3,7 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Box, BoxProps, Button, Loader, Select, Stack, Text } from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
+import { splitRelationId } from "$/connectors/postgres/postgresRelationId";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
@@ -114,7 +115,7 @@ export function PostgresConnectorImportView({
   // small, ungrouped `Select` the Sheets tab picker uses.
   const relationsBySchema = makeBucketMap(load.relations ?? [], {
     keyFn: (relation) => {
-      return relation.relationId.split(".")[0] ?? "";
+      return splitRelationId(relation.relationId)?.schemaName ?? "";
     },
     valueFn: (relation) => {
       return { value: relation.relationId, label: relation.label };
