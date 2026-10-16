@@ -39,7 +39,7 @@ Layer 2 - relation     the addressable child that becomes one Avandar
 
 | Term | What it is | Examples |
 | --- | --- | --- |
-| **Drive** (layer 0) | The account or endpoint that owns many connections. Optional: a connector with no shared account layer has no drive. | A user's Google OAuth grant (`tokens__google`). A Socrata open-data portal's base URL (e.g. `data.cityofnewyork.us`). A CKAN deployment's base URL (e.g. `data.humdata.org`). Avandar's own Supabase Storage project, for the `AvandarSupabaseStorage` connector (see below) - the one connector whose drive is always the same, fixed instance. |
+| **Drive** (layer 0) | The account or endpoint that owns many connections. Optional: a connector with no shared account layer has no drive. | A user's Google OAuth grant (`tokens__google`). A Socrata open-data portal's base URL (e.g. `data.cityofnewyork.us`). A CKAN deployment's base URL (e.g. `data.humdata.org`). One specific bucket (or bucket plus path prefix) in Avandar's own Supabase Storage project, for the `AvandarSupabaseStorage` connector (see below) - the one connector whose drives are all Avandar-operated, never a third party's. |
 | **Connection** (layer 1) | The reusable, picked-once-used-many-times parent a relation lives under. Infrastructure configuration, not a per-resource shareable item: gated by app role, not by per-resource sharing. | A Postgres server + database (`db_connections` / `db_connections__postgres`). One Google Sheets file, picked from the drive's list. One Socrata or CKAN dataset, picked from the portal. One Open Data Catalog entry, for `AvandarSupabaseStorage`. |
 | **Relation** (layer 2) | The addressable child a user ultimately selects as one Avandar dataset - QETL's own word for this (`RelationRef`, `RelationCapabilities`). | A Postgres table or view. A tab within a Google Sheets file. A Socrata dataset's own rows (Socrata datasets do not subdivide further in practice, so layer 1 and layer 2 are almost always the same object for Socrata). The one Parquet object a catalog entry names. |
 
@@ -48,9 +48,19 @@ further substructure to pick from, the connection *is* the relation: a
 Socrata dataset with no internal sheets, a CKAN resource, an Open Data
 Catalog entry read through `AvandarSupabaseStorage`. There is no third, empty
 layer to represent in code or schema for these - the connection row and the
-relation are one and the same thing. (An uploaded CSV/XLSX/PDF file does
-*not* belong on this list - see "Not every dataset source type is a
-connector" below for why it has no layers at all, not even collapsed ones.)
+relation are one and the same thing.
+
+**Layer 0 can exist with nothing discoverable above it.** An uploaded
+CSV/XLSX/PDF file, once synced online (see "Not every dataset source type is
+a connector" below), is still read back through `AvandarSupabaseStorage` - it
+has a drive (the bucket it lives in) and a relation (its own Parquet object),
+with connection collapsed into relation exactly as above. What it does *not*
+have is anything a user could browse or pick a *different* relation from: the
+bucket is not a catalog, nothing is listed, and the one object there exists
+only because one specific upload created it. A drive with no metacatalog
+above it and nothing reusable to pick from is still a drive; it is just not a
+connector *in the discovery sense* the rest of this file describes. See
+"Not every dataset source type is a connector" for the precise line.
 
 **Layer 0 can be absent.** Today's Postgres connector has no drive: a
 `db_connections__postgres` row stores host, port, *and* database together, so
@@ -81,19 +91,33 @@ different layer (section 7 of the Postgres spec): write for the user's
 mental model (the account, the portal, the database they are adding), not
 for the internal implementation name.
 
-**A connector's drive does not have to be a third party.** `AvandarSupabaseStorage`
-is a connector too - the protocol client that reads a Parquet object out of
-Avandar's own Supabase Storage by path, used for `pipeline_parquet` Open Data
-Catalog entries today and for the cached copy of an `api_resource` entry once
-the write-back cache exists (see "Not every dataset source type is a
-connector" below). Its drive is always the same one Avandar-operated bucket -
-there is no second instance a user could ever point it at, unlike every other
-connector in this file, which is multi-tenant by nature (many organizations
-each run their own Postgres server, Google account, or Socrata portal). That
-asymmetry is exactly why its name keeps "Avandar" in it rather than reading
-just "Supabase Storage": every other connector name would be misleading if it
+**A connector's drive does not have to be a third party, and one connector
+can have several drives of its own.** `AvandarSupabaseStorage` is a connector
+too - the protocol client that reads (and, for uploads, writes) a Parquet
+object out of Avandar's own Supabase Storage by bucket and path. Its drives
+are buckets (or a bucket plus a path prefix acting as one), and there are
+several, each serving a different purpose:
+
+| Drive (bucket / prefix) | Serves | Existing client |
+| --- | --- | --- |
+| `workspaces` bucket, `{workspaceId}/datasets/{datasetId}.parquet` | An uploaded `csv_file`/`xlsx_file`/`pdf_file` dataset's transcoded Parquet, once synced online | `DatasetParquetStorageClient` |
+| A retained-original prefix in the same storage project | The original file bytes for a non-reconstructable source (`pdf_file`) | `DatasetOriginalFileStorageClient` |
+| The Open Data Catalog's public bucket | A `pipeline_parquet` catalog entry's Parquet object today; the `api_resource` write-back cache once it exists | `OpenDatasetParquetStorageClient` |
+| A public-snapshot bucket | A published dashboard's dataset Parquet, read by anonymous viewers | `PublicDatasetParquetStorageClient` |
+
+Every one of these is a connector-shaped read (an addressable object, fetched
+by a client, from a location Avandar itself operates) even though none of
+them reaches a third party. There is no second Avandar-operated instance of
+this connector a user could ever point it at - unlike every other connector
+in this file, which is multi-tenant by nature (many organizations each run
+their own Postgres server, Google account, or Socrata portal). That asymmetry
+is exactly why its name keeps "Avandar" in it rather than reading just
+"Supabase Storage": every other connector name would be misleading if it
 named a specific operator, but this is the one connector where the operator
-*is* part of what distinguishes it.
+*is* part of what distinguishes it. (Today these four clients are separate,
+independently-implemented modules, not one connector with four drives in
+code; unifying them is part of what this spec proposes, not something
+already built.)
 
 One connector can support many simultaneous drives for one user or
 workspace. Google Sheets supports exactly one today (one Google account
@@ -103,50 +127,74 @@ adding a second account a new row in an existing table, not a new connector.
 
 ## Not every dataset source type is a connector
 
+"Reads through a protocol client" and "is connector-shaped" turn out to be
+different questions, answered differently below.
+
 **Ownership is not the test.** `pipeline_parquet` Open Data Catalog entries
 are Avandar-owned - the bytes sit in Avandar's own Supabase Storage, written
 there by Avandar's own pipeline - and they are still connector-backed,
-through `AvandarSupabaseStorage` (above). So "is this reached through a
-connector" cannot be "is this a third party's system," or that case would
-wrongly fall on the "not a connector" side.
+through `AvandarSupabaseStorage`. So "is this reached through a connector"
+cannot be "is this a third party's system," or that case would wrongly fall
+on the "not a connector" side.
 
-**The actual test: is there a reusable, named, addressable parent - a
-connection, and optionally a drive above it - that a relation is *picked
-from*, with a protocol client doing the picking and the fetching?** This is
-true of `pipeline_parquet` (the parent is the Open Data Catalog entry itself,
-a specific addressable Parquet object, fetched by `AvandarSupabaseStorage`
-rather than invented by the asker). It is false of an uploaded file: nothing
-was picked from anything reusable - the user handed over one specific file
-directly, there was no catalog or picker backing it, and there is no
-addressable reference anywhere that the stored Parquet is a fetch *of*. The
-Parquet object an upload produces is the one and only copy there has ever
-been; a connector-backed relation's cached object, by contrast, is always a
-copy *of* something addressable elsewhere (a portal, a server, a catalog
-entry), even when the "elsewhere" is Avandar's own storage.
+**Nor is "does acquiring this relation's bytes go through a protocol
+client," on its own, the test either - verified, this turns out to be true
+of almost every source type, including uploads.** A `csv_file`/`xlsx_file`/
+`pdf_file` dataset is, by default, synced online: saving it uploads its
+Parquet to the `workspaces` bucket
+(`DatasetParquetStorageClient.startDatasetUpload`), and every later query -
+including a different team member's, on a different device, who never
+touched the upload - reads it back the same way, through
+`DatasetParquetWrapper._downloadStoredParquet` calling
+`DatasetParquetStorageClient.downloadDataset`. That is a real, addressable,
+Avandar-operated location, read through a client, exactly the shape every
+other connector-backed read has. A workspace member can reverse this: the
+`ToggleOfflineOnlyButton` in `DatasetMetaView` flips a dataset to
+`isInCloudStorage: false`, which **deletes** the cloud Parquet (and any
+retained original) outright, after which the dataset is queryable only on
+the one device still holding it in local IndexedDB (`LocalDataset`) - there
+is no connector involved at all in that state, because there is nothing left
+anywhere for one to read.
 
-Of today's `datasets.source_type` values, split where one value uses more
-than one protocol client:
+**The actual test is about discovery, not about the read path: is there a
+reusable, named, addressable parent that a relation is *picked from*, with a
+metacatalog or a picker UI in front of it?** `pipeline_parquet` passes: the
+parent is the Open Data Catalog, a browsable, shared list a user picks an
+entry out of. An uploaded file fails, in both its states: online-synced, it
+is read through the exact same `AvandarSupabaseStorage` connector as a
+catalog entry, but there was never anything to browse or pick from - the
+object exists solely because one specific upload created it, nothing else is
+listed beside it, and no second relation could ever be chosen from the same
+parent. Offline-only, there is not even a connector-shaped read left to
+speak of.
 
-| Category | Source type (access kind) | Protocol client | Layers above the dataset |
-| --- | --- | --- | --- |
-| Connector-backed | `open_data` (`pipeline_parquet`) | `AvandarSupabaseStorage` | Drive = Avandar's bucket; connection = relation = the catalog entry's Parquet object |
-| Connector-backed | `open_data` (`api_resource`) | `CkanClient` today, a future `SocrataClient`; falls through to `AvandarSupabaseStorage` on a cache hit once the write-back cache exists | Relation always (one catalog entry); connection and drive per the CKAN/Socrata table above |
-| Connector-backed | `google_sheets` | the Google Sheets client (`src/clients/google/GoogleDriveClient/`) | Relation (and connection, loosely - see the drive table above); drive = the user's Google account |
-| Connector-backed | `postgres_table` | the Postgres driver (`supabase/functions/external-datasets/connectors/postgres/`) | Relation and connection; no drive today |
-| Uploaded | `csv_file`, `xlsx_file`, `pdf_file` | none | None at all, not even collapsed. Nothing was picked from a reusable parent; the stored object is the one and only copy, never a fetch of something addressable elsewhere |
-| Derived | `virtual` | none | None. Defined by a stored SQL query over relations already resident in the workspace; no storage fetch of any kind |
+So a dataset source type can be connector-backed in the read-path sense
+without being connector-backed in the full drive/connection/relation/
+metacatalog sense this file otherwise describes. Of today's values, split
+where one value uses more than one protocol client or state:
+
+| Source type (state) | Protocol client at acquire time | Has drive/connection/relation layering with real discovery above it? |
+| --- | --- | --- |
+| `open_data` (`pipeline_parquet`) | `AvandarSupabaseStorage` | Yes - the Open Data Catalog is the discoverable parent |
+| `open_data` (`api_resource`) | `CkanClient` today, a future `SocrataClient`; falls through to `AvandarSupabaseStorage` on a cache hit once the write-back cache exists | Yes - the CKAN/Socrata portal is the discoverable parent |
+| `google_sheets` | the Google Sheets client (`src/clients/google/GoogleDriveClient/`) | Yes - the user's Google Drive is the discoverable parent |
+| `postgres_table` | the Postgres driver (`supabase/functions/external-datasets/connectors/postgres/`) | Yes - the connected server's table/view catalog is the discoverable parent |
+| `csv_file`, `xlsx_file`, `pdf_file` (`isInCloudStorage: true`, the default) | `AvandarSupabaseStorage` | No - a drive (the bucket) exists, but nothing is listed there to pick a *different* relation from; see "Layer 0 can exist with nothing discoverable above it" above |
+| `csv_file`, `xlsx_file`, `pdf_file` (`isInCloudStorage: false`, offline-only) | none | No - and no read-time connector at all; the cloud object was deleted, so only the device holding the local `LocalDataset` cache can query it |
+| `virtual` | none | No. Defined by a stored SQL query over relations already resident in the workspace; no storage fetch of any kind, in either state |
 
 This is also why `shared/connectors/` (the rename this spec proposes for
-`shared/open-data/`, see below) holds protocol clients only for genuinely
-connector-backed source types - `CkanClient`, a future `SocrataClient`, a new
-`AvandarSupabaseStorageClient` (today's anonymous `fetch(parquetUrl)` inside
-`DatasetParquetWrapper._downloadPipelineOpenDataParquet`, named and given a
-home so every `open_data` access kind dispatches to a named client, not three
-named ones and one inline fetch), and eventually a Google Sheets client if
-that connector is ever retrofitted onto this model. It is not where
-CSV/XLSX/PDF parsing or `virtual` dataset logic belongs; that code already
-lives correctly under `src/clients/datasets/source-datasets/` and has
-nothing to do with connectors at all.
+`shared/open-data/`, see below) holds protocol clients only for source types
+with real discovery above them - `CkanClient`, a future `SocrataClient`, and
+eventually a Google Sheets client if that connector is ever retrofitted onto
+this model. A unified `AvandarSupabaseStorageClient` is also proposed there
+(see the drive table above) so every `open_data` access kind, and the
+upload read/write paths, dispatch to one named client instead of four
+separately-implemented ones; that unification does not make uploads
+discoverable, it only names the client correctly. CSV/XLSX/PDF parsing and
+`virtual` dataset logic stay exactly where they already live, under
+`src/clients/datasets/source-datasets/` - connector-ness is about discovery,
+not about which runtime module happens to read Supabase Storage.
 
 ## Metacatalog: a searchable directory over a connector's own universe
 
@@ -222,17 +270,21 @@ connector's full metacatalog to get an entry into it.
 - Say "the Open Data Catalog" (capitalized) for the product surface, never
   bare "catalog."
 - Call `AvandarSupabaseStorage` a connector, same as any other. Ownership
-  does not disqualify it; "is a relation picked from a reusable, addressable
-  parent via a protocol client" does qualify it.
+  does not disqualify it.
+- Keep "reads through a protocol client" and "is connector-shaped, with real
+  discovery above it" as two separate questions. An online-synced upload is
+  true on the first and false on the second; say which one you mean.
 
 **Don't**
 
 - Don't decide whether something is a connector by asking who owns the
-  system behind it. Ask whether a relation is picked from a reusable,
-  addressable parent via a protocol client ("Not every dataset source type
-  is a connector" above). An uploaded file fails that test regardless of
-  where its Parquet ends up stored; `pipeline_parquet` passes it despite
-  being entirely Avandar-owned.
+  system behind it, or by asking whether acquiring it touches a protocol
+  client at all. Ask whether a relation is *discoverable* - picked from a
+  reusable, listed parent, not just read from an addressable one ("Not every
+  dataset source type is a connector" above). An online-synced upload reads
+  through `AvandarSupabaseStorage` exactly like a catalog entry does, and
+  still is not connector-shaped, because nothing was ever listed to pick it
+  from.
 
 - Don't name a connector's technology in user-facing copy ("Socrata",
   "CKAN"). Name the drive the user picked.
