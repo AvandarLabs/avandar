@@ -605,8 +605,9 @@ already validated), matching how `access_kind`'s own CHECKs were handled.
 Add to `supabase/tests/database/permissions/catalog_entries_open_data_access.test.sql`
 (extend the existing file; do not create a second one):
 
+Cache columns: all-null is valid on an `api_resource` row.
+
 ```sql
--- Cache columns: all-null is valid on an api_resource row
 select lives_ok(
   $$
     insert into catalog_entries__open_data
@@ -619,8 +620,11 @@ select lives_ok(
   $$,
   'An api_resource row with no cache columns set inserts'
 );
+```
 
--- Cache columns: all-set is valid
+Cache columns: all-set is valid.
+
+```sql
 select lives_ok(
   $$
     insert into catalog_entries__open_data
@@ -635,8 +639,11 @@ select lives_ok(
   $$,
   'An api_resource row with every cache column set inserts'
 );
+```
 
--- Cache columns: partially-set is rejected
+Cache columns: partially-set is rejected.
+
+```sql
 select throws_ok(
   $$
     insert into catalog_entries__open_data
@@ -653,8 +660,11 @@ select throws_ok(
   null,
   'An api_resource row with only cached_object_path set is rejected'
 );
+```
 
--- A pipeline_parquet row cannot carry cache state
+A `pipeline_parquet` row cannot carry cache state.
+
+```sql
 select throws_ok(
   $$
     insert into catalog_entries__open_data
