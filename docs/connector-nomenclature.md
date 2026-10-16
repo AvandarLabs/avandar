@@ -82,6 +82,29 @@ connected at a time - tracked as a gap, not a design ceiling: see "Open
 questions" below) but the drive/connection/relation split is what makes
 adding a second account a new row in an existing table, not a new connector.
 
+## Not every dataset source type is a connector
+
+A connector exists only where there is an external system Avandar does not
+own, reached through a protocol client (`qetl-architecture.md` section 2.1).
+Of today's `datasets.source_type` values, that is exactly three:
+`google_sheets`, `postgres_table`, and `open_data` (CKAN today, Socrata once
+it exists). The rest are not connectors, and nothing above (drive,
+connection, relation, metacatalog) applies to them:
+
+| Category | Source types | Has a protocol client? | Layers above the dataset |
+| --- | --- | --- | --- |
+| **Connector-backed** | `google_sheets`, `postgres_table`, `open_data` | Yes | Relation always; connection and drive where the technology has one (see the table above) |
+| **Uploaded** | `csv_file`, `xlsx_file`, `pdf_file` | No - the "source" is bytes the user handed over directly, already sitting in Avandar's own Storage | None. The uploaded file is simultaneously its own connection and its own relation, and there is no drive: nothing is picked *from* anything, because nothing external is ever addressed again after the upload completes |
+| **Derived** | `virtual` | No - defined by a stored SQL query over relations already resident in the workspace | None. There is no external reach at all, not even once |
+
+This is also why `shared/connectors/` (the rename this spec proposes for
+`shared/open-data/`, see below) only ever holds protocol clients for the
+first category - `CkanClient`, a future `SocrataClient`, and eventually a
+Google Sheets client if that connector is ever retrofitted onto this model.
+It is not where CSV/XLSX/PDF parsing or `virtual` dataset logic belongs; that
+code already lives correctly under `src/clients/datasets/source-datasets/`
+and has nothing to do with connectors at all.
+
 ## Metacatalog: a searchable directory over a connector's own universe
 
 A **metacatalog** is a searchable index of a connector's available drives

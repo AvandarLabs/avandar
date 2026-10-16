@@ -43,7 +43,7 @@ loading entirely; they only see tables already resident in the tab.
 | relation | Anything SQL can name that QETL can make resident: a dataset or an ontology concept |
 | `RelationRef` | `{ kind, id }` naming a relation; `kind` is `dataset` or `concept` ([RelationRef.types.ts](../shared/models/relations/RelationRef/RelationRef.types.ts)) |
 | table name | A dataset's DuckDB name is its bare UUID; a concept's is `concept_<uuid>` (`RelationRef.toTableName` and `fromTableName`) |
-| source type | `datasets.source_type`: `csv_file`, `xlsx_file`, `pdf_file`, `open_data`, `virtual`, `google_sheets`. Not part of `RelationRef` |
+| source type | `datasets.source_type`: `csv_file`, `xlsx_file`, `pdf_file`, `open_data`, `virtual`, `google_sheets`, `postgres_table`. Not part of `RelationRef` |
 | session | `WorkspaceQuerySession` or `PublicQuerySession`; builds one mediator per principal with a policy object |
 | mediator | The module built by `QueryMediatorFactory`; its only method is `runQuery`, implemented in `queryRunner.ts` |
 | principal key | `w:<workspaceId>:<userId>` or `p:<bucket>:<dashboardId>:<percent-encoded revision>`; scopes the storage tier |
@@ -63,6 +63,39 @@ loading entirely; they only see tables already resident in the tab.
 | spine | `concept_<id>__individuals`: a one-column `VARCHAR` table of a concept's `external_id` values |
 | `ava_rows_<id>` | A second view over a dataset's Parquet file that adds `file_row_number` |
 | trusted internal SQL | SQL the DuckDB client or QETL builds itself (loaders, CSV sniffing, projection, concept views), marked with the `TRUSTED_INTERNAL_SQL` symbol so `runRawQuery` accepts it when the analyzer's only objection is a source it cannot inspect (`uninspectable-source`) |
+
+### 2.1 Client, wrapper, and adapter: three words, two separate layers
+
+Every connector-backed source type (see
+[`connector-nomenclature.md`](connector-nomenclature.md) for which source
+types count as connector-backed and which do not) is built from two
+independent pieces, and they must not be confused:
+
+- **A protocol client**: a plain, QETL-ignorant module that only knows how to
+  talk to one external service - HTTP calls, auth, pagination, its own error
+  shapes. `CkanClient`, a future `SocrataClient`, and the Postgres driver
+  inside `supabase/functions/external-datasets/connectors/postgres/` are this
+  layer. None of it knows what a `RelationRef`, a `RelationCapabilities`
+  record, Parquet, or DuckDB is, and all of it is reusable outside QETL
+  entirely - a client could be unit-tested or called from a script with no
+  QETL import anywhere.
+- **A wrapper**: the `SourceWrapper` implementation that adapts a client's
+  native response into what QETL needs - `describe`, `acquire`, and
+  optionally `pushDown`/`readFreshness` - governed by the `RelationCapabilities`
+  record it declares. `PostgresTableWrapper` and `GoogleSheetsWrapper` are
+  each one connector's wrapper; `DatasetParquetWrapper` is a composite one,
+  internally dispatching to `CkanClient` today for `open_data` datasets and
+  to `SocrataClient` once that connector exists, alongside its unrelated
+  `csv_file`/`xlsx_file`/`pdf_file` branches (section 2's vocabulary table,
+  "source type").
+
+**"Wrapper" is the name to use, in code and in prose - not "adapter," even
+though both describe the same role.** The type is `SourceWrapper`, every
+implementation is named `*Wrapper` (`PostgresTableWrapper`, never
+`PostgresTableAdapter`), and section 9's design pattern table already uses
+"Adapter" to name the *Gang-of-Four pattern* a wrapper happens to implement,
+not as a second name for the thing itself. One name per concept keeps
+"adapter" from becoming a synonym nothing in the codebase answers to.
 
 ## 3. Architecture: one query from caller to DuckDB
 
