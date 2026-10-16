@@ -40,7 +40,7 @@ const ONE_TEXT_RULE: StructuredQuery.FilterGroup = {
     {
       type: "rule",
       id: "r1",
-      columnName: "Admin2",
+      columnId: "qc_Admin2" as QueryColumn.Id,
       columnDataType: "varchar",
       operator: "contains",
       value: "",
@@ -135,7 +135,7 @@ describe("QueryFiltersField", () => {
         {
           type: "rule",
           id: "r2",
-          columnName: "Admin2",
+          columnId: "qc_Admin2" as QueryColumn.Id,
           columnDataType: "varchar",
           operator: "=",
           value: "Butte",
@@ -167,7 +167,7 @@ describe("QueryFiltersField", () => {
         {
           type: "rule",
           id: "r1",
-          columnName: "daily_new_cases",
+          columnId: "qc_daily_new_cases" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: ">",
           value: 5,
@@ -214,7 +214,7 @@ describe("QueryFiltersField", () => {
         {
           type: "rule",
           id: "r1",
-          columnName: "daily_new_cases",
+          columnId: "qc_daily_new_cases" as QueryColumn.Id,
           columnDataType: "bigint",
           operator: ">",
           value: "abc",

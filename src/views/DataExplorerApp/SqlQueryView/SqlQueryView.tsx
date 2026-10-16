@@ -40,8 +40,10 @@ type Props = {
  */
 export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
   const { t } = useLingui();
-  const [{ rawSql, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
-    DataExplorerStateManager.useContext();
+  const [
+    { rawSql, query, isStructuredQueryInSync, sqlSyncWarnings },
+    dispatch,
+  ] = DataExplorerStateManager.useContext();
   const [isEditMode, setIsEditMode] = useState(false);
   const { parseSql } = useSqlToStructuredQuery();
   const displaySql = useMemo(() => {
@@ -52,7 +54,7 @@ export function SqlQueryView({ layout = "stacked" }: Props): ReactNode {
     const trimmedValue = rawValue.trim();
     dispatch.setQueryTrigger("sql_submit");
     dispatch.setRawSql(trimmedValue);
-    const mapping = parseSql(trimmedValue);
+    const mapping = parseSql(trimmedValue, query);
     dispatch.applySqlMapping({
       query: mapping.query,
       isFullyMapped: mapping.isFullyMapped,

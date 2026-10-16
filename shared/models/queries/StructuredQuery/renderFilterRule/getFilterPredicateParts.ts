@@ -1,5 +1,4 @@
 import { matchLiteral } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { AvaDataType as AvaDataTypeNs } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { FilterPredicateParts } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.types.ts";
@@ -29,13 +28,12 @@ function _getCastTargetFromDataType(
  */
 export function getFilterPredicateParts(
   options: Readonly<{
-    columnName: string;
+    columnSql: string;
     dataType: AvaDataTypeNs.T | undefined;
     foldCase: boolean;
   }>,
 ): FilterPredicateParts {
-  const { columnName, dataType, foldCase } = options;
-  const column = quoteSqlIdentifier(columnName);
+  const { columnSql: column, dataType, foldCase } = options;
   return {
     column,
     leftSide: foldCase ? `lower(${column})` : column,

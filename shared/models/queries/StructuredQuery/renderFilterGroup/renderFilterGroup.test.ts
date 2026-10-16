@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { renderFilterGroup } from "$/models/queries/StructuredQuery/renderFilterGroup/renderFilterGroup.ts";
+import { renderFilterGroup as renderGroup } from "$/models/queries/StructuredQuery/renderFilterGroup/renderFilterGroup.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 const TEXT_RULE = {
   type: "rule",
-  columnName: "Admin2",
+  columnId: "Admin2" as QueryColumn.Id,
   columnDataType: "varchar",
   operator: "=",
   value: "Alameda",
@@ -13,7 +14,7 @@ const TEXT_RULE = {
 
 const NUMERIC_RULE = {
   type: "rule",
-  columnName: "cases",
+  columnId: "cases" as QueryColumn.Id,
   columnDataType: "bigint",
   operator: ">",
   value: 100,
@@ -91,3 +92,14 @@ describe("renderFilterGroup", () => {
     ).toBe('"Admin2" = ?');
   });
 });
+
+function renderFilterGroup(group: QueryFilterGroup) {
+  return renderGroup(group, {
+    getColumn: (columnId) => {
+      return {
+        sql: `"${columnId}"`,
+        dataType: columnId === "cases" ? "bigint" : "varchar",
+      };
+    },
+  });
+}

@@ -43,8 +43,14 @@ export function renderFilterRule(
     return undefined;
   }
 
+  const column = options.getColumn?.(rule.columnId);
+  if (!column) {
+    return undefined;
+  }
   const dataType =
-    options.columnTypes?.[rule.columnName] ?? rule.columnDataType;
+    options.columnTypes?.[rule.columnId] ??
+    column.dataType ??
+    rule.columnDataType;
 
   // A rule that cannot be applied is left out of the SQL entirely rather than
   // handed to DuckDB, which would reject the whole query with a conversion
@@ -62,7 +68,7 @@ export function renderFilterRule(
   // column whose type is unknown is treated as text, matching the SQL layer.
   const isTextColumn = dataType === undefined || AvaDataType.isText(dataType);
   const parts = getFilterPredicateParts({
-    columnName: rule.columnName,
+    columnSql: column.sql,
     dataType,
     foldCase: spec.supportsMatchCase && isTextColumn && rule.matchCase !== true,
   });

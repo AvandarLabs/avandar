@@ -157,6 +157,7 @@ function _makeConceptAttributeColumn(args: {
 function _makeQuery(args: {
   dataSource: QueryDataSource;
   columns: readonly QueryColumnRead[];
+  sourceColumns?: readonly QueryColumnRead[];
   filters?: QueryFilterGroup;
   having?: QueryFilterGroup;
   joins?: readonly QueryJoin[];
@@ -176,6 +177,7 @@ function _makeQuery(args: {
     version: 1 as const,
     dataSource: args.dataSource,
     queryColumns: args.columns,
+    sourceColumns: args.sourceColumns ?? args.columns,
     orderByColumn: args.orderByColumn,
     orderByDirection: args.orderByDirection,
     aggregations,
@@ -220,6 +222,21 @@ async function _runQuery(sql: string): Promise<Array<Record<string, unknown>>> {
   });
 }
 
+function _getParserDatasets() {
+  return [
+    {
+      dataset: _makeDataset("cases"),
+      columns: [
+        _makeColumn({ id: "district", name: "district" }),
+        _makeColumn({ id: "cnt", name: "cnt", dataType: "bigint" }),
+        _makeColumn({ id: "status", name: "status" }),
+      ].map((column) => {
+        return column.baseColumn as DatasetColumn.T;
+      }),
+    },
+  ];
+}
+
 describe("structuredQueryToSql executed", () => {
   it("returns the same groups after a SQL/form round trip with an aggregate alias in HAVING", async () => {
     const originalSql = `
@@ -252,7 +269,100 @@ describe("structuredQueryToSql executed", () => {
     ).resolves.toEqual(expectedRows);
   });
 
+  it.each([
+    {
+      sql: "SELECT district FROM cases WHERE cnt >= 5;",
+      rows: [{ district: "North" }],
+    },
+    {
+      sql: "SELECT district AS area FROM cases WHERE cnt >= 5 ORDER BY district;",
+      rows: [{ area: "North" }],
+    },
+    {
+      sql: "SELECT district, SUM(cnt) AS total, MAX(cnt) AS peak FROM cases WHERE cnt >= 2 GROUP BY district HAVING total > 5 AND peak >= 5;",
+      rows: [{ district: "North", total: 7, peak: 5 }],
+    },
+    {
+      sql: "SELECT district, COUNT(status) AS total FROM cases GROUP BY district HAVING total > 1;",
+      rows: [{ district: "North", total: 2 }],
+    },
+  ])(
+    "preserves rows and output names through SQL/form mapping: $sql",
+    async ({ sql, rows }) => {
+      const mapped = sqlToStructuredQuery({
+        sql,
+        datasets: _getParserDatasets(),
+      });
+      expect(mapped.isFullyMapped).toBe(true);
+      await expect(_runQuery(sql)).resolves.toEqual(rows);
+      await expect(
+        _runQuery(structuredQueryToSql(mapped.query)),
+      ).resolves.toEqual(rows);
+    },
+  );
+
+  it("retains WHERE input and independent HAVING projections after alias and source renames", async () => {
+    const sql =
+      "SELECT district, SUM(cnt) AS total, MAX(cnt) AS peak FROM cases WHERE cnt >= 2 GROUP BY district HAVING total > 5 AND peak >= 5;";
+    const mapped = sqlToStructuredQuery({
+      sql,
+      datasets: _getParserDatasets(),
+    });
+    const total = mapped.query.queryColumns.find((column) => {
+      return column.outputAlias === "total";
+    });
+    expect(total).toBeDefined();
+    const aliased = {
+      ...mapped.query,
+      queryColumns: mapped.query.queryColumns.map((column) => {
+        return column.id === total?.id
+          ? { ...column, outputAlias: "amount" }
+          : column;
+      }),
+    };
+    await expect(_runQuery(structuredQueryToSql(aliased))).resolves.toEqual([
+      { district: "North", amount: 7, peak: 5 },
+    ]);
+    const reparsed = sqlToStructuredQuery({
+      sql: sql.replaceAll("total", "amount"),
+      datasets: _getParserDatasets(),
+      previousQuery: mapped.query,
+      sourceColumns: mapped.query.sourceColumns,
+    });
+    expect(
+      reparsed.query.queryColumns.find((column) => {
+        return column.outputAlias === "amount";
+      })?.id,
+    ).toBe(total?.id);
+    const rename = (column: QueryColumnRead): QueryColumnRead => {
+      return column.baseColumn.name === "cnt"
+        ? {
+            ...column,
+            baseColumn: { ...column.baseColumn, name: "count_value" },
+          }
+        : column;
+    };
+    const renamed = {
+      ...aliased,
+      sourceColumns: aliased.sourceColumns?.map(rename),
+      queryColumns: aliased.queryColumns.map(rename),
+    };
+    await withDuckDb(async (connection) => {
+      await connection.run(_FIXTURE_SQL);
+      await connection.run(
+        "ALTER TABLE cases RENAME COLUMN cnt TO count_value",
+      );
+      const result = await connection.runAndReadAll(
+        structuredQueryToSql(renamed),
+      );
+      expect(result.getRowObjects().map(_normalizeRow)).toEqual([
+        { district: "North", amount: 7, peak: 5 },
+      ]);
+    });
+  });
+
   it("filters and groups to the right rows", async () => {
+    const status = _makeColumn({ id: "qc_status", name: "status" });
     const district = _makeColumn({ id: "qc_1_district", name: "district" });
     const total = _makeColumn({
       id: "qc_2_cnt",
@@ -265,13 +375,14 @@ describe("structuredQueryToSql executed", () => {
       _makeQuery({
         dataSource: _makeDataset("cases"),
         columns: [district, total],
+        sourceColumns: [district, total, status],
         filters: {
           type: "group",
           combinator: "AND",
           rules: [
             {
               type: "rule",
-              columnName: "status",
+              columnId: status.id,
               operator: "=",
               value: "confirmed",
             },
@@ -375,7 +486,7 @@ describe("structuredQueryToSql executed", () => {
               type: "rule",
               // The HAVING tree names the *derived* column, which is the
               // alias `structuredQueryToSql` emits for a sum.
-              columnName: "sum(cnt)",
+              columnId: total.id,
               operator: ">",
               value: 3,
             },
@@ -589,7 +700,7 @@ describe("structuredQueryToSql executed", () => {
           rules: [
             {
               type: "rule",
-              columnName: "headcount",
+              columnId: headcount.id,
               operator: ">",
               value: 1,
             },

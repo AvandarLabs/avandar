@@ -78,6 +78,7 @@ function _query(rule: QueryFilterRule): PartialStructuredQuery {
     version: 1 as const,
     dataSource: DATASETS[0]!.dataset,
     queryColumns,
+    sourceColumns: queryColumns,
     orderByColumn: undefined,
     orderByDirection: undefined,
     aggregations: Object.fromEntries(
@@ -100,182 +101,182 @@ function _query(rule: QueryFilterRule): PartialStructuredQuery {
 const RULES: Readonly<Record<QueryFilterOperator, QueryFilterRule>> = {
   "=": {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "=",
     value: "a",
   },
   "!=": {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "!=",
     value: "a",
   },
   ">": {
     type: "rule",
-    columnName: "total",
+    columnId: "qc_total" as QueryColumn.Id,
     columnDataType: "bigint",
     operator: ">",
     value: 1,
   },
   ">=": {
     type: "rule",
-    columnName: "total",
+    columnId: "qc_total" as QueryColumn.Id,
     columnDataType: "bigint",
     operator: ">=",
     value: 1,
   },
   "<": {
     type: "rule",
-    columnName: "total",
+    columnId: "qc_total" as QueryColumn.Id,
     columnDataType: "bigint",
     operator: "<",
     value: 1,
   },
   "<=": {
     type: "rule",
-    columnName: "total",
+    columnId: "qc_total" as QueryColumn.Id,
     columnDataType: "bigint",
     operator: "<=",
     value: 1,
   },
   contains: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "contains",
     value: "a",
   },
   not_contains: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "not_contains",
     value: "a",
   },
   starts_with: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "starts_with",
     value: "a",
   },
   not_starts_with: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "not_starts_with",
     value: "a",
   },
   ends_with: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "ends_with",
     value: "a",
   },
   not_ends_with: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "not_ends_with",
     value: "a",
   },
   in: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "in",
     value: ["a", "b"],
   },
   not_in: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "not_in",
     value: ["a", "b"],
   },
   between: {
     type: "rule",
-    columnName: "total",
+    columnId: "qc_total" as QueryColumn.Id,
     columnDataType: "bigint",
     operator: "between",
     value: [1, 2],
   },
   not_between: {
     type: "rule",
-    columnName: "total",
+    columnId: "qc_total" as QueryColumn.Id,
     columnDataType: "bigint",
     operator: "not_between",
     value: [1, 2],
   },
   is_null: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "is_null",
     value: null,
   },
   is_not_null: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "is_not_null",
     value: null,
   },
   is_blank: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "is_blank",
     value: null,
   },
   is_not_blank: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "is_not_blank",
     value: null,
   },
   is_true: {
     type: "rule",
-    columnName: "is_active",
+    columnId: "qc_is_active" as QueryColumn.Id,
     columnDataType: "boolean",
     operator: "is_true",
     value: null,
   },
   is_false: {
     type: "rule",
-    columnName: "is_active",
+    columnId: "qc_is_active" as QueryColumn.Id,
     columnDataType: "boolean",
     operator: "is_false",
     value: null,
   },
   matches_regex: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "matches_regex",
     value: "^a",
   },
   not_matches_regex: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "not_matches_regex",
     value: "^a",
   },
   like: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "like",
     value: "a%",
   },
   not_like: {
     type: "rule",
-    columnName: "label",
+    columnId: "qc_label" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "not_like",
     value: "a%",
@@ -287,7 +288,11 @@ describe("filter round trip", () => {
     it(`round-trips ${spec.operator}`, () => {
       const rule = RULES[spec.operator];
       const sql = structuredQueryToSql(_query(rule));
-      const result = sqlToStructuredQuery({ sql, datasets: DATASETS });
+      const result = sqlToStructuredQuery({
+        sql,
+        datasets: DATASETS,
+        previousQuery: _query(rule),
+      });
 
       expect(
         result.unmappedReasons.filter((reason) => {
@@ -305,7 +310,7 @@ describe("filter round trip", () => {
         return;
       }
       expect(parsed.operator).toBe(rule.operator);
-      expect(parsed.columnName).toBe(rule.columnName);
+      expect(parsed.columnId).toBe(rule.columnId);
       expect(parsed.matchCase ?? false).toBe(rule.matchCase ?? false);
       expect(parsed.value).toEqual(rule.value);
     });
@@ -314,14 +319,18 @@ describe("filter round trip", () => {
   it("round-trips a case-sensitive text rule as matchCase true", () => {
     const rule: QueryFilterRule = {
       type: "rule",
-      columnName: "label",
+      columnId: "qc_label" as QueryColumn.Id,
       columnDataType: "varchar",
       operator: "contains",
       value: "a",
       matchCase: true,
     };
     const sql = structuredQueryToSql(_query(rule));
-    const result = sqlToStructuredQuery({ sql, datasets: DATASETS });
+    const result = sqlToStructuredQuery({
+      sql,
+      datasets: DATASETS,
+      previousQuery: _query(rule),
+    });
     const parsed = result.query.filters.rules[0];
     expect(parsed?.type === "rule" && parsed.matchCase).toBe(true);
   });
@@ -344,7 +353,11 @@ describe("filter round trip", () => {
       },
     } as PartialStructuredQuery;
     const sql = structuredQueryToSql(nested);
-    const result = sqlToStructuredQuery({ sql, datasets: DATASETS });
+    const result = sqlToStructuredQuery({
+      sql,
+      datasets: DATASETS,
+      previousQuery: nested,
+    });
     expect(result.query.filters).toEqual(nested.filters);
   });
 });

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { renderFilterRule } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryFilterRule } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { RenderFilterRuleOptions } from "$/models/queries/StructuredQuery/renderFilterRule/renderFilterRule.ts";
 
@@ -9,13 +10,21 @@ function _render(
 ) {
   const rule: QueryFilterRule = {
     type: "rule",
-    columnName: "Admin2",
+    columnId: "Admin2" as QueryColumn.Id,
     columnDataType: "varchar",
     operator: "=",
     value: "Alameda",
     ...overrides,
   };
-  return renderFilterRule(rule, options);
+  return renderFilterRule(rule, {
+    getColumn: (columnId) => {
+      return {
+        sql: `"${columnId}"`,
+        dataType: rule.columnDataType ?? "varchar",
+      };
+    },
+    ...options,
+  });
 }
 
 describe("renderFilterRule, text comparison", () => {
@@ -74,7 +83,7 @@ describe("renderFilterRule, numeric and temporal literals", () => {
   it("binds numeric values as numbers", () => {
     expect(
       _render({
-        columnName: "daily_new_cases",
+        columnId: "daily_new_cases" as QueryColumn.Id,
         columnDataType: "bigint",
         operator: ">",
         value: "1000",
@@ -85,7 +94,7 @@ describe("renderFilterRule, numeric and temporal literals", () => {
   it("casts temporal values", () => {
     expect(
       _render({
-        columnName: "date",
+        columnId: "date" as QueryColumn.Id,
         columnDataType: "date",
         operator: ">",
         value: "2020-01-01",
@@ -99,7 +108,7 @@ describe("renderFilterRule, numeric and temporal literals", () => {
   it("casts timestamps as TIMESTAMP", () => {
     expect(
       _render({
-        columnName: "seen_at",
+        columnId: "seen_at" as QueryColumn.Id,
         columnDataType: "timestamp",
         operator: "<=",
         value: "2020-01-01 10:00:00",
@@ -111,12 +120,12 @@ describe("renderFilterRule, numeric and temporal literals", () => {
     expect(
       _render(
         {
-          columnName: "cases",
+          columnId: "cases" as QueryColumn.Id,
           columnDataType: "varchar",
           operator: ">",
           value: "5",
         },
-        { columnTypes: { cases: "bigint" } },
+        { columnTypes: { ["cases" as QueryColumn.Id]: "bigint" } },
       ),
     ).toEqual({ sql: '"cases" > ?', bindings: [5] });
   });
@@ -144,7 +153,7 @@ describe("renderFilterRule, list and range operators", () => {
 
   it("renders BETWEEN and NOT BETWEEN with numeric bindings", () => {
     const numeric = {
-      columnName: "daily_new_cases",
+      columnId: "daily_new_cases" as QueryColumn.Id,
       columnDataType: "bigint",
     } as const;
     expect(
@@ -182,7 +191,7 @@ describe("renderFilterRule, valueless operators", () => {
   it("renders boolean checks", () => {
     expect(
       _render({
-        columnName: "is_active",
+        columnId: "is_active" as QueryColumn.Id,
         columnDataType: "boolean",
         operator: "is_true",
         value: null,
@@ -190,7 +199,7 @@ describe("renderFilterRule, valueless operators", () => {
     ).toBe('"is_active" IS TRUE');
     expect(
       _render({
-        columnName: "is_active",
+        columnId: "is_active" as QueryColumn.Id,
         columnDataType: "boolean",
         operator: "is_false",
         value: null,
@@ -233,7 +242,7 @@ describe("renderFilterRule, exclusions", () => {
     // would fail with a conversion error the user did not ask for.
     expect(
       _render({
-        columnName: "daily_new_cases",
+        columnId: "daily_new_cases" as QueryColumn.Id,
         columnDataType: "bigint",
         operator: "=",
         value: "abc",
@@ -242,7 +251,7 @@ describe("renderFilterRule, exclusions", () => {
     expect(_render({ operator: "matches_regex", value: "a(" })).toBeUndefined();
     expect(
       _render({
-        columnName: "daily_new_cases",
+        columnId: "daily_new_cases" as QueryColumn.Id,
         columnDataType: "bigint",
         operator: "between",
         value: [200, 100],
@@ -255,15 +264,20 @@ describe("renderFilterRule, exclusions", () => {
     // was authored against a text column.
     expect(
       _render(
-        { columnName: "cases", columnDataType: "varchar", value: "abc" },
-        { columnTypes: { cases: "bigint" } },
+        {
+          columnId: "cases" as QueryColumn.Id,
+          columnDataType: "varchar",
+          value: "abc",
+        },
+        { columnTypes: { ["cases" as QueryColumn.Id]: "bigint" } },
       ),
     ).toBeUndefined();
   });
 
   it("quotes identifiers that contain punctuation", () => {
-    expect(_render({ columnName: "Country/Region", value: "Chad" })?.sql).toBe(
-      'lower("Country/Region") = lower(?)',
-    );
+    expect(
+      _render({ columnId: "Country/Region" as QueryColumn.Id, value: "Chad" })
+        ?.sql,
+    ).toBe('lower("Country/Region") = lower(?)');
   });
 });

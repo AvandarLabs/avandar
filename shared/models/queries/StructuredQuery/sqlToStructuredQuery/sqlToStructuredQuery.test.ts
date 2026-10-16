@@ -89,7 +89,11 @@ describe("sqlToStructuredQuery", () => {
     const rule = result.query.filters.rules[0];
     expect(rule?.type).toBe("rule");
     if (rule && rule.type === "rule") {
-      expect(rule.columnName).toBe("age");
+      expect(
+        result.query.sourceColumns?.find((column) => {
+          return column.id === rule.columnId;
+        })?.baseColumn.name,
+      ).toBe("age");
       expect(rule.operator).toBe(">");
       expect(rule.value).toBe(30);
     }
@@ -199,7 +203,16 @@ describe("sqlToStructuredQuery", () => {
     const rule = result.query.having.rules[0];
     expect(rule?.type).toBe("rule");
     if (rule && rule.type === "rule") {
-      expect(rule.columnName).toBe("count(age)");
+      expect(
+        result.query.queryColumns.find((column) => {
+          return column.id === rule.columnId;
+        })?.aggregation,
+      ).toBe("count");
+      expect(
+        result.query.queryColumns.find((column) => {
+          return column.id === rule.columnId;
+        })?.baseColumn.name,
+      ).toBe("age");
       expect(rule.operator).toBe(">");
       expect(rule.value).toBe(1);
     }

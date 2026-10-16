@@ -8,6 +8,7 @@ import { useGisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 import { useGisAppLayerSelection } from "@/views/GisApp/useGisApp/useGisAppLayerSelection";
 import { useGisAppMapCallbacks } from "@/views/GisApp/useGisApp/useGisAppMapCallbacks";
 import { useGisAppRendering } from "@/views/GisApp/useGisApp/useGisAppRendering";
+import { useHydratedMapSources } from "./MapSourceHydration/useHydratedMapSources";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -176,7 +177,8 @@ export function useGisAppState(avaMap: AvaMap.T): ReturnType<
       SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
     >;
   } {
-  const editor = useAvaMapEditor(avaMap);
+  const draftEditor = useAvaMapEditor(avaMap);
+  const editor = useHydratedMapSources(draftEditor, avaMap.workspaceId);
   const selection = useGisAppLayerSelection(editor.mapConfig);
   const featureInspector = useFeatureInspector();
   const chrome = useGisAppChrome();

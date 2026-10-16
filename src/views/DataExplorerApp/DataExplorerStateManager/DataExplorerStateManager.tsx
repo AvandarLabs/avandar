@@ -145,8 +145,9 @@ export const DataExplorerStateManager = createAppStateManager({
       }
       const columns = QueryColumnReconciliation.reconcileSourceColumns({
         sourceKey,
-        previousSourceKey: state.sourceCatalog?.sourceKey,
-        previous: state.sourceCatalog?.columns ?? [],
+        previousSourceKey: state.sourceCatalog?.sourceKey ?? sourceKey,
+        previous:
+          state.query.sourceColumns ?? state.sourceCatalog?.columns ?? [],
         incoming: catalog.columns,
       });
       const query = _getQueryFromSourceColumns({ query: state.query, columns });
@@ -284,6 +285,15 @@ export const DataExplorerStateManager = createAppStateManager({
       return {
         ...state,
         query: payload.query,
+        sourceCatalog: payload.query.sourceColumns
+          ? {
+              sourceKey: payload.query.dataSource
+                ? Model.getTypedId(payload.query.dataSource)
+                : undefined,
+              status: "ready",
+              columns: payload.query.sourceColumns,
+            }
+          : state.sourceCatalog,
         isStructuredQueryInSync: payload.isFullyMapped,
         sqlSyncWarnings: payload.unmappedReasons,
       };

@@ -18,16 +18,22 @@ export function FilterFieldSelector({
 }: Props): ReactNode {
   const { t } = useLingui();
   const selected = String(value ?? "");
+  const data = options.map((option) => {
+    const name = getOptionNameFromUnknown(option);
+    const label = "label" in option ? String(option.label) : name;
+    return { value: name, label };
+  });
+  const label =
+    data.find((option) => {
+      return option.value === selected;
+    })?.label ?? "";
   return (
-    <Tooltip label={selected} disabled={selected === ""} withinPortal>
+    <Tooltip label={label} disabled={selected === ""} withinPortal>
       <Select
         size="sm"
         aria-label={t`Column`}
         placeholder={t`Column`}
-        data={options.map((option) => {
-          const name = getOptionNameFromUnknown(option);
-          return { value: name, label: name };
-        })}
+        data={data}
         value={selected === "" ? null : selected}
         onChange={(nextColumnName) => {
           handleOnChange(nextColumnName ?? "");

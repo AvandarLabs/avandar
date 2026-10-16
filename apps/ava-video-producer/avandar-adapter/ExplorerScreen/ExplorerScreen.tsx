@@ -44,6 +44,7 @@ import {
   emptyFilter,
   explorerStage,
 } from "./explorerStage";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ExplorerMode } from "./explorerStage";
 import type { EditorView } from "@codemirror/view";
@@ -75,7 +76,9 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
               {
                 type: "rule",
                 id: "demo-district-filter",
-                columnName: stage.filterColumn,
+                columnId: (EXPLORER_COLUMNS.find(
+                  (column) => column.baseColumn.name === stage.filterColumn,
+                )?.id ?? "") as QueryColumn.Id,
                 columnDataType: "varchar",
                 operator: "=",
                 value: stage.filterText,

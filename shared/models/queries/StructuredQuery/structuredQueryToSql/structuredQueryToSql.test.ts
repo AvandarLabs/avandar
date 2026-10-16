@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
   QueryColumnId,
   QueryColumnRead,
@@ -44,6 +45,7 @@ function _makeQuery(
     version: 1 as const,
     dataSource: _makeDataset(),
     queryColumns: [nameColumn, ageColumn],
+    sourceColumns: [nameColumn, ageColumn],
     orderByColumn: undefined,
     orderByDirection: undefined,
     aggregations: {
@@ -76,7 +78,7 @@ describe("structuredQueryToSql", () => {
         rules: [
           {
             type: "rule",
-            columnName: "age",
+            columnId: "qc_age" as QueryColumn.Id,
             operator: ">",
             value: 30,
           },
@@ -98,13 +100,13 @@ describe("structuredQueryToSql", () => {
             rules: [
               {
                 type: "rule",
-                columnName: "age",
+                columnId: "qc_age" as QueryColumn.Id,
                 operator: ">",
                 value: 30,
               },
               {
                 type: "rule",
-                columnName: "name",
+                columnId: "qc_name" as QueryColumn.Id,
                 operator: "=",
                 value: "alice",
               },
@@ -112,7 +114,7 @@ describe("structuredQueryToSql", () => {
           },
           {
             type: "rule",
-            columnName: "name",
+            columnId: "qc_name" as QueryColumn.Id,
             operator: "=",
             value: "admin",
           },
@@ -132,7 +134,7 @@ describe("structuredQueryToSql", () => {
         rules: [
           {
             type: "rule",
-            columnName: "name",
+            columnId: "qc_name" as QueryColumn.Id,
             operator: "in",
             value: ["alice", "bob"],
           },
@@ -150,7 +152,7 @@ describe("structuredQueryToSql", () => {
         rules: [
           {
             type: "rule",
-            columnName: "name",
+            columnId: "qc_name" as QueryColumn.Id,
             operator: "in",
             value: ["alice", "bob"],
             matchCase: true,
@@ -170,7 +172,7 @@ describe("structuredQueryToSql", () => {
         rules: [
           {
             type: "rule",
-            columnName: "age",
+            columnId: "qc_age" as QueryColumn.Id,
             operator: ">",
             value: "30",
           },
@@ -189,13 +191,13 @@ describe("structuredQueryToSql", () => {
         rules: [
           {
             type: "rule",
-            columnName: "name",
+            columnId: "qc_name" as QueryColumn.Id,
             operator: "=",
             value: "5",
           },
         ],
       }),
-      { columnTypes: { name: "bigint" } },
+      { columnTypes: { ["qc_name" as QueryColumn.Id]: "bigint" } },
     );
     expect(sql).toContain('"name" = 5');
   });
@@ -208,7 +210,7 @@ describe("structuredQueryToSql", () => {
         rules: [
           {
             type: "rule",
-            columnName: "age",
+            columnId: "qc_age" as QueryColumn.Id,
             operator: "is_null",
             value: null,
           },
@@ -220,12 +222,16 @@ describe("structuredQueryToSql", () => {
 
   it("emits a HAVING clause when set", () => {
     const nameColumn = _makeColumn("name");
-    const ageColumn = _makeColumn("age", "integer");
+    const ageColumn = {
+      ..._makeColumn("age", "bigint"),
+      outputAlias: "count_age",
+    };
     const query = Model.make("StructuredQuery", {
       id: "q1" as StructuredQueryId,
       version: 1 as const,
       dataSource: _makeDataset(),
       queryColumns: [nameColumn, ageColumn],
+      sourceColumns: [nameColumn, ageColumn],
       orderByColumn: undefined,
       orderByDirection: undefined,
       aggregations: {
@@ -239,7 +245,7 @@ describe("structuredQueryToSql", () => {
         rules: [
           {
             type: "rule",
-            columnName: "count_age",
+            columnId: ageColumn.id,
             operator: ">",
             value: 5,
           },

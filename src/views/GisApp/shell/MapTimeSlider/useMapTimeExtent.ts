@@ -17,7 +17,11 @@ function _participatingTimeLayers(
   layers: readonly MapLayer.T[],
 ): TimeExtentLayer[] {
   return layers.flatMap((layer) => {
-    if (!layer.timeColumn) {
+    if (
+      !layer.timeColumn ||
+      (layer.source.filters.rules.length > 0 &&
+        layer.source.sourceColumns === undefined)
+    ) {
       return [];
     }
     const column = layer.source.queryColumns.find((item) => {

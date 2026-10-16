@@ -242,6 +242,8 @@ export function useDataExplorerUrlSync({ urlSearch, navigate }: Options): void {
           dispatch.setRawSql(urlState.rawSql);
           const mapping = sqlToStructuredQuery({
             sql: urlState.rawSql,
+            previousQuery: state.query,
+            sourceColumns: state.query.sourceColumns,
             datasets: buildSqlMappingDatasets(
               datasets ?? [],
               allDatasetColumns ?? [],

@@ -1,5 +1,5 @@
 import { makeObject, prop } from "@avandar/utils";
-import { useCallback, useMemo } from "react";
+import { useCallback, useState } from "react";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -34,16 +34,37 @@ export function useDashboardManualQueryState(
 ): DashboardManualQueryState {
   const { rawSql, onRawSqlChange } = options;
   const { parseSql, isReady } = useSqlToStructuredQuery();
-  const sqlMapping = useMemo(() => {
-    if (!isReady || rawSql.trim() === "") {
-      return {
-        query: StructuredQuery.makeEmpty(),
-        isFullyMapped: true,
-        unmappedReasons: [] as readonly SqlFailedMappingReason[],
-      };
-    }
-    return parseSql(rawSql);
-  }, [isReady, parseSql, rawSql]);
+  const [previous, setPrevious] = useState(() => {
+    return {
+      rawSql,
+      isReady,
+      parseSql,
+      mapping:
+        isReady && rawSql.trim() !== ""
+          ? parseSql(rawSql)
+          : {
+              query: StructuredQuery.makeEmpty(),
+              isFullyMapped: true,
+              unmappedReasons: [] as readonly SqlFailedMappingReason[],
+            },
+    };
+  });
+  let sqlMapping = previous.mapping;
+  if (
+    previous.rawSql !== rawSql ||
+    previous.isReady !== isReady ||
+    previous.parseSql !== parseSql
+  ) {
+    sqlMapping =
+      isReady && rawSql.trim() !== ""
+        ? parseSql(rawSql, previous.mapping.query)
+        : {
+            query: StructuredQuery.makeEmpty(),
+            isFullyMapped: true,
+            unmappedReasons: [] as readonly SqlFailedMappingReason[],
+          };
+    setPrevious({ rawSql, isReady, parseSql, mapping: sqlMapping });
+  }
   const query = sqlMapping.query;
 
   // Regenerate SQL from a new structured query and push it up.
@@ -59,9 +80,15 @@ export function useDashboardManualQueryState(
           return "";
         }
       })();
+      setPrevious({
+        rawSql: nextSql,
+        isReady,
+        parseSql,
+        mapping: { query: nextQuery, isFullyMapped: true, unmappedReasons: [] },
+      });
       onRawSqlChange(nextSql);
     },
-    [onRawSqlChange],
+    [onRawSqlChange, isReady, parseSql],
   );
 
   const handlers: ManualQueryFormHandlers = {
@@ -121,8 +148,12 @@ export function useDashboardManualQueryState(
         orderByDirection: direction,
       } as StructuredQuery.Partial);
     },
-    onSetFilters: (filters: StructuredQuery.FilterGroup) => {
-      applyQueryChange({ ...query, filters } as StructuredQuery.Partial);
+    onSetFilters: (filters, sourceColumns) => {
+      applyQueryChange({
+        ...query,
+        filters,
+        sourceColumns: sourceColumns ?? query.sourceColumns,
+      });
     },
     onSetLimit: (limit: number | undefined) => {
       applyQueryChange({ ...query, limit } as StructuredQuery.Partial);
