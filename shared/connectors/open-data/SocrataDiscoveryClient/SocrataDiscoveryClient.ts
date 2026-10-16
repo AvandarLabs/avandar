@@ -10,11 +10,11 @@ const DISCOVERY_BASE_URL = "https://api.us.socrata.com/api/catalog/v1";
 /**
  * Searches Socrata's cross-portal Discovery API over an injected HTTP layer.
  *
- * Stateless, mirroring `CkanClient` and `SocrataClient`. A network failure
- * from `http.getJson` propagates raw rather than being wrapped in a structured
- * error: `openDataErrors.ts` defines no code for a Discovery API failure
- * specifically, and inventing one here would be ahead of what this task
- * needs.
+ * Stateless, mirroring `CkanClient` and `SocrataClient`'s shape. Unlike
+ * `SocrataClient`, this client does not convert failures into a structured
+ * `OpenDataAcquisitionFailed` error: `openDataErrors.ts` has no failure code
+ * for the Discovery API, and none is introduced here. An HTTP or
+ * schema-validation failure propagates as a raw exception.
  */
 export function createSocrataDiscoveryClient(
   http: Readonly<OpenDataHttp>,
