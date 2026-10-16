@@ -21,10 +21,12 @@ export function statusFromOpenDataFailure(
     case "resource-not-found":
       return 404;
     case "resource-too-large":
+    case "socrata-too-large":
       return 413;
     case "ckan-authorization-required":
     case "ckan-action-failed":
     case "resource-unreachable":
+    case "socrata-unreachable":
       return 502;
     case "access-shape-invalid":
     case "resource-is-remote-api":

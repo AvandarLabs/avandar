@@ -69,7 +69,16 @@ export type OpenDataAcquisitionFailure =
    */
   | { code: "resource-unreachable"; ckanResourceId: string }
   /** The catalog entry satisfied neither access shape, so it cannot be read. */
-  | { code: "access-shape-invalid"; accessKind: string };
+  | { code: "access-shape-invalid"; accessKind: string }
+  /** Socrata reported more rows than the caller's ceiling allows. */
+  | {
+      code: "socrata-too-large";
+      socrataDatasetId: string;
+      rowCount: number;
+      maxRows: number;
+    }
+  /** The Socrata metadata or data request failed. */
+  | { code: "socrata-unreachable"; socrataDatasetId: string };
 
 /** Machine-readable reason an open data acquisition was refused. */
 export type OpenDataAcquisitionFailureCode = OpenDataAcquisitionFailure["code"];
@@ -96,6 +105,10 @@ function _buildFailureMessage(failure: OpenDataAcquisitionFailure): string {
       return `CKAN resource '${failure.ckanResourceId}' could not be read.`;
     case "access-shape-invalid":
       return `Catalog entry declares access kind '${failure.accessKind}' but does not carry that shape's columns.`;
+    case "socrata-too-large":
+      return `Socrata dataset '${failure.socrataDatasetId}' has ${failure.rowCount} rows, above the ${failure.maxRows} row limit.`;
+    case "socrata-unreachable":
+      return `Socrata dataset '${failure.socrataDatasetId}' could not be read.`;
   }
 }
 
