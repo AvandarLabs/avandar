@@ -56,8 +56,8 @@ function _apiAccess(
     kind: "api_resource",
     apiService,
     apiBaseUrl,
-    ckanDatasetId: externalDatasetId,
-    ckanResourceId: apiResourceId,
+    externalDatasetId,
+    apiResourceId,
     expectedFormat: apiResourceFormat,
   };
 }

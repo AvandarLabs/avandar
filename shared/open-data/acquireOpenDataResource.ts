@@ -94,11 +94,11 @@ export async function acquireOpenDataResource(params: {
   const client = createCkanClient(params.http);
   const ckanPackage = await client.getPackage({
     baseUrl: access.apiBaseUrl,
-    ckanDatasetId: access.ckanDatasetId,
+    ckanDatasetId: access.externalDatasetId,
   });
   const resource = getCkanResourceFromPackage({
     ckanPackage,
-    ckanResourceId: access.ckanResourceId,
+    ckanResourceId: access.apiResourceId,
     baseUrl: access.apiBaseUrl,
     expectedFormat: access.expectedFormat,
     maxBytes: params.maxBytes ?? DEFAULT_MAX_BYTES,

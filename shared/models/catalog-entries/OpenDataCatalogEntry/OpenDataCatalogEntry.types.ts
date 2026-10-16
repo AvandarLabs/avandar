@@ -113,9 +113,9 @@ export type OpenDataAccess =
       kind: "api_resource";
       apiService: OpenDataApiService;
       apiBaseUrl: string;
-      /** The CKAN dataset containing the resource, by slug or id. */
-      ckanDatasetId: string;
-      ckanResourceId: string;
+      /** The external dataset containing the resource, by slug or id. */
+      externalDatasetId: string;
+      apiResourceId: string;
       /** The format recorded when the entry was written. */
       expectedFormat: string;
     };

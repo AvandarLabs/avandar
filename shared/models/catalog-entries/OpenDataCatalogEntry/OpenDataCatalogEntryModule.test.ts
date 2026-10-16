@@ -74,8 +74,8 @@ describe("OpenDataCatalogEntry.toAccess", () => {
       kind: "api_resource",
       apiService: "ckan",
       apiBaseUrl: "https://data.humdata.org",
-      ckanDatasetId: "hdx-hapi-operational-presence",
-      ckanResourceId: "e3a18c4c-ec1b-457e-9f60-cee283c04e0c",
+      externalDatasetId: "hdx-hapi-operational-presence",
+      apiResourceId: "e3a18c4c-ec1b-457e-9f60-cee283c04e0c",
       expectedFormat: "CSV",
     });
   });
