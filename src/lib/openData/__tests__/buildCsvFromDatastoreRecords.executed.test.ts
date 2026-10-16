@@ -10,13 +10,13 @@ import type { DuckDBConnection } from "@duckdb/node-api";
 
 /**
  * This suite lives under `src/` rather than beside
- * `shared/connectors/open-data/buildCsvFromDatastoreRecords.ts` because it reuses
- * `withDuckDb`, whose DuckDB driver is Node-only. Anything under `shared/` is
- * type-checked by Deno and may use only path-alias imports, and there is no
- * Deno-visible alias for `src/`, so importing the harness from there would fail
- * both `deno check shared` and lint. Duplicating the harness was the
- * alternative, and its whole purpose is to be the one place a DuckDB
- * instance is guaranteed to be closed.
+ * `shared/connectors/open-data/buildCsvFromDatastoreRecords.ts` because it
+ * reuses `withDuckDb`, whose DuckDB driver is Node-only. Anything under
+ * `shared/` is type-checked by Deno and may use only path-alias imports, and
+ * there is no Deno-visible alias for `src/`, so importing the harness from
+ * there would fail both `deno check shared` and lint. Duplicating the
+ * harness was the alternative, and its whole purpose is to be the one place
+ * a DuckDB instance is guaranteed to be closed.
  */
 const HERE = dirname(fileURLToPath(import.meta.url));
 
