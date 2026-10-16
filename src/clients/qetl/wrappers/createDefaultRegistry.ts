@@ -217,7 +217,7 @@ function _createDatasetWrapper(
     getDataset: (id: Dataset.Id) => Promise<Dataset.T>;
   }>,
 ): SourceWrapper<DatasetRef> {
-  const delegateFor = async (
+  const getDelegateFromRef = async (
     ref: DatasetRef,
   ): Promise<SourceWrapper<DatasetRef>> => {
     const dataset = await delegates.getDataset(ref.id);
@@ -246,12 +246,12 @@ function _createDatasetWrapper(
     },
 
     describe: async (ref, ctx) => {
-      const delegate = await delegateFor(ref);
+      const delegate = await getDelegateFromRef(ref);
       return await delegate.describe(ref, ctx);
     },
 
     acquire: async (req, ctx): Promise<AcquiredRelation> => {
-      const delegate = await delegateFor(req.ref);
+      const delegate = await getDelegateFromRef(req.ref);
       if (!delegate.acquire) {
         throw new Error(
           `Wrapper '${delegate.name}' cannot acquire relation '${req.ref.id}'`,
