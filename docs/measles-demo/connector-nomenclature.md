@@ -274,6 +274,11 @@ connector's full metacatalog to get an entry into it.
 - Keep "reads through a protocol client" and "is connector-shaped, with real
   discovery above it" as two separate questions. An online-synced upload is
   true on the first and false on the second; say which one you mean.
+- Say "dataset" and "relation" interchangeably for layer 2. "Relation" is
+  QETL's internal word (`RelationRef`, `RelationCapabilities`); "dataset" is
+  the product-facing word for the same granularity (an Avandar `datasets`
+  row). They name the same layer, not two different things - don't treat a
+  mention of "dataset" as somehow layer-1/connection-adjacent.
 
 **Don't**
 
