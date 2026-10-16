@@ -1,3 +1,4 @@
+import { UnsafeHostError } from "@sbfn/_shared/validateHostNotPrivate.ts";
 import type { ConnectorErrorCode } from "@sbfn/connectors/Connector.ts";
 
 function _getErrorCode(error: unknown): string | undefined {
@@ -30,6 +31,14 @@ function _getErrorMessage(error: unknown): string {
 export function classifyPostgresConnectionError(
   error: unknown,
 ): ConnectorErrorCode {
+  // Checked by exact type first, ahead of every heuristic below: this is the
+  // SSRF guard refusing a host that resolved to a loopback, link-local, or
+  // private address, never a network-level failure the heuristics below are
+  // meant to recognize.
+  if (error instanceof UnsafeHostError) {
+    return "host_not_allowed";
+  }
+
   const code = _getErrorCode(error);
   const message = _getErrorMessage(error).toLowerCase();
 

@@ -54,13 +54,14 @@ export function createPostgresConnector(
     },
 
     listRelations: async (context, connectionId) => {
-      const { sql } = await openSavedConnection(
-        context,
-        connectionId,
-        connect,
-        assertHostIsSafeToConnect,
-      );
+      let sql: PostgresSql | undefined;
       try {
+        ({ sql } = await openSavedConnection(
+          context,
+          connectionId,
+          connect,
+          assertHostIsSafeToConnect,
+        ));
         const relations = await listCatalogRelations(sql);
         await context.supabaseAdminClient
           .from("connections__postgres")
@@ -74,19 +75,20 @@ export function createPostgresConnector(
           error instanceof Error ? error.message : String(error),
         );
       } finally {
-        await sql.end({ timeout: 5 });
+        await sql?.end({ timeout: 5 });
       }
     },
 
     previewRelation: async (context, connectionId, relationId) => {
       const { schemaName, tableName } = parseRelationId(relationId);
-      const { sql } = await openSavedConnection(
-        context,
-        connectionId,
-        connect,
-        assertHostIsSafeToConnect,
-      );
+      let sql: PostgresSql | undefined;
       try {
+        ({ sql } = await openSavedConnection(
+          context,
+          connectionId,
+          connect,
+          assertHostIsSafeToConnect,
+        ));
         await assertRelationStillExists(sql, schemaName, tableName);
 
         // `quoteQualifiedPostgresIdentifier` already throws on a NUL byte or
@@ -132,19 +134,20 @@ export function createPostgresConnector(
           error instanceof Error ? error.message : String(error),
         );
       } finally {
-        await sql.end({ timeout: 5 });
+        await sql?.end({ timeout: 5 });
       }
     },
 
     getRelationRows: async (context, connectionId, relationId) => {
       const { schemaName, tableName } = parseRelationId(relationId);
-      const { sql } = await openSavedConnection(
-        context,
-        connectionId,
-        connect,
-        assertHostIsSafeToConnect,
-      );
+      let sql: PostgresSql | undefined;
       try {
+        ({ sql } = await openSavedConnection(
+          context,
+          connectionId,
+          connect,
+          assertHostIsSafeToConnect,
+        ));
         await assertRelationStillExists(sql, schemaName, tableName);
         const quotedRelation = quoteQualifiedPostgresIdentifier(
           schemaName,
@@ -191,7 +194,7 @@ export function createPostgresConnector(
           error instanceof Error ? error.message : String(error),
         );
       } finally {
-        await sql.end({ timeout: 5 });
+        await sql?.end({ timeout: 5 });
       }
     },
   };

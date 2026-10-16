@@ -49,6 +49,10 @@ function _getCopyDescriptors(code: ConnectorErrorCode): CopyDescriptors {
       title: msg`This table is too large to import`,
       message: msg`This table has more rows than Avandar can import at once. Try a smaller table or view.`,
     },
+    host_not_allowed: {
+      title: msg`This address isn't allowed`,
+      message: msg`Avandar can't connect to a loopback, link-local, or private address. Use a publicly reachable host and port.`,
+    },
     unknown: GENERIC_FAILURE,
   });
 }

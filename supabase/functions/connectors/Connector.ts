@@ -40,6 +40,7 @@ export type ConnectorErrorCode =
   | "ssl_required"
   | "timeout"
   | "too_large"
+  | "host_not_allowed"
   | "unknown";
 
 /** A connector failure with a specific, user-facing reason attached. */
