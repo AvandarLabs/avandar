@@ -5,8 +5,10 @@ layer of it is called, which word is a specific product surface and which is
 a generic shape, and how a connector relates to the places a user actually
 picks data from. Use these words in code, schema, comments, commits, and
 design review. It applies to every connector QETL has or will have: Google
-Sheets, Postgres (`feat/postgres-connector`), CKAN, and a future Socrata
-connector.
+Sheets, Postgres (`feat/postgres-connector`), CKAN, a future Socrata
+connector, and `AvandarSupabaseStorage` - the connector Avandar reads its own
+pipeline-built and cached Parquet through, every bit as much a connector as
+the others even though Avandar operates the drive behind it.
 
 Related: [`qetl-architecture.md`](qetl-architecture.md) section 2 (QETL's own
 vocabulary: relation, `RelationRef`, wrapper, capability) and section 10
@@ -37,15 +39,18 @@ Layer 2 - relation     the addressable child that becomes one Avandar
 
 | Term | What it is | Examples |
 | --- | --- | --- |
-| **Drive** (layer 0) | The account or endpoint that owns many connections. Optional: a connector with no shared account layer has no drive. | A user's Google OAuth grant (`tokens__google`). A Socrata open-data portal's base URL (e.g. `data.cityofnewyork.us`). A CKAN deployment's base URL (e.g. `data.humdata.org`). |
-| **Connection** (layer 1) | The reusable, picked-once-used-many-times parent a relation lives under. Infrastructure configuration, not a per-resource shareable item: gated by app role, not by per-resource sharing. | A Postgres server + database (`db_connections` / `db_connections__postgres`). One Google Sheets file, picked from the drive's list. One Socrata or CKAN dataset, picked from the portal. |
-| **Relation** (layer 2) | The addressable child a user ultimately selects as one Avandar dataset - QETL's own word for this (`RelationRef`, `RelationCapabilities`). | A Postgres table or view. A tab within a Google Sheets file. A Socrata dataset's own rows (Socrata datasets do not subdivide further in practice, so layer 1 and layer 2 are almost always the same object for Socrata). |
+| **Drive** (layer 0) | The account or endpoint that owns many connections. Optional: a connector with no shared account layer has no drive. | A user's Google OAuth grant (`tokens__google`). A Socrata open-data portal's base URL (e.g. `data.cityofnewyork.us`). A CKAN deployment's base URL (e.g. `data.humdata.org`). Avandar's own Supabase Storage project, for the `AvandarSupabaseStorage` connector (see below) - the one connector whose drive is always the same, fixed instance. |
+| **Connection** (layer 1) | The reusable, picked-once-used-many-times parent a relation lives under. Infrastructure configuration, not a per-resource shareable item: gated by app role, not by per-resource sharing. | A Postgres server + database (`db_connections` / `db_connections__postgres`). One Google Sheets file, picked from the drive's list. One Socrata or CKAN dataset, picked from the portal. One Open Data Catalog entry, for `AvandarSupabaseStorage`. |
+| **Relation** (layer 2) | The addressable child a user ultimately selects as one Avandar dataset - QETL's own word for this (`RelationRef`, `RelationCapabilities`). | A Postgres table or view. A tab within a Google Sheets file. A Socrata dataset's own rows (Socrata datasets do not subdivide further in practice, so layer 1 and layer 2 are almost always the same object for Socrata). The one Parquet object a catalog entry names. |
 
 **Layer 1 and layer 2 can be the same object.** When a connection has no
-further substructure to pick from, the connection *is* the relation: a CSV or
-XLSX upload, a Socrata dataset with no internal sheets, a CKAN resource. There
-is no third, empty layer to represent in code or schema for these - the
-connection row and the relation are one and the same thing.
+further substructure to pick from, the connection *is* the relation: a
+Socrata dataset with no internal sheets, a CKAN resource, an Open Data
+Catalog entry read through `AvandarSupabaseStorage`. There is no third, empty
+layer to represent in code or schema for these - the connection row and the
+relation are one and the same thing. (An uploaded CSV/XLSX/PDF file does
+*not* belong on this list - see "Not every dataset source type is a
+connector" below for why it has no layers at all, not even collapsed ones.)
 
 **Layer 0 can be absent.** Today's Postgres connector has no drive: a
 `db_connections__postgres` row stores host, port, *and* database together, so
@@ -76,6 +81,20 @@ different layer (section 7 of the Postgres spec): write for the user's
 mental model (the account, the portal, the database they are adding), not
 for the internal implementation name.
 
+**A connector's drive does not have to be a third party.** `AvandarSupabaseStorage`
+is a connector too - the protocol client that reads a Parquet object out of
+Avandar's own Supabase Storage by path, used for `pipeline_parquet` Open Data
+Catalog entries today and for the cached copy of an `api_resource` entry once
+the write-back cache exists (see "Not every dataset source type is a
+connector" below). Its drive is always the same one Avandar-operated bucket -
+there is no second instance a user could ever point it at, unlike every other
+connector in this file, which is multi-tenant by nature (many organizations
+each run their own Postgres server, Google account, or Socrata portal). That
+asymmetry is exactly why its name keeps "Avandar" in it rather than reading
+just "Supabase Storage": every other connector name would be misleading if it
+named a specific operator, but this is the one connector where the operator
+*is* part of what distinguishes it.
+
 One connector can support many simultaneous drives for one user or
 workspace. Google Sheets supports exactly one today (one Google account
 connected at a time - tracked as a gap, not a design ceiling: see "Open
@@ -84,26 +103,50 @@ adding a second account a new row in an existing table, not a new connector.
 
 ## Not every dataset source type is a connector
 
-A connector exists only where there is an external system Avandar does not
-own, reached through a protocol client (`qetl-architecture.md` section 2.1).
-Of today's `datasets.source_type` values, that is exactly three:
-`google_sheets`, `postgres_table`, and `open_data` (CKAN today, Socrata once
-it exists). The rest are not connectors, and nothing above (drive,
-connection, relation, metacatalog) applies to them:
+**Ownership is not the test.** `pipeline_parquet` Open Data Catalog entries
+are Avandar-owned - the bytes sit in Avandar's own Supabase Storage, written
+there by Avandar's own pipeline - and they are still connector-backed,
+through `AvandarSupabaseStorage` (above). So "is this reached through a
+connector" cannot be "is this a third party's system," or that case would
+wrongly fall on the "not a connector" side.
 
-| Category | Source types | Has a protocol client? | Layers above the dataset |
+**The actual test: is there a reusable, named, addressable parent - a
+connection, and optionally a drive above it - that a relation is *picked
+from*, with a protocol client doing the picking and the fetching?** This is
+true of `pipeline_parquet` (the parent is the Open Data Catalog entry itself,
+a specific addressable Parquet object, fetched by `AvandarSupabaseStorage`
+rather than invented by the asker). It is false of an uploaded file: nothing
+was picked from anything reusable - the user handed over one specific file
+directly, there was no catalog or picker backing it, and there is no
+addressable reference anywhere that the stored Parquet is a fetch *of*. The
+Parquet object an upload produces is the one and only copy there has ever
+been; a connector-backed relation's cached object, by contrast, is always a
+copy *of* something addressable elsewhere (a portal, a server, a catalog
+entry), even when the "elsewhere" is Avandar's own storage.
+
+Of today's `datasets.source_type` values, split where one value uses more
+than one protocol client:
+
+| Category | Source type (access kind) | Protocol client | Layers above the dataset |
 | --- | --- | --- | --- |
-| **Connector-backed** | `google_sheets`, `postgres_table`, `open_data` | Yes | Relation always; connection and drive where the technology has one (see the table above) |
-| **Uploaded** | `csv_file`, `xlsx_file`, `pdf_file` | No - the "source" is bytes the user handed over directly, already sitting in Avandar's own Storage | None. The uploaded file is simultaneously its own connection and its own relation, and there is no drive: nothing is picked *from* anything, because nothing external is ever addressed again after the upload completes |
-| **Derived** | `virtual` | No - defined by a stored SQL query over relations already resident in the workspace | None. There is no external reach at all, not even once |
+| Connector-backed | `open_data` (`pipeline_parquet`) | `AvandarSupabaseStorage` | Drive = Avandar's bucket; connection = relation = the catalog entry's Parquet object |
+| Connector-backed | `open_data` (`api_resource`) | `CkanClient` today, a future `SocrataClient`; falls through to `AvandarSupabaseStorage` on a cache hit once the write-back cache exists | Relation always (one catalog entry); connection and drive per the CKAN/Socrata table above |
+| Connector-backed | `google_sheets` | the Google Sheets client (`src/clients/google/GoogleDriveClient/`) | Relation (and connection, loosely - see the drive table above); drive = the user's Google account |
+| Connector-backed | `postgres_table` | the Postgres driver (`supabase/functions/external-datasets/connectors/postgres/`) | Relation and connection; no drive today |
+| Uploaded | `csv_file`, `xlsx_file`, `pdf_file` | none | None at all, not even collapsed. Nothing was picked from a reusable parent; the stored object is the one and only copy, never a fetch of something addressable elsewhere |
+| Derived | `virtual` | none | None. Defined by a stored SQL query over relations already resident in the workspace; no storage fetch of any kind |
 
 This is also why `shared/connectors/` (the rename this spec proposes for
-`shared/open-data/`, see below) only ever holds protocol clients for the
-first category - `CkanClient`, a future `SocrataClient`, and eventually a
-Google Sheets client if that connector is ever retrofitted onto this model.
-It is not where CSV/XLSX/PDF parsing or `virtual` dataset logic belongs; that
-code already lives correctly under `src/clients/datasets/source-datasets/`
-and has nothing to do with connectors at all.
+`shared/open-data/`, see below) holds protocol clients only for genuinely
+connector-backed source types - `CkanClient`, a future `SocrataClient`, a new
+`AvandarSupabaseStorageClient` (today's anonymous `fetch(parquetUrl)` inside
+`DatasetParquetWrapper._downloadPipelineOpenDataParquet`, named and given a
+home so every `open_data` access kind dispatches to a named client, not three
+named ones and one inline fetch), and eventually a Google Sheets client if
+that connector is ever retrofitted onto this model. It is not where
+CSV/XLSX/PDF parsing or `virtual` dataset logic belongs; that code already
+lives correctly under `src/clients/datasets/source-datasets/` and has
+nothing to do with connectors at all.
 
 ## Metacatalog: a searchable directory over a connector's own universe
 
@@ -178,8 +221,18 @@ connector's full metacatalog to get an entry into it.
   "metacatalog" when the distinction matters to the sentence.
 - Say "the Open Data Catalog" (capitalized) for the product surface, never
   bare "catalog."
+- Call `AvandarSupabaseStorage` a connector, same as any other. Ownership
+  does not disqualify it; "is a relation picked from a reusable, addressable
+  parent via a protocol client" does qualify it.
 
 **Don't**
+
+- Don't decide whether something is a connector by asking who owns the
+  system behind it. Ask whether a relation is picked from a reusable,
+  addressable parent via a protocol client ("Not every dataset source type
+  is a connector" above). An uploaded file fails that test regardless of
+  where its Parquet ends up stored; `pipeline_parquet` passes it despite
+  being entirely Avandar-owned.
 
 - Don't name a connector's technology in user-facing copy ("Socrata",
   "CKAN"). Name the drive the user picked.
