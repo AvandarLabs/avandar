@@ -49,15 +49,18 @@ export type PostgresTableWrapperOptions = {
 /**
  * Capability record for the Postgres connector.
  *
- * Bounded (not `"unbounded"`, unlike Sheets): an arbitrary customer table can
- * be far larger than a Sheets export, and both the edge function and the
- * browser have to hold the result in memory. The cap values themselves are
+ * Byte-bounded (not `"unbounded"`, unlike Sheets): an arbitrary customer
+ * table can be far larger than a Sheets export, and both the edge function
+ * and the browser have to hold the result in memory. The byte cap is
  * declared and enforced server-side (`createPostgresConnector.ts`'s
- * `POSTGRES_MAX_ROWS_PER_ACQUIRE`/`POSTGRES_MAX_BYTES_PER_ACQUIRE`, under
- * `supabase/functions/connectors/postgres/`) - this
- * capability record mirrors the same two numbers so the mediator's
- * bookkeeping matches what the server will actually enforce. Keep these two
- * files in sync if either value ever changes.
+ * `POSTGRES_MAX_BYTES_PER_ACQUIRE`, under
+ * `supabase/functions/connectors/postgres/`) - this capability record
+ * mirrors that same number so the mediator's bookkeeping matches what the
+ * server will actually enforce. Keep these two files in sync if the value
+ * ever changes. There is deliberately no row cap to mirror: the edge
+ * function estimates the CSV byte size from the table's own column types
+ * before reading anything, rather than refusing by row count alone - a row
+ * count tells you nothing about how wide each row actually is.
  */
 const CAPABILITIES = {
   /** One dataset row is one table/view. */
@@ -71,14 +74,17 @@ const CAPABILITIES = {
   aggregatePushdown: false,
   wholeRelationAcquirable: "yes",
 
-  /** Mirrors `createPostgresConnector.ts`'s `POSTGRES_MAX_ROWS_PER_ACQUIRE`. */
-  maxRowsPerCall: 200_000,
+  /**
+   * No row cap: the edge function gates by estimated/actual CSV byte size
+   * only (`maxBytesPerCall` below), never by row count.
+   */
+  maxRowsPerCall: "unbounded",
 
   /**
    * Mirrors `createPostgresConnector.ts`'s
    * `POSTGRES_MAX_BYTES_PER_ACQUIRE`.
    */
-  maxBytesPerCall: 100 * 1024 * 1024,
+  maxBytesPerCall: 150 * 1024 * 1024,
 
   /**
    * No freshness signal yet; a future revision can detect server-side

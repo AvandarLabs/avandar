@@ -11,6 +11,7 @@ import {
 } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
 import { openSavedConnection } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv.ts";
+import { estimateRelationCsvBytes } from "@sbfn/connectors/postgres/createPostgresConnector/estimateRelationCsvBytes.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
@@ -19,9 +20,22 @@ import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts
  * A configured ceiling, not "unbounded": this connector acquires a relation
  * as a single whole-table CSV rather than paging, so a cap here is what keeps
  * one oversized table from blocking the request indefinitely.
+ *
+ * This number is bounded above by the Supabase Edge Function runtime itself,
+ * not chosen freely: an isolate is killed with a 546 at 250MB of memory or
+ * 2s of actual CPU time, whichever comes first
+ * (https://supabase.com/docs/guides/functions/limits), and this connector
+ * holds the raw driver rows, the CSV string, and the HTTP response body at
+ * once - several times the eventual CSV's own byte size. 150MB of CSV stays
+ * comfortably under the memory ceiling with that overhead included, but a
+ * row count anywhere near "1 million" is likely to blow the 2-second CPU
+ * budget on the CSV-serialization loop alone, regardless of this byte cap -
+ * there is no cap value that makes this architecture handle a table that
+ * size. Serving a materially larger relation needs the connector running
+ * somewhere without these ceilings (see the Open question this links to in
+ * the design walkthrough, §4.4), not a bigger number here.
  */
-const POSTGRES_MAX_ROWS_PER_ACQUIRE = 200_000;
-const POSTGRES_MAX_BYTES_PER_ACQUIRE = 100 * 1024 * 1024;
+const POSTGRES_MAX_BYTES_PER_ACQUIRE = 150 * 1024 * 1024;
 const MAX_PREVIEW_ROWS = 50;
 
 type CreatePostgresConnectorOptions = {
@@ -158,23 +172,47 @@ export function createPostgresConnector(
           `select count(*)::int as exact_count from ${quotedRelation}`,
         );
         const rowCount = countRow?.exact_count ?? 0;
-        if (rowCount > POSTGRES_MAX_ROWS_PER_ACQUIRE) {
-          throw new ConnectorError(
-            "too_large",
-            `'${schemaName}.${tableName}' has ${rowCount} rows, over the ${POSTGRES_MAX_ROWS_PER_ACQUIRE}-row limit for a single acquisition`,
-          );
-        }
 
-        const columns = await sql<{ column_name: string }>`
-          select column_name
+        // A raw row count is not a usable size signal on its own - a
+        // 50-column table of `text` and a 2-column table of `boolean` can
+        // have the same row count and wildly different CSV sizes. Estimate
+        // the actual CSV footprint from the columns' own declared types
+        // (and, where there is no declared bound, a name-based guess - see
+        // `estimateRelationCsvBytes.ts`) multiplied by the exact row count,
+        // and refuse before reading a single row if that estimate alone is
+        // already over the cap.
+        const columns = await sql<{
+          column_name: string;
+          data_type: string;
+          character_maximum_length: number | null;
+        }>`
+          select column_name, data_type, character_maximum_length
           from information_schema.columns
           where table_schema = ${schemaName} and table_name = ${tableName}
           order by ordinal_position
         `;
+        const columnSizeInfo = columns.map((column) => {
+          return {
+            columnName: column.column_name,
+            dataType: column.data_type,
+            characterMaximumLength: column.character_maximum_length,
+          };
+        });
+        const estimatedBytes = estimateRelationCsvBytes({
+          columns: columnSizeInfo,
+          rowCount,
+        });
+        if (estimatedBytes > POSTGRES_MAX_BYTES_PER_ACQUIRE) {
+          throw new ConnectorError(
+            "too_large",
+            `'${schemaName}.${tableName}' is estimated at ~${estimatedBytes} bytes as CSV (${rowCount} rows), over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
+          );
+        }
+
         const rows = await sql.unsafe<Record<string, unknown>>(
           `select * from ${quotedRelation}`,
         );
-        const csv = rowsToCsv(columns.map(prop("column_name")), rows);
+        const csv = rowsToCsv(columnSizeInfo.map(prop("columnName")), rows);
 
         const byteLength = new TextEncoder().encode(csv).length;
         if (byteLength > POSTGRES_MAX_BYTES_PER_ACQUIRE) {

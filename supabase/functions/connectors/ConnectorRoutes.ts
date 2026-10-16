@@ -124,6 +124,14 @@ export const ConnectorRoutes = defineRoutes<ConnectorsApi>(
             ? await _getOwningWorkspaceId(supabaseClient, body.connectionId)
             : body.workspaceId;
 
+          // Authoritative pattern for this gate, not one of several options:
+          // `assertMeetsMinAppRole` is the first and only edge-function
+          // caller of `util__auth_user_meets_min_app_role` in this codebase.
+          // A future route that needs an app-role check before touching
+          // `supabaseAdminClient` should call it exactly this way - only on
+          // the branch with no existing row to derive access from, before any
+          // service-role work begins. See `assertMeetsMinAppRole.ts`'s own
+          // docstring for the full reasoning.
           if (!body.connectionId) {
             await assertMeetsMinAppRole({
               supabaseClient,
