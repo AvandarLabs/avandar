@@ -37,9 +37,7 @@ function _blobToBytes(blob: Blob): Promise<Uint8Array<ArrayBuffer>> {
  * Every dependency is injected - the freshness check, the live fetch, the
  * storage client, and the catalog-entry update - so this function contains
  * only the cache-aside decision itself and nothing that reaches a network or
- * a database on its own. Not yet wired into a route; `OpenDataRoutes.ts` is
- * expected to be its first caller, supplying real implementations backed by
- * `SupabaseAdmin`.
+ * a database on its own.
  */
 export async function acquireOpenDataResourceWithCache(params: {
   entry: Readonly<OpenDataCatalogEntry.T>;
