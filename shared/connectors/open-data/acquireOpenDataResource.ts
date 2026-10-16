@@ -76,10 +76,12 @@ type OpenDataApiAccess = Extract<OpenDataAccess, { kind: "api_resource" }>;
  * cannot do this narrowing itself: `apiService` is a plain field on a single
  * object type, not its own discriminated union member, so every `Extract`
  * candidate still has to satisfy the whole (wider) `apiService` type and
- * none do.
+ * none do. Exported so other modules that need the same narrowing, such as
+ * `readOpenDataFreshnessToken.ts`, import it instead of redefining it.
  */
-type OpenDataApiAccessFor<TService extends OpenDataApiAccess["apiService"]> =
-  Omit<OpenDataApiAccess, "apiService"> & { apiService: TService };
+export type OpenDataApiAccessFor<
+  TService extends OpenDataApiAccess["apiService"],
+> = Omit<OpenDataApiAccess, "apiService"> & { apiService: TService };
 
 /** Reads a CKAN-hosted resource through `CkanClient`. */
 async function _acquireCkanResource(

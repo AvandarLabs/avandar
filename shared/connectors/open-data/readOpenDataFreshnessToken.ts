@@ -4,22 +4,9 @@ import { buildSocrataSourceVersion } from "$/connectors/open-data/buildSocrataSo
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import type { OpenDataApiAccessFor } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
-import type { OpenDataAccess } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
-
-/** The access shape `toAccess` produces for an `api_resource` entry. */
-type OpenDataApiAccess = Extract<OpenDataAccess, { kind: "api_resource" }>;
-
-/**
- * `OpenDataApiAccess` with `apiService` narrowed to one protocol. `Extract`
- * cannot do this narrowing itself: `apiService` is a plain field on a single
- * object type, not its own discriminated union member, so every `Extract`
- * candidate still has to satisfy the whole (wider) `apiService` type and none
- * do. Mirrors the same helper type in `acquireOpenDataResource.ts`.
- */
-type OpenDataApiAccessFor<TService extends OpenDataApiAccess["apiService"]> =
-  Omit<OpenDataApiAccess, "apiService"> & { apiService: TService };
 
 /**
  * Reads one cheap, up-to-date freshness token for an `api_resource` entry,
