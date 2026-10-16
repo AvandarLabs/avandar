@@ -2,9 +2,9 @@ import {
   estimateColumnCsvBytes,
   estimateRelationCsvBytes,
   estimateRowCsvBytes,
-} from "@sbfn/connectors/postgres/createPostgresConnector/estimateRelationCsvBytes.ts";
+} from "$/connectors/postgres/estimateRelationCsvBytes.ts";
 import { describe, expect, it } from "vitest";
-import type { ColumnSizeInfo } from "@sbfn/connectors/postgres/createPostgresConnector/estimateRelationCsvBytes.ts";
+import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes.ts";
 
 function _column(
   overrides: Partial<ColumnSizeInfo> & { columnName: string },

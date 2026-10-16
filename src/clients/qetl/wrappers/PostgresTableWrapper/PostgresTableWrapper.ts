@@ -1,8 +1,12 @@
 import { acquirePostgresTableRelation } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
+import { POSTGRES_MAX_BYTES_PER_ACQUIRE } from "$/connectors/postgres/estimateRelationCsvBytes";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
-import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+import type {
+  RelationCapabilities,
+  RelationRowDescriptor,
+} from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
@@ -47,20 +51,37 @@ export type PostgresTableWrapperOptions = {
 };
 
 /**
+ * Derives a row cap from the shared byte budget and the relation's own
+ * estimated row width, rather than declaring one flat row number for every
+ * table regardless of how wide its rows are. `"unbounded"` when no row-width
+ * estimate is available for this relation - `maxBytesPerCall` alone still
+ * binds in that case, per `RelationCallCap`'s both-apply, defer-when-unknown
+ * contract (`RelationCapabilities.types.ts`).
+ */
+function _postgresMaxRowsPerCall(
+  descriptor: RelationRowDescriptor,
+): number | "unbounded" {
+  if (
+    descriptor.estimatedRowBytes === undefined ||
+    descriptor.estimatedRowBytes <= 0
+  ) {
+    return "unbounded";
+  }
+  return Math.floor(
+    POSTGRES_MAX_BYTES_PER_ACQUIRE / descriptor.estimatedRowBytes,
+  );
+}
+
+/**
  * Capability record for the Postgres connector.
  *
  * Byte-bounded (not `"unbounded"`, unlike Sheets): an arbitrary customer
  * table can be far larger than a Sheets export, and both the edge function
- * and the browser have to hold the result in memory. The byte cap is
- * declared and enforced server-side (`createPostgresConnector.ts`'s
- * `POSTGRES_MAX_BYTES_PER_ACQUIRE`, under
- * `supabase/functions/connectors/postgres/`) - this capability record
- * mirrors that same number so the mediator's bookkeeping matches what the
- * server will actually enforce. Keep these two files in sync if the value
- * ever changes. There is deliberately no row cap to mirror: the edge
- * function estimates the CSV byte size from the table's own column types
- * before reading anything, rather than refusing by row count alone - a row
- * count tells you nothing about how wide each row actually is.
+ * and the browser have to hold the result in memory. `maxBytesPerCall`
+ * imports `POSTGRES_MAX_BYTES_PER_ACQUIRE` directly from
+ * `shared/connectors/postgres/estimateRelationCsvBytes.ts`, the same module
+ * `createPostgresConnector.ts` enforces it from - one constant, imported by
+ * both runtimes, not two numbers kept in sync by convention.
  */
 const CAPABILITIES = {
   /** One dataset row is one table/view. */
@@ -74,17 +95,8 @@ const CAPABILITIES = {
   aggregatePushdown: false,
   wholeRelationAcquirable: "yes",
 
-  /**
-   * No row cap: the edge function gates by estimated/actual CSV byte size
-   * only (`maxBytesPerCall` below), never by row count.
-   */
-  maxRowsPerCall: "unbounded",
-
-  /**
-   * Mirrors `createPostgresConnector.ts`'s
-   * `POSTGRES_MAX_BYTES_PER_ACQUIRE`.
-   */
-  maxBytesPerCall: 150 * 1024 * 1024,
+  maxRowsPerCall: _postgresMaxRowsPerCall,
+  maxBytesPerCall: POSTGRES_MAX_BYTES_PER_ACQUIRE,
 
   /**
    * No freshness signal yet; a future revision can detect server-side

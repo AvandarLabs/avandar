@@ -153,6 +153,29 @@ describe("PostgresTableWrapper", () => {
     expect(wrapper.acquire).toBeDefined();
   });
 
+  it("derives maxRowsPerCall from the shared byte budget and the relation's row width", () => {
+    const wrapper = createPostgresTableWrapper();
+    const maxRowsPerCall = wrapper.capabilities.maxRowsPerCall;
+    if (typeof maxRowsPerCall !== "function") {
+      expect.unreachable("maxRowsPerCall should be a function, not a flat cap");
+    }
+
+    // 150MB budget / 100 bytes-per-row = 1,572,864 rows.
+    expect(maxRowsPerCall({ columnCount: 3, estimatedRowBytes: 100 })).toBe(
+      1_572_864,
+    );
+  });
+
+  it("defers maxRowsPerCall to the byte cap when no row-width estimate is available", () => {
+    const wrapper = createPostgresTableWrapper();
+    const maxRowsPerCall = wrapper.capabilities.maxRowsPerCall;
+    if (typeof maxRowsPerCall !== "function") {
+      expect.unreachable("maxRowsPerCall should be a function, not a flat cap");
+    }
+
+    expect(maxRowsPerCall({ columnCount: 3 })).toBe("unbounded");
+  });
+
   it("has no readFreshness, matching the 'none' freshness signal", () => {
     const wrapper = createPostgresTableWrapper();
 

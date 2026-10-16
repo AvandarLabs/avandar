@@ -11,31 +11,14 @@ import {
 } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
 import { openSavedConnection } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv.ts";
-import { estimateRelationCsvBytes } from "@sbfn/connectors/postgres/createPostgresConnector/estimateRelationCsvBytes.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
+import {
+  estimateRelationCsvBytes,
+  POSTGRES_MAX_BYTES_PER_ACQUIRE,
+} from "$/connectors/postgres/estimateRelationCsvBytes.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
-/**
- * A configured ceiling, not "unbounded": this connector acquires a relation
- * as a single whole-table CSV rather than paging, so a cap here is what keeps
- * one oversized table from blocking the request indefinitely.
- *
- * This number is bounded above by the Supabase Edge Function runtime itself,
- * not chosen freely: an isolate is killed with a 546 at 250MB of memory or
- * 2s of actual CPU time, whichever comes first
- * (https://supabase.com/docs/guides/functions/limits), and this connector
- * holds the raw driver rows, the CSV string, and the HTTP response body at
- * once - several times the eventual CSV's own byte size. 150MB of CSV stays
- * comfortably under the memory ceiling with that overhead included, but a
- * row count anywhere near "1 million" is likely to blow the 2-second CPU
- * budget on the CSV-serialization loop alone, regardless of this byte cap -
- * there is no cap value that makes this architecture handle a table that
- * size. Serving a materially larger relation needs the connector running
- * somewhere without these ceilings (see the Open question this links to in
- * the design walkthrough, §4.4), not a bigger number here.
- */
-const POSTGRES_MAX_BYTES_PER_ACQUIRE = 150 * 1024 * 1024;
 const MAX_PREVIEW_ROWS = 50;
 
 type CreatePostgresConnectorOptions = {

@@ -1,4 +1,27 @@
 /**
+ * A single shared ceiling, imported by reference from both runtimes that
+ * need it - `supabase/functions/connectors/postgres/` (the edge function
+ * that actually enforces it) and
+ * `src/clients/qetl/wrappers/PostgresTableWrapper/` (whose capability
+ * record mirrors it so the mediator's bookkeeping agrees with what the
+ * server will enforce). `shared/` is importable from both the browser and
+ * Deno for exactly this reason - two runtimes needing the same number is
+ * not a reason to duplicate it, only a reason to put it where both
+ * can reach it.
+ *
+ * Bounded by the Supabase Edge Function runtime's own 250MB memory / 2s CPU
+ * ceiling, not a free choice: an isolate is killed with a 546 at whichever
+ * limit it hits first (https://supabase.com/docs/guides/functions/limits),
+ * and the edge function holds the raw driver rows, the CSV string, and the
+ * HTTP response body in memory at once - several times the eventual CSV's
+ * own byte size. 150MB stays comfortably under that ceiling with the
+ * overhead included; a relation needing on the order of a million rows in
+ * one call is not reliably servable through an edge function at any cap
+ * value, regardless of this number (AVA-379).
+ */
+export const POSTGRES_MAX_BYTES_PER_ACQUIRE = 150 * 1024 * 1024;
+
+/**
  * One column's type metadata, as `information_schema.columns` reports it -
  * enough to estimate that column's average CSV-serialized width without
  * reading a single row.
