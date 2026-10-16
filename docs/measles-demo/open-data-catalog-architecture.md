@@ -51,7 +51,10 @@ a real endpoint, not assumed:
    (the catalog's own Parquet), `DatasetOriginalFileStorageClient` (retained
    PDF originals), and `PublicDatasetParquetStorageClient` (published
    dashboard snapshots) are four separately-implemented clients today, all
-   reading the same Supabase Storage project.
+   reading the same Supabase Storage project - though, verified while
+   designing section 3's cache, three of the four have a workspace-scoped,
+   resumable-upload shape different enough from the Open Data Catalog's own
+   storage that this spec does not attempt to unify them (section 3's note).
 
 ## 2. The three acquisition tiers, current vs. target
 
@@ -69,20 +72,22 @@ shared/connectors/                                   renamed from shared/open-da
     CkanClient/                                       unchanged, moved
     SocrataClient/                                    new - getMetadata, getRows
     SocrataDiscoveryClient/                            new - the metacatalog client (section 7)
-    AvandarSupabaseStorageClient/                      new - unifies the four clients below
+    AvandarSupabaseStorageClient/                      new - the Open Data Catalog's own
+                                                        storage drive (narrower than first
+                                                        drafted - see the note below)
     acquireOpenDataResource.ts                        extended: dispatches on api_service,
                                                        then tries the cache before either client
     openDataErrors.ts
     __tests__/
 
-src/clients/storage/                                  unchanged paths, now documented as
-  DatasetParquetStorageClient/                         four drives of one connector rather
-  DatasetOriginalFileStorageClient/                    than four unrelated clients. Actually
-  OpenDatasetParquetStorageClient/                      unifying their implementations behind
-  PublicDatasetParquetStorageClient/                    AvandarSupabaseStorageClient is this
-                                                        spec's proposal, not forced on day one:
-                                                        each can adopt it independently, since
-                                                        all four already read the same project.
+src/clients/storage/                                  unchanged, not touched by this spec
+  DatasetParquetStorageClient/                         (workspace-scoped, authenticated,
+  DatasetOriginalFileStorageClient/                     resumable-upload clients - a different
+  PublicDatasetParquetStorageClient/                    auth model and upload strategy from
+                                                        the Open Data Catalog's own storage;
+                                                        see the note below for why these stay
+                                                        separate rather than adopting
+                                                        AvandarSupabaseStorageClient now)
 
 supabase/functions/
   open-data/                                          unchanged name. Gains the cache-check
@@ -97,26 +102,51 @@ supabase/functions/
                                                         needs no proxy (fact 2, section 1).
 ```
 
-`AvandarSupabaseStorageClient` takes an injected storage transport, the same
-pattern `CkanClient` already uses for `OpenDataHttp` (`getJson`/`getBytes`):
+**Narrowed from the first draft of this section, and why.** Verifying the
+four existing storage clients directly (not just by name) found two
+different access models hiding under one idea: `DatasetParquetStorageClient`
+and `DatasetOriginalFileStorageClient` are workspace-scoped, authenticated,
+and use a resumable TUS upload for large files; `PublicDatasetParquetStorageClient`
+additionally lists, paginates, and batch-deletes across a dashboard's whole
+generation folder - operations a simple `{download, upload, remove}`
+transport cannot express without growing well past what this spec needs.
+Forcing all four onto one transport now would be unrelated design work on
+already-shipped, already-tested code, not something Socrata or the cache
+needs. So `AvandarSupabaseStorageClient` in this spec is scoped to exactly
+one thing: the Open Data Catalog's own storage, which has neither of those
+complications (a flat set of catalog-entry-keyed objects, no per-workspace
+scoping, no resumable upload needed at the sizes a cached resource runs to).
+Unifying the other three remains a real idea, tracked as deferred work
+(section 7), not abandoned.
+
+`AvandarSupabaseStorageClient`'s shape, reflecting what the cache actually
+needs - a private, non-workspace-scoped bucket (`open-data-catalog`, new),
+read by any authenticated user (matching `catalog_entries__open_data`'s own
+`select`-to-`authenticated` grant), written only by the `open-data` edge
+function's service-role client:
 
 ```ts
-export type AvandarStorageTransport = {
-  download: (bucket: string, path: string) => Promise<Uint8Array<ArrayBuffer> | undefined>;
-  upload: (bucket: string, path: string, bytes: Uint8Array<ArrayBuffer>) => Promise<void>;
-  remove: (bucket: string, path: string) => Promise<void>;
+export type AvandarSupabaseStorageClient = {
+  downloadCachedResource: (objectPath: string) => Promise<Blob | undefined>;
+  uploadCachedResource: (objectPath: string, blob: Blob) => Promise<void>;
+  removeCachedResource: (objectPath: string) => Promise<void>;
 };
 ```
 
-This is necessary, not cosmetic: `src/clients/storage/*` today call
-`AvaSupabase.db().storage.from(...)` directly, which is a browser-only client
-singleton. `shared/` must stay reachable from the browser, Deno edge
-functions, and Node with no such singleton (the same rule that already keeps
-`CkanClient` injectable). The browser's default transport wraps the
-authenticated Supabase JS client exactly as today; the pipeline/edge-function
-default transport uses the service-role client. Each of the four existing
-callers keeps its own call sites; only the bucket-and-path logic and the
-actual network call move behind the shared client.
+It takes an injected Supabase Storage handle (`SupabaseClient["storage"]`),
+the same injection shape `CkanClient` already uses for `OpenDataHttp` - the
+browser's default handle is the authenticated client already in use
+everywhere else in `src/`; the edge function's is the service-role client.
+This keeps the module itself reachable from `shared/` with no client
+singleton baked in, while every caller still gets a real, non-mocked storage
+handle by default.
+
+A `pipeline_parquet` entry's read is **not** touched by this spec: it keeps
+reading a public URL out of `canonical_urls` exactly as it does today
+(`OpenDatasetParquetStorageClient`), because that path already works,
+nothing about Socrata requires changing it, and migrating ten-plus live
+production catalog rows onto a new private bucket is an unrelated, separate
+decision this spec does not make.
 
 `DatasetParquetWrapper`'s dispatch gains one more named arm. Today:
 
@@ -130,12 +160,12 @@ Target:
 
 ```text
 sourceType === "open_data"
-  -> access_kind === "pipeline_parquet": AvandarSupabaseStorageClient
+  -> access_kind === "pipeline_parquet": unchanged (OpenDatasetParquetStorageClient)
   -> access_kind === "api_resource":
        check cache freshness (section 6)
-       -> fresh:  AvandarSupabaseStorageClient (cache hit)
+       -> fresh:  AvandarSupabaseStorageClient.downloadCachedResource (cache hit)
        -> stale:  CkanClient or SocrataClient, by api_service,
-                  then write back through AvandarSupabaseStorageClient
+                  then AvandarSupabaseStorageClient.uploadCachedResource (write-back)
 ```
 
 No new `SourceWrapper`. `DatasetParquetWrapper`'s `CAPABILITIES` are
@@ -188,12 +218,17 @@ constraint catalog_entries__open_data__cache_complete check (
 )
 ```
 
-The cached object's bucket and path convention are an implementation detail
-for whoever builds this (the exact bucket `catalogOpenDataInsert.ts` already
-writes pipeline Parquet to should be confirmed and reused rather than
-inventing a second one); the schema only needs `cached_object_path` to be
-enough to resolve it unambiguously, the same way `parquet_file_name` already
-is for pipeline rows.
+The cached object lives in a new, dedicated, private bucket
+(`open-data-catalog`), not the pipeline's existing public bucket
+(`catalogOpenDataInsert.ts`'s target): the cache is read under the caller's
+own authenticated session, gated by a storage policy granting `select` to
+`authenticated` - mirroring `catalog_entries__open_data`'s own grant - rather
+than a public, logged-out-readable URL, which the pipeline's bucket is and
+which nothing about the cache needs to be. `cached_object_path` is a
+bucket-relative path (e.g. `<catalogEntryId>.parquet`), not a URL, the same
+shape `parquet_file_name` already is for pipeline rows and deliberately not
+the `canonical_urls` free-text-array shape the original CKAN generalization
+spec called a mistake (section 13.2 there).
 
 ## 5. The freshness-check and write-back cache flow
 
@@ -264,10 +299,12 @@ picker UI, not a v1 requirement.
 **In scope, built by this spec:**
 
 - `SocrataClient` and `SocrataDiscoveryClient` in `shared/connectors/open-data/`.
-- `api_service` gains `'socrata'`.
-- The write-back cache (section 5), for both CKAN and Socrata.
-- `AvandarSupabaseStorageClient`, unifying the four existing storage clients
-  behind one injectable transport.
+- `api_service` gains `'socrata'`; the `OpenDataAccess` union's `ckanDatasetId`/
+  `ckanResourceId` fields are renamed to `externalDatasetId`/`apiResourceId`
+  (matching the already-generic DB column names), since those names are
+  reused by a non-CKAN connector starting now.
+- The write-back cache (section 5), for both CKAN and Socrata, including the
+  new `open-data-catalog` bucket and `AvandarSupabaseStorageClient`.
 - The `shared/open-data/` to `shared/connectors/open-data/` rename.
 - The `external-datasets` to `connectors` edge function rename.
 
@@ -283,6 +320,17 @@ picker UI, not a v1 requirement.
    connection shape.
 3. A prebuilt Socrata metacatalog slice (section 6), should the live Discovery
    API prove insufficient.
+4. Unifying `DatasetParquetStorageClient`, `DatasetOriginalFileStorageClient`,
+   and `PublicDatasetParquetStorageClient` onto `AvandarSupabaseStorageClient`
+   (or a sibling client with a richer transport). Section 3's module-layout
+   note explains why these three stay untouched for now: a different auth
+   model (workspace-scoped, resumable TUS upload) and, for the public
+   snapshot client, list/paginate/batch-delete operations a simple
+   download/upload/remove transport does not cover.
+5. Migrating `pipeline_parquet`'s existing public-URL read
+   (`OpenDatasetParquetStorageClient`) onto the new private bucket. Not
+   needed for Socrata or the cache, and a separate decision touching live
+   production catalog rows.
 
 ## 8. Testing references to add
 
@@ -292,7 +340,8 @@ Following `qetl-architecture.md` section 12's table shape:
 | --- | --- |
 | Freshness check reads the cache before either live client | new test on the shared acquisition function (section 5), asserting `getBytes`/`getRows` is not called when the live token matches `cached_source_version` |
 | A changed token re-fetches live and overwrites the cache | same file, opposite case |
-| `AvandarSupabaseStorageClient`'s four callers (`DatasetParquetStorageClient`, `DatasetOriginalFileStorageClient`, `OpenDatasetParquetStorageClient`, `PublicDatasetParquetStorageClient`) keep their existing behavior once rebased onto the shared transport | characterization tests per existing caller, asserting bucket and path are unchanged |
+| `AvandarSupabaseStorageClient` reads and writes the `open-data-catalog` bucket correctly, under an injected storage handle | unit test against a faked `SupabaseClient["storage"]`, no network |
+| `OpenDatasetParquetStorageClient`'s existing `pipeline_parquet` read is unchanged by this spec | existing test suite stays green, untouched |
 | `SocrataClient`/`SocrataDiscoveryClient` against a faked HTTP layer, no network | mirrors `CkanClient.test.ts`'s shape |
 | CHECK constraints: cache columns are all-null or all-set; never set on a `pipeline_parquet` row | pgTAP, mirroring `catalog_entries_open_data_access.test.sql` |
 | The `connectors` edge function rename does not change any route's behavior, only its path prefix | existing Postgres connector e2e spec, updated for the new prefix |
