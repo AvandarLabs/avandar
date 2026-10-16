@@ -1,6 +1,6 @@
-import { ExternalDatasetError } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
-import type { ExternalDatasetRelation } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
-import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/PostgresSql.types.ts";
+import { ExternalDatasetError } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
+import type { ExternalDatasetRelation } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
+import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
 
 function makeRelationFromCatalogRow(row: {
   table_schema: string;

@@ -3,16 +3,16 @@ import {
   ExternalDatasetError,
   type ExternalDatasetConnectorContext,
   type ExternalDatasetRelation,
-} from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
-import { classifyPostgresConnectionError } from "@sbfn/external-datasets/connectors/postgres/classifyPostgresConnectionError.ts";
-import { toPostgresConnectionConfig } from "@sbfn/external-datasets/connectors/postgres/PostgresConnectionConfig.ts";
+} from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
+import { classifyPostgresConnectionError } from "@sbfn/connectors/connectors/postgres/classifyPostgresConnectionError.ts";
+import { toPostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   postgresTestAndSaveInputSchema,
   type PostgresTestAndSaveInput,
-} from "@sbfn/external-datasets/connectors/postgres/PostgresConnectorInput.ts";
-import { fetchConnectionRow } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
-import { listCatalogRelations } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
-import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/PostgresSql.types.ts";
+} from "@sbfn/connectors/connectors/postgres/PostgresConnectorInput.ts";
+import { fetchConnectionRow } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
+import { listCatalogRelations } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
+import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
 
 type ConnectFn = (
   config: ReturnType<typeof toPostgresConnectionConfig>,

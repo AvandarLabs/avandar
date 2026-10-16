@@ -14,7 +14,7 @@
  * same shortcut `util__auth_user_meets_min_app_role` itself takes.
  *
  * `authenticated` has no insert/update/delete grant on either table at all:
- * writes only happen through the `external-datasets` edge function's
+ * writes only happen through the `connectors` edge function's
  * `service_role` client, because `vault_secret_id` is not a foreign key and
  * nothing else stops a direct insert/update from pointing a row at a Vault
  * secret it never created. The insider-write tests below

@@ -2,7 +2,7 @@ import type {
   ExternalDatasetErrorCode,
   ExternalDatasetPreviewColumn,
   ExternalDatasetRelation,
-} from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
+} from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type ExternalDatasetErrorResponse = {
@@ -10,7 +10,7 @@ export type ExternalDatasetErrorResponse = {
 };
 
 export type ExternalDatasetsApi = APITypeDef<
-  "external-datasets",
+  "connectors",
   [
     "/:connectorType/connections/test-and-save",
     "/:connectorType/connections/:connectionId/relations",

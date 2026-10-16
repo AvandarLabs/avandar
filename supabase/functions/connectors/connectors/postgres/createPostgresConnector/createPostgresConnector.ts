@@ -4,19 +4,19 @@ import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.
 import {
   ExternalDatasetError,
   type ExternalDatasetConnector,
-} from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
-import { classifyPostgresConnectionError } from "@sbfn/external-datasets/connectors/postgres/classifyPostgresConnectionError.ts";
-import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/external-datasets/connectors/postgres/connectToPostgres.ts";
-import { toPostgresConnectionConfig } from "@sbfn/external-datasets/connectors/postgres/PostgresConnectionConfig.ts";
+} from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
+import { classifyPostgresConnectionError } from "@sbfn/connectors/connectors/postgres/classifyPostgresConnectionError.ts";
+import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/connectors/postgres/connectToPostgres.ts";
+import { toPostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   assertRelationStillExists,
   listCatalogRelations,
   parseRelationId,
-} from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
-import { openSavedConnection } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
-import { rowsToCsv } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/postgresCsv.ts";
-import { testAndSaveConnection } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
-import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/PostgresSql.types.ts";
+} from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
+import { openSavedConnection } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
+import { rowsToCsv } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresCsv.ts";
+import { testAndSaveConnection } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
+import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
 
 /**
  * A configured ceiling, not "unbounded": this connector acquires a relation

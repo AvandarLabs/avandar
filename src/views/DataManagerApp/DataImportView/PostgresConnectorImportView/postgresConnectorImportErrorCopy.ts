@@ -1,6 +1,6 @@
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
-import type { ExternalDatasetErrorCode } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector";
+import type { ExternalDatasetErrorCode } from "@sbfn/connectors/connectors/ExternalDatasetConnector";
 import type { I18n, MessageDescriptor } from "@lingui/core";
 
 /** The notification a failed Postgres connection attempt shows. */
@@ -20,7 +20,7 @@ const GENERIC_FAILURE: CopyDescriptors = {
 };
 
 /**
- * Chooses the message pair for one `external-datasets` connection failure.
+ * Chooses the message pair for one `connectors` connection failure.
  *
  * Split out from the `i18n._` calls so every string stays a `msg` macro at its
  * own call site: `docs/rules/i18n.md` bans relocating a `` t`…` `` macro out of
@@ -59,7 +59,7 @@ function _getCopyDescriptors(code: ExternalDatasetErrorCode): CopyDescriptors {
  * message prose, so each failure kind gets its own specific recovery
  * instruction instead of one generic "Could not connect" string.
  *
- * @param params The error code the `external-datasets` edge function
+ * @param params The error code the `connectors` edge function
  *   returned, and the reactive `i18n` from `useLingui()`.
  * @returns The notification title and message.
  */

@@ -19,7 +19,7 @@ import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDatase
 import type {
   ExternalDatasetErrorCode,
   ExternalDatasetRelation,
-} from "@sbfn/external-datasets/connectors/ExternalDatasetConnector";
+} from "@sbfn/connectors/connectors/ExternalDatasetConnector";
 
 /**
  * The connection form's own fields - never retained once test-and-save
@@ -91,7 +91,7 @@ const POSTGRES_RELATION_KINDS = [
 ] as const satisfies readonly PostgresTableDataset.RelationKind[];
 
 /**
- * Whether the `external-datasets` proxy reported a relation kind this
+ * Whether the `connectors` proxy reported a relation kind this
  * connector actually understands - its `kind` field is a plain `string`
  * shared across every connector type, so a connector-specific caller must
  * validate it before narrowing.
@@ -154,7 +154,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       connectionId: DatabaseConnection.Id;
     }): Promise<ExternalDatasetRelation[]> => {
       const result = await APIClient.get({
-        route: "external-datasets/:connectorType/connections/:connectionId/relations",
+        route: "connectors/:connectorType/connections/:connectionId/relations",
         pathParams: { connectorType: "postgres", connectionId: params.connectionId },
       });
       if ("error" in result) {
@@ -211,7 +211,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
           detail: t`Listing tables...`,
         });
         const result = await APIClient.post({
-          route: "external-datasets/:connectorType/connections/test-and-save",
+          route: "connectors/:connectorType/connections/test-and-save",
           pathParams: { connectorType: "postgres" },
           body: {
             workspaceId: workspace.id,
@@ -265,7 +265,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       relationKind: PostgresTableDataset.RelationKind;
     }): Promise<void> => {
       const result = await APIClient.get({
-        route: "external-datasets/:connectorType/connections/:connectionId/relations/:relationId/preview",
+        route: "connectors/:connectorType/connections/:connectionId/relations/:relationId/preview",
         pathParams: {
           connectorType: "postgres",
           connectionId: params.connectionId,

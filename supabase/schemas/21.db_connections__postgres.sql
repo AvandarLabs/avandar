@@ -21,7 +21,7 @@ create table public.db_connections__postgres (
   -- password itself. Deliberately not a foreign
   -- key: `vault.secrets` is owned by the Vault extension, not this
   -- application's schema, so this column trusts the single write path
-  -- (the `external-datasets` edge function via the security-definer
+  -- (the `connectors` edge function via the security-definer
   -- wrapper below) to keep it valid rather than coupling the declarative
   -- schema to an extension-managed table.
   vault_secret_id uuid not null,

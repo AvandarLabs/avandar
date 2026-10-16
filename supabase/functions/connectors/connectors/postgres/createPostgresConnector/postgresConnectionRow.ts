@@ -1,8 +1,8 @@
-import { ExternalDatasetError } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
-import { toPostgresConnectionConfig } from "@sbfn/external-datasets/connectors/postgres/PostgresConnectionConfig.ts";
+import { ExternalDatasetError } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
+import { toPostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection.ts";
-import type { ExternalDatasetConnectorContext } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
-import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/PostgresSql.types.ts";
+import type { ExternalDatasetConnectorContext } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
+import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
 
 export type DbConnectionsPostgresRow = {
   connection_id: string;

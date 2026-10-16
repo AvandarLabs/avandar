@@ -32,7 +32,7 @@ create table public.db_connections (
 alter table public.db_connections enable row level security;
 
 -- Data API privileges. `authenticated` is select-only: every write to this
--- table happens through the `external-datasets` edge function's
+-- table happens through the `connectors` edge function's
 -- `service_role` client, never a direct Data API insert/update/delete,
 -- because `vault_secret_id` (on the satellite table) is not a foreign key
 -- and has no way to verify which connection actually created the Vault

@@ -1,6 +1,6 @@
 /**
  * Tests that Postgres acquires a named relation as Parquet through the
- * `external-datasets` edge function and describes it from stored columns.
+ * `connectors` edge function and describes it from stored columns.
  */
 
 import { describe, expect, it, vi } from "vitest";

@@ -3,16 +3,16 @@ import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { defineRoutes, GET, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { getConnector } from "@sbfn/external-datasets/connectorRegistry.ts";
+import { getConnector } from "@sbfn/connectors/connectorRegistry.ts";
 import {
   ExternalDatasetError,
   type ExternalDatasetConnectorContext,
-} from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
+} from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 import { object, string } from "zod";
 import type {
   ExternalDatasetErrorResponse,
   ExternalDatasetsApi,
-} from "@sbfn/external-datasets/ExternalDatasetRoutes.types.ts";
+} from "@sbfn/connectors/ExternalDatasetRoutes.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 /**
@@ -98,13 +98,13 @@ async function _resolveConnectorContext(
 }
 
 /**
- * The `external-datasets` proxy's route table: test-and-save a connection,
+ * The `connectors` proxy's route table: test-and-save a connection,
  * list its relations, preview one, and read its full rows as CSV - all
  * dispatched through {@link getConnector} to the connector type named in
  * the path.
  */
 export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsApi>(
-  "external-datasets",
+  "connectors",
   {
     "/:connectorType/connections/test-and-save": {
       POST: POST({

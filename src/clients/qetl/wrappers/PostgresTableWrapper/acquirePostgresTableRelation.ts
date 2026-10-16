@@ -38,7 +38,7 @@ export type PostgresRowsFetch = (
 
 /**
  * Acquires one Postgres relation: fetch its rows as CSV through the
- * `external-datasets` edge function's `rows` route, then read it.
+ * `connectors` edge function's `rows` route, then read it.
  *
  * This is the whole connector in one function, same shape as
  * `acquireGoogleSheetRelation`: it reads no dataset record, holds no
@@ -81,7 +81,7 @@ export async function acquirePostgresTableRelation<TRelation>(
   }
 
   const url =
-    `${AvaSupabase.getEdgeFunctionsURL()}/external-datasets/postgres/connections/` +
+    `${AvaSupabase.getEdgeFunctionsURL()}/connectors/postgres/connections/` +
     `${encodeURIComponent(params.connectionId)}/relations/` +
     `${encodeURIComponent(relationId)}/rows`;
   const response = await doFetch(url, {

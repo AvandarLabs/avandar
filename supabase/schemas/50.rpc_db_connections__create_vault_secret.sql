@@ -7,7 +7,7 @@
  * over the Data API (that is the entire point of Vault - every access goes
  * through a `security definer` function in `public` instead, same as the
  * read path `rpc_db_connections__get_decrypted_secret`). Called from the
- * `external-datasets` edge function using `SupabaseAdmin`, only after that
+ * `connectors` edge function using `SupabaseAdmin`, only after that
  * function's own `util__auth_user_meets_min_app_role` check has passed.
  *
  * @param p_secret The plaintext value to encrypt (the connection password).

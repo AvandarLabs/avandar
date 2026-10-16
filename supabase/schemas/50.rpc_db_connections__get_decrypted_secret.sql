@@ -7,7 +7,7 @@
  * pair below - `anon` and `authenticated`
  * have no EXECUTE grant on this function at all, so even a bug that let an
  * unauthorized caller reach it could not leak a password to the browser.
- * Called from the `external-datasets` edge function using `SupabaseAdmin`,
+ * Called from the `connectors` edge function using `SupabaseAdmin`,
  * only after that function's own `util__auth_user_meets_min_app_role` check
  * has passed for the caller's own session.
  *

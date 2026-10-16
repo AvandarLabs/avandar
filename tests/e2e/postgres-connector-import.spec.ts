@@ -14,7 +14,7 @@ import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
  * The Postgres connector, end to end: a saved connection, the schema-grouped
  * table picker, the preview, and the import form the rows land in.
  *
- * Only the two `external-datasets` HTTP calls that would otherwise open a
+ * Only the two `connectors` HTTP calls that would otherwise open a
  * real TCP connection to an external Postgres server are stubbed
  * (`relations`, `preview`) - mirroring exactly why
  * `google-sheets-import.spec.ts` stubs the Google API boundary and nothing
@@ -66,14 +66,14 @@ function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
 }
 
 /**
- * Answers the two `external-datasets` routes this view calls for an
+ * Answers the two `connectors` routes this view calls for an
  * already-saved connection, out of the fixture above. `test-and-save` is
  * deliberately not stubbed here - see the file docstring for why the
  * connection-creation path is out of scope for this spec.
  */
 async function _stubExternalDatasetsRoutes(page: Page): Promise<void> {
   await page.route(
-    "**/functions/v1/external-datasets/postgres/connections/*/relations",
+    "**/functions/v1/connectors/postgres/connections/*/relations",
     async (route: Route) => {
       await route.fulfill({
         status: 200,
@@ -84,7 +84,7 @@ async function _stubExternalDatasetsRoutes(page: Page): Promise<void> {
   );
 
   await page.route(
-    "**/functions/v1/external-datasets/postgres/connections/*/relations/*/preview",
+    "**/functions/v1/connectors/postgres/connections/*/relations/*/preview",
     async (route: Route) => {
       await route.fulfill({
         status: 200,

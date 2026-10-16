@@ -54,7 +54,7 @@ export type PostgresTableWrapperOptions = {
  * browser have to hold the result in memory. The cap values themselves are
  * declared and enforced server-side (`createPostgresConnector.ts`'s
  * `POSTGRES_MAX_ROWS_PER_ACQUIRE`/`POSTGRES_MAX_BYTES_PER_ACQUIRE`, under
- * `supabase/functions/external-datasets/connectors/postgres/`) - this
+ * `supabase/functions/connectors/connectors/postgres/`) - this
  * capability record mirrors the same two numbers so the mediator's
  * bookkeeping matches what the server will actually enforce. Keep these two
  * files in sync if either value ever changes.
@@ -131,7 +131,7 @@ function _missingReadCsv(): Promise<never> {
 
 /**
  * Acquires one Postgres table/view as Parquet, downloading it as CSV through
- * the `external-datasets` edge function.
+ * the `connectors` edge function.
  *
  * `acquire` is present because the capabilities declare the relation
  * acquirable. The source record and CSV reader arrive as options so this

@@ -1,8 +1,8 @@
-import { createPostgresConnector } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
+import { createPostgresConnector } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import type {
   ExternalDatasetConnector,
   ExternalDatasetConnectorType,
-} from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
+} from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 
 /**
  * The one registry every route dispatches through - the same registry shape

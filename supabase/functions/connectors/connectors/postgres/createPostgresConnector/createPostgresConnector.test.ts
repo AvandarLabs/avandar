@@ -1,9 +1,9 @@
 import { propEq } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-import { createPostgresConnector } from "@sbfn/external-datasets/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
-import type { ExternalDatasetConnectorContext } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
-import type { PostgresConnectionConfig } from "@sbfn/external-datasets/connectors/postgres/PostgresConnectionConfig.ts";
-import type { PostgresSql } from "@sbfn/external-datasets/connectors/postgres/PostgresSql.types.ts";
+import { createPostgresConnector } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
+import type { ExternalDatasetConnectorContext } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
+import type { PostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
+import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
 
 /**
  * SQL-injection-shaped payloads for every `test-and-save` connection-form

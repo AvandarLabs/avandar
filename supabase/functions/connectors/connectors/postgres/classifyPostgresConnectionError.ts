@@ -1,4 +1,4 @@
-import type { ExternalDatasetErrorCode } from "@sbfn/external-datasets/connectors/ExternalDatasetConnector.ts";
+import type { ExternalDatasetErrorCode } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 
 function _getErrorCode(error: unknown): string | undefined {
   if (
