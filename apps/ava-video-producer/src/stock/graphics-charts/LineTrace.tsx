@@ -1,5 +1,11 @@
 import { EASE, mix, ramp } from "../../motion";
-import { Eyebrow, Pill, STOCK, Text, type GraphicProps } from "../graphics-common";
+import {
+  Eyebrow,
+  Pill,
+  STOCK,
+  Text,
+  type GraphicProps,
+} from "../graphics-common";
 
 const TRACE_VALUES = [18, 24, 21, 39, 35, 51, 47, 61, 58, 76, 73, 88];
 const TRACE_REFERENCE = [12, 18, 23, 21, 30, 33, 41, 40, 43, 49, 51, 57];

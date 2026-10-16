@@ -1,4 +1,7 @@
-import { DENO_UNSAFE_PACKAGES, NO_RELATIVE_IMPORTS } from "./deno-restrictions.js";
+import {
+  DENO_UNSAFE_PACKAGES,
+  NO_RELATIVE_IMPORTS,
+} from "./deno-restrictions.js";
 
 export const NO_APP_IMPORTS = {
   group: ["@/*", "$/*"],

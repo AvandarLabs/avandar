@@ -7,8 +7,8 @@ import { CaseTypeHome } from "@/views/OntologyDesignerApp/CaseTypeHome/CaseTypeH
 import { CaseTypeAttributesList } from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList";
 import { ConceptNavbar } from "@/views/OntologyDesignerApp/ConceptNavbar";
 import fixtures from "../fixtures.json";
-import { CaseTypeDetails } from "./CaseTypeDetails";
 import css from "./CasesScreen.module.css";
+import { CaseTypeDetails } from "./CaseTypeDetails";
 import { RecordDetail } from "./RecordDetail";
 import type { ComponentProps } from "react";
 import "@mantine/tiptap/styles.css";
@@ -98,18 +98,23 @@ export function CasesScreen({
   height: number;
 }) {
   const root = useRef<HTMLDivElement>(null);
-  useLayoutEffect(function markCasesVideoTargets() {
-    const homeButton = [
-      ...(root.current?.querySelectorAll("button") ?? []),
-    ].find((button) => button.textContent?.startsWith(caseType.name));
-    homeButton?.setAttribute("data-video-target", "cases-type");
-    const firstRecord = root.current?.querySelector('a[data-record="HF-0001"]');
-    firstRecord?.setAttribute("data-video-target", "cases-record-001");
-    root.current?.querySelectorAll('[role="listitem"]').forEach((item) => {
-      if (item.textContent?.includes("supply_kits_delivered"))
-        item.setAttribute("data-video-target", "cases-visit-value");
-    });
-  }, [frame]);
+  useLayoutEffect(
+    function markCasesVideoTargets() {
+      const homeButton = [
+        ...(root.current?.querySelectorAll("button") ?? []),
+      ].find((button) => button.textContent?.startsWith(caseType.name));
+      homeButton?.setAttribute("data-video-target", "cases-type");
+      const firstRecord = root.current?.querySelector(
+        'a[data-record="HF-0001"]',
+      );
+      firstRecord?.setAttribute("data-video-target", "cases-record-001");
+      root.current?.querySelectorAll('[role="listitem"]').forEach((item) => {
+        if (item.textContent?.includes("supply_kits_delivered"))
+          item.setAttribute("data-video-target", "cases-visit-value");
+      });
+    },
+    [frame],
+  );
   const selected = frame >= 358;
   return (
     <div

@@ -1,8 +1,8 @@
 import { rename, writeFile } from "node:fs/promises";
 import { basename, relative, sep } from "node:path";
+import { isWithin } from "./fsSafety.mjs";
 import { assertSafeManifest } from "./sanitize.mjs";
 import { requestPolicy, sourceUrl } from "./urlSafety.mjs";
-import { isWithin } from "./fsSafety.mjs";
 
 /** Validate a manifest for leaked credentials, then write it atomically with owner-only mode. */
 export async function writeManifest(path, manifest, secrets = []) {

@@ -192,7 +192,9 @@ export function printReport({
     console.log(
       "Add your product's name for them to ALIASES in scripts/adopt-theme.mjs,",
     );
-    console.log("or set them by hand knowing the next run overwrites the file.");
+    console.log(
+      "or set them by hand knowing the next run overwrites the file.",
+    );
   }
 
   if (easings.length) {

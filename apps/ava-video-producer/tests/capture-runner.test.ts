@@ -3,6 +3,10 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { type TestContext } from "node:test";
+import {
+  CaptureRunError,
+  runCapture,
+} from "../scripts/capture-avandar/capture-avandar.mjs";
 import type {
   Browser,
   BrowserContext,
@@ -12,10 +16,6 @@ import type {
   Request,
   Route,
 } from "@playwright/test";
-import {
-  CaptureRunError,
-  runCapture,
-} from "../scripts/capture-avandar/capture-avandar.mjs";
 
 /** The subset of a Playwright `Request` the network-policy mock inspects. */
 type FakeRequest = Pick<Request, "url" | "method" | "resourceType">;
@@ -72,11 +72,10 @@ interface FakePage extends Pick<Page, "url" | "waitForTimeout"> {
  * The subset of a Playwright `BrowserContext` the capture runner manages:
  * network routing for the policy guard, storage-state capture, and lifecycle.
  */
-interface FakeContext
-  extends Pick<
-    BrowserContext,
-    "setDefaultTimeout" | "setDefaultNavigationTimeout" | "close"
-  > {
+interface FakeContext extends Pick<
+  BrowserContext,
+  "setDefaultTimeout" | "setDefaultNavigationTimeout" | "close"
+> {
   options: BrowserContextOptions;
   route: (pattern: string, handler: FakeRouteHandler) => Promise<void>;
   routeWebSocket: () => Promise<void>;

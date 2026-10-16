@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { EASE, ramp } from "../../motion";
 import { CaptionOverlay } from "../../scenes/CaptionOverlay";
@@ -10,6 +9,7 @@ import {
   type Storyboard,
 } from "../schema/schema";
 import { ShotView, type ProductSceneRenderer } from "./ShotView";
+import type { CSSProperties } from "react";
 
 export type { ProductSceneRenderer } from "./ShotView";
 

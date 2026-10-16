@@ -1,5 +1,11 @@
 import { DUR, ramp } from "../../motion";
-import { Eyebrow, Pill, STOCK, Text, type GraphicProps } from "../graphics-common";
+import {
+  Eyebrow,
+  Pill,
+  STOCK,
+  Text,
+  type GraphicProps,
+} from "../graphics-common";
 
 const MATRIX_POINTS = Array.from({ length: 100 }, (_, i) => ({
   x: 78 + (i % 20) * 30,

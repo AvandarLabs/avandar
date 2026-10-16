@@ -1,9 +1,9 @@
 import { memo } from "react";
-import type { StockPresetId } from "../../stock/catalog";
 import { StockGraphic } from "../../stock/StockGraphic";
 import { Icon } from "./Icon";
-import type { Preset } from "./shared";
 import { useFrames, useVisible } from "./useGalleryClock";
+import type { StockPresetId } from "../../stock/catalog";
+import type { Preset } from "./shared";
 
 export const MotionCard = memo(function MotionCard({
   preset,

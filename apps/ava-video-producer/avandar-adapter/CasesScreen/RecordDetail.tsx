@@ -1,9 +1,9 @@
 import { Paper } from "@avandar/ui";
 import { Container, Stack, Title } from "@mantine/core";
-import type { ComponentProps } from "react";
 import { ActivityBlock } from "@/views/IndividualManagerApp/SingleIndividualView/ActivityBlock";
 import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
 import { enter } from "../../src/motion";
+import type { ComponentProps } from "react";
 
 type Props = {
   frame: number;

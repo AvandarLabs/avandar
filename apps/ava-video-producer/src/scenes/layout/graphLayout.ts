@@ -1,7 +1,12 @@
 import { DUR, ramp } from "../../motion";
-import type { FlowStep, GraphEdge, GraphNode, TraversalBeat } from "../scenes.types";
 import { assertFrame, assertUnit, type Point, type Rect } from "./geometry";
 import { fitTextLines } from "./textLayout";
+import type {
+  FlowStep,
+  GraphEdge,
+  GraphNode,
+  TraversalBeat,
+} from "../scenes.types";
 
 export function validateGraph(
   nodes: GraphNode[],

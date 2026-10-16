@@ -1,8 +1,4 @@
-import {
-  IconCircleDashed,
-  IconPointer,
-  IconVector,
-} from "@tabler/icons-react";
+import { IconCircleDashed, IconPointer, IconVector } from "@tabler/icons-react";
 import { AnnotateMapTool } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapTool";
 import { EraseMapTool } from "@/views/GisApp/shell/MapToolCluster/EraseMapTool";
 import { GoToMapTool } from "@/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool";

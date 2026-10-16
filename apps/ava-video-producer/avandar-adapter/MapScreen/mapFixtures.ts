@@ -72,9 +72,8 @@ export const facilityPoints = makeFeatureCollectionFromRows({
   layerId: facilityLayer.id,
 });
 export const selectedFacility = facilityPoints.featureCollection.features[2]!;
-export const selectedCoordinates = (
-  selectedFacility.geometry as GeoJSON.Point
-).coordinates as [number, number];
+export const selectedCoordinates = (selectedFacility.geometry as GeoJSON.Point)
+  .coordinates as [number, number];
 
 /** A ready, error-free view state for a layer with `count` rendered features. */
 function _createViewState(count: number): MapLayerViewState {
@@ -90,7 +89,10 @@ function _createViewState(count: number): MapLayerViewState {
   };
 }
 export const viewStates = new Map([
-  [caseLayer.id, _createViewState(casePoints.featureCollection.features.length)],
+  [
+    caseLayer.id,
+    _createViewState(casePoints.featureCollection.features.length),
+  ],
   [
     facilityLayer.id,
     _createViewState(facilityPoints.featureCollection.features.length),

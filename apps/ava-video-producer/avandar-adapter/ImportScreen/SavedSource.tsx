@@ -7,7 +7,6 @@ import {
 import { Box, Button, Stack, ThemeIcon } from "@mantine/core";
 import { IconDotsVertical, IconShare, IconWorld } from "@tabler/icons-react";
 import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
@@ -24,6 +23,7 @@ import {
   NAME,
   source,
 } from "./importFixtures";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 const _noop = () => {};
 

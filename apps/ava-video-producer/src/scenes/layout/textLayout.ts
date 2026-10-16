@@ -1,5 +1,5 @@
-import type { MetricSceneProps } from "../scenes.types";
 import { assertFinite } from "./geometry";
+import type { MetricSceneProps } from "../scenes.types";
 
 export function formatMetric(value: number, precision = 0): string {
   assertFinite(value, "metric value");

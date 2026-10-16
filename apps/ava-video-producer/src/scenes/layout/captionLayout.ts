@@ -1,6 +1,6 @@
-import type { CaptionCue } from "../scenes.types";
 import { assertFinite, assertFrame } from "./geometry";
 import { fitTextLines } from "./textLayout";
+import type { CaptionCue } from "../scenes.types";
 
 /** One geometry calculation controls both the caption box and its reserved band. */
 export function captionGeometry(

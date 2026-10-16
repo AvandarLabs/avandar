@@ -14,8 +14,12 @@ import type { ComponentProps } from "react";
 
 type Props = {
   caseType: { id: string; name: string; description: string };
-  attributes: NonNullable<ComponentProps<typeof CaseTypeAttributesList>["attributes"]>;
-  datasets: NonNullable<ComponentProps<typeof CaseTypeAttributesList>["datasets"]>;
+  attributes: NonNullable<
+    ComponentProps<typeof CaseTypeAttributesList>["attributes"]
+  >;
+  datasets: NonNullable<
+    ComponentProps<typeof CaseTypeAttributesList>["datasets"]
+  >;
 };
 
 /**

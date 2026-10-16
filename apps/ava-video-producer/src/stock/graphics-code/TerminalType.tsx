@@ -1,5 +1,12 @@
 import { caretOn, DUR, ramp, typed } from "../../motion";
-import { Arrive, Check, Eyebrow, STOCK, Text, type GraphicProps } from "../graphics-common";
+import {
+  Arrive,
+  Check,
+  Eyebrow,
+  STOCK,
+  Text,
+  type GraphicProps,
+} from "../graphics-common";
 import { CodeWindow } from "./CodeWindow";
 
 const TERMINAL_STEPS = [

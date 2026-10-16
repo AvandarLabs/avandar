@@ -1,5 +1,11 @@
 import { DUR, EASE, mix, ramp } from "../../motion";
-import { Eyebrow, Pill, STOCK, Text, type GraphicProps } from "../graphics-common";
+import {
+  Eyebrow,
+  Pill,
+  STOCK,
+  Text,
+  type GraphicProps,
+} from "../graphics-common";
 
 const BAR_DATA = [
   { label: "Alpha", start: 42, end: 86, from: 2, to: 0, color: STOCK.mint },

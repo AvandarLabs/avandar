@@ -1,6 +1,6 @@
-import type { CSSProperties } from "react";
 import { TYPE } from "../fonts";
 import { Orb } from "./Orb";
+import type { CSSProperties } from "react";
 
 export const BAR = 40;
 export const HEAD = 68;

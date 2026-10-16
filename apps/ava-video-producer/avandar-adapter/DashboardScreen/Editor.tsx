@@ -7,9 +7,9 @@ import editorCss from "@/views/DashboardApp/DashboardEditorView/DashboardEditorV
 import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton";
 import { useFullWidthCanvasViewport } from "@/views/DashboardApp/DashboardEditorView/useFullWidthCanvasViewport/useFullWidthCanvasViewport";
 import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 const _noop = () => {};
 

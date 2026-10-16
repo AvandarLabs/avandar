@@ -15,8 +15,8 @@ import { CreateModal } from "./CreateModal";
 import css from "./DashboardScreen.module.css";
 import { Editor } from "./Editor";
 import { SourceChart } from "./SourceChart";
-import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export const DASHBOARD_DURATION = 720;
 export const DASHBOARD_BEATS = [

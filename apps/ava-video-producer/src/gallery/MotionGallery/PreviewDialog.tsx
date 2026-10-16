@@ -1,11 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { downloadFilm } from "../../../showcase/download.js";
-import type { StockPresetId } from "../../stock/catalog";
 import { StockGraphic } from "../../stock/StockGraphic";
 import { Icon } from "./Icon";
 import { PaletteControls, type Props as PaletteProps } from "./PaletteControls";
-import { reduceMotion, referenceBrief, referenceUrl, type Preset } from "./shared";
+import {
+  reduceMotion,
+  referenceBrief,
+  referenceUrl,
+  type Preset,
+} from "./shared";
 import { useFrames } from "./useGalleryClock";
+import type { StockPresetId } from "../../stock/catalog";
 
 function trapDialogFocus(event: React.KeyboardEvent<HTMLDialogElement>) {
   if (event.key !== "Tab") return;

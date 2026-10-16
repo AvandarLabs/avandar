@@ -1,5 +1,11 @@
 import { EASE, ramp } from "../../motion";
-import { Eyebrow, Pill, STOCK, Text, type GraphicProps } from "../graphics-common";
+import {
+  Eyebrow,
+  Pill,
+  STOCK,
+  Text,
+  type GraphicProps,
+} from "../graphics-common";
 import { CodeWindow } from "./CodeWindow";
 
 type CodeToken = { text: string; color: string };

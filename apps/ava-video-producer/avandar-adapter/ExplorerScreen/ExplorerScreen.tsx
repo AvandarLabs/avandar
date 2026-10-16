@@ -37,15 +37,15 @@ import {
   EXPLORER_SELECTED_COLUMNS,
   EXPLORER_SQL_CATALOG,
 } from "../Explorer.constants";
+import css from "./ExplorerScreen.module.css";
 import {
   aggregateColumns,
   barConfig,
   emptyFilter,
   explorerStage,
 } from "./explorerStage";
-import css from "./ExplorerScreen.module.css";
-import type { ExplorerMode } from "./explorerStage";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { ExplorerMode } from "./explorerStage";
 import type { EditorView } from "@codemirror/view";
 
 export type { ExplorerMode };
@@ -62,12 +62,7 @@ export type Props = {
 };
 
 /** Real product leaves, with fixture bindings and a frame-owned controller replacing app/network state. */
-export function ExplorerScreen({
-  frame,
-  width,
-  height,
-  mode = "full",
-}: Props) {
+export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
   const stage = explorerStage(frame, mode);
   const rootRef = useRef<HTMLDivElement>(null);
   const sqlViewRef = useRef<EditorView | null>(null);

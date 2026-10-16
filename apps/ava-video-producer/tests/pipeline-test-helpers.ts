@@ -1,7 +1,10 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { storyboardSchema, type Storyboard } from "../src/storyboard/schema/schema";
+import {
+  storyboardSchema,
+  type Storyboard,
+} from "../src/storyboard/schema/schema";
 
 /** A small two-shot plan with narration and a sound effect, used by the pipeline unit tests. */
 export function fixture(): Storyboard {

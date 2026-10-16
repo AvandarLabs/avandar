@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { FlowchartScene } from "../../scenes/FlowchartScene";
 import { GraphScene } from "../../scenes/GraphScene";
 import { MediaScene } from "../../scenes/MediaScene";
@@ -7,6 +6,7 @@ import { StockScene } from "../../scenes/StockScene";
 import { TypographyScene } from "../../scenes/TypographyScene";
 import { TitleCard } from "../../title-card";
 import type { Shot } from "../schema/schema";
+import type { ReactNode } from "react";
 
 /** All registered scene inputs are checked by the same storyboard schema. */
 export type ProductSceneRenderer = (

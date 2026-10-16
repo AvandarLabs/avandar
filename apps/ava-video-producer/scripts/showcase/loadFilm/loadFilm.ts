@@ -47,8 +47,12 @@ export async function loadFilm(
   rawOptions: unknown = {},
 ): Promise<Film> {
   const options = optionsSchema.parse(rawOptions);
-  const { STOCK_CATALOG, STOCK_FPS }: typeof import("../../../src/stock/catalog") =
-    await import(await _sourceModuleUrl("src/stock/catalog.ts"));
+  const {
+    STOCK_CATALOG,
+    STOCK_FPS,
+  }: typeof import("../../../src/stock/catalog") = await import(
+    await _sourceModuleUrl("src/stock/catalog.ts")
+  );
   const stock = STOCK_CATALOG.find((entry) => `stock-${entry.id}` === id);
   if (!stock && (options.accent || options.background)) {
     throw new Error("Palette options require an Atlas preset");

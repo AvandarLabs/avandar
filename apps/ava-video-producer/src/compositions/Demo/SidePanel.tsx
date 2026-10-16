@@ -1,7 +1,23 @@
-import type { ReactNode } from "react";
 import { abs, Orb } from "../../chrome/chrome";
-import { DUR, enter, enterAt, mix, mixToken, pop, press, ramp } from "../../motion";
-import { CHIP_CLICK, CHIPS, LIT_CHIP, ROWS_AT, SIDE, TOAST_AT } from "./timeline";
+import {
+  DUR,
+  enter,
+  enterAt,
+  mix,
+  mixToken,
+  pop,
+  press,
+  ramp,
+} from "../../motion";
+import {
+  CHIP_CLICK,
+  CHIPS,
+  LIT_CHIP,
+  ROWS_AT,
+  SIDE,
+  TOAST_AT,
+} from "./timeline";
+import type { ReactNode } from "react";
 
 /** The side panel phase: the matched-rows counter, the filter chips, a pair
  *  of supporting facts, and the publish toast that lands once the report
