@@ -1,11 +1,15 @@
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { string } from "zod";
 import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
 import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache.ts";
+import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.ts";
 import { createOpenDataHttp } from "$/connectors/open-data/createOpenDataHttp.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 
 /**
@@ -75,10 +79,42 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
       );
 
       try {
-        const acquisition = await acquireOpenDataResource({
+        const http = createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES });
+        const storage = createAvandarSupabaseStorageClient(
+          SupabaseAdmin.storage.from("open-data-catalog"),
+        );
+
+        const acquisition = await acquireOpenDataResourceWithCache({
           entry,
-          http: createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES }),
-          maxBytes: MAX_RESOURCE_BYTES,
+          readFreshnessToken: (freshnessEntry) => {
+            return readOpenDataFreshnessToken({ entry: freshnessEntry, http });
+          },
+          acquireLive: (liveEntry) => {
+            return acquireOpenDataResource({
+              entry: liveEntry,
+              http,
+              maxBytes: MAX_RESOURCE_BYTES,
+            });
+          },
+          storage,
+          updateCache: async ({
+            catalogEntryId,
+            cachedObjectPath,
+            cachedSourceVersion,
+          }) => {
+            const { error: updateError } = await SupabaseAdmin.from(
+              "catalog_entries__open_data",
+            )
+              .update({
+                cached_object_path: cachedObjectPath,
+                cached_source_version: cachedSourceVersion,
+                cached_at: new Date().toISOString(),
+              })
+              .eq("id", catalogEntryId);
+            if (updateError) {
+              throw updateError;
+            }
+          },
         });
 
         return new Response(acquisition.bytes as BodyInit, {
