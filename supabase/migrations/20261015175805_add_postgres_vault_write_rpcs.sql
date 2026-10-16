@@ -1,6 +1,6 @@
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.rpc_db_connections__create_vault_secret(p_secret text, p_name text, p_description text)
+CREATE OR REPLACE FUNCTION public.rpc_connections__create_vault_secret(p_secret text, p_name text, p_description text)
  RETURNS uuid
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -15,7 +15,7 @@ end;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.rpc_db_connections__update_vault_secret(p_secret_id uuid, p_new_secret text)
+CREATE OR REPLACE FUNCTION public.rpc_connections__update_vault_secret(p_secret_id uuid, p_new_secret text)
  RETURNS void
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -31,7 +31,7 @@ $function$
 -- Privileges that `supabase db diff` cannot see: default, schema, column,
 -- and view grants. Appended by `pnpm db:new-migration` from what
 -- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
-revoke all privileges on function public.rpc_db_connections__create_vault_secret(p_secret text, p_name text, p_description text) from public, anon, authenticated, service_role;
-grant EXECUTE on function public.rpc_db_connections__create_vault_secret(p_secret text, p_name text, p_description text) to "service_role";
-revoke all privileges on function public.rpc_db_connections__update_vault_secret(p_secret_id uuid, p_new_secret text) from public, anon, authenticated, service_role;
-grant EXECUTE on function public.rpc_db_connections__update_vault_secret(p_secret_id uuid, p_new_secret text) to "service_role";
+revoke all privileges on function public.rpc_connections__create_vault_secret(p_secret text, p_name text, p_description text) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_connections__create_vault_secret(p_secret text, p_name text, p_description text) to "service_role";
+revoke all privileges on function public.rpc_connections__update_vault_secret(p_secret_id uuid, p_new_secret text) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_connections__update_vault_secret(p_secret_id uuid, p_new_secret text) to "service_role";

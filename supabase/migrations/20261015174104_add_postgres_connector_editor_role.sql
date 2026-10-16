@@ -1,9 +1,9 @@
-drop policy "User can select db_connections in their workspace" on "public"."db_connections";
+drop policy "User can select connections in their workspace" on "public"."connections";
 
-drop policy "User can select db_connections__postgres in their workspace" on "public"."db_connections__postgres";
+drop policy "User can select connections__postgres in their workspace" on "public"."connections__postgres";
 
-  create policy "User can select db_connections in their workspace"
-  on "public"."db_connections"
+  create policy "User can select connections in their workspace"
+  on "public"."connections"
   as permissive
   for select
   to authenticated
@@ -11,8 +11,8 @@ using (public.util__auth_user_meets_min_app_role(workspace_id, 'data_sources'::p
 
 
 
-  create policy "User can select db_connections__postgres in their workspace"
-  on "public"."db_connections__postgres"
+  create policy "User can select connections__postgres in their workspace"
+  on "public"."connections__postgres"
   as permissive
   for select
   to authenticated

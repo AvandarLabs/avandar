@@ -8,8 +8,8 @@
  * reach the table at all. Mirrors `rls_datasets__pdf_file.test.sql` exactly -
  * this table is gated by `util__auth_user_can_access_resource('dataset', ...)`
  * the same way every other `datasets__<type>` satellite table is, unlike
- * `db_connections`/`db_connections__postgres` (app-role gated, tested
- * separately in `rls_db_connections.test.sql`).
+ * `connections`/`connections__postgres` (app-role gated, tested
+ * separately in `rls_connections.test.sql`).
  */
 begin;
 
@@ -41,13 +41,13 @@ values
   ('0c023002-0000-4000-8000-000000000002'::uuid, '0c020002-0000-4000-8000-000000000002'::uuid, '0c021002-0000-4000-8000-000000000002'::uuid, '0c022002-0000-4000-8000-000000000002'::uuid, 'Outsider', 'Outsider')
 on conflict (id) do nothing;
 
-insert into public.db_connections (
+insert into public.connections (
   id, workspace_id, connection_type, name, created_by
 )
 values (
   '0c024001-0000-4000-8000-000000000001'::uuid,
   '0c021001-0000-4000-8000-000000000001'::uuid,
-  'postgres'::public.db_connections__connection_type,
+  'postgres'::public.connections__connection_type,
   'ws a connection',
   '0c020001-0000-4000-8000-000000000001'::uuid
 )

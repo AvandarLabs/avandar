@@ -163,7 +163,7 @@ describe("PostgresConnectorImportView", () => {
     await waitFor(() => {
       expect(apiPostMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          route: "external-datasets/:connectorType/connections/test-and-save",
+          route: "connectors/:connectorType/connections/test-and-save",
           pathParams: { connectorType: "postgres" },
           body: expect.objectContaining({
             host: "db.example.org",
@@ -194,7 +194,7 @@ describe("PostgresConnectorImportView", () => {
       expect(apiGetMock).toHaveBeenCalledWith(
         expect.objectContaining({
           route:
-            "external-datasets/:connectorType/connections/:connectionId/relations/:relationId/preview",
+            "connectors/:connectorType/connections/:connectionId/relations/:relationId/preview",
         }),
       );
     });
@@ -263,7 +263,7 @@ describe("PostgresConnectorImportView", () => {
       expect(apiGetMock).toHaveBeenCalledWith(
         expect.objectContaining({
           route:
-            "external-datasets/:connectorType/connections/:connectionId/relations",
+            "connectors/:connectorType/connections/:connectionId/relations",
         }),
       );
     });

@@ -14,7 +14,7 @@ import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
  * The Postgres connector, end to end: a saved connection, the schema-grouped
  * table picker, the preview, and the import form the rows land in.
  *
- * Only the two `external-datasets` HTTP calls that would otherwise open a
+ * Only the two `connectors` HTTP calls that would otherwise open a
  * real TCP connection to an external Postgres server are stubbed
  * (`relations`, `preview`) - mirroring exactly why
  * `google-sheets-import.spec.ts` stubs the Google API boundary and nothing
@@ -66,14 +66,14 @@ function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
 }
 
 /**
- * Answers the two `external-datasets` routes this view calls for an
+ * Answers the two `connectors` routes this view calls for an
  * already-saved connection, out of the fixture above. `test-and-save` is
  * deliberately not stubbed here - see the file docstring for why the
  * connection-creation path is out of scope for this spec.
  */
 async function _stubExternalDatasetsRoutes(page: Page): Promise<void> {
   await page.route(
-    "**/functions/v1/external-datasets/postgres/connections/*/relations",
+    "**/functions/v1/connectors/postgres/connections/*/relations",
     async (route: Route) => {
       await route.fulfill({
         status: 200,
@@ -84,7 +84,7 @@ async function _stubExternalDatasetsRoutes(page: Page): Promise<void> {
   );
 
   await page.route(
-    "**/functions/v1/external-datasets/postgres/connections/*/relations/*/preview",
+    "**/functions/v1/connectors/postgres/connections/*/relations/*/preview",
     async (route: Route) => {
       await route.fulfill({
         status: 200,
@@ -99,8 +99,8 @@ async function _stubExternalDatasetsRoutes(page: Page): Promise<void> {
 }
 
 /**
- * Seeds one saved Postgres connection (`db_connections` +
- * `db_connections__postgres`) for the workspace, with a real Vault secret
+ * Seeds one saved Postgres connection (`connections` +
+ * `connections__postgres`) for the workspace, with a real Vault secret
  * (the password value is never dialed in this spec, since the live-DB round
  * trip is stubbed, but the FK and the RLS/Vault shape are real). Returns the
  * ids so cleanup can remove exactly what this test created.
@@ -112,7 +112,7 @@ async function _seedSavedConnection(options: {
   const { admin, workspaceId } = options;
 
   const { data: secretId, error: secretError } = await admin.rpc(
-    "rpc_db_connections__create_vault_secret",
+    "rpc_connections__create_vault_secret",
     {
       p_secret: "e2e-throwaway-password",
       p_name: `e2e-postgres-connector-${Date.now()}`,
@@ -128,7 +128,7 @@ async function _seedSavedConnection(options: {
   // leaves a row behind that the caller has no id to clean up.
   try {
     const { data: connection, error: connectionError } = await admin
-      .from("db_connections")
+      .from("connections")
       .insert({
         workspace_id: workspaceId,
         connection_type: "postgres",
@@ -137,11 +137,11 @@ async function _seedSavedConnection(options: {
       .select("id")
       .single();
     if (connectionError || !connection) {
-      throw new Error(`db_connections seed failed: ${connectionError?.message}`);
+      throw new Error(`connections seed failed: ${connectionError?.message}`);
     }
 
     const { error: postgresError } = await admin
-      .from("db_connections__postgres")
+      .from("connections__postgres")
       .insert({
         connection_id: connection.id,
         workspace_id: workspaceId,
@@ -154,13 +154,13 @@ async function _seedSavedConnection(options: {
         last_verified_at: new Date().toISOString(),
       });
     if (postgresError) {
-      await admin.from("db_connections").delete().eq("id", connection.id);
-      throw new Error(`db_connections__postgres seed failed: ${postgresError.message}`);
+      await admin.from("connections").delete().eq("id", connection.id);
+      throw new Error(`connections__postgres seed failed: ${postgresError.message}`);
     }
 
     return { connectionId: connection.id, vaultSecretId: secretId };
   } catch (error) {
-    await admin.rpc("rpc_db_connections__delete_vault_secret", {
+    await admin.rpc("rpc_connections__delete_vault_secret", {
       p_secret_id: secretId,
     });
     throw error;
@@ -168,7 +168,7 @@ async function _seedSavedConnection(options: {
 }
 
 /**
- * Deletes the seeded `db_connections`/`db_connections__postgres` rows and
+ * Deletes the seeded `connections`/`connections__postgres` rows and
  * the Vault secret they point at, so nothing from this test outlives it.
  */
 async function _cleanUpSavedConnection(options: {
@@ -178,14 +178,14 @@ async function _cleanUpSavedConnection(options: {
 }): Promise<void> {
   const { admin, connectionId, vaultSecretId } = options;
 
-  // Children before the parent: `db_connections__postgres.connection_id` is
-  // a foreign key onto `db_connections.id`.
+  // Children before the parent: `connections__postgres.connection_id` is
+  // a foreign key onto `connections.id`.
   await admin
-    .from("db_connections__postgres")
+    .from("connections__postgres")
     .delete()
     .eq("connection_id", connectionId);
-  await admin.from("db_connections").delete().eq("id", connectionId);
-  await admin.rpc("rpc_db_connections__delete_vault_secret", {
+  await admin.from("connections").delete().eq("id", connectionId);
+  await admin.rpc("rpc_connections__delete_vault_secret", {
     p_secret_id: vaultSecretId,
   });
 }

@@ -424,7 +424,7 @@ Gate the connection tables by **app role**
 `datasets__<type>` table uses - a connection is infrastructure configuration
 a workspace editor manages, not a document one teammate shares with another.
 See the Postgres spec's section 5.1 for the worked example
-(`db_connections` / `db_connections__postgres`).
+(`connections` / `connections__postgres`).
 
 ### 10.2 A credential storage tier stronger than a plain column
 
@@ -455,7 +455,7 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 13 | `src/clients/datasets/SourceDatasetClient.ts` | registry entry | compiler |
 | 14 | `src/clients/datasets/DatasetClient/createDatasetQueries.ts` | `getSourceDataset` arm | compiler |
 | 15 | `src/clients/datasets/DatasetClient/createDatasetMutations.ts`, `DatasetClient.types.ts`, `DatasetClient.ts` | insert mutation and its registration | inherent |
-| 16 | new server proxy - the real Postgres connector registers a connector implementation into a shared `supabase/functions/external-datasets/` edge function rather than creating a single-purpose one; see the Postgres spec section 5.4 for why | keeps credentials server-side | inherent |
+| 16 | new server proxy - the real Postgres connector registers a connector implementation into a shared `supabase/functions/connectors/` edge function rather than creating a single-purpose one; see the Postgres spec section 5.4 for why | keeps credentials server-side | inherent |
 | 17 | new browser client, for example `src/lib/postgresTable/` | calls the proxy, returns bytes | inherent |
 | 18 | new `src/clients/qetl/wrappers/PostgresTableWrapper/` | `SourceWrapper` with `capabilities` and `acquire`, plus tests | inherent |
 | 19 | `src/clients/qetl/QueryMediator/QueryMediator.types.ts` | `RelationSource` arm | compiler (through row 20) |

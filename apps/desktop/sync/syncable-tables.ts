@@ -161,8 +161,8 @@ export const EXCLUDED_TABLES = [
   "user_nux_progress",
   // A saved connection's secret pointer is meaningless offline, and the
   // desktop shell cannot proxy a live Postgres connection either.
-  "db_connections",
-  "db_connections__postgres",
+  "connections",
+  "connections__postgres",
 ] as const;
 
 /**

@@ -12,14 +12,14 @@ import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/DataImp
 import type { PostgresDatabaseConnectionWithDetails } from "@/clients/connections/DatabaseConnectionClient";
 import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
-import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection";
+import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type {
   ExternalDatasetErrorCode,
   ExternalDatasetRelation,
-} from "@sbfn/external-datasets/connectors/ExternalDatasetConnector";
+} from "@sbfn/connectors/ExternalDatasetConnector";
 
 /**
  * The connection form's own fields - never retained once test-and-save
@@ -91,7 +91,7 @@ const POSTGRES_RELATION_KINDS = [
 ] as const satisfies readonly PostgresTableDataset.RelationKind[];
 
 /**
- * Whether the `external-datasets` proxy reported a relation kind this
+ * Whether the `connectors` proxy reported a relation kind this
  * connector actually understands - its `kind` field is a plain `string`
  * shared across every connector type, so a connector-specific caller must
  * validate it before narrowing.
@@ -154,7 +154,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       connectionId: DatabaseConnection.Id;
     }): Promise<ExternalDatasetRelation[]> => {
       const result = await APIClient.get({
-        route: "external-datasets/:connectorType/connections/:connectionId/relations",
+        route: "connectors/:connectorType/connections/:connectionId/relations",
         pathParams: { connectorType: "postgres", connectionId: params.connectionId },
       });
       if ("error" in result) {
@@ -211,7 +211,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
           detail: t`Listing tables...`,
         });
         const result = await APIClient.post({
-          route: "external-datasets/:connectorType/connections/test-and-save",
+          route: "connectors/:connectorType/connections/test-and-save",
           pathParams: { connectorType: "postgres" },
           body: {
             workspaceId: workspace.id,
@@ -265,7 +265,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       relationKind: PostgresTableDataset.RelationKind;
     }): Promise<void> => {
       const result = await APIClient.get({
-        route: "external-datasets/:connectorType/connections/:connectionId/relations/:relationId/preview",
+        route: "connectors/:connectorType/connections/:connectionId/relations/:relationId/preview",
         pathParams: {
           connectorType: "postgres",
           connectionId: params.connectionId,

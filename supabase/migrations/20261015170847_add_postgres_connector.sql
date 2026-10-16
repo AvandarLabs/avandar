@@ -1,8 +1,8 @@
 create type "public"."datasets__postgres_table_relation_kind" as enum ('table', 'view');
 
-create type "public"."db_connections__connection_type" as enum ('postgres');
+create type "public"."connections__connection_type" as enum ('postgres');
 
-create type "public"."db_connections__postgres_ssl_mode" as enum ('disable', 'require');
+create type "public"."connections__postgres_ssl_mode" as enum ('disable', 'require');
 
 alter type "public"."datasets__source_type" rename to "datasets__source_type__old_version_to_be_dropped";
 
@@ -25,10 +25,10 @@ create type "public"."datasets__source_type" as enum ('csv_file', 'google_sheets
 alter table "public"."datasets__postgres_table" enable row level security;
 
 
-  create table "public"."db_connections" (
+  create table "public"."connections" (
     "id" uuid not null default gen_random_uuid(),
     "workspace_id" uuid not null,
-    "connection_type" public.db_connections__connection_type not null,
+    "connection_type" public.connections__connection_type not null,
     "name" text not null,
     "created_by" uuid,
     "created_at" timestamp with time zone not null default now(),
@@ -36,17 +36,17 @@ alter table "public"."datasets__postgres_table" enable row level security;
       );
 
 
-alter table "public"."db_connections" enable row level security;
+alter table "public"."connections" enable row level security;
 
 
-  create table "public"."db_connections__postgres" (
+  create table "public"."connections__postgres" (
     "connection_id" uuid not null,
     "workspace_id" uuid not null,
     "host" text not null,
     "port" integer not null,
     "database_name" text not null,
     "username" text not null,
-    "ssl_mode" public.db_connections__postgres_ssl_mode not null default 'require'::public.db_connections__postgres_ssl_mode,
+    "ssl_mode" public.connections__postgres_ssl_mode not null default 'require'::public.connections__postgres_ssl_mode,
     "vault_secret_id" uuid not null,
     "last_verified_at" timestamp with time zone,
     "created_at" timestamp with time zone not null default now(),
@@ -54,7 +54,7 @@ alter table "public"."db_connections" enable row level security;
       );
 
 
-alter table "public"."db_connections__postgres" enable row level security;
+alter table "public"."connections__postgres" enable row level security;
 
 alter table "public"."datasets" alter column source_type type "public"."datasets__source_type" using source_type::text::"public"."datasets__source_type";
 
@@ -173,19 +173,19 @@ CREATE UNIQUE INDEX datasets__postgres_table_dataset_id_key ON public.datasets__
 
 CREATE UNIQUE INDEX datasets__postgres_table_pkey ON public.datasets__postgres_table USING btree (id);
 
-CREATE UNIQUE INDEX db_connections__postgres_pkey ON public.db_connections__postgres USING btree (connection_id);
+CREATE UNIQUE INDEX connections__postgres_pkey ON public.connections__postgres USING btree (connection_id);
 
-CREATE UNIQUE INDEX db_connections_pkey ON public.db_connections USING btree (id);
+CREATE UNIQUE INDEX connections_pkey ON public.connections USING btree (id);
 
-CREATE INDEX idx_db_connections__workspace ON public.db_connections USING btree (workspace_id);
+CREATE INDEX idx_connections__workspace ON public.connections USING btree (workspace_id);
 
 alter table "public"."datasets__postgres_table" add constraint "datasets__postgres_table_pkey" PRIMARY KEY using index "datasets__postgres_table_pkey";
 
-alter table "public"."db_connections" add constraint "db_connections_pkey" PRIMARY KEY using index "db_connections_pkey";
+alter table "public"."connections" add constraint "connections_pkey" PRIMARY KEY using index "connections_pkey";
 
-alter table "public"."db_connections__postgres" add constraint "db_connections__postgres_pkey" PRIMARY KEY using index "db_connections__postgres_pkey";
+alter table "public"."connections__postgres" add constraint "connections__postgres_pkey" PRIMARY KEY using index "connections__postgres_pkey";
 
-alter table "public"."datasets__postgres_table" add constraint "datasets__postgres_table_connection_id_fkey" FOREIGN KEY (connection_id) REFERENCES public.db_connections(id) ON UPDATE CASCADE ON DELETE RESTRICT not valid;
+alter table "public"."datasets__postgres_table" add constraint "datasets__postgres_table_connection_id_fkey" FOREIGN KEY (connection_id) REFERENCES public.connections(id) ON UPDATE CASCADE ON DELETE RESTRICT not valid;
 
 alter table "public"."datasets__postgres_table" validate constraint "datasets__postgres_table_connection_id_fkey";
 
@@ -199,21 +199,21 @@ alter table "public"."datasets__postgres_table" add constraint "datasets__postgr
 
 alter table "public"."datasets__postgres_table" validate constraint "datasets__postgres_table_workspace_id_fkey";
 
-alter table "public"."db_connections" add constraint "db_connections_created_by_fkey" FOREIGN KEY (created_by) REFERENCES auth.users(id) ON UPDATE CASCADE ON DELETE SET NULL not valid;
+alter table "public"."connections" add constraint "connections_created_by_fkey" FOREIGN KEY (created_by) REFERENCES auth.users(id) ON UPDATE CASCADE ON DELETE SET NULL not valid;
 
-alter table "public"."db_connections" validate constraint "db_connections_created_by_fkey";
+alter table "public"."connections" validate constraint "connections_created_by_fkey";
 
-alter table "public"."db_connections" add constraint "db_connections_workspace_id_fkey" FOREIGN KEY (workspace_id) REFERENCES public.workspaces(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+alter table "public"."connections" add constraint "connections_workspace_id_fkey" FOREIGN KEY (workspace_id) REFERENCES public.workspaces(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
-alter table "public"."db_connections" validate constraint "db_connections_workspace_id_fkey";
+alter table "public"."connections" validate constraint "connections_workspace_id_fkey";
 
-alter table "public"."db_connections__postgres" add constraint "db_connections__postgres_connection_id_fkey" FOREIGN KEY (connection_id) REFERENCES public.db_connections(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+alter table "public"."connections__postgres" add constraint "connections__postgres_connection_id_fkey" FOREIGN KEY (connection_id) REFERENCES public.connections(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
-alter table "public"."db_connections__postgres" validate constraint "db_connections__postgres_connection_id_fkey";
+alter table "public"."connections__postgres" validate constraint "connections__postgres_connection_id_fkey";
 
-alter table "public"."db_connections__postgres" add constraint "db_connections__postgres_workspace_id_fkey" FOREIGN KEY (workspace_id) REFERENCES public.workspaces(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+alter table "public"."connections__postgres" add constraint "connections__postgres_workspace_id_fkey" FOREIGN KEY (workspace_id) REFERENCES public.workspaces(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
-alter table "public"."db_connections__postgres" validate constraint "db_connections__postgres_workspace_id_fkey";
+alter table "public"."connections__postgres" validate constraint "connections__postgres_workspace_id_fkey";
 
 set check_function_bodies = off;
 
@@ -254,7 +254,7 @@ end;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.rpc_db_connections__get_decrypted_secret(p_vault_secret_id uuid)
+CREATE OR REPLACE FUNCTION public.rpc_connections__get_decrypted_secret(p_vault_secret_id uuid)
  RETURNS text
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -288,37 +288,37 @@ grant select on table "public"."datasets__postgres_table" to "service_role";
 
 grant update on table "public"."datasets__postgres_table" to "service_role";
 
-grant delete on table "public"."db_connections" to "authenticated";
+grant delete on table "public"."connections" to "authenticated";
 
-grant insert on table "public"."db_connections" to "authenticated";
+grant insert on table "public"."connections" to "authenticated";
 
-grant select on table "public"."db_connections" to "authenticated";
+grant select on table "public"."connections" to "authenticated";
 
-grant update on table "public"."db_connections" to "authenticated";
+grant update on table "public"."connections" to "authenticated";
 
-grant delete on table "public"."db_connections" to "service_role";
+grant delete on table "public"."connections" to "service_role";
 
-grant insert on table "public"."db_connections" to "service_role";
+grant insert on table "public"."connections" to "service_role";
 
-grant select on table "public"."db_connections" to "service_role";
+grant select on table "public"."connections" to "service_role";
 
-grant update on table "public"."db_connections" to "service_role";
+grant update on table "public"."connections" to "service_role";
 
-grant delete on table "public"."db_connections__postgres" to "authenticated";
+grant delete on table "public"."connections__postgres" to "authenticated";
 
-grant insert on table "public"."db_connections__postgres" to "authenticated";
+grant insert on table "public"."connections__postgres" to "authenticated";
 
-grant select on table "public"."db_connections__postgres" to "authenticated";
+grant select on table "public"."connections__postgres" to "authenticated";
 
-grant update on table "public"."db_connections__postgres" to "authenticated";
+grant update on table "public"."connections__postgres" to "authenticated";
 
-grant delete on table "public"."db_connections__postgres" to "service_role";
+grant delete on table "public"."connections__postgres" to "service_role";
 
-grant insert on table "public"."db_connections__postgres" to "service_role";
+grant insert on table "public"."connections__postgres" to "service_role";
 
-grant select on table "public"."db_connections__postgres" to "service_role";
+grant select on table "public"."connections__postgres" to "service_role";
 
-grant update on table "public"."db_connections__postgres" to "service_role";
+grant update on table "public"."connections__postgres" to "service_role";
 
 
   create policy "User can delete datasets__postgres_table in their workspace"
@@ -358,8 +358,8 @@ with check (public.util__auth_user_can_access_resource('dataset'::public.resourc
 
 
 
-  create policy "User can delete db_connections in their workspace"
-  on "public"."db_connections"
+  create policy "User can delete connections in their workspace"
+  on "public"."connections"
   as permissive
   for delete
   to authenticated
@@ -367,8 +367,8 @@ using (public.util__auth_user_meets_min_app_role(workspace_id, 'data_sources'::p
 
 
 
-  create policy "User can insert db_connections in their workspace"
-  on "public"."db_connections"
+  create policy "User can insert connections in their workspace"
+  on "public"."connections"
   as permissive
   for insert
   to authenticated
@@ -376,8 +376,8 @@ with check (public.util__auth_user_meets_min_app_role(workspace_id, 'data_source
 
 
 
-  create policy "User can select db_connections in their workspace"
-  on "public"."db_connections"
+  create policy "User can select connections in their workspace"
+  on "public"."connections"
   as permissive
   for select
   to authenticated
@@ -385,8 +385,8 @@ using (public.util__auth_user_meets_min_app_role(workspace_id, 'data_sources'::p
 
 
 
-  create policy "User can update db_connections in their workspace"
-  on "public"."db_connections"
+  create policy "User can update connections in their workspace"
+  on "public"."connections"
   as permissive
   for update
   to authenticated
@@ -395,8 +395,8 @@ with check (public.util__auth_user_meets_min_app_role(workspace_id, 'data_source
 
 
 
-  create policy "User can delete db_connections__postgres in their workspace"
-  on "public"."db_connections__postgres"
+  create policy "User can delete connections__postgres in their workspace"
+  on "public"."connections__postgres"
   as permissive
   for delete
   to authenticated
@@ -404,8 +404,8 @@ using (public.util__auth_user_meets_min_app_role(workspace_id, 'data_sources'::p
 
 
 
-  create policy "User can insert db_connections__postgres in their workspace"
-  on "public"."db_connections__postgres"
+  create policy "User can insert connections__postgres in their workspace"
+  on "public"."connections__postgres"
   as permissive
   for insert
   to authenticated
@@ -413,8 +413,8 @@ with check (public.util__auth_user_meets_min_app_role(workspace_id, 'data_source
 
 
 
-  create policy "User can select db_connections__postgres in their workspace"
-  on "public"."db_connections__postgres"
+  create policy "User can select connections__postgres in their workspace"
+  on "public"."connections__postgres"
   as permissive
   for select
   to authenticated
@@ -422,8 +422,8 @@ using (public.util__auth_user_meets_min_app_role(workspace_id, 'data_sources'::p
 
 
 
-  create policy "User can update db_connections__postgres in their workspace"
-  on "public"."db_connections__postgres"
+  create policy "User can update connections__postgres in their workspace"
+  on "public"."connections__postgres"
   as permissive
   for update
   to authenticated
@@ -433,9 +433,9 @@ with check (public.util__auth_user_meets_min_app_role(workspace_id, 'data_source
 
 CREATE TRIGGER tr_datasets__postgres_table__set_updated_at BEFORE UPDATE ON public.datasets__postgres_table FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
 
-CREATE TRIGGER tr_db_connections__set_updated_at BEFORE UPDATE ON public.db_connections FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
+CREATE TRIGGER tr_connections__set_updated_at BEFORE UPDATE ON public.connections FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
 
-CREATE TRIGGER tr_db_connections__postgres__set_updated_at BEFORE UPDATE ON public.db_connections__postgres FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
+CREATE TRIGGER tr_connections__postgres__set_updated_at BEFORE UPDATE ON public.connections__postgres FOR EACH ROW EXECUTE FUNCTION public.util__set_updated_at();
 
 
 
@@ -446,5 +446,5 @@ revoke all privileges on function public.rpc_datasets__add_dataset(p_dataset_id 
 grant EXECUTE on function public.rpc_datasets__add_dataset(p_dataset_id uuid, p_workspace_id uuid, p_dataset_name text, p_dataset_description text, p_dataset_source_type datasets__source_type, p_columns dataset_column_input[]) to "authenticated";
 revoke all privileges on function public.rpc_datasets__add_postgres_table_dataset(p_dataset_id uuid, p_workspace_id uuid, p_dataset_name text, p_dataset_description text, p_columns dataset_column_input[], p_connection_id uuid, p_schema_name text, p_table_name text, p_relation_kind datasets__postgres_table_relation_kind) from public, anon, authenticated, service_role;
 grant EXECUTE on function public.rpc_datasets__add_postgres_table_dataset(p_dataset_id uuid, p_workspace_id uuid, p_dataset_name text, p_dataset_description text, p_columns dataset_column_input[], p_connection_id uuid, p_schema_name text, p_table_name text, p_relation_kind datasets__postgres_table_relation_kind) to "authenticated";
-revoke all privileges on function public.rpc_db_connections__get_decrypted_secret(p_vault_secret_id uuid) from public, anon, authenticated, service_role;
-grant EXECUTE on function public.rpc_db_connections__get_decrypted_secret(p_vault_secret_id uuid) to "service_role";
+revoke all privileges on function public.rpc_connections__get_decrypted_secret(p_vault_secret_id uuid) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_connections__get_decrypted_secret(p_vault_secret_id uuid) to "service_role";

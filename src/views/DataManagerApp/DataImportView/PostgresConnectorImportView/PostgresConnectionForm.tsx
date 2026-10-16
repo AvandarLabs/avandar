@@ -13,7 +13,7 @@ import type {
   PostgresConnectionError,
   PostgresConnectionFormValues,
 } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
-import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection";
+import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection";
 
 const SSL_MODES = [
   "require",

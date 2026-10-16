@@ -2,7 +2,7 @@
  * One row per Postgres table or view imported as an Avandar dataset - the
  * satellite half of the `datasets` / `datasets__<type>` split, the same
  * shape as `datasets__csv_file` or `datasets__google_sheets`. Reached
- * through `db_connections__postgres` (`connection_id`), which holds the
+ * through `connections__postgres` (`connection_id`), which holds the
  * saved server connection this table is read through; `schema_name` and
  * `table_name` together identify the relation within that server.
  */
@@ -17,7 +17,7 @@ create table public.datasets__postgres_table (
   -- `cascade`: deleting a connection with live datasets must be an
   -- explicit, informed action - the FK must not silently orphan a
   -- queryable dataset.
-  connection_id uuid not null references public.db_connections (id) on update cascade on delete restrict,
+  connection_id uuid not null references public.connections (id) on update cascade on delete restrict,
   schema_name text not null,
   table_name text not null,
   relation_kind public.datasets__postgres_table_relation_kind not null,

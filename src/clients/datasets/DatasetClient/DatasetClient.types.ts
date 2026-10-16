@@ -1,5 +1,5 @@
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
-import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import type {
