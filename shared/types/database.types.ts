@@ -1806,7 +1806,7 @@ export type Database = {
         Returns: string
       }
       rpc_connections__delete_vault_secret: {
-        Args: { p_secret_id: string }
+        Args: { p_secret_id: string; p_workspace_id: string }
         Returns: undefined
       }
       rpc_connections__get_decrypted_secret: {
@@ -1814,7 +1814,11 @@ export type Database = {
         Returns: string
       }
       rpc_connections__update_vault_secret: {
-        Args: { p_new_secret: string; p_secret_id: string }
+        Args: {
+          p_new_secret: string
+          p_secret_id: string
+          p_workspace_id: string
+        }
         Returns: undefined
       }
       rpc_datasets__add_csv_file_dataset: {

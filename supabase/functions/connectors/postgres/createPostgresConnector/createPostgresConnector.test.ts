@@ -335,7 +335,10 @@ describe("createPostgresConnector - rolls back an orphaned Vault secret", () => 
     expect(rpcCalls).toContainEqual(
       expect.objectContaining({
         name: "rpc_connections__delete_vault_secret",
-        params: { p_secret_id: "11111111-1111-1111-1111-111111111111" },
+        params: {
+          p_secret_id: "11111111-1111-1111-1111-111111111111",
+          p_workspace_id: "33333333-3333-3333-3333-333333333333",
+        },
       }),
     );
     expect(deletedConnectionIds).toContain(

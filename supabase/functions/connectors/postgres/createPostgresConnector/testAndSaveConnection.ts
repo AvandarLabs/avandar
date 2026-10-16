@@ -88,6 +88,7 @@ async function _rotateConnection(
     {
       p_secret_id: existing.vault_secret_id,
       p_new_secret: input.password,
+      p_workspace_id: context.workspaceId,
     },
   );
   if (updateSecretError) {
@@ -122,7 +123,6 @@ async function _rotateConnection(
   return connectionId;
 }
 
-/** Creates a new Vault secret and a new saved connection pointing at it. */
 /**
  * Deletes a Vault secret this request itself just created, after a later
  * step in the same creation failed. Best-effort: a failure here must never
@@ -136,7 +136,7 @@ async function _rollbackOrphanedVaultSecret(
 ): Promise<void> {
   const { error } = await context.supabaseAdminClient.rpc(
     "rpc_connections__delete_vault_secret",
-    { p_secret_id: secretId },
+    { p_secret_id: secretId, p_workspace_id: context.workspaceId },
   );
   if (error) {
     console.error(
@@ -146,6 +146,7 @@ async function _rollbackOrphanedVaultSecret(
   }
 }
 
+/** Creates a new Vault secret and a new saved connection pointing at it. */
 async function _createConnection(
   context: ConnectorContext,
   input: PostgresTestAndSaveInput,

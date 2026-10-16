@@ -165,6 +165,7 @@ async function _seedSavedConnection(options: {
   } catch (error) {
     await admin.rpc("rpc_connections__delete_vault_secret", {
       p_secret_id: secretId,
+      p_workspace_id: workspaceId,
     });
     throw error;
   }
@@ -178,8 +179,9 @@ async function _cleanUpSavedConnection(options: {
   admin: AvaSupabaseDBClient;
   connectionId: string;
   vaultSecretId: string;
+  workspaceId: string;
 }): Promise<void> {
-  const { admin, connectionId, vaultSecretId } = options;
+  const { admin, connectionId, vaultSecretId, workspaceId } = options;
 
   // Children before the parent: `connections__postgres.connection_id` is
   // a foreign key onto `connections.id`.
@@ -190,6 +192,7 @@ async function _cleanUpSavedConnection(options: {
   await admin.from("connections").delete().eq("id", connectionId);
   await admin.rpc("rpc_connections__delete_vault_secret", {
     p_secret_id: vaultSecretId,
+    p_workspace_id: workspaceId,
   });
 }
 
@@ -265,7 +268,12 @@ test.describe("Postgres connector", () => {
         workspaceId,
       });
       if (connectionId && vaultSecretId) {
-        await _cleanUpSavedConnection({ admin, connectionId, vaultSecretId });
+        await _cleanUpSavedConnection({
+          admin,
+          connectionId,
+          vaultSecretId,
+          workspaceId,
+        });
       }
     }
   });
