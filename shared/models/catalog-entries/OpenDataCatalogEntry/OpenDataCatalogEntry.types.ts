@@ -95,7 +95,7 @@ export type OpenDataCatalogEntryRead = {
 export type OpenDataAccessKind = "pipeline_parquet" | "api_resource";
 
 /** The API protocol an `api_resource` entry speaks, not the host serving it. */
-export type OpenDataApiService = "ckan";
+export type OpenDataApiService = "ckan" | "socrata";
 
 /**
  * An entry's access shape, with the null checks already done. Every member is

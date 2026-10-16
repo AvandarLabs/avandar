@@ -2332,7 +2332,7 @@ export type Database = {
       catalog_entries__open_data__access_kind:
         | "pipeline_parquet"
         | "api_resource"
-      catalog_entries__open_data__api_service: "ckan"
+      catalog_entries__open_data__api_service: "ckan" | "socrata"
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       dashboard_snapshot_transition_kind:
         | "publish"
@@ -2587,7 +2587,7 @@ export const Constants = {
         "pipeline_parquet",
         "api_resource",
       ],
-      catalog_entries__open_data__api_service: ["ckan"],
+      catalog_entries__open_data__api_service: ["ckan", "socrata"],
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       dashboard_snapshot_transition_kind: [
         "publish",

@@ -100,7 +100,7 @@ describe("OpenDataCatalogEntryParsers", () => {
   });
 
   it("rejects an unknown API service", () => {
-    const row = { ..._apiDBRow(), api_service: "socrata" };
+    const row = { ..._apiDBRow(), api_service: "arcgis" };
 
     expect(() => {
       return OpenDataCatalogEntryParsers.DBReadSchema.parse(row);

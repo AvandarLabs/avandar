@@ -39,7 +39,7 @@ const DBReadSchema = z.object({
   notes: z.string().nullable(),
   metadata: supabaseJSONSchema.nullable(),
   access_kind: z.enum(["pipeline_parquet", "api_resource"]),
-  api_service: z.enum(["ckan"]).nullable(),
+  api_service: z.enum(["ckan", "socrata"]).nullable(),
   api_base_url: z.string().nullable(),
   api_resource_id: z.string().nullable(),
   api_resource_format: z.string().nullable(),
