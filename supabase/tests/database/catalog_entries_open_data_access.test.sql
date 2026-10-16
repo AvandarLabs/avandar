@@ -234,15 +234,16 @@ select throws_ok(
 select throws_ok(
   $$insert into public.catalog_entries__open_data
       (id, display_name, external_organization_name, access_kind,
-       parquet_file_name, pipeline_name, pipeline_run_id, cached_object_path)
+       parquet_file_name, pipeline_name, pipeline_run_id,
+       cached_object_path, cached_source_version, cached_at)
     values
       ('aaaaaaaa-0000-4000-8000-000000000104', 'pgtap-fixture pipeline row',
        'World Bank', 'pipeline_parquet',
        'pgtap-fixture-other2.parquet', 'pgtap-fixture-pipeline', 'run-4',
-       'should-not-be-allowed.csv')$$,
+       'should-not-be-allowed.csv', 'pgtap-fixture-version', now())$$,
   '23514',
   null,
-  'a pipeline_parquet row with cached_object_path set is rejected'
+  'a pipeline_parquet row with a complete cache set is still rejected'
 );
 
 -- ---------------------------------------------------------------------------
