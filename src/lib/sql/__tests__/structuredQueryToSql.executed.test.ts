@@ -16,11 +16,13 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptModel } from "$/models/ontology/Concept/Concept.types";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
@@ -219,6 +221,37 @@ async function _runQuery(sql: string): Promise<Array<Record<string, unknown>>> {
 }
 
 describe("structuredQueryToSql executed", () => {
+  it("returns the same groups after a SQL/form round trip with an aggregate alias in HAVING", async () => {
+    const originalSql = `
+      SELECT district, SUM(cnt) AS total
+      FROM cases
+      WHERE cnt >= 2
+      GROUP BY district
+      HAVING total > 5
+    `;
+    const expectedRows = [{ district: "North", total: 7 }];
+    await expect(_runQuery(originalSql)).resolves.toEqual(expectedRows);
+    const mapped = sqlToStructuredQuery({
+      sql: originalSql,
+      datasets: [
+        {
+          dataset: _makeDataset("cases"),
+          columns: [
+            _makeColumn({ id: "district", name: "district" })
+              .baseColumn as DatasetColumn.T,
+            _makeColumn({ id: "cnt", name: "cnt", dataType: "bigint" })
+              .baseColumn as DatasetColumn.T,
+          ],
+        },
+      ],
+    });
+    expect(mapped.isFullyMapped).toBe(true);
+
+    await expect(
+      _runQuery(structuredQueryToSql(mapped.query)),
+    ).resolves.toEqual(expectedRows);
+  });
+
   it("filters and groups to the right rows", async () => {
     const district = _makeColumn({ id: "qc_1_district", name: "district" });
     const total = _makeColumn({
