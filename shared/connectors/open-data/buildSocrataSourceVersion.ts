@@ -13,7 +13,7 @@ const VIEW_MODIFIED_PREFIX = "socrata:viewLastModified:";
  * metadata-only edit (a description typo fix), mirroring exactly why the
  * CKAN version builder prefers `hash` over `metadata_modified`.
  */
-export function buildSocrataSourceVersion(
+export function makeSourceVersionFromSocrataViewMetadata(
   metadata: Readonly<SocrataViewMetadata>,
 ): SourceVersion | undefined {
   if (metadata.rowsUpdatedAt !== undefined) {

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildSocrataSourceVersion } from "$/connectors/open-data/buildSocrataSourceVersion.ts";
+import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/buildSocrataSourceVersion.ts";
 
-describe("buildSocrataSourceVersion", () => {
+describe("makeSourceVersionFromSocrataViewMetadata", () => {
   it("prefers rowsUpdatedAt when present", () => {
     expect(
-      buildSocrataSourceVersion({
+      makeSourceVersionFromSocrataViewMetadata({
         id: "x",
         name: "x",
         rowsUpdatedAt: 1792114673,
@@ -15,7 +15,7 @@ describe("buildSocrataSourceVersion", () => {
 
   it("falls back to viewLastModified when rowsUpdatedAt is absent", () => {
     expect(
-      buildSocrataSourceVersion({
+      makeSourceVersionFromSocrataViewMetadata({
         id: "x",
         name: "x",
         rowsUpdatedAt: undefined,
@@ -26,7 +26,7 @@ describe("buildSocrataSourceVersion", () => {
 
   it("returns undefined when neither field is present", () => {
     expect(
-      buildSocrataSourceVersion({
+      makeSourceVersionFromSocrataViewMetadata({
         id: "x",
         name: "x",
         rowsUpdatedAt: undefined,
@@ -36,13 +36,13 @@ describe("buildSocrataSourceVersion", () => {
   });
 
   it("cannot collide with a viewLastModified-derived token sharing the same number", () => {
-    const fromRows = buildSocrataSourceVersion({
+    const fromRows = makeSourceVersionFromSocrataViewMetadata({
       id: "x",
       name: "x",
       rowsUpdatedAt: 1767021900,
       viewLastModified: undefined,
     });
-    const fromView = buildSocrataSourceVersion({
+    const fromView = makeSourceVersionFromSocrataViewMetadata({
       id: "x",
       name: "x",
       rowsUpdatedAt: undefined,

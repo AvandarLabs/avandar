@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
-import { buildSocrataSourceVersion } from "$/connectors/open-data/buildSocrataSourceVersion.ts";
+import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/buildSocrataSourceVersion.ts";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
@@ -152,7 +152,7 @@ async function _acquireSocrataResource(
   return {
     contentKind: "csv",
     bytes: new TextEncoder().encode(csv) as Uint8Array<ArrayBuffer>,
-    sourceVersion: buildSocrataSourceVersion(metadata),
+    sourceVersion: makeSourceVersionFromSocrataViewMetadata(metadata),
     datastoreActive: false,
   };
 }
