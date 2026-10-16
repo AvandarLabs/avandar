@@ -1,4 +1,5 @@
 import type { AvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.types.ts";
+import { formatToContentKind } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 
@@ -46,8 +47,9 @@ function _blobToBytes(blob: Blob): Promise<Uint8Array<ArrayBuffer>> {
  * Every dependency is injected - the freshness check, the live fetch, the
  * storage client, and the catalog-entry update - so this function contains
  * only the cache-aside decision itself and nothing that reaches a network or
- * a database on its own. The one caller today is `OpenDataRoutes.ts`, which
- * supplies real implementations backed by `SupabaseAdmin`.
+ * a database on its own. Not yet wired into a route; `OpenDataRoutes.ts` is
+ * expected to be its first caller, supplying real implementations backed by
+ * `SupabaseAdmin`.
  */
 export async function acquireOpenDataResourceWithCache(params: {
   entry: Readonly<OpenDataCatalogEntry.T>;
@@ -76,9 +78,7 @@ export async function acquireOpenDataResourceWithCache(params: {
     );
     if (cachedBlob) {
       return {
-        contentKind: entry.apiResourceFormat?.toLowerCase() === "parquet"
-          ? "parquet"
-          : "csv",
+        contentKind: formatToContentKind(entry.apiResourceFormat ?? ""),
         bytes: await _blobToBytes(cachedBlob),
         sourceVersion: liveToken,
         datastoreActive: false,

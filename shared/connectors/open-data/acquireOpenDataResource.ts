@@ -59,8 +59,12 @@ export type OpenDataAcquisition = {
   datastoreActive: boolean;
 };
 
-/** Maps a CKAN resource format onto how its bytes must be read. */
-function _toContentKind(format: string): OpenDataContentKind {
+/**
+ * Maps a CKAN resource format onto how its bytes must be read. Exported so
+ * callers that need the same rule - such as the cache-aside wrapper reading
+ * a cached entry's recorded format - do not reimplement it.
+ */
+export function formatToContentKind(format: string): OpenDataContentKind {
   return format.toLowerCase() === "parquet" ? "parquet" : "csv";
 }
 
@@ -97,7 +101,7 @@ async function _acquireCkanResource(
   });
 
   return {
-    contentKind: _toContentKind(resource.format),
+    contentKind: formatToContentKind(resource.format),
     bytes: await client.getResourceBytes({
       ckanResourceId: resource.id,
       url: resource.url,
@@ -113,7 +117,7 @@ async function _acquireCkanResource(
  * The row count is checked against `maxRows` before any rows are fetched,
  * mirroring how the CKAN branch checks `size` before any bytes are fetched.
  * Socrata always answers in CSV: `SocrataClient.getRows` only ever requests
- * the view's `.csv` resource, so this branch never needs `_toContentKind`.
+ * the view's `.csv` resource, so this branch never needs `formatToContentKind`.
  */
 async function _acquireSocrataResource(
   access: Readonly<OpenDataApiAccessFor<"socrata">>,

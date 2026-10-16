@@ -183,4 +183,69 @@ describe("acquireOpenDataResourceWithCache", () => {
 
     expect(acquireLive).toHaveBeenCalledTimes(1);
   });
+
+  it("fetches live and writes a parquet cache object when the resource is parquet", async () => {
+    const entry = _entry({ apiResourceFormat: "PARQUET" });
+    const readFreshnessToken = vi.fn().mockResolvedValue("ckan:hash:abc");
+    const acquireLive = vi.fn().mockResolvedValue({
+      contentKind: "parquet",
+      bytes: new Uint8Array([1, 2, 3]),
+      sourceVersion: "ckan:hash:abc",
+      datastoreActive: false,
+    });
+    const storage = {
+      downloadCachedResource: vi.fn(),
+      uploadCachedResource: vi.fn().mockResolvedValue(undefined),
+      removeCachedResource: vi.fn(),
+    };
+    const updateCache = vi.fn().mockResolvedValue(undefined);
+
+    const result = await acquireOpenDataResourceWithCache({
+      entry,
+      readFreshnessToken,
+      acquireLive,
+      storage,
+      updateCache,
+    });
+
+    expect(storage.uploadCachedResource).toHaveBeenCalledWith(
+      `${entry.id}.parquet`,
+      expect.any(Blob),
+    );
+    expect(updateCache).toHaveBeenCalledWith({
+      catalogEntryId: entry.id,
+      cachedObjectPath: `${entry.id}.parquet`,
+      cachedSourceVersion: "ckan:hash:abc",
+    });
+    expect(result.contentKind).toBe("parquet");
+  });
+
+  it("serves the cache as parquet when the recorded format is mixed-case", async () => {
+    const cachedEntry = _entry({
+      apiResourceFormat: "Parquet",
+      cachedObjectPath: `${ENTRY_ID}.parquet`,
+      cachedSourceVersion: "ckan:hash:abc",
+      cachedAt: "2026-10-01T00:00:00Z",
+    });
+    const readFreshnessToken = vi.fn().mockResolvedValue("ckan:hash:abc");
+    const acquireLive = vi.fn();
+    const cachedBlob = new Blob([new Uint8Array([1, 2, 3])]);
+    const storage = {
+      downloadCachedResource: vi.fn().mockResolvedValue(cachedBlob),
+      uploadCachedResource: vi.fn(),
+      removeCachedResource: vi.fn(),
+    };
+    const updateCache = vi.fn();
+
+    const result = await acquireOpenDataResourceWithCache({
+      entry: cachedEntry,
+      readFreshnessToken,
+      acquireLive,
+      storage,
+      updateCache,
+    });
+
+    expect(acquireLive).not.toHaveBeenCalled();
+    expect(result.contentKind).toBe("parquet");
+  });
 });
