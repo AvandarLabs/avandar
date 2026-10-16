@@ -23,7 +23,7 @@ const DBReadSchema = z.object({
 
 /**
  * Read-only in practice - see `DatabaseConnectionClient`. Writes to
- * `db_connections` happen exclusively through the `external-datasets` edge
+ * `db_connections` happen exclusively through the `connectors` edge
  * function (only it can create the matching Vault secret); the browser
  * client never inserts or updates this table directly.
  */
@@ -45,12 +45,12 @@ export const DatabaseConnectionParsers =
     ),
     fromModelInsertToDBInsert: () => {
       throw new Error(
-        "DatabaseConnection is never inserted from client code - only the external-datasets edge function may create one.",
+        "DatabaseConnection is never inserted from client code - only the connectors edge function may create one.",
       );
     },
     fromModelUpdateToDBUpdate: () => {
       throw new Error(
-        "DatabaseConnection is never updated from client code - only the external-datasets edge function may update one.",
+        "DatabaseConnection is never updated from client code - only the connectors edge function may update one.",
       );
     },
   });

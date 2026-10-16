@@ -44,12 +44,12 @@ describe("DatabaseConnectionParsers", () => {
 
     expect(() => {
       DatabaseConnectionParsers.fromModelInsertToDBInsert(insert);
-    }).toThrow(/external-datasets edge function/);
+    }).toThrow(/connectors edge function/);
   });
 
   it("refuses to build an update payload from client code", () => {
     expect(() => {
       DatabaseConnectionParsers.fromModelUpdateToDBUpdate({});
-    }).toThrow(/external-datasets edge function/);
+    }).toThrow(/connectors edge function/);
   });
 });

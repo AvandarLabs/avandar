@@ -59,12 +59,12 @@ describe("PostgresDatabaseConnectionParsers", () => {
 
     expect(() => {
       PostgresDatabaseConnectionParsers.fromModelInsertToDBInsert(insert);
-    }).toThrow(/external-datasets edge function/);
+    }).toThrow(/connectors edge function/);
   });
 
   it("refuses to build an update payload from client code", () => {
     expect(() => {
       PostgresDatabaseConnectionParsers.fromModelUpdateToDBUpdate({});
-    }).toThrow(/external-datasets edge function/);
+    }).toThrow(/connectors edge function/);
   });
 });

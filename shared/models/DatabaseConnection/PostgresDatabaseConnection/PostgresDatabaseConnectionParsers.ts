@@ -29,7 +29,7 @@ const DBReadSchema = z.object({
  * Note: this is read-only in practice - see `DatabaseConnectionClient`, which
  * is the only consumer and never calls `fromModelInsertToDBInsert` or
  * `fromModelUpdateToDBUpdate`. Writes happen exclusively through the
- * `external-datasets` edge function, which never goes through this parser
+ * `connectors` edge function, which never goes through this parser
  * registry (it writes with `SupabaseAdmin`, outside the browser bundle).
  */
 export const PostgresDatabaseConnectionParsers =
@@ -50,12 +50,12 @@ export const PostgresDatabaseConnectionParsers =
     ),
     fromModelInsertToDBInsert: () => {
       throw new Error(
-        "PostgresDatabaseConnection is never inserted from client code - only the external-datasets edge function may create one.",
+        "PostgresDatabaseConnection is never inserted from client code - only the connectors edge function may create one.",
       );
     },
     fromModelUpdateToDBUpdate: () => {
       throw new Error(
-        "PostgresDatabaseConnection is never updated from client code - only the external-datasets edge function may update one.",
+        "PostgresDatabaseConnection is never updated from client code - only the connectors edge function may update one.",
       );
     },
   });

@@ -51,7 +51,7 @@ export type PostgresDatabaseConnectionRead = Model.Base<
 
     /**
      * Points at the Vault secret holding the password alone - never the
-     * password itself. Only ever written by the `external-datasets` edge
+     * password itself. Only ever written by the `connectors` edge
      * function; nothing in this model layer reads or writes the decrypted
      * value.
      */
