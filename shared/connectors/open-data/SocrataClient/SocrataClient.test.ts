@@ -77,7 +77,7 @@ describe("SocrataClient.getRowCount", () => {
       }),
     });
 
-    const count = await createSocrataClient(http).getRowCount({
+    const rowCount = await createSocrataClient(http).getRowCount({
       baseUrl: BASE_URL,
       socrataDatasetId: DATASET_ID,
     });
@@ -85,7 +85,7 @@ describe("SocrataClient.getRowCount", () => {
     expect(http.getJson).toHaveBeenCalledWith(
       `${BASE_URL}/resource/${DATASET_ID}.json?%24select=count(*)`,
     );
-    expect(count).toBe(22811427);
+    expect(rowCount).toBe(22811427);
   });
 });
 

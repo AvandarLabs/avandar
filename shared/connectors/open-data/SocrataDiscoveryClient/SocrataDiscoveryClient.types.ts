@@ -1,3 +1,4 @@
+/** One dataset returned by a Socrata Discovery API search. */
 export type SocrataDiscoveryResult = {
   /** The dataset's 4x4 id, e.g. "erm2-nwe9". */
   datasetId: string;
@@ -6,6 +7,7 @@ export type SocrataDiscoveryResult = {
   domain: string;
 };
 
+/** Searches Socrata's cross-portal Discovery API for candidate datasets. */
 export type SocrataDiscoveryClient = {
   /**
    * Searches Socrata's cross-portal Discovery API. `domains`, when given,

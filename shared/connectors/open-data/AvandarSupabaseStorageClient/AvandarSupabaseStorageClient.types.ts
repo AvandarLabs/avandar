@@ -16,6 +16,7 @@ export type SupabaseStorageBucketHandle = {
   remove: (paths: string[]) => Promise<{ error: { message: string } | null }>;
 };
 
+/** Reads and writes the Open Data Catalog's own write-back cache objects. */
 export type AvandarSupabaseStorageClient = {
   downloadCachedResource: (objectPath: string) => Promise<Blob | undefined>;
   uploadCachedResource: (objectPath: string, blob: Blob) => Promise<void>;
