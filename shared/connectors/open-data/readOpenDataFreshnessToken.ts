@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { propEq } from "@avandar/utils";
 import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
-import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/buildSocrataSourceVersion.ts";
+import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata.ts";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
