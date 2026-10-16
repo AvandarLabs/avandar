@@ -10,16 +10,6 @@ type UpdateCacheParams = {
 };
 
 /**
- * Maps an acquired resource's format onto the extension its cache object is
- * stored under.
- */
-function _toCacheExtension(
-  contentKind: OpenDataAcquisition["contentKind"],
-): string {
-  return contentKind === "parquet" ? "parquet" : "csv";
-}
-
-/**
  * Reads a `Blob`'s bytes through `FileReader` rather than `Blob.arrayBuffer`.
  * `FileReader` is the one Blob-reading API implemented consistently across
  * the runtimes this function needs to work in: the Deno edge function it
@@ -65,7 +55,7 @@ export async function acquireOpenDataResourceWithCache(params: {
     entry: Readonly<OpenDataCatalogEntry.T>,
   ) => Promise<OpenDataAcquisition>;
   storage: Readonly<AvandarSupabaseStorageClient>;
-  updateCache: (params: UpdateCacheParams) => Promise<void>;
+  updateCache: (params: Readonly<UpdateCacheParams>) => Promise<void>;
 }): Promise<OpenDataAcquisition> {
   const { entry, readFreshnessToken, acquireLive, storage, updateCache } =
     params;
@@ -90,7 +80,7 @@ export async function acquireOpenDataResourceWithCache(params: {
   }
 
   const acquisition = await acquireLive(entry);
-  const objectPath = `${entry.id}.${_toCacheExtension(acquisition.contentKind)}`;
+  const objectPath = `${entry.id}.${acquisition.contentKind === "parquet" ? "parquet" : "csv"}`;
   await storage.uploadCachedResource(objectPath, new Blob([acquisition.bytes]));
   if (acquisition.sourceVersion) {
     await updateCache({
