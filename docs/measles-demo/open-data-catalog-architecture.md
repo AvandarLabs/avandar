@@ -148,33 +148,52 @@ nothing about Socrata requires changing it, and migrating ten-plus live
 production catalog rows onto a new private bucket is an unrelated, separate
 decision this spec does not make.
 
-`DatasetParquetWrapper`'s dispatch gains one more named arm. Today:
+**`DatasetParquetWrapper` does not change at all, and that is the point, not
+a gap** (the same conclusion the Postgres connector spec reached for the
+mediator, section 5.4a there). Caching is invisible above the HTTP boundary.
+Today, for an `api_resource` entry, the wrapper calls its injected
+`fetchApiOpenDataResource(catalogEntryId)`, wired in `createDefaultRegistry.ts`
+to `fetchOpenDataCatalogResource` - the browser function that calls
+`GET /open-data/catalog-entries/:id/resource`. That edge-function route
+today calls `acquireOpenDataResource` directly, always live
+(`OpenDataRoutes.ts`). The only thing this spec changes is **what that one
+route does on the server**, behind the exact same request and response
+contract (bytes, `X-Ava-Content-Kind`, `X-Ava-Source-Version`):
 
 ```text
-sourceType === "open_data"
-  -> access_kind === "pipeline_parquet": anonymous fetch(parquetUrl)
-  -> access_kind === "api_resource": CkanClient, always live
-```
+Today:
+  GET /catalog-entries/:id/resource
+    -> acquireOpenDataResource(entry)   (CkanClient, always live)
+    -> return bytes
 
 Target:
-
-```text
-sourceType === "open_data"
-  -> access_kind === "pipeline_parquet": unchanged (OpenDatasetParquetStorageClient)
-  -> access_kind === "api_resource":
-       check cache freshness (section 6)
-       -> fresh:  AvandarSupabaseStorageClient.downloadCachedResource (cache hit)
-       -> stale:  CkanClient or SocrataClient, by api_service,
-                  then AvandarSupabaseStorageClient.uploadCachedResource (write-back)
+  GET /catalog-entries/:id/resource
+    -> acquireOpenDataResourceWithCache(entry, SupabaseAdmin)
+         1. ask the connector (CkanClient or SocrataClient, by api_service)
+            for the live freshness token (section 5)
+         2. live token === entry.cached_source_version?
+              yes: read open-data-catalog/<objectPath> (AvandarSupabaseStorageClient)
+              no:  acquireOpenDataResource(entry)   (now dispatches by api_service too)
+                   write the bytes to open-data-catalog/<objectPath>
+                   update the catalog entry's cache_* columns (service-role)
+    -> return bytes, same headers as today
 ```
 
-No new `SourceWrapper`. `DatasetParquetWrapper`'s `CAPABILITIES` are
-unchanged by this spec (`predicatePushdown: "none"`,
-`wholeRelationAcquirable: "yes"`, `acquisitionUnit: { kind: "whole-relation" }`
-all still hold for a cached, whole-relation Socrata/CKAN read); only
-`freshnessSignal` moves from `"none"` to `"version-token"`, which the CKAN
-generalization spec already flagged as pending integration work (section 7.4
-there).
+No change to `DatasetParquetWrapper.ts`, `createDefaultRegistry.ts`, or
+`fetchOpenDataCatalogResource.ts`. A `pipeline_parquet` entry never reaches
+this route at all, today or after this spec:
+`acquireOpenDataResource` already refuses pipeline-kind entries
+(`access-shape-invalid`), because the browser reads that case directly from
+its own public Storage URL (`OpenDatasetParquetStorageClient`).
+
+No new `SourceWrapper`, and `DatasetParquetWrapper.ts` is not edited by this
+spec at all: `predicatePushdown: "none"`, `wholeRelationAcquirable: "yes"`,
+`acquisitionUnit: { kind: "whole-relation" }`, and `freshnessSignal: "none"`
+all still hold, unchanged, for a cached, whole-relation Socrata/CKAN read.
+(`freshnessSignal` under-declaring a token the wrapper already threads
+through today, for CKAN, is pre-existing, out-of-scope debt the CKAN
+generalization spec flagged and did not fix either - section 7.4 there - not
+something Socrata or the cache introduces or is required to resolve.)
 
 ## 4. Schema changes
 
@@ -220,20 +239,23 @@ constraint catalog_entries__open_data__cache_complete check (
 
 The cached object lives in a new, dedicated, private bucket
 (`open-data-catalog`), not the pipeline's existing public bucket
-(`catalogOpenDataInsert.ts`'s target): the cache is read under the caller's
-own authenticated session, gated by a storage policy granting `select` to
-`authenticated` - mirroring `catalog_entries__open_data`'s own grant - rather
-than a public, logged-out-readable URL, which the pipeline's bucket is and
-which nothing about the cache needs to be. `cached_object_path` is a
-bucket-relative path (e.g. `<catalogEntryId>.parquet`), not a URL, the same
-shape `parquet_file_name` already is for pipeline rows and deliberately not
-the `canonical_urls` free-text-array shape the original CKAN generalization
-spec called a mistake (section 13.2 there).
+(`catalogOpenDataInsert.ts`'s target). Unlike the pipeline's bucket, nothing
+ever reads this one directly: every reader is the `open-data` edge function's
+`SupabaseAdmin` (service-role) client, which bypasses storage RLS entirely
+(section 5), so the bucket needs no `authenticated`-facing storage policy at
+all - the browser never learns this bucket exists, the same way it never
+sees `vault.decrypted_secrets` in the Postgres connector (section 5.2 there).
+`cached_object_path` is a bucket-relative path (e.g. `<catalogEntryId>.parquet`),
+not a URL, the same shape `parquet_file_name` already is for pipeline rows
+and deliberately not the `canonical_urls` free-text-array shape the original
+CKAN generalization spec called a mistake (section 13.2 there).
 
 ## 5. The freshness-check and write-back cache flow
 
-One function, shared across both connectors, called from
-`_downloadApiOpenData` before either client is touched:
+One function (`acquireOpenDataResourceWithCache`), shared across both
+connectors, called from the `open-data` edge function's existing route
+(`OpenDataRoutes.ts`) in place of today's direct `acquireOpenDataResource`
+call - nothing above the HTTP boundary (section 3) changes:
 
 ```text
 acquire an api_resource entry:
@@ -247,13 +269,25 @@ acquire an api_resource entry:
        read cached_object_path through AvandarSupabaseStorageClient. Done.
   4. Otherwise (no cache, or token changed):
        fetch the full resource live (CkanClient.getResourceBytes /
-       SocrataClient.getRows), transcode to Parquet if needed (unchanged:
-       DatasetParquetWrapper already owns this step for CSV),
-       write the bytes to AvandarSupabaseStorageClient,
+       SocrataClient.getRows),
+       write those same raw bytes to AvandarSupabaseStorageClient, unchanged
+       in contentKind - no transcode happens here or ever on this path,
        update cached_object_path / cached_source_version / cached_at
        on the catalog entry,
        return the freshly-fetched bytes.
 ```
+
+**The cache stores exactly what the connector returned - raw CSV or Parquet
+bytes, never a transcode.** This matters for where this code can run, not
+just for simplicity: a Deno edge function has no DuckDB-WASM, so it could
+never produce a Parquet transcode even if asked to. Nothing needs to ask:
+`contentKind` (`"csv" | "parquet"`) already travels with the bytes today
+(`OpenDataAcquisition.contentKind`), the cache simply persists both together,
+and the CSV-to-Parquet transcode stays exactly where it already is -
+client-side, in `DatasetParquetWrapper`, via the injected
+`transcodeCsvToParquet`, run identically whether the bytes came from a cache
+hit or a live fetch. Caching removes the network round trip to a third-party
+API; it was never meant to remove the local, already-cheap transcode step.
 
 This is a cache-aside read, the same shape QETL's own storage tier already
 uses (`qetl-architecture.md` section 6), one level further out: QETL's
@@ -265,17 +299,19 @@ workspace to query a given catalog entry pay the live-fetch cost and every
 subsequent workspace (and every subsequent session of the same workspace,
 after IndexedDB eviction) get the fast path.
 
-**Where this runs.** The write (step 4's storage write and catalog-entry
-update) is a trust boundary, not a CORS problem (`connector-nomenclature.md`,
-"A connector's drive does not have to be a third party"): a shared,
-cross-workspace object should not be writable directly by any authenticated
-client, even though Socrata's own fetch needs no proxy. So step 4's write
-goes through the `open-data` edge function (service-role) for both
-connectors. Socrata's steps 1-2 and the live-fetch half of step 4 *can* run
-directly in the browser (no CORS problem), but routing all of it through one
-server-side call keeps one code path instead of two, and keeps the
-version-token race (two workspaces racing to write different outcomes of the
-"is this stale" check) inside one process instead of two browsers.
+**Why all four steps run server-side, even though Socrata needs no proxy for
+any of them.** This is a trust boundary, not a CORS problem
+(`connector-nomenclature.md`, "A connector's drive does not have to be a
+third party"): a shared, cross-workspace cache should not be writable
+directly by any authenticated client. Since `DatasetParquetWrapper` already
+calls this route for every `api_resource` entry today regardless of
+`api_service` (section 3), adding the cache check inside the route it already
+calls is also simply the smaller change - no new call site, no new decision
+point for the browser to make about which entries are Socrata versus CKAN.
+Running Socrata's cheap, CORS-open calls server-side anyway costs nothing
+real and keeps the version-token race (two workspaces' requests landing
+inside the "is this stale" window at the same time) inside one process
+instead of two browsers.
 
 ## 6. Metacatalog: live, not prebuilt, for v1
 
