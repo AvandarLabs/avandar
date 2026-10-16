@@ -80,6 +80,21 @@ function _errorFetch(code: string, message: string): PostgresRowsFetch {
   };
 }
 
+/**
+ * A fetch stub for a response the edge function never got to shape itself -
+ * the Supabase Edge Function runtime killing the isolate outright (a 546),
+ * not a connector-classified failure. No `{error:{code,message}}` body, since
+ * no line of this connector's own code ran to produce one.
+ */
+function _resourceLimitKillFetch(): PostgresRowsFetch {
+  return async () => {
+    return new Response("WORKER_LIMIT", {
+      status: 546,
+      headers: { "Content-Type": "text/plain" },
+    });
+  };
+}
+
 describe("acquirePostgresTableRelation", () => {
   it("reads the relation's rows through the edge function and transcodes them with a real DuckDB reader", async () => {
     const { acquirePostgresTableRelation } = await import(
@@ -119,19 +134,43 @@ describe("acquirePostgresTableRelation", () => {
     expect(typeof acquired.relation[0]?.population).toBe("bigint");
   });
 
-  it("fails when the edge function reports a connector error", async () => {
+  it("fails when the edge function reports a connector error, preserving its code", async () => {
     const { acquirePostgresTableRelation } = await import(
       "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
     );
 
-    await expect(
-      acquirePostgresTableRelation({
+    try {
+      await acquirePostgresTableRelation({
         connectionId: "connection-1",
         schemaName: "public",
         tableName: "cities",
         readCsv: _readCsvWithDuckDb,
         rowsFetch: _errorFetch("unreachable", "could not connect to server"),
-      }),
-    ).rejects.toThrow("could not connect to server");
+      });
+      expect.unreachable("Expected acquirePostgresTableRelation to throw");
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toBe("could not connect to server");
+      expect((error as Error & { code: string }).code).toBe("unreachable");
+    }
+  });
+
+  it("defaults to too_large when the edge function's own isolate was killed outright, not a connector-classified failure", async () => {
+    const { acquirePostgresTableRelation } = await import(
+      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
+    );
+
+    try {
+      await acquirePostgresTableRelation({
+        connectionId: "connection-1",
+        schemaName: "public",
+        tableName: "cities",
+        readCsv: _readCsvWithDuckDb,
+        rowsFetch: _resourceLimitKillFetch(),
+      });
+      expect.unreachable("Expected acquirePostgresTableRelation to throw");
+    } catch (error) {
+      expect((error as Error & { code: string }).code).toBe("too_large");
+    }
   });
 });

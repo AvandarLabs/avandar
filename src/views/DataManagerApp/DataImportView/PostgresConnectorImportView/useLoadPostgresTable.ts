@@ -159,20 +159,24 @@ export function useLoadPostgresTable(): PostgresTableLoad {
         },
       });
       if ("error" in result) {
-        throw new Error(result.error.message);
+        throw Object.assign(new Error(result.error.message), {
+          code: result.error.code,
+        });
       }
       return result.relations;
     },
     onSuccess: (newRelations) => {
+      setConnectionError(undefined);
       setRelations(newRelations);
     },
     onError: (error) => {
       Logger.error(error, { devMsg: "Failed to list Postgres relations" });
-      const copy = postgresConnectorImportErrorCopy({
-        code: undefined,
-        i18n,
-      });
-      setConnectionError({ code: undefined, ...copy });
+      const code =
+        error instanceof Error && "code" in error
+          ? (error as { code: ConnectorErrorCode }).code
+          : undefined;
+      const copy = postgresConnectorImportErrorCopy({ code, i18n });
+      setConnectionError({ code, ...copy });
     },
   });
 
@@ -275,13 +279,16 @@ export function useLoadPostgresTable(): PostgresTableLoad {
         },
       });
       if ("error" in result) {
-        throw new Error(result.error.message);
+        throw Object.assign(new Error(result.error.message), {
+          code: result.error.code,
+        });
       }
       const [schemaName, tableName] = params.relationId.split(/\.(.*)/s);
       if (!schemaName || tableName === undefined) {
         throw new Error(`Unexpected relation id '${params.relationId}'`);
       }
       const newDatasetId = uuid() as Dataset.Id;
+      setConnectionError(undefined);
       setDataSourceMetadata({
         sourceType: "postgres_table",
         connectionId: params.connectionId,
@@ -346,11 +353,12 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     },
     onError: (error) => {
       Logger.error(error, { devMsg: "Failed to preview Postgres relation" });
-      const copy = postgresConnectorImportErrorCopy({
-        code: undefined,
-        i18n,
-      });
-      setConnectionError({ code: undefined, ...copy });
+      const code =
+        error instanceof Error && "code" in error
+          ? (error as { code: ConnectorErrorCode }).code
+          : undefined;
+      const copy = postgresConnectorImportErrorCopy({ code, i18n });
+      setConnectionError({ code, ...copy });
     },
   });
 

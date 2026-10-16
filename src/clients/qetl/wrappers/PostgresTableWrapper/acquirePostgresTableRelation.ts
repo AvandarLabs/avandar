@@ -93,16 +93,37 @@ export async function acquirePostgresTableRelation<TRelation>(
     const body: unknown = contentType.includes("application/json")
       ? await response.json()
       : await response.text();
-    const message =
+    const classifiedError =
       typeof body === "object" &&
       body !== null &&
       "error" in body &&
       typeof body.error === "object" &&
       body.error !== null &&
       "message" in body.error
-        ? String(body.error.message)
+        ? (body.error as { code?: unknown; message: unknown })
+        : undefined;
+
+    // The edge function classifies every error it itself produces into this
+    // `{error:{code,message}}` shape (always a 200, per `ConnectorRoutes.ts`)
+    // - this branch only reaches a response the edge function never got to
+    // shape itself. In practice that is the Supabase Edge Function runtime
+    // killing the isolate outright (a 546, at its 250MB memory / 2s CPU
+    // ceiling - `createPostgresConnector.ts`'s own docstring on
+    // `POSTGRES_MAX_BYTES_PER_ACQUIRE`), which never runs a line of this
+    // connector's own code and so can never report its own code. Defaulting
+    // to `too_large` is a deliberate assumption, not a detection: there is no
+    // reliable way from here to distinguish that kill from any other
+    // transport-level failure, and `too_large` is overwhelmingly the likely
+    // cause for this specific route.
+    const code =
+      typeof classifiedError?.code === "string"
+        ? classifiedError.code
+        : "too_large";
+    const message =
+      classifiedError !== undefined
+        ? String(classifiedError.message)
         : `Failed to read Postgres relation '${relationId}' (${response.status})`;
-    throw new Error(message);
+    throw Object.assign(new Error(message), { code });
   }
 
   const csvText = await response.text();

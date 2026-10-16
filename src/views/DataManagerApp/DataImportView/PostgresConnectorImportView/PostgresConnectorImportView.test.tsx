@@ -224,6 +224,32 @@ describe("PostgresConnectorImportView", () => {
     expect(screen.getByLabelText(/^host$/i)).toHaveValue("db.example.org");
   });
 
+  it("surfaces the specific too_large message, not a generic fallback, when listing relations fails", async () => {
+    getAllPostgresMock.mockReturnValue([
+      {
+        connection: {
+          id: "20000000-0000-4000-8000-000000000001",
+          name: "Prod reporting replica",
+        },
+        postgres: {
+          host: "db.example.org",
+          port: 5432,
+          databaseName: "reporting",
+          lastVerifiedAt: new Date().toISOString(),
+        },
+      },
+    ]);
+    apiGetMock.mockResolvedValue({
+      error: { code: "too_large", message: "catalog listing too large" },
+    });
+
+    renderWithProviders(<PostgresConnectorImportView />);
+
+    expect(
+      await screen.findByText(/more rows than avandar can import/i),
+    ).toBeInTheDocument();
+  });
+
   it("offers a saved database and lists its tables without re-opening the form", async () => {
     getAllPostgresMock.mockReturnValue([
       {

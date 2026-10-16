@@ -1,6 +1,6 @@
 import { makeBucketMap } from "@avandar/utils";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { Box, BoxProps, Button, Loader, Select, Stack } from "@mantine/core";
+import { Box, BoxProps, Button, Loader, Select, Stack, Text } from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
@@ -150,6 +150,16 @@ export function PostgresConnectorImportView({
           ) : null}
 
           {!showForm && load.isLoadingRelations ? <Loader size="xs" /> : null}
+
+          {/* A saved connection has no form to show this inside of (unlike
+              the new-connection form's own inline error), so a listing or
+              preview failure needs its own surface here, or it fails
+              silently: no error, no loader, no picker. */}
+          {!showForm && load.connectionError ? (
+            <Text size="sm" c="error" role="alert">
+              {load.connectionError.message}
+            </Text>
+          ) : null}
 
           {!showForm && load.relations ? (
             <Select
