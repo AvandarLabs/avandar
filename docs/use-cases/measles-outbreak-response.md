@@ -514,11 +514,14 @@ is new work, but it is "write one more pipeline using an existing, proven
 pattern," not a new connector type, and is sufficient for this demo.
 
 A durable fix, for every future Socrata-hosted city or state dataset, would be
-a real **Socrata connector**. Whether it should snapshot into
-`pipeline_parquet` (today's pattern) or resolve as a genuinely lazy,
-API-backed relation that is never materialized locally is an open design
-question, not resolved by this plan. Not required for this demo either way;
-worth flagging as the generalizable version of this gap.
+a real **Socrata connector**. This is no longer an open question: see
+[`open-data-catalog-architecture.md`](../open-data-catalog-architecture.md),
+which specifies a Socrata connector plus a write-back cache (fetched live
+once per catalog entry, then served from Avandar's own storage for every
+later workspace, same as `pipeline_parquet` today). Not required for this
+demo either way - §5.2-§5.4 still ship through the `pipeline_parquet` path
+above - but the generalizable version of this gap now has a real design, not
+just a flag.
 
 ### 7.2 Address geocoding — blocks Workflow A, partially blocks Workflow B
 
