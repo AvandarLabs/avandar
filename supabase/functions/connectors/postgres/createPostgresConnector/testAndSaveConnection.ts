@@ -123,6 +123,29 @@ async function _rotateConnection(
 }
 
 /** Creates a new Vault secret and a new saved connection pointing at it. */
+/**
+ * Deletes a Vault secret this request itself just created, after a later
+ * step in the same creation failed. Best-effort: a failure here must never
+ * mask the original error the caller is about to throw, but is worth
+ * logging - it means a secret is now orphaned for real, not just at risk of
+ * it.
+ */
+async function _rollbackOrphanedVaultSecret(
+  context: ConnectorContext,
+  secretId: string,
+): Promise<void> {
+  const { error } = await context.supabaseAdminClient.rpc(
+    "rpc_connections__delete_vault_secret",
+    { p_secret_id: secretId },
+  );
+  if (error) {
+    console.error(
+      `Failed to roll back orphaned Vault secret '${secretId}' after a failed connection creation`,
+      error,
+    );
+  }
+}
+
 async function _createConnection(
   context: ConnectorContext,
   input: PostgresTestAndSaveInput,
@@ -155,6 +178,7 @@ async function _createConnection(
       .select("id")
       .single();
   if (insertConnectionError || !connectionRow) {
+    await _rollbackOrphanedVaultSecret(context, secretId);
     throw new ConnectorError(
       "unknown",
       insertConnectionError?.message ?? "Failed to create connection",
@@ -176,6 +200,21 @@ async function _createConnection(
       last_verified_at: nowIso,
     });
   if (insertPostgresRowError) {
+    await _rollbackOrphanedVaultSecret(context, secretId);
+    // The satellite row failed, but the generic `connections` row above
+    // already committed - without this, every failed creation would leave a
+    // connection that looks real (it has a name and a type) but has no
+    // host, port, or credential behind it at all.
+    const { error: deleteConnectionError } = await context.supabaseAdminClient
+      .from("connections")
+      .delete()
+      .eq("id", connectionId);
+    if (deleteConnectionError) {
+      console.error(
+        `Failed to roll back orphaned connection '${connectionId}' after a failed connection creation`,
+        deleteConnectionError,
+      );
+    }
     throw new ConnectorError("unknown", insertPostgresRowError.message);
   }
 

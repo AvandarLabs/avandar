@@ -1,4 +1,8 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
+import {
+  makeRelationId,
+  splitRelationId,
+} from "$/connectors/postgres/postgresRelationId.ts";
 import type { ConnectorRelation } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
@@ -7,10 +11,10 @@ function makeRelationFromCatalogRow(row: {
   table_name: string;
   table_type: string;
 }): ConnectorRelation {
-  const relationId = `${row.table_schema}.${row.table_name}`;
+  const relationId = makeRelationId(row.table_schema, row.table_name);
   return {
     relationId,
-    label: relationId,
+    label: `${row.table_schema}.${row.table_name}`,
     kind: row.table_type === "VIEW" ? "view" : "table",
   };
 }
@@ -58,19 +62,22 @@ export async function assertRelationStillExists(
   return row.table_type === "VIEW" ? "view" : "table";
 }
 
+/**
+ * Parses a relation id built by {@link makeRelationId}, throwing a
+ * classified `ConnectorError` rather than returning `undefined` - every
+ * caller in this edge function already expects a thrown failure, the same
+ * shape every other malformed-input case here produces.
+ */
 export function parseRelationId(relationId: string): {
   schemaName: string;
   tableName: string;
 } {
-  const separatorIndex = relationId.indexOf(".");
-  if (separatorIndex === -1) {
+  const split = splitRelationId(relationId);
+  if (!split) {
     throw new ConnectorError(
       "unknown",
       `Malformed relationId '${relationId}' - expected 'schema.table'`,
     );
   }
-  return {
-    schemaName: relationId.slice(0, separatorIndex),
-    tableName: relationId.slice(separatorIndex + 1),
-  };
+  return split;
 }

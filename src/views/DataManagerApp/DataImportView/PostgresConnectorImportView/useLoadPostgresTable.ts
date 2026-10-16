@@ -3,6 +3,7 @@ import { MIMEType, propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useState } from "react";
 import { uuid } from "$/lib/uuid";
+import { splitRelationId } from "$/connectors/postgres/postgresRelationId";
 import { APIClient } from "@/clients/APIClient";
 import { DatabaseConnectionClient } from "@/clients/connections/DatabaseConnectionClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -283,10 +284,11 @@ export function useLoadPostgresTable(): PostgresTableLoad {
           code: result.error.code,
         });
       }
-      const [schemaName, tableName] = params.relationId.split(/\.(.*)/s);
-      if (!schemaName || tableName === undefined) {
+      const split = splitRelationId(params.relationId);
+      if (!split) {
         throw new Error(`Unexpected relation id '${params.relationId}'`);
       }
+      const { schemaName, tableName } = split;
       const newDatasetId = uuid() as Dataset.Id;
       setConnectionError(undefined);
       setDataSourceMetadata({
