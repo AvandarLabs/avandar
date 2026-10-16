@@ -10,6 +10,8 @@ import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/Avand
 import { createOpenDataHttp } from "$/connectors/open-data/createOpenDataHttp.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken.ts";
+import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 
 /**
@@ -31,6 +33,60 @@ function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
   return new Response(JSON.stringify({ error: { code: error.failure.code } }), {
     status: statusFromOpenDataFailure(error.failure.code),
     headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * Writes a freshly fetched resource's cache location and source version back
+ * onto its catalog entry. The sole `updateCache` implementation
+ * `acquireOpenDataResourceWithCache` is given, so a cache write only happens
+ * through the catalog-entry update it performs.
+ */
+async function _persistOpenDataCache(params: {
+  catalogEntryId: OpenDataCatalogEntry.Id;
+  cachedObjectPath: string;
+  cachedSourceVersion: string;
+}): Promise<void> {
+  const { error: updateError } = await SupabaseAdmin.from("catalog_entries__open_data")
+    .update({
+      cached_object_path: params.cachedObjectPath,
+      cached_source_version: params.cachedSourceVersion,
+      cached_at: new Date().toISOString(),
+    })
+    .eq("id", params.catalogEntryId);
+  if (updateError) {
+    throw updateError;
+  }
+}
+
+/**
+ * Resolves one catalog entry's resource bytes through the cache-aside path:
+ * builds the HTTP and storage clients the acquisition needs, then wires them
+ * into `acquireOpenDataResourceWithCache` along with the freshness check,
+ * the live fetch, and the cache-persist callback.
+ */
+async function _resolveOpenDataAcquisition(
+  entry: Readonly<OpenDataCatalogEntry.T>,
+): Promise<OpenDataAcquisition> {
+  const http = createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES });
+  const storage = createAvandarSupabaseStorageClient(
+    SupabaseAdmin.storage.from("open-data-catalog"),
+  );
+
+  return acquireOpenDataResourceWithCache({
+    entry,
+    readFreshnessToken: (freshnessEntry) => {
+      return readOpenDataFreshnessToken({ entry: freshnessEntry, http });
+    },
+    acquireLive: (liveEntry) => {
+      return acquireOpenDataResource({
+        entry: liveEntry,
+        http,
+        maxBytes: MAX_RESOURCE_BYTES,
+      });
+    },
+    storage,
+    updateCache: _persistOpenDataCache,
   });
 }
 
@@ -79,43 +135,7 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
       );
 
       try {
-        const http = createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES });
-        const storage = createAvandarSupabaseStorageClient(
-          SupabaseAdmin.storage.from("open-data-catalog"),
-        );
-
-        const acquisition = await acquireOpenDataResourceWithCache({
-          entry,
-          readFreshnessToken: (freshnessEntry) => {
-            return readOpenDataFreshnessToken({ entry: freshnessEntry, http });
-          },
-          acquireLive: (liveEntry) => {
-            return acquireOpenDataResource({
-              entry: liveEntry,
-              http,
-              maxBytes: MAX_RESOURCE_BYTES,
-            });
-          },
-          storage,
-          updateCache: async ({
-            catalogEntryId,
-            cachedObjectPath,
-            cachedSourceVersion,
-          }) => {
-            const { error: updateError } = await SupabaseAdmin.from(
-              "catalog_entries__open_data",
-            )
-              .update({
-                cached_object_path: cachedObjectPath,
-                cached_source_version: cachedSourceVersion,
-                cached_at: new Date().toISOString(),
-              })
-              .eq("id", catalogEntryId);
-            if (updateError) {
-              throw updateError;
-            }
-          },
-        });
+        const acquisition = await _resolveOpenDataAcquisition(entry);
 
         return new Response(acquisition.bytes as BodyInit, {
           status: 200,
