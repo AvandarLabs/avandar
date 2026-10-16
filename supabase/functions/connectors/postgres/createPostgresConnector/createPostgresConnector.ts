@@ -14,8 +14,13 @@ import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresC
 import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   estimateRelationCsvBytes,
+  estimateRowCsvBytes,
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
+  postgresMaxRowsPerCall,
 } from "$/connectors/postgres/estimateRelationCsvBytes.ts";
+import { isWithinRelationCallCaps } from "$/models/relations/RelationCapabilities/isWithinRelationCallCaps.ts";
+import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes.ts";
+import type { RelationRowDescriptor } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 const MAX_PREVIEW_ROWS = 50;
@@ -26,6 +31,116 @@ type CreatePostgresConnectorOptions = {
     config: ReturnType<typeof toPostgresConnectionConfig>,
   ) => PostgresSql;
 };
+
+/**
+ * Throws `too_large` unless `byteCount`/`rowCount` both stay within the
+ * shared Postgres cap contract (`postgresMaxRowsPerCall`,
+ * `POSTGRES_MAX_BYTES_PER_ACQUIRE`) for the relation `descriptor` describes -
+ * the same contract `PostgresTableWrapper.ts`'s capability record advertises,
+ * so the edge function enforces exactly what it advertises rather than a
+ * second, separately-maintained threshold check.
+ */
+function _assertWithinPostgresCallCaps(options: {
+  rowCount: number;
+  byteCount: number;
+  descriptor: RelationRowDescriptor;
+  message: string;
+}): void {
+  const withinCaps = isWithinRelationCallCaps({
+    rowCount: options.rowCount,
+    byteCount: options.byteCount,
+    maxRowsPerCall: postgresMaxRowsPerCall,
+    maxBytesPerCall: POSTGRES_MAX_BYTES_PER_ACQUIRE,
+    descriptor: options.descriptor,
+  });
+  if (!withinCaps) {
+    throw new ConnectorError("too_large", options.message);
+  }
+}
+
+/**
+ * Reads one relation's columns with enough type metadata to estimate its CSV
+ * width, for the cap check in {@link _readRelationRowsWithinCaps} - a
+ * separate, wider `select` than `previewRelation`'s own columns query, which
+ * only needs a column's name and type to show in the picker, not its
+ * declared length bound.
+ */
+async function _getColumnSizeInfo(
+  sql: PostgresSql,
+  schemaName: string,
+  tableName: string,
+): Promise<ColumnSizeInfo[]> {
+  const columns = await sql<{
+    column_name: string;
+    data_type: string;
+    character_maximum_length: number | null;
+  }>`
+    select column_name, data_type, character_maximum_length
+    from information_schema.columns
+    where table_schema = ${schemaName} and table_name = ${tableName}
+    order by ordinal_position
+  `;
+  return columns.map((column) => {
+    return {
+      columnName: column.column_name,
+      dataType: column.data_type,
+      characterMaximumLength: column.character_maximum_length,
+    };
+  });
+}
+
+/**
+ * Reads one relation's full rows as CSV, refusing before and after the read
+ * if its size is outside the shared call caps. The pre-read refusal (from an
+ * exact row count and an estimated row width, never reading a row) is the
+ * common case; the post-read refusal is the backstop for when that estimate
+ * turns out wrong.
+ */
+async function _readRelationRowsWithinCaps(
+  sql: PostgresSql,
+  schemaName: string,
+  tableName: string,
+): Promise<string> {
+  const [countRow] = await sql<{ exact_count: number }>`
+    select count(*)::int as exact_count
+    from ${sql(schemaName)}.${sql(tableName)}
+  `;
+  const rowCount = countRow?.exact_count ?? 0;
+
+  // A raw row count alone says nothing about row width - estimate the CSV
+  // footprint from the columns' own declared types instead (see
+  // `estimateRelationCsvBytes.ts`), multiplied by the exact row count.
+  const columnSizeInfo = await _getColumnSizeInfo(sql, schemaName, tableName);
+  const descriptor = {
+    columnCount: columnSizeInfo.length,
+    estimatedRowBytes: estimateRowCsvBytes(columnSizeInfo),
+  };
+  const estimatedBytes = estimateRelationCsvBytes({
+    columns: columnSizeInfo,
+    rowCount,
+  });
+  _assertWithinPostgresCallCaps({
+    rowCount,
+    byteCount: estimatedBytes,
+    descriptor,
+    message: `'${schemaName}.${tableName}' is estimated at ~${estimatedBytes} bytes as CSV (${rowCount} rows), over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
+  });
+
+  const rows = await sql<Record<string, unknown>>`
+    select * from ${sql(schemaName)}.${sql(tableName)}
+  `;
+  const csv = rowsToCsv(columnSizeInfo.map(prop("columnName")), rows);
+
+  const byteLength = new TextEncoder().encode(csv).length;
+  _assertWithinPostgresCallCaps({
+    rowCount,
+    byteCount: byteLength,
+    descriptor,
+    message: `'${schemaName}.${tableName}' is ${byteLength} bytes as CSV, over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
+  });
+
+  return csv;
+}
 
 /**
  * Builds the `postgres` {@link Connector}: test-and-save a
@@ -141,63 +256,7 @@ export function createPostgresConnector(
           assertHostIsSafeToConnect,
         ));
         await assertRelationStillExists(sql, schemaName, tableName);
-
-        const [countRow] = await sql<{ exact_count: number }>`
-          select count(*)::int as exact_count
-          from ${sql(schemaName)}.${sql(tableName)}
-        `;
-        const rowCount = countRow?.exact_count ?? 0;
-
-        // A raw row count is not a usable size signal on its own - a
-        // 50-column table of `text` and a 2-column table of `boolean` can
-        // have the same row count and wildly different CSV sizes. Estimate
-        // the actual CSV footprint from the columns' own declared types
-        // (and, where there is no declared bound, a name-based guess - see
-        // `estimateRelationCsvBytes.ts`) multiplied by the exact row count,
-        // and refuse before reading a single row if that estimate alone is
-        // already over the cap.
-        const columns = await sql<{
-          column_name: string;
-          data_type: string;
-          character_maximum_length: number | null;
-        }>`
-          select column_name, data_type, character_maximum_length
-          from information_schema.columns
-          where table_schema = ${schemaName} and table_name = ${tableName}
-          order by ordinal_position
-        `;
-        const columnSizeInfo = columns.map((column) => {
-          return {
-            columnName: column.column_name,
-            dataType: column.data_type,
-            characterMaximumLength: column.character_maximum_length,
-          };
-        });
-        const estimatedBytes = estimateRelationCsvBytes({
-          columns: columnSizeInfo,
-          rowCount,
-        });
-        if (estimatedBytes > POSTGRES_MAX_BYTES_PER_ACQUIRE) {
-          throw new ConnectorError(
-            "too_large",
-            `'${schemaName}.${tableName}' is estimated at ~${estimatedBytes} bytes as CSV (${rowCount} rows), over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
-          );
-        }
-
-        const rows = await sql<Record<string, unknown>>`
-          select * from ${sql(schemaName)}.${sql(tableName)}
-        `;
-        const csv = rowsToCsv(columnSizeInfo.map(prop("columnName")), rows);
-
-        const byteLength = new TextEncoder().encode(csv).length;
-        if (byteLength > POSTGRES_MAX_BYTES_PER_ACQUIRE) {
-          throw new ConnectorError(
-            "too_large",
-            `'${schemaName}.${tableName}' is ${byteLength} bytes as CSV, over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
-          );
-        }
-
-        return csv;
+        return await _readRelationRowsWithinCaps(sql, schemaName, tableName);
       } catch (error) {
         if (error instanceof ConnectorError) {
           throw error;

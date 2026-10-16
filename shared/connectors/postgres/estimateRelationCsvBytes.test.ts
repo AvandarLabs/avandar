@@ -1,9 +1,11 @@
+import { describe, expect, it } from "vitest";
 import {
   estimateColumnCsvBytes,
   estimateRelationCsvBytes,
   estimateRowCsvBytes,
+  POSTGRES_MAX_BYTES_PER_ACQUIRE,
+  postgresMaxRowsPerCall,
 } from "$/connectors/postgres/estimateRelationCsvBytes.ts";
-import { describe, expect, it } from "vitest";
 import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes.ts";
 
 function _column(
@@ -92,5 +94,24 @@ describe("estimateRelationCsvBytes", () => {
     expect(estimateRelationCsvBytes({ columns, rowCount: 1000 })).toBe(
       perRow * 1000,
     );
+  });
+});
+
+describe("postgresMaxRowsPerCall", () => {
+  it("derives a row cap from the shared byte budget and the relation's row width", () => {
+    // 150MB budget / 100 bytes-per-row = 1,572,864 rows.
+    expect(
+      postgresMaxRowsPerCall({ columnCount: 3, estimatedRowBytes: 100 }),
+    ).toBe(Math.floor(POSTGRES_MAX_BYTES_PER_ACQUIRE / 100));
+  });
+
+  it("defers to the byte cap when no row-width estimate is available", () => {
+    expect(postgresMaxRowsPerCall({ columnCount: 3 })).toBe("unbounded");
+  });
+
+  it("defers to the byte cap when the row-width estimate is zero or negative", () => {
+    expect(
+      postgresMaxRowsPerCall({ columnCount: 3, estimatedRowBytes: 0 }),
+    ).toBe("unbounded");
   });
 });

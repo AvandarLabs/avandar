@@ -67,6 +67,13 @@ export async function testAndSaveConnection(
   }
 }
 
+/** Throws a classified `ConnectorError` for a Supabase client error, if any. */
+function _throwIfSupabaseError(error: { message: string } | null): void {
+  if (error) {
+    throw new ConnectorError("unknown", error.message);
+  }
+}
+
 /**
  * Updates an existing saved connection's credentials and metadata. Derives
  * the owning workspace from the existing row itself, never from the
@@ -91,18 +98,14 @@ async function _rotateConnection(
       p_workspace_id: context.workspaceId,
     },
   );
-  if (updateSecretError) {
-    throw new ConnectorError("unknown", updateSecretError.message);
-  }
+  _throwIfSupabaseError(updateSecretError);
 
   const { error: updateDbConnectionsError } = await context.supabaseAdminClient
     .from("connections")
     .update({ name: input.name })
     .eq("id", connectionId)
     .eq("workspace_id", context.workspaceId);
-  if (updateDbConnectionsError) {
-    throw new ConnectorError("unknown", updateDbConnectionsError.message);
-  }
+  _throwIfSupabaseError(updateDbConnectionsError);
 
   const { error: updatePostgresRowError } = await context.supabaseAdminClient
     .from("connections__postgres")
@@ -116,9 +119,7 @@ async function _rotateConnection(
     })
     .eq("connection_id", connectionId)
     .eq("workspace_id", context.workspaceId);
-  if (updatePostgresRowError) {
-    throw new ConnectorError("unknown", updatePostgresRowError.message);
-  }
+  _throwIfSupabaseError(updatePostgresRowError);
 
   return connectionId;
 }
@@ -146,48 +147,71 @@ async function _rollbackOrphanedVaultSecret(
   }
 }
 
-/** Creates a new Vault secret and a new saved connection pointing at it. */
-async function _createConnection(
+/** Creates the Vault secret that will hold a new connection's password. */
+async function _createVaultSecretForConnection(
   context: ConnectorContext,
   input: PostgresTestAndSaveInput,
-  nowIso: string,
 ): Promise<string> {
-  const { data: secretId, error: createSecretError } =
-    await context.supabaseAdminClient.rpc(
-      "rpc_connections__create_vault_secret",
-      {
-        p_secret: input.password,
-        p_name: `connections__postgres:${crypto.randomUUID()}`,
-        p_description: `Postgres connection password for '${input.name}'`,
-      },
-    );
-  if (createSecretError || !secretId) {
+  const { data: secretId, error } = await context.supabaseAdminClient.rpc(
+    "rpc_connections__create_vault_secret",
+    {
+      p_secret: input.password,
+      p_name: `connections__postgres:${crypto.randomUUID()}`,
+      p_description: `Postgres connection password for '${input.name}'`,
+    },
+  );
+  if (error || !secretId) {
     throw new ConnectorError(
       "unknown",
-      createSecretError?.message ?? "Failed to create Vault secret",
+      error?.message ?? "Failed to create Vault secret",
     );
   }
+  return secretId;
+}
 
-  const { data: connectionRow, error: insertConnectionError } =
-    await context.supabaseAdminClient
-      .from("connections")
-      .insert({
-        workspace_id: context.workspaceId,
-        connection_type: "postgres",
-        name: input.name,
-      })
-      .select("id")
-      .single();
-  if (insertConnectionError || !connectionRow) {
+/**
+ * Inserts the generic `connections` row for a new connection, rolling back
+ * the just-created Vault secret if it fails - nothing yet points at that
+ * secret, so it would otherwise be orphaned.
+ */
+async function _insertConnectionRow(
+  context: ConnectorContext,
+  input: PostgresTestAndSaveInput,
+  secretId: string,
+): Promise<string> {
+  const { data: connectionRow, error } = await context.supabaseAdminClient
+    .from("connections")
+    .insert({
+      workspace_id: context.workspaceId,
+      connection_type: "postgres",
+      name: input.name,
+    })
+    .select("id")
+    .single();
+  if (error || !connectionRow) {
     await _rollbackOrphanedVaultSecret(context, secretId);
     throw new ConnectorError(
       "unknown",
-      insertConnectionError?.message ?? "Failed to create connection",
+      error?.message ?? "Failed to create connection",
     );
   }
-  const connectionId = connectionRow.id;
+  return connectionRow.id;
+}
 
-  const { error: insertPostgresRowError } = await context.supabaseAdminClient
+/**
+ * Inserts the Postgres-specific satellite row, rolling back both the Vault
+ * secret and the just-inserted `connections` row if it fails - without this,
+ * every failed creation would leave a connection that looks real (it has a
+ * name and a type) but has no host, port, or credential behind it at all.
+ */
+async function _insertPostgresConnectionRow(
+  context: ConnectorContext,
+  input: PostgresTestAndSaveInput,
+  nowIso: string,
+  connectionId: string,
+  secretId: string,
+): Promise<void> {
+  const { error } = await context.supabaseAdminClient
     .from("connections__postgres")
     .insert({
       connection_id: connectionId,
@@ -200,24 +224,38 @@ async function _createConnection(
       vault_secret_id: secretId,
       last_verified_at: nowIso,
     });
-  if (insertPostgresRowError) {
-    await _rollbackOrphanedVaultSecret(context, secretId);
-    // The satellite row failed, but the generic `connections` row above
-    // already committed - without this, every failed creation would leave a
-    // connection that looks real (it has a name and a type) but has no
-    // host, port, or credential behind it at all.
-    const { error: deleteConnectionError } = await context.supabaseAdminClient
-      .from("connections")
-      .delete()
-      .eq("id", connectionId);
-    if (deleteConnectionError) {
-      console.error(
-        `Failed to roll back orphaned connection '${connectionId}' after a failed connection creation`,
-        deleteConnectionError,
-      );
-    }
-    throw new ConnectorError("unknown", insertPostgresRowError.message);
+  if (!error) {
+    return;
   }
 
+  await _rollbackOrphanedVaultSecret(context, secretId);
+  const { error: deleteConnectionError } = await context.supabaseAdminClient
+    .from("connections")
+    .delete()
+    .eq("id", connectionId);
+  if (deleteConnectionError) {
+    console.error(
+      `Failed to roll back orphaned connection '${connectionId}' after a failed connection creation`,
+      deleteConnectionError,
+    );
+  }
+  throw new ConnectorError("unknown", error.message);
+}
+
+/** Creates a new Vault secret and a new saved connection pointing at it. */
+async function _createConnection(
+  context: ConnectorContext,
+  input: PostgresTestAndSaveInput,
+  nowIso: string,
+): Promise<string> {
+  const secretId = await _createVaultSecretForConnection(context, input);
+  const connectionId = await _insertConnectionRow(context, input, secretId);
+  await _insertPostgresConnectionRow(
+    context,
+    input,
+    nowIso,
+    connectionId,
+    secretId,
+  );
   return connectionId;
 }

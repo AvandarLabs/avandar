@@ -1,3 +1,5 @@
+import type { RelationRowDescriptor } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
+
 /**
  * A single shared ceiling, imported by reference from both runtimes that
  * need it - `supabase/functions/connectors/postgres/` (the edge function
@@ -72,7 +74,10 @@ const NAMED_TEXT_HEURISTICS: ReadonlyArray<{
   averageBytes: number;
 }> = [
   // Free-text fields: a sentence or short paragraph, not a label.
-  { pattern: /(description|notes?|comment|summary|bio|remarks)/i, averageBytes: 280 },
+  {
+    pattern: /(description|notes?|comment|summary|bio|remarks)/i,
+    averageBytes: 280,
+  },
   { pattern: /(body|content|message|details?)/i, averageBytes: 220 },
   // Short, structured text.
   { pattern: /(title|subtitle|headline)/i, averageBytes: 55 },
@@ -154,4 +159,34 @@ export function estimateRelationCsvBytes(
   }>,
 ): number {
   return estimateRowCsvBytes(options.columns) * options.rowCount;
+}
+
+/**
+ * Derives a row cap from the shared byte budget and a relation's own
+ * estimated row width, rather than one flat row number for every table
+ * regardless of how wide its rows are. `"unbounded"` when no row-width
+ * estimate is available (or it is zero/negative) - `maxBytesPerCall` alone
+ * still binds in that case, per `RelationCallCap`'s both-apply,
+ * defer-when-unknown contract (`RelationCapabilities.types.ts`).
+ *
+ * The one `RelationCallCap` function both runtimes that need a Postgres row
+ * cap import by reference: `createPostgresConnector.ts`'s `getRelationRows`
+ * passes it `estimateRowCsvBytes`'s own output as `estimatedRowBytes`, so the
+ * same per-column-type estimate this module already computes also drives the
+ * row axis of `isWithinRelationCallCaps`, not a second, separately-chosen
+ * number; `PostgresTableWrapper.ts`'s capability record uses it to advertise
+ * the same derivation to the mediator.
+ */
+export function postgresMaxRowsPerCall(
+  descriptor: RelationRowDescriptor,
+): number | "unbounded" {
+  if (
+    descriptor.estimatedRowBytes === undefined ||
+    descriptor.estimatedRowBytes <= 0
+  ) {
+    return "unbounded";
+  }
+  return Math.floor(
+    POSTGRES_MAX_BYTES_PER_ACQUIRE / descriptor.estimatedRowBytes,
+  );
 }

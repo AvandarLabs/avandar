@@ -1,12 +1,12 @@
-import { acquirePostgresTableRelation } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
+import {
+  POSTGRES_MAX_BYTES_PER_ACQUIRE,
+  postgresMaxRowsPerCall,
+} from "$/connectors/postgres/estimateRelationCsvBytes";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
-import { POSTGRES_MAX_BYTES_PER_ACQUIRE } from "$/connectors/postgres/estimateRelationCsvBytes";
+import { acquirePostgresTableRelation } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
-import type {
-  RelationCapabilities,
-  RelationRowDescriptor,
-} from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
@@ -51,28 +51,6 @@ export type PostgresTableWrapperOptions = {
 };
 
 /**
- * Derives a row cap from the shared byte budget and the relation's own
- * estimated row width, rather than declaring one flat row number for every
- * table regardless of how wide its rows are. `"unbounded"` when no row-width
- * estimate is available for this relation - `maxBytesPerCall` alone still
- * binds in that case, per `RelationCallCap`'s both-apply, defer-when-unknown
- * contract (`RelationCapabilities.types.ts`).
- */
-function _postgresMaxRowsPerCall(
-  descriptor: RelationRowDescriptor,
-): number | "unbounded" {
-  if (
-    descriptor.estimatedRowBytes === undefined ||
-    descriptor.estimatedRowBytes <= 0
-  ) {
-    return "unbounded";
-  }
-  return Math.floor(
-    POSTGRES_MAX_BYTES_PER_ACQUIRE / descriptor.estimatedRowBytes,
-  );
-}
-
-/**
  * Capability record for the Postgres connector.
  *
  * Byte-bounded (not `"unbounded"`, unlike Sheets): an arbitrary customer
@@ -81,7 +59,12 @@ function _postgresMaxRowsPerCall(
  * imports `POSTGRES_MAX_BYTES_PER_ACQUIRE` directly from
  * `shared/connectors/postgres/estimateRelationCsvBytes.ts`, the same module
  * `createPostgresConnector.ts` enforces it from - one constant, imported by
- * both runtimes, not two numbers kept in sync by convention.
+ * both runtimes, not two numbers kept in sync by convention. `maxRowsPerCall`
+ * is `postgresMaxRowsPerCall` for the same reason: the edge function's own
+ * `getRelationRows` derives its row cap from the exact same function, fed
+ * the exact same per-column-type byte estimate, rather than this wrapper
+ * advertising one row-cap derivation while the server enforces a different
+ * one.
  */
 const CAPABILITIES = {
   /** One dataset row is one table/view. */
@@ -95,7 +78,7 @@ const CAPABILITIES = {
   aggregatePushdown: false,
   wholeRelationAcquirable: "yes",
 
-  maxRowsPerCall: _postgresMaxRowsPerCall,
+  maxRowsPerCall: postgresMaxRowsPerCall,
   maxBytesPerCall: POSTGRES_MAX_BYTES_PER_ACQUIRE,
 
   /**
