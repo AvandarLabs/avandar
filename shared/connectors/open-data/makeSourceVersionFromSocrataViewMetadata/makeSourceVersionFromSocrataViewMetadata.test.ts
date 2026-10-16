@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata.ts";
+import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
 
 describe("makeSourceVersionFromSocrataViewMetadata", () => {
   it("prefers rowsUpdatedAt when present", () => {

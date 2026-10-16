@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
-import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken.ts";
+import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
