@@ -1,6 +1,6 @@
 import type { AvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.types.ts";
-import { formatToContentKind } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 
 type UpdateCacheParams = {

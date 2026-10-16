@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 import { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
 import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/buildSocrataSourceVersion.ts";
+import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
@@ -58,15 +59,6 @@ export type OpenDataAcquisition = {
    */
   datastoreActive: boolean;
 };
-
-/**
- * Maps a CKAN resource format onto how its bytes must be read. Exported so
- * callers that need the same rule - such as the cache-aside wrapper reading
- * a cached entry's recorded format - do not reimplement it.
- */
-export function formatToContentKind(format: string): OpenDataContentKind {
-  return format.toLowerCase() === "parquet" ? "parquet" : "csv";
-}
 
 /** The access shape `toAccess` produces for an `api_resource` entry. */
 type OpenDataApiAccess = Extract<OpenDataAccess, { kind: "api_resource" }>;
