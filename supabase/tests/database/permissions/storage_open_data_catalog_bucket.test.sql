@@ -14,7 +14,7 @@ select results_eq(
   $$
     select count(*)::int from pg_policies
     where schemaname = 'storage' and tablename = 'objects'
-      and qual like '%open-data-catalog%'
+      and (qual like '%open-data-catalog%' or with_check like '%open-data-catalog%')
   $$,
   $$ values (0) $$,
   'No storage policy references the open-data-catalog bucket - service-role only'
