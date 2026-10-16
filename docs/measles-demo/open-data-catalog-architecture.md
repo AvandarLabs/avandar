@@ -261,10 +261,13 @@ call - nothing above the HTTP boundary (section 3) changes:
 acquire an api_resource entry:
   1. Read the catalog entry's cached_source_version (may be null - no cache yet).
   2. Ask the connector (CkanClient.getPackage / SocrataClient.getMetadata) for
-     the live freshness token. This is the one call acquisition needs anyway
-     (CKAN: package_show supplies the download URL too; Socrata: the metadata
-     call is separate from the data call, but still one cheap request, no
-     row data fetched).
+     the live freshness token. This is a separate call from whatever step 4's
+     live acquisition makes - on a cache miss or a stale token, the metadata
+     is genuinely fetched twice (once here, once again inside
+     acquireOpenDataResource's CKAN/Socrata branch), not shared. This is a
+     cheap request either way (no row data fetched), and de-duplicating the
+     two calls is a natural future optimization, not something this flow
+     does today.
   3. If cached_source_version is set AND equals the live token:
        read cached_object_path through AvandarSupabaseStorageClient. Done.
   4. Otherwise (no cache, or token changed):

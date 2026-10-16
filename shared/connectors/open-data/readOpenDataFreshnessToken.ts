@@ -10,9 +10,17 @@ import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.
 
 /**
  * Reads one cheap, up-to-date freshness token for an `api_resource` entry,
- * without fetching its rows. For CKAN this is the same `package_show` call
- * acquisition needs anyway; for Socrata it is a separate, equally cheap
- * metadata call.
+ * without fetching its rows. For both CKAN and Socrata this makes its own
+ * metadata call (`CkanClient.getPackage` / `SocrataClient.getMetadata`),
+ * independent of whatever `acquireLive` does inside
+ * `acquireOpenDataResourceWithCache` - the two are separate closures, each
+ * with their own call. On a cache miss or a stale cached token, this means
+ * the metadata is fetched twice (once here, once again inside the CKAN or
+ * Socrata branch of `acquireOpenDataResource`), not once and reused. This is
+ * a known, accepted inefficiency: de-duplicating it would mean threading the
+ * metadata this function already fetched into `acquireLive`, which would
+ * change `acquireOpenDataResourceWithCache`'s injected-function contracts
+ * and is deliberately deferred rather than done now.
  */
 export async function readOpenDataFreshnessToken(params: {
   entry: Readonly<OpenDataCatalogEntry.T>;

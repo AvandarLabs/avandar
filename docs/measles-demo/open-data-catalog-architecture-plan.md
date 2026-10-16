@@ -2285,6 +2285,15 @@ in shape to before this task (same headers, same status codes for the same
 refusal cases) and that a second request for the same catalog entry is
 noticeably faster (served from the new bucket, not re-fetched from HDX).
 
+**Known gap (as of this task's implementation):** this manual check was
+attempted and blocked by a JWT-issuer mismatch between the edge-runtime
+container and the host-exposed URL in this worktree's switched local
+Supabase stack - a local-environment/tooling issue, not a defect in the
+shipped code. All other verification for this plan (unit tests across every
+task, `pnpm test:db`, `pnpm type-check`) is green. A human should either fix
+that local-stack config and run this check, or run it from an unswitched or
+differently-configured stack, before merging to develop.
+
 - [ ] **Step 7: Type-check**
 
 ```bash
