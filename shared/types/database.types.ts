@@ -1810,7 +1810,7 @@ export type Database = {
         Returns: undefined
       }
       rpc_connections__get_decrypted_secret: {
-        Args: { p_vault_secret_id: string }
+        Args: { p_vault_secret_id: string; p_workspace_id: string }
         Returns: string
       }
       rpc_connections__update_vault_secret: {

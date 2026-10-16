@@ -31,7 +31,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'anon',
-    'public.rpc_connections__get_decrypted_secret(uuid)',
+    'public.rpc_connections__get_decrypted_secret(uuid, uuid)',
     'EXECUTE'
   ),
   'anon cannot execute rpc_connections__get_decrypted_secret'
@@ -40,7 +40,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'authenticated',
-    'public.rpc_connections__get_decrypted_secret(uuid)',
+    'public.rpc_connections__get_decrypted_secret(uuid, uuid)',
     'EXECUTE'
   ),
   'authenticated cannot execute rpc_connections__get_decrypted_secret'
@@ -49,7 +49,7 @@ select ok(
 select ok(
   has_function_privilege(
     'service_role',
-    'public.rpc_connections__get_decrypted_secret(uuid)',
+    'public.rpc_connections__get_decrypted_secret(uuid, uuid)',
     'EXECUTE'
   ),
   'service_role can execute rpc_connections__get_decrypted_secret'

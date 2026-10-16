@@ -50,14 +50,22 @@ export async function fetchConnectionRow(
   return data;
 }
 
-/** Decrypts a saved connection's Vault-stored password. */
+/**
+ * Decrypts a saved connection's Vault-stored password.
+ *
+ * Passes `context.workspaceId` through to the RPC itself, not only using it
+ * to scope the row lookup that found `vaultSecretId` in the first place -
+ * the RPC re-checks that the id actually belongs to a connection in this
+ * workspace before decrypting, so this call staying correctly scoped does
+ * not depend solely on this function always being the only caller.
+ */
 export async function decryptConnectionSecret(
   context: ConnectorContext,
   vaultSecretId: string,
 ): Promise<string> {
   const { data, error } = await context.supabaseAdminClient.rpc(
     "rpc_connections__get_decrypted_secret",
-    { p_vault_secret_id: vaultSecretId },
+    { p_vault_secret_id: vaultSecretId, p_workspace_id: context.workspaceId },
   );
   if (error || data === null) {
     throw new ConnectorError(
