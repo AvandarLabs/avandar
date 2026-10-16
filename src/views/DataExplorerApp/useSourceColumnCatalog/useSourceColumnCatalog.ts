@@ -15,9 +15,9 @@ function _createCatalog(options: {
     sourceKey?.id === previous?.sourceKey?.id;
   return {
     sourceKey,
-    status: incoming.isLoading ? "loading" : "ready",
+    status: incoming.isReady ? "ready" : "loading",
     columns:
-      sourceKey && !incoming.isLoading
+      sourceKey && incoming.isReady
         ? QueryColumnReconciliation.reconcileSourceColumns({
             sourceKey,
             previousSourceKey: previous?.sourceKey,
@@ -50,6 +50,7 @@ export function useSourceColumnCatalog(
   if (
     incoming.columns === previous.incoming.columns &&
     incoming.isLoading === previous.incoming.isLoading &&
+    incoming.isReady === previous.incoming.isReady &&
     isSameScope
   ) {
     return previous.catalog;

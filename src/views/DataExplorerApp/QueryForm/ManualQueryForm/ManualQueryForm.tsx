@@ -145,10 +145,10 @@ function DataExplorerManualQueryForm({
   useEffect(() => {
     dispatch.setSourceColumns({
       sourceKey,
-      status: loaded.isLoading ? "loading" : "ready",
+      status: loaded.isReady ? "ready" : "loading",
       columns: loaded.columns,
     });
-  }, [dispatch, sourceKey, loaded.columns, loaded.isLoading]);
+  }, [dispatch, sourceKey, loaded.columns, loaded.isReady]);
 
   const handlers: ManualQueryFormHandlers = {
     onSetDataSource: (dataSource, options) => {

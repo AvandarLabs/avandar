@@ -9,7 +9,7 @@ import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColum
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
 const loader = vi.hoisted(() => {
-  return { columns: [] as QueryColumn.T[], isLoading: true };
+  return { columns: [] as QueryColumn.T[], isLoading: true, isReady: false };
 });
 vi.mock("@/views/DataExplorerApp/useQueryColumnsForDataSource", () => {
   return {
@@ -29,6 +29,7 @@ it("retains source IDs on refresh and distinguishes loading from ready-empty", (
   );
   loader.columns = [];
   loader.isLoading = true;
+  loader.isReady = false;
   const sourceKey: QueryDataSource.TypedId = {
     __type: "Dataset",
     id: "sales" as Dataset.Id,
@@ -42,6 +43,7 @@ it("retains source IDs on refresh and distinguishes loading from ready-empty", (
   expect(result.current.status).toBe("loading");
   loader.columns = [firstColumn];
   loader.isLoading = false;
+  loader.isReady = true;
   rerender({ sourceKey: { ...sourceKey } });
   const retainedId = result.current.columns[0]?.id;
   loader.columns = [
@@ -60,5 +62,34 @@ it("retains source IDs on refresh and distinguishes loading from ready-empty", (
   expect(result.current.columns[0]?.id).toBe(incomingId);
   loader.columns = [];
   rerender({ sourceKey });
+  expect(result.current).toMatchObject({ status: "ready", columns: [] });
+});
+
+it("preserves the existing catalog when metadata fails until an empty response succeeds", () => {
+  const source = QueryColumn.makeFromDatasetColumn(
+    Model.make("DatasetColumn", {
+      id: "dc_revenue",
+      name: "revenue",
+      dataType: "double",
+    }) as DatasetColumn.T,
+  );
+  const sourceKey: QueryDataSource.TypedId = {
+    __type: "Dataset",
+    id: "sales" as Dataset.Id,
+  };
+  loader.columns = [source];
+  loader.isLoading = false;
+  loader.isReady = true;
+  const { result, rerender } = renderHook(() => {
+    return useSourceColumnCatalog(sourceKey);
+  });
+  const loadedColumns = result.current.columns;
+  loader.columns = [];
+  loader.isReady = false;
+  rerender();
+  expect(result.current.status).toBe("loading");
+  expect(result.current.columns).toBe(loadedColumns);
+  loader.isReady = true;
+  rerender();
   expect(result.current).toMatchObject({ status: "ready", columns: [] });
 });

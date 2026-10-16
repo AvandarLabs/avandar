@@ -11,6 +11,8 @@ type Result = {
   /** Every column of the data source, as query columns. */
   columns: QueryColumn.T[];
   isLoading: boolean;
+  /** True after a successful active query, or when no source is selected. */
+  isReady: boolean;
 };
 
 /**
@@ -23,7 +25,7 @@ type Result = {
 export function useQueryColumnsForDataSource(
   dataSourceId: QueryDataSource.TypedId | undefined,
 ): Result {
-  const [datasetColumns, isLoadingDatasetColumns] =
+  const [datasetColumns, isLoadingDatasetColumns, datasetQuery] =
     DatasetColumnClient.useGetAll({
       ...where("dataset_id", "eq", dataSourceId?.id),
       useQueryOptions: {
@@ -31,7 +33,7 @@ export function useQueryColumnsForDataSource(
       },
     });
 
-  const [conceptAttributes, isLoadingConceptAttributes] =
+  const [conceptAttributes, isLoadingConceptAttributes, conceptQuery] =
     ConceptAttributeClient.useGetAll({
       ...where("concept_id", "eq", dataSourceId?.id),
       useQueryOptions: {
@@ -61,6 +63,12 @@ export function useQueryColumnsForDataSource(
 
   return {
     columns,
+    isReady:
+      sourceType === "Dataset"
+        ? datasetQuery.isSuccess
+        : sourceType === "Concept"
+          ? conceptQuery.isSuccess
+          : true,
     isLoading: Model.isOfModelType(dataSourceId, "Dataset")
       ? isLoadingDatasetColumns
       : Model.isOfModelType(dataSourceId, "Concept")
