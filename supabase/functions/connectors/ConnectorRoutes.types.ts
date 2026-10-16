@@ -1,15 +1,15 @@
 import type {
-  ExternalDatasetErrorCode,
-  ExternalDatasetPreviewColumn,
-  ExternalDatasetRelation,
-} from "@sbfn/connectors/ExternalDatasetConnector.ts";
+  ConnectorErrorCode,
+  ConnectorPreviewColumn,
+  ConnectorRelation,
+} from "@sbfn/connectors/Connector.ts";
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
-export type ExternalDatasetErrorResponse = {
-  error: { code: ExternalDatasetErrorCode; message: string };
+export type ConnectorErrorResponse = {
+  error: { code: ConnectorErrorCode; message: string };
 };
 
-export type ExternalDatasetsApi = APITypeDef<
+export type ConnectorsApi = APITypeDef<
   "connectors",
   [
     "/:connectorType/connections/test-and-save",
@@ -26,16 +26,16 @@ export type ExternalDatasetsApi = APITypeDef<
           unknown
         >;
         returnType:
-          | { connectionId: string; relations: ExternalDatasetRelation[] }
-          | ExternalDatasetErrorResponse;
+          | { connectionId: string; relations: ConnectorRelation[] }
+          | ConnectorErrorResponse;
       };
     };
     "/:connectorType/connections/:connectionId/relations": {
       GET: {
         pathParams: { connectorType: string; connectionId: string };
         returnType:
-          | { relations: ExternalDatasetRelation[] }
-          | ExternalDatasetErrorResponse;
+          | { relations: ConnectorRelation[] }
+          | ConnectorErrorResponse;
       };
     };
     "/:connectorType/connections/:connectionId/relations/:relationId/preview": {
@@ -47,10 +47,10 @@ export type ExternalDatasetsApi = APITypeDef<
         };
         returnType:
           | {
-              columns: ExternalDatasetPreviewColumn[];
+              columns: ConnectorPreviewColumn[];
               previewRows: Array<Record<string, unknown>>;
             }
-          | ExternalDatasetErrorResponse;
+          | ConnectorErrorResponse;
       };
     };
     "/:connectorType/connections/:connectionId/relations/:relationId/rows": {
@@ -75,8 +75,8 @@ export type ExternalDatasetsApi = APITypeDef<
         // does its own authenticated `fetch`, mirroring
         // `fetchOpenDataCatalogResource.ts`, and reads the body itself. An
         // error response is still JSON (MiniServer's default wrapping), so
-        // it comes back as the usual `ExternalDatasetErrorResponse` shape.
-        returnType: Response | ExternalDatasetErrorResponse;
+        // it comes back as the usual `ConnectorErrorResponse` shape.
+        returnType: Response | ConnectorErrorResponse;
       };
     };
   }

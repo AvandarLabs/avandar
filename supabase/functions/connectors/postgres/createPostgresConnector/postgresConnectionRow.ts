@@ -1,7 +1,7 @@
-import { ExternalDatasetError } from "@sbfn/connectors/ExternalDatasetConnector.ts";
+import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection.ts";
-import type { ExternalDatasetConnectorContext } from "@sbfn/connectors/ExternalDatasetConnector.ts";
+import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 export type DbConnectionsPostgresRow = {
@@ -26,7 +26,7 @@ export type DbConnectionsPostgresRow = {
  * could be read or mutated.
  */
 export async function fetchConnectionRow(
-  context: ExternalDatasetConnectorContext,
+  context: ConnectorContext,
   connectionId: string,
 ): Promise<DbConnectionsPostgresRow> {
   const { data, error } = await context.supabaseAdminClient
@@ -39,10 +39,10 @@ export async function fetchConnectionRow(
     .maybeSingle();
 
   if (error) {
-    throw new ExternalDatasetError("unknown", error.message);
+    throw new ConnectorError("unknown", error.message);
   }
   if (!data) {
-    throw new ExternalDatasetError(
+    throw new ConnectorError(
       "unknown",
       `No Postgres connection '${connectionId}' in this workspace`,
     );
@@ -52,7 +52,7 @@ export async function fetchConnectionRow(
 
 /** Decrypts a saved connection's Vault-stored password. */
 export async function decryptConnectionSecret(
-  context: ExternalDatasetConnectorContext,
+  context: ConnectorContext,
   vaultSecretId: string,
 ): Promise<string> {
   const { data, error } = await context.supabaseAdminClient.rpc(
@@ -60,7 +60,7 @@ export async function decryptConnectionSecret(
     { p_vault_secret_id: vaultSecretId },
   );
   if (error || data === null) {
-    throw new ExternalDatasetError(
+    throw new ConnectorError(
       "unknown",
       `Failed to decrypt connection secret: ${error?.message ?? "not found"}`,
     );
@@ -74,7 +74,7 @@ export async function decryptConnectionSecret(
  * change between when it was saved and when it is used again.
  */
 export async function openSavedConnection(
-  context: ExternalDatasetConnectorContext,
+  context: ConnectorContext,
   connectionId: string,
   connect: (
     config: ReturnType<typeof toPostgresConnectionConfig>,

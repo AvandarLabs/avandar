@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { describe, expect, it, vi } from "vitest";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
-import type { ExternalDatasetConnectorContext } from "@sbfn/connectors/ExternalDatasetConnector.ts";
+import { describe, expect, it, vi } from "vitest";
+import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
 import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
@@ -34,8 +34,7 @@ function _makeFakeSql(
 
 function _makeFakeSupabaseAdminClient() {
   const insertedRows: Record<string, Array<Record<string, unknown>>> = {};
-  const rpcCalls: Array<{ name: string; params: Record<string, unknown> }> =
-    [];
+  const rpcCalls: Array<{ name: string; params: Record<string, unknown> }> = [];
 
   const client = {
     rpc: vi.fn(async (name: string, params: Record<string, unknown>) => {
@@ -57,7 +56,10 @@ function _makeFakeSupabaseAdminClient() {
           return { data: null, error: null };
         }),
         single: vi.fn(async () => {
-          return { data: { id: "22222222-2222-2222-2222-222222222222" }, error: null };
+          return {
+            data: { id: "22222222-2222-2222-2222-222222222222" },
+            error: null,
+          };
         }),
         insert: vi.fn((row: Record<string, unknown>) => {
           insertedRows[table] = [...(insertedRows[table] ?? []), row];
@@ -81,14 +83,18 @@ describe("createPostgresConnector - field parameterization", () => {
     const connectToPostgres = vi.fn((config: PostgresConnectionConfig) => {
       capturedConfig = config;
       return _makeFakeSql([
-        { table_schema: "public", table_name: "customers", table_type: "BASE TABLE" },
+        {
+          table_schema: "public",
+          table_name: "customers",
+          table_type: "BASE TABLE",
+        },
       ]);
     });
 
     const connector = createPostgresConnector({ connectToPostgres });
     const { client, insertedRows, rpcCalls } = _makeFakeSupabaseAdminClient();
 
-    const context: ExternalDatasetConnectorContext = {
+    const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
       // Not exercised by this connector method - only the admin client
       // matters here.
@@ -141,7 +147,11 @@ describe("createPostgresConnector - field parameterization", () => {
     expect(connectionRow?.database_name).toBe(INJECTION_PAYLOAD);
 
     expect(result.relations).toEqual([
-      { relationId: "public.customers", label: "public.customers", kind: "table" },
+      {
+        relationId: "public.customers",
+        label: "public.customers",
+        kind: "table",
+      },
     ]);
   });
 
@@ -154,7 +164,7 @@ describe("createPostgresConnector - field parameterization", () => {
     const connector = createPostgresConnector({ connectToPostgres });
     const { client } = _makeFakeSupabaseAdminClient();
 
-    const context: ExternalDatasetConnectorContext = {
+    const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       supabaseClient: undefined as any,
@@ -181,7 +191,7 @@ describe("createPostgresConnector - field parameterization", () => {
     const connector = createPostgresConnector({ connectToPostgres });
     const { client } = _makeFakeSupabaseAdminClient();
 
-    const context: ExternalDatasetConnectorContext = {
+    const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       supabaseClient: undefined as any,

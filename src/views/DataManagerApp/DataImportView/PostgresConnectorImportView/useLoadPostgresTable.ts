@@ -9,17 +9,17 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { Logger } from "@/utils/Logger";
 import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy";
-import type { PostgresDatabaseConnectionWithDetails } from "@/clients/connections/DatabaseConnectionClient";
-import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
-import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection";
 import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
+import type { PostgresDatabaseConnectionWithDetails } from "@/clients/connections/DatabaseConnectionClient";
+import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
+import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 import type {
-  ExternalDatasetErrorCode,
-  ExternalDatasetRelation,
-} from "@sbfn/connectors/ExternalDatasetConnector";
+  ConnectorErrorCode,
+  ConnectorRelation,
+} from "@sbfn/connectors/Connector";
 
 /**
  * The connection form's own fields - never retained once test-and-save
@@ -40,7 +40,7 @@ export type PostgresConnectionFormValues = {
  * nothing - the form keeps its own field state.
  */
 export type PostgresConnectionError = {
-  code: ExternalDatasetErrorCode | undefined;
+  code: ConnectorErrorCode | undefined;
   title: string;
   message: string;
 };
@@ -68,7 +68,7 @@ export type PostgresTableLoad = {
   connectionError: PostgresConnectionError | undefined;
 
   /** The relation (table/view) list for the active connection, once known. */
-  relations: ExternalDatasetRelation[] | undefined;
+  relations: ConnectorRelation[] | undefined;
   isLoadingRelations: boolean;
 
   selectedRelationId: string | undefined;
@@ -139,9 +139,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
   const [connectionError, setConnectionError] = useState<
     PostgresConnectionError | undefined
   >();
-  const [relations, setRelations] = useState<
-    ExternalDatasetRelation[] | undefined
-  >();
+  const [relations, setRelations] = useState<ConnectorRelation[] | undefined>();
   const [selectedRelationId, setSelectedRelationId] = useState<
     string | undefined
   >();
@@ -152,10 +150,13 @@ export function useLoadPostgresTable(): PostgresTableLoad {
   const [listRelations, isLoadingRelations] = useMutation({
     mutationFn: async (params: {
       connectionId: DatabaseConnection.Id;
-    }): Promise<ExternalDatasetRelation[]> => {
+    }): Promise<ConnectorRelation[]> => {
       const result = await APIClient.get({
         route: "connectors/:connectorType/connections/:connectionId/relations",
-        pathParams: { connectorType: "postgres", connectionId: params.connectionId },
+        pathParams: {
+          connectorType: "postgres",
+          connectionId: params.connectionId,
+        },
       });
       if ("error" in result) {
         throw new Error(result.error.message);
@@ -201,7 +202,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       values: PostgresConnectionFormValues,
     ): Promise<{
       connectionId: string;
-      relations: ExternalDatasetRelation[];
+      relations: ConnectorRelation[];
     }> => {
       const jobId = JobProgressStore.startJob(t`Connecting to database`);
       try {
@@ -251,7 +252,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       Logger.error(error, { devMsg: "Postgres test-and-save failed" });
       const code =
         error instanceof Error && "code" in error
-          ? (error as { code: ExternalDatasetErrorCode }).code
+          ? (error as { code: ConnectorErrorCode }).code
           : undefined;
       const copy = postgresConnectorImportErrorCopy({ code, i18n });
       setConnectionError({ code, ...copy });
@@ -265,7 +266,8 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       relationKind: PostgresTableDataset.RelationKind;
     }): Promise<void> => {
       const result = await APIClient.get({
-        route: "connectors/:connectorType/connections/:connectionId/relations/:relationId/preview",
+        route:
+          "connectors/:connectorType/connections/:connectionId/relations/:relationId/preview",
         pathParams: {
           connectorType: "postgres",
           connectionId: params.connectionId,
@@ -404,7 +406,9 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       ) {
         return;
       }
-      const relation = relations?.find(propEq("relationId", selectedRelationId));
+      const relation = relations?.find(
+        propEq("relationId", selectedRelationId),
+      );
       if (!relation || !_isPostgresRelationKind(relation.kind)) {
         return;
       }

@@ -1,8 +1,5 @@
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
-import type {
-  ExternalDatasetConnector,
-  ExternalDatasetConnectorType,
-} from "@sbfn/connectors/ExternalDatasetConnector.ts";
+import type { Connector, ConnectorType } from "@sbfn/connectors/Connector.ts";
 
 /**
  * The one registry every route dispatches through - the same registry shape
@@ -10,18 +7,13 @@ import type {
  * down at the HTTP boundary. Adding a connector after `postgres` means a new
  * entry here, never a new edge function.
  */
-export const CONNECTORS: Record<
-  ExternalDatasetConnectorType,
-  ExternalDatasetConnector
-> = {
+export const CONNECTORS: Record<ConnectorType, Connector> = {
   postgres: createPostgresConnector(),
 };
 
 /** Looks up a connector by type; throws if the type is unrecognized. */
-export function getConnector(
-  connectorType: string,
-): ExternalDatasetConnector {
-  const connector = CONNECTORS[connectorType as ExternalDatasetConnectorType];
+export function getConnector(connectorType: string): Connector {
+  const connector = CONNECTORS[connectorType as ConnectorType];
   if (!connector) {
     throw new Error(`Unknown connector type: '${connectorType}'`);
   }

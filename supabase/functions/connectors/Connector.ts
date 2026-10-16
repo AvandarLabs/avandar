@@ -3,10 +3,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "$/types/database.types.ts";
 
 /** Widens per future connector (MySQL, MSSQL, Snowflake, ...). */
-export type ExternalDatasetConnectorType = "postgres";
+export type ConnectorType = "postgres";
 
 /** One pickable child object under a connection - a table/view, a sheet tab. */
-export type ExternalDatasetRelation = {
+export type ConnectorRelation = {
   /** Opaque to callers; the `postgres` connector encodes `"schema.table"`. */
   relationId: string;
   /** What the picker shows, e.g. "public.customers". */
@@ -25,7 +25,7 @@ export type ExternalDatasetRelation = {
  * Sheets; this preview type exists only to describe what the picker shows
  * before that happens.
  */
-export type ExternalDatasetPreviewColumn = {
+export type ConnectorPreviewColumn = {
   columnName: string;
   /**
    * The source database's own type name, e.g. Postgres's
@@ -34,7 +34,7 @@ export type ExternalDatasetPreviewColumn = {
   sourceType: string;
 };
 
-export type ExternalDatasetErrorCode =
+export type ConnectorErrorCode =
   | "auth_failed"
   | "unreachable"
   | "ssl_required"
@@ -43,9 +43,9 @@ export type ExternalDatasetErrorCode =
   | "unknown";
 
 /** A connector failure with a specific, user-facing reason attached. */
-export class ExternalDatasetError extends Error {
+export class ConnectorError extends Error {
   constructor(
-    public readonly code: ExternalDatasetErrorCode,
+    public readonly code: ConnectorErrorCode,
     message: string,
   ) {
     super(message);
@@ -54,11 +54,11 @@ export class ExternalDatasetError extends Error {
 
 /**
  * Everything a connector implementation needs from the caller, resolved
- * once per request by `ExternalDatasetRoutes.ts` before dispatching into the
+ * once per request by `ConnectorRoutes.ts` before dispatching into the
  * registry. The QETL mediator never learns any of this exists - this
  * context lives entirely at the HTTP boundary, one layer below it.
  */
-export type ExternalDatasetConnectorContext = {
+export type ConnectorContext = {
   workspaceId: string;
   /**
    * User-scoped client (the caller's own session) - for the app-role check
@@ -72,29 +72,29 @@ export type ExternalDatasetConnectorContext = {
   supabaseAdminClient: SupabaseClient<Database>;
 };
 
-export type ExternalDatasetConnector = {
+export type Connector = {
   testAndSaveConnection: (
-    context: ExternalDatasetConnectorContext,
+    context: ConnectorContext,
     input: Record<string, unknown>,
   ) => Promise<{
     connectionId: string;
-    relations: ExternalDatasetRelation[];
+    relations: ConnectorRelation[];
   }>;
   listRelations: (
-    context: ExternalDatasetConnectorContext,
+    context: ConnectorContext,
     connectionId: string,
-  ) => Promise<ExternalDatasetRelation[]>;
+  ) => Promise<ConnectorRelation[]>;
   previewRelation: (
-    context: ExternalDatasetConnectorContext,
+    context: ConnectorContext,
     connectionId: string,
     relationId: string,
   ) => Promise<{
-    columns: ExternalDatasetPreviewColumn[];
+    columns: ConnectorPreviewColumn[];
     previewRows: Array<Record<string, unknown>>;
   }>;
   /** Returns the full relation as CSV text - what `acquire` calls. */
   getRelationRows: (
-    context: ExternalDatasetConnectorContext,
+    context: ConnectorContext,
     connectionId: string,
     relationId: string,
   ) => Promise<string>;

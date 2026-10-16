@@ -52,7 +52,7 @@ export type PostgresRowsFetch = (
  * `APIClient`/`supabase.functions.invoke`: that call's own content-type
  * parsing would resolve the body to a plain string before this function
  * ever saw it, and the route's declared type can only be `Response`
- * (`ExternalDatasetRoutes.types.ts`'s comment explains why). This mirrors
+ * (`ConnectorRoutes.types.ts`'s comment explains why). This mirrors
  * `fetchOpenDataCatalogResource.ts`, the one other raw-bytes route in this
  * codebase, including its auth pattern (a manually attached session Bearer
  * token).

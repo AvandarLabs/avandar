@@ -1,4 +1,4 @@
-import type { ExternalDatasetErrorCode } from "@sbfn/connectors/ExternalDatasetConnector.ts";
+import type { ConnectorErrorCode } from "@sbfn/connectors/Connector.ts";
 
 function _getErrorCode(error: unknown): string | undefined {
   if (
@@ -29,7 +29,7 @@ function _getErrorMessage(error: unknown): string {
  */
 export function classifyPostgresConnectionError(
   error: unknown,
-): ExternalDatasetErrorCode {
+): ConnectorErrorCode {
   const code = _getErrorCode(error);
   const message = _getErrorMessage(error).toLowerCase();
 

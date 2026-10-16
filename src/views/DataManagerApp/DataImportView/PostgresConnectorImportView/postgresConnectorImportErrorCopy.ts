@@ -1,7 +1,7 @@
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
-import type { ExternalDatasetErrorCode } from "@sbfn/connectors/ExternalDatasetConnector";
 import type { I18n, MessageDescriptor } from "@lingui/core";
+import type { ConnectorErrorCode } from "@sbfn/connectors/Connector";
 
 /** The notification a failed Postgres connection attempt shows. */
 export type PostgresConnectorImportErrorCopy = {
@@ -27,7 +27,7 @@ const GENERIC_FAILURE: CopyDescriptors = {
  * its lexical scope, because the extractor cannot follow it and the strings
  * never reach the catalogs.
  */
-function _getCopyDescriptors(code: ExternalDatasetErrorCode): CopyDescriptors {
+function _getCopyDescriptors(code: ConnectorErrorCode): CopyDescriptors {
   return matchLiteral(code, {
     auth_failed: {
       title: msg`Authentication failed`,
@@ -55,7 +55,7 @@ function _getCopyDescriptors(code: ExternalDatasetErrorCode): CopyDescriptors {
 
 /**
  * Turns a failed Postgres connection/import attempt into the copy the user
- * sees. Branches on the edge function's `ExternalDatasetErrorCode`, never on
+ * sees. Branches on the edge function's `ConnectorErrorCode`, never on
  * message prose, so each failure kind gets its own specific recovery
  * instruction instead of one generic "Could not connect" string.
  *
@@ -65,7 +65,7 @@ function _getCopyDescriptors(code: ExternalDatasetErrorCode): CopyDescriptors {
  */
 export function postgresConnectorImportErrorCopy(
   params: Readonly<{
-    code: ExternalDatasetErrorCode | undefined;
+    code: ConnectorErrorCode | undefined;
     i18n: I18n;
   }>,
 ): PostgresConnectorImportErrorCopy {

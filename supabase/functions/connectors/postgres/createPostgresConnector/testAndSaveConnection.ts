@@ -1,17 +1,17 @@
 import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.ts";
 import {
-  ExternalDatasetError,
-  type ExternalDatasetConnectorContext,
-  type ExternalDatasetRelation,
-} from "@sbfn/connectors/ExternalDatasetConnector.ts";
+  ConnectorError,
+  type ConnectorContext,
+  type ConnectorRelation,
+} from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
+import { listCatalogRelations } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
+import { fetchConnectionRow } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   postgresTestAndSaveInputSchema,
   type PostgresTestAndSaveInput,
 } from "@sbfn/connectors/postgres/PostgresConnectorInput.ts";
-import { fetchConnectionRow } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
-import { listCatalogRelations } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 type ConnectFn = (
@@ -26,10 +26,10 @@ type ConnectFn = (
  * step.
  */
 export async function testAndSaveConnection(
-  context: ExternalDatasetConnectorContext,
+  context: ConnectorContext,
   rawInput: Record<string, unknown>,
   connect: ConnectFn,
-): Promise<{ connectionId: string; relations: ExternalDatasetRelation[] }> {
+): Promise<{ connectionId: string; relations: ConnectorRelation[] }> {
   const input = postgresTestAndSaveInputSchema.parse(rawInput);
 
   let sql: PostgresSql | undefined;
@@ -55,10 +55,10 @@ export async function testAndSaveConnection(
 
     return { connectionId, relations };
   } catch (error) {
-    if (error instanceof ExternalDatasetError) {
+    if (error instanceof ConnectorError) {
       throw error;
     }
-    throw new ExternalDatasetError(
+    throw new ConnectorError(
       classifyPostgresConnectionError(error),
       error instanceof Error ? error.message : String(error),
     );
@@ -76,7 +76,7 @@ export async function testAndSaveConnection(
  * else's connection.
  */
 async function _rotateConnection(
-  context: ExternalDatasetConnectorContext,
+  context: ConnectorContext,
   connectionId: string,
   input: PostgresTestAndSaveInput,
   nowIso: string,
@@ -91,7 +91,7 @@ async function _rotateConnection(
     },
   );
   if (updateSecretError) {
-    throw new ExternalDatasetError("unknown", updateSecretError.message);
+    throw new ConnectorError("unknown", updateSecretError.message);
   }
 
   const { error: updateDbConnectionsError } = await context.supabaseAdminClient
@@ -100,7 +100,7 @@ async function _rotateConnection(
     .eq("id", connectionId)
     .eq("workspace_id", context.workspaceId);
   if (updateDbConnectionsError) {
-    throw new ExternalDatasetError("unknown", updateDbConnectionsError.message);
+    throw new ConnectorError("unknown", updateDbConnectionsError.message);
   }
 
   const { error: updatePostgresRowError } = await context.supabaseAdminClient
@@ -116,10 +116,7 @@ async function _rotateConnection(
     .eq("connection_id", connectionId)
     .eq("workspace_id", context.workspaceId);
   if (updatePostgresRowError) {
-    throw new ExternalDatasetError(
-      "unknown",
-      updatePostgresRowError.message,
-    );
+    throw new ConnectorError("unknown", updatePostgresRowError.message);
   }
 
   return connectionId;
@@ -127,7 +124,7 @@ async function _rotateConnection(
 
 /** Creates a new Vault secret and a new saved connection pointing at it. */
 async function _createConnection(
-  context: ExternalDatasetConnectorContext,
+  context: ConnectorContext,
   input: PostgresTestAndSaveInput,
   nowIso: string,
 ): Promise<string> {
@@ -141,7 +138,7 @@ async function _createConnection(
       },
     );
   if (createSecretError || !secretId) {
-    throw new ExternalDatasetError(
+    throw new ConnectorError(
       "unknown",
       createSecretError?.message ?? "Failed to create Vault secret",
     );
@@ -158,7 +155,7 @@ async function _createConnection(
       .select("id")
       .single();
   if (insertConnectionError || !connectionRow) {
-    throw new ExternalDatasetError(
+    throw new ConnectorError(
       "unknown",
       insertConnectionError?.message ?? "Failed to create connection",
     );
@@ -179,7 +176,7 @@ async function _createConnection(
       last_verified_at: nowIso,
     });
   if (insertPostgresRowError) {
-    throw new ExternalDatasetError("unknown", insertPostgresRowError.message);
+    throw new ConnectorError("unknown", insertPostgresRowError.message);
   }
 
   return connectionId;

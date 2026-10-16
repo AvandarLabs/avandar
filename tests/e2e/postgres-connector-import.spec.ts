@@ -1,5 +1,5 @@
-import { signInWithEmailPassword } from "./helpers/auth";
 import { expect, test } from "./fixtures/e2e.fixture";
+import { signInWithEmailPassword } from "./helpers/auth";
 import { parseDatasetIdFromDataManagerUrl } from "./helpers/manualUploadCloudSyncFlow";
 import {
   createSupabaseAdminClient,
@@ -7,8 +7,8 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { Page, Route } from "@playwright/test";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import type { Page, Route } from "@playwright/test";
 
 /**
  * The Postgres connector, end to end: a saved connection, the schema-grouped
@@ -71,7 +71,7 @@ function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
  * deliberately not stubbed here - see the file docstring for why the
  * connection-creation path is out of scope for this spec.
  */
-async function _stubExternalDatasetsRoutes(page: Page): Promise<void> {
+async function _stubConnectorRoutes(page: Page): Promise<void> {
   await page.route(
     "**/functions/v1/connectors/postgres/connections/*/relations",
     async (route: Route) => {
@@ -116,7 +116,8 @@ async function _seedSavedConnection(options: {
     {
       p_secret: "e2e-throwaway-password",
       p_name: `e2e-postgres-connector-${Date.now()}`,
-      p_description: "Created by postgres-connector-import.spec.ts; safe to delete.",
+      p_description:
+        "Created by postgres-connector-import.spec.ts; safe to delete.",
     },
   );
   if (secretError || !secretId) {
@@ -155,7 +156,9 @@ async function _seedSavedConnection(options: {
       });
     if (postgresError) {
       await admin.from("connections").delete().eq("id", connection.id);
-      throw new Error(`connections__postgres seed failed: ${postgresError.message}`);
+      throw new Error(
+        `connections__postgres seed failed: ${postgresError.message}`,
+      );
     }
 
     return { connectionId: connection.id, vaultSecretId: secretId };
@@ -209,7 +212,7 @@ test.describe("Postgres connector", () => {
         workspaceId,
       }));
 
-      await _stubExternalDatasetsRoutes(page);
+      await _stubConnectorRoutes(page);
 
       await signInWithEmailPassword(page, {
         email: e2eWorkerDb.primaryUser.email,

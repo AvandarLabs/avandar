@@ -1,12 +1,12 @@
-import { ExternalDatasetError } from "@sbfn/connectors/ExternalDatasetConnector.ts";
-import type { ExternalDatasetRelation } from "@sbfn/connectors/ExternalDatasetConnector.ts";
+import { ConnectorError } from "@sbfn/connectors/Connector.ts";
+import type { ConnectorRelation } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 function makeRelationFromCatalogRow(row: {
   table_schema: string;
   table_name: string;
   table_type: string;
-}): ExternalDatasetRelation {
+}): ConnectorRelation {
   const relationId = `${row.table_schema}.${row.table_name}`;
   return {
     relationId,
@@ -18,7 +18,7 @@ function makeRelationFromCatalogRow(row: {
 /** Lists every table and view a connection can see, across every schema. */
 export async function listCatalogRelations(
   sql: PostgresSql,
-): Promise<ExternalDatasetRelation[]> {
+): Promise<ConnectorRelation[]> {
   const rows = await sql<{
     table_schema: string;
     table_name: string;
@@ -50,7 +50,7 @@ export async function assertRelationStillExists(
   `;
   const row = rows[0];
   if (!row) {
-    throw new ExternalDatasetError(
+    throw new ConnectorError(
       "unknown",
       `'${schemaName}.${tableName}' was not found - it may have been dropped or renamed`,
     );
@@ -64,7 +64,7 @@ export function parseRelationId(relationId: string): {
 } {
   const separatorIndex = relationId.indexOf(".");
   if (separatorIndex === -1) {
-    throw new ExternalDatasetError(
+    throw new ConnectorError(
       "unknown",
       `Malformed relationId '${relationId}' - expected 'schema.table'`,
     );

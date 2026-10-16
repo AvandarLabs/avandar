@@ -5,14 +5,14 @@ import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { defineRoutes, GET, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getConnector } from "@sbfn/connectors/connectorRegistry.ts";
 import {
-  ExternalDatasetError,
-  type ExternalDatasetConnectorContext,
-} from "@sbfn/connectors/ExternalDatasetConnector.ts";
+  ConnectorError,
+  type ConnectorContext,
+} from "@sbfn/connectors/Connector.ts";
 import { object, string } from "zod";
 import type {
-  ExternalDatasetErrorResponse,
-  ExternalDatasetsApi,
-} from "@sbfn/connectors/ExternalDatasetRoutes.types.ts";
+  ConnectorErrorResponse,
+  ConnectorsApi,
+} from "@sbfn/connectors/ConnectorRoutes.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 /**
@@ -59,12 +59,12 @@ async function _getOwningWorkspaceId(
  * return in a 200 via `responseSuccess` either way, so the domain-specific
  * failure lives entirely in the body's own `error` field, not the transport
  * status. An error this function does not recognize (anything but
- * `ExternalDatasetError`) is rethrown so MiniServer's own catch-all still
+ * `ConnectorError`) is rethrown so MiniServer's own catch-all still
  * produces a real 500, instead of this masking a genuine bug as a tidy
  * `{error: {...}}` response.
  */
-function _toErrorResult(error: unknown): ExternalDatasetErrorResponse {
-  if (error instanceof ExternalDatasetError) {
+function _toErrorResult(error: unknown): ConnectorErrorResponse {
+  if (error instanceof ConnectorError) {
     return { error: { code: error.code, message: error.message } };
   }
   throw error;
@@ -81,10 +81,10 @@ function _toErrorResult(error: unknown): ExternalDatasetErrorResponse {
 async function _resolveConnectorContext(
   pathParams: { connectorType: string; connectionId: string },
   supabaseClient: AvaSupabaseClient,
-  supabaseAdminClient: ExternalDatasetConnectorContext["supabaseAdminClient"],
+  supabaseAdminClient: ConnectorContext["supabaseAdminClient"],
 ): Promise<{
   connector: ReturnType<typeof getConnector>;
-  context: ExternalDatasetConnectorContext;
+  context: ConnectorContext;
 }> {
   const connector = getConnector(pathParams.connectorType);
   const workspaceId = await _getOwningWorkspaceId(
@@ -103,7 +103,7 @@ async function _resolveConnectorContext(
  * dispatched through {@link getConnector} to the connector type named in
  * the path.
  */
-export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsApi>(
+export const ConnectorRoutes = defineRoutes<ConnectorsApi>(
   "connectors",
   {
     "/:connectorType/connections/test-and-save": {
@@ -133,7 +133,7 @@ export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsApi>(
             });
           }
 
-          const context: ExternalDatasetConnectorContext = {
+          const context: ConnectorContext = {
             workspaceId,
             supabaseClient,
             supabaseAdminClient,

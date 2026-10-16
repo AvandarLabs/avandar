@@ -1,13 +1,9 @@
 import { prop } from "@avandar/utils";
 import { quoteQualifiedPostgresIdentifier } from "@sbfn/_shared/quotePostgresIdentifier.ts";
 import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.ts";
-import {
-  ExternalDatasetError,
-  type ExternalDatasetConnector,
-} from "@sbfn/connectors/ExternalDatasetConnector.ts";
+import { ConnectorError, type Connector } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
 import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres.ts";
-import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   assertRelationStillExists,
   listCatalogRelations,
@@ -16,6 +12,7 @@ import {
 import { openSavedConnection } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
+import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 /**
@@ -35,7 +32,7 @@ type CreatePostgresConnectorOptions = {
 };
 
 /**
- * Builds the `postgres` {@link ExternalDatasetConnector}: test-and-save a
+ * Builds the `postgres` {@link Connector}: test-and-save a
  * connection, list a connection's tables/views, preview one, and read its
  * full rows as CSV. Every method re-validates the target host against
  * {@link assertHostIsSafeToConnect} before opening a connection (never trusts
@@ -48,7 +45,7 @@ type CreatePostgresConnectorOptions = {
  */
 export function createPostgresConnector(
   options: CreatePostgresConnectorOptions = {},
-): ExternalDatasetConnector {
+): Connector {
   const connect = options.connectToPostgres ?? defaultConnectToPostgres;
 
   return {
@@ -72,7 +69,7 @@ export function createPostgresConnector(
           .eq("workspace_id", context.workspaceId);
         return relations;
       } catch (error) {
-        throw new ExternalDatasetError(
+        throw new ConnectorError(
           classifyPostgresConnectionError(error),
           error instanceof Error ? error.message : String(error),
         );
@@ -127,10 +124,10 @@ export function createPostgresConnector(
           previewRows,
         };
       } catch (error) {
-        if (error instanceof ExternalDatasetError) {
+        if (error instanceof ConnectorError) {
           throw error;
         }
-        throw new ExternalDatasetError(
+        throw new ConnectorError(
           classifyPostgresConnectionError(error),
           error instanceof Error ? error.message : String(error),
         );
@@ -159,7 +156,7 @@ export function createPostgresConnector(
         );
         const rowCount = countRow?.exact_count ?? 0;
         if (rowCount > POSTGRES_MAX_ROWS_PER_ACQUIRE) {
-          throw new ExternalDatasetError(
+          throw new ConnectorError(
             "too_large",
             `'${schemaName}.${tableName}' has ${rowCount} rows, over the ${POSTGRES_MAX_ROWS_PER_ACQUIRE}-row limit for a single acquisition`,
           );
@@ -178,7 +175,7 @@ export function createPostgresConnector(
 
         const byteLength = new TextEncoder().encode(csv).length;
         if (byteLength > POSTGRES_MAX_BYTES_PER_ACQUIRE) {
-          throw new ExternalDatasetError(
+          throw new ConnectorError(
             "too_large",
             `'${schemaName}.${tableName}' is ${byteLength} bytes as CSV, over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
           );
@@ -186,10 +183,10 @@ export function createPostgresConnector(
 
         return csv;
       } catch (error) {
-        if (error instanceof ExternalDatasetError) {
+        if (error instanceof ConnectorError) {
           throw error;
         }
-        throw new ExternalDatasetError(
+        throw new ConnectorError(
           classifyPostgresConnectionError(error),
           error instanceof Error ? error.message : String(error),
         );

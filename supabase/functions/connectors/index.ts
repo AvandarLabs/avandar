@@ -1,4 +1,4 @@
 import { MiniServer } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { ExternalDatasetRoutes } from "@sbfn/connectors/ExternalDatasetRoutes.ts";
+import { ConnectorRoutes } from "@sbfn/connectors/ConnectorRoutes.ts";
 
-MiniServer(ExternalDatasetRoutes).serve();
+MiniServer(ConnectorRoutes).serve();
