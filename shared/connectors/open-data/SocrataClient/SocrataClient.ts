@@ -31,36 +31,38 @@ export function createSocrataClient(
     }): Promise<SocrataViewMetadata> => {
       const root = _trimTrailingSlash(baseUrl);
       const url = `${root}/api/views/${socrataDatasetId}.json`;
+      let body: unknown;
       try {
-        const body = await http.getJson(url);
-        const wire = SocrataViewMetadataSchema.parse(body);
-        return {
-          id: wire.id,
-          name: wire.name,
-          rowsUpdatedAt: wire.rowsUpdatedAt,
-          viewLastModified: wire.viewLastModified,
-        };
+        body = await http.getJson(url);
       } catch (cause) {
         throw new OpenDataAcquisitionFailed(
           { code: "socrata-unreachable", socrataDatasetId },
           cause,
         );
       }
+      const wire = SocrataViewMetadataSchema.parse(body);
+      return {
+        id: wire.id,
+        name: wire.name,
+        rowsUpdatedAt: wire.rowsUpdatedAt,
+        viewLastModified: wire.viewLastModified,
+      };
     },
 
     getRowCount: async ({ baseUrl, socrataDatasetId }): Promise<number> => {
       const root = _trimTrailingSlash(baseUrl);
       const url = `${root}/resource/${socrataDatasetId}.json?%24select=count(*)`;
+      let body: unknown;
       try {
-        const body = await http.getJson(url);
-        const [row] = SocrataCountResponseSchema.parse(body);
-        return Number(row?.count ?? "0");
+        body = await http.getJson(url);
       } catch (cause) {
         throw new OpenDataAcquisitionFailed(
           { code: "socrata-unreachable", socrataDatasetId },
           cause,
         );
       }
+      const [row] = SocrataCountResponseSchema.parse(body);
+      return Number(row?.count ?? "0");
     },
 
     getRows: async ({
