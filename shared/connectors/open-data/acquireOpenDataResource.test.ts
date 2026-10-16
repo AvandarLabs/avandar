@@ -284,3 +284,75 @@ describe("acquireOpenDataResource", () => {
     expect(http.getBytes).not.toHaveBeenCalled();
   });
 });
+
+const SOCRATA_BASE_URL = "https://data.cityofnewyork.us";
+const SOCRATA_DATASET_ID = "erm2-nwe9";
+
+function _socrataEntry(
+  overrides: Partial<OpenDataCatalogEntry.T> = {},
+): OpenDataCatalogEntry.T {
+  return _entry({
+    apiService: "socrata",
+    apiBaseUrl: SOCRATA_BASE_URL,
+    externalDatasetId: SOCRATA_DATASET_ID,
+    apiResourceId: SOCRATA_DATASET_ID,
+    apiResourceFormat: "CSV",
+    ...overrides,
+  });
+}
+
+function _socrataHttp(
+  options: {
+    rowCount?: string;
+    csv?: string;
+    rowsUpdatedAt?: number;
+  } = {},
+): OpenDataHttp {
+  return {
+    getJson: vi.fn(async (url: string) => {
+      if (url.includes("/api/views/")) {
+        return {
+          id: SOCRATA_DATASET_ID,
+          name: "311",
+          rowsUpdatedAt: options.rowsUpdatedAt ?? 1792114673,
+        };
+      }
+      return [{ count: options.rowCount ?? "100" }];
+    }),
+    getBytes: vi.fn(async () => {
+      return new TextEncoder().encode(
+        options.csv ?? "a,b\n1,2\n",
+      ) as Uint8Array<ArrayBuffer>;
+    }),
+  };
+}
+
+describe("acquireOpenDataResource, api_service: socrata", () => {
+  it("dispatches to SocrataClient and returns CSV content", async () => {
+    const http = _socrataHttp();
+
+    const acquisition = await acquireOpenDataResource({
+      entry: _socrataEntry(),
+      http,
+    });
+
+    expect(acquisition.contentKind).toBe("csv");
+    expect(new TextDecoder().decode(acquisition.bytes)).toBe("a,b\n1,2\n");
+    expect(acquisition.sourceVersion).toBe("socrata:rowsUpdatedAt:1792114673");
+  });
+
+  it("refuses a Socrata dataset over the row ceiling before fetching", async () => {
+    const http = _socrataHttp({ rowCount: "22811427" });
+
+    expect(
+      await _failureCode(() => {
+        return acquireOpenDataResource({
+          entry: _socrataEntry(),
+          http,
+          maxRows: 1_000_000,
+        });
+      }),
+    ).toBe("socrata-too-large");
+    expect(http.getBytes).not.toHaveBeenCalled();
+  });
+});
