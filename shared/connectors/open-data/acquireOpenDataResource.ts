@@ -1,10 +1,10 @@
 import { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
-import { buildCkanSourceVersion } from "$/open-data/buildCkanSourceVersion.ts";
-import { createCkanClient } from "$/open-data/CkanClient/CkanClient.ts";
-import { getCkanResourceFromPackage } from "$/open-data/getCkanResourceFromPackage.ts";
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
+import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
+import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
+import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
+import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
-import type { OpenDataHttp } from "$/open-data/CkanClient/CkanClient.types.ts";
+import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 /**
  * The largest resource acquired by default. CKAN caps nothing itself, and real

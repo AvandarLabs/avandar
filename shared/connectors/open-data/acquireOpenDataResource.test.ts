@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { acquireOpenDataResource } from "$/open-data/acquireOpenDataResource.ts";
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
+import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
-import type { OpenDataHttp } from "$/open-data/CkanClient/CkanClient.types.ts";
-import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
+import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
+import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
 
 const BASE_URL = "https://data.humdata.org";
 const DATASET_ID = "hdx-hapi-operational-presence";

@@ -1,4 +1,4 @@
-import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
+import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
 
 /**
  * Maps an open data refusal onto the HTTP status that describes it.

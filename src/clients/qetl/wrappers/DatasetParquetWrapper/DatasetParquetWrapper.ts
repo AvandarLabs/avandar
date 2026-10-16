@@ -20,7 +20,7 @@ import type {
   AcquiredRelation,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
-import type { OpenDataContentKind } from "$/open-data/acquireOpenDataResource";
+import type { OpenDataContentKind } from "$/connectors/open-data/acquireOpenDataResource";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 

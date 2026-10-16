@@ -1,4 +1,4 @@
-import type { CkanDatastoreField } from "$/open-data/CkanClient/CkanClient.types.ts";
+import type { CkanDatastoreField } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 /** Characters that force a field to be quoted, per RFC 4180. */
 const QUOTE_REQUIRED_PATTERN = /[",\r\n]/;

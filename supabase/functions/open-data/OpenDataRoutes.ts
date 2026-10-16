@@ -3,9 +3,9 @@ import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { string } from "zod";
 import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
-import { acquireOpenDataResource } from "$/open-data/acquireOpenDataResource.ts";
-import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
+import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import { createOpenDataHttp } from "$/connectors/open-data/createOpenDataHttp.ts";
+import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 
 /**

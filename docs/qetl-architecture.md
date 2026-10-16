@@ -205,7 +205,7 @@ taking locks.
 | SQL analyzer | [`src/lib/sql/DuckDbSqlAnalyzer/`](../src/lib/sql/DuckDbSqlAnalyzer/) | Fail-closed read, mutating, or unsafe verdict with the relations involved | `RelationRef`, `duckDbSqlText` |
 | DuckDB client | [`src/clients/DuckDbClient/`](../src/clients/DuckDbClient/) | Facade over connection, load, query, export units; coordinator | analyzer, `@duckdb/duckdb-wasm` |
 | Google Drive | [`src/clients/google/GoogleDriveClient/`](../src/clients/google/GoogleDriveClient/) | Tab CSV export, file version, debounced freshness | `fetch` |
-| Open data (shared) | [`shared/open-data/`](../shared/open-data/) | CKAN client, resource selection, size-capped HTTP | runtime-neutral |
+| Open data (shared) | [`shared/connectors/open-data/`](../shared/connectors/open-data/) | CKAN and Socrata clients, the Open Data Catalog's own storage client, resource selection, size-capped HTTP | runtime-neutral |
 | Open data proxy | [`supabase/functions/open-data/`](../supabase/functions/open-data/) | Relays one catalogued CKAN resource | `shared/open-data` |
 | Open data fetch | [`src/lib/openData/`](../src/lib/openData/) | Browser call to the proxy | Supabase session |
 | Storage clients | [`src/clients/storage/`](../src/clients/storage/) | Workspace Parquet, catalog Parquet URL, snapshot generations | Supabase Storage |

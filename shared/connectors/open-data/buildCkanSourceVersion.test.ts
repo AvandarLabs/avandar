@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildCkanSourceVersion } from "$/open-data/buildCkanSourceVersion.ts";
-import type { CkanResource } from "$/open-data/CkanClient/CkanClient.types.ts";
+import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
+import type { CkanResource } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 const CONTENT_HASH = "32e316c0337f8a9b9117999a595f8e86";
 

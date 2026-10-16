@@ -1,4 +1,4 @@
-import type { OpenDataHttp } from "$/open-data/CkanClient/CkanClient.types.ts";
+import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 /** A `fetch` implementation, injected so tests need no network. */
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
