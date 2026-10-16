@@ -3,10 +3,15 @@
  * expressed as an interface rather than the real driver's own type so a
  * test can inject a fake implementation without importing the driver at
  * all. The real `postgres` package's `Sql` instance satisfies this shape
- * directly (tagged-template query execution, plus calling `sql(identifier)`
+ * directly: tagged-template query execution, plus calling `sql(identifier)`
  * with a single string to safely interpolate a dynamic table/column name -
- * see `connectToPostgres.ts`, the only module that imports the real
- * driver).
+ * two separate `sql(name)` calls joined by a literal `.` in the same
+ * template is how a schema-qualified identifier is built (never a single
+ * string spanning both, which would quote the literal text `schema.table`
+ * as one name). See `connectToPostgres.ts`, the only module that imports
+ * the real driver. No `unsafe` escape hatch: every query this connector
+ * runs is expressible as a tagged template, so there is no dynamic SQL
+ * this interface needs to support outside of it.
  */
 export type PostgresSql = {
   <Row extends object = Record<string, unknown>>(
@@ -14,16 +19,5 @@ export type PostgresSql = {
     ...values: unknown[]
   ): Promise<Row[]>;
   (identifier: string): unknown;
-  /**
-   * Runs a plain query string with `$1`-style bound parameters, for the one
-   * case a tagged template cannot express: a dynamic identifier in the
-   * `FROM` clause. The identifier text passed here must already be quoted
-   * via `quotePostgresIdentifier`/`quoteQualifiedPostgresIdentifier` -
-   * never a raw, unquoted name.
-   */
-  unsafe: <Row extends object = Record<string, unknown>>(
-    query: string,
-    params?: unknown[],
-  ) => Promise<Row[]>;
   end: (options?: { timeout?: number }) => Promise<void>;
 };

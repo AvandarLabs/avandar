@@ -26,9 +26,6 @@ function _makeFakeSql(
   const fakeSql = vi.fn(async () => {
     return catalogRows;
   }) as unknown as PostgresSql;
-  fakeSql.unsafe = vi.fn(async () => {
-    return [];
-  });
   fakeSql.end = vi.fn(async () => {});
   return fakeSql;
 }

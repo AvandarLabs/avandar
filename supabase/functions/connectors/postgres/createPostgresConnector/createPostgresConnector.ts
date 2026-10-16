@@ -1,5 +1,4 @@
 import { prop } from "@avandar/utils";
-import { quoteQualifiedPostgresIdentifier } from "@sbfn/_shared/quotePostgresIdentifier.ts";
 import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.ts";
 import { ConnectorError, type Connector } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
@@ -88,16 +87,6 @@ export function createPostgresConnector(
         ));
         await assertRelationStillExists(sql, schemaName, tableName);
 
-        // `quoteQualifiedPostgresIdentifier` already throws on a NUL byte or
-        // empty segment - its return value is a fully quoted,
-        // injection-safe identifier, safe to splice into the query text
-        // below because every character that could otherwise break out of
-        // it (an embedded `"`) is already doubled.
-        const quotedRelation = quoteQualifiedPostgresIdentifier(
-          schemaName,
-          tableName,
-        );
-
         const columns = await sql<{
           column_name: string;
           data_type: string;
@@ -108,10 +97,16 @@ export function createPostgresConnector(
           order by ordinal_position
         `;
 
-        const previewRows = await sql.unsafe<Record<string, unknown>>(
-          `select * from ${quotedRelation} limit $1`,
-          [MAX_PREVIEW_ROWS],
-        );
+        // `sql(schemaName)`/`sql(tableName)` are the driver's own identifier
+        // helper, each quoting its argument the same way `quote_ident()`
+        // does - the schema and table are two separate identifiers, quoted
+        // independently and joined by a literal `.` in the template text,
+        // never one string spanning both (that would quote `schema.table`
+        // as a single name rather than referencing the table inside the
+        // schema).
+        const previewRows = await sql<Record<string, unknown>>`
+          select * from ${sql(schemaName)}.${sql(tableName)} limit ${MAX_PREVIEW_ROWS}
+        `;
 
         return {
           columns: columns.map((column) => {
@@ -146,14 +141,11 @@ export function createPostgresConnector(
           assertHostIsSafeToConnect,
         ));
         await assertRelationStillExists(sql, schemaName, tableName);
-        const quotedRelation = quoteQualifiedPostgresIdentifier(
-          schemaName,
-          tableName,
-        );
 
-        const [countRow] = await sql.unsafe<{ exact_count: number }>(
-          `select count(*)::int as exact_count from ${quotedRelation}`,
-        );
+        const [countRow] = await sql<{ exact_count: number }>`
+          select count(*)::int as exact_count
+          from ${sql(schemaName)}.${sql(tableName)}
+        `;
         const rowCount = countRow?.exact_count ?? 0;
 
         // A raw row count is not a usable size signal on its own - a
@@ -192,9 +184,9 @@ export function createPostgresConnector(
           );
         }
 
-        const rows = await sql.unsafe<Record<string, unknown>>(
-          `select * from ${quotedRelation}`,
-        );
+        const rows = await sql<Record<string, unknown>>`
+          select * from ${sql(schemaName)}.${sql(tableName)}
+        `;
         const csv = rowsToCsv(columnSizeInfo.map(prop("columnName")), rows);
 
         const byteLength = new TextEncoder().encode(csv).length;
