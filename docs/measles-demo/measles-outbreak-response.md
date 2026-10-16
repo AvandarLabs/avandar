@@ -515,7 +515,7 @@ pattern," not a new connector type, and is sufficient for this demo.
 
 A durable fix, for every future Socrata-hosted city or state dataset, would be
 a real **Socrata connector**. This is no longer an open question: see
-[`open-data-catalog-architecture.md`](../open-data-catalog-architecture.md),
+[`open-data-catalog-architecture.md`](open-data-catalog-architecture.md),
 which specifies a Socrata connector plus a write-back cache (fetched live
 once per catalog entry, then served from Avandar's own storage for every
 later workspace, same as `pipeline_parquet` today). Not required for this

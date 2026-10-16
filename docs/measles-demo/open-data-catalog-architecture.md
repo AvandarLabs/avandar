@@ -6,7 +6,7 @@ once a Socrata connector and a write-back cache exist, and what stays
 deferred. It assumes
 [`connector-nomenclature.md`](connector-nomenclature.md) (drive, connection,
 relation, metacatalog, the connector-vs-discovery distinction) and
-[`qetl-architecture.md`](qetl-architecture.md) section 2.1 (client vs.
+[`qetl-architecture.md`](../qetl-architecture.md) section 2.1 (client vs.
 wrapper). Facts are as of 2026-10-16 (`feat/demo/measles`, with
 `feat/postgres-connector` merged in); section 8 lists what is proposed rather
 than built.
@@ -302,19 +302,19 @@ Following `qetl-architecture.md` section 12's table shape:
 - [`connector-nomenclature.md`](connector-nomenclature.md): drive, connection,
   relation, metacatalog, the connector-vs-discovery distinction this spec
   builds on throughout.
-- [`qetl-architecture.md`](qetl-architecture.md) section 2.1 (client vs.
+- [`qetl-architecture.md`](../qetl-architecture.md) section 2.1 (client vs.
   wrapper), section 9 (capability record is declarative only, no planner
   yet), section 10 (adding a new connector).
-- [`superpowers/specs/2026-08-19-qetl-open-data-apis-design.md`](superpowers/specs/2026-08-19-qetl-open-data-apis-design.md):
+- [`superpowers/specs/2026-08-19-qetl-open-data-apis-design.md`](../superpowers/specs/2026-08-19-qetl-open-data-apis-design.md):
   the CKAN acquisition model this spec extends, including why Socrata was
   explicitly out of scope there (section 13.1) and what it predicted a
   Socrata follow-up would need (true: no further catalog migration beyond the
   enum value).
-- [`superpowers/specs/2026-10-13-qetl-postgres-connector-design/`](superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md):
+- [`superpowers/specs/2026-10-13-qetl-postgres-connector-design/`](../superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md):
   where "connection" and "relation" were first fixed as shared vocabulary,
   and the precedent for a connector-agnostic edge function (section 5.4
   there, `connectors` here).
-- [`use-cases/measles-outbreak-response.md`](use-cases/measles-outbreak-response.md)
-  section 7.1: the demo-driven question that prompted this doc. Its own
-  open design question is answered here; see section 7 above for what is
-  actually being built versus deferred.
+- [`measles-outbreak-response.md`](measles-outbreak-response.md) section 7.1:
+  the demo-driven question that prompted this doc. Its own open design
+  question is answered here; see section 7 above for what is actually being
+  built versus deferred.

@@ -10,13 +10,13 @@ connector, and `AvandarSupabaseStorage` - the connector Avandar reads its own
 pipeline-built and cached Parquet through, every bit as much a connector as
 the others even though Avandar operates the drive behind it.
 
-Related: [`qetl-architecture.md`](qetl-architecture.md) section 2 (QETL's own
-vocabulary: relation, `RelationRef`, wrapper, capability) and section 10
+Related: [`qetl-architecture.md`](../qetl-architecture.md) section 2 (QETL's
+own vocabulary: relation, `RelationRef`, wrapper, capability) and section 10
 (adding a new connector), the
-[Postgres connector design](superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md)
+[Postgres connector design](../superpowers/specs/2026-10-13-qetl-postgres-connector-design/2026-10-13-qetl-postgres-connector-design.md)
 section 5.4 (where "connection" and "relation" were first fixed as the shared
 vocabulary), and the
-[open data APIs design](superpowers/specs/2026-08-19-qetl-open-data-apis-design.md)
+[open data APIs design](../superpowers/specs/2026-08-19-qetl-open-data-apis-design.md)
 (the CKAN acquisition model this file's "drive"/metacatalog layer sits above).
 
 ## The shape: three layers, not two

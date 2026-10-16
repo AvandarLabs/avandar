@@ -67,7 +67,7 @@ loading entirely; they only see tables already resident in the tab.
 ### 2.1 Client, wrapper, and adapter: three words, two separate layers
 
 Every connector-backed source type (see
-[`connector-nomenclature.md`](connector-nomenclature.md) for which source
+[`connector-nomenclature.md`](measles-demo/connector-nomenclature.md) for which source
 types count as connector-backed and which do not) is built from two
 independent pieces, and they must not be confused:
 
