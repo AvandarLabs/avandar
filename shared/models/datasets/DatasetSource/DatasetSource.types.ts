@@ -2,6 +2,7 @@ import type { CsvFileDatasetModel } from "$/models/datasets/CsvFileDataset/CsvFi
 import type { GoogleSheetsDatasetModel } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types.ts";
 import type { OpenDataDatasetModel } from "$/models/datasets/OpenDataDataset/OpenDataDataset.types.ts";
 import type { PdfFileDatasetModel } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types.ts";
+import type { PostgresTableDatasetModel } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset.types.ts";
 import type { VirtualDatasetModel } from "$/models/datasets/VirtualDataset/VirtualDataset.types.ts";
 import type { XlsxFileDatasetModel } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset.types.ts";
 import type { Enums } from "$/types/database.types.ts";
@@ -51,6 +52,7 @@ export type DatasetSourceRegistry<
   google_sheets: GoogleSheetsDatasetModel[K];
   open_data: OpenDataDatasetModel[K];
   pdf_file: PdfFileDatasetModel[K];
+  postgres_table: PostgresTableDatasetModel[K];
   virtual: VirtualDatasetModel[K];
   xlsx_file: XlsxFileDatasetModel[K];
 };

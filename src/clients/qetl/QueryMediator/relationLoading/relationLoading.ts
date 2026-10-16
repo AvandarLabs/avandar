@@ -11,13 +11,12 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { rememberQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
 import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type {
   PrincipalKey,
   RelationCacheKey,
@@ -91,125 +90,6 @@ function _getColumnReplacements(
         : undefined;
     })
     .filter(isDefined);
-}
-
-/**
- * Narrows a relation source to the `virtual` arm, the only one carrying a
- * defining SQL. A plain boolean predicate does not narrow a discriminated
- * union, so this has to be a type guard rather than `propEq`.
- */
-function _isVirtualRelationSource(
-  relationSource: Readonly<RelationSource>,
-): relationSource is Extract<RelationSource, { sourceType: "virtual" }> {
-  return relationSource.sourceType === "virtual";
-}
-
-function _isGoogleSheetsRelationSource(
-  relationSource: Readonly<RelationSource>,
-): relationSource is Extract<RelationSource, { sourceType: "google_sheets" }> {
-  return relationSource.sourceType === "google_sheets";
-}
-
-function _googleSheetsSourceByDatasetId(
-  relationSources: readonly RelationSource[],
-): Record<string, GoogleSheetsDataset.T> {
-  return Object.fromEntries(
-    relationSources.filter(_isGoogleSheetsRelationSource).map((source) => {
-      return [source.dataset.id, source.sourceDataset];
-    }),
-  );
-}
-
-function _lookupsForFetch(relationSources: readonly RelationSource[]) {
-  return {
-    datasetsById: makeIdLookupRecord(relationSources.map(prop("dataset"))),
-    rawSqlByDatasetId: Object.fromEntries(
-      relationSources.filter(_isVirtualRelationSource).map((relationSource) => {
-        return [relationSource.dataset.id, relationSource.sourceDataset.rawSql];
-      }),
-    ),
-    googleSheetsByDatasetId: _googleSheetsSourceByDatasetId(relationSources),
-  };
-}
-
-function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
-  return {
-    readGoogleSheetTabCsv: async ({
-      datasetId,
-      csvText,
-    }: {
-      datasetId: Dataset.Id;
-      csvText: string;
-    }) => {
-      // The same reader the import path uses, so a dataset's columns are typed
-      // the same whether the rows arrived at import or at query time.
-      const loaded = await DuckDbClient.loadCsv({
-        tableName: datasetId,
-        fileText: csvText,
-        datasetDuckDbLease,
-      });
-      return { parquetBlob: loaded.parquetData };
-    },
-    transcodeCsvToParquet: async ({
-      datasetId,
-      bytes,
-    }: {
-      datasetId: Dataset.Id;
-      bytes: Uint8Array<ArrayBuffer>;
-    }) => {
-      const loaded = await DuckDbClient.loadCsv({
-        tableName: datasetId,
-        fileText: new TextDecoder().decode(bytes),
-        datasetDuckDbLease,
-      });
-      return loaded.parquetData;
-    },
-  };
-}
-
-function _createRegistryForFetch(
-  options: Readonly<{
-    relationSources: readonly RelationSource[];
-    datasetDuckDbLease: DatasetDuckDbLease;
-    runQuery: QetlRunQuery;
-  }>,
-): RelationRegistry {
-  const lookups = _lookupsForFetch(options.relationSources);
-  return createDefaultRegistry({
-    ..._leaseBoundTranscoders(options.datasetDuckDbLease),
-    getRawSql: async (ref) => {
-      const rawSql = lookups.rawSqlByDatasetId[ref.id];
-      if (rawSql === undefined) {
-        throw new Error(
-          `Virtual dataset '${ref.id}' is not among the relations to fetch`,
-        );
-      }
-      return rawSql;
-    },
-    getDataset: async (id) => {
-      const dataset = lookups.datasetsById[id];
-      if (!dataset) {
-        throw new Error(`Dataset '${id}' is not among the relations to fetch`);
-      }
-      return dataset;
-    },
-    getGoogleSheetsSource: async (id) => {
-      const source = lookups.googleSheetsByDatasetId[id];
-      if (!source) {
-        throw new Error(
-          `Google Sheets dataset '${id}' is not among the relations to fetch`,
-        );
-      }
-      return source;
-    },
-    runParquetQuery: ({ rawSql }) => {
-      return options.runQuery({
-        rawSql,
-        returnType: "parquet",
-        datasetDuckDbLease: options.datasetDuckDbLease,
-      });
-    },
-  });
 }
 
 /**
@@ -435,7 +315,7 @@ export async function fetchRelationBytes(
     runQuery: QetlRunQuery;
   }>,
 ): Promise<AcquiredRelationBytes[]> {
-  const relationRegistry = _createRegistryForFetch(options);
+  const relationRegistry = createRegistryForFetch(options);
 
   return options.relationSources.reduce<Promise<AcquiredRelationBytes[]>>(
     async (priorBytesPromise, relationSource) => {

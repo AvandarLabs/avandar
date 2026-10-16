@@ -1,8 +1,11 @@
 import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
+import { Stack } from "@mantine/core";
+import { ConnectorsAdvisory } from "@/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";
+import { PostgresConnectorImportView } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
@@ -39,7 +42,11 @@ export function DataImportTabs({
         },
         "connectors-view": () => {
           return (
-            <GoogleSheetsImportView pt="lg" onSaveSuccess={onSaveSuccess} />
+            <Stack gap="xl" pt="lg">
+              <GoogleSheetsImportView onSaveSuccess={onSaveSuccess} />
+              <PostgresConnectorImportView onSaveSuccess={onSaveSuccess} />
+              <ConnectorsAdvisory />
+            </Stack>
           );
         },
         "open-data-catalog": () => {

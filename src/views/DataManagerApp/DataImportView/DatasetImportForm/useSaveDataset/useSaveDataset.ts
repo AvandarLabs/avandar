@@ -1,5 +1,5 @@
 import { useMutation } from "@avandar/query-hooks";
-import { MIMEType, snakeCaseKeysShallow, where } from "@avandar/utils";
+import { where } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
@@ -7,24 +7,23 @@ import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
-import { makePdfTableFingerprintFromTable } from "@/clients/datasets/pdfTableFingerprint/pdfTableFingerprint";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedPayloadFromSaveResult/makeDatasetImportedPayloadFromSaveResult";
+import { saveCsvDataset } from "./saveCsvDataset/saveCsvDataset";
+import { saveGoogleSheetsDataset } from "./saveGoogleSheetsDataset/saveGoogleSheetsDataset";
+import { savePdfDataset } from "./savePdfDataset/savePdfDataset";
+import { savePostgresTableDataset } from "./savePostgresTableDataset/savePostgresTableDataset";
+import { saveXlsxDataset } from "./saveXlsxDataset/saveXlsxDataset";
 import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded/startOriginalFileUploadIfNeeded";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
   DatasetImportFormValues,
   DataSourceMetadata,
 } from "../DatasetImportForm.types";
-import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";
 
@@ -93,26 +92,20 @@ export type GoogleSheetsParseOptions = {
   // replaced, but no control offers it yet.
 };
 
+export type PostgresTableParseOptions = {
+  type: "postgres_table";
+
+  // No further options. A table/view is read with a capped `SELECT *` -
+  // there is no delimiter, header, or skip-rows concept to vary, same
+  // reasoning `GoogleSheetsParseOptions` gives for its own near-empty shape.
+};
+
 export type FileParseOptions =
   | CsvParseOptions
   | XlsxParseOptions
   | PdfParseOptions
-  | GoogleSheetsParseOptions;
-
-function _duckDbColumnsToImportedColumns(
-  columns: readonly DuckDbColumnSchema[],
-): DatasetColumn.Imported[] {
-  return columns.map((duckDbColumn, columnIndex) => {
-    return {
-      name: duckDbColumn.column_name,
-      originalName: duckDbColumn.column_name,
-      originalDataType: duckDbColumn.column_type,
-      detectedDataType: duckDbColumn.column_type,
-      dataType: DuckDbDataTypeUtils.toAvaDataType(duckDbColumn.column_type),
-      columnIdx: columnIndex,
-    };
-  });
-}
+  | GoogleSheetsParseOptions
+  | PostgresTableParseOptions;
 
 type UseSaveDatasetOptions = {
   /**
@@ -137,7 +130,7 @@ type SaveDatasetMutationContext = {
   isFirstInWorkspace?: boolean;
 };
 
-type DatasetInsertContext = {
+export type DatasetInsertContext = {
   datasetDescription: string;
   datasetName: string;
   workspaceId: Dataset.T["workspaceId"];
@@ -184,171 +177,6 @@ type NavigateAfterDatasetSaveOptions = {
   workspaceSlug: string;
 };
 
-async function _saveCsvDataset(
-  options: Readonly<{
-    context: DatasetInsertContext;
-    payload: Extract<DataSourceMetadata, { sourceType: "csv_file" }>;
-  }>,
-): Promise<Dataset.T> {
-  const { datasetLoadResult, onlineStorageAllowed, parseOptions, sizeInBytes } =
-    options.payload;
-  const { csvSniff, columns } = datasetLoadResult;
-  return DatasetClient.insertCsvFileDataset({
-    datasetId: datasetLoadResult.datasetId,
-    workspaceId: options.context.workspaceId,
-    datasetName: options.context.datasetName,
-    datasetDescription: options.context.datasetDescription,
-    columns: _duckDbColumnsToImportedColumns(columns).map(snakeCaseKeysShallow),
-    isInCloudStorage: onlineStorageAllowed,
-    sizeInBytes,
-    parseOptions: {
-      rowsToSkip: parseOptions.numRowsToSkip ?? csvSniff.SkipRows,
-      delimiter: parseOptions.delimiter ?? csvSniff.Delimiter,
-      quoteChar: csvSniff.Quote,
-      escapeChar: csvSniff.Escape,
-      newlineDelimiter: csvSniff.NewLineDelimiter,
-      commentChar: csvSniff.Comment,
-      hasHeader: csvSniff.HasHeader,
-      dateFormat: csvSniff.DateFormat ?? undefined,
-      timestampFormat: csvSniff.TimestampFormat ?? undefined,
-    },
-  });
-}
-
-async function _saveGoogleSheetsDataset(
-  options: Readonly<{
-    context: DatasetInsertContext;
-    payload: Extract<DataSourceMetadata, { sourceType: "google_sheets" }>;
-  }>,
-): Promise<Dataset.T> {
-  const { datasetLoadResult } = options.payload;
-  const { columns, sheetName } = datasetLoadResult;
-  return DatasetClient.insertGoogleSheetsDataset({
-    googleAccountId: options.payload.googleAccountId,
-    googleDocumentId: options.payload.googleDocumentId,
-    columns: _duckDbColumnsToImportedColumns(columns).map(snakeCaseKeysShallow),
-    datasetDescription: options.context.datasetDescription,
-    datasetId: datasetLoadResult.datasetId,
-    datasetName: options.context.datasetName,
-    // The tab the download actually read, and deliberately preferred over
-    // `parseOptions.sheetName`, which is only the tab the user has *selected*.
-    // The two diverge when a user picks a different tab and saves without
-    // pressing "Process data again": the stored columns are still the old
-    // tab's, so recording the new tab's name would leave `sheet_name`
-    // disagreeing with `dataset_columns`, and acquisition would then read a tab
-    // whose schema was never validated.
-    //
-    // Always a concrete name, so a stored `null` stays a legacy value that only
-    // pre-tab-column rows carry.
-    sheetName,
-    // No control offers a row skip for Sheets yet. See the note on
-    // `GoogleSheetsParseOptions`.
-    rowsToSkip: 0,
-    workspaceId: options.context.workspaceId,
-  });
-}
-
-async function _saveXlsxDataset(
-  options: Readonly<{
-    context: DatasetInsertContext;
-    payload: Extract<DataSourceMetadata, { sourceType: "xlsx_file" }>;
-  }>,
-): Promise<Dataset.T> {
-  const { datasetLoadResult, onlineStorageAllowed, parseOptions, sizeInBytes } =
-    options.payload;
-  return DatasetClient.insertXlsxFileDataset({
-    datasetId: datasetLoadResult.datasetId,
-    workspaceId: options.context.workspaceId,
-    datasetName: options.context.datasetName,
-    datasetDescription: options.context.datasetDescription,
-    columns: _duckDbColumnsToImportedColumns(datasetLoadResult.columns).map(
-      snakeCaseKeysShallow,
-    ),
-    isInCloudStorage: onlineStorageAllowed,
-    sizeInBytes,
-    rowsToSkip: parseOptions.numRowsToSkip ?? 0,
-    sheetName: parseOptions.sheetName,
-    hasHeader: parseOptions.hasHeader ?? true,
-    dateFormat: parseOptions.dateFormat ?? undefined,
-    timestampFormat: parseOptions.timestampFormat ?? undefined,
-  });
-}
-
-async function _savePdfDataset(
-  options: Readonly<{
-    context: DatasetInsertContext;
-    payload: Extract<DataSourceMetadata, { sourceType: "pdf_file" }>;
-  }>,
-): Promise<Dataset.T> {
-  const { datasetLoadResult, onlineStorageAllowed, parseOptions, sizeInBytes } =
-    options.payload;
-
-  if (datasetLoadResult.status !== "extracted") {
-    // The submit button is disabled while a PDF is awaiting a selection, so
-    // getting here means something bypassed the form. Saving anyway would
-    // write a dataset with no columns and no rows.
-    throw new Error("Select a region before saving.");
-  }
-
-  // The dataset is rebuilt from `combinedCells`, which is what the review
-  // grid has been writing to: corrected values and any model-assisted rows
-  // are already in it. The import-time transcode ran against the raw
-  // extraction, so without this the saved rows would be the ones the user
-  // just finished fixing, in their unfixed form. The review grid exists
-  // because association-by-position was measured getting roughly one figure
-  // in sixteen silently wrong, so a review that does not reach the data is
-  // worse than no review: it manufactures confidence in the same bad rows.
-  //
-  // This runs once, on save, rather than on every edit: typing each
-  // keystroke through DuckDB would be wasteful and would make the grid feel
-  // broken.
-  const reviewedCsv = makeCsvFromPdfTable({
-    cells: datasetLoadResult.combinedCells,
-    headerRows: datasetLoadResult.combinedHeaderRows,
-  });
-  const transcode = await LocalDatasetClient.transcodeReviewedPdfExtraction({
-    datasetId: datasetLoadResult.datasetId,
-    workspaceId: options.context.workspaceId,
-    csvFile: new File([reviewedCsv], `${datasetLoadResult.datasetId}.csv`, {
-      type: MIMEType.TEXT_CSV,
-    }),
-  });
-
-  return DatasetClient.insertPdfFileDataset({
-    datasetId: datasetLoadResult.datasetId,
-    workspaceId: options.context.workspaceId,
-    datasetName: options.context.datasetName,
-    datasetDescription: options.context.datasetDescription,
-    // The transcode's schema, not the sniff's: it is the authoritative
-    // typing of the rows that were actually written.
-    columns: _duckDbColumnsToImportedColumns(transcode.columns).map(
-      snakeCaseKeysShallow,
-    ),
-    isInCloudStorage: onlineStorageAllowed,
-    sizeInBytes,
-    // A PDF is pinned in local storage from the moment it is read, so the
-    // original exists whether or not the user allowed the cloud upload.
-    hasOriginalFile: true,
-    regions: parseOptions.regions ?? [],
-    outputMode: parseOptions.outputMode ?? "natural",
-    llmModel: parseOptions.llmModel,
-    // The form's range is inclusive and one-based; the stored one is
-    // inclusive and zero-based, matching `PageGeometry.pageIndex`.
-    pageRangeStart: parseOptions.pageRange
-      ? parseOptions.pageRange[0] - 1
-      : undefined,
-    pageRangeEnd: parseOptions.pageRange
-      ? parseOptions.pageRange[1] - 1
-      : undefined,
-    // Fingerprinted from the combination rather than any single region,
-    // because the combination is what the dataset's rows actually are.
-    fingerprint: await makePdfTableFingerprintFromTable({
-      cells: datasetLoadResult.combinedCells,
-      headerRows: datasetLoadResult.combinedHeaderRows,
-    }),
-  });
-}
-
 function _saveDatasetFromValues(
   options: Readonly<{
     values: SaveDatasetValues;
@@ -363,16 +191,19 @@ function _saveDatasetFromValues(
   };
   return match(dataSourceMetadata)
     .with({ sourceType: "csv_file" }, (payload) => {
-      return _saveCsvDataset({ context, payload });
+      return saveCsvDataset({ context, payload });
     })
     .with({ sourceType: "google_sheets" }, (payload) => {
-      return _saveGoogleSheetsDataset({ context, payload });
+      return saveGoogleSheetsDataset({ context, payload });
     })
     .with({ sourceType: "xlsx_file" }, (payload) => {
-      return _saveXlsxDataset({ context, payload });
+      return saveXlsxDataset({ context, payload });
     })
     .with({ sourceType: "pdf_file" }, (payload) => {
-      return _savePdfDataset({ context, payload });
+      return savePdfDataset({ context, payload });
+    })
+    .with({ sourceType: "postgres_table" }, (payload) => {
+      return savePostgresTableDataset({ context, payload });
     })
     .exhaustive();
 }
@@ -386,6 +217,7 @@ function _startDatasetUploadIfAllowed(
 ): void {
   if (
     options.params.sourceType === "google_sheets" ||
+    options.params.sourceType === "postgres_table" ||
     !options.params.onlineStorageAllowed
   ) {
     return;
@@ -419,6 +251,7 @@ function _startOriginalFileUploadIfAllowed(
 ): void {
   if (
     options.params.sourceType === "google_sheets" ||
+    options.params.sourceType === "postgres_table" ||
     !options.params.onlineStorageAllowed
   ) {
     return;

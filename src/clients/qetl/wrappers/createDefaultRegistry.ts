@@ -3,15 +3,18 @@ import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
+import { PostgresTableDatasetClient } from "@/clients/datasets/source-datasets/PostgresTableDatasetClient";
 import { createRelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import { createConceptWrapper } from "@/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper";
 import { createDatasetParquetWrapper } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
 import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
+import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
 import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
 import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
@@ -21,6 +24,7 @@ import type {
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
 import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
+import type { PostgresTableWrapperOptions } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
@@ -67,6 +71,12 @@ export type DefaultRegistryOptions = {
 
   /** Reads one Sheets tab under the caller's DuckDB lease. */
   readGoogleSheetTabCsv?: GoogleSheetsWrapperOptions["readCsv"];
+
+  /** The stored Postgres table row for one dataset. */
+  getPostgresTableSource?: PostgresTableWrapperOptions["getPostgresTableSource"];
+
+  /** Reads one Postgres relation's CSV under the caller's DuckDB lease. */
+  readPostgresTableCsv?: PostgresTableWrapperOptions["readCsv"];
 
   /** Fetches one API-backed catalog resource through the open-data proxy. */
   fetchApiOpenDataResource?: (
@@ -162,6 +172,21 @@ async function _getGoogleAccessToken(): Promise<string> {
   return accessToken;
 }
 
+async function _getPostgresTableSource(
+  id: Dataset.Id,
+): Promise<
+  Pick<PostgresTableDataset.T, "connectionId" | "schemaName" | "tableName">
+> {
+  const sources = await PostgresTableDatasetClient.withCache(AvaQueryClient)
+    .withEnsureQueryData()
+    .getAll(where("dataset_id", "in", [id]));
+  const source = sources[0];
+  if (!source) {
+    throw new Error(`No Postgres table source record for dataset '${id}'`);
+  }
+  return source;
+}
+
 async function _getDataset(id: Dataset.Id): Promise<Dataset.T> {
   const datasets = await DatasetClient.withCache(AvaQueryClient)
     .withEnsureQueryData()
@@ -188,6 +213,7 @@ function _createDatasetWrapper(
     parquet: SourceWrapper<DatasetRef>;
     virtual: SourceWrapper<DatasetRef>;
     googleSheets: SourceWrapper<DatasetRef>;
+    postgres: SourceWrapper<DatasetRef>;
     getDataset: (id: Dataset.Id) => Promise<Dataset.T>;
   }>,
 ): SourceWrapper<DatasetRef> {
@@ -204,6 +230,9 @@ function _createDatasetWrapper(
       })
       .with("google_sheets", () => {
         return delegates.googleSheets;
+      })
+      .with("postgres_table", () => {
+        return delegates.postgres;
       })
       .exhaustive();
   };
@@ -262,6 +291,11 @@ export function createDefaultRegistry(
         getSheetSource: options.getGoogleSheetsSource ?? _getGoogleSheetsSource,
         getAccessToken: options.getGoogleAccessToken ?? _getGoogleAccessToken,
         readCsv: options.readGoogleSheetTabCsv,
+      }),
+      postgres: createPostgresTableWrapper({
+        getPostgresTableSource:
+          options.getPostgresTableSource ?? _getPostgresTableSource,
+        readCsv: options.readPostgresTableCsv,
       }),
     }),
     createConceptWrapper(),

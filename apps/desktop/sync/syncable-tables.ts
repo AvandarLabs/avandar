@@ -38,6 +38,7 @@ const ACTIVE_TABLES = [
   "datasets__pdf_file",
   "datasets__virtual",
   "datasets__xlsx_file",
+  "datasets__postgres_table",
   "catalog_entries__open_data",
   "catalog_entries__dataset_column",
   "dashboards",
@@ -155,6 +156,13 @@ export const EXCLUDED_TABLES = [
   "resource_shares",
   // Web GIS maps are not mirrored to desktop SQLite yet.
   "maps",
+  // Web-only first-run tutorial/onboarding progress; nothing the desktop
+  // needs to render offline.
+  "user_nux_progress",
+  // A saved connection's secret pointer is meaningless offline, and the
+  // desktop shell cannot proxy a live Postgres connection either.
+  "db_connections",
+  "db_connections__postgres",
 ] as const;
 
 /**

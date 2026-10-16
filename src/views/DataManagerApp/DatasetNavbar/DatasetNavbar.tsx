@@ -134,6 +134,7 @@ export function DatasetNavbar({
       google_sheets: t`Google Sheets`,
       open_data: t`Open data`,
       pdf_file: t`PDF`,
+      postgres_table: t`Database`,
       virtual: t`Derived`,
       xlsx_file: t`Excel`,
     };

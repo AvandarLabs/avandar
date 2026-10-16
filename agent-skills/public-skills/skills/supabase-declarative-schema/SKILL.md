@@ -518,6 +518,65 @@ the migrations.
 4. Run `supabase db reset`, then confirm the policy list in `pg_policies`.
 5. Run `supabase db diff` and confirm it is empty.
 
+## Vault (`vault.secrets` and `vault.decrypted_secrets`)
+
+Vault is simpler than Storage, but shares its one real hazard: a
+`security definer` function wrapping `vault.decrypted_secrets` is DDL, and
+`db diff` will propose dropping it the same way it once proposed dropping
+Storage policies, unless that function is declared in `supabase/schemas/`.
+
+### Why Vault needs no enabling step
+
+Unlike Storage, there is no bucket-row equivalent and no `config.toml`
+toggle to flip. `supabase/config.toml`'s `[db.vault]` block is commented
+out by default and only exposes a `secret_key` override (a custom root
+encryption key) - it is not an enable switch. Confirmed empirically: a
+fresh `supabase db reset` already has `vault.create_secret()` and
+`vault.decrypted_secrets` working, with zero `config.toml` changes, on this
+project's Supabase image. Before assuming Vault needs "enabling" for a new
+feature, check this directly:
+
+```sql
+select vault.create_secret('a-test-value', 'a-test-name', 'a-test-description');
+select decrypted_secret from vault.decrypted_secrets where name = 'a-test-name';
+delete from vault.secrets where name = 'a-test-name'; -- there is no vault.delete_secret() in this project's version
+```
+
+If that already works, nothing in `config.toml` needs to change at all.
+
+### What's DML (runtime, not tracked by `db diff`) vs. DDL (declare it)
+
+| | Storage | Vault |
+| --- | --- | --- |
+| The row holding the actual data | A bucket row, inserted once at deploy time by a hand-written migration | A secret, created at **runtime** by application code calling `vault.create_secret()` - one per end-user action (e.g. saving a connection), never a migration-seeded fixture |
+| The access-control object | RLS policies on `storage.objects` | A `security definer` function wrapping `vault.decrypted_secrets`, plus its own `revoke`/`grant` pair |
+| Where the access-control object must live | `supabase/schemas/99.storage.sql`, mirroring the hand-written migration's policies | `supabase/schemas/`, same as any other function - there is no separate mirror step because nothing hand-written needs mirroring |
+
+So Vault's version of "Rule 5" collapses to one requirement: **write the
+`security definer` wrapper function as an ordinary declarative-schema
+file** (a `50.*` or similar tier, next to this project's other
+service-role-only RPCs), grant `execute` to `service_role` only, and
+revoke it from `public`/`anon`/`authenticated` explicitly - `anon` and
+`authenticated` already have no grant on `vault.decrypted_secrets` itself
+by default, but the wrapper function needs its own revoke/grant pair
+regardless, since that is the object actually callable through the Data
+API.
+
+### Checklist for a new Vault-backed secret
+
+1. Confirm Vault already works per the empirical check above - don't touch
+   `config.toml` unless that check proves you need to.
+2. Write the `security definer` function that reads `vault.decrypted_secrets`
+   as an ordinary file in `supabase/schemas/`, restricted to `service_role`
+   via its own `revoke`/`grant` pair.
+3. Call `vault.create_secret()`/`vault.update_secret()` only from
+   application code (an edge function using the service-role client), never
+   from a migration - there is no fixture to seed.
+4. Run `supabase db reset`, then `supabase db diff`, and confirm it is empty
+   - the wrapper function is the only thing `db diff` needs to see as
+   intentional; the secrets themselves are invisible to it, same as any
+   other row-level data.
+
 ## Known Caveats
 
 `supabase db diff` and its underlying tooling do not reliably capture every

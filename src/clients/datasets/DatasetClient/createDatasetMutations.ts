@@ -176,6 +176,31 @@ function _makeInsertGoogleSheetsDataset(
   };
 }
 
+function _makeInsertPostgresTableDataset(
+  options: Readonly<DatasetMutationConfig>,
+): DatasetMutationRecord["insertPostgresTableDataset"] {
+  return async (params) => {
+    const logger = options.logger.appendName("insertPostgresTableDataset");
+    logger.log("Creating postgres table dataset", params);
+    const dataset = await serverApi.rpc<DatasetDBRead>(
+      "rpc_datasets__add_postgres_table_dataset",
+      {
+        p_dataset_id: params.datasetId,
+        p_workspace_id: params.workspaceId,
+        p_dataset_name: params.datasetName,
+        p_dataset_description: params.datasetDescription,
+        p_columns: _getDatabaseColumns(params.columns),
+        p_connection_id: params.connectionId,
+        p_schema_name: params.schemaName,
+        p_table_name: params.tableName,
+        p_relation_kind: params.relationKind,
+      },
+    );
+    logger.log("Successfully added postgres table dataset", dataset);
+    return options.parsers.fromDBReadToModelRead(dataset);
+  };
+}
+
 function _makeInsertOpenDataDataset(
   options: Readonly<DatasetMutationConfig>,
 ): DatasetMutationRecord["insertOpenDataDataset"] {
@@ -255,6 +280,7 @@ export function createDatasetMutations(
     insertPdfFileDataset: _makeInsertPdfFileDataset(options),
     insertGoogleSheetsDataset: _makeInsertGoogleSheetsDataset(options),
     insertOpenDataDataset: _makeInsertOpenDataDataset(options),
+    insertPostgresTableDataset: _makeInsertPostgresTableDataset(options),
     fullDelete: _makeFullDelete(options),
   };
 }

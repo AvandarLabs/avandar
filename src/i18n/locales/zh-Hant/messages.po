@@ -542,6 +542,10 @@ msgstr "保存並重新執行查詢"
 msgid "Saved as \"{0}\"."
 msgstr "已保存為 \"{0}\"。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
 msgstr "無法儲存。您上次的變更仍顯示在畫面上。"
@@ -986,7 +990,7 @@ msgstr "目前的 SQL 包含表單無法表示的部分。繼續操作會以表�
 msgid "Updated {0}"
 msgstr "已更新 {0}"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Request a data source connection via feedback"
 msgstr "通過反饋請求數據源連接"
 
@@ -1438,6 +1442,10 @@ msgstr "已發布的版本仍會提供給先前的受眾。請使用下方按鈕
 msgid "Hide tutorial"
 msgstr "隱藏教學"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Username"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
@@ -1502,6 +1510,7 @@ msgstr "依值調整大小"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Label"
 msgstr "標籤"
 
@@ -1614,6 +1623,7 @@ msgstr "值軸 {0} 至 {1}，{scaleLabel}，適合 {2} 個刻度（最大誤差 
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 #: src/views/ProfileView/PasswordSection.tsx
 #: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
@@ -1886,6 +1896,10 @@ msgstr "來自這些區塊的列"
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
 msgstr "聊天"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Host"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the z, x and y placeholders where the server expects the tile "
@@ -2273,6 +2287,10 @@ msgstr "儲存空間"
 msgid "Publish it"
 msgstr "發佈"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Prod reporting replica"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "請求我將圖表添加到此儀表板..."
@@ -2531,6 +2549,10 @@ msgid "Your workspace is on the Free plan, which lets you share or publish one "
 "dashboard. Upgrade to our Starter or Impact plan to share as many "
 "dashboards as you like."
 msgstr "您的工作區使用 Free 方案，可分享或發布一個儀表板。升級至 Starter 或 Impact 方案，即可隨意分享任意數量的儀表板。"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Disable"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -2824,6 +2846,10 @@ msgstr "無法總結此列。查詢可能因不支持的值或格式錯誤的單
 msgid "Draw a box around a table, chart, map or block of text to extract it."
 msgstr "在表格、圖表、地圖或文字區塊周圍框選，以擷取內容。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable.ts
+msgid "Listing tables..."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "數據範圍"
@@ -2884,6 +2910,10 @@ msgstr "檢閱相符項目"
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "完成"
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From a database"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
@@ -2994,6 +3024,10 @@ msgstr "{layerName} 未傳回任何資料列"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at most"
 msgstr "小於或等於"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Use a database"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
@@ -3237,6 +3271,10 @@ msgstr "X 軸最大值"
 msgid "ends with"
 msgstr "結尾為"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Table or view to import"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "例如 cholera-outbreak-2024"
@@ -3358,7 +3396,7 @@ msgstr "經度"
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "僅發布儀表板所需的列。最狹窄，最私密。"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "New connectors are added every month. If there is a database or service "
 "you need, <0>tell us so we can prioritize it</0>."
 msgstr "每月都會新增連接器。如果您需要某個資料庫或服務，<0>請告訴我們，以便我們排定優先順序</0>。"
@@ -3469,6 +3507,10 @@ msgstr "捕捉儀表板中…"
 msgid "Keep the measurements as found"
 msgstr "依原樣保留測量值"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "A secure connection is required"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "X 軸刻度間隔"
@@ -3512,6 +3554,10 @@ msgstr "Y 軸標籤顏色"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Name of {0}"
 msgstr "{0} 的名稱"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "This table is too large to import"
+msgstr ""
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Please <0>email us</0> if you would like access."
@@ -4060,6 +4106,10 @@ msgstr "要匯入的分頁"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf}（約 {approxSizeMb} MB 下載）。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Authentication failed"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Hex"
 msgstr "六邊形"
@@ -4122,6 +4172,10 @@ msgstr "下一步"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "來自數據集的欄位"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Port"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
@@ -4345,6 +4399,7 @@ msgid "Draw a region on the page"
 msgstr "在頁面上繪製區域"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Connect"
 msgstr "連線"
 
@@ -4663,6 +4718,13 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
 msgstr "此 SQL 的部分內容無法在手動表單中表示。表單會顯示盡力近似的結果；實際執行的是 SQL。"
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Database"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
 msgstr "導出 PDF"
@@ -4708,6 +4770,10 @@ msgstr "1"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
 msgstr "略過的列數"
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Databases"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
@@ -5150,6 +5216,10 @@ msgstr "您的工作區目前使用免費計劃，最多支持 2 個席位。要
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
 msgstr "選項（以逗號分隔，適用於選擇模式）"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Postgres"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -5636,6 +5706,10 @@ msgstr "測量讀值"
 msgid "Upper bound"
 msgstr "上限"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable.ts
+msgid "Connecting to database"
+msgstr ""
+
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to create dashboard: {0}"
@@ -5944,6 +6018,11 @@ msgstr "此圖層有一個作用中的篩選條件，可能會排除所有內容
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "工作區名稱已更新"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Avandar could not reach that host and port. Check the address and that "
+"the server allows connections from Avandar."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
@@ -6279,6 +6358,11 @@ msgstr "創建一個新的工作區。您可以隨時稍後編輯它。"
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "請稍後再試；如果問題持續發生，請聯絡支援人員。"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "The database user should ideally have read-only access to the table or "
+"view you plan to import."
+msgstr ""
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -7193,6 +7277,12 @@ msgstr "已保留原始內容"
 msgid "{lengthValue} km"
 msgstr "{lengthValue} km"
 
+#. placeholder {0}: load.savedConnections?.length
+#. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "{0} saved {1} available"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "來源行"
@@ -7237,6 +7327,10 @@ msgstr "有訪問權限的人"
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "+ New database"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
@@ -7337,6 +7431,14 @@ msgid "The layer fetches exactly these fields, so adding one also makes it "
 "available to filter on."
 msgstr "此圖層會擷取這些欄位，因此新增欄位後也能用於篩選。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Require"
+msgstr ""
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Import a table or view from a database your organization runs"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
 msgstr "默認值"
@@ -7396,6 +7498,10 @@ msgstr "堆疊群組"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "選擇規則（例如：最常見）"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Database is unreachable"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
@@ -7601,6 +7707,11 @@ msgstr "儲存中"
 msgid "Role for new share"
 msgstr "新共享的角色"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "This table has more rows than Avandar can import at once. Try a smaller "
+"table or view."
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
 msgstr "地圖工具"
@@ -7612,6 +7723,11 @@ msgstr "發送給 AI 嗎？"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
 msgstr "購買 {seatsToAdd} 個席位"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "The username or password was not accepted. Check the credentials and try "
+"again."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -7787,6 +7903,10 @@ msgstr "SELECT 中的未命名欄位運算式；已略過。"
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Clear search"
 msgstr "清除搜尋"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "An unexpected error occurred while connecting."
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -8416,6 +8536,10 @@ msgstr "彙總只會在至少有 {0} 筆資料參與時繪製區域。低於此�
 msgid "Dataset saved"
 msgstr "資料集已儲存"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Connection timed out"
+msgstr ""
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
 msgstr "低至高"
@@ -8791,6 +8915,10 @@ msgid "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the "
 msgstr "上傳 CSV、Excel 或 PDF 檔案、連結 Google Sheet，或瀏覽開放資料目錄。Avandar "
 "中的其他功能都建立在您從這裡匯入的內容之上。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "The database did not respond in time. Check the address and try again."
+msgstr ""
+
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
@@ -9027,6 +9155,10 @@ msgstr "第 10 欄"
 msgid "Click a labelled tick on the y-axis."
 msgstr "在 Y 軸上按一下有標籤的刻度。"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Could not connect to the database"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
 msgstr "值，以逗號分隔"
@@ -9117,6 +9249,10 @@ msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
 msgstr "繪製註記區域"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "SSL mode"
+msgstr ""
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"

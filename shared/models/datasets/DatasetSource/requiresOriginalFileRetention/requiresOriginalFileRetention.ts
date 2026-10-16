@@ -16,6 +16,7 @@ const RETENTION_BY_SOURCE_TYPE: Record<DatasetSourceType, boolean> = {
   pdf_file: true,
   virtual: false,
   xlsx_file: false,
+  postgres_table: false,
 };
 
 /**

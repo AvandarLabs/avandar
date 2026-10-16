@@ -560,6 +560,10 @@ msgstr "Hifadhi na rudia swali"
 msgid "Saved as \"{0}\"."
 msgstr "Imehifadhiwa kama \"{0}\"."
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Could not save. Your last change is still on screen."
 msgstr "Haikuweza kuhifadhi. Mabadiliko yako ya mwisho bado yanaonyeshwa."
@@ -1024,7 +1028,7 @@ msgstr "SQL ya sasa ina sehemu ambazo fomu haikuweza kuwakilisha. Ukiendelea, "
 msgid "Updated {0}"
 msgstr "Imesasishwa {0}"
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "Request a data source connection via feedback"
 msgstr "Omba muunganisho wa chanzo cha data kupitia maoni"
 
@@ -1496,6 +1500,10 @@ msgstr "Nakala iliyochapishwa bado inahudumia hadhira ya awali. Tumia kitufe "
 msgid "Hide tutorial"
 msgstr "Ficha mafunzo"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Username"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Column name in SQL"
 msgstr "Jina la safu katika SQL"
@@ -1561,6 +1569,7 @@ msgstr "Ukubwa kulingana na thamani"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Label"
 msgstr "Lebo"
 
@@ -1677,6 +1686,7 @@ msgstr "Mhimili wa thamani {0} hadi {1}, {scaleLabel}, unatoshea alama {2} "
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 #: src/views/ProfileView/PasswordSection.tsx
 #: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
@@ -1960,6 +1970,10 @@ msgstr "Mistari kutoka kwenye vizuizi hivi"
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
 msgstr "Mazungumzo"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Host"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the z, x and y placeholders where the server expects the tile "
@@ -2362,6 +2376,10 @@ msgstr "Hifadhi"
 msgid "Publish it"
 msgstr "Ichapishe"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Prod reporting replica"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "Nijulishe kuongeza chati kwenye dashibodi hii..."
@@ -2637,6 +2655,10 @@ msgid "Your workspace is on the Free plan, which lets you share or publish one "
 msgstr "Workspace yako iko kwenye mpango wa Free, unaokuruhusu kushiriki au "
 "kuchapisha dashibodi moja. Boresha hadi mpango wetu wa Starter au "
 "Impact ili kushiriki dashibodi nyingi utakavyo."
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Disable"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -2943,6 +2965,10 @@ msgid "Draw a box around a table, chart, map or block of text to extract it."
 msgstr "Chora kisanduku kuzunguka jedwali, chati, ramani au kipande cha "
 "maandishi ili kukitoa."
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable.ts
+msgid "Listing tables..."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "Muktadha wa data"
@@ -3005,6 +3031,10 @@ msgstr "Kagua zinazolingana"
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
 msgid "Done"
 msgstr "Imekamilika"
+
+#: src/components/badges/SourceBadge.tsx
+msgid "From a database"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Layers"
@@ -3119,6 +3149,10 @@ msgstr "{layerName} haikurejesha safu yoyote"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at most"
 msgstr "ni isiyozidi"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Use a database"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is"
@@ -3376,6 +3410,10 @@ msgstr "Kima cha juu cha mhimili wa X"
 msgid "ends with"
 msgstr "huishia na"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Table or view to import"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "e.g. cholera-outbreak-2024"
 msgstr "mfano. cholera-outbreak-2024"
@@ -3500,7 +3538,7 @@ msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "Chapisha tu safu ambazo dashibodi yako inasoma. Nyembamba zaidi, "
 "binafsi zaidi."
 
-#: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
 msgid "New connectors are added every month. If there is a database or service "
 "you need, <0>tell us so we can prioritize it</0>."
 msgstr "Viunganishi vipya huongezwa kila mwezi. Ikiwa kuna hifadhidata au "
@@ -3618,6 +3656,10 @@ msgstr "Inanasa dashibodi…"
 msgid "Keep the measurements as found"
 msgstr "Weka vipimo kama vilivyopatikana"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "A secure connection is required"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick interval"
 msgstr "Muda wa alama za mhimili wa X"
@@ -3662,6 +3704,10 @@ msgstr "Rangi ya lebo ya mhimili wa Y"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Name of {0}"
 msgstr "Jina la {0}"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "This table is too large to import"
+msgstr ""
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Please <0>email us</0> if you would like access."
@@ -4226,6 +4272,10 @@ msgstr "Kichupo cha kuleta"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Authentication failed"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Hex"
 msgstr "Hex"
@@ -4289,6 +4339,10 @@ msgstr "Ifuatayo"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Fields that come from datasets"
 msgstr "Sehemu zinazotoka kwenye seti za data"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Port"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stroke width"
@@ -4516,6 +4570,7 @@ msgid "Draw a region on the page"
 msgstr "Chora eneo kwenye ukurasa"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Connect"
 msgstr "Unganisha"
 
@@ -4845,6 +4900,13 @@ msgstr "Baadhi ya sehemu za SQL hii hazikuweza kuwakilishwa katika fomu ya "
 "Manual. Fomu inaonyesha makadirio bora yaliyowezekana; SQL ndiyo "
 "inayotekelezwa kwa hakika."
 
+#: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Database"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Export PDF"
 msgstr "Export PDF"
@@ -4890,6 +4952,10 @@ msgstr "1"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Rows skipped"
 msgstr "Safu zilizorukwa"
+
+#: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
+msgid "Databases"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "Not yet published. Viewers will not see this."
@@ -5348,6 +5414,10 @@ msgstr "Ofisi yako iko kwenye mpango wa Bure, ambao unasaidia viti 2 tu. Ili "
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Options (comma-separated, for select modes)"
 msgstr "Chaguzi (zinazo tengwa kwa koma, kwa njia za kuchagua)"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Postgres"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -5846,6 +5916,10 @@ msgstr "Usomaji wa kipimo"
 msgid "Upper bound"
 msgstr "Kikomo cha juu"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable.ts
+msgid "Connecting to database"
+msgstr ""
+
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Failed to create dashboard: {0}"
@@ -6160,6 +6234,11 @@ msgstr "Kichujio kimoja kinatumika kwenye safu hii. Huenda kinazuia kila kitu."
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "Jina la eneo la kazi limeboreshwa"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Avandar could not reach that host and port. Check the address and that "
+"the server allows connections from Avandar."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Add column as a field"
@@ -6505,6 +6584,11 @@ msgstr "Unda eneo jipya la kazi. Unaweza kila wakati kulihariri baadaye."
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Jaribu tena baada ya muda mfupi, au wasiliana na usaidizi ikiwa tatizo "
 "litaendelea."
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "The database user should ideally have read-only access to the table or "
+"view you plan to import."
+msgstr ""
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
 msgid "Qwen 2.5 7B"
@@ -7454,6 +7538,12 @@ msgstr "Asili imehifadhiwa"
 msgid "{lengthValue} km"
 msgstr "{lengthValue} km"
 
+#. placeholder {0}: load.savedConnections?.length
+#. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "{0} saved {1} available"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
 msgstr "Mstari wa chanzo"
@@ -7498,6 +7588,10 @@ msgstr "Watu wenye ufikiaji"
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Google Sheets"
 msgstr "Google Sheets"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "+ New database"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "None of the selected regions produced any rows yet, so there are no "
@@ -7603,6 +7697,14 @@ msgid "The layer fetches exactly these fields, so adding one also makes it "
 msgstr "Tabaka hupata sehemu hizi haswa, kwa hivyo kuongeza sehemu pia huifanya "
 "ipatikane kwa ajili ya kuchuja."
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Require"
+msgstr ""
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "Import a table or view from a database your organization runs"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Default value"
 msgstr "Thamani ya kawaida"
@@ -7664,6 +7766,10 @@ msgstr "Kundi la tabaka"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Chagua sheria (mfano: ya kawaida zaidi)"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Database is unreachable"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add tabular data to render a simple table."
@@ -7874,6 +7980,11 @@ msgstr "Inahifadhi"
 msgid "Role for new share"
 msgstr "Jukumu la kushiriki mpya"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "This table has more rows than Avandar can import at once. Try a smaller "
+"table or view."
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/MapToolClusterToolbar.tsx
 msgid "Map tools"
 msgstr "Zana za ramani"
@@ -7885,6 +7996,11 @@ msgstr "Tuma kwa AI?"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Nunua viti {seatsToAdd}"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "The username or password was not accepted. Check the credentials and try "
+"again."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Current Plan"
@@ -8062,6 +8178,10 @@ msgstr "Usemi wa safu usio na jina katika SELECT; umerukwa."
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Clear search"
 msgstr "Futa utafutaji"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "An unexpected error occurred while connecting."
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -8714,6 +8834,10 @@ msgstr "Jumlisha huchora maeneo tu baada ya angalau rekodi {0} zinazochangia. "
 msgid "Dataset saved"
 msgstr "Dataset imehifadhiwa"
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Connection timed out"
+msgstr ""
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
 msgstr "Chini hadi Juu"
@@ -9104,6 +9228,10 @@ msgstr "Pakia faili ya CSV, Excel au PDF, unganisha Google Sheet, au vinjari "
 "katalogi ya data iliyo wazi. Kila kitu kingine katika Avandar hujengwa "
 "kutokana na unacholeta hapa."
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "The database did not respond in time. Check the address and try again."
+msgstr ""
+
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
 msgid "{0} (boundary)"
@@ -9343,6 +9471,10 @@ msgstr "Safu wima ya 10"
 msgid "Click a labelled tick on the y-axis."
 msgstr "Bofya tiki iliyo na lebo kwenye mhimili wa Y."
 
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+msgid "Could not connect to the database"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Values, comma-separated"
 msgstr "Thamani, zilizotengwa kwa koma"
@@ -9437,6 +9569,10 @@ msgstr "Usemi wa SELECT wa aina \"{exprType}\" hautumiki na fomu."
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
 msgstr "Chora eneo la dokezo"
+
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "SSL mode"
+msgstr ""
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "S"

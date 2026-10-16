@@ -49,6 +49,7 @@ export const DatasetClient = createUsableServiceClient(
       "insertXlsxFileDataset",
       "insertGoogleSheetsDataset",
       "insertOpenDataDataset",
+      "insertPostgresTableDataset",
       "insertVirtualDataset",
       "fullDelete",
     ],

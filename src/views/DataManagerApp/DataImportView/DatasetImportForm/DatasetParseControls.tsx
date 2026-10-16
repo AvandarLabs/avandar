@@ -208,6 +208,12 @@ export function DatasetParseControls({
         </Tooltip>
       );
     })
+    .with({ sourceType: "postgres_table" }, () => {
+      // No controls at all. A table/view is read with a capped `SELECT *`
+      // against the live database - there is nothing here to vary, unlike
+      // Sheets' tab picker above.
+      return <></>;
+    })
     .exhaustive(() => {
       return (
         <Text>

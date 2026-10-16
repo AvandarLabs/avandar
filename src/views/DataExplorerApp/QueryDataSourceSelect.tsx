@@ -158,6 +158,9 @@ export function QueryDataSourceSelect({
         .with("pdf_file", () => {
           return t`PDF files`;
         })
+        .with("postgres_table", () => {
+          return t`Databases`;
+        })
         .exhaustive(() => {
           return undefined;
         });

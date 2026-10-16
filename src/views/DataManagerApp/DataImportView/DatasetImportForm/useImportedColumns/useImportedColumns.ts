@@ -34,6 +34,10 @@ export function useImportedColumns(
         // A Google Sheets tab is downloaded as CSV, so its load result carries
         // the same top-level columns the file sources do.
         { sourceType: "google_sheets" },
+        // A Postgres table/view is also transcoded through DuckDB's CSV
+        // reader, so its load result carries the same top-level columns
+        // too.
+        { sourceType: "postgres_table" },
         (metadata) => {
           return _duckDbColumnsToImportedColumns(
             metadata.datasetLoadResult.columns,

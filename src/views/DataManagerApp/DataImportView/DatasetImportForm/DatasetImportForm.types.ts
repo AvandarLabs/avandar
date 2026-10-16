@@ -1,4 +1,6 @@
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
+import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type {
   CsvFileLoadResult,
   PdfFileLoadResult,
@@ -9,6 +11,7 @@ import type {
   FileParseOptions,
   GoogleSheetsParseOptions,
   PdfParseOptions,
+  PostgresTableParseOptions,
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
 import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
@@ -112,11 +115,45 @@ export type GoogleSheetsDataSourceMetadata = {
   parseOptions: GoogleSheetsParseOptions;
 };
 
+export type PostgresTableLoadResult = BaseLoadResult &
+  DuckDbLoadCsvResult & {
+    /** The Postgres schema the table/view lives in. */
+    schemaName: string;
+
+    /** The Postgres table or view name. */
+    tableName: string;
+
+    /** Whether `tableName` names a table or a view. */
+    relationKind: PostgresTableDataset.RelationKind;
+
+    /**
+     * The rows the preview already read, carried through so the form has its
+     * preview without a second read.
+     */
+    previewRows: UnknownObject[];
+  };
+
+export type PostgresTableDataSourceMetadata = {
+  sourceType: "postgres_table";
+
+  /** The saved connection this dataset reads through. */
+  connectionId: DatabaseConnection.Id;
+
+  datasetLoadResult: PostgresTableLoadResult;
+
+  /**
+   * Options used to load the Postgres table. Used in case we ever need to
+   * reload the data.
+   */
+  parseOptions: PostgresTableParseOptions;
+};
+
 export type DataSourceMetadata =
   | XlsxDataSourceMetadata
   | CsvDataSourceMetadata
   | PdfDataSourceMetadata
-  | GoogleSheetsDataSourceMetadata;
+  | GoogleSheetsDataSourceMetadata
+  | PostgresTableDataSourceMetadata;
 
 export type DatasetImportFormProps = {
   /**

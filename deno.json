@@ -26,6 +26,7 @@
     "google-auth-library": "npm:google-auth-library@10",
     "googleapis": "npm:googleapis@154",
     "jose": "jsr:@panva/jose@6",
+    "postgres": "npm:postgres@3",
     "react": "npm:react@19",
     "resend": "npm:resend@6",
     "ts-pattern": "npm:ts-pattern@5",
