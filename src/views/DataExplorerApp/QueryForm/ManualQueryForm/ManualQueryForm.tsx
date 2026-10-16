@@ -16,19 +16,17 @@ import { SourceFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { useManualQueryDataSourceChange } from "@/views/DataExplorerApp/QueryForm/useManualQueryDataSourceChange";
 import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
+import { useSourceColumnCatalog } from "@/views/DataExplorerApp/useSourceColumnCatalog/useSourceColumnCatalog";
 import classes from "./ManualQueryForm.module.css";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type {
-  QueryColumnId,
-  QueryColumnRead,
-} from "$/models/queries/QueryColumn/QueryColumn.types";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type {
   SettingsColumnGroup,
   SettingsColumnsLayout,
 } from "@/components/SettingsColumns/SettingsColumns";
+import type { SourceColumnCatalog } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { ReactNode } from "react";
 
 /**
@@ -44,7 +42,7 @@ export type ManualQuerySetDataSourceOptions = {
 
 export type ManualQueryFormHandlers = {
   onSetDataSource: (
-    dataSource: QueryDataSource | undefined,
+    dataSource: QueryDataSource.T | undefined,
     options?: ManualQuerySetDataSourceOptions,
   ) => void;
   onSetColumns: (columns: readonly QueryColumn.T[]) => void;
@@ -52,7 +50,7 @@ export type ManualQueryFormHandlers = {
     columnId: QueryColumn.Id;
     aggregation: QueryAggregationType.T;
   }) => void;
-  onSetOrderByColumn: (columnId: QueryColumnId | undefined) => void;
+  onSetOrderByColumn: (columnId: QueryColumn.Id | undefined) => void;
   onSetOrderByDirection: (
     direction: StructuredQuery.OrderByDirection | undefined,
   ) => void;
@@ -90,7 +88,7 @@ export function ManualQueryForm(props: Props): ReactNode {
   const { withinPortal = true, layout = "stacked" } = props;
   if (props.query !== undefined) {
     return (
-      <ManualQueryFormView
+      <ControlledManualQueryForm
         query={props.query}
         isStructuredQueryInSync={props.isStructuredQueryInSync}
         handlers={props.handlers}
@@ -101,6 +99,28 @@ export function ManualQueryForm(props: Props): ReactNode {
   }
   return (
     <DataExplorerManualQueryForm withinPortal={withinPortal} layout={layout} />
+  );
+}
+
+/** Shares one local metadata catalog across a controlled form's fields. */
+function ControlledManualQueryForm(
+  props: Omit<ViewProps, "sourceCatalog">,
+): ReactNode {
+  const sourceCatalog = useSourceColumnCatalog(
+    props.query.dataSource
+      ? Model.getTypedId(props.query.dataSource)
+      : undefined,
+  );
+  return (
+    <ManualQueryFormView
+      {...props}
+      query={{
+        ...props.query,
+        sourceColumns:
+          sourceCatalog.status === "ready" ? sourceCatalog.columns : undefined,
+      }}
+      sourceCatalog={sourceCatalog}
+    />
   );
 }
 
@@ -116,8 +136,19 @@ function DataExplorerManualQueryForm({
   withinPortal: boolean;
   layout: SettingsColumnsLayout;
 }): ReactNode {
-  const [{ query, isStructuredQueryInSync }, dispatch] =
+  const [{ query, isStructuredQueryInSync, sourceCatalog }, dispatch] =
     DataExplorerStateManager.useContext();
+  const sourceKey = useMemo(() => {
+    return query.dataSource ? Model.getTypedId(query.dataSource) : undefined;
+  }, [query.dataSource]);
+  const loaded = useQueryColumnsForDataSource(sourceKey);
+  useEffect(() => {
+    dispatch.setSourceColumns({
+      sourceKey,
+      status: loaded.isLoading ? "loading" : "ready",
+      columns: loaded.columns,
+    });
+  }, [dispatch, sourceKey, loaded.columns, loaded.isLoading]);
 
   const handlers: ManualQueryFormHandlers = {
     onSetDataSource: (dataSource, options) => {
@@ -134,6 +165,9 @@ function DataExplorerManualQueryForm({
   return (
     <ManualQueryFormView
       query={query}
+      sourceCatalog={
+        sourceCatalog ?? { sourceKey, status: "loading", columns: [] }
+      }
       isStructuredQueryInSync={isStructuredQueryInSync}
       handlers={handlers}
       withinPortal={withinPortal}
@@ -143,6 +177,7 @@ function DataExplorerManualQueryForm({
 }
 
 type ViewProps = {
+  sourceCatalog: SourceColumnCatalog;
   query: StructuredQuery.Partial;
   isStructuredQueryInSync: boolean;
   handlers: ManualQueryFormHandlers;
@@ -152,6 +187,7 @@ type ViewProps = {
 
 function ManualQueryFormView({
   query,
+  sourceCatalog,
   isStructuredQueryInSync,
   handlers,
   withinPortal,
@@ -176,9 +212,7 @@ function ManualQueryFormView({
 
   // Filters address any column of the data source, not only the ones the query
   // displays: what you filter on and what you select are separate choices.
-  const { columns: dataSourceColumns } = useQueryColumnsForDataSource(
-    dataSource ? Model.getTypedId(dataSource) : undefined,
-  );
+  const dataSourceColumns = sourceCatalog.columns;
 
   const dataSourceColumnNames = useMemo(() => {
     return dataSourceColumns.map(prop("baseColumn.name"));
@@ -259,9 +293,10 @@ function ManualQueryFormView({
   const sourceFields = (
     <SourceFields
       dataSource={dataSource}
+      sourceCatalog={sourceCatalog}
       queryColumns={queryColumns}
       onDataSourceChange={onDataSourceChange}
-      onSetColumns={(newColumns: readonly QueryColumnRead[]) => {
+      onSetColumns={(newColumns: readonly QueryColumn.T[]) => {
         handlers.onSetColumns(newColumns);
       }}
       withinPortal={withinPortal}

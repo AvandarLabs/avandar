@@ -39,19 +39,32 @@ export function useQueryColumnsForDataSource(
       },
     });
 
+  const sourceType = dataSourceId?.__type;
+  const sourceId = dataSourceId?.id;
   const columns = useMemo(() => {
+    if (!sourceId) {
+      return [];
+    }
     return [
-      ...(datasetColumns ?? []).map((column) => {
-        return QueryColumnFns.makeFromDatasetColumn(column);
-      }),
-      ...(conceptAttributes ?? []).map((attribute) => {
-        return QueryColumnFns.makeFromConceptAttribute(attribute);
-      }),
+      ...(sourceType === "Dataset" ? (datasetColumns ?? []) : []).map(
+        (column) => {
+          return QueryColumnFns.makeFromDatasetColumn(column);
+        },
+      ),
+      ...(sourceType === "Concept" ? (conceptAttributes ?? []) : []).map(
+        (attribute) => {
+          return QueryColumnFns.makeFromConceptAttribute(attribute);
+        },
+      ),
     ];
-  }, [datasetColumns, conceptAttributes]);
+  }, [datasetColumns, conceptAttributes, sourceType, sourceId]);
 
   return {
     columns,
-    isLoading: isLoadingDatasetColumns || isLoadingConceptAttributes,
+    isLoading: Model.isOfModelType(dataSourceId, "Dataset")
+      ? isLoadingDatasetColumns
+      : Model.isOfModelType(dataSourceId, "Concept")
+        ? isLoadingConceptAttributes
+        : false,
   };
 }

@@ -1,5 +1,6 @@
-import { makeObject, prop, setValue } from "@avandar/utils";
-import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
+import { Model } from "@avandar/models";
+import { setValue } from "@avandar/utils";
+import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import {
   applyVizConfigFromQueryResult,
@@ -16,7 +17,7 @@ import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQuer
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type {
@@ -35,6 +36,38 @@ import type {
 const initialDataExplorerState: DataExplorerAppState =
   INITIAL_DATA_EXPLORER_STATE;
 
+function _getQueryFromSourceColumns(options: {
+  query: StructuredQuery.Partial;
+  columns: readonly QueryColumn.T[];
+}): StructuredQuery.Partial {
+  const { query, columns } = options;
+  const selectedColumns = query.queryColumns.flatMap((selected) => {
+    const source = columns.find((column) => {
+      return (
+        column.baseColumn.__type === selected.baseColumn.__type &&
+        column.baseColumn.id === selected.baseColumn.id
+      );
+    });
+    return source ? [{ ...selected, baseColumn: source.baseColumn }] : [];
+  });
+  const reconciled = QueryColumnReconciliation.reconcileSelectedColumns({
+    previous: query.queryColumns,
+    incoming: selectedColumns,
+    aggregations: query.aggregations,
+  });
+  return {
+    ...query,
+    sourceColumns: columns,
+    queryColumns: reconciled.columns,
+    aggregations: reconciled.aggregations,
+    orderByColumn: selectedColumns.some((column) => {
+      return column.id === query.orderByColumn;
+    })
+      ? query.orderByColumn
+      : undefined,
+  };
+}
+
 /**
  * This store is used to manage the state of the Data Explorer app.
  *
@@ -49,17 +82,82 @@ export const DataExplorerStateManager = createAppStateManager({
     setDataSource: (
       state: DataExplorerAppState,
       payload: {
-        dataSource: QueryDataSource | undefined;
+        dataSource: QueryDataSource.T | undefined;
         options?: { limit?: number };
       },
     ) => {
       const { dataSource, options } = payload;
+      const sourceKey = dataSource ? Model.getTypedId(dataSource) : undefined;
+      const previousKey = state.query.dataSource
+        ? Model.getTypedId(state.query.dataSource)
+        : undefined;
+      const isSameSource =
+        sourceKey?.__type === previousKey?.__type &&
+        sourceKey?.id === previousKey?.id;
       const newQuery = applyDefaultManualQueryLimit({
         ...state.query,
+        ...(!isSameSource
+          ? {
+              queryColumns: [],
+              aggregations: {},
+              orderByColumn: undefined,
+              sourceColumns: undefined,
+            }
+          : {}),
         dataSource,
         ...(options?.limit !== undefined ? { limit: options.limit } : {}),
       } as StructuredQuery.Partial);
-      return applyQueryChange({ state, newQuery });
+      const updatedState = applyQueryChange({ state, newQuery });
+      return isSameSource
+        ? updatedState
+        : {
+            ...updatedState,
+            sourceCatalog: {
+              sourceKey,
+              status: "loading" as const,
+              columns: [],
+            },
+          };
+    },
+
+    /** Accepts source metadata only for the currently selected source. */
+    setSourceColumns: (
+      state: DataExplorerAppState,
+      catalog: NonNullable<DataExplorerAppState["sourceCatalog"]>,
+    ) => {
+      const sourceKey = state.query.dataSource
+        ? Model.getTypedId(state.query.dataSource)
+        : undefined;
+      if (
+        sourceKey?.__type !== catalog.sourceKey?.__type ||
+        sourceKey?.id !== catalog.sourceKey?.id
+      ) {
+        return state;
+      }
+      if (!sourceKey || catalog.status === "loading") {
+        return {
+          ...state,
+          sourceCatalog: {
+            ...catalog,
+            columns: state.sourceCatalog?.columns ?? [],
+          },
+        };
+      }
+      const columns = QueryColumnReconciliation.reconcileSourceColumns({
+        sourceKey,
+        previousSourceKey: state.sourceCatalog?.sourceKey,
+        previous: state.sourceCatalog?.columns ?? [],
+        incoming: catalog.columns,
+      });
+      const query = _getQueryFromSourceColumns({ query: state.query, columns });
+      const updatedState = state.isStructuredQueryInSync
+        ? applyQueryChange({ state, newQuery: query })
+        : { ...state, query };
+      return {
+        ...updatedState,
+        queryTrigger: state.queryTrigger,
+        sourceCatalog: { ...catalog, columns },
+      };
     },
 
     /** Set the columns for the query. */
@@ -67,20 +165,21 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       columns: readonly QueryColumn.T[],
     ) => {
-      const {
-        query: { aggregations },
-      } = state;
-      const newColumnIds = columns.map(prop("id"));
-      const newAggregations = makeObject(newColumnIds, {
-        valueFn: (colId) => {
-          // if this column already had an aggregation we keep it
-          return aggregations[colId] ?? "none";
-        },
-      });
+      const { columns: selectedColumns, aggregations } =
+        QueryColumnReconciliation.reconcileSelectedColumns({
+          previous: state.query.queryColumns,
+          incoming: columns,
+          aggregations: state.query.aggregations,
+        });
       const newQuery = {
         ...state.query,
-        queryColumns: columns,
-        aggregations: newAggregations,
+        queryColumns: selectedColumns,
+        aggregations,
+        orderByColumn: selectedColumns.some((column) => {
+          return column.id === state.query.orderByColumn;
+        })
+          ? state.query.orderByColumn
+          : undefined,
       } as StructuredQuery.Partial;
       const newVizConfig = VizConfigs.hydrateFromQuery(
         state.vizConfig,
@@ -124,7 +223,7 @@ export const DataExplorerStateManager = createAppStateManager({
     /** Set the column that we are ordering by. */
     setOrderByColumn: (
       state: DataExplorerAppState,
-      columnId: QueryColumnId | undefined,
+      columnId: QueryColumn.Id | undefined,
     ) => {
       const newQuery = {
         ...state.query,

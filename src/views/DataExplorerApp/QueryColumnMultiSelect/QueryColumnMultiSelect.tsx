@@ -1,4 +1,3 @@
-import { Model } from "@avandar/models";
 import { makeSelectOptions } from "@avandar/ui";
 import { isNonNullish, makeIdLookupMap, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
@@ -10,11 +9,11 @@ import {
 import { useUncontrolled } from "@mantine/hooks";
 import { matchSorter } from "match-sorter";
 import { useMemo } from "react";
-import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
-import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId/remapColumnsByBaseId";
-import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
+import { uuid } from "$/lib/uuid";
+import { useSourceColumnCatalog } from "@/views/DataExplorerApp/useSourceColumnCatalog/useSourceColumnCatalog";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { SourceColumnCatalog } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type {
   ComboboxItem,
   ComboboxParsedItem,
@@ -43,7 +42,8 @@ function _optionByValueFromParsed(
 type Props = {
   label: ReactNode;
   placeholder: string;
-  dataSourceId?: Model.TypedId<QueryDataSource>;
+  dataSourceId?: QueryDataSource.TypedId;
+  sourceCatalog?: SourceColumnCatalog;
   value?: readonly QueryColumn.T[];
   defaultValue?: readonly QueryColumn.T[];
   onChange?: (fields: readonly QueryColumn.T[]) => void;
@@ -53,6 +53,7 @@ export function QueryColumnMultiSelect({
   label,
   placeholder,
   dataSourceId,
+  sourceCatalog,
   value,
   defaultValue,
   onChange,
@@ -68,11 +69,31 @@ export function QueryColumnMultiSelect({
     finalValue: [],
   });
 
-  // Column loading lives in a shared hook so this multi-select (what the query
-  // selects) and the filter panel (what the query can filter on) always agree
-  // about which columns exist.
-  const { columns: queryColumns, isLoading } =
-    useQueryColumnsForDataSource(dataSourceId);
+  const fallbackCatalog = useSourceColumnCatalog(
+    sourceCatalog ? undefined : dataSourceId,
+  );
+  const catalog = sourceCatalog ?? fallbackCatalog;
+  const isLoading = catalog.status === "loading";
+  const queryColumns = useMemo(() => {
+    const selectedColumns = currentSelectedColumns.flatMap((selected) => {
+      const source = catalog.columns.find((column) => {
+        return (
+          column.baseColumn.__type === selected.baseColumn.__type &&
+          column.baseColumn.id === selected.baseColumn.id
+        );
+      });
+      return source ? [{ ...selected, baseColumn: source.baseColumn }] : [];
+    });
+    const unselectedSources = catalog.columns.filter((source) => {
+      return !selectedColumns.some((selected) => {
+        return (
+          selected.baseColumn.__type === source.baseColumn.__type &&
+          selected.baseColumn.id === source.baseColumn.id
+        );
+      });
+    });
+    return [...selectedColumns, ...unselectedSources];
+  }, [currentSelectedColumns, catalog.columns]);
 
   const { selectableOptions, queryColumnLookup } = useMemo(() => {
     return {
@@ -112,18 +133,13 @@ export function QueryColumnMultiSelect({
     return filter;
   }, [queryColumns]);
 
-  const renderedSelectedColumns = useMemo(() => {
-    return (
-      remapColumnsByBaseId({
-        selectedColumns: currentSelectedColumns,
-        availableColumns: queryColumns,
-      }) ?? currentSelectedColumns
-    );
-  }, [currentSelectedColumns, queryColumns]);
-
   const selectedColumnIds = useMemo(() => {
-    return renderedSelectedColumns.map(prop("id"));
-  }, [renderedSelectedColumns]);
+    return currentSelectedColumns
+      .filter((column) => {
+        return queryColumnLookup.has(column.id);
+      })
+      .map(prop("id"));
+  }, [currentSelectedColumns, queryColumnLookup]);
 
   const hasSelectableColumns = selectableOptions.length > 0;
   const { disabled: disabledProp, ...restMultiSelectProps } = multiSelectProps;
@@ -142,7 +158,16 @@ export function QueryColumnMultiSelect({
         // convert the column ids back to columns by looking them up
         const newSelectedColumns = newColumnIds
           .map((columnId) => {
-            return queryColumnLookup.get(columnId as QueryColumnId);
+            const column = queryColumnLookup.get(columnId as QueryColumn.Id);
+            if (
+              !column ||
+              currentSelectedColumns.some((selected) => {
+                return selected.id === column.id;
+              })
+            ) {
+              return column;
+            }
+            return { ...column, id: uuid<QueryColumn.Id>() };
           })
           .filter(isNonNullish);
         setCurrentSelectedColumns(newSelectedColumns);

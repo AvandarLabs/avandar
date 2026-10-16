@@ -5,6 +5,7 @@ import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSe
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { SourceColumnCatalog } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   onDataSourceChange: (dataSource: QueryDataSource.T | null) => void;
   onSetColumns: (columns: readonly QueryColumn.T[]) => void;
   withinPortal: boolean;
+  sourceCatalog: SourceColumnCatalog;
 };
 
 /** Data source picker plus the column multi-select it populates. */
@@ -22,6 +24,7 @@ export function SourceFields({
   onDataSourceChange,
   onSetColumns,
   withinPortal,
+  sourceCatalog,
 }: Props): ReactNode {
   const { t } = useLingui();
   return (
@@ -35,6 +38,7 @@ export function SourceFields({
         label={t`Select columns`}
         placeholder={t`Select columns to query`}
         dataSourceId={dataSource ? Model.getTypedId(dataSource) : undefined}
+        sourceCatalog={sourceCatalog}
         value={queryColumns}
         onChange={onSetColumns}
         comboboxProps={{ withinPortal }}

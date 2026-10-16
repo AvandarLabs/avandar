@@ -3,6 +3,8 @@ import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/Anal
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
@@ -29,8 +31,18 @@ export type OpenDatasetInfo = {
   virtualDatasetId?: VirtualDatasetId;
 };
 
+/** Metadata available to all controls for one source scope. */
+export type SourceColumnCatalog = {
+  sourceKey: QueryDataSource.TypedId | undefined;
+  status: "loading" | "ready";
+  columns: readonly QueryColumn.T[];
+};
+
 export type DataExplorerAppState = {
   query: PartialStructuredQuery;
+
+  /** Source metadata is scoped separately from selected projections. */
+  sourceCatalog?: SourceColumnCatalog;
 
   /**
    * If raw SQL was generated, we should use that for our query instead of
