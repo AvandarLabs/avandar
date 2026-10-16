@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "id": "avandar-explorer",
+  "title": "Avandar: explore a district comparison",
+  "description": "Filter the fictional cases to Eastbank, write the grouped SQL comparison, and render the six-district bar chart through actual Avandar components.",
+  "sourceNotes": [
+    "Programmatic React rendering of actual components and styles from the enclosing Avandar worktree. Each build records the current source revision and SHA-256 hashes in ignored src/avandar/generated/build.json. Tracked sample MP4s retain their original export provenance.",
+    "These shots use the avandar scene and frame-controlled adapters in avandar-adapter/. They contain no screenshots, screen recordings, screenshot callouts, or prerecorded UI. The original generic demo and showcase remain separate.",
+    "All Harborfield records and locations come from the deterministic fictional bundle in demo-data/manifest.json, bound through avandar-adapter/fixtures.json. Fictional demonstration data remains visible. No real person, organization, or reporting area is represented.",
+    "Typing, selection, query results, save responses, and navigation are deterministic fixture states. Rendering invokes no product backend, authentication, persistence mutation, or publication operation. Source reuse establishes UI provenance, not a new end-to-end product test.",
+    "Historical browser evidence remains separate: accepted local rehearsal pilot-2026-10-14T22-11-57-800Z-Z53br8 passed import, explorer, dashboards, cases, and point-map checks with 14 checkpoints and zero blocked requests. Earlier capture results do not prove that this component film executed those operations.",
+    "Narration cues are authored against adapter frames. This source plan contains text cues and captions only; any generated voice is scratch narration and requires separate listening and timing review. Final render and frame-gate evidence are recorded after completed runs.",
+    "The original Avandar DataGrid, SqlEditor, query controls, drawer rail, visualization settings, and BarChart render the interface. Dataset fetching, filter-tree ownership and query execution are replaced by deterministic fixture adapters.",
+    "The Eastbank predicate selects 56 of 240 fixture rows. The grouped query uses all cases and returns, in descending count order: Eastbank 56, North Quay 51, South Gardens 40, Lakeside 39, Ridge 29, West Marsh 25. Both the fixture computation and earlier local browser results support these values.",
+    "The authored SQL uses a stable synthetic fixture dataset ID shared with the import and dashboard adapters. It is not a credential or a claim about a live backend dataset ID. No natural-language query reliability or production-scale performance claim is made."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "transitionInFrames": 0,
+      "props": {
+        "name": "Find a useful comparison",
+        "kicker": "Avandar Data Explorer \u00b7 fictional data"
+      }
+    },
+    {
+      "id": "flow",
+      "scene": "avandar",
+      "durationInFrames": 800,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "explorer",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "One continuous adapter timeline. All interaction, typing, chart and camera timing is body-local in the feature adapter."
+    }
+  ],
+  "narration": [
+    {
+      "id": "open-query",
+      "shotId": "flow",
+      "startFrame": 0,
+      "endFrame": 90,
+      "text": "Open the query controls."
+    },
+    {
+      "id": "filter-eastbank",
+      "shotId": "flow",
+      "startFrame": 100,
+      "endFrame": 220,
+      "text": "Filter the records to Eastbank."
+    },
+    {
+      "id": "eastbank-count",
+      "shotId": "flow",
+      "startFrame": 230,
+      "endFrame": 320,
+      "text": "Eastbank has 56 recorded cases."
+    },
+    {
+      "id": "write-query",
+      "shotId": "flow",
+      "startFrame": 344,
+      "endFrame": 484,
+      "text": "Write a query to compare all six districts."
+    },
+    {
+      "id": "run-query",
+      "shotId": "flow",
+      "startFrame": 510,
+      "endFrame": 630,
+      "text": "Run the grouped count for every district."
+    },
+    {
+      "id": "make-chart",
+      "shotId": "flow",
+      "startFrame": 650,
+      "endFrame": 780,
+      "text": "Show the comparison as a bar chart."
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

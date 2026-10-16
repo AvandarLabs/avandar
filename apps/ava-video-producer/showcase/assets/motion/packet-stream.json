@@ -1,0 +1,14 @@
+{
+  "preset": "packet-stream",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "5ec62890e6e264ff6dd225cc14795aff5bb722f66d70cbad4637840f8ae443e4",
+  "posterSha256": "9d37ec6f75e985e4a390dcb532a5b3bb82ab0660cb7c121922bd1302107460f7",
+  "generatedAt": "2026-10-14T23:55:13.476Z"
+}

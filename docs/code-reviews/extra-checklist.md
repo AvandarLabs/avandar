@@ -271,7 +271,13 @@ when the gate matches.
 ### Phase: internationalization (Lingui)
 
 - **Gate:** the diff includes a frontend `.ts` or `.tsx` file under `src/`
-  (or `packages/web/`).
+  (or `packages/web/`), excluding internal-only tooling apps that are never
+  shown to a customer and are never localized. `apps/ava-video-producer` is
+  one such app: it renders demo videos and an internal showcase gallery for
+  the team, not a surface any workspace user ever opens, so its English-only
+  copy is not a finding. A future internal-only app can be added to this
+  exclusion the same way; a customer-facing app never qualifies, even if it
+  is new or small.
 - This repo renders user-facing copy through Lingui. All displayable,
   user-facing text must be translated. Flag any bare user-facing string
   literal:

@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "id": "avandar-import",
+  "title": "Avandar: import a CSV",
+  "description": "Choose and name a fictional CSV, inspect its real preview components, then review the saved-source fixture state.",
+  "sourceNotes": [
+    "Programmatic React rendering of actual components and styles from the enclosing Avandar worktree. Each build records the current source revision and SHA-256 hashes in ignored src/avandar/generated/build.json. Tracked sample MP4s retain their original export provenance.",
+    "These shots use the avandar scene and frame-controlled adapters in avandar-adapter/. They contain no screenshots, screen recordings, screenshot callouts, or prerecorded UI. The original generic demo and showcase remain separate.",
+    "All Harborfield records and locations come from the deterministic fictional bundle in demo-data/manifest.json, bound through avandar-adapter/fixtures.json. Fictional demonstration data remains visible. No real person, organization, or reporting area is represented.",
+    "Typing, selection, query results, save responses, and navigation are deterministic fixture states. Rendering invokes no product backend, authentication, persistence mutation, or publication operation. Source reuse establishes UI provenance, not a new end-to-end product test.",
+    "Historical browser evidence remains separate: accepted local rehearsal pilot-2026-10-14T22-11-57-800Z-Z53br8 passed import, explorer, dashboards, cases, and point-map checks with 14 checkpoints and zero blocked requests. Earlier capture results do not prove that this component film executed those operations.",
+    "Narration cues are authored against adapter frames. This source plan contains text cues and captions only; any generated voice is scratch narration and requires separate listening and timing review. Final render and frame-gate evidence are recorded after completed runs.",
+    "The actual FileDropzone, UploadedFileBar, DatasetImportFields, DatasetPreviewBlock, DatasetImportActions, and DatasetSourceRail are imported from Avandar. Frame-bound form props replace acquisition and save hooks; the CSV-only parse-control seam excludes PDF workers.",
+    "cases.csv is 26,703 bytes with 240 rows and 13 columns. The preview retains the source limit of 200 rows. All four demonstrated Harborfield CSV dataset names remain in source order; unrelated local datasets are excluded.",
+    "The saved dataset is a deterministic fixture view. Saving a new source succeeded in the earlier rehearsal; the accepted repeat capture reused the existing source at the workspace capacity limit. The film performs neither operation against a backend."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "transitionInFrames": 0,
+      "props": {
+        "name": "Bring in a CSV",
+        "kicker": "Avandar Data Sources \u00b7 fictional data"
+      }
+    },
+    {
+      "id": "flow",
+      "scene": "avandar",
+      "durationInFrames": 660,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "import",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "One continuous adapter timeline. All interaction, typing, chart and camera timing is body-local in the feature adapter."
+    }
+  ],
+  "narration": [
+    {
+      "id": "choose-csv",
+      "shotId": "flow",
+      "startFrame": 24,
+      "endFrame": 114,
+      "text": "Choose the fictional Harborfield CSV."
+    },
+    {
+      "id": "name-dataset",
+      "shotId": "flow",
+      "startFrame": 126,
+      "endFrame": 216,
+      "text": "Give the dataset a clear name."
+    },
+    {
+      "id": "review-preview",
+      "shotId": "flow",
+      "startFrame": 228,
+      "endFrame": 348,
+      "text": "Review 200 rows and 13 detected columns."
+    },
+    {
+      "id": "save-dataset",
+      "shotId": "flow",
+      "startFrame": 390,
+      "endFrame": 480,
+      "text": "Save the dataset for later exploration."
+    },
+    {
+      "id": "saved-row-count",
+      "shotId": "flow",
+      "startFrame": 510,
+      "endFrame": 630,
+      "text": "The saved source contains 240 cases."
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "id": "avandar-dashboards",
+  "title": "Avandar: save a dashboard view",
+  "description": "Carry the existing district chart into a named dashboard, inspect the real Puck editor, and finish on the unpublished preview.",
+  "sourceNotes": [
+    "Programmatic React rendering of actual components and styles from the enclosing Avandar worktree. Each build records the current source revision and SHA-256 hashes in ignored src/avandar/generated/build.json. Tracked sample MP4s retain their original export provenance.",
+    "These shots use the avandar scene and frame-controlled adapters in avandar-adapter/. They contain no screenshots, screen recordings, screenshot callouts, or prerecorded UI. The original generic demo and showcase remain separate.",
+    "All Harborfield records and locations come from the deterministic fictional bundle in demo-data/manifest.json, bound through avandar-adapter/fixtures.json. Fictional demonstration data remains visible. No real person, organization, or reporting area is represented.",
+    "Typing, selection, query results, save responses, and navigation are deterministic fixture states. Rendering invokes no product backend, authentication, persistence mutation, or publication operation. Source reuse establishes UI provenance, not a new end-to-end product test.",
+    "Historical browser evidence remains separate: accepted local rehearsal pilot-2026-10-14T22-11-57-800Z-Z53br8 passed import, explorer, dashboards, cases, and point-map checks with 14 checkpoints and zero blocked requests. Earlier capture results do not prove that this component film executed those operations.",
+    "Narration cues are authored against adapter frames. This source plan contains text cues and captions only; any generated voice is scratch narration and requires separate listening and timing review. Final render and frame-gate evidence are recorded after completed runs.",
+    "The actual SaveToDashboardCreateMode, Puck editor, useDashboardPuckConfig, DataVizContent, SaveDashboardButton, ViewDashboardButton and DashboardPreviewBanner are reused. The original full editor catalog, page fields and root renderer are preserved.",
+    "DataViz client/query ownership and unused field controllers are replaced by a fixture config. No Filter block is rendered. The native Puck iframe is disabled so the deterministic document renders text at its native size; source editor CSS remains in use.",
+    "The district chart retains exact fixture totals and ordering. Frame-based clip masks reveal its bar geometry without altering data or axis domains. The preview retains Not yet published. Viewers will not see this. No sharing, publication or access-control behavior is demonstrated.",
+    "Historical create-and-save succeeded in pilot-2026-10-14T21-53-32-840Z-XzCTmY; the accepted repeat capture reused the saved dashboard. This new film represents the same supported authoring flow with fixture state and performs no persistence operation."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "transitionInFrames": 0,
+      "props": {
+        "name": "Keep the finding in view",
+        "kicker": "Avandar Dashboards \u00b7 fictional data"
+      }
+    },
+    {
+      "id": "flow",
+      "scene": "avandar",
+      "durationInFrames": 720,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "dashboards",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "One continuous adapter timeline. All interaction, typing, chart and camera timing is body-local in the feature adapter."
+    }
+  ],
+  "narration": [
+    {
+      "id": "save-chart",
+      "shotId": "flow",
+      "startFrame": 24,
+      "endFrame": 114,
+      "text": "Save the district chart to a dashboard."
+    },
+    {
+      "id": "name-dashboard",
+      "shotId": "flow",
+      "startFrame": 132,
+      "endFrame": 282,
+      "text": "Name the briefing view."
+    },
+    {
+      "id": "review-editor",
+      "shotId": "flow",
+      "startFrame": 300,
+      "endFrame": 420,
+      "text": "Review the saved chart in the editor."
+    },
+    {
+      "id": "open-preview",
+      "shotId": "flow",
+      "startFrame": 438,
+      "endFrame": 558,
+      "text": "Open the dashboard preview."
+    },
+    {
+      "id": "unpublished-draft",
+      "shotId": "flow",
+      "startFrame": 582,
+      "endFrame": 702,
+      "text": "This draft has not been published."
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

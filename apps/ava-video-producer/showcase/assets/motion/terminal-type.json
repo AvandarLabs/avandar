@@ -1,0 +1,14 @@
+{
+  "preset": "terminal-type",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "c630dbd93974a69d6e3b6b09bc04efcf178d025056ebb434e6ee4482424facf0",
+  "posterSha256": "faec865429ae69934bccb4ffbcd327d4968db93b6596dda43c7a935a13b18db6",
+  "generatedAt": "2026-10-14T23:55:33.552Z"
+}

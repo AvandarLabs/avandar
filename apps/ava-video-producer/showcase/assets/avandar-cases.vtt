@@ -1,0 +1,25 @@
+WEBVTT
+
+open-case-type
+00:00:02.600 --> 00:00:05.600
+Open the fictional case type.
+
+review-mappings
+00:00:06.000 --> 00:00:10.000
+Review its dataset-backed attributes.
+
+browse-records
+00:00:10.467 --> 00:00:13.800
+Browse the 240 fictional case records.
+
+inspect-record
+00:00:14.200 --> 00:00:17.400
+Inspect Response case 001.
+
+linked-fields
+00:00:17.800 --> 00:00:20.800
+See case and visit fields together.
+
+activity-boundary
+00:00:21.000 --> 00:00:24.000
+Local preview; activity saving is unavailable.

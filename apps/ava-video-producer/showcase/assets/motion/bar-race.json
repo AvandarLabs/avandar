@@ -1,0 +1,14 @@
+{
+  "preset": "bar-race",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "42f63db22e1bc678f165fc3d6bf8579479e00d22f4f4bc40f749a8ec12ddd61b",
+  "posterSha256": "78afec01d68b5c23953d0cb4ef8224e54e204eb762a69390e2f95a85977093c4",
+  "generatedAt": "2026-10-14T23:55:46.927Z"
+}

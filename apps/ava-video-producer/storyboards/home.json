@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "id": "avandar-home",
+  "title": "Avandar: from query to comparison",
+  "description": "A silent homepage loop using the real Avandar Data Explorer, SQL editor, results grid, and bar chart with fictional Harborfield fixtures.",
+  "sourceNotes": [
+    "Programmatic React rendering of actual components and styles from the enclosing Avandar worktree. Each build records the current source revision and SHA-256 hashes in ignored src/avandar/generated/build.json. Tracked sample MP4s retain their original export provenance.",
+    "All Harborfield records and locations come from the deterministic fictional bundle in demo-data/manifest.json, bound through avandar-adapter/fixtures.json. Fictional demonstration data remains visible. No real person, organization, or reporting area is represented.",
+    "Typing, selection, query results, save responses, and navigation are deterministic fixture states. Rendering invokes no product backend, authentication, persistence mutation, or publication operation. Source reuse establishes UI provenance, not a new end-to-end product test.",
+    "The original Avandar DataGrid, SqlEditor, query controls, drawer rail, visualization settings, and BarChart render the interface. Dataset fetching, filter-tree ownership and query execution are replaced by deterministic fixture adapters.",
+    "The Eastbank predicate selects 56 of 240 fixture rows. The grouped query uses all cases and returns, in descending count order: Eastbank 56, North Quay 51, South Gardens 40, Lakeside 39, Ridge 29, West Marsh 25. Both the fixture computation and earlier local browser results support these values.",
+    "The authored SQL uses a stable synthetic fixture dataset ID shared with the import and dashboard adapters. It is not a credential or a claim about a live backend dataset ID. No natural-language query reliability or production-scale performance claim is made.",
+    "Homepage adaptation of the starter motion style: a 66-frame masked title followed by one continuous Explorer shot using authored frames 276 through 799. Existing measured cursor targets and typing holds are retained. The final 18 frames dissolve to the opening dark ground.",
+    "This is a silent fixture-driven component film. It demonstrates query editing and visualization, not a live backend execution or publication operation. The original upstream demo remains available in source and sample assets."
+  ],
+  "purpose": "loop",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "transitionInFrames": 0,
+      "props": {
+        "name": "Avandar",
+        "kicker": "Data Explorer"
+      }
+    },
+    {
+      "id": "flow",
+      "scene": "avandar",
+      "durationInFrames": 524,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "explorer",
+        "fromFrame": 276,
+        "mode": "full"
+      },
+      "note": "Continuous native component lifecycle. Starts with the existing filtered records, then edits SQL, runs the grouped comparison, and shows the bar chart."
+    }
+  ],
+  "narration": [
+    {
+      "id": "write-query",
+      "shotId": "flow",
+      "startFrame": 64,
+      "endFrame": 264,
+      "text": "Write a query to compare all six districts."
+    },
+    {
+      "id": "run-query",
+      "shotId": "flow",
+      "startFrame": 280,
+      "endFrame": 370,
+      "text": "Run the grouped count for every district."
+    },
+    {
+      "id": "make-chart",
+      "shotId": "flow",
+      "startFrame": 374,
+      "endFrame": 504,
+      "text": "Show the comparison as a bar chart."
+    }
+  ],
+  "captions": true,
+  "soundEffects": [],
+  "theme": {
+    "brand": "#1563fe"
+  }
+}

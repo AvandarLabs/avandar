@@ -1,0 +1,11 @@
+Avandar: save a dashboard view
+
+Save the district chart to a dashboard.
+
+Name the briefing view.
+
+Review the saved chart in the editor.
+
+Open the dashboard preview.
+
+This draft has not been published.

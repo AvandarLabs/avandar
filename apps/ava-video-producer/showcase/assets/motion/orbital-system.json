@@ -1,0 +1,14 @@
+{
+  "preset": "orbital-system",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "0f7730fc8f6804b686164f089b7a1b8978a85bc6418e52352843bace0006c60a",
+  "posterSha256": "96df17e5c47a32484cb8da36489da93f9c0a92a43f8998de8b62b37186fc4012",
+  "generatedAt": "2026-10-14T23:54:21.534Z"
+}

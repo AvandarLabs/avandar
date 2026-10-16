@@ -324,3 +324,17 @@ authorized merge to `develop`.
   page looked like. Store them in `.temp/` directory at the repo root, which
   is gitignored, inside a subdirectory named after the current branch
   (kebab-cased, in case of invalid characters) (e.g. `.temp/feat-hello-world`)
+
+## Product videos
+
+Video production tooling, the Motion Atlas, and sample films live in
+`apps/ava-video-producer`. Before authoring a video or storyboard there or in
+root `.videos/`, read that app's `AGENTS.md` and
+`apps/ava-video-producer/.claude/skills/product-demo/SKILL.md`. Resolve the
+producer's documented paths relative to its app directory. Run commands there
+or with `pnpm --filter @avandar/ava-video-producer <command>`.
+
+Keep company-specific storyboards, footage, research, and exports in ignored
+`.videos/<project>/`. Use `video:new <project>` to create the project. Product
+component previews import this worktree's source directly. Preserve ignored
+video projects before removing a worktree; Git does not transfer them.

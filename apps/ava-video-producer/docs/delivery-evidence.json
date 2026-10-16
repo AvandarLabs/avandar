@@ -1,0 +1,711 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-10-14T22:21:40.489Z",
+  "scope": "Stream, duration, exact caption text, signal, picture packet, fingerprint and delivered-file hash checks. No listening-review claim.",
+  "films": [
+    {
+      "id": "scene-library",
+      "renderedAt": "2026-10-14T22:14:17.171Z",
+      "frames": 846,
+      "seconds": 28.2,
+      "width": 1536,
+      "height": 960,
+      "fps": 30,
+      "audio": {
+        "codec": "aac",
+        "sampleRate": 48000,
+        "kind": "macOS scratch narration",
+        "cues": [
+          {
+            "id": "type-voice",
+            "startFrame": 78,
+            "endFrame": 204,
+            "peakDbfs": -6
+          },
+          {
+            "id": "graph-voice",
+            "startFrame": 228,
+            "endFrame": 384,
+            "peakDbfs": -6.4
+          },
+          {
+            "id": "flow-voice",
+            "startFrame": 408,
+            "endFrame": 564,
+            "peakDbfs": -5.4
+          },
+          {
+            "id": "metric-voice",
+            "startFrame": 588,
+            "endFrame": 714,
+            "peakDbfs": -5.8
+          },
+          {
+            "id": "closing-voice",
+            "startFrame": 734,
+            "endFrame": 838,
+            "peakDbfs": -6.9
+          }
+        ]
+      },
+      "pictureGate": "passed unchanged thresholds",
+      "picturePacketHash": "SHA256=5538059c3993eb4787d127c84285b29b634e84df30325c2b9df4b31fc622ff0e",
+      "matchingPreviewFrames": 54,
+      "fingerprint": {
+        "sourcePlanSha256": "cdfcffd9f2e5ee4d8b090ead9b446177db1538cc3eccf23381f52bf5fa908b4f",
+        "parsedPlanSha256": "7f485be40fefea5e55eade5cf23333e0ebb8c06b90947ee9886de11c6105667c",
+        "assets": [
+          {
+            "path": "narration/scene-library/scratch-4fc1231d-5ccd-4545-8408-3a51188a8ebc/closing-voice.wav",
+            "sha256": "2385cad7c28c6ca90b834086cb87c92c1c0c549f5148538959282792ae560071"
+          },
+          {
+            "path": "narration/scene-library/scratch-4fc1231d-5ccd-4545-8408-3a51188a8ebc/flow-voice.wav",
+            "sha256": "31c7f722c28345466753e6134611bca2d07abb45e9362932b4dd5f84e406b397"
+          },
+          {
+            "path": "narration/scene-library/scratch-4fc1231d-5ccd-4545-8408-3a51188a8ebc/graph-voice.wav",
+            "sha256": "12ab26895b223558e35951f238ae245e8b72c454a689b09386207ac2d2f03531"
+          },
+          {
+            "path": "narration/scene-library/scratch-4fc1231d-5ccd-4545-8408-3a51188a8ebc/metric-voice.wav",
+            "sha256": "aa7325439591511b4436dd5f703625134f74ff0f782f59bb7e40b89514e3325f"
+          },
+          {
+            "path": "narration/scene-library/scratch-4fc1231d-5ccd-4545-8408-3a51188a8ebc/type-voice.wav",
+            "sha256": "c4a1008d6273daca65990c271d481a9a59111034f01731cab99746c2b410aca3"
+          }
+        ],
+        "rendererSha256": "592f5a6d73beb265d0db1e924c9adfd4366b53a9118ad540a743807164644359"
+      },
+      "assets": [
+        {
+          "path": "showcase/assets/scene-library.mp4",
+          "sha256": "30669bc01d4590bfdbd714e49ebc7a2d00173685a42512ac245b71877a6e26c0",
+          "bytes": 1655004
+        },
+        {
+          "path": "showcase/assets/scene-library-poster.jpg",
+          "sha256": "54a52ca0b8747566e5204ed38947be63fd3af0cf24f3f09850a7db96b23cdab1",
+          "bytes": 73876
+        },
+        {
+          "path": "showcase/assets/scene-library.txt",
+          "sha256": "972b2e7e63ae901e7f9e95f257e539357f42ebdf47c99f88be561332532ef786",
+          "bytes": 322
+        },
+        {
+          "path": "showcase/assets/scene-library.srt",
+          "sha256": "f50825da085212db8777f7221833bbb788e381f2e2426b3c5accac330114bfbe",
+          "bytes": 454
+        },
+        {
+          "path": "showcase/assets/scene-library.vtt",
+          "sha256": "33fece8d46b69b6fb5310455f951b358a8f9bbbebb8cd0bba5fcbc9971e7a17b",
+          "bytes": 513
+        }
+      ]
+    },
+    {
+      "id": "avandar-overview",
+      "renderedAt": "2026-10-14T22:18:11.931Z",
+      "frames": 1146,
+      "seconds": 38.2,
+      "width": 1536,
+      "height": 960,
+      "fps": 30,
+      "audio": {
+        "codec": "aac",
+        "sampleRate": 48000,
+        "kind": "macOS scratch narration",
+        "cues": [
+          {
+            "id": "import-preview-voice",
+            "startFrame": 90,
+            "endFrame": 240,
+            "peakDbfs": -5
+          },
+          {
+            "id": "district-filter-voice",
+            "startFrame": 300,
+            "endFrame": 450,
+            "peakDbfs": -6.6
+          },
+          {
+            "id": "district-query-voice",
+            "startFrame": 510,
+            "endFrame": 660,
+            "peakDbfs": -7.4
+          },
+          {
+            "id": "district-chart-voice",
+            "startFrame": 720,
+            "endFrame": 870,
+            "peakDbfs": -5.3
+          },
+          {
+            "id": "dashboard-preview-voice",
+            "startFrame": 930,
+            "endFrame": 1080,
+            "peakDbfs": -5.8
+          }
+        ]
+      },
+      "pictureGate": "passed unchanged thresholds",
+      "picturePacketHash": "SHA256=bb2c0141c456405fef432fe6e6da4319c77a9bb5874d717fa20906f81849e8ba",
+      "matchingPreviewFrames": 45,
+      "fingerprint": {
+        "sourcePlanSha256": "c65bcfed4555ea9bd33d330172dde12fe28070cefedbbf63065766a5123b34ff",
+        "parsedPlanSha256": "d1560146697a37536feafbe41bb66d3157973ef634c1a9f3f82b89dbfcde9eed",
+        "assets": [
+          {
+            "path": "avandar/clips/eastbank-filter.mp4",
+            "sha256": "6055436bb3e03729e7bff943134772271937028a3691c328f26a1062ec4dd7c2"
+          },
+          {
+            "path": "avandar/screens/dashboards-dashboard-preview.png",
+            "sha256": "70e556509cf17e756eb3d8e15321274176c8cf12ab8094765ef3b44a7f865a66"
+          },
+          {
+            "path": "avandar/screens/explorer-explorer-chart.png",
+            "sha256": "d86815940a380fbf29424fe169d2ba9d8441e524e69237c187d27f181e75fdf6"
+          },
+          {
+            "path": "avandar/screens/explorer-explorer-query.png",
+            "sha256": "08788124ac10ae7207c353ee9aa70a847e9b6266ae49d10186feef8525f29690"
+          },
+          {
+            "path": "avandar/screens/import-import-preview.png",
+            "sha256": "3d071b7548d5eca144d3c2623d3d88af6d68749fe4996416e13c3e75b80168e4"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-27661ce2-cf4d-4068-81d8-dc30dccc6859/dashboard-preview-voice.wav",
+            "sha256": "9d95a3a62e6abe74058bf55c600d32fab7280cd2b235e5bc969c7d1b25b7f72c"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-27661ce2-cf4d-4068-81d8-dc30dccc6859/district-chart-voice.wav",
+            "sha256": "71a6eca6b6955256d90c2631198dfa39cb2e9d5351e479458ed989450cef85aa"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-27661ce2-cf4d-4068-81d8-dc30dccc6859/district-filter-voice.wav",
+            "sha256": "e440a8b41f7c68546da648fbd74b50e4642aa6dff80582a6d29d5bcb71eb6555"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-27661ce2-cf4d-4068-81d8-dc30dccc6859/district-query-voice.wav",
+            "sha256": "709f59b3743af1859350da4802c440963ab3811923d4c1e267db972484ad4199"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-27661ce2-cf4d-4068-81d8-dc30dccc6859/import-preview-voice.wav",
+            "sha256": "830856e8d9182a113a99e66241693e5b710da41341484b483b04a84e5ae23430"
+          }
+        ],
+        "rendererSha256": "592f5a6d73beb265d0db1e924c9adfd4366b53a9118ad540a743807164644359"
+      },
+      "assets": [
+        {
+          "path": "showcase/assets/avandar-overview.mp4",
+          "sha256": "476b8f122bc4ba7b1775463ced45ea9737d237790df12c116c425bbc5ba4d969",
+          "bytes": 2866255
+        },
+        {
+          "path": "showcase/assets/avandar-overview-poster.jpg",
+          "sha256": "8fb090910b91709f3e6f6dee6ad8a2f9c3bd3b50fb5b019e46c9dbe77a917b16",
+          "bytes": 106700
+        },
+        {
+          "path": "showcase/assets/avandar-overview.txt",
+          "sha256": "377b7461e5b33bedee539267b17999391c4b8a9d5c4d4bb72516156b3ed15fbd",
+          "bytes": 439
+        },
+        {
+          "path": "showcase/assets/avandar-overview.srt",
+          "sha256": "9bd7b91c5342fea93a7564f3b4168425efd7c019f10eb85948641cf77772e8c3",
+          "bytes": 565
+        },
+        {
+          "path": "showcase/assets/avandar-overview.vtt",
+          "sha256": "19b9d64fc7034dcac3f4dc958ad5b95420caba3b6dd8e3e31e412f02aff3bd2b",
+          "bytes": 672
+        }
+      ]
+    },
+    {
+      "id": "avandar-import",
+      "renderedAt": "2026-10-14T22:17:24.537Z",
+      "frames": 516,
+      "seconds": 17.2,
+      "width": 1536,
+      "height": 960,
+      "fps": 30,
+      "audio": {
+        "codec": "aac",
+        "sampleRate": 48000,
+        "kind": "macOS scratch narration",
+        "cues": [
+          {
+            "id": "preview-voice",
+            "startFrame": 90,
+            "endFrame": 240,
+            "peakDbfs": -5.5
+          },
+          {
+            "id": "saved-source-voice",
+            "startFrame": 300,
+            "endFrame": 450,
+            "peakDbfs": -5.6
+          }
+        ]
+      },
+      "pictureGate": "passed unchanged thresholds",
+      "picturePacketHash": "SHA256=137282bfe6c775bffb07dce9c729da534098a385e6b14650c2ac6e7ecaa0a109",
+      "matchingPreviewFrames": 23,
+      "fingerprint": {
+        "sourcePlanSha256": "0f67b65a0c9f2f23bfbed247f4b430212a04c0b830d3d908e08b10262c0976e5",
+        "parsedPlanSha256": "3b3a9c7676ec79e897f1692e1491edefbefc0b8446438726b17ea5cc15d94af9",
+        "assets": [
+          {
+            "path": "avandar/screens/import-import-preview.png",
+            "sha256": "3d071b7548d5eca144d3c2623d3d88af6d68749fe4996416e13c3e75b80168e4"
+          },
+          {
+            "path": "avandar/screens/import-import-saved.png",
+            "sha256": "3f586d87f89168b307a6f68001284c8a9269ba6248f0b12449a541e226ac195b"
+          },
+          {
+            "path": "narration/avandar-import/scratch-285a8062-1961-462d-b670-e9a336da4a64/preview-voice.wav",
+            "sha256": "8651daa0df40afae5ce4a505d6a70fe327e0cbe62949782999736f7300fab764"
+          },
+          {
+            "path": "narration/avandar-import/scratch-285a8062-1961-462d-b670-e9a336da4a64/saved-source-voice.wav",
+            "sha256": "5216d18c56ada858c809785c24dae50c7cfdaf4a61cd3479e0858a10422950a7"
+          }
+        ],
+        "rendererSha256": "592f5a6d73beb265d0db1e924c9adfd4366b53a9118ad540a743807164644359"
+      },
+      "assets": [
+        {
+          "path": "showcase/assets/avandar-import.mp4",
+          "sha256": "0de6ed54279c537a72ec4963d37c5c87b07c6284b0a0ce80df1b7457c137451b",
+          "bytes": 1274163
+        },
+        {
+          "path": "showcase/assets/avandar-import-poster.jpg",
+          "sha256": "e439174edbeafb95040acc0df4f2be77fdbbfaabd88b43b20283fd7daef9ef9f",
+          "bytes": 143005
+        },
+        {
+          "path": "showcase/assets/avandar-import.txt",
+          "sha256": "982cff8c162f9158816bd8263cf50fa8671d2ac06994d9df6c5b5d886973d782",
+          "bytes": 191
+        },
+        {
+          "path": "showcase/assets/avandar-import.srt",
+          "sha256": "66e5d6d4629dc4d40848cc21b10ab865252b1a0023f46a863d97489876bda07d",
+          "bytes": 232
+        },
+        {
+          "path": "showcase/assets/avandar-import.vtt",
+          "sha256": "acb8f314f44643e7488f7c2496591d43ff5d85186f8bbd2faabf698c359be299",
+          "bytes": 269
+        }
+      ]
+    },
+    {
+      "id": "avandar-explorer",
+      "renderedAt": "2026-10-14T22:18:41.526Z",
+      "frames": 726,
+      "seconds": 24.2,
+      "width": 1536,
+      "height": 960,
+      "fps": 30,
+      "audio": {
+        "codec": "aac",
+        "sampleRate": 48000,
+        "kind": "macOS scratch narration",
+        "cues": [
+          {
+            "id": "filtered-records-voice",
+            "startFrame": 90,
+            "endFrame": 240,
+            "peakDbfs": -5.6
+          },
+          {
+            "id": "grouped-query-voice",
+            "startFrame": 300,
+            "endFrame": 450,
+            "peakDbfs": -5.2
+          },
+          {
+            "id": "comparison-chart-voice",
+            "startFrame": 510,
+            "endFrame": 660,
+            "peakDbfs": -5.4
+          }
+        ]
+      },
+      "pictureGate": "passed unchanged thresholds",
+      "picturePacketHash": "SHA256=b15f4bb08d6adc0ee5c87945ff01261bd6e6f7fbd3ff262fd8277fe050b7c578",
+      "matchingPreviewFrames": 29,
+      "fingerprint": {
+        "sourcePlanSha256": "282fde26fb86b6aa9b4c35e793273e646c56a30f098e4bd2437d589a3516ad9d",
+        "parsedPlanSha256": "1c5f49851280d5cbccab7327e2d59744cc44d7dc7d63823a2468e7b2f17e7846",
+        "assets": [
+          {
+            "path": "avandar/screens/explorer-explorer-chart.png",
+            "sha256": "d86815940a380fbf29424fe169d2ba9d8441e524e69237c187d27f181e75fdf6"
+          },
+          {
+            "path": "avandar/screens/explorer-explorer-filtered.png",
+            "sha256": "69cdef10132669c5cf5497697e7b2458b0e245d09ec24bcd60723575545d6d33"
+          },
+          {
+            "path": "avandar/screens/explorer-explorer-query.png",
+            "sha256": "08788124ac10ae7207c353ee9aa70a847e9b6266ae49d10186feef8525f29690"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-8aa96c7e-c286-44f2-a0c7-91a749952b42/comparison-chart-voice.wav",
+            "sha256": "9b07b71c25578db36b326fa61be9b500e2065df32faa418114d30a8c021ddefa"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-8aa96c7e-c286-44f2-a0c7-91a749952b42/filtered-records-voice.wav",
+            "sha256": "895347866ec57e27f1b2fd4af0b27b5b778f017a33b15833f80c53f141a2287d"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-8aa96c7e-c286-44f2-a0c7-91a749952b42/grouped-query-voice.wav",
+            "sha256": "8c1a3ce88ebb5ddedfadc6560cecbdfd8a43e8d10b3a7058b1715fcb6ad5df99"
+          }
+        ],
+        "rendererSha256": "592f5a6d73beb265d0db1e924c9adfd4366b53a9118ad540a743807164644359"
+      },
+      "assets": [
+        {
+          "path": "showcase/assets/avandar-explorer.mp4",
+          "sha256": "560839a660c2acadcfdbfc81134ffaf6ea14e30894f9dd2aff1d1d88d60a89a4",
+          "bytes": 1671192
+        },
+        {
+          "path": "showcase/assets/avandar-explorer-poster.jpg",
+          "sha256": "dcf878cd186e436821073a5ca8c6c069a89c01f55a27edaf276665f94937872d",
+          "bytes": 114922
+        },
+        {
+          "path": "showcase/assets/avandar-explorer.txt",
+          "sha256": "1d9ddf7df5067a23baa8fb2590d2825bc79c409dca93d9d3acefa3fb9d786590",
+          "bytes": 293
+        },
+        {
+          "path": "showcase/assets/avandar-explorer.srt",
+          "sha256": "48f9a933512abefe695aa6a090c74733833dfdae222eff7b05822cee8720c946",
+          "bytes": 349
+        },
+        {
+          "path": "showcase/assets/avandar-explorer.vtt",
+          "sha256": "34a7b46c71d9327ddd90ae00b2cb07eb88df17f717564493d56c1643bfc71bb5",
+          "bytes": 417
+        }
+      ]
+    },
+    {
+      "id": "avandar-dashboards",
+      "renderedAt": "2026-10-14T22:19:10.814Z",
+      "frames": 726,
+      "seconds": 24.2,
+      "width": 1536,
+      "height": 960,
+      "fps": 30,
+      "audio": {
+        "codec": "aac",
+        "sampleRate": 48000,
+        "kind": "macOS scratch narration",
+        "cues": [
+          {
+            "id": "source-chart-voice",
+            "startFrame": 90,
+            "endFrame": 240,
+            "peakDbfs": -6.8
+          },
+          {
+            "id": "saved-dashboard-voice",
+            "startFrame": 300,
+            "endFrame": 450,
+            "peakDbfs": -6
+          },
+          {
+            "id": "dashboard-preview-voice",
+            "startFrame": 510,
+            "endFrame": 660,
+            "peakDbfs": -5.3
+          }
+        ]
+      },
+      "pictureGate": "passed unchanged thresholds",
+      "picturePacketHash": "SHA256=f36a0499e9c9c749573b2e07fcf1b9b46c6df95148c9d2e8deb757fd6379dba9",
+      "matchingPreviewFrames": 29,
+      "fingerprint": {
+        "sourcePlanSha256": "3b2b5add5f8a15ee59e02da106296aa600a4eecc44b85fe4e7f0d9e5f176043e",
+        "parsedPlanSha256": "890923cab94f5fc98f48e077d49eed9dced640d351fe39ee2f713a5426b2ee0c",
+        "assets": [
+          {
+            "path": "avandar/screens/dashboards-dashboard-editor.png",
+            "sha256": "d77710bbfa732edd876e080a2d43fd9a3a2641b94d38d68db4d6fce9ee179fcd"
+          },
+          {
+            "path": "avandar/screens/dashboards-dashboard-preview.png",
+            "sha256": "70e556509cf17e756eb3d8e15321274176c8cf12ab8094765ef3b44a7f865a66"
+          },
+          {
+            "path": "avandar/screens/explorer-explorer-chart.png",
+            "sha256": "d86815940a380fbf29424fe169d2ba9d8441e524e69237c187d27f181e75fdf6"
+          },
+          {
+            "path": "narration/avandar-dashboards/scratch-54f8f7d5-2e71-4afc-ab13-bd4815e9c413/dashboard-preview-voice.wav",
+            "sha256": "20ccd01f5e021b1c4a1b57736903218eb4c835b6992b1c317bb50c7782704cd7"
+          },
+          {
+            "path": "narration/avandar-dashboards/scratch-54f8f7d5-2e71-4afc-ab13-bd4815e9c413/saved-dashboard-voice.wav",
+            "sha256": "01f2d0833ec1c313a3aa5c03fd8d7cac1448a0833fd81dd5fa5c5fe2c359ff1a"
+          },
+          {
+            "path": "narration/avandar-dashboards/scratch-54f8f7d5-2e71-4afc-ab13-bd4815e9c413/source-chart-voice.wav",
+            "sha256": "03e269a6bb07de7b842dc6d092d87a9fc1a984f383b240273bc6307f4acf7811"
+          }
+        ],
+        "rendererSha256": "592f5a6d73beb265d0db1e924c9adfd4366b53a9118ad540a743807164644359"
+      },
+      "assets": [
+        {
+          "path": "showcase/assets/avandar-dashboards.mp4",
+          "sha256": "1be9b32afd91cd43ac6a3051515bdc92f229b1f9eefc79ab23964896925f9ecc",
+          "bytes": 1610295
+        },
+        {
+          "path": "showcase/assets/avandar-dashboards-poster.jpg",
+          "sha256": "8588bb025fd17cdae3bf8c4dad82b8be945ef9ef0acf729b14b4c182fd5cce77",
+          "bytes": 112625
+        },
+        {
+          "path": "showcase/assets/avandar-dashboards.txt",
+          "sha256": "58eeac76809eac81e34323debc3becd27107bc3163c1f6a0da9d42c311d0d834",
+          "bytes": 284
+        },
+        {
+          "path": "showcase/assets/avandar-dashboards.srt",
+          "sha256": "7c4800982f65627a7fd2c43539b44b3b7cf69db049f4bccc7e1449826532dc68",
+          "bytes": 348
+        },
+        {
+          "path": "showcase/assets/avandar-dashboards.vtt",
+          "sha256": "f3347782dca4921955447b0997c7f8688c9683aba1330cf5fa592fee9b19ce2b",
+          "bytes": 415
+        }
+      ]
+    },
+    {
+      "id": "avandar-cases",
+      "renderedAt": "2026-10-14T22:19:40.144Z",
+      "frames": 726,
+      "seconds": 24.2,
+      "width": 1536,
+      "height": 960,
+      "fps": 30,
+      "audio": {
+        "codec": "aac",
+        "sampleRate": 48000,
+        "kind": "macOS scratch narration",
+        "cues": [
+          {
+            "id": "case-type-voice",
+            "startFrame": 90,
+            "endFrame": 240,
+            "peakDbfs": -6.8
+          },
+          {
+            "id": "records-list-voice",
+            "startFrame": 300,
+            "endFrame": 450,
+            "peakDbfs": -5.4
+          },
+          {
+            "id": "record-detail-voice",
+            "startFrame": 510,
+            "endFrame": 660,
+            "peakDbfs": -6.5
+          }
+        ]
+      },
+      "pictureGate": "passed unchanged thresholds",
+      "picturePacketHash": "SHA256=daeed5a58492fff56dfc47d1f0368931829bd994dc0bed2d8d7ff761e5475b87",
+      "matchingPreviewFrames": 29,
+      "fingerprint": {
+        "sourcePlanSha256": "5746de3fedee133be844fa2f2daa62522942625d9510d645967d64ff1c5441b4",
+        "parsedPlanSha256": "66d182eec34b19ecae38c5545abef4a632018bf966d3c4a659679113d7fd4139",
+        "assets": [
+          {
+            "path": "avandar/screens/cases-cases-record-detail.png",
+            "sha256": "0e6f8894ce0f86596fa98ff61669d5271c25d22f91e2f71520a3217fe08add7e"
+          },
+          {
+            "path": "avandar/screens/cases-cases-records.png",
+            "sha256": "cdb1304d1a6cdeda5c3c2e2caf38b1ed5a9512603b49e58c5e607020a15631f6"
+          },
+          {
+            "path": "avandar/screens/cases-cases-type.png",
+            "sha256": "df590c123fe918f093e152ea890bcdc1707ef3adbe10a3b8f52dbfe1129379e1"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-a340ede0-db5d-46db-acfc-eb69a683743d/case-type-voice.wav",
+            "sha256": "d62c9ac020750069ffd09378710f8e3284d0d96f32f6bcf38ca3c0eff86eee58"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-a340ede0-db5d-46db-acfc-eb69a683743d/record-detail-voice.wav",
+            "sha256": "00035d925db2768934c07d21356256465fbe73412ae6d0c4004747cf5823ffcb"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-a340ede0-db5d-46db-acfc-eb69a683743d/records-list-voice.wav",
+            "sha256": "a1a850578a84b101c4deba7787357ea367ab8d51990ae14f22bce9a460759bea"
+          }
+        ],
+        "rendererSha256": "592f5a6d73beb265d0db1e924c9adfd4366b53a9118ad540a743807164644359"
+      },
+      "assets": [
+        {
+          "path": "showcase/assets/avandar-cases.mp4",
+          "sha256": "b7353c60e6c7061e489ae50e35297da3039fab0fb1a0c12b48afdd66562f149e",
+          "bytes": 1490763
+        },
+        {
+          "path": "showcase/assets/avandar-cases-poster.jpg",
+          "sha256": "c444c32617ace390301134c303835d609cbdd7f2dde6f277989fa3cc9c0eda91",
+          "bytes": 129768
+        },
+        {
+          "path": "showcase/assets/avandar-cases.txt",
+          "sha256": "c52ad6b8884890c29a9a9cbf022dce99fc7e5e11625eb0fb85c40449e8502778",
+          "bytes": 287
+        },
+        {
+          "path": "showcase/assets/avandar-cases.srt",
+          "sha256": "813f52d11f94bfb09064435747fc3296c9b0309e1d18170444f4f496c01c4f84",
+          "bytes": 352
+        },
+        {
+          "path": "showcase/assets/avandar-cases.vtt",
+          "sha256": "73845d94fb62df53de86491d548a5429831309c661b5d8568cb4e7149d340e85",
+          "bytes": 409
+        }
+      ]
+    },
+    {
+      "id": "avandar-map",
+      "renderedAt": "2026-10-14T22:21:11.087Z",
+      "frames": 726,
+      "seconds": 24.2,
+      "width": 1536,
+      "height": 960,
+      "fps": 30,
+      "audio": {
+        "codec": "aac",
+        "sampleRate": 48000,
+        "kind": "macOS scratch narration",
+        "cues": [
+          {
+            "id": "case-locations-voice",
+            "startFrame": 90,
+            "endFrame": 240,
+            "peakDbfs": -5.8
+          },
+          {
+            "id": "facility-locations-voice",
+            "startFrame": 300,
+            "endFrame": 450,
+            "peakDbfs": -5.5
+          },
+          {
+            "id": "layered-map-voice",
+            "startFrame": 510,
+            "endFrame": 660,
+            "peakDbfs": -7.4
+          }
+        ]
+      },
+      "pictureGate": "passed unchanged thresholds",
+      "picturePacketHash": "SHA256=b99cd4b67dc79b24c669a35f2cac50ce5700aaec48fb53fcf8e3fb86ea8222b5",
+      "matchingPreviewFrames": 29,
+      "fingerprint": {
+        "sourcePlanSha256": "ac8fd7f141a73083d0ff614ab9e54d8a05a60d8713b55bcf5d19271cf3d63f5e",
+        "parsedPlanSha256": "4e9e428dd492ab48e31863cb434de2d81742ad3b7fe182686277012c4aa30807",
+        "assets": [
+          {
+            "path": "avandar/screens/map-map-cases.png",
+            "sha256": "0f6c89f4b619d97f016a164ceb802b541cefadc8e6d3396c333454dd6cb06435"
+          },
+          {
+            "path": "avandar/screens/map-map-facilities.png",
+            "sha256": "384f938db5a5bc48574cac1fe9191d8248a2f1ba966f00fd7777f22016b06cc5"
+          },
+          {
+            "path": "avandar/screens/map-map-saved.png",
+            "sha256": "6c2811f547eb08c8cb001f5d6f66a06ad6dfec2aa50512685f5e35b5b61060af"
+          },
+          {
+            "path": "narration/avandar-map/scratch-c9f5b9bf-659d-4db5-b369-e6782fedf4c1/case-locations-voice.wav",
+            "sha256": "a208ba840620b6e3197b740882c9a8d45c205cc028c97af270337959e3ec6c13"
+          },
+          {
+            "path": "narration/avandar-map/scratch-c9f5b9bf-659d-4db5-b369-e6782fedf4c1/facility-locations-voice.wav",
+            "sha256": "c2c3052acf9222452e3880cfbb8e9902e4662f2c960eb66af036e286aac14ee1"
+          },
+          {
+            "path": "narration/avandar-map/scratch-c9f5b9bf-659d-4db5-b369-e6782fedf4c1/layered-map-voice.wav",
+            "sha256": "450675495dd3c77e3b6f1a9265811f88febc3b916cfe51b7339271982f3169eb"
+          }
+        ],
+        "rendererSha256": "592f5a6d73beb265d0db1e924c9adfd4366b53a9118ad540a743807164644359"
+      },
+      "assets": [
+        {
+          "path": "showcase/assets/avandar-map.mp4",
+          "sha256": "ce20413c63f0efbe5546222f26a9c657d2517a83eb393a36ee1c9f59a3e101ef",
+          "bytes": 2035247
+        },
+        {
+          "path": "showcase/assets/avandar-map-poster.jpg",
+          "sha256": "1680f7daaffbc2795a128e68b81d7d09731d180e562d7f915ac3a2af5c131b4b",
+          "bytes": 172687
+        },
+        {
+          "path": "showcase/assets/avandar-map.txt",
+          "sha256": "cbd8a80cb9d9d52f0444a81b2d97a18f902754742d92226e0736e36516c2edf3",
+          "bytes": 311
+        },
+        {
+          "path": "showcase/assets/avandar-map.srt",
+          "sha256": "5fdbe4d4e12a2212af5fdccfe097db59c423fe709c68f3453f0f252b366acebf",
+          "bytes": 377
+        },
+        {
+          "path": "showcase/assets/avandar-map.vtt",
+          "sha256": "2667a467a051f94e3353cd2bc17227e65a17d824b31ba15c8397a34d3e8614c1",
+          "bytes": 443
+        }
+      ]
+    }
+  ],
+  "gallery": {
+    "url": "http://localhost:4173/productions.html",
+    "desktopViewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "mobileViewport": {
+      "width": 390,
+      "height": 844
+    },
+    "horizontalOverflow": false,
+    "videosWithMetadata": 7,
+    "unavailableMessages": 0,
+    "linkedDownloadsHttp200": 21,
+    "playback": "All seven videos reached ended without media errors at 4x speed, muted; controls restored to normal speed and unmuted. This is a playback smoke check, not a listening review.",
+    "visualReview": "All 238 selected frames from the delivered files were inspected as contact sheets, with full-size checks for key results, callout and captions."
+  }
+}

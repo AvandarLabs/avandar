@@ -1,0 +1,241 @@
+case_id,case_label,district_id,district_name,facility_id,report_date,week_start,age_band,support_need,referral_status,latitude,longitude,household_size
+HF-0001,Response case 001,D01,North Quay,F01,2026-08-03,2026-08-03,65+,supplies,contacted,10.05136,10.01757,4
+HF-0002,Response case 002,D01,North Quay,F02,2026-08-04,2026-08-03,65+,transport,contacted,10.04852,10.02845,3
+HF-0003,Response case 003,D01,North Quay,F01,2026-08-05,2026-08-03,5-17,information,contacted,10.05986,10.06523,4
+HF-0004,Response case 004,D01,North Quay,F02,2026-08-06,2026-08-03,18-44,supplies,contacted,10.01184,10.0618,6
+HF-0005,Response case 005,D01,North Quay,F01,2026-08-07,2026-08-03,18-44,information,contacted,10.02813,10.02487,4
+HF-0006,Response case 006,D01,North Quay,F02,2026-08-08,2026-08-03,65+,supplies,contacted,10.0697,10.05295,2
+HF-0007,Response case 007,D01,North Quay,F01,2026-08-09,2026-08-03,0-4,information,contacted,10.01426,10.06263,1
+HF-0008,Response case 008,D01,North Quay,F02,2026-08-03,2026-08-03,18-44,transport,contacted,10.03308,10.01572,4
+HF-0009,Response case 009,D01,North Quay,F01,2026-08-10,2026-08-10,45-64,water,contacted,10.01647,10.06483,7
+HF-0010,Response case 010,D01,North Quay,F02,2026-08-11,2026-08-10,18-44,transport,contacted,10.01165,10.06207,2
+HF-0011,Response case 011,D01,North Quay,F01,2026-08-12,2026-08-10,0-4,supplies,contacted,10.00856,10.02697,5
+HF-0012,Response case 012,D01,North Quay,F02,2026-08-13,2026-08-10,0-4,water,contacted,10.07158,10.02521,1
+HF-0013,Response case 013,D01,North Quay,F01,2026-08-14,2026-08-10,18-44,information,contacted,10.05529,10.05913,1
+HF-0014,Response case 014,D01,North Quay,F02,2026-08-15,2026-08-10,18-44,water,contacted,10.01522,10.04486,6
+HF-0015,Response case 015,D01,North Quay,F01,2026-08-16,2026-08-10,0-4,supplies,contacted,10.00864,10.05563,2
+HF-0016,Response case 016,D01,North Quay,F02,2026-08-10,2026-08-10,65+,transport,contacted,10.05218,10.06018,3
+HF-0017,Response case 017,D01,North Quay,F01,2026-08-11,2026-08-10,18-44,water,contacted,10.02168,10.01414,6
+HF-0018,Response case 018,D01,North Quay,F01,2026-08-17,2026-08-17,65+,supplies,contacted,10.02341,10.05369,3
+HF-0019,Response case 019,D01,North Quay,F02,2026-08-18,2026-08-17,65+,transport,contacted,10.04091,10.05894,5
+HF-0020,Response case 020,D01,North Quay,F01,2026-08-19,2026-08-17,5-17,supplies,contacted,10.00947,10.0371,5
+HF-0021,Response case 021,D01,North Quay,F02,2026-08-20,2026-08-17,65+,information,contacted,10.03807,10.03754,7
+HF-0022,Response case 022,D01,North Quay,F01,2026-08-21,2026-08-17,0-4,information,contacted,10.06395,10.07169,7
+HF-0023,Response case 023,D01,North Quay,F02,2026-08-22,2026-08-17,18-44,transport,contacted,10.02217,10.05773,3
+HF-0024,Response case 024,D01,North Quay,F01,2026-08-23,2026-08-17,0-4,information,contacted,10.0395,10.03169,5
+HF-0025,Response case 025,D01,North Quay,F02,2026-08-17,2026-08-17,5-17,information,contacted,10.03468,10.02627,4
+HF-0026,Response case 026,D01,North Quay,F01,2026-08-18,2026-08-17,45-64,supplies,contacted,10.032,10.03579,3
+HF-0027,Response case 027,D01,North Quay,F02,2026-08-19,2026-08-17,45-64,water,contacted,10.06078,10.03709,6
+HF-0028,Response case 028,D01,North Quay,F01,2026-08-24,2026-08-24,5-17,supplies,contacted,10.03278,10.07179,7
+HF-0029,Response case 029,D01,North Quay,F02,2026-08-25,2026-08-24,18-44,transport,contacted,10.07153,10.03927,6
+HF-0030,Response case 030,D01,North Quay,F01,2026-08-26,2026-08-24,45-64,information,contacted,10.01269,10.04335,4
+HF-0031,Response case 031,D01,North Quay,F02,2026-08-27,2026-08-24,65+,water,contacted,10.00804,10.01733,7
+HF-0032,Response case 032,D01,North Quay,F01,2026-08-28,2026-08-24,45-64,transport,contacted,10.06542,10.0273,2
+HF-0033,Response case 033,D01,North Quay,F02,2026-08-29,2026-08-24,18-44,information,contacted,10.06229,10.01449,2
+HF-0034,Response case 034,D01,North Quay,F01,2026-08-30,2026-08-24,45-64,transport,contacted,10.01996,10.06742,5
+HF-0035,Response case 035,D01,North Quay,F02,2026-08-24,2026-08-24,65+,supplies,contacted,10.03183,10.04174,7
+HF-0036,Response case 036,D01,North Quay,F01,2026-08-25,2026-08-24,65+,water,contacted,10.05078,10.03769,5
+HF-0037,Response case 037,D01,North Quay,F01,2026-08-31,2026-08-31,0-4,transport,contacted,10.04107,10.03794,3
+HF-0038,Response case 038,D01,North Quay,F02,2026-09-01,2026-08-31,5-17,information,contacted,10.02086,10.04782,1
+HF-0039,Response case 039,D01,North Quay,F01,2026-09-02,2026-08-31,0-4,supplies,contacted,10.03596,10.0681,6
+HF-0040,Response case 040,D01,North Quay,F02,2026-09-03,2026-08-31,0-4,information,contacted,10.02725,10.05575,6
+HF-0041,Response case 041,D01,North Quay,F01,2026-09-04,2026-08-31,5-17,information,contacted,10.01068,10.03621,5
+HF-0042,Response case 042,D01,North Quay,F02,2026-09-05,2026-08-31,45-64,transport,contacted,10.07136,10.04866,2
+HF-0043,Response case 043,D01,North Quay,F01,2026-09-06,2026-08-31,0-4,information,contacted,10.01426,10.02403,2
+HF-0044,Response case 044,D01,North Quay,F02,2026-08-31,2026-08-31,18-44,transport,contacted,10.01903,10.0227,1
+HF-0045,Response case 045,D01,North Quay,F01,2026-09-07,2026-09-07,65+,water,contacted,10.06695,10.01205,2
+HF-0046,Response case 046,D01,North Quay,F02,2026-09-08,2026-09-07,65+,transport,contacted,10.03035,10.03828,3
+HF-0047,Response case 047,D01,North Quay,F01,2026-09-09,2026-09-07,45-64,water,contacted,10.05118,10.07142,5
+HF-0048,Response case 048,D01,North Quay,F02,2026-09-10,2026-09-07,0-4,supplies,contacted,10.01966,10.06092,3
+HF-0049,Response case 049,D01,North Quay,F01,2026-09-11,2026-09-07,18-44,information,contacted,10.06577,10.03463,5
+HF-0050,Response case 050,D01,North Quay,F02,2026-09-12,2026-09-07,0-4,supplies,contacted,10.06728,10.06809,1
+HF-0051,Response case 051,D01,North Quay,F01,2026-09-13,2026-09-07,45-64,information,contacted,10.03654,10.01708,5
+HF-0052,Response case 052,D02,Eastbank,F03,2026-08-03,2026-08-03,18-44,supplies,contacted,10.02098,10.13149,7
+HF-0053,Response case 053,D02,Eastbank,F04,2026-08-04,2026-08-03,65+,information,contacted,10.01565,10.14437,1
+HF-0054,Response case 054,D02,Eastbank,F03,2026-08-05,2026-08-03,65+,supplies,contacted,10.0196,10.09946,4
+HF-0055,Response case 055,D02,Eastbank,F04,2026-08-06,2026-08-03,0-4,water,contacted,10.06696,10.13538,6
+HF-0056,Response case 056,D02,Eastbank,F03,2026-08-10,2026-08-10,45-64,supplies,contacted,10.06843,10.13937,4
+HF-0057,Response case 057,D02,Eastbank,F04,2026-08-11,2026-08-10,0-4,water,contacted,10.04461,10.134,4
+HF-0058,Response case 058,D02,Eastbank,F03,2026-08-12,2026-08-10,18-44,transport,contacted,10.02914,10.12442,4
+HF-0059,Response case 059,D02,Eastbank,F04,2026-08-13,2026-08-10,18-44,water,contacted,10.04828,10.1051,7
+HF-0060,Response case 060,D02,Eastbank,F03,2026-08-14,2026-08-10,0-4,information,contacted,10.04739,10.10944,3
+HF-0061,Response case 061,D02,Eastbank,F03,2026-08-17,2026-08-17,18-44,water,contacted,10.00844,10.14554,7
+HF-0062,Response case 062,D02,Eastbank,F04,2026-08-18,2026-08-17,5-17,transport,contacted,10.02598,10.09333,6
+HF-0063,Response case 063,D02,Eastbank,F03,2026-08-19,2026-08-17,45-64,information,contacted,10.04365,10.1076,2
+HF-0064,Response case 064,D02,Eastbank,F04,2026-08-20,2026-08-17,65+,supplies,contacted,10.03723,10.09951,5
+HF-0065,Response case 065,D02,Eastbank,F03,2026-08-21,2026-08-17,0-4,transport,contacted,10.03566,10.11215,1
+HF-0066,Response case 066,D02,Eastbank,F04,2026-08-22,2026-08-17,45-64,information,contacted,10.04051,10.09355,3
+HF-0067,Response case 067,D02,Eastbank,F03,2026-08-23,2026-08-17,0-4,water,contacted,10.06887,10.14425,7
+HF-0068,Response case 068,D02,Eastbank,F03,2026-08-24,2026-08-24,5-17,information,contacted,10.06244,10.15051,2
+HF-0069,Response case 069,D02,Eastbank,F04,2026-08-25,2026-08-24,0-4,water,contacted,10.02075,10.11677,6
+HF-0070,Response case 070,D02,Eastbank,F03,2026-08-26,2026-08-24,45-64,information,contacted,10.03624,10.09394,5
+HF-0071,Response case 071,D02,Eastbank,F04,2026-08-27,2026-08-24,18-44,transport,contacted,10.06418,10.09141,3
+HF-0072,Response case 072,D02,Eastbank,F03,2026-08-28,2026-08-24,5-17,supplies,contacted,10.03631,10.0952,7
+HF-0073,Response case 073,D02,Eastbank,F04,2026-08-29,2026-08-24,18-44,supplies,contacted,10.02109,10.13423,4
+HF-0074,Response case 074,D02,Eastbank,F03,2026-08-30,2026-08-24,65+,water,contacted,10.03319,10.09583,2
+HF-0075,Response case 075,D02,Eastbank,F04,2026-08-24,2026-08-24,45-64,supplies,contacted,10.01877,10.09628,3
+HF-0076,Response case 076,D02,Eastbank,F03,2026-08-25,2026-08-24,0-4,transport,contacted,10.05936,10.11547,6
+HF-0077,Response case 077,D02,Eastbank,F04,2026-08-26,2026-08-24,65+,transport,contacted,10.04873,10.13723,1
+HF-0078,Response case 078,D02,Eastbank,F03,2026-08-31,2026-08-31,0-4,water,contacted,10.05747,10.1288,4
+HF-0079,Response case 079,D02,Eastbank,F04,2026-09-01,2026-08-31,65+,water,awaiting_contact,10.02531,10.10506,7
+HF-0080,Response case 080,D02,Eastbank,F03,2026-09-02,2026-08-31,0-4,water,awaiting_contact,10.04084,10.11723,4
+HF-0081,Response case 081,D02,Eastbank,F04,2026-09-03,2026-08-31,0-4,supplies,contacted,10.06068,10.12698,1
+HF-0082,Response case 082,D02,Eastbank,F03,2026-09-04,2026-08-31,5-17,supplies,awaiting_contact,10.06727,10.14256,7
+HF-0083,Response case 083,D02,Eastbank,F04,2026-09-05,2026-08-31,18-44,transport,awaiting_contact,10.0571,10.15111,5
+HF-0084,Response case 084,D02,Eastbank,F03,2026-09-06,2026-08-31,65+,transport,contacted,10.03231,10.10461,7
+HF-0085,Response case 085,D02,Eastbank,F04,2026-08-31,2026-08-31,0-4,water,awaiting_contact,10.04978,10.11937,4
+HF-0086,Response case 086,D02,Eastbank,F03,2026-09-01,2026-08-31,5-17,supplies,awaiting_contact,10.00915,10.10699,7
+HF-0087,Response case 087,D02,Eastbank,F04,2026-09-02,2026-08-31,18-44,water,contacted,10.06738,10.11629,3
+HF-0088,Response case 088,D02,Eastbank,F03,2026-09-03,2026-08-31,5-17,information,awaiting_contact,10.05843,10.1402,6
+HF-0089,Response case 089,D02,Eastbank,F04,2026-09-04,2026-08-31,5-17,supplies,awaiting_contact,10.06878,10.12227,3
+HF-0090,Response case 090,D02,Eastbank,F03,2026-09-05,2026-08-31,18-44,water,contacted,10.0245,10.09504,7
+HF-0091,Response case 091,D02,Eastbank,F03,2026-09-07,2026-09-07,0-4,water,contacted,10.0697,10.15169,1
+HF-0092,Response case 092,D02,Eastbank,F04,2026-09-08,2026-09-07,45-64,water,awaiting_contact,10.03678,10.12489,7
+HF-0093,Response case 093,D02,Eastbank,F03,2026-09-09,2026-09-07,5-17,supplies,awaiting_contact,10.06872,10.11997,3
+HF-0094,Response case 094,D02,Eastbank,F04,2026-09-10,2026-09-07,65+,information,contacted,10.05237,10.14069,3
+HF-0095,Response case 095,D02,Eastbank,F03,2026-09-11,2026-09-07,0-4,transport,awaiting_contact,10.01992,10.13885,5
+HF-0096,Response case 096,D02,Eastbank,F04,2026-09-12,2026-09-07,45-64,supplies,awaiting_contact,10.02167,10.11751,4
+HF-0097,Response case 097,D02,Eastbank,F03,2026-09-13,2026-09-07,0-4,supplies,contacted,10.06404,10.11685,3
+HF-0098,Response case 098,D02,Eastbank,F04,2026-09-07,2026-09-07,45-64,information,awaiting_contact,10.02425,10.13095,5
+HF-0099,Response case 099,D02,Eastbank,F03,2026-09-08,2026-09-07,65+,water,awaiting_contact,10.04087,10.11189,7
+HF-0100,Response case 100,D02,Eastbank,F04,2026-09-09,2026-09-07,0-4,water,contacted,10.05247,10.13142,2
+HF-0101,Response case 101,D02,Eastbank,F03,2026-09-10,2026-09-07,65+,water,awaiting_contact,10.05259,10.11907,1
+HF-0102,Response case 102,D02,Eastbank,F04,2026-09-11,2026-09-07,5-17,supplies,awaiting_contact,10.02857,10.10447,7
+HF-0103,Response case 103,D02,Eastbank,F03,2026-09-12,2026-09-07,5-17,transport,contacted,10.0287,10.11873,5
+HF-0104,Response case 104,D02,Eastbank,F04,2026-09-13,2026-09-07,0-4,information,awaiting_contact,10.02694,10.1066,4
+HF-0105,Response case 105,D02,Eastbank,F03,2026-09-07,2026-09-07,0-4,supplies,awaiting_contact,10.01892,10.09878,7
+HF-0106,Response case 106,D02,Eastbank,F04,2026-09-08,2026-09-07,18-44,information,contacted,10.06747,10.14869,1
+HF-0107,Response case 107,D02,Eastbank,F03,2026-09-09,2026-09-07,45-64,supplies,awaiting_contact,10.00899,10.142,3
+HF-0108,Response case 108,D03,South Gardens,F05,2026-08-03,2026-08-03,45-64,water,contacted,10.05678,10.18081,4
+HF-0109,Response case 109,D03,South Gardens,F06,2026-08-04,2026-08-03,5-17,information,contacted,10.02062,10.1708,5
+HF-0110,Response case 110,D03,South Gardens,F05,2026-08-05,2026-08-03,45-64,supplies,contacted,10.02236,10.22724,6
+HF-0111,Response case 111,D03,South Gardens,F06,2026-08-06,2026-08-03,65+,transport,contacted,10.03104,10.19764,5
+HF-0112,Response case 112,D03,South Gardens,F05,2026-08-07,2026-08-03,65+,information,contacted,10.02011,10.22721,3
+HF-0113,Response case 113,D03,South Gardens,F06,2026-08-08,2026-08-03,45-64,information,contacted,10.06622,10.20258,7
+HF-0114,Response case 114,D03,South Gardens,F05,2026-08-10,2026-08-10,5-17,water,contacted,10.00954,10.18576,7
+HF-0115,Response case 115,D03,South Gardens,F06,2026-08-11,2026-08-10,0-4,information,contacted,10.02222,10.18054,6
+HF-0116,Response case 116,D03,South Gardens,F05,2026-08-12,2026-08-10,0-4,transport,contacted,10.06889,10.21852,1
+HF-0117,Response case 117,D03,South Gardens,F06,2026-08-13,2026-08-10,5-17,water,contacted,10.0416,10.2314,2
+HF-0118,Response case 118,D03,South Gardens,F05,2026-08-14,2026-08-10,5-17,water,contacted,10.02677,10.19565,1
+HF-0119,Response case 119,D03,South Gardens,F06,2026-08-15,2026-08-10,5-17,information,contacted,10.02829,10.19699,1
+HF-0120,Response case 120,D03,South Gardens,F05,2026-08-16,2026-08-10,45-64,water,contacted,10.06761,10.20379,1
+HF-0121,Response case 121,D03,South Gardens,F05,2026-08-17,2026-08-17,45-64,supplies,contacted,10.01087,10.23141,4
+HF-0122,Response case 122,D03,South Gardens,F06,2026-08-18,2026-08-17,65+,transport,contacted,10.0599,10.21129,1
+HF-0123,Response case 123,D03,South Gardens,F05,2026-08-19,2026-08-17,65+,water,contacted,10.0151,10.22557,5
+HF-0124,Response case 124,D03,South Gardens,F06,2026-08-20,2026-08-17,0-4,information,contacted,10.03988,10.17887,3
+HF-0125,Response case 125,D03,South Gardens,F05,2026-08-21,2026-08-17,65+,water,contacted,10.05906,10.17628,2
+HF-0126,Response case 126,D03,South Gardens,F06,2026-08-22,2026-08-17,5-17,supplies,contacted,10.01504,10.21813,3
+HF-0127,Response case 127,D03,South Gardens,F05,2026-08-24,2026-08-24,0-4,water,contacted,10.03398,10.2273,6
+HF-0128,Response case 128,D03,South Gardens,F06,2026-08-25,2026-08-24,5-17,water,contacted,10.06167,10.17786,2
+HF-0129,Response case 129,D03,South Gardens,F05,2026-08-26,2026-08-24,18-44,supplies,contacted,10.05599,10.20484,1
+HF-0130,Response case 130,D03,South Gardens,F06,2026-08-27,2026-08-24,18-44,information,contacted,10.04386,10.22184,6
+HF-0131,Response case 131,D03,South Gardens,F05,2026-08-28,2026-08-24,0-4,transport,contacted,10.02412,10.17063,4
+HF-0132,Response case 132,D03,South Gardens,F06,2026-08-29,2026-08-24,0-4,transport,contacted,10.05346,10.22045,4
+HF-0133,Response case 133,D03,South Gardens,F05,2026-08-30,2026-08-24,65+,transport,contacted,10.05629,10.17688,6
+HF-0134,Response case 134,D03,South Gardens,F06,2026-08-24,2026-08-24,45-64,transport,contacted,10.06144,10.19625,7
+HF-0135,Response case 135,D03,South Gardens,F05,2026-08-31,2026-08-31,0-4,information,contacted,10.02362,10.20763,7
+HF-0136,Response case 136,D03,South Gardens,F06,2026-09-01,2026-08-31,18-44,transport,contacted,10.0711,10.19755,4
+HF-0137,Response case 137,D03,South Gardens,F05,2026-09-02,2026-08-31,45-64,water,contacted,10.04253,10.19315,5
+HF-0138,Response case 138,D03,South Gardens,F06,2026-09-03,2026-08-31,65+,water,contacted,10.06994,10.22454,4
+HF-0139,Response case 139,D03,South Gardens,F05,2026-09-04,2026-08-31,5-17,supplies,contacted,10.02712,10.20802,6
+HF-0140,Response case 140,D03,South Gardens,F06,2026-09-05,2026-08-31,0-4,supplies,contacted,10.0316,10.19933,3
+HF-0141,Response case 141,D03,South Gardens,F05,2026-09-06,2026-08-31,5-17,information,contacted,10.01107,10.1853,7
+HF-0142,Response case 142,D03,South Gardens,F05,2026-09-07,2026-09-07,0-4,transport,contacted,10.01183,10.1994,4
+HF-0143,Response case 143,D03,South Gardens,F06,2026-09-08,2026-09-07,18-44,supplies,contacted,10.04324,10.17725,7
+HF-0144,Response case 144,D03,South Gardens,F05,2026-09-09,2026-09-07,0-4,information,contacted,10.04212,10.229,6
+HF-0145,Response case 145,D03,South Gardens,F06,2026-09-10,2026-09-07,5-17,water,contacted,10.06001,10.20457,2
+HF-0146,Response case 146,D03,South Gardens,F05,2026-09-11,2026-09-07,45-64,transport,contacted,10.02708,10.21854,3
+HF-0147,Response case 147,D03,South Gardens,F06,2026-09-12,2026-09-07,0-4,water,contacted,10.05557,10.17952,2
+HF-0148,Response case 148,D04,Ridge,F07,2026-08-03,2026-08-03,45-64,transport,contacted,10.1478,10.03424,2
+HF-0149,Response case 149,D04,Ridge,F08,2026-08-04,2026-08-03,0-4,supplies,contacted,10.11517,10.02774,7
+HF-0150,Response case 150,D04,Ridge,F07,2026-08-05,2026-08-03,0-4,information,contacted,10.10631,10.0152,7
+HF-0151,Response case 151,D04,Ridge,F07,2026-08-10,2026-08-10,45-64,supplies,contacted,10.13926,10.04285,5
+HF-0152,Response case 152,D04,Ridge,F08,2026-08-11,2026-08-10,18-44,transport,contacted,10.14443,10.0471,5
+HF-0153,Response case 153,D04,Ridge,F07,2026-08-12,2026-08-10,5-17,information,contacted,10.08995,10.02597,6
+HF-0154,Response case 154,D04,Ridge,F08,2026-08-13,2026-08-10,5-17,information,contacted,10.12818,10.04174,5
+HF-0155,Response case 155,D04,Ridge,F07,2026-08-17,2026-08-17,65+,water,contacted,10.10429,10.0387,2
+HF-0156,Response case 156,D04,Ridge,F08,2026-08-18,2026-08-17,18-44,information,contacted,10.10722,10.02849,3
+HF-0157,Response case 157,D04,Ridge,F07,2026-08-19,2026-08-17,45-64,information,contacted,10.12246,10.0561,6
+HF-0158,Response case 158,D04,Ridge,F08,2026-08-20,2026-08-17,45-64,supplies,contacted,10.10269,10.02717,2
+HF-0159,Response case 159,D04,Ridge,F07,2026-08-21,2026-08-17,0-4,water,contacted,10.14699,10.01258,2
+HF-0160,Response case 160,D04,Ridge,F07,2026-08-24,2026-08-24,45-64,information,contacted,10.15025,10.027,5
+HF-0161,Response case 161,D04,Ridge,F08,2026-08-25,2026-08-24,18-44,transport,contacted,10.13929,10.01028,1
+HF-0162,Response case 162,D04,Ridge,F07,2026-08-26,2026-08-24,0-4,supplies,contacted,10.14797,10.00959,7
+HF-0163,Response case 163,D04,Ridge,F08,2026-08-27,2026-08-24,45-64,water,contacted,10.1375,10.01538,3
+HF-0164,Response case 164,D04,Ridge,F07,2026-08-28,2026-08-24,5-17,information,contacted,10.14436,10.05021,2
+HF-0165,Response case 165,D04,Ridge,F07,2026-08-31,2026-08-31,65+,information,contacted,10.10947,10.05079,2
+HF-0166,Response case 166,D04,Ridge,F08,2026-09-01,2026-08-31,45-64,water,contacted,10.14311,10.06564,6
+HF-0167,Response case 167,D04,Ridge,F07,2026-09-02,2026-08-31,65+,transport,contacted,10.13889,10.05614,6
+HF-0168,Response case 168,D04,Ridge,F08,2026-09-03,2026-08-31,5-17,water,contacted,10.11343,10.06669,5
+HF-0169,Response case 169,D04,Ridge,F07,2026-09-04,2026-08-31,0-4,water,contacted,10.10536,10.0287,5
+HF-0170,Response case 170,D04,Ridge,F08,2026-09-05,2026-08-31,65+,transport,contacted,10.13161,10.03709,3
+HF-0171,Response case 171,D04,Ridge,F07,2026-09-07,2026-09-07,0-4,supplies,contacted,10.0937,10.05389,7
+HF-0172,Response case 172,D04,Ridge,F08,2026-09-08,2026-09-07,0-4,information,contacted,10.13409,10.03027,6
+HF-0173,Response case 173,D04,Ridge,F07,2026-09-09,2026-09-07,65+,information,contacted,10.12568,10.05303,3
+HF-0174,Response case 174,D04,Ridge,F08,2026-09-10,2026-09-07,45-64,supplies,contacted,10.0929,10.05664,6
+HF-0175,Response case 175,D04,Ridge,F07,2026-09-11,2026-09-07,18-44,transport,contacted,10.11962,10.05555,1
+HF-0176,Response case 176,D04,Ridge,F08,2026-09-12,2026-09-07,18-44,transport,contacted,10.13428,10.05803,4
+HF-0177,Response case 177,D05,Lakeside,F09,2026-08-03,2026-08-03,5-17,transport,contacted,10.1295,10.13554,2
+HF-0178,Response case 178,D05,Lakeside,F10,2026-08-04,2026-08-03,65+,supplies,contacted,10.14948,10.1472,4
+HF-0179,Response case 179,D05,Lakeside,F09,2026-08-05,2026-08-03,5-17,water,contacted,10.14644,10.12594,1
+HF-0180,Response case 180,D05,Lakeside,F10,2026-08-06,2026-08-03,0-4,transport,contacted,10.09812,10.13341,5
+HF-0181,Response case 181,D05,Lakeside,F09,2026-08-07,2026-08-03,5-17,information,contacted,10.11931,10.09334,7
+HF-0182,Response case 182,D05,Lakeside,F09,2026-08-10,2026-08-10,5-17,water,contacted,10.09152,10.10636,6
+HF-0183,Response case 183,D05,Lakeside,F10,2026-08-11,2026-08-10,45-64,water,contacted,10.11085,10.08958,7
+HF-0184,Response case 184,D05,Lakeside,F09,2026-08-12,2026-08-10,0-4,information,contacted,10.14458,10.10277,1
+HF-0185,Response case 185,D05,Lakeside,F10,2026-08-13,2026-08-10,5-17,water,contacted,10.09477,10.11252,4
+HF-0186,Response case 186,D05,Lakeside,F09,2026-08-14,2026-08-10,5-17,supplies,contacted,10.09641,10.11315,4
+HF-0187,Response case 187,D05,Lakeside,F10,2026-08-15,2026-08-10,45-64,transport,contacted,10.11654,10.10673,1
+HF-0188,Response case 188,D05,Lakeside,F09,2026-08-17,2026-08-17,5-17,information,contacted,10.09248,10.11569,1
+HF-0189,Response case 189,D05,Lakeside,F10,2026-08-18,2026-08-17,0-4,supplies,contacted,10.11921,10.09243,4
+HF-0190,Response case 190,D05,Lakeside,F09,2026-08-19,2026-08-17,5-17,transport,contacted,10.10692,10.12478,2
+HF-0191,Response case 191,D05,Lakeside,F10,2026-08-20,2026-08-17,0-4,information,contacted,10.10276,10.09686,3
+HF-0192,Response case 192,D05,Lakeside,F09,2026-08-21,2026-08-17,65+,supplies,contacted,10.13823,10.10309,4
+HF-0193,Response case 193,D05,Lakeside,F10,2026-08-22,2026-08-17,18-44,water,contacted,10.14737,10.12844,1
+HF-0194,Response case 194,D05,Lakeside,F09,2026-08-24,2026-08-24,65+,supplies,contacted,10.10692,10.13875,7
+HF-0195,Response case 195,D05,Lakeside,F10,2026-08-25,2026-08-24,18-44,water,contacted,10.10838,10.12373,2
+HF-0196,Response case 196,D05,Lakeside,F09,2026-08-26,2026-08-24,45-64,transport,contacted,10.12328,10.14541,1
+HF-0197,Response case 197,D05,Lakeside,F10,2026-08-27,2026-08-24,5-17,supplies,contacted,10.10918,10.1091,6
+HF-0198,Response case 198,D05,Lakeside,F09,2026-08-28,2026-08-24,18-44,transport,contacted,10.08975,10.09711,4
+HF-0199,Response case 199,D05,Lakeside,F10,2026-08-29,2026-08-24,18-44,water,contacted,10.10445,10.10927,2
+HF-0200,Response case 200,D05,Lakeside,F09,2026-08-30,2026-08-24,5-17,transport,contacted,10.11815,10.13378,1
+HF-0201,Response case 201,D05,Lakeside,F09,2026-08-31,2026-08-31,65+,information,contacted,10.09817,10.15135,7
+HF-0202,Response case 202,D05,Lakeside,F10,2026-09-01,2026-08-31,65+,transport,contacted,10.10322,10.14454,3
+HF-0203,Response case 203,D05,Lakeside,F09,2026-09-02,2026-08-31,18-44,information,contacted,10.13082,10.12549,1
+HF-0204,Response case 204,D05,Lakeside,F10,2026-09-03,2026-08-31,45-64,transport,contacted,10.09436,10.12302,7
+HF-0205,Response case 205,D05,Lakeside,F09,2026-09-04,2026-08-31,0-4,transport,contacted,10.11663,10.10295,4
+HF-0206,Response case 206,D05,Lakeside,F10,2026-09-05,2026-08-31,18-44,water,contacted,10.11842,10.10076,5
+HF-0207,Response case 207,D05,Lakeside,F09,2026-09-06,2026-08-31,18-44,supplies,contacted,10.1445,10.1206,2
+HF-0208,Response case 208,D05,Lakeside,F09,2026-09-07,2026-09-07,18-44,water,contacted,10.11806,10.09897,6
+HF-0209,Response case 209,D05,Lakeside,F10,2026-09-08,2026-09-07,65+,information,contacted,10.11836,10.14668,1
+HF-0210,Response case 210,D05,Lakeside,F09,2026-09-09,2026-09-07,18-44,water,contacted,10.11637,10.09379,7
+HF-0211,Response case 211,D05,Lakeside,F10,2026-09-10,2026-09-07,18-44,supplies,contacted,10.10397,10.09481,7
+HF-0212,Response case 212,D05,Lakeside,F09,2026-09-11,2026-09-07,45-64,transport,contacted,10.11017,10.09188,4
+HF-0213,Response case 213,D05,Lakeside,F10,2026-09-12,2026-09-07,45-64,supplies,contacted,10.13915,10.12115,7
+HF-0214,Response case 214,D05,Lakeside,F09,2026-09-13,2026-09-07,0-4,transport,contacted,10.1342,10.14772,2
+HF-0215,Response case 215,D05,Lakeside,F10,2026-09-07,2026-09-07,65+,water,contacted,10.10437,10.11337,7
+HF-0216,Response case 216,D06,West Marsh,F11,2026-08-03,2026-08-03,0-4,information,contacted,10.12527,10.22762,1
+HF-0217,Response case 217,D06,West Marsh,F12,2026-08-04,2026-08-03,18-44,information,contacted,10.13752,10.21701,4
+HF-0218,Response case 218,D06,West Marsh,F11,2026-08-05,2026-08-03,0-4,information,contacted,10.10416,10.21021,6
+HF-0219,Response case 219,D06,West Marsh,F12,2026-08-06,2026-08-03,18-44,supplies,contacted,10.10447,10.20206,6
+HF-0220,Response case 220,D06,West Marsh,F11,2026-08-07,2026-08-03,45-64,water,contacted,10.11713,10.21421,6
+HF-0221,Response case 221,D06,West Marsh,F12,2026-08-08,2026-08-03,65+,transport,contacted,10.10991,10.21846,5
+HF-0222,Response case 222,D06,West Marsh,F11,2026-08-10,2026-08-10,65+,supplies,contacted,10.12696,10.19352,7
+HF-0223,Response case 223,D06,West Marsh,F12,2026-08-11,2026-08-10,45-64,information,contacted,10.11928,10.23107,2
+HF-0224,Response case 224,D06,West Marsh,F11,2026-08-12,2026-08-10,5-17,transport,contacted,10.14113,10.20735,4
+HF-0225,Response case 225,D06,West Marsh,F12,2026-08-13,2026-08-10,18-44,information,contacted,10.13313,10.19761,1
+HF-0226,Response case 226,D06,West Marsh,F11,2026-08-14,2026-08-10,18-44,transport,contacted,10.10869,10.16904,1
+HF-0227,Response case 227,D06,West Marsh,F12,2026-08-15,2026-08-10,18-44,information,contacted,10.13558,10.19336,4
+HF-0228,Response case 228,D06,West Marsh,F11,2026-08-16,2026-08-10,65+,supplies,contacted,10.1048,10.21206,6
+HF-0229,Response case 229,D06,West Marsh,F11,2026-08-17,2026-08-17,65+,transport,contacted,10.13377,10.16833,1
+HF-0230,Response case 230,D06,West Marsh,F12,2026-08-18,2026-08-17,18-44,transport,contacted,10.12968,10.20553,5
+HF-0231,Response case 231,D06,West Marsh,F11,2026-08-19,2026-08-17,18-44,supplies,contacted,10.1052,10.22014,1
+HF-0232,Response case 232,D06,West Marsh,F12,2026-08-20,2026-08-17,5-17,supplies,contacted,10.09644,10.1759,6
+HF-0233,Response case 233,D06,West Marsh,F11,2026-08-21,2026-08-17,0-4,transport,contacted,10.13542,10.21828,5
+HF-0234,Response case 234,D06,West Marsh,F12,2026-08-22,2026-08-17,5-17,water,contacted,10.09843,10.17626,6
+HF-0235,Response case 235,D06,West Marsh,F11,2026-08-24,2026-08-24,18-44,transport,contacted,10.11099,10.17593,4
+HF-0236,Response case 236,D06,West Marsh,F12,2026-08-25,2026-08-24,0-4,transport,contacted,10.09616,10.23094,3
+HF-0237,Response case 237,D06,West Marsh,F11,2026-08-26,2026-08-24,45-64,supplies,contacted,10.09818,10.18854,2
+HF-0238,Response case 238,D06,West Marsh,F12,2026-08-27,2026-08-24,0-4,water,contacted,10.09357,10.19614,1
+HF-0239,Response case 239,D06,West Marsh,F11,2026-08-28,2026-08-24,45-64,water,contacted,10.11545,10.19028,1
+HF-0240,Response case 240,D06,West Marsh,F12,2026-08-29,2026-08-24,45-64,transport,contacted,10.14873,10.18843,2

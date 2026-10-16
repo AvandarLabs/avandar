@@ -1,0 +1,14 @@
+{
+  "preset": "metric-counter",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "098a750bd9951cb3bc6c0cccc17df23d79a4ca3a57c5a00f76279383dcafef45",
+  "posterSha256": "70c7c3505c1f000fe89105f59d6035ea8eda217b6663490f119e5a55bb262d40",
+  "generatedAt": "2026-10-14T23:56:00.140Z"
+}

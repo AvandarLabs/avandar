@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "id": "avandar-map",
+  "title": "Avandar: layered map preview",
+  "description": "Inspect two fictional point layers through the native Avandar MapLibre canvas, toggle facility visibility, and open a facility detail in the local map preview.",
+  "sourceNotes": [
+    "Programmatic React rendering of actual components and styles from the enclosing Avandar worktree. Each build records the current source revision and SHA-256 hashes in ignored src/avandar/generated/build.json. Tracked sample MP4s retain their original export provenance.",
+    "These shots use the avandar scene and frame-controlled adapters in avandar-adapter/. They contain no screenshots, screen recordings, screenshot callouts, or prerecorded UI. The original generic demo and showcase remain separate.",
+    "All Harborfield records and locations come from the deterministic fictional bundle in demo-data/manifest.json, bound through avandar-adapter/fixtures.json. Fictional demonstration data remains visible. No real person, organization, or reporting area is represented.",
+    "Typing, selection, query results, save responses, and navigation are deterministic fixture states. Rendering invokes no product backend, authentication, persistence mutation, or publication operation. Source reuse establishes UI provenance, not a new end-to-end product test.",
+    "Historical browser evidence remains separate: accepted local rehearsal pilot-2026-10-14T22-11-57-800Z-Z53br8 passed import, explorer, dashboards, cases, and point-map checks with 14 checkpoints and zero blocked requests. Earlier capture results do not prove that this component film executed those operations.",
+    "Narration cues are authored against adapter frames. This source plan contains text cues and captions only; any generated voice is scratch narration and requires separate listening and timing review. Final render and frame-gate evidence are recorded after completed runs.",
+    "Release boundary: GIS is a local product preview. Source code and marketed availability do not establish a generally released flow. This film demonstrates point layers only.",
+    "The actual MapShell, MapCanvasSurface, useMapCanvas, layer builder, layer list, inspector controls, legend, tools, and feature inspector are reused. MapLibre draws fixture coordinates directly. No captured map image or surrogate SVG map is used.",
+    "The built-in Avandar basemap uses the original OpenFreeMap Bright style and Avandar styling with real geographic tiles and labels. The 252 overlaid points remain fictional near 10 degrees east and 10 degrees north. Tile readiness is required before capture; provider attribution stays visible.",
+    "There are 240 case points and 12 facility points. Blue and larger orange symbols identify the two layers; they are not a quantitative scale. Camera motion and visibility are frame-driven; native paint transitions are disabled.",
+    "The earlier local browser rehearsal verified both point layers and their counts after reload. A WKT district layer failed with a DuckDB Binder Error for an internal geometry column and was removed from the task-owned map. This film makes no polygon, spatial-join, travel-time, isochrone, map-export or map-publication claim.",
+    "An earlier point load also failed after the WKT attempt, while the later accepted run succeeded. A cache or timing explanation remains a hypothesis. The component film does not invoke DuckDB Spatial or resolve that failure."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "scene": "title",
+      "durationInFrames": 66,
+      "transitionInFrames": 0,
+      "props": {
+        "name": "Put records on a map",
+        "kicker": "Local product preview \u00b7 fictional data"
+      }
+    },
+    {
+      "id": "flow",
+      "scene": "avandar",
+      "durationInFrames": 720,
+      "transitionInFrames": 18,
+      "props": {
+        "feature": "map",
+        "fromFrame": 0,
+        "mode": "full"
+      },
+      "note": "One continuous adapter timeline. All interaction, typing, chart and camera timing is body-local in the feature adapter."
+    }
+  ],
+  "narration": [
+    {
+      "id": "case-locations",
+      "shotId": "flow",
+      "startFrame": 12,
+      "endFrame": 102,
+      "text": "Inspect 240 fictional case locations."
+    },
+    {
+      "id": "facility-layer",
+      "shotId": "flow",
+      "startFrame": 108,
+      "endFrame": 228,
+      "text": "Select the 12 facility locations."
+    },
+    {
+      "id": "hide-facilities",
+      "shotId": "flow",
+      "startFrame": 240,
+      "endFrame": 348,
+      "text": "Hide the facility layer to compare."
+    },
+    {
+      "id": "show-facilities",
+      "shotId": "flow",
+      "startFrame": 360,
+      "endFrame": 450,
+      "text": "Restore the separate facility layer."
+    },
+    {
+      "id": "inspect-location",
+      "shotId": "flow",
+      "startFrame": 456,
+      "endFrame": 546,
+      "text": "Move closer to inspect one location."
+    },
+    {
+      "id": "facility-details",
+      "shotId": "flow",
+      "startFrame": 564,
+      "endFrame": 684,
+      "text": "Read the selected facility's details."
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

@@ -1,0 +1,14 @@
+{
+  "preset": "data-pipeline",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "f0876490118e686f43967b8ebb7d6e610382e01c6ddeb6b3d9c8c0656fa4ceee",
+  "posterSha256": "a9fe0a076018c757a11ab7087ef55b975426eeb47ac3d25a12479158fc647db1",
+  "generatedAt": "2026-10-14T23:54:49.145Z"
+}

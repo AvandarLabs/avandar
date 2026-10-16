@@ -1,0 +1,8 @@
+.caseTypeHomePane {
+  padding: var(--mantine-spacing-md);
+}
+
+.casesSidebarPane {
+  min-width: 240px;
+  width: 240px;
+}

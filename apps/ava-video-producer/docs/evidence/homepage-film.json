@@ -1,0 +1,45 @@
+{
+  "storyboard": "storyboards/home.json",
+  "render": {
+    "version": 1,
+    "complete": true,
+    "fingerprint": {
+      "sourcePlanSha256": "626336ec8b7e96605c8237abc1ada2b10fb92f9337696a263635e0affb46e9d2",
+      "parsedPlanSha256": "426498946d0376771cbda34cf4429d54629fdb4e7690dd315ce21ea24c2140b7",
+      "assets": [],
+      "rendererSha256": "f5584b5b91b2d0e022d26b2d302fd458567967272a7502b46486bff1f1de1b61"
+    },
+    "generatedAt": "2026-10-15T14:22:48.577Z",
+    "final": "final.mp4",
+    "poster": "avandar-home-poster.jpg",
+    "hasAudio": false,
+    "durationInFrames": 590,
+    "fps": 30,
+    "pictureGate": "passed",
+    "videoStream": "copied without re-encoding during audio assembly"
+  },
+  "productSourceRevision": "eb85770a302ed1000d8751185548d33a5fd54e2d",
+  "productBuildManifestSha256": "5944bbf074c2663dfafdfd5c94454109b15ab604b6c7be6defe6d535b4454a78",
+  "videoSha256": "83129cdbb0e72d3015a9af95bb652b81f7078fbec6f4a8c40d7fc7f402e3bdd5",
+  "posterSha256": "d3c78a291b8c2c8fa2b9f8c3d54492cbc3f1c265bb1d0d64aa042a5f5e68d134",
+  "posterFrame": 490,
+  "delivery": {
+    "width": 1536,
+    "height": 960,
+    "frames": 590,
+    "fps": 30,
+    "hasAudio": false
+  },
+  "frameGate": {
+    "tiledFrames": 0,
+    "luminanceJumpsOver25": 0,
+    "loopSeamLuminanceJump": 0.8
+  },
+  "review": {
+    "preview": "Contact sheet and full-size SQL and chart frames inspected",
+    "browser": "Headless Chromium: encoded film played to completion, SQL and chart screenshots inspected, chapter seek, clip switching, speed and loop verified",
+    "tests": 65,
+    "typecheck": "passed",
+    "showcaseJavaScriptLint": "passed"
+  }
+}

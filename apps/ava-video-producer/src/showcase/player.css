@@ -1,0 +1,40 @@
+html,
+body,
+#root {
+  background: #080b12;
+  margin: 0;
+  width: 100%;
+}
+
+.liveFilm {
+  position: relative;
+}
+
+.captionToggle {
+  align-items: center;
+  background: #101820e8;
+  border-radius: 4px;
+  color: #fff;
+  display: flex;
+  font:
+    11px system-ui,
+    sans-serif;
+  gap: 5px;
+  padding: 5px 8px;
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  z-index: 20000;
+}
+
+.captionToggle input {
+  accent-color: #1563fe;
+}
+
+.liveError {
+  color: #fff;
+  font:
+    14px system-ui,
+    sans-serif;
+  padding: 20px;
+}

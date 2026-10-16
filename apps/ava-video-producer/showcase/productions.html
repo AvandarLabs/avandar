@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eeede7" />
+    <title>Avandar / Productions</title>
+    <meta
+      name="description"
+      content="Internal review gallery for reusable scenes and Avandar component films using fictional demonstration data."
+    />
+    <link rel="stylesheet" href="showcase-theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="productions.css" />
+  </head>
+  <body class="productions-page">
+    <header class="masthead wrap">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">a.</span> AVANDAR
+        <span class="brand-divider">/</span>
+        <span class="room">Productions</span>
+      </a>
+      <a class="text-link" href="index.html"
+        >Starter showcase <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <main class="wrap">
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">
+            <span class="status-dot"></span> INTERNAL SCREENING
+            <span class="edition">003 / COMPONENT FILMS</span>
+          </p>
+          <h1 id="page-title">
+            Scenes that explain.<br />Footage that <em>shows.</em>
+          </h1>
+        </div>
+        <div class="intro-note">
+          <p>The next set of films.</p>
+          <p>
+            A reusable scene study, an Avandar walkthrough, and focused feature
+            cuts. Product films render Avandar’s actual React components and
+            styles, animated with fictional Harborfield data.
+          </p>
+          <div class="specs">
+            <span>Live previews</span><span>30 fps delivery</span
+            ><span>Local review</span>
+          </div>
+          <p>
+            <a class="text-link" href="motion.html"
+              >Browse Motion Atlas: 20 stock graphics
+              <span aria-hidden="true">↗</span></a
+            >
+          </p>
+        </div>
+      </section>
+
+      <aside class="production-context" aria-label="How to read these films">
+        <p>
+          <strong>Fictional demonstration data.</strong> The records, people,
+          facilities, and Harborfield districts are invented. The map basemap
+          supplies real geographic context.
+        </p>
+        <p>
+          Scratch narration uses a temporary system voice when generated audio
+          is available locally. Use each player’s captions toggle to choose
+          captions for its preview and MP4 export. Product controls use
+          fixture-backed state for repeatable animation; the films make no
+          backend changes. Case Manager and Maps remain product previews.
+        </p>
+      </aside>
+
+      <section class="production-section" aria-labelledby="main-films-title">
+        <div class="section-head">
+          <p class="eyebrow">TWO WAYS TO TELL THE STORY</p>
+          <h2 id="main-films-title">The scenes. The product.</h2>
+          <p>
+            Play a live composition, pause, seek, or watch full screen. Download
+            MP4 renders the current film only when requested.
+          </p>
+        </div>
+        <div class="production-grid primary-productions">
+          <article class="production-card" id="scene-library">
+            <div class="screening-top">
+              <span><span class="live-dot"></span> 01 / SCENE LIBRARY</span
+              ><span>EDITORIAL STUDY</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=scene-library"
+              title="A language for the explanation: live preview"
+              aria-describedby="scene-library-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <p class="production-label">REUSABLE GRAPHICS · FICTIONAL DATA</p>
+              <h3 id="scene-library-title">A language for the explanation</h3>
+              <p id="scene-library-description">
+                Word masks, a connected dataset graph, a process flow, and a
+                metric. An editorial study of the scene library, with no
+                reconstructed Avandar interface.
+              </p>
+              <div class="production-meta">
+                <span>Live preview · optional captions</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download A language for the explanation as MP4"
+                  aria-describedby="scene-library-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span></button
+                ><a href="/api/films/scene-library/transcript.txt" download
+                  >Transcript</a
+                ><a href="/api/films/scene-library/captions.srt" download
+                  >Captions</a
+                >
+              </div>
+              <p
+                id="scene-library-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+          <article class="production-card" id="avandar-overview">
+            <div class="screening-top">
+              <span><span class="live-dot"></span> 02 / AVANDAR</span
+              ><span>REACT COMPONENT FILM</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=avandar-overview"
+              title="From source to briefing: live preview"
+              aria-describedby="overview-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <p class="production-label">
+                ACTUAL PRODUCT COMPONENTS · FICTIONAL DATA
+              </p>
+              <h3 id="overview-title">From source to briefing</h3>
+              <p id="overview-description">
+                Follow the cursor as it imports fictional Harborfield records,
+                types a filter and SQL query, builds a district comparison, and
+                creates a dashboard preview.
+              </p>
+              <div class="production-meta">
+                <span>Live preview · optional captions</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download From source to briefing as MP4"
+                  aria-describedby="avandar-overview-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span></button
+                ><a href="/api/films/avandar-overview/transcript.txt" download
+                  >Transcript</a
+                ><a href="/api/films/avandar-overview/captions.srt" download
+                  >Captions</a
+                >
+              </div>
+              <p
+                id="avandar-overview-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section
+        class="production-section feature-section"
+        aria-labelledby="feature-films-title"
+      >
+        <div class="section-head">
+          <p class="eyebrow">ONE WORKFLOW AT A TIME</p>
+          <h2 id="feature-films-title">Look a little closer.</h2>
+          <p>
+            Live workflows from Avandar’s own components. Watch inputs type,
+            controls respond, and views change.
+          </p>
+        </div>
+        <div class="production-grid feature-productions">
+          <article class="production-card" id="avandar-import">
+            <div class="screening-top">
+              <span>03 / IMPORT</span><span>REACT COMPONENTS</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=avandar-import"
+              title="Bring the records in: live preview"
+              aria-describedby="import-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <h3 id="import-title">Bring the records in</h3>
+              <p id="import-description">
+                Upload a CSV, inspect its preview, and save the dataset with its
+                fictional provenance.
+              </p>
+              <div class="production-meta">
+                <span>Fictional data</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download Bring the records in as MP4"
+                  aria-describedby="avandar-import-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span></button
+                ><a href="/api/films/avandar-import/transcript.txt" download
+                  >Transcript</a
+                ><a href="/api/films/avandar-import/captions.srt" download
+                  >Captions</a
+                >
+              </div>
+              <p
+                id="avandar-import-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+          <article class="production-card" id="avandar-explorer">
+            <div class="screening-top">
+              <span>04 / EXPLORER</span><span>REACT COMPONENTS</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=avandar-explorer"
+              title="Inspect the answer: live preview"
+              aria-describedby="explorer-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <h3 id="explorer-title">Inspect the answer</h3>
+              <p id="explorer-description">
+                Read the rows, filter a district, then turn a query result into
+                a chart.
+              </p>
+              <div class="production-meta">
+                <span>Fictional data</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download Inspect the answer as MP4"
+                  aria-describedby="avandar-explorer-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span></button
+                ><a href="/api/films/avandar-explorer/transcript.txt" download
+                  >Transcript</a
+                ><a href="/api/films/avandar-explorer/captions.srt" download
+                  >Captions</a
+                >
+              </div>
+              <p
+                id="avandar-explorer-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+          <article class="production-card" id="avandar-dashboards">
+            <div class="screening-top">
+              <span>05 / DASHBOARDS</span><span>REACT COMPONENTS</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=avandar-dashboards"
+              title="Prepare a briefing: live preview"
+              aria-describedby="dashboards-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <h3 id="dashboards-title">Prepare a briefing</h3>
+              <p id="dashboards-description">
+                Save an Explorer view to a dashboard, open its editor, and
+                inspect the preview.
+              </p>
+              <div class="production-meta">
+                <span>Fictional data</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download Prepare a briefing as MP4"
+                  aria-describedby="avandar-dashboards-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span></button
+                ><a href="/api/films/avandar-dashboards/transcript.txt" download
+                  >Transcript</a
+                ><a href="/api/films/avandar-dashboards/captions.srt" download
+                  >Captions</a
+                >
+              </div>
+              <p
+                id="avandar-dashboards-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+          <article class="production-card" id="avandar-cases">
+            <div class="screening-top">
+              <span>06 / CASE MANAGER</span
+              ><span class="preview-label">PRODUCT PREVIEW</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=avandar-cases"
+              title="Connect the record: live preview"
+              aria-describedby="cases-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <h3 id="cases-title">Connect the record</h3>
+              <p id="cases-description">
+                Inspect dataset-backed records and related source fields. This
+                preview does not demonstrate assignment, comments, or a
+                follow-up workflow.
+              </p>
+              <div class="production-meta">
+                <span>Component render · fictional data</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download Connect the record as MP4"
+                  aria-describedby="avandar-cases-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span></button
+                ><a href="/api/films/avandar-cases/transcript.txt" download
+                  >Transcript</a
+                ><a href="/api/films/avandar-cases/captions.srt" download
+                  >Captions</a
+                >
+              </div>
+              <p
+                id="avandar-cases-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+          <article class="production-card" id="avandar-map">
+            <div class="screening-top">
+              <span>07 / MAPS</span
+              ><span class="preview-label">PRODUCT PREVIEW</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=avandar-map"
+              title="Read the geography: live preview"
+              aria-describedby="map-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <h3 id="map-title">Read the geography</h3>
+              <p id="map-description">
+                Toggle case and facility point layers, pan and zoom Avandar’s
+                native basemap, and inspect a facility. Real geographic tiles
+                provide context beneath fictional demonstration records.
+              </p>
+              <div class="production-meta">
+                <span>Component render · fictional data</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download Read the geography as MP4"
+                  aria-describedby="avandar-map-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span></button
+                ><a href="/api/films/avandar-map/transcript.txt" download
+                  >Transcript</a
+                ><a href="/api/films/avandar-map/captions.srt" download
+                  >Captions</a
+                >
+              </div>
+              <p
+                id="avandar-map-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="production-review" aria-labelledby="review-title">
+        <div>
+          <p class="eyebrow">INTERNAL REVIEW NOTES</p>
+          <h2 id="review-title">Watch the result.<br />Keep the evidence.</h2>
+          <p>
+            Review the actual screen, reading time, captions, and narration
+            together. The starter examples remain available in the original
+            Motion room.
+          </p>
+          <a class="text-link" href="index.html"
+            >Return to the starter showcase <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <dl class="production-sources">
+          <div>
+            <dt>Component source and animation</dt>
+            <dd>
+              <code>apps/ava-video-producer/docs/component-videos.md</code>
+            </dd>
+          </div>
+          <div>
+            <dt>Product flows and limitations</dt>
+            <dd><code>apps/ava-video-producer/docs/using-avandar.md</code></dd>
+          </div>
+          <div>
+            <dt>Fictional data and provenance</dt>
+            <dd><code>apps/ava-video-producer/demo-data/README.md</code></dd>
+          </div>
+          <div>
+            <dt>Storyboard and audio pipeline</dt>
+            <dd><code>apps/ava-video-producer/docs/video-pipeline.md</code></dd>
+          </div>
+          <div>
+            <dt>Reusable scene contracts</dt>
+            <dd><code>apps/ava-video-producer/docs/scene-api.md</code></dd>
+          </div>
+        </dl>
+      </section>
+    </main>
+    <footer class="wrap">
+      <span>AVANDAR / PRODUCTIONS</span>
+      <p>
+        Live local gallery. Fictional data. Scratch narration when available.
+        MP4 exports on demand.
+      </p>
+    </footer>
+    <script type="module" src="live-gallery.js"></script>
+  </body>
+</html>

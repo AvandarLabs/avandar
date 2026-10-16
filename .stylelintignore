@@ -1,3 +1,14 @@
 node_modules
 dist
 .agents
+
+# Video-producer build output and the CSS bridge it regenerates from this
+# worktree's product source on every build; neither is hand-written.
+apps/ava-video-producer/out
+apps/ava-video-producer/src/avandar/generated
+
+# The video-producer's static HTML showcase/gallery tool. Its stylesheets
+# predate stylelint coverage for this app and are referenced directly from
+# plain .html/.js, not CSS modules, so the CSS-modules camelCase convention
+# below doesn't fit them. Bringing them into line is its own follow-up pass.
+apps/ava-video-producer/showcase

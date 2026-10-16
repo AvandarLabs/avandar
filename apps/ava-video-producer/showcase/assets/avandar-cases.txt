@@ -1,0 +1,13 @@
+Avandar: case records preview
+
+Open the fictional case type.
+
+Review its dataset-backed attributes.
+
+Browse the 240 fictional case records.
+
+Inspect Response case 001.
+
+See case and visit fields together.
+
+Local preview; activity saving is unavailable.

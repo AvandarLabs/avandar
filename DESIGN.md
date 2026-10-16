@@ -22,7 +22,7 @@ colors:
   info: "#3bc9e1"
 typography:
   body:
-    fontFamily: "Figtree, sans-serif"
+    fontFamily: "Figtree Variable, Figtree, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.55

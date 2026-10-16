@@ -1,0 +1,14 @@
+{
+  "preset": "plexus-field",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "1e0ffa503bc3732d02aa9ea7da0f9172a5554a7e50f75ed636ced1ab82fe301b",
+  "posterSha256": "c4bca1728de4c4ac6a54e2625e2f50c079c9c025dbd055281e81402e3a36f2c0",
+  "generatedAt": "2026-10-14T23:54:11.630Z"
+}

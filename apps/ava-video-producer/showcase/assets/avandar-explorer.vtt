@@ -1,0 +1,25 @@
+WEBVTT
+
+open-query
+00:00:02.200 --> 00:00:05.200
+Open the query controls.
+
+filter-eastbank
+00:00:05.533 --> 00:00:09.533
+Filter the records to Eastbank.
+
+eastbank-count
+00:00:09.867 --> 00:00:12.867
+Eastbank has 56 recorded cases.
+
+write-query
+00:00:13.667 --> 00:00:18.333
+Write a query to compare all six districts.
+
+run-query
+00:00:19.200 --> 00:00:23.200
+Run the grouped count for every district.
+
+make-chart
+00:00:23.867 --> 00:00:28.200
+Show the comparison as a bar chart.

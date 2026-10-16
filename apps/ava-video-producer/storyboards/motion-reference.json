@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "id": "motion-reference",
+  "title": "Stock motion references",
+  "description": "Three conceptual stock samples showing integration, connections, and ambient plexus motion. Sample content is illustrative, not product evidence.",
+  "sourceNotes": [
+    "Authored Motion Atlas presets with fixed fictional content. No product footage or measured outcomes."
+  ],
+  "purpose": "loop",
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "delivery": {
+    "width": 1280,
+    "height": 800
+  },
+  "theme": {
+    "ground": "#0b1219"
+  },
+  "captions": false,
+  "narration": [],
+  "shots": [
+    {
+      "id": "integration",
+      "scene": "stock",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "props": {
+        "preset": "source-merge"
+      }
+    },
+    {
+      "id": "connections",
+      "scene": "stock",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "props": {
+        "preset": "node-traversal"
+      }
+    },
+    {
+      "id": "ambient",
+      "scene": "stock",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "props": {
+        "preset": "plexus-field"
+      }
+    }
+  ]
+}

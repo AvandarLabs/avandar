@@ -1,0 +1,48 @@
+{
+  "kind": "actual-product-component-render",
+  "sourceRevision": "3c164aa32b8a60b30885081e7bb0986135e99f70",
+  "sourceFiles": 665,
+  "fps": 30,
+  "width": 1536,
+  "height": 960,
+  "frames": 726,
+  "seconds": 24.2,
+  "posterFrame": 660,
+  "posterSource": "Decoded final MP4 at the completed result hold",
+  "videoSha256": "1b0f9d3b0f9da5638b31f0fe04cfa47d96a356644ab5ed8bbebcd64018f4f81a",
+  "posterSha256": "7084390e4f01259f8373d5aaa56c1a70d4da7ddc7c9076b8357b4003e3b13a01",
+  "fingerprint": {
+    "sourcePlanSha256": "a0a291c0ccd7d016a8439b7b89e16bf59851aa6767243477a5ad80a0bb8f9553",
+    "parsedPlanSha256": "80cdd0921b5d502f7192cdc475ae9a7addcb36a213e317691232710d8b78cb03",
+    "assets": [
+      {
+        "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/activity-boundary.wav",
+        "sha256": "060ad898cf5d2cc526f3fcc3431ddc6f75ef3e79da79bbeb2e65d7c659697d6e"
+      },
+      {
+        "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/browse-records.wav",
+        "sha256": "cc091c9ff7422d80d538fcee9ab250cc7a3a7f81d63a2b5366106c10d378268e"
+      },
+      {
+        "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/inspect-record.wav",
+        "sha256": "bfc54e1ba97246fcb6603a72a6d024f70b721564d13608d293a959cad3538531"
+      },
+      {
+        "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/linked-fields.wav",
+        "sha256": "a5034ceb1a927608f3a9a65b3f1471f2b7953368c919b1d6cfd155acbd789695"
+      },
+      {
+        "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/open-case-type.wav",
+        "sha256": "d96604436fa1f320481660598bab023fc2cebf9ea8386bf8bfa8bc994fafc3ca"
+      },
+      {
+        "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/review-mappings.wav",
+        "sha256": "c244ad1f7ef81b26d940e637fbc417f83bcdfd84838b03a55a97a32ac22642de"
+      }
+    ],
+    "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+  },
+  "pictureGate": "passed",
+  "audio": "macOS Samantha scratch narration; duration and signal checked",
+  "generatedAt": "2026-10-15T10:20:29.120Z"
+}

@@ -1,0 +1,44 @@
+{
+  "kind": "actual-product-component-render",
+  "sourceRevision": "3c164aa32b8a60b30885081e7bb0986135e99f70",
+  "sourceFiles": 665,
+  "fps": 30,
+  "width": 1536,
+  "height": 960,
+  "frames": 786,
+  "seconds": 26.2,
+  "posterFrame": 714,
+  "posterSource": "Decoded final MP4 at the completed result hold",
+  "videoSha256": "508ec98cf578bb4813a477317d7fb0d41c2e754c67e8837eac2173e298543e07",
+  "posterSha256": "770e893f18651cdc54bb1deae4e89aa19f63ea31d1f0515cbfd513e8e1c6e482",
+  "fingerprint": {
+    "sourcePlanSha256": "51c79c59aa5c07ba9b2be47c209ff431d076daac96041403929f5ba92cfbe8b7",
+    "parsedPlanSha256": "1ddd475c5bbaa319555d9cef5ccce522e8d851e4b016d0d3786e99879bdb0be5",
+    "assets": [
+      {
+        "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/name-dashboard.wav",
+        "sha256": "d5c99d8aa8b177249c705d3ad7a9a79dfb0ba2d1196bafc9cadd77e9e8db6e45"
+      },
+      {
+        "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/open-preview.wav",
+        "sha256": "406c7c395ddf827b86ae184493a33954e8ac7d17950f6207ee6c0119ab96cbab"
+      },
+      {
+        "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/review-editor.wav",
+        "sha256": "532e386e89729cfeb236a746cac598c70df6302b67831ec97a7a5f3a0cda61b6"
+      },
+      {
+        "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/save-chart.wav",
+        "sha256": "235d5c1c2d91fa5920305505a42d3561ab9196846960310ed1bf80b94d5513c9"
+      },
+      {
+        "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/unpublished-draft.wav",
+        "sha256": "55663dd772815530a146e58a6de9307c96fec844dd69624f949f0e6f6ddbc049"
+      }
+    ],
+    "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+  },
+  "pictureGate": "passed",
+  "audio": "macOS Samantha scratch narration; duration and signal checked",
+  "generatedAt": "2026-10-15T10:18:39.583Z"
+}

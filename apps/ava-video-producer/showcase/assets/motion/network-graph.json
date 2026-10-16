@@ -1,0 +1,14 @@
+{
+  "preset": "network-graph",
+  "fingerprint": "0413712153a71a484e073301c4530379a194e7c0b8957dbad79acd73b9fd4643",
+  "frames": 180,
+  "fps": 30,
+  "width": 1280,
+  "height": 800,
+  "seconds": 6,
+  "audio": false,
+  "gate": "passed including loop seam",
+  "videoSha256": "af11a09b5232c972b3a3fe7e66c9d7ff4557a7480c57535d42b895665fa34f32",
+  "posterSha256": "41dd7d67a29e55798d1f7a59668d256f960f716090aa68eeaff8bc585cb157bd",
+  "generatedAt": "2026-10-14T23:53:38.152Z"
+}

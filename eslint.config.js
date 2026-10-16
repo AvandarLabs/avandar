@@ -11,37 +11,9 @@ import eslintPluginReactRefresh from "eslint-plugin-react-refresh";
 import eslintPluginUnusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import tseslint from "typescript-eslint";
-
-/**
- * The Deno-safe `@avandar/*` packages are exactly those mapped in every
- * `deno.json` import map: clients, logger, models, modules, and utils. The rest
- * are browser- or Node-only, have no Deno mapping, and will fail `deno check`
- * if they reach Deno-allowable code.
- */
-const DENO_UNSAFE_PACKAGES = [
-  { name: "@avandar/etl", runtime: "Node-only" },
-  { name: "@avandar/query-hooks", runtime: "browser-only" },
-  { name: "@avandar/browser-utils", runtime: "browser-only" },
-  { name: "@avandar/hooks", runtime: "browser-only" },
-  { name: "@avandar/ui", runtime: "browser-only" },
-].map(({ name, runtime }) => {
-  return {
-    name,
-    message: `Deno-allowable code: ${name} is ${runtime} and is not in the deno.json import maps.`,
-  };
-});
-
-const NO_RELATIVE_IMPORTS = {
-  regex: "^\\.{1,2}/",
-  message:
-    "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../).",
-};
-
-const NO_APP_IMPORTS = {
-  group: ["@/*", "$/*"],
-  message:
-    "Publishable packages cannot import app code. `@/*` (src) and `$/*` (shared) resolve here but would be bundled into the published tarball. Move what you need into a package, or take it as a parameter.",
-};
+import { denoRestrictions } from "./eslint/deno-restrictions.js";
+import { packageRestrictions } from "./eslint/package-restrictions.js";
+import { privacyChokepoint } from "./eslint/privacy-chokepoint.js";
 
 export default [
   {
@@ -56,6 +28,11 @@ export default [
       ".opencode/**",
       "agent-skills/**",
       "apps/desktop/build/**",
+      // Video exports and generated browser bundles are not source code.
+      ".videos/**",
+      "apps/ava-video-producer/out/**",
+      "apps/ava-video-producer/src/avandar/generated/**",
+      "apps/ava-video-producer/showcase/motion-gallery.js",
       "apps/desktop/bundle/**",
       "apps/desktop/.electrobun-cache/**",
       // `playwright test` writes its minified HTML report and trace viewer
@@ -255,51 +232,8 @@ export default [
       ],
     },
   },
-  {
-    files: [
-      "supabase/**/*.{js,jsx,ts,tsx}",
-      "shared/**/*.{js,jsx,ts,tsx}",
-      "packages/shared/**/*.{js,jsx,ts,tsx}",
-    ],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        { paths: DENO_UNSAFE_PACKAGES, patterns: [NO_RELATIVE_IMPORTS] },
-      ],
-    },
-  },
-  {
-    // Publishable packages must not reach back into the app.
-    // `tsconfig.base.json` maps `@/*` and `$/*` for the whole repo, so these
-    // resolve from inside a package and type-check cleanly; tsup would then
-    // inline app source into the published `dist/`, and nothing downstream
-    // would notice. `verify:packages` cannot catch it either, because the
-    // resulting tarball is self-consistent. This is the only thing standing
-    // between the app and the registry.
-    //
-    // This must sit AFTER the Deno block: flat config replaces a rule's options
-    // wholesale rather than merging them, so an earlier declaration would be
-    // dropped for `packages/shared/**`. For the same reason the block below
-    // re-states the Deno restrictions, which apply only to
-    // `packages/shared/**`. Note `shared/**` and `supabase/**` are app code and
-    // may import `$/*` freely; only `packages/**` is restricted.
-    files: ["packages/**/*.{js,jsx,ts,tsx}"],
-    rules: {
-      "no-restricted-imports": ["error", { patterns: [NO_APP_IMPORTS] }],
-    },
-  },
-  {
-    files: ["packages/shared/**/*.{js,jsx,ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          paths: DENO_UNSAFE_PACKAGES,
-          patterns: [NO_RELATIVE_IMPORTS, NO_APP_IMPORTS],
-        },
-      ],
-    },
-  },
+  ...denoRestrictions,
+  ...packageRestrictions,
   {
     files: ["**/vitest.config.ts"],
     rules: {
@@ -330,46 +264,48 @@ export default [
     ],
   },
 
-  /**
-   * Enforce that all data crossing the LLM boundary goes through
-   * `src/lib/privacy/decideIfDataCanCrossBoundary.tsx`. The ack-token issuance
-   * and the pending-acks queue are the load-bearing pieces of the consent
-   * pipeline, importing them anywhere else lets a caller forge a token
-   * or drop the queue check. This forces `decideIfDataCanCrossBoundary` as the
-   * single chokepoint for data crossing the LLM boundary.
-   *
-   * Adding a new caller for `issueAckToken` or `registerAck`? Don't. Add
-   * a new context to `CrossBoundaryContext` and route through
-   * `decideIfDataCanCrossBoundary` instead.
-   */
+  ...privacyChokepoint,
   {
-    files: ["src/**/*.{ts,tsx}"],
-    ignores: [
-      "src/lib/privacy/decideIfDataCanCrossBoundary.tsx",
-      "src/lib/privacy/sessionSecret.ts",
-      "src/lib/privacy/pendingAcks.ts",
-      "src/lib/privacy/**/*.test.ts",
-    ],
+    // The imported Remotion toolkit retains its established frame DSL and
+    // fixture types. Keep behavioral rules active without rewriting its API.
+    files: ["apps/ava-video-producer/**/*.{ts,tsx,js,mjs}"],
     rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          paths: [
-            {
-              name: "@/lib/privacy/sessionSecret",
-              importNames: ["issueAckToken"],
-              message:
-                "Privacy chokepoint: ack tokens must only be minted inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead.",
-            },
-            {
-              name: "@/lib/privacy/pendingAcks",
-              importNames: ["registerAck"],
-              message:
-                "Privacy chokepoint: pending acks must only be registered inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead.",
-            },
-          ],
-        },
-      ],
+      "max-len": "off",
+      "arrow-body-style": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "react/function-component-definition": "off",
+      // Remotion and esbuild review use full reloads, not Vite Fast Refresh.
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
+    // Film controllers and capture doubles deliberately emulate partial APIs.
+    files: [
+      "apps/ava-video-producer/avandar-adapter/**/*.{ts,tsx}",
+      "apps/ava-video-producer/tests/**/*.ts",
+    ],
+    rules: { "@typescript-eslint/no-explicit-any": "off" },
+  },
+  {
+    files: ["apps/ava-video-producer/avandar-adapter/index.tsx"],
+    rules: {
+      "import-x/no-unresolved": ["error", { ignore: ["^@product-assets/"] }],
+    },
+  },
+  {
+    // Playwright's generated CommonJS export table is not statically named.
+    files: [
+      "apps/ava-video-producer/capture-flows/**/*.mjs",
+      "apps/ava-video-producer/scripts/measure-avandar.mjs",
+    ],
+    rules: { "import-x/named": "off" },
+  },
+  {
+    // This config loads via Node's native ESM loader, not a bundler, so its
+    // own relative imports need real extensions to resolve at all.
+    files: ["eslint.config.js", "eslint/**/*.js"],
+    rules: {
+      "import-x/extensions": ["error", "ignorePackages", { js: "always" }],
     },
   },
 ];

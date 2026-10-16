@@ -1,0 +1,39 @@
+node_modules
+out
+.cache
+.DS_Store
+public/payoff
+
+# clips shot against a real product — keep them local, they need assets
+# that do not belong in this repo
+src/compositions/Athana.tsx
+
+# assets for the Athana clip — not ours to publish
+public/athana
+src/compositions/AthanaLaunch.tsx
+scripts/beats/athana-launch.txt
+
+# Local credentials and generated scratch files
+.env
+.env.*
+*.log
+.temp/
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# Generated speech and imported full recordings; curated showcase media is explicit.
+public/narration/
+public/audio/
+
+# Rebuilt from the current Avandar worktree, never committed.
+src/avandar/generated/*.js
+src/avandar/generated/*.css
+src/avandar/generated/*.json
+
+# Theme values are read directly from the workspace during gallery builds.
+src/gallery/theme-colors.json
+
+# Videos are generated on demand. Never track encoded exports.
+*.mp4
+showcase/motion-gallery.js
