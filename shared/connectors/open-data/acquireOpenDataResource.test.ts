@@ -43,6 +43,9 @@ function _entry(
     apiBaseUrl: BASE_URL,
     apiResourceId: RESOURCE_ID,
     apiResourceFormat: "CSV",
+    cachedObjectPath: undefined,
+    cachedSourceVersion: undefined,
+    cachedAt: undefined,
     ...overrides,
   };
 }

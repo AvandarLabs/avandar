@@ -43,6 +43,9 @@ const DBReadSchema = z.object({
   api_base_url: z.string().nullable(),
   api_resource_id: z.string().nullable(),
   api_resource_format: z.string().nullable(),
+  cached_object_path: z.string().nullable(),
+  cached_source_version: z.string().nullable(),
+  cached_at: z.iso.datetime({ offset: true }).nullable(),
 });
 
 export const OpenDataCatalogEntryParsers =

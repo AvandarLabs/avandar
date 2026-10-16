@@ -71,6 +71,18 @@ create table public.catalog_entries__open_data (
   -- call; the live value stays authoritative and a mismatch is an error rather
   -- than a reason to parse the bytes as something else.
   api_resource_format text,
+  -- Where this entry's cached copy lives in the `open-data-catalog` bucket,
+  -- once one has been written. Null until the first successful fetch. Only
+  -- ever set on an `api_resource` entry: a `pipeline_parquet` entry already
+  -- has a stable Parquet object named by `parquet_file_name` and never needs
+  -- a cache.
+  cached_object_path text,
+  -- The freshness token captured when the cache was last written. Compared
+  -- against a live metadata read before serving the cache; never parsed.
+  cached_source_version text,
+  -- When the cache was last written. Informational only:
+  -- cached_source_version is what correctness depends on.
+  cached_at timestamptz,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline entry carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -84,7 +96,10 @@ create table public.catalog_entries__open_data (
       api_service is null and
       api_base_url is null and
       api_resource_id is null and
-      api_resource_format is null
+      api_resource_format is null and
+      cached_object_path is null and
+      cached_source_version is null and
+      cached_at is null
     )
   ),
   -- An API entry names its service, instance, dataset and resource, and
@@ -101,6 +116,13 @@ create table public.catalog_entries__open_data (
       pipeline_name is null and
       pipeline_run_id is null
     )
+  ),
+  -- A cache is written atomically or not at all: either every column is set,
+  -- or every column is null. There is no state where only one has a value.
+  constraint catalog_entries__open_data__cache_complete check (
+    (cached_object_path is null and cached_source_version is null and cached_at is null)
+    or
+    (cached_object_path is not null and cached_source_version is not null and cached_at is not null)
   ),
   -- Resource bytes are fetched from this host, so it must be TLS. Some CKAN
   -- resources point at upstream APIs over plain HTTP; those are rejected here

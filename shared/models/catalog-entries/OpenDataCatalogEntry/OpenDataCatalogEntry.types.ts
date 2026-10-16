@@ -86,6 +86,22 @@ export type OpenDataCatalogEntryRead = {
    * live value stays authoritative.
    */
   apiResourceFormat: string | undefined;
+
+  /**
+   * Where this entry's cached copy lives in the `open-data-catalog` bucket.
+   * Undefined until the first successful fetch. Only ever set on an
+   * `api_resource` entry.
+   */
+  cachedObjectPath: string | undefined;
+
+  /**
+   * The freshness token captured when the cache was last written. Compared
+   * against a live metadata read, never parsed.
+   */
+  cachedSourceVersion: string | undefined;
+
+  /** When the cache was last written. Informational only. */
+  cachedAt: string | undefined;
 };
 
 /**

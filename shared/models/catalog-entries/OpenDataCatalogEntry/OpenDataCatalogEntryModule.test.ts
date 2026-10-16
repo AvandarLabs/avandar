@@ -37,6 +37,9 @@ function _entry(
     apiBaseUrl: undefined,
     apiResourceId: undefined,
     apiResourceFormat: undefined,
+    cachedObjectPath: undefined,
+    cachedSourceVersion: undefined,
+    cachedAt: undefined,
     ...overrides,
   };
 }

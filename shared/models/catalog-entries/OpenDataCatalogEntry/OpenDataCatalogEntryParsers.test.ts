@@ -24,6 +24,9 @@ const SHARED_DB_COLUMNS = {
   description: null,
   notes: null,
   metadata: null,
+  cached_object_path: null,
+  cached_source_version: null,
+  cached_at: null,
 } as const;
 
 function _pipelineDBRow(): OpenDataCatalogEntryModel["DBRead"] {

@@ -171,6 +171,9 @@ export type Database = {
           api_service:
             | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
             | null
+          cached_at: string | null
+          cached_object_path: string | null
+          cached_source_version: string | null
           canonical_urls: string[] | null
           coverage_end_date: string | null
           coverage_start_date: string | null
@@ -201,6 +204,9 @@ export type Database = {
           api_service?:
             | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
             | null
+          cached_at?: string | null
+          cached_object_path?: string | null
+          cached_source_version?: string | null
           canonical_urls?: string[] | null
           coverage_end_date?: string | null
           coverage_start_date?: string | null
@@ -231,6 +237,9 @@ export type Database = {
           api_service?:
             | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
             | null
+          cached_at?: string | null
+          cached_object_path?: string | null
+          cached_source_version?: string | null
           canonical_urls?: string[] | null
           coverage_end_date?: string | null
           coverage_start_date?: string | null
