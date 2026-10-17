@@ -17,7 +17,7 @@
  *
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
- *     catalog entries, dashboards, concepts + their attributes + attribute
+ *     catalog listings, dashboards, concepts + their attributes + attribute
  *     mappings, individuals, user profile, plus `workspaces` and
  *     `workspace_memberships` so the workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
@@ -39,8 +39,8 @@ const ACTIVE_TABLES = [
   "datasets__virtual",
   "datasets__xlsx_file",
   "datasets__postgres_table",
-  "catalog_entries__open_data",
-  "catalog_entries__dataset_column",
+  "catalog_listings__open_data",
+  "catalog_listings__dataset_column",
   "dashboards",
   "concepts",
   "concept_attributes",
@@ -108,6 +108,14 @@ const DEPRECATED_TABLES = [
   "entities",
   "value_extractors__dataset_column_value",
   "value_extractors__manual_entry",
+  // Renamed by 20261017112819 ("rename catalog_entries to
+  // catalog_listings"). The old names have to stay recognisable so the
+  // whole pre-rename history, and the rename ALTER TABLEs themselves,
+  // partition cleanly:
+  //   catalog_entries__open_data    -> catalog_listings__open_data
+  //   catalog_entries__dataset_column -> catalog_listings__dataset_column
+  "catalog_entries__open_data",
+  "catalog_entries__dataset_column",
 ] as const;
 
 /**

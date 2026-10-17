@@ -3,7 +3,7 @@
 -- Every identifier below is deliberately synthetic and `pgtap-fixture`-prefixed,
 -- and the hosts are `.invalid`. This file inserts into a table that real rows
 -- also live in, and `unique_parquet_file_pipeline` is enforced across all of
--- them, so a fixture sharing a key with a real catalog entry makes the insert
+-- them, so a fixture sharing a key with a real catalog listing makes the insert
 -- fail. Realistic-looking values are exactly the hazard: an earlier version used
 -- the World Bank WDI pipeline's own `series.parquet` / `world-bank__wdi`, which
 -- collides with what that pipeline actually writes.
@@ -14,28 +14,28 @@ select plan(22);
 
 -- ---------------------------------------------------------------------------
 -- The three pipeline columns become nullable, because only a pipeline-produced
--- entry has a Parquet object and a pipeline run behind it.
+-- listing has a Parquet object and a pipeline run behind it.
 -- ---------------------------------------------------------------------------
 
 select col_is_null(
   'public',
-  'catalog_entries__open_data',
+  'catalog_listings__open_data',
   'parquet_file_name',
-  'parquet_file_name is nullable, so an API-backed entry needs no Parquet object'
+  'parquet_file_name is nullable, so an API-backed listing needs no Parquet object'
 );
 
 select col_is_null(
   'public',
-  'catalog_entries__open_data',
+  'catalog_listings__open_data',
   'pipeline_name',
-  'pipeline_name is nullable, so an API-backed entry needs no pipeline'
+  'pipeline_name is nullable, so an API-backed listing needs no pipeline'
 );
 
 select col_is_null(
   'public',
-  'catalog_entries__open_data',
+  'catalog_listings__open_data',
   'pipeline_run_id',
-  'pipeline_run_id is nullable, so an API-backed entry needs no pipeline run'
+  'pipeline_run_id is nullable, so an API-backed listing needs no pipeline run'
 );
 
 -- ---------------------------------------------------------------------------
@@ -45,22 +45,22 @@ select col_is_null(
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
        external_organization_name)
     values ('pgtap-fixture.parquet', 'Series', 'pgtap-fixture-pipeline', 'run-1',
             'World Bank')$$,
-  'a pipeline entry inserts without naming access_kind'
+  'a pipeline listing inserts without naming access_kind'
 );
 
 select is(
   (
     select access_kind::text
-    from public.catalog_entries__open_data
+    from public.catalog_listings__open_data
     where parquet_file_name = 'pgtap-fixture.parquet'
   ),
   'pipeline_parquet',
-  'an entry inserted the old way reads back as the pipeline kind'
+  'a listing inserted the old way reads back as the pipeline kind'
 );
 
 -- The pipeline upserts with `on conflict (parquet_file_name, pipeline_name)`.
@@ -68,7 +68,7 @@ select is(
 -- partial index, this statement would fail rather than update.
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
        external_organization_name)
     values ('pgtap-fixture.parquet', 'Series v2', 'pgtap-fixture-pipeline', 'run-2',
@@ -82,7 +82,7 @@ select lives_ok(
 select is(
   (
     select display_name
-    from public.catalog_entries__open_data
+    from public.catalog_listings__open_data
     where parquet_file_name = 'pgtap-fixture.parquet'
       and pipeline_name = 'pgtap-fixture-pipeline'
   ),
@@ -93,7 +93,7 @@ select is(
 select is(
   (
     select count(*)
-    from public.catalog_entries__open_data
+    from public.catalog_listings__open_data
     where parquet_file_name = 'pgtap-fixture.parquet'
       and pipeline_name = 'pgtap-fixture-pipeline'
   ),
@@ -102,32 +102,32 @@ select is(
 );
 
 -- ---------------------------------------------------------------------------
--- API-backed entries. Postgres 15 defaults to NULLS DISTINCT, so any number of
+-- API-backed listings. Postgres 15 defaults to NULLS DISTINCT, so any number of
 -- these coexist under unique_parquet_file_pipeline with both key columns null.
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-a',
             'pgtap-fixture-resource-a', 'CSV')$$,
-  'an API entry inserts with no Parquet object and no pipeline'
+  'an API listing inserts with no Parquet object and no pipeline'
 );
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Movement Range', 'Meta', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-b',
             'pgtap-fixture-resource-b', 'CSV')$$,
-  'a second API entry coexists, because null keys are distinct'
+  'a second API listing coexists, because null keys are distinct'
 );
 
 select throws_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence again', 'OCHA', 'api_resource', 'ckan',
@@ -139,13 +139,13 @@ select throws_ok(
 );
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence elsewhere', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture-other.invalid', 'pgtap-fixture-dataset-a',
             'pgtap-fixture-resource-a', 'CSV')$$,
-  'the same dataset and resource id on another CKAN instance is a separate entry'
+  'the same dataset and resource id on another CKAN instance is a separate listing'
 );
 
 -- ---------------------------------------------------------------------------
@@ -154,29 +154,29 @@ select lives_ok(
 -- ---------------------------------------------------------------------------
 
 select throws_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_format)
     values ('No resource named', 'OCHA', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'pgtap-fixture-dataset-b', 'CSV')$$,
   '23514',
   null,
-  'an API entry that names no resource is refused'
+  'an API listing that names no resource is refused'
 );
 
 select throws_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
        external_organization_name, api_service)
     values ('pgtap-fixture-other.parquet', 'Mixed', 'pgtap-fixture-pipeline', 'run-3',
             'World Bank', 'ckan')$$,
   '23514',
   null,
-  'a pipeline entry carrying an API column is refused'
+  'a pipeline listing carrying an API column is refused'
 );
 
 select throws_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Insecure', 'OCHA', 'api_resource', 'ckan',
@@ -189,11 +189,11 @@ select throws_ok(
 
 -- ---------------------------------------------------------------------------
 -- The write-back cache columns. Written atomically: either all three are set,
--- or none are. Only an `api_resource` entry may carry cache state at all.
+-- or none are. Only an `api_resource` listing may carry cache state at all.
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values
@@ -204,7 +204,7 @@ select lives_ok(
 );
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        cached_object_path, cached_source_version, cached_at)
@@ -217,7 +217,7 @@ select lives_ok(
 );
 
 select throws_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        cached_object_path)
@@ -232,7 +232,7 @@ select throws_ok(
 );
 
 select throws_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (id, display_name, external_organization_name, access_kind,
        parquet_file_name, pipeline_name, pipeline_run_id,
        cached_object_path, cached_source_version, cached_at)
@@ -247,15 +247,15 @@ select throws_ok(
 );
 
 -- ---------------------------------------------------------------------------
--- catalog_entries__open_data__api_resource_unique must be a plain index, not
+-- catalog_listings__open_data__api_resource_unique must be a plain index, not
 -- a partial one. PostgREST's `.upsert(rows, {onConflict: "..."})` can only
 -- generate a bare column-list `ON CONFLICT`, and Postgres refuses to infer a
 -- partial index as that clause's arbiter. This is the exact conflict target
--- the metacatalog pipeline's upsert uses.
+-- the drive-index pipeline's upsert uses.
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values
@@ -279,23 +279,23 @@ set local role authenticated;
 select is(
   (
     select display_name
-    from public.catalog_entries__open_data
+    from public.catalog_listings__open_data
     where api_base_url = 'https://pgtap-fixture.invalid'
       and api_resource_id = 'pgtap-fixture-resource-a'
   ),
   'Operational Presence',
-  'authenticated reads an API catalog entry'
+  'authenticated reads an API catalog listing'
 );
 
 select throws_ok(
-  $$insert into public.catalog_entries__open_data
+  $$insert into public.catalog_listings__open_data
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Smuggled', 'Nobody', 'api_resource', 'ckan',
             'https://pgtap-fixture.invalid', 'smuggled', 'smuggled-resource', 'CSV')$$,
   '42501',
   null,
-  'authenticated cannot insert a catalog entry'
+  'authenticated cannot insert a catalog listing'
 );
 
 reset role;

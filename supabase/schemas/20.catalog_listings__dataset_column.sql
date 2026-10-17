@@ -1,14 +1,14 @@
 /**
- * Links a catalog entry (an open data source) to one of its dataset columns.
+ * Links a catalog listing (an open data source) to one of its dataset columns.
  */
-create table if not exists catalog_entries__dataset_column (
+create table if not exists catalog_listings__dataset_column (
   id uuid primary key default gen_random_uuid(),
-  catalog_entry_id uuid not null references catalog_entries__open_data (id) on delete cascade,
+  catalog_listing_id uuid not null references catalog_listings__open_data (id) on delete cascade,
   -- Name of the column in the dataset
   column_name text not null,
   -- Display order of the column in the dataset
   display_order integer,
-  -- Timestamp of when the catalog entry dataset column was created.
+  -- Timestamp of when the catalog listing dataset column was created.
   created_at timestamp with time zone default now(),
   -- Timestamp of when this row was last updated.
   updated_at timestamp with time zone default now(),
@@ -26,33 +26,33 @@ create table if not exists catalog_entries__dataset_column (
 );
 
 -- RLS Policies
-alter table catalog_entries__dataset_column enable row level security;
+alter table catalog_listings__dataset_column enable row level security;
 
 -- Data API privileges.
 --
 -- Read-only: the column catalog is populated by the backend.
 grant
 select
-  on table public.catalog_entries__dataset_column to authenticated;
+  on table public.catalog_listings__dataset_column to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-delete on table public.catalog_entries__dataset_column to service_role;
+delete on table public.catalog_listings__dataset_column to service_role;
 
 -- Any signed-in user may read the catalog's column associations.
 --
 -- Scoped `to authenticated` rather than left unscoped. An unscoped policy
 -- defaults to role `public`, which includes `anon`, so this table was readable
 -- by an unauthenticated visitor. Nothing anonymous browses the open data
--- catalog, and the sibling table `catalog_entries__open_data` is already
+-- catalog, and the sibling table `catalog_listings__open_data` is already
 -- authenticated-only, so the two now agree.
-create policy "User can select catalog dataset columns" on catalog_entries__dataset_column for
+create policy "User can select catalog listing columns" on catalog_listings__dataset_column for
 select
   to authenticated using (true);
 
-create trigger tr_catalog_entries__dataset_column__set_updated_at before
-update on catalog_entries__dataset_column for each row
+create trigger tr_catalog_listings__dataset_column__set_updated_at before
+update on catalog_listings__dataset_column for each row
 execute function public.util__set_updated_at ();

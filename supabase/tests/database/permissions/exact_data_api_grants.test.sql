@@ -30,8 +30,8 @@ with public_tables as (
     public_tables
   where
     table_name not in (
-      'catalog_entries__dataset_column',
-      'catalog_entries__open_data',
+      'catalog_listings__dataset_column',
+      'catalog_listings__open_data',
       'db_connections',
       'db_connections__postgres',
       'subscriptions',
@@ -67,8 +67,8 @@ with public_tables as (
     public_tables
   where
     table_name in (
-      'catalog_entries__dataset_column',
-      'catalog_entries__open_data',
+      'catalog_listings__dataset_column',
+      'catalog_listings__open_data',
       'db_connections',
       'db_connections__postgres',
       'subscriptions',

@@ -10,8 +10,8 @@ create table public.datasets__open_data (
   created_at timestamptz not null default now(),
   -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
-  -- Catalog entry this dataset belongs to
-  catalog_entry_id uuid not null references public.catalog_entries__open_data (id) on update cascade on delete cascade
+  -- Catalog listing this dataset was adopted from
+  catalog_listing_id uuid not null references public.catalog_listings__open_data (id) on update cascade on delete cascade
 );
 
 -- Enable row level security

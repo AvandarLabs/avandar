@@ -121,10 +121,10 @@ export type Database = {
           },
         ]
       }
-      catalog_entries__dataset_column: {
+      catalog_listings__dataset_column: {
         Row: {
           cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
-          catalog_entry_id: string
+          catalog_listing_id: string
           column_name: string
           created_at: string | null
           display_order: number | null
@@ -134,7 +134,7 @@ export type Database = {
         }
         Insert: {
           cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
-          catalog_entry_id: string
+          catalog_listing_id: string
           column_name: string
           created_at?: string | null
           display_order?: number | null
@@ -144,7 +144,7 @@ export type Database = {
         }
         Update: {
           cast_data_type?: Database["public"]["Enums"]["datasets__duckdb_data_type"]
-          catalog_entry_id?: string
+          catalog_listing_id?: string
           column_name?: string
           created_at?: string | null
           display_order?: number | null
@@ -154,22 +154,22 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "catalog_entries__dataset_column_catalog_entry_id_fkey"
-            columns: ["catalog_entry_id"]
+            foreignKeyName: "catalog_listings__dataset_column_catalog_listing_id_fkey"
+            columns: ["catalog_listing_id"]
             isOneToOne: false
-            referencedRelation: "catalog_entries__open_data"
+            referencedRelation: "catalog_listings__open_data"
             referencedColumns: ["id"]
           },
         ]
       }
-      catalog_entries__open_data: {
+      catalog_listings__open_data: {
         Row: {
-          access_kind: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          access_kind: Database["public"]["Enums"]["catalog_listings__open_data__access_kind"]
           api_base_url: string | null
           api_resource_format: string | null
           api_resource_id: string | null
           api_service:
-            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | Database["public"]["Enums"]["catalog_listings__open_data__api_service"]
             | null
           cached_at: string | null
           cached_object_path: string | null
@@ -197,12 +197,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          access_kind?: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          access_kind?: Database["public"]["Enums"]["catalog_listings__open_data__access_kind"]
           api_base_url?: string | null
           api_resource_format?: string | null
           api_resource_id?: string | null
           api_service?:
-            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | Database["public"]["Enums"]["catalog_listings__open_data__api_service"]
             | null
           cached_at?: string | null
           cached_object_path?: string | null
@@ -230,12 +230,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          access_kind?: Database["public"]["Enums"]["catalog_entries__open_data__access_kind"]
+          access_kind?: Database["public"]["Enums"]["catalog_listings__open_data__access_kind"]
           api_base_url?: string | null
           api_resource_format?: string | null
           api_resource_id?: string | null
           api_service?:
-            | Database["public"]["Enums"]["catalog_entries__open_data__api_service"]
+            | Database["public"]["Enums"]["catalog_listings__open_data__api_service"]
             | null
           cached_at?: string | null
           cached_object_path?: string | null
@@ -716,7 +716,7 @@ export type Database = {
       }
       datasets__open_data: {
         Row: {
-          catalog_entry_id: string
+          catalog_listing_id: string
           created_at: string
           dataset_id: string
           id: string
@@ -724,7 +724,7 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
-          catalog_entry_id: string
+          catalog_listing_id: string
           created_at?: string
           dataset_id: string
           id?: string
@@ -732,7 +732,7 @@ export type Database = {
           workspace_id: string
         }
         Update: {
-          catalog_entry_id?: string
+          catalog_listing_id?: string
           created_at?: string
           dataset_id?: string
           id?: string
@@ -741,10 +741,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "datasets__open_data_catalog_entry_id_fkey"
-            columns: ["catalog_entry_id"]
+            foreignKeyName: "datasets__open_data_catalog_listing_id_fkey"
+            columns: ["catalog_listing_id"]
             isOneToOne: false
-            referencedRelation: "catalog_entries__open_data"
+            referencedRelation: "catalog_listings__open_data"
             referencedColumns: ["id"]
           },
           {
@@ -1911,7 +1911,7 @@ export type Database = {
       }
       rpc_datasets__add_open_data_dataset: {
         Args: {
-          p_catalog_entry_id: string
+          p_catalog_listing_id: string
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_dataset_description: string
           p_dataset_id: string
@@ -2338,10 +2338,10 @@ export type Database = {
         | "count"
         | "max"
         | "min"
-      catalog_entries__open_data__access_kind:
+      catalog_listings__open_data__access_kind:
         | "pipeline_parquet"
         | "api_resource"
-      catalog_entries__open_data__api_service: "ckan" | "socrata"
+      catalog_listings__open_data__api_service: "ckan" | "socrata"
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       dashboard_snapshot_transition_kind:
         | "publish"
@@ -2592,11 +2592,11 @@ export const Constants = {
         "max",
         "min",
       ],
-      catalog_entries__open_data__access_kind: [
+      catalog_listings__open_data__access_kind: [
         "pipeline_parquet",
         "api_resource",
       ],
-      catalog_entries__open_data__api_service: ["ckan", "socrata"],
+      catalog_listings__open_data__api_service: ["ckan", "socrata"],
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       dashboard_snapshot_transition_kind: [
         "publish",
