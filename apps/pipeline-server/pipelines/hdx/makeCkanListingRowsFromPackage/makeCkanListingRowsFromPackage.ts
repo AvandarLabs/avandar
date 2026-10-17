@@ -1,7 +1,7 @@
 import { isReadableCkanResource } from "$/connectors/open-data/isReadableCkanResource/isReadableCkanResource";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
-import type { ConfiguredDrive } from "@pipelines/open-data-catalog-listings/configuredDrives/configuredDrives";
-import type { CatalogListingRow } from "@pipelines/open-data-catalog-listings/CatalogListingRow.types";
+import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
+import type { DataCatalogListingRow } from "@pipelines/shared/DataCatalogListingRow.types";
 
 /**
  * Builds one row per CKAN resource worth reading, using the exact same
@@ -10,9 +10,9 @@ import type { CatalogListingRow } from "@pipelines/open-data-catalog-listings/Ca
  * via `package_list`, just not catalog-worthy.
  */
 export function makeCkanListingRowsFromPackage(params: {
-  drive: Readonly<ConfiguredDrive>;
+  drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
-}): CatalogListingRow[] {
+}): DataCatalogListingRow[] {
   const { drive, ckanPackage } = params;
   return ckanPackage.resources
     .filter(isReadableCkanResource)
@@ -26,6 +26,6 @@ export function makeCkanListingRowsFromPackage(params: {
         api_resource_format: resource.format.toUpperCase(),
         display_name: resource.name,
         external_organization_name: drive.organizationName,
-      } satisfies CatalogListingRow;
+      } satisfies DataCatalogListingRow;
     });
 }

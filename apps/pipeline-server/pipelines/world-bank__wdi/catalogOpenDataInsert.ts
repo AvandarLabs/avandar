@@ -128,7 +128,7 @@ function _buildMetadataForTable(options: {
 }
 
 /**
- * Upserts one `catalog_listings__open_data` row per loaded Parquet dataset.
+ * Upserts one `data_catalog_listings` row per loaded Parquet dataset.
  * `parquet_file_name` is the Parquet object stem (e.g. `series.parquet`).
  * Conflicts on (`parquet_file_name`, `pipeline_name`) replace the existing row.
  */
@@ -190,7 +190,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   });
 
   const { data: upsertedEntries, error } = await supabase
-    .from("catalog_listings__open_data")
+    .from("data_catalog_listings")
     .upsert(rows, {
       onConflict: "parquet_file_name,pipeline_name",
     })
@@ -198,7 +198,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
 
   if (error) {
     throw new Error(
-      `catalog_listings__open_data upsert failed: ${error.message}`,
+      `data_catalog_listings upsert failed: ${error.message}`,
     );
   }
 
@@ -211,13 +211,13 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   });
 
   const { error: deleteColumnsError } = await supabase
-    .from("catalog_listings__dataset_column")
+    .from("data_catalog_listings__relation_columns")
     .delete()
     .in("catalog_listing_id", upsertedCatalogEntryIds);
 
   if (deleteColumnsError) {
     throw new Error(
-      `catalog_listings__dataset_column delete failed: ` +
+      `data_catalog_listings__relation_columns delete failed: ` +
         `${deleteColumnsError.message}`,
     );
   }
@@ -269,12 +269,12 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   }
 
   const { error: insertColumnsError } = await supabase
-    .from("catalog_listings__dataset_column")
+    .from("data_catalog_listings__relation_columns")
     .insert(columnRows);
 
   if (insertColumnsError) {
     throw new Error(
-      `catalog_listings__dataset_column insert failed: ` +
+      `data_catalog_listings__relation_columns insert failed: ` +
         `${insertColumnsError.message}`,
     );
   }

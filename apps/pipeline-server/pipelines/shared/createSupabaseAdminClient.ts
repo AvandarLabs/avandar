@@ -10,7 +10,7 @@ export function createSupabaseAdminClient(): SupabaseClient {
 
   if (!supabaseUrl || !serviceRoleKey) {
     throw new Error(
-      "Inserting catalog_listings__open_data requires SUPABASE_URL and " +
+      "Inserting data_catalog_listings requires SUPABASE_URL and " +
         "SUPABASE_SERVICE_ROLE_KEY.",
     );
   }

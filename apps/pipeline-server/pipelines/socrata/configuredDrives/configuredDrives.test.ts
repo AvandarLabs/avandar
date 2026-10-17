@@ -1,10 +1,10 @@
-import { CONFIGURED_DRIVES } from "@pipelines/open-data-catalog-listings/configuredDrives/configuredDrives";
+import { CONFIGURED_DRIVES } from "@pipelines/socrata/configuredDrives/configuredDrives";
 import { describe, expect, it } from "vitest";
 
 describe("CONFIGURED_DRIVES", () => {
-  it("has no duplicate (apiService, baseUrl) pair", () => {
+  it("has no duplicate baseUrl", () => {
     const keys = CONFIGURED_DRIVES.map((drive) => {
-      return `${drive.apiService}:${drive.baseUrl}`;
+      return drive.baseUrl;
     });
 
     expect(new Set(keys).size).toBe(keys.length);

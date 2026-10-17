@@ -1,10 +1,9 @@
-import { makeListingRowFromSocrataResult } from "@pipelines/open-data-catalog-listings/makeListingRowFromSocrataResult/makeListingRowFromSocrataResult";
+import { makeListingRowFromSocrataResult } from "@pipelines/socrata/makeListingRowFromSocrataResult/makeListingRowFromSocrataResult";
 import { describe, expect, it } from "vitest";
 import type { SocrataDiscoveryResult } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
-import type { ConfiguredDrive } from "@pipelines/open-data-catalog-listings/configuredDrives/configuredDrives";
+import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
 
 const SOCRATA_DRIVE: ConfiguredDrive = {
-  apiService: "socrata",
   baseUrl: "https://data.cityofnewyork.us",
   organizationName: "NYC Open Data",
 };

@@ -1,6 +1,6 @@
 import type { SocrataDiscoveryResult } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
-import type { ConfiguredDrive } from "@pipelines/open-data-catalog-listings/configuredDrives/configuredDrives";
-import type { CatalogListingRow } from "@pipelines/open-data-catalog-listings/CatalogListingRow.types";
+import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
+import type { DataCatalogListingRow } from "@pipelines/shared/DataCatalogListingRow.types";
 
 /**
  * Builds the one row a discovered Socrata dataset becomes. Always
@@ -11,7 +11,7 @@ import type { CatalogListingRow } from "@pipelines/open-data-catalog-listings/Ca
 export function makeListingRowFromSocrataResult(params: {
   drive: Readonly<ConfiguredDrive>;
   result: Readonly<SocrataDiscoveryResult>;
-}): CatalogListingRow {
+}): DataCatalogListingRow {
   const { drive, result } = params;
   return {
     access_kind: "api_resource",

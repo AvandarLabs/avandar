@@ -1,8 +1,8 @@
-import { upsertCatalogListingRows } from "@pipelines/open-data-catalog-listings/upsertCatalogListingRows/upsertCatalogListingRows";
+import { upsertDataCatalogListingRows } from "@pipelines/shared/upsertDataCatalogListingRows/upsertDataCatalogListingRows";
 import { describe, expect, it, vi } from "vitest";
-import type { CatalogListingRow } from "@pipelines/open-data-catalog-listings/CatalogListingRow.types";
+import type { DataCatalogListingRow } from "@pipelines/shared/DataCatalogListingRow.types";
 
-const ROW: CatalogListingRow = {
+const ROW: DataCatalogListingRow = {
   access_kind: "api_resource",
   api_service: "ckan",
   api_base_url: "https://data.humdata.org",
@@ -27,11 +27,11 @@ function _fakeSupabase(
   return { client, upsert };
 }
 
-describe("upsertCatalogListingRows", () => {
+describe("upsertDataCatalogListingRows", () => {
   it("does nothing when there are no rows", async () => {
     const { client, upsert } = _fakeSupabase();
 
-    await upsertCatalogListingRows({ supabase: client, rows: [] });
+    await upsertDataCatalogListingRows({ supabase: client, rows: [] });
 
     expect(upsert).not.toHaveBeenCalled();
   });
@@ -39,9 +39,9 @@ describe("upsertCatalogListingRows", () => {
   it("upserts every row against the api_resource unique index", async () => {
     const { client, upsert } = _fakeSupabase();
 
-    await upsertCatalogListingRows({ supabase: client, rows: [ROW] });
+    await upsertDataCatalogListingRows({ supabase: client, rows: [ROW] });
 
-    expect(client.from).toHaveBeenCalledWith("catalog_listings__open_data");
+    expect(client.from).toHaveBeenCalledWith("data_catalog_listings");
     expect(upsert).toHaveBeenCalledWith([ROW], {
       onConflict:
         "api_service,api_base_url,external_dataset_id,api_resource_id",
@@ -54,7 +54,7 @@ describe("upsertCatalogListingRows", () => {
     });
 
     await expect(
-      upsertCatalogListingRows({ supabase: client, rows: [ROW] }),
+      upsertDataCatalogListingRows({ supabase: client, rows: [ROW] }),
     ).rejects.toThrow("constraint violation");
   });
 });

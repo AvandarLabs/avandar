@@ -1,10 +1,9 @@
-import { makeCkanListingRowsFromPackage } from "@pipelines/open-data-catalog-listings/makeCkanListingRowsFromPackage/makeCkanListingRowsFromPackage";
+import { makeCkanListingRowsFromPackage } from "@pipelines/hdx/makeCkanListingRowsFromPackage/makeCkanListingRowsFromPackage";
 import { describe, expect, it } from "vitest";
 import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
-import type { ConfiguredDrive } from "@pipelines/open-data-catalog-listings/configuredDrives/configuredDrives";
+import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 
-const CKAN_DRIVE: ConfiguredDrive = {
-  apiService: "ckan",
+const CKAN_DRIVE: HdxDrive = {
   baseUrl: "https://data.humdata.org",
   organizationName: "Humanitarian Data Exchange",
 };
