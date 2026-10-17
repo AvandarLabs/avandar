@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  getRelationCallCapValue,
   isWithinRelationCallCaps,
-  resolveRelationCallCap,
 } from "$/models/relations/RelationCapabilities/isWithinRelationCallCaps.ts";
 import type { RelationRowDescriptor } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 
@@ -10,20 +10,22 @@ const DESCRIPTOR: RelationRowDescriptor = {
   estimatedRowBytes: 100,
 };
 
-describe("resolveRelationCallCap", () => {
+describe("getRelationCallCapValue", () => {
   it("passes a flat number through unchanged", () => {
-    expect(resolveRelationCallCap(500, DESCRIPTOR)).toBe(500);
+    expect(getRelationCallCapValue(500, DESCRIPTOR)).toBe(500);
   });
 
   it("passes 'unbounded' through unchanged", () => {
-    expect(resolveRelationCallCap("unbounded", DESCRIPTOR)).toBe("unbounded");
+    expect(getRelationCallCapValue("unbounded", DESCRIPTOR)).toBe(
+      "unbounded",
+    );
   });
 
-  it("calls a function cap with the descriptor", () => {
+  it("returns the function cap's computed value for the descriptor", () => {
     const cap = (descriptor: typeof DESCRIPTOR): number => {
       return descriptor.columnCount * 10;
     };
-    expect(resolveRelationCallCap(cap, DESCRIPTOR)).toBe(30);
+    expect(getRelationCallCapValue(cap, DESCRIPTOR)).toBe(30);
   });
 });
 

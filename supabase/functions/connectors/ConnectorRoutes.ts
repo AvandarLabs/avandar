@@ -78,7 +78,7 @@ function _toErrorResult(error: unknown): ConnectorErrorResponse {
  * takes. `test-and-save` does not use this - it may not have a
  * `connectionId` yet, so its workspace resolution branches differently.
  */
-async function _resolveConnectorContext(
+async function _buildConnectorContext(
   pathParams: { connectorType: string; connectionId: string },
   supabaseClient: AvaSupabaseClient,
   supabaseAdminClient: ConnectorContext["supabaseAdminClient"],
@@ -160,7 +160,7 @@ export const ConnectorRoutes = defineRoutes<ConnectorsApi>(
         schema: { connectorType: string(), connectionId: string() },
       }).action(
         async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const { connector, context } = await _resolveConnectorContext(
+          const { connector, context } = await _buildConnectorContext(
             pathParams,
             supabaseClient,
             supabaseAdminClient,
@@ -189,7 +189,7 @@ export const ConnectorRoutes = defineRoutes<ConnectorsApi>(
           },
         }).action(
           async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-            const { connector, context } = await _resolveConnectorContext(
+            const { connector, context } = await _buildConnectorContext(
               pathParams,
               supabaseClient,
               supabaseAdminClient,
@@ -217,7 +217,7 @@ export const ConnectorRoutes = defineRoutes<ConnectorsApi>(
         },
       }).action(
         async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const { connector, context } = await _resolveConnectorContext(
+          const { connector, context } = await _buildConnectorContext(
             pathParams,
             supabaseClient,
             supabaseAdminClient,

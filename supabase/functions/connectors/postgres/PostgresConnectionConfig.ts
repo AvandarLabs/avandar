@@ -32,7 +32,7 @@ export type DecryptedPostgresConnection = {
 };
 
 /** Converts a decrypted connection row into the driver's own config shape. */
-export function toPostgresConnectionConfig(
+export function makePostgresConnectionConfigFromDecryptedConnection(
   connection: DecryptedPostgresConnection,
 ): PostgresConnectionConfig {
   return {

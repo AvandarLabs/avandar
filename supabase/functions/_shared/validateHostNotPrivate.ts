@@ -18,13 +18,13 @@ export class UnsafeHostError extends Error {
 }
 
 /**
- * Resolves a hostname (or passes a literal IP through unchanged) to every
- * address it could connect to. Exposed separately from
+ * Gets every address a hostname could connect to (or passes a literal IP
+ * through unchanged). Exposed separately from
  * {@link assertHostIsSafeToConnect} so a test can inject a fake resolver
  * without a real DNS lookup (or `Deno.resolveDns`, which does not exist
  * under the Node/vitest runtime these files are unit-tested in).
  */
-export async function resolveHostAddresses(host: string): Promise<string[]> {
+export async function getAddressesForHost(host: string): Promise<string[]> {
   if (isIP(host) !== 0) {
     return [host];
   }
@@ -35,24 +35,24 @@ export async function resolveHostAddresses(host: string): Promise<string[]> {
 
 function _isPrivateOrLoopbackIPv4(address: string): boolean {
   const octets = address.split(".").map(Number);
-  const [a, b] = octets as [number, number, number, number];
-  if (a === 127) {
+  const [firstOctet, secondOctet] = octets as [number, number, number, number];
+  if (firstOctet === 127) {
     return true; // 127.0.0.0/8 loopback
   }
-  if (a === 10) {
+  if (firstOctet === 10) {
     return true; // 10.0.0.0/8 private
   }
-  if (a === 172 && b >= 16 && b <= 31) {
+  if (firstOctet === 172 && secondOctet >= 16 && secondOctet <= 31) {
     return true; // 172.16.0.0/12 private
   }
-  if (a === 192 && b === 168) {
+  if (firstOctet === 192 && secondOctet === 168) {
     return true; // 192.168.0.0/16 private
   }
-  if (a === 169 && b === 254) {
+  if (firstOctet === 169 && secondOctet === 254) {
     // 169.254.0.0/16 link-local (includes the cloud-metadata address)
     return true;
   }
-  if (a === 0) {
+  if (firstOctet === 0) {
     return true; // 0.0.0.0/8 "this network"
   }
   return false;
@@ -121,11 +121,11 @@ export function isPrivateOrLoopbackAddress(address: string): boolean {
  * @param host The hostname or literal IP the user supplied in the
  *   connection form.
  * @param resolveHost Injectable for tests; defaults to a real DNS lookup
- *   via {@link resolveHostAddresses}.
+ *   via {@link getAddressesForHost}.
  */
 export async function assertHostIsSafeToConnect(
   host: string,
-  resolveHost: (host: string) => Promise<string[]> = resolveHostAddresses,
+  resolveHost: (host: string) => Promise<string[]> = getAddressesForHost,
 ): Promise<void> {
   const addresses = await resolveHost(host);
 

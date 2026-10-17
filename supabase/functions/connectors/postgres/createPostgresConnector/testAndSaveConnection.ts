@@ -7,7 +7,7 @@ import {
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
 import { listCatalogRelations } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
 import { fetchConnectionRow } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
-import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
+import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   postgresTestAndSaveInputSchema,
   type PostgresTestAndSaveInput,
@@ -15,7 +15,9 @@ import {
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 type ConnectFn = (
-  config: ReturnType<typeof toPostgresConnectionConfig>,
+  config: ReturnType<
+    typeof makePostgresConnectionConfigFromDecryptedConnection
+  >,
 ) => PostgresSql;
 
 /**
@@ -37,7 +39,7 @@ export async function testAndSaveConnection(
     await assertHostIsSafeToConnect(input.host);
 
     sql = connect(
-      toPostgresConnectionConfig({
+      makePostgresConnectionConfigFromDecryptedConnection({
         host: input.host,
         port: input.port,
         databaseName: input.databaseName,

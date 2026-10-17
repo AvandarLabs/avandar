@@ -4,11 +4,11 @@ import type {
 } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 
 /**
- * Resolves one `RelationCallCap` to its concrete value for the relation
- * actually being acquired - calling it if it is a function, passing it
- * through unchanged otherwise.
+ * Gets one `RelationCallCap`'s concrete value for the relation actually
+ * being acquired - calling it if it is a function, passing it through
+ * unchanged otherwise.
  */
-export function resolveRelationCallCap(
+export function getRelationCallCapValue(
   cap: RelationCallCap,
   descriptor: RelationRowDescriptor,
 ): number | "unbounded" {
@@ -18,6 +18,15 @@ export function resolveRelationCallCap(
 function _isWithinCap(count: number, cap: number | "unbounded"): boolean {
   return cap === "unbounded" || count <= cap;
 }
+
+/** Input to {@link isWithinRelationCallCaps}. */
+export type RelationCallCapsCheck = {
+  rowCount: number;
+  byteCount: number;
+  maxRowsPerCall: RelationCallCap;
+  maxBytesPerCall: RelationCallCap;
+  descriptor: RelationRowDescriptor;
+};
 
 /**
  * Whether a relation's actual row count and byte size both stay within
@@ -32,19 +41,13 @@ function _isWithinCap(count: number, cap: number | "unbounded"): boolean {
  * needs to know about separately.
  */
 export function isWithinRelationCallCaps(
-  options: Readonly<{
-    rowCount: number;
-    byteCount: number;
-    maxRowsPerCall: RelationCallCap;
-    maxBytesPerCall: RelationCallCap;
-    descriptor: RelationRowDescriptor;
-  }>,
+  options: Readonly<RelationCallCapsCheck>,
 ): boolean {
-  const resolvedMaxRows = resolveRelationCallCap(
+  const resolvedMaxRows = getRelationCallCapValue(
     options.maxRowsPerCall,
     options.descriptor,
   );
-  const resolvedMaxBytes = resolveRelationCallCap(
+  const resolvedMaxBytes = getRelationCallCapValue(
     options.maxBytesPerCall,
     options.descriptor,
   );

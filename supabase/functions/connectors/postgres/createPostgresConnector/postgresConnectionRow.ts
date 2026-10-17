@@ -1,5 +1,5 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
-import { toPostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
+import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection.ts";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
@@ -76,6 +76,17 @@ export async function decryptConnectionSecret(
   return data;
 }
 
+/** Input to {@link openSavedConnection}. */
+export type OpenSavedConnectionOptions = {
+  connectionId: string;
+  connect: (
+    config: ReturnType<
+      typeof makePostgresConnectionConfigFromDecryptedConnection
+    >,
+  ) => PostgresSql;
+  assertHostIsSafeToConnect: (host: string) => Promise<void>;
+};
+
 /**
  * Opens a live connection for an already-saved connection, re-checking SSRF
  * every time - a stored host is never trusted as still-safe, since DNS can
@@ -83,18 +94,15 @@ export async function decryptConnectionSecret(
  */
 export async function openSavedConnection(
   context: ConnectorContext,
-  connectionId: string,
-  connect: (
-    config: ReturnType<typeof toPostgresConnectionConfig>,
-  ) => PostgresSql,
-  assertHostIsSafeToConnect: (host: string) => Promise<void>,
+  options: Readonly<OpenSavedConnectionOptions>,
 ): Promise<{ sql: PostgresSql; row: DbConnectionsPostgresRow }> {
+  const { connectionId, connect, assertHostIsSafeToConnect } = options;
   const row = await fetchConnectionRow(context, connectionId);
   const password = await decryptConnectionSecret(context, row.vault_secret_id);
   await assertHostIsSafeToConnect(row.host);
 
   const sql = connect(
-    toPostgresConnectionConfig({
+    makePostgresConnectionConfigFromDecryptedConnection({
       host: row.host,
       port: row.port,
       databaseName: row.database_name,
