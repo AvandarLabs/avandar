@@ -4,22 +4,13 @@ import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/St
 import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type XYSeriesConfig = {
-  xAxisKey: string | undefined;
+  xAxisKey: QueryColumn.Id | undefined;
   series: readonly XYSeries[];
 };
 
 /**
- * Hydrate the `xAxisKey` and `series` array of an XY-host viz config
- * (bar / line / area) from a query.
- *
- * - Series whose `key` is no longer present in the query's columns are
- *   dropped.
- * - If `xAxisKey` is no longer present, it's cleared.
- * - If the series array becomes empty, seed one series using the first
- *   numeric column that isn't the x axis, with `renderAs` set to the
- *   host's default.
- * - If `xAxisKey` is undefined after that, pick the first column
- *   that isn't already a series key.
+ * Seeds unconfigured slots from column IDs and preserves existing selections
+ * and styles, including identities absent from the current result.
  */
 export function hydrateXYSeriesFromQuery<VConfig extends XYSeriesConfig>(
   currVizConfig: VConfig,
@@ -27,34 +18,21 @@ export function hydrateXYSeriesFromQuery<VConfig extends XYSeriesConfig>(
   defaultRenderAs: RenderAs,
 ): VConfig {
   const { queryColumns } = query;
-  const columnNames = new Set(
-    queryColumns.map((c) => {
-      return QueryColumn.getDerivedColumnName(c);
-    }),
-  );
 
-  const filteredSeries = currVizConfig.series.filter((s) => {
-    return columnNames.has(s.key);
-  });
+  let nextXAxisKey = currVizConfig.xAxisKey;
 
-  const isXAxisStillValid =
-    currVizConfig.xAxisKey !== undefined &&
-    columnNames.has(currVizConfig.xAxisKey);
-
-  let nextXAxisKey = isXAxisStillValid ? currVizConfig.xAxisKey : undefined;
-
-  let nextSeries: XYSeries[] = [...filteredSeries];
+  let nextSeries: XYSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0 && isNonEmptyArray(queryColumns)) {
     const firstNumeric = queryColumns.find((col) => {
-      const name = QueryColumn.getDerivedColumnName(col);
+      const name = col.id;
       return QueryColumn.isNumeric(col) && name !== nextXAxisKey;
     });
     if (firstNumeric !== undefined) {
       nextSeries = [
         {
           renderAs: defaultRenderAs,
-          key: QueryColumn.getDerivedColumnName(firstNumeric),
+          key: firstNumeric.id,
         },
       ];
     }
@@ -67,11 +45,11 @@ export function hydrateXYSeriesFromQuery<VConfig extends XYSeriesConfig>(
       }),
     );
     const firstNonSeries = queryColumns.find((col) => {
-      const name = QueryColumn.getDerivedColumnName(col);
+      const name = col.id;
       return !seriesKeys.has(name);
     });
     if (firstNonSeries !== undefined) {
-      nextXAxisKey = QueryColumn.getDerivedColumnName(firstNonSeries);
+      nextXAxisKey = firstNonSeries.id;
     }
   }
 

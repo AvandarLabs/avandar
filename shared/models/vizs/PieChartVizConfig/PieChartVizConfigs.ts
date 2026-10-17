@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery/hydratePieFromQuery.ts";
 import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult/hydratePieFromQueryResult.ts";
 import { EMPTY_VIZ_SETTING_DESCRIPTORS } from "$/models/vizs/SettingDescriptor.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
@@ -45,7 +45,7 @@ export const PieChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: PieChartVizConfig,
-    columns: readonly QueryResultColumn[],
+    columns: readonly QueryResult.BoundColumn[],
   ): PieChartVizConfig => {
     return hydratePieFromQueryResult(vizConfig, columns);
   },

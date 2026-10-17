@@ -295,14 +295,19 @@ describe("runStructuredQueryWithMetadata", () => {
       rowCount: 900000,
     });
 
-    const { result, didAutoLimit } = await runStructuredQueryWithMetadata({
-      auth: "workspace",
-      workspaceId: uuid<Workspace.Id>(),
-      query: StructuredQuery.makeEmpty(),
-      rawSql: "SELECT 1",
-    });
+    const { result, didAutoLimit, executedSql } =
+      await runStructuredQueryWithMetadata({
+        auth: "workspace",
+        workspaceId: uuid<Workspace.Id>(),
+        query: StructuredQuery.makeEmpty(),
+        rawSql: "SELECT 1",
+      });
 
     expect(result).toBe(emptyResult);
+    expect(executedSql).toBe("SELECT 1");
+    expect(runQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawSql: executedSql }),
+    );
     expect(didAutoLimit).toBe(false);
     expect(resolveManualQueryForExecutionMock).not.toHaveBeenCalled();
   });

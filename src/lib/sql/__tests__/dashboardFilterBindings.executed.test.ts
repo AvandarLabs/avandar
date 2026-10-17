@@ -145,8 +145,89 @@ describe("chart-owned dashboard filter targets", () => {
               ]
             : [{ region: "North", amount: 7 }],
         );
-        if (mode === "none") expect(resolved.targets).toEqual({});
+        if (mode === "none") {
+          expect(resolved.targets).toEqual({});
+        }
       });
     },
   );
+});
+
+it("migrates a v4 chart and executes both saved local and global targets", async () => {
+  const { upgradeAvaPageData } =
+    await import("@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData");
+  const { reconcileResultBindings } =
+    await import("$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings");
+  const { resolveSavedDataVizBindings } =
+    await import("@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveSavedDataVizBindings/resolveSavedDataVizBindings");
+  const { useApplyDashboardFiltersToSql } =
+    await import("@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql");
+  const rawSql =
+    "SELECT * FROM (VALUES ('North', 'retail', 7), ('North', 'wholesale', 9), ('South', 'retail', 3)) AS sales(region, channel, amount)";
+  const document = {
+    root: { props: { schemaVersion: 4 } },
+    content: [
+      {
+        type: "DataViz",
+        props: {
+          id: "saved-chart",
+          nlQuery: { prompt: "Sales", rawSql, generations: [] },
+          vizType: "table",
+          vizConfig: { vizType: "table" },
+          localFilters: [
+            {
+              id: "local",
+              columnName: "channel",
+              mode: "select_single",
+              label: "Channel",
+              optionsRaw: "retail,wholesale",
+              defaultValue: "retail",
+            },
+          ],
+          globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
+        },
+      },
+    ],
+  };
+  const upgraded = upgradeAvaPageData(JSON.parse(JSON.stringify(document)));
+  const props = upgraded.content[0]!
+    .props as import("@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock").Props;
+  const schema = reconcileResultBindings({
+    scopeKey: "saved-chart",
+    sqlKey: rawSql,
+    columns: [
+      { name: "region", dataType: "varchar" },
+      { name: "channel", dataType: "varchar" },
+      { name: "amount", dataType: "double" },
+    ],
+    projections: [],
+    previous: undefined,
+  });
+  const resolved = resolveSavedDataVizBindings(props, schema);
+  expect(resolved.props.bindingVersion).toBe(1);
+  if (resolved.props.bindingVersion !== 1) {
+    throw new Error("Legacy targets did not resolve");
+  }
+  const global = resolveDashboardFilterBindings({
+    filters: [GLOBAL],
+    targets: resolved.props.globalFilterTargets,
+    columns: schema.columns,
+  });
+  const sql = useApplyDashboardFiltersToSql({
+    rawSql,
+    columns: schema.columns,
+    globalFilters: global.resolvedFilters,
+    localFilters: resolved.props.localFilters,
+    localFilterState: {
+      valuesById: { local: "retail" },
+      setValue: () => {},
+      reset: () => {},
+    },
+  });
+  expect(sql).toBeDefined();
+  await withDuckDb(async (connection) => {
+    expect((await connection.runAndReadAll(sql!)).getRowObjects()).toEqual([
+      { region: "North", channel: "retail", amount: 7 },
+    ]);
+  });
 });

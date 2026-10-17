@@ -12,20 +12,21 @@
 import { describe, expect, it } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { RenderHookResult } from "@testing-library/react";
 import type { ReactNode } from "react";
 
-const COLUMNS: readonly QueryResultColumn[] = [
-  { name: "quarter", dataType: "varchar" },
-  { name: "revenue", dataType: "double" },
+const COLUMNS: readonly QueryResult.BoundColumn[] = [
+  { id: "quarter" as QueryColumn.Id, name: "quarter", dataType: "varchar" },
+  { id: "revenue" as QueryColumn.Id, name: "revenue", dataType: "double" },
 ];
 
 const STYLED_BAR_CONFIG: BarChartVizConfig = {
   vizType: "bar",
-  xAxisKey: "quarter",
-  series: [{ renderAs: "bar", key: "revenue" }],
+  xAxisKey: "quarter" as QueryColumn.Id,
+  series: [{ renderAs: "bar", key: "revenue" as QueryColumn.Id }],
   layout: "stack",
   withLegend: false,
   chartStyle: {
@@ -109,16 +110,20 @@ describe("Data Explorer viz config memory", () => {
       result.current[1].setActiveVizType("line");
     });
 
-    // With no memory for the target type, the action converts the current
-    // config and then applies structured hydration. Hydration prunes keys the
-    // (empty) structured query cannot account for, which is why xAxisKey does
-    // not survive here.
+    // Type conversion preserves owned IDs even while result metadata is absent.
     const convertedVizConfig = result.current[0].vizConfig;
     expect(convertedVizConfig.vizType).toBe("line");
     expect(convertedVizConfig).toStrictEqual({
       vizType: "line",
-      xAxisKey: undefined,
-      series: [],
+      xAxisKey: STYLED_BAR_CONFIG.xAxisKey,
+      series: [
+        {
+          renderAs: "line",
+          key: STYLED_BAR_CONFIG.series[0]!.key,
+          label: undefined,
+          color: undefined,
+        },
+      ],
       withLegend: false,
       chartStyle: STYLED_BAR_CONFIG.chartStyle,
     });
@@ -155,7 +160,7 @@ describe("Data Explorer viz config memory", () => {
     expect(result.current[0]).toBe(stateBeforeReselection);
   });
 
-  it("repairs a remembered config that names a dropped column", () => {
+  it("retains a remembered selection when its ID is missing", () => {
     const { result } = _renderStateManager();
 
     act(() => {
@@ -172,8 +177,12 @@ describe("Data Explorer viz config memory", () => {
     // config's series key can no longer resolve.
     act(() => {
       result.current[1].syncVizFromQueryResult([
-        { name: "quarter", dataType: "varchar" },
-        { name: "profit", dataType: "double" },
+        {
+          id: "quarter" as QueryColumn.Id,
+          name: "quarter",
+          dataType: "varchar",
+        },
+        { id: "profit" as QueryColumn.Id, name: "profit", dataType: "double" },
       ]);
     });
     act(() => {
@@ -182,13 +191,13 @@ describe("Data Explorer viz config memory", () => {
 
     const restoredVizConfig = result.current[0].vizConfig as BarChartVizConfig;
 
-    // The stale series key is gone.
+    // The missing selection remains owned until explicit repair.
     const seriesKeys = restoredVizConfig.series.map((entry) => {
       return entry.key;
     });
-    expect(seriesKeys).not.toContain("revenue");
+    expect(seriesKeys).toEqual(["revenue"]);
 
-    // These values prove the remembered config was repaired: a fresh
+    // These values prove the remembered config was retained: a fresh
     // projection from pie cannot carry any of them.
     expect(restoredVizConfig.chartStyle?.grid?.color).toBe("#e0e0e0");
     expect(restoredVizConfig.chartStyle?.legend?.position).toBe("left");

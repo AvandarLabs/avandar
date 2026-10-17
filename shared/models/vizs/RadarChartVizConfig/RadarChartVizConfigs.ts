@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 import { hydrateRadarSeriesFromQuery } from "$/models/vizs/hydrateRadarSeriesFromQuery.ts";
 import { hydrateRadarSeriesFromQueryResult } from "$/models/vizs/hydrateRadarSeriesFromQueryResult.ts";
 import { makeLegendPositionDescriptor } from "$/models/vizs/makeLegendPositionDescriptor/makeLegendPositionDescriptor.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
@@ -90,7 +90,7 @@ export const RadarChartVizConfigs = {
 
   hydrateFromQueryResult: (
     vizConfig: RadarChartVizConfig,
-    columns: readonly QueryResultColumn[],
+    columns: readonly QueryResult.BoundColumn[],
   ): RadarChartVizConfig => {
     return hydrateRadarSeriesFromQueryResult(vizConfig, columns);
   },

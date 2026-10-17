@@ -1,15 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { hydrateBubbleSeriesFromQueryResult } from "$/models/vizs/hydrateBubbleSeriesFromQueryResult/hydrateBubbleSeriesFromQueryResult.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
 function cols(
   pairs: ReadonlyArray<{
+    id?: QueryColumn.Id;
     name: string;
-    dataType: QueryResultColumn["dataType"];
+    dataType: QueryResult.BoundColumn["dataType"];
   }>,
-): QueryResultColumn[] {
+): QueryResult.BoundColumn[] {
   return pairs.map((p) => {
-    return { name: p.name, dataType: p.dataType };
+    return {
+      id: p.id ?? (p.name as QueryColumn.Id),
+      name: p.name,
+      dataType: p.dataType,
+    };
   });
 }
 
@@ -20,125 +26,188 @@ describe("hydrateBubbleSeriesFromQueryResult", () => {
     expect(out).toBe(cfg);
   });
 
-  it("prunes a series whose xKey is missing and re-seeds from two numerics", () => {
+  it("retains a series with a missing xKey is missing", () => {
     // xKey "gone" missing; "y" and "s" remain =>
     // seeds { xKey:"y", key:"s", sizeKey:"s" }
     const out = hydrateBubbleSeriesFromQueryResult(
       {
         vizType: "bubble" as const,
-        series: [{ xKey: "gone", key: "y", sizeKey: "s" }],
+        series: [
+          {
+            xKey: "gone" as QueryColumn.Id,
+            key: "y" as QueryColumn.Id,
+            sizeKey: "s" as QueryColumn.Id,
+          },
+        ],
       },
       cols([
-        { name: "y", dataType: "double" },
-        { name: "s", dataType: "double" },
+        { id: "y" as QueryColumn.Id, name: "y", dataType: "double" },
+        { id: "s" as QueryColumn.Id, name: "s", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "y", key: "s", sizeKey: "s" });
+    expect(out.series[0]).toEqual({
+      xKey: "gone" as QueryColumn.Id,
+      key: "y" as QueryColumn.Id,
+      sizeKey: "s" as QueryColumn.Id,
+    });
   });
 
-  it("prunes a series whose key (Y) is missing and re-seeds from two numerics", () => {
+  it("retains a series with a missing key (Y) is missing", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       {
         vizType: "bubble" as const,
-        series: [{ xKey: "x", key: "gone", sizeKey: "s" }],
+        series: [
+          {
+            xKey: "x" as QueryColumn.Id,
+            key: "gone" as QueryColumn.Id,
+            sizeKey: "s" as QueryColumn.Id,
+          },
+        ],
       },
       cols([
-        { name: "x", dataType: "double" },
-        { name: "s", dataType: "double" },
+        { id: "x" as QueryColumn.Id, name: "x", dataType: "double" },
+        { id: "s" as QueryColumn.Id, name: "s", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "x", key: "s", sizeKey: "s" });
+    expect(out.series[0]).toEqual({
+      xKey: "x" as QueryColumn.Id,
+      key: "gone" as QueryColumn.Id,
+      sizeKey: "s" as QueryColumn.Id,
+    });
   });
 
-  it("prunes a series whose sizeKey is missing and re-seeds from two numerics", () => {
+  it("retains a series with a missing sizeKey is missing", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       {
         vizType: "bubble" as const,
-        series: [{ xKey: "x", key: "y", sizeKey: "gone" }],
+        series: [
+          {
+            xKey: "x" as QueryColumn.Id,
+            key: "y" as QueryColumn.Id,
+            sizeKey: "gone" as QueryColumn.Id,
+          },
+        ],
       },
       cols([
-        { name: "x", dataType: "double" },
-        { name: "y", dataType: "double" },
+        { id: "x" as QueryColumn.Id, name: "x", dataType: "double" },
+        { id: "y" as QueryColumn.Id, name: "y", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "x", key: "y", sizeKey: "y" });
+    expect(out.series[0]).toEqual({
+      xKey: "x" as QueryColumn.Id,
+      key: "y" as QueryColumn.Id,
+      sizeKey: "gone" as QueryColumn.Id,
+    });
   });
 
-  it("prunes a series and leaves empty when no numeric columns remain", () => {
+  it("retains owned IDs when no numeric columns remain", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       {
         vizType: "bubble" as const,
-        series: [{ xKey: "gone", key: "also_gone", sizeKey: "gone_too" }],
+        series: [
+          {
+            xKey: "gone" as QueryColumn.Id,
+            key: "also_gone" as QueryColumn.Id,
+            sizeKey: "gone_too" as QueryColumn.Id,
+          },
+        ],
       },
-      cols([{ name: "label", dataType: "varchar" }]),
+      cols([
+        { id: "label" as QueryColumn.Id, name: "label", dataType: "varchar" },
+      ]),
     );
-    expect(out.series).toHaveLength(0);
+    expect(out.series).toHaveLength(1);
+    expect(out.series[0]).toEqual({
+      xKey: "gone" as QueryColumn.Id,
+      key: "also_gone" as QueryColumn.Id,
+      sizeKey: "gone_too" as QueryColumn.Id,
+    });
   });
 
   it("keeps a series whose all three keys exist in columns", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       {
         vizType: "bubble" as const,
-        series: [{ xKey: "x", key: "y", sizeKey: "s" }],
+        series: [
+          {
+            xKey: "x" as QueryColumn.Id,
+            key: "y" as QueryColumn.Id,
+            sizeKey: "s" as QueryColumn.Id,
+          },
+        ],
       },
       cols([
-        { name: "x", dataType: "double" },
-        { name: "y", dataType: "double" },
-        { name: "s", dataType: "double" },
+        { id: "x" as QueryColumn.Id, name: "x", dataType: "double" },
+        { id: "y" as QueryColumn.Id, name: "y", dataType: "double" },
+        { id: "s" as QueryColumn.Id, name: "s", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "x", key: "y", sizeKey: "s" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "x" as QueryColumn.Id,
+      key: "y" as QueryColumn.Id,
+      sizeKey: "s" as QueryColumn.Id,
+    });
   });
 
   it("seeds from first three numeric columns when series is empty", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       { vizType: "bubble" as const, series: [] },
       cols([
-        { name: "a", dataType: "double" },
-        { name: "b", dataType: "bigint" },
-        { name: "c", dataType: "double" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "double" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "bigint" },
+        { id: "c" as QueryColumn.Id, name: "c", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "a", key: "b", sizeKey: "c" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "a" as QueryColumn.Id,
+      key: "b" as QueryColumn.Id,
+      sizeKey: "c" as QueryColumn.Id,
+    });
   });
 
   it("seeds from two numerics with sizeKey=key when only two numeric columns", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       { vizType: "bubble" as const, series: [] },
       cols([
-        { name: "a", dataType: "double" },
-        { name: "b", dataType: "double" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "double" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "a", key: "b", sizeKey: "b" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "a" as QueryColumn.Id,
+      key: "b" as QueryColumn.Id,
+      sizeKey: "b" as QueryColumn.Id,
+    });
   });
 
   it("seeds all three from one numeric column when only one exists", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       { vizType: "bubble" as const, series: [] },
       cols([
-        { name: "val", dataType: "double" },
-        { name: "label", dataType: "varchar" },
+        { id: "val" as QueryColumn.Id, name: "val", dataType: "double" },
+        { id: "label" as QueryColumn.Id, name: "label", dataType: "varchar" },
       ]),
     );
     expect(out.series).toHaveLength(1);
     expect(out.series[0]).toMatchObject({
-      xKey: "val",
-      key: "val",
-      sizeKey: "val",
+      xKey: "val" as QueryColumn.Id,
+      key: "val" as QueryColumn.Id,
+      sizeKey: "val" as QueryColumn.Id,
     });
   });
 
   it("leaves series empty when no numeric columns exist", () => {
     const out = hydrateBubbleSeriesFromQueryResult(
       { vizType: "bubble" as const, series: [] },
-      cols([{ name: "label", dataType: "varchar" }]),
+      cols([
+        { id: "label" as QueryColumn.Id, name: "label", dataType: "varchar" },
+      ]),
     );
     expect(out.series).toHaveLength(0);
   });

@@ -12,10 +12,14 @@ function createBlockId(type: string): string {
 function buildDataVizItem(
   block: Extract<ChatGeneratedDashboardBlock, { kind: "DataViz" }>,
 ): PuckContentItem {
+  const id = createBlockId("DataViz");
   return {
     type: "DataViz",
     props: {
-      id: createBlockId("DataViz"),
+      id,
+      bindingVersion: 1,
+      columnBindings: { version: 1, scopeKey: id, sqlKey: "", columns: [] },
+      globalFilterTargets: {},
       nlQuery: {
         prompt: block.prompt,
         rawSql: block.sql,

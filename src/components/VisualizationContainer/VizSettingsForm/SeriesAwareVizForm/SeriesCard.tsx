@@ -17,7 +17,7 @@ import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
   RadarSeries,
   RenderAs,
@@ -44,8 +44,8 @@ function useRenderAsOptions(): ReadonlyArray<{
 }
 
 type SeriesCardProps = {
-  fields: readonly QueryResultColumn[];
-  numericFields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.BoundColumn[];
+  numericFields: readonly QueryResult.BoundColumn[];
   series: XYSeries | RadarSeries;
   hostVizType: HostConfig["vizType"];
   isRadarHost: boolean;
@@ -92,7 +92,7 @@ export function SeriesCard({
 
   const numericOptions = useMemo(() => {
     return numericFields.map((c) => {
-      return { value: c.name, label: c.name };
+      return { value: c.id, label: c.name };
     });
   }, [numericFields]);
 
@@ -113,9 +113,14 @@ export function SeriesCard({
       if (nextKey === null) {
         return;
       }
-      onSeriesChange({ ...series, key: nextKey });
+      const column = numericFields.find((field) => {
+        return field.id === nextKey;
+      });
+      if (column) {
+        onSeriesChange({ ...series, key: column.id });
+      }
     },
-    [series, onSeriesChange],
+    [series, onSeriesChange, numericFields],
   );
 
   const setRenderAs = useCallback(

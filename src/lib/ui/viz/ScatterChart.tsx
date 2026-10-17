@@ -22,8 +22,8 @@ import {
 import { useScatterChartStyleProps } from "@/lib/ui/viz/axis/useScatterChartStyleProps";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import type { LegacyScatterSeries as ScatterSeries } from "$/models/vizs/BoundVizConfig/LegacyVizConfig.types";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ScatterChartSeries } from "@mantine/charts";
 
@@ -97,7 +97,7 @@ export function ScatterChart({
           }}
         >
           <CartesianGrid {...styleProps.gridProps} />
-          {styleProps.withXAxis !== false ?
+          {styleProps.withXAxis !== false ? (
             <XAxis
               dataKey="x"
               type="number"
@@ -107,18 +107,18 @@ export function ScatterChart({
               }}
               {...styleProps.xAxisProps}
               label={
-                hasXLabel ?
-                  {
-                    value: xLabel,
-                    position: "insideBottom",
-                    offset: -10,
-                    fill: chartStyle?.xAxis?.labelColor,
-                  }
-                : undefined
+                hasXLabel
+                  ? {
+                      value: xLabel,
+                      position: "insideBottom",
+                      offset: -10,
+                      fill: chartStyle?.xAxis?.labelColor,
+                    }
+                  : undefined
               }
             />
-          : null}
-          {styleProps.withYAxis !== false ?
+          ) : null}
+          {styleProps.withYAxis !== false ? (
             <YAxis
               dataKey="y"
               type="number"
@@ -129,17 +129,17 @@ export function ScatterChart({
               }}
               {...styleProps.yAxisProps}
               label={
-                hasYLabel ?
-                  {
-                    value: yLabel,
-                    angle: -90,
-                    position: "insideLeft",
-                    fill: chartStyle?.yAxis?.labelColor,
-                  }
-                : undefined
+                hasYLabel
+                  ? {
+                      value: yLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                      fill: chartStyle?.yAxis?.labelColor,
+                    }
+                  : undefined
               }
             />
-          : null}
+          ) : null}
           <Tooltip
             cursor={{ strokeDasharray: "3 3" }}
             formatter={(value: unknown) => {

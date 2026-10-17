@@ -1,3 +1,4 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
@@ -13,11 +14,11 @@ export type AreaChartVizConfig = {
    * The key of the column to use for the X axis. This is a column
    * name, not an ID.
    */
-  xAxisKey: string | undefined;
+  xAxisKey: QueryColumn.Id | undefined;
 
   /**
    * One entry per rendered series. Each series carries its own `key`
-   * (column name), `renderAs` (area by default — bar / line allowed),
+   * (column name), `renderAs` (area by default - bar / line allowed),
    * `color`, `curveType`, `fillOpacity`, and other mark-level
    * settings.
    */

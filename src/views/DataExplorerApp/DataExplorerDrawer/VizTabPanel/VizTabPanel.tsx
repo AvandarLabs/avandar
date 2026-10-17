@@ -8,7 +8,7 @@ import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
 
 type Props = {
-  columns: readonly QueryResult.Column[];
+  columns: readonly QueryResult.BoundColumn[];
   data: UnknownDataFrame;
   vizConfig: VizConfig.T;
   onVizConfigChange: (vizConfig: VizConfig.T) => void;

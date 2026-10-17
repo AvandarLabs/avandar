@@ -1,13 +1,10 @@
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { BindingIssue } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DashboardFilterRecord } from "../DashboardFilterStateManager";
 import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 /** An authored local filter whose target is an output identity. */
-export type BoundLocalFilter = Omit<LocalFilter, "columnName"> & {
-  columnId: QueryColumn.Id;
-};
+export type BoundLocalFilter = LocalFilter;
 type Options = {
   filters: readonly BoundLocalFilter[];
   valuesById: Readonly<Record<string, string | readonly string[] | undefined>>;

@@ -3,6 +3,7 @@ import {
   EXPLORER_AGGREGATE_SQL,
   EXPLORER_FILTER_SQL,
 } from "../Explorer.constants";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 
 export type ExplorerMode = "filter" | "query" | "chart" | "full";
@@ -15,22 +16,39 @@ export const emptyFilter = {
   rules: [],
 } as const;
 
-/** Column metadata for the chart-mode series editor, matching the aggregate SQL. */
+/**
+ * Column metadata for the chart-mode series editor, matching the aggregate
+ * SQL.
+ */
 export const aggregateColumns = [
-  { name: "district_name", dataType: "varchar" },
-  { name: "recorded_cases", dataType: "bigint" },
+  {
+    id: "film-district" as QueryColumn.Id,
+    name: "district_name",
+    dataType: "varchar",
+  },
+  {
+    id: "film-cases" as QueryColumn.Id,
+    name: "recorded_cases",
+    dataType: "bigint",
+  },
 ] as const;
 
-/** The bar chart config shown once the stage reaches its chart/visualizations phase. */
+/**
+ * The bar chart config shown once the stage reaches its chart/visualizations
+ * phase.
+ */
 export const barConfig: BarChartVizConfig = {
   vizType: "bar",
-  xAxisKey: "district_name",
-  series: [{ key: "recorded_cases", renderAs: "bar" }],
+  xAxisKey: "film-district" as QueryColumn.Id,
+  series: [{ key: "film-cases" as QueryColumn.Id, renderAs: "bar" }],
   layout: "group",
   withLegend: true,
 };
 
-/** Body-frame click targets. The outer film measures these DOM nodes before assigning cursor positions. */
+/**
+ * Body-frame click targets. The outer film measures these DOM nodes before
+ * assigning cursor positions.
+ */
 export const EXPLORER_BEATS = [
   { frame: 48, target: "explorer-query-tab", action: "click" },
   { frame: 88, target: "explorer-add-condition", action: "click" },
@@ -45,7 +63,10 @@ export const EXPLORER_BEATS = [
   { frame: 650, target: "explorer-viz-type", action: "click" },
 ] as const;
 
-/** The focused variants retain a readable action sequence and hold their completed state. */
+/**
+ * The focused variants retain a readable action sequence and hold their
+ * completed state.
+ */
 export function explorerStage(frame: number, mode: ExplorerMode = "full") {
   const time =
     mode === "query"

@@ -21,6 +21,7 @@ import type { DataQueryRunMetadata } from "@/views/DataExplorerApp/useDataQueryA
 import type { UseQueryResultTuple } from "@avandar/query-hooks";
 
 type UseDataQueryOptions = {
+  enabled?: boolean;
   query: StructuredQuery.Partial;
   rawSql: string | undefined;
   /**
@@ -180,7 +181,9 @@ function _buildQuerySourceMeta(
  */
 export function useDataQuery(
   options: Readonly<UseDataQueryOptions>,
-): UseQueryResultTuple<QueryResult.T<UnknownRow>> {
+): UseQueryResultTuple<
+  QueryResult.T<UnknownRow> & { executedSql: string | undefined }
+> {
   const {
     query,
     rawSql,
@@ -201,7 +204,7 @@ export function useDataQuery(
   });
 
   const queryResult = useQuery({
-    enabled: !!dataSource || !!rawSql,
+    enabled: options.enabled !== false && (!!dataSource || !!rawSql),
     // `isWorkspaceRawSqlDataQueryKey` reads the first four positions.
     queryKey: [
       queryAuth,
@@ -215,7 +218,9 @@ export function useDataQuery(
       "structuredInSync",
       isStructuredQueryInSync,
     ],
-    queryFn: async (): Promise<QueryResult.T<UnknownRow>> => {
+    queryFn: async (): Promise<
+      QueryResult.T<UnknownRow> & { executedSql: string | undefined }
+    > => {
       const recordRun = beginRun();
       try {
         const run = await _runDataQuery({
@@ -230,7 +235,7 @@ export function useDataQuery(
           rowCount: run.result.numRows,
           columnCount: run.result.columns.length,
         });
-        return run.result;
+        return { ...run.result, executedSql: run.executedSql };
       } catch (error) {
         // Not just a rethrow: the emitter reads an absent record as "no run
         // happened", so an unrecorded failure is never reported. Connectivity

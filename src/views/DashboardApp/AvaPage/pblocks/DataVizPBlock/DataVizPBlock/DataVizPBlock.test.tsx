@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
+import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render, screen } from "@/test-utils";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement } from "react";
 
@@ -37,6 +39,31 @@ const { useDataQueryMock } = vi.hoisted(() => {
 vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
   return { useDataQuery: useDataQueryMock };
 });
+
+vi.mock(
+  "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizColumnBindings/useDataVizColumnBindings",
+  () => {
+    return {
+      useDataVizColumnBindings: () => {
+        return {
+          status: "ready",
+          schema: reconcileResultBindings({
+            scopeKey: "chart",
+            sqlKey: "SELECT * FROM foo",
+            columns: [
+              { name: "category", dataType: "varchar" },
+              { name: "value", dataType: "double" },
+              { name: "score", dataType: "double" },
+            ],
+            projections: [],
+            previous: undefined,
+          }),
+          error: undefined,
+        };
+      },
+    };
+  },
+);
 
 vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
   return {
@@ -81,7 +108,7 @@ function renderBlock(props: {
   prompt: string;
   rawSql: string;
   vizType: string;
-  vizConfig: Parameters<typeof DataVizPBlock>[0]["vizConfig"];
+  vizConfig: VizConfig.Legacy;
 }): ReactElement {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -91,6 +118,8 @@ function renderBlock(props: {
       <AvandarAppProvider>
         <DashboardFilterStateManager.Provider>
           <DataVizPBlock
+            id="chart"
+            bindingVersion={0}
             puck={fakePuckContext()}
             nlQuery={{
               prompt: props.prompt,

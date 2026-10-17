@@ -56,13 +56,13 @@ export function applyQueryChange(
 
 /**
  * Returns true when two column lists describe the same result schema:
- * same length, names, and data types, in order. Used by
+ * same length, IDs, names, and data types, in order. Used by
  * `syncVizFromQueryResult` to avoid re-emitting state on identical refetches.
  */
 export function isSameColumnSchema(
   options: Readonly<{
-    previousColumns: readonly QueryResult.Column[] | undefined;
-    currentColumns: readonly QueryResult.Column[];
+    previousColumns: readonly QueryResult.BoundColumn[] | undefined;
+    currentColumns: readonly QueryResult.BoundColumn[];
   }>,
 ): boolean {
   const { previousColumns, currentColumns } = options;
@@ -75,6 +75,7 @@ export function isSameColumnSchema(
   return currentColumns.every((currentColumn, idx) => {
     const previousColumn = previousColumns[idx];
     return (
+      previousColumn?.id === currentColumn.id &&
       previousColumn?.name === currentColumn.name &&
       previousColumn?.dataType === currentColumn.dataType
     );

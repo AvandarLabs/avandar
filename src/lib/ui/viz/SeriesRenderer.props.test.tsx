@@ -15,11 +15,12 @@ import { LineChart } from "@/lib/ui/viz/LineChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { render } from "@/test-utils";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+type BarChartVizConfig = Extract<VizConfig.Resolved, { vizType: "bar" }>;
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
-import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
-import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
+type LineChartVizConfig = Extract<VizConfig.Resolved, { vizType: "line" }>;
+type RadarChartVizConfig = Extract<VizConfig.Resolved, { vizType: "radar" }>;
+import type { LegacyScatterSeries as ScatterSeries } from "$/models/vizs/BoundVizConfig/LegacyVizConfig.types";
 import type { ReactNode } from "react";
 
 const mantineBarChartMock = vi.fn();

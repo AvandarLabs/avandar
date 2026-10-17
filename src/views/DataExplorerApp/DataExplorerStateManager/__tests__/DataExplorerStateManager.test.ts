@@ -15,18 +15,24 @@ import { describe, expect, it } from "vitest";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { applyVizConfigFromQueryResult } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
 import { INITIAL_DATA_EXPLORER_STATE } from "../DataExplorerAppState.types";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { DataExplorerAppState } from "../DataExplorerAppState.types";
 
 function cols(
   pairs: ReadonlyArray<{
+    id?: QueryColumn.Id;
     name: string;
-    dataType: QueryResultColumn["dataType"];
+    dataType: QueryResult.BoundColumn["dataType"];
   }>,
-): QueryResultColumn[] {
+): QueryResult.BoundColumn[] {
   return pairs.map((p) => {
-    return { name: p.name, dataType: p.dataType };
+    return {
+      id: p.id ?? (p.name as QueryColumn.Id),
+      name: p.name,
+      dataType: p.dataType,
+    };
   });
 }
 
@@ -36,7 +42,7 @@ function cols(
 // fast and free of provider boilerplate.
 function syncVizFromQueryResultReducer(
   state: DataExplorerAppState,
-  columns: readonly QueryResultColumn[],
+  columns: readonly QueryResult.BoundColumn[],
 ): DataExplorerAppState {
   const next = applyVizConfigFromQueryResult({
     vizConfig: state.vizConfig,
@@ -54,8 +60,8 @@ function syncVizFromQueryResultReducer(
 describe("Data Explorer state sync", () => {
   const initialBarConfig: BarChartVizConfig = {
     vizType: "bar",
-    xAxisKey: "region",
-    series: [{ renderAs: "bar", key: "count" }],
+    xAxisKey: "region" as QueryColumn.Id,
+    series: [{ renderAs: "bar", key: "count" as QueryColumn.Id }],
     layout: "group",
     withLegend: true,
   };
@@ -74,9 +80,9 @@ describe("Data Explorer state sync", () => {
     const afterRequery = syncVizFromQueryResultReducer(
       startingState,
       cols([
-        { name: "region", dataType: "varchar" },
-        { name: "count", dataType: "bigint" },
-        { name: "total", dataType: "double" },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
+        { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
+        { id: "total" as QueryColumn.Id, name: "total", dataType: "double" },
       ]),
     );
 
@@ -90,16 +96,16 @@ describe("Data Explorer state sync", () => {
     expect(bar.xAxisKey).toBe("region");
   });
 
-  it("drops series whose column disappears from the new result", () => {
+  it("retains series IDs missing from the new result", () => {
     const startingState: DataExplorerAppState = {
       ...INITIAL_DATA_EXPLORER_STATE,
       rawSql: "SELECT a, b FROM t",
       vizConfig: {
         vizType: "bar",
-        xAxisKey: "a",
+        xAxisKey: "a" as QueryColumn.Id,
         series: [
-          { renderAs: "bar", key: "b" },
-          { renderAs: "bar", key: "gone" },
+          { renderAs: "bar", key: "b" as QueryColumn.Id },
+          { renderAs: "bar", key: "gone" as QueryColumn.Id },
         ],
         layout: "group",
         withLegend: true,
@@ -109,8 +115,8 @@ describe("Data Explorer state sync", () => {
     const afterRequery = syncVizFromQueryResultReducer(
       startingState,
       cols([
-        { name: "a", dataType: "varchar" },
-        { name: "b", dataType: "double" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "varchar" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "double" },
       ]),
     );
 
@@ -119,7 +125,7 @@ describe("Data Explorer state sync", () => {
       bar.series.map((s) => {
         return s.key;
       }),
-    ).toEqual(["b"]);
+    ).toEqual(["b", "gone"]);
   });
 
   it("records lastResultColumns so cross-cutting consumers see the live schema", () => {
@@ -128,23 +134,23 @@ describe("Data Explorer state sync", () => {
       vizConfig: initialBarConfig,
     };
     const columns = cols([
-      { name: "region", dataType: "varchar" },
-      { name: "count", dataType: "bigint" },
+      { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
+      { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
     ]);
 
     const next = syncVizFromQueryResultReducer(startingState, columns);
     expect(next.lastResultColumns).toEqual(columns);
   });
 
-  it("survives a column rename via case-insensitive fallback", () => {
+  it("preserves bound IDs without case-insensitive name fallback", () => {
     // Old config has `Count` (the AI used PascalCase last time). The new
     // result returns `count`. The series should rebind, not be dropped.
     const startingState: DataExplorerAppState = {
       ...INITIAL_DATA_EXPLORER_STATE,
       vizConfig: {
         vizType: "bar",
-        xAxisKey: "Region",
-        series: [{ renderAs: "bar", key: "Count" }],
+        xAxisKey: "Region" as QueryColumn.Id,
+        series: [{ renderAs: "bar", key: "Count" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
@@ -153,17 +159,17 @@ describe("Data Explorer state sync", () => {
     const afterRequery = syncVizFromQueryResultReducer(
       startingState,
       cols([
-        { name: "region", dataType: "varchar" },
-        { name: "count", dataType: "bigint" },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
+        { id: "count" as QueryColumn.Id, name: "count", dataType: "bigint" },
       ]),
     );
 
     const bar = afterRequery.vizConfig as BarChartVizConfig;
-    expect(bar.xAxisKey).toBe("region");
+    expect(bar.xAxisKey).toBe("Region");
     expect(
       bar.series.map((s) => {
         return s.key;
       }),
-    ).toEqual(["count"]);
+    ).toEqual(["Count"]);
   });
 });

@@ -1,5 +1,6 @@
 import { uuid } from "$/lib/uuid";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type {
   VizConfig,
   VizType,
@@ -8,6 +9,7 @@ import type {
   GlobalFilterSubscription,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { DashboardFilterTargets } from "@/views/DashboardApp/DashboardFilterStateManager/resolveDashboardFilterBindings/resolveDashboardFilterBindings";
 
 /**
  * Fallback prompt used when the Data Explorer's `state.nlPrompt` is empty
@@ -32,6 +34,9 @@ export type DataVizDashboardBlock = {
   type: "DataViz";
   props: {
     id: string;
+    bindingVersion: 1;
+    columnBindings: ResultBindingRegistry;
+    globalFilterTargets: DashboardFilterTargets;
     nlQuery: {
       prompt: string;
       rawSql: string;
@@ -54,6 +59,7 @@ export type DataVizDashboardBlock = {
  * created from the dashboard editor's NL query field.
  */
 export function createDataVizBlock(args: {
+  columnBindings: ResultBindingRegistry;
   rawSql: string;
   prompt: string | undefined;
   vizType: VizType;
@@ -62,10 +68,14 @@ export function createDataVizBlock(args: {
   const trimmedPrompt = args.prompt?.trim() ?? "";
   const normalizedPrompt =
     trimmedPrompt.length > 0 ? trimmedPrompt : DATA_EXPLORER_FALLBACK_PROMPT;
+  const id = uuid();
   return {
     type: "DataViz",
     props: {
-      id: uuid(),
+      id,
+      bindingVersion: 1,
+      columnBindings: { ...args.columnBindings, scopeKey: id },
+      globalFilterTargets: {},
       nlQuery: {
         prompt: normalizedPrompt,
         rawSql: args.rawSql,

@@ -7,6 +7,7 @@ import { DashboardPreviewBanner } from "@/views/DashboardApp/DashboardViewerView
 import { ramp } from "../../src/motion";
 import {
   chartConfig,
+  chartColumns,
   DashboardFixtureContext,
   DASHBOARD_NAME,
   DASHBOARD_SQL,
@@ -42,7 +43,7 @@ const data: AvaPageData = {
   root: {
     props: {
       title: DASHBOARD_NAME,
-      schemaVersion: 4,
+      schemaVersion: 5,
       theme: "default",
       typography: "system",
       containerMaxWidth: { unit: "%", value: 100 },
@@ -62,6 +63,14 @@ const data: AvaPageData = {
       type: "DataViz",
       props: {
         id: "film-district-chart",
+        bindingVersion: 1,
+        columnBindings: {
+          version: 1,
+          scopeKey: "film-district-chart",
+          sqlKey: DASHBOARD_SQL,
+          columns: chartColumns,
+        },
+        globalFilterTargets: {},
         nlQuery: {
           prompt: "Saved from Data Explorer",
           rawSql: DASHBOARD_SQL,

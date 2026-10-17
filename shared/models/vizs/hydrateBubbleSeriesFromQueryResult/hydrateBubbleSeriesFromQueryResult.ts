@@ -1,6 +1,5 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { columnNameSet } from "$/models/vizs/hydrateColumnPicking.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { BubbleSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type BubbleSeriesConfig = {
@@ -8,33 +7,20 @@ type BubbleSeriesConfig = {
 };
 
 /**
- * Reconcile a bubble config against current query columns. Prunes
- * series whose `xKey`, `key`, or `sizeKey` reference columns that no
- * longer exist, then seeds the first series from the first three numeric
- * columns when the series array is empty.
- *
- * Fallback seeding rules:
- * - 3+ numerics: `{ xKey: n[0], key: n[1], sizeKey: n[2] }`
- * - 2 numerics:  `{ xKey: n[0], key: n[1], sizeKey: n[1] }`
- * - 1 numeric:   `{ xKey: n[0], key: n[0], sizeKey: n[0] }`
- *
- * @param currVizConfig Current bubble viz config.
- * @param columns Result columns with names and `AvaDataType`.
- * @returns Updated config with stale series pruned and defaults seeded.
+ * Seeds unconfigured slots from column IDs and preserves existing selections
+ * and styles, including identities absent from the current result.
  */
 export function hydrateBubbleSeriesFromQueryResult<
   VConfig extends BubbleSeriesConfig,
->(currVizConfig: VConfig, columns: readonly QueryResultColumn[]): VConfig {
+>(
+  currVizConfig: VConfig,
+  columns: readonly QueryResult.BoundColumn[],
+): VConfig {
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = columnNameSet(columns);
 
-  let nextSeries: BubbleSeries[] = currVizConfig.series.filter((s) => {
-    return (
-      colNames.has(s.xKey) && colNames.has(s.key) && colNames.has(s.sizeKey)
-    );
-  });
+  let nextSeries: BubbleSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
     const numerics = columns.filter((c) => {
@@ -43,21 +29,21 @@ export function hydrateBubbleSeriesFromQueryResult<
     if (numerics.length >= 3) {
       nextSeries = [
         {
-          xKey: numerics[0]!.name,
-          key: numerics[1]!.name,
-          sizeKey: numerics[2]!.name,
+          xKey: numerics[0]!.id,
+          key: numerics[1]!.id,
+          sizeKey: numerics[2]!.id,
         },
       ];
     } else if (numerics.length === 2) {
       nextSeries = [
         {
-          xKey: numerics[0]!.name,
-          key: numerics[1]!.name,
-          sizeKey: numerics[1]!.name,
+          xKey: numerics[0]!.id,
+          key: numerics[1]!.id,
+          sizeKey: numerics[1]!.id,
         },
       ];
     } else if (numerics.length === 1) {
-      const only = numerics[0]!.name;
+      const only = numerics[0]!.id;
       nextSeries = [{ xKey: only, key: only, sizeKey: only }];
     }
   }

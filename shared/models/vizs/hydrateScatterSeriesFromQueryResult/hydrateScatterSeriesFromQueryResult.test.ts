@@ -1,15 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { hydrateScatterSeriesFromQueryResult } from "$/models/vizs/hydrateScatterSeriesFromQueryResult/hydrateScatterSeriesFromQueryResult.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
 function cols(
   pairs: ReadonlyArray<{
+    id?: QueryColumn.Id;
     name: string;
-    dataType: QueryResultColumn["dataType"];
+    dataType: QueryResult.BoundColumn["dataType"];
   }>,
-): QueryResultColumn[] {
+): QueryResult.BoundColumn[] {
   return pairs.map((p) => {
-    return { name: p.name, dataType: p.dataType };
+    return {
+      id: p.id ?? (p.name as QueryColumn.Id),
+      name: p.name,
+      dataType: p.dataType,
+    };
   });
 }
 
@@ -20,88 +26,122 @@ describe("hydrateScatterSeriesFromQueryResult", () => {
     expect(out).toBe(cfg);
   });
 
-  it("prunes a series whose xKey is missing and re-seeds from one numeric", () => {
+  it("retains a series with a missing xKey is missing", () => {
     // xKey "gone" missing; "y" is numeric =>
-    // seeding produces { xKey: "y", key: "y" }
+    // seeding produces { xKey: "y" as QueryColumn.Id, key: "y" as
+    // QueryColumn.Id }
     const out = hydrateScatterSeriesFromQueryResult(
       {
         vizType: "scatter" as const,
-        series: [{ xKey: "gone", key: "y" }],
+        series: [
+          { xKey: "gone" as QueryColumn.Id, key: "y" as QueryColumn.Id },
+        ],
       },
-      cols([{ name: "y", dataType: "double" }]),
+      cols([{ id: "y" as QueryColumn.Id, name: "y", dataType: "double" }]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "y", key: "y" });
+    expect(out.series[0]).toEqual({
+      xKey: "gone" as QueryColumn.Id,
+      key: "y" as QueryColumn.Id,
+    });
   });
 
-  it("prunes a series whose key (Y) is missing and re-seeds from one numeric", () => {
+  it("retains a series with a missing key (Y) is missing", () => {
     // key "gone" missing; "x" is numeric =>
-    // seeding produces { xKey: "x", key: "x" }
+    // seeding produces { xKey: "x" as QueryColumn.Id, key: "x" as
+    // QueryColumn.Id }
     const out = hydrateScatterSeriesFromQueryResult(
       {
         vizType: "scatter" as const,
-        series: [{ xKey: "x", key: "gone" }],
+        series: [
+          { xKey: "x" as QueryColumn.Id, key: "gone" as QueryColumn.Id },
+        ],
       },
-      cols([{ name: "x", dataType: "double" }]),
+      cols([{ id: "x" as QueryColumn.Id, name: "x", dataType: "double" }]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "x", key: "x" });
+    expect(out.series[0]).toEqual({
+      xKey: "x" as QueryColumn.Id,
+      key: "gone" as QueryColumn.Id,
+    });
   });
 
-  it("prunes a series and leaves empty when no numeric columns remain", () => {
+  it("retains owned IDs when no numeric columns remain", () => {
     const out = hydrateScatterSeriesFromQueryResult(
       {
         vizType: "scatter" as const,
-        series: [{ xKey: "gone", key: "also_gone" }],
+        series: [
+          {
+            xKey: "gone" as QueryColumn.Id,
+            key: "also_gone" as QueryColumn.Id,
+          },
+        ],
       },
-      cols([{ name: "label", dataType: "varchar" }]),
+      cols([
+        { id: "label" as QueryColumn.Id, name: "label", dataType: "varchar" },
+      ]),
     );
-    expect(out.series).toHaveLength(0);
+    expect(out.series).toHaveLength(1);
+    expect(out.series[0]).toEqual({
+      xKey: "gone" as QueryColumn.Id,
+      key: "also_gone" as QueryColumn.Id,
+    });
   });
 
   it("keeps a series whose both xKey and key exist in columns", () => {
     const out = hydrateScatterSeriesFromQueryResult(
       {
         vizType: "scatter" as const,
-        series: [{ xKey: "x", key: "y" }],
+        series: [{ xKey: "x" as QueryColumn.Id, key: "y" as QueryColumn.Id }],
       },
       cols([
-        { name: "x", dataType: "double" },
-        { name: "y", dataType: "double" },
+        { id: "x" as QueryColumn.Id, name: "x", dataType: "double" },
+        { id: "y" as QueryColumn.Id, name: "y", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "x", key: "y" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "x" as QueryColumn.Id,
+      key: "y" as QueryColumn.Id,
+    });
   });
 
   it("seeds from first two numeric columns when series is empty", () => {
     const out = hydrateScatterSeriesFromQueryResult(
       { vizType: "scatter" as const, series: [] },
       cols([
-        { name: "a", dataType: "double" },
-        { name: "b", dataType: "bigint" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "double" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "bigint" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "a", key: "b" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "a" as QueryColumn.Id,
+      key: "b" as QueryColumn.Id,
+    });
   });
 
   it("seeds xKey=key when only one numeric column exists", () => {
     const out = hydrateScatterSeriesFromQueryResult(
       { vizType: "scatter" as const, series: [] },
       cols([
-        { name: "val", dataType: "double" },
-        { name: "label", dataType: "varchar" },
+        { id: "val" as QueryColumn.Id, name: "val", dataType: "double" },
+        { id: "label" as QueryColumn.Id, name: "label", dataType: "varchar" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "val", key: "val" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "val" as QueryColumn.Id,
+      key: "val" as QueryColumn.Id,
+    });
   });
 
   it("leaves series empty when no numeric columns exist", () => {
     const out = hydrateScatterSeriesFromQueryResult(
       { vizType: "scatter" as const, series: [] },
-      cols([{ name: "label", dataType: "varchar" }]),
+      cols([
+        { id: "label" as QueryColumn.Id, name: "label", dataType: "varchar" },
+      ]),
     );
     expect(out.series).toHaveLength(0);
   });
@@ -110,15 +150,18 @@ describe("hydrateScatterSeriesFromQueryResult", () => {
     const out = hydrateScatterSeriesFromQueryResult(
       {
         vizType: "scatter" as const,
-        series: [{ xKey: "a", key: "b" }],
+        series: [{ xKey: "a" as QueryColumn.Id, key: "b" as QueryColumn.Id }],
       },
       cols([
-        { name: "a", dataType: "double" },
-        { name: "b", dataType: "double" },
-        { name: "c", dataType: "double" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "double" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "double" },
+        { id: "c" as QueryColumn.Id, name: "c", dataType: "double" },
       ]),
     );
     expect(out.series).toHaveLength(1);
-    expect(out.series[0]).toMatchObject({ xKey: "a", key: "b" });
+    expect(out.series[0]).toMatchObject({
+      xKey: "a" as QueryColumn.Id,
+      key: "b" as QueryColumn.Id,
+    });
   });
 });

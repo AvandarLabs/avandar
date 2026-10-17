@@ -1,15 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { hydrateXYFromQueryResult } from "$/models/vizs/hydrateXYFromQueryResult/hydrateXYFromQueryResult.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
 function cols(
   pairs: ReadonlyArray<{
+    id?: QueryColumn.Id;
     name: string;
-    dataType: QueryResultColumn["dataType"];
+    dataType: QueryResult.BoundColumn["dataType"];
   }>,
-): QueryResultColumn[] {
+): QueryResult.BoundColumn[] {
   return pairs.map((p) => {
-    return { name: p.name, dataType: p.dataType };
+    return {
+      id: p.id ?? (p.name as QueryColumn.Id),
+      name: p.name,
+      dataType: p.dataType,
+    };
   });
 }
 
@@ -20,8 +26,12 @@ describe("hydrateXYFromQueryResult", () => {
     const out = hydrateXYFromQueryResult(
       { ...empty },
       cols([
-        { name: "month", dataType: "timestamp" },
-        { name: "total_cases", dataType: "double" },
+        { id: "month" as QueryColumn.Id, name: "month", dataType: "timestamp" },
+        {
+          id: "total_cases" as QueryColumn.Id,
+          name: "total_cases",
+          dataType: "double",
+        },
       ]),
       "bar",
     );
@@ -33,8 +43,12 @@ describe("hydrateXYFromQueryResult", () => {
     const out = hydrateXYFromQueryResult(
       { ...empty },
       cols([
-        { name: "total_cases", dataType: "double" },
-        { name: "region", dataType: "varchar" },
+        {
+          id: "total_cases" as QueryColumn.Id,
+          name: "total_cases",
+          dataType: "double",
+        },
+        { id: "region" as QueryColumn.Id, name: "region", dataType: "varchar" },
       ]),
       "bar",
     );
@@ -46,8 +60,8 @@ describe("hydrateXYFromQueryResult", () => {
     const out = hydrateXYFromQueryResult(
       { ...empty },
       cols([
-        { name: "a", dataType: "bigint" },
-        { name: "b", dataType: "double" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "bigint" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "double" },
       ]),
       "bar",
     );
@@ -57,10 +71,13 @@ describe("hydrateXYFromQueryResult", () => {
 
   it("does not overwrite preset axis keys", () => {
     const out = hydrateXYFromQueryResult(
-      { xAxisKey: "custom_x", yAxisKey: "custom_y" },
+      {
+        xAxisKey: "custom_x" as QueryColumn.Id,
+        yAxisKey: "custom_y" as QueryColumn.Id,
+      },
       cols([
-        { name: "a", dataType: "varchar" },
-        { name: "b", dataType: "double" },
+        { id: "a" as QueryColumn.Id, name: "a", dataType: "varchar" },
+        { id: "b" as QueryColumn.Id, name: "b", dataType: "double" },
       ]),
       "bar",
     );
@@ -77,7 +94,13 @@ describe("hydrateXYFromQueryResult", () => {
   it("leaves Y undefined when no numeric column", () => {
     const out = hydrateXYFromQueryResult(
       { ...empty },
-      cols([{ name: "only_text", dataType: "varchar" }]),
+      cols([
+        {
+          id: "only_text" as QueryColumn.Id,
+          name: "only_text",
+          dataType: "varchar",
+        },
+      ]),
       "bar",
     );
     expect(out.yAxisKey).toBeUndefined();

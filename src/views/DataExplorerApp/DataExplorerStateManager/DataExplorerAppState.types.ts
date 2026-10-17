@@ -4,8 +4,9 @@ import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type {
@@ -40,6 +41,8 @@ export type SourceColumnCatalog = {
 
 export type DataExplorerAppState = {
   query: PartialStructuredQuery;
+  /** Last completed block-independent Explorer binding registry. */
+  columnBindings?: ResultBindingRegistry;
 
   /** Source metadata is scoped separately from selected projections. */
   sourceCatalog?: SourceColumnCatalog;
@@ -115,7 +118,7 @@ export type DataExplorerAppState = {
    * current result schema without holding a reference to the React Query
    * cache. `undefined` while no query has succeeded.
    */
-  lastResultColumns: readonly QueryResultColumn[] | undefined;
+  lastResultColumns: readonly QueryResult.BoundColumn[] | undefined;
 
   /**
    * What caused the query that is about to run, recorded on `query.ran` and

@@ -5,22 +5,31 @@ import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { render } from "@/test-utils";
 import { FunnelChartForm } from "./FunnelChartForm";
 import { PieChartForm } from "./PieChartForm";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
 
 i18n.load("en", {});
 i18n.activate("en");
 
-const fields: readonly QueryResultColumn[] = [
-  { name: "region", dataType: "varchar" } as QueryResultColumn,
-  { name: "count", dataType: "double" } as QueryResultColumn,
+const fields: readonly QueryResult.BoundColumn[] = [
+  {
+    id: "region" as QueryColumn.Id,
+    name: "region",
+    dataType: "varchar",
+  } as QueryResult.BoundColumn,
+  {
+    id: "count" as QueryColumn.Id,
+    name: "count",
+    dataType: "double",
+  } as QueryResult.BoundColumn,
 ];
 
 const pieConfig: PieChartVizConfig = {
   vizType: "pie",
-  nameKey: "region",
-  valueKey: "count",
+  nameKey: "region" as QueryColumn.Id,
+  valueKey: "count" as QueryColumn.Id,
   isDonut: false,
   withLabels: true,
   labelsType: "value",
@@ -28,8 +37,8 @@ const pieConfig: PieChartVizConfig = {
 
 const funnelConfig: FunnelChartVizConfig = {
   vizType: "funnel",
-  nameKey: "region",
-  valueKey: "count",
+  nameKey: "region" as QueryColumn.Id,
+  valueKey: "count" as QueryColumn.Id,
 };
 
 describe("PieChartForm layout", () => {

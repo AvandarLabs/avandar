@@ -19,12 +19,12 @@ import css from "@/components/VisualizationContainer/VizSettingsForm/PairSeriesF
 import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList";
 import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { ScatterSeries } from "$/models/vizs/SeriesConfig";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 
 type Props = {
-  fields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.BoundColumn[];
   series: readonly ScatterSeries[];
   onChange: (next: ScatterSeries[]) => void;
 
@@ -52,7 +52,7 @@ export function PairSeriesFieldset({
 
   const numericOptions = useMemo(() => {
     return makeSelectOptions(numericFields, {
-      valueKey: "name",
+      valueKey: "id",
       labelKey: "name",
     });
   }, [numericFields]);
@@ -63,7 +63,7 @@ export function PairSeriesFieldset({
       return;
     }
     const yField = numericFields[1] ?? xField;
-    const next: ScatterSeries = { xKey: xField.name, key: yField.name };
+    const next: ScatterSeries = { xKey: xField.id, key: yField.id };
     onChange([...series, next]);
   }, [numericFields, series, onChange]);
 
@@ -143,7 +143,12 @@ export function PairSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          updateAt(idx, { xKey: next });
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
+                          if (column) {
+                            updateAt(idx, { xKey: column.id });
+                          }
                         }
                       }}
                     />
@@ -160,7 +165,12 @@ export function PairSeriesFieldset({
                       }
                       onChange={(next) => {
                         if (next !== null) {
-                          updateAt(idx, { key: next });
+                          const column = fields.find((field) => {
+                            return field.id === next;
+                          });
+                          if (column) {
+                            updateAt(idx, { key: column.id });
+                          }
                         }
                       }}
                     />

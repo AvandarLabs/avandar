@@ -1,10 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
-import { notifySuccess } from "@/utils/notifications/notify";
+import { notifySuccess, notifyError } from "@/utils/notifications/notify";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
+import { prepareDashboardBindings } from "@/views/DashboardApp/AvaPage/utils/prepareDashboardBindings/prepareDashboardBindings";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DashboardEditorContent } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorContent";
@@ -81,6 +83,9 @@ type SaveDashboardOptions = {
 function useSaveDashboard(
   options: Readonly<SaveDashboardOptions>,
 ): (savedData: AvaPageData) => void {
+  const queryClient = useQueryClient();
+  const { t } = useLingui();
+  const workspaceId = options.dashboard.workspaceId;
   const [saveDashboard] = DashboardClient.useUpdate({
     queriesToInvalidate: [
       DashboardClient.QueryKeys.getAll(),
@@ -98,15 +103,27 @@ function useSaveDashboard(
   const { dashboardTitle } = options;
   return useCallback(
     (savedData: AvaPageData): void => {
-      saveDashboard({
-        id: dashboardId,
-        data: {
-          name: getDashboardTitleFromPuckData(savedData) ?? dashboardTitle,
-          config: savedData as Dashboard.T["config"],
-        },
-      });
+      void prepareDashboardBindings(
+        savedData,
+        { auth: "workspace", workspaceId },
+        queryClient,
+      )
+        .then((preparedData) => {
+          return saveDashboard({
+            id: dashboardId,
+            data: {
+              name: getDashboardTitleFromPuckData(savedData) ?? dashboardTitle,
+              config: preparedData as Dashboard.T["config"],
+            },
+          });
+        })
+        .catch((error: unknown) => {
+          return notifyError(
+            t`Failed to save dashboard: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        });
     },
-    [dashboardId, dashboardTitle, saveDashboard],
+    [dashboardId, dashboardTitle, saveDashboard, workspaceId, queryClient, t],
   );
 }
 

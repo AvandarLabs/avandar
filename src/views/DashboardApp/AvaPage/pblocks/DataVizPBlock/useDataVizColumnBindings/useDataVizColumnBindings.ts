@@ -10,6 +10,7 @@ import type {
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
+import type { QueryClient } from "@tanstack/react-query";
 
 type Options = {
   scopeKey: string;
@@ -102,6 +103,7 @@ export function useDataVizColumnBindings(options: Readonly<Options>): {
   const { auth, scopeKey } = options;
   const sqlKey = normalizeSqlForSubquery(options.rawSql);
   const [schema, , query] = useQuery({
+    enabled: sqlKey.length > 0,
     queryKey: ["data-viz-column-bindings", auth, scopeKey, sqlKey],
     queryFn: async () => {
       return _discoverSchema(auth, scopeKey, sqlKey);
@@ -120,4 +122,28 @@ export function useDataVizColumnBindings(options: Readonly<Options>): {
     schema: query.isError ? undefined : schema,
     error: query.error ?? undefined,
   };
+}
+
+/** Reuses the renderer's discovery cache during an authorized editor change. */
+export async function getDataVizColumnBindings(
+  options: Readonly<Options>,
+  queryClient: QueryClient,
+): Promise<BoundResultSchema> {
+  const sqlKey = normalizeSqlForSubquery(options.rawSql);
+  const discovery = await queryClient.ensureQueryData({
+    queryKey: [
+      "data-viz-column-bindings",
+      options.auth,
+      options.scopeKey,
+      sqlKey,
+    ],
+    queryFn: () => {
+      return _discoverSchema(options.auth, options.scopeKey, sqlKey);
+    },
+    initialData: () => {
+      return _getInitialDiscovery(options);
+    },
+    staleTime: Infinity,
+  });
+  return _bindDiscovery(options, discovery);
 }

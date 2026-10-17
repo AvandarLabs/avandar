@@ -51,16 +51,36 @@ export function makeDataVizPBlockStateFromProps(options: {
     return { props: props as DataVizPBlockProps, vizConfigMemory };
   }
 
-  const nextProps: DataVizPBlockProps = {
-    nlQuery: props.nlQuery ?? DEFAULT_NL_QUERY,
-    vizType: props.vizType ?? DEFAULT_VIZ_TYPE,
+  if (props.bindingVersion === 0) {
+    return {
+      props: {
+        ...props,
+        vizType: props.vizType ?? props.vizConfig?.vizType ?? DEFAULT_VIZ_TYPE,
+      } as DataVizPBlockProps,
+      vizConfigMemory,
+    };
+  }
+  const boundProps = props as Partial<
+    Extract<DataVizPBlockProps, { bindingVersion: 1 }>
+  >;
+  const nextProps: Extract<DataVizPBlockProps, { bindingVersion: 1 }> = {
+    bindingVersion: 1,
+    columnBindings: boundProps.columnBindings ?? {
+      version: 1,
+      scopeKey: blockId,
+      sqlKey: "",
+      columns: [],
+    },
+    globalFilterTargets: boundProps.globalFilterTargets ?? {},
+    nlQuery: boundProps.nlQuery ?? DEFAULT_NL_QUERY,
+    vizType: boundProps.vizType ?? DEFAULT_VIZ_TYPE,
     vizConfig:
-      props.vizConfig ??
-      VizConfigs.makeEmptyConfig(props.vizType ?? DEFAULT_VIZ_TYPE),
+      boundProps.vizConfig ??
+      VizConfigs.makeEmptyConfig(boundProps.vizType ?? DEFAULT_VIZ_TYPE),
     globalFilterSubscription:
-      props.globalFilterSubscription ??
+      boundProps.globalFilterSubscription ??
       DataVizFilters.defaultGlobalFilterSubscription,
-    localFilters: props.localFilters ?? [],
+    localFilters: boundProps.localFilters ?? [],
   };
 
   if (changed.vizType && nextProps.vizConfig.vizType !== nextProps.vizType) {

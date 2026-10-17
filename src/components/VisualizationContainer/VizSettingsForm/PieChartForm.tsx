@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { SliceColorFields } from "@/components/VisualizationContainer/VizSettingsForm/SliceColorFields";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types";
 import type {
   SettingsColumnGroup,
@@ -15,7 +15,7 @@ import type {
 import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
-  fields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.BoundColumn[];
   config: PieChartVizConfig;
   data: UnknownDataFrame;
   onConfigChange: (newConfig: PieChartVizConfig) => void;
@@ -39,13 +39,13 @@ export function PieChartForm({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const fieldOptions = useMemo(() => {
-    return makeSelectOptions(fields, { valueKey: "name", labelKey: "name" });
+    return makeSelectOptions(fields, { valueKey: "id", labelKey: "name" });
   }, [fields]);
 
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
       fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
-      { valueKey: "name", labelKey: "name" },
+      { valueKey: "id", labelKey: "name" },
     );
   }, [fields]);
 
@@ -55,13 +55,19 @@ export function PieChartForm({
     }
     const seen = new Set<string>();
     data.forEach((row) => {
-      const name = String(row[config.nameKey ?? ""] ?? "");
+      const name = String(
+        row[
+          fields.find((column) => {
+            return column.id === config.nameKey;
+          })?.name ?? ""
+        ] ?? "",
+      );
       if (name) {
         seen.add(name);
       }
     });
     return Array.from(seen);
-  }, [data, config.nameKey]);
+  }, [data, config.nameKey, fields]);
 
   const labelsTypeOptions = [
     { label: t`Value`, value: "value" },
@@ -88,7 +94,12 @@ export function PieChartForm({
                 : t`Select a column`
             }
             onChange={(field) => {
-              onConfigChange({ ...config, nameKey: field ?? undefined });
+              onConfigChange({
+                ...config,
+                nameKey: fields.find((column) => {
+                  return column.id === field;
+                })?.id,
+              });
             }}
           />
 
@@ -104,7 +115,12 @@ export function PieChartForm({
                 : t`Select a column`
             }
             onChange={(field) => {
-              onConfigChange({ ...config, valueKey: field ?? undefined });
+              onConfigChange({
+                ...config,
+                valueKey: fields.find((column) => {
+                  return column.id === field;
+                })?.id,
+              });
             }}
           />
         </Stack>

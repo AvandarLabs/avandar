@@ -3,8 +3,8 @@ import { getAxisRolesFromVizType } from "$/models/vizs/getAxisRolesFromVizType/g
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import { useAxisValueExtent } from "@/lib/ui/viz/axis/useAxisValueExtent";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import type { LegacyBubbleSeries as BubbleSeries } from "$/models/vizs/BoundVizConfig/LegacyVizConfig.types";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types";
-import type { BubbleSeries } from "$/models/vizs/SeriesConfig";
 import type { ChartStyleProps } from "@/lib/ui/viz/applyChartStyle/applyChartStyle";
 import type { UnknownDataFrame } from "@avandar/utils";
 

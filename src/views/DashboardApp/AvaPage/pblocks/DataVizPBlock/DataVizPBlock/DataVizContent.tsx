@@ -17,7 +17,8 @@ type Props = {
   prompt: string;
   rawSql: string;
   isLoading: boolean;
-  columns: QueryResult.Column[];
+  columns: readonly QueryResult.BoundColumn[];
+  rawColumns?: readonly QueryResult.Column[];
   data: UnknownDataFrame;
   dateColumns: ReadonlySet<string>;
   displayVizConfig: VizConfig.T;
@@ -39,6 +40,7 @@ export function DataVizContent({
   rawSql,
   isLoading,
   columns,
+  rawColumns,
   data,
   dateColumns,
   displayVizConfig,
@@ -84,6 +86,7 @@ export function DataVizContent({
         <Box pos="relative" w="100%" h={420}>
           <LoadingOverlay visible={isLoading} zIndex={10} />
           <VisualizationContainer
+            rawColumns={rawColumns}
             columns={columns}
             data={data}
             dateColumns={dateColumns}

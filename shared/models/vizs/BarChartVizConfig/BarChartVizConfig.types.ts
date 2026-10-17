@@ -1,9 +1,10 @@
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 import type { XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
 /**
  * Configuration for a bar chart. The chart is the host; individual
- * series declare how they render (bar by default — but a line or area
+ * series declare how they render (bar by default - but a line or area
  * series can be embedded, in which case the renderer falls back to a
  * composite chart).
  */
@@ -12,11 +13,10 @@ export type BarChartVizConfig = {
 
   /**
    * The key of the column to use for the X (category) axis. This is a
-   * column name, not an ID.
+   * stable result-column ID.
    *
-   * TODO(jpsyx): create a concept of a QueryColumn and use QueryColumnId here.
    */
-  xAxisKey: string | undefined;
+  xAxisKey: QueryColumn.Id | undefined;
 
   /**
    * One entry per rendered series. Each series carries its own `key`

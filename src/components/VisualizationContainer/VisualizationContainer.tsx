@@ -5,6 +5,7 @@ import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
+import { resolveVizColumnBindings } from "$/models/vizs/resolveVizColumnBindings/resolveVizColumnBindings";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -17,11 +18,16 @@ import { LineChart } from "@/lib/ui/viz/LineChart";
 import { PieChart } from "@/lib/ui/viz/PieChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
-  columns: readonly QueryResultColumn[];
+  columns: readonly QueryResult.BoundColumn[];
+  /**
+   * Raw output metadata remains available to tables when identity is
+   * ambiguous.
+   */
+  rawColumns?: readonly QueryResult.Column[];
 
   /**
    * The names of the query result columns that are dates.
@@ -120,6 +126,7 @@ function useVizConfigSchemas() {
  */
 export function VisualizationContainer({
   columns,
+  rawColumns = columns,
   data,
   dateColumns,
   vizConfig,
@@ -129,10 +136,11 @@ export function VisualizationContainer({
 
   const { t } = useLingui();
   const schemas = useVizConfigSchemas();
-  const columnNames = columns.map(prop("name"));
+  const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  return match(vizConfig)
+  const resolved = resolveVizColumnBindings(vizConfig, columns);
+  return match(resolved.config)
     .with({ vizType: "table" }, () => {
       return (
         <Box h="100%" w="100%" mih={0}>

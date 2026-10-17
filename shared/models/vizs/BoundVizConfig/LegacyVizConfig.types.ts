@@ -129,3 +129,10 @@ export type LegacyAxisStyle = {
 
 /** Row-key output produced exclusively at the renderer boundary. */
 export type ResolvedVizConfig = LegacyVizConfig;
+
+/** Row-key bar marks. */
+export type LegacyBarSeries = Extract<LegacyXYSeries, { renderAs: "bar" }>;
+/** Row-key line marks. */
+export type LegacyLineSeries = Extract<LegacyXYSeries, { renderAs: "line" }>;
+/** Row-key area marks. */
+export type LegacyAreaSeries = Extract<LegacyXYSeries, { renderAs: "area" }>;

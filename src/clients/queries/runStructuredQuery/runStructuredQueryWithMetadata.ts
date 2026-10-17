@@ -224,7 +224,11 @@ export async function runStructuredQueryWithMetadata(
     await _selectSqlForExecution(params);
 
   if (sqlToRun) {
-    return { result: await _runRawSql(params, sqlToRun), didAutoLimit };
+    return {
+      result: await _runRawSql(params, sqlToRun),
+      didAutoLimit,
+      executedSql: sqlToRun,
+    };
   }
 
   return {
@@ -235,5 +239,6 @@ export async function runStructuredQueryWithMetadata(
       sortedQueryColumns,
     }),
     didAutoLimit,
+    executedSql: sqlToRun,
   };
 }

@@ -14,7 +14,7 @@ import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAware
 import { SeriesCard } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard";
 import { useChartSettingGroups } from "@/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups";
 import { useUpdateSettingPath } from "@/components/VisualizationContainer/VizSettingsForm/useUpdateSettingPath";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
@@ -32,7 +32,7 @@ type RadarHostConfig = RadarChartVizConfig;
 export type HostConfig = XYHostConfig | RadarHostConfig;
 
 type Props<TConfig extends HostConfig> = {
-  fields: readonly QueryResultColumn[];
+  fields: readonly QueryResult.BoundColumn[];
   config: TConfig;
   onConfigChange: (nextConfig: TConfig) => void;
 
@@ -117,14 +117,14 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       }),
     );
     const nextNumeric = numericFields.find((c) => {
-      return !usedKeys.has(c.name);
+      return !usedKeys.has(c.id);
     });
     if (nextNumeric === undefined) {
       return;
     }
     if (isRadar) {
       const radarConfig = config as RadarHostConfig;
-      const nextSeries: RadarSeries = { key: nextNumeric.name };
+      const nextSeries: RadarSeries = { key: nextNumeric.id };
       onConfigChange({
         ...radarConfig,
         series: [...radarConfig.series, nextSeries],
@@ -133,7 +133,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       const xyConfig = config as XYHostConfig;
       const nextSeries: XYSeries = {
         renderAs: xyConfig.vizType,
-        key: nextNumeric.name,
+        key: nextNumeric.id,
       } as XYSeries;
       onConfigChange({
         ...xyConfig,

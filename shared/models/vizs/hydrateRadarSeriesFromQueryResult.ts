@@ -1,48 +1,38 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import {
-  columnNameSet,
-  pickFirstNumericColumnName,
-} from "$/models/vizs/hydrateColumnPicking.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import { pickFirstNumericColumnId } from "$/models/vizs/hydrateColumnPicking.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type RadarSeriesConfig = {
-  nameKey: string | undefined;
+  nameKey: QueryColumn.Id | undefined;
   series: readonly RadarSeries[];
 };
 
 /**
- * Reconcile a radar config against current query columns: prune any
- * `nameKey` or `series[i].key` that references a column the query no
- * longer returns, then seed sensible defaults. The first numeric
- * column becomes the first series; the first non-series text/temporal
- * column becomes the name axis. Goal: a config that always renders
- * something useful when columns change, never references a missing
- * column.
+ * Seeds unconfigured slots from column IDs and preserves existing selections
+ * and styles, including identities absent from the current result.
  */
 export function hydrateRadarSeriesFromQueryResult<
   VConfig extends RadarSeriesConfig,
->(currVizConfig: VConfig, columns: readonly QueryResultColumn[]): VConfig {
+>(
+  currVizConfig: VConfig,
+  columns: readonly QueryResult.BoundColumn[],
+): VConfig {
   if (columns.length === 0) {
     return currVizConfig;
   }
-  const colNames = columnNameSet(columns);
 
-  let nextSeries: RadarSeries[] = currVizConfig.series.filter((s) => {
-    return colNames.has(s.key);
-  });
+  let nextSeries: RadarSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
-    const firstNumericName = pickFirstNumericColumnName(columns);
-    if (firstNumericName !== undefined) {
-      nextSeries = [{ key: firstNumericName }];
+    const firstNumericId = pickFirstNumericColumnId(columns);
+    if (firstNumericId !== undefined) {
+      nextSeries = [{ key: firstNumericId }];
     }
   }
 
-  let nextNameKey =
-    currVizConfig.nameKey && colNames.has(currVizConfig.nameKey)
-      ? currVizConfig.nameKey
-      : undefined;
+  let nextNameKey = currVizConfig.nameKey;
   if (nextNameKey === undefined && nextSeries.length > 0) {
     const seriesKeys = new Set(
       nextSeries.map((s) => {
@@ -50,7 +40,7 @@ export function hydrateRadarSeriesFromQueryResult<
       }),
     );
     const others = columns.filter((c) => {
-      return !seriesKeys.has(c.name);
+      return !seriesKeys.has(c.id);
     });
     const text = others.find((c) => {
       return AvaDataType.isText(c.dataType);
@@ -62,7 +52,7 @@ export function hydrateRadarSeriesFromQueryResult<
       }) ??
       others[0];
     if (pick !== undefined) {
-      nextNameKey = pick.name;
+      nextNameKey = pick.id;
     }
   }
 

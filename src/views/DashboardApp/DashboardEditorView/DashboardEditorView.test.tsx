@@ -1,6 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, RenderOptions, screen } from "@/test-utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  fireEvent,
+  render,
+  RenderOptions,
+  screen,
+  waitFor,
+} from "@/test-utils";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { User } from "$/models/User/User";
@@ -31,7 +37,8 @@ vi.mock("@puckeditor/core/puck.css", () => {
   return {};
 });
 
-vi.mock("@puckeditor/core", async () => {
+vi.mock("@puckeditor/core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@puckeditor/core")>();
   const { createElement, useEffect } = await import("react");
 
   type PuckProps = {
@@ -100,7 +107,7 @@ vi.mock("@puckeditor/core", async () => {
     };
   }
 
-  return { Puck: PuckMock, createUsePuck };
+  return { ...actual, Puck: PuckMock, createUsePuck };
 });
 
 vi.mock("@/components/layouts/AppSlate/AppSlate", async () => {
@@ -183,15 +190,23 @@ vi.mock(
   },
 );
 
+const { saveDashboard } = vi.hoisted(() => {
+  return { saveDashboard: vi.fn() };
+});
+beforeEach(() => {
+  return saveDashboard.mockClear();
+});
+
 vi.mock("@/clients/dashboards/DashboardClient/DashboardClient", () => {
   return {
     DashboardClient: {
       useUpdate: (config: {
         onSuccess?: () => void;
       }): [(...args: unknown[]) => void, boolean] => {
-        const saveFn = vi.fn(() => {
+        const saveFn = (...args: unknown[]) => {
+          saveDashboard(...args);
           config.onSuccess?.();
-        });
+        };
         return [saveFn, false];
       },
       useFullDelete: (): [ReturnType<typeof vi.fn>, boolean] => {
@@ -309,7 +324,7 @@ describe("DashboardEditorView", () => {
     );
   });
 
-  it("clears the unsaved-changes flag after saving the new component", () => {
+  it("clears the unsaved-changes flag after saving the new component", async () => {
     renderWithProviders(
       <DashboardEditorView
         dashboard={_makeDashboard()}
@@ -325,13 +340,14 @@ describe("DashboardEditorView", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
-    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
-      "data-has-unsaved-changes",
-      "false",
-    );
+    await waitFor(() => {
+      return expect(
+        screen.getByTestId("dashboard-share-button"),
+      ).toHaveAttribute("data-has-unsaved-changes", "false");
+    });
   });
 
-  it("saves the dashboard when mod+S is pressed", () => {
+  it("saves the dashboard when mod+S is pressed", async () => {
     renderWithProviders(
       <DashboardEditorView
         dashboard={_makeDashboard()}
@@ -351,10 +367,11 @@ describe("DashboardEditorView", () => {
       metaKey: true,
     });
 
-    expect(screen.getByTestId("dashboard-share-button")).toHaveAttribute(
-      "data-has-unsaved-changes",
-      "false",
-    );
+    await waitFor(() => {
+      return expect(
+        screen.getByTestId("dashboard-share-button"),
+      ).toHaveAttribute("data-has-unsaved-changes", "false");
+    });
   });
 });
 
@@ -392,4 +409,44 @@ describe("DashboardEditorView Puck remount", () => {
       revisionAfterMount ?? "",
     );
   });
+});
+
+it("loading the same legacy chart twice neither saves nor changes its stored names", () => {
+  const dashboard = _makeDashboard();
+  dashboard.config = {
+    root: { props: { title: "Legacy", schemaVersion: 4 } },
+    content: [
+      {
+        type: "DataViz",
+        props: {
+          id: "chart",
+          nlQuery: {
+            prompt: "Sales",
+            rawSql: "SELECT revenue FROM sales",
+            generations: [],
+          },
+          vizType: "line",
+          vizConfig: {
+            vizType: "line",
+            xAxisKey: "region",
+            series: [{ key: "revenue", renderAs: "line", color: "#123456" }],
+            withLegend: true,
+          },
+          localFilters: [],
+          globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
+        },
+      },
+    ],
+  } as Dashboard.T["config"];
+  const original = JSON.stringify(dashboard.config);
+  const first = renderWithProviders(
+    <DashboardEditorView dashboard={dashboard} workspaceSlug="test" />,
+  );
+  first.unmount();
+  const second = renderWithProviders(
+    <DashboardEditorView dashboard={dashboard} workspaceSlug="test" />,
+  );
+  expect(saveDashboard).not.toHaveBeenCalled();
+  expect(JSON.stringify(dashboard.config)).toBe(original);
+  second.unmount();
 });

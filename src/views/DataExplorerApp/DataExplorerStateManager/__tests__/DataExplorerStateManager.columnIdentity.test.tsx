@@ -3,6 +3,7 @@ import { Model } from "@avandar/models";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { resolveVizColumnBindings } from "$/models/vizs/resolveVizColumnBindings/resolveVizColumnBindings";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm";
@@ -85,18 +86,23 @@ vi.mock(
 
 const _STYLED_BAR_CONFIG: BarChartVizConfig = {
   vizType: "bar",
-  xAxisKey: "quarter",
+  xAxisKey: "quarter" as QueryColumn.Id,
   layout: "group",
   withLegend: true,
   series: [
     {
-      key: "revenue",
+      key: "revenue" as QueryColumn.Id,
       renderAs: "line",
       label: "Revenue trend",
       color: "#123456",
       strokeWidth: 4,
     },
-    { key: "profit", renderAs: "bar", label: "Profit", color: "#654321" },
+    {
+      key: "profit" as QueryColumn.Id,
+      renderAs: "bar",
+      label: "Profit",
+      color: "#654321",
+    },
   ],
 };
 
@@ -148,7 +154,16 @@ describe("Data Explorer column identity", () => {
       return result.current[1].setColumns([quarter, revenue, profit]);
     });
     act(() => {
-      return result.current[1].setVizConfig(_STYLED_BAR_CONFIG);
+      return result.current[1].setVizConfig({
+        ..._STYLED_BAR_CONFIG,
+        xAxisKey: quarter.id,
+        series: _STYLED_BAR_CONFIG.series.map((series) => {
+          return {
+            ...series,
+            key: series.key === "revenue" ? revenue.id : profit.id,
+          };
+        }),
+      });
     });
 
     act(() => {
@@ -158,17 +173,121 @@ describe("Data Explorer column identity", () => {
       });
     });
 
-    expect(result.current[0].vizConfig).toMatchObject({
+    const resolved = resolveVizColumnBindings(result.current[0].vizConfig, [
+      { id: quarter.id, name: "quarter", dataType: "varchar" },
+      { id: revenue.id, name: "sum(revenue)", dataType: "double" },
+      { id: profit.id, name: "profit", dataType: "double" },
+    ]);
+    expect(resolved.config).toMatchObject({
       series: [
         {
-          key: "sum(revenue)",
+          key: "sum(revenue)" as QueryColumn.Id,
           renderAs: "line",
           label: "Revenue trend",
           color: "#123456",
           strokeWidth: 4,
         },
-        { key: "profit", renderAs: "bar", label: "Profit", color: "#654321" },
+        {
+          key: "profit" as QueryColumn.Id,
+          renderAs: "bar",
+          label: "Profit",
+          color: "#654321",
+        },
       ],
+    });
+  });
+
+  it("waits for current raw-SQL metadata before seeding a new chart type", () => {
+    const { result } = _renderStateManager();
+    const oldColumn = QueryColumn.makeFromDatasetColumn(
+      _createSourceColumn("old", "double"),
+    );
+    act(() => {
+      return result.current[1].setColumns([oldColumn]);
+    });
+    act(() => {
+      return result.current[1].setRawSql("SELECT other FROM new_source");
+    });
+    act(() => {
+      return result.current[1].setActiveVizType("bar");
+    });
+    expect(result.current[0].vizConfig).toMatchObject({
+      xAxisKey: undefined,
+      series: [],
+    });
+    const currentColumns = [
+      {
+        id: "new-output" as QueryColumn.Id,
+        name: "other",
+        dataType: "double" as const,
+      },
+    ];
+    act(() => {
+      return result.current[1].syncVizFromQueryResult(currentColumns);
+    });
+    expect(result.current[0].vizConfig).toMatchObject({
+      series: [{ key: currentColumns[0]!.id }],
+    });
+  });
+
+  it("propagates scatter X-only and bubble size-only changes through the real provider", () => {
+    const { result } = _renderStateManager();
+    const x = "x" as QueryColumn.Id;
+    const y = "y" as QueryColumn.Id;
+    const size = "size" as QueryColumn.Id;
+    const changed = "changed" as QueryColumn.Id;
+    const columns = [x, y, size, changed].map((id) => {
+      return { id, name: String(id), dataType: "double" as const };
+    });
+    act(() => {
+      return result.current[1].setVizConfig({
+        vizType: "scatter",
+        series: [{ xKey: x, key: y, label: "Measured", color: "#123456" }],
+      });
+    });
+    act(() => {
+      return result.current[1].syncVizFromQueryResult(columns);
+    });
+    act(() => {
+      return result.current[1].setVizConfig({
+        vizType: "scatter",
+        series: [
+          { xKey: changed, key: y, label: "Measured", color: "#123456" },
+        ],
+      });
+    });
+    act(() => {
+      return result.current[1].syncVizFromQueryResult(columns);
+    });
+    expect(
+      resolveVizColumnBindings(result.current[0].vizConfig, columns).config,
+    ).toMatchObject({
+      series: [
+        { xKey: "changed", key: "y", label: "Measured", color: "#123456" },
+      ],
+    });
+    act(() => {
+      return result.current[1].setVizConfig({
+        vizType: "bubble",
+        series: [{ xKey: x, key: y, sizeKey: size, color: "#654321" }],
+      });
+    });
+    act(() => {
+      return result.current[1].syncVizFromQueryResult(columns);
+    });
+    act(() => {
+      return result.current[1].setVizConfig({
+        vizType: "bubble",
+        series: [{ xKey: x, key: y, sizeKey: changed, color: "#654321" }],
+      });
+    });
+    act(() => {
+      return result.current[1].syncVizFromQueryResult(columns);
+    });
+    expect(
+      resolveVizColumnBindings(result.current[0].vizConfig, columns).config,
+    ).toMatchObject({
+      series: [{ xKey: "x", key: "y", sizeKey: "changed", color: "#654321" }],
     });
   });
 

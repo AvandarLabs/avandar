@@ -1,10 +1,11 @@
 import { matchLiteral, prop } from "@avandar/utils";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { DashboardFilterMode } from "$/types/dashboard.types";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 
-export type LocalFilter = {
+export type LegacyLocalFilter = {
   /** Stable identifier used for viewer state. */
   id: string;
   /** Display label shown above the input. */
@@ -17,6 +18,11 @@ export type LocalFilter = {
   optionsRaw: string;
   /** Default value, encoded as JSON for multi-select filters. */
   defaultValue: string;
+};
+
+/** Local filter with an output identity target. */
+export type LocalFilter = Omit<LegacyLocalFilter, "columnName"> & {
+  columnId: QueryColumn.Id;
 };
 
 export type GlobalFilterSubscription = {
@@ -44,7 +50,7 @@ type ParseLocalFilterDefaultValueOptions = {
 };
 
 type LocalFilterToRecordOptions = {
-  filter: LocalFilter;
+  filter: LegacyLocalFilter;
   value: string | readonly string[] | undefined;
 };
 

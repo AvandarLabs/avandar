@@ -3,7 +3,8 @@ import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { render, screen } from "@/test-utils";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownDataFrame } from "@avandar/utils";
 
 const { notifyWarningMock } = vi.hoisted(() => {
@@ -167,10 +168,10 @@ vi.mock("@/lib/ui/viz/BubbleChart", () => {
   };
 });
 
-const COLUMNS: readonly QueryResultColumn[] = [
-  { name: "category", dataType: "varchar" },
-  { name: "value", dataType: "double" },
-  { name: "score", dataType: "double" },
+const COLUMNS: readonly QueryResult.BoundColumn[] = [
+  { id: "category" as QueryColumn.Id, name: "category", dataType: "varchar" },
+  { id: "value" as QueryColumn.Id, name: "value", dataType: "double" },
+  { id: "score" as QueryColumn.Id, name: "score", dataType: "double" },
 ];
 
 const DATA = [
@@ -213,8 +214,8 @@ describe("VisualizationContainer", () => {
   it("renders the bar chart with the chosen axes", () => {
     renderViz({
       vizType: "bar",
-      xAxisKey: "category",
-      series: [{ renderAs: "bar", key: "value" }],
+      xAxisKey: "category" as QueryColumn.Id,
+      series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
       layout: "group",
       withLegend: true,
     });
@@ -239,8 +240,14 @@ describe("VisualizationContainer", () => {
   it("renders the line chart with the chosen axes", () => {
     renderViz({
       vizType: "line",
-      xAxisKey: "category",
-      series: [{ renderAs: "line", key: "value", curveType: "monotone" }],
+      xAxisKey: "category" as QueryColumn.Id,
+      series: [
+        {
+          renderAs: "line",
+          key: "value" as QueryColumn.Id,
+          curveType: "monotone",
+        },
+      ],
       withLegend: false,
     });
     const line = screen.getByTestId("line-chart");
@@ -251,8 +258,14 @@ describe("VisualizationContainer", () => {
   it("renders the area chart with the chosen axes", () => {
     renderViz({
       vizType: "area",
-      xAxisKey: "category",
-      series: [{ renderAs: "area", key: "value", curveType: "linear" }],
+      xAxisKey: "category" as QueryColumn.Id,
+      series: [
+        {
+          renderAs: "area",
+          key: "value" as QueryColumn.Id,
+          curveType: "linear",
+        },
+      ],
       layout: "default",
       withLegend: false,
     });
@@ -264,7 +277,9 @@ describe("VisualizationContainer", () => {
   it("renders the scatter chart with the chosen axes", () => {
     renderViz({
       vizType: "scatter",
-      series: [{ xKey: "value", key: "score" }],
+      series: [
+        { xKey: "value" as QueryColumn.Id, key: "score" as QueryColumn.Id },
+      ],
     });
     const scatter = screen.getByTestId("scatter-chart");
     expect(scatter).toHaveAttribute("data-x", "value");
@@ -274,8 +289,8 @@ describe("VisualizationContainer", () => {
   it("renders the pie chart with the chosen name and value", () => {
     renderViz({
       vizType: "pie",
-      nameKey: "category",
-      valueKey: "value",
+      nameKey: "category" as QueryColumn.Id,
+      valueKey: "value" as QueryColumn.Id,
       isDonut: false,
       withLabels: true,
       labelsType: "value",
@@ -288,8 +303,8 @@ describe("VisualizationContainer", () => {
   it("renders the funnel chart with the chosen name and value", () => {
     renderViz({
       vizType: "funnel",
-      nameKey: "category",
-      valueKey: "value",
+      nameKey: "category" as QueryColumn.Id,
+      valueKey: "value" as QueryColumn.Id,
     });
     const funnel = screen.getByTestId("funnel-chart");
     expect(funnel).toHaveAttribute("data-name", "category");
@@ -299,8 +314,8 @@ describe("VisualizationContainer", () => {
   it("renders the radar chart with the chosen name and value", () => {
     renderViz({
       vizType: "radar",
-      nameKey: "category",
-      series: [{ key: "value" }],
+      nameKey: "category" as QueryColumn.Id,
+      series: [{ key: "value" as QueryColumn.Id }],
       withLegend: true,
     });
     const radar = screen.getByTestId("radar-chart");
@@ -311,7 +326,13 @@ describe("VisualizationContainer", () => {
   it("renders the bubble chart with the chosen axes and size", () => {
     renderViz({
       vizType: "bubble",
-      series: [{ xKey: "value", key: "score", sizeKey: "value" }],
+      series: [
+        {
+          xKey: "value" as QueryColumn.Id,
+          key: "score" as QueryColumn.Id,
+          sizeKey: "value" as QueryColumn.Id,
+        },
+      ],
     });
     const bubble = screen.getByTestId("bubble-chart");
     expect(bubble).toHaveAttribute("data-x", "value");
@@ -331,8 +352,8 @@ describe("VisualizationContainer", () => {
     renderViz(
       {
         vizType: "bar",
-        xAxisKey: "category",
-        series: [{ renderAs: "bar", key: "value" }],
+        xAxisKey: "category" as QueryColumn.Id,
+        series: [{ renderAs: "bar", key: "value" as QueryColumn.Id }],
         layout: "group",
         withLegend: true,
       },
@@ -361,4 +382,23 @@ describe("VisualizationContainer", () => {
     );
     expect(notifyWarningMock).not.toHaveBeenCalled();
   });
+});
+
+it("retains raw table metadata when a column cannot receive a unique identity", () => {
+  render(
+    <AvandarAppProvider>
+      <VisualizationContainer
+        columns={[]}
+        rawColumns={[{ name: "unbound", dataType: "varchar" }]}
+        data={[{ unbound: "value" }]}
+        dateColumns={new Set()}
+        vizConfig={{ vizType: "table" }}
+      />
+    </AvandarAppProvider>,
+  );
+  expect(screen.getByTestId("data-grid")).toHaveTextContent("unbound");
+  expect(screen.getByTestId("data-grid")).toHaveAttribute(
+    "data-row-count",
+    "1",
+  );
 });

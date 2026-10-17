@@ -12,17 +12,21 @@ import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError } from "@/utils/notifications/notify";
+import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
 import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode";
 import { SaveToDashboardListMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 type Props = {
+  columnBindings: ResultBindingRegistry;
   rawSql: string;
   prompt: string | undefined;
   vizType: VizType;
@@ -53,6 +57,7 @@ type Mode = "list" | "create";
  * owns the mode state, the dashboards query, and the mutations.
  */
 export function SaveToDashboardModal({
+  columnBindings,
   rawSql,
   prompt,
   vizType,
@@ -185,17 +190,20 @@ export function SaveToDashboardModal({
   const isMutating = isInsertingDashboard || isUpdatingDashboard;
 
   const onSaveToExisting = (targetDashboard: Dashboard.T) => {
+    if (!columnBindings) {
+      return;
+    }
     const newBlock = createDataVizBlock({
+      columnBindings,
       rawSql,
       prompt,
       vizType,
       vizConfig,
     });
 
-    const existingConfig = targetDashboard.config as unknown as {
-      content: unknown[];
-      root: unknown;
-    };
+    const existingConfig = upgradeAvaPageData(
+      targetDashboard.config as unknown as AvaPageGenericData,
+    );
     const updatedConfig = {
       ...existingConfig,
       content: [...(existingConfig.content ?? []), newBlock],
@@ -213,7 +221,11 @@ export function SaveToDashboardModal({
       return;
     }
 
+    if (!columnBindings) {
+      return;
+    }
     const newBlock = createDataVizBlock({
+      columnBindings,
       rawSql,
       prompt,
       vizType,

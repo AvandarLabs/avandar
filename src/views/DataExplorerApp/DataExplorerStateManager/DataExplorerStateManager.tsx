@@ -6,6 +6,7 @@ import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult/applyVizConfigFromQueryResult";
+import { rebindProvisionalVizConfig } from "$/models/vizs/rebindProvisionalVizConfig/rebindProvisionalVizConfig";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
@@ -17,8 +18,9 @@ import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQuer
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { SqlFailedMappingReason } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/SqlFailedMappingReason.types";
 import type {
   VizConfig,
@@ -321,23 +323,20 @@ export const DataExplorerStateManager = createAppStateManager({
       }
 
       const rememberedVizConfig = vizConfigMemory[newVizType];
+      const initialVizConfig =
+        rememberedVizConfig ??
+        VizConfigs.convertVizConfig(vizConfig, newVizType);
       const nextVizConfig =
-        rememberedVizConfig === undefined
-          ? VizConfigs.hydrateFromQuery(
-              VizConfigs.convertVizConfig(vizConfig, newVizType),
+        lastResultColumns !== undefined
+          ? applyVizConfigFromQueryResult({
+              vizConfig: initialVizConfig,
+              rawSql,
               query,
-            )
-          : // Without results there is nothing to reconcile against, so the
-            // remembered config stands as-is until `syncVizFromQueryResult`
-            // runs.
-            lastResultColumns === undefined
-            ? rememberedVizConfig
-            : applyVizConfigFromQueryResult({
-                vizConfig: rememberedVizConfig,
-                rawSql,
-                query,
-                columns: lastResultColumns,
-              });
+              columns: lastResultColumns,
+            })
+          : rememberedVizConfig === undefined && state.isStructuredQueryInSync
+            ? VizConfigs.hydrateFromQuery(initialVizConfig, query)
+            : initialVizConfig;
 
       // TypeScript widens the computed union key to `string` and so cannot see
       // that `vizConfig` lands under its own `vizType`. The key is taken from
@@ -355,12 +354,12 @@ export const DataExplorerStateManager = createAppStateManager({
     },
 
     /**
-     * Clears axis keys missing from the latest result columns and applies
-     * `hydrateFromQueryResult` when `shouldHydrateVizFromQueryResult` is true.
+     * Seeds unconfigured slots from completed bound metadata and preserves
+     * owned selections while their output is unavailable.
      */
     syncVizFromQueryResult: (
       state: DataExplorerAppState,
-      columns: readonly QueryResultColumn[],
+      columns: readonly QueryResult.BoundColumn[],
     ) => {
       const next = applyVizConfigFromQueryResult({
         vizConfig: state.vizConfig,
@@ -389,6 +388,31 @@ export const DataExplorerStateManager = createAppStateManager({
       };
     },
 
+    /** Records the completed registry used by explicit save. */
+    setColumnBindings: (
+      state: DataExplorerAppState,
+      columnBindings: ResultBindingRegistry,
+    ) => {
+      const previous = state.columnBindings;
+      if (!previous) {
+        return { ...state, columnBindings };
+      }
+      const vizConfig = rebindProvisionalVizConfig(
+        state.vizConfig,
+        previous,
+        columnBindings,
+      );
+      const vizConfigMemory = Object.fromEntries(
+        Object.entries(state.vizConfigMemory).map(([type, config]) => {
+          return [
+            type,
+            rebindProvisionalVizConfig(config, previous, columnBindings),
+          ];
+        }),
+      ) as Partial<VizConfigRegistry>;
+      return { ...state, columnBindings, vizConfig, vizConfigMemory };
+    },
+
     setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig) => {
       // fill in the defaults
       return setValue(state, "vizConfig", vizConfig);
@@ -410,6 +434,7 @@ export const DataExplorerStateManager = createAppStateManager({
       return {
         ...state,
         rawSql: rawSql,
+        lastResultColumns: undefined,
         isStructuredQueryInSync: false,
         sqlSyncWarnings: state.sqlSyncWarnings,
       };
