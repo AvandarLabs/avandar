@@ -34,6 +34,14 @@ type CreatePostgresConnectorOptions = {
   ) => PostgresSql;
 };
 
+/** Input to {@link _assertWithinPostgresCallCaps}. */
+type AssertWithinPostgresCallCapsOptions = {
+  rowCount: number;
+  byteCount: number;
+  descriptor: RelationRowDescriptor;
+  message: string;
+};
+
 /**
  * Throws `too_large` unless `byteCount`/`rowCount` both stay within the
  * shared Postgres cap contract (`postgresMaxRowsPerCall`,
@@ -42,12 +50,9 @@ type CreatePostgresConnectorOptions = {
  * so the edge function enforces exactly what it advertises rather than a
  * second, separately-maintained threshold check.
  */
-function _assertWithinPostgresCallCaps(options: {
-  rowCount: number;
-  byteCount: number;
-  descriptor: RelationRowDescriptor;
-  message: string;
-}): void {
+function _assertWithinPostgresCallCaps(
+  options: Readonly<AssertWithinPostgresCallCapsOptions>,
+): void {
   const withinCaps = isWithinRelationCallCaps({
     rowCount: options.rowCount,
     byteCount: options.byteCount,

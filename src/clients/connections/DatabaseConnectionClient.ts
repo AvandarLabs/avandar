@@ -22,14 +22,14 @@ export type PostgresDatabaseConnectionWithDetails = {
 
 type DatabaseConnectionClientQueries = {
   /** Every saved connection in a workspace, for the connection picker. */
-  getAll: (params: {
-    workspaceId: Workspace.Id;
-  }) => Promise<DatabaseConnection.T[]>;
+  getAll: (
+    params: Readonly<{ workspaceId: Workspace.Id }>,
+  ) => Promise<DatabaseConnection.T[]>;
 
   /** One saved connection by id, or `undefined` if it does not exist. */
-  getById: (params: {
-    id: DatabaseConnection.Id;
-  }) => Promise<DatabaseConnection.T | undefined>;
+  getById: (
+    params: Readonly<{ id: DatabaseConnection.Id }>,
+  ) => Promise<DatabaseConnection.T | undefined>;
 
   /**
    * Every saved Postgres connection in a workspace, joined with its
@@ -38,9 +38,9 @@ type DatabaseConnectionClientQueries = {
    * specific rather than a generic join, since a future connector type's
    * picker will need its own satellite's fields, not these.
    */
-  getAllPostgres: (params: {
-    workspaceId: Workspace.Id;
-  }) => Promise<PostgresDatabaseConnectionWithDetails[]>;
+  getAllPostgres: (
+    params: Readonly<{ workspaceId: Workspace.Id }>,
+  ) => Promise<PostgresDatabaseConnectionWithDetails[]>;
 };
 
 type IDatabaseConnectionClient = ServiceClient<"DatabaseConnectionClient"> &

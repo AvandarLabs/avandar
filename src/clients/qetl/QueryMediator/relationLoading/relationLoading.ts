@@ -46,6 +46,32 @@ type FetchRelationSourceOptions = {
   growFromColumnsByDatasetId: NeededColumnsByDatasetId;
 };
 
+/** Input to {@link probeStorageRelationCache}. */
+type ProbeStorageRelationCacheOptions = {
+  datasetIds: readonly Dataset.Id[];
+  neededByDatasetId: NeededColumnsByDatasetId;
+  relationCache: RelationCachePort;
+  principalKey: PrincipalKey;
+};
+
+/** Input to {@link fetchRelationBytes}. */
+type FetchRelationBytesOptions = {
+  datasetDuckDbLease: DatasetDuckDbLease;
+  growFromColumnsByDatasetId: NeededColumnsByDatasetId;
+  neededByDatasetId: NeededColumnsByDatasetId;
+  relationSources: readonly RelationSource[];
+  runQuery: QetlRunQuery;
+};
+
+/** Input to {@link loadRelationBytes}. */
+type LoadRelationBytesOptions = {
+  relations: readonly AcquiredRelationBytes[];
+  relationsToStore: readonly AcquiredRelationBytes[];
+  datasetDuckDbLease: DatasetDuckDbLease;
+  relationCache: RelationCachePort;
+  principalKey: PrincipalKey;
+};
+
 /** Named so wrapper diagnostics are attributable to relation acquisition. */
 const _relationLogger: ILogger = Logger.appendName("QetlRelations");
 
@@ -194,12 +220,7 @@ function _makeEmptyStorageProbeResult(): {
  * reordering is warned about.
  */
 export async function probeStorageRelationCache(
-  options: Readonly<{
-    datasetIds: readonly Dataset.Id[];
-    neededByDatasetId: NeededColumnsByDatasetId;
-    relationCache: RelationCachePort;
-    principalKey: PrincipalKey;
-  }>,
+  options: Readonly<ProbeStorageRelationCacheOptions>,
 ): Promise<{
   cachedRelations: AcquiredRelationBytes[];
   growFromColumnsByDatasetId: Record<string, readonly string[] | "all">;
@@ -307,13 +328,7 @@ async function _fetchRelationSource(
  * shared cache.
  */
 export async function fetchRelationBytes(
-  options: Readonly<{
-    datasetDuckDbLease: DatasetDuckDbLease;
-    growFromColumnsByDatasetId: NeededColumnsByDatasetId;
-    neededByDatasetId: NeededColumnsByDatasetId;
-    relationSources: readonly RelationSource[];
-    runQuery: QetlRunQuery;
-  }>,
+  options: Readonly<FetchRelationBytesOptions>,
 ): Promise<AcquiredRelationBytes[]> {
   const relationRegistry = createRegistryForFetch(options);
 
@@ -376,13 +391,7 @@ async function _writeStoredRelationBytes(
  * query a re-fetch rather than costing this one its result.
  */
 export async function loadRelationBytes(
-  options: Readonly<{
-    relations: readonly AcquiredRelationBytes[];
-    relationsToStore: readonly AcquiredRelationBytes[];
-    datasetDuckDbLease: DatasetDuckDbLease;
-    relationCache: RelationCachePort;
-    principalKey: PrincipalKey;
-  }>,
+  options: Readonly<LoadRelationBytesOptions>,
 ): Promise<void> {
   await _writeStoredRelationBytes(options);
   const columns = await DatasetColumnClient.withCache(AvaQueryClient)

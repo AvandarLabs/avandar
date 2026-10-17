@@ -37,6 +37,15 @@ export type PostgresRowsFetch = (
   init?: RequestInit,
 ) => Promise<Response>;
 
+/** Input to {@link acquirePostgresTableRelation}. */
+export type AcquirePostgresTableRelationParams<TRelation> = {
+  connectionId: string;
+  schemaName: string;
+  tableName: string;
+  readCsv: PostgresRelationCsvReader<TRelation>;
+  rowsFetch?: PostgresRowsFetch;
+};
+
 /**
  * Acquires one Postgres relation: fetch its rows as CSV through the
  * `connectors` edge function's `rows` route, then read it.
@@ -64,13 +73,7 @@ export type PostgresRowsFetch = (
  *   (no freshness signal).
  */
 export async function acquirePostgresTableRelation<TRelation>(
-  params: Readonly<{
-    connectionId: string;
-    schemaName: string;
-    tableName: string;
-    readCsv: PostgresRelationCsvReader<TRelation>;
-    rowsFetch?: PostgresRowsFetch;
-  }>,
+  params: Readonly<AcquirePostgresTableRelationParams<TRelation>>,
 ): Promise<AcquiredPostgresTableRelation<TRelation>> {
   const relationId = makeRelationId(params.schemaName, params.tableName);
   const doFetch = params.rowsFetch ?? fetch;

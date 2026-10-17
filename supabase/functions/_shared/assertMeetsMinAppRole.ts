@@ -6,6 +6,14 @@ import type { Database } from "$/types/database.types.ts";
 type AppType = Database["public"]["Enums"]["app_type"];
 type RoleLevel = Database["public"]["Enums"]["role_level"];
 
+/** Input to {@link assertMeetsMinAppRole}. */
+type AssertMeetsMinAppRoleOptions = {
+  supabaseClient: AvaSupabaseClient;
+  workspaceId: string;
+  app: AppType;
+  minRole: RoleLevel;
+};
+
 /**
  * Confirms the caller meets at least `minRole` on `app` for `workspaceId`,
  * evaluated against the **user-scoped** client (never `SupabaseAdmin`) so
@@ -22,12 +30,9 @@ type RoleLevel = Database["public"]["Enums"]["role_level"];
  * route can call this as its first line and let `responseError` translate
  * the throw, instead of every caller re-implementing the same `if`.
  */
-export async function assertMeetsMinAppRole(options: {
-  supabaseClient: AvaSupabaseClient;
-  workspaceId: string;
-  app: AppType;
-  minRole: RoleLevel;
-}): Promise<void> {
+export async function assertMeetsMinAppRole(
+  options: Readonly<AssertMeetsMinAppRoleOptions>,
+): Promise<void> {
   const { supabaseClient, workspaceId, app, minRole } = options;
 
   const { data, error } = await supabaseClient.rpc(
