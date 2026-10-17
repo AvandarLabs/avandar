@@ -3,17 +3,17 @@ import type {
   OpenDataAccess,
   OpenDataAccessKind,
   OpenDataApiService,
-  OpenDataCatalogEntryId,
-  OpenDataCatalogEntryModel,
-} from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+  OpenDataCatalogListingId,
+  OpenDataCatalogListingModel,
+} from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
 
-export { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
-export { OpenDataCatalogEntryModule as OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryModule.ts";
+export { OpenDataCatalogListingParsers } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListingParsers.ts";
+export { OpenDataCatalogListingModule as OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListingModule.ts";
 
-export namespace OpenDataCatalogEntry {
-  export type T<K extends keyof OpenDataCatalogEntryModel = "Read"> =
-    OpenDataCatalogEntryModel[K];
-  export type Id = OpenDataCatalogEntryId;
+export namespace OpenDataCatalogListing {
+  export type T<K extends keyof OpenDataCatalogListingModel = "Read"> =
+    OpenDataCatalogListingModel[K];
+  export type Id = OpenDataCatalogListingId;
 
   /** The access shape `toAccess` produces, with its undefined checks done. */
   export type Access = OpenDataAccess;

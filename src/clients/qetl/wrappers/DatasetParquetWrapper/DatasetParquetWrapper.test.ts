@@ -91,9 +91,9 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
-vi.mock("@/clients/catalog-entries/OpenDataCatalogEntryClient", () => {
+vi.mock("@/clients/catalog-listings/OpenDataCatalogListingClient", () => {
   return {
-    OpenDataCatalogEntryClient: { getOne: catalogEntryGetOneMock },
+    OpenDataCatalogListingClient: { getOne: catalogEntryGetOneMock },
   };
 });
 
@@ -124,7 +124,7 @@ beforeEach(() => {
   csvSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
   xlsxSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
   openDataSourceGetAllMock.mockResolvedValue([
-    { datasetId: DATASET_ID, catalogEntryId: CATALOG_ENTRY_ID },
+    { datasetId: DATASET_ID, catalogListingId: CATALOG_ENTRY_ID },
   ]);
   datasetColumnGetAllMock.mockResolvedValue([]);
 });
@@ -184,7 +184,7 @@ describe("DatasetParquetWrapper", () => {
     );
   });
 
-  it("downloads open data from the parquet url its catalog entry names", async () => {
+  it("downloads open data from the parquet url its catalog listing names", async () => {
     _mockDataset("open_data");
     catalogEntryGetOneMock.mockResolvedValue({
       id: CATALOG_ENTRY_ID,
@@ -215,7 +215,7 @@ describe("DatasetParquetWrapper", () => {
     expect(acquired.parquetBlob).toBe(parquetBlob);
   });
 
-  it("refuses open data whose catalog entry has no parquet url", async () => {
+  it("refuses open data whose catalog listing has no parquet url", async () => {
     _mockDataset("open_data");
     catalogEntryGetOneMock.mockResolvedValue({
       id: CATALOG_ENTRY_ID,

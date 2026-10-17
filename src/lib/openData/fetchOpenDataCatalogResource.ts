@@ -1,7 +1,7 @@
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
-import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { OpenDataContentKind } from "$/connectors/open-data/acquireOpenDataResource";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
+import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 
 /** One catalog resource as the open-data edge function returns it. */
 export type FetchedOpenDataCatalogResource = {
@@ -15,13 +15,13 @@ export type FetchedOpenDataCatalogResource = {
  *
  * A browser cannot fetch CKAN resource bytes itself: the download redirects to
  * a presigned URL whose CORS header names only the CKAN host. This call is
- * that proxy. The caller sends a catalog entry id and nothing else.
+ * that proxy. The caller sends a catalog listing id and nothing else.
  *
- * @param catalogEntryId The catalog row that names the resource.
+ * @param catalogListingId The catalog row that names the resource.
  * @returns The resource bytes, how they must be read, and any source version.
  */
 export async function fetchOpenDataCatalogResource(
-  catalogEntryId: OpenDataCatalogEntry.Id,
+  catalogListingId: OpenDataCatalogListing.Id,
 ): Promise<FetchedOpenDataCatalogResource> {
   const { data } = await AvaSupabase.db().auth.getSession();
   const accessToken = data.session?.access_token;
@@ -30,8 +30,8 @@ export async function fetchOpenDataCatalogResource(
   }
 
   const url =
-    `${AvaSupabase.getEdgeFunctionsURL()}/open-data/catalog-entries/` +
-    `${encodeURIComponent(catalogEntryId)}/resource`;
+    `${AvaSupabase.getEdgeFunctionsURL()}/open-data/catalog-listings/` +
+    `${encodeURIComponent(catalogListingId)}/resource`;
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });

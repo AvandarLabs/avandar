@@ -1,4 +1,4 @@
-.openDataCatalogEntryListRow {
+.openDataCatalogListingListRow {
   border-radius: var(--mantine-radius-sm);
   display: block;
   padding: 6px var(--mantine-spacing-xs);
@@ -6,15 +6,15 @@
   width: 100%;
 }
 
-.openDataCatalogEntryListRow:hover {
+.openDataCatalogListingListRow:hover {
   background-color: var(--ava-surface-sunken);
 }
 
-.openDataCatalogEntryListRowSelected {
+.openDataCatalogListingListRowSelected {
   color: var(--mantine-color-primary-7);
 }
 
-.openDataCatalogEntryListRowSelected,
-.openDataCatalogEntryListRowSelected:hover {
+.openDataCatalogListingListRowSelected,
+.openDataCatalogListingListRowSelected:hover {
   background-color: var(--mantine-color-primary-0);
 }

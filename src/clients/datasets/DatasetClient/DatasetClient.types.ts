@@ -1,4 +1,4 @@
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
 import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
@@ -138,7 +138,7 @@ export type DatasetMutationRecord = {
   ) => Promise<Dataset.T>;
   insertOpenDataDataset: (
     params: Readonly<
-      BaseDatasetInsertParams & { catalogEntryId: OpenDataCatalogEntry.Id }
+      BaseDatasetInsertParams & { catalogListingId: OpenDataCatalogListing.Id }
     >,
   ) => Promise<Dataset.T>;
   insertPostgresTableDataset: (

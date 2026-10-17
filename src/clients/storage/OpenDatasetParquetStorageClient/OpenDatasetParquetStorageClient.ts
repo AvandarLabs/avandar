@@ -1,35 +1,35 @@
 import { where } from "@avandar/utils";
-import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
-import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+import { OpenDataCatalogListingClient } from "@/clients/catalog-listings/OpenDataCatalogListingClient";
+import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types";
 
 /**
  * Downloads an open dataset Parquet blob from the catalog canonical URL.
  *
  * @param options The download options.
- * @param options.catalogEntryId The open catalog entry whose Parquet to fetch.
+ * @param options.catalogListingId The catalog listing whose Parquet to fetch.
  * @returns The Parquet blob bytes.
  */
 async function download(options: {
-  catalogEntryId: OpenDataCatalogEntryId;
+  catalogListingId: OpenDataCatalogListingId;
 }): Promise<Blob> {
-  const { catalogEntryId } = options;
+  const { catalogListingId } = options;
 
-  const catalogEntry = await OpenDataCatalogEntryClient.getOne(
-    where("id", "eq", catalogEntryId),
+  const catalogListing = await OpenDataCatalogListingClient.getOne(
+    where("id", "eq", catalogListingId),
   );
 
-  if (!catalogEntry) {
+  if (!catalogListing) {
     throw new Error(
-      `Missing catalog entry for open data (catalogEntryId: ${catalogEntryId}).`,
+      `Missing catalog listing for open data (catalogListingId: ${catalogListingId}).`,
     );
   }
 
-  const parquetUrl = catalogEntry.canonicalUrls?.find((url) => {
+  const parquetUrl = catalogListing.canonicalUrls?.find((url) => {
     return url.toLowerCase().endsWith(".parquet");
   });
 
   if (!parquetUrl) {
-    throw new Error("No Parquet URL in catalog for this open data entry.");
+    throw new Error("No Parquet URL in catalog for this open data listing.");
   }
 
   const response = await fetch(parquetUrl);

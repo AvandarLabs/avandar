@@ -3,15 +3,15 @@ import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { string } from "zod";
-import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
 import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache/acquireOpenDataResourceWithCache.ts";
 import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.ts";
 import { createOpenDataHttp } from "$/connectors/open-data/createOpenDataHttp.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
+import { OpenDataCatalogListingParsers } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListingParsers.ts";
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 
 /**
@@ -38,35 +38,37 @@ function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
 
 /**
  * Writes a freshly fetched resource's cache location and source version back
- * onto its catalog entry. The sole `updateCache` implementation
+ * onto its catalog listing. The sole `updateCache` implementation
  * `acquireOpenDataResourceWithCache` is given, so a cache write only happens
  * through the catalog-entry update it performs.
  */
 async function _persistOpenDataCache(params: {
-  catalogEntryId: OpenDataCatalogEntry.Id;
+  catalogListingId: OpenDataCatalogListing.Id;
   cachedObjectPath: string;
   cachedSourceVersion: string;
 }): Promise<void> {
-  const { error: updateError } = await SupabaseAdmin.from("catalog_entries__open_data")
+  const { error: updateError } = await SupabaseAdmin.from(
+    "catalog_listings__open_data",
+  )
     .update({
       cached_object_path: params.cachedObjectPath,
       cached_source_version: params.cachedSourceVersion,
       cached_at: new Date().toISOString(),
     })
-    .eq("id", params.catalogEntryId);
+    .eq("id", params.catalogListingId);
   if (updateError) {
     throw updateError;
   }
 }
 
 /**
- * Resolves one catalog entry's resource bytes through the cache-aside path:
+ * Resolves one catalog listing's resource bytes through the cache-aside path:
  * builds the HTTP and storage clients the acquisition needs, then wires them
  * into `acquireOpenDataResourceWithCache` along with the freshness check,
  * the live fetch, and the cache-persist callback.
  */
 async function _resolveOpenDataAcquisition(
-  entry: Readonly<OpenDataCatalogEntry.T>,
+  entry: Readonly<OpenDataCatalogListing.T>,
 ): Promise<OpenDataAcquisition> {
   const http = createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES });
   const storage = createAvandarSupabaseStorageClient(
@@ -99,22 +101,22 @@ async function _resolveOpenDataAcquisition(
  * `access-control-allow-origin` names only the CKAN host, so the bytes are
  * unreachable from any other origin. Server-side there is no such restriction.
  *
- * The caller sends a catalog entry id and nothing else. It never sends a URL:
+ * The caller sends a catalog listing id and nothing else. It never sends a URL:
  * the API root comes from the catalog row, the resource URL comes from CKAN's
  * own response, and `getCkanResourceFromPackage` refuses a resource URL whose
  * host is not the catalogued one. That chain is what keeps this from being an
  * open relay for arbitrary server-side requests.
  */
 export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
-  "/catalog-entries/:catalogEntryId/resource": {
+  "/catalog-listings/:catalogListingId/resource": {
     GET: GET({
-      path: "/catalog-entries/:catalogEntryId/resource",
-      schema: { catalogEntryId: string().uuid() },
+      path: "/catalog-listings/:catalogListingId/resource",
+      schema: { catalogListingId: string().uuid() },
     }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
       const { data, error } = await supabaseClient
-        .from("catalog_entries__open_data")
+        .from("catalog_listings__open_data")
         .select("*")
-        .eq("id", pathParams.catalogEntryId)
+        .eq("id", pathParams.catalogListingId)
         .maybeSingle();
 
       if (error) {
@@ -130,8 +132,8 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
         );
       }
 
-      const entry = OpenDataCatalogEntryParsers.fromDBReadToModelRead(
-        OpenDataCatalogEntryParsers.DBReadSchema.parse(data),
+      const entry = OpenDataCatalogListingParsers.fromDBReadToModelRead(
+        OpenDataCatalogListingParsers.DBReadSchema.parse(data),
       );
 
       try {

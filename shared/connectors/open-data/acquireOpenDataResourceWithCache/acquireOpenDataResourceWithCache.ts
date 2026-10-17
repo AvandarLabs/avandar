@@ -1,10 +1,10 @@
-import type { AvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.types.ts";
-import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
+import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
+import type { AvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.types.ts";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
 
 type UpdateCacheParams = {
-  catalogEntryId: OpenDataCatalogEntry.Id;
+  catalogListingId: OpenDataCatalogListing.Id;
   cachedObjectPath: string;
   cachedSourceVersion: string;
 };
@@ -40,17 +40,17 @@ function _blobToBytes(blob: Blob): Promise<Uint8Array<ArrayBuffer>> {
  * a database on its own.
  */
 export async function acquireOpenDataResourceWithCache(params: {
-  entry: Readonly<OpenDataCatalogEntry.T>;
+  entry: Readonly<OpenDataCatalogListing.T>;
   /** Reads the live source's freshness token - one cheap metadata call. */
   readFreshnessToken: (
-    entry: Readonly<OpenDataCatalogEntry.T>,
+    entry: Readonly<OpenDataCatalogListing.T>,
   ) => Promise<string>;
   /**
    * Fetches the full resource live. Only called on a cache miss or a stale
    * token.
    */
   acquireLive: (
-    entry: Readonly<OpenDataCatalogEntry.T>,
+    entry: Readonly<OpenDataCatalogListing.T>,
   ) => Promise<OpenDataAcquisition>;
   storage: Readonly<AvandarSupabaseStorageClient>;
   updateCache: (params: Readonly<UpdateCacheParams>) => Promise<void>;
@@ -72,7 +72,7 @@ export async function acquireOpenDataResourceWithCache(params: {
         datastoreActive: false,
       };
     }
-    // Falls through to a live fetch: the catalog entry claims a cache object
+    // Falls through to a live fetch: the catalog listing claims a cache object
     // exists, but it is actually gone (deleted out of band). Treat this as a
     // miss rather than an error - the next successful write repairs it.
   }
@@ -82,7 +82,7 @@ export async function acquireOpenDataResourceWithCache(params: {
   await storage.uploadCachedResource(objectPath, new Blob([acquisition.bytes]));
   if (acquisition.sourceVersion) {
     await updateCache({
-      catalogEntryId: entry.id,
+      catalogListingId: entry.id,
       cachedObjectPath: objectPath,
       cachedSourceVersion: acquisition.sourceVersion,
     });

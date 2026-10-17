@@ -1,4 +1,4 @@
-import { CONFIGURED_DRIVES } from "@pipelines/open-data-metacatalog/configuredDrives";
+import { CONFIGURED_DRIVES } from "@pipelines/open-data-catalog-listings/configuredDrives/configuredDrives";
 import { describe, expect, it } from "vitest";
 
 describe("CONFIGURED_DRIVES", () => {

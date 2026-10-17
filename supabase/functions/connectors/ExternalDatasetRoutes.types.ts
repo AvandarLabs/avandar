@@ -1,9 +1,9 @@
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type {
   ExternalDatasetErrorCode,
   ExternalDatasetPreviewColumn,
   ExternalDatasetRelation,
 } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
-import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type ExternalDatasetErrorResponse = {
   error: { code: ExternalDatasetErrorCode; message: string };
@@ -65,7 +65,7 @@ export type ExternalDatasetsApi = APITypeDef<
         // `Record<string, unknown> | void | Response` here, so this must
         // stay `Response`, matching the one other route in this codebase
         // that also returns raw bytes (`open-data`'s
-        // `/catalog-entries/:catalogEntryId/resource`, same `returnType:
+        // `/catalog-listings/:catalogListingId/resource`, same `returnType:
         // Response`). That precedent is never called through
         // `APIClient`/`supabase.functions.invoke` for exactly this reason:
         // `functions.invoke`'s own content-type-based parsing resolves

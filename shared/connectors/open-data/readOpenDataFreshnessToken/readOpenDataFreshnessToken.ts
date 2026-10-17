@@ -1,12 +1,12 @@
-import { match } from "ts-pattern";
 import { propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
-import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
-import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
+import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
+import { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
 import type { OpenDataApiAccessFor } from "$/connectors/open-data/acquireOpenDataResource.ts";
-import { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 /**
@@ -15,10 +15,10 @@ import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.
  * `SocrataClient.getMetadata`); never fetches its rows.
  */
 export async function readOpenDataFreshnessToken(params: {
-  entry: Readonly<OpenDataCatalogEntry.T>;
+  entry: Readonly<OpenDataCatalogListing.T>;
   http: Readonly<OpenDataHttp>;
 }): Promise<string> {
-  const access = OpenDataCatalogEntry.toAccess(params.entry);
+  const access = OpenDataCatalogListing.toAccess(params.entry);
   if (!access || access.kind !== "api_resource") {
     throw new OpenDataAcquisitionFailed({
       code: "access-shape-invalid",

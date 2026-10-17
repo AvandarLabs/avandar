@@ -13,19 +13,19 @@ import { IconChevronDown, IconPlus } from "@tabler/icons-react";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
-import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.module.css";
-import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.module.css";
+import type { OpenDataCatalogListingRead } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types";
 import type { ReactNode } from "react";
 
 type Props = {
-  /** Selected catalog entry, or none when nothing is selected. */
-  entry: OpenDataCatalogEntryRead | undefined;
+  /** Selected catalog listing, or none when nothing is selected. */
+  listing: OpenDataCatalogListingRead | undefined;
   /** When false, add is blocked (e.g. subscription limit). */
   isAddAllowed: boolean;
   /** True while the insert mutation is running. */
   isAdding: boolean;
   /**
-   * True while loading `catalog_entries__dataset_column` for the entry (or
+   * True while loading `catalog_listings__dataset_column` for the listing (or
    * before the query runs). Add stays disabled until this is false.
    */
   isLoadingColumnMetadata: boolean;
@@ -34,15 +34,15 @@ type Props = {
 };
 
 /**
- * Everything the catalog knows about one entry, and the one action on it.
+ * Everything the catalog knows about one listing, and the one action on it.
  *
  * The provenance fields read as a labelled fact list rather than as nine
  * bold-heading-plus-paragraph pairs, which turns a page of short values into
  * a page of headings. There is exactly one add button: a primary action
  * offered twice makes a user check whether the two do the same thing.
  */
-export function OpenDataCatalogEntryDetail({
-  entry,
+export function OpenDataCatalogListingDetail({
+  listing,
   isAddAllowed,
   isAdding,
   isLoadingColumnMetadata,
@@ -52,7 +52,7 @@ export function OpenDataCatalogEntryDetail({
   const offline = useOfflineGate();
   const [isRawMetadataOpen, rawMetadata] = useDisclosure(false);
 
-  if (!entry) {
+  if (!listing) {
     return (
       <Stack align="center" justify="center" mih={200} gap="xs" p="lg">
         <Text c="dimmed" ta="center" size="sm" maw="34ch">
@@ -66,21 +66,21 @@ export function OpenDataCatalogEntryDetail({
   }
 
   const metadataJson =
-    entry.metadata !== undefined
-      ? JSON.stringify(entry.metadata, undefined, 2)
+    listing.metadata !== undefined
+      ? JSON.stringify(listing.metadata, undefined, 2)
       : undefined;
   const isAddBlocked =
     !isAddAllowed || isAdding || isLoadingColumnMetadata || offline.isBlocked;
 
   return (
-    <Stack gap="md" className={css.openDataCatalogEntryDetail}>
+    <Stack gap="md" className={css.openDataCatalogListingDetail}>
       <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
         <Title
           order={4}
           lineClamp={3}
-          className={css.openDataCatalogEntryDetailTitle}
+          className={css.openDataCatalogListingDetailTitle}
         >
-          {entry.displayName}
+          {listing.displayName}
         </Title>
         <OfflineGated>
           <Button
@@ -105,47 +105,47 @@ export function OpenDataCatalogEntryDetail({
         </Text>
       ) : null}
 
-      {entry.description ? (
+      {listing.description ? (
         <Text size="sm" maw="70ch">
-          {entry.description}
+          {listing.description}
         </Text>
       ) : null}
 
       <AppViewRail.Group>
         <AppViewRail.Fact label={t`Organization`}>
-          {entry.externalOrganizationName}
+          {listing.externalOrganizationName}
         </AppViewRail.Fact>
-        {entry.externalServiceName ? (
+        {listing.externalServiceName ? (
           <AppViewRail.Fact label={t`Service`}>
-            {entry.externalServiceName}
+            {listing.externalServiceName}
           </AppViewRail.Fact>
         ) : null}
         <AppViewRail.Fact label={t`Pipeline`}>
           <Trans>
-            {entry.pipelineName} · run {entry.pipelineRunId}
+            {listing.pipelineName} · run {listing.pipelineRunId}
           </Trans>
         </AppViewRail.Fact>
-        {entry.license ? (
+        {listing.license ? (
           <AppViewRail.Fact label={t`License`}>
-            {entry.license}
+            {listing.license}
           </AppViewRail.Fact>
         ) : null}
-        {entry.updateFrequency ? (
+        {listing.updateFrequency ? (
           <AppViewRail.Fact label={t`Updates`}>
-            {entry.updateFrequency}
+            {listing.updateFrequency}
           </AppViewRail.Fact>
         ) : null}
-        {entry.sourceUrl ? (
+        {listing.sourceUrl ? (
           <AppViewRail.Fact label={t`Source`}>
-            <Anchor href={entry.sourceUrl} size="xs" target="_blank">
-              {entry.sourceUrl}
+            <Anchor href={listing.sourceUrl} size="xs" target="_blank">
+              {listing.sourceUrl}
             </Anchor>
           </AppViewRail.Fact>
         ) : null}
-        {entry.canonicalUrls && entry.canonicalUrls.length > 0 ? (
+        {listing.canonicalUrls && listing.canonicalUrls.length > 0 ? (
           <AppViewRail.Fact label={t`Canonical`}>
             <Stack gap={2}>
-              {entry.canonicalUrls.map((url) => {
+              {listing.canonicalUrls.map((url) => {
                 return (
                   <Anchor key={url} href={url} size="xs" target="_blank">
                     {url}
@@ -155,8 +155,8 @@ export function OpenDataCatalogEntryDetail({
             </Stack>
           </AppViewRail.Fact>
         ) : null}
-        {entry.notes ? (
-          <AppViewRail.Fact label={t`Notes`}>{entry.notes}</AppViewRail.Fact>
+        {listing.notes ? (
+          <AppViewRail.Fact label={t`Notes`}>{listing.notes}</AppViewRail.Fact>
         ) : null}
       </AppViewRail.Group>
 
@@ -171,8 +171,8 @@ export function OpenDataCatalogEntryDetail({
                 size={14}
                 className={
                   isRawMetadataOpen
-                    ? css.openDataCatalogEntryDetailChevronOpen
-                    : css.openDataCatalogEntryDetailChevronClosed
+                    ? css.openDataCatalogListingDetailChevronOpen
+                    : css.openDataCatalogListingDetailChevronClosed
                 }
               />
             }
@@ -185,7 +185,7 @@ export function OpenDataCatalogEntryDetail({
             <Text
               component="pre"
               size="xs"
-              className={css.openDataCatalogEntryDetailRawMetadata}
+              className={css.openDataCatalogListingDetailRawMetadata}
             >
               {metadataJson}
             </Text>

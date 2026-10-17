@@ -1,17 +1,17 @@
-import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
-export type CatalogDatasetColumnId = UUID<"CatalogDatasetColumn">;
+export type CatalogListingColumnId = UUID<"CatalogListingColumn">;
 
-export type CatalogDatasetColumnRead = {
+export type CatalogListingColumnRead = {
   /** Primary key. */
-  id: CatalogDatasetColumnId;
+  id: CatalogListingColumnId;
 
-  /** Parent open-data catalog entry. */
-  catalogEntryId: OpenDataCatalogEntryId;
+  /** Parent open-data catalog listing. */
+  catalogListingId: OpenDataCatalogListingId;
 
   /** Column name in the source Parquet / dataset. */
   columnName: string;
@@ -34,20 +34,20 @@ export type CatalogDatasetColumnRead = {
 };
 
 /**
- * CRUD type definitions for the CatalogDatasetColumn model.
+ * CRUD type definitions for the CatalogListingColumn model.
  */
-export type CatalogDatasetColumnModel = SupabaseCrudModelSpec<
+export type CatalogListingColumnModel = SupabaseCrudModelSpec<
   {
-    tableName: "catalog_entries__dataset_column";
-    modelName: "CatalogDatasetColumn";
-    modelPrimaryKeyType: CatalogDatasetColumnId;
+    tableName: "catalog_listings__dataset_column";
+    modelName: "CatalogListingColumn";
+    modelPrimaryKeyType: CatalogListingColumnId;
     modelTypes: {
-      Read: CatalogDatasetColumnRead;
+      Read: CatalogListingColumnRead;
       Insert: SetOptional<
-        CatalogDatasetColumnRead,
+        CatalogListingColumnRead,
         "id" | "createdAt" | "updatedAt"
       >;
-      Update: Partial<CatalogDatasetColumnRead>;
+      Update: Partial<CatalogListingColumnRead>;
     };
   },
   {

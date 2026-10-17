@@ -1,12 +1,12 @@
-import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers";
+import { OpenDataCatalogListingParsers } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListingParsers";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
-export const OpenDataCatalogEntryClient = createUsableServiceClient(
+export const OpenDataCatalogListingClient = createUsableServiceClient(
   createRdbCrudClient({
-    modelName: "OpenDataCatalogEntry",
-    tableName: "catalog_entries__open_data",
+    modelName: "OpenDataCatalogListing",
+    tableName: "catalog_listings__open_data",
     dbTablePrimaryKey: "id",
-    parsers: OpenDataCatalogEntryParsers,
+    parsers: OpenDataCatalogListingParsers,
   }),
 );

@@ -1,12 +1,12 @@
-import { CatalogDatasetColumnParsers } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumnParsers";
+import { CatalogListingColumnParsers } from "$/models/catalog-listings/CatalogListingColumn/CatalogListingColumnParsers";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
-export const CatalogDatasetColumnClient = createUsableServiceClient(
+export const CatalogListingColumnClient = createUsableServiceClient(
   createRdbCrudClient({
-    modelName: "CatalogDatasetColumn",
-    tableName: "catalog_entries__dataset_column",
+    modelName: "CatalogListingColumn",
+    tableName: "catalog_listings__dataset_column",
     dbTablePrimaryKey: "id",
-    parsers: CatalogDatasetColumnParsers,
+    parsers: CatalogListingColumnParsers,
   }),
 );

@@ -1,9 +1,8 @@
-import { upsertMetacatalogRows } from "@pipelines/open-data-metacatalog/upsertMetacatalogRows";
+import { upsertCatalogListingRows } from "@pipelines/open-data-catalog-listings/upsertCatalogListingRows/upsertCatalogListingRows";
 import { describe, expect, it, vi } from "vitest";
-import type { MetacatalogRow } from "@pipelines/open-data-metacatalog/buildMetacatalogRows";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { CatalogListingRow } from "@pipelines/open-data-catalog-listings/CatalogListingRow.types";
 
-const ROW: MetacatalogRow = {
+const ROW: CatalogListingRow = {
   access_kind: "api_resource",
   api_service: "ckan",
   api_base_url: "https://data.humdata.org",
@@ -24,15 +23,15 @@ function _fakeSupabase(
     from: vi.fn(() => {
       return { upsert };
     }),
-  } as unknown as SupabaseClient;
+  };
   return { client, upsert };
 }
 
-describe("upsertMetacatalogRows", () => {
+describe("upsertCatalogListingRows", () => {
   it("does nothing when there are no rows", async () => {
     const { client, upsert } = _fakeSupabase();
 
-    await upsertMetacatalogRows({ supabase: client, rows: [] });
+    await upsertCatalogListingRows({ supabase: client, rows: [] });
 
     expect(upsert).not.toHaveBeenCalled();
   });
@@ -40,9 +39,9 @@ describe("upsertMetacatalogRows", () => {
   it("upserts every row against the api_resource unique index", async () => {
     const { client, upsert } = _fakeSupabase();
 
-    await upsertMetacatalogRows({ supabase: client, rows: [ROW] });
+    await upsertCatalogListingRows({ supabase: client, rows: [ROW] });
 
-    expect(client.from).toHaveBeenCalledWith("catalog_entries__open_data");
+    expect(client.from).toHaveBeenCalledWith("catalog_listings__open_data");
     expect(upsert).toHaveBeenCalledWith([ROW], {
       onConflict:
         "api_service,api_base_url,external_dataset_id,api_resource_id",
@@ -55,7 +54,7 @@ describe("upsertMetacatalogRows", () => {
     });
 
     await expect(
-      upsertMetacatalogRows({ supabase: client, rows: [ROW] }),
+      upsertCatalogListingRows({ supabase: client, rows: [ROW] }),
     ).rejects.toThrow("constraint violation");
   });
 });

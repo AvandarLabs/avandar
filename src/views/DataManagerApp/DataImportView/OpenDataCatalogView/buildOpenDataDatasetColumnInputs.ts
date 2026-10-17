@@ -1,5 +1,5 @@
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import type { CatalogDatasetColumnRead } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types";
+import type { CatalogListingColumnRead } from "$/models/catalog-listings/CatalogListingColumn/CatalogListingColumn.types";
 import type { CompositeTypes, Json } from "$/types/database.types";
 import type { ExcludeNullsIn } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
@@ -12,7 +12,7 @@ type DatasetColumnInput = SetOptional<
 /**
  * Reads `metadata.table.column_names` from catalog pipeline metadata.
  *
- * @param metadata - Raw JSON from `catalog_entries__open_data.metadata`.
+ * @param metadata - Raw JSON from `catalog_listings__open_data.metadata`.
  * @returns Column names when present, otherwise `undefined`.
  */
 export function getColumnNamesFromOpenDataMetadata(
@@ -73,9 +73,9 @@ export function buildOpenDataDatasetColumnInputs(
 /**
  * Stable order for catalog column rows: `display_order` then name.
  */
-function _sortCatalogDatasetColumns(
-  rows: readonly CatalogDatasetColumnRead[],
-): CatalogDatasetColumnRead[] {
+function _sortCatalogListingColumns(
+  rows: readonly CatalogListingColumnRead[],
+): CatalogListingColumnRead[] {
   return [...rows].sort((a, b) => {
     const orderA = a.displayOrder ?? Number.MAX_SAFE_INTEGER;
     const orderB = b.displayOrder ?? Number.MAX_SAFE_INTEGER;
@@ -87,14 +87,14 @@ function _sortCatalogDatasetColumns(
 }
 
 /**
- * Builds RPC column inputs from `catalog_entries__dataset_column` rows.
+ * Builds RPC column inputs from `catalog_listings__dataset_column` rows.
  *
- * @param rows - Column rows for one open-data catalog entry.
+ * @param rows - Column rows for one open-data catalog listing.
  */
 export function buildOpenDataDatasetColumnInputsFromCatalogRows(
-  rows: readonly CatalogDatasetColumnRead[],
+  rows: readonly CatalogListingColumnRead[],
 ): DatasetColumnInput[] {
-  const sorted = _sortCatalogDatasetColumns(rows);
+  const sorted = _sortCatalogListingColumns(rows);
   return sorted.map((col, columnIdx) => {
     return {
       original_name: col.columnName,
@@ -111,11 +111,11 @@ export function buildOpenDataDatasetColumnInputsFromCatalogRows(
 /**
  * Prefers normalized catalog column rows; falls back to legacy JSON metadata.
  *
- * @param options.catalogColumns - Rows from `catalog_entries__dataset_column`.
- * @param options.metadata - Legacy `catalog_entries__open_data.metadata` JSON.
+ * @param options.catalogColumns - Rows from `catalog_listings__dataset_column`.
+ * @param options.metadata - Legacy `catalog_listings__open_data.metadata` JSON.
  */
 export function resolveOpenDataDatasetColumnInputs(options: {
-  catalogColumns: readonly CatalogDatasetColumnRead[] | undefined;
+  catalogColumns: readonly CatalogListingColumnRead[] | undefined;
   metadata: Json | undefined;
 }): DatasetColumnInput[] | undefined {
   const { catalogColumns, metadata } = options;

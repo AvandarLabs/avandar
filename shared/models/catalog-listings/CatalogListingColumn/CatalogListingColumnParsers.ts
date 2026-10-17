@@ -8,17 +8,17 @@ import {
 import { z } from "zod";
 import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type {
-  CatalogDatasetColumnId,
-  CatalogDatasetColumnModel,
-  CatalogDatasetColumnRead,
-} from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types.ts";
-import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+  CatalogListingColumnId,
+  CatalogListingColumnModel,
+  CatalogListingColumnRead,
+} from "$/models/catalog-listings/CatalogListingColumn/CatalogListingColumn.types.ts";
+import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
 const DBReadSchema = z.object({
   id: z.uuid(),
-  catalog_entry_id: z.uuid(),
+  catalog_listing_id: z.uuid(),
   column_name: z.string(),
   display_order: z.number().nullable(),
   created_at: z.iso.datetime({ offset: true }).nullable(),
@@ -27,24 +27,24 @@ const DBReadSchema = z.object({
   cast_data_type: z.enum(DuckDbDataTypes),
 });
 
-export const CatalogDatasetColumnParsers =
-  makeParserRegistry<CatalogDatasetColumnModel>().build({
-    modelName: "CatalogDatasetColumn",
+export const CatalogListingColumnParsers =
+  makeParserRegistry<CatalogListingColumnModel>().build({
+    modelName: "CatalogListingColumn",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
-      (obj): CatalogDatasetColumnRead => {
+      (obj): CatalogListingColumnRead => {
         const createdAt = obj.createdAt;
         const updatedAt = obj.updatedAt;
         if (createdAt === undefined || updatedAt === undefined) {
           throw new Error(
-            "CatalogDatasetColumn: missing created_at or updated_at from DB",
+            "CatalogListingColumn: missing created_at or updated_at from DB",
           );
         }
         return {
-          id: obj.id as CatalogDatasetColumnId,
-          catalogEntryId: obj.catalogEntryId as OpenDataCatalogEntryId,
+          id: obj.id as CatalogListingColumnId,
+          catalogListingId: obj.catalogListingId as OpenDataCatalogListingId,
           columnName: obj.columnName,
           displayOrder: obj.displayOrder,
           createdAt,
@@ -61,7 +61,7 @@ export const CatalogDatasetColumnParsers =
 /**
  * Do not remove these tests!
  */
-type CrudTypes = CatalogDatasetColumnModel;
+type CrudTypes = CatalogListingColumnModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

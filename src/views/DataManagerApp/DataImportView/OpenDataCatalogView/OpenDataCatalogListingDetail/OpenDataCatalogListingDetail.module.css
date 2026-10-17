@@ -1,12 +1,12 @@
-.openDataCatalogEntryDetail {
+.openDataCatalogListingDetail {
   padding: var(--mantine-spacing-md);
 }
 
-.openDataCatalogEntryDetailTitle {
+.openDataCatalogListingDetailTitle {
   min-width: 0;
 }
 
-.openDataCatalogEntryDetailRawMetadata {
+.openDataCatalogListingDetailRawMetadata {
   background-color: var(--ava-surface-body);
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
@@ -19,19 +19,19 @@
   white-space: pre-wrap;
 }
 
-.openDataCatalogEntryDetailChevronClosed,
-.openDataCatalogEntryDetailChevronOpen {
+.openDataCatalogListingDetailChevronClosed,
+.openDataCatalogListingDetailChevronOpen {
   transition: transform var(--ava-animation-duration-fast)
     var(--ava-animation-easing-out);
 }
 
-.openDataCatalogEntryDetailChevronOpen {
+.openDataCatalogListingDetailChevronOpen {
   transform: rotate(180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .openDataCatalogEntryDetailChevronClosed,
-  .openDataCatalogEntryDetailChevronOpen {
+  .openDataCatalogListingDetailChevronClosed,
+  .openDataCatalogListingDetailChevronOpen {
     transition: none;
   }
 }

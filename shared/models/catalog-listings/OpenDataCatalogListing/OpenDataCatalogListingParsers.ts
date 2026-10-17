@@ -8,10 +8,10 @@ import {
 import { z } from "zod";
 import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
 import type {
-  OpenDataCatalogEntryId,
-  OpenDataCatalogEntryModel,
-  OpenDataCatalogEntryRead,
-} from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+  OpenDataCatalogListingId,
+  OpenDataCatalogListingModel,
+  OpenDataCatalogListingRead,
+} from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
 import type { Json } from "$/types/database.types.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
@@ -48,17 +48,17 @@ const DBReadSchema = z.object({
   cached_at: z.iso.datetime({ offset: true }).nullable(),
 });
 
-export const OpenDataCatalogEntryParsers =
-  makeParserRegistry<OpenDataCatalogEntryModel>().build({
-    modelName: "OpenDataCatalogEntry",
+export const OpenDataCatalogListingParsers =
+  makeParserRegistry<OpenDataCatalogListingModel>().build({
+    modelName: "OpenDataCatalogListing",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
-      (obj): OpenDataCatalogEntryRead => {
+      (obj): OpenDataCatalogListingRead => {
         return {
           ...obj,
-          id: obj.id as OpenDataCatalogEntryId,
+          id: obj.id as OpenDataCatalogListingId,
           metadata: obj.metadata as Json | undefined,
         };
       },
@@ -70,7 +70,7 @@ export const OpenDataCatalogEntryParsers =
 /**
  * Do not remove these tests!
  */
-type CrudTypes = OpenDataCatalogEntryModel;
+type CrudTypes = OpenDataCatalogListingModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

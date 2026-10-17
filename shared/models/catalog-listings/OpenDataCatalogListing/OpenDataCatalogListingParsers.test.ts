@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
-import type { OpenDataCatalogEntryModel } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+import { OpenDataCatalogListingParsers } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListingParsers.ts";
+import type { OpenDataCatalogListingModel } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
 
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
 
 /**
- * The columns every catalog entry carries, whichever access shape it uses.
+ * The columns every catalog listing carries, whichever access shape it uses.
  * Spread into each fixture so a test body shows only the fields it is about.
  */
 const SHARED_DB_COLUMNS = {
@@ -29,7 +29,7 @@ const SHARED_DB_COLUMNS = {
   cached_at: null,
 } as const;
 
-function _pipelineDBRow(): OpenDataCatalogEntryModel["DBRead"] {
+function _pipelineDBRow(): OpenDataCatalogListingModel["DBRead"] {
   return {
     ...SHARED_DB_COLUMNS,
     display_name: "Series",
@@ -46,7 +46,7 @@ function _pipelineDBRow(): OpenDataCatalogEntryModel["DBRead"] {
   };
 }
 
-function _apiDBRow(): OpenDataCatalogEntryModel["DBRead"] {
+function _apiDBRow(): OpenDataCatalogListingModel["DBRead"] {
   return {
     ...SHARED_DB_COLUMNS,
     display_name: "Operational Presence",
@@ -63,10 +63,10 @@ function _apiDBRow(): OpenDataCatalogEntryModel["DBRead"] {
   };
 }
 
-describe("OpenDataCatalogEntryParsers", () => {
+describe("OpenDataCatalogListingParsers", () => {
   it("reads an API entry with no Parquet object and no pipeline", () => {
-    const entry = OpenDataCatalogEntryParsers.fromDBReadToModelRead(
-      OpenDataCatalogEntryParsers.DBReadSchema.parse(_apiDBRow()),
+    const entry = OpenDataCatalogListingParsers.fromDBReadToModelRead(
+      OpenDataCatalogListingParsers.DBReadSchema.parse(_apiDBRow()),
     );
 
     expect(entry.accessKind).toBe("api_resource");
@@ -80,8 +80,8 @@ describe("OpenDataCatalogEntryParsers", () => {
   });
 
   it("reads a pipeline entry with no API columns", () => {
-    const entry = OpenDataCatalogEntryParsers.fromDBReadToModelRead(
-      OpenDataCatalogEntryParsers.DBReadSchema.parse(_pipelineDBRow()),
+    const entry = OpenDataCatalogListingParsers.fromDBReadToModelRead(
+      OpenDataCatalogListingParsers.DBReadSchema.parse(_pipelineDBRow()),
     );
 
     expect(entry.accessKind).toBe("pipeline_parquet");
@@ -98,7 +98,7 @@ describe("OpenDataCatalogEntryParsers", () => {
     const row = { ..._apiDBRow(), access_kind: "sftp_drop" };
 
     expect(() => {
-      return OpenDataCatalogEntryParsers.DBReadSchema.parse(row);
+      return OpenDataCatalogListingParsers.DBReadSchema.parse(row);
     }).toThrow();
   });
 
@@ -106,14 +106,14 @@ describe("OpenDataCatalogEntryParsers", () => {
     const row = { ..._apiDBRow(), api_service: "arcgis" };
 
     expect(() => {
-      return OpenDataCatalogEntryParsers.DBReadSchema.parse(row);
+      return OpenDataCatalogListingParsers.DBReadSchema.parse(row);
     }).toThrow();
   });
 
   it("writes an API entry back to snake case", () => {
-    const dbInsert = OpenDataCatalogEntryParsers.fromModelInsertToDBInsert({
-      ...OpenDataCatalogEntryParsers.fromDBReadToModelRead(
-        OpenDataCatalogEntryParsers.DBReadSchema.parse(_apiDBRow()),
+    const dbInsert = OpenDataCatalogListingParsers.fromModelInsertToDBInsert({
+      ...OpenDataCatalogListingParsers.fromDBReadToModelRead(
+        OpenDataCatalogListingParsers.DBReadSchema.parse(_apiDBRow()),
       ),
     });
 

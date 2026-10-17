@@ -13,34 +13,14 @@ import type {
  * a parsing decision this code does not make yet, and refusing them by name is
  * more useful than downloading bytes nothing can read.
  */
-const READABLE_FORMATS: readonly string[] = ["csv", "parquet"];
+export const READABLE_FORMATS: readonly string[] = ["csv", "parquet"];
 
 /**
  * The `url_type` CKAN gives a file it hosts itself. Anything else, in practice
  * `api`, points at an upstream endpoint with no shared contract, no size
  * guarantee, and sometimes no TLS.
  */
-const HOSTED_FILE_URL_TYPE = "upload";
-
-/**
- * Whether a CKAN resource is worth reading at all - the same two rules
- * `getCkanResourceFromPackage` enforces one at a time with a distinct
- * failure code each, collapsed into a single yes/no answer for a caller
- * (the open-data-metacatalog pipeline) that only needs to decide whether to
- * register the resource, not explain why it was skipped.
- *
- * Checks only the resource's intrinsic upload-type and format - not whether
- * its URL's host matches the catalogued `baseUrl`, and not any size ceiling,
- * both of which `getCkanResourceFromPackage` still separately enforces.
- */
-export function isReadableCkanResource(
-  resource: Readonly<CkanResource>,
-): boolean {
-  if (resource.url_type !== HOSTED_FILE_URL_TYPE) {
-    return false;
-  }
-  return READABLE_FORMATS.includes(resource.format.toLowerCase());
-}
+export const HOSTED_FILE_URL_TYPE = "upload";
 
 /**
  * Reads a URL's lowercased host, or the empty string when it does not parse.

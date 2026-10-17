@@ -7,8 +7,8 @@ import {
   NodeDuckDb,
 } from "@avandar/etl";
 import { MIMEType } from "@avandar/utils";
+import { createSupabaseAdminClient } from "@pipelines/shared/createSupabaseAdminClient";
 import {
-  createSupabaseAdminClient,
   getWdiYearCoverageFromParquet,
   upsertWorldBankWdiCatalogEntry,
 } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";

@@ -214,7 +214,7 @@ function _makeInsertOpenDataDataset(
         p_workspace_id: params.workspaceId,
         p_dataset_name: params.datasetName,
         p_dataset_description: params.datasetDescription,
-        p_catalog_entry_id: params.catalogEntryId,
+        p_catalog_listing_id: params.catalogListingId,
         p_columns: _getDatabaseColumns(params.columns),
       },
     );

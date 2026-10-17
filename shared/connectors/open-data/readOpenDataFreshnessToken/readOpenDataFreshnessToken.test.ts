@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
 
 const BASE_URL = "https://data.humdata.org";
 const DATASET_ID = "hdx-hapi-operational-presence";
@@ -12,10 +12,10 @@ const CONTENT_HASH = "32e316c0337f8a9b9117999a595f8e86";
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
 
 function _entry(
-  overrides: Partial<OpenDataCatalogEntry.T> = {},
-): OpenDataCatalogEntry.T {
+  overrides: Partial<OpenDataCatalogListing.T> = {},
+): OpenDataCatalogListing.T {
   return {
-    id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogEntry.Id,
+    id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogListing.Id,
     createdAt: TIMESTAMP,
     updatedAt: TIMESTAMP,
     dateOfLastSync: undefined,
@@ -90,8 +90,8 @@ const SOCRATA_BASE_URL = "https://data.cityofnewyork.us";
 const SOCRATA_DATASET_ID = "erm2-nwe9";
 
 function _socrataEntry(
-  overrides: Partial<OpenDataCatalogEntry.T> = {},
-): OpenDataCatalogEntry.T {
+  overrides: Partial<OpenDataCatalogListing.T> = {},
+): OpenDataCatalogListing.T {
   return _entry({
     apiService: "socrata",
     apiBaseUrl: SOCRATA_BASE_URL,
@@ -102,9 +102,7 @@ function _socrataEntry(
   });
 }
 
-function _socrataHttp(
-  options: { rowsUpdatedAt?: number } = {},
-): OpenDataHttp {
+function _socrataHttp(options: { rowsUpdatedAt?: number } = {}): OpenDataHttp {
   return {
     getJson: vi.fn(async () => {
       return {

@@ -2,10 +2,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
 
 const CATALOG_ENTRY_ID =
-  "55555555-5555-4555-8555-555555555555" as OpenDataCatalogEntry.Id;
+  "55555555-5555-4555-8555-555555555555" as OpenDataCatalogListing.Id;
 const EDGE_FUNCTIONS_URL = "https://functions.example";
 const ACCESS_TOKEN = "session-token";
 
@@ -72,7 +72,7 @@ describe("fetchOpenDataCatalogResource", () => {
     const fetched = await fetchOpenDataCatalogResource(CATALOG_ENTRY_ID);
 
     expect(fetch).toHaveBeenCalledWith(
-      `${EDGE_FUNCTIONS_URL}/open-data/catalog-entries/${CATALOG_ENTRY_ID}/resource`,
+      `${EDGE_FUNCTIONS_URL}/open-data/catalog-listings/${CATALOG_ENTRY_ID}/resource`,
       { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } },
     );
     expect(fetched.contentKind).toBe("parquet");

@@ -1,7 +1,8 @@
 import {
-  CkanEnvelopeSchema,
-  CkanPackageSchema,
-} from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
+  buildCkanActionUrl,
+  unwrapCkanActionEnvelope,
+} from "$/connectors/open-data/ckanActionApiHelpers.ts";
+import { CkanPackageSchema } from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import type {
   CkanClient,
@@ -10,51 +11,6 @@ import type {
   OpenDataHttp,
 } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type { z } from "zod";
-
-/** CKAN's action API path, the same on every deployment. */
-const ACTION_PATH = "/api/3/action";
-
-/**
- * The `error.__type` CKAN uses when an action needs a logged-in user. HDX
- * returns it for every datastore action to an anonymous caller, so it is worth
- * telling apart from an ordinary action failure: one means "not for you", the
- * other means "your request was wrong".
- */
-const AUTHORIZATION_ERROR_TYPE = "Authorization Error";
-
-function _buildActionUrl(params: {
-  baseUrl: string;
-  action: string;
-  query: Readonly<Record<string, string>>;
-}): string {
-  const root = params.baseUrl.replace(/\/+$/, "");
-  const search = new URLSearchParams(params.query).toString();
-  return `${root}${ACTION_PATH}/${params.action}?${search}`;
-}
-
-/**
- * Unwraps CKAN's envelope, raising rather than returning undefined when the
- * action failed. A failed action still arrives with HTTP 200, so this check is
- * the only thing standing between a caller and a silently absent result.
- */
-function _getActionResult(action: string, body: unknown): unknown {
-  const envelope = CkanEnvelopeSchema.parse(body);
-  if (envelope.success) {
-    return envelope.result;
-  }
-  const ckanErrorType = envelope.error.__type ?? "unknown";
-  if (ckanErrorType === AUTHORIZATION_ERROR_TYPE) {
-    throw new OpenDataAcquisitionFailed({
-      code: "ckan-authorization-required",
-      action,
-    });
-  }
-  throw new OpenDataAcquisitionFailed({
-    code: "ckan-action-failed",
-    action,
-    ckanErrorType,
-  });
-}
 
 /**
  * Normalizes one wire resource into the shape the rest of this code reads,
@@ -89,12 +45,15 @@ function _toResource(
 export function createCkanClient(http: Readonly<OpenDataHttp>): CkanClient {
   return {
     getPackage: async ({ baseUrl, ckanDatasetId }): Promise<CkanPackage> => {
-      const url = _buildActionUrl({
+      const url = buildCkanActionUrl({
         baseUrl,
         action: "package_show",
         query: { id: ckanDatasetId },
       });
-      const result = _getActionResult("package_show", await http.getJson(url));
+      const result = unwrapCkanActionEnvelope(
+        "package_show",
+        await http.getJson(url),
+      );
       const wire = CkanPackageSchema.parse(result);
       return {
         id: wire.id,

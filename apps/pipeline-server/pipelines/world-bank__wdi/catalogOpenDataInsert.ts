@@ -1,6 +1,5 @@
 import { duckDbDescribeColumnTypeToSniffable } from "@avandar/etl";
 import { getWdiCatalogDatasetPresentation } from "@pipelines/world-bank__wdi/wdiCatalogDatasetConfig";
-import { createClient } from "@supabase/supabase-js";
 import type { NodeDuckDb } from "@avandar/etl";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -35,23 +34,6 @@ function mapDescribeColumnTypeToCastDataType(
   columnType: string,
 ): ReturnType<typeof duckDbDescribeColumnTypeToSniffable> {
   return duckDbDescribeColumnTypeToSniffable(columnType);
-}
-
-/**
- * Creates a Supabase client using the service role key (bypasses RLS).
- */
-export function createSupabaseAdminClient(): SupabaseClient {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error(
-      "Inserting catalog_entries__open_data requires SUPABASE_URL and " +
-        "SUPABASE_SERVICE_ROLE_KEY.",
-    );
-  }
-
-  return createClient(supabaseUrl, serviceRoleKey);
 }
 
 function _getOpenDataBucket(): string {
@@ -146,7 +128,7 @@ function _buildMetadataForTable(options: {
 }
 
 /**
- * Upserts one `catalog_entries__open_data` row per loaded Parquet dataset.
+ * Upserts one `catalog_listings__open_data` row per loaded Parquet dataset.
  * `parquet_file_name` is the Parquet object stem (e.g. `series.parquet`).
  * Conflicts on (`parquet_file_name`, `pipeline_name`) replace the existing row.
  */
@@ -208,7 +190,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   });
 
   const { data: upsertedEntries, error } = await supabase
-    .from("catalog_entries__open_data")
+    .from("catalog_listings__open_data")
     .upsert(rows, {
       onConflict: "parquet_file_name,pipeline_name",
     })
@@ -216,7 +198,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
 
   if (error) {
     throw new Error(
-      `catalog_entries__open_data upsert failed: ${error.message}`,
+      `catalog_listings__open_data upsert failed: ${error.message}`,
     );
   }
 
@@ -229,19 +211,19 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   });
 
   const { error: deleteColumnsError } = await supabase
-    .from("catalog_entries__dataset_column")
+    .from("catalog_listings__dataset_column")
     .delete()
-    .in("catalog_entry_id", upsertedCatalogEntryIds);
+    .in("catalog_listing_id", upsertedCatalogEntryIds);
 
   if (deleteColumnsError) {
     throw new Error(
-      `catalog_entries__dataset_column delete failed: ` +
+      `catalog_listings__dataset_column delete failed: ` +
         `${deleteColumnsError.message}`,
     );
   }
 
   const columnRows: Array<{
-    catalog_entry_id: string;
+    catalog_listing_id: string;
     column_name: string;
     display_order: number;
     original_data_type: string;
@@ -250,11 +232,11 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
 
   for (const summary of tableSummaries) {
     const expectedParquetFileName = `${summary.tableBaseName}.parquet`;
-    const catalogEntryId = upsertedEntries.find((row) => {
+    const catalogListingId = upsertedEntries.find((row) => {
       return row.parquet_file_name === expectedParquetFileName;
     })?.id;
 
-    if (!catalogEntryId) {
+    if (!catalogListingId) {
       continue;
     }
 
@@ -273,7 +255,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
       }
 
       columnRows.push({
-        catalog_entry_id: catalogEntryId,
+        catalog_listing_id: catalogListingId,
         column_name: columnName,
         display_order: columnIdx,
         original_data_type: typeDescription,
@@ -287,12 +269,12 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   }
 
   const { error: insertColumnsError } = await supabase
-    .from("catalog_entries__dataset_column")
+    .from("catalog_listings__dataset_column")
     .insert(columnRows);
 
   if (insertColumnsError) {
     throw new Error(
-      `catalog_entries__dataset_column insert failed: ` +
+      `catalog_listings__dataset_column insert failed: ` +
         `${insertColumnsError.message}`,
     );
   }

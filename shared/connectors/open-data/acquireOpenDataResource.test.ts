@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
 
 const BASE_URL = "https://data.humdata.org";
 const DATASET_ID = "hdx-hapi-operational-presence";
@@ -14,10 +14,10 @@ const CSV_BYTES = new Uint8Array([99, 111, 100, 101, 10]);
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
 
 function _entry(
-  overrides: Partial<OpenDataCatalogEntry.T> = {},
-): OpenDataCatalogEntry.T {
+  overrides: Partial<OpenDataCatalogListing.T> = {},
+): OpenDataCatalogListing.T {
   return {
-    id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogEntry.Id,
+    id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogListing.Id,
     createdAt: TIMESTAMP,
     updatedAt: TIMESTAMP,
     dateOfLastSync: undefined,
@@ -289,8 +289,8 @@ const SOCRATA_BASE_URL = "https://data.cityofnewyork.us";
 const SOCRATA_DATASET_ID = "erm2-nwe9";
 
 function _socrataEntry(
-  overrides: Partial<OpenDataCatalogEntry.T> = {},
-): OpenDataCatalogEntry.T {
+  overrides: Partial<OpenDataCatalogListing.T> = {},
+): OpenDataCatalogListing.T {
   return _entry({
     apiService: "socrata",
     apiBaseUrl: SOCRATA_BASE_URL,

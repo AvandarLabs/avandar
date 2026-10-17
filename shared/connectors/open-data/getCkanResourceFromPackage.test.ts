@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  getCkanResourceFromPackage,
-  isReadableCkanResource,
-} from "$/connectors/open-data/getCkanResourceFromPackage.ts";
+import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import type {
   CkanPackage,
@@ -366,33 +363,5 @@ describe("getCkanResourceFromPackage", () => {
         });
       }),
     ).toBe("resource-format-unsupported");
-  });
-});
-
-describe("isReadableCkanResource", () => {
-  it("accepts an uploaded CSV resource", () => {
-    expect(
-      isReadableCkanResource(_resource({ format: "CSV", url_type: "upload" })),
-    ).toBe(true);
-  });
-
-  it("accepts an uploaded Parquet resource regardless of format casing", () => {
-    expect(
-      isReadableCkanResource(
-        _resource({ format: "Parquet", url_type: "upload" }),
-      ),
-    ).toBe(true);
-  });
-
-  it("rejects a resource whose url_type is an upstream api link", () => {
-    expect(
-      isReadableCkanResource(_resource({ format: "CSV", url_type: "api" })),
-    ).toBe(false);
-  });
-
-  it("rejects an uploaded resource in an unsupported format", () => {
-    expect(
-      isReadableCkanResource(_resource({ format: "TXT", url_type: "upload" })),
-    ).toBe(false);
   });
 });

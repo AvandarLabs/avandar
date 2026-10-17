@@ -16,8 +16,8 @@ import { IconSearch, IconWorldSearch } from "@tabler/icons-react";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
 import { uuid } from "$/lib/uuid";
-import { CatalogDatasetColumnClient } from "@/clients/catalog-entries/CatalogDatasetColumnClient";
-import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
+import { CatalogListingColumnClient } from "@/clients/catalog-listings/CatalogListingColumnClient";
+import { OpenDataCatalogListingClient } from "@/clients/catalog-listings/OpenDataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
@@ -28,10 +28,10 @@ import {
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
-import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail";
-import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList/OpenDataCatalogEntryList";
+import { OpenDataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail";
+import { OpenDataCatalogListingList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingList/OpenDataCatalogListingList";
 import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
-import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+import type { OpenDataCatalogListingRead } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = BoxProps & {
@@ -40,13 +40,13 @@ type Props = BoxProps & {
 
   /**
    * When set, this callback is invoked with the newly saved dataset after
-   * a successful catalog-entry import.
+   * a successful catalog-listing import.
    */
   onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
 /**
- * Browse the public open-data catalog, search entries, inspect metadata, and
+ * Browse the public open-data catalog, search listings, inspect metadata, and
  * add a catalog dataset to the current workspace.
  *
  * A search field over a two-pane browser, split by a hairline. The panes are
@@ -64,19 +64,19 @@ export function OpenDataCatalogView({
   const [debouncedSearch] = useDebouncedValue(search, 150);
   const [selectedId, setSelectedId] = useState<string | undefined>();
 
-  const [catalogEntries = [], isLoadingCatalog] =
-    OpenDataCatalogEntryClient.useGetAll({});
+  const [catalogListings = [], isLoadingCatalog] =
+    OpenDataCatalogListingClient.useGetAll({});
 
-  const [catalogDatasetColumns = [], isLoadingCatalogColumns] =
-    CatalogDatasetColumnClient.useGetAll({
-      ...where("catalog_entry_id", "eq", selectedId),
+  const [catalogListingColumns = [], isLoadingCatalogColumns] =
+    CatalogListingColumnClient.useGetAll({
+      ...where("catalog_listing_id", "eq", selectedId),
       useQueryOptions: {
         enabled: selectedId !== undefined,
       },
     });
 
   const fuse = useMemo(() => {
-    return new Fuse(catalogEntries, {
+    return new Fuse(catalogListings, {
       ignoreLocation: true,
       keys: [
         { name: "displayName", weight: 2 },
@@ -88,26 +88,27 @@ export function OpenDataCatalogView({
       ],
       threshold: 0.35,
     });
-  }, [catalogEntries]);
+  }, [catalogListings]);
 
-  const displayedEntries = useMemo(() => {
+  const displayedListings = useMemo(() => {
     const query = debouncedSearch.trim();
     if (!query) {
-      return catalogEntries;
+      return catalogListings;
     }
     return fuse.search(query).map((result) => {
       return result.item;
     });
-  }, [catalogEntries, debouncedSearch, fuse]);
+  }, [catalogListings, debouncedSearch, fuse]);
 
-  const selectedEntry: OpenDataCatalogEntryRead | undefined = useMemo(() => {
+  const selectedListing: OpenDataCatalogListingRead | undefined = useMemo(
+    () => {
     if (!selectedId) {
       return undefined;
     }
-    return catalogEntries.find((entry) => {
-      return entry.id === selectedId;
+    return catalogListings.find((listing) => {
+      return listing.id === selectedId;
     });
-  }, [catalogEntries, selectedId]);
+  }, [catalogListings, selectedId]);
 
   const [insertOpenDataDataset, isInsertPending] =
     DatasetClient.useInsertOpenDataDataset({
@@ -122,29 +123,29 @@ export function OpenDataCatalogView({
     });
 
   function onAddToWorkspace(): void {
-    if (!selectedEntry) {
+    if (!selectedListing) {
       return;
     }
 
     const columnInputs = resolveOpenDataDatasetColumnInputs({
-      catalogColumns: catalogDatasetColumns,
-      metadata: selectedEntry.metadata,
+      catalogColumns: catalogListingColumns,
+      metadata: selectedListing.metadata,
     });
 
     if (!columnInputs) {
       notifyError({
         title: t`Cannot add dataset`,
-        message: t`This catalog entry has no column metadata. It cannot be imported yet.`,
+        message: t`This catalog listing has no column metadata. It cannot be imported yet.`,
       });
       return;
     }
 
     insertOpenDataDataset({
-      catalogEntryId: selectedEntry.id,
+      catalogListingId: selectedListing.id,
       columns: columnInputs,
-      datasetDescription: selectedEntry.description ?? "",
+      datasetDescription: selectedListing.description ?? "",
       datasetId: uuid(),
-      datasetName: selectedEntry.displayName,
+      datasetName: selectedListing.displayName,
       workspaceId: workspace.id,
     });
   }
@@ -168,7 +169,7 @@ export function OpenDataCatalogView({
   // asks the user to pick from an empty list. The activation state replaces
   // all of it and carries the one move that does something, which is telling
   // us what to publish next. Same rule the no-datasets route follows.
-  if (!isLoadingCatalog && catalogEntries.length === 0) {
+  if (!isLoadingCatalog && catalogListings.length === 0) {
     return (
       <Box {...boxProps}>
         <AppSlateEmptyState
@@ -238,9 +239,9 @@ export function OpenDataCatalogView({
           </Group>
         ) : (
           <div className={css.openDataCatalogViewBrowser}>
-            {displayedEntries.length === 0 ? (
+            {displayedListings.length === 0 ? (
               /*
-               * The catalog has entries; this query matched none of them. One
+               * The catalog has listings; this query matched none of them. One
                * message spanning the frame rather than a "no matches" note in
                * the list beside a "pick one on the left" note in the detail:
                * the second cannot be acted on, and two apologies for one
@@ -269,18 +270,18 @@ export function OpenDataCatalogView({
                     component="h4"
                     className={css.openDataCatalogViewBrowserListTitle}
                   >
-                    <Trans>Catalog ({displayedEntries.length})</Trans>
+                    <Trans>Catalog ({displayedListings.length})</Trans>
                   </Text>
-                  <OpenDataCatalogEntryList
-                    displayedEntries={displayedEntries}
+                  <OpenDataCatalogListingList
+                    displayedListings={displayedListings}
                     selectedId={selectedId}
                     onSelect={setSelectedId}
                   />
                 </div>
 
                 <div className={css.openDataCatalogViewBrowserDetail}>
-                  <OpenDataCatalogEntryDetail
-                    entry={selectedEntry}
+                  <OpenDataCatalogListingDetail
+                    listing={selectedListing}
                     isAddAllowed={isAddAllowed}
                     isAdding={isInsertPending}
                     isLoadingColumnMetadata={isLoadingCatalogColumns}

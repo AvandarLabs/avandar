@@ -1,15 +1,15 @@
 import { match } from "ts-pattern";
-import { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
 import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
-import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
-import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
-import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
+import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
+import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
-import type { OpenDataAccess } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
-import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
+import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
+import { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
+import type { OpenDataAccess } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
+import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 
 /**
  * The largest resource acquired by default. CKAN caps nothing itself, and real
@@ -150,7 +150,7 @@ async function _acquireSocrataResource(
 }
 
 /**
- * Reads one API-backed open data catalog entry and returns its bytes.
+ * Reads one API-backed open data catalog listing and returns its bytes.
  *
  * Dispatches on `access.apiService`: a CKAN entry's one metadata call does all
  * the discovery, since the same `package_show` response supplies the
@@ -174,12 +174,12 @@ async function _acquireSocrataResource(
  *   the row count the source reports before any rows are fetched.
  */
 export async function acquireOpenDataResource(params: {
-  entry: Readonly<OpenDataCatalogEntry.T>;
+  entry: Readonly<OpenDataCatalogListing.T>;
   http: Readonly<OpenDataHttp>;
   maxBytes?: number;
   maxRows?: number;
 }): Promise<OpenDataAcquisition> {
-  const access = OpenDataCatalogEntry.toAccess(params.entry);
+  const access = OpenDataCatalogListing.toAccess(params.entry);
   if (!access) {
     throw new OpenDataAcquisitionFailed({
       code: "access-shape-invalid",

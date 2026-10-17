@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type {
-  CatalogDatasetColumnId,
-  CatalogDatasetColumnModel,
-} from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types.ts";
+  CatalogListingColumnId,
+  CatalogListingColumnModel,
+} from "$/models/catalog-listings/CatalogListingColumn/CatalogListingColumn.types.ts";
 
-export { CatalogDatasetColumnParsers } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumnParsers.ts";
+export { CatalogListingColumnParsers } from "$/models/catalog-listings/CatalogListingColumn/CatalogListingColumnParsers.ts";
 
-export namespace CatalogDatasetColumn {
-  export type T<K extends keyof CatalogDatasetColumnModel = "Read"> =
-    CatalogDatasetColumnModel[K];
-  export type Id = CatalogDatasetColumnId;
+export namespace CatalogListingColumn {
+  export type T<K extends keyof CatalogListingColumnModel = "Read"> =
+    CatalogListingColumnModel[K];
+  export type Id = CatalogListingColumnId;
 }

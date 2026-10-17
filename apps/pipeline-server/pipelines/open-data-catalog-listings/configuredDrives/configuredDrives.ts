@@ -1,9 +1,11 @@
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
+
 /**
  * One drive (CKAN deployment or Socrata portal) the metacatalog pipeline
  * enumerates.
  */
 export type ConfiguredDrive = {
-  apiService: "ckan" | "socrata";
+  apiService: OpenDataCatalogListing.ApiService;
   /** No trailing slash, always `https://`. */
   baseUrl: string;
   /**
@@ -23,7 +25,7 @@ export type ConfiguredDrive = {
  *
  * Empty by default. Before adding a drive here, confirm its real total
  * dataset count is small enough to fully enumerate in one run (`ava
- * pipeline run open-data-metacatalog` has no retry/backoff for a rate
+ * pipeline run open-data-catalog-listings` has no retry/backoff for a rate
  * limit, and makes one sequential metadata request per CKAN dataset or
  * Socrata page) - HDX (`data.humdata.org`) was tried here first and
  * removed: its real catalog is 42,000+ datasets, and its rate limiter

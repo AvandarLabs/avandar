@@ -2,7 +2,7 @@ import { makeParserRegistry } from "@avandar/clients";
 import { Model } from "@avandar/models";
 import { camelCaseKeysDeep, pipe, snakeCaseKeysDeep } from "@avandar/utils";
 import { z } from "zod";
-import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   OpenDataDatasetId,
@@ -16,7 +16,7 @@ const DBReadSchema = z.object({
   id: z.uuid(),
   dataset_id: z.uuid(),
   workspace_id: z.uuid(),
-  catalog_entry_id: z.uuid(),
+  catalog_listing_id: z.uuid(),
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
 });
@@ -31,7 +31,7 @@ export const OpenDataDatasetParsers =
         id: obj.id as OpenDataDatasetId,
         datasetId: obj.datasetId as DatasetId,
         workspaceId: obj.workspaceId as Workspace.Id,
-        catalogEntryId: obj.catalogEntryId as OpenDataCatalogEntryId,
+        catalogListingId: obj.catalogListingId as OpenDataCatalogListingId,
       });
     }),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,

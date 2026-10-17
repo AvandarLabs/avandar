@@ -1,16 +1,17 @@
 import { describe, expect, it, vi } from "vitest";
 import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache/acquireOpenDataResourceWithCache.ts";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.ts";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
 
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
-const ENTRY_ID = "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogEntry.Id;
+const ENTRY_ID =
+  "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogListing.Id;
 const BASE_URL = "https://data.humdata.org";
 const DATASET_ID = "movement-range-maps";
 const RESOURCE_ID = "9da55974-adf5-4106-988c-d3c92333ea0a";
 
 function _entry(
-  overrides: Partial<OpenDataCatalogEntry.T> = {},
-): OpenDataCatalogEntry.T {
+  overrides: Partial<OpenDataCatalogListing.T> = {},
+): OpenDataCatalogListing.T {
   return {
     id: ENTRY_ID,
     createdAt: TIMESTAMP,
@@ -77,7 +78,7 @@ describe("acquireOpenDataResourceWithCache", () => {
       expect.any(Blob),
     );
     expect(updateCache).toHaveBeenCalledWith({
-      catalogEntryId: entry.id,
+      catalogListingId: entry.id,
       cachedObjectPath: `${entry.id}.csv`,
       cachedSourceVersion: "ckan:hash:abc",
     });
@@ -147,7 +148,7 @@ describe("acquireOpenDataResourceWithCache", () => {
     expect(storage.downloadCachedResource).not.toHaveBeenCalled();
     expect(acquireLive).toHaveBeenCalledTimes(1);
     expect(updateCache).toHaveBeenCalledWith({
-      catalogEntryId: ENTRY_ID,
+      catalogListingId: ENTRY_ID,
       cachedObjectPath: `${ENTRY_ID}.csv`,
       cachedSourceVersion: "ckan:hash:new",
     });
@@ -213,7 +214,7 @@ describe("acquireOpenDataResourceWithCache", () => {
       expect.any(Blob),
     );
     expect(updateCache).toHaveBeenCalledWith({
-      catalogEntryId: entry.id,
+      catalogListingId: entry.id,
       cachedObjectPath: `${entry.id}.parquet`,
       cachedSourceVersion: "ckan:hash:abc",
     });

@@ -89,7 +89,7 @@ async function _downloadOpenDataSnapshot(
   );
   assertIsDefined(openDataDataset, { name: "openDataDataset" });
   return await OpenDatasetParquetStorageClient.download({
-    catalogEntryId: openDataDataset.catalogEntryId,
+    catalogListingId: openDataDataset.catalogListingId,
   });
 }
 

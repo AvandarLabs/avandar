@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
+import { OpenDataCatalogListingClient } from "@/clients/catalog-listings/OpenDataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
@@ -9,7 +9,8 @@ import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFi
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import type { OpenDataContentKind } from "$/connectors/open-data/acquireOpenDataResource";
+import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   RelationCapabilities,
@@ -20,11 +21,10 @@ import type {
   AcquiredRelation,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
-import type { OpenDataContentKind } from "$/connectors/open-data/acquireOpenDataResource";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
-/** Bytes fetched from an API-backed catalog entry, before any transcode. */
+/** Bytes fetched from an API-backed catalog listing, before any transcode. */
 export type FetchedApiOpenDataResource = {
   contentKind: OpenDataContentKind;
   bytes: Uint8Array<ArrayBuffer>;
@@ -48,7 +48,7 @@ const CAPABILITIES = {
   maxBytesPerCall: "unbounded",
 
   /**
-   * Stored Parquet carries no version we read. An API-backed catalog entry
+   * Stored Parquet carries no version we read. An API-backed catalog listing
    * does produce a token, which `acquire` returns on that path; the uploaded
    * file types still report none.
    */
@@ -100,7 +100,7 @@ type DatasetParquetWrapperOptions = {
    * function. Injected so a test drives the branch without a network.
    */
   fetchApiOpenDataResource?: (
-    catalogEntryId: OpenDataCatalogEntry.Id,
+    catalogListingId: OpenDataCatalogListing.Id,
   ) => Promise<FetchedApiOpenDataResource>;
 
   /**
@@ -171,16 +171,16 @@ async function _downloadStoredParquet(
 
 /**
  * Downloads a pipeline-produced `open_data` dataset from the Parquet URL its
- * catalog entry names. The catalog entry read is deliberately uncached, as it
- * is today.
+ * catalog listing names. The catalog listing read is deliberately uncached,
+ * as it is today.
  */
 async function _downloadPipelineOpenDataParquet(
   dataset: Readonly<Dataset.T>,
-  catalogEntry: Readonly<{
+  catalogListing: Readonly<{
     canonicalUrls?: readonly string[];
   }>,
 ): Promise<FetchedParquet> {
-  const parquetUrl = catalogEntry.canonicalUrls?.find((url) => {
+  const parquetUrl = catalogListing.canonicalUrls?.find((url) => {
     return url.toLowerCase().endsWith(".parquet");
   });
   if (!parquetUrl) {
@@ -198,7 +198,7 @@ async function _downloadPipelineOpenDataParquet(
 async function _downloadApiOpenData(
   options: Readonly<{
     datasetId: Dataset.Id;
-    catalogEntryId: OpenDataCatalogEntry.Id;
+    catalogListingId: OpenDataCatalogListing.Id;
     fetchApiOpenDataResource?: DatasetParquetWrapperOptions["fetchApiOpenDataResource"];
     transcodeCsvToParquet?: DatasetParquetWrapperOptions["transcodeCsvToParquet"];
   }>,
@@ -206,10 +206,10 @@ async function _downloadApiOpenData(
   const fetchApi = options.fetchApiOpenDataResource;
   if (!fetchApi) {
     throw new Error(
-      `No API open-data fetch for catalog entry '${options.catalogEntryId}'`,
+      `No API open-data fetch for catalog listing '${options.catalogListingId}'`,
     );
   }
-  const acquisition = await fetchApi(options.catalogEntryId);
+  const acquisition = await fetchApi(options.catalogListingId);
   if (acquisition.contentKind !== "csv") {
     return {
       parquetBlob: _parquetBlobFromBytes(acquisition.bytes),
@@ -219,7 +219,7 @@ async function _downloadApiOpenData(
   const transcode = options.transcodeCsvToParquet;
   if (!transcode) {
     throw new Error(
-      `No CSV transcode for catalog entry '${options.catalogEntryId}'`,
+      `No CSV transcode for catalog listing '${options.catalogListingId}'`,
     );
   }
   return {
@@ -251,17 +251,17 @@ async function _downloadOpenDataParquet(
       `No open data source record for dataset '${dataset.id}' (${dataset.name})`,
     );
   }
-  const catalogEntry = await OpenDataCatalogEntryClient.getOne(
-    where("id", "eq", sourceDataset.catalogEntryId),
+  const catalogListing = await OpenDataCatalogListingClient.getOne(
+    where("id", "eq", sourceDataset.catalogListingId),
   );
-  if (catalogEntry?.accessKind === "api_resource") {
+  if (catalogListing?.accessKind === "api_resource") {
     return await _downloadApiOpenData({
       datasetId: dataset.id,
-      catalogEntryId: catalogEntry.id,
+      catalogListingId: catalogListing.id,
       ...apiOptions,
     });
   }
-  return await _downloadPipelineOpenDataParquet(dataset, catalogEntry ?? {});
+  return await _downloadPipelineOpenDataParquet(dataset, catalogListing ?? {});
 }
 
 async function _fetchParquetFromSource(

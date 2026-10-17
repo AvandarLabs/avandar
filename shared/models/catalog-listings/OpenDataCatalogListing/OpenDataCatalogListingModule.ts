@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
 import type {
   OpenDataAccess,
-  OpenDataCatalogEntryRead,
-} from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
+  OpenDataCatalogListingRead,
+} from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
 
 /**
  * Builds the pipeline access shape, or undefined when the entry does not carry
@@ -10,7 +10,7 @@ import type {
  * spread, so adding a column to the union fails to compile here.
  */
 function _pipelineAccess(
-  entry: Readonly<OpenDataCatalogEntryRead>,
+  entry: Readonly<OpenDataCatalogListingRead>,
 ): OpenDataAccess | undefined {
   const { parquetFileName, pipelineName, pipelineRunId } = entry;
   if (
@@ -34,7 +34,7 @@ function _pipelineAccess(
  * that contains the resource, so a resource id without it is unusable.
  */
 function _apiAccess(
-  entry: Readonly<OpenDataCatalogEntryRead>,
+  entry: Readonly<OpenDataCatalogListingRead>,
 ): OpenDataAccess | undefined {
   const {
     apiService,
@@ -62,9 +62,9 @@ function _apiAccess(
   };
 }
 
-export const OpenDataCatalogEntryModule = {
+export const OpenDataCatalogListingModule = {
   /**
-   * Converts a catalog entry into the access shape its `accessKind` names, so
+   * Converts a catalog listing into the access shape its `accessKind` names, so
    * a caller switches on one discriminant instead of testing several columns
    * for undefined.
    *
@@ -75,7 +75,7 @@ export const OpenDataCatalogEntryModule = {
    * undefined as an error rather than as an empty result.
    */
   toAccess(
-    entry: Readonly<OpenDataCatalogEntryRead>,
+    entry: Readonly<OpenDataCatalogListingRead>,
   ): OpenDataAccess | undefined {
     return match(entry.accessKind)
       .with("pipeline_parquet", () => {
