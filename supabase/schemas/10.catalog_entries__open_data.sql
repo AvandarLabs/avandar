@@ -1,5 +1,8 @@
 /**
  * One open data dataset published in the Avandar public open data catalog.
+ * This row is effectively a union of two types: a pipeline-produced Parquet
+ * dataset or an API resource. The `access_kind` column discriminates between
+ * the two.
  */
 create table public.catalog_entries__open_data (
   -- Primary key
@@ -120,9 +123,16 @@ create table public.catalog_entries__open_data (
   -- A cache is written atomically or not at all: either every column is set,
   -- or every column is null. There is no state where only one has a value.
   constraint catalog_entries__open_data__cache_complete check (
-    (cached_object_path is null and cached_source_version is null and cached_at is null)
-    or
-    (cached_object_path is not null and cached_source_version is not null and cached_at is not null)
+    (
+      cached_object_path is null and
+      cached_source_version is null and
+      cached_at is null
+    ) or
+    (
+      cached_object_path is not null and
+      cached_source_version is not null and
+      cached_at is not null
+    )
   ),
   -- Resource bytes are fetched from this host, so it must be TLS. Some CKAN
   -- resources point at upstream APIs over plain HTTP; those are rejected here
@@ -133,20 +143,23 @@ create table public.catalog_entries__open_data (
   )
 );
 
--- One catalog entry per resource per dataset per API instance. Partial because
--- it is a statement about API entries only; `unique_parquet_file_pipeline`
--- above is the corresponding statement about pipeline entries and is
--- deliberately left as a plain constraint, since the pipeline upsert's
--- `on conflict (parquet_file_name, pipeline_name)` can only infer a
--- non-partial one.
+-- One catalog entry per resource per dataset per API instance. Plain, not
+-- partial, for the same reason `unique_parquet_file_pipeline` above is
+-- plain: a metacatalog pipeline's upsert can only target
+-- `on conflict (api_service, api_base_url, external_dataset_id,
+-- api_resource_id)`, and Postgres cannot infer a partial index as that
+-- conflict's arbiter from a bare column list. This is safe because every
+-- `pipeline_parquet` row has these four columns `NULL`
+-- (`catalog_entries__open_data__pipeline_access_complete` enforces it), and
+-- Postgres never treats a NULL-containing row as conflicting with any other
+-- row under a unique index - so this plain index still only ever constrains
+-- `api_resource` rows against each other, exactly as the partial version did.
 create unique index catalog_entries__open_data__api_resource_unique on public.catalog_entries__open_data (
   api_service,
   api_base_url,
   external_dataset_id,
   api_resource_id
-)
-where
-  access_kind = 'api_resource';
+);
 
 -- Enable row level security
 alter table public.catalog_entries__open_data enable row level security;

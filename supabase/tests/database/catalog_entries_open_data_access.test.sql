@@ -10,7 +10,7 @@
 
 begin;
 
-select plan(21);
+select plan(22);
 
 -- ---------------------------------------------------------------------------
 -- The three pipeline columns become nullable, because only a pipeline-produced
@@ -244,6 +244,27 @@ select throws_ok(
   '23514',
   null,
   'a pipeline_parquet row with a complete cache set is still rejected'
+);
+
+-- ---------------------------------------------------------------------------
+-- catalog_entries__open_data__api_resource_unique must be a plain index, not
+-- a partial one. PostgREST's `.upsert(rows, {onConflict: "..."})` can only
+-- generate a bare column-list `ON CONFLICT`, and Postgres refuses to infer a
+-- partial index as that clause's arbiter. This is the exact conflict target
+-- the metacatalog pipeline's upsert uses.
+-- ---------------------------------------------------------------------------
+
+select lives_ok(
+  $$insert into public.catalog_entries__open_data
+      (id, display_name, external_organization_name, access_kind, api_service,
+       api_base_url, external_dataset_id, api_resource_id, api_resource_format)
+    values
+      ('aaaaaaaa-0000-4000-8000-000000000105', 'pgtap-fixture upsert test',
+       'OCHA', 'api_resource', 'ckan', 'https://pgtap-fixture.invalid',
+       'pgtap-fixture-dataset-f', 'pgtap-fixture-resource-f', 'CSV')
+    on conflict (api_service, api_base_url, external_dataset_id, api_resource_id)
+    do update set display_name = excluded.display_name$$,
+  'a bare column-list ON CONFLICT against the api_resource unique index succeeds (regression test for the partial-index bug)'
 );
 
 -- ---------------------------------------------------------------------------
