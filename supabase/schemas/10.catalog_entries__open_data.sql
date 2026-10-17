@@ -149,11 +149,13 @@ create table public.catalog_entries__open_data (
 -- `on conflict (api_service, api_base_url, external_dataset_id,
 -- api_resource_id)`, and Postgres cannot infer a partial index as that
 -- conflict's arbiter from a bare column list. This is safe because every
--- `pipeline_parquet` row has these four columns `NULL`
--- (`catalog_entries__open_data__pipeline_access_complete` enforces it), and
--- Postgres never treats a NULL-containing row as conflicting with any other
--- row under a unique index - so this plain index still only ever constrains
--- `api_resource` rows against each other, exactly as the partial version did.
+-- `pipeline_parquet` row has `api_service` (along with `api_base_url` and
+-- `api_resource_id`) forced `NULL` by
+-- `catalog_entries__open_data__pipeline_access_complete` - `external_dataset_id`
+-- is not, but a single `NULL` anywhere in the indexed tuple already exempts
+-- the row from a unique-index conflict, so this plain index still only ever
+-- constrains `api_resource` rows against each other, exactly as the partial
+-- version did.
 create unique index catalog_entries__open_data__api_resource_unique on public.catalog_entries__open_data (
   api_service,
   api_base_url,

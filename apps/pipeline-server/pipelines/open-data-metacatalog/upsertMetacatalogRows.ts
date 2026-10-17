@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Upserts one `catalog_entries__open_data` row per discovered resource,
- * against the existing partial unique index on `(api_service, api_base_url,
+ * against the existing unique index on `(api_service, api_base_url,
  * external_dataset_id, api_resource_id)`.
  *
  * Deliberately never writes `cached_object_path`/`cached_source_version`/
