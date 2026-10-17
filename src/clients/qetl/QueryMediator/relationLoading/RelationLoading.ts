@@ -46,7 +46,7 @@ type FetchRelationSourceOptions = {
   growFromColumnsByDatasetId: NeededColumnsByDatasetId;
 };
 
-/** Input to {@link probeStorageRelationCache}. */
+/** Input to {@link RelationLoading.probeStorageRelationCache}. */
 type ProbeStorageRelationCacheOptions = {
   datasetIds: readonly Dataset.Id[];
   neededByDatasetId: NeededColumnsByDatasetId;
@@ -54,7 +54,7 @@ type ProbeStorageRelationCacheOptions = {
   principalKey: PrincipalKey;
 };
 
-/** Input to {@link fetchRelationBytes}. */
+/** Input to {@link RelationLoading.fetchRelationBytes}. */
 type FetchRelationBytesOptions = {
   datasetDuckDbLease: DatasetDuckDbLease;
   growFromColumnsByDatasetId: NeededColumnsByDatasetId;
@@ -63,7 +63,7 @@ type FetchRelationBytesOptions = {
   runQuery: QetlRunQuery;
 };
 
-/** Input to {@link loadRelationBytes}. */
+/** Input to {@link RelationLoading.loadRelationBytes}. */
 type LoadRelationBytesOptions = {
   relations: readonly AcquiredRelationBytes[];
   relationsToStore: readonly AcquiredRelationBytes[];
@@ -219,7 +219,7 @@ function _makeEmptyStorageProbeResult(): {
  * for an unauthorized relation would otherwise be exactly the hole that probe
  * reordering is warned about.
  */
-export async function probeStorageRelationCache(
+async function _probeStorageRelationCache(
   options: Readonly<ProbeStorageRelationCacheOptions>,
 ): Promise<{
   cachedRelations: AcquiredRelationBytes[];
@@ -277,10 +277,11 @@ async function _projectAcquiredBlob(
 /**
  * Fetches one relation's bytes, through the wrapper the registry resolves.
  *
- * The storage cache is **not** consulted here: `probeStorageRelationCache` ran
- * before dispatch, so everything reaching this function is already known to be
- * a miss. A wrapper must never consult a cache either, which is why the probe
- * belongs to the mediator rather than to either side of this call.
+ * The storage cache is **not** consulted here:
+ * `RelationLoading.probeStorageRelationCache` ran before dispatch, so
+ * everything reaching this function is already known to be a miss. A
+ * wrapper must never consult a cache either, which is why the probe belongs
+ * to the mediator rather than to either side of this call.
  *
  * `workspaceId` comes from the dataset record rather than from session state,
  * which is why no workspace has to be threaded down from the query runner. The
@@ -327,7 +328,7 @@ async function _fetchRelationSource(
  * So these fetches must stay sequential rather than racing each other on that
  * shared cache.
  */
-export async function fetchRelationBytes(
+async function _fetchRelationBytes(
   options: Readonly<FetchRelationBytesOptions>,
 ): Promise<AcquiredRelationBytes[]> {
   const relationRegistry = createRegistryForFetch(options);
@@ -390,7 +391,7 @@ async function _writeStoredRelationBytes(
  * queryable tier is about to receive them, so a full disk costs the next
  * query a re-fetch rather than costing this one its result.
  */
-export async function loadRelationBytes(
+async function _loadRelationBytes(
   options: Readonly<LoadRelationBytesOptions>,
 ): Promise<void> {
   await _writeStoredRelationBytes(options);
@@ -417,3 +418,10 @@ export async function loadRelationBytes(
     rememberQueryableColumns(relation.datasetId, relation.columns);
   });
 }
+
+/** Probes the storage cache, fetches misses, then loads bytes for a query. */
+export const RelationLoading = {
+  probeStorageRelationCache: _probeStorageRelationCache,
+  fetchRelationBytes: _fetchRelationBytes,
+  loadRelationBytes: _loadRelationBytes,
+};
