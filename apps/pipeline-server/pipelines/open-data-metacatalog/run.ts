@@ -86,6 +86,13 @@ async function _enumerateDrive(
  * data into Parquet. It only discovers metadata and writes catalog rows -
  * the actual resource bytes are still fetched live on first query, by the
  * existing `acquireOpenDataResourceWithCache` path, completely unchanged.
+ *
+ * Known gap, not yet hit in practice because `CONFIGURED_DRIVES` ships
+ * empty: `Promise.all` is fail-fast, so one drive throwing (e.g. a rate
+ * limit - see `configuredDrives.ts`'s docstring) discards every other
+ * drive's already-enumerated rows instead of upserting what did succeed.
+ * Worth revisiting (`Promise.allSettled` plus a per-drive try/catch) before
+ * a drive is reintroduced.
  */
 export async function run(): Promise<string> {
   const pipelineRunId = randomUUID();
@@ -97,7 +104,7 @@ export async function run(): Promise<string> {
 
   const rows = rowsPerDrive.flat();
   console.log(
-    `[open-data-metacatalog] discovered ${String(rows.length)} resources across ${String(CONFIGURED_DRIVES.length)} drives`,
+    `[open-data-metacatalog] run ${pipelineRunId}: discovered ${String(rows.length)} resources across ${String(CONFIGURED_DRIVES.length)} drives`,
   );
   await upsertMetacatalogRows({ supabase, rows });
 
