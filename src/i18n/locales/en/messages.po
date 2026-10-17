@@ -414,7 +414,7 @@ msgstr "Style"
 msgid "Square"
 msgstr "Square"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/ActivityBlock.tsx
 msgid "Notes"
 msgstr "Notes"
@@ -556,7 +556,7 @@ msgstr "Save and re-run query"
 msgid "Saved as \"{0}\"."
 msgstr "Saved as \"{0}\"."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr "This server requires SSL. Set SSL mode to \"Require\" and try again."
 
@@ -848,7 +848,7 @@ msgstr "Pick both a latitude and a longitude column. One on its own plots every 
 "point on a diagonal line, which looks like a result and is not."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Open data"
@@ -948,6 +948,7 @@ msgstr "Map"
 #: shared/copy/vizTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Table"
 msgstr "Table"
 
@@ -1018,7 +1019,7 @@ msgstr "The current SQL contains parts the form could not represent. Continuing 
 msgid "Updated {0}"
 msgstr "Updated {0}"
 
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
 msgstr "Request a data source connection via feedback"
 
@@ -1099,7 +1100,7 @@ msgstr "Could not load"
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "Only the people and groups listed below can access this {resource}."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "You cannot add more datasets on your current plan. Upgrade to add this "
@@ -1233,7 +1234,7 @@ msgstr "Run a query first."
 msgid "Seat limit reached"
 msgstr "Seat limit reached"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Pipeline"
 msgstr "Pipeline"
 
@@ -1330,7 +1331,7 @@ msgstr "Copied"
 msgid "Measure distance and area"
 msgstr "Measure distance and area"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Add to workspace"
 msgstr "Add to workspace"
 
@@ -1391,7 +1392,7 @@ msgstr "Close chat (⌘/)"
 msgid "Create failed"
 msgstr "Create failed"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Raw metadata"
 msgstr "Raw metadata"
 
@@ -1483,7 +1484,7 @@ msgstr "The published copy still serves the previous audience. Use the button "
 msgid "Hide tutorial"
 msgstr "Hide tutorial"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Username"
 msgstr "Username"
 
@@ -1552,7 +1553,7 @@ msgstr "Sized by value"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Label"
 msgstr "Label"
 
@@ -1667,7 +1668,7 @@ msgstr "Value axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error "
 
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 #: src/views/ProfileView/PasswordSection.tsx
 #: src/views/RegisterView/RegistrationFields.tsx
 msgid "Password"
@@ -1945,7 +1946,7 @@ msgstr "Rows from these blocks"
 msgid "Chat"
 msgstr "Chat"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
 msgstr "Host"
 
@@ -2346,7 +2347,7 @@ msgstr "Storage"
 msgid "Publish it"
 msgstr "Publish it"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Prod reporting replica"
 msgstr "Prod reporting replica"
 
@@ -2619,7 +2620,7 @@ msgstr "Your workspace is on the Free plan, which lets you share or publish one 
 "dashboard. Upgrade to our Starter or Impact plan to share as many "
 "dashboards as you like."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Disable"
 msgstr "Disable"
 
@@ -2691,7 +2692,7 @@ msgstr "{0}, {1}, and {2} are fixed for every workspace."
 msgid "Synced to the cloud"
 msgstr "Synced to the cloud"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Pick a dataset on the left to read what it covers, who publishes it, and "
 "how often it updates."
 msgstr "Pick a dataset on the left to read what it covers, who publishes it, "
@@ -2925,7 +2926,7 @@ msgstr "Could not summarize this column. The query may have failed for an "
 msgid "Draw a box around a table, chart, map or block of text to extract it."
 msgstr "Draw a box around a table, chart, map or block of text to extract it."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable.ts
 msgid "Listing tables..."
 msgstr "Listing tables..."
 
@@ -3493,7 +3494,7 @@ msgstr "Longitude"
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
 msgstr "Publish only the columns your dashboard reads. Narrowest, most private."
 
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory.tsx
 msgid "New connectors are added every month. If there is a database or service "
 "you need, <0>tell us so we can prioritize it</0>."
 msgstr "New connectors are added every month. If there is a database or service "
@@ -3609,7 +3610,7 @@ msgstr "Capturing dashboard…"
 msgid "Keep the measurements as found"
 msgstr "Keep the measurements as found"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
 msgstr "A secure connection is required"
 
@@ -3657,7 +3658,7 @@ msgstr "Y axis label color"
 msgid "Name of {0}"
 msgstr "Name of {0}"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
 msgstr "This table is too large to import"
 
@@ -4218,7 +4219,7 @@ msgstr "Tab to import"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
@@ -4285,7 +4286,7 @@ msgstr "Next"
 msgid "Fields that come from datasets"
 msgstr "Fields that come from datasets"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Port"
 msgstr "Port"
 
@@ -4498,7 +4499,7 @@ msgstr "Anyone in {app}"
 msgid "Failed to delete dataset"
 msgstr "Failed to delete dataset"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "License"
 msgstr "License"
 
@@ -4515,7 +4516,7 @@ msgid "Draw a region on the page"
 msgstr "Draw a region on the page"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Connect"
 msgstr "Connect"
 
@@ -4527,7 +4528,7 @@ msgstr "Drop to import"
 msgid "Date range"
 msgstr "Date range"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "Add dataset to workspace"
 
@@ -4664,7 +4665,7 @@ msgstr "Columns"
 msgid "Bright"
 msgstr "Bright"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Canonical"
 msgstr "Canonical"
 
@@ -4703,7 +4704,7 @@ msgstr "\"{value}\" is not a valid regular expression."
 msgid "Unable to load dashboard"
 msgstr "Unable to load dashboard"
 
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Connectors"
 msgstr "Connectors"
 
@@ -4719,7 +4720,7 @@ msgstr "Seats purchased successfully"
 msgid "Open chat (⌘/)"
 msgstr "Open chat (⌘/)"
 
-#. placeholder {0}: displayedEntries.length
+#. placeholder {0}: displayedListings.length
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
 msgid "Catalog ({0})"
 msgstr "Catalog ({0})"
@@ -4842,6 +4843,7 @@ msgstr "Parts of this SQL could not be represented in the Manual form. The form 
 "shows a best-effort approximation; the SQL is what actually runs."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -5849,7 +5851,7 @@ msgstr "Measure readout"
 msgid "Upper bound"
 msgstr "Upper bound"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable.ts
 msgid "Connecting to database"
 msgstr "Connecting to database"
 
@@ -6079,9 +6081,9 @@ msgstr "Email"
 msgid "Y axis tick color"
 msgstr "Y axis tick color"
 
-#. placeholder {0}: entry.pipelineName
-#. placeholder {1}: entry.pipelineRunId
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#. placeholder {0}: listing.pipelineName
+#. placeholder {1}: listing.pipelineRunId
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "{0} · run {1}"
 msgstr "{0} · run {1}"
 
@@ -6167,7 +6169,7 @@ msgstr "One filter is active on this layer. It may be excluding everything."
 msgid "Workspace name updated"
 msgstr "Workspace name updated"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
 msgstr "Avandar could not reach that host and port. Check the address and that "
@@ -6219,7 +6221,7 @@ msgid "Private dashboards"
 msgstr "Private dashboards"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DataManagerApp/DataImportView/DataImportTabs.tsx
+#: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Upload"
 
@@ -6514,7 +6516,7 @@ msgstr "Create a new workspace. You can always edit it later."
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Try again in a moment, or reach out to support if it keeps happening."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
 msgstr "The database user should ideally have read-only access to the table or "
@@ -6694,13 +6696,17 @@ msgstr "Connected"
 msgid "Only the owner can make this {resource} private."
 msgstr "Only the owner can make this {resource} private."
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Updates"
 msgstr "Updates"
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "That query failed. Please fix the SQL and try again."
 msgstr "That query failed. Please fix the SQL and try again."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
+msgid "Schema"
+msgstr "Schema"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Repeating labelled blocks"
@@ -6759,8 +6765,8 @@ msgid "Add layer"
 msgstr "Add layer"
 
 #: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
-msgid "This catalog entry has no column metadata. It cannot be imported yet."
-msgstr "This catalog entry has no column metadata. It cannot be imported yet."
+#~ msgid "This catalog entry has no column metadata. It cannot be imported yet."
+#~ msgstr "This catalog entry has no column metadata. It cannot be imported yet."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 msgid "Offline chat model ready"
@@ -7442,7 +7448,7 @@ msgstr "1 dataset"
 msgid "No numeric columns"
 msgstr "No numeric columns"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Service"
 msgstr "Service"
 
@@ -7463,8 +7469,8 @@ msgstr "{lengthValue} km"
 #. placeholder {0}: load.savedConnections?.length
 #. placeholder {1}: load.savedConnections?.length === 1 ? "database" : "databases"
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
-msgid "{0} saved {1} available"
-msgstr "{0} saved {1} available"
+#~ msgid "{0} saved {1} available"
+#~ msgstr "{0} saved {1} available"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 msgid "Source line"
@@ -7620,7 +7626,7 @@ msgid "The layer fetches exactly these fields, so adding one also makes it "
 msgstr "The layer fetches exactly these fields, so adding one also makes it "
 "available to filter on."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
 msgstr "Require"
 
@@ -7689,7 +7695,7 @@ msgstr "Stack group"
 msgid "Select rule (e.g. most frequent)"
 msgstr "Select rule (e.g. most frequent)"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
 msgstr "Database is unreachable"
 
@@ -7873,7 +7879,7 @@ msgstr "Editor"
 msgid "Entered manually"
 msgstr "Entered manually"
 
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 msgid "Organization"
 msgstr "Organization"
 
@@ -7901,7 +7907,7 @@ msgstr "Saving"
 msgid "Role for new share"
 msgstr "Role for new share"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
 msgstr "This table has more rows than Avandar can import at once. Try a smaller "
@@ -7919,7 +7925,7 @@ msgstr "Send to AI?"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Purchase {seatsToAdd} seats"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr "The username or password was not accepted. Check the credentials and "
@@ -8101,7 +8107,7 @@ msgstr "Unnamed column expression in SELECT; skipped."
 msgid "Clear search"
 msgstr "Clear search"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
 msgstr "An unexpected error occurred while connecting."
 
@@ -8498,7 +8504,7 @@ msgid "Thank you for your interest!"
 msgstr "Thank you for your interest!"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryForm.tsx
-#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail/OpenDataCatalogEntryDetail.tsx
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -8601,6 +8607,13 @@ msgstr "Popup"
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterOperatorSelector/FilterOperatorSelector.tsx
 msgid "Condition"
 msgstr "Condition"
+
+#. placeholder {0}: load.savedConnections?.length ?? 0
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+msgid "{0, plural, one {# saved database available} other {# saved databases "
+"available}}"
+msgstr "{0, plural, one {# saved database available} other {# saved databases "
+"available}}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -8749,7 +8762,7 @@ msgstr "Aggregate only draws areas after at least {0} contributing records. "
 msgid "Dataset saved"
 msgstr "Dataset saved"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
 msgstr "Connection timed out"
 
@@ -9046,6 +9059,10 @@ msgstr "Case type deleted"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING uses operator \"{operator}\" which the form does not support."
 
+#: src/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.tsx
+msgid "This catalog listing has no column metadata. It cannot be imported yet."
+msgstr "This catalog listing has no column metadata. It cannot be imported yet."
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Displaced"
 msgstr "Displaced"
@@ -9139,7 +9156,7 @@ msgstr "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the 
 "open data catalog. Everything else in Avandar builds on what you import "
 "here."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
 msgstr "The database did not respond in time. Check the address and try again."
 
@@ -9382,7 +9399,7 @@ msgstr "Column 10"
 msgid "Click a labelled tick on the y-axis."
 msgstr "Click a labelled tick on the y-axis."
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/getPostgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
 msgstr "Could not connect to the database"
 
@@ -9480,7 +9497,7 @@ msgstr "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgid "Draw an annotation area"
 msgstr "Draw an annotation area"
 
-#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
+#: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "SSL mode"
 msgstr "SSL mode"
 
