@@ -5,7 +5,7 @@ serve it, how a relation's bytes actually get acquired today, what changes
 once a Socrata connector and a write-back cache exist, and what stays
 deferred. It assumes
 [`connector-nomenclature.md`](connector-nomenclature.md) (drive, connection,
-relation, metacatalog, the connector-vs-discovery distinction) and
+relation, drive index, the connector-vs-discovery distinction) and
 [`qetl-architecture.md`](../qetl-architecture.md) section 2.1 (client vs.
 wrapper). Facts are as of 2026-10-16 (`feat/demo/measles`, with
 `feat/postgres-connector` merged in); section 8 lists what is proposed rather
@@ -15,7 +15,7 @@ than built.
 this doc was explicit about it:** the Open Data Catalog is not a special
 data-loading mechanism. It is connectors - CKAN, a future Socrata, and
 `AvandarSupabaseStorage` - plugged into QETL with no special exceptions. A
-catalog entry becomes an ordinary `datasets` row with `source_type:
+catalog listing becomes an ordinary `datasets` row with `source_type:
 "open_data"`, and `DatasetParquetWrapper` acquires it the same way it
 acquires any other dataset: through a `SourceWrapper`, with capabilities
 declared in `RelationCapabilities`, with no bespoke code path anywhere in
@@ -71,7 +71,7 @@ shared/connectors/                                   renamed from shared/open-da
   open-data/
     CkanClient/                                       unchanged, moved
     SocrataClient/                                    new - getMetadata, getRows
-    SocrataDiscoveryClient/                            new - the metacatalog client (section 7)
+    SocrataDiscoveryClient/                            new - the drive index client (section 7)
     AvandarSupabaseStorageClient/                      new - the Open Data Catalog's own
                                                         storage drive (narrower than first
                                                         drafted - see the note below)
@@ -121,7 +121,7 @@ Unifying the other three remains a real idea, tracked as deferred work
 
 `AvandarSupabaseStorageClient`'s shape, reflecting what the cache actually
 needs - a private, non-workspace-scoped bucket (`open-data-catalog`, new),
-read by any authenticated user (matching `catalog_entries__open_data`'s own
+read by any authenticated user (matching `catalog_listings__open_data`'s own
 `select`-to-`authenticated` grant), written only by the `open-data` edge
 function's service-role client:
 
@@ -175,7 +175,7 @@ Target:
               yes: read open-data-catalog/<objectPath> (AvandarSupabaseStorageClient)
               no:  acquireOpenDataResource(entry)   (now dispatches by api_service too)
                    write the bytes to open-data-catalog/<objectPath>
-                   update the catalog entry's cache_* columns (service-role)
+                   update the catalog listing's cache_* columns (service-role)
     -> return bytes, same headers as today
 ```
 
@@ -197,12 +197,12 @@ something Socrata or the cache introduces or is required to resolve.)
 
 ## 4. Schema changes
 
-`catalog_entries__open_data__api_service` (currently `enum('ckan')`) gains
+`catalog_listings__open_data__api_service` (currently `enum('ckan')`) gains
 `'socrata'`. No other new enum: `api_base_url` and `external_dataset_id`
 already carry a SODA endpoint and a 4x4 dataset id without further migration,
 exactly as the CKAN generalization spec predicted (section 13.1 there).
 
-Three new nullable columns on `catalog_entries__open_data`, written only by
+Three new nullable columns on `catalog_listings__open_data`, written only by
 `access_kind = 'api_resource'` rows, mirroring the existing `api_*` columns'
 pattern:
 
@@ -230,7 +230,7 @@ and cached_source_version is null
 and cached_at is null
 
 -- a new constraint, grouped the same way api_access_complete is:
-constraint catalog_entries__open_data__cache_complete check (
+constraint catalog_listings__open_data__cache_complete check (
   (cached_object_path is null and cached_source_version is null and cached_at is null)
   or
   (cached_object_path is not null and cached_source_version is not null and cached_at is not null)
@@ -259,7 +259,7 @@ call - nothing above the HTTP boundary (section 3) changes:
 
 ```text
 acquire an api_resource entry:
-  1. Read the catalog entry's cached_source_version (may be null - no cache yet).
+  1. Read the catalog listing's cached_source_version (may be null - no cache yet).
   2. Ask the connector (CkanClient.getPackage / SocrataClient.getMetadata) for
      the live freshness token. This is a separate call from whatever step 4's
      live acquisition makes - on a cache miss or a stale token, the metadata
@@ -276,7 +276,7 @@ acquire an api_resource entry:
        write those same raw bytes to AvandarSupabaseStorageClient, unchanged
        in contentKind - no transcode happens here or ever on this path,
        update cached_object_path / cached_source_version / cached_at
-       on the catalog entry,
+       on the catalog listing,
        return the freshly-fetched bytes.
 ```
 
@@ -296,9 +296,9 @@ This is a cache-aside read, the same shape QETL's own storage tier already
 uses (`qetl-architecture.md` section 6), one level further out: QETL's
 existing IndexedDB tier still sits in front of all of this and is
 untouched - a workspace that already has this relation resident never
-reaches step 1 at all. What's new here is purely the *catalog entry's own*
+reaches step 1 at all. What's new here is purely the *catalog listing's own*
 cache, shared across every workspace, which is what makes the first
-workspace to query a given catalog entry pay the live-fetch cost and every
+workspace to query a given catalog listing pay the live-fetch cost and every
 subsequent workspace (and every subsequent session of the same workspace,
 after IndexedDB eviction) get the fast path.
 
@@ -316,20 +316,20 @@ real and keeps the version-token race (two workspaces' requests landing
 inside the "is this stale" window at the same time) inside one process
 instead of two browsers.
 
-## 6. Metacatalog: prebuilt, from a hardcoded list of drives
+## 6. Drive index: prebuilt, from a hardcoded list of drives
 
 **Revised 2026-10-16: no longer deferred.** The original version of this
-section called the metacatalog "live, not prebuilt, for v1" and pushed the
+section called the drive index "live, not prebuilt, for v1" and pushed the
 prebuilt shape to future work. That is reversed: Avandar now prebuilds the
-metacatalog for a short, hardcoded list of drives, via a new pipeline. The
+drive index for a short, hardcoded list of drives, via a new pipeline. The
 live-search capability this section previously described
 (`SocrataDiscoveryClient`) is not removed - it is still the right tool for
 letting a human *pick which drives to add* to that list - but it is no longer
 how a workspace finds a candidate dataset to query. That now comes from
-`catalog_entries__open_data` rows a pipeline already wrote.
+`catalog_listings__open_data` rows a pipeline already wrote.
 
 **Why prebuilt now:** there is currently no way to get an `api_resource` row
-into `catalog_entries__open_data` at all - no pipeline, no admin UI, no CLI
+into `catalog_listings__open_data` at all - no pipeline, no admin UI, no CLI
 command. A `pipeline_parquet` row gets there because a pipeline writes it;
 an `api_resource` row had no equivalent path. Building that path as "a
 pipeline that enumerates a drive and upserts rows" is strictly simpler than
@@ -342,7 +342,7 @@ re-runnable job.
 
 `connector-nomenclature.md` already names both: "A Socrata open-data portal's
 base URL (e.g. `data.cityofnewyork.us`)" and "A CKAN deployment's base URL
-(e.g. `data.humdata.org`)" are both layer-0 drive examples. The difference
+(e.g. `data.humdata.org`)" are both layer-1 drive examples. The difference
 between them is not whether a drive exists - it is whether there is a
 federated index *across* drives:
 
@@ -360,7 +360,7 @@ which drives to enumerate.
 
 ### 6.2 The drive registry
 
-A new hardcoded list, `apps/pipeline-server/pipelines/open-data-metacatalog/configuredDrives.ts`:
+A new hardcoded list, `apps/pipeline-server/pipelines/open-data-catalog-listings/configuredDrives.ts`:
 
 ```ts
 export type ConfiguredDrive = {
@@ -407,7 +407,7 @@ Neither existing client can enumerate "everything in this drive" today:
 
 Socrata and CKAN differ here too, for the same reason `connector-nomenclature.md`
 already gives: a Socrata dataset does not subdivide, so dataset and resource
-are the same object (layer 1 and layer 2 collapse); a CKAN dataset routinely
+are the same object (layer 2 and layer 3 collapse); a CKAN dataset routinely
 lists several resources side by side.
 
 - **Socrata:** one discovered dataset is one catalog row.
@@ -433,7 +433,7 @@ partial unique index:
 
 ```sql
 -- already exists, from section 4 / the original schema:
-create unique index catalog_entries__open_data__api_resource_unique on public.catalog_entries__open_data (
+create unique index catalog_listings__open_data__api_resource_unique on public.catalog_listings__open_data (
   api_service, api_base_url, external_dataset_id, api_resource_id
 ) where access_kind = 'api_resource';
 ```
@@ -456,9 +456,9 @@ when it happens.
 
 ### 6.6 Where this runs
 
-A new pipeline, `apps/pipeline-server/pipelines/open-data-metacatalog/`,
+A new pipeline, `apps/pipeline-server/pipelines/open-data-catalog-listings/`,
 discoverable and runnable the same way `world-bank__wdi` already is (`ava
-pipeline run open-data-metacatalog` - presence of `run.ts` is the only
+pipeline run open-data-catalog-listings` - presence of `run.ts` is the only
 registration step this repo requires). Unlike every pipeline that exists
 today, it does not use `EtlEngine.create(...)`: that abstraction is for
 extracting, transforming, and loading *data* into Parquet, and this pipeline
@@ -479,9 +479,9 @@ needs to reconcile with the EtlEngine pattern later.
   new `open-data-catalog` bucket and `AvandarSupabaseStorageClient`.
 - The `shared/open-data/` to `shared/connectors/open-data/` rename.
 - The `external-datasets` to `connectors` edge function rename.
-- The prebuilt metacatalog pipeline (section 6): `CkanDiscoveryClient`;
+- The prebuilt drive index pipeline (section 6): `CkanDiscoveryClient`;
   widening `SocrataDiscoveryClient.search()`'s `query` to optional; the
-  `open-data-metacatalog` pipeline and its hardcoded drive registry;
+  `open-data-catalog-listings` pipeline and its hardcoded drive registry;
   extracting `getCkanResourceFromPackage.ts`'s readable-resource filter into
   a reusable, exported predicate.
 
@@ -495,7 +495,7 @@ needs to reconcile with the EtlEngine pattern later.
    multi-account Google Sheets support (a real `drive` entity, today
    implicit) and a Postgres server-level drive above today's one-database-per-
    connection shape.
-3. Pruning or deactivating a metacatalog row once its drive stops listing the
+3. Pruning or deactivating a drive index row once its drive stops listing the
    dataset (section 6.5) - the pipeline is additive-only for now.
 4. Unifying `DatasetParquetStorageClient`, `DatasetOriginalFileStorageClient`,
    and `PublicDatasetParquetStorageClient` onto `AvandarSupabaseStorageClient`
@@ -508,7 +508,7 @@ needs to reconcile with the EtlEngine pattern later.
    (`OpenDatasetParquetStorageClient`) onto the new private bucket. Not
    needed for Socrata or the cache, and a separate decision touching live
    production catalog rows.
-6. Retry/backoff/throttling for the metacatalog pipeline's HTTP calls.
+6. Retry/backoff/throttling for the drive index pipeline's HTTP calls.
    Discovered necessary, not hypothetical: a live dry run against HDX's real
    CKAN catalog (42,000+ datasets) hit its rate limiter after ~150
    sequential requests with no `Retry-After` header. `CONFIGURED_DRIVES`
@@ -527,17 +527,17 @@ Following `qetl-architecture.md` section 12's table shape:
 | `AvandarSupabaseStorageClient` reads and writes the `open-data-catalog` bucket correctly, under an injected storage handle | unit test against a faked `SupabaseClient["storage"]`, no network |
 | `OpenDatasetParquetStorageClient`'s existing `pipeline_parquet` read is unchanged by this spec | existing test suite stays green, untouched |
 | `SocrataClient`/`SocrataDiscoveryClient` against a faked HTTP layer, no network | mirrors `CkanClient.test.ts`'s shape |
-| CHECK constraints: cache columns are all-null or all-set; never set on a `pipeline_parquet` row | pgTAP, mirroring `catalog_entries_open_data_access.test.sql` |
+| CHECK constraints: cache columns are all-null or all-set; never set on a `pipeline_parquet` row | pgTAP, mirroring `catalog_listings_open_data_access.test.sql` |
 | The `connectors` edge function rename does not change any route's behavior, only its path prefix | existing Postgres connector e2e spec, updated for the new prefix |
 | `CkanDiscoveryClient` lists every dataset slug in one drive, no network | unit test against a faked HTTP layer, mirrors `SocrataDiscoveryClient.test.ts`'s shape |
 | `SocrataDiscoveryClient.search()` with no `query` lists a domain's full catalog | extends `SocrataDiscoveryClient.test.ts` |
-| The open-data-metacatalog pipeline upserts one row per qualifying CKAN resource and one row per Socrata dataset, using the shared readable-resource predicate | unit test on the pipeline's pure row-building functions, no network or DB |
+| The open-data-catalog-listings pipeline upserts one row per qualifying CKAN resource and one row per Socrata dataset, using the shared readable-resource predicate | unit test on the pipeline's pure row-building functions, no network or DB |
 | Re-running the pipeline never overwrites an existing row's cache columns | unit test asserting the upserted row object never carries `cached_*` keys |
 
 ## 9. Related documents
 
 - [`connector-nomenclature.md`](connector-nomenclature.md): drive, connection,
-  relation, metacatalog, the connector-vs-discovery distinction this spec
+  relation, drive index, the connector-vs-discovery distinction this spec
   builds on throughout.
 - [`qetl-architecture.md`](../qetl-architecture.md) section 2.1 (client vs.
   wrapper), section 9 (capability record is declarative only, no planner

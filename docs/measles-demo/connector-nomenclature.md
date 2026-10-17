@@ -17,52 +17,88 @@ own vocabulary: relation, `RelationRef`, wrapper, capability) and section 10
 section 5.4 (where "connection" and "relation" were first fixed as the shared
 vocabulary), and the
 [open data APIs design](../superpowers/specs/2026-08-19-qetl-open-data-apis-design.md)
-(the CKAN acquisition model this file's "drive"/metacatalog layer sits above).
+(the CKAN acquisition model this file's "drive"/drive-index layer sits above).
 
-## The shape: three layers, not two
+## The shape: four layers, not two
 
-A connector's data lives in up to three nested layers. Not every connector
-has all three - the lower two always exist, the top one only exists when the
-connector's own technology has a real account/endpoint layer above the thing
-a user picks.
+A connector's data lives in up to four nested layers. Not every connector
+has all four - the bottom two always exist, the middle one only exists when
+the connector's own technology has a real account/endpoint layer above the
+thing a user picks, and the top one collapses to "the connector itself" for a
+connector with only one deployment Avandar will ever talk to.
 
 ```text
-Layer 0 - drive        the account or endpoint a connector talks to
-            |           (optional: absent when a connection is entered
-            |            directly, with nothing to pick it from)
-Layer 1 - connection   the reusable, authenticate-or-configure-once parent
-            |           a user picks a relation from
-Layer 2 - relation     the addressable child that becomes one Avandar
-                        dataset - what QETL calls a relation everywhere else
-                        (`RelationRef`, `RelationCapabilities`)
+Layer 0 - service       the protocol/implementation a connector speaks -
+            |            CKAN, Socrata, Postgres, Google Sheets,
+            |            AvandarSupabaseStorage. One Avandar connector per
+            |            service; matches the `api_service` column/type
+            |            already in the Open Data Catalog's schema
+            |            (`"ckan" | "socrata"`).
+Layer 1 - drive         the account or endpoint a connector talks to
+            |            (optional: absent when a connection is entered
+            |             directly, with nothing to pick it from)
+Layer 2 - connection    the reusable, authenticate-or-configure-once parent
+            |            a user picks a relation from
+Layer 3 - relation      the addressable child that becomes one Avandar
+                         dataset - what QETL calls a relation everywhere else
+                         (`RelationRef`, `RelationCapabilities`)
 ```
 
 | Term | What it is | Examples |
 | --- | --- | --- |
-| **Drive** (layer 0) | The account or endpoint that owns many connections. Optional: a connector with no shared account layer has no drive. | A user's Google OAuth grant (`tokens__google`). A Socrata open-data portal's base URL (e.g. `data.cityofnewyork.us`). A CKAN deployment's base URL (e.g. `data.humdata.org`). One specific bucket (or bucket plus path prefix) in Avandar's own Supabase Storage project, for the `AvandarSupabaseStorage` connector (see below) - the one connector whose drives are all Avandar-operated, never a third party's. |
-| **Connection** (layer 1) | The reusable, picked-once-used-many-times parent a relation lives under. Infrastructure configuration, not a per-resource shareable item: gated by app role, not by per-resource sharing. | A Postgres server + database (`db_connections` / `db_connections__postgres`). One Google Sheets file, picked from the drive's list. One Socrata or CKAN dataset, picked from the portal. One Open Data Catalog entry, for `AvandarSupabaseStorage`. |
-| **Relation** (layer 2) | The addressable child a user ultimately selects as one Avandar dataset - QETL's own word for this (`RelationRef`, `RelationCapabilities`). | A Postgres table or view. A tab within a Google Sheets file. A Socrata dataset's own rows (Socrata datasets do not subdivide further in practice, so layer 1 and layer 2 are almost always the same object for Socrata). The one Parquet object a catalog entry names. |
+| **Service** (layer 0) | The protocol or implementation a connector speaks - the thing the rest of this file calls "the connector" when talking about code (see "Connector vs. the drives it talks to" below). One Avandar connector implements exactly one service; a service has many drives. | `ckan`, `socrata`, `postgres`, `google_sheets`, and `avandar_supabase_storage` (the connector reading Avandar's own pipeline-built and cached Parquet). `ckan`/`socrata` are already literal values of the `api_service` column and the `OpenDataCatalogListing.ApiService` type - this layer is not a new concept, just this file's name for a value that already exists in the schema. |
+| **Drive** (layer 1) | The account or endpoint that owns many connections. Optional: a connector with no shared account layer has no drive. | A user's Google OAuth grant (`tokens__google`). A Socrata open-data portal's base URL (e.g. `data.cityofnewyork.us`). A CKAN deployment's base URL (e.g. `data.humdata.org`). One specific bucket (or bucket plus path prefix) in Avandar's own Supabase Storage project, for the `AvandarSupabaseStorage` connector (see below) - the one connector whose drives are all Avandar-operated, never a third party's. |
+| **Connection** (layer 2) | The reusable, picked-once-used-many-times parent a relation lives under. Infrastructure configuration, not a per-resource shareable item: gated by app role, not by per-resource sharing. | A Postgres server + database (`db_connections` / `db_connections__postgres`). One Google Sheets file, picked from the drive's list. One Socrata or CKAN dataset, picked from the portal. One Open Data Catalog listing, for `AvandarSupabaseStorage`. |
+| **Relation** (layer 3) | The addressable child a user ultimately selects - QETL's own word for this (`RelationRef`, `RelationCapabilities`). Becomes one Avandar dataset once a workspace adopts it (see "Relation vs. dataset" below) - it is not one before that. | A Postgres table or view. A tab within a Google Sheets file. A Socrata dataset's own rows (Socrata datasets do not subdivide further in practice, so layer 2 and layer 3 are almost always the same object for Socrata). The one Parquet object a catalog listing names. |
 
-**Layer 1 and layer 2 can be the same object.** When a connection has no
+### Relation vs. dataset: related, not interchangeable
+
+A **relation** is the layer-3 granularity itself, regardless of who (if
+anyone) owns it. A **dataset** is a relation that a specific workspace has
+adopted: an actual `public.datasets` row, whose `owner_id` and
+`workspace_id` columns are both `not null` in the schema. There is no such
+thing as an unowned dataset - ownership is not optional metadata bolted onto
+a dataset, it is what makes something a dataset at all.
+
+This is why an Open Data Catalog listing is a relation, never a dataset, for
+as long as it stays an unpicked catalog listing: `catalog_listings__open_data`
+has no `owner_id` or `workspace_id` column, by design - it is shared across
+every workspace, owned by none of them. The same CKAN resource becomes a
+dataset only at the moment some workspace imports it, which creates its own
+`public.datasets` row with that workspace's `owner_id`/`workspace_id`,
+entirely separate from the catalog listing it was copied from. This is also
+why `OpenDataCatalogListing`/`catalog_listings__open_data` were named with
+"entry," not "dataset," in the first place: calling an unowned, shared row a
+"dataset" would misstate the one thing that word is supposed to guarantee.
+
+**Layer 0 never collapses the way layers 1-3 can.** A service always has
+exactly one connector implementation; there is nothing above it to merge
+into and nothing below it is ever optional in the way a drive or a
+connection can be. It is listed as its own layer so the hierarchy is
+unambiguous ("which drives does this service have," never "which services
+does this drive have"), not because any connector-specific logic keys off it
+beyond the `api_service` column that already carries it.
+
+**Layer 2 and layer 3 can be the same object.** When a connection has no
 further substructure to pick from, the connection *is* the relation: a
 Socrata dataset with no internal sheets, a CKAN resource, an Open Data
-Catalog entry read through `AvandarSupabaseStorage`. There is no third, empty
-layer to represent in code or schema for these - the connection row and the
-relation are one and the same thing.
+Catalog listing read through `AvandarSupabaseStorage`. There is no fourth,
+empty layer to represent in code or schema for these - the connection row
+and the relation are one and the same thing.
 
-**Layer 0 can exist with nothing discoverable above it.** An uploaded
+**Layer 1 can exist with nothing discoverable above it.** An uploaded
 CSV/XLSX/PDF file, once synced online (see "Not every dataset source type is
 a connector" below), is still read back through `AvandarSupabaseStorage` - it
 has a drive (the bucket it lives in) and a relation (its own Parquet object),
 with connection collapsed into relation exactly as above. What it does *not*
 have is anything a user could browse or pick a *different* relation from: the
 bucket is not a catalog, nothing is listed, and the one object there exists
-only because one specific upload created it. A drive with no metacatalog
+only because one specific upload created it. A drive with no searchable index
 above it and nothing reusable to pick from is still a drive; it is just not a
 connector *in the discovery sense* the rest of this file describes. See
 "Not every dataset source type is a connector" for the precise line.
 
-**Layer 0 can be absent.** Today's Postgres connector has no drive: a
+**Layer 1 can be absent.** Today's Postgres connector has no drive: a
 `db_connections__postgres` row stores host, port, *and* database together, so
 there is no shared "this server, pick a database" entity above it, because v1
 intentionally scoped one connection to one already-chosen database (see the
@@ -102,7 +138,7 @@ several, each serving a different purpose:
 | --- | --- | --- |
 | `workspaces` bucket, `{workspaceId}/datasets/{datasetId}.parquet` | An uploaded `csv_file`/`xlsx_file`/`pdf_file` dataset's transcoded Parquet, once synced online | `DatasetParquetStorageClient` |
 | A retained-original prefix in the same storage project | The original file bytes for a non-reconstructable source (`pdf_file`) | `DatasetOriginalFileStorageClient` |
-| The Open Data Catalog's public bucket | A `pipeline_parquet` catalog entry's Parquet object today; the `api_resource` write-back cache once it exists | `OpenDatasetParquetStorageClient` |
+| The Open Data Catalog's public bucket | A `pipeline_parquet` catalog listing's Parquet object today; the `api_resource` write-back cache once it exists | `OpenDatasetParquetStorageClient` |
 | A public-snapshot bucket | A published dashboard's dataset Parquet, read by anonymous viewers | `PublicDatasetParquetStorageClient` |
 
 Every one of these is a connector-shaped read (an addressable object, fetched
@@ -130,7 +166,7 @@ adding a second account a new row in an existing table, not a new connector.
 "Reads through a protocol client" and "is connector-shaped" turn out to be
 different questions, answered differently below.
 
-**Ownership is not the test.** `pipeline_parquet` Open Data Catalog entries
+**Ownership is not the test.** `pipeline_parquet` Open Data Catalog listings
 are Avandar-owned - the bytes sit in Avandar's own Supabase Storage, written
 there by Avandar's own pipeline - and they are still connector-backed,
 through `AvandarSupabaseStorage`. So "is this reached through a connector"
@@ -158,11 +194,11 @@ anywhere for one to read.
 
 **The actual test is about discovery, not about the read path: is there a
 reusable, named, addressable parent that a relation is *picked from*, with a
-metacatalog or a picker UI in front of it?** `pipeline_parquet` passes: the
-parent is the Open Data Catalog, a browsable, shared list a user picks an
-entry out of. An uploaded file fails, in both its states: online-synced, it
+drive index or a picker UI in front of it?** `pipeline_parquet` passes: the
+parent is the Open Data Catalog, a browsable, shared list a user picks a
+listing out of. An uploaded file fails, in both its states: online-synced, it
 is read through the exact same `AvandarSupabaseStorage` connector as a
-catalog entry, but there was never anything to browse or pick from - the
+catalog listing, but there was never anything to browse or pick from - the
 object exists solely because one specific upload created it, nothing else is
 listed beside it, and no second relation could ever be chosen from the same
 parent. Offline-only, there is not even a connector-shaped read left to
@@ -170,7 +206,7 @@ speak of.
 
 So a dataset source type can be connector-backed in the read-path sense
 without being connector-backed in the full drive/connection/relation/
-metacatalog sense this file otherwise describes. Of today's values, split
+drive-index sense this file otherwise describes. Of today's values, split
 where one value uses more than one protocol client or state:
 
 | Source type (state) | Protocol client at acquire time | Has drive/connection/relation layering with real discovery above it? |
@@ -179,7 +215,7 @@ where one value uses more than one protocol client or state:
 | `open_data` (`api_resource`) | `CkanClient` today, a future `SocrataClient`; falls through to `AvandarSupabaseStorage` on a cache hit once the write-back cache exists | Yes - the CKAN/Socrata portal is the discoverable parent |
 | `google_sheets` | the Google Sheets client (`src/clients/google/GoogleDriveClient/`) | Yes - the user's Google Drive is the discoverable parent |
 | `postgres_table` | the Postgres driver (`supabase/functions/external-datasets/connectors/postgres/`) | Yes - the connected server's table/view catalog is the discoverable parent |
-| `csv_file`, `xlsx_file`, `pdf_file` (`isInCloudStorage: true`, the default) | `AvandarSupabaseStorage` | No - a drive (the bucket) exists, but nothing is listed there to pick a *different* relation from; see "Layer 0 can exist with nothing discoverable above it" above |
+| `csv_file`, `xlsx_file`, `pdf_file` (`isInCloudStorage: true`, the default) | `AvandarSupabaseStorage` | No - a drive (the bucket) exists, but nothing is listed there to pick a *different* relation from; see "Layer 1 can exist with nothing discoverable above it" above |
 | `csv_file`, `xlsx_file`, `pdf_file` (`isInCloudStorage: false`, offline-only) | none | No - and no read-time connector at all; the cloud object was deleted, so only the device holding the local `LocalDataset` cache can query it |
 | `virtual` | none | No. Defined by a stored SQL query over relations already resident in the workspace; no storage fetch of any kind, in either state |
 
@@ -196,77 +232,84 @@ discoverable, it only names the client correctly. CSV/XLSX/PDF parsing and
 `src/clients/datasets/source-datasets/` - connector-ness is about discovery,
 not about which runtime module happens to read Supabase Storage.
 
-## Metacatalog: a searchable directory over a connector's own universe
+## Drive index: a searchable directory over one drive's relations
 
-A **metacatalog** is a searchable index of a connector's available drives
-and/or relations, so a user (or Avandar's own picker UI) can answer "does a
-Chicago open-data portal exist?" or "is there a dataset named
-`cdc-outbreaks`?" without a live round trip to the source for every
-keystroke.
+A **drive index** is a searchable index of the relations inside *one* drive,
+so a user (or Avandar's own picker UI) can answer "is there a dataset named
+`cdc-outbreaks` on NYC Open Data?" without a live round trip to the source
+for every keystroke. It is scoped to a single drive, not to "does a Chicago
+open-data portal exist at all" - that is a different question, about which
+*drives* exist for a service, not which relations exist inside one. Socrata's
+own federated catalog (`api.us.socrata.com/api/catalog/v1`) answers that
+different question today; this file does not propose a name for it, because
+nothing in this spec's build scope indexes it.
 
-A metacatalog is not a new kind of QETL relation and does not change how a
+A drive index is not a new kind of QETL relation and does not change how a
 relation is acquired once picked. It answers a different question -
 "what *can* I connect to and where is it" - that is logically upstream of
 acquisition, the same way CKAN's `package_show` metadata call already is: a
 discovery step that ends with the user creating an ordinary `datasets` row,
 after which QETL acquires that row exactly like any other dataset.
 
-A metacatalog can be built one of three ways, and a connector may mix them:
+A drive index can be built one of three ways, and a connector may mix them:
 
 | Shape | When to use it | Example |
 | --- | --- | --- |
-| **Prebuilt** | The source has too much to search live, but is small enough (or a filterable slice of it is) to index ahead of time. Built by the Avandar **pipeline** - a scheduled, out-of-band process, never app or edge-function runtime code - and the materialized index (a SQLite file, a JSON or CSV manifest) is stored in Supabase storage for every workspace to query. | Socrata: thousands of government portals, each with its own dataset listing. Prebuilding every portal's full catalog is possible for the scope Avandar actually wants (for example, US portals only, until there is a reason to index Europe too) - a **hybrid** metacatalog: serve the prebuilt slice directly, and fall back to a live portal search for anything outside it. |
-| **Search-time (live)** | The source is too large or too dynamic to prebuild at all, or it is scoped to one user's own private account rather than a shared public universe. | Google Sheets: layer 1 (which files exist under a user's Drive) is searched live through the Google Picker UI at pick time, because it is specific to that user's own account and changes whenever they do. CKAN: a deployment the size of HDX is queried live (`package_search`) and any result worth re-showing is cached, never fully pre-indexed. |
-| **Hybrid** | Part of the universe is worth prebuilding, the rest is not. | Socrata, scoped to one region today with room to grow: prebuilt for the indexed region, live API search for everything outside it. |
+| **Prebuilt** | The drive has too much to search live, but is small enough (or a filterable slice of it is) to index ahead of time. Built by the Avandar **pipeline** - a scheduled, out-of-band process, never app or edge-function runtime code - and the materialized index (a SQLite file, a JSON or CSV manifest) is stored in Supabase storage for every workspace to query. | The `open-data-catalog-listings` pipeline (section 6 of `open-data-catalog-architecture.md`): enumerates one hardcoded drive at a time (a CKAN deployment or a Socrata portal) and writes one `catalog_listings__open_data` row per readable relation it finds. |
+| **Search-time (live)** | The drive is too large or too dynamic to prebuild at all, or it is scoped to one user's own private account rather than a shared public universe. | Google Sheets: layer 2 (which files exist under a user's Drive) is searched live through the Google Picker UI at pick time, because it is specific to that user's own account and changes whenever they do. A CKAN deployment the size of HDX cannot be prebuilt at all with today's pipeline design - its real catalog (42,000+ datasets) exceeds what a no-retry sequential crawl can enumerate in one run, so it is not addable as a drive today in either shape. |
+| **Hybrid** | Part of one drive's relations are worth prebuilding, the rest are not. | Not built for any drive today. A CKAN deployment too large to enumerate in full could prebuild one organization's relations (via `package_search`'s `organization` filter) and leave the rest unindexed. |
 
 "Prebuild" always means the same thing wherever this file or a design spec
 uses it: **built by the Avandar pipeline, on a schedule, never by frontend or
 edge-function runtime code, with its output materialized into Supabase
 storage** - the same meaning the word already carries for a
-`pipeline_parquet` Open Data Catalog entry (`apps/pipeline-server/pipelines/`).
-A metacatalog is a new kind of pipeline artifact, not a new way of
+`pipeline_parquet` Open Data Catalog listing (`apps/pipeline-server/pipelines/`).
+A drive index is a new kind of pipeline artifact, not a new way of
 loading one.
 
-## Open Data Catalog, "catalog", and "metacatalog" are three different words
+## Open Data Catalog, "catalog", and "drive index" are three different words
 
 These three are easy to conflate and must not be:
 
 - **Open Data Catalog** (capitalized, a proper noun) is one specific Avandar
-  product surface: the `catalog_entries__open_data` table plus its browsing
+  product surface: the `catalog_listings__open_data` table plus its browsing
   UI, listing every freely available public dataset Avandar has vetted and
   made addable to any workspace, regardless of which connector or protocol
   serves it underneath (`pipeline_parquet` today, CKAN's `api_resource` today,
   a future Socrata `api_resource`). It is shared across every workspace, not
-  workspace-scoped.
-- **A metacatalog** (lower case, a generic shape, defined above) is a
-  per-connector search index over that connector's own drives and relations.
-  It exists independently of the Open Data Catalog and is not limited to
-  public data: a user's own Google Sheets picker is a (search-time) metacatalog
-  over their private drive, with nothing "open data" about it.
+  workspace-scoped. Its rows are **listings** (`OpenDataCatalogListing`) -
+  see "Relation vs. dataset" above for why a listing is a relation, not a
+  dataset, until some workspace adopts it.
+- **A drive index** (lower case, a generic shape, defined above) is a
+  per-drive search index over one drive's own relations. It exists
+  independently of the Open Data Catalog and is not limited to public data: a
+  user's own Google Sheets picker is a (search-time) drive index over their
+  private drive, with nothing "open data" about it.
 - **"Catalog"** used alone, with neither qualifier, is ambiguous and should be
   avoided in code, schema, and docs from here on. Say "the Open Data Catalog"
-  or "the <connector>'s metacatalog" - never bare "catalog" - once both
-  concepts exist side by side. (An existing exception that is not being
-  renamed: `catalog_entries__open_data`, the table the Open Data Catalog is
-  built on, and `OpenDataCatalogEntry`, its model. Both names predate this
-  file and already carry "open_data"/"OpenData" as the qualifier.)
+  or "the <drive>'s drive index" - never bare "catalog" - once both concepts
+  exist side by side. `catalog_listings__open_data` and
+  `OpenDataCatalogListing` keep "catalog" in their own names because they
+  name the Open Data Catalog specifically, not because "catalog" alone is
+  ambiguous there - the `open_data`/`OpenData` qualifier is what resolves it.
 
-A single Open Data Catalog entry can be thought of as one hand-curated row
-copied out of some connector's metacatalog (or, for `pipeline_parquet` rows,
-out of no connector's metacatalog at all - a one-off pipeline artifact with no
-live drive behind it). The Open Data Catalog does not have to expose a
-connector's full metacatalog to get an entry into it.
+A single Open Data Catalog listing can be thought of as one hand-curated row
+copied out of some drive's drive index (or, for `pipeline_parquet` rows, out
+of no drive index at all - a one-off pipeline artifact with no live drive
+behind it). The Open Data Catalog does not have to expose a drive's full
+index to get a listing into it.
 
 ## Do and don't
 
 **Do**
 
-- Say "drive" for layer 0, "connection" for layer 1, "relation" for layer 2.
-  Relation is already QETL's word (`RelationRef`); do not coin a second one.
+- Say "service" for layer 0, "drive" for layer 1, "connection" for layer 2,
+  "relation" for layer 3. Relation is already QETL's word (`RelationRef`); do
+  not coin a second one.
 - Say "the Socrata connector" for the implementation, and name the specific
   drive ("NYC Open Data") everywhere a user sees it.
-- Say "prebuilt metacatalog" or "search-time metacatalog" rather than bare
-  "metacatalog" when the distinction matters to the sentence.
+- Say "prebuilt drive index" or "search-time drive index" rather than bare
+  "drive index" when the distinction matters to the sentence.
 - Say "the Open Data Catalog" (capitalized) for the product surface, never
   bare "catalog."
 - Call `AvandarSupabaseStorage` a connector, same as any other. Ownership
@@ -274,11 +317,16 @@ connector's full metacatalog to get an entry into it.
 - Keep "reads through a protocol client" and "is connector-shaped, with real
   discovery above it" as two separate questions. An online-synced upload is
   true on the first and false on the second; say which one you mean.
-- Say "dataset" and "relation" interchangeably for layer 2. "Relation" is
-  QETL's internal word (`RelationRef`, `RelationCapabilities`); "dataset" is
-  the product-facing word for the same granularity (an Avandar `datasets`
-  row). They name the same layer, not two different things - don't treat a
-  mention of "dataset" as somehow layer-1/connection-adjacent.
+- Say "relation" for the layer-3 granularity itself (QETL's internal word:
+  `RelationRef`, `RelationCapabilities`) regardless of whether it is owned by
+  a workspace yet. Say "dataset" only once that relation has been adopted
+  into a specific workspace as an actual `public.datasets` row - that table's
+  `owner_id` and `workspace_id` are both `not null`, so "dataset" always
+  carries ownership that bare "relation" does not. They describe the same
+  granularity, not the same object: a relation becomes a dataset the moment a
+  workspace adopts it, and is not one before that. Don't treat a mention of
+  "dataset" as layer-2/connection-adjacent, and don't call an unowned
+  relation a "dataset" just because it is the same granularity as one.
 
 **Don't**
 
@@ -287,16 +335,16 @@ connector's full metacatalog to get an entry into it.
   client at all. Ask whether a relation is *discoverable* - picked from a
   reusable, listed parent, not just read from an addressable one ("Not every
   dataset source type is a connector" above). An online-synced upload reads
-  through `AvandarSupabaseStorage` exactly like a catalog entry does, and
+  through `AvandarSupabaseStorage` exactly like a catalog listing does, and
   still is not connector-shaped, because nothing was ever listed to pick it
   from.
 
 - Don't name a connector's technology in user-facing copy ("Socrata",
   "CKAN"). Name the drive the user picked.
-- Don't call layer 0 "the catalog." It is the drive; "catalog" is reserved for
-  the Open Data Catalog and "metacatalog" is reserved for a connector's search
-  index over its own drives and relations.
-- Don't model a metacatalog as a QETL relation kind. It is a discovery step
+- Don't call layer 1 "the catalog." It is the drive; "catalog" is reserved for
+  the Open Data Catalog and "drive index" is reserved for one drive's own
+  search index over its relations.
+- Don't model a drive index as a QETL relation kind. It is a discovery step
   that produces a `datasets` row for QETL to acquire afterward, not something
   QETL itself queries.
 
