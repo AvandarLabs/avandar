@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
+import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
 
@@ -8,10 +8,10 @@ const TIMESTAMP = "2026-08-19T00:00:00+00:00";
  * fields its own claim depends on.
  */
 function _entry(
-  overrides: Partial<OpenDataCatalogListing.T>,
-): OpenDataCatalogListing.T {
+  overrides: Partial<DataCatalogListing.T>,
+): DataCatalogListing.T {
   return {
-    id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogListing.Id,
+    id: "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as DataCatalogListing.Id,
     createdAt: TIMESTAMP,
     updatedAt: TIMESTAMP,
     dateOfLastSync: undefined,
@@ -60,10 +60,10 @@ const COMPLETE_PIPELINE_FIELDS = {
   pipelineRunId: "run-1",
 } as const;
 
-describe("OpenDataCatalogListing.toAccess", () => {
+describe("DataCatalogListing.toAccess", () => {
   it("reads a pipeline entry as the pipeline shape", () => {
     expect(
-      OpenDataCatalogListing.toAccess(_entry(COMPLETE_PIPELINE_FIELDS)),
+      DataCatalogListing.toAccess(_entry(COMPLETE_PIPELINE_FIELDS)),
     ).toEqual({
       kind: "pipeline_parquet",
       parquetFileName: "series.parquet",
@@ -74,7 +74,7 @@ describe("OpenDataCatalogListing.toAccess", () => {
 
   it("reads an API entry as the API shape", () => {
     expect(
-      OpenDataCatalogListing.toAccess(_entry(COMPLETE_API_FIELDS)),
+      DataCatalogListing.toAccess(_entry(COMPLETE_API_FIELDS)),
     ).toEqual({
       kind: "api_resource",
       apiService: "ckan",
@@ -96,7 +96,7 @@ describe("OpenDataCatalogListing.toAccess", () => {
     ["externalDatasetId", { externalDatasetId: undefined }],
   ])("refuses an API entry missing %s", (_field, missing) => {
     expect(
-      OpenDataCatalogListing.toAccess(
+      DataCatalogListing.toAccess(
         _entry({ ...COMPLETE_API_FIELDS, ...missing }),
       ),
     ).toBeUndefined();
@@ -108,7 +108,7 @@ describe("OpenDataCatalogListing.toAccess", () => {
     ["pipelineRunId", { pipelineRunId: undefined }],
   ])("refuses a pipeline entry missing %s", (_field, missing) => {
     expect(
-      OpenDataCatalogListing.toAccess(
+      DataCatalogListing.toAccess(
         _entry({ ...COMPLETE_PIPELINE_FIELDS, ...missing }),
       ),
     ).toBeUndefined();

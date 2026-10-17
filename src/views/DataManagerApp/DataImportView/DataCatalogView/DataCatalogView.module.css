@@ -3,7 +3,7 @@
  * same surface, not two cards side by side, so nothing between the list and
  * the entry it describes costs more than a pixel.
  */
-.openDataCatalogViewBrowser {
+.dataCatalogViewBrowser {
   /*
    * One number for the frame's height, so the no-matches region fills exactly
    * the box the two panes would have occupied and the frame does not resize
@@ -24,7 +24,7 @@
  * so the browser keeps the size it had while listing and the message sits
  * where the eye already is instead of hugging the left edge.
  */
-.openDataCatalogViewBrowserEmpty {
+.dataCatalogViewBrowserEmpty {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -35,7 +35,7 @@
   padding: var(--mantine-spacing-xl);
 }
 
-.openDataCatalogViewBrowserList {
+.dataCatalogViewBrowserList {
   background-color: var(--ava-surface-body);
   border-inline-end: 1px solid var(--ava-border-default);
   max-height: 30rem;
@@ -44,7 +44,7 @@
   scrollbar-width: thin;
 }
 
-.openDataCatalogViewBrowserListTitle {
+.dataCatalogViewBrowserListTitle {
   color: var(--mantine-color-neutral-6);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -55,7 +55,7 @@
   text-transform: uppercase;
 }
 
-.openDataCatalogViewBrowserDetail {
+.dataCatalogViewBrowserDetail {
   max-height: 30rem;
   min-width: 0;
   overflow-y: auto;
@@ -63,11 +63,11 @@
 }
 
 @media (width <= 62em) {
-  .openDataCatalogViewBrowser {
+  .dataCatalogViewBrowser {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .openDataCatalogViewBrowserList {
+  .dataCatalogViewBrowserList {
     border-block-end: 1px solid var(--ava-border-default);
     border-inline-end: none;
   }

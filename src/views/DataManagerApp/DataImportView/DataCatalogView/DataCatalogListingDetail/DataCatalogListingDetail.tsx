@@ -13,20 +13,21 @@ import { IconChevronDown, IconPlus } from "@tabler/icons-react";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { useOfflineGate } from "@/lib/hooks/browser/useOfflineGate/useOfflineGate";
-import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail.module.css";
-import type { OpenDataCatalogListingRead } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types";
+import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.module.css";
+import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { ReactNode } from "react";
 
 type Props = {
   /** Selected catalog listing, or none when nothing is selected. */
-  listing: OpenDataCatalogListingRead | undefined;
+  listing: DataCatalogListingRead | undefined;
   /** When false, add is blocked (e.g. subscription limit). */
   isAddAllowed: boolean;
   /** True while the insert mutation is running. */
   isAdding: boolean;
   /**
-   * True while loading `catalog_listings__dataset_column` for the listing (or
-   * before the query runs). Add stays disabled until this is false.
+   * True while loading `data_catalog_listings__relation_columns` for the
+   * listing (or before the query runs). Add stays disabled until this is
+   * false.
    */
   isLoadingColumnMetadata: boolean;
   /** Invoked when the user confirms adding the dataset to the workspace. */
@@ -41,7 +42,7 @@ type Props = {
  * a page of headings. There is exactly one add button: a primary action
  * offered twice makes a user check whether the two do the same thing.
  */
-export function OpenDataCatalogListingDetail({
+export function DataCatalogListingDetail({
   listing,
   isAddAllowed,
   isAdding,
@@ -73,12 +74,12 @@ export function OpenDataCatalogListingDetail({
     !isAddAllowed || isAdding || isLoadingColumnMetadata || offline.isBlocked;
 
   return (
-    <Stack gap="md" className={css.openDataCatalogListingDetail}>
+    <Stack gap="md" className={css.dataCatalogListingDetail}>
       <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
         <Title
           order={4}
           lineClamp={3}
-          className={css.openDataCatalogListingDetailTitle}
+          className={css.dataCatalogListingDetailTitle}
         >
           {listing.displayName}
         </Title>
@@ -171,8 +172,8 @@ export function OpenDataCatalogListingDetail({
                 size={14}
                 className={
                   isRawMetadataOpen
-                    ? css.openDataCatalogListingDetailChevronOpen
-                    : css.openDataCatalogListingDetailChevronClosed
+                    ? css.dataCatalogListingDetailChevronOpen
+                    : css.dataCatalogListingDetailChevronClosed
                 }
               />
             }
@@ -185,7 +186,7 @@ export function OpenDataCatalogListingDetail({
             <Text
               component="pre"
               size="xs"
-              className={css.openDataCatalogListingDetailRawMetadata}
+              className={css.dataCatalogListingDetailRawMetadata}
             >
               {metadataJson}
             </Text>

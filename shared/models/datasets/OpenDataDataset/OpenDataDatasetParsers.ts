@@ -2,7 +2,7 @@ import { makeParserRegistry } from "@avandar/clients";
 import { Model } from "@avandar/models";
 import { camelCaseKeysDeep, pipe, snakeCaseKeysDeep } from "@avandar/utils";
 import { z } from "zod";
-import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
+import type { DataCatalogListingId } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   OpenDataDatasetId,
@@ -31,7 +31,7 @@ export const OpenDataDatasetParsers =
         id: obj.id as OpenDataDatasetId,
         datasetId: obj.datasetId as DatasetId,
         workspaceId: obj.workspaceId as Workspace.Id,
-        catalogListingId: obj.catalogListingId as OpenDataCatalogListingId,
+        catalogListingId: obj.catalogListingId as DataCatalogListingId,
       });
     }),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,

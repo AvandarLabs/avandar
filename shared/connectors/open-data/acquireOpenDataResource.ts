@@ -6,9 +6,9 @@ import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResour
 import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
-import { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
+import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
-import type { OpenDataAccess } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
+import type { OpenDataAccess } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 
 /**
@@ -174,12 +174,12 @@ async function _acquireSocrataResource(
  *   the row count the source reports before any rows are fetched.
  */
 export async function acquireOpenDataResource(params: {
-  entry: Readonly<OpenDataCatalogListing.T>;
+  entry: Readonly<DataCatalogListing.T>;
   http: Readonly<OpenDataHttp>;
   maxBytes?: number;
   maxRows?: number;
 }): Promise<OpenDataAcquisition> {
-  const access = OpenDataCatalogListing.toAccess(params.entry);
+  const access = DataCatalogListing.toAccess(params.entry);
   if (!access) {
     throw new OpenDataAcquisitionFailed({
       code: "access-shape-invalid",

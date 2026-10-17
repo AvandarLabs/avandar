@@ -1,12 +1,12 @@
 import { Stack, Text, UnstyledButton } from "@mantine/core";
 import clsx from "clsx";
-import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingList/OpenDataCatalogListingList.module.css";
-import type { OpenDataCatalogListingRead } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types";
+import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";
+import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { ReactNode } from "react";
 
 type Props = {
   /** Listings after optional fuzzy search. */
-  displayedListings: readonly OpenDataCatalogListingRead[];
+  displayedListings: readonly DataCatalogListingRead[];
   /** Currently highlighted catalog listing id. */
   selectedId: string | undefined;
   /** Called when the user picks a row. */
@@ -24,7 +24,7 @@ type Props = {
  * situations applies, an unpublished catalog or a query that matched nothing,
  * is the parent's to tell apart, and each wants a different answer.
  */
-export function OpenDataCatalogListingList({
+export function DataCatalogListingList({
   displayedListings,
   selectedId,
   onSelect,
@@ -39,8 +39,8 @@ export function OpenDataCatalogListingList({
             role="option"
             aria-selected={isSelected}
             className={clsx(
-              css.openDataCatalogListingListRow,
-              isSelected && css.openDataCatalogListingListRowSelected,
+              css.dataCatalogListingListRow,
+              isSelected && css.dataCatalogListingListRowSelected,
             )}
             onClick={() => {
               onSelect(listing.id);

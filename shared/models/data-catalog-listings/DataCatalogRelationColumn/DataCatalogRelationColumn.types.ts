@@ -1,17 +1,17 @@
-import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
+import type { DataCatalogListingId } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
-export type CatalogListingColumnId = UUID<"CatalogListingColumn">;
+export type DataCatalogRelationColumnId = UUID<"DataCatalogRelationColumn">;
 
-export type CatalogListingColumnRead = {
+export type DataCatalogRelationColumnRead = {
   /** Primary key. */
-  id: CatalogListingColumnId;
+  id: DataCatalogRelationColumnId;
 
   /** Parent open-data catalog listing. */
-  catalogListingId: OpenDataCatalogListingId;
+  catalogListingId: DataCatalogListingId;
 
   /** Column name in the source Parquet / dataset. */
   columnName: string;
@@ -34,20 +34,20 @@ export type CatalogListingColumnRead = {
 };
 
 /**
- * CRUD type definitions for the CatalogListingColumn model.
+ * CRUD type definitions for the DataCatalogRelationColumn model.
  */
-export type CatalogListingColumnModel = SupabaseCrudModelSpec<
+export type DataCatalogRelationColumnModel = SupabaseCrudModelSpec<
   {
-    tableName: "catalog_listings__dataset_column";
-    modelName: "CatalogListingColumn";
-    modelPrimaryKeyType: CatalogListingColumnId;
+    tableName: "data_catalog_listings__relation_columns";
+    modelName: "DataCatalogRelationColumn";
+    modelPrimaryKeyType: DataCatalogRelationColumnId;
     modelTypes: {
-      Read: CatalogListingColumnRead;
+      Read: DataCatalogRelationColumnRead;
       Insert: SetOptional<
-        CatalogListingColumnRead,
+        DataCatalogRelationColumnRead,
         "id" | "createdAt" | "updatedAt"
       >;
-      Update: Partial<CatalogListingColumnRead>;
+      Update: Partial<DataCatalogRelationColumnRead>;
     };
   },
   {

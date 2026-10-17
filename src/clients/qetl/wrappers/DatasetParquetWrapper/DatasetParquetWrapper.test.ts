@@ -91,9 +91,9 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
-vi.mock("@/clients/catalog-listings/OpenDataCatalogListingClient", () => {
+vi.mock("@/clients/data-catalog-listings/DataCatalogListingClient", () => {
   return {
-    OpenDataCatalogListingClient: { getOne: catalogEntryGetOneMock },
+    DataCatalogListingClient: { getOne: catalogEntryGetOneMock },
   };
 });
 

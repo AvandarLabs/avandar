@@ -65,8 +65,8 @@ export type ExternalDatasetsApi = APITypeDef<
         // `Record<string, unknown> | void | Response` here, so this must
         // stay `Response`, matching the one other route in this codebase
         // that also returns raw bytes (`open-data`'s
-        // `/catalog-listings/:catalogListingId/resource`, same `returnType:
-        // Response`). That precedent is never called through
+        // `/data-catalog-listings/:catalogListingId/resource`, same
+        // `returnType: Response`). That precedent is never called through
         // `APIClient`/`supabase.functions.invoke` for exactly this reason:
         // `functions.invoke`'s own content-type-based parsing resolves
         // `text/csv` to a plain string, not a `Response` object, so a caller

@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { OpenDataCatalogListingClient } from "@/clients/catalog-listings/OpenDataCatalogListingClient";
+import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
@@ -10,7 +10,7 @@ import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParque
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { OpenDataContentKind } from "$/connectors/open-data/acquireOpenDataResource";
-import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   RelationCapabilities,
@@ -100,7 +100,7 @@ type DatasetParquetWrapperOptions = {
    * function. Injected so a test drives the branch without a network.
    */
   fetchApiOpenDataResource?: (
-    catalogListingId: OpenDataCatalogListing.Id,
+    catalogListingId: DataCatalogListing.Id,
   ) => Promise<FetchedApiOpenDataResource>;
 
   /**
@@ -198,7 +198,7 @@ async function _downloadPipelineOpenDataParquet(
 async function _downloadApiOpenData(
   options: Readonly<{
     datasetId: Dataset.Id;
-    catalogListingId: OpenDataCatalogListing.Id;
+    catalogListingId: DataCatalogListing.Id;
     fetchApiOpenDataResource?: DatasetParquetWrapperOptions["fetchApiOpenDataResource"];
     transcodeCsvToParquet?: DatasetParquetWrapperOptions["transcodeCsvToParquet"];
   }>,
@@ -251,7 +251,7 @@ async function _downloadOpenDataParquet(
       `No open data source record for dataset '${dataset.id}' (${dataset.name})`,
     );
   }
-  const catalogListing = await OpenDataCatalogListingClient.getOne(
+  const catalogListing = await DataCatalogListingClient.getOne(
     where("id", "eq", sourceDataset.catalogListingId),
   );
   if (catalogListing?.accessKind === "api_resource") {

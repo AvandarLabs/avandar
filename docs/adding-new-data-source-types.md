@@ -134,7 +134,7 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 | `.../DatasetImportForm/DatasetParseControls.tsx`                          | Controls per source type.                                                    |
 | `.../DatasetImportForm/useImportedColumns/useImportedColumns.ts`          | Column preview by metadata shape.                                            |
 | `.../GoogleSheetsImportView/GoogleSheetsImportView.tsx`                   | Reference for **connector**-style import (non-file).                         |
-| `.../OpenDataCatalogView/*`                                               | Reference for **catalog**-style import (`open_data`).                        |
+| `.../DataCatalogView/*`                                               | Reference for **catalog**-style import (`open_data`).                        |
 
 ### Resync (pull fresh data from upstream)
 

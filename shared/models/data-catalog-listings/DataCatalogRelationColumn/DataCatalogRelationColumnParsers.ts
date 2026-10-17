@@ -8,11 +8,11 @@ import {
 import { z } from "zod";
 import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type {
-  CatalogListingColumnId,
-  CatalogListingColumnModel,
-  CatalogListingColumnRead,
-} from "$/models/catalog-listings/CatalogListingColumn/CatalogListingColumn.types.ts";
-import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
+  DataCatalogRelationColumnId,
+  DataCatalogRelationColumnModel,
+  DataCatalogRelationColumnRead,
+} from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn.types.ts";
+import type { DataCatalogListingId } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
@@ -27,24 +27,24 @@ const DBReadSchema = z.object({
   cast_data_type: z.enum(DuckDbDataTypes),
 });
 
-export const CatalogListingColumnParsers =
-  makeParserRegistry<CatalogListingColumnModel>().build({
-    modelName: "CatalogListingColumn",
+export const DataCatalogRelationColumnParsers =
+  makeParserRegistry<DataCatalogRelationColumnModel>().build({
+    modelName: "DataCatalogRelationColumn",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
-      (obj): CatalogListingColumnRead => {
+      (obj): DataCatalogRelationColumnRead => {
         const createdAt = obj.createdAt;
         const updatedAt = obj.updatedAt;
         if (createdAt === undefined || updatedAt === undefined) {
           throw new Error(
-            "CatalogListingColumn: missing created_at or updated_at from DB",
+            "DataCatalogRelationColumn: missing created_at or updated_at from DB",
           );
         }
         return {
-          id: obj.id as CatalogListingColumnId,
-          catalogListingId: obj.catalogListingId as OpenDataCatalogListingId,
+          id: obj.id as DataCatalogRelationColumnId,
+          catalogListingId: obj.catalogListingId as DataCatalogListingId,
           columnName: obj.columnName,
           displayOrder: obj.displayOrder,
           createdAt,
@@ -61,7 +61,7 @@ export const CatalogListingColumnParsers =
 /**
  * Do not remove these tests!
  */
-type CrudTypes = CatalogListingColumnModel;
+type CrudTypes = DataCatalogRelationColumnModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

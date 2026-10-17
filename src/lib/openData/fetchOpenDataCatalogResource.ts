@@ -1,6 +1,6 @@
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { OpenDataContentKind } from "$/connectors/open-data/acquireOpenDataResource";
-import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 
 /** One catalog resource as the open-data edge function returns it. */
@@ -21,7 +21,7 @@ export type FetchedOpenDataCatalogResource = {
  * @returns The resource bytes, how they must be read, and any source version.
  */
 export async function fetchOpenDataCatalogResource(
-  catalogListingId: OpenDataCatalogListing.Id,
+  catalogListingId: DataCatalogListing.Id,
 ): Promise<FetchedOpenDataCatalogResource> {
   const { data } = await AvaSupabase.db().auth.getSession();
   const accessToken = data.session?.access_token;
@@ -30,7 +30,7 @@ export async function fetchOpenDataCatalogResource(
   }
 
   const url =
-    `${AvaSupabase.getEdgeFunctionsURL()}/open-data/catalog-listings/` +
+    `${AvaSupabase.getEdgeFunctionsURL()}/open-data/data-catalog-listings/` +
     `${encodeURIComponent(catalogListingId)}/resource`;
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },

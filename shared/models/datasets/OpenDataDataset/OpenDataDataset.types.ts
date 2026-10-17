@@ -1,4 +1,4 @@
-import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types.ts";
+import type { DataCatalogListingId } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
@@ -21,7 +21,7 @@ export type OpenDataDatasetRead = Model.Base<
     workspaceId: Workspace.Id;
 
     /** Public catalog listing for this open dataset. */
-    catalogListingId: OpenDataCatalogListingId;
+    catalogListingId: DataCatalogListingId;
 
     createdAt: string;
 

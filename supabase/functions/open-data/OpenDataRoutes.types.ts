@@ -10,9 +10,9 @@ import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
  */
 export type OpenDataAPI = APITypeDef<
   "open-data",
-  ["/catalog-listings/:catalogListingId/resource"],
+  ["/data-catalog-listings/:catalogListingId/resource"],
   {
-    "/catalog-listings/:catalogListingId/resource": {
+    "/data-catalog-listings/:catalogListingId/resource": {
       GET: {
         returnType: Response;
         pathParams: { catalogListingId: string };

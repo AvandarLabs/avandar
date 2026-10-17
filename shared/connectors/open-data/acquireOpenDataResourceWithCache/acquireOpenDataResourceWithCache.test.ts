@@ -1,17 +1,17 @@
 import { describe, expect, it, vi } from "vitest";
 import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache/acquireOpenDataResourceWithCache.ts";
-import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
 const ENTRY_ID =
-  "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as OpenDataCatalogListing.Id;
+  "5b89fc55-586d-485f-8526-3c7a9a1b0d90" as DataCatalogListing.Id;
 const BASE_URL = "https://data.humdata.org";
 const DATASET_ID = "movement-range-maps";
 const RESOURCE_ID = "9da55974-adf5-4106-988c-d3c92333ea0a";
 
 function _entry(
-  overrides: Partial<OpenDataCatalogListing.T> = {},
-): OpenDataCatalogListing.T {
+  overrides: Partial<DataCatalogListing.T> = {},
+): DataCatalogListing.T {
   return {
     id: ENTRY_ID,
     createdAt: TIMESTAMP,

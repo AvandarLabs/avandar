@@ -4,7 +4,7 @@ import { Stack } from "@mantine/core";
 import { ConnectorsAdvisory } from "@/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
-import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";
+import { DataCatalogView } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView";
 import { PostgresConnectorImportView } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -51,7 +51,7 @@ export function DataImportTabs({
         },
         "open-data-catalog": () => {
           return (
-            <OpenDataCatalogView
+            <DataCatalogView
               isAddAllowed={isAddAllowed}
               onSaveSuccess={onSaveSuccess}
               pt="lg"

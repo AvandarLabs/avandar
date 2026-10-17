@@ -1,10 +1,10 @@
 import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { AvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.types.ts";
-import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 
 type UpdateCacheParams = {
-  catalogListingId: OpenDataCatalogListing.Id;
+  catalogListingId: DataCatalogListing.Id;
   cachedObjectPath: string;
   cachedSourceVersion: string;
 };
@@ -40,17 +40,17 @@ function _blobToBytes(blob: Blob): Promise<Uint8Array<ArrayBuffer>> {
  * a database on its own.
  */
 export async function acquireOpenDataResourceWithCache(params: {
-  entry: Readonly<OpenDataCatalogListing.T>;
+  entry: Readonly<DataCatalogListing.T>;
   /** Reads the live source's freshness token - one cheap metadata call. */
   readFreshnessToken: (
-    entry: Readonly<OpenDataCatalogListing.T>,
+    entry: Readonly<DataCatalogListing.T>,
   ) => Promise<string>;
   /**
    * Fetches the full resource live. Only called on a cache miss or a stale
    * token.
    */
   acquireLive: (
-    entry: Readonly<OpenDataCatalogListing.T>,
+    entry: Readonly<DataCatalogListing.T>,
   ) => Promise<OpenDataAcquisition>;
   storage: Readonly<AvandarSupabaseStorageClient>;
   updateCache: (params: Readonly<UpdateCacheParams>) => Promise<void>;

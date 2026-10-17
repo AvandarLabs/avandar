@@ -16,8 +16,8 @@ import { IconSearch, IconWorldSearch } from "@tabler/icons-react";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
 import { uuid } from "$/lib/uuid";
-import { CatalogListingColumnClient } from "@/clients/catalog-listings/CatalogListingColumnClient";
-import { OpenDataCatalogListingClient } from "@/clients/catalog-listings/OpenDataCatalogListingClient";
+import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
+import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
@@ -27,11 +27,11 @@ import {
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
-import { OpenDataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingDetail/OpenDataCatalogListingDetail";
-import { OpenDataCatalogListingList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogListingList/OpenDataCatalogListingList";
-import css from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView.module.css";
-import type { OpenDataCatalogListingRead } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types";
+import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
+import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail";
+import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList";
+import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
+import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = BoxProps & {
@@ -53,7 +53,7 @@ type Props = BoxProps & {
  * regions of one surface rather than bordered cards: nesting cards costs four
  * edges and four paddings to say "these are two lists".
  */
-export function OpenDataCatalogView({
+export function DataCatalogView({
   isAddAllowed,
   onSaveSuccess,
   ...boxProps
@@ -65,10 +65,10 @@ export function OpenDataCatalogView({
   const [selectedId, setSelectedId] = useState<string | undefined>();
 
   const [catalogListings = [], isLoadingCatalog] =
-    OpenDataCatalogListingClient.useGetAll({});
+    DataCatalogListingClient.useGetAll({});
 
   const [catalogListingColumns = [], isLoadingCatalogColumns] =
-    CatalogListingColumnClient.useGetAll({
+    DataCatalogRelationColumnClient.useGetAll({
       ...where("catalog_listing_id", "eq", selectedId),
       useQueryOptions: {
         enabled: selectedId !== undefined,
@@ -100,7 +100,7 @@ export function OpenDataCatalogView({
     });
   }, [catalogListings, debouncedSearch, fuse]);
 
-  const selectedListing: OpenDataCatalogListingRead | undefined = useMemo(
+  const selectedListing: DataCatalogListingRead | undefined = useMemo(
     () => {
     if (!selectedId) {
       return undefined;
@@ -238,7 +238,7 @@ export function OpenDataCatalogView({
             <Loader />
           </Group>
         ) : (
-          <div className={css.openDataCatalogViewBrowser}>
+          <div className={css.dataCatalogViewBrowser}>
             {displayedListings.length === 0 ? (
               /*
                * The catalog has listings; this query matched none of them. One
@@ -247,7 +247,7 @@ export function OpenDataCatalogView({
                * the second cannot be acted on, and two apologies for one
                * situation read as two situations.
                */
-              <div className={css.openDataCatalogViewBrowserEmpty}>
+              <div className={css.dataCatalogViewBrowserEmpty}>
                 <Text size="sm" c="dimmed" ta="center" maw="42ch">
                   <Trans>
                     No catalog dataset matches “{debouncedSearch.trim()}”.
@@ -265,22 +265,22 @@ export function OpenDataCatalogView({
               </div>
             ) : (
               <>
-                <div className={css.openDataCatalogViewBrowserList}>
+                <div className={css.dataCatalogViewBrowserList}>
                   <Text
                     component="h4"
-                    className={css.openDataCatalogViewBrowserListTitle}
+                    className={css.dataCatalogViewBrowserListTitle}
                   >
                     <Trans>Catalog ({displayedListings.length})</Trans>
                   </Text>
-                  <OpenDataCatalogListingList
+                  <DataCatalogListingList
                     displayedListings={displayedListings}
                     selectedId={selectedId}
                     onSelect={setSelectedId}
                   />
                 </div>
 
-                <div className={css.openDataCatalogViewBrowserDetail}>
-                  <OpenDataCatalogListingDetail
+                <div className={css.dataCatalogViewBrowserDetail}>
+                  <DataCatalogListingDetail
                     listing={selectedListing}
                     isAddAllowed={isAddAllowed}
                     isAdding={isInsertPending}

@@ -12,7 +12,7 @@ import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTabl
 import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
-import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
@@ -80,7 +80,7 @@ export type DefaultRegistryOptions = {
 
   /** Fetches one API-backed catalog resource through the open-data proxy. */
   fetchApiOpenDataResource?: (
-    catalogListingId: OpenDataCatalogListing.Id,
+    catalogListingId: DataCatalogListing.Id,
   ) => Promise<FetchedApiOpenDataResource>;
 
   /** Transcodes CSV bytes into Parquet under the caller's DuckDB lease. */

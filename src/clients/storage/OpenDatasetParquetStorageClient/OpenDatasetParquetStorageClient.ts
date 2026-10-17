@@ -1,6 +1,6 @@
 import { where } from "@avandar/utils";
-import { OpenDataCatalogListingClient } from "@/clients/catalog-listings/OpenDataCatalogListingClient";
-import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.types";
+import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
+import type { DataCatalogListingId } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
 
 /**
  * Downloads an open dataset Parquet blob from the catalog canonical URL.
@@ -10,11 +10,11 @@ import type { OpenDataCatalogListingId } from "$/models/catalog-listings/OpenDat
  * @returns The Parquet blob bytes.
  */
 async function download(options: {
-  catalogListingId: OpenDataCatalogListingId;
+  catalogListingId: DataCatalogListingId;
 }): Promise<Blob> {
   const { catalogListingId } = options;
 
-  const catalogListing = await OpenDataCatalogListingClient.getOne(
+  const catalogListing = await DataCatalogListingClient.getOne(
     where("id", "eq", catalogListingId),
   );
 

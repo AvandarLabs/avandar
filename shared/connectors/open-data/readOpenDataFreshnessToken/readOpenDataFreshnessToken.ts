@@ -5,7 +5,7 @@ import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.t
 import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
-import { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
+import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataApiAccessFor } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
@@ -15,10 +15,10 @@ import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.
  * `SocrataClient.getMetadata`); never fetches its rows.
  */
 export async function readOpenDataFreshnessToken(params: {
-  entry: Readonly<OpenDataCatalogListing.T>;
+  entry: Readonly<DataCatalogListing.T>;
   http: Readonly<OpenDataHttp>;
 }): Promise<string> {
-  const access = OpenDataCatalogListing.toAccess(params.entry);
+  const access = DataCatalogListing.toAccess(params.entry);
   if (!access || access.kind !== "api_resource") {
     throw new OpenDataAcquisitionFailed({
       code: "access-shape-invalid",

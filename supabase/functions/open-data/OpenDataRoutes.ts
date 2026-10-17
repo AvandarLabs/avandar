@@ -9,9 +9,9 @@ import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/Avand
 import { createOpenDataHttp } from "$/connectors/open-data/createOpenDataHttp.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
-import { OpenDataCatalogListingParsers } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListingParsers.ts";
+import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
-import type { OpenDataCatalogListing } from "$/models/catalog-listings/OpenDataCatalogListing/OpenDataCatalogListing.ts";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 
 /**
@@ -43,12 +43,12 @@ function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
  * through the catalog-entry update it performs.
  */
 async function _persistOpenDataCache(params: {
-  catalogListingId: OpenDataCatalogListing.Id;
+  catalogListingId: DataCatalogListing.Id;
   cachedObjectPath: string;
   cachedSourceVersion: string;
 }): Promise<void> {
   const { error: updateError } = await SupabaseAdmin.from(
-    "catalog_listings__open_data",
+    "data_catalog_listings",
   )
     .update({
       cached_object_path: params.cachedObjectPath,
@@ -68,7 +68,7 @@ async function _persistOpenDataCache(params: {
  * the live fetch, and the cache-persist callback.
  */
 async function _resolveOpenDataAcquisition(
-  entry: Readonly<OpenDataCatalogListing.T>,
+  entry: Readonly<DataCatalogListing.T>,
 ): Promise<OpenDataAcquisition> {
   const http = createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES });
   const storage = createAvandarSupabaseStorageClient(
@@ -108,13 +108,13 @@ async function _resolveOpenDataAcquisition(
  * open relay for arbitrary server-side requests.
  */
 export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
-  "/catalog-listings/:catalogListingId/resource": {
+  "/data-catalog-listings/:catalogListingId/resource": {
     GET: GET({
-      path: "/catalog-listings/:catalogListingId/resource",
+      path: "/data-catalog-listings/:catalogListingId/resource",
       schema: { catalogListingId: string().uuid() },
     }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
       const { data, error } = await supabaseClient
-        .from("catalog_listings__open_data")
+        .from("data_catalog_listings")
         .select("*")
         .eq("id", pathParams.catalogListingId)
         .maybeSingle();
@@ -132,8 +132,8 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
         );
       }
 
-      const entry = OpenDataCatalogListingParsers.fromDBReadToModelRead(
-        OpenDataCatalogListingParsers.DBReadSchema.parse(data),
+      const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+        DataCatalogListingParsers.DBReadSchema.parse(data),
       );
 
       try {

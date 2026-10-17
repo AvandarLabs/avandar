@@ -3,11 +3,11 @@ import type { Json } from "$/types/database.types.ts";
 import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
-export type OpenDataCatalogListingId = UUID<"OpenDataCatalogListing">;
+export type DataCatalogListingId = UUID<"DataCatalogListing">;
 
-export type OpenDataCatalogListingRead = {
+export type DataCatalogListingRead = {
   /** Unique identifier for this catalog listing. */
-  id: OpenDataCatalogListingId;
+  id: DataCatalogListingId;
 
   createdAt: string;
 
@@ -116,7 +116,7 @@ export type OpenDataApiService = "ckan" | "socrata";
 /**
  * An entry's access shape, with the null checks already done. Every member is
  * complete by construction, so a consumer switches on `kind` instead of
- * testing four fields. `OpenDataCatalogListing.toAccess` is what produces one.
+ * testing four fields. `DataCatalogListing.toAccess` is what produces one.
  */
 export type OpenDataAccess =
   | {
@@ -137,20 +137,20 @@ export type OpenDataAccess =
     };
 
 /**
- * CRUD type definitions for the OpenDataCatalogListing model.
+ * CRUD type definitions for the DataCatalogListing model.
  */
-export type OpenDataCatalogListingModel = SupabaseCrudModelSpec<
+export type DataCatalogListingModel = SupabaseCrudModelSpec<
   {
-    tableName: "catalog_listings__open_data";
-    modelName: "OpenDataCatalogListing";
-    modelPrimaryKeyType: OpenDataCatalogListingId;
+    tableName: "data_catalog_listings";
+    modelName: "DataCatalogListing";
+    modelPrimaryKeyType: DataCatalogListingId;
     modelTypes: {
-      Read: OpenDataCatalogListingRead;
+      Read: DataCatalogListingRead;
       Insert: SetOptional<
-        OpenDataCatalogListingRead,
+        DataCatalogListingRead,
         "id" | "createdAt" | "updatedAt"
       >;
-      Update: Partial<OpenDataCatalogListingRead>;
+      Update: Partial<DataCatalogListingRead>;
     };
   },
   {

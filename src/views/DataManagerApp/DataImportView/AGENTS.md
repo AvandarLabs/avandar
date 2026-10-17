@@ -12,7 +12,7 @@ preview, and hands the result to
 name, adjust and save. `ManualUploadView` and `GoogleSheetsImportView` are
 both of these, and any new connector will be too.
 
-`OpenDataCatalogView` is deliberately not one. It adds an already-modeled
+`DataCatalogView` is deliberately not one. It adds an already-modeled
 catalog entry to the workspace, so it never sniffs, never previews, and never
 renders `DatasetImportForm`. Do not force it into the shape below, and do not
 take it as the example to copy.
