@@ -6,6 +6,7 @@ import type {
   BindingIssue,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { LocalFilter } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { DataVizBindingProps } from "./resolveSavedDataVizBindings.types";
 
 export type { DataVizBindingProps } from "./resolveSavedDataVizBindings.types";
@@ -18,11 +19,13 @@ export function resolveSavedDataVizBindings(
   props: DataVizBindingProps;
   runtimeConfig: VizConfig.T;
   issues: readonly BindingIssue[];
+  localFilters: readonly LocalFilter[];
 } {
   if (props.bindingVersion === 1) {
     return {
       props: { ...props, columnBindings: schema.registry },
       runtimeConfig: props.vizConfig,
+      localFilters: props.localFilters,
       issues: resolveVizColumnBindings(props.vizConfig, schema.columns).issues,
     };
   }
@@ -56,6 +59,7 @@ export function resolveSavedDataVizBindings(
           globalFilterTargets: {},
         },
     runtimeConfig: bound.config,
+    localFilters,
     issues,
   };
 }

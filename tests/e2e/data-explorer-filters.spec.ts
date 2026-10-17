@@ -20,7 +20,7 @@ import {
   dismissBlockingOverlays,
   openDataExplorerDrawerTab,
 } from "./helpers/dataExplorerFlow";
-import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
+import { deleteDatasetFixture } from "./helpers/deleteDatasetFixture";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -157,9 +157,8 @@ async function _getColumnCellTexts(options: {
 }
 
 test.describe("Data Explorer filter semantics", () => {
-  // Importing a dataset and running two queries against it exceeds the default
-  // per-test budget.
-  test.slow();
+  test.use({ trace: "retain-on-failure" });
+  test.setTimeout(45_000);
 
   test("a text filter built in the panel matches regardless of case, until Match case is on", async ({
     page,
@@ -221,14 +220,7 @@ test.describe("Data Explorer filter semantics", () => {
         )
         .toEqual([]);
     } finally {
-      await page.goto(`/${workspaceSlug}/data-manager/${datasetId}`);
-      await deleteDatasetViaDataManagerUiAndVerify({
-        admin,
-        datasetId,
-        page,
-        workspaceId,
-        workspaceSlug,
-      });
+      await deleteDatasetFixture({ admin, datasetId, workspaceId });
     }
   });
 
@@ -276,14 +268,7 @@ test.describe("Data Explorer filter semantics", () => {
           expect.arrayContaining([COUNTY_VALUE_IN_DATA, "Alpine", "Amador"]),
         );
     } finally {
-      await page.goto(`/${workspaceSlug}/data-manager/${datasetId}`);
-      await deleteDatasetViaDataManagerUiAndVerify({
-        admin,
-        datasetId,
-        page,
-        workspaceId,
-        workspaceSlug,
-      });
+      await deleteDatasetFixture({ admin, datasetId, workspaceId });
     }
   });
 });

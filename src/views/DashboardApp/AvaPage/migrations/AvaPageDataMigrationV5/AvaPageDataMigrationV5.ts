@@ -22,14 +22,20 @@ function _downgradeChart(
     ...rest
   } = props;
   Object.values(globalFilterTargets).forEach((target) => {
-    if (
-      target.kind === "bound" &&
-      !columnBindings.columns.some((column) => {
-        return column.id === target.columnId;
-      })
-    ) {
+    if (target.kind !== "bound") {
+      return;
+    }
+    const column = columnBindings.columns.find((candidate) => {
+      return candidate.id === target.columnId;
+    });
+    if (!column) {
       throw new Error(
         "Cannot downgrade DataViz: a global filter has no persisted binding",
+      );
+    }
+    if (column.name !== target.authoringColumnName) {
+      throw new Error(
+        "Cannot downgrade DataViz: a global filter alias cannot be represented in v4",
       );
     }
   });

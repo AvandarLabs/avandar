@@ -1,11 +1,17 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { render, screen } from "@/test-utils";
+import { render, screen, TestProviders } from "@/test-utils";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import { upgradeAvaPageData } from "../../../utils/upgradeAvaPageData";
+import { useDataVizPBlockConfig } from "../useDataVizPBlockConfig";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { Props } from "./DataVizPBlock";
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement } from "react";
 
@@ -329,5 +335,110 @@ describe("DataVizPBlock", () => {
       "data-viz-type",
       "bubble",
     );
+  });
+});
+
+it("converts the migrated top-level type picker and restores unresolved legacy styles on return", async () => {
+  const original = {
+    id: "chart",
+    vizType: "line",
+    nlQuery: { prompt: "Sales", rawSql: "SELECT * FROM foo", generations: [] },
+    vizConfig: {
+      vizType: "line",
+      xAxisKey: "category",
+      withLegend: true,
+      series: [
+        {
+          renderAs: "line",
+          key: "value",
+          label: "Revenue",
+          color: "#123456",
+          strokeWidth: 4,
+        },
+        {
+          renderAs: "line",
+          key: "missing",
+          label: "Missing",
+          color: "#654321",
+          strokeWidth: 3,
+        },
+      ],
+    },
+    localFilters: [],
+    globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
+  };
+  const upgraded = upgradeAvaPageData({
+    root: { props: { schemaVersion: 4, title: "Legacy chart" } },
+    content: [{ type: "DataViz", props: original }],
+  });
+  const props = upgraded.content[0]!.props as Props & { id: string };
+  const client = new QueryClient();
+  const { result } = renderHook(
+    () => {
+      return useDataVizPBlockConfig({
+        dashboardTitle: "Saved",
+        workspaceId: TEST_WORKSPACE_ID as Workspace.Id,
+        dashboardId: TEST_DASHBOARD_ID as Dashboard.Id,
+      });
+    },
+    {
+      wrapper: ({ children }) => {
+        return (
+          <QueryClientProvider client={client}>
+            <TestProviders>{children}</TestProviders>
+          </QueryClientProvider>
+        );
+      },
+    },
+  );
+  const resolveData = result.current.resolveData!;
+  const load = await resolveData(
+    { type: "DataViz", props } as Parameters<typeof resolveData>[0],
+    { changed: { vizType: true }, trigger: "load" } as Parameters<
+      typeof resolveData
+    >[1],
+  );
+  expect(load.props).toEqual(props);
+  const switched = await resolveData(
+    { type: "DataViz", props: { ...props, vizType: "bar" } } as Parameters<
+      typeof resolveData
+    >[0],
+    { changed: { vizType: true }, trigger: "replace" } as Parameters<
+      typeof resolveData
+    >[1],
+  );
+  expect(switched.props).toMatchObject({
+    bindingVersion: 0,
+    vizType: "bar",
+    vizConfig: {
+      vizType: "bar",
+      series: [
+        { key: "value", label: "Revenue", color: "#123456" },
+        { key: "missing", label: "Missing", color: "#654321" },
+      ],
+    },
+  });
+  const barProps = switched.props as Props & { id: string };
+  renderBlock({
+    prompt: barProps.nlQuery.prompt,
+    rawSql: barProps.nlQuery.rawSql,
+    vizType: barProps.vizType,
+    vizConfig: barProps.vizConfig,
+  });
+  expect(screen.getByTestId("visualization-container")).toHaveAttribute(
+    "data-viz-type",
+    "bar",
+  );
+  const restored = await resolveData(
+    { type: "DataViz", props: { ...barProps, vizType: "line" } } as Parameters<
+      typeof resolveData
+    >[0],
+    { changed: { vizType: true }, trigger: "replace" } as Parameters<
+      typeof resolveData
+    >[1],
+  );
+  expect(restored.props).toMatchObject({
+    bindingVersion: 0,
+    vizConfig: original.vizConfig,
   });
 });

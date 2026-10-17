@@ -231,3 +231,68 @@ it("migrates a v4 chart and executes both saved local and global targets", async
     ]);
   });
 });
+
+it("executes a valid legacy local filter despite unresolved chart and local siblings", async () => {
+  const { resolveDataVizRuntimeBindings } =
+    await import("@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/resolveSavedDataVizBindings/resolveDataVizRuntimeBindings");
+  const { useApplyDashboardFiltersToSql } =
+    await import("@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql");
+  const columns = _columns("region");
+  const localFilter = {
+    id: "local",
+    columnName: "region",
+    label: "Region",
+    mode: "select_single" as const,
+    optionsRaw: "North,South",
+    defaultValue: "North",
+  };
+  const props = {
+    bindingVersion: 0 as const,
+    nlQuery: { rawSql: SQL_A, prompt: "", generations: [] },
+    vizType: "line" as const,
+    vizConfig: {
+      vizType: "line" as const,
+      xAxisKey: "region",
+      series: [
+        { renderAs: "line" as const, key: "missing-series", color: "#123456" },
+      ],
+      withLegend: true,
+    },
+    localFilters: [
+      localFilter,
+      { ...localFilter, id: "missing-local", columnName: "missing-column" },
+    ],
+    globalFilterSubscription: { mode: "all" as const, subscribedFilterIds: [] },
+  };
+  const schema = {
+    issues: [],
+    columns,
+    registry: {
+      version: 1 as const,
+      scopeKey: "chart",
+      sqlKey: SQL_A,
+      columns,
+    },
+  };
+  const resolved = resolveDataVizRuntimeBindings(props, schema, []);
+  expect(resolved.props).toEqual(props);
+  expect(resolved.localFilters).toEqual([
+    { ...localFilter, columnName: undefined, columnId: columns[0]!.id },
+  ]);
+  const sql = useApplyDashboardFiltersToSql({
+    rawSql: SQL_A,
+    columns,
+    globalFilters: [],
+    localFilters: resolved.localFilters,
+    localFilterState: {
+      valuesById: { local: "North", "missing-local": "North" },
+      setValue: () => {},
+      reset: () => {},
+    },
+  });
+  await withDuckDb(async (connection) => {
+    expect((await connection.runAndReadAll(sql!)).getRowObjects()).toEqual([
+      { region: "North", amount: 7 },
+    ]);
+  });
+});

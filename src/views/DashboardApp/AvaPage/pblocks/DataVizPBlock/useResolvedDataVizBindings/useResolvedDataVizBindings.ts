@@ -27,16 +27,22 @@ export function useResolvedDataVizBindings(
     auth,
     projections: [],
   });
+  const memoryScope = JSON.stringify([
+    props.id,
+    auth.auth,
+    auth.auth === "workspace" ? auth.workspaceId : auth.publicAvaPageId,
+    auth.auth === "workspace" ? undefined : auth.snapshotRevision,
+  ]);
   const previous = useRef<
-    { sql: string; targets: DashboardFilterTargets } | undefined
+    { scope: string; sql: string; targets: DashboardFilterTargets } | undefined
   >(undefined);
   const resolved = useMemo(() => {
     if (!discovery.schema) {
       return undefined;
     }
     const cachedTargets =
-      previous.current?.sql === props.nlQuery.rawSql
-        ? previous.current.targets
+      previous.current?.scope === memoryScope
+        ? _getRetainedTargets(previous.current, props.nlQuery.rawSql)
         : undefined;
     return resolveDataVizRuntimeBindings(
       props,
@@ -44,17 +50,40 @@ export function useResolvedDataVizBindings(
       Object.values(filtersById),
       cachedTargets,
     );
-  }, [discovery.schema, props, filtersById]);
+  }, [discovery.schema, props, filtersById, memoryScope]);
   useLayoutEffect(
     function rememberRuntimeTargets() {
       if (resolved) {
         previous.current = {
+          scope: memoryScope,
           sql: props.nlQuery.rawSql,
           targets: resolved.global.targets,
         };
       }
     },
-    [props.nlQuery.rawSql, resolved],
+    [memoryScope, props.nlQuery.rawSql, resolved],
   );
   return { ...discovery, resolved };
+}
+
+/**
+ * Bound identities survive SQL edits. Unresolved names may bootstrap again.
+ */
+function _getRetainedTargets(
+  previous: { sql: string; targets: DashboardFilterTargets },
+  sql: string,
+): DashboardFilterTargets {
+  if (previous.sql === sql) {
+    return previous.targets;
+  }
+  return Object.fromEntries(
+    Object.entries(previous.targets).map(([id, target]) => {
+      return [
+        id,
+        target.kind === "unresolved"
+          ? { kind: "legacy" as const, columnName: target.columnName }
+          : target,
+      ];
+    }),
+  );
 }

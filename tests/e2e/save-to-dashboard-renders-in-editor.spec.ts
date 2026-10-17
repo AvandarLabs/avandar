@@ -145,7 +145,8 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
       await expect(listbox).toBeVisible({ timeout: SHORT_WAIT });
       await listbox
-        .getByRole("option", { name: dashboardName, exact: true })
+        .getByRole("option")
+        .filter({ hasText: dashboardName })
         .click();
 
       await page.getByRole("button", { name: /^save to dashboard$/i }).click();

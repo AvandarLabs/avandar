@@ -84,8 +84,6 @@ export function resolveDataVizRuntimeBindings(
     ...result,
     runtimeConfig,
     global,
-    localFilters:
-      result.props.bindingVersion === 1 ? result.props.localFilters : [],
     props: boundProps,
   };
 }

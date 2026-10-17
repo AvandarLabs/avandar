@@ -198,3 +198,66 @@ it("downgrades bound chart and local targets using only persisted names", async 
   expect(downgraded.content[0]?.props).not.toHaveProperty("columnBindings");
   expect(downgraded.content[0]?.props).not.toHaveProperty("bindingVersion");
 });
+
+it.each([["territory"], ["region", "territory"]])(
+  "rejects a shared global target that v4 cannot represent across %j",
+  async (...names) => {
+    const { AvaPageDataMigrationV5 } = await import("./AvaPageDataMigrationV5");
+    const document = upgradeAvaPageData({
+      root: { props: { schemaVersion: 5, title: "Shared filter" } },
+      content: [
+        {
+          type: "Filter",
+          props: {
+            id: "control",
+            filterId: "global",
+            columnName: "region",
+            label: "Region",
+            mode: "select_single",
+            optionsRaw: "North,South",
+            defaultValue: "North",
+          },
+        },
+        ...names.map((name, index) => {
+          return {
+            type: "DataViz",
+            props: {
+              id: `chart-${index}`,
+              bindingVersion: 1,
+              nlQuery: {
+                prompt: "",
+                rawSql: `SELECT region AS ${name} FROM sales`,
+                generations: [],
+              },
+              vizType: "table",
+              vizConfig: { vizType: "table" },
+              localFilters: [],
+              globalFilterSubscription: {
+                mode: "all",
+                subscribedFilterIds: [],
+              },
+              columnBindings: {
+                version: 1,
+                scopeKey: `chart-${index}`,
+                sqlKey: `SELECT region AS ${name} FROM sales`,
+                columns: [{ id: `column-${index}`, name, dataType: "varchar" }],
+              },
+              globalFilterTargets: {
+                global: {
+                  kind: "bound",
+                  columnId: `column-${index}`,
+                  authoringColumnName: "region",
+                },
+              },
+            },
+          };
+        }),
+      ],
+    });
+    const original = JSON.stringify(document);
+    expect(() => {
+      return AvaPageDataMigrationV5.downgrade(document);
+    }).toThrow(/global filter.*cannot be represented.*v4/i);
+    expect(JSON.stringify(document)).toBe(original);
+  },
+);

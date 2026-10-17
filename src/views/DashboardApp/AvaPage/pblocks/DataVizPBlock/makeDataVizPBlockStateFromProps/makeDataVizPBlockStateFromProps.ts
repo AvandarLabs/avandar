@@ -1,6 +1,7 @@
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
-import type { VizConfigRegistry } from "$/models/vizs/VizConfig/VizConfig.types";
+import { synchronizeLegacyVizType } from "./synchronizeLegacyVizType";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { ResolveDataTrigger } from "@puckeditor/core";
 
@@ -13,11 +14,16 @@ import type { ResolveDataTrigger } from "@puckeditor/core";
  * other's memory, which looks correct until a dashboard holds more than one
  * chart.
  *
- * The inner map is a `Partial<VizConfigRegistry>`, so each entry's config is
+ * Bound entries use `Partial<VizConfig.Registry>`, so each entry's config is
  * correlated with the viz type it is filed under: a bar config cannot be
- * stored under `"pie"`.
+ * stored under `"pie"`. Legacy name-based configs have their own memory.
  */
-export type DataVizConfigMemory = Record<string, Partial<VizConfigRegistry>>;
+export type DataVizConfigMemory = Record<
+  string,
+  Partial<VizConfig.Registry> & {
+    legacy?: Partial<Record<VizConfig.Type, VizConfig.Legacy>>;
+  }
+>;
 
 type ChangedFlags = Partial<Record<keyof DataVizPBlockProps, boolean>>;
 
@@ -52,13 +58,12 @@ export function makeDataVizPBlockStateFromProps(options: {
   }
 
   if (props.bindingVersion === 0) {
-    return {
-      props: {
-        ...props,
-        vizType: props.vizType ?? props.vizConfig?.vizType ?? DEFAULT_VIZ_TYPE,
-      } as DataVizPBlockProps,
+    return synchronizeLegacyVizType({
+      props,
+      changed,
+      blockId,
       vizConfigMemory,
-    };
+    });
   }
   const boundProps = props as Partial<
     Extract<DataVizPBlockProps, { bindingVersion: 1 }>
@@ -102,7 +107,7 @@ export function makeDataVizPBlockStateFromProps(options: {
     const nextBlockVizConfigMemory = {
       ...blockVizConfigMemory,
       [outgoingVizConfig.vizType]: outgoingVizConfig,
-    } as Partial<VizConfigRegistry>;
+    } as Partial<VizConfig.Registry>;
 
     return {
       props: nextProps,
