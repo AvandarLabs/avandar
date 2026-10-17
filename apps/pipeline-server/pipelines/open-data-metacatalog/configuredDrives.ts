@@ -1,4 +1,7 @@
-/** One drive (CKAN deployment or Socrata portal) the metacatalog pipeline enumerates. */
+/**
+ * One drive (CKAN deployment or Socrata portal) the metacatalog pipeline
+ * enumerates.
+ */
 export type ConfiguredDrive = {
   apiService: "ckan" | "socrata";
   /** No trailing slash, always `https://`. */

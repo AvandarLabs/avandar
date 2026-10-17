@@ -1,25 +1,28 @@
-import { describe, expect, it } from "vitest";
 import { CONFIGURED_DRIVES } from "@pipelines/open-data-metacatalog/configuredDrives";
+import { describe, expect, it } from "vitest";
 
 describe("CONFIGURED_DRIVES", () => {
   it("has no duplicate (apiService, baseUrl) pair", () => {
-    const seen = new Set<string>();
-    for (const drive of CONFIGURED_DRIVES) {
-      const key = `${drive.apiService}:${drive.baseUrl}`;
-      expect(seen.has(key)).toBe(false);
-      seen.add(key);
-    }
+    const keys = CONFIGURED_DRIVES.map((drive) => {
+      return `${drive.apiService}:${drive.baseUrl}`;
+    });
+
+    expect(new Set(keys).size).toBe(keys.length);
   });
 
   it("every baseUrl is https", () => {
-    for (const drive of CONFIGURED_DRIVES) {
-      expect(drive.baseUrl.startsWith("https://")).toBe(true);
-    }
+    const allHttps = CONFIGURED_DRIVES.every((drive) => {
+      return drive.baseUrl.startsWith("https://");
+    });
+
+    expect(allHttps).toBe(true);
   });
 
   it("every baseUrl has no trailing slash", () => {
-    for (const drive of CONFIGURED_DRIVES) {
-      expect(drive.baseUrl.endsWith("/")).toBe(false);
-    }
+    const noneTrailing = CONFIGURED_DRIVES.every((drive) => {
+      return !drive.baseUrl.endsWith("/");
+    });
+
+    expect(noneTrailing).toBe(true);
   });
 });
