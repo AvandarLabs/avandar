@@ -5,8 +5,8 @@ import {
   estimateRowCsvBytes,
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
   postgresMaxRowsPerCall,
-} from "$/connectors/postgres/estimateRelationCsvBytes.ts";
-import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes.ts";
+} from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
+import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
 
 function _column(
   overrides: Partial<ColumnSizeInfo> & { columnName: string },

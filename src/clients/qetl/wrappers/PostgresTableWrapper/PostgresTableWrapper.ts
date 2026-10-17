@@ -1,7 +1,7 @@
 import {
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
   postgresMaxRowsPerCall,
-} from "$/connectors/postgres/estimateRelationCsvBytes";
+} from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import { acquirePostgresTableRelation } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -57,7 +57,7 @@ export type PostgresTableWrapperOptions = {
  * table can be far larger than a Sheets export, and both the edge function
  * and the browser have to hold the result in memory. `maxBytesPerCall`
  * imports `POSTGRES_MAX_BYTES_PER_ACQUIRE` directly from
- * `shared/connectors/postgres/estimateRelationCsvBytes.ts`, the same module
+ * `shared/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts`, the same module
  * `createPostgresConnector.ts` enforces it from - one constant, imported by
  * both runtimes, not two numbers kept in sync by convention. `maxRowsPerCall`
  * is `postgresMaxRowsPerCall` for the same reason: the edge function's own

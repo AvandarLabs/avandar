@@ -3,7 +3,7 @@ import { MIMEType, propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useState } from "react";
 import { uuid } from "$/lib/uuid";
-import { splitRelationId } from "$/connectors/postgres/postgresRelationId";
+import { splitRelationId } from "$/connectors/postgres/postgresRelationId/postgresRelationId";
 import { APIClient } from "@/clients/APIClient";
 import { DatabaseConnectionClient } from "@/clients/connections/DatabaseConnectionClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

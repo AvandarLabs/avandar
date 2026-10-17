@@ -17,9 +17,9 @@ import {
   estimateRowCsvBytes,
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
   postgresMaxRowsPerCall,
-} from "$/connectors/postgres/estimateRelationCsvBytes.ts";
+} from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
 import { isWithinRelationCallCaps } from "$/models/relations/RelationCapabilities/isWithinRelationCallCaps.ts";
-import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes.ts";
+import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
 import type { RelationRowDescriptor } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 

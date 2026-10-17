@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   makeRelationId,
   splitRelationId,
-} from "$/connectors/postgres/postgresRelationId.ts";
+} from "$/connectors/postgres/postgresRelationId/postgresRelationId.ts";
 
 describe("makeRelationId / splitRelationId", () => {
   it("round-trips a plain schema and table name", () => {

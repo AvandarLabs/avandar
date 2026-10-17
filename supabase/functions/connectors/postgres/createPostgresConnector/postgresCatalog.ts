@@ -2,7 +2,7 @@ import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import {
   makeRelationId,
   splitRelationId,
-} from "$/connectors/postgres/postgresRelationId.ts";
+} from "$/connectors/postgres/postgresRelationId/postgresRelationId.ts";
 import type { ConnectorRelation } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 

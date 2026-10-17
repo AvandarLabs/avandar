@@ -1,4 +1,4 @@
-import { makeRelationId } from "$/connectors/postgres/postgresRelationId";
+import { makeRelationId } from "$/connectors/postgres/postgresRelationId/postgresRelationId";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 

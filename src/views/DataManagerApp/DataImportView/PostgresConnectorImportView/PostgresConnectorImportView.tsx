@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
-import { splitRelationId } from "$/connectors/postgres/postgresRelationId";
+import { splitRelationId } from "$/connectors/postgres/postgresRelationId/postgresRelationId";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
