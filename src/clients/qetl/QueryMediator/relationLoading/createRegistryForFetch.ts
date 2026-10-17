@@ -127,6 +127,14 @@ function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
  * one place that wiring is assembled, so a new source type is added here and
  * nowhere else in the fetch path.
  */
+/** Throws `message` when `value` is missing, instead of returning it. */
+function _getOrThrow<T>(value: T | undefined, message: string): T {
+  if (value === undefined) {
+    throw new Error(message);
+  }
+  return value;
+}
+
 export function createRegistryForFetch(
   options: Readonly<{
     relationSources: readonly RelationSource[];
@@ -138,38 +146,28 @@ export function createRegistryForFetch(
   return createDefaultRegistry({
     ..._leaseBoundTranscoders(options.datasetDuckDbLease),
     getRawSql: async (ref) => {
-      const rawSql = lookups.rawSqlByDatasetId[ref.id];
-      if (rawSql === undefined) {
-        throw new Error(
-          `Virtual dataset '${ref.id}' is not among the relations to fetch`,
-        );
-      }
-      return rawSql;
+      return _getOrThrow(
+        lookups.rawSqlByDatasetId[ref.id],
+        `Virtual dataset '${ref.id}' is not among the relations to fetch`,
+      );
     },
     getDataset: async (id) => {
-      const dataset = lookups.datasetsById[id];
-      if (!dataset) {
-        throw new Error(`Dataset '${id}' is not among the relations to fetch`);
-      }
-      return dataset;
+      return _getOrThrow(
+        lookups.datasetsById[id],
+        `Dataset '${id}' is not among the relations to fetch`,
+      );
     },
     getGoogleSheetsSource: async (id) => {
-      const source = lookups.googleSheetsByDatasetId[id];
-      if (!source) {
-        throw new Error(
-          `Google Sheets dataset '${id}' is not among the relations to fetch`,
-        );
-      }
-      return source;
+      return _getOrThrow(
+        lookups.googleSheetsByDatasetId[id],
+        `Google Sheets dataset '${id}' is not among the relations to fetch`,
+      );
     },
     getPostgresTableSource: async (id) => {
-      const source = lookups.postgresTableByDatasetId[id];
-      if (!source) {
-        throw new Error(
-          `Postgres table dataset '${id}' is not among the relations to fetch`,
-        );
-      }
-      return source;
+      return _getOrThrow(
+        lookups.postgresTableByDatasetId[id],
+        `Postgres table dataset '${id}' is not among the relations to fetch`,
+      );
     },
     runParquetQuery: ({ rawSql }) => {
       return options.runQuery({

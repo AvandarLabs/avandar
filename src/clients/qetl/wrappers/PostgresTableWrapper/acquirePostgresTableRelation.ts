@@ -47,6 +47,53 @@ export type AcquirePostgresTableRelationParams<TRelation> = {
 };
 
 /**
+ * Classifies a failed `rows` response and throws, for the branch of
+ * {@link acquirePostgresTableRelation} that sees anything other than a
+ * `text/csv` success.
+ *
+ * The edge function classifies every error it itself produces into this
+ * `{error:{code,message}}` shape (always a 200, per `ConnectorRoutes.ts`) -
+ * this function only reaches a response the edge function never got to
+ * shape itself. In practice that is the Supabase Edge Function runtime
+ * killing the isolate outright (a 546, at its 250MB memory / 2s CPU ceiling
+ * - `createPostgresConnector.ts`'s own docstring on
+ * `POSTGRES_MAX_BYTES_PER_ACQUIRE`), which never runs a line of this
+ * connector's own code and so can never report its own code. Defaulting to
+ * `too_large` is a deliberate assumption, not a detection: there is no
+ * reliable way from here to distinguish that kill from any other
+ * transport-level failure, and `too_large` is overwhelmingly the likely
+ * cause for this specific route.
+ */
+async function _throwForFailedRowsResponse(
+  response: Response,
+  relationId: string,
+): Promise<never> {
+  const contentType = response.headers.get("Content-Type") ?? "";
+  const body: unknown = contentType.includes("application/json")
+    ? await response.json()
+    : await response.text();
+  const classifiedError =
+    typeof body === "object" &&
+    body !== null &&
+    "error" in body &&
+    typeof body.error === "object" &&
+    body.error !== null &&
+    "message" in body.error
+      ? (body.error as { code?: unknown; message: unknown })
+      : undefined;
+
+  const code =
+    typeof classifiedError?.code === "string"
+      ? classifiedError.code
+      : "too_large";
+  const message =
+    classifiedError !== undefined
+      ? String(classifiedError.message)
+      : `Failed to read Postgres relation '${relationId}' (${response.status})`;
+  throw Object.assign(new Error(message), { code });
+}
+
+/**
  * Acquires one Postgres relation: fetch its rows as CSV through the
  * `connectors` edge function's `rows` route, then read it.
  *
@@ -98,40 +145,7 @@ export async function acquirePostgresTableRelation<TRelation>(
 
   const contentType = response.headers.get("Content-Type") ?? "";
   if (!response.ok || !contentType.includes("text/csv")) {
-    const body: unknown = contentType.includes("application/json")
-      ? await response.json()
-      : await response.text();
-    const classifiedError =
-      typeof body === "object" &&
-      body !== null &&
-      "error" in body &&
-      typeof body.error === "object" &&
-      body.error !== null &&
-      "message" in body.error
-        ? (body.error as { code?: unknown; message: unknown })
-        : undefined;
-
-    // The edge function classifies every error it itself produces into this
-    // `{error:{code,message}}` shape (always a 200, per `ConnectorRoutes.ts`)
-    // - this branch only reaches a response the edge function never got to
-    // shape itself. In practice that is the Supabase Edge Function runtime
-    // killing the isolate outright (a 546, at its 250MB memory / 2s CPU
-    // ceiling - `createPostgresConnector.ts`'s own docstring on
-    // `POSTGRES_MAX_BYTES_PER_ACQUIRE`), which never runs a line of this
-    // connector's own code and so can never report its own code. Defaulting
-    // to `too_large` is a deliberate assumption, not a detection: there is no
-    // reliable way from here to distinguish that kill from any other
-    // transport-level failure, and `too_large` is overwhelmingly the likely
-    // cause for this specific route.
-    const code =
-      typeof classifiedError?.code === "string"
-        ? classifiedError.code
-        : "too_large";
-    const message =
-      classifiedError !== undefined
-        ? String(classifiedError.message)
-        : `Failed to read Postgres relation '${relationId}' (${response.status})`;
-    throw Object.assign(new Error(message), { code });
+    await _throwForFailedRowsResponse(response, relationId);
   }
 
   const csvText = await response.text();
