@@ -32,6 +32,8 @@ import {
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
 
+test.use({ trace: "retain-on-failure" });
+
 const DATASET_NAME = "small-california-covid-sample.csv";
 
 /**
@@ -157,7 +159,6 @@ async function _getColumnCellTexts(options: {
 }
 
 test.describe("Data Explorer filter semantics", () => {
-  test.use({ trace: "retain-on-failure" });
   test.setTimeout(45_000);
 
   test("a text filter built in the panel matches regardless of case, until Match case is on", async ({
