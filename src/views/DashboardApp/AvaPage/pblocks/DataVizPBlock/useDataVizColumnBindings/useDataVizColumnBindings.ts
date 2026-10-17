@@ -1,6 +1,7 @@
 import { useQuery } from "@avandar/query-hooks";
 import { describeSqlProjections } from "$/models/queries/QueryColumnBindings/describeSqlProjections/describeSqlProjections";
 import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
+import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import { runQuerySchema } from "@/clients/queries/runQuerySchema/runQuerySchema";
 import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
 import type {
@@ -9,6 +10,7 @@ import type {
   ResultBindingRegistry,
 } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { QueryClient } from "@tanstack/react-query";
 
@@ -20,7 +22,10 @@ type Options = {
   projections: readonly ProjectionDescriptor[];
 };
 
+const DISCOVERY_QUERY_KEY = "data-viz-column-bindings-v2";
+
 type VerifiedSchema = BoundResultSchema & {
+  metadataProvenance: QueryMetadataProvenance;
   rawColumns: readonly QueryResult.Column[];
 };
 
@@ -28,6 +33,7 @@ function _createSchema(
   options: Readonly<Options>,
   columns: readonly QueryResult.Column[],
   previous: ResultBindingRegistry | undefined,
+  metadataProvenance: QueryMetadataProvenance,
 ): VerifiedSchema {
   const schema = reconcileResultBindings({
     scopeKey: options.scopeKey,
@@ -39,7 +45,7 @@ function _createSchema(
         : describeSqlProjections({ sql: options.rawSql, columns }),
     previous,
   });
-  return { ...schema, rawColumns: columns };
+  return { ...schema, rawColumns: columns, metadataProvenance };
 }
 
 async function _discoverSchema(
@@ -49,7 +55,12 @@ async function _discoverSchema(
     rawSql: normalizeSqlForSubquery(options.rawSql),
     auth: options.auth,
   });
-  return _createSchema(options, columns, options.initialRegistry);
+  return _createSchema(
+    options,
+    columns,
+    options.initialRegistry,
+    createQueryMetadataProvenance(),
+  );
 }
 
 /**
@@ -71,10 +82,11 @@ export function useDataVizColumnBindings(options: Readonly<Options>): {
     // Registry/projection inputs seed identity only. Keying by saved state
     // would rediscover on explicit saves and split renderer/settings identity.
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ["data-viz-column-bindings", auth, scopeKey, sqlKey],
+    queryKey: [DISCOVERY_QUERY_KEY, auth, scopeKey, sqlKey],
     queryFn: async () => {
       return _discoverSchema(options);
     },
+    meta: { persist: false },
     staleTime: Infinity,
     retry: false,
   });
@@ -95,15 +107,11 @@ export async function getDataVizColumnBindings(
     // Registry/projection inputs seed identity only. Keying by saved state
     // would rediscover on explicit saves and split renderer/settings identity.
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [
-      "data-viz-column-bindings",
-      options.auth,
-      options.scopeKey,
-      sqlKey,
-    ],
+    queryKey: [DISCOVERY_QUERY_KEY, options.auth, options.scopeKey, sqlKey],
     queryFn: () => {
       return _discoverSchema(options);
     },
+    meta: { persist: false },
     staleTime: Infinity,
   });
 }
@@ -112,15 +120,21 @@ export async function getDataVizColumnBindings(
 export function refreshDataVizColumnBindings(
   options: Readonly<Options>,
   queryClient: QueryClient,
-  result: Readonly<QueryResult.T & { executedSql: string | undefined }>,
+  result: Readonly<
+    QueryResult.T & {
+      executedSql: string | undefined;
+      metadataProvenance?: QueryMetadataProvenance;
+    }
+  >,
   expectedSql: string,
 ): void {
-  if (result.executedSql !== expectedSql) {
+  const provenance = result.metadataProvenance;
+  if (result.executedSql !== expectedSql || !provenance) {
     return;
   }
   queryClient.setQueryData<VerifiedSchema>(
     [
-      "data-viz-column-bindings",
+      DISCOVERY_QUERY_KEY,
       options.auth,
       options.scopeKey,
       normalizeSqlForSubquery(options.rawSql),
@@ -128,11 +142,15 @@ export function refreshDataVizColumnBindings(
     (previous) => {
       if (
         !previous ||
-        JSON.stringify(previous.rawColumns) === JSON.stringify(result.columns)
+        provenance.session !== previous.metadataProvenance.session ||
+        provenance.sequence <= previous.metadataProvenance.sequence
       ) {
         return previous;
       }
-      return _createSchema(options, result.columns, previous.registry);
+      return JSON.stringify(previous.rawColumns) ===
+        JSON.stringify(result.columns)
+        ? { ...previous, metadataProvenance: provenance }
+        : _createSchema(options, result.columns, previous.registry, provenance);
     },
   );
 }

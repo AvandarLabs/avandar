@@ -1,5 +1,10 @@
 import { AvaQueryProvider } from "@avandar/query-hooks";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  dehydrate,
+  hydrate,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import {
   act,
   render,
@@ -7,18 +12,24 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { expect, it, vi } from "vitest";
+import { afterEach, expect, it, vi } from "vitest";
 import { describeSqlProjections } from "$/models/queries/QueryColumnBindings/describeSqlProjections/describeSqlProjections";
 import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { AvandarQueryClientProvider } from "@/components/providers/AvandarQueryClientProvider/AvandarQueryClientProvider";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { isWorkspaceRawSqlDataQueryKey } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { DataVizPBlock } from "./pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import { refreshDataVizColumnBindings } from "./pblocks/DataVizPBlock/useDataVizColumnBindings/useDataVizColumnBindings";
 import { useResolvedDataVizBindings } from "./pblocks/DataVizPBlock/useResolvedDataVizBindings/useResolvedDataVizBindings";
 import { prepareDataVizBindings } from "./utils/prepareDashboardBindings/prepareDashboardBindings";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Props } from "./pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { PuckContext } from "@puckeditor/core";
-import type { ReactNode } from "react";
+import type { DehydrateOptions } from "@tanstack/react-query";
+import type { ReactElement, ReactNode } from "react";
 
 const mocks = vi.hoisted(() => {
   return { runQuery: vi.fn(), filtersById: {} };
@@ -64,6 +75,10 @@ vi.mock("@/clients/qetl/PublicQuerySession/PublicQuerySession", () => {
     PublicQuerySession: { runQuery: mocks.runQuery },
   };
 });
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 const AUTH = {
   auth: "workspace" as const,
   workspaceId: "00000000-0000-4000-8000-000000000002" as Workspace.Id,
@@ -438,3 +453,366 @@ it("keeps freshly discovered metadata while cached rows are revalidating", async
   });
   first.unmount();
 });
+
+function _dehydrateWithProductionPolicy(client: QueryClient) {
+  const provider = AvandarQueryClientProvider({
+    userId: undefined,
+    children: null,
+  }) as ReactElement<{
+    persistOptions: { dehydrateOptions: DehydrateOptions };
+  }>;
+  return JSON.parse(
+    JSON.stringify(
+      dehydrate(client, provider.props.persistOptions.dehydrateOptions),
+    ),
+  );
+}
+
+it.each(["hook", "explicit"])(
+  "rediscovers schema after production persistence from %s creation",
+  async (creation) => {
+    mocks.filtersById = {};
+    const props = _createProps();
+    const original = JSON.stringify(props);
+    const before = new QueryClient();
+    mocks.runQuery.mockResolvedValue({
+      ...QueryResult.makeEmpty(),
+      columns: [
+        { name: "region", dataType: "varchar" },
+        { name: "amount", dataType: "varchar" },
+      ],
+    });
+    if (creation === "hook") {
+      const hook = renderHook(
+        () => {
+          return useResolvedDataVizBindings(props, AUTH);
+        },
+        { wrapper: _createWrapper(before) },
+      );
+      await waitFor(() => {
+        return expect(hook.result.current.status).toBe("ready");
+      });
+      hook.unmount();
+    } else {
+      await prepareDataVizBindings(props, AUTH, before, []);
+    }
+    before.setQueryData(["unrelated-retained-query"], { retained: true });
+    const persisted = _dehydrateWithProductionPolicy(before);
+    const reopened = new QueryClient();
+    hydrate(reopened, persisted);
+    const queries: string[] = [];
+    mocks.runQuery.mockImplementation(
+      async ({ rawSql }: { rawSql: string }) => {
+        queries.push(rawSql);
+        return {
+          ...QueryResult.makeEmpty(),
+          columns: [
+            { name: "territory", dataType: "varchar" },
+            { name: "amount", dataType: "double" },
+          ],
+          data: [{ territory: "West", amount: 42 }],
+        };
+      },
+    );
+    const view = _renderBlock(props, _createWrapper(reopened));
+    await waitFor(() => {
+      return expect(screen.getByTestId("rendered").textContent).toContain(
+        '"name":"territory"',
+      );
+    });
+    expect(queries[0]).toContain('"_ava_schema" LIMIT 0');
+    expect(reopened.getQueryData(["unrelated-retained-query"])).toEqual({
+      retained: true,
+    });
+    expect(JSON.stringify(props)).toBe(original);
+    const saved = await prepareDataVizBindings(props, AUTH, reopened, []);
+    expect(saved).toMatchObject({
+      columnBindings: {
+        columns: [
+          { name: "territory", dataType: "varchar" },
+          { name: "amount", dataType: "double" },
+        ],
+      },
+    });
+    // A successful discovery must not be part of the next disk snapshot either.
+    expect(
+      _dehydrateWithProductionPolicy(reopened).queries.some(
+        (query: { queryKey: unknown[] }) => {
+          return (
+            typeof query.queryKey[0] === "string" &&
+            query.queryKey[0].startsWith("data-viz-column-bindings")
+          );
+        },
+      ),
+    ).toBe(false);
+    view.unmount();
+  },
+);
+
+it.each(["verified", "older-discovery"])(
+  "rejects a disk-restored %s schema before applying removed targets",
+  async (shape) => {
+    await withDuckDb(async (connection) => {
+      await connection.run(
+        "CREATE TABLE sales AS SELECT 'West' AS territory, 42::DOUBLE AS amount",
+      );
+      const props = _createProps();
+      if (props.bindingVersion !== 1) {
+        throw new Error("Expected bound fixture");
+      }
+      const original = JSON.stringify(props);
+      const registry = props.columnBindings;
+      const oldClient = new QueryClient();
+      oldClient.setQueryData(
+        ["data-viz-column-bindings", AUTH, props.id, props.nlQuery.rawSql],
+        shape === "verified"
+          ? {
+              registry,
+              columns: registry.columns,
+              issues: [],
+              rawColumns: registry.columns.map(({ name, dataType }) => {
+                return { name, dataType };
+              }),
+            }
+          : {
+              registry,
+              columns: registry.columns.map(({ name, dataType }) => {
+                return { name, dataType };
+              }),
+              projections: [],
+            },
+      );
+      const reopened = new QueryClient();
+      hydrate(reopened, _dehydrateWithProductionPolicy(oldClient));
+      const queries: string[] = [];
+      mocks.filtersById = {
+        filter: {
+          filterId: "filter",
+          columnName: "region",
+          label: "Region",
+          operator: "equals",
+          value: "North",
+        },
+      };
+      mocks.runQuery.mockImplementation(
+        async ({ rawSql }: { rawSql: string }) => {
+          queries.push(rawSql);
+          const rows = await connection.runAndReadAll(rawSql);
+          return {
+            ...QueryResult.makeEmpty(),
+            columns: [
+              { name: "territory", dataType: "varchar" },
+              { name: "amount", dataType: "double" },
+            ],
+            data: rows.getRowObjects(),
+          };
+        },
+      );
+      const view = _renderBlock(props, _createWrapper(reopened));
+      await waitFor(() => {
+        return expect(screen.getByTestId("rendered").textContent).toContain(
+          '"amount":42',
+        );
+      });
+      expect(queries[0]).toContain('"_ava_schema" LIMIT 0');
+      expect(
+        queries.some((sql) => {
+          return sql.includes('"region" =');
+        }),
+      ).toBe(false);
+      expect(JSON.stringify(props)).toBe(original);
+      const saved = await prepareDataVizBindings(props, AUTH, reopened, []);
+      expect(saved).toMatchObject({
+        columnBindings: {
+          columns: [
+            { name: "territory", dataType: "varchar" },
+            { name: "amount", dataType: "double" },
+          ],
+        },
+        globalFilterTargets: props.globalFilterTargets,
+      });
+      view.unmount();
+    });
+  },
+);
+
+it.each([false, true])(
+  "keeps newer discovery with six-minute-fresh cached rows (same tick: %s)",
+  async (sameTick) => {
+    if (sameTick) {
+      vi.spyOn(Date, "now").mockReturnValue(Date.now());
+    }
+    mocks.filtersById = {};
+    const props = _createProps();
+    const client = new QueryClient({
+      defaultOptions: { queries: { staleTime: 6 * 60 * 1000, retry: false } },
+    });
+    const executions: string[] = [];
+    mocks.runQuery.mockImplementation(
+      async ({ rawSql }: { rawSql: string }) => {
+        executions.push(rawSql);
+        return {
+          ...QueryResult.makeEmpty(),
+          columns: [{ name: "region", dataType: "varchar" }],
+          data: [{ region: "North" }],
+        };
+      },
+    );
+    const view = _renderBlock(props, _createWrapper(client));
+    await waitFor(() => {
+      return expect(screen.getByTestId("rendered").textContent).toContain(
+        '"region":"North"',
+      );
+    });
+    const isDataQuery = (query: { queryKey: readonly unknown[] }) => {
+      return isWorkspaceRawSqlDataQueryKey(query.queryKey, {
+        workspaceId: AUTH.workspaceId,
+        rawSql: props.nlQuery.rawSql,
+      });
+    };
+    const cached = client
+      .getQueryCache()
+      .findAll({ predicate: isDataQuery })[0]!;
+    client.setQueryData(cached.queryKey, cached.state.data, {
+      updatedAt: sameTick ? Date.now() : Date.now() - 60_000,
+    });
+    executions.length = 0;
+    mocks.runQuery.mockImplementation(
+      async ({ rawSql }: { rawSql: string }) => {
+        executions.push(rawSql);
+        return {
+          ...QueryResult.makeEmpty(),
+          columns: rawSql.includes('"_ava_schema"')
+            ? [{ name: "territory", dataType: "varchar" }]
+            : [
+                { name: "territory", dataType: "varchar" },
+                { name: "newest", dataType: "date" },
+              ],
+          data: [{ territory: "West", newest: "2026-10-16" }],
+        };
+      },
+    );
+    const changed = { ...props, id: "other-chart" };
+    view.rerender(
+      <DataVizPBlock
+        {...changed}
+        puck={_createPuck({
+          ...AUTH,
+          dashboardId: "00000000-0000-4000-8000-000000000001",
+        })}
+      />,
+    );
+    await waitFor(() => {
+      return expect(screen.getByTestId("rendered").textContent).toContain(
+        '"name":"territory"',
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => {
+        return setTimeout(resolve, 20);
+      });
+    });
+    expect(screen.getByTestId("rendered").textContent).not.toContain(
+      '"name":"region"',
+    );
+    expect(executions).toHaveLength(1);
+    expect(executions[0]).toContain('"_ava_schema"');
+    await act(async () => {
+      await client.invalidateQueries({ predicate: isDataQuery });
+    });
+    await waitFor(() => {
+      return expect(screen.getByTestId("rendered").textContent).toContain(
+        '"name":"newest","dataType":"date"',
+      );
+    });
+    view.unmount();
+  },
+);
+
+it.each(["older", "restored"])(
+  "rejects %s row provenance after an unchanged metadata completion",
+  async (origin) => {
+    const props = _createProps();
+    const client = new QueryClient();
+    const current: QueryResult.T = {
+      ...QueryResult.makeEmpty(),
+      columns: [{ name: "territory", dataType: "varchar" }],
+      data: [{ territory: "West" }],
+    };
+    mocks.runQuery.mockResolvedValue(current);
+    await prepareDataVizBindings(props, AUTH, client, []);
+    mocks.runQuery.mockResolvedValue({
+      ...QueryResult.makeEmpty(),
+      columns: [{ name: "region", dataType: "varchar" }],
+      data: [{ region: "North" }],
+    });
+    const query = StructuredQuery.makeEmpty();
+    const rows = renderHook(
+      () => {
+        return useDataQuery({
+          ...AUTH,
+          query,
+          rawSql: props.nlQuery.rawSql,
+          analyticsSurface: "dashboard_block",
+        });
+      },
+      { wrapper: _createWrapper(client) },
+    );
+    await waitFor(() => {
+      return expect(rows.result.current[2].isSuccess).toBe(true);
+    });
+    const older = rows.result.current[0]!;
+    mocks.runQuery.mockResolvedValue(current);
+    await act(async () => {
+      await rows.result.current[2].refetch();
+    });
+    await waitFor(() => {
+      return expect(rows.result.current[0]?.columns[0]?.name).toBe("territory");
+    });
+    const latest = rows.result.current[0]!;
+    const options = {
+      scopeKey: props.id,
+      rawSql: props.nlQuery.rawSql,
+      auth: AUTH,
+      initialRegistry: undefined,
+      projections: [],
+    };
+    refreshDataVizColumnBindings(options, client, latest, props.nlQuery.rawSql);
+    // A later hydrated timestamp cannot make a disk copy runtime-authoritative.
+    let candidate = older;
+    if (origin === "restored") {
+      mocks.runQuery.mockResolvedValue({
+        ...QueryResult.makeEmpty(),
+        columns: [{ name: "region", dataType: "varchar" }],
+        data: [{ region: "North" }],
+      });
+      await act(async () => {
+        await rows.result.current[2].refetch();
+      });
+      await waitFor(() => {
+        return expect(rows.result.current[0]?.columns[0]?.name).toBe("region");
+      });
+      const restored = new QueryClient();
+      hydrate(restored, _dehydrateWithProductionPolicy(client));
+      candidate = restored.getQueryCache().findAll({
+        predicate: (cachedQuery) => {
+          return isWorkspaceRawSqlDataQueryKey(cachedQuery.queryKey, {
+            workspaceId: AUTH.workspaceId,
+            rawSql: props.nlQuery.rawSql,
+          });
+        },
+      })[0]!.state.data as typeof older;
+    }
+    refreshDataVizColumnBindings(
+      options,
+      client,
+      candidate,
+      props.nlQuery.rawSql,
+    );
+    const saved = await prepareDataVizBindings(props, AUTH, client, []);
+    expect(saved).toMatchObject({
+      columnBindings: { columns: [{ name: "territory", dataType: "varchar" }] },
+    });
+    rows.unmount();
+  },
+);

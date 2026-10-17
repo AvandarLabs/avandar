@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { refreshDataVizColumnBindings } from "./useDataVizColumnBindings";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
 type Options = {
@@ -9,7 +10,12 @@ type Options = {
   rawSql: string;
   auth: StructuredQueryAuth;
   expectedSql: string | undefined;
-  result: (QueryResult.T & { executedSql: string | undefined }) | undefined;
+  result:
+    | (QueryResult.T & {
+        executedSql: string | undefined;
+        metadataProvenance?: QueryMetadataProvenance;
+      })
+    | undefined;
   isSuccess: boolean;
 };
 
