@@ -134,7 +134,7 @@ describe("acquirePostgresTableRelation", () => {
     expect(typeof acquired.relation[0]?.population).toBe("bigint");
   });
 
-  it("encodes a dotted table name with makeRelationId, not plain concatenation", async () => {
+  it("encodes a dotted table name with PostgresRelationId.makeRelationId, not plain concatenation", async () => {
     const { acquirePostgresTableRelation } = await import(
       "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
     );
@@ -156,12 +156,12 @@ describe("acquirePostgresTableRelation", () => {
       rowsFetch: _capturingFetch,
     });
 
-    // `makeRelationId` escapes the table name's own literal `.` before
-    // joining with the unescaped separator, so decoding it back on the
-    // edge function side (`splitRelationId`) can tell the separator from
-    // an escaped dot. Plain `${schemaName}.${tableName}` concatenation
-    // would instead produce `public.weird.table`, indistinguishable from
-    // schema `public.weird` and table `table`.
+    // `PostgresRelationId.makeRelationId` escapes the table name's own
+    // literal `.` before joining with the unescaped separator, so decoding
+    // it back on the edge function side (`splitRelationId`) can tell the
+    // separator from an escaped dot. Plain `${schemaName}.${tableName}`
+    // concatenation would instead produce `public.weird.table`,
+    // indistinguishable from schema `public.weird` and table `table`.
     expect(decodeURIComponent(requestedUrl)).toContain(
       "/relations/public.weird\\.table/rows",
     );

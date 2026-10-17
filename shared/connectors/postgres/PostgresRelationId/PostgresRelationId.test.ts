@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import {
-  makeRelationId,
-  splitRelationId,
-} from "$/connectors/postgres/postgresRelationId/postgresRelationId.ts";
+import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId.ts";
 
-describe("makeRelationId / splitRelationId", () => {
+const { makeRelationId, splitRelationId } = PostgresRelationId;
+
+describe("PostgresRelationId.makeRelationId / .splitRelationId", () => {
   it("round-trips a plain schema and table name", () => {
     const id = makeRelationId("public", "customers");
     expect(id).toBe("public.customers");

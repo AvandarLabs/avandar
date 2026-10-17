@@ -1,8 +1,5 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
-import {
-  makeRelationId,
-  splitRelationId,
-} from "$/connectors/postgres/postgresRelationId/postgresRelationId.ts";
+import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId.ts";
 import type { ConnectorRelation } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
@@ -11,7 +8,10 @@ function _makeRelationFromCatalogRow(row: {
   table_name: string;
   table_type: string;
 }): ConnectorRelation {
-  const relationId = makeRelationId(row.table_schema, row.table_name);
+  const relationId = PostgresRelationId.makeRelationId(
+    row.table_schema,
+    row.table_name,
+  );
   return {
     relationId,
     label: `${row.table_schema}.${row.table_name}`,
@@ -63,16 +63,16 @@ export async function assertRelationStillExists(
 }
 
 /**
- * Parses a relation id built by {@link makeRelationId}, throwing a
- * classified `ConnectorError` rather than returning `undefined` - every
- * caller in this edge function already expects a thrown failure, the same
- * shape every other malformed-input case here produces.
+ * Parses a relation id built by {@link PostgresRelationId.makeRelationId},
+ * throwing a classified `ConnectorError` rather than returning `undefined` -
+ * every caller in this edge function already expects a thrown failure, the
+ * same shape every other malformed-input case here produces.
  */
 export function parseRelationId(relationId: string): {
   schemaName: string;
   tableName: string;
 } {
-  const split = splitRelationId(relationId);
+  const split = PostgresRelationId.splitRelationId(relationId);
   if (!split) {
     throw new ConnectorError(
       "unknown",

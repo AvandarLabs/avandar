@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
-import { splitRelationId } from "$/connectors/postgres/postgresRelationId/postgresRelationId";
+import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
@@ -123,7 +123,10 @@ export function PostgresConnectorImportView({
   // small, ungrouped `Select` the Sheets tab picker uses.
   const relationsBySchema = makeBucketMap(load.relations ?? [], {
     keyFn: (relation) => {
-      return splitRelationId(relation.relationId)?.schemaName ?? "";
+      return (
+        PostgresRelationId.splitRelationId(relation.relationId)
+          ?.schemaName ?? ""
+      );
     },
     valueFn: (relation) => {
       return { value: relation.relationId, label: relation.label };

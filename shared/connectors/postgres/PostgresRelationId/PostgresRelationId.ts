@@ -10,18 +10,18 @@ function _escapeRelationIdPart(part: string): string {
 
 /**
  * Builds the wire-format id for one relation: a schema name and a
- * table/view name, joined so {@link splitRelationId} can always split them
+ * table/view name, joined so {@link _splitRelationId} can always split them
  * back apart exactly - even when either one (or both) contains a literal
  * `.`, which any Postgres identifier can once it is quoted. A literal `\`
  * or `.` in either part is escaped before joining, so exactly one
  * unescaped `.` remains: the real separator.
  */
-export function makeRelationId(schemaName: string, tableName: string): string {
+function _makeRelationId(schemaName: string, tableName: string): string {
   return `${_escapeRelationIdPart(schemaName)}.${_escapeRelationIdPart(tableName)}`;
 }
 
 /**
- * Splits a relation id built by {@link makeRelationId} back into its schema
+ * Splits a relation id built by {@link _makeRelationId} back into its schema
  * and table name, unescaping each part. Returns `undefined` for a
  * malformed id (no unescaped separator, or an empty half) rather than
  * guessing - the caller decides how to report that.
@@ -32,7 +32,7 @@ export function makeRelationId(schemaName: string, tableName: string): string {
  * which end of the string to split from - identifies the real separator
  * correctly in every case.
  */
-export function splitRelationId(
+function _splitRelationId(
   relationId: string,
 ): { schemaName: string; tableName: string } | undefined {
   const { parts, current } = Array.from(relationId).reduce(
@@ -69,3 +69,9 @@ export function splitRelationId(
   }
   return { schemaName, tableName };
 }
+
+/** Encodes and decodes a Postgres relation's wire-format id. */
+export const PostgresRelationId = {
+  makeRelationId: _makeRelationId,
+  splitRelationId: _splitRelationId,
+};

@@ -1,4 +1,4 @@
-import { makeRelationId } from "$/connectors/postgres/postgresRelationId/postgresRelationId";
+import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 
@@ -54,8 +54,9 @@ export type AcquirePostgresTableRelationParams<TRelation> = {
  * `acquireGoogleSheetRelation`: it reads no dataset record, holds no
  * connection credential, and imports no client singleton, so the wrapper
  * that eventually calls it keeps `WrapperContext` as the only source of
- * identity. `relationId` is built with `makeRelationId`, matching how the
- * edge function's `relations` route reports it.
+ * identity. `relationId` is built with
+ * `PostgresRelationId.makeRelationId`, matching how the edge function's
+ * `relations` route reports it.
  *
  * This route returns raw CSV text (`Content-Type: text/csv`), not a JSON
  * object, so it is fetched directly rather than through
@@ -75,7 +76,10 @@ export type AcquirePostgresTableRelationParams<TRelation> = {
 export async function acquirePostgresTableRelation<TRelation>(
   params: Readonly<AcquirePostgresTableRelationParams<TRelation>>,
 ): Promise<AcquiredPostgresTableRelation<TRelation>> {
-  const relationId = makeRelationId(params.schemaName, params.tableName);
+  const relationId = PostgresRelationId.makeRelationId(
+    params.schemaName,
+    params.tableName,
+  );
   const doFetch = params.rowsFetch ?? fetch;
 
   const { data } = await AvaSupabase.db().auth.getSession();
