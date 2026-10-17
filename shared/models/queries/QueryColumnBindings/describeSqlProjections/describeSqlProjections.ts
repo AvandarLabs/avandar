@@ -1,4 +1,5 @@
 import { isPlainObject } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@utils/sql/index.ts";
 import { Parser } from "node-sql-parser";
 import { uuid } from "$/lib/uuid.ts";
 import { buildSqlExpressionKey } from "$/models/queries/QueryColumnBindings/buildSqlExpressionKey.ts";
@@ -64,9 +65,48 @@ function _createDescriptor(
   };
 }
 
+function _getAggregateOutputName(
+  argument: Readonly<Record<string, unknown>>,
+  aggregation: QueryAggregationType.T,
+  columns: readonly QueryResult.Column[],
+): string | undefined {
+  const parts = [
+    _getQualifier(argument.schema),
+    _getQualifier(argument.table),
+    columnRefName(argument),
+  ].filter((part) => {
+    return part !== undefined;
+  });
+  // DuckDB removes unnecessary quotes, but retains them for spaces/keywords.
+  // Only equivalent spellings of this exact qualified AST argument qualify.
+  const spellings = parts.reduce<string[]>(
+    (prefixes, part) => {
+      const identifiers = /^[a-z_][a-z0-9_$]*$/i.test(part)
+        ? [part, quoteSqlIdentifier(part)]
+        : [quoteSqlIdentifier(part)];
+      return prefixes.flatMap((prefix) => {
+        return identifiers.map((identifier) => {
+          return prefix ? `${prefix}.${identifier}` : identifier;
+        });
+      });
+    },
+    [""],
+  );
+  const names = new Set(
+    spellings.map((spelling) => {
+      return `${aggregation}(${spelling})`;
+    }),
+  );
+  const matches = columns.filter((column) => {
+    return names.has(column.name);
+  });
+  return matches.length === 1 ? matches[0]!.name : undefined;
+}
+
 function _getProjection(
   item: unknown,
   source: Readonly<Source>,
+  columns: readonly QueryResult.Column[],
 ): ProjectionDescriptor | undefined {
   if (!isPlainObject(item) || !isPlainObject(item.expr)) {
     return undefined;
@@ -94,6 +134,7 @@ function _getProjection(
   if (
     !aggregation ||
     !argument ||
+    !isPlainObject(args.expr) ||
     argument === "*" ||
     args.distinct ||
     args.orderby ||
@@ -101,12 +142,11 @@ function _getProjection(
   ) {
     return undefined;
   }
-  return _createDescriptor(
-    source,
-    argument,
-    alias ?? `${aggregation}(${argument})`,
-    aggregation,
-  );
+  const outputName =
+    alias ?? _getAggregateOutputName(args.expr, aggregation, columns);
+  return outputName === undefined
+    ? undefined
+    : _createDescriptor(source, argument, outputName, aggregation);
 }
 
 function _hasNestedSelect(node: unknown): boolean {
@@ -209,7 +249,7 @@ export function describeSqlProjections(
     });
   }
   const projections = ast.columns.map((item: unknown) => {
-    return _getProjection(item, source);
+    return _getProjection(item, source, options.columns);
   });
   return projections.every((projection) => {
     return projection !== undefined;
