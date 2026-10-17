@@ -9,7 +9,7 @@ import { DatabaseConnectionClient } from "@/clients/connections/DatabaseConnecti
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { Logger } from "@/utils/Logger";
-import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/postgresConnectorImportErrorCopy";
+import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/copy/postgresConnectorImportErrorCopy";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
