@@ -1192,6 +1192,25 @@ unchanged (idempotent upsert, not duplicate inserts), and that
 for every row the dry run touched (confirming the upsert never wrote cache
 columns it has no opinion about).
 
+**Outcome of this step, as actually run:** a full enumeration against HDX's
+real catalog (42,181 dataset slugs from `package_list`) always fails
+partway through - HDX's rate limiter rejects the sequential `package_show`
+crawl after roughly 144-150 requests within ~13 seconds, with no
+`Retry-After` header, and nothing in this plan's design includes
+retry/backoff/throttling. HDX was a bad choice for the seed entry: it was
+picked only because this codebase's existing CKAN tests/fixtures already
+reference a few specific HDX datasets, without checking the portal's total
+dataset count against "a handful of entries" (section 6.2). `run()`,
+`buildMetacatalogRows.ts`, `upsertMetacatalogRows.ts`, and
+`CkanDiscoveryClient` were instead independently verified correct against a
+smaller real-data slice (15 datasets), including idempotency and
+cache-column isolation - this is not a code defect in the pipeline logic.
+`CONFIGURED_DRIVES` now ships empty rather than seeded with HDX; see
+`open-data-catalog-architecture.md` section 7's deferred-items list. A
+future reader following this step literally against the seeded HDX drive
+will find there is no longer a seeded drive to run it against - add a
+small, fully-enumerable drive here first if you want to repeat this dry run.
+
 - [ ] **Step 6: Commit**
 
 ```bash

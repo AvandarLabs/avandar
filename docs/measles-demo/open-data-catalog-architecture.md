@@ -508,6 +508,13 @@ needs to reconcile with the EtlEngine pattern later.
    (`OpenDatasetParquetStorageClient`) onto the new private bucket. Not
    needed for Socrata or the cache, and a separate decision touching live
    production catalog rows.
+6. Retry/backoff/throttling for the metacatalog pipeline's HTTP calls.
+   Discovered necessary, not hypothetical: a live dry run against HDX's real
+   CKAN catalog (42,000+ datasets) hit its rate limiter after ~150
+   sequential requests with no `Retry-After` header. `CONFIGURED_DRIVES`
+   ships empty rather than seeded with a drive this size; a deployer adding
+   any drive should first confirm its real total dataset count is small
+   enough to enumerate in one run without this.
 
 ## 8. Testing references to add
 

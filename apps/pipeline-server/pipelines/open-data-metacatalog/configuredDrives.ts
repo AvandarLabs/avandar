@@ -20,11 +20,16 @@ export type ConfiguredDrive = {
  * The short, hardcoded list of drives this Avandar deployment prebuilds a
  * metacatalog for. A fork maintains its own list; nothing here is shared
  * across deployments. See `open-data-catalog-architecture.md` section 6.2.
+ *
+ * Empty by default. Before adding a drive here, confirm its real total
+ * dataset count is small enough to fully enumerate in one run (`ava
+ * pipeline run open-data-metacatalog` has no retry/backoff for a rate
+ * limit, and makes one sequential metadata request per CKAN dataset or
+ * Socrata page) - HDX (`data.humdata.org`) was tried here first and
+ * removed: its real catalog is 42,000+ datasets, and its rate limiter
+ * rejects a sequential crawl after roughly 150 requests with no
+ * `Retry-After` header, so a full HDX enumeration cannot succeed with
+ * this pipeline's current design. See section 6's "deliberately
+ * deferred" list.
  */
-export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
-  {
-    apiService: "ckan",
-    baseUrl: "https://data.humdata.org",
-    organizationName: "Humanitarian Data Exchange",
-  },
-];
+export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [];
