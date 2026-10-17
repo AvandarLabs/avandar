@@ -6,6 +6,7 @@ import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetad
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { getDataVizQueryAuth } from "../getDataVizQueryAuth";
+import { useRefreshDataVizColumnBindings } from "../useDataVizColumnBindings/useRefreshDataVizColumnBindings";
 import { useResolvedDataVizBindings } from "../useResolvedDataVizBindings/useResolvedDataVizBindings";
 import { DataVizContent } from "./DataVizContent";
 import { useLocalFilterState } from "./useLocalFilterState";
@@ -49,6 +50,17 @@ export function DataVizPBlock(
     enabled: bindings.status === "ready",
     analyticsSurface: "dashboard_block",
     ...auth,
+  });
+  useRefreshDataVizColumnBindings({
+    id: props.id,
+    rawSql: props.nlQuery.rawSql,
+    auth,
+    expectedSql: filteredSql,
+    result,
+    isSuccess:
+      query.isSuccess &&
+      query.fetchStatus === "idle" &&
+      bindings.status === "ready",
   });
   const columns = bindings.schema?.columns ?? [];
   const data = result?.data ?? [];

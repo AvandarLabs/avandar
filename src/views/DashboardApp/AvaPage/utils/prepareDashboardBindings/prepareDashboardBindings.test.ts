@@ -1,10 +1,22 @@
 import { QueryClient } from "@tanstack/react-query";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
+import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { prepareDashboardBindings } from "./prepareDashboardBindings";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaPageData } from "../../AvaPage.types";
+
+vi.mock("@/clients/queries/runStructuredQuery/runStructuredQuery", () => {
+  return {
+    runStructuredQuery: async () => {
+      return {
+        ...QueryResult.makeEmpty(),
+        columns: [{ name: "region", dataType: "varchar" }],
+      };
+    },
+  };
+});
 
 it("persists a newly subscribed global target on explicit save without changing viewer values", async () => {
   const id = "region-id" as QueryColumn.Id;

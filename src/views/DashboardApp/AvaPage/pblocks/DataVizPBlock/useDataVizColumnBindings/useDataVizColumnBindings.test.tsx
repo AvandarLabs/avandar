@@ -369,7 +369,7 @@ describe("useDataVizColumnBindings", () => {
     expect(first.result.current.bindings.schema?.columns[0]?.id).toBe(columnId);
     expect(runQuery).toHaveBeenCalledTimes(1);
   });
-  it("accepts a completed empty registry but rediscovers a stale query signature", async () => {
+  it("revalidates persisted empty metadata before enabling predicates", async () => {
     const registry: ResultBindingRegistry = {
       version: 1,
       scopeKey: "block-a",
@@ -386,14 +386,16 @@ describe("useDataVizColumnBindings", () => {
       },
       { wrapper: _createWrapper(), initialProps: { rawSql: OPTIONS.rawSql } },
     );
-    expect(result.current.status).toBe("ready");
-    expect(result.current.schema?.columns).toEqual([]);
-    expect(runQuery).not.toHaveBeenCalled();
+    expect(result.current.status).toBe("loading");
+    expect(result.current.schema).toBeUndefined();
+    await waitFor(() => {
+      return expect(result.current.schema?.columns[0]?.name).toBe("region");
+    });
     rerender({ rawSql: "SELECT region FROM other_sales" });
     expect(result.current.status).toBe("loading");
     await waitFor(() => {
       return expect(result.current.status).toBe("ready");
     });
-    expect(runQuery).toHaveBeenCalledTimes(1);
+    expect(runQuery).toHaveBeenCalledTimes(2);
   });
 });

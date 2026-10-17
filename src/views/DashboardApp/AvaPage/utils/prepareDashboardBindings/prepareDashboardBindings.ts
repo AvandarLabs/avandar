@@ -1,3 +1,4 @@
+import { DataVizRuntimeTargets } from "../../pblocks/DataVizPBlock/DataVizRuntimeTargets";
 import { resolveDataVizRuntimeBindings } from "../../pblocks/DataVizPBlock/resolveSavedDataVizBindings/resolveDataVizRuntimeBindings";
 import { getDataVizColumnBindings } from "../../pblocks/DataVizPBlock/useDataVizColumnBindings/useDataVizColumnBindings";
 import { transformAvaPageProps } from "../createAvaPageTraversalConfig/transformAvaPageProps";
@@ -37,7 +38,14 @@ export async function prepareDataVizBindings(
     },
     queryClient,
   );
-  const resolved = resolveDataVizRuntimeBindings(props, schema, filters);
+  const scope = { id: props.id, auth, rawSql: props.nlQuery.rawSql };
+  const resolved = resolveDataVizRuntimeBindings(
+    props,
+    schema,
+    filters,
+    DataVizRuntimeTargets.get(queryClient, scope),
+  );
+  DataVizRuntimeTargets.set(queryClient, scope, resolved.global.targets);
   return { ...props, ...resolved.props };
 }
 

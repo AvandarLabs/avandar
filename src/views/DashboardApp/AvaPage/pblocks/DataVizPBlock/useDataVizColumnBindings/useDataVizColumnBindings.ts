@@ -20,80 +20,44 @@ type Options = {
   projections: readonly ProjectionDescriptor[];
 };
 
-type Discovery = {
-  columns: readonly QueryResult.Column[];
-  projections: readonly ProjectionDescriptor[];
-  registry: ResultBindingRegistry;
+type VerifiedSchema = BoundResultSchema & {
+  rawColumns: readonly QueryResult.Column[];
 };
 
-async function _discoverSchema(
-  auth: StructuredQueryAuth,
-  scopeKey: string,
-  sqlKey: string,
-): Promise<Discovery> {
-  const columns = await runQuerySchema({ rawSql: sqlKey, auth });
-  const projections = describeSqlProjections({ sql: sqlKey, columns });
+function _createSchema(
+  options: Readonly<Options>,
+  columns: readonly QueryResult.Column[],
+  previous: ResultBindingRegistry | undefined,
+): VerifiedSchema {
   const schema = reconcileResultBindings({
-    scopeKey,
-    sqlKey,
-    columns,
-    projections,
-    previous: undefined,
-  });
-  return { columns, projections, registry: schema.registry };
-}
-
-function _bindDiscovery(
-  options: Readonly<Options>,
-  discovery: Readonly<Discovery>,
-): BoundResultSchema {
-  const sqlKey = normalizeSqlForSubquery(options.rawSql);
-  const projections =
-    options.projections.length > 0
-      ? options.projections
-      : discovery.projections;
-  const previous = options.initialRegistry;
-  // Opaque edits cannot inherit prior identity. Use this query's cached IDs
-  // so independent consumers agree on newly discovered outputs.
-  const canReconcilePrevious =
-    previous?.scopeKey === options.scopeKey &&
-    (projections.length > 0 || previous.sqlKey === sqlKey);
-  return reconcileResultBindings({
     scopeKey: options.scopeKey,
-    sqlKey,
-    previous: canReconcilePrevious ? previous : discovery.registry,
-    columns: discovery.columns,
-    projections,
+    sqlKey: normalizeSqlForSubquery(options.rawSql),
+    columns,
+    projections:
+      options.projections.length > 0
+        ? options.projections
+        : describeSqlProjections({ sql: options.rawSql, columns }),
+    previous,
   });
+  return { ...schema, rawColumns: columns };
 }
 
-function _getInitialDiscovery(
+async function _discoverSchema(
   options: Readonly<Options>,
-): Discovery | undefined {
-  const registry = options.initialRegistry;
-  if (
-    registry?.version !== 1 ||
-    registry.scopeKey !== options.scopeKey ||
-    registry.sqlKey !== normalizeSqlForSubquery(options.rawSql)
-  ) {
-    return undefined;
-  }
-  return {
-    registry,
-    columns: registry.columns,
-    projections: describeSqlProjections({
-      sql: options.rawSql,
-      columns: registry.columns,
-    }),
-  };
+): Promise<VerifiedSchema> {
+  const columns = await runQuerySchema({
+    rawSql: normalizeSqlForSubquery(options.rawSql),
+    auth: options.auth,
+  });
+  return _createSchema(options, columns, options.initialRegistry);
 }
 
 /**
  * Shares unfiltered output identities across chart/settings consumers. Only
  * `ready` permits predicate execution. Errors use the query error reporter.
  * Persist `schema.registry` with its block scope, never the auth cache key.
- * A completed unfiltered data result can supply `initialRegistry` to skip
- * discovery. Supply the last registry to reconcile an explicit SQL edit.
+ * Persisted registries seed identity history only. Every uncached scope/SQL
+ * discovers actual metadata before allowing filtered execution.
  */
 export function useDataVizColumnBindings(options: Readonly<Options>): {
   status: "loading" | "ready" | "error";
@@ -104,15 +68,12 @@ export function useDataVizColumnBindings(options: Readonly<Options>): {
   const sqlKey = normalizeSqlForSubquery(options.rawSql);
   const [schema, , query] = useQuery({
     enabled: sqlKey.length > 0,
+    // Registry/projection inputs seed identity only. Keying by saved state
+    // would rediscover on explicit saves and split renderer/settings identity.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["data-viz-column-bindings", auth, scopeKey, sqlKey],
     queryFn: async () => {
-      return _discoverSchema(auth, scopeKey, sqlKey);
-    },
-    initialData: () => {
-      return _getInitialDiscovery(options);
-    },
-    select: (discovery) => {
-      return _bindDiscovery(options, discovery);
+      return _discoverSchema(options);
     },
     staleTime: Infinity,
     retry: false,
@@ -130,7 +91,10 @@ export async function getDataVizColumnBindings(
   queryClient: QueryClient,
 ): Promise<BoundResultSchema> {
   const sqlKey = normalizeSqlForSubquery(options.rawSql);
-  const discovery = await queryClient.ensureQueryData({
+  return await queryClient.ensureQueryData({
+    // Registry/projection inputs seed identity only. Keying by saved state
+    // would rediscover on explicit saves and split renderer/settings identity.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "data-viz-column-bindings",
       options.auth,
@@ -138,12 +102,37 @@ export async function getDataVizColumnBindings(
       sqlKey,
     ],
     queryFn: () => {
-      return _discoverSchema(options.auth, options.scopeKey, sqlKey);
-    },
-    initialData: () => {
-      return _getInitialDiscovery(options);
+      return _discoverSchema(options);
     },
     staleTime: Infinity,
   });
-  return _bindDiscovery(options, discovery);
+}
+
+/** Updates verified metadata only for the SQL executed by the owning block. */
+export function refreshDataVizColumnBindings(
+  options: Readonly<Options>,
+  queryClient: QueryClient,
+  result: Readonly<QueryResult.T & { executedSql: string | undefined }>,
+  expectedSql: string,
+): void {
+  if (result.executedSql !== expectedSql) {
+    return;
+  }
+  queryClient.setQueryData<VerifiedSchema>(
+    [
+      "data-viz-column-bindings",
+      options.auth,
+      options.scopeKey,
+      normalizeSqlForSubquery(options.rawSql),
+    ],
+    (previous) => {
+      if (
+        !previous ||
+        JSON.stringify(previous.rawColumns) === JSON.stringify(result.columns)
+      ) {
+        return previous;
+      }
+      return _createSchema(options, result.columns, previous.registry);
+    },
+  );
 }

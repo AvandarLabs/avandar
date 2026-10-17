@@ -2,15 +2,22 @@ import { AvaQueryProvider } from "@avandar/query-hooks";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
+import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { describeSqlProjections } from "$/models/queries/QueryColumnBindings/describeSqlProjections/describeSqlProjections";
 import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql/applyDashboardFiltersToSql";
-import { getDataVizAuthoringProps } from "../../../pfields/useDataVizAuthoring/getDataVizAuthoringProps";
+import {
+  prepareDashboardBindings,
+  prepareDataVizBindings,
+} from "../../../utils/prepareDashboardBindings/prepareDashboardBindings";
+import { resolveDataVizRuntimeBindings } from "../resolveSavedDataVizBindings/resolveDataVizRuntimeBindings";
+import { getDataVizColumnBindings } from "../useDataVizColumnBindings/useDataVizColumnBindings";
 import { useResolvedDataVizBindings } from "./useResolvedDataVizBindings";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AvaPageData } from "../../../AvaPage.types";
 import type { Props } from "../DataVizPBlock/DataVizPBlock";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 import type { ReactNode } from "react";
@@ -70,10 +77,11 @@ function _createProps(id: string): Props & { id: string } {
     globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
   };
 }
-function _createWrapper() {
-  const client = new QueryClient({
+function _createWrapper(
+  client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
-  });
+  }),
+) {
   return ({ children }: { children: ReactNode }) => {
     return (
       <QueryClientProvider client={client}>
@@ -96,7 +104,7 @@ beforeEach(() => {
     };
   });
 });
-it.each(["owner", "workspace", "revision"])(
+it.each(["owner", "workspace", "revision", "auth"])(
   "scopes target memory to the %s and saves only its own identity",
   async (scope) => {
     const first = _createProps("chart-a");
@@ -112,9 +120,16 @@ it.each(["owner", "workspace", "revision"])(
     const changedAuth: StructuredQueryAuth =
       scope === "revision"
         ? ({ ...initialAuth, snapshotRevision: "two" } as StructuredQueryAuth)
-        : scope === "workspace"
-          ? { auth: "workspace", workspaceId: "other" as Workspace.Id }
-          : AUTH;
+        : scope === "auth"
+          ? {
+              auth: "public",
+              publicAvaPageId: "dashboard" as Dashboard.Id,
+              snapshotRevision: "one",
+            }
+          : scope === "workspace"
+            ? { auth: "workspace", workspaceId: "other" as Workspace.Id }
+            : AUTH;
+    const client = new QueryClient();
     const { result, rerender } = renderHook(
       ({
         props,
@@ -130,7 +145,7 @@ it.each(["owner", "workspace", "revision"])(
           props: first,
           auth: initialAuth as StructuredQueryAuth,
         },
-        wrapper: _createWrapper(),
+        wrapper: _createWrapper(client),
       },
     );
     await waitFor(() => {
@@ -140,12 +155,9 @@ it.each(["owner", "workspace", "revision"])(
     await waitFor(() => {
       return expect(result.current.status).toBe("ready");
     });
-    const saved = getDataVizAuthoringProps({
-      props: second,
-      bindings: result.current,
-      filters: [FILTER],
-      change: { kind: "bound", props: {} },
-    });
+    const saved = await prepareDataVizBindings(second, changedAuth, client, [
+      FILTER,
+    ]);
     expect(saved).toMatchObject({
       globalFilterTargets: {
         filter: {
@@ -175,11 +187,13 @@ it.each([
   "SELECT region FROM sales_b",
 ])("retains registered unsaved targets across %s", async (rawSql) => {
   const props = _createProps("chart");
-  const { result, rerender } = renderHook(
+  const original = JSON.stringify(props);
+  const client = new QueryClient();
+  const { result, rerender, unmount } = renderHook(
     ({ currentProps }) => {
       return useResolvedDataVizBindings(currentProps, AUTH);
     },
-    { initialProps: { currentProps: props }, wrapper: _createWrapper() },
+    { initialProps: { currentProps: props }, wrapper: _createWrapper(client) },
   );
   await waitFor(() => {
     return expect(result.current.status).toBe("ready");
@@ -194,6 +208,57 @@ it.each([
   expect(result.current.resolved!.global.targets.filter).toEqual(
     originalTarget,
   );
+  unmount();
+  // The explicit query callback has no filter list, then save supplies it.
+  // Target ownership must survive changing the selected authoring field.
+  const edited = await prepareDataVizBindings(
+    { ...props, nlQuery: { ...props.nlQuery, rawSql } },
+    AUTH,
+    client,
+    [],
+  );
+  const savedDocument = await prepareDashboardBindings(
+    {
+      ...DashboardConfigs.makeEmpty(),
+      content: [
+        { type: "DataViz", props: edited },
+        {
+          type: "Filter",
+          props: {
+            id: "filter-block",
+            filterId: "filter",
+            columnName: "region",
+            label: "Region",
+            mode: "select_single",
+            defaultValue: "North",
+            optionsRaw: "North,South",
+          },
+        },
+      ],
+    } as AvaPageData,
+    AUTH,
+    client,
+  );
+  const saved = savedDocument.content[0]!.props;
+  expect(JSON.stringify(props)).toBe(original);
+  const reopened = JSON.parse(JSON.stringify(saved)) as Props & { id: string };
+  const reopenedSchema = await getDataVizColumnBindings(
+    {
+      scopeKey: reopened.id,
+      rawSql,
+      auth: AUTH,
+      projections: [],
+      initialRegistry:
+        reopened.bindingVersion === 1 ? reopened.columnBindings : undefined,
+    },
+    new QueryClient(),
+  );
+  const reopenedBindings = resolveDataVizRuntimeBindings(
+    reopened,
+    reopenedSchema,
+    [FILTER],
+  );
+  expect(reopenedBindings.global.targets.filter).toEqual(originalTarget);
   await withDuckDb(async (connection) => {
     await connection.run(
       "CREATE TABLE sales_a AS SELECT * FROM (VALUES ('North'), ('South')) t(region)",
@@ -202,7 +267,7 @@ it.each([
     const rows = await connection.runAndReadAll(
       applyDashboardFiltersToSql({
         sql: rawSql,
-        filters: result.current.resolved!.global.resolvedFilters,
+        filters: reopenedBindings.global.resolvedFilters,
       }),
     );
     expect(rows.getRowObjects()).toEqual(
