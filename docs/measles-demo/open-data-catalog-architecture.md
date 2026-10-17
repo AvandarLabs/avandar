@@ -121,7 +121,7 @@ Unifying the other three remains a real idea, tracked as deferred work
 
 `AvandarSupabaseStorageClient`'s shape, reflecting what the cache actually
 needs - a private, non-workspace-scoped bucket (`open-data-catalog`, new),
-read by any authenticated user (matching `catalog_listings__open_data`'s own
+read by any authenticated user (matching `data_catalog_listings`'s own
 `select`-to-`authenticated` grant), written only by the `open-data` edge
 function's service-role client:
 
@@ -197,12 +197,12 @@ something Socrata or the cache introduces or is required to resolve.)
 
 ## 4. Schema changes
 
-`catalog_listings__open_data__api_service` (currently `enum('ckan')`) gains
+`data_catalog_listings__api_service` (currently `enum('ckan')`) gains
 `'socrata'`. No other new enum: `api_base_url` and `external_dataset_id`
 already carry a SODA endpoint and a 4x4 dataset id without further migration,
 exactly as the CKAN generalization spec predicted (section 13.1 there).
 
-Three new nullable columns on `catalog_listings__open_data`, written only by
+Three new nullable columns on `data_catalog_listings`, written only by
 `access_kind = 'api_resource'` rows, mirroring the existing `api_*` columns'
 pattern:
 
@@ -230,7 +230,7 @@ and cached_source_version is null
 and cached_at is null
 
 -- a new constraint, grouped the same way api_access_complete is:
-constraint catalog_listings__open_data__cache_complete check (
+constraint data_catalog_listings__cache_complete check (
   (cached_object_path is null and cached_source_version is null and cached_at is null)
   or
   (cached_object_path is not null and cached_source_version is not null and cached_at is not null)
@@ -326,10 +326,10 @@ live-search capability this section previously described
 (`SocrataDiscoveryClient`) is not removed - it is still the right tool for
 letting a human *pick which drives to add* to that list - but it is no longer
 how a workspace finds a candidate dataset to query. That now comes from
-`catalog_listings__open_data` rows a pipeline already wrote.
+`data_catalog_listings` rows a pipeline already wrote.
 
 **Why prebuilt now:** there is currently no way to get an `api_resource` row
-into `catalog_listings__open_data` at all - no pipeline, no admin UI, no CLI
+into `data_catalog_listings` at all - no pipeline, no admin UI, no CLI
 command. A `pipeline_parquet` row gets there because a pipeline writes it;
 an `api_resource` row had no equivalent path. Building that path as "a
 pipeline that enumerates a drive and upserts rows" is strictly simpler than
@@ -360,11 +360,30 @@ which drives to enumerate.
 
 ### 6.2 The drive registry
 
-A new hardcoded list, `apps/pipeline-server/pipelines/open-data-catalog-listings/configuredDrives.ts`:
+**Split per pipeline, not one shared registry** - see
+`connector-nomenclature.md`'s "One pipeline per service" section for why. Each
+pipeline owns its own config, with no `apiService` field in either shape:
+single-service pipelines don't need to discriminate a field that only ever
+has one value.
+
+`apps/pipeline-server/pipelines/hdx/hdxDrive.ts` - a single optional value,
+not an array, because HDX is one specific CKAN deployment, not a list of
+them:
+
+```ts
+export type HdxDrive = {
+  baseUrl: string;
+  organizationName: string;
+};
+
+export const HDX_DRIVE: HdxDrive | undefined = undefined;
+```
+
+`apps/pipeline-server/pipelines/socrata/configuredDrives/configuredDrives.ts` -
+an array, because Socrata genuinely has many independent portals:
 
 ```ts
 export type ConfiguredDrive = {
-  apiService: "ckan" | "socrata";
   baseUrl: string;
   /**
    * Used as every discovered dataset's `external_organization_name`. Neither
@@ -384,8 +403,8 @@ export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
 ```
 
 This is the "short list of drives" - a handful of entries, not thousands of
-per-dataset rows. Adding a new drive is a one-line addition here, not a
-schema change or a new connector.
+per-dataset rows. Adding a new Socrata drive is a one-line addition here, not
+a schema change or a new connector.
 
 ### 6.3 New discovery capabilities needed
 
@@ -433,7 +452,7 @@ partial unique index:
 
 ```sql
 -- already exists, from section 4 / the original schema:
-create unique index catalog_listings__open_data__api_resource_unique on public.catalog_listings__open_data (
+create unique index data_catalog_listings__api_resource_unique on public.data_catalog_listings (
   api_service, api_base_url, external_dataset_id, api_resource_id
 ) where access_kind = 'api_resource';
 ```
@@ -456,15 +475,18 @@ when it happens.
 
 ### 6.6 Where this runs
 
-A new pipeline, `apps/pipeline-server/pipelines/open-data-catalog-listings/`,
-discoverable and runnable the same way `world-bank__wdi` already is (`ava
-pipeline run open-data-catalog-listings` - presence of `run.ts` is the only
-registration step this repo requires). Unlike every pipeline that exists
-today, it does not use `EtlEngine.create(...)`: that abstraction is for
-extracting, transforming, and loading *data* into Parquet, and this pipeline
-does neither - it only enumerates drives and upserts metadata rows. Its
-`run.ts` is a plain async function for that reason, not a deviation anyone
-needs to reconcile with the EtlEngine pattern later.
+Two pipelines, `apps/pipeline-server/pipelines/hdx/` and
+`apps/pipeline-server/pipelines/socrata/`, each discoverable and runnable the
+same way `world-bank__wdi` already is (`ava pipeline run hdx` / `ava pipeline
+run socrata` - presence of `run.ts` is the only registration step this repo
+requires). The upsert against `data_catalog_listings` is identical for both,
+so it lives once, shared, in
+`apps/pipeline-server/pipelines/shared/upsertDataCatalogListingRows/`. Unlike
+every `EtlEngine`-based pipeline, neither uses `EtlEngine.create(...)`: that
+abstraction is for extracting, transforming, and loading *data* into Parquet,
+and these pipelines do neither - they only enumerate drives and upsert
+metadata rows. Each `run.ts` is a plain async function for that reason, not a
+deviation anyone needs to reconcile with the EtlEngine pattern later.
 
 ## 7. What this spec builds vs. what it does not
 
@@ -479,9 +501,9 @@ needs to reconcile with the EtlEngine pattern later.
   new `open-data-catalog` bucket and `AvandarSupabaseStorageClient`.
 - The `shared/open-data/` to `shared/connectors/open-data/` rename.
 - The `external-datasets` to `connectors` edge function rename.
-- The prebuilt drive index pipeline (section 6): `CkanDiscoveryClient`;
+- The prebuilt drive index pipelines (section 6): `CkanDiscoveryClient`;
   widening `SocrataDiscoveryClient.search()`'s `query` to optional; the
-  `open-data-catalog-listings` pipeline and its hardcoded drive registry;
+  `hdx` and `socrata` pipelines and their per-service drive configs;
   extracting `getCkanResourceFromPackage.ts`'s readable-resource filter into
   a reusable, exported predicate.
 
@@ -508,13 +530,14 @@ needs to reconcile with the EtlEngine pattern later.
    (`OpenDatasetParquetStorageClient`) onto the new private bucket. Not
    needed for Socrata or the cache, and a separate decision touching live
    production catalog rows.
-6. Retry/backoff/throttling for the drive index pipeline's HTTP calls.
+6. Retry/backoff/throttling for the drive index pipelines' HTTP calls.
    Discovered necessary, not hypothetical: a live dry run against HDX's real
    CKAN catalog (42,000+ datasets) hit its rate limiter after ~150
-   sequential requests with no `Retry-After` header. `CONFIGURED_DRIVES`
-   ships empty rather than seeded with a drive this size; a deployer adding
-   any drive should first confirm its real total dataset count is small
-   enough to enumerate in one run without this.
+   sequential requests with no `Retry-After` header. `HDX_DRIVE` stays
+   `undefined` and Socrata's `CONFIGURED_DRIVES` ships empty rather than
+   either being seeded with a drive this size; a deployer adding any drive
+   should first confirm its real total dataset count is small enough to
+   enumerate in one run without this.
 
 ## 8. Testing references to add
 
@@ -531,7 +554,7 @@ Following `qetl-architecture.md` section 12's table shape:
 | The `connectors` edge function rename does not change any route's behavior, only its path prefix | existing Postgres connector e2e spec, updated for the new prefix |
 | `CkanDiscoveryClient` lists every dataset slug in one drive, no network | unit test against a faked HTTP layer, mirrors `SocrataDiscoveryClient.test.ts`'s shape |
 | `SocrataDiscoveryClient.search()` with no `query` lists a domain's full catalog | extends `SocrataDiscoveryClient.test.ts` |
-| The open-data-catalog-listings pipeline upserts one row per qualifying CKAN resource and one row per Socrata dataset, using the shared readable-resource predicate | unit test on the pipeline's pure row-building functions, no network or DB |
+| The `hdx` pipeline upserts one row per qualifying CKAN resource and the `socrata` pipeline upserts one row per Socrata dataset, both using the shared readable-resource predicate | unit test on each pipeline's pure row-building functions, no network or DB |
 | Re-running the pipeline never overwrites an existing row's cache columns | unit test asserting the upserted row object never carries `cached_*` keys |
 
 ## 9. Related documents

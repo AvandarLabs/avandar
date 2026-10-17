@@ -46,7 +46,7 @@ Layer 3 - relation      the addressable child that becomes one Avandar
 
 | Term | What it is | Examples |
 | --- | --- | --- |
-| **Service** (layer 0) | The protocol or implementation a connector speaks - the thing the rest of this file calls "the connector" when talking about code (see "Connector vs. the drives it talks to" below). One Avandar connector implements exactly one service; a service has many drives. | `ckan`, `socrata`, `postgres`, `google_sheets`, and `avandar_supabase_storage` (the connector reading Avandar's own pipeline-built and cached Parquet). `ckan`/`socrata` are already literal values of the `api_service` column and the `OpenDataCatalogListing.ApiService` type - this layer is not a new concept, just this file's name for a value that already exists in the schema. |
+| **Service** (layer 0) | The protocol or implementation a connector speaks - the thing the rest of this file calls "the connector" when talking about code (see "Connector vs. the drives it talks to" below). One Avandar connector implements exactly one service; a service has many drives. | `ckan`, `socrata`, `postgres`, `google_sheets`, and `avandar_supabase_storage` (the connector reading Avandar's own pipeline-built and cached Parquet). `ckan`/`socrata` are already literal values of the `api_service` column and the `DataCatalogListing.ApiService` type - this layer is not a new concept, just this file's name for a value that already exists in the schema. |
 | **Drive** (layer 1) | The account or endpoint that owns many connections. Optional: a connector with no shared account layer has no drive. | A user's Google OAuth grant (`tokens__google`). A Socrata open-data portal's base URL (e.g. `data.cityofnewyork.us`). A CKAN deployment's base URL (e.g. `data.humdata.org`). One specific bucket (or bucket plus path prefix) in Avandar's own Supabase Storage project, for the `AvandarSupabaseStorage` connector (see below) - the one connector whose drives are all Avandar-operated, never a third party's. |
 | **Connection** (layer 2) | The reusable, picked-once-used-many-times parent a relation lives under. Infrastructure configuration, not a per-resource shareable item: gated by app role, not by per-resource sharing. | A Postgres server + database (`db_connections` / `db_connections__postgres`). One Google Sheets file, picked from the drive's list. One Socrata or CKAN dataset, picked from the portal. One Open Data Catalog listing, for `AvandarSupabaseStorage`. |
 | **Relation** (layer 3) | The addressable child a user ultimately selects - QETL's own word for this (`RelationRef`, `RelationCapabilities`). Becomes one Avandar dataset once a workspace adopts it (see "Relation vs. dataset" below) - it is not one before that. | A Postgres table or view. A tab within a Google Sheets file. A Socrata dataset's own rows (Socrata datasets do not subdivide further in practice, so layer 2 and layer 3 are almost always the same object for Socrata). The one Parquet object a catalog listing names. |
@@ -61,15 +61,36 @@ thing as an unowned dataset - ownership is not optional metadata bolted onto
 a dataset, it is what makes something a dataset at all.
 
 This is why an Open Data Catalog listing is a relation, never a dataset, for
-as long as it stays an unpicked catalog listing: `catalog_listings__open_data`
+as long as it stays an unpicked catalog listing: `data_catalog_listings`
 has no `owner_id` or `workspace_id` column, by design - it is shared across
 every workspace, owned by none of them. The same CKAN resource becomes a
 dataset only at the moment some workspace imports it, which creates its own
 `public.datasets` row with that workspace's `owner_id`/`workspace_id`,
 entirely separate from the catalog listing it was copied from. This is also
-why `OpenDataCatalogListing`/`catalog_listings__open_data` were named with
+why `DataCatalogListing`/`data_catalog_listings` were named with
 "entry," not "dataset," in the first place: calling an unowned, shared row a
 "dataset" would misstate the one thing that word is supposed to guarantee.
+
+### Relation column vs. dataset column: the same split, one level down
+
+The relation-vs-dataset ownership distinction above applies again at column
+granularity, between a `data_catalog_listings__relation_columns` row and a
+`dataset_columns` row:
+
+- A **relation column** is a column of an unowned relation (a Data Catalog
+  listing's column). It is **not editable by any user** - it is an inherent,
+  fixed property of the source data, discovered by a pipeline, exactly as
+  immutable as the listing it belongs to.
+- A **dataset column** is a column of an owned `datasets` row. A workspace
+  can rename it, redescribe it, or change its data type - it is mutable,
+  user-owned metadata, same ownership shape as a dataset itself.
+
+This mirrors exactly why "entry" became "listing" earlier in this file: the
+old name (`CatalogListingColumn`) borrowed a word already used for something
+with different ownership semantics (`dataset_columns`'s own "column"), which
+invited the same confusion this ownership rule exists to prevent. The model
+is `DataCatalogRelationColumn` (`data_catalog_listings__relation_columns`)
+for exactly this reason, not `DataCatalogListingColumn`.
 
 **Layer 0 never collapses the way layers 1-3 can.** A service always has
 exactly one connector implementation; there is nothing above it to merge
@@ -255,7 +276,7 @@ A drive index can be built one of three ways, and a connector may mix them:
 
 | Shape | When to use it | Example |
 | --- | --- | --- |
-| **Prebuilt** | The drive has too much to search live, but is small enough (or a filterable slice of it is) to index ahead of time. Built by the Avandar **pipeline** - a scheduled, out-of-band process, never app or edge-function runtime code - and the materialized index (a SQLite file, a JSON or CSV manifest) is stored in Supabase storage for every workspace to query. | The `open-data-catalog-listings` pipeline (section 6 of `open-data-catalog-architecture.md`): enumerates one hardcoded drive at a time (a CKAN deployment or a Socrata portal) and writes one `catalog_listings__open_data` row per readable relation it finds. |
+| **Prebuilt** | The drive has too much to search live, but is small enough (or a filterable slice of it is) to index ahead of time. Built by the Avandar **pipeline** - a scheduled, out-of-band process, never app or edge-function runtime code - and the materialized index (a SQLite file, a JSON or CSV manifest) is stored in Supabase storage for every workspace to query. | The `hdx` and `socrata` pipelines (section 6 of `open-data-catalog-architecture.md`): each enumerates its own service's configured drives and writes one `data_catalog_listings` row per readable relation it finds. |
 | **Search-time (live)** | The drive is too large or too dynamic to prebuild at all, or it is scoped to one user's own private account rather than a shared public universe. | Google Sheets: layer 2 (which files exist under a user's Drive) is searched live through the Google Picker UI at pick time, because it is specific to that user's own account and changes whenever they do. A CKAN deployment the size of HDX cannot be prebuilt at all with today's pipeline design - its real catalog (42,000+ datasets) exceeds what a no-retry sequential crawl can enumerate in one run, so it is not addable as a drive today in either shape. |
 | **Hybrid** | Part of one drive's relations are worth prebuilding, the rest are not. | Not built for any drive today. A CKAN deployment too large to enumerate in full could prebuild one organization's relations (via `package_search`'s `organization` filter) and leave the rest unindexed. |
 
@@ -267,17 +288,43 @@ storage** - the same meaning the word already carries for a
 A drive index is a new kind of pipeline artifact, not a new way of
 loading one.
 
+## One pipeline per service, named after the service, not the protocol
+
+A drive-index pipeline (above) is named and scoped per **service** (layer
+0), never per protocol, and never shared across unrelated services:
+
+- **A pipeline's output always includes a drive index, and optionally
+  prebuilt relations.**
+- A pipeline is named after the service it talks to, not the protocol: the
+  `hdx` pipeline, not a `ckan` pipeline. CKAN is an openly-installable
+  protocol - anyone can stand up their own deployment - so "CKAN" names
+  *how* a service talks, not *which* service Avandar is pointed at. HDX
+  (the Humanitarian Data Exchange, `data.humdata.org`) is the actual
+  service, which happens to run CKAN as its software.
+- Socrata gets one pipeline, `socrata`, because Socrata genuinely is one
+  federated service with many portals (drives) underneath it - there is a
+  real cross-drive Discovery API above any one portal (see "Connector vs.
+  the drives it talks to" above). CKAN has no such federated layer: each
+  deployment is its own island, so a second CKAN deployment, if Avandar
+  ever adds one, gets its **own** separate pipeline rather than joining
+  `hdx`'s drive list, even though both speak the same protocol.
+- This is why `hdx`'s own drive config (`hdxDrive.ts`) is a single
+  optional value, not a `ConfiguredDrive[]` registry: a list implies a
+  second drive this pipeline will never have. `socrata`'s registry
+  (`configuredDrives.ts`) stays an array, because Socrata genuinely has
+  many independent drives.
+
 ## Open Data Catalog, "catalog", and "drive index" are three different words
 
 These three are easy to conflate and must not be:
 
 - **Open Data Catalog** (capitalized, a proper noun) is one specific Avandar
-  product surface: the `catalog_listings__open_data` table plus its browsing
+  product surface: the `data_catalog_listings` table plus its browsing
   UI, listing every freely available public dataset Avandar has vetted and
   made addable to any workspace, regardless of which connector or protocol
   serves it underneath (`pipeline_parquet` today, CKAN's `api_resource` today,
   a future Socrata `api_resource`). It is shared across every workspace, not
-  workspace-scoped. Its rows are **listings** (`OpenDataCatalogListing`) -
+  workspace-scoped. Its rows are **listings** (`DataCatalogListing`) -
   see "Relation vs. dataset" above for why a listing is a relation, not a
   dataset, until some workspace adopts it.
 - **A drive index** (lower case, a generic shape, defined above) is a
@@ -288,8 +335,8 @@ These three are easy to conflate and must not be:
 - **"Catalog"** used alone, with neither qualifier, is ambiguous and should be
   avoided in code, schema, and docs from here on. Say "the Open Data Catalog"
   or "the <drive>'s drive index" - never bare "catalog" - once both concepts
-  exist side by side. `catalog_listings__open_data` and
-  `OpenDataCatalogListing` keep "catalog" in their own names because they
+  exist side by side. `data_catalog_listings` and
+  `DataCatalogListing` keep "catalog" in their own names because they
   name the Open Data Catalog specifically, not because "catalog" alone is
   ambiguous there - the `open_data`/`OpenData` qualifier is what resolves it.
 
