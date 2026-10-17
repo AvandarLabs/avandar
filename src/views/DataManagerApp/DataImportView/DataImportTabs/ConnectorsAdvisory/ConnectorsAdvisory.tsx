@@ -4,6 +4,7 @@ import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
+import classes from "./ConnectorsAdvisory.module.css";
 
 /**
  * Standing advisory for the Connectors tab, shared across every connector
@@ -28,7 +29,7 @@ export function ConnectorsAdvisory(): JSX.Element {
           c="primary"
           fz="xs"
           fw={500}
-          style={{ verticalAlign: "baseline" }}
+          className={classes.feedbackLink}
           onClick={() => {
             openFeaturebaseFeedbackWidget({
               boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
