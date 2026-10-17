@@ -316,22 +316,155 @@ real and keeps the version-token race (two workspaces' requests landing
 inside the "is this stale" window at the same time) inside one process
 instead of two browsers.
 
-## 6. Metacatalog: live, not prebuilt, for v1
+## 6. Metacatalog: prebuilt, from a hardcoded list of drives
 
-Verified: `api.us.socrata.com/api/catalog/v1?q=measles` returned results from
-both `data.cityofnewyork.us` and `data.cdc.gov` in one call - a single
-federated index Socrata already runs across every opted-in portal, CORS-open,
-supporting a domain-scoped search (`?domains=data.cityofnewyork.us`) for
-searching within one already-chosen drive. This is a real, live metacatalog
-Avandar does not have to build.
+**Revised 2026-10-16: no longer deferred.** The original version of this
+section called the metacatalog "live, not prebuilt, for v1" and pushed the
+prebuilt shape to future work. That is reversed: Avandar now prebuilds the
+metacatalog for a short, hardcoded list of drives, via a new pipeline. The
+live-search capability this section previously described
+(`SocrataDiscoveryClient`) is not removed - it is still the right tool for
+letting a human *pick which drives to add* to that list - but it is no longer
+how a workspace finds a candidate dataset to query. That now comes from
+`catalog_entries__open_data` rows a pipeline already wrote.
 
-`SocrataDiscoveryClient` wraps two jobs against this one API: drive search
-(free text or `?domains=`, "is there a Chicago portal") and relation search
-within a chosen drive (`?domains=<drive>&q=...`, "is there a measles dataset
-here"). No prebuild for v1. A prebuilt regional slice
-(`connector-nomenclature.md`'s "Prebuilt" metacatalog shape) stays documented
-future work, for if the live API ever proves rate-limited or too slow for a
-picker UI, not a v1 requirement.
+**Why prebuilt now:** there is currently no way to get an `api_resource` row
+into `catalog_entries__open_data` at all - no pipeline, no admin UI, no CLI
+command. A `pipeline_parquet` row gets there because a pipeline writes it;
+an `api_resource` row had no equivalent path. Building that path as "a
+pipeline that enumerates a drive and upserts rows" is strictly simpler than
+building a live picker UI with its own query/pagination/caching concerns, and
+it reuses infrastructure (`ava pipeline run <name>`, the `pipeline-server`
+app) that already exists for exactly this kind of scheduled, code-reviewed,
+re-runnable job.
+
+### 6.1 Both CKAN and Socrata have drives
+
+`connector-nomenclature.md` already names both: "A Socrata open-data portal's
+base URL (e.g. `data.cityofnewyork.us`)" and "A CKAN deployment's base URL
+(e.g. `data.humdata.org`)" are both layer-0 drive examples. The difference
+between them is not whether a drive exists - it is whether there is a
+federated index *across* drives:
+
+| | Socrata | CKAN |
+| --- | --- | --- |
+| One drive | One portal's base URL (`data.cityofnewyork.us`) | One deployment's base URL (`data.humdata.org`) |
+| Enumerate everything in one drive | `SocrataDiscoveryClient.search({domains: [drive]})` with no query (new - see 6.3) | `package_list` action against that one deployment (new - `CkanDiscoveryClient`, see 6.3) |
+| Enumerate across drives in one call | Yes - `api.us.socrata.com/api/catalog/v1`, CORS-open, federates every opted-in portal | No - each CKAN deployment only knows its own datasets; there is no cross-deployment CKAN index |
+
+So the pipeline's drive registry (6.2) always enumerates one drive at a time
+for both services. Socrata's cross-drive discovery stays useful for a human
+deciding *which* drives to add to that registry - "is there a Chicago
+portal" - but the pipeline itself never relies on it, since it already knows
+which drives to enumerate.
+
+### 6.2 The drive registry
+
+A new hardcoded list, `apps/pipeline-server/pipelines/open-data-metacatalog/configuredDrives.ts`:
+
+```ts
+export type ConfiguredDrive = {
+  apiService: "ckan" | "socrata";
+  baseUrl: string;
+  /**
+   * Used as every discovered dataset's `external_organization_name`. Neither
+   * client parses an organization field from its own API today (CKAN's
+   * `package_show` has one, Socrata's Discovery API has a different one, and
+   * the two are not alike enough to normalize), so the registry names it
+   * once per drive instead of extending either client's schema just for
+   * this.
+   */
+  organizationName: string;
+};
+
+export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
+  // A handful of entries, picked by whoever maintains this Avandar
+  // deployment. A fork maintains its own list.
+];
+```
+
+This is the "short list of drives" - a handful of entries, not thousands of
+per-dataset rows. Adding a new drive is a one-line addition here, not a
+schema change or a new connector.
+
+### 6.3 New discovery capabilities needed
+
+Neither existing client can enumerate "everything in this drive" today:
+
+- **`SocrataDiscoveryClient.search()` requires a non-empty `query`.** Real
+  Socrata Discovery API calls can omit `q` entirely to list a domain's full
+  catalog; this client's signature does not allow that yet. Widen `query` to
+  optional (backward compatible - nothing besides its own test file calls
+  this method today).
+- **CKAN has no listing client at all.** `CkanClient` only reads one *named*
+  dataset (`getPackage`). A new `CkanDiscoveryClient`, mirroring
+  `SocrataDiscoveryClient`'s separate-module shape, wraps CKAN's
+  `package_list` action (`GET {baseUrl}/api/3/action/package_list`) to
+  return every dataset slug in one drive. `package_list` takes no domain
+  parameter - a CKAN drive has nothing else to scope by, matching 6.1.
+
+### 6.4 Which resources become rows
+
+Socrata and CKAN differ here too, for the same reason `connector-nomenclature.md`
+already gives: a Socrata dataset does not subdivide, so dataset and resource
+are the same object (layer 1 and layer 2 collapse); a CKAN dataset routinely
+lists several resources side by side.
+
+- **Socrata:** one discovered dataset is one catalog row.
+  `api_resource_format` is always `"CSV"` - not read from any metadata field,
+  because `SocrataClient.getRows` always fetches the `.csv` export
+  regardless of what else the dataset offers, so `"CSV"` is simply what this
+  row will actually be read as.
+- **CKAN:** one discovered dataset can become zero, one, or several catalog
+  rows - one per resource that passes the exact same readability filter
+  `getCkanResourceFromPackage.ts` already enforces at acquisition time
+  (format is `csv` or `parquet`, case-insensitively, and `url_type ===
+  "upload"`). That filter is extracted out of `getCkanResourceFromPackage.ts`
+  into an exported, reusable predicate so the pipeline and the acquisition
+  path can never drift out of sync on what counts as readable.
+
+### 6.5 Upsert semantics
+
+The pipeline writes rows with `access_kind: 'api_resource'`, hand-built as
+plain snake_case objects, matching the existing (not `@avandar/models`-based)
+convention `apps/pipeline-server/pipelines/world-bank__wdi/catalogOpenDataInsert.ts`
+already uses for `pipeline_parquet` rows. It upserts against the existing
+partial unique index:
+
+```sql
+-- already exists, from section 4 / the original schema:
+create unique index catalog_entries__open_data__api_resource_unique on public.catalog_entries__open_data (
+  api_service, api_base_url, external_dataset_id, api_resource_id
+) where access_kind = 'api_resource';
+```
+
+Re-running the pipeline is safe and idempotent: a dataset's `display_name`,
+`external_organization_name`, or `api_resource_format` can change on a
+re-run (upstream renamed something), but **the upserted row objects never
+include `cached_object_path`, `cached_source_version`, or `cached_at`** - so
+those columns are left untouched by the upsert for every row that already
+has a cache, and stay `null` for every row that doesn't. The write-back
+cache (section 5) is completely unaffected by this pipeline; it still
+populates on the first live query, exactly as before.
+
+**Deliberately deferred:** the pipeline is additive-only. If a drive stops
+listing a dataset it previously had, the pipeline does not prune or
+deactivate that dataset's row. Handling removal (a status column, a
+last-seen timestamp, a prune pass) is future work, not required for a short,
+hand-curated drive list where removal is rare and can be handled by hand
+when it happens.
+
+### 6.6 Where this runs
+
+A new pipeline, `apps/pipeline-server/pipelines/open-data-metacatalog/`,
+discoverable and runnable the same way `world-bank__wdi` already is (`ava
+pipeline run open-data-metacatalog` - presence of `run.ts` is the only
+registration step this repo requires). Unlike every pipeline that exists
+today, it does not use `EtlEngine.create(...)`: that abstraction is for
+extracting, transforming, and loading *data* into Parquet, and this pipeline
+does neither - it only enumerates drives and upserts metadata rows. Its
+`run.ts` is a plain async function for that reason, not a deviation anyone
+needs to reconcile with the EtlEngine pattern later.
 
 ## 7. What this spec builds vs. what it does not
 
@@ -346,6 +479,11 @@ picker UI, not a v1 requirement.
   new `open-data-catalog` bucket and `AvandarSupabaseStorageClient`.
 - The `shared/open-data/` to `shared/connectors/open-data/` rename.
 - The `external-datasets` to `connectors` edge function rename.
+- The prebuilt metacatalog pipeline (section 6): `CkanDiscoveryClient`;
+  widening `SocrataDiscoveryClient.search()`'s `query` to optional; the
+  `open-data-metacatalog` pipeline and its hardcoded drive registry;
+  extracting `getCkanResourceFromPackage.ts`'s readable-resource filter into
+  a reusable, exported predicate.
 
 **Explicitly deferred, not designed here, tracked in Linear and in
 `production-plan-world-humanitarian-day.md`:**
@@ -357,8 +495,8 @@ picker UI, not a v1 requirement.
    multi-account Google Sheets support (a real `drive` entity, today
    implicit) and a Postgres server-level drive above today's one-database-per-
    connection shape.
-3. A prebuilt Socrata metacatalog slice (section 6), should the live Discovery
-   API prove insufficient.
+3. Pruning or deactivating a metacatalog row once its drive stops listing the
+   dataset (section 6.5) - the pipeline is additive-only for now.
 4. Unifying `DatasetParquetStorageClient`, `DatasetOriginalFileStorageClient`,
    and `PublicDatasetParquetStorageClient` onto `AvandarSupabaseStorageClient`
    (or a sibling client with a richer transport). Section 3's module-layout
@@ -384,6 +522,10 @@ Following `qetl-architecture.md` section 12's table shape:
 | `SocrataClient`/`SocrataDiscoveryClient` against a faked HTTP layer, no network | mirrors `CkanClient.test.ts`'s shape |
 | CHECK constraints: cache columns are all-null or all-set; never set on a `pipeline_parquet` row | pgTAP, mirroring `catalog_entries_open_data_access.test.sql` |
 | The `connectors` edge function rename does not change any route's behavior, only its path prefix | existing Postgres connector e2e spec, updated for the new prefix |
+| `CkanDiscoveryClient` lists every dataset slug in one drive, no network | unit test against a faked HTTP layer, mirrors `SocrataDiscoveryClient.test.ts`'s shape |
+| `SocrataDiscoveryClient.search()` with no `query` lists a domain's full catalog | extends `SocrataDiscoveryClient.test.ts` |
+| The open-data-metacatalog pipeline upserts one row per qualifying CKAN resource and one row per Socrata dataset, using the shared readable-resource predicate | unit test on the pipeline's pure row-building functions, no network or DB |
+| Re-running the pipeline never overwrites an existing row's cache columns | unit test asserting the upserted row object never carries `cached_*` keys |
 
 ## 9. Related documents
 
