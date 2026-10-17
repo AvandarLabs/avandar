@@ -1,18 +1,16 @@
 import { useMutation } from "@avandar/query-hooks";
-import { MIMEType, propEq } from "@avandar/utils";
+import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useState } from "react";
-import { uuid } from "$/lib/uuid";
-import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
-import { APIClient } from "@/clients/APIClient";
 import { DatabaseConnectionClient } from "@/clients/connections/DatabaseConnectionClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { Logger } from "@/utils/Logger";
 import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/copy/postgresConnectorImportErrorCopy";
+import { listPostgresRelations } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/listPostgresRelations";
+import { previewPostgresRelation } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/previewPostgresRelation";
+import { testAndSavePostgresConnection } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { PostgresDatabaseConnectionWithDetails } from "@/clients/connections/DatabaseConnectionClient";
 import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
@@ -129,7 +127,7 @@ function _getMostRecentConnection(
  * that's `useSaveDataset`.
  */
 export function useLoadPostgresTable(): PostgresTableLoad {
-  const { t, i18n } = useLingui();
+  const { i18n } = useLingui();
   const workspace = useCurrentWorkspace();
 
   const [savedConnections, isLoadingSavedConnections] =
@@ -150,22 +148,8 @@ export function useLoadPostgresTable(): PostgresTableLoad {
   >();
 
   const [listRelations, isLoadingRelations] = useMutation({
-    mutationFn: async (params: {
-      connectionId: DatabaseConnection.Id;
-    }): Promise<ConnectorRelation[]> => {
-      const result = await APIClient.get({
-        route: "connectors/:connectorType/connections/:connectionId/relations",
-        pathParams: {
-          connectorType: "postgres",
-          connectionId: params.connectionId,
-        },
-      });
-      if ("error" in result) {
-        throw Object.assign(new Error(result.error.message), {
-          code: result.error.code,
-        });
-      }
-      return result.relations;
+    mutationFn: (params: { connectionId: DatabaseConnection.Id }) => {
+      return listPostgresRelations(params.connectionId);
     },
     onSuccess: (newRelations) => {
       setConnectionError(undefined);
@@ -204,50 +188,12 @@ export function useLoadPostgresTable(): PostgresTableLoad {
   );
 
   const [submitConnectionForm, isTestingConnection] = useMutation({
-    mutationFn: async (
-      values: PostgresConnectionFormValues,
-    ): Promise<{
-      connectionId: string;
-      relations: ConnectorRelation[];
-    }> => {
-      const jobId = JobProgressStore.startJob(t`Connecting to database`);
-      try {
-        JobProgressStore.updateJob(jobId, {
-          status: "indeterminate",
-          label: t`Connecting to database`,
-          detail: t`Listing tables...`,
-        });
-        const result = await APIClient.post({
-          route: "connectors/:connectorType/connections/test-and-save",
-          pathParams: { connectorType: "postgres" },
-          body: {
-            workspaceId: workspace.id,
-            name: values.name,
-            host: values.host,
-            port: values.port,
-            databaseName: values.databaseName,
-            username: values.username,
-            password: values.password,
-            sslMode: values.sslMode,
-          },
-        });
-        if ("error" in result) {
-          JobProgressStore.failJob(jobId, result.error.message);
-          throw Object.assign(new Error(result.error.message), {
-            code: result.error.code,
-          });
-        }
-        JobProgressStore.finishJob(jobId);
-        return result;
-      } catch (error) {
-        if (!(error instanceof Error && "code" in error)) {
-          JobProgressStore.failJob(
-            jobId,
-            error instanceof Error ? error.message : String(error),
-          );
-        }
-        throw error;
-      }
+    mutationFn: (values: PostgresConnectionFormValues) => {
+      return testAndSavePostgresConnection({
+        workspaceId: workspace.id,
+        values,
+        i18n,
+      });
     },
     onSuccess: (result) => {
       setConnectionError(undefined);
@@ -266,93 +212,10 @@ export function useLoadPostgresTable(): PostgresTableLoad {
   });
 
   const [previewRelation, isLoadingPreview] = useMutation({
-    mutationFn: async (params: {
-      connectionId: DatabaseConnection.Id;
-      relationId: string;
-      relationKind: PostgresTableDataset.RelationKind;
-    }): Promise<void> => {
-      const result = await APIClient.get({
-        route:
-          "connectors/:connectorType/connections/:connectionId/relations/:relationId/preview",
-        pathParams: {
-          connectorType: "postgres",
-          connectionId: params.connectionId,
-          relationId: encodeURIComponent(params.relationId),
-        },
-      });
-      if ("error" in result) {
-        throw Object.assign(new Error(result.error.message), {
-          code: result.error.code,
-        });
-      }
-      const split = PostgresRelationId.splitRelationId(params.relationId);
-      if (!split) {
-        throw new Error(`Unexpected relation id '${params.relationId}'`);
-      }
-      const { schemaName, tableName } = split;
-      const newDatasetId = uuid() as Dataset.Id;
+    mutationFn: previewPostgresRelation,
+    onSuccess: (metadata) => {
       setConnectionError(undefined);
-      setDataSourceMetadata({
-        sourceType: "postgres_table",
-        connectionId: params.connectionId,
-        datasetLoadResult: {
-          datasetId: newDatasetId,
-          numRows: result.previewRows.length,
-          type: "csv",
-          id: uuid(),
-          csvName: `${schemaName}.${tableName}.csv`,
-          // The real Postgres table/view name - there is no local DuckDB
-          // view to name at import time (unlike Sheets, nothing here calls
-          // `DuckDbClient.loadCsv`; that only happens later, at acquire
-          // time, in `acquirePostgresTableRelation`).
-          tableName,
-          numRejectedRows: 0,
-          errors: { rejectedScans: [], rejectedRows: [] },
-          // Cosmetic for this preview only - not a real sniff, since
-          // Postgres's column types already come from `information_schema`
-          // (`result.columns` below), not from DuckDB auto-detection. The
-          // real transcode at acquire time runs its own real sniff.
-          csvSniff: {
-            Delimiter: ",",
-            Quote: '"',
-            Escape: '"',
-            NewLineDelimiter: "\n",
-            Comment: "",
-            SkipRows: 0,
-            HasHeader: true,
-            Columns: result.columns.map((column) => {
-              return { name: column.columnName, type: "VARCHAR" };
-            }),
-            DateFormat: null,
-            TimestampFormat: null,
-            UserArguments: "",
-            Prompt: "",
-            table_name: newDatasetId,
-          },
-          schemaName,
-          relationKind: params.relationKind,
-          previewRows: result.previewRows,
-          columns: result.columns.map((column) => {
-            return {
-              column_name: column.columnName,
-              // Postgres's `information_schema.data_type` string (e.g.
-              // "integer"), not a real DuckDB type - good enough for this
-              // preview table's column headers; the acquire-time transcode
-              // infers real DuckDB types independently.
-              column_type: "VARCHAR",
-              default: undefined,
-              extra: null,
-              key: null,
-              null: "YES",
-            };
-          }),
-          // No parquet yet at import time - the acquire-time transcode
-          // produces the real bytes later, same reasoning as the DuckDB
-          // view name above.
-          parquetData: new Blob([], { type: MIMEType.APPLICATION_PARQUET }),
-        },
-        parseOptions: { type: "postgres_table" },
-      });
+      setDataSourceMetadata(metadata);
     },
     onError: (error) => {
       Logger.error(error, { devMsg: "Failed to preview Postgres relation" });

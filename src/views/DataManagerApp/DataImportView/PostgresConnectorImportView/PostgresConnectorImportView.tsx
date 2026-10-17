@@ -16,8 +16,8 @@ import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
 import { formatSavedConnectionLabel } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/formatSavedConnectionLabel";
-import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
-import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
+import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
+import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLoadPostgresTable";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 
