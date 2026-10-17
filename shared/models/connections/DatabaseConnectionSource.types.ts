@@ -1,4 +1,4 @@
-import type { DatabaseConnectionType } from "$/models/connections/DatabaseConnection.types.ts";
+import type { DatabaseConnectionType } from "$/models/connections/DatabaseConnection/DatabaseConnection.types.ts";
 import type { PostgresDatabaseConnectionModel } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection.types.ts";
 
 /**

@@ -19,7 +19,7 @@ import { formatSavedConnectionLabel } from "@/views/DataManagerApp/DataImportVie
 import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
 import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatabaseConnection } from "$/models/connections/DatabaseConnection";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 
 type Props = BoxProps & {
   /**

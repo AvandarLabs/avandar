@@ -5,7 +5,7 @@ import { z } from "zod";
 import type {
   DatabaseConnectionId,
   DatabaseConnectionModel,
-} from "$/models/connections/DatabaseConnection.types.ts";
+} from "$/models/connections/DatabaseConnection/DatabaseConnection.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Expect } from "@avandar/utils";

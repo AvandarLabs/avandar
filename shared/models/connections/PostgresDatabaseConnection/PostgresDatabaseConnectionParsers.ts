@@ -2,7 +2,7 @@ import { makeParserRegistry } from "@avandar/clients";
 import { Model } from "@avandar/models";
 import { camelCaseKeysDeep, nullsToUndefinedDeep, pipe } from "@avandar/utils";
 import { z } from "zod";
-import type { DatabaseConnectionId } from "$/models/connections/DatabaseConnection.types.ts";
+import type { DatabaseConnectionId } from "$/models/connections/DatabaseConnection/DatabaseConnection.types.ts";
 import type {
   PostgresDatabaseConnectionModel,
   VaultSecretId,

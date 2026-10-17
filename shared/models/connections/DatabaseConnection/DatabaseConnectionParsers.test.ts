@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
-import { DatabaseConnectionParsers } from "$/models/connections/DatabaseConnectionParsers.ts";
-import type { DatabaseConnection } from "$/models/connections/DatabaseConnection.ts";
+import { DatabaseConnectionParsers } from "$/models/connections/DatabaseConnection/DatabaseConnectionParsers.ts";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 function _dbRow(

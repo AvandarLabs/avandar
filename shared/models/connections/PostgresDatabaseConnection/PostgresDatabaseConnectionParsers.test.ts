@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { PostgresDatabaseConnectionParsers } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnectionParsers.ts";
-import type { DatabaseConnection } from "$/models/connections/DatabaseConnection.ts";
+import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection.ts";
 import type {
   PostgresDatabaseConnection,
   VaultSecretId,
