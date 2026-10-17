@@ -129,7 +129,7 @@ describe("PostgresConnectorImportView", () => {
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
   });
 
-  it("tests, saves, lists tables and imports one on a successful connection", async () => {
+  it("creates a dataset by connecting, picking a table, and saving", async () => {
     apiPostMock.mockResolvedValue({
       connectionId: "10000000-0000-4000-8000-000000000001",
       relations: [

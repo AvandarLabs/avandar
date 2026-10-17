@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { PostgresDatabaseConnectionParsers } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnectionParsers.ts";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection.ts";
@@ -45,8 +46,7 @@ describe("PostgresDatabaseConnectionParsers", () => {
   });
 
   it("refuses to build an insert payload from client code", () => {
-    const insert: PostgresDatabaseConnection.T<"Insert"> = {
-      __type: "PostgresDatabaseConnection",
+    const insert = Model.make("PostgresDatabaseConnection", {
       connectionId: "11111111-1111-4111-8111-111111111111" as DatabaseConnection.Id,
       databaseName: "reporting",
       host: "db.example.org",
@@ -55,7 +55,7 @@ describe("PostgresDatabaseConnectionParsers", () => {
       username: "readonly_user",
       vaultSecretId: "22222222-2222-4222-8222-222222222222" as VaultSecretId,
       workspaceId: "33333333-3333-4333-8333-333333333333" as Workspace.Id,
-    };
+    });
 
     expect(() => {
       PostgresDatabaseConnectionParsers.fromModelInsertToDBInsert(insert);
