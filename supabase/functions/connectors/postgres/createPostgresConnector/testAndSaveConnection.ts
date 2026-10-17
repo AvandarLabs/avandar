@@ -5,7 +5,7 @@ import {
   type ConnectorRelation,
 } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
-import { listCatalogRelations } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
+import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
 import { fetchConnectionRow } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import {
@@ -49,7 +49,7 @@ export async function testAndSaveConnection(
       }),
     );
 
-    const relations = await listCatalogRelations(sql);
+    const relations = await PostgresCatalog.listCatalogRelations(sql);
     const nowIso = new Date().toISOString();
     const connectionId = input.connectionId
       ? await _rotateConnection(context, input.connectionId, input, nowIso)

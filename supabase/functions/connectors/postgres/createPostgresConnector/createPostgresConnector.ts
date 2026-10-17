@@ -3,11 +3,7 @@ import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.
 import { ConnectorError, type Connector } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
 import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres.ts";
-import {
-  assertRelationStillExists,
-  listCatalogRelations,
-  parseRelationId,
-} from "@sbfn/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
+import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
 import { openSavedConnection } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
@@ -171,7 +167,7 @@ export function createPostgresConnector(
           connect,
           assertHostIsSafeToConnect,
         }));
-        const relations = await listCatalogRelations(sql);
+        const relations = await PostgresCatalog.listCatalogRelations(sql);
         await context.supabaseAdminClient
           .from("connections__postgres")
           .update({ last_verified_at: new Date().toISOString() })
@@ -189,7 +185,8 @@ export function createPostgresConnector(
     },
 
     previewRelation: async (context, connectionId, relationId) => {
-      const { schemaName, tableName } = parseRelationId(relationId);
+      const { schemaName, tableName } =
+        PostgresCatalog.parseRelationId(relationId);
       let sql: PostgresSql | undefined;
       try {
         ({ sql } = await openSavedConnection(context, {
@@ -197,7 +194,11 @@ export function createPostgresConnector(
           connect,
           assertHostIsSafeToConnect,
         }));
-        await assertRelationStillExists(sql, schemaName, tableName);
+        await PostgresCatalog.assertRelationStillExists(
+          sql,
+          schemaName,
+          tableName,
+        );
 
         const columns = await sql<{
           column_name: string;
@@ -243,7 +244,8 @@ export function createPostgresConnector(
     },
 
     getRelationRows: async (context, connectionId, relationId) => {
-      const { schemaName, tableName } = parseRelationId(relationId);
+      const { schemaName, tableName } =
+        PostgresCatalog.parseRelationId(relationId);
       let sql: PostgresSql | undefined;
       try {
         ({ sql } = await openSavedConnection(context, {
@@ -251,7 +253,11 @@ export function createPostgresConnector(
           connect,
           assertHostIsSafeToConnect,
         }));
-        await assertRelationStillExists(sql, schemaName, tableName);
+        await PostgresCatalog.assertRelationStillExists(
+          sql,
+          schemaName,
+          tableName,
+        );
         return await _readRelationRowsWithinCaps(sql, schemaName, tableName);
       } catch (error) {
         if (error instanceof ConnectorError) {

@@ -20,7 +20,7 @@ function _makeRelationFromCatalogRow(row: {
 }
 
 /** Lists every table and view a connection can see, across every schema. */
-export async function listCatalogRelations(
+async function _listCatalogRelations(
   sql: PostgresSql,
 ): Promise<ConnectorRelation[]> {
   const rows = await sql<{
@@ -41,7 +41,7 @@ export async function listCatalogRelations(
  * relation is never trusted to still exist - it may have been dropped or
  * renamed since the picker loaded it.
  */
-export async function assertRelationStillExists(
+async function _assertRelationStillExists(
   sql: PostgresSql,
   schemaName: string,
   tableName: string,
@@ -68,7 +68,7 @@ export async function assertRelationStillExists(
  * every caller in this edge function already expects a thrown failure, the
  * same shape every other malformed-input case here produces.
  */
-export function parseRelationId(relationId: string): {
+function _parseRelationId(relationId: string): {
   schemaName: string;
   tableName: string;
 } {
@@ -81,3 +81,10 @@ export function parseRelationId(relationId: string): {
   }
   return split;
 }
+
+/** Reads and validates Postgres catalog relations for a saved connection. */
+export const PostgresCatalog = {
+  listCatalogRelations: _listCatalogRelations,
+  assertRelationStillExists: _assertRelationStillExists,
+  parseRelationId: _parseRelationId,
+};
