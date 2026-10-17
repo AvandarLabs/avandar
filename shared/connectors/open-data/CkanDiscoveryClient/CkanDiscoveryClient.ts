@@ -1,8 +1,8 @@
 import { CkanEnvelopeSchema } from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
 import { CkanPackageListResultSchema } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.schemas.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
-import type { CkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
+import type { CkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types.ts";
 
 /** CKAN's action API path, the same on every deployment. */
 const ACTION_PATH = "/api/3/action";
