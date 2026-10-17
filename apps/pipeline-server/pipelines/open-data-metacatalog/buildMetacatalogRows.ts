@@ -1,6 +1,6 @@
-import { isReadableCkanResource } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
-import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
-import type { SocrataDiscoveryResult } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types.ts";
+import { isReadableCkanResource } from "$/connectors/open-data/getCkanResourceFromPackage";
+import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
+import type { SocrataDiscoveryResult } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
 import type { ConfiguredDrive } from "@pipelines/open-data-metacatalog/configuredDrives";
 
 /**

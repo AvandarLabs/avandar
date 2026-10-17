@@ -3,8 +3,8 @@ import {
   buildSocrataMetacatalogRow,
 } from "@pipelines/open-data-metacatalog/buildMetacatalogRows";
 import { describe, expect, it } from "vitest";
-import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
-import type { SocrataDiscoveryResult } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types.ts";
+import type { CkanPackage } from "$/connectors/open-data/CkanClient/CkanClient.types";
+import type { SocrataDiscoveryResult } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
 import type { ConfiguredDrive } from "@pipelines/open-data-metacatalog/configuredDrives";
 
 const CKAN_DRIVE: ConfiguredDrive = {
