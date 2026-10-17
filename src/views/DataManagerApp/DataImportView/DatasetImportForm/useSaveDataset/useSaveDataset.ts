@@ -13,11 +13,11 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedPayloadFromSaveResult/makeDatasetImportedPayloadFromSaveResult";
-import { saveCsvDataset } from "./saveCsvDataset/saveCsvDataset";
-import { saveGoogleSheetsDataset } from "./saveGoogleSheetsDataset/saveGoogleSheetsDataset";
-import { savePdfDataset } from "./savePdfDataset/savePdfDataset";
-import { savePostgresTableDataset } from "./savePostgresTableDataset/savePostgresTableDataset";
-import { saveXlsxDataset } from "./saveXlsxDataset/saveXlsxDataset";
+import { saveCsvDataset } from "./saveCsvDataset";
+import { saveGoogleSheetsDataset } from "./saveGoogleSheetsDataset";
+import { savePdfDataset } from "./savePdfDataset";
+import { savePostgresTableDataset } from "./savePostgresTableDataset";
+import { saveXlsxDataset } from "./saveXlsxDataset";
 import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded/startOriginalFileUploadIfNeeded";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {

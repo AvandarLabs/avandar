@@ -3,10 +3,10 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
 import { makePdfTableFingerprintFromTable } from "@/clients/datasets/pdfTableFingerprint/pdfTableFingerprint";
-import { duckDbColumnsToImportedColumns } from "../duckDbColumnsToImportedColumns/duckDbColumnsToImportedColumns";
-import type { DatasetInsertContext } from "../useSaveDataset";
+import { duckDbColumnsToImportedColumns } from "./duckDbColumnsToImportedColumns";
+import type { DatasetInsertContext } from "./useSaveDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DataSourceMetadata } from "../../DatasetImportForm.types";
+import type { DataSourceMetadata } from "../DatasetImportForm.types";
 
 /** Inserts a dataset backed by a reviewed PDF table extraction. */
 export async function savePdfDataset(
