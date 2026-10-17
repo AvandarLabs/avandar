@@ -46,6 +46,7 @@ export type PostgresConnectionError = {
   message: string;
 };
 
+/** `useLoadPostgresTable`'s return value: connection/relation/preview state. */
 export type PostgresTableLoad = {
   /** Every saved Postgres connection in this workspace, for the picker. */
   savedConnections: PostgresDatabaseConnectionWithDetails[] | undefined;
@@ -107,7 +108,7 @@ function _isPostgresRelationKind(
  * The saved connection most recently verified, or most recently created if
  * none has been.
  */
-function _mostRecentConnection(
+function _getMostRecentConnection(
   connections: readonly PostgresDatabaseConnectionWithDetails[],
 ): PostgresDatabaseConnectionWithDetails | undefined {
   return [...connections].sort((a, b) => {
@@ -193,7 +194,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
         setSelectedConnectionId("new");
         return;
       }
-      const mostRecent = _mostRecentConnection(savedConnections);
+      const mostRecent = _getMostRecentConnection(savedConnections);
       if (mostRecent) {
         setSelectedConnectionId(mostRecent.connection.id);
         listRelations({ connectionId: mostRecent.connection.id });

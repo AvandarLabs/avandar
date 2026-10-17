@@ -1,6 +1,14 @@
 import { makeBucketMap } from "@avandar/utils";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { Box, BoxProps, Button, Loader, Select, Stack, Text } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Loader,
+  Select,
+  Stack,
+  Text,
+  type BoxProps,
+} from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
 import { splitRelationId } from "$/connectors/postgres/postgresRelationId";

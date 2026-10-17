@@ -6,7 +6,7 @@ import {
 import type { ConnectorRelation } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
-function makeRelationFromCatalogRow(row: {
+function _makeRelationFromCatalogRow(row: {
   table_schema: string;
   table_name: string;
   table_type: string;
@@ -33,7 +33,7 @@ export async function listCatalogRelations(
     where table_schema not in ('pg_catalog', 'information_schema')
     order by table_schema, table_name
   `;
-  return rows.map(makeRelationFromCatalogRow);
+  return rows.map(_makeRelationFromCatalogRow);
 }
 
 /**

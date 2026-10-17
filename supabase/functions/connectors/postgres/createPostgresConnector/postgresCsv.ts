@@ -2,7 +2,7 @@
  * A single CSV field, quoted only when it needs to be (a comma, quote, or
  * newline is present).
  */
-function csvField(value: unknown): string {
+function _csvField(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
   }
@@ -23,11 +23,11 @@ export function rowsToCsv(
   columnNames: string[],
   rows: Array<Record<string, unknown>>,
 ): string {
-  const header = columnNames.map(csvField).join(",");
+  const header = columnNames.map(_csvField).join(",");
   const lines = rows.map((row) => {
     return columnNames
       .map((columnName) => {
-        return csvField(row[columnName]);
+        return _csvField(row[columnName]);
       })
       .join(",");
   });

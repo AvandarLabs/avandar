@@ -70,7 +70,9 @@ export async function testAndSaveConnection(
 }
 
 /** Throws a classified `ConnectorError` for a Supabase client error, if any. */
-function _throwIfSupabaseError(error: { message: string } | null): void {
+function _throwIfSupabaseError(
+  error: { message: string } | undefined,
+): void {
   if (error) {
     throw new ConnectorError("unknown", error.message);
   }
@@ -100,14 +102,14 @@ async function _rotateConnection(
       p_workspace_id: context.workspaceId,
     },
   );
-  _throwIfSupabaseError(updateSecretError);
+  _throwIfSupabaseError(updateSecretError ?? undefined);
 
   const { error: updateDbConnectionsError } = await context.supabaseAdminClient
     .from("connections")
     .update({ name: input.name })
     .eq("id", connectionId)
     .eq("workspace_id", context.workspaceId);
-  _throwIfSupabaseError(updateDbConnectionsError);
+  _throwIfSupabaseError(updateDbConnectionsError ?? undefined);
 
   const { error: updatePostgresRowError } = await context.supabaseAdminClient
     .from("connections__postgres")
@@ -121,7 +123,7 @@ async function _rotateConnection(
     })
     .eq("connection_id", connectionId)
     .eq("workspace_id", context.workspaceId);
-  _throwIfSupabaseError(updatePostgresRowError);
+  _throwIfSupabaseError(updatePostgresRowError ?? undefined);
 
   return connectionId;
 }

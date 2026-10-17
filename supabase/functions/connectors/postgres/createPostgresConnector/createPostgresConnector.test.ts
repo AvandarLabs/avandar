@@ -68,8 +68,7 @@ function _makeFakeSupabaseAdminClient() {
         }),
       };
       return builder;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any,
+    }) as unknown as ConnectorContext["supabaseAdminClient"]["from"],
   };
 
   return { client, insertedRows, rpcCalls };
@@ -96,10 +95,8 @@ describe("createPostgresConnector - field parameterization", () => {
       workspaceId: "33333333-3333-3333-3333-333333333333",
       // Not exercised by this connector method - only the admin client
       // matters here.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseAdminClient: client as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     // `host` is deliberately a plain public IP here, not the injection
@@ -164,10 +161,8 @@ describe("createPostgresConnector - field parameterization", () => {
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseAdminClient: client as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     await connector.testAndSaveConnection(context, {
@@ -191,10 +186,8 @@ describe("createPostgresConnector - field parameterization", () => {
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseAdminClient: client as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     await expect(
@@ -219,10 +212,8 @@ describe("createPostgresConnector - field parameterization", () => {
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseAdminClient: client as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     try {
@@ -292,11 +283,12 @@ describe("createPostgresConnector - rolls back an orphaned Vault secret", () => 
           delete: vi.fn(() => {
             return builder;
           }),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any;
+          // `insert` above returns either `builder` itself or a
+          // differently-shaped error object, which TypeScript cannot infer
+          // as one self-referencing object type without this cast.
+        } as unknown as ReturnType<ConnectorContext["supabaseAdminClient"]["from"]>;
         return builder;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }) as any,
+      }) as unknown as ConnectorContext["supabaseAdminClient"]["from"],
     };
 
     return { client, rpcCalls, deletedConnectionIds };
@@ -313,10 +305,8 @@ describe("createPostgresConnector - rolls back an orphaned Vault secret", () => 
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseAdminClient: client as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     await expect(
@@ -394,8 +384,7 @@ describe("createPostgresConnector - SSRF re-check on an already-saved connection
           }),
         };
         return builder;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }) as any,
+      }) as unknown as ConnectorContext["supabaseAdminClient"]["from"],
     };
     return client;
   }
@@ -404,8 +393,7 @@ describe("createPostgresConnector - SSRF re-check on an already-saved connection
     const connector = createPostgresConnector({ connectToPostgres: vi.fn() });
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
       supabaseAdminClient:
         _makeSavedLoopbackConnectionAdminClient() as unknown as ConnectorContext["supabaseAdminClient"],
     };
@@ -470,8 +458,7 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
           }),
         };
         return builder;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }) as any,
+      }) as unknown as ConnectorContext["supabaseAdminClient"]["from"],
     };
     return client;
   }
@@ -525,8 +512,7 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
     const connector = createPostgresConnector({ connectToPostgres });
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
       supabaseAdminClient:
         _makeSavedConnectionAdminClient() as unknown as ConnectorContext["supabaseAdminClient"],
     };
@@ -554,8 +540,7 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
     const connector = createPostgresConnector({ connectToPostgres });
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      supabaseClient: undefined as any,
+      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
       supabaseAdminClient:
         _makeSavedConnectionAdminClient() as unknown as ConnectorContext["supabaseAdminClient"],
     };

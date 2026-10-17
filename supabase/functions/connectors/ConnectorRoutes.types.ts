@@ -5,10 +5,12 @@ import type {
 } from "@sbfn/connectors/Connector.ts";
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
+/** The shared error shape every `connectors` route returns on failure. */
 export type ConnectorErrorResponse = {
   error: { code: ConnectorErrorCode; message: string };
 };
 
+/** HTTP contract for the `connectors` edge function's routes. */
 export type ConnectorsApi = APITypeDef<
   "connectors",
   [
