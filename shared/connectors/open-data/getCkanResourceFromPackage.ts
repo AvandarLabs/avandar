@@ -28,8 +28,14 @@ const HOSTED_FILE_URL_TYPE = "upload";
  * failure code each, collapsed into a single yes/no answer for a caller
  * (the open-data-metacatalog pipeline) that only needs to decide whether to
  * register the resource, not explain why it was skipped.
+ *
+ * Checks only the resource's intrinsic upload-type and format - not whether
+ * its URL's host matches the catalogued `baseUrl`, and not any size ceiling,
+ * both of which `getCkanResourceFromPackage` still separately enforces.
  */
-export function isReadableCkanResource(resource: Readonly<CkanResource>): boolean {
+export function isReadableCkanResource(
+  resource: Readonly<CkanResource>,
+): boolean {
   if (resource.url_type !== HOSTED_FILE_URL_TYPE) {
     return false;
   }

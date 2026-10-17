@@ -372,69 +372,27 @@ describe("getCkanResourceFromPackage", () => {
 describe("isReadableCkanResource", () => {
   it("accepts an uploaded CSV resource", () => {
     expect(
-      isReadableCkanResource({
-        id: "r1",
-        name: "data.csv",
-        format: "CSV",
-        url: "https://data.humdata.org/dataset/x/resource/r1/download/data.csv",
-        url_type: "upload",
-        size: 100,
-        hash: "",
-        last_modified: undefined,
-        mimetype: undefined,
-        datastore_active: false,
-      }),
+      isReadableCkanResource(_resource({ format: "CSV", url_type: "upload" })),
     ).toBe(true);
   });
 
   it("accepts an uploaded Parquet resource regardless of format casing", () => {
     expect(
-      isReadableCkanResource({
-        id: "r2",
-        name: "data.parquet",
-        format: "Parquet",
-        url: "https://data.humdata.org/dataset/x/resource/r2/download/data.parquet",
-        url_type: "upload",
-        size: 100,
-        hash: "",
-        last_modified: undefined,
-        mimetype: undefined,
-        datastore_active: false,
-      }),
+      isReadableCkanResource(
+        _resource({ format: "Parquet", url_type: "upload" }),
+      ),
     ).toBe(true);
   });
 
   it("rejects a resource whose url_type is an upstream api link", () => {
     expect(
-      isReadableCkanResource({
-        id: "r3",
-        name: "api link",
-        format: "CSV",
-        url: "https://upstream.example/api",
-        url_type: "api",
-        size: undefined,
-        hash: "",
-        last_modified: undefined,
-        mimetype: undefined,
-        datastore_active: false,
-      }),
+      isReadableCkanResource(_resource({ format: "CSV", url_type: "api" })),
     ).toBe(false);
   });
 
   it("rejects an uploaded resource in an unsupported format", () => {
     expect(
-      isReadableCkanResource({
-        id: "r4",
-        name: "readme.txt",
-        format: "TXT",
-        url: "https://data.humdata.org/dataset/x/resource/r4/download/readme.txt",
-        url_type: "upload",
-        size: 100,
-        hash: "",
-        last_modified: undefined,
-        mimetype: undefined,
-        datastore_active: false,
-      }),
+      isReadableCkanResource(_resource({ format: "TXT", url_type: "upload" })),
     ).toBe(false);
   });
 });
