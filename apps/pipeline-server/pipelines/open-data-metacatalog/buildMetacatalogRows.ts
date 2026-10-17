@@ -33,7 +33,7 @@ export function buildCkanMetacatalogRows(params: {
   const { drive, ckanPackage } = params;
   return ckanPackage.resources
     .filter(isReadableCkanResource)
-    .map((resource): MetacatalogRow => {
+    .map((resource) => {
       return {
         access_kind: "api_resource",
         api_service: "ckan",
@@ -43,7 +43,7 @@ export function buildCkanMetacatalogRows(params: {
         api_resource_format: resource.format.toUpperCase(),
         display_name: resource.name,
         external_organization_name: drive.organizationName,
-      };
+      } satisfies MetacatalogRow;
     });
 }
 
