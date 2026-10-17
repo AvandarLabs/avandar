@@ -1,5 +1,6 @@
 import { isDefined, matchLiteral } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
 import type {
   DashboardFilterRecord,
   DashboardFilterValue,
@@ -94,7 +95,7 @@ export function applyDashboardFiltersToSql(
   if (whereClauses.length === 0) {
     return sql;
   }
-  const trimmed = sql.trim().replace(/;\s*$/u, "");
+  const trimmed = normalizeSqlForSubquery(sql);
   // Wrap the entire query in a subselect so dashboard filters compose
   // correctly with whatever WHERE/GROUP BY/etc. the inner query already has.
   return `SELECT * FROM (${trimmed}) AS _ava_filtered WHERE ${whereClauses.join(" AND ")}`;
