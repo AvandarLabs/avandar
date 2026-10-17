@@ -1,3 +1,4 @@
+import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
   LegacyQueryFilterGroup,
@@ -88,11 +89,9 @@ function _getBoundRule(
 ): QueryFilterRule {
   const { columnName: _columnName, ...rule } = node;
   const aggregation = clause === "having" ? column.aggregation : undefined;
-  const columnDataType =
-    aggregation === "count"
-      ? "bigint"
-      : aggregation === "avg"
-        ? "double"
-        : column.baseColumn.dataType;
+  const columnDataType = QueryAggregationType.getResultDataType(
+    aggregation,
+    column.baseColumn.dataType,
+  );
   return { ...rule, columnId: column.id, columnDataType };
 }

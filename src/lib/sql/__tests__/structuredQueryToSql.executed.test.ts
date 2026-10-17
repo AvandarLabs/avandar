@@ -17,6 +17,7 @@ import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
+import { resolveFilterColumn } from "$/models/queries/StructuredQuery/structuredQueryToSql/resolveFilterColumn/resolveFilterColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
@@ -298,6 +299,77 @@ describe("structuredQueryToSql executed", () => {
       await expect(
         _runQuery(structuredQueryToSql(mapped.query)),
       ).resolves.toEqual(rows);
+    },
+  );
+
+  it.each([
+    {
+      sourceType: "boolean",
+      values: "(true), (false)",
+      threshold: 1,
+      rows: [],
+      resultType: "bigint",
+    },
+    {
+      sourceType: "boolean",
+      values: "(true), (false)",
+      threshold: 0,
+      rows: [{ total: 1 }],
+      resultType: "bigint",
+    },
+    {
+      sourceType: "bigint",
+      values: "(2147483647::INTEGER), (1::INTEGER)",
+      threshold: 2147483647,
+      rows: [{ total: 2147483648 }],
+      resultType: "bigint",
+    },
+    {
+      sourceType: "double",
+      values: "(0.75::DOUBLE), (0.5::DOUBLE)",
+      threshold: 1,
+      rows: [{ total: 1.25 }],
+      resultType: "double",
+    },
+  ] as const)(
+    "retains numeric HAVING on SUM($sourceType) above $threshold",
+    async ({ sourceType, values, threshold, rows, resultType }) => {
+      const sql = `SELECT SUM(flag) AS total FROM cases HAVING total > ${threshold}`;
+      const mapped = sqlToStructuredQuery({
+        sql,
+        datasets: [
+          {
+            dataset: _makeDataset("cases"),
+            columns: [
+              _makeColumn({ id: "flag", name: "flag", dataType: sourceType })
+                .baseColumn as DatasetColumn.T,
+            ],
+          },
+        ],
+      });
+      expect(mapped.isFullyMapped).toBe(true);
+      await withDuckDb(async (connection) => {
+        await connection.run(
+          `CREATE TABLE cases AS SELECT * FROM (VALUES ${values}) t(flag)`,
+        );
+        const original = await connection.runAndReadAll(sql);
+        const emitted = await connection.runAndReadAll(
+          structuredQueryToSql(mapped.query),
+        );
+        expect(original.getRowObjects().map(_normalizeRow)).toEqual(rows);
+        expect(emitted.getRowObjects().map(_normalizeRow)).toEqual(rows);
+      });
+      const projection = mapped.query.queryColumns[0]!;
+      expect(mapped.query.having.rules[0]).toMatchObject({
+        columnDataType: resultType,
+      });
+      expect(
+        resolveFilterColumn({
+          query: mapped.query,
+          columnId: projection.id,
+          clause: "having",
+        })?.dataType,
+      ).toBe(resultType);
     },
   );
 

@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 
@@ -42,8 +43,49 @@ function _getBufferSourceQueryKey(
   };
 }
 
+function _hasBoundFilterTargets(filters: QueryFilterGroup): boolean {
+  return filters.rules.every((node) => {
+    return node.type === "group"
+      ? _hasBoundFilterTargets(node)
+      : typeof node.columnId === "string";
+  });
+}
+
+function _hasReadySourceFilters(layer: MapLayer.T): boolean {
+  const { filters, having, sourceColumns } = layer.source;
+  return (
+    (filters.rules.length === 0 && having.rules.length === 0) ||
+    (sourceColumns !== undefined &&
+      _hasBoundFilterTargets(filters) &&
+      _hasBoundFilterTargets(having))
+  );
+}
+
 /** Queryability and cache-key helpers for map-layer data. */
 export const MapLayerData = {
+  /**
+   * True when both filter clauses are hydrated for this layer and its buffer
+   * dependencies. Missing sources and cycles retain the compiler's diagnostics.
+   */
+  hasReadySourceFilters: (
+    layer: MapLayer.T,
+    stack: readonly MapLayer.T[],
+  ): boolean => {
+    const visited = new Set<MapLayer.Id>();
+    let current: MapLayer.T | undefined = layer;
+    while (current && !visited.has(current.id)) {
+      if (!_hasReadySourceFilters(current)) {
+        return false;
+      }
+      visited.add(current.id);
+      current =
+        current.geoBinding?.type === "bufferOfLayer"
+          ? stack.find(propEq("id", current.geoBinding.layerId))
+          : undefined;
+    }
+    return true;
+  },
+
   /**
    * True when the layer can compile: a resolvable binding, or a buffer whose
    * source is on the stack.

@@ -1,3 +1,4 @@
+import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import { buildProjectionExpression } from "$/models/queries/StructuredQuery/structuredQueryToSql/buildProjectionExpression/buildProjectionExpression.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
@@ -31,11 +32,9 @@ export function resolveFilterColumn(
   }
   return {
     sql: buildProjectionExpression(column, aggregation),
-    dataType:
-      aggregation === "count"
-        ? "bigint"
-        : aggregation === "avg"
-          ? "double"
-          : column.baseColumn.dataType,
+    dataType: QueryAggregationType.getResultDataType(
+      aggregation,
+      column.baseColumn.dataType,
+    ),
   };
 }

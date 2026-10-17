@@ -293,8 +293,7 @@ function _createLayerQuery(
     enabled:
       MapLayerData.isQueryable(layer, context.layers) &&
       isCapabilityReady &&
-      (layer.source.filters.rules.length === 0 ||
-        layer.source.sourceColumns !== undefined),
+      MapLayerData.hasReadySourceFilters(layer, context.layers),
 
     // `context.zoomBand` is read by `_runLatLngLayer` but only enters the key
     // for a lat/lng layer, which is the only binding that reaches it: every

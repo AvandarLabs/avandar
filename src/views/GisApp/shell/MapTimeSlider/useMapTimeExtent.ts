@@ -3,6 +3,7 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { getMapTimeExtentSql } from "@/clients/maps/MapLayerTimeExtent/getMapTimeExtentSql/getMapTimeExtentSql";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { getIsoInstantFromValue } from "@/views/GisApp/shell/MapTimeSlider/getIsoInstantFromValue/getIsoInstantFromValue";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -19,8 +20,7 @@ function _participatingTimeLayers(
   return layers.flatMap((layer) => {
     if (
       !layer.timeColumn ||
-      (layer.source.filters.rules.length > 0 &&
-        layer.source.sourceColumns === undefined)
+      !MapLayerData.hasReadySourceFilters(layer, layers)
     ) {
       return [];
     }
