@@ -11,7 +11,7 @@ create table public.datasets__open_data (
   -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- Catalog listing this dataset was adopted from
-  catalog_listing_id uuid not null references public.catalog_listings__open_data (id) on update cascade on delete cascade
+  catalog_listing_id uuid not null references public.data_catalog_listings (id) on update cascade on delete cascade
 );
 
 -- Enable row level security

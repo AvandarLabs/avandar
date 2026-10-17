@@ -121,149 +121,6 @@ export type Database = {
           },
         ]
       }
-      catalog_listings__dataset_column: {
-        Row: {
-          cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
-          catalog_listing_id: string
-          column_name: string
-          created_at: string | null
-          display_order: number | null
-          id: string
-          original_data_type: string
-          updated_at: string | null
-        }
-        Insert: {
-          cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
-          catalog_listing_id: string
-          column_name: string
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          original_data_type: string
-          updated_at?: string | null
-        }
-        Update: {
-          cast_data_type?: Database["public"]["Enums"]["datasets__duckdb_data_type"]
-          catalog_listing_id?: string
-          column_name?: string
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          original_data_type?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "catalog_listings__dataset_column_catalog_listing_id_fkey"
-            columns: ["catalog_listing_id"]
-            isOneToOne: false
-            referencedRelation: "catalog_listings__open_data"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      catalog_listings__open_data: {
-        Row: {
-          access_kind: Database["public"]["Enums"]["catalog_listings__open_data__access_kind"]
-          api_base_url: string | null
-          api_resource_format: string | null
-          api_resource_id: string | null
-          api_service:
-            | Database["public"]["Enums"]["catalog_listings__open_data__api_service"]
-            | null
-          cached_at: string | null
-          cached_object_path: string | null
-          cached_source_version: string | null
-          canonical_urls: string[] | null
-          coverage_end_date: string | null
-          coverage_start_date: string | null
-          created_at: string
-          date_of_last_sync: string | null
-          date_of_last_update: string | null
-          description: string | null
-          display_name: string
-          external_dataset_id: string | null
-          external_organization_name: string
-          external_service_name: string | null
-          id: string
-          license: string | null
-          metadata: Json | null
-          notes: string | null
-          parquet_file_name: string | null
-          pipeline_name: string | null
-          pipeline_run_id: string | null
-          source_url: string | null
-          update_frequency: string | null
-          updated_at: string
-        }
-        Insert: {
-          access_kind?: Database["public"]["Enums"]["catalog_listings__open_data__access_kind"]
-          api_base_url?: string | null
-          api_resource_format?: string | null
-          api_resource_id?: string | null
-          api_service?:
-            | Database["public"]["Enums"]["catalog_listings__open_data__api_service"]
-            | null
-          cached_at?: string | null
-          cached_object_path?: string | null
-          cached_source_version?: string | null
-          canonical_urls?: string[] | null
-          coverage_end_date?: string | null
-          coverage_start_date?: string | null
-          created_at?: string
-          date_of_last_sync?: string | null
-          date_of_last_update?: string | null
-          description?: string | null
-          display_name: string
-          external_dataset_id?: string | null
-          external_organization_name: string
-          external_service_name?: string | null
-          id?: string
-          license?: string | null
-          metadata?: Json | null
-          notes?: string | null
-          parquet_file_name?: string | null
-          pipeline_name?: string | null
-          pipeline_run_id?: string | null
-          source_url?: string | null
-          update_frequency?: string | null
-          updated_at?: string
-        }
-        Update: {
-          access_kind?: Database["public"]["Enums"]["catalog_listings__open_data__access_kind"]
-          api_base_url?: string | null
-          api_resource_format?: string | null
-          api_resource_id?: string | null
-          api_service?:
-            | Database["public"]["Enums"]["catalog_listings__open_data__api_service"]
-            | null
-          cached_at?: string | null
-          cached_object_path?: string | null
-          cached_source_version?: string | null
-          canonical_urls?: string[] | null
-          coverage_end_date?: string | null
-          coverage_start_date?: string | null
-          created_at?: string
-          date_of_last_sync?: string | null
-          date_of_last_update?: string | null
-          description?: string | null
-          display_name?: string
-          external_dataset_id?: string | null
-          external_organization_name?: string
-          external_service_name?: string | null
-          id?: string
-          license?: string | null
-          metadata?: Json | null
-          notes?: string | null
-          parquet_file_name?: string | null
-          pipeline_name?: string | null
-          pipeline_run_id?: string | null
-          source_url?: string | null
-          update_frequency?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       concept_attributes: {
         Row: {
           allow_manual_edit: boolean
@@ -463,6 +320,149 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_catalog_listings: {
+        Row: {
+          access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          api_base_url: string | null
+          api_resource_format: string | null
+          api_resource_id: string | null
+          api_service:
+            | Database["public"]["Enums"]["data_catalog_listings__api_service"]
+            | null
+          cached_at: string | null
+          cached_object_path: string | null
+          cached_source_version: string | null
+          canonical_urls: string[] | null
+          coverage_end_date: string | null
+          coverage_start_date: string | null
+          created_at: string
+          date_of_last_sync: string | null
+          date_of_last_update: string | null
+          description: string | null
+          display_name: string
+          external_dataset_id: string | null
+          external_organization_name: string
+          external_service_name: string | null
+          id: string
+          license: string | null
+          metadata: Json | null
+          notes: string | null
+          parquet_file_name: string | null
+          pipeline_name: string | null
+          pipeline_run_id: string | null
+          source_url: string | null
+          update_frequency: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_kind?: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          api_base_url?: string | null
+          api_resource_format?: string | null
+          api_resource_id?: string | null
+          api_service?:
+            | Database["public"]["Enums"]["data_catalog_listings__api_service"]
+            | null
+          cached_at?: string | null
+          cached_object_path?: string | null
+          cached_source_version?: string | null
+          canonical_urls?: string[] | null
+          coverage_end_date?: string | null
+          coverage_start_date?: string | null
+          created_at?: string
+          date_of_last_sync?: string | null
+          date_of_last_update?: string | null
+          description?: string | null
+          display_name: string
+          external_dataset_id?: string | null
+          external_organization_name: string
+          external_service_name?: string | null
+          id?: string
+          license?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          parquet_file_name?: string | null
+          pipeline_name?: string | null
+          pipeline_run_id?: string | null
+          source_url?: string | null
+          update_frequency?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_kind?: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          api_base_url?: string | null
+          api_resource_format?: string | null
+          api_resource_id?: string | null
+          api_service?:
+            | Database["public"]["Enums"]["data_catalog_listings__api_service"]
+            | null
+          cached_at?: string | null
+          cached_object_path?: string | null
+          cached_source_version?: string | null
+          canonical_urls?: string[] | null
+          coverage_end_date?: string | null
+          coverage_start_date?: string | null
+          created_at?: string
+          date_of_last_sync?: string | null
+          date_of_last_update?: string | null
+          description?: string | null
+          display_name?: string
+          external_dataset_id?: string | null
+          external_organization_name?: string
+          external_service_name?: string | null
+          id?: string
+          license?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          parquet_file_name?: string | null
+          pipeline_name?: string | null
+          pipeline_run_id?: string | null
+          source_url?: string | null
+          update_frequency?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      data_catalog_listings__relation_columns: {
+        Row: {
+          cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          catalog_listing_id: string
+          column_name: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          original_data_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          catalog_listing_id: string
+          column_name: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          original_data_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          cast_data_type?: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          catalog_listing_id?: string
+          column_name?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          original_data_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_catalog_listings__relation_columns_catalog_listing_id_fkey"
+            columns: ["catalog_listing_id"]
+            isOneToOne: false
+            referencedRelation: "data_catalog_listings"
             referencedColumns: ["id"]
           },
         ]
@@ -744,7 +744,7 @@ export type Database = {
             foreignKeyName: "datasets__open_data_catalog_listing_id_fkey"
             columns: ["catalog_listing_id"]
             isOneToOne: false
-            referencedRelation: "catalog_listings__open_data"
+            referencedRelation: "data_catalog_listings"
             referencedColumns: ["id"]
           },
           {
@@ -2338,10 +2338,6 @@ export type Database = {
         | "count"
         | "max"
         | "min"
-      catalog_listings__open_data__access_kind:
-        | "pipeline_parquet"
-        | "api_resource"
-      catalog_listings__open_data__api_service: "ckan" | "socrata"
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       dashboard_snapshot_transition_kind:
         | "publish"
@@ -2349,6 +2345,8 @@ export type Database = {
         | "unpublish"
         | "delete"
       dashboard_visibility: "draft" | "workspace" | "public"
+      data_catalog_listings__access_kind: "pipeline_parquet" | "api_resource"
+      data_catalog_listings__api_service: "ckan" | "socrata"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -2592,11 +2590,6 @@ export const Constants = {
         "max",
         "min",
       ],
-      catalog_listings__open_data__access_kind: [
-        "pipeline_parquet",
-        "api_resource",
-      ],
-      catalog_listings__open_data__api_service: ["ckan", "socrata"],
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       dashboard_snapshot_transition_kind: [
         "publish",
@@ -2605,6 +2598,8 @@ export const Constants = {
         "delete",
       ],
       dashboard_visibility: ["draft", "workspace", "public"],
+      data_catalog_listings__access_kind: ["pipeline_parquet", "api_resource"],
+      data_catalog_listings__api_service: ["ckan", "socrata"],
       datasets__ava_data_type: [
         "boolean",
         "bigint",

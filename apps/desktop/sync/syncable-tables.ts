@@ -39,8 +39,8 @@ const ACTIVE_TABLES = [
   "datasets__virtual",
   "datasets__xlsx_file",
   "datasets__postgres_table",
-  "catalog_listings__open_data",
-  "catalog_listings__dataset_column",
+  "data_catalog_listings",
+  "data_catalog_listings__relation_columns",
   "dashboards",
   "concepts",
   "concept_attributes",
@@ -109,13 +109,19 @@ const DEPRECATED_TABLES = [
   "value_extractors__dataset_column_value",
   "value_extractors__manual_entry",
   // Renamed by 20261017112819 ("rename catalog_entries to
-  // catalog_listings"). The old names have to stay recognisable so the
-  // whole pre-rename history, and the rename ALTER TABLEs themselves,
+  // catalog_listings") and then by 20261017121944 ("rename catalog_listings
+  // to data_catalog_listings"). The old names have to stay recognisable so
+  // the whole pre-rename history, and both rename ALTER TABLEs themselves,
   // partition cleanly:
-  //   catalog_entries__open_data    -> catalog_listings__open_data
+  //   catalog_entries__open_data      -> catalog_listings__open_data
+  //                                   -> data_catalog_listings
   //   catalog_entries__dataset_column -> catalog_listings__dataset_column
+  //                                   -> data_catalog_listings
+  //                                      __relation_columns
   "catalog_entries__open_data",
   "catalog_entries__dataset_column",
+  "catalog_listings__open_data",
+  "catalog_listings__dataset_column",
 ] as const;
 
 /**

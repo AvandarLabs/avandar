@@ -4,7 +4,7 @@
  * dataset or an API resource. The `access_kind` column discriminates between
  * the two.
  */
-create table public.catalog_listings__open_data (
+create table public.data_catalog_listings (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
   -- Timestamp of when the catalog listing was created.
@@ -57,9 +57,9 @@ create table public.catalog_listings__open_data (
   -- Which of the two access shapes below this listing uses. Defaulted, so an
   -- insert written before this column existed still lands on the pipeline
   -- shape it was describing.
-  access_kind public.catalog_listings__open_data__access_kind not null default 'pipeline_parquet',
+  access_kind public.data_catalog_listings__access_kind not null default 'pipeline_parquet',
   -- The API protocol to speak. Null unless `access_kind` is `api_resource`.
-  api_service public.catalog_listings__open_data__api_service,
+  api_service public.data_catalog_listings__api_service,
   -- Root of the API that serves this resource, e.g. `https://data.humdata.org`.
   -- Part of the API uniqueness key, because the same dataset id on two
   -- instances names two different datasets.
@@ -91,7 +91,7 @@ create table public.catalog_listings__open_data (
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
   -- nothing.
-  constraint catalog_listings__open_data__pipeline_access_complete check (
+  constraint data_catalog_listings__pipeline_access_complete check (
     access_kind <> 'pipeline_parquet' or
     (
       parquet_file_name is not null and
@@ -108,7 +108,7 @@ create table public.catalog_listings__open_data (
   ),
   -- An API listing names its service, instance, dataset and resource, and
   -- carries no pipeline column.
-  constraint catalog_listings__open_data__api_access_complete check (
+  constraint data_catalog_listings__api_access_complete check (
     access_kind <> 'api_resource' or
     (
       api_service is not null and
@@ -123,7 +123,7 @@ create table public.catalog_listings__open_data (
   ),
   -- A cache is written atomically or not at all: either every column is set,
   -- or every column is null. There is no state where only one has a value.
-  constraint catalog_listings__open_data__cache_complete check (
+  constraint data_catalog_listings__cache_complete check (
     (
       cached_object_path is null and
       cached_source_version is null and
@@ -138,7 +138,7 @@ create table public.catalog_listings__open_data (
   -- Resource bytes are fetched from this host, so it must be TLS. Some CKAN
   -- resources point at upstream APIs over plain HTTP; those are rejected here
   -- rather than downloaded.
-  constraint catalog_listings__open_data__api_base_url_is_https check (
+  constraint data_catalog_listings__api_base_url_is_https check (
     api_base_url is null or
     api_base_url like 'https://%'
   )
@@ -152,12 +152,12 @@ create table public.catalog_listings__open_data (
 -- conflict's arbiter from a bare column list. This is safe because every
 -- `pipeline_parquet` row has `api_service` (along with `api_base_url` and
 -- `api_resource_id`) forced `NULL` by
--- `catalog_listings__open_data__pipeline_access_complete` - `external_dataset_id`
+-- `data_catalog_listings__pipeline_access_complete` - `external_dataset_id`
 -- is not, but a single `NULL` anywhere in the indexed tuple already exempts
 -- the row from a unique-index conflict, so this plain index still only ever
 -- constrains `api_resource` rows against each other, exactly as the partial
 -- version did.
-create unique index catalog_listings__open_data__api_resource_unique on public.catalog_listings__open_data (
+create unique index data_catalog_listings__api_resource_unique on public.data_catalog_listings (
   api_service,
   api_base_url,
   external_dataset_id,
@@ -165,27 +165,27 @@ create unique index catalog_listings__open_data__api_resource_unique on public.c
 );
 
 -- Enable row level security
-alter table public.catalog_listings__open_data enable row level security;
+alter table public.data_catalog_listings enable row level security;
 
 -- Data API privileges.
 --
 -- Read-only: the open data catalog is populated by the backend.
 grant
 select
-  on table public.catalog_listings__open_data to authenticated;
+  on table public.data_catalog_listings to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-delete on table public.catalog_listings__open_data to service_role;
+delete on table public.data_catalog_listings to service_role;
 
 -- Policies
-create policy "User can select open data catalog listings" on public.catalog_listings__open_data for
+create policy "User can select open data catalog listings" on public.data_catalog_listings for
 select
   to authenticated using (true);
 
-create trigger tr_catalog_listings__open_data__set_updated_at before
-update on public.catalog_listings__open_data for each row
+create trigger tr_data_catalog_listings__set_updated_at before
+update on public.data_catalog_listings for each row
 execute function public.util__set_updated_at ();

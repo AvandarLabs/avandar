@@ -1,14 +1,18 @@
 /**
- * Links a catalog listing (an open data source) to one of its dataset columns.
+ * One column of a Data Catalog listing. Unlike a `dataset_columns` row (a
+ * workspace's own, user-editable column metadata), a relation column
+ * describes an unowned catalog listing: it is not editable by any user, only
+ * discovered and written by a pipeline, exactly as immutable as the listing
+ * it belongs to.
  */
-create table if not exists catalog_listings__dataset_column (
+create table if not exists data_catalog_listings__relation_columns (
   id uuid primary key default gen_random_uuid(),
-  catalog_listing_id uuid not null references catalog_listings__open_data (id) on delete cascade,
-  -- Name of the column in the dataset
+  catalog_listing_id uuid not null references data_catalog_listings (id) on delete cascade,
+  -- Name of the column in the relation
   column_name text not null,
-  -- Display order of the column in the dataset
+  -- Display order of the column in the relation
   display_order integer,
-  -- Timestamp of when the catalog listing dataset column was created.
+  -- Timestamp of when the relation column was created.
   created_at timestamp with time zone default now(),
   -- Timestamp of when this row was last updated.
   updated_at timestamp with time zone default now(),
@@ -26,33 +30,33 @@ create table if not exists catalog_listings__dataset_column (
 );
 
 -- RLS Policies
-alter table catalog_listings__dataset_column enable row level security;
+alter table data_catalog_listings__relation_columns enable row level security;
 
 -- Data API privileges.
 --
--- Read-only: the column catalog is populated by the backend.
+-- Read-only: relation columns are discovered and written by the backend.
 grant
 select
-  on table public.catalog_listings__dataset_column to authenticated;
+  on table public.data_catalog_listings__relation_columns to authenticated;
 
 grant
 select
 ,
   insert,
 update,
-delete on table public.catalog_listings__dataset_column to service_role;
+delete on table public.data_catalog_listings__relation_columns to service_role;
 
 -- Any signed-in user may read the catalog's column associations.
 --
 -- Scoped `to authenticated` rather than left unscoped. An unscoped policy
 -- defaults to role `public`, which includes `anon`, so this table was readable
 -- by an unauthenticated visitor. Nothing anonymous browses the open data
--- catalog, and the sibling table `catalog_listings__open_data` is already
+-- catalog, and the sibling table `data_catalog_listings` is already
 -- authenticated-only, so the two now agree.
-create policy "User can select catalog listing columns" on catalog_listings__dataset_column for
+create policy "User can select catalog listing columns" on data_catalog_listings__relation_columns for
 select
   to authenticated using (true);
 
-create trigger tr_catalog_listings__dataset_column__set_updated_at before
-update on catalog_listings__dataset_column for each row
+create trigger tr_data_catalog_listings__relation_columns__set_updated_at before
+update on data_catalog_listings__relation_columns for each row
 execute function public.util__set_updated_at ();

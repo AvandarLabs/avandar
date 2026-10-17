@@ -9,7 +9,7 @@
  * `api_resource` - A resource an external data API serves, fetched on demand.
  *
  * Note: Every listing is exactly one of these. The per-kind CHECK constraints
- * on `catalog_listings__open_data` are what keep the two shapes from
+ * on `data_catalog_listings` are what keep the two shapes from
  * blurring.
  */
-create type public.catalog_listings__open_data__access_kind as enum('pipeline_parquet', 'api_resource');
+create type public.data_catalog_listings__access_kind as enum('pipeline_parquet', 'api_resource');

@@ -7,4 +7,4 @@
  * CKAN, and the same reasoning applies, one client per protocol,
  * `api_base_url` per instance.
  */
-create type public.catalog_listings__open_data__api_service as enum('ckan', 'socrata');
+create type public.data_catalog_listings__api_service as enum('ckan', 'socrata');

@@ -19,21 +19,21 @@ select plan(22);
 
 select col_is_null(
   'public',
-  'catalog_listings__open_data',
+  'data_catalog_listings',
   'parquet_file_name',
   'parquet_file_name is nullable, so an API-backed listing needs no Parquet object'
 );
 
 select col_is_null(
   'public',
-  'catalog_listings__open_data',
+  'data_catalog_listings',
   'pipeline_name',
   'pipeline_name is nullable, so an API-backed listing needs no pipeline'
 );
 
 select col_is_null(
   'public',
-  'catalog_listings__open_data',
+  'data_catalog_listings',
   'pipeline_run_id',
   'pipeline_run_id is nullable, so an API-backed listing needs no pipeline run'
 );
@@ -45,7 +45,7 @@ select col_is_null(
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
        external_organization_name)
     values ('pgtap-fixture.parquet', 'Series', 'pgtap-fixture-pipeline', 'run-1',
@@ -56,7 +56,7 @@ select lives_ok(
 select is(
   (
     select access_kind::text
-    from public.catalog_listings__open_data
+    from public.data_catalog_listings
     where parquet_file_name = 'pgtap-fixture.parquet'
   ),
   'pipeline_parquet',
@@ -68,7 +68,7 @@ select is(
 -- partial index, this statement would fail rather than update.
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
        external_organization_name)
     values ('pgtap-fixture.parquet', 'Series v2', 'pgtap-fixture-pipeline', 'run-2',
@@ -82,7 +82,7 @@ select lives_ok(
 select is(
   (
     select display_name
-    from public.catalog_listings__open_data
+    from public.data_catalog_listings
     where parquet_file_name = 'pgtap-fixture.parquet'
       and pipeline_name = 'pgtap-fixture-pipeline'
   ),
@@ -93,7 +93,7 @@ select is(
 select is(
   (
     select count(*)
-    from public.catalog_listings__open_data
+    from public.data_catalog_listings
     where parquet_file_name = 'pgtap-fixture.parquet'
       and pipeline_name = 'pgtap-fixture-pipeline'
   ),
@@ -107,7 +107,7 @@ select is(
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence', 'OCHA', 'api_resource', 'ckan',
@@ -117,7 +117,7 @@ select lives_ok(
 );
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Movement Range', 'Meta', 'api_resource', 'ckan',
@@ -127,7 +127,7 @@ select lives_ok(
 );
 
 select throws_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence again', 'OCHA', 'api_resource', 'ckan',
@@ -139,7 +139,7 @@ select throws_ok(
 );
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Operational Presence elsewhere', 'OCHA', 'api_resource', 'ckan',
@@ -154,7 +154,7 @@ select lives_ok(
 -- ---------------------------------------------------------------------------
 
 select throws_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_format)
     values ('No resource named', 'OCHA', 'api_resource', 'ckan',
@@ -165,7 +165,7 @@ select throws_ok(
 );
 
 select throws_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (parquet_file_name, display_name, pipeline_name, pipeline_run_id,
        external_organization_name, api_service)
     values ('pgtap-fixture-other.parquet', 'Mixed', 'pgtap-fixture-pipeline', 'run-3',
@@ -176,7 +176,7 @@ select throws_ok(
 );
 
 select throws_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Insecure', 'OCHA', 'api_resource', 'ckan',
@@ -193,7 +193,7 @@ select throws_ok(
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values
@@ -204,7 +204,7 @@ select lives_ok(
 );
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        cached_object_path, cached_source_version, cached_at)
@@ -217,7 +217,7 @@ select lives_ok(
 );
 
 select throws_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format,
        cached_object_path)
@@ -232,7 +232,7 @@ select throws_ok(
 );
 
 select throws_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (id, display_name, external_organization_name, access_kind,
        parquet_file_name, pipeline_name, pipeline_run_id,
        cached_object_path, cached_source_version, cached_at)
@@ -247,7 +247,7 @@ select throws_ok(
 );
 
 -- ---------------------------------------------------------------------------
--- catalog_listings__open_data__api_resource_unique must be a plain index, not
+-- data_catalog_listings__api_resource_unique must be a plain index, not
 -- a partial one. PostgREST's `.upsert(rows, {onConflict: "..."})` can only
 -- generate a bare column-list `ON CONFLICT`, and Postgres refuses to infer a
 -- partial index as that clause's arbiter. This is the exact conflict target
@@ -255,7 +255,7 @@ select throws_ok(
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (id, display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values
@@ -279,7 +279,7 @@ set local role authenticated;
 select is(
   (
     select display_name
-    from public.catalog_listings__open_data
+    from public.data_catalog_listings
     where api_base_url = 'https://pgtap-fixture.invalid'
       and api_resource_id = 'pgtap-fixture-resource-a'
   ),
@@ -288,7 +288,7 @@ select is(
 );
 
 select throws_ok(
-  $$insert into public.catalog_listings__open_data
+  $$insert into public.data_catalog_listings
       (display_name, external_organization_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values ('Smuggled', 'Nobody', 'api_resource', 'ckan',
