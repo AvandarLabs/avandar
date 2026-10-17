@@ -16,8 +16,11 @@ export type SocrataDiscoveryClient = {
    * Chicago portal").
    */
   search: (params: {
-    query: string;
+    /** Free-text search. Omitted lists the domain's full catalog. */
+    query?: string;
     domains?: readonly string[];
     limit?: number;
+    /** Pages past the first `limit` results, for enumerating a large domain. */
+    offset?: number;
   }) => Promise<SocrataDiscoveryResult[]>;
 };

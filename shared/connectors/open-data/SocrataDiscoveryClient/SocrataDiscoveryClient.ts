@@ -24,13 +24,20 @@ export function createSocrataDiscoveryClient(
       query,
       domains,
       limit,
+      offset,
     }): Promise<SocrataDiscoveryResult[]> => {
-      const params = new URLSearchParams({ q: query });
+      const params = new URLSearchParams();
+      if (query !== undefined) {
+        params.set("q", query);
+      }
       if (domains && domains.length > 0) {
         params.set("domains", domains.join(","));
       }
       if (limit !== undefined) {
         params.set("limit", String(limit));
+      }
+      if (offset !== undefined) {
+        params.set("offset", String(offset));
       }
       const body = await http.getJson(
         `${DISCOVERY_BASE_URL}?${params.toString()}`,

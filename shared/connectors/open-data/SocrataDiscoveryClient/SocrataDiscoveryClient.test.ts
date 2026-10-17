@@ -66,4 +66,30 @@ describe("SocrataDiscoveryClient.search", () => {
       `${DISCOVERY_BASE_URL}?q=measles&limit=3`,
     );
   });
+
+  it("lists a domain's full catalog when no query is given", async () => {
+    const http = _http();
+
+    await createSocrataDiscoveryClient(http).search({
+      domains: ["data.cityofnewyork.us"],
+    });
+
+    expect(http.getJson).toHaveBeenCalledWith(
+      `${DISCOVERY_BASE_URL}?domains=data.cityofnewyork.us`,
+    );
+  });
+
+  it("passes an offset through when given, for paginating a large drive", async () => {
+    const http = _http();
+
+    await createSocrataDiscoveryClient(http).search({
+      domains: ["data.cityofnewyork.us"],
+      limit: 100,
+      offset: 200,
+    });
+
+    expect(http.getJson).toHaveBeenCalledWith(
+      `${DISCOVERY_BASE_URL}?domains=data.cityofnewyork.us&limit=100&offset=200`,
+    );
+  });
 });
