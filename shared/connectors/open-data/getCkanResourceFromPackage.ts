@@ -23,6 +23,20 @@ const READABLE_FORMATS: readonly string[] = ["csv", "parquet"];
 const HOSTED_FILE_URL_TYPE = "upload";
 
 /**
+ * Whether a CKAN resource is worth reading at all - the same two rules
+ * `getCkanResourceFromPackage` enforces one at a time with a distinct
+ * failure code each, collapsed into a single yes/no answer for a caller
+ * (the open-data-metacatalog pipeline) that only needs to decide whether to
+ * register the resource, not explain why it was skipped.
+ */
+export function isReadableCkanResource(resource: Readonly<CkanResource>): boolean {
+  if (resource.url_type !== HOSTED_FILE_URL_TYPE) {
+    return false;
+  }
+  return READABLE_FORMATS.includes(resource.format.toLowerCase());
+}
+
+/**
  * Reads a URL's lowercased host, or the empty string when it does not parse.
  *
  * An unparseable URL yields the empty string rather than throwing, so a
