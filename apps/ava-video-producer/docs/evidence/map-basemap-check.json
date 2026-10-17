@@ -1,0 +1,439 @@
+{
+  "checkedAt": "2026-10-15T08:36:27.505Z",
+  "basemap": "Avandar",
+  "styleUrl": "https://tiles.openfreemap.org/styles/bright",
+  "states": [
+    {
+      "frame": 40,
+      "ready": "true",
+      "basemapFeatures": 116,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-40-tiles.png"
+    },
+    {
+      "frame": 140,
+      "ready": "true",
+      "basemapFeatures": 116,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-140-tiles.png"
+    },
+    {
+      "frame": 330,
+      "ready": "true",
+      "basemapFeatures": 116,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-330-tiles.png"
+    },
+    {
+      "frame": 400,
+      "ready": "true",
+      "basemapFeatures": 116,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-400-tiles.png"
+    },
+    {
+      "frame": 460,
+      "ready": "true",
+      "basemapFeatures": 111,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-460-tiles.png"
+    },
+    {
+      "frame": 514,
+      "ready": "true",
+      "basemapFeatures": 58,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-514-tiles.png"
+    },
+    {
+      "frame": 540,
+      "ready": "true",
+      "basemapFeatures": 58,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-540-tiles.png"
+    },
+    {
+      "frame": 570,
+      "ready": "true",
+      "basemapFeatures": 40,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-570-tiles.png"
+    },
+    {
+      "frame": 660,
+      "ready": "true",
+      "basemapFeatures": 40,
+      "attribution": "Move the pointer over the map to read a coordinate\nOpenFreeMap \u00b7 \u00a9 OpenMapTiles \u00b7 Data from OpenStreetMap\nFictional demonstration data",
+      "screenshot": "out/map-tiles-review/map-660-tiles.png"
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://tiles.openfreemap.org/styles/bright",
+      "status": 200,
+      "sha256": "ada317e9b31c65b726dc46a2b3b14acb9856782051a09e3f4bc92d034373999f"
+    },
+    {
+      "url": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm.png",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm.json",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet",
+      "status": 200,
+      "sha256": "6da5604000f11b01be50b7767c6a781fe7b880a1e6c8d0500fb153eb6d7cc51d"
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/10/541/482.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/10/541/483.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/10/540/483.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/10/539/482.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/10/539/483.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/10/540/482.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/0-255.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/0-255.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1081/967.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1082/966.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1081/965.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1080/965.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1082/967.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1082/965.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1080/966.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1081/966.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/11/1080/967.pbf",
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "blockedSource": {
+    "cancelled": true,
+    "ready": false,
+    "error": "Error: AJAXError: Failed to fetch (0): https://tiles.openfreemap.org/planet"
+  },
+  "expectedErrors": [
+    "AJAXError: Failed to fetch (0): https://tiles.openfreemap.org/planet"
+  ],
+  "cursorMeasurement": {
+    "url": "http://localhost:4175/",
+    "stage": {
+      "width": 1600,
+      "height": 840
+    },
+    "settleMs": 700,
+    "readiness": "Player frame acknowledged, native render handles empty, three stable target-bound samples",
+    "seeks": [
+      {
+        "frame": 89,
+        "elapsedMs": 1956,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 199,
+        "elapsedMs": 1183,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 299,
+        "elapsedMs": 1174,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 379,
+        "elapsedMs": 1182,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 439,
+        "elapsedMs": 1183,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 539,
+        "elapsedMs": 1804,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 140,
+        "elapsedMs": 1628,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 740,
+        "elapsedMs": 1490,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 17,
+        "elapsedMs": 1488,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 140,
+        "elapsedMs": 1183,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 460,
+        "elapsedMs": 1610,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 740,
+        "elapsedMs": 1486,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 17,
+        "elapsedMs": 1484,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 460,
+        "elapsedMs": 1174,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 650,
+        "elapsedMs": 1603,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 740,
+        "elapsedMs": 1182,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 17,
+        "elapsedMs": 1487,
+        "ready": true,
+        "handles": 0
+      },
+      {
+        "frame": 650,
+        "elapsedMs": 1483,
+        "ready": true,
+        "handles": 0
+      }
+    ],
+    "errors": [],
+    "unresolved": [],
+    "determinism": [
+      {
+        "feature": "map",
+        "frame": 140,
+        "route": [740, 17, 140],
+        "identicalPixels": false,
+        "identicalText": true,
+        "changedPixels": 6,
+        "maxChannelDelta": 5,
+        "bounds": {
+          "x": 501,
+          "y": 259,
+          "width": 3,
+          "height": 2
+        },
+        "directSha256": "90072e5f73cb429a10a82ccc91e2aabdd426a75f7828da750da450baef6114c4",
+        "afterSeeksSha256": "9492db46f121505efb05bf6e8d3e5a7fd9dc0f8b9fb2512d9b51fbe7321f879b"
+      },
+      {
+        "feature": "map",
+        "frame": 460,
+        "route": [740, 17, 460],
+        "identicalPixels": false,
+        "identicalText": true,
+        "changedPixels": 6,
+        "maxChannelDelta": 5,
+        "bounds": {
+          "x": 501,
+          "y": 259,
+          "width": 3,
+          "height": 2
+        },
+        "directSha256": "d675036444a7e8fa0c389bcfc1f7b5e58a0438a941d0f0aabcc8b6562c95f3da",
+        "afterSeeksSha256": "41f021dc785c0ce32628a8b9a8360279eda7a41d252524497fbf82248be97fe7"
+      },
+      {
+        "feature": "map",
+        "frame": 650,
+        "route": [740, 17, 650],
+        "identicalPixels": false,
+        "identicalText": true,
+        "changedPixels": 19,
+        "maxChannelDelta": 2,
+        "bounds": {
+          "x": 1559,
+          "y": 500,
+          "width": 22,
+          "height": 6
+        },
+        "directSha256": "71a9e11e84eedbbc7903860d56858311752bfa23a08e6b1780c2b687f176943f",
+        "afterSeeksSha256": "9125ba18f2e18627c3c247a94a855e7c3515005d21f8794b432bd4dbb871fa9b"
+      }
+    ]
+  },
+  "delivery": {
+    "kind": "actual-product-component-render",
+    "sourceRevision": "3c164aa32b8a60b30885081e7bb0986135e99f70",
+    "sourceFiles": 665,
+    "fps": 30,
+    "width": 1536,
+    "height": 960,
+    "frames": 786,
+    "seconds": 26.2,
+    "posterFrame": 714,
+    "posterSource": "Decoded final MP4 at the completed result hold",
+    "videoSha256": "120a1277b26f8181680bb48e6d9c785421d852960d23727c434e6cae8a58f7cd",
+    "posterSha256": "171df9dea2e7b5d1c9a8c31a67a825c166d528766950ced2bb610c1b74a008c1",
+    "fingerprint": {
+      "sourcePlanSha256": "7baca31640cf8e1576a3e30b2e2eda6a5264c9d54e88f8b55d006fa3c9c0c5b3",
+      "parsedPlanSha256": "fcdf62a7f9f2580d6bc5c726a36f4d98d2072f7fec8d242ca3dd7bb9eb82826b",
+      "assets": [
+        {
+          "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/case-locations.wav",
+          "sha256": "c92adce26f5ef56c1ec179e5c5e315b0f2343e3ff3739bb9538549b3697b8196"
+        },
+        {
+          "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/facility-details.wav",
+          "sha256": "7b29e018f0c1db660cb631a0d50e12bf7f1ad05b074adcf2e2393bbe509235a8"
+        },
+        {
+          "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/facility-layer.wav",
+          "sha256": "eaba5a95c552a26227143a5b8faf2c05ef10f5831779d46f89119b2a8ee7a0a5"
+        },
+        {
+          "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/hide-facilities.wav",
+          "sha256": "4e3359e953e8ce7d82dd95a6bde0743e32a5c1c2c98bc8840dbe835e895a122a"
+        },
+        {
+          "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/inspect-location.wav",
+          "sha256": "fd7be0347d6754b3efc521af570ec24e3853e941cd6be7d5df2a1072b9c71a31"
+        },
+        {
+          "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/show-facilities.wav",
+          "sha256": "31e84f3f8bd64e1df385e8015fef6e77605dba264cfbe8ae2628d419e23a0a8b"
+        }
+      ],
+      "rendererSha256": "66211a4c43e2904e001dc421a975707b99dc359938b3589f1ffe31b2174c75ab"
+    },
+    "pictureGate": "passed",
+    "audio": "macOS Samantha scratch narration; duration and signal checked",
+    "generatedAt": "2026-10-15T08:42:04.991Z"
+  },
+  "playback": {
+    "kind": "automated-browser-media-playback",
+    "method": "Corrected map played from start to ended at 1x, muted; three paused sample frames. No human listening claim.",
+    "result": {
+      "id": "avandar-map",
+      "checkedAt": "2026-10-15T08:42:52.547Z",
+      "videoSha256": "120a1277b26f8181680bb48e6d9c785421d852960d23727c434e6cae8a58f7cd",
+      "media": {
+        "src": "http://127.0.0.1:4173/assets/avandar-map.mp4?v=120a1277b26f",
+        "poster": "http://127.0.0.1:4173/assets/avandar-map-poster.jpg?v=120a1277b26f",
+        "duration": 26.2,
+        "width": 1536,
+        "height": 960,
+        "error": null
+      },
+      "samples": [
+        {
+          "fraction": 0.2,
+          "time": 5.24,
+          "file": "out/map-tiles-review/delivered-20.png",
+          "sha256": "de5f8f71f7e53111003a763b4023a066c394b90c3073bf62bf39c7df9ae3b1fa"
+        },
+        {
+          "fraction": 0.55,
+          "time": 14.41,
+          "file": "out/map-tiles-review/delivered-55.png",
+          "sha256": "5c816e0d874f0fee3ad2ca3a05e8472a68a6cdf3aec1518b7a1caa30270d26f1"
+        },
+        {
+          "fraction": 0.88,
+          "time": 23.056,
+          "file": "out/map-tiles-review/delivered-88.png",
+          "sha256": "972ab314a1f5e3677d65660454ca2a70ea50434a51719aab83232ee844b06d3a"
+        }
+      ],
+      "playback": {
+        "ended": true,
+        "finalTime": 26.2,
+        "wallSeconds": 26.26680000001192,
+        "playbackRate": 1,
+        "muted": true,
+        "presentedCallbacks": 786,
+        "totalVideoFrames": 857,
+        "droppedVideoFrames": 0,
+        "error": null
+      },
+      "rangeStatus": 206
+    },
+    "pageErrors": []
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "screens": ["Data Sources import", "Dashboard editor", "Dashboard preview"],
+  "layoutSources": [
+    "src/views/DataManagerApp/DataImportView/DataImportView.tsx",
+    "src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx",
+    "src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx",
+    "src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx",
+    "src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx",
+    "src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveAsMenuItems.tsx",
+    "src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx",
+    "src/views/DashboardApp/DashboardEditorView/DashboardEditorContent.tsx"
+  ],
+  "originalLeaves": [
+    "src/components/layouts/AppListPane/AppListPane.tsx",
+    "src/components/layouts/AppView/AppView.tsx",
+    "src/components/layouts/AppView/AppViewHeader/AppViewHeader.tsx",
+    "src/components/layouts/AppView/AppViewBody/AppViewBody.tsx",
+    "src/components/layouts/AppView/AppViewSection/AppViewSection.tsx",
+    "src/views/DataManagerApp/DatasetSourceIcon.tsx",
+    "src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx",
+    "src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx",
+    "src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFields.tsx",
+    "src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx",
+    "src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx",
+    "src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportActions/DatasetImportActions.tsx",
+    "src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx",
+    "packages/web/ui/src/EditableDisplayText/EditableDisplayText.tsx",
+    "packages/web/ui/src/ObjectDescriptionList/ObjectDescriptionList.tsx",
+    "packages/web/ui/src/Tabs/Tabs.tsx",
+    "packages/web/ui/src/router-links/NavLinkList.tsx",
+    "src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx",
+    "src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx",
+    "src/views/DashboardApp/DashboardEditorView/SaveDashboardButton/SaveDashboardButton.tsx",
+    "src/views/DashboardApp/DashboardEditorView/ViewDashboardButton.tsx",
+    "src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx",
+    "src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizContent.tsx",
+    "src/components/VisualizationContainer/VisualizationContainer.tsx"
+  ],
+  "adapterBoundaries": [
+    "Import acquisition, parsing and persistence are represented by frame-owned fixture state. The genuine presentation components receive original CSV rows and deterministic inferred metadata.",
+    "The import metadata form receives a controlled getInputProps adapter so its unchanged inputs show frame-driven typing.",
+    "The CSV parse-controls dependency is limited to the original CSV branch, excluding unrelated PDF workers and remote connectors.",
+    "The saved metadata page retains source layout, real EditableDisplayText, ObjectDescriptionList and DatasetSourceRail. Inactive action buttons retain the exact source markup without service controllers.",
+    "The task-owned source list contains the four demonstrated Harborfield CSV datasets. Unrelated local datasets are not included.",
+    "Dashboard creation uses the genuine SaveToDashboardCreateMode component; a deterministic key replaces event-owned name state.",
+    "The editor uses real Puck and unchanged useDashboardPuckConfig, including complete layout/content/media catalogs, page fields and root renderer. Its iframe is disabled so text stays at native size inside the deterministic video document.",
+    "DataViz query ownership and unused property editing are replaced by a fixture-backed config. The visible block is the original DataVizContent and VisualizationContainer. Attempting to render an unused Filter block throws.",
+    "Dashboard draft Share/Delete and Explorer Save dropdown markup follow their product parents; service mutations are excluded. The film activates only create and preview state changes.",
+    "The original preview banner retains Not yet published. Viewers will not see this. No sharing or publication is demonstrated.",
+    "Mantine's BarChart disables native animation. Frame-driven clip masks reveal original bars while fixture totals and axis domains remain constant.",
+    "Phase transitions keep outgoing states opaque while incoming opaque screens dissolve over them. No screenshot or recorded-video media is used."
+  ],
+  "fixtures": {
+    "source": "demo-data/cases.csv",
+    "fileSizeBytes": 26703,
+    "rows": 240,
+    "columns": 13,
+    "importPreviewRows": 200,
+    "datasetId": "00000000-0000-4000-8000-000000000240",
+    "datasetIdKind": "synthetic fixture identity shared with Explorer, not an imported backend ID"
+  },
+  "verification": {
+    "adapterSyntax": "passed",
+    "integratedBuild": "passed in shared localhost:4175 review bridge",
+    "renderedReview": "20 initial component frames and five rebuilt component frames captured with no console or runtime errors. Import fields, saved metadata, creation modal, Puck editor and preview visually inspected. The rebuilt review confirms selected tabs and First 200 rows text, descending chart order, the View target in the Puck toolbar, and collapsed typed-text selection. This review covers component frames, not a completed narrated film.",
+    "reviewEvidence": "out/component-review/import-dashboard-final-inspection.json (rebuilt frames), out/component-review/import-dashboard-inspection.json (initial review)",
+    "dateFormattingObservation": "The unchanged product DataGrid formats DATE strings in the browser timezone. In America/New_York, the preview reproduces the existing capture's previous-day presentation. Original CSV fixture values remain unchanged."
+  }
+}

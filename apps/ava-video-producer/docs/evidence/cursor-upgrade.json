@@ -1,0 +1,327 @@
+{
+  "checkedAt": "2026-10-15T10:32:59.150835+00:00",
+  "cursorPackage": "@remotion/mac-cursors@4.0.516",
+  "validation": {
+    "typecheck": "passed",
+    "unitTestsPassed": 61,
+    "fixtureValidation": "passed",
+    "previewReview": "All eight contact sheets inspected, plus full-size typing/click and decoded playback frames",
+    "audio": "All six product films have identical decoded audio SHA-256 to their previous exports; no new listening review"
+  },
+  "decodedAudioSha256": {
+    "avandar-import": "SHA256=24986afc8b1ab647275c2dd8cefd7ebaf11d78ce1d597465fdc2efd0c3e079b4",
+    "avandar-explorer": "SHA256=c64a849d608a01bbbfa71aaead8ba9c8aee834708c16064400fc54aac9aeb62c",
+    "avandar-dashboards": "SHA256=1497f1a783c5f73629af3af2c2558d1ad30ade7f121c967a57672f6dc7401831",
+    "avandar-cases": "SHA256=95060006c8677c28c089640734832c67d3fc840064b442355a04f734d6f865f2",
+    "avandar-map": "SHA256=5ad9d0adf4992799b124fe1577ee184e1d88ebcb4f0ee956029d1d1b81908980",
+    "avandar-overview": "SHA256=50f90898bad391ce28ecee72dbc95e6c868c6121976b1d3fd2be261312bd7d91"
+  },
+  "exports": [
+    {
+      "id": "demo",
+      "videoSha256": "0b1bcf8d06ed07324aee06f960d5d6f53e6398968b5b58b358dc6a7cd501dc3b",
+      "posterSha256": "384f341f0f74f7ee48ea4a79d0f74d0254a7f0497ed91d4474acad759a229fa9",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 480,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames"
+    },
+    {
+      "id": "motion-lab",
+      "videoSha256": "2726c0bdc3f04225b108b57186808fc1422013c2a95b7ced0fdc2548718e3745",
+      "posterSha256": "b3f896429fd7576f3279e3d83daff14f6431188ea32b162df54a12d3665fe766",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 360,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames"
+    },
+    {
+      "id": "avandar-import",
+      "videoSha256": "bb7c7af51d8473b17b7001f97da0051ea56bc6983fab73ba3eeac64b26d30927",
+      "posterSha256": "e7bf86b746bac632619762ccd2b37075f69bc633c56193a29d8930a9daaabbb6",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 726,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames",
+      "fingerprint": {
+        "sourcePlanSha256": "25613f1b3146a40db1053ca6acfbcf272114d2bd15a5ea2b9bfeab0a57baa371",
+        "parsedPlanSha256": "68a24fd3d115d615566a40582e652ad4a9be90dc65483d9a834ef204a0ea54d8",
+        "assets": [
+          {
+            "path": "narration/avandar-import/scratch-3e64872b-ec74-4f5a-a566-99204379caf4/choose-csv.wav",
+            "sha256": "67af830413c2544d443810b4da026a89e14b93c882e7b8d247ebcbc804346907"
+          },
+          {
+            "path": "narration/avandar-import/scratch-3e64872b-ec74-4f5a-a566-99204379caf4/name-dataset.wav",
+            "sha256": "f4e3a626a3d31c5113375dea566c737d042e31b37aaa2e62d3ec3f54e06a7966"
+          },
+          {
+            "path": "narration/avandar-import/scratch-3e64872b-ec74-4f5a-a566-99204379caf4/review-preview.wav",
+            "sha256": "a6144032bfcd268513eaa659320a504be25817ddcac8e6de2f7fb9c34240e34f"
+          },
+          {
+            "path": "narration/avandar-import/scratch-3e64872b-ec74-4f5a-a566-99204379caf4/save-dataset.wav",
+            "sha256": "123f709eb134adbc77feda9108ec37cc98ea4dfd30c1faffcd466dee40aa66ab"
+          },
+          {
+            "path": "narration/avandar-import/scratch-3e64872b-ec74-4f5a-a566-99204379caf4/saved-row-count.wav",
+            "sha256": "627d6280a75bb7dba24ed3053f5336fa4c67bec98652d001778fc7a62a06aad3"
+          }
+        ],
+        "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+      }
+    },
+    {
+      "id": "avandar-explorer",
+      "videoSha256": "29740d8b68232f0723c7dc18889ae908350f03207dbbe47df0068fa3b953eea3",
+      "posterSha256": "966566fbe57e9d0f703e2471cc319e85809d6f496154b00c08f575f8b3fb2aa1",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 866,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames",
+      "fingerprint": {
+        "sourcePlanSha256": "2264a3d26caa8beeca3a64f2679f83638acebb8a3327e507bb356c9474b77f35",
+        "parsedPlanSha256": "c32e54cb9344567e8f86378a9b5dfc0ea50120a98574882d6f0ca800ae277f5b",
+        "assets": [
+          {
+            "path": "narration/avandar-explorer/scratch-2bb65e50-e905-49fd-b3fb-15936947c344/eastbank-count.wav",
+            "sha256": "d19c108115ff26bdc83a2b4bed8a25c5ac8e23773e7cc7f5b80717b9e1d70499"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-2bb65e50-e905-49fd-b3fb-15936947c344/filter-eastbank.wav",
+            "sha256": "3c8739821ac44c2eaae68c22ebdbd645f97c304c6fc1925a56bcdc88c330d64a"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-2bb65e50-e905-49fd-b3fb-15936947c344/make-chart.wav",
+            "sha256": "96d2262ec752b85fb4f12aceaf365ccd9660e1ce4d08f962bc94d38ff2f55ed9"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-2bb65e50-e905-49fd-b3fb-15936947c344/open-query.wav",
+            "sha256": "592c078dea05b19b681c2c66f65975e893654c9f90784398d9638335f180427a"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-2bb65e50-e905-49fd-b3fb-15936947c344/run-query.wav",
+            "sha256": "a6c32b4291de689645eabf0f3d4b91f26f4605d88f808755dce89352ab79af98"
+          },
+          {
+            "path": "narration/avandar-explorer/scratch-2bb65e50-e905-49fd-b3fb-15936947c344/write-query.wav",
+            "sha256": "129bf0753edd9c473eaa4bc607cec8c8bdd851bb17344cfecea50eeaa0ad88c0"
+          }
+        ],
+        "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+      }
+    },
+    {
+      "id": "avandar-dashboards",
+      "videoSha256": "508ec98cf578bb4813a477317d7fb0d41c2e754c67e8837eac2173e298543e07",
+      "posterSha256": "770e893f18651cdc54bb1deae4e89aa19f63ea31d1f0515cbfd513e8e1c6e482",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 786,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames",
+      "fingerprint": {
+        "sourcePlanSha256": "51c79c59aa5c07ba9b2be47c209ff431d076daac96041403929f5ba92cfbe8b7",
+        "parsedPlanSha256": "1ddd475c5bbaa319555d9cef5ccce522e8d851e4b016d0d3786e99879bdb0be5",
+        "assets": [
+          {
+            "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/name-dashboard.wav",
+            "sha256": "d5c99d8aa8b177249c705d3ad7a9a79dfb0ba2d1196bafc9cadd77e9e8db6e45"
+          },
+          {
+            "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/open-preview.wav",
+            "sha256": "406c7c395ddf827b86ae184493a33954e8ac7d17950f6207ee6c0119ab96cbab"
+          },
+          {
+            "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/review-editor.wav",
+            "sha256": "532e386e89729cfeb236a746cac598c70df6302b67831ec97a7a5f3a0cda61b6"
+          },
+          {
+            "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/save-chart.wav",
+            "sha256": "235d5c1c2d91fa5920305505a42d3561ab9196846960310ed1bf80b94d5513c9"
+          },
+          {
+            "path": "narration/avandar-dashboards/scratch-e54812a0-7989-4484-87c9-92eebda0129b/unpublished-draft.wav",
+            "sha256": "55663dd772815530a146e58a6de9307c96fec844dd69624f949f0e6f6ddbc049"
+          }
+        ],
+        "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+      }
+    },
+    {
+      "id": "avandar-cases",
+      "videoSha256": "1b0f9d3b0f9da5638b31f0fe04cfa47d96a356644ab5ed8bbebcd64018f4f81a",
+      "posterSha256": "7084390e4f01259f8373d5aaa56c1a70d4da7ddc7c9076b8357b4003e3b13a01",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 726,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames",
+      "fingerprint": {
+        "sourcePlanSha256": "a0a291c0ccd7d016a8439b7b89e16bf59851aa6767243477a5ad80a0bb8f9553",
+        "parsedPlanSha256": "80cdd0921b5d502f7192cdc475ae9a7addcb36a213e317691232710d8b78cb03",
+        "assets": [
+          {
+            "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/activity-boundary.wav",
+            "sha256": "060ad898cf5d2cc526f3fcc3431ddc6f75ef3e79da79bbeb2e65d7c659697d6e"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/browse-records.wav",
+            "sha256": "cc091c9ff7422d80d538fcee9ab250cc7a3a7f81d63a2b5366106c10d378268e"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/inspect-record.wav",
+            "sha256": "bfc54e1ba97246fcb6603a72a6d024f70b721564d13608d293a959cad3538531"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/linked-fields.wav",
+            "sha256": "a5034ceb1a927608f3a9a65b3f1471f2b7953368c919b1d6cfd155acbd789695"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/open-case-type.wav",
+            "sha256": "d96604436fa1f320481660598bab023fc2cebf9ea8386bf8bfa8bc994fafc3ca"
+          },
+          {
+            "path": "narration/avandar-cases/scratch-bc500a79-5363-4e6d-bb59-dc7c7748a9be/review-mappings.wav",
+            "sha256": "c244ad1f7ef81b26d940e637fbc417f83bcdfd84838b03a55a97a32ac22642de"
+          }
+        ],
+        "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+      }
+    },
+    {
+      "id": "avandar-map",
+      "videoSha256": "f776b5d17a03d7c407a56468d64dbb405ec64de796ed446106c94ca9c29dd5de",
+      "posterSha256": "332b478ffaa6fb69f6b62248b8057d2d3e70f5e94999a46be18b7b2bacb6608f",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 786,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames",
+      "fingerprint": {
+        "sourcePlanSha256": "7baca31640cf8e1576a3e30b2e2eda6a5264c9d54e88f8b55d006fa3c9c0c5b3",
+        "parsedPlanSha256": "fcdf62a7f9f2580d6bc5c726a36f4d98d2072f7fec8d242ca3dd7bb9eb82826b",
+        "assets": [
+          {
+            "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/case-locations.wav",
+            "sha256": "c92adce26f5ef56c1ec179e5c5e315b0f2343e3ff3739bb9538549b3697b8196"
+          },
+          {
+            "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/facility-details.wav",
+            "sha256": "7b29e018f0c1db660cb631a0d50e12bf7f1ad05b074adcf2e2393bbe509235a8"
+          },
+          {
+            "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/facility-layer.wav",
+            "sha256": "eaba5a95c552a26227143a5b8faf2c05ef10f5831779d46f89119b2a8ee7a0a5"
+          },
+          {
+            "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/hide-facilities.wav",
+            "sha256": "4e3359e953e8ce7d82dd95a6bde0743e32a5c1c2c98bc8840dbe835e895a122a"
+          },
+          {
+            "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/inspect-location.wav",
+            "sha256": "fd7be0347d6754b3efc521af570ec24e3853e941cd6be7d5df2a1072b9c71a31"
+          },
+          {
+            "path": "narration/avandar-map/scratch-8d277816-155f-4609-b875-4443359c4807/show-facilities.wav",
+            "sha256": "31e84f3f8bd64e1df385e8015fef6e77605dba264cfbe8ae2628d419e23a0a8b"
+          }
+        ],
+        "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+      }
+    },
+    {
+      "id": "avandar-overview",
+      "videoSha256": "bdcfcb308dcccf3cfb68c9962a17a24a2e96df92849dd32ba1d816f2e1822e03",
+      "posterSha256": "770e893f18651cdc54bb1deae4e89aa19f63ea31d1f0515cbfd513e8e1c6e482",
+      "width": 1536,
+      "height": 960,
+      "fps": "30/1",
+      "frames": 2246,
+      "pictureGate": "passed",
+      "playback": "Complete 1x muted Chromium playback, no media errors or dropped frames",
+      "fingerprint": {
+        "sourcePlanSha256": "631ef055d4becd7cf9c28655ca2129d789271c57192a64beb2776f5010b5b355",
+        "parsedPlanSha256": "0f161ce1c58a7ab64c2df71de16f4c6857f6fc209cbedd3627eaf30f3a7f2186",
+        "assets": [
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-name-dashboard.wav",
+            "sha256": "d5c99d8aa8b177249c705d3ad7a9a79dfb0ba2d1196bafc9cadd77e9e8db6e45"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-open-preview.wav",
+            "sha256": "406c7c395ddf827b86ae184493a33954e8ac7d17950f6207ee6c0119ab96cbab"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-review-editor.wav",
+            "sha256": "532e386e89729cfeb236a746cac598c70df6302b67831ec97a7a5f3a0cda61b6"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-save-chart.wav",
+            "sha256": "235d5c1c2d91fa5920305505a42d3561ab9196846960310ed1bf80b94d5513c9"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/dashboards-unpublished-draft.wav",
+            "sha256": "55663dd772815530a146e58a6de9307c96fec844dd69624f949f0e6f6ddbc049"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-eastbank-count.wav",
+            "sha256": "d19c108115ff26bdc83a2b4bed8a25c5ac8e23773e7cc7f5b80717b9e1d70499"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-filter-eastbank.wav",
+            "sha256": "3c8739821ac44c2eaae68c22ebdbd645f97c304c6fc1925a56bcdc88c330d64a"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-make-chart.wav",
+            "sha256": "96d2262ec752b85fb4f12aceaf365ccd9660e1ce4d08f962bc94d38ff2f55ed9"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-open-query.wav",
+            "sha256": "592c078dea05b19b681c2c66f65975e893654c9f90784398d9638335f180427a"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-run-query.wav",
+            "sha256": "a6c32b4291de689645eabf0f3d4b91f26f4605d88f808755dce89352ab79af98"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/explorer-write-query.wav",
+            "sha256": "129bf0753edd9c473eaa4bc607cec8c8bdd851bb17344cfecea50eeaa0ad88c0"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-choose-csv.wav",
+            "sha256": "67af830413c2544d443810b4da026a89e14b93c882e7b8d247ebcbc804346907"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-name-dataset.wav",
+            "sha256": "f4e3a626a3d31c5113375dea566c737d042e31b37aaa2e62d3ec3f54e06a7966"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-review-preview.wav",
+            "sha256": "a6144032bfcd268513eaa659320a504be25817ddcac8e6de2f7fb9c34240e34f"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-save-dataset.wav",
+            "sha256": "123f709eb134adbc77feda9108ec37cc98ea4dfd30c1faffcd466dee40aa66ab"
+          },
+          {
+            "path": "narration/avandar-overview/scratch-99d96902-c714-4545-bb31-e80952a243a2/import-saved-row-count.wav",
+            "sha256": "627d6280a75bb7dba24ed3053f5336fa4c67bec98652d001778fc7a62a06aad3"
+          }
+        ],
+        "rendererSha256": "c3be0f01656c15ba23bda42ac8eae15cdcfdeca35bb42c8225169aa952cf5edf"
+      }
+    }
+  ]
+}

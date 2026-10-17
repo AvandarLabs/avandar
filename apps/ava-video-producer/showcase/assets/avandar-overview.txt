@@ -1,0 +1,33 @@
+Avandar: from source to briefing
+
+Choose the fictional Harborfield CSV.
+
+Give the dataset a clear name.
+
+Review 200 rows and 13 detected columns.
+
+Save the dataset for later exploration.
+
+The saved source contains 240 cases.
+
+Open the query controls.
+
+Filter the records to Eastbank.
+
+Eastbank has 56 recorded cases.
+
+Write a query to compare all six districts.
+
+Run the grouped count for every district.
+
+Show the comparison as a bar chart.
+
+Save the district chart to a dashboard.
+
+Name the briefing view.
+
+Review the saved chart in the editor.
+
+Open the dashboard preview.
+
+This draft has not been published.

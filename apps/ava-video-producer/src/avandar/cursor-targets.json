@@ -1,0 +1,432 @@
+{
+  "import": [
+    {
+      "frame": 45,
+      "target": "import-upload",
+      "action": "click",
+      "x": 1043,
+      "y": 325.64,
+      "rect": {
+        "x": 517,
+        "y": 239.09,
+        "width": 1052,
+        "height": 173.09
+      },
+      "measuredAtFrame": 44
+    },
+    {
+      "frame": 124,
+      "target": "import-name",
+      "action": "click",
+      "x": 733,
+      "y": 394.48,
+      "rect": {
+        "x": 517,
+        "y": 376.48,
+        "width": 432,
+        "height": 36
+      },
+      "measuredAtFrame": 123
+    },
+    {
+      "frame": 205,
+      "target": "import-description",
+      "action": "click",
+      "x": 1181,
+      "y": 394.48,
+      "rect": {
+        "x": 965,
+        "y": 376.48,
+        "width": 432,
+        "height": 36
+      },
+      "measuredAtFrame": 204
+    },
+    {
+      "frame": 420,
+      "target": "import-save",
+      "action": "click",
+      "x": 1508.48,
+      "y": 777,
+      "rect": {
+        "x": 1447.95,
+        "y": 759,
+        "width": 121.05,
+        "height": 36
+      },
+      "measuredAtFrame": 419
+    }
+  ],
+  "explorer": [
+    {
+      "frame": 48,
+      "target": "explorer-query-tab",
+      "action": "click",
+      "x": 265.69,
+      "y": 786.59,
+      "rect": {
+        "x": 249,
+        "y": 779.59,
+        "width": 33.38,
+        "height": 14
+      },
+      "measuredAtFrame": 47
+    },
+    {
+      "frame": 88,
+      "target": "explorer-add-condition",
+      "action": "click",
+      "x": 982.79,
+      "y": 546.59,
+      "rect": {
+        "x": 936.5,
+        "y": 533.59,
+        "width": 92.58,
+        "height": 26
+      },
+      "measuredAtFrame": 87
+    },
+    {
+      "frame": 104,
+      "target": "explorer-filter-column",
+      "action": "click",
+      "x": 1028.09,
+      "y": 601.59,
+      "rect": {
+        "x": 936.5,
+        "y": 583.59,
+        "width": 183.17,
+        "height": 36
+      },
+      "measuredAtFrame": 103
+    },
+    {
+      "frame": 132,
+      "target": "explorer-filter-value",
+      "action": "click",
+      "x": 1390.63,
+      "y": 601.59,
+      "rect": {
+        "x": 1283.25,
+        "y": 583.59,
+        "width": 214.75,
+        "height": 36
+      },
+      "measuredAtFrame": 131
+    },
+    {
+      "frame": 190,
+      "target": "explorer-filter-value",
+      "action": "commit",
+      "x": 1390.63,
+      "y": 601.59,
+      "rect": {
+        "x": 1283.25,
+        "y": 583.59,
+        "width": 214.75,
+        "height": 36
+      },
+      "measuredAtFrame": 189
+    },
+    {
+      "frame": 300,
+      "target": "explorer-sql-mode",
+      "action": "click",
+      "x": 1527.45,
+      "y": 457,
+      "rect": {
+        "x": 1509.89,
+        "y": 445.7,
+        "width": 35.11,
+        "height": 22.59
+      },
+      "measuredAtFrame": 299
+    },
+    {
+      "frame": 344,
+      "target": "explorer-edit-query",
+      "action": "click",
+      "x": 1536.23,
+      "y": 787.59,
+      "rect": {
+        "x": 1493.45,
+        "y": 772.59,
+        "width": 85.55,
+        "height": 30
+      },
+      "measuredAtFrame": 343
+    },
+    {
+      "frame": 364,
+      "target": "explorer-sql-editor",
+      "action": "click",
+      "x": 913,
+      "y": 631.59,
+      "rect": {
+        "x": 247,
+        "y": 524.59,
+        "width": 1332,
+        "height": 214
+      },
+      "measuredAtFrame": 363
+    },
+    {
+      "frame": 570,
+      "target": "explorer-run-query",
+      "action": "click",
+      "x": 1429.13,
+      "y": 768.59,
+      "rect": {
+        "x": 1368.91,
+        "y": 750.59,
+        "width": 120.45,
+        "height": 36
+      },
+      "measuredAtFrame": 569
+    },
+    {
+      "frame": 620,
+      "target": "explorer-viz-tab",
+      "action": "click",
+      "x": 347.13,
+      "y": 456.59,
+      "rect": {
+        "x": 310.38,
+        "y": 449.59,
+        "width": 73.5,
+        "height": 14
+      },
+      "measuredAtFrame": 619
+    },
+    {
+      "frame": 650,
+      "target": "explorer-viz-type",
+      "action": "click",
+      "x": 1466.5,
+      "y": 457,
+      "rect": {
+        "x": 1384,
+        "y": 442,
+        "width": 165,
+        "height": 30
+      },
+      "measuredAtFrame": 649
+    }
+  ],
+  "dashboards": [
+    {
+      "frame": 48,
+      "target": "dashboard-save-menu",
+      "action": "click",
+      "x": 1546.04,
+      "y": 74,
+      "rect": {
+        "x": 1511.08,
+        "y": 61,
+        "width": 69.92,
+        "height": 26
+      },
+      "measuredAtFrame": 47
+    },
+    {
+      "frame": 92,
+      "target": "dashboard-save-option",
+      "action": "click",
+      "x": 1466,
+      "y": 148.52,
+      "rect": {
+        "x": 1351,
+        "y": 132.34,
+        "width": 230,
+        "height": 32.34
+      },
+      "measuredAtFrame": 91
+    },
+    {
+      "frame": 144,
+      "target": "dashboard-name",
+      "action": "click",
+      "x": 913,
+      "y": 469.09,
+      "rect": {
+        "x": 619,
+        "y": 451.09,
+        "width": 588,
+        "height": 36
+      },
+      "measuredAtFrame": 143
+    },
+    {
+      "frame": 300,
+      "target": "dashboard-create",
+      "action": "click",
+      "x": 1109.35,
+      "y": 529.09,
+      "rect": {
+        "x": 1011.7,
+        "y": 511.09,
+        "width": 195.3,
+        "height": 36
+      },
+      "measuredAtFrame": 299
+    },
+    {
+      "frame": 456,
+      "target": "dashboard-view",
+      "action": "click",
+      "x": 1448.56,
+      "y": 70,
+      "rect": {
+        "x": 1412.38,
+        "y": 57,
+        "width": 72.38,
+        "height": 26
+      },
+      "measuredAtFrame": 455
+    }
+  ],
+  "cases": [
+    {
+      "frame": 90,
+      "target": "cases-type",
+      "action": "click",
+      "x": 619,
+      "y": 272.63,
+      "rect": {
+        "x": 337,
+        "y": 156.89,
+        "width": 564,
+        "height": 231.48
+      },
+      "measuredAtFrame": 89
+    },
+    {
+      "frame": 250,
+      "target": "cases-view-records",
+      "action": "click",
+      "x": 1058.26,
+      "y": 78,
+      "rect": {
+        "x": 997.02,
+        "y": 65,
+        "width": 122.48,
+        "height": 26
+      },
+      "measuredAtFrame": 249
+    },
+    {
+      "frame": 350,
+      "target": "cases-record-001",
+      "action": "click",
+      "x": 348.5,
+      "y": 74,
+      "rect": {
+        "x": 241,
+        "y": 49,
+        "width": 215,
+        "height": 50
+      },
+      "measuredAtFrame": 349
+    },
+    {
+      "frame": 470,
+      "target": "cases-visit-value",
+      "action": "point",
+      "x": 695,
+      "y": 310.77,
+      "rect": {
+        "x": 594,
+        "y": 281.58,
+        "width": 202,
+        "height": 58.39
+      },
+      "measuredAtFrame": 469
+    }
+  ],
+  "map": [
+    {
+      "frame": 90,
+      "target": "map-facilities-layer",
+      "action": "click",
+      "x": 384,
+      "y": 176.61,
+      "rect": {
+        "x": 299,
+        "y": 155.69,
+        "width": 170,
+        "height": 41.84
+      },
+      "measuredAtFrame": 89
+    },
+    {
+      "frame": 200,
+      "target": "map-data-section",
+      "action": "click",
+      "x": 1421,
+      "y": 223.27,
+      "rect": {
+        "x": 1262,
+        "y": 205.97,
+        "width": 318,
+        "height": 34.59
+      },
+      "measuredAtFrame": 199
+    },
+    {
+      "frame": 300,
+      "target": "map-facilities-visibility",
+      "action": "click",
+      "x": 280,
+      "y": 176.61,
+      "rect": {
+        "x": 269,
+        "y": 165.61,
+        "width": 22,
+        "height": 22
+      },
+      "measuredAtFrame": 299
+    },
+    {
+      "frame": 380,
+      "target": "map-facilities-visibility",
+      "action": "click",
+      "x": 280,
+      "y": 176.61,
+      "rect": {
+        "x": 269,
+        "y": 165.61,
+        "width": 22,
+        "height": 22
+      },
+      "measuredAtFrame": 379
+    },
+    {
+      "frame": 440,
+      "target": "map-facility-point",
+      "action": "point",
+      "x": 888.75,
+      "y": 504.25,
+      "rect": {
+        "x": 882.75,
+        "y": 498.25,
+        "width": 12,
+        "height": 12
+      },
+      "measuredAtFrame": 439
+    },
+    {
+      "frame": 540,
+      "target": "map-facility-point",
+      "action": "click",
+      "x": 876.81,
+      "y": 444.61,
+      "rect": {
+        "x": 870.81,
+        "y": 438.61,
+        "width": 12,
+        "height": 12
+      },
+      "measuredAtFrame": 539
+    }
+  ]
+}
