@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { camelCaseKeysShallow, prop } from "@avandar/utils";
 import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.ts";
 import { ConnectorError, type Connector } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
@@ -87,13 +87,7 @@ async function _getColumnSizeInfo(
     where table_schema = ${schemaName} and table_name = ${tableName}
     order by ordinal_position
   `;
-  return columns.map((column) => {
-    return {
-      columnName: column.column_name,
-      dataType: column.data_type,
-      characterMaximumLength: column.character_maximum_length,
-    };
-  });
+  return columns.map(camelCaseKeysShallow);
 }
 
 /**

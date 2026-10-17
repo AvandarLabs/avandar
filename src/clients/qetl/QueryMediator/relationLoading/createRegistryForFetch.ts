@@ -37,33 +37,30 @@ function _isPostgresTableRelationSource(
 function _googleSheetsSourceByDatasetId(
   relationSources: readonly RelationSource[],
 ): Record<string, GoogleSheetsDataset.T> {
-  return Object.fromEntries(
-    relationSources.filter(_isGoogleSheetsRelationSource).map((source) => {
-      return [source.dataset.id, source.sourceDataset];
-    }),
-  );
+  return makeObject(relationSources.filter(_isGoogleSheetsRelationSource), {
+    keyFn: prop("dataset.id"),
+    valueFn: prop("sourceDataset"),
+  });
 }
 
 function _postgresTableSourceByDatasetId(
   relationSources: readonly RelationSource[],
 ): Record<string, PostgresTableDataset.T> {
   return makeObject(relationSources.filter(_isPostgresTableRelationSource), {
-    keyFn: (source) => {
-      return source.dataset.id;
-    },
-    valueFn: (source) => {
-      return source.sourceDataset;
-    },
+    keyFn: prop("dataset.id"),
+    valueFn: prop("sourceDataset"),
   });
 }
 
 function _lookupsForFetch(relationSources: readonly RelationSource[]) {
   return {
     datasetsById: makeIdLookupRecord(relationSources.map(prop("dataset"))),
-    rawSqlByDatasetId: Object.fromEntries(
-      relationSources.filter(_isVirtualRelationSource).map((relationSource) => {
-        return [relationSource.dataset.id, relationSource.sourceDataset.rawSql];
-      }),
+    rawSqlByDatasetId: makeObject(
+      relationSources.filter(_isVirtualRelationSource),
+      {
+        keyFn: prop("dataset.id"),
+        valueFn: prop("sourceDataset.rawSql"),
+      },
     ),
     googleSheetsByDatasetId: _googleSheetsSourceByDatasetId(relationSources),
     postgresTableByDatasetId: _postgresTableSourceByDatasetId(relationSources),
