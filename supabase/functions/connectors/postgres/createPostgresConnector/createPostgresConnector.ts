@@ -13,13 +13,11 @@ import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/pos
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import {
-  estimateRelationCsvBytes,
-  estimateRowCsvBytes,
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
-  postgresMaxRowsPerCall,
-} from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
+  PostgresCsvEstimate,
+} from "$/connectors/postgres/PostgresCsvEstimate/PostgresCsvEstimate.ts";
 import { isWithinRelationCallCaps } from "$/models/relations/RelationCapabilities/isWithinRelationCallCaps.ts";
-import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
+import type { ColumnSizeInfo } from "$/connectors/postgres/PostgresCsvEstimate/PostgresCsvEstimate.ts";
 import type { RelationRowDescriptor } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
@@ -44,7 +42,7 @@ type AssertWithinPostgresCallCapsOptions = {
 
 /**
  * Throws `too_large` unless `byteCount`/`rowCount` both stay within the
- * shared Postgres cap contract (`postgresMaxRowsPerCall`,
+ * shared Postgres cap contract (`PostgresCsvEstimate.postgresMaxRowsPerCall`,
  * `POSTGRES_MAX_BYTES_PER_ACQUIRE`) for the relation `descriptor` describes -
  * the same contract `PostgresTableWrapper.ts`'s capability record advertises,
  * so the edge function enforces exactly what it advertises rather than a
@@ -56,7 +54,7 @@ function _assertWithinPostgresCallCaps(
   const withinCaps = isWithinRelationCallCaps({
     rowCount: options.rowCount,
     byteCount: options.byteCount,
-    maxRowsPerCall: postgresMaxRowsPerCall,
+    maxRowsPerCall: PostgresCsvEstimate.postgresMaxRowsPerCall,
     maxBytesPerCall: POSTGRES_MAX_BYTES_PER_ACQUIRE,
     descriptor: options.descriptor,
   });
@@ -110,13 +108,13 @@ async function _readRelationRowsWithinCaps(
 
   // A raw row count alone says nothing about row width - estimate the CSV
   // footprint from the columns' own declared types instead (see
-  // `estimateRelationCsvBytes.ts`), multiplied by the exact row count.
+  // `PostgresCsvEstimate.ts`), multiplied by the exact row count.
   const columnSizeInfo = await _getColumnSizeInfo(sql, schemaName, tableName);
   const descriptor = {
     columnCount: columnSizeInfo.length,
-    estimatedRowBytes: estimateRowCsvBytes(columnSizeInfo),
+    estimatedRowBytes: PostgresCsvEstimate.estimateRowCsvBytes(columnSizeInfo),
   };
-  const estimatedBytes = estimateRelationCsvBytes({
+  const estimatedBytes = PostgresCsvEstimate.estimateRelationCsvBytes({
     columns: columnSizeInfo,
     rowCount,
   });

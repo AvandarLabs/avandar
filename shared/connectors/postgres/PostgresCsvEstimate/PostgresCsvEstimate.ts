@@ -109,7 +109,7 @@ function _estimateUnboundedTextBytes(columnName: string): number {
  * bound, not a guess; everything else without a fixed width falls to the
  * name-based heuristics above.
  */
-export function estimateColumnCsvBytes(column: ColumnSizeInfo): number {
+function _estimateColumnCsvBytes(column: ColumnSizeInfo): number {
   const { dataType, characterMaximumLength, columnName } = column;
 
   if (characterMaximumLength !== null) {
@@ -134,11 +134,9 @@ export function estimateColumnCsvBytes(column: ColumnSizeInfo): number {
  * comma between each pair of columns and the `\r\n` `rowsToCsv` actually
  * writes (never a bare `\n`).
  */
-export function estimateRowCsvBytes(
-  columns: readonly ColumnSizeInfo[],
-): number {
+function _estimateRowCsvBytes(columns: readonly ColumnSizeInfo[]): number {
   const columnBytes = columns.reduce((total, column) => {
-    return total + estimateColumnCsvBytes(column);
+    return total + _estimateColumnCsvBytes(column);
   }, 0);
   const commaCount = Math.max(columns.length - 1, 0);
   const rowTerminatorBytes = 2; // "\r\n"
@@ -152,13 +150,13 @@ export function estimateRowCsvBytes(
  * reliable as that estimate, which is why `getRelationRows` still checks the
  * real byte count once the CSV is actually built.
  */
-export function estimateRelationCsvBytes(
+function _estimateRelationCsvBytes(
   options: Readonly<{
     columns: readonly ColumnSizeInfo[];
     rowCount: number;
   }>,
 ): number {
-  return estimateRowCsvBytes(options.columns) * options.rowCount;
+  return _estimateRowCsvBytes(options.columns) * options.rowCount;
 }
 
 /**
@@ -177,7 +175,7 @@ export function estimateRelationCsvBytes(
  * number; `PostgresTableWrapper.ts`'s capability record uses it to advertise
  * the same derivation to the mediator.
  */
-export function postgresMaxRowsPerCall(
+function _postgresMaxRowsPerCall(
   descriptor: RelationRowDescriptor,
 ): number | "unbounded" {
   if (
@@ -190,3 +188,11 @@ export function postgresMaxRowsPerCall(
     POSTGRES_MAX_BYTES_PER_ACQUIRE / descriptor.estimatedRowBytes,
   );
 }
+
+/** Estimates a Postgres relation's CSV footprint from its column types. */
+export const PostgresCsvEstimate = {
+  estimateColumnCsvBytes: _estimateColumnCsvBytes,
+  estimateRowCsvBytes: _estimateRowCsvBytes,
+  estimateRelationCsvBytes: _estimateRelationCsvBytes,
+  postgresMaxRowsPerCall: _postgresMaxRowsPerCall,
+};

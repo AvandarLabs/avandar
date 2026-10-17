@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
-  estimateColumnCsvBytes,
-  estimateRelationCsvBytes,
-  estimateRowCsvBytes,
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
+  PostgresCsvEstimate,
+} from "$/connectors/postgres/PostgresCsvEstimate/PostgresCsvEstimate.ts";
+import type { ColumnSizeInfo } from "$/connectors/postgres/PostgresCsvEstimate/PostgresCsvEstimate.ts";
+
+const {
+  estimateColumnCsvBytes,
+  estimateRowCsvBytes,
+  estimateRelationCsvBytes,
   postgresMaxRowsPerCall,
-} from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
-import type { ColumnSizeInfo } from "$/connectors/postgres/estimateRelationCsvBytes/estimateRelationCsvBytes.ts";
+} = PostgresCsvEstimate;
 
 function _column(
   overrides: Partial<ColumnSizeInfo> & { columnName: string },
@@ -18,7 +22,7 @@ function _column(
   };
 }
 
-describe("estimateColumnCsvBytes", () => {
+describe("PostgresCsvEstimate.estimateColumnCsvBytes", () => {
   it("uses the declared length for a bounded varchar, never a guess", () => {
     const column = _column({
       columnName: "anything_at_all",
@@ -67,7 +71,7 @@ describe("estimateColumnCsvBytes", () => {
   });
 });
 
-describe("estimateRowCsvBytes", () => {
+describe("PostgresCsvEstimate.estimateRowCsvBytes", () => {
   it("sums every column plus commas and the \\r\\n terminator", () => {
     const columns: ColumnSizeInfo[] = [
       _column({ columnName: "id", dataType: "uuid" }), // 36
@@ -85,7 +89,7 @@ describe("estimateRowCsvBytes", () => {
   });
 });
 
-describe("estimateRelationCsvBytes", () => {
+describe("PostgresCsvEstimate.estimateRelationCsvBytes", () => {
   it("multiplies the per-row estimate by the exact row count", () => {
     const columns: ColumnSizeInfo[] = [
       _column({ columnName: "id", dataType: "uuid" }),
@@ -97,7 +101,7 @@ describe("estimateRelationCsvBytes", () => {
   });
 });
 
-describe("postgresMaxRowsPerCall", () => {
+describe("PostgresCsvEstimate.postgresMaxRowsPerCall", () => {
   it("derives a row cap from the shared byte budget and the relation's row width", () => {
     // 150MB budget / 100 bytes-per-row = 1,572,864 rows.
     expect(
