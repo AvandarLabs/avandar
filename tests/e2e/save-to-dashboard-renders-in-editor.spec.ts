@@ -15,8 +15,9 @@ import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
  *   2. Create + save an empty dashboard.
  *   3. Run a constant SQL query in the Data Explorer and switch the viz to bar.
  *   4. Save to the existing dashboard.
- *   5. Navigate (client-side) back to the dashboard editor.
- *   6. Assert the bar chart is visible inside the Puck canvas iframe.
+ *   5. Reopen the persisted dashboard in the editor.
+ *   6. Assert the chart and styling inside the Puck canvas iframe.
+ *   7. Open View and verify tooltip values in the saved preview.
  */
 test.describe("Data Explorer: save viz to dashboard", () => {
   test("bar chart saved to an existing dashboard renders inside that dashboard's editor", async ({
@@ -178,15 +179,33 @@ test.describe("Data Explorer: save viz to dashboard", () => {
       await expect(
         editorFrame.getByText("Revenue trend", { exact: true }).first(),
       ).toBeVisible();
-      await bars.first().hover();
-      const tooltip = editorFrame.locator(".recharts-tooltip-wrapper");
+      await page.screenshot({
+        path: ".temp/refactor-query-column-id/save-reopen-bindings.png",
+        fullPage: true,
+      });
+
+      // The editor's selection overlay owns pointer interactions. View opens
+      // the persisted dashboard with interactive chart tooltips.
+      await page.getByRole("button", { name: "View", exact: true }).click();
+      await expect(page).toHaveURL(
+        new RegExp(`/${workspaceSlug}/dashboards/preview/${dashboardId}`),
+        { timeout: MEDIUM_WAIT },
+      );
+      const previewBars = page.locator(".recharts-bar-rectangle path");
+      await expect(previewBars).toHaveCount(4, { timeout: MEDIUM_WAIT });
+      await expect(previewBars.first()).toHaveAttribute("fill", "#123456");
+      await expect(
+        page.getByText("Revenue trend", { exact: true }).first(),
+      ).toBeVisible();
+      await previewBars.first().hover();
+      const tooltip = page.locator(".recharts-tooltip-wrapper");
       await expect(tooltip).toContainText("Riverside");
       await expect(tooltip).toContainText(/1,?800/);
-      await bars.last().hover();
+      await previewBars.last().hover();
       await expect(tooltip).toContainText("Fresno");
       await expect(tooltip).toContainText("700");
       await page.screenshot({
-        path: ".temp/refactor-query-column-id/save-reopen-bindings.png",
+        path: ".temp/refactor-query-column-id/save-reopen-preview-bindings.png",
         fullPage: true,
       });
     } finally {
