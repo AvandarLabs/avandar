@@ -13,17 +13,22 @@ create table public.datasets__postgres_table (
   dataset_id uuid not null unique references public.datasets (id) on update cascade on delete cascade,
   -- Workspace this dataset belongs to
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
-  -- The saved connection this dataset reads through. `restrict`, not
-  -- `cascade`: deleting a connection with live datasets must be an
-  -- explicit, informed action - the FK must not silently orphan a
-  -- queryable dataset.
-  connection_id uuid not null references public.connections (id) on update cascade on delete restrict,
+  -- The saved connection this dataset reads through, constrained below to a
+  -- connection in this dataset's own workspace.
+  connection_id uuid not null,
   schema_name text not null,
   table_name text not null,
   relation_kind public.datasets__postgres_table_relation_kind not null,
   -- Timestamps
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  -- Keyed on the workspace as well as the connection, so a dataset can never
+  -- read through another workspace's connection. A foreign key check bypasses
+  -- RLS, so a key on `connection_id` alone would accept any connection id in
+  -- any workspace. `restrict`, not `cascade`: deleting a connection with
+  -- live datasets must be an explicit, informed action - the FK must not
+  -- silently orphan a queryable dataset.
+  constraint datasets__postgres_table__connection_in_workspace_fkey foreign key (connection_id, workspace_id) references public.connections (id, workspace_id) on update cascade on delete restrict
 );
 
 -- Enable row level security

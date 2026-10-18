@@ -60,7 +60,9 @@ values
   ('0c025002-0000-4000-8000-000000000002'::uuid, '0c021001-0000-4000-8000-000000000001'::uuid, '0c020001-0000-4000-8000-000000000001'::uuid, '0c023001-0000-4000-8000-000000000001'::uuid,
    'ws a postgres dataset', 'postgres_table'::public.datasets__source_type),
   ('0c025003-0000-4000-8000-000000000003'::uuid, '0c021001-0000-4000-8000-000000000001'::uuid, '0c020001-0000-4000-8000-000000000001'::uuid, '0c023001-0000-4000-8000-000000000001'::uuid,
-   'ws a spare dataset', 'postgres_table'::public.datasets__source_type)
+   'ws a spare dataset', 'postgres_table'::public.datasets__source_type),
+  ('0c025004-0000-4000-8000-000000000004'::uuid, '0c021002-0000-4000-8000-000000000002'::uuid, '0c020002-0000-4000-8000-000000000002'::uuid, '0c023002-0000-4000-8000-000000000002'::uuid,
+   'ws b postgres dataset', 'postgres_table'::public.datasets__source_type)
 on conflict (id) do nothing;
 
 insert into public.datasets__postgres_table (
@@ -77,7 +79,7 @@ values (
 )
 on conflict (id) do nothing;
 
-select plan (6);
+select plan (7);
 
 -- 1. A member of the owning workspace reads the row.
 select lives_ok (
@@ -206,6 +208,26 @@ select throws_ok (
   '42501',
   null,
   'anon cannot select datasets__postgres_table'
+);
+
+-- 7. A dataset cannot read through another workspace's connection, even when
+-- RLS is bypassed: the foreign key itself ties the connection to the
+-- dataset's own workspace.
+select throws_ok (
+  $t7$
+  insert into public.datasets__postgres_table (dataset_id, workspace_id, connection_id, schema_name, table_name, relation_kind)
+  values (
+    '0c025004-0000-4000-8000-000000000004'::uuid,
+    '0c021002-0000-4000-8000-000000000002'::uuid,
+    '0c024001-0000-4000-8000-000000000001'::uuid,
+    'public',
+    'customers',
+    'table'::public.datasets__postgres_table_relation_kind
+  );
+  $t7$,
+  '23503',
+  null,
+  'a datasets__postgres_table row cannot reference a connection in another workspace'
 );
 
 select * from finish ();

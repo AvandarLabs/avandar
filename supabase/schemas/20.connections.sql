@@ -25,7 +25,11 @@ create table public.connections (
   created_by uuid references auth.users (id) on update cascade on delete set null,
   -- Timestamps
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  -- The target of a satellite table's `(connection_id, workspace_id)` foreign
+  -- key, which ties a row that reads through a connection to that
+  -- connection's own workspace.
+  constraint connections__id_workspace_id_key unique (id, workspace_id)
 );
 
 -- Enable row level security
