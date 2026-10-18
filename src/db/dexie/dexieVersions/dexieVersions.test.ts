@@ -166,6 +166,41 @@ async function _seedV9DatabaseWithParquetData(
 }
 
 /**
+ * A v10 database holding relation-cache rows written before cached rows
+ * carried a stale-at time, plus a resumable-upload staging row, so the v11
+ * upgrade can be shown to clear the one and keep the other.
+ */
+async function _seedV10DatabaseWithRelationCache(
+  legacyDatabase: Dexie,
+): Promise<void> {
+  legacyDatabase.version(10).stores({
+    meta: "&key",
+    LocalDataset: "&datasetId,userId,workspaceId",
+    LocalPublicDataset: "&[dashboardId+datasetId],dashboardId",
+    ConsentAuditEntry: "&id,workspaceId,userId,timestamp,context,decision",
+    ClarificationAuditEntry: "&id,workspaceId,timestamp,outcome,turnNumber",
+    RelationCacheEntry: "&identityKey,tableName,principalKey,lastQueriedAt",
+    RelationCachePayload: "&identityKey",
+  });
+  await legacyDatabase.open();
+  await legacyDatabase.table("RelationCacheEntry").put({
+    identityKey: "w:ws:u|sheet|v0|d0",
+    tableName: "sheet",
+    principalKey: "w:ws:u",
+    lastQueriedAt: 1,
+    staleAt: undefined,
+  });
+  await legacyDatabase.table("RelationCachePayload").put({
+    identityKey: "w:ws:u|sheet|v0|d0",
+    payload: new Blob(["parquet-bytes"]),
+  });
+  await legacyDatabase.table("LocalDataset").put({
+    datasetId: "staged-dataset",
+    parquetData: new Blob(["parquet-bytes"]),
+  });
+}
+
+/**
  * A store that was rebuilt has to be usable, not merely present. Writing and
  * reading back by compound key is the positive control for the emptiness
  * assertions, which would also pass against a store that does not exist.
@@ -187,8 +222,20 @@ afterAll(async () => {
   await db.delete();
 });
 
+describe("AvaDexie v11 schema", () => {
+  it("clears relation-cache rows that predate stale-at times, so live sources are acquired again, and keeps everything else", async () => {
+    await _upgradeFromLegacyDatabase(_seedV10DatabaseWithRelationCache);
+
+    await expect(db.table("RelationCacheEntry").count()).resolves.toBe(0);
+    await expect(db.table("RelationCachePayload").count()).resolves.toBe(0);
+    await expect(
+      db.table("LocalDataset").get("staged-dataset"),
+    ).resolves.toBeDefined();
+  });
+});
+
 describe("AvaDexie v10 schema", () => {
-  it("is current and keeps every earlier table", async () => {
+  it("is still the current table layout under v11, and keeps every earlier table", async () => {
     await db.open();
 
     expect(

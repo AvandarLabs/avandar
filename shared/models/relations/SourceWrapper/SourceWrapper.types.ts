@@ -22,6 +22,12 @@ export type AcquiredRelation = {
   ref: RelationRef.T;
   parquetBlob: Blob;
   sourceVersion: SourceVersion | undefined;
+  /**
+   * How long these rows may be served from a cache before the source is
+   * acquired again, in ms. Omitted for a source whose rows never change
+   * under the dataset, such as an uploaded file.
+   */
+  maxAgeMs?: number;
 };
 
 /** A request to fetch a relation's rows. */

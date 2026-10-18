@@ -134,6 +134,10 @@ msgstr "سمِّ نوع الحالة هذا، واذكر مصدر حقوله. ط
 msgid "Value column"
 msgstr "عمود القيمة"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Could not refresh this dataset"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
 msgstr "ليس على"
@@ -556,7 +560,7 @@ msgstr "احفظ وأعد تشغيل الاستعلام"
 msgid "Saved as \"{0}\"."
 msgstr "تم الحفظ كـ \"{0}\"."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr ""
 
@@ -2124,6 +2128,10 @@ msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
 msgstr "لا تعني الحدود والأسماء المعروضة تأييدًا أو قبولًا رسميًا."
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Try again. If it keeps failing, reload the page."
+msgstr ""
+
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "يمكنك البدء في استخدام كلمة المرور الجديدة الآن"
@@ -2239,6 +2247,10 @@ msgid "You shared your first dashboard with your workspace. Anyone there can "
 "open it whenever they need it."
 msgstr "لقد شاركت لوحة المعلومات الأولى مع مساحة عملك. ويمكن لأي شخص فيها فتحها "
 "متى احتاج إليها."
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "This dataset now reflects the current contents of the table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -2939,7 +2951,7 @@ msgstr "نطاق البيانات"
 msgid "Data preview"
 msgstr "معاينة البيانات"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This address isn't allowed"
 msgstr ""
 
@@ -3054,6 +3066,10 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 msgstr "يمكن الترقية إلى خطة \"ادفع ما تريد\" فقط من خلال بوابة "
 "الفوترة.<0/>سيأخذك الزر أدناه إلى هناك."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+msgid "Refresh from the database"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
@@ -3612,7 +3628,7 @@ msgstr "جارٍ التقاط اللوحة…"
 msgid "Keep the measurements as found"
 msgstr "الاحتفاظ بالقياسات كما هي"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
 msgstr ""
 
@@ -3660,7 +3676,7 @@ msgstr "لون تسمية المحور Y"
 msgid "Name of {0}"
 msgstr "اسم {0}"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
 msgstr ""
 
@@ -4221,7 +4237,7 @@ msgstr "علامة تبويب للاستيراد"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB للتنزيل)."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
 msgstr ""
 
@@ -4574,6 +4590,10 @@ msgstr "تعرّف مجددًا على كيفية إنشاء لوحة معلوم
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "تدوير تسمية المحور X"
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Refreshed from the database"
+msgstr ""
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
@@ -6165,7 +6185,7 @@ msgstr "يوجد عامل تصفية واحد نشط على هذه الطبقة.
 msgid "Workspace name updated"
 msgstr "تم تحديث اسم مساحة العمل"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
 msgstr ""
@@ -7681,7 +7701,7 @@ msgstr "مجموعة التكديس"
 msgid "Select rule (e.g. most frequent)"
 msgstr "اختر قاعدة (مثل الأكثر تكرارًا)"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
 msgstr ""
 
@@ -7893,7 +7913,7 @@ msgstr "جارٍ الحفظ"
 msgid "Role for new share"
 msgstr "الدور للمشاركة الجديدة"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
 msgstr ""
@@ -7910,7 +7930,7 @@ msgstr "إرسال إلى الذكاء الاصطناعي؟"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "شراء {seatsToAdd} مقاعد"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr ""
@@ -8092,7 +8112,7 @@ msgstr "تعبير عمود غير مُسمّى في SELECT؛ تم تخطيه."
 msgid "Clear search"
 msgstr "مسح البحث"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
 msgstr ""
 
@@ -8251,7 +8271,7 @@ msgstr "إخفاء التفاصيل"
 msgid "See why"
 msgstr "معرفة السبب"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar can't connect to a loopback, link-local, or private address. Use "
 "a publicly reachable host and port."
 msgstr ""
@@ -8751,7 +8771,7 @@ msgstr "لا يرسم التجميع المناطق إلا بعد وجود {0} �
 msgid "Dataset saved"
 msgstr "تم حفظ مجموعة البيانات"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
 msgstr ""
 
@@ -9140,7 +9160,7 @@ msgid "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the "
 msgstr "حمّل ملف CSV أو Excel أو PDF، أو صِل Google Sheet، أو تصفّح كتالوج "
 "البيانات المفتوحة. كل ما في Avandar يعتمد على ما تستورده هنا."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
 msgstr ""
 
@@ -9383,7 +9403,7 @@ msgstr "العمود 10"
 msgid "Click a labelled tick on the y-axis."
 msgstr "انقر على تدريج مُسمّى على المحور ص."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
 msgstr ""
 

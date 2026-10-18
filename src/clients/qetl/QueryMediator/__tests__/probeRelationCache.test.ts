@@ -52,7 +52,11 @@ describe("probeRelationCache", () => {
 
   it("treats a present table as a miss when its loaded columns do not cover the request", async () => {
     getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-    rememberQueryableColumns(LOADED_ID, ["a"]);
+    rememberQueryableColumns({
+      datasetId: LOADED_ID,
+      columns: ["a"],
+      staleAt: undefined,
+    });
 
     const { probeRelationCache } =
       await import("@/clients/qetl/QueryMediator/getRelationSources");
@@ -65,7 +69,11 @@ describe("probeRelationCache", () => {
 
   it("still serves a present table whose loaded columns cover the request", async () => {
     getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-    rememberQueryableColumns(LOADED_ID, ["a", "b"]);
+    rememberQueryableColumns({
+      datasetId: LOADED_ID,
+      columns: ["a", "b"],
+      staleAt: undefined,
+    });
 
     const { probeRelationCache } =
       await import("@/clients/qetl/QueryMediator/getRelationSources");
@@ -74,5 +82,20 @@ describe("probeRelationCache", () => {
     });
 
     expect(result).toEqual([]);
+  });
+
+  it("treats a loaded table as a miss once its stale-at time has passed, so a live source is acquired again", async () => {
+    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
+    rememberQueryableColumns({
+      datasetId: LOADED_ID,
+      columns: "all",
+      staleAt: Date.now() - 1,
+    });
+
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache([LOADED_ID]);
+
+    expect(result).toEqual([LOADED_ID]);
   });
 });

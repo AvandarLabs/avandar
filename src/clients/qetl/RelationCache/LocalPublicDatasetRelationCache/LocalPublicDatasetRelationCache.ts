@@ -6,6 +6,7 @@ import {
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { getRelationFreshnessNow } from "@/clients/qetl/RelationCache/getRelationFreshnessNow/getRelationFreshnessNow";
 import { isQuotaExceededError } from "@/clients/qetl/RelationCache/isQuotaExceededError";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
@@ -195,7 +196,7 @@ async function _rowServesKey(
     columns: "all",
     staleAt: undefined,
   };
-  return serves(entryFields, prepared);
+  return serves(entryFields, prepared, getRelationFreshnessNow());
 }
 
 /**

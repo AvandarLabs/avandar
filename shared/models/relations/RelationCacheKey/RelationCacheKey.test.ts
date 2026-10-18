@@ -277,6 +277,9 @@ describe("coversColumns", () => {
   });
 });
 
+/** A fixed "current time" for the reuse predicate's staleness check. */
+const NOW = 1_800_000_000_000;
+
 describe("serves", () => {
   it("serves when principal, table, definition match and columns are covered", () => {
     const entry = {
@@ -287,12 +290,16 @@ describe("serves", () => {
       staleAt: undefined,
     };
     expect(
-      serves(entry, {
-        principalKey: "w:ws:u",
-        tableName: DATASET_ID,
-        definitionToken: "d0",
-        columns: ["a"],
-      }),
+      serves(
+        entry,
+        {
+          principalKey: "w:ws:u",
+          tableName: DATASET_ID,
+          definitionToken: "d0",
+          columns: ["a"],
+        },
+        NOW,
+      ),
     ).toBe(true);
   });
 
@@ -305,31 +312,83 @@ describe("serves", () => {
       staleAt: undefined,
     };
     expect(
-      serves(entry, {
-        principalKey: "p:published:dash1:1",
-        tableName: DATASET_ID,
-        definitionToken: "d0",
-        columns: "all",
-      }),
+      serves(
+        entry,
+        {
+          principalKey: "p:published:dash1:1",
+          tableName: DATASET_ID,
+          definitionToken: "d0",
+          columns: "all",
+        },
+        NOW,
+      ),
     ).toBe(false);
   });
 
-  it("does not serve once staleAt is set", () => {
+  it("does not serve once its stale-at time has passed", () => {
     const entry = {
       principalKey: "w:ws:u",
       tableName: DATASET_ID,
       definitionToken: "d0",
       columns: "all" as const,
-      staleAt: Date.now(),
+      staleAt: NOW - 1,
     };
     expect(
-      serves(entry, {
-        principalKey: "w:ws:u",
-        tableName: DATASET_ID,
-        definitionToken: "d0",
-        columns: "all",
-      }),
+      serves(
+        entry,
+        {
+          principalKey: "w:ws:u",
+          tableName: DATASET_ID,
+          definitionToken: "d0",
+          columns: "all",
+        },
+        NOW,
+      ),
     ).toBe(false);
+  });
+
+  it("does not serve at exactly its stale-at time", () => {
+    const entry = {
+      principalKey: "w:ws:u",
+      tableName: DATASET_ID,
+      definitionToken: "d0",
+      columns: "all" as const,
+      staleAt: NOW,
+    };
+    expect(
+      serves(
+        entry,
+        {
+          principalKey: "w:ws:u",
+          tableName: DATASET_ID,
+          definitionToken: "d0",
+          columns: "all",
+        },
+        NOW,
+      ),
+    ).toBe(false);
+  });
+
+  it("serves until its stale-at time arrives", () => {
+    const entry = {
+      principalKey: "w:ws:u",
+      tableName: DATASET_ID,
+      definitionToken: "d0",
+      columns: "all" as const,
+      staleAt: NOW + 1,
+    };
+    expect(
+      serves(
+        entry,
+        {
+          principalKey: "w:ws:u",
+          tableName: DATASET_ID,
+          definitionToken: "d0",
+          columns: "all",
+        },
+        NOW,
+      ),
+    ).toBe(true);
   });
 
   it("does not serve a different definition token", () => {
@@ -341,12 +400,16 @@ describe("serves", () => {
       staleAt: undefined,
     };
     expect(
-      serves(entry, {
-        principalKey: "w:ws:u",
-        tableName: DATASET_ID,
-        definitionToken: "d1.bbbb",
-        columns: "all",
-      }),
+      serves(
+        entry,
+        {
+          principalKey: "w:ws:u",
+          tableName: DATASET_ID,
+          definitionToken: "d1.bbbb",
+          columns: "all",
+        },
+        NOW,
+      ),
     ).toBe(false);
   });
 });

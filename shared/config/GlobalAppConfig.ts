@@ -44,5 +44,13 @@ export const GlobalAppConfig = {
      * action is the escape hatch that makes that acceptable.
      */
     googleSheetFreshnessDebounceMs: 60_000,
+
+    /**
+     * How long rows acquired from a live source (a Google Sheet or a
+     * Postgres table) may be served from a browser cache before they are
+     * acquired again. An edit made at the source shows up within this window,
+     * and the source's "Refresh" action is the escape hatch for not waiting.
+     */
+    liveRelationMaxAgeMs: 5 * 60_000,
   },
 } as const;

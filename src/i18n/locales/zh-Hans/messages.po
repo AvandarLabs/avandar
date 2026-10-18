@@ -128,6 +128,10 @@ msgstr "为此案例类型命名，并说明其字段来源。您可以映射现
 msgid "Value column"
 msgstr "值列"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Could not refresh this dataset"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
 msgstr "不在"
@@ -542,7 +546,7 @@ msgstr "保存并重新运行查询"
 msgid "Saved as \"{0}\"."
 msgstr "已保存为 \"{0}\"。"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr ""
 
@@ -2072,6 +2076,10 @@ msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
 msgstr "所示边界和名称不代表官方认可或接受。"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Try again. If it keeps failing, reload the page."
+msgstr ""
+
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "您现在可以开始使用新密码"
@@ -2183,6 +2191,10 @@ msgstr "比例尺"
 msgid "You shared your first dashboard with your workspace. Anyone there can "
 "open it whenever they need it."
 msgstr "您已与工作区共享第一个仪表板。工作区中的任何人都可以在需要时打开它。"
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "This dataset now reflects the current contents of the table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -2860,7 +2872,7 @@ msgstr "数据范围"
 msgid "Data preview"
 msgstr "数据预览"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This address isn't allowed"
 msgstr ""
 
@@ -2973,6 +2985,10 @@ msgstr "搜索开放数据目录"
 msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 "billing portal.<0/>The button below will take you there."
 msgstr "升级到“您想支付多少”计划只能通过账单门户进行。<0/>下面的按钮将带您前往那里。"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+msgid "Refresh from the database"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
@@ -3513,7 +3529,7 @@ msgstr "正在捕获仪表板…"
 msgid "Keep the measurements as found"
 msgstr "保留原始测量值"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
 msgstr ""
 
@@ -3561,7 +3577,7 @@ msgstr "Y 轴标签颜色"
 msgid "Name of {0}"
 msgstr "{0} 的名称"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
 msgstr ""
 
@@ -4112,7 +4128,7 @@ msgstr "要导入的标签页"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf}（约 {approxSizeMb} MB 下载）。"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
 msgstr ""
 
@@ -4460,6 +4476,10 @@ msgstr "再次从头开始，了解如何创建和共享仪表板。"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "X 轴标签旋转角度"
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Refreshed from the database"
+msgstr ""
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
@@ -6026,7 +6046,7 @@ msgstr "此图层有一个活动筛选条件，可能会排除所有内容。"
 msgid "Workspace name updated"
 msgstr "工作区名称已更新"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
 msgstr ""
@@ -7509,7 +7529,7 @@ msgstr "堆叠组"
 msgid "Select rule (e.g. most frequent)"
 msgstr "选择规则（例如，最频繁）"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
 msgstr ""
 
@@ -7717,7 +7737,7 @@ msgstr "正在保存"
 msgid "Role for new share"
 msgstr "新共享的角色"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
 msgstr ""
@@ -7734,7 +7754,7 @@ msgstr "发送给 AI 吗？"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "购买 {seatsToAdd} 个座位"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr ""
@@ -7914,7 +7934,7 @@ msgstr "SELECT 中的列表达式未命名；已跳过。"
 msgid "Clear search"
 msgstr "清除搜索"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
 msgstr ""
 
@@ -8068,7 +8088,7 @@ msgstr "隐藏详情"
 msgid "See why"
 msgstr "了解原因"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar can't connect to a loopback, link-local, or private address. Use "
 "a publicly reachable host and port."
 msgstr ""
@@ -8557,7 +8577,7 @@ msgstr "只有在至少有 {0} 条记录参与时，聚合结果才会绘制区�
 msgid "Dataset saved"
 msgstr "数据集已保存"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
 msgstr ""
 
@@ -8936,7 +8956,7 @@ msgid "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the "
 msgstr "上传 CSV、Excel 或 PDF 文件，连接 Google Sheet，或浏览开放数据目录。Avandar "
 "中的其他所有内容都基于您在此处导入的数据。"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
 msgstr ""
 
@@ -9176,7 +9196,7 @@ msgstr "第 10 列"
 msgid "Click a labelled tick on the y-axis."
 msgstr "在 Y 轴上点击一个带标签的刻度。"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
 msgstr ""
 

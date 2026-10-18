@@ -10,6 +10,7 @@ import { POPOVER_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
+import { useRefreshPostgresTableDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { ReactNode } from "react";
@@ -44,6 +45,8 @@ export function DatasetActionsMenu({
   });
   const [refreshGoogleSheetDataset, isRefreshPending] =
     useRefreshGoogleSheetDataset();
+  const [refreshPostgresTableDataset, isPostgresRefreshPending] =
+    useRefreshPostgresTableDataset();
 
   const onDelete = (): void => {
     modals.openConfirmModal({
@@ -89,10 +92,11 @@ export function DatasetActionsMenu({
       </Menu.Target>
       <Menu.Dropdown>
         {/*
-          Google Sheets is the one source type whose rows can change under the
-          dataset without anyone re-importing it. The freshness check is
-          throttled, so this is the escape hatch for a user who has just
-          edited the sheet and does not want to wait for the window to close.
+          Google Sheets and Postgres tables are the source types whose rows
+          can change under the dataset without anyone re-importing it. Their
+          cached rows only go stale after a few minutes, so these are the
+          escape hatch for a user who has just edited the source and does not
+          want to wait for that window to close.
         */}
         {googleSheetSource ? (
           <Menu.Item
@@ -106,6 +110,17 @@ export function DatasetActionsMenu({
             }}
           >
             <Trans>Refresh from Google Sheets</Trans>
+          </Menu.Item>
+        ) : null}
+        {dataset.sourceType === "postgres_table" ? (
+          <Menu.Item
+            leftSection={<IconRefresh size={16} />}
+            disabled={isPostgresRefreshPending}
+            onClick={() => {
+              refreshPostgresTableDataset({ datasetId: dataset.id });
+            }}
+          >
+            <Trans>Refresh from the database</Trans>
           </Menu.Item>
         ) : null}
         <Menu.Item

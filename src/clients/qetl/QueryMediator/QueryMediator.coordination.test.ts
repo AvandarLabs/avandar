@@ -212,6 +212,7 @@ function _configureVirtualDependencyMocks(workspaceId: string): void {
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
   getTableOrViewNamesMock.mockResolvedValue([]);
   runRawQueryMock.mockImplementation(async (_sql, options) => {
@@ -257,6 +258,7 @@ function _configureVirtualSiblingData(workspaceId: string): void {
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
   getTableOrViewNamesMock.mockResolvedValue([]);
 }

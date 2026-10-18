@@ -1,11 +1,13 @@
 import {
   coversColumns,
+  isFreshAt,
   makeIdentityTokensFromIdentity,
   makePreparedRelationCacheKeyFromKey,
   serves,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { RelationCacheWriteFailed } from "$/models/relations/RelationCachePort/RelationCacheWriteFailed";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { getRelationFreshnessNow } from "@/clients/qetl/RelationCache/getRelationFreshnessNow/getRelationFreshnessNow";
 import { isQuotaExceededError } from "@/clients/qetl/RelationCache/isQuotaExceededError";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import type { PreparedRelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey";
@@ -31,22 +33,24 @@ function _normalizeColumns(
 
 /**
  * The narrower cached entry a miss on `prepared` could grow instead of
- * acquiring fresh: same principal, table and definition, live, and failing
- * `serves()` on the column check alone. By the single-live-entry rule (only
- * one live entry can exist per `(principalKey, tableName)`) at most one
- * candidate can ever match, so more than one is a §6.2 violation rather than
- * a choice to make.
+ * acquiring fresh: same principal, table and definition, live, still fresh
+ * at `freshnessNow`, and failing `serves()` on the column check alone. A
+ * stale entry is never grown, since its rows are the ones being replaced.
+ * By the single-live-entry rule (only one live entry can exist per
+ * `(principalKey, tableName)`) at most one candidate can ever match, so more
+ * than one is a §6.2 violation rather than a choice to make.
  */
 function _getGrowFromCandidate(
   candidates: readonly RelationCacheEntry[],
   prepared: PreparedRelationCacheKey,
+  freshnessNow: number,
 ): RelationCacheEntry | undefined {
   const growable = candidates.filter((entry) => {
     return (
       entry.principalKey === prepared.principalKey &&
       entry.tableName === prepared.tableName &&
       entry.definitionToken === prepared.definitionToken &&
-      entry.staleAt === undefined &&
+      isFreshAt(entry.staleAt, freshnessNow) &&
       !coversColumns(entry.columns, prepared.columns)
     );
   });
@@ -83,6 +87,7 @@ async function _probe(
 
   const result: RelationCacheProbeResult = { hits: [], misses: [] };
   const now = Date.now();
+  const freshnessNow = getRelationFreshnessNow();
 
   // The candidate read and the hit stamp run in one `rw` transaction, same
   // atomicity rationale as `_evict` and `_evictToBudget`: without it, a
@@ -101,7 +106,7 @@ async function _probe(
 
       preparedKeys.forEach(({ key, prepared }) => {
         const hit = candidates.find((entry) => {
-          return serves(entry, prepared);
+          return serves(entry, prepared, freshnessNow);
         });
         if (hit) {
           hitIdentityKeys.push(hit.identityKey);
@@ -110,7 +115,7 @@ async function _probe(
         }
         result.misses.push({
           key,
-          growFrom: _getGrowFromCandidate(candidates, prepared),
+          growFrom: _getGrowFromCandidate(candidates, prepared, freshnessNow),
         });
       });
 
@@ -224,7 +229,7 @@ async function _write(write: RelationCacheWrite): Promise<void> {
     byteSize: write.payload.size,
     lastQueriedAt: now,
     writtenAt: now,
-    staleAt: undefined,
+    staleAt: write.staleAt,
     freshnessCheckedAt: undefined,
   };
 

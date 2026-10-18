@@ -139,6 +139,10 @@ msgstr "Nommez ce type de dossier et indiquez l’origine de ses champs. Faites 
 msgid "Value column"
 msgstr "Colonne de valeur"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Could not refresh this dataset"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
 msgstr "n'est pas sur"
@@ -566,7 +570,7 @@ msgstr "Enregistrer et relancer la requête"
 msgid "Saved as \"{0}\"."
 msgstr "Enregistré sous \"{0}\"."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr ""
 
@@ -2173,6 +2177,10 @@ msgid "The boundaries and names shown do not imply official endorsement or "
 msgstr "Les limites et les noms affichés n’impliquent aucune approbation ni "
 "reconnaissance officielle."
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Try again. If it keeps failing, reload the page."
+msgstr ""
+
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "Vous pouvez commencer à utiliser votre nouveau mot de passe maintenant"
@@ -2292,6 +2300,10 @@ msgid "You shared your first dashboard with your workspace. Anyone there can "
 msgstr "Vous avez partagé votre premier tableau de bord avec votre espace de "
 "travail. Toute personne qui en fait partie peut l'ouvrir dès qu'elle en "
 "a besoin."
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "This dataset now reflects the current contents of the table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -3012,7 +3024,7 @@ msgstr "Portée des données"
 msgid "Data preview"
 msgstr "Aperçu des données"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This address isn't allowed"
 msgstr ""
 
@@ -3131,6 +3143,10 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 msgstr "La mise à niveau vers un plan \"Payez ce que vous voulez\" ne peut se "
 "faire que via le portail de facturation.<0/>Le bouton ci-dessous vous y "
 "conduira."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+msgid "Refresh from the database"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
@@ -3703,7 +3719,7 @@ msgstr "Capture du tableau de bord…"
 msgid "Keep the measurements as found"
 msgstr "Conserver les mesures telles qu’elles ont été trouvées"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
 msgstr ""
 
@@ -3752,7 +3768,7 @@ msgstr "Couleur du libellé de l’axe Y"
 msgid "Name of {0}"
 msgstr "Nom de {0}"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
 msgstr ""
 
@@ -4325,7 +4341,7 @@ msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (téléchargement d’environ {approxSizeMb} "
 "Mo)."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
 msgstr ""
 
@@ -4681,6 +4697,10 @@ msgstr "Revoyez la création et le partage d’un tableau de bord, depuis le "
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "Rotation des libellés de l’axe X"
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Refreshed from the database"
+msgstr ""
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
@@ -6306,7 +6326,7 @@ msgstr "Un filtre est actif sur cette couche. Il peut exclure tous les "
 msgid "Workspace name updated"
 msgstr "Nom de l'espace de travail mis à jour"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
 msgstr ""
@@ -7862,7 +7882,7 @@ msgstr "Groupe d’empilement"
 msgid "Select rule (e.g. most frequent)"
 msgstr "Sélectionner la règle (par exemple, la plus fréquente)"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
 msgstr ""
 
@@ -8076,7 +8096,7 @@ msgstr "Enregistrement"
 msgid "Role for new share"
 msgstr "Rôle pour le nouveau partage"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
 msgstr ""
@@ -8093,7 +8113,7 @@ msgstr "Envoyer à l'IA ?"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Acheter {seatsToAdd} sièges"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr ""
@@ -8277,7 +8297,7 @@ msgstr "Expression de colonne sans nom dans SELECT ; ignorée."
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
 msgstr ""
 
@@ -8440,7 +8460,7 @@ msgstr "Masquer les détails"
 msgid "See why"
 msgstr "Voir pourquoi"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar can't connect to a loopback, link-local, or private address. Use "
 "a publicly reachable host and port."
 msgstr ""
@@ -8953,7 +8973,7 @@ msgstr "Aggregate n’affiche les zones qu’après au moins {0} enregistrements
 msgid "Dataset saved"
 msgstr "Ensemble de données enregistré"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
 msgstr ""
 
@@ -9354,7 +9374,7 @@ msgstr "Importez un fichier CSV, Excel ou PDF, connectez une feuille Google "
 "Sheets ou parcourez le catalogue de données ouvertes. Tout le reste "
 "dans Avandar repose sur ce que vous importez ici."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
 msgstr ""
 
@@ -9598,7 +9618,7 @@ msgstr "Colonne 10"
 msgid "Click a labelled tick on the y-axis."
 msgstr "Cliquez sur une graduation étiquetée de l’axe Y."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
 msgstr ""
 

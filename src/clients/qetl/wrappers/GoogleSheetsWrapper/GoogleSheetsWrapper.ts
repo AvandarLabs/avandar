@@ -1,3 +1,4 @@
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
 import { getGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
@@ -115,6 +116,8 @@ async function _acquireGoogleSheet(
     ref,
     parquetBlob: acquired.relation.parquetBlob,
     sourceVersion: acquired.sourceVersion,
+    // A live source: its rows can change without anyone re-importing it.
+    maxAgeMs: GlobalAppConfig.timing.liveRelationMaxAgeMs,
   };
 }
 

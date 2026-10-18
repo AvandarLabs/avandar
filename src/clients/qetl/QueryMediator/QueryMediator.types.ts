@@ -75,6 +75,11 @@ export type AcquiredRelationBytes = {
   parquetBlob: Blob;
   /** The columns actually held in `parquetBlob`. */
   columns: readonly string[] | "all";
+  /**
+   * Epoch ms from which these rows are stale, so a live source is acquired
+   * again; `undefined` for rows that never go stale.
+   */
+  staleAt: number | undefined;
 };
 
 /** Per-dataset column sets a query needs, or `"all"` when unknown. */

@@ -136,6 +136,10 @@ msgstr "Asigne un nombre a este tipo de caso e indique de dónde provienen sus "
 msgid "Value column"
 msgstr "Columna de valor"
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Could not refresh this dataset"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
 msgstr "no está en"
@@ -563,7 +567,7 @@ msgstr "Guardar y volver a ejecutar la consulta"
 msgid "Saved as \"{0}\"."
 msgstr "Guardado como \"{0}\"."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr ""
 
@@ -2158,6 +2162,10 @@ msgid "The boundaries and names shown do not imply official endorsement or "
 msgstr "Los límites y nombres mostrados no implican respaldo ni aceptación "
 "oficial."
 
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Try again. If it keeps failing, reload the page."
+msgstr ""
+
 #: src/routes/update-password.tsx
 msgid "You can start using your new password now"
 msgstr "Puedes comenzar a usar tu nueva contraseña ahora"
@@ -2274,6 +2282,10 @@ msgid "You shared your first dashboard with your workspace. Anyone there can "
 "open it whenever they need it."
 msgstr "Compartió su primer panel con su espacio de trabajo. Cualquier persona "
 "allí puede abrirlo cuando lo necesite."
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "This dataset now reflects the current contents of the table."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -2987,7 +2999,7 @@ msgstr "Alcance de datos"
 msgid "Data preview"
 msgstr "Previsualización de datos"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This address isn't allowed"
 msgstr ""
 
@@ -3104,6 +3116,10 @@ msgid "Upgrading to a \"Pay What You Want\" plan can only be done through the "
 msgstr "La actualización a un plan \"Paga lo que quieras\" solo se puede hacer "
 "a través del portal de facturación.<0/>El botón de abajo te llevará "
 "allí."
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu.tsx
+msgid "Refresh from the database"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Empty text"
@@ -3671,7 +3687,7 @@ msgstr "Capturando panel…"
 msgid "Keep the measurements as found"
 msgstr "Conservar las mediciones tal como se encontraron"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
 msgstr ""
 
@@ -3720,7 +3736,7 @@ msgstr "Color de la etiqueta del eje Y"
 msgid "Name of {0}"
 msgstr "Nombre de {0}"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table is too large to import"
 msgstr ""
 
@@ -4289,7 +4305,7 @@ msgstr "Pestaña para importar"
 msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 msgstr "{description} {recommendedIf} (~{approxSizeMb} MB de descarga)."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
 msgstr ""
 
@@ -4643,6 +4659,10 @@ msgstr "Vuelva a recorrer el proceso para crear y compartir un dashboard desde "
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "Rotación de las etiquetas del eje X"
+
+#: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
+msgid "Refreshed from the database"
+msgstr ""
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryRecovery.ts
 msgid "[The local discovery lookup failed. Try a different column or lookup "
@@ -6259,7 +6279,7 @@ msgstr "Hay un filtro activo en esta capa. Es posible que esté excluyendo todo.
 msgid "Workspace name updated"
 msgstr "Nombre del espacio de trabajo actualizado"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar could not reach that host and port. Check the address and that "
 "the server allows connections from Avandar."
 msgstr ""
@@ -7806,7 +7826,7 @@ msgstr "Grupo de apilamiento"
 msgid "Select rule (e.g. most frequent)"
 msgstr "Seleccionar regla (por ejemplo, la más frecuente)"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Database is unreachable"
 msgstr ""
 
@@ -8020,7 +8040,7 @@ msgstr "Guardando"
 msgid "Role for new share"
 msgstr "Rol para nuevo compartir"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This table has more rows than Avandar can import at once. Try a smaller "
 "table or view."
 msgstr ""
@@ -8037,7 +8057,7 @@ msgstr "¿Enviar a AI?"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Comprar {seatsToAdd} asientos"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The username or password was not accepted. Check the credentials and try "
 "again."
 msgstr ""
@@ -8221,7 +8241,7 @@ msgstr "Expresión de columna sin nombre en SELECT; se omitió."
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "An unexpected error occurred while connecting."
 msgstr ""
 
@@ -8384,7 +8404,7 @@ msgstr "Ocultar detalles"
 msgid "See why"
 msgstr "Ver por qué"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Avandar can't connect to a loopback, link-local, or private address. Use "
 "a publicly reachable host and port."
 msgstr ""
@@ -8891,7 +8911,7 @@ msgstr "Aggregate solo dibuja áreas después de al menos {0} registros "
 msgid "Dataset saved"
 msgstr "Conjunto de datos guardado"
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Connection timed out"
 msgstr ""
 
@@ -9287,7 +9307,7 @@ msgstr "Cargue un archivo CSV, Excel o PDF, conecte una hoja de cálculo de "
 "Google o explore el catálogo de datos abiertos. Todo lo demás en "
 "Avandar se basa en lo que importe aquí."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
 msgstr ""
 
@@ -9532,7 +9552,7 @@ msgstr "Columna 10"
 msgid "Click a labelled tick on the y-axis."
 msgstr "Haga clic en una marca etiquetada del eje Y."
 
-#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy.ts
+#: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Could not connect to the database"
 msgstr ""
 

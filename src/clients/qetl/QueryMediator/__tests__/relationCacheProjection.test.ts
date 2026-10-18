@@ -157,6 +157,7 @@ async function _seedCache(columns: readonly string[] | "all"): Promise<void> {
     },
     columns,
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
 }
 
@@ -286,7 +287,11 @@ describe("QueryMediator relation cache projection", () => {
 
   it("does not skip storage when a queryable table is too narrow", async () => {
     getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
-    rememberQueryableColumns(DATASET_ID, ["a"]);
+    rememberQueryableColumns({
+      datasetId: DATASET_ID,
+      columns: ["a"],
+      staleAt: undefined,
+    });
 
     await _runSelect(["a", "b"]);
 
@@ -295,7 +300,11 @@ describe("QueryMediator relation cache projection", () => {
 
   it("serves a covering queryable table without reading a dataset record", async () => {
     getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
-    rememberQueryableColumns(DATASET_ID, ["a"]);
+    rememberQueryableColumns({
+      datasetId: DATASET_ID,
+      columns: ["a"],
+      staleAt: undefined,
+    });
 
     await _runSelect(["a"]);
 

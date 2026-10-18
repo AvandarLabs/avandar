@@ -5,6 +5,7 @@ import {
   clearQueryableRelationColumns,
   forgetQueryableColumns,
   getQueryableColumns,
+  isQueryableRelationStale,
   rememberQueryableColumns,
 } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -17,14 +18,43 @@ describe("queryableRelationColumns", () => {
   });
 
   it("remembers a finite set until forgotten", () => {
-    rememberQueryableColumns(DATASET_ID, ["a", "b"]);
+    rememberQueryableColumns({
+      datasetId: DATASET_ID,
+      columns: ["a", "b"],
+      staleAt: undefined,
+    });
     expect(getQueryableColumns(DATASET_ID)).toEqual(["a", "b"]);
     forgetQueryableColumns(DATASET_ID);
     expect(getQueryableColumns(DATASET_ID)).toBeUndefined();
   });
 
   it("remembers 'all'", () => {
-    rememberQueryableColumns(DATASET_ID, "all");
+    rememberQueryableColumns({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+    });
     expect(getQueryableColumns(DATASET_ID)).toBe("all");
+  });
+
+  it("reports a loaded relation stale once its stale-at time has passed", () => {
+    rememberQueryableColumns({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: 1_000,
+    });
+    expect(isQueryableRelationStale(DATASET_ID, 999)).toBe(false);
+    expect(isQueryableRelationStale(DATASET_ID, 1_000)).toBe(true);
+  });
+
+  it("never reports a relation stale when it has no stale-at time", () => {
+    rememberQueryableColumns({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+    });
+    expect(isQueryableRelationStale(DATASET_ID, Number.MAX_SAFE_INTEGER)).toBe(
+      false,
+    );
   });
 });

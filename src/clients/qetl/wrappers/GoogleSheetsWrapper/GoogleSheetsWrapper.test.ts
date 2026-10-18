@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
@@ -60,7 +61,7 @@ function _driveFetch(version: string) {
 }
 
 describe("GoogleSheetsWrapper", () => {
-  it("acquires the named tab as parquet and reports the Drive version", async () => {
+  it("acquires the named tab as parquet, reports the Drive version, and is fresh for the live-source max age", async () => {
     const parquetBlob = new Blob(["sheet-parquet"]);
     const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
     const getSheetSource = vi.fn().mockResolvedValue({
@@ -91,6 +92,7 @@ describe("GoogleSheetsWrapper", () => {
       ref: DATASET_REF,
       parquetBlob,
       sourceVersion: "42",
+      maxAgeMs: GlobalAppConfig.timing.liveRelationMaxAgeMs,
     });
   });
 

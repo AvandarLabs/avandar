@@ -191,7 +191,7 @@ flowchart TD
   B["Does the sidecar hold<br/>an entry for it?"]
   C["Does the recorded set<br/>cover the needed set?"]
   HIT1["Served by DuckDB"]
-  D["probeStorageRelationCache:<br/>does an entry serve it?<br/>same principal, table,<br/>definition token;<br/>staleAt unset; columns<br/>cover the need"]
+  D["probeStorageRelationCache:<br/>does an entry serve it?<br/>same principal, table,<br/>definition token;<br/>not past staleAt; columns<br/>cover the need"]
   E["Is the payload<br/>row readable?"]
   HIT2["Served by IndexedDB,<br/>loaded at step 11"]
   F["Miss, with growFrom if<br/>a narrower live entry exists"]
@@ -217,6 +217,14 @@ reaches a wrapper._
 **Queryable tier.** Presence in `information_schema.tables` plus the sidecar.
 It has no principal; it is protected by authorization (step 1), the lease check
 (step 13), and ownership (section 7). A tab reload empties it.
+
+**Max age for live sources.** A wrapper whose rows can change without a
+re-import (Google Sheets, Postgres tables) returns `maxAgeMs` from `acquire`
+(`GlobalAppConfig.timing.liveRelationMaxAgeMs`, 5 minutes). Relation loading
+turns it into a `staleAt` time that both tiers record, and from that time on
+neither serves the rows, so the next query acquires them again. While the
+browser is offline nothing is judged stale (`getRelationFreshnessNow`): stale
+rows beat no rows. Each source's "Refresh" action evicts both tiers at once.
 
 **Storage key** ([RelationCacheKey.ts](../shared/models/relations/RelationCacheKey/RelationCacheKey.ts)):
 
@@ -551,7 +559,7 @@ means traced through the source but not run.
 
 | Gap | Status | Where |
 | --- | --- | --- |
-| No freshness: `sourceVersion` and `definition` are always `undefined` in the storage key, the acquired `sourceVersion` is dropped, `readFreshness` has no caller, nothing sets `staleAt`. Virtual dataset edits and CKAN republishes are never seen; only "Refresh from Google Sheets" evicts | by reading | `relationLoading.ts` |
+| No version-based freshness: `sourceVersion` and `definition` are always `undefined` in the storage key, the acquired `sourceVersion` is dropped, and `readFreshness` has no caller. Live sources (Sheets, Postgres) are re-acquired once their max age passes, but virtual dataset edits and CKAN republishes are never seen | by reading | `relationLoading/RelationLoading.ts` |
 | No pushdown and no capability-driven planning | by reading | `QueryMediator.ts` TODO |
 | Eviction only on `QuotaExceededError`; no byte budget | by reading | both cache adapters |
 | Every workspace query locks every workspace dataset, so top-level queries in one workspace serialize across tabs | by reading | `WorkspaceQuerySession.ts`, `queryRunner.ts` |

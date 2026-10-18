@@ -4,11 +4,12 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
-import type { PostgresRowsFetch } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { PostgresRowsFetch } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 import type { ILogger } from "@avandar/logger";
 
 const DATASET_REF = {
@@ -81,7 +82,7 @@ function _errorFetch(code: string, message: string): PostgresRowsFetch {
 }
 
 describe("PostgresTableWrapper", () => {
-  it("acquires the named relation as parquet", async () => {
+  it("acquires the named relation as parquet, fresh for the live-source max age", async () => {
     const parquetBlob = new Blob(["postgres-parquet"]);
     const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
     const getPostgresTableSource = vi.fn().mockResolvedValue({
@@ -108,6 +109,7 @@ describe("PostgresTableWrapper", () => {
       ref: DATASET_REF,
       parquetBlob,
       sourceVersion: undefined,
+      maxAgeMs: GlobalAppConfig.timing.liveRelationMaxAgeMs,
     });
   });
 

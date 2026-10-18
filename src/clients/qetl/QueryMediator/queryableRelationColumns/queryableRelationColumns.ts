@@ -1,23 +1,37 @@
-import { normalizeColumns } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import {
+  isFreshAt,
+  normalizeColumns,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
-const loadedColumnsByDatasetId = new Map<string, readonly string[] | "all">();
+const loadedRelationsByDatasetId = new Map<
+  string,
+  { columns: readonly string[] | "all"; staleAt: number | undefined }
+>();
 
 /**
- * Records the column set currently loaded into DuckDB for this dataset.
+ * Records the column set currently loaded into DuckDB for this dataset, and
+ * the epoch ms from which those rows are stale (`undefined` for rows that
+ * never go stale).
  */
 export function rememberQueryableColumns(
-  datasetId: Dataset.Id,
-  columns: readonly string[] | "all",
+  options: Readonly<{
+    datasetId: Dataset.Id;
+    columns: readonly string[] | "all";
+    staleAt: number | undefined;
+  }>,
 ): void {
-  loadedColumnsByDatasetId.set(datasetId, normalizeColumns(columns));
+  loadedRelationsByDatasetId.set(options.datasetId, {
+    columns: normalizeColumns(options.columns),
+    staleAt: options.staleAt,
+  });
 }
 
 /**
  * Drops the recorded column set for this dataset, if any.
  */
 export function forgetQueryableColumns(datasetId: Dataset.Id): void {
-  loadedColumnsByDatasetId.delete(datasetId);
+  loadedRelationsByDatasetId.delete(datasetId);
 }
 
 /**
@@ -27,12 +41,24 @@ export function forgetQueryableColumns(datasetId: Dataset.Id): void {
 export function getQueryableColumns(
   datasetId: Dataset.Id,
 ): readonly string[] | "all" | undefined {
-  return loadedColumnsByDatasetId.get(datasetId);
+  return loadedRelationsByDatasetId.get(datasetId)?.columns;
+}
+
+/**
+ * Whether the rows loaded into DuckDB for this dataset are stale at `now`,
+ * in epoch ms. A relation this process did not record never is.
+ */
+export function isQueryableRelationStale(
+  datasetId: Dataset.Id,
+  now: number,
+): boolean {
+  const staleAt = loadedRelationsByDatasetId.get(datasetId)?.staleAt;
+  return !isFreshAt(staleAt, now);
 }
 
 /**
  * Forgets every recorded queryable column set.
  */
 export function clearQueryableRelationColumns(): void {
-  loadedColumnsByDatasetId.clear();
+  loadedRelationsByDatasetId.clear();
 }

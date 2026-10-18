@@ -158,6 +158,7 @@ async function _readStorageCacheHit(
     columns: options.hit.entry.columns,
     datasetId: options.hit.key.relation.id,
     parquetBlob: payload,
+    staleAt: options.hit.entry.staleAt,
   };
 }
 
@@ -317,6 +318,10 @@ async function _fetchRelationSource(
       datasetDuckDbLease: options.datasetDuckDbLease,
       parquetBlob: acquired.parquetBlob,
     }),
+    staleAt:
+      acquired.maxAgeMs === undefined
+        ? undefined
+        : Date.now() + acquired.maxAgeMs,
   };
 }
 
@@ -369,6 +374,7 @@ async function _writeStoredRelationBytes(
         },
         columns: relation.columns,
         payload: relation.parquetBlob,
+        staleAt: relation.staleAt,
       });
     } catch (error) {
       _relationLogger.error(
@@ -415,7 +421,11 @@ async function _loadRelationBytes(
         { key: "originalName" },
       ),
     });
-    rememberQueryableColumns(relation.datasetId, relation.columns);
+    rememberQueryableColumns({
+      datasetId: relation.datasetId,
+      columns: relation.columns,
+      staleAt: relation.staleAt,
+    });
   });
 }
 

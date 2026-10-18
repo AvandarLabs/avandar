@@ -1,3 +1,4 @@
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import {
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
   PostgresCsvEstimate,
@@ -120,6 +121,8 @@ async function _acquirePostgresTable(
     ref,
     parquetBlob: acquired.relation.parquetBlob,
     sourceVersion: acquired.sourceVersion,
+    // A live source: its rows can change without anyone re-importing it.
+    maxAgeMs: GlobalAppConfig.timing.liveRelationMaxAgeMs,
   };
 }
 
