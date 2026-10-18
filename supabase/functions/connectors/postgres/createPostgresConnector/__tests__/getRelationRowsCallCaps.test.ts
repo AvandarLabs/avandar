@@ -1,3 +1,4 @@
+import { identity } from "@avandar/utils";
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { describe, expect, it, vi } from "vitest";
@@ -87,9 +88,7 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
       }
       return Promise.resolve(options.dataRows);
     }) as unknown as PostgresSql;
-    fakeSql.unsafe = vi.fn((queryText: string) => {
-      return queryText;
-    });
+    fakeSql.unsafe = vi.fn(identity);
     fakeSql.end = vi.fn(async () => {});
     return fakeSql;
   }

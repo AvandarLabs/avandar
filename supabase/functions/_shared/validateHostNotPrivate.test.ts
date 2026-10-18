@@ -52,7 +52,10 @@ describe("isPrivateOrLoopbackAddress", () => {
     ["::127.0.0.1", true], // deprecated IPv4-compatible form
     ["64:ff9b::a9fe:a9fe", true], // NAT64 to 169.254.169.254
     ["2002:7f00:1::", true], // 6to4 wrapping 127.0.0.1
+    ["::ffff:0:7f00:1", true], // IPv4-translated (SIIT) 127.0.0.1
+    ["64:ff9b:1::1", true], // 64:ff9b:1::/48 local-use NAT64
     ["::ffff:808:808", false], // ::ffff:8.8.8.8 is public
+    ["::ffff:0:808:808", false], // IPv4-translated (SIIT) 8.8.8.8 is public
     ["64:ff9b::808:808", false], // NAT64 to 8.8.8.8 is public
     // Remaining non-public IPv6 ranges
     ["fec0::1", true], // fec0::/10 deprecated site-local

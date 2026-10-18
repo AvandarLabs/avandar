@@ -1,3 +1,4 @@
+import { identity } from "@avandar/utils";
 import postgres from "postgres";
 import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
@@ -20,9 +21,7 @@ const RAW_DATE_TIME_TEXT_TYPE = {
   serialize: (value: Date | string): string => {
     return (value instanceof Date ? value : new Date(value)).toISOString();
   },
-  parse: (value: string): string => {
-    return value;
-  },
+  parse: identity<string>,
 };
 
 /**
@@ -40,6 +39,9 @@ const RAW_DATE_TIME_TEXT_TYPE = {
 export function connectToPostgres(
   config: PostgresConnectionConfig,
 ): PostgresSql {
+  // Cast because the driver types its tagged-template call as a
+  // `PendingQuery`, which TypeScript cannot prove matches `PostgresSql`'s
+  // `Promise<Row[]>`.
   return postgres({
     host: config.host,
     port: config.port,
@@ -53,5 +55,5 @@ export function connectToPostgres(
     connect_timeout: 10,
     idle_timeout: 0,
     types: { rawDateTimeText: RAW_DATE_TIME_TEXT_TYPE },
-  }) as unknown as PostgresSql;
+  }) as PostgresSql;
 }

@@ -1,4 +1,4 @@
-import { connectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres.ts";
+import { connectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres/connectToPostgres.ts";
 import { describe, expect, it } from "vitest";
 
 type ParserTable = Record<number, ((raw: string) => unknown) | undefined>;

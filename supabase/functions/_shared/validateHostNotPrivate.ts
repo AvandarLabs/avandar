@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, valEq } from "@avandar/utils";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 
@@ -33,7 +33,7 @@ export async function getAddressesForHost(host: string): Promise<string[]> {
   return results.map(prop("address"));
 }
 
-function _isPrivateOrLoopbackIPv4(address: string): boolean {
+function _isPrivateOrLoopbackIpv4(address: string): boolean {
   const octets = address.split(".").map(Number);
   const [firstOctet, secondOctet, thirdOctet] = octets as [
     number,
@@ -80,28 +80,34 @@ function _isPrivateOrLoopbackIPv4(address: string): boolean {
 }
 
 /**
+ * Rewrites a trailing dotted IPv4 address (`::ffff:127.0.0.1`) as the two hex
+ * groups it occupies (`::ffff:7f00:1`), or returns the text unchanged when it
+ * has none.
+ */
+function _rewriteDottedIpv4AsHexGroups(addressText: string): string {
+  const dottedIpv4 = /(\d+)\.(\d+)\.(\d+)\.(\d+)$/.exec(addressText);
+  if (!dottedIpv4) {
+    return addressText;
+  }
+  const [firstOctet = 0, secondOctet = 0, thirdOctet = 0, fourthOctet = 0] =
+    dottedIpv4.slice(1).map(Number);
+  const highGroup = (firstOctet << 8) | secondOctet;
+  const lowGroup = (thirdOctet << 8) | fourthOctet;
+  return `${addressText.slice(0, dottedIpv4.index)}${highGroup.toString(16)}:${lowGroup.toString(16)}`;
+}
+
+/**
  * Expands any valid IPv6 spelling into its eight 16-bit groups, so the range
  * checks below compare numbers rather than one of the many equivalent ways to
  * write the same address (`::1`, `0::1`, `0:0:0:0:0:0:0:1`, or an embedded
  * IPv4 address written as hex or as dotted decimal). Returns `undefined` for
  * anything it cannot parse.
  */
-function _parseIPv6Groups(address: string): number[] | undefined {
+function _parseIpv6Groups(address: string): number[] | undefined {
   // A zone id (`fe80::1%eth0`) names a local interface, not part of the
   // address itself.
   const [withoutZone = ""] = address.split("%");
-  let hexText = withoutZone.toLowerCase();
-
-  // Rewrite a trailing dotted IPv4 address as the two hex groups it occupies.
-  const embeddedIPv4 = /(\d+)\.(\d+)\.(\d+)\.(\d+)$/.exec(hexText);
-  if (embeddedIPv4) {
-    const [first, second, third, fourth] = embeddedIPv4.slice(1).map(Number);
-    const highGroup = ((first ?? 0) << 8) | (second ?? 0);
-    const lowGroup = ((third ?? 0) << 8) | (fourth ?? 0);
-    hexText =
-      hexText.slice(0, embeddedIPv4.index) +
-      `${highGroup.toString(16)}:${lowGroup.toString(16)}`;
-  }
+  const hexText = _rewriteDottedIpv4AsHexGroups(withoutZone.toLowerCase());
 
   const halves = hexText.split("::");
   if (halves.length > 2) {
@@ -131,60 +137,62 @@ function _parseIPv6Groups(address: string): number[] | undefined {
 }
 
 /** Joins two 16-bit groups back into the dotted IPv4 address they carry. */
-function _groupsToIPv4(highGroup: number, lowGroup: number): string {
+function _groupsToIpv4(highGroup: number, lowGroup: number): string {
   return [highGroup >> 8, highGroup & 0xff, lowGroup >> 8, lowGroup & 0xff]
     .map(String)
     .join(".");
 }
 
 /**
- * The IPv4 address an IPv6 address wraps, for every encoding a connection to
- * it could end up reaching that IPv4 address through, or `undefined` if it
- * wraps none.
+ * The IPv4 address an IPv6 address carries in one of these encodings, or
+ * `undefined` if it carries none: IPv4-mapped (`::ffff:0:0/96`),
+ * IPv4-translated (`::ffff:0:0:0/96`), the deprecated IPv4-compatible form
+ * (`::/96`), the well-known NAT64 prefix (`64:ff9b::/96`), and 6to4
+ * (`2002::/16`).
  */
-function _getEmbeddedIPv4(groups: readonly number[]): string | undefined {
-  const [g0, g1, g2, g3, g4, g5, g6 = 0, g7 = 0] = groups;
-  const isFirstFiveZero = [g0, g1, g2, g3, g4].every((group) => {
-    return group === 0;
-  });
-  // ::ffff:0:0/96 IPv4-mapped, or ::/96 the deprecated IPv4-compatible form
-  if (isFirstFiveZero && (g5 === 0xffff || g5 === 0)) {
-    return _groupsToIPv4(g6, g7);
-  }
-  // 64:ff9b::/96 NAT64 well-known prefix
+function _getEmbeddedIpv4(groups: readonly number[]): string | undefined {
+  const [firstGroup = 0, secondGroup = 0, thirdGroup = 0] = groups;
+  const [fifthGroup, sixthGroup, highGroup = 0, lowGroup = 0] =
+    groups.slice(4);
+  const isMappedOrCompatible =
+    groups.slice(0, 5).every(valEq(0)) &&
+    (sixthGroup === 0xffff || sixthGroup === 0);
+  const isTranslated =
+    groups.slice(0, 4).every(valEq(0)) &&
+    fifthGroup === 0xffff &&
+    sixthGroup === 0;
   const isNat64 =
-    g0 === 0x64 &&
-    g1 === 0xff9b &&
-    [g2, g3, g4, g5].every((group) => {
-      return group === 0;
-    });
-  if (isNat64) {
-    return _groupsToIPv4(g6, g7);
-  }
-  // 2002::/16 6to4, which carries the IPv4 address in the next two groups
-  if (g0 === 0x2002 && g1 !== undefined && g2 !== undefined) {
-    return _groupsToIPv4(g1, g2);
-  }
-  return undefined;
+    firstGroup === 0x64 &&
+    secondGroup === 0xff9b &&
+    groups.slice(2, 6).every(valEq(0));
+  const is6to4 = firstGroup === 0x2002;
+
+  return isMappedOrCompatible || isTranslated || isNat64 ?
+      _groupsToIpv4(highGroup, lowGroup)
+    : is6to4 ? _groupsToIpv4(secondGroup, thirdGroup)
+    : undefined;
 }
 
-function _isPrivateOrLoopbackIPv6(address: string): boolean {
-  const groups = _parseIPv6Groups(address);
+function _isPrivateOrLoopbackIpv6(address: string): boolean {
+  const groups = _parseIpv6Groups(address);
   if (!groups) {
     return true; // unparseable, so treat it as unsafe
   }
-  const [firstGroup = 0] = groups;
-  const isZeroUntilLast = groups.slice(0, 7).every((group) => {
-    return group === 0;
-  });
+  const [firstGroup = 0, secondGroup = 0, thirdGroup = 0] = groups;
+  const isZeroUntilLast = groups.slice(0, 7).every(valEq(0));
   if (isZeroUntilLast && (groups[7] === 0 || groups[7] === 1)) {
     return true; // :: unspecified, or ::1 loopback
   }
   // Checked ahead of the IPv6 ranges below so every IPv4 range above still
-  // applies through any IPv6 encoding of it.
-  const embeddedIPv4 = _getEmbeddedIPv4(groups);
-  if (embeddedIPv4 !== undefined) {
-    return _isPrivateOrLoopbackIPv4(embeddedIPv4);
+  // applies through each encoding `_getEmbeddedIpv4` recognizes.
+  const embeddedIpv4 = _getEmbeddedIpv4(groups);
+  if (embeddedIpv4 !== undefined) {
+    return _isPrivateOrLoopbackIpv4(embeddedIpv4);
+  }
+  if (firstGroup === 0x64 && secondGroup === 0xff9b && thirdGroup === 1) {
+    // 64:ff9b:1::/48 local-use NAT64, which only translates into an
+    // operator's own network
+    return true;
   }
   if ((firstGroup & 0xfe00) === 0xfc00) {
     return true; // fc00::/7 unique local
@@ -211,10 +219,10 @@ export function isPrivateOrLoopbackAddress(address: string): boolean {
   const ipVersion = isIP(address);
 
   if (ipVersion === 4) {
-    return _isPrivateOrLoopbackIPv4(address);
+    return _isPrivateOrLoopbackIpv4(address);
   }
   if (ipVersion === 6) {
-    return _isPrivateOrLoopbackIPv6(address);
+    return _isPrivateOrLoopbackIpv6(address);
   }
 
   // Not a valid IP at all - treat as unsafe rather than silently passing it

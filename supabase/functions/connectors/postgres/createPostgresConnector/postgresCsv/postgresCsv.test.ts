@@ -1,4 +1,4 @@
-import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv.ts";
+import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv/postgresCsv.ts";
 import { describe, expect, it } from "vitest";
 
 /** The single data line `rowsToCsv` writes for one `value` column. */

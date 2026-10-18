@@ -2,13 +2,13 @@ import { camelCaseKeysShallow, prop } from "@avandar/utils";
 import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.ts";
 import { ConnectorError, type Connector } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
-import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres.ts";
+import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres/connectToPostgres.ts";
 import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
 import { openSavedConnection } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
-import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv.ts";
+import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv/postgresCsv.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
-import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName.ts";
+import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName/quotePostgresRelationName.ts";
 import {
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
   PostgresCsvEstimate,
@@ -97,7 +97,11 @@ async function _readRelationRowsWithinCaps(
   schemaName: string,
   tableName: string,
 ): Promise<string> {
-  const relationName = quotePostgresRelationName(sql, schemaName, tableName);
+  const relationName = quotePostgresRelationName({
+    sql,
+    schemaName,
+    tableName,
+  });
   // `count(*)` is a `bigint`, which the driver returns as a string. Casting
   // it to `int` instead would fail outright past 2^31 rows rather than
   // reporting the table as too large.
@@ -220,7 +224,7 @@ export function createPostgresConnector(
         // `quotePostgresRelationName.ts`), so a dot inside either name
         // stays part of that name.
         const previewRows = await sql<Record<string, unknown>>`
-          select * from ${quotePostgresRelationName(sql, schemaName, tableName)} limit ${MAX_PREVIEW_ROWS}
+          select * from ${quotePostgresRelationName({ sql, schemaName, tableName })} limit ${MAX_PREVIEW_ROWS}
         `;
 
         return {

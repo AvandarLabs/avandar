@@ -1,3 +1,4 @@
+import { identity } from "@avandar/utils";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { describe, expect, it, vi } from "vitest";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
@@ -52,9 +53,7 @@ function _makeRecordingSql(selectFromValues: unknown[][]): PostgresSql {
     }
     return Promise.resolve([]);
   }) as unknown as PostgresSql;
-  fakeSql.unsafe = vi.fn((queryText: string) => {
-    return queryText;
-  });
+  fakeSql.unsafe = vi.fn(identity);
   fakeSql.end = vi.fn(async () => {});
   return fakeSql;
 }
