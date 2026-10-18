@@ -38,7 +38,14 @@ const { getAllPostgresMock, apiPostMock, apiGetMock } = vi.hoisted(() => {
   };
 });
 
-export { apiGetMock, apiPostMock, getAllPostgresMock };
+/** Stub for `APIClient.get`: the `relations` and `preview` routes. */
+export { apiGetMock };
+
+/** Stub for `APIClient.post`: the `test-and-save` route. */
+export { apiPostMock };
+
+/** The saved databases `DatabaseConnectionClient.useGetAllPostgres` returns. */
+export { getAllPostgresMock };
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return { useCurrentWorkspace: vi.fn() };

@@ -1,13 +1,6 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
-/** Input to {@link quotePostgresRelationName}. */
-export type QuotePostgresRelationNameOptions = {
-  sql: PostgresSql;
-  schemaName: string;
-  tableName: string;
-};
-
 /**
  * Builds the `"schema"."table"` fragment a query interpolates to reference
  * one relation, with each name always quoted as its own identifier.
@@ -19,7 +12,11 @@ export type QuotePostgresRelationNameOptions = {
  * the way postgres.js itself does for `listen`/`notify` channel names.
  */
 export function quotePostgresRelationName(
-  options: Readonly<QuotePostgresRelationNameOptions>,
+  options: Readonly<{
+    sql: PostgresSql;
+    schemaName: string;
+    tableName: string;
+  }>,
 ): unknown {
   return options.sql.unsafe(
     `${quoteSqlIdentifier(options.schemaName)}.${quoteSqlIdentifier(options.tableName)}`,

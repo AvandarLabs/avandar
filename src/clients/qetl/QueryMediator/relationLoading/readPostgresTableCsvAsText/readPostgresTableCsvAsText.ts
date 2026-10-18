@@ -5,13 +5,6 @@ import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 
-/** Input to {@link readPostgresTableCsvAsText}. */
-export type ReadPostgresTableCsvAsTextOptions = {
-  datasetId: Dataset.Id;
-  csvText: string;
-  datasetDuckDbLease: DatasetDuckDbLease;
-};
-
 /**
  * Reads one Postgres relation's CSV into Parquet with every stored column as
  * text, so no column takes a type DuckDB's sniff guessed from its values: a
@@ -20,7 +13,11 @@ export type ReadPostgresTableCsvAsTextOptions = {
  * queryable type, and relation loading casts this text to it.
  */
 export async function readPostgresTableCsvAsText(
-  options: Readonly<ReadPostgresTableCsvAsTextOptions>,
+  options: Readonly<{
+    datasetId: Dataset.Id;
+    csvText: string;
+    datasetDuckDbLease: DatasetDuckDbLease;
+  }>,
 ): Promise<{ parquetBlob: Blob }> {
   const storedColumns = await DatasetColumnClient.withCache(AvaQueryClient)
     .withEnsureQueryData()
