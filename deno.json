@@ -23,6 +23,7 @@
     "@upstash/ratelimit": "npm:@upstash/ratelimit@2",
     "@upstash/redis": "npm:@upstash/redis@1",
     "@utils/": "./packages/shared/utils/src/",
+    "bottleneck": "npm:bottleneck@2",
     "google-auth-library": "npm:google-auth-library@10",
     "googleapis": "npm:googleapis@154",
     "jose": "jsr:@panva/jose@6",
