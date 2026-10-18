@@ -488,6 +488,11 @@ and these pipelines do neither - they only enumerate drives and upsert
 metadata rows. Each `run.ts` is a plain async function for that reason, not a
 deviation anyone needs to reconcile with the EtlEngine pattern later.
 
+Both pipelines send every request through an `HttpClientFactory` client with
+`withRateLimit({ minTimeMs: 1000 })`, so each makes at most one request per
+second. The Socrata pipeline shares one client across all of its drives,
+because every drive is enumerated through the same Discovery API host.
+
 ## 7. What this spec builds vs. what it does not
 
 **In scope, built by this spec:**
@@ -530,14 +535,14 @@ deviation anyone needs to reconcile with the EtlEngine pattern later.
    (`OpenDatasetParquetStorageClient`) onto the new private bucket. Not
    needed for Socrata or the cache, and a separate decision touching live
    production catalog rows.
-6. Retry/backoff/throttling for the drive index pipelines' HTTP calls.
+6. Retry and backoff for the drive index pipelines' HTTP calls. Both
+   pipelines are rate-limited to one request per second (section 6.6), but a
+   request that is still rejected fails its drive's run: nothing retries it.
    Discovered necessary, not hypothetical: a live dry run against HDX's real
-   CKAN catalog (42,000+ datasets) hit its rate limiter after ~150
-   sequential requests with no `Retry-After` header. `HDX_DRIVE` stays
-   `undefined` and Socrata's `CONFIGURED_DRIVES` ships empty rather than
-   either being seeded with a drive this size; a deployer adding any drive
-   should first confirm its real total dataset count is small enough to
-   enumerate in one run without this.
+   CKAN catalog (42,000+ datasets) hit its rate limiter after ~150 sequential
+   requests with no `Retry-After` header, which is why `HDX_DRIVE` stays
+   `undefined`. A deployer adding any drive should first confirm its real
+   total dataset count can be enumerated in one run.
 
 ## 8. Testing references to add
 
