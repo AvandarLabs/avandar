@@ -1,14 +1,12 @@
 # @avandar/modules
 
-A small library for building composable object modules in place of class
-hierarchies. A module is a plain object with auto-generated getters/setters
-over its state plus whatever members its builder defines, and can be
-incrementally extended via `mixin()`.
+A small library for building composable modules in place of class
+hierarchies. A module is a frozen plain object: generated `get{Key}` and
+`set{Key}` accessors over its state, plus the members its builders and
+mixins add. Every setter returns a new module rebuilt against the new state,
+so a state change never drops a builder or a mixin.
 
-State is immutable: every setter call returns a new module instance, leaving
-the original untouched.
-
-ESM only. Requires Node 22+.
+ESM only. Requires Node 22+. Also runs under Deno.
 
 ## Install
 
@@ -16,118 +14,153 @@ ESM only. Requires Node 22+.
 pnpm add @avandar/modules
 ```
 
-No peer dependencies.
-
-## Usage
+## A standalone module
 
 ```ts
-import { createModule, createModuleFactory, withNewMembers } from "@avandar/modules";
+import { createModule } from "@avandar/modules";
 
 const Counter = createModule("Counter", {
   state: { count: 0 },
-  builder: (m) => ({
-    increment: () => m.setCount((c) => c + 1),
-    double:    () => m.setCount((c) => c * 2),
-  }),
-});
-
-Counter.getCount();        // 0
-const next = Counter.increment().double();
-next.getCount();           // 2
-Counter.getCount();        // still 0 (immutable)
-```
-
-### Mixins
-
-`mixin()` extends a module with extra state and members. Returns a new
-module with the merged types.
-
-```ts
-const WithLabel = Counter.mixin((prev) => ({
-  state: { label: "count" },
-  members: {
-    describe: () => `${prev.getLabel()}: ${prev.getCount()}`,
+  builder: (module) => {
+    return {
+      increment: () => {
+        return module.setCount((count) => {
+          return count + 1;
+        });
+      },
+    };
   },
-}));
-
-WithLabel.describe(); // "count: 0"
-```
-
-The `withNewMembers` helper is a convenience shortcut for mixins that only
-add members (no new state):
-
-```ts
-const WithReset = Counter.mixin(withNewMembers({
-  reset: () => Counter.setCount(0),
-}));
-```
-
-### Factories
-
-`createModuleFactory` produces a factory module whose `.create(state)` call
-returns a fresh child module each time. Useful when each instance needs its
-own state but should share members.
-
-```ts
-type CounterModule = Module<"Counter", { count: number }, { increment: () => CounterModule }>;
-
-const CounterFactory = createModuleFactory<CounterModule>("Counter", {
-  childBuilder: (m) => ({
-    increment: () => m.setCount((c) => c + 1),
-  }),
 });
 
-const a = CounterFactory.create({ count: 0 });
-const b = CounterFactory.create({ count: 100 });
+Counter.getCount(); // 0
+Counter.setCount(5).increment().getCount(); // 6
+Counter.getCount(); // still 0
 ```
 
-## API
+## Mixins
 
-### `createModule(moduleName, options?)`
+A mixin is a function `(base) => ({ state?, members? })`. `base` is the
+module built so far, with the current state.
 
-Creates a module.
+```ts
+const Described = Counter.mixin((base) => {
+  return {
+    members: {
+      describe: () => {
+        return `count: ${base.getCount()}`;
+      },
+    },
+  };
+});
 
-| Option    | Type                                      | Description                                                                |
-| --------- | ----------------------------------------- | -------------------------------------------------------------------------- |
-| `state`   | object                                    | Initial state. Auto-generates `getX()` / `setX()` accessors for each key.  |
-| `builder` | `(accessors) => members` or `members` obj | Returns the module's members (functions, data) given its base accessors.   |
+Described.setCount(4).describe(); // "count: 4"
+```
 
-Every module instance has the following base accessors:
+- A mixin's `state` is merged in once, when the mixin is applied. Its
+  `members` are rebuilt on every state change.
+- A later layer's member replaces an earlier member with the same name.
+- A mixin can wrap a member by calling it through `base`, but a module's own
+  members never call the wrapped version. To make a module extensible, give
+  it an extension point in its state (for example a list of middlewares) and
+  let mixins add to it.
 
-| Member                      | Description                                                                       |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| `getModuleName()`           | Returns the module's name string                                                  |
-| `getState()`                | Returns the full current state object                                             |
-| `setState(partial)`         | Returns a new module with `partial` merged into state                             |
-| `set(keyPath, value)`       | Returns a new module with `value` set at a dot-notation `keyPath` in state        |
-| `get<Key>()` (per state key)| Returns the value of `state[key]`                                                 |
-| `set<Key>(value)` (per key) | Returns a new module with `state[key]` replaced. Accepts a value or `(prev) => v` |
-| `mixin(mixinFn)`            | Returns a new module with extra state/members merged in                           |
+Rules for mixin authors:
 
-### `createModuleFactory<ChildModule>(moduleName, options)`
+1. Type `base` with the smallest shape the mixin reads. That type is the
+   mixin's requirement, and applying the mixin to a module that does not meet
+   it fails to compile.
+2. Read state inside members, through accessors, not when the mixin runs.
+3. Never mutate `base`.
+4. Keep the mixin function pure, because it runs more than once. Create
+   resources such as a rate limiter or a cache in the outer `withX(options)`
+   call.
 
-Creates a factory module that produces child instances on demand. The
-factory itself is a module named `${moduleName}Factory` with a single
-`create(state)` member.
+`withNewMembers(members)` is a mixin that only adds members.
 
-| Option         | Type                          | Description                                              |
-| -------------- | ----------------------------- | -------------------------------------------------------- |
-| `childBuilder` | `(accessors) => childMembers` | Members each created child should have given its accessors |
+## Factories
 
-### `withNewMembers(members)`
+A factory defines a kind of module. `create` makes a module of that kind with
+its own name, state, builder and mixins.
 
-Mixin helper that returns a `() => { members }` function. Use this when
-your mixin only adds members and doesn't depend on the previous module's
-state or accessors.
+```ts
+import { createModuleFactory, withNewMembers } from "@avandar/modules";
+import type { BuilderModule } from "@avandar/modules";
 
-## Types
+type CounterState = { count: number; label?: string };
 
-| Type                     | Description                                                                            |
-| ------------------------ | -------------------------------------------------------------------------------------- |
-| `Module<Name, State, M>` | A full module: base accessors + state getters/setters + `mixin` + your custom members  |
-| `BaseModule<...>`        | Alias for `Accessors` — the auto-generated accessor surface, without `mixin` or members |
-| `ModuleFactory<Child>`   | The factory module type produced by `createModuleFactory`                              |
-| `EmptyObject`            | Re-export from `@avandar/utils`; the default state/members shape                        |
+const CounterFactory = createModuleFactory("Counter", {
+  defaultState: { label: undefined },
+  builder: (module: BuilderModule<CounterState>) => {
+    return {
+      describe: () => {
+        return `${module.getLabel() ?? "count"}: ${module.getCount()}`;
+      },
+    };
+  },
+});
+
+const steps = CounterFactory.create("Steps", {
+  state: { count: 0 },
+  mixins: [withNewMembers({ unit: () => "steps" })],
+});
+```
+
+- Annotate the kind builder's parameter: the kind's state type is read from
+  that annotation.
+- `defaultState` needs a value, even `undefined`, for every optional state
+  key. Accessors are generated from the keys a state actually has, so an
+  optional key with no default would have no accessors.
+- `mixins` is a `readonly` tuple of any length, applied left to right, and
+  each mixin sees the members added before it. A mixin whose requirement is
+  not met fails to compile at the `create` call, and the error names its
+  index.
+- If a mixin needs members defined by the `create` call's own `builder`,
+  annotate that builder's parameter or leave the parameter out.
+
+## Mixins whose members depend on the module
+
+A plain mixin's added members are read off its signature. When they depend
+on the module the mixin is applied to, for example a mixin that wraps the
+module's own functions, declare a type lambda and brand the mixin with
+`createLambdaMixin`. `this["base"]` is the module the mixin is applied to.
+
+```ts
+import { createLambdaMixin } from "@avandar/modules";
+import type { EmptyObject, LambdaMixin, MixinTypeLambda } from "@avandar/modules";
+
+interface QueryHooksMixin<QueryName extends string> extends MixinTypeLambda {
+  readonly requires: Record<QueryName, (...args: never[]) => Promise<unknown>>;
+  readonly state: EmptyObject;
+  readonly members: QueryHooks<this["base"], QueryName>;
+}
+
+function withQueryHooks<const QueryName extends string>(options: {
+  queryFns: readonly QueryName[];
+}): LambdaMixin<QueryHooksMixin<QueryName>> {
+  return createLambdaMixin<QueryHooksMixin<QueryName>>((base) => {
+    return { members: buildHooks(base, options.queryFns) };
+  });
+}
+```
+
+## Every module has
+
+| Member | Description |
+| --- | --- |
+| `getModuleName()` | The module's name. |
+| `getState()` | The frozen state. |
+| `setState(partial)` | A new module with `partial` merged over the state. |
+| `set(keyPath, valueOrUpdater)` | A new module with a value set at a dot-notation path. |
+| `get{Key}()` | The value of one state key. |
+| `set{Key}(valueOrUpdater)` | A new module with that key replaced. A function argument is treated as an updater, so to store a function pass `() => newFunction`. |
+| `mixin(mixinFn)` | A new module with `mixinFn` applied after every existing layer. |
+
+Builders and mixins cannot define a member named `getModuleName`, `getState`,
+`setState`, `set` or `mixin`, and state cannot have a `moduleName` or `state`
+key, because their accessors would collide.
+
+Modules and their state objects are shallow-frozen. Values nested inside
+state are not frozen.
 
 ## License
 
