@@ -20,7 +20,7 @@ export class UnsafeHostError extends Error {
 /**
  * Gets every address a hostname could connect to (or passes a literal IP
  * through unchanged). Exposed separately from
- * {@link assertHostIsSafeToConnect} so a test can inject a fake resolver
+ * {@link getSafeAddressFromHost} so a test can inject a fake resolver
  * without a real DNS lookup (or `Deno.resolveDns`, which does not exist
  * under the Node/vitest runtime these files are unit-tested in).
  */
@@ -212,7 +212,7 @@ function _isPrivateOrLoopbackIpv6(address: string): boolean {
 /**
  * True if `address` is loopback, link-local, or a private range, for either
  * IPv4 or IPv6. This is the one place the actual ranges are spelled out -
- * every caller of {@link assertHostIsSafeToConnect} goes through it, so a
+ * every caller of {@link getSafeAddressFromHost} goes through it, so a
  * fix here fixes every connector, present and future.
  */
 export function isPrivateOrLoopbackAddress(address: string): boolean {
@@ -231,28 +231,34 @@ export function isPrivateOrLoopbackAddress(address: string): boolean {
 }
 
 /**
- * Resolves `host` and throws {@link UnsafeHostError} if any resolved address
- * is loopback, link-local, or a private range. Checks every **resolved**
- * address, never the input string, so a hostname whose records point at an
- * internal address is refused.
+ * Resolves `host` and returns the address a connection should open, after
+ * checking every address it resolves to. Throws {@link UnsafeHostError} if
+ * any of them is loopback, link-local, or a private range, so a hostname
+ * whose records point at an internal address is refused.
  *
- * This does not pin the address a caller then connects to: the driver
- * resolves `host` again when it opens the socket, so a record that changes
- * between this check and that connect (DNS rebinding) is not caught here.
+ * Connect to the returned address, never to `host` itself: resolving `host`
+ * again at connect time could return a different, unsafe address than the
+ * one checked here (DNS rebinding).
  *
  * @param host The hostname or literal IP the user supplied in the
  *   connection form.
  * @param resolveHost Injectable for tests; defaults to a real DNS lookup
  *   via {@link getAddressesForHost}.
+ * @returns The first address `host` resolved to.
  */
-export async function assertHostIsSafeToConnect(
+export async function getSafeAddressFromHost(
   host: string,
   resolveHost: (host: string) => Promise<string[]> = getAddressesForHost,
-): Promise<void> {
+): Promise<string> {
   const addresses = await resolveHost(host);
 
   const unsafeAddress = addresses.find(isPrivateOrLoopbackAddress);
   if (unsafeAddress) {
     throw new UnsafeHostError(host, unsafeAddress);
   }
+  const [firstAddress] = addresses;
+  if (firstAddress === undefined) {
+    throw new Error(`'${host}' did not resolve to any address`);
+  }
+  return firstAddress;
 }

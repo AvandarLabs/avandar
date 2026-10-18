@@ -2,6 +2,7 @@ import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection.ts";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
+import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 export type DbConnectionsPostgresRow = {
@@ -79,31 +80,29 @@ export async function decryptConnectionSecret(
 /** Input to {@link openSavedConnection}. */
 export type OpenSavedConnectionOptions = {
   connectionId: string;
-  connect: (
-    config: ReturnType<
-      typeof makePostgresConnectionConfigFromDecryptedConnection
-    >,
-  ) => PostgresSql;
-  assertHostIsSafeToConnect: (host: string) => Promise<void>;
+  connect: (config: PostgresConnectionConfig) => PostgresSql;
+  getSafeAddressFromHost: (host: string) => Promise<string>;
 };
 
 /**
  * Opens a live connection for an already-saved connection, re-checking SSRF
  * every time - a stored host is never trusted as still-safe, since DNS can
- * change between when it was saved and when it is used again.
+ * change between when it was saved and when it is used again - and
+ * connecting to the address that check vetted.
  */
 export async function openSavedConnection(
   context: ConnectorContext,
   options: Readonly<OpenSavedConnectionOptions>,
 ): Promise<{ sql: PostgresSql; row: DbConnectionsPostgresRow }> {
-  const { connectionId, connect, assertHostIsSafeToConnect } = options;
+  const { connectionId, connect, getSafeAddressFromHost } = options;
   const row = await fetchConnectionRow(context, connectionId);
   const password = await decryptConnectionSecret(context, row.vault_secret_id);
-  await assertHostIsSafeToConnect(row.host);
+  const vettedAddress = await getSafeAddressFromHost(row.host);
 
   const sql = connect(
     makePostgresConnectionConfigFromDecryptedConnection({
       host: row.host,
+      vettedAddress,
       port: row.port,
       databaseName: row.database_name,
       username: row.username,

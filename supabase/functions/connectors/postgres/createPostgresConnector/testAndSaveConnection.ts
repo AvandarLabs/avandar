@@ -1,4 +1,3 @@
-import { assertHostIsSafeToConnect } from "@sbfn/_shared/validateHostNotPrivate.ts";
 import {
   ConnectorError,
   type ConnectorContext,
@@ -12,13 +11,9 @@ import {
   postgresTestAndSaveInputSchema,
   type PostgresTestAndSaveInput,
 } from "@sbfn/connectors/postgres/PostgresConnectorInput.ts";
+import { runReadOnlyTransaction } from "@sbfn/connectors/postgres/runReadOnlyTransaction/runReadOnlyTransaction.ts";
+import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
-
-type ConnectFn = (
-  config: ReturnType<
-    typeof makePostgresConnectionConfigFromDecryptedConnection
-  >,
-) => PostgresSql;
 
 /**
  * Opens a connection with the submitted credentials and, if it succeeds,
@@ -30,17 +25,22 @@ type ConnectFn = (
 export async function testAndSaveConnection(
   context: ConnectorContext,
   rawInput: Record<string, unknown>,
-  connect: ConnectFn,
+  dependencies: Readonly<{
+    connect: (config: PostgresConnectionConfig) => PostgresSql;
+    getSafeAddressFromHost: (host: string) => Promise<string>;
+    statementTimeoutMs: number;
+  }>,
 ): Promise<{ connectionId: string; relations: ConnectorRelation[] }> {
   const input = postgresTestAndSaveInputSchema.parse(rawInput);
 
   let sql: PostgresSql | undefined;
   try {
-    await assertHostIsSafeToConnect(input.host);
+    const vettedAddress = await dependencies.getSafeAddressFromHost(input.host);
 
-    sql = connect(
+    sql = dependencies.connect(
       makePostgresConnectionConfigFromDecryptedConnection({
         host: input.host,
+        vettedAddress,
         port: input.port,
         databaseName: input.databaseName,
         username: input.username,
@@ -49,7 +49,11 @@ export async function testAndSaveConnection(
       }),
     );
 
-    const relations = await PostgresCatalog.listCatalogRelations(sql);
+    const relations = await runReadOnlyTransaction({
+      sql,
+      statementTimeoutMs: dependencies.statementTimeoutMs,
+      run: PostgresCatalog.listCatalogRelations,
+    });
     const nowIso = new Date().toISOString();
     const connectionId = input.connectionId
       ? await _rotateConnection(context, input.connectionId, input, nowIso)
@@ -70,9 +74,7 @@ export async function testAndSaveConnection(
 }
 
 /** Throws a classified `ConnectorError` for a Supabase client error, if any. */
-function _throwIfSupabaseError(
-  error: { message: string } | undefined,
-): void {
+function _throwIfSupabaseError(error: { message: string } | undefined): void {
   if (error) {
     throw new ConnectorError("unknown", error.message);
   }

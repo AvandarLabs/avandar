@@ -5,6 +5,23 @@ import { describe, expect, it, vi } from "vitest";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
+/**
+ * Reads the CSV bytes back as text. Through `FileReader` because the test
+ * environment's jsdom `Blob` has no `text()` method.
+ */
+function _readBlobText(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      resolve(String(reader.result));
+    };
+    reader.onerror = () => {
+      reject(reader.error);
+    };
+    reader.readAsText(blob);
+  });
+}
+
 describe("createPostgresConnector - getRelationRows row/byte cap enforcement", () => {
   /**
    * `getRelationRows`'s pre-read and post-read size gates both go through
@@ -86,9 +103,18 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
           },
         ]);
       }
-      return Promise.resolve(options.dataRows);
+      return Object.assign(Promise.resolve(options.dataRows), {
+        cursor: async function* () {
+          yield options.dataRows;
+        },
+      });
     }) as unknown as PostgresSql;
     fakeSql.unsafe = vi.fn(identity);
+    fakeSql.begin = vi.fn(
+      async (_options: string, run: (transaction: PostgresSql) => unknown) => {
+        return run(fakeSql);
+      },
+    ) as unknown as PostgresSql["begin"];
     fakeSql.end = vi.fn(async () => {});
     return fakeSql;
   }
@@ -144,7 +170,8 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
       "public.customers",
     );
 
-    expect(csv).toContain("id");
-    expect(csv.split("\r\n")).toHaveLength(11); // header + 10 rows
+    const csvText = await _readBlobText(csv);
+    expect(csvText).toContain("id");
+    expect(csvText.split("\r\n")).toHaveLength(11); // header + 10 rows
   });
 });

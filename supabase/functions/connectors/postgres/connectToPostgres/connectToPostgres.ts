@@ -48,7 +48,13 @@ export function connectToPostgres(
     database: config.database,
     username: config.username,
     password: config.password,
-    ssl: config.ssl,
+    // `host` is the vetted address, from which the driver would derive no
+    // TLS server name, so the entered hostname is passed explicitly. The
+    // certificate is still not verified, same as the driver's own "require".
+    ssl:
+      config.ssl === "require"
+        ? { rejectUnauthorized: false, servername: config.tlsServerName }
+        : false,
     // A single, short-lived connection per request - this proxy opens a
     // fresh connection per call rather than pooling across requests.
     max: 1,

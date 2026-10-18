@@ -43,7 +43,9 @@ function _classifyByErrorCode(
     return "unreachable";
   }
 
-  if (code === "ETIMEDOUT" || code === "CONNECT_TIMEOUT") {
+  // 57014 is `query_canceled`, which the server raises when a statement
+  // runs past its `statement_timeout`.
+  if (code === "ETIMEDOUT" || code === "CONNECT_TIMEOUT" || code === "57014") {
     return "timeout";
   }
 

@@ -13,6 +13,11 @@ function _makeFakeSql(
   const fakeSql = vi.fn(async () => {
     return catalogRows;
   }) as unknown as PostgresSql;
+  fakeSql.begin = vi.fn(
+    async (_options: string, run: (transaction: PostgresSql) => unknown) => {
+      return run(fakeSql);
+    },
+  ) as unknown as PostgresSql["begin"];
   fakeSql.end = vi.fn(async () => {});
   return fakeSql;
 }
@@ -68,7 +73,9 @@ describe("createPostgresConnector - rolls back an orphaned Vault secret", () => 
           // `insert` above returns either `builder` itself or a
           // differently-shaped error object, which TypeScript cannot infer
           // as one self-referencing object type without this cast.
-        } as unknown as ReturnType<ConnectorContext["supabaseAdminClient"]["from"]>;
+        } as unknown as ReturnType<
+          ConnectorContext["supabaseAdminClient"]["from"]
+        >;
         return builder;
       }) as unknown as ConnectorContext["supabaseAdminClient"]["from"],
     };
@@ -87,8 +94,10 @@ describe("createPostgresConnector - rolls back an orphaned Vault secret", () => 
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
-      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient:
+        client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     await expect(

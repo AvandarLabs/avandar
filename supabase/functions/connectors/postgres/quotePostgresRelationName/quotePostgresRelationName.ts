@@ -1,5 +1,5 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
+import type { PostgresQueryRunner } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 /**
  * Builds the `"schema"."table"` fragment a query interpolates to reference
@@ -13,7 +13,7 @@ import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts
  */
 export function quotePostgresRelationName(
   options: Readonly<{
-    sql: PostgresSql;
+    sql: PostgresQueryRunner;
     schemaName: string;
     tableName: string;
   }>,

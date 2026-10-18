@@ -1,6 +1,6 @@
+import type { Database } from "$/types/database.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "$/types/database.types.ts";
 
 /** Widens per future connector (MySQL, MSSQL, Snowflake, ...). */
 export type ConnectorType = "postgres";
@@ -93,10 +93,10 @@ export type Connector = {
     columns: ConnectorPreviewColumn[];
     previewRows: Array<Record<string, unknown>>;
   }>;
-  /** Returns the full relation as CSV text - what `acquire` calls. */
+  /** Returns the full relation as CSV bytes - what `acquire` calls. */
   getRelationRows: (
     context: ConnectorContext,
     connectionId: string,
     relationId: string,
-  ) => Promise<string>;
+  ) => Promise<Blob>;
 };

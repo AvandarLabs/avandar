@@ -137,7 +137,7 @@ function _estimateColumnCsvBytes(column: ColumnSizeInfo): number {
 
 /**
  * Estimates one row's total CSV width: every column's width, plus the
- * comma between each pair of columns and the `\r\n` `rowsToCsv` actually
+ * comma between each pair of columns and the `\r\n` `PostgresCsv` actually
  * writes (never a bare `\n`).
  */
 function _estimateRowCsvBytes(columns: readonly ColumnSizeInfo[]): number {

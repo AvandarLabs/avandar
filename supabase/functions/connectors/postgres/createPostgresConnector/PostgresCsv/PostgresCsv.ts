@@ -45,22 +45,40 @@ function _csvField(value: unknown): string {
 }
 
 /**
- * Builds CSV text from an explicit, ordered column-name list rather than
+ * The CSV header line for an explicit, ordered column-name list rather than
  * `Object.keys(rows[0])`, so the header is correct even when the relation has
  * zero rows (and so column order matches the table's own column order, not
  * whatever order the driver happens to return object keys in).
  */
-export function rowsToCsv(
-  columnNames: string[],
-  rows: Array<Record<string, unknown>>,
+function _makeHeaderLineFromColumnNames(
+  columnNames: readonly string[],
 ): string {
-  const header = columnNames.map(_csvField).join(",");
-  const lines = rows.map((row) => {
-    return columnNames
-      .map((columnName) => {
-        return _csvField(row[columnName]);
-      })
-      .join(",");
-  });
-  return [header, ...lines].join("\r\n");
+  return columnNames.map(_csvField).join(",");
 }
+
+/**
+ * The CSV lines for one batch of rows, each starting with the `\r\n` that
+ * ends the line before it, so a header and any number of batches join into
+ * one document without tracking which batch came first.
+ */
+function _makeRowLinesFromRows(
+  options: Readonly<{
+    columnNames: readonly string[];
+    rows: ReadonlyArray<Record<string, unknown>>;
+  }>,
+): string {
+  return options.rows
+    .map((row) => {
+      const fields = options.columnNames.map((columnName) => {
+        return _csvField(row[columnName]);
+      });
+      return `\r\n${fields.join(",")}`;
+    })
+    .join("");
+}
+
+/** Writes a Postgres relation's rows as CSV text, a batch at a time. */
+export const PostgresCsv = {
+  makeHeaderLineFromColumnNames: _makeHeaderLineFromColumnNames,
+  makeRowLinesFromRows: _makeRowLinesFromRows,
+};

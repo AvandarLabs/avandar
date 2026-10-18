@@ -1,7 +1,7 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId.ts";
 import type { ConnectorRelation } from "@sbfn/connectors/Connector.ts";
-import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
+import type { PostgresQueryRunner } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 function _makeRelationFromCatalogRow(row: {
   table_schema: string;
@@ -21,7 +21,7 @@ function _makeRelationFromCatalogRow(row: {
 
 /** Lists every table and view a connection can see, across every schema. */
 async function _listCatalogRelations(
-  sql: PostgresSql,
+  sql: PostgresQueryRunner,
 ): Promise<ConnectorRelation[]> {
   const rows = await sql<{
     table_schema: string;
@@ -42,7 +42,7 @@ async function _listCatalogRelations(
  * renamed since the picker loaded it.
  */
 async function _assertRelationStillExists(
-  sql: PostgresSql,
+  sql: PostgresQueryRunner,
   schemaName: string,
   tableName: string,
 ): Promise<"table" | "view"> {

@@ -1,12 +1,39 @@
-import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv/postgresCsv.ts";
+import { PostgresCsv } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCsv/PostgresCsv.ts";
 import { describe, expect, it } from "vitest";
 
-/** The single data line `rowsToCsv` writes for one `value` column. */
-function _toCsvField(value: unknown): string | undefined {
-  return rowsToCsv(["value"], [{ value }]).split("\r\n")[1];
+/** The single field `PostgresCsv` writes for one `value` column. */
+function _toCsvField(value: unknown): string {
+  // Each row line starts with the `\r\n` that ends the line before it.
+  return PostgresCsv.makeRowLinesFromRows({
+    columnNames: ["value"],
+    rows: [{ value }],
+  }).slice(2);
 }
 
-describe("rowsToCsv", () => {
+describe("PostgresCsv", () => {
+  it("joins a header and successive batches into one CSV document", () => {
+    const columnNames = ["id", "name"];
+    const csv = [
+      PostgresCsv.makeHeaderLineFromColumnNames(columnNames),
+      PostgresCsv.makeRowLinesFromRows({
+        columnNames,
+        rows: [{ id: 1, name: "Ada" }],
+      }),
+      PostgresCsv.makeRowLinesFromRows({
+        columnNames,
+        rows: [{ id: 2, name: "Grace, Hopper" }],
+      }),
+    ].join("");
+
+    expect(csv).toBe('id,name\r\n1,Ada\r\n2,"Grace, Hopper"');
+  });
+
+  it("writes nothing for an empty batch", () => {
+    expect(
+      PostgresCsv.makeRowLinesFromRows({ columnNames: ["id"], rows: [] }),
+    ).toBe("");
+  });
+
   it("writes a Date as a bare ISO timestamp, never wrapped in literal quote characters", () => {
     expect(_toCsvField(new Date("2024-01-01T13:45:00.000Z"))).toBe(
       "2024-01-01T13:45:00.000Z",

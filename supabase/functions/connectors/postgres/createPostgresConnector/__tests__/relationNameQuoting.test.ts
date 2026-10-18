@@ -54,6 +54,11 @@ function _makeRecordingSql(selectFromValues: unknown[][]): PostgresSql {
     return Promise.resolve([]);
   }) as unknown as PostgresSql;
   fakeSql.unsafe = vi.fn(identity);
+  fakeSql.begin = vi.fn(
+    async (_options: string, run: (transaction: PostgresSql) => unknown) => {
+      return run(fakeSql);
+    },
+  ) as unknown as PostgresSql["begin"];
   fakeSql.end = vi.fn(async () => {});
   return fakeSql;
 }

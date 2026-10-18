@@ -44,3 +44,13 @@ describe("classifyPostgresConnectionError - SSL-only servers", () => {
     expect(classifyPostgresConnectionError(error)).toBe("auth_failed");
   });
 });
+
+describe("classifyPostgresConnectionError - statement timeouts", () => {
+  it("classifies a statement cancelled by statement_timeout as timeout", () => {
+    const error = Object.assign(
+      new Error("canceling statement due to statement timeout"),
+      { code: "57014" },
+    );
+    expect(classifyPostgresConnectionError(error)).toBe("timeout");
+  });
+});

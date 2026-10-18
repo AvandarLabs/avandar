@@ -26,6 +26,11 @@ function _makeFakeSql(
   const fakeSql = vi.fn(async () => {
     return catalogRows;
   }) as unknown as PostgresSql;
+  fakeSql.begin = vi.fn(
+    async (_options: string, run: (transaction: PostgresSql) => unknown) => {
+      return run(fakeSql);
+    },
+  ) as unknown as PostgresSql["begin"];
   fakeSql.end = vi.fn(async () => {});
   return fakeSql;
 }
@@ -95,8 +100,10 @@ describe("createPostgresConnector - field parameterization", () => {
       workspaceId: "33333333-3333-3333-3333-333333333333",
       // Not exercised by this connector method - only the admin client
       // matters here.
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
-      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient:
+        client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     // `host` is deliberately a plain public IP here, not the injection
@@ -120,6 +127,7 @@ describe("createPostgresConnector - field parameterization", () => {
     expect(connectToPostgres).toHaveBeenCalledTimes(1);
     expect(capturedConfig).toEqual({
       host: "8.8.8.8",
+      tlsServerName: undefined,
       port: 5432,
       database: INJECTION_PAYLOAD,
       username: INJECTION_PAYLOAD,
@@ -161,8 +169,10 @@ describe("createPostgresConnector - field parameterization", () => {
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
-      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient:
+        client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     await connector.testAndSaveConnection(context, {
@@ -186,8 +196,10 @@ describe("createPostgresConnector - field parameterization", () => {
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
-      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient:
+        client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     await expect(
@@ -212,8 +224,10 @@ describe("createPostgresConnector - field parameterization", () => {
 
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
-      supabaseAdminClient: client as unknown as ConnectorContext["supabaseAdminClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseAdminClient:
+        client as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
     try {

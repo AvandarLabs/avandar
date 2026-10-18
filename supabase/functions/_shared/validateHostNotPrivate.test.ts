@@ -1,5 +1,5 @@
 import {
-  assertHostIsSafeToConnect,
+  getSafeAddressFromHost,
   isPrivateOrLoopbackAddress,
   UnsafeHostError,
 } from "@sbfn/_shared/validateHostNotPrivate.ts";
@@ -66,18 +66,18 @@ describe("isPrivateOrLoopbackAddress", () => {
   });
 });
 
-describe("assertHostIsSafeToConnect", () => {
-  it("passes a literal public IP through unchanged", async () => {
+describe("getSafeAddressFromHost", () => {
+  it("returns a literal public IP unchanged", async () => {
     await expect(
-      assertHostIsSafeToConnect("8.8.8.8", async () => {
+      getSafeAddressFromHost("8.8.8.8", async () => {
         return ["8.8.8.8"];
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toBe("8.8.8.8");
   });
 
   it("rejects a literal loopback IP", async () => {
     await expect(
-      assertHostIsSafeToConnect("127.0.0.1", async () => {
+      getSafeAddressFromHost("127.0.0.1", async () => {
         return ["127.0.0.1"];
       }),
     ).rejects.toThrow(UnsafeHostError);
@@ -85,7 +85,7 @@ describe("assertHostIsSafeToConnect", () => {
 
   it("rejects the cloud metadata address", async () => {
     await expect(
-      assertHostIsSafeToConnect("169.254.169.254", async () => {
+      getSafeAddressFromHost("169.254.169.254", async () => {
         return ["169.254.169.254"];
       }),
     ).rejects.toThrow(UnsafeHostError);
@@ -93,18 +93,18 @@ describe("assertHostIsSafeToConnect", () => {
 
   it("rejects a private-range IP", async () => {
     await expect(
-      assertHostIsSafeToConnect("10.0.0.5", async () => {
+      getSafeAddressFromHost("10.0.0.5", async () => {
         return ["10.0.0.5"];
       }),
     ).rejects.toThrow(UnsafeHostError);
   });
 
-  it("rejects a hostname that resolves to a private address (DNS rebinding shape)", async () => {
+  it("rejects a hostname that resolves to a private address", async () => {
     // The resolver is stubbed to simulate a hostname an attacker controls
     // that resolves to an internal address - the check must reject based on
     // the resolved address, not the (harmless-looking) hostname string.
     await expect(
-      assertHostIsSafeToConnect("attacker-controlled.example.com", async () => {
+      getSafeAddressFromHost("attacker-controlled.example.com", async () => {
         return ["10.0.0.1"];
       }),
     ).rejects.toThrow(UnsafeHostError);
@@ -112,17 +112,25 @@ describe("assertHostIsSafeToConnect", () => {
 
   it("rejects when a hostname resolves to multiple addresses and any one is unsafe", async () => {
     await expect(
-      assertHostIsSafeToConnect("multi-a-record.example.com", async () => {
+      getSafeAddressFromHost("multi-a-record.example.com", async () => {
         return ["8.8.8.8", "127.0.0.1"];
       }),
     ).rejects.toThrow(UnsafeHostError);
   });
 
-  it("allows a hostname that resolves only to public addresses", async () => {
+  it("returns the first vetted address of a hostname, so the caller connects to that address instead of resolving the name again", async () => {
     await expect(
-      assertHostIsSafeToConnect("public.example.com", async () => {
-        return ["203.0.113.5"];
+      getSafeAddressFromHost("public.example.com", async () => {
+        return ["203.0.113.5", "203.0.113.6"];
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toBe("203.0.113.5");
+  });
+
+  it("rejects a hostname that resolves to no address at all", async () => {
+    await expect(
+      getSafeAddressFromHost("nothing.example.com", async () => {
+        return [];
+      }),
+    ).rejects.toThrow();
   });
 });

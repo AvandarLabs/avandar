@@ -2,18 +2,22 @@ import { assertMeetsMinAppRole } from "@sbfn/_shared/assertMeetsMinAppRole.ts";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
-import { defineRoutes, GET, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { getConnector } from "@sbfn/connectors/connectorRegistry.ts";
+import {
+  defineRoutes,
+  GET,
+  POST,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import {
   ConnectorError,
   type ConnectorContext,
 } from "@sbfn/connectors/Connector.ts";
+import { getConnector } from "@sbfn/connectors/connectorRegistry.ts";
 import { object, string } from "zod";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type {
   ConnectorErrorResponse,
   ConnectorsApi,
 } from "@sbfn/connectors/ConnectorRoutes.types.ts";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 /**
  * `{ workspaceId, connectionId?, ...connectorFields }` - every connector
@@ -44,10 +48,7 @@ async function _getOwningWorkspaceId(
     .maybeSingle();
 
   if (error || !data) {
-    throw new AvaHTTPError(
-      `No connection '${connectionId}' found`,
-      FORBIDDEN,
-    );
+    throw new AvaHTTPError(`No connection '${connectionId}' found`, FORBIDDEN);
   }
   return data.workspace_id;
 }
@@ -103,21 +104,15 @@ async function _buildConnectorContext(
  * dispatched through {@link getConnector} to the connector type named in
  * the path.
  */
-export const ConnectorRoutes = defineRoutes<ConnectorsApi>(
-  "connectors",
-  {
-    "/:connectorType/connections/test-and-save": {
-      POST: POST({
-        path: "/:connectorType/connections/test-and-save",
-        schema: { connectorType: string() },
-      })
-        .bodySchema(testAndSaveBodySchema)
-        .action(async ({
-          pathParams,
-          body,
-          supabaseClient,
-          supabaseAdminClient,
-        }) => {
+export const ConnectorRoutes = defineRoutes<ConnectorsApi>("connectors", {
+  "/:connectorType/connections/test-and-save": {
+    POST: POST({
+      path: "/:connectorType/connections/test-and-save",
+      schema: { connectorType: string() },
+    })
+      .bodySchema(testAndSaveBodySchema)
+      .action(
+        async ({ pathParams, body, supabaseClient, supabaseAdminClient }) => {
           const connector = getConnector(pathParams.connectorType);
 
           const workspaceId = body.connectionId
@@ -152,91 +147,84 @@ export const ConnectorRoutes = defineRoutes<ConnectorsApi>(
           } catch (error) {
             return _toErrorResult(error);
           }
-        }),
-    },
-    "/:connectorType/connections/:connectionId/relations": {
-      GET: GET({
-        path: "/:connectorType/connections/:connectionId/relations",
-        schema: { connectorType: string(), connectionId: string() },
-      }).action(
-        async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const { connector, context } = await _buildConnectorContext(
-            pathParams,
-            supabaseClient,
-            supabaseAdminClient,
-          );
-
-          try {
-            const relations = await connector.listRelations(
-              context,
-              pathParams.connectionId,
-            );
-            return { relations };
-          } catch (error) {
-            return _toErrorResult(error);
-          }
         },
       ),
-    },
-    "/:connectorType/connections/:connectionId/relations/:relationId/preview":
-      {
-        GET: GET({
-          path: "/:connectorType/connections/:connectionId/relations/:relationId/preview",
-          schema: {
-            connectorType: string(),
-            connectionId: string(),
-            relationId: string(),
-          },
-        }).action(
-          async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-            const { connector, context } = await _buildConnectorContext(
-              pathParams,
-              supabaseClient,
-              supabaseAdminClient,
-            );
-
-            try {
-              return await connector.previewRelation(
-                context,
-                pathParams.connectionId,
-                decodeURIComponent(pathParams.relationId),
-              );
-            } catch (error) {
-              return _toErrorResult(error);
-            }
-          },
-        ),
-      },
-    "/:connectorType/connections/:connectionId/relations/:relationId/rows": {
-      GET: GET({
-        path: "/:connectorType/connections/:connectionId/relations/:relationId/rows",
-        schema: {
-          connectorType: string(),
-          connectionId: string(),
-          relationId: string(),
-        },
-      }).action(
-        async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const { connector, context } = await _buildConnectorContext(
-            pathParams,
-            supabaseClient,
-            supabaseAdminClient,
-          );
-
-          try {
-            const csv = await connector.getRelationRows(
-              context,
-              pathParams.connectionId,
-              decodeURIComponent(pathParams.relationId),
-            );
-            return new Response(csv, {
-              headers: { ...corsHeaders, "Content-Type": "text/csv" },
-            });
-          } catch (error) {
-            return _toErrorResult(error);
-          }
-        },
-      ),
-    },
   },
-);
+  "/:connectorType/connections/:connectionId/relations": {
+    GET: GET({
+      path: "/:connectorType/connections/:connectionId/relations",
+      schema: { connectorType: string(), connectionId: string() },
+    }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
+      const { connector, context } = await _buildConnectorContext(
+        pathParams,
+        supabaseClient,
+        supabaseAdminClient,
+      );
+
+      try {
+        const relations = await connector.listRelations(
+          context,
+          pathParams.connectionId,
+        );
+        return { relations };
+      } catch (error) {
+        return _toErrorResult(error);
+      }
+    }),
+  },
+  "/:connectorType/connections/:connectionId/relations/:relationId/preview": {
+    GET: GET({
+      path: "/:connectorType/connections/:connectionId/relations/:relationId/preview",
+      schema: {
+        connectorType: string(),
+        connectionId: string(),
+        relationId: string(),
+      },
+    }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
+      const { connector, context } = await _buildConnectorContext(
+        pathParams,
+        supabaseClient,
+        supabaseAdminClient,
+      );
+
+      try {
+        return await connector.previewRelation(
+          context,
+          pathParams.connectionId,
+          decodeURIComponent(pathParams.relationId),
+        );
+      } catch (error) {
+        return _toErrorResult(error);
+      }
+    }),
+  },
+  "/:connectorType/connections/:connectionId/relations/:relationId/rows": {
+    GET: GET({
+      path: "/:connectorType/connections/:connectionId/relations/:relationId/rows",
+      schema: {
+        connectorType: string(),
+        connectionId: string(),
+        relationId: string(),
+      },
+    }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
+      const { connector, context } = await _buildConnectorContext(
+        pathParams,
+        supabaseClient,
+        supabaseAdminClient,
+      );
+
+      try {
+        const csvBytes = await connector.getRelationRows(
+          context,
+          pathParams.connectionId,
+          decodeURIComponent(pathParams.relationId),
+        );
+        return new Response(csvBytes, {
+          headers: { ...corsHeaders, "Content-Type": "text/csv" },
+        });
+      } catch (error) {
+        return _toErrorResult(error);
+      }
+    }),
+  },
+});
