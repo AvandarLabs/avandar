@@ -21,3 +21,26 @@ describe("classifyPostgresConnectionError", () => {
     );
   });
 });
+
+describe("classifyPostgresConnectionError - SSL-only servers", () => {
+  it("classifies a pg_hba rejection of an unencrypted connection as ssl_required, not auth_failed", () => {
+    // A server whose pg_hba.conf only has `hostssl` lines rejects a
+    // non-SSL connection with SQLSTATE 28000, the same class as a bad
+    // password, so the message is what tells the two apart.
+    const error = Object.assign(
+      new Error(
+        'no pg_hba.conf entry for host "203.0.113.5", user "reader", database "postgres", no encryption',
+      ),
+      { code: "28000" },
+    );
+    expect(classifyPostgresConnectionError(error)).toBe("ssl_required");
+  });
+
+  it("still classifies a wrong password as auth_failed", () => {
+    const error = Object.assign(
+      new Error('password authentication failed for user "reader"'),
+      { code: "28P01" },
+    );
+    expect(classifyPostgresConnectionError(error)).toBe("auth_failed");
+  });
+});

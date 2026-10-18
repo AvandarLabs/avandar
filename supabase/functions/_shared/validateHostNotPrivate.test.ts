@@ -30,6 +30,34 @@ describe("isPrivateOrLoopbackAddress", () => {
     ["172.32.0.0", false], // just outside 172.16.0.0/12
     ["2606:4700:4700::1111", false], // public IPv6 (Cloudflare)
     ["not-an-ip-at-all", true], // invalid input treated as unsafe
+    // IPv4 ranges outside RFC 1918 that still never reach the public internet
+    ["100.64.0.1", true], // 100.64.0.0/10 carrier-grade NAT
+    ["100.127.255.255", true],
+    ["100.128.0.0", false], // just outside 100.64.0.0/10
+    ["192.0.0.8", true], // 192.0.0.0/24 IETF protocol assignments
+    ["198.18.0.1", true], // 198.18.0.0/15 benchmarking
+    ["198.19.255.255", true],
+    ["224.0.0.1", true], // 224.0.0.0/4 multicast
+    ["255.255.255.255", true], // 240.0.0.0/4 reserved, including broadcast
+    // Every spelling of the IPv6 loopback and unspecified addresses
+    ["0:0:0:0:0:0:0:1", true],
+    ["0::1", true],
+    ["::0", true],
+    ["0:0:0:0:0:0:0:0", true],
+    // IPv4 embedded in IPv6, in both hex and dotted forms
+    ["::ffff:7f00:1", true], // ::ffff:127.0.0.1
+    ["::ffff:a9fe:a9fe", true], // ::ffff:169.254.169.254, cloud metadata
+    ["0:0:0:0:0:ffff:127.0.0.1", true],
+    ["::FFFF:10.0.0.1", true],
+    ["::127.0.0.1", true], // deprecated IPv4-compatible form
+    ["64:ff9b::a9fe:a9fe", true], // NAT64 to 169.254.169.254
+    ["2002:7f00:1::", true], // 6to4 wrapping 127.0.0.1
+    ["::ffff:808:808", false], // ::ffff:8.8.8.8 is public
+    ["64:ff9b::808:808", false], // NAT64 to 8.8.8.8 is public
+    // Remaining non-public IPv6 ranges
+    ["fec0::1", true], // fec0::/10 deprecated site-local
+    ["ff02::1", true], // ff00::/8 multicast
+    ["fe80::1%eth0", true], // link-local with a zone id
   ])("%s -> unsafe=%s", (address, expected) => {
     expect(isPrivateOrLoopbackAddress(address)).toBe(expected);
   });

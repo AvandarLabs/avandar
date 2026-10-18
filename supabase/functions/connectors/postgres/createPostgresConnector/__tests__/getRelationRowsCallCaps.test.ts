@@ -60,20 +60,16 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
    * Dispatches on each query's own text, since `getRelationRows` issues four
    * distinct queries against the same fake `sql` in sequence: the
    * still-exists check, the sized columns read, the exact row count, and the
-   * full row read. `sql(identifier)` (a single-string call, for the
-   * schema/table identifiers in the final two queries) just echoes its
-   * argument back - this fake never actually interprets SQL, so the quoted
-   * value itself is unused.
+   * full row read. `sql.unsafe(text)` (the quoted `"schema"."table"`
+   * fragment in the final two queries) just echoes its argument back - this
+   * fake never actually interprets SQL, so the quoted value itself is unused.
    */
   function _makeFakeSqlForRows(options: {
     rowCount: number;
     dataRows: Array<Record<string, unknown>>;
   }): PostgresSql {
-    const fakeSql = vi.fn((stringsOrIdentifier: unknown, ..._values) => {
-      if (typeof stringsOrIdentifier === "string") {
-        return stringsOrIdentifier;
-      }
-      const queryText = (stringsOrIdentifier as TemplateStringsArray).join(" ");
+    const fakeSql = vi.fn((strings: TemplateStringsArray, ..._values) => {
+      const queryText = strings.join(" ");
       if (queryText.includes("limit 1")) {
         return Promise.resolve([{ table_type: "BASE TABLE" }]);
       }
@@ -91,6 +87,9 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
       }
       return Promise.resolve(options.dataRows);
     }) as unknown as PostgresSql;
+    fakeSql.unsafe = vi.fn((queryText: string) => {
+      return queryText;
+    });
     fakeSql.end = vi.fn(async () => {});
     return fakeSql;
   }

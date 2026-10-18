@@ -1,4 +1,35 @@
 /**
+ * The text one driver value is written as, before any CSV quoting. Each
+ * non-string shape the driver can return gets the text a CSV reader parses
+ * back to the same value, never `JSON.stringify` alone: that wraps a `Date`
+ * in literal quote characters, writes `NaN` and the infinities as `null`, and
+ * writes bytes as a JSON array of numbers.
+ */
+function _toFieldText(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    typeof value === "bigint"
+  ) {
+    return String(value);
+  }
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? "" : value.toISOString();
+  }
+  if (value instanceof Uint8Array) {
+    // Postgres's own `bytea` hex output format.
+    const hexDigits = Array.from(value, (byte) => {
+      return byte.toString(16).padStart(2, "0");
+    });
+    return `\\x${hexDigits.join("")}`;
+  }
+  return JSON.stringify(value);
+}
+
+/**
  * A single CSV field, quoted only when it needs to be (a comma, quote, or
  * newline is present).
  */
@@ -6,7 +37,7 @@ function _csvField(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
   }
-  const text = typeof value === "string" ? value : JSON.stringify(value);
+  const text = _toFieldText(value);
   if (/[",\n\r]/.test(text)) {
     return `"${text.replaceAll('"', '""')}"`;
   }

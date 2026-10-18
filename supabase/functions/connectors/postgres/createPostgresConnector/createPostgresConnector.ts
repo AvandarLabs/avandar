@@ -8,6 +8,7 @@ import { openSavedConnection } from "@sbfn/connectors/postgres/createPostgresCon
 import { rowsToCsv } from "@sbfn/connectors/postgres/createPostgresConnector/postgresCsv.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
+import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName.ts";
 import {
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
   PostgresCsvEstimate,
@@ -96,11 +97,15 @@ async function _readRelationRowsWithinCaps(
   schemaName: string,
   tableName: string,
 ): Promise<string> {
-  const [countRow] = await sql<{ exact_count: number }>`
-    select count(*)::int as exact_count
-    from ${sql(schemaName)}.${sql(tableName)}
+  const relationName = quotePostgresRelationName(sql, schemaName, tableName);
+  // `count(*)` is a `bigint`, which the driver returns as a string. Casting
+  // it to `int` instead would fail outright past 2^31 rows rather than
+  // reporting the table as too large.
+  const [countRow] = await sql<{ exact_count: string | number }>`
+    select count(*) as exact_count
+    from ${relationName}
   `;
-  const rowCount = countRow?.exact_count ?? 0;
+  const rowCount = Number(countRow?.exact_count ?? 0);
 
   // A raw row count alone says nothing about row width - estimate the CSV
   // footprint from the columns' own declared types instead (see
@@ -122,7 +127,7 @@ async function _readRelationRowsWithinCaps(
   });
 
   const rows = await sql<Record<string, unknown>>`
-    select * from ${sql(schemaName)}.${sql(tableName)}
+    select * from ${relationName}
   `;
   const csv = rowsToCsv(columnSizeInfo.map(prop("columnName")), rows);
 
@@ -142,7 +147,8 @@ async function _readRelationRowsWithinCaps(
  * connection, list a connection's tables/views, preview one, and read its
  * full rows as CSV. Every method re-validates the target host against
  * {@link assertHostIsSafeToConnect} before opening a connection (never trusts
- * a previously-saved host as still safe, closing the DNS-rebinding gap), and
+ * a previously-saved host as still safe, since its DNS records can change
+ * after it was saved), and
  * every read/write against `connections`/`connections__postgres` scopes
  * explicitly by `workspaceId` so one workspace's connection can never be
  * read, previewed, or mutated through another workspace's session. The
@@ -210,15 +216,11 @@ export function createPostgresConnector(
           order by ordinal_position
         `;
 
-        // `sql(schemaName)`/`sql(tableName)` are the driver's own identifier
-        // helper, each quoting its argument the same way `quote_ident()`
-        // does - the schema and table are two separate identifiers, quoted
-        // independently and joined by a literal `.` in the template text,
-        // never one string spanning both (that would quote `schema.table`
-        // as a single name rather than referencing the table inside the
-        // schema).
+        // The schema and table are quoted as two separate identifiers (see
+        // `quotePostgresRelationName.ts`), so a dot inside either name
+        // stays part of that name.
         const previewRows = await sql<Record<string, unknown>>`
-          select * from ${sql(schemaName)}.${sql(tableName)} limit ${MAX_PREVIEW_ROWS}
+          select * from ${quotePostgresRelationName(sql, schemaName, tableName)} limit ${MAX_PREVIEW_ROWS}
         `;
 
         return {
