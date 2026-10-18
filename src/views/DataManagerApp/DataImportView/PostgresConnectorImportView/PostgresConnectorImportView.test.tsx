@@ -35,6 +35,9 @@ vi.mock("@/clients/APIClient", () => {
 vi.mock("@/clients/connections/DatabaseConnectionClient", () => {
   return {
     DatabaseConnectionClient: {
+      getClientName: (): string => {
+        return "DatabaseConnectionClient";
+      },
       useGetAllPostgres: (): [unknown[], boolean] => {
         return [getAllPostgresMock(), false];
       },
@@ -103,6 +106,51 @@ function renderWithProviders(
     ...options,
   });
 }
+
+/** Fills the required connection fields and submits the form. */
+async function _connectThroughForm(): Promise<void> {
+  fireEvent.change(screen.getByLabelText(/^host$/i), {
+    target: { value: "db.example.org" },
+  });
+  fireEvent.change(screen.getByLabelText(/^database$/i), {
+    target: { value: "reporting" },
+  });
+  fireEvent.change(screen.getByLabelText(/^username$/i), {
+    target: { value: "readonly" },
+  });
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: "secret" },
+  });
+  await act(async () => {
+    screen.getByRole("button", { name: /^connect$/i }).click();
+  });
+}
+
+/** Opens the table picker and picks the option labeled `label`. */
+async function _pickRelation(label: string): Promise<void> {
+  const tableSelect = await screen.findByRole("combobox", {
+    name: /table or view to import/i,
+  });
+  await act(async () => {
+    fireEvent.click(tableSelect);
+    fireEvent.focus(tableSelect);
+  });
+  const option = await screen.findByRole("option", {
+    name: label,
+    hidden: true,
+  });
+  await act(async () => {
+    fireEvent.click(option);
+  });
+}
+
+const TWO_RELATIONS_SAVE_RESULT = {
+  connectionId: "10000000-0000-4000-8000-000000000001",
+  relations: [
+    { relationId: "public.customers", label: "public.customers", kind: "table" },
+    { relationId: "public.orders", label: "public.orders", kind: "table" },
+  ],
+};
 
 describe("PostgresConnectorImportView", () => {
   beforeEach(() => {
@@ -296,5 +344,80 @@ describe("PostgresConnectorImportView", () => {
     expect(
       await screen.findByRole("combobox", { name: /table or view to import/i }),
     ).toBeInTheDocument();
+  });
+
+  it("refreshes the saved databases after a new one is connected", async () => {
+    const invalidateQueriesSpy = vi.spyOn(
+      QueryClient.prototype,
+      "invalidateQueries",
+    );
+    apiPostMock.mockResolvedValue(TWO_RELATIONS_SAVE_RESULT);
+
+    renderWithProviders(<PostgresConnectorImportView />);
+    await _connectThroughForm();
+
+    await waitFor(() => {
+      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+        queryKey: ["DatabaseConnectionClient"],
+      });
+    });
+    invalidateQueriesSpy.mockRestore();
+  });
+
+  it("drops the previous table's preview when the next table's preview fails", async () => {
+    apiPostMock.mockResolvedValue(TWO_RELATIONS_SAVE_RESULT);
+    apiGetMock
+      .mockResolvedValueOnce({
+        columns: [{ columnName: "id", sourceType: "integer" }],
+        previewRows: [{ id: 1 }],
+      })
+      .mockResolvedValueOnce({
+        error: { code: "timeout", message: "statement timed out" },
+      });
+
+    renderWithProviders(<PostgresConnectorImportView />);
+    await _connectThroughForm();
+    await _pickRelation("public.customers");
+    expect(await screen.findByText(/1 detected/i)).toBeInTheDocument();
+
+    await _pickRelation("public.orders");
+
+    await waitFor(() => {
+      expect(screen.queryByText(/1 detected/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it("keeps the latest table's preview when an earlier pick's preview arrives after it", async () => {
+    apiPostMock.mockResolvedValue(TWO_RELATIONS_SAVE_RESULT);
+    let resolveCustomersPreview: (value: unknown) => void = () => {};
+    apiGetMock
+      .mockImplementationOnce(() => {
+        return new Promise((resolve) => {
+          resolveCustomersPreview = resolve;
+        });
+      })
+      .mockResolvedValueOnce({
+        columns: [
+          { columnName: "id", sourceType: "integer" },
+          { columnName: "total", sourceType: "numeric" },
+        ],
+        previewRows: [{ id: 1, total: "9.50" }],
+      });
+
+    renderWithProviders(<PostgresConnectorImportView />);
+    await _connectThroughForm();
+    await _pickRelation("public.customers");
+    await _pickRelation("public.orders");
+    expect(await screen.findByText(/2 detected/i)).toBeInTheDocument();
+
+    await act(async () => {
+      resolveCustomersPreview({
+        columns: [{ columnName: "id", sourceType: "integer" }],
+        previewRows: [{ id: 1 }],
+      });
+    });
+
+    expect(screen.getByText(/2 detected/i)).toBeInTheDocument();
+    expect(screen.queryByText(/1 detected/i)).not.toBeInTheDocument();
   });
 });

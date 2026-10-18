@@ -54,6 +54,10 @@ function _getCopyDescriptors(code: ConnectorErrorCode): CopyDescriptors {
       message: msg`Avandar can't connect to a loopback, link-local, or private address. Use a publicly reachable host and port.`,
     },
     unknown: GENERIC_FAILURE,
+    // Any thrown error with a `code` property reaches here, not only a
+    // connector's, so an unrecognized code gets the generic copy rather than
+    // throwing inside the caller's error handler.
+    _otherwise: GENERIC_FAILURE,
   });
 }
 

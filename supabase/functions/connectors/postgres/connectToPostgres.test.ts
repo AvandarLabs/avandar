@@ -22,8 +22,10 @@ describe("connectToPostgres", () => {
         password: "hunter2",
         ssl: false,
       });
-      const { parsers } = (sql as unknown as { options: { parsers: ParserTable } })
-        .options;
+      const sqlWithOptions = sql as unknown as {
+        options: { parsers: ParserTable };
+      };
+      const { parsers } = sqlWithOptions.options;
 
       expect(parsers[typeOid]?.(text)).toBe(text);
       await sql.end({ timeout: 0 });

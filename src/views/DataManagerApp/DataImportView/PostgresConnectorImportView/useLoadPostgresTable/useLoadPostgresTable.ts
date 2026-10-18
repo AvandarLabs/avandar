@@ -1,7 +1,7 @@
 import { useMutation } from "@avandar/query-hooks";
 import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DatabaseConnectionClient } from "@/clients/connections/DatabaseConnectionClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
@@ -14,6 +14,7 @@ import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDa
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { PostgresDatabaseConnectionWithDetails } from "@/clients/connections/DatabaseConnectionClient";
 import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
+import type { I18n } from "@lingui/core";
 import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 import type {
   ConnectorErrorCode,
@@ -85,6 +86,10 @@ export type PostgresTableLoad = {
   onRequestDataReparse: (parseOptions: FileParseOptions) => Promise<void>;
 };
 
+type ListRelationsVariables = { connectionId: DatabaseConnection.Id };
+
+type PreviewRelationVariables = Parameters<typeof previewPostgresRelation>[0];
+
 const POSTGRES_RELATION_KINDS = [
   "table",
   "view",
@@ -100,6 +105,18 @@ function _isPostgresRelationKind(
   kind: string,
 ): kind is PostgresTableDataset.RelationKind {
   return (POSTGRES_RELATION_KINDS as readonly string[]).includes(kind);
+}
+
+/** Converts a failed `connectors` request into the error shown inline. */
+function _toConnectionError(
+  error: unknown,
+  i18n: I18n,
+): PostgresConnectionError {
+  const code =
+    error instanceof Error && "code" in error
+      ? (error as { code: ConnectorErrorCode }).code
+      : undefined;
+  return { code, ...postgresConnectorImportErrorCopy({ code, i18n }) };
 }
 
 /**
@@ -147,24 +164,45 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     PostgresTableDataSourceMetadata | undefined
   >();
 
+  // The variables of the latest list and preview requests. A response to
+  // any earlier request is stale, because the user has picked a different
+  // connection or relation since, so it is dropped rather than overwriting
+  // the newer state.
+  const latestListRequestRef = useRef<ListRelationsVariables | undefined>(
+    undefined,
+  );
+  const latestPreviewRequestRef = useRef<PreviewRelationVariables | undefined>(
+    undefined,
+  );
+
   const [listRelations, isLoadingRelations] = useMutation({
-    mutationFn: (params: { connectionId: DatabaseConnection.Id }) => {
+    mutationFn: (params: ListRelationsVariables) => {
       return listPostgresRelations(params.connectionId);
     },
-    onSuccess: (newRelations) => {
+    onSuccess: (newRelations, variables) => {
+      if (variables !== latestListRequestRef.current) {
+        return;
+      }
       setConnectionError(undefined);
       setRelations(newRelations);
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       Logger.error(error, { devMsg: "Failed to list Postgres relations" });
-      const code =
-        error instanceof Error && "code" in error
-          ? (error as { code: ConnectorErrorCode }).code
-          : undefined;
-      const copy = postgresConnectorImportErrorCopy({ code, i18n });
-      setConnectionError({ code, ...copy });
+      if (variables !== latestListRequestRef.current) {
+        return;
+      }
+      setConnectionError(_toConnectionError(error, i18n));
     },
   });
+
+  const requestRelations = useCallback(
+    (connectionId: DatabaseConnection.Id) => {
+      const variables = { connectionId };
+      latestListRequestRef.current = variables;
+      listRelations(variables);
+    },
+    [listRelations],
+  );
 
   // Defaults the picker to the most-recently-verified saved connection, and
   // eagerly lists its tables, so a returning user sees the table picker
@@ -181,13 +219,15 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       const mostRecent = _getMostRecentConnection(savedConnections);
       if (mostRecent) {
         setSelectedConnectionId(mostRecent.connection.id);
-        listRelations({ connectionId: mostRecent.connection.id });
+        requestRelations(mostRecent.connection.id);
       }
     },
-    [savedConnections, selectedConnectionId, listRelations],
+    [savedConnections, selectedConnectionId, requestRelations],
   );
 
   const [submitConnectionForm, isTestingConnection] = useMutation({
+    // The picker lists saved connections, so it has to see the new one.
+    queryToInvalidate: [DatabaseConnectionClient.getClientName()],
     mutationFn: (values: PostgresConnectionFormValues) => {
       return testAndSavePostgresConnection({
         workspaceId: workspace.id,
@@ -202,31 +242,35 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     },
     onError: (error: unknown) => {
       Logger.error(error, { devMsg: "Postgres test-and-save failed" });
-      const code =
-        error instanceof Error && "code" in error
-          ? (error as { code: ConnectorErrorCode }).code
-          : undefined;
-      const copy = postgresConnectorImportErrorCopy({ code, i18n });
-      setConnectionError({ code, ...copy });
+      setConnectionError(_toConnectionError(error, i18n));
     },
   });
 
   const [previewRelation, isLoadingPreview] = useMutation({
     mutationFn: previewPostgresRelation,
-    onSuccess: (metadata) => {
+    onSuccess: (metadata, variables) => {
+      if (variables !== latestPreviewRequestRef.current) {
+        return;
+      }
       setConnectionError(undefined);
       setDataSourceMetadata(metadata);
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       Logger.error(error, { devMsg: "Failed to preview Postgres relation" });
-      const code =
-        error instanceof Error && "code" in error
-          ? (error as { code: ConnectorErrorCode }).code
-          : undefined;
-      const copy = postgresConnectorImportErrorCopy({ code, i18n });
-      setConnectionError({ code, ...copy });
+      if (variables !== latestPreviewRequestRef.current) {
+        return;
+      }
+      setConnectionError(_toConnectionError(error, i18n));
     },
   });
+
+  const requestPreview = useCallback(
+    (variables: PreviewRelationVariables) => {
+      latestPreviewRequestRef.current = variables;
+      previewRelation(variables);
+    },
+    [previewRelation],
+  );
 
   const onSelectConnection = useCallback(
     (id: DatabaseConnection.Id | "new") => {
@@ -235,11 +279,13 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       setRelations(undefined);
       setSelectedRelationId(undefined);
       setDataSourceMetadata(undefined);
+      latestListRequestRef.current = undefined;
+      latestPreviewRequestRef.current = undefined;
       if (id !== "new") {
-        listRelations({ connectionId: id });
+        requestRelations(id);
       }
     },
-    [listRelations],
+    [requestRelations],
   );
 
   const onSubmitConnectionForm = useCallback(
@@ -252,6 +298,11 @@ export function useLoadPostgresTable(): PostgresTableLoad {
   const onSelectRelation = useCallback(
     (relationId: string) => {
       setSelectedRelationId(relationId);
+      // The previous relation's preview must not stay importable while this
+      // one loads, or if this one fails.
+      setDataSourceMetadata(undefined);
+      setConnectionError(undefined);
+      latestPreviewRequestRef.current = undefined;
       const relation = relations?.find(propEq("relationId", relationId));
       if (
         !relation ||
@@ -261,13 +312,13 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       ) {
         return;
       }
-      previewRelation({
+      requestPreview({
         connectionId: selectedConnectionId,
         relationId,
         relationKind: relation.kind,
       });
     },
-    [previewRelation, relations, selectedConnectionId],
+    [requestPreview, relations, selectedConnectionId],
   );
 
   const onRequestDataReparse = useCallback(
@@ -286,13 +337,13 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       if (!relation || !_isPostgresRelationKind(relation.kind)) {
         return;
       }
-      previewRelation({
+      requestPreview({
         connectionId: selectedConnectionId,
         relationId: selectedRelationId,
         relationKind: relation.kind,
       });
     },
-    [previewRelation, relations, selectedConnectionId, selectedRelationId],
+    [requestPreview, relations, selectedConnectionId, selectedRelationId],
   );
 
   return {

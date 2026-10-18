@@ -12,7 +12,9 @@ const { insertPostgresTableDatasetMock } = vi.hoisted(() => {
 
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
-    DatasetClient: { insertPostgresTableDataset: insertPostgresTableDatasetMock },
+    DatasetClient: {
+      insertPostgresTableDataset: insertPostgresTableDatasetMock,
+    },
   };
 });
 
