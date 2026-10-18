@@ -1,26 +1,7 @@
+import { makeFakeSql } from "@sbfn/connectors/postgres/createPostgresConnector/__tests__/createPostgresConnector.fixtures.ts";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { describe, expect, it, vi } from "vitest";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
-import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
-
-function _makeFakeSql(
-  catalogRows: Array<{
-    table_schema: string;
-    table_name: string;
-    table_type: string;
-  }> = [],
-): PostgresSql {
-  const fakeSql = vi.fn(async () => {
-    return catalogRows;
-  }) as unknown as PostgresSql;
-  fakeSql.begin = vi.fn(
-    async (_options: string, run: (transaction: PostgresSql) => unknown) => {
-      return run(fakeSql);
-    },
-  ) as unknown as PostgresSql["begin"];
-  fakeSql.end = vi.fn(async () => {});
-  return fakeSql;
-}
 
 describe("createPostgresConnector - rolls back an orphaned Vault secret", () => {
   /**
@@ -86,7 +67,9 @@ describe("createPostgresConnector - rolls back an orphaned Vault secret", () => 
   it("deletes the Vault secret and the orphaned connection row when the satellite insert fails", async () => {
     const connector = createPostgresConnector({
       connectToPostgres: vi.fn(() => {
-        return _makeFakeSql([]);
+        return makeFakeSql(() => {
+          return Promise.resolve([]);
+        });
       }),
     });
     const { client, rpcCalls, deletedConnectionIds } =

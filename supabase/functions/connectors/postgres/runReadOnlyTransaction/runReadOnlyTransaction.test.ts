@@ -7,7 +7,10 @@ import type {
 } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 /** A fake connection that records each query and the transaction mode. */
-function _makeRecordingSql() {
+function _makeRecordingSql(): {
+  sql: PostgresSql;
+  queries: Array<{ text: string; values: unknown[] }>;
+} {
   const queries: Array<{ text: string; values: unknown[] }> = [];
   const transaction = vi.fn(
     (strings: TemplateStringsArray, ...values: unknown[]) => {

@@ -5,14 +5,16 @@ import {
 } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
 import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
-import { fetchConnectionRow } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
+import {
+  fetchConnectionRow,
+  type PostgresConnectDependencies,
+} from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { makePostgresConnectionConfigFromDecryptedConnection } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   postgresTestAndSaveInputSchema,
   type PostgresTestAndSaveInput,
 } from "@sbfn/connectors/postgres/PostgresConnectorInput.ts";
 import { runReadOnlyTransaction } from "@sbfn/connectors/postgres/runReadOnlyTransaction/runReadOnlyTransaction.ts";
-import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 /**
@@ -25,33 +27,18 @@ import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts
 export async function testAndSaveConnection(
   context: ConnectorContext,
   rawInput: Record<string, unknown>,
-  dependencies: Readonly<{
-    connect: (config: PostgresConnectionConfig) => PostgresSql;
-    getSafeAddressFromHost: (host: string) => Promise<string>;
-    statementTimeoutMs: number;
-  }>,
+  options: Readonly<
+    PostgresConnectDependencies & { statementTimeoutMs: number }
+  >,
 ): Promise<{ connectionId: string; relations: ConnectorRelation[] }> {
   const input = postgresTestAndSaveInputSchema.parse(rawInput);
 
   let sql: PostgresSql | undefined;
   try {
-    const vettedAddress = await dependencies.getSafeAddressFromHost(input.host);
-
-    sql = dependencies.connect(
-      makePostgresConnectionConfigFromDecryptedConnection({
-        host: input.host,
-        vettedAddress,
-        port: input.port,
-        databaseName: input.databaseName,
-        username: input.username,
-        password: input.password,
-        sslMode: input.sslMode,
-      }),
-    );
-
+    sql = await _openSubmittedConnection({ ...options, input });
     const relations = await runReadOnlyTransaction({
       sql,
-      statementTimeoutMs: dependencies.statementTimeoutMs,
+      statementTimeoutMs: options.statementTimeoutMs,
       run: PostgresCatalog.listCatalogRelations,
     });
     const nowIso = new Date().toISOString();
@@ -71,6 +58,30 @@ export async function testAndSaveConnection(
   } finally {
     await sql?.end({ timeout: 5 });
   }
+}
+
+/**
+ * Opens a connection with the submitted credentials, to the address the SSRF
+ * check vetted for the submitted host.
+ */
+async function _openSubmittedConnection(
+  options: Readonly<
+    PostgresConnectDependencies & { input: PostgresTestAndSaveInput }
+  >,
+): Promise<PostgresSql> {
+  const { input } = options;
+  const vettedAddress = await options.getSafeAddressFromHost(input.host);
+  return options.connect(
+    makePostgresConnectionConfigFromDecryptedConnection({
+      host: input.host,
+      vettedAddress,
+      port: input.port,
+      databaseName: input.databaseName,
+      username: input.username,
+      password: input.password,
+      sslMode: input.sslMode,
+    }),
+  );
 }
 
 /** Throws a classified `ConnectorError` for a Supabase client error, if any. */

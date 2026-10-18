@@ -47,8 +47,10 @@ describe("classifyPostgresConnectionError - SSL-only servers", () => {
 
 describe("classifyPostgresConnectionError - statement timeouts", () => {
   it("classifies a statement cancelled by statement_timeout as timeout", () => {
+    // A server set to another language words the message without "timeout",
+    // so only the 57014 code identifies it.
     const error = Object.assign(
-      new Error("canceling statement due to statement timeout"),
+      new Error("Anweisung wegen Zeitüberschreitung abgebrochen"),
       { code: "57014" },
     );
     expect(classifyPostgresConnectionError(error)).toBe("timeout");

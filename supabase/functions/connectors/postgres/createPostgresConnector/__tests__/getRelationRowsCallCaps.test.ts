@@ -1,5 +1,5 @@
-import { identity } from "@avandar/utils";
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
+import { makeFakeSql } from "@sbfn/connectors/postgres/createPostgresConnector/__tests__/createPostgresConnector.fixtures.ts";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { describe, expect, it, vi } from "vitest";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
@@ -86,8 +86,7 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
     rowCount: number;
     dataRows: Array<Record<string, unknown>>;
   }): PostgresSql {
-    const fakeSql = vi.fn((strings: TemplateStringsArray, ..._values) => {
-      const queryText = strings.join(" ");
+    return makeFakeSql((queryText) => {
       if (queryText.includes("limit 1")) {
         return Promise.resolve([{ table_type: "BASE TABLE" }]);
       }
@@ -108,15 +107,7 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
           yield options.dataRows;
         },
       });
-    }) as unknown as PostgresSql;
-    fakeSql.unsafe = vi.fn(identity);
-    fakeSql.begin = vi.fn(
-      async (_options: string, run: (transaction: PostgresSql) => unknown) => {
-        return run(fakeSql);
-      },
-    ) as unknown as PostgresSql["begin"];
-    fakeSql.end = vi.fn(async () => {});
-    return fakeSql;
+    });
   }
 
   it("throws too_large, via the shared cap contract, when the pre-read estimate exceeds the byte cap", async () => {

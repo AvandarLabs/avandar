@@ -77,11 +77,18 @@ export async function decryptConnectionSecret(
   return data;
 }
 
-/** Input to {@link openSavedConnection}. */
-export type OpenSavedConnectionOptions = {
-  connectionId: string;
+/**
+ * How the connector vets a host and opens a connection, injectable so a test
+ * can fake both.
+ */
+export type PostgresConnectDependencies = {
   connect: (config: PostgresConnectionConfig) => PostgresSql;
   getSafeAddressFromHost: (host: string) => Promise<string>;
+};
+
+/** Input to {@link openSavedConnection}. */
+export type OpenSavedConnectionOptions = PostgresConnectDependencies & {
+  connectionId: string;
 };
 
 /**

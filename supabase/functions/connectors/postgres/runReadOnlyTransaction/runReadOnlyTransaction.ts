@@ -7,8 +7,9 @@ import type {
  * Runs `run` in a read-only transaction in which any single statement taking
  * longer than `statementTimeoutMs` is cancelled by the server. Read-only so
  * nothing this connector runs, even a view calling a volatile function, can
- * write to the customer's database. The timeout keeps a slow table or view
- * from holding the request until the platform kills the function.
+ * write to the customer's database. The timeout bounds each statement on its
+ * own, not the transaction as a whole, so a caller that runs many statements,
+ * such as a cursor read, bounds their total itself.
  *
  * @returns Whatever `run` returns.
  */

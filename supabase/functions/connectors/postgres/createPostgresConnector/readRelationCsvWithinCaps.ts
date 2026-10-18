@@ -17,6 +17,39 @@ import type { PostgresQueryRunner } from "@sbfn/connectors/postgres/PostgresSql.
  */
 const CSV_ROWS_PER_BATCH = 5_000;
 
+/** Sizes to check against the shared Postgres cap contract. */
+type PostgresCallCapsCheck = {
+  rowCount: number;
+  byteCount: number;
+  descriptor: RelationRowDescriptor;
+
+  /** Why the relation is refused, if it is over the caps. */
+  message: string;
+};
+
+/** A relation to measure before any of its rows are read. */
+type RelationToMeasure = {
+  transaction: PostgresQueryRunner;
+
+  /** The quoted relation name fragment the size query interpolates. */
+  relationName: unknown;
+  schemaName: string;
+  tableName: string;
+};
+
+/** The relation whose rows {@link readRelationCsvWithinCaps} reads. */
+export type ReadRelationCsvWithinCapsOptions = {
+  transaction: PostgresQueryRunner;
+  schemaName: string;
+  tableName: string;
+
+  /**
+   * Epoch ms after which the read is refused as `timeout`. Checked as each
+   * batch of rows arrives, since the statement timeout bounds only one batch.
+   */
+  deadlineAt: number;
+};
+
 /**
  * Throws `too_large` unless `byteCount`/`rowCount` both stay within the
  * shared Postgres cap contract (`PostgresCsvEstimate.postgresMaxRowsPerCall`,
@@ -26,12 +59,7 @@ const CSV_ROWS_PER_BATCH = 5_000;
  * second, separately-maintained threshold check.
  */
 function _assertWithinPostgresCallCaps(
-  options: Readonly<{
-    rowCount: number;
-    byteCount: number;
-    descriptor: RelationRowDescriptor;
-    message: string;
-  }>,
+  options: Readonly<PostgresCallCapsCheck>,
 ): void {
   const withinCaps = isWithinRelationCallCaps({
     rowCount: options.rowCount,
@@ -52,10 +80,13 @@ function _assertWithinPostgresCallCaps(
  * not its declared length bound.
  */
 async function _getColumnSizeInfo(
-  transaction: PostgresQueryRunner,
-  schemaName: string,
-  tableName: string,
+  options: Readonly<{
+    transaction: PostgresQueryRunner;
+    schemaName: string;
+    tableName: string;
+  }>,
 ): Promise<ColumnSizeInfo[]> {
+  const { transaction, schemaName, tableName } = options;
   const columns = await transaction<{
     column_name: string;
     data_type: string;
@@ -75,12 +106,7 @@ async function _getColumnSizeInfo(
  * `too_large` if that estimate is already over the caps.
  */
 async function _getRelationSizeWithinCaps(
-  options: Readonly<{
-    transaction: PostgresQueryRunner;
-    relationName: unknown;
-    schemaName: string;
-    tableName: string;
-  }>,
+  options: Readonly<RelationToMeasure>,
 ): Promise<{
   rowCount: number;
   descriptor: RelationRowDescriptor;
@@ -95,7 +121,11 @@ async function _getRelationSizeWithinCaps(
     from ${relationName}
   `;
   const rowCount = Number(countRow?.exact_count ?? 0);
-  const columns = await _getColumnSizeInfo(transaction, schemaName, tableName);
+  const columns = await _getColumnSizeInfo({
+    transaction,
+    schemaName,
+    tableName,
+  });
   const descriptor = {
     columnCount: columns.length,
     estimatedRowBytes: PostgresCsvEstimate.estimateRowCsvBytes(columns),
@@ -114,21 +144,34 @@ async function _getRelationSizeWithinCaps(
 }
 
 /**
+ * Throws `timeout` once `deadlineAt` has passed, so a relation whose rows
+ * keep arriving slowly is refused before the request runs out of time.
+ */
+function _assertBeforeReadDeadline(
+  options: Readonly<{
+    deadlineAt: number;
+    schemaName: string;
+    tableName: string;
+  }>,
+): void {
+  if (Date.now() > options.deadlineAt) {
+    throw new ConnectorError(
+      "timeout",
+      `Reading '${options.schemaName}.${options.tableName}' did not finish before its deadline`,
+    );
+  }
+}
+
+/**
  * Reads one relation's full rows as CSV bytes, refusing it as `too_large`
  * before reading a row if its estimated size is over the shared call caps,
- * and again as soon as the CSV actually written crosses them. Rows arrive
- * through a cursor a batch at a time and are written straight to bytes, so a
- * relation far wider than estimated is refused once it crosses the cap
- * instead of after every row is in memory.
+ * and again as soon as the CSV actually written crosses them. Refuses it as
+ * `timeout` once its rows are still arriving past `deadlineAt`.
  *
  * @returns The CSV, including its header line, as `text/csv` bytes.
  */
 export async function readRelationCsvWithinCaps(
-  options: Readonly<{
-    transaction: PostgresQueryRunner;
-    schemaName: string;
-    tableName: string;
-  }>,
+  options: Readonly<ReadRelationCsvWithinCapsOptions>,
 ): Promise<Blob> {
   const { transaction, schemaName, tableName } = options;
   const relationName = quotePostgresRelationName({
@@ -137,7 +180,12 @@ export async function readRelationCsvWithinCaps(
     tableName,
   });
   const { rowCount, descriptor, columnNames } =
-    await _getRelationSizeWithinCaps({ ...options, relationName });
+    await _getRelationSizeWithinCaps({
+      transaction,
+      relationName,
+      schemaName,
+      tableName,
+    });
 
   const encoder = new TextEncoder();
   const headerChunk = encoder.encode(
@@ -145,10 +193,14 @@ export async function readRelationCsvWithinCaps(
   );
   const chunks = [headerChunk];
   let byteCount = headerChunk.byteLength;
+  // Rows arrive through a cursor a batch at a time and are written straight
+  // to bytes, so a relation far wider than estimated is refused once it
+  // crosses the cap instead of after every row is in memory.
   const rowBatches = transaction<Record<string, unknown>>`
     select * from ${relationName}
   `.cursor(CSV_ROWS_PER_BATCH);
   for await (const rows of rowBatches) {
+    _assertBeforeReadDeadline(options);
     const chunk = encoder.encode(
       PostgresCsv.makeRowLinesFromRows({ columnNames, rows }),
     );

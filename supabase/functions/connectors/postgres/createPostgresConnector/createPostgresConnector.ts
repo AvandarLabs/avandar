@@ -7,7 +7,10 @@ import {
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
 import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres/connectToPostgres.ts";
 import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
-import { openSavedConnection } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
+import {
+  openSavedConnection,
+  type OpenSavedConnectionOptions,
+} from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { readRelationCsvWithinCaps } from "@sbfn/connectors/postgres/createPostgresConnector/readRelationCsvWithinCaps.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName/quotePostgresRelationName.ts";
@@ -25,10 +28,19 @@ const CATALOG_STATEMENT_TIMEOUT_MS = 15_000;
 
 /**
  * Longest any one statement reading a relation's rows may run, in
- * milliseconds. Well inside the Edge Function runtime's own wall-clock limit,
- * so a slow table is reported as `timeout` rather than killing the function.
+ * milliseconds. The rows arrive through a cursor whose every batch is its
+ * own statement, so this bounds one batch, not the whole read.
  */
-const ROWS_STATEMENT_TIMEOUT_MS = 60_000;
+const ROWS_STATEMENT_TIMEOUT_MS = 30_000;
+
+/**
+ * Longest reading one relation's rows may take in all, in milliseconds,
+ * checked as each batch of rows arrives. The batch in flight when it passes
+ * can still run for up to {@link ROWS_STATEMENT_TIMEOUT_MS}, which keeps the
+ * request inside the 150 seconds after which the Edge Function runtime
+ * answers it with a 504, so a slow table is reported as `timeout` instead.
+ */
+const ROWS_READ_DEADLINE_MS = 90_000;
 
 type CreatePostgresConnectorOptions = {
   /** Injectable for tests - defaults to opening a real connection. */
@@ -38,20 +50,27 @@ type CreatePostgresConnectorOptions = {
   getSafeAddressFromHost?: (host: string) => Promise<string>;
 };
 
+/** A saved connection, and how to open it. */
+type SavedConnectionTarget = OpenSavedConnectionOptions & {
+  context: ConnectorContext;
+};
+
+/** One relation on a saved connection, and how to open the connection. */
+type SavedRelationTarget = SavedConnectionTarget & { relationId: string };
+
+/** A saved connection to open, and what to run on it once it is open. */
+type WithSavedConnectionOptions<T> = SavedConnectionTarget & {
+  statementTimeoutMs: number;
+  run: (transaction: PostgresQueryRunner) => Promise<T>;
+};
+
 /**
  * Opens a saved connection, runs `run` in a read-only transaction with a
  * statement timeout, and closes the connection again, classifying any
  * failure into a {@link ConnectorError}.
  */
 async function _withSavedConnection<T>(
-  options: Readonly<{
-    context: ConnectorContext;
-    connectionId: string;
-    connect: (config: PostgresConnectionConfig) => PostgresSql;
-    getSafeAddressFromHost: (host: string) => Promise<string>;
-    statementTimeoutMs: number;
-    run: (transaction: PostgresQueryRunner) => Promise<T>;
-  }>,
+  options: Readonly<WithSavedConnectionOptions<T>>,
 ): Promise<T> {
   let sql: PostgresSql | undefined;
   try {
@@ -68,6 +87,24 @@ async function _withSavedConnection<T>(
   } finally {
     await sql?.end({ timeout: 5 });
   }
+}
+
+/** Lists a saved connection's relations, and records it as just verified. */
+async function _listRelations(
+  options: Readonly<SavedConnectionTarget>,
+): ReturnType<Connector["listRelations"]> {
+  const { context, connectionId } = options;
+  const relations = await _withSavedConnection({
+    ...options,
+    statementTimeoutMs: CATALOG_STATEMENT_TIMEOUT_MS,
+    run: PostgresCatalog.listCatalogRelations,
+  });
+  await context.supabaseAdminClient
+    .from("connections__postgres")
+    .update({ last_verified_at: new Date().toISOString() })
+    .eq("connection_id", connectionId)
+    .eq("workspace_id", context.workspaceId);
+  return relations;
 }
 
 /** Reads a relation's columns and first rows for the import preview. */
@@ -107,6 +144,52 @@ async function _previewRelationRows(
   };
 }
 
+/** Previews one relation on a saved connection. */
+async function _previewRelation(
+  options: Readonly<SavedRelationTarget>,
+): ReturnType<Connector["previewRelation"]> {
+  const { schemaName, tableName } = PostgresCatalog.parseRelationId(
+    options.relationId,
+  );
+  return await _withSavedConnection({
+    ...options,
+    statementTimeoutMs: CATALOG_STATEMENT_TIMEOUT_MS,
+    run: (transaction) => {
+      return _previewRelationRows({ transaction, schemaName, tableName });
+    },
+  });
+}
+
+/**
+ * Reads one relation on a saved connection as CSV, refusing it as `timeout`
+ * if it is still reading {@link ROWS_READ_DEADLINE_MS} after the call began.
+ */
+async function _getRelationRows(
+  options: Readonly<SavedRelationTarget>,
+): ReturnType<Connector["getRelationRows"]> {
+  const deadlineAt = Date.now() + ROWS_READ_DEADLINE_MS;
+  const { schemaName, tableName } = PostgresCatalog.parseRelationId(
+    options.relationId,
+  );
+  return await _withSavedConnection({
+    ...options,
+    statementTimeoutMs: ROWS_STATEMENT_TIMEOUT_MS,
+    run: async (transaction) => {
+      await PostgresCatalog.assertRelationStillExists(
+        transaction,
+        schemaName,
+        tableName,
+      );
+      return await readRelationCsvWithinCaps({
+        transaction,
+        schemaName,
+        tableName,
+        deadlineAt,
+      });
+    },
+  });
+}
+
 /**
  * Builds the `postgres` {@link Connector}: test-and-save a connection, list a
  * connection's tables/views, preview one, and read its full rows as CSV.
@@ -137,56 +220,25 @@ export function createPostgresConnector(
       });
     },
 
-    listRelations: async (context, connectionId) => {
-      const relations = await _withSavedConnection({
-        ...dependencies,
-        context,
-        connectionId,
-        statementTimeoutMs: CATALOG_STATEMENT_TIMEOUT_MS,
-        run: PostgresCatalog.listCatalogRelations,
-      });
-      await context.supabaseAdminClient
-        .from("connections__postgres")
-        .update({ last_verified_at: new Date().toISOString() })
-        .eq("connection_id", connectionId)
-        .eq("workspace_id", context.workspaceId);
-      return relations;
+    listRelations: (context, connectionId) => {
+      return _listRelations({ ...dependencies, context, connectionId });
     },
 
-    previewRelation: async (context, connectionId, relationId) => {
-      const { schemaName, tableName } =
-        PostgresCatalog.parseRelationId(relationId);
-      return await _withSavedConnection({
+    previewRelation: (context, connectionId, relationId) => {
+      return _previewRelation({
         ...dependencies,
         context,
         connectionId,
-        statementTimeoutMs: CATALOG_STATEMENT_TIMEOUT_MS,
-        run: (transaction) => {
-          return _previewRelationRows({ transaction, schemaName, tableName });
-        },
+        relationId,
       });
     },
 
-    getRelationRows: async (context, connectionId, relationId) => {
-      const { schemaName, tableName } =
-        PostgresCatalog.parseRelationId(relationId);
-      return await _withSavedConnection({
+    getRelationRows: (context, connectionId, relationId) => {
+      return _getRelationRows({
         ...dependencies,
         context,
         connectionId,
-        statementTimeoutMs: ROWS_STATEMENT_TIMEOUT_MS,
-        run: async (transaction) => {
-          await PostgresCatalog.assertRelationStillExists(
-            transaction,
-            schemaName,
-            tableName,
-          );
-          return await readRelationCsvWithinCaps({
-            transaction,
-            schemaName,
-            tableName,
-          });
-        },
+        relationId,
       });
     },
   };

@@ -60,7 +60,7 @@ describe("createPostgresConnector - streamed rows past the byte cap", () => {
     });
 
     const result = connector.getRelationRows(
-      makeSavedConnectionContext({ host: "8.8.8.8" }),
+      makeSavedConnectionContext("8.8.8.8"),
       SAVED_CONNECTION_ID,
       "public.notes",
     );

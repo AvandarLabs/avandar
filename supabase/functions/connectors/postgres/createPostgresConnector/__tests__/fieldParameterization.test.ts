@@ -1,10 +1,10 @@
 import { propEq } from "@avandar/utils";
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
+import { makeFakeSql } from "@sbfn/connectors/postgres/createPostgresConnector/__tests__/createPostgresConnector.fixtures.ts";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { describe, expect, it, vi } from "vitest";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
 import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
-import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 /**
  * SQL-injection-shaped payloads for every `test-and-save` connection-form
@@ -15,25 +15,6 @@ import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts
  * the call chain.
  */
 const INJECTION_PAYLOAD = "'; select pg_sleep(5); --";
-
-function _makeFakeSql(
-  catalogRows: Array<{
-    table_schema: string;
-    table_name: string;
-    table_type: string;
-  }> = [],
-): PostgresSql {
-  const fakeSql = vi.fn(async () => {
-    return catalogRows;
-  }) as unknown as PostgresSql;
-  fakeSql.begin = vi.fn(
-    async (_options: string, run: (transaction: PostgresSql) => unknown) => {
-      return run(fakeSql);
-    },
-  ) as unknown as PostgresSql["begin"];
-  fakeSql.end = vi.fn(async () => {});
-  return fakeSql;
-}
 
 function _makeFakeSupabaseAdminClient() {
   const insertedRows: Record<string, Array<Record<string, unknown>>> = {};
@@ -84,13 +65,15 @@ describe("createPostgresConnector - field parameterization", () => {
     let capturedConfig: PostgresConnectionConfig | undefined;
     const connectToPostgres = vi.fn((config: PostgresConnectionConfig) => {
       capturedConfig = config;
-      return _makeFakeSql([
-        {
-          table_schema: "public",
-          table_name: "customers",
-          table_type: "BASE TABLE",
-        },
-      ]);
+      return makeFakeSql(() => {
+        return Promise.resolve([
+          {
+            table_schema: "public",
+            table_name: "customers",
+            table_type: "BASE TABLE",
+          },
+        ]);
+      });
     });
 
     const connector = createPostgresConnector({ connectToPostgres });
@@ -162,7 +145,9 @@ describe("createPostgresConnector - field parameterization", () => {
     let capturedConfig: PostgresConnectionConfig | undefined;
     const connectToPostgres = vi.fn((config: PostgresConnectionConfig) => {
       capturedConfig = config;
-      return _makeFakeSql([]);
+      return makeFakeSql(() => {
+        return Promise.resolve([]);
+      });
     });
     const connector = createPostgresConnector({ connectToPostgres });
     const { client } = _makeFakeSupabaseAdminClient();

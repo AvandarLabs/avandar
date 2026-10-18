@@ -23,7 +23,7 @@ describe("createPostgresConnector - connecting to the vetted address", () => {
     });
 
     await connector.listRelations(
-      makeSavedConnectionContext({ host: "db.example.org" }),
+      makeSavedConnectionContext("db.example.org"),
       SAVED_CONNECTION_ID,
     );
 
@@ -52,19 +52,16 @@ describe("createPostgresConnector - connecting to the vetted address", () => {
     // Test-and-save fails afterwards on the fake admin client, but it opens
     // the connection first, which is all this test checks.
     await connector
-      .testAndSaveConnection(
-        makeSavedConnectionContext({ host: "db.example.org" }),
-        {
-          workspaceId: "33333333-3333-3333-3333-333333333333",
-          name: "Reporting",
-          host: "db.example.org",
-          port: 5432,
-          databaseName: "reporting",
-          username: "reader",
-          password: "hunter2",
-          sslMode: "require",
-        },
-      )
+      .testAndSaveConnection(makeSavedConnectionContext("db.example.org"), {
+        workspaceId: "33333333-3333-3333-3333-333333333333",
+        name: "Reporting",
+        host: "db.example.org",
+        port: 5432,
+        databaseName: "reporting",
+        username: "reader",
+        password: "hunter2",
+        sslMode: "require",
+      })
       .catch(() => {});
 
     expect(connectToPostgres).toHaveBeenCalledWith(

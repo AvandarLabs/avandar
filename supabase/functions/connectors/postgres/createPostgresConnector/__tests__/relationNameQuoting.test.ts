@@ -1,4 +1,4 @@
-import { identity } from "@avandar/utils";
+import { makeFakeSql } from "@sbfn/connectors/postgres/createPostgresConnector/__tests__/createPostgresConnector.fixtures.ts";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { describe, expect, it, vi } from "vitest";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
@@ -43,8 +43,7 @@ function _makeSavedConnectionAdminClient() {
  * see exactly which relation-name fragment reached the query.
  */
 function _makeRecordingSql(selectFromValues: unknown[][]): PostgresSql {
-  const fakeSql = vi.fn((strings: TemplateStringsArray, ...values) => {
-    const queryText = strings.join(" ");
+  return makeFakeSql((queryText, values) => {
     if (queryText.includes("information_schema.tables")) {
       return Promise.resolve([{ table_type: "BASE TABLE" }]);
     }
@@ -52,15 +51,7 @@ function _makeRecordingSql(selectFromValues: unknown[][]): PostgresSql {
       selectFromValues.push(values);
     }
     return Promise.resolve([]);
-  }) as unknown as PostgresSql;
-  fakeSql.unsafe = vi.fn(identity);
-  fakeSql.begin = vi.fn(
-    async (_options: string, run: (transaction: PostgresSql) => unknown) => {
-      return run(fakeSql);
-    },
-  ) as unknown as PostgresSql["begin"];
-  fakeSql.end = vi.fn(async () => {});
-  return fakeSql;
+  });
 }
 
 describe("createPostgresConnector - relation name quoting", () => {
