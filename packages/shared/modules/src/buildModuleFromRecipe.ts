@@ -126,14 +126,17 @@ function _buildLayerMembers(
 }
 
 /**
- * Members on `receiver` that `builtModule` does not have, or has with a
- * different value. These were attached by spreading the module into a new
- * object, outside the mixin system.
+ * Members on `receiver` that `builtModule` does not have. These were attached
+ * by spreading the module into a new object, outside the mixin system. Throws
+ * when the receiver replaces an existing member, because that override would
+ * be lost on the next rebuild.
  */
-function _findCarriedMembers(
-  builtModule: UnknownObject,
-  receiver: unknown,
-): UnknownObject | undefined {
+function _findCarriedMembers(params: {
+  moduleName: string;
+  builtModule: UnknownObject;
+  receiver: unknown;
+}): UnknownObject | undefined {
+  const { moduleName, builtModule, receiver } = params;
   if (
     typeof receiver !== "object" ||
     receiver === null ||
@@ -141,8 +144,17 @@ function _findCarriedMembers(
   ) {
     return undefined;
   }
-  const carriedEntries = Object.entries(receiver).filter(([key, value]) => {
-    return !RESERVED_MEMBER_NAMES.has(key) && builtModule[key] !== value;
+  const receiverEntries = Object.entries(receiver);
+  const replacedEntry = receiverEntries.find(([key, value]) => {
+    return key in builtModule && builtModule[key] !== value;
+  });
+  if (replacedEntry !== undefined) {
+    throw new Error(
+      `Module "${moduleName}" member "${replacedEntry[0]}" was replaced by spreading; use a mixin to override members`,
+    );
+  }
+  const carriedEntries = receiverEntries.filter(([key]) => {
+    return !(key in builtModule);
   });
   return carriedEntries.length > 0
     ? Object.fromEntries(carriedEntries)
@@ -156,7 +168,11 @@ function _applyMixin(params: {
   mixinFn: RuntimeMixin;
 }): RuntimeModule {
   const { recipe, builtModule, receiver, mixinFn } = params;
-  const carriedMembers = _findCarriedMembers(builtModule, receiver);
+  const carriedMembers = _findCarriedMembers({
+    moduleName: recipe.moduleName,
+    builtModule,
+    receiver,
+  });
   const layersSoFar: readonly ModuleLayer[] =
     carriedMembers === undefined
       ? recipe.layers
@@ -166,9 +182,11 @@ function _applyMixin(params: {
       ? builtModule
       : Object.freeze({ ...builtModule, ...carriedMembers });
   const { state: mixinState = {} } = mixinFn(base);
+  const mergedState = { ...recipe.state, ...mixinState };
+  assertNoReservedStateKeys(recipe.moduleName, mergedState);
   return buildModuleFromRecipe({
     moduleName: recipe.moduleName,
-    state: { ...recipe.state, ...mixinState },
+    state: mergedState,
     layers: [...layersSoFar, { type: "mixin", apply: mixinFn }],
   });
 }
@@ -189,13 +207,16 @@ export function createBuilderLayer<BuilderInput, Members extends UnknownObject>(
   };
 }
 
-/** Throws when `state` has a key whose accessors would be reserved names. */
+/**
+ * Throws when `state` has a key whose accessors would be reserved names. An
+ * empty-string key is rejected too, since it would generate `get` and `set`.
+ */
 export function assertNoReservedStateKeys(
   moduleName: string,
   state: UnknownObject,
 ): void {
   const reservedKey = Object.keys(state).find((key) => {
-    return RESERVED_STATE_KEYS.has(key);
+    return key === "" || RESERVED_STATE_KEYS.has(key);
   });
   if (reservedKey !== undefined) {
     throw new Error(

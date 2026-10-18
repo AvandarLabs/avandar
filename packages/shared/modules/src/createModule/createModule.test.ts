@@ -173,6 +173,20 @@ describe("createModule: immutability and reserved names", () => {
       createModule("BadState", { state: { state: 1 } });
     }).toThrow(/state key named "state"/);
   });
+
+  it("throws when a mixin adds a state key whose accessors would be reserved", () => {
+    expect(() => {
+      _createCounter().mixin(() => {
+        return { state: { state: 1 } };
+      });
+    }).toThrow(/state key named "state"/);
+  });
+
+  it("throws when the state has an empty-string key", () => {
+    expect(() => {
+      createModule("EmptyKey", { state: { "": 1 } });
+    }).toThrow(/state key named ""/);
+  });
 });
 
 describe("createModule: members attached by spreading", () => {
@@ -200,5 +214,19 @@ describe("createModule: members attached by spreading", () => {
       return {};
     });
     expect(baseHadExtra).toBe(true);
+  });
+
+  it("throws when a spread-in member replaces an existing member", () => {
+    const spread = {
+      ..._createCounter(),
+      increment: (): string => {
+        return "replaced";
+      },
+    };
+    expect(() => {
+      spread.mixin(withNewMembers({ fromMixin: () => {} }));
+    }).toThrow(
+      'Module "Counter" member "increment" was replaced by spreading; use a mixin to override members',
+    );
   });
 });
