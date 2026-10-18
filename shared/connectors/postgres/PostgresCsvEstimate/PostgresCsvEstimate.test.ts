@@ -49,12 +49,13 @@ describe("PostgresCsvEstimate.estimateColumnCsvBytes", () => {
   });
 
   it("uses the declared length for a fixed-width character column, which is always padded to it", () => {
+    // `email` guesses 24 bytes, so a `varchar(100)` would estimate 24 here.
     const column = _column({
-      columnName: "description",
+      columnName: "email",
       dataType: "character",
-      characterMaximumLength: 10,
+      characterMaximumLength: 100,
     });
-    expect(estimateColumnCsvBytes(column)).toBe(10);
+    expect(estimateColumnCsvBytes(column)).toBe(100);
   });
 
   it("returns a fixed width for a uuid regardless of column name", () => {
