@@ -32,6 +32,7 @@ on conflict (id) do nothing;
 
 select vault.create_secret('direct-delete-password', 'vaultlife-direct', 'pgTAP fixture') as direct_secret_id \gset
 select vault.create_secret('workspace-delete-password', 'vaultlife-workspace', 'pgTAP fixture') as workspace_secret_id \gset
+select vault.create_secret('bystander-password', 'vaultlife-bystander', 'pgTAP fixture') as bystander_secret_id \gset
 
 insert into public.connections__postgres (
   connection_id, workspace_id, host, port, database_name, username, vault_secret_id
@@ -53,6 +54,14 @@ select throws_ok (
   'two connections cannot share one Vault secret'
 );
 
+-- A connection in the same workspace that is never deleted, so its secret
+-- must survive every delete below.
+insert into public.connections__postgres (
+  connection_id, workspace_id, host, port, database_name, username, vault_secret_id
+)
+values
+  ('0c034003-0000-4000-8000-000000000003'::uuid, '0c031001-0000-4000-8000-000000000001'::uuid, 'db.example.org', 5432, 'reporting', 'reader', :'bystander_secret_id'::uuid);
+
 -- 2. Deleting a connection deletes its secret.
 delete from public.connections where id = '0c034001-0000-4000-8000-000000000001'::uuid;
 
@@ -73,12 +82,10 @@ select is (
 );
 
 -- 4. Nothing but the owning row's own secret is touched.
-select vault.create_secret('bystander-password', 'vaultlife-bystander', 'pgTAP fixture') as bystander_secret_id \gset
-
 select is (
   (select count(*)::int from vault.secrets where id = :'bystander_secret_id'::uuid),
   1,
-  'an unrelated Vault secret survives those deletes'
+  'a connection that is not deleted keeps its Vault secret through those deletes'
 );
 
 select * from finish ();

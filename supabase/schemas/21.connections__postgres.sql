@@ -44,10 +44,13 @@ alter table public.connections__postgres enable row level security;
 -- go through the edge function's `service_role` client, never a direct
 -- Data API insert/update/delete.
 grant
-select on table public.connections__postgres to authenticated,
-service_role;
+select
+  on table public.connections__postgres to authenticated,
+  service_role;
 
-grant insert, update, delete on table public.connections__postgres to service_role;
+grant insert,
+update,
+delete on table public.connections__postgres to service_role;
 
 -- Policies
 create policy "User can select connections__postgres in their workspace" on public.connections__postgres for
@@ -71,7 +74,7 @@ execute function public.util__set_updated_at ();
  *
  * `security definer` because only the owner can delete from `vault.secrets`.
  */
-create or replace function public.util__connections__postgres__delete_vault_secret () returns trigger language plpgsql security definer
+create or replace function public.connections__postgres__delete_vault_secret () returns trigger language plpgsql security definer
 set
   search_path = '' as $$
 begin
@@ -82,13 +85,13 @@ $$;
 
 -- A trigger function needs no `execute` grant: Postgres checks it when the
 -- trigger is created, not when it fires.
-revoke all on function public.util__connections__postgres__delete_vault_secret ()
+revoke all on function public.connections__postgres__delete_vault_secret ()
 from
   public,
   anon,
   authenticated,
   service_role;
 
-create trigger tr_connections__postgres__delete_vault_secret
+create trigger tr__connections__postgres__delete_vault_secret
 after delete on public.connections__postgres for each row
-execute function public.util__connections__postgres__delete_vault_secret ();
+execute function public.connections__postgres__delete_vault_secret ();

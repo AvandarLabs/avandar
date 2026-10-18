@@ -24,7 +24,7 @@ alter table "public"."datasets__postgres_table" validate constraint "datasets__p
 
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.util__connections__postgres__delete_vault_secret()
+CREATE OR REPLACE FUNCTION public.connections__postgres__delete_vault_secret()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -37,11 +37,11 @@ end;
 $function$
 ;
 
-CREATE TRIGGER tr_connections__postgres__delete_vault_secret AFTER DELETE ON public.connections__postgres FOR EACH ROW EXECUTE FUNCTION public.util__connections__postgres__delete_vault_secret();
+CREATE TRIGGER tr__connections__postgres__delete_vault_secret AFTER DELETE ON public.connections__postgres FOR EACH ROW EXECUTE FUNCTION public.connections__postgres__delete_vault_secret();
 
 
 
 -- Privileges that `supabase db diff` cannot see: default, schema, column,
 -- and view grants. Appended by `pnpm db:new-migration` from what
 -- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
-revoke all privileges on function public.util__connections__postgres__delete_vault_secret() from public, anon, authenticated, service_role;
+revoke all privileges on function public.connections__postgres__delete_vault_secret() from public, anon, authenticated, service_role;

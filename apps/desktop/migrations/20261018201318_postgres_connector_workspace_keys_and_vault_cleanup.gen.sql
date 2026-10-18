@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261018191247_postgres_connector_workspace_keys_and_vault_cleanup.sql by
+-- Generated from supabase/migrations/20261018201318_postgres_connector_workspace_keys_and_vault_cleanup.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 1
