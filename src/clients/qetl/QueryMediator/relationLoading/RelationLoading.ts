@@ -10,7 +10,7 @@ import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCac
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { rememberQueryableColumns } from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
 import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
@@ -421,7 +421,7 @@ async function _loadRelationBytes(
         { key: "originalName" },
       ),
     });
-    rememberQueryableColumns({
+    QueryableRelationColumns.remember({
       datasetId: relation.datasetId,
       columns: relation.columns,
       staleAt: relation.staleAt,

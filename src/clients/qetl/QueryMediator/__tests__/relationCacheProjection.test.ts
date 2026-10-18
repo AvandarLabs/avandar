@@ -1,10 +1,7 @@
 /** Pins mediator column projection: subset hits, wider misses, growFrom. */
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  clearQueryableRelationColumns,
-  rememberQueryableColumns,
-} from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
@@ -225,7 +222,7 @@ function _mockAcquirableCsvSource(): void {
 beforeEach(() => {
   vi.clearAllMocks();
   relationCache = createInMemoryRelationCache();
-  clearQueryableRelationColumns();
+  QueryableRelationColumns.clear();
   getTableOrViewNamesMock.mockResolvedValue([]);
   datasetGetAllMock.mockResolvedValue([]);
   sourceDatasetGetAllMock.mockResolvedValue([]);
@@ -287,7 +284,7 @@ describe("QueryMediator relation cache projection", () => {
 
   it("does not skip storage when a queryable table is too narrow", async () => {
     getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
-    rememberQueryableColumns({
+    QueryableRelationColumns.remember({
       datasetId: DATASET_ID,
       columns: ["a"],
       staleAt: undefined,
@@ -300,7 +297,7 @@ describe("QueryMediator relation cache projection", () => {
 
   it("serves a covering queryable table without reading a dataset record", async () => {
     getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
-    rememberQueryableColumns({
+    QueryableRelationColumns.remember({
       datasetId: DATASET_ID,
       columns: ["a"],
       staleAt: undefined,
@@ -310,6 +307,41 @@ describe("QueryMediator relation cache projection", () => {
 
     expect(datasetGetAllMock).not.toHaveBeenCalled();
   });
+  it("marks acquired rows stale once the source's max age has passed, in both the stored copy and DuckDB's record", async () => {
+    const maxAgeMs = 60_000;
+    _mockAcquirableCsvSource();
+    acquireMock.mockResolvedValue({
+      ref: { kind: "dataset", id: DATASET_ID },
+      parquetBlob: new Blob(["acquired"]),
+      sourceVersion: undefined,
+      maxAgeMs,
+    });
+
+    const queryStartedAt = Date.now();
+    await _runSelect(["a"]);
+    const queryFinishedAt = Date.now();
+
+    const { hits } = await relationCache.probe([_cacheKey(["a"])]);
+    expect(hits[0]?.entry.staleAt).toBeGreaterThanOrEqual(
+      queryStartedAt + maxAgeMs,
+    );
+    expect(hits[0]?.entry.staleAt).toBeLessThanOrEqual(
+      queryFinishedAt + maxAgeMs,
+    );
+    expect(
+      QueryableRelationColumns.isStale({
+        datasetId: DATASET_ID,
+        now: queryStartedAt + maxAgeMs - 1,
+      }),
+    ).toBe(false);
+    expect(
+      QueryableRelationColumns.isStale({
+        datasetId: DATASET_ID,
+        now: queryFinishedAt + maxAgeMs,
+      }),
+    ).toBe(true);
+  });
+
   // A `CREATE TABLE AS SELECT` has no top-level select list, so inference
   // cannot read one and fails wide. Individual generation is exactly that
   // shape, which is why it acquired every column of every dataset it named.

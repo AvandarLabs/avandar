@@ -16,10 +16,7 @@ import { PostgresTableDatasetClient } from "@/clients/datasets/source-datasets/P
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import {
-  getQueryableColumns,
-  isQueryableRelationStale,
-} from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { getRelationFreshnessNow } from "@/clients/qetl/RelationCache/getRelationFreshnessNow/getRelationFreshnessNow";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -55,11 +52,11 @@ export async function probeRelationCache(
   return queryDependencies.filter((datasetId) => {
     if (
       !inMemoryRelationIdSet.has(datasetId) ||
-      isQueryableRelationStale(datasetId, freshnessNow)
+      QueryableRelationColumns.isStale({ datasetId, now: freshnessNow })
     ) {
       return true;
     }
-    const loaded = getQueryableColumns(datasetId) ?? "all";
+    const loaded = QueryableRelationColumns.getColumns(datasetId) ?? "all";
     const needed = neededByDatasetId[datasetId] ?? "all";
     return !coversColumns(loaded, needed);
   });

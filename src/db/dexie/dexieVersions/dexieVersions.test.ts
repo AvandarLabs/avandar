@@ -167,8 +167,9 @@ async function _seedV9DatabaseWithParquetData(
 
 /**
  * A v10 database holding relation-cache rows written before cached rows
- * carried a stale-at time, plus a resumable-upload staging row, so the v11
- * upgrade can be shown to clear the one and keep the other.
+ * carried a stale-at time, plus one row in every other table (among them a
+ * resumable-upload staging row), so the v11 upgrade can be shown to clear
+ * the relation cache and keep everything else.
  */
 async function _seedV10DatabaseWithRelationCache(
   legacyDatabase: Dexie,
@@ -198,6 +199,14 @@ async function _seedV10DatabaseWithRelationCache(
     datasetId: "staged-dataset",
     parquetData: new Blob(["parquet-bytes"]),
   });
+  await legacyDatabase.table("LocalPublicDataset").put({
+    dashboardId: "kept-dashboard",
+    datasetId: "kept-dataset",
+  });
+  await legacyDatabase.table("ConsentAuditEntry").put({ id: "kept-consent" });
+  await legacyDatabase
+    .table("ClarificationAuditEntry")
+    .put({ id: "kept-clarification" });
 }
 
 /**
@@ -230,6 +239,15 @@ describe("AvaDexie v11 schema", () => {
     await expect(db.table("RelationCachePayload").count()).resolves.toBe(0);
     await expect(
       db.table("LocalDataset").get("staged-dataset"),
+    ).resolves.toBeDefined();
+    await expect(
+      db.table("LocalPublicDataset").get(["kept-dashboard", "kept-dataset"]),
+    ).resolves.toBeDefined();
+    await expect(
+      db.table("ConsentAuditEntry").get("kept-consent"),
+    ).resolves.toBeDefined();
+    await expect(
+      db.table("ClarificationAuditEntry").get("kept-clarification"),
     ).resolves.toBeDefined();
   });
 });

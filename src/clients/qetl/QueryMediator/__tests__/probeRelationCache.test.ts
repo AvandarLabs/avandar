@@ -6,10 +6,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  clearQueryableRelationColumns,
-  rememberQueryableColumns,
-} from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const MISSING_ID = "66666666-6666-4666-8666-666666666666" as Dataset.Id;
@@ -25,7 +22,7 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  clearQueryableRelationColumns();
+  QueryableRelationColumns.clear();
   getTableOrViewNamesMock.mockResolvedValue([]);
 });
 
@@ -52,7 +49,7 @@ describe("probeRelationCache", () => {
 
   it("treats a present table as a miss when its loaded columns do not cover the request", async () => {
     getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-    rememberQueryableColumns({
+    QueryableRelationColumns.remember({
       datasetId: LOADED_ID,
       columns: ["a"],
       staleAt: undefined,
@@ -69,7 +66,7 @@ describe("probeRelationCache", () => {
 
   it("still serves a present table whose loaded columns cover the request", async () => {
     getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-    rememberQueryableColumns({
+    QueryableRelationColumns.remember({
       datasetId: LOADED_ID,
       columns: ["a", "b"],
       staleAt: undefined,
@@ -86,7 +83,7 @@ describe("probeRelationCache", () => {
 
   it("treats a loaded table as a miss once its stale-at time has passed, so a live source is acquired again", async () => {
     getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
-    rememberQueryableColumns({
+    QueryableRelationColumns.remember({
       datasetId: LOADED_ID,
       columns: "all",
       staleAt: Date.now() - 1,

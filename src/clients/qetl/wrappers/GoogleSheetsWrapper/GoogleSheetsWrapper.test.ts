@@ -61,7 +61,7 @@ function _driveFetch(version: string) {
 }
 
 describe("GoogleSheetsWrapper", () => {
-  it("acquires the named tab as parquet, reports the Drive version, and is fresh for the live-source max age", async () => {
+  it("acquires the named tab as parquet and reports the Drive version", async () => {
     const parquetBlob = new Blob(["sheet-parquet"]);
     const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
     const getSheetSource = vi.fn().mockResolvedValue({
@@ -88,12 +88,39 @@ describe("GoogleSheetsWrapper", () => {
       datasetId: DATASET_REF.id,
       csvText: "city\r\ntab-77\r\n",
     });
-    expect(acquired).toEqual({
+    expect(acquired).toMatchObject({
       ref: DATASET_REF,
       parquetBlob,
       sourceVersion: "42",
-      maxAgeMs: GlobalAppConfig.timing.liveRelationMaxAgeMs,
     });
+  });
+
+  it("marks acquired rows stale after the live-source max age", async () => {
+    const wrapper = createGoogleSheetsWrapper({
+      getSheetSource: async () => {
+        return {
+          googleDocumentId: "1sheetFileId",
+          sheetName: "Kenya",
+          googleAccountId: "google-account-1",
+        };
+      },
+      getAccessToken: async () => {
+        return "ya29.test-token";
+      },
+      readCsv: async () => {
+        return { parquetBlob: new Blob([]) };
+      },
+      driveFetch: _driveFetch("42"),
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired?.maxAgeMs).toBe(
+      GlobalAppConfig.timing.liveRelationMaxAgeMs,
+    );
   });
 
   it("reads the first tab when the stored tab is null", async () => {

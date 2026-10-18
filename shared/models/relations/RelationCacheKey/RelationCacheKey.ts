@@ -242,8 +242,10 @@ export function coversColumns(
  * Whether an entry with this `staleAt` is still fresh at `now`, in epoch ms.
  * An entry with no `staleAt` never goes stale.
  */
-export function isFreshAt(staleAt: number | undefined, now: number): boolean {
-  return staleAt === undefined || now < staleAt;
+export function isFreshAt(
+  options: Readonly<{ staleAt: number | undefined; now: number }>,
+): boolean {
+  return options.staleAt === undefined || options.now < options.staleAt;
 }
 
 /**
@@ -254,15 +256,18 @@ export function isFreshAt(staleAt: number | undefined, now: number): boolean {
  * a refetch.
  */
 export function serves(
-  entry: Readonly<RelationCacheEntryFields>,
-  key: PreparedRelationCacheKey,
-  now: number,
+  options: Readonly<{
+    entry: Readonly<RelationCacheEntryFields>;
+    key: PreparedRelationCacheKey;
+    now: number;
+  }>,
 ): boolean {
+  const { entry, key, now } = options;
   return (
     entry.principalKey === key.principalKey &&
     entry.tableName === key.tableName &&
     entry.definitionToken === key.definitionToken &&
-    isFreshAt(entry.staleAt, now) &&
+    isFreshAt({ staleAt: entry.staleAt, now }) &&
     coversColumns(entry.columns, key.columns)
   );
 }

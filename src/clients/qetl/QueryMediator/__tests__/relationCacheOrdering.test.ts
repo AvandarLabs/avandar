@@ -13,10 +13,7 @@ const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
 
 let relationCache = createInMemoryRelationCache();
 
-async function _seedCache(
-  datasetId: Dataset.Id,
-  staleAt: number | undefined = undefined,
-): Promise<void> {
+async function _seedCache(datasetId: Dataset.Id): Promise<void> {
   await relationCache.write({
     identity: {
       principal: PRINCIPAL_KEY,
@@ -26,7 +23,7 @@ async function _seedCache(
     },
     columns: "all",
     payload: new Blob(["cached"]),
-    staleAt,
+    staleAt: undefined,
   });
 }
 
@@ -209,16 +206,6 @@ describe("QueryMediator relation cache ordering", () => {
 
     expect(datasetGetAllMock).not.toHaveBeenCalled();
     expect(loadParquetMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("acquires a google_sheets relation again once its stored rows are stale", async () => {
-    await _seedCache(SHEETS_DATASET_ID, Date.now() - 1);
-
-    await _runQueryForDependencies([SHEETS_DATASET_ID]);
-
-    // A stale entry is a miss, so the relation goes back to source dispatch,
-    // which is what reads its dataset record.
-    expect(datasetGetAllMock).toHaveBeenCalledTimes(1);
   });
 
   it("dispatches only the relations the storage tier could not serve", async () => {

@@ -52,7 +52,7 @@ loading entirely; they only see tables already resident in the tab.
 | registry | `RelationRegistry`: one wrapper per relation kind, built per fetch |
 | acquire | `SourceWrapper.acquire`: fetch a relation's rows from its source |
 | queryable tier | The DuckDB catalog itself: a dataset is cached if its table or view exists |
-| sidecar | The module-level map in `queryableRelationColumns.ts` recording which columns each DuckDB table was loaded with |
+| sidecar | The module-level map in `QueryableRelationColumns.ts` recording which columns each DuckDB table was loaded with |
 | storage tier | IndexedDB behind `RelationCachePort`: `DexieRelationCache` (workspace) or `LocalPublicDatasetRelationCache` (public) |
 | `growFrom` | On a storage miss, the narrower live entry for the same relation, whose columns are added to the next acquisition |
 | lease | `DatasetDuckDbLease`: an unforgeable token proving the holder runs inside a coordinated operation for a set of names. No expiry |
@@ -163,7 +163,7 @@ taking locks.
 | Public session | [`src/clients/qetl/PublicQuerySession/`](../src/clients/qetl/PublicQuerySession/) | Snapshot policy; one mediator per dashboard, visibility, revision | analyzer, `LocalPublicDatasetRelationCache`, `PublicDatasetParquetStorageClient` |
 | Authorization | [`src/clients/qetl/assertWorkspaceMembership/`](../src/clients/qetl/assertWorkspaceMembership/), [`assertWorkspaceRelations/`](../src/clients/qetl/assertWorkspaceRelations/) | Principal check and per-relation check, both fail closed | `AuthClient`, `WorkspaceClient`, `DatasetClient` |
 | Mediator | [`src/clients/qetl/QueryMediator/`](../src/clients/qetl/QueryMediator/) | The pipeline of section 4 | everything below |
-| Column inference | `QueryMediator/getNeededColumnsFromQuery/`, `getParquetColumnNamesFromNeeded/`, `queryableRelationColumns/` | Infer and map needed columns; the sidecar | analyzer tokens |
+| Column inference | `QueryMediator/getNeededColumnsFromQuery/`, `getParquetColumnNamesFromNeeded/`, `QueryableRelationColumns/` | Infer and map needed columns; the sidecar | analyzer tokens |
 | Concepts | `QueryMediator/conceptRelation/` | Plan, spine, view | ontology CRUD clients, `DuckDbClient` |
 | Registry | [`src/clients/qetl/RelationRegistry/`](../src/clients/qetl/RelationRegistry/) | One wrapper per kind; registration checks | wrapper types |
 | Wrappers | [`src/clients/qetl/wrappers/`](../src/clients/qetl/wrappers/) | `createDefaultRegistry` (dataset dispatcher on `sourceType`), Parquet, virtual, Sheets, concept wrappers | connector clients, CRUD clients |
@@ -570,7 +570,7 @@ means traced through the source but not run.
 | The analyzer refuses `EXTRACT(part FROM column)` as `uninspectable-source` | verified | `duckDbSqlSources.ts` |
 | Anonymous public dashboards: `loadRelationBytes` always reads `dataset_columns`, which `anon` cannot read (HTTP 401 on the local stack) | 401 verified; dashboard failure by reading | `relationLoading.ts` |
 | A CKAN resource in Parquet format is wrapped in an untyped Blob and fails `registerParquetFile` when the query needs all columns; the bad entry is cached first. Latent: in-repo registrations are CSV and XLSX | by reading | `DatasetParquetWrapper.ts` |
-| The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `queryableRelationColumns.ts` |
+| The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `QueryableRelationColumns.ts` |
 | Snapshot publishing of an `all_columns` slice fails over Google Sheets (no Storage object exists) and over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists) | by reading | `dashboardPublishSnapshots.ts` |
 | `_runConceptQuery` fallback ignores filters, grouping, aggregation, and sort | by reading | `runStructuredQueryWithMetadata.ts` |
 | `ConceptWrapper` is registered but never resolved; `extractReferencedRelations`, `buildCsvFromDatastoreRecords`, `RelationRegistry.resolveAll` and `wrappers` have no production caller | by reading | as named |

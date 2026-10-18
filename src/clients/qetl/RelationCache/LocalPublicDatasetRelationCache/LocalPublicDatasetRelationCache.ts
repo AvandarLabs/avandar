@@ -196,7 +196,11 @@ async function _rowServesKey(
     columns: "all",
     staleAt: undefined,
   };
-  return serves(entryFields, prepared, getRelationFreshnessNow());
+  return serves({
+    entry: entryFields,
+    key: prepared,
+    now: getRelationFreshnessNow(),
+  });
 }
 
 /**

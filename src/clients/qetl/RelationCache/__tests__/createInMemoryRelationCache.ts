@@ -50,7 +50,10 @@ export function createInMemoryRelationCache(): RelationCachePort & {
         // A stale entry is neither served nor grown, same as the Dexie port.
         if (
           stored === undefined ||
-          !isFreshAt(stored.entry.staleAt, getRelationFreshnessNow())
+          !isFreshAt({
+            staleAt: stored.entry.staleAt,
+            now: getRelationFreshnessNow(),
+          })
         ) {
           misses.push({ key, growFrom: undefined });
           return;
