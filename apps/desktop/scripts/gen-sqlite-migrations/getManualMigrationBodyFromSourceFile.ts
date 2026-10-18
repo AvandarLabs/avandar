@@ -67,7 +67,7 @@ alter table "dashboards" add column "snapshot_transition_prior_revision" text;
 alter table "dashboards" add column "snapshot_transition_prior_visibility" text;
 alter table "dashboards" add column "snapshot_transition_target_visibility" text;
 `,
-  "20260819053812_generalize_open_data_catalog_access.sql": `-- SQLite override. The Postgres migration relaxes three NOT NULL columns, which
+  "20260819130000_generalize_open_data_catalog_access.sql": `-- SQLite override. The Postgres migration relaxes three NOT NULL columns, which
 -- SQLite's ALTER TABLE cannot do: it supports RENAME / ADD COLUMN / DROP COLUMN
 -- only, so the table is rebuilt. The generator routes ALTER COLUMN to
 -- needsHandEdit for exactly this reason.
