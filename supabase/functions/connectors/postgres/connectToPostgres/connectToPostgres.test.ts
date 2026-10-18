@@ -1,5 +1,6 @@
 import { connectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres/connectToPostgres.ts";
 import { describe, expect, it } from "vitest";
+import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 type ParserTable = Record<number, ((raw: string) => unknown) | undefined>;
 
@@ -22,7 +23,9 @@ describe("connectToPostgres", () => {
         password: "hunter2",
         ssl: false,
       });
-      const sqlWithOptions = sql as unknown as {
+      // `options` is part of the driver's own `Sql` type, which
+      // `PostgresSql` leaves out.
+      const sqlWithOptions = sql as PostgresSql & {
         options: { parsers: ParserTable };
       };
       const { parsers } = sqlWithOptions.options;

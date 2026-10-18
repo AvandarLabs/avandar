@@ -39,7 +39,7 @@ describe("isPrivateOrLoopbackAddress", () => {
     ["198.19.255.255", true],
     ["224.0.0.1", true], // 224.0.0.0/4 multicast
     ["255.255.255.255", true], // 240.0.0.0/4 reserved, including broadcast
-    // Every spelling of the IPv6 loopback and unspecified addresses
+    // Equivalent spellings of the IPv6 loopback and unspecified addresses
     ["0:0:0:0:0:0:0:1", true],
     ["0::1", true],
     ["::0", true],

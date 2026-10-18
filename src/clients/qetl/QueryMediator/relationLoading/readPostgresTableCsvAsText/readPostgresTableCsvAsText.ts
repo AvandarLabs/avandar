@@ -9,8 +9,9 @@ import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoo
  * Reads one Postgres relation's CSV into Parquet with every stored column as
  * text, so no column takes a type DuckDB's sniff guessed from its values: a
  * text column of zip codes would otherwise lose its leading zeros as a
- * number. A Postgres dataset stores each column's declared type as its
- * queryable type, and relation loading casts this text to it.
+ * number. A Postgres dataset stores the queryable type mapped from each
+ * column's declared Postgres type, and relation loading casts this text to
+ * it.
  */
 export async function readPostgresTableCsvAsText(
   options: Readonly<{

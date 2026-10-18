@@ -12,7 +12,7 @@ create table public.datasets__postgres_table (
   -- Dataset this metadata belongs to, constrained below together with
   -- `workspace_id`.
   dataset_id uuid not null unique,
-  -- Workspace this dataset belongs to, which must be the dataset's own
+  -- Workspace this dataset belongs to, keyed below to the dataset's own
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- The saved connection this dataset reads through, constrained below to a
   -- connection in this dataset's own workspace.

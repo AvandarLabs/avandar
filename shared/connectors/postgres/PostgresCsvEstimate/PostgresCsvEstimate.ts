@@ -104,7 +104,7 @@ function _estimateUnboundedTextBytes(columnName: string): number {
 
 /**
  * Estimates one column's average CSV-serialized width in bytes, from its
- * declared type alone - never reads a row.
+ * declared type and name alone - never reads a row.
  */
 function _estimateColumnCsvBytes(column: ColumnSizeInfo): number {
   const { dataType, characterMaximumLength, columnName } = column;

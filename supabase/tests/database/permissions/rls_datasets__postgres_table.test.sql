@@ -79,7 +79,7 @@ values (
 )
 on conflict (id) do nothing;
 
-select plan (9);
+select plan (10);
 
 -- 1. A member of the owning workspace reads the row.
 select lives_ok (
@@ -263,6 +263,20 @@ select throws_ok (
   '23503',
   null,
   'a datasets__postgres_table row cannot be moved to a workspace other than its dataset''s'
+);
+
+-- 10. Nor can a row be repointed at a dataset in another workspace while
+-- keeping its own workspace, which only the dataset key rejects.
+select throws_ok (
+  $t10$
+  reset role;
+  update public.datasets__postgres_table
+  set dataset_id = '0c025004-0000-4000-8000-000000000004'::uuid
+  where id = '0c026001-0000-4000-8000-000000000001'::uuid;
+  $t10$,
+  '23503',
+  null,
+  'a datasets__postgres_table row cannot be repointed at another workspace''s dataset'
 );
 
 select * from finish ();
