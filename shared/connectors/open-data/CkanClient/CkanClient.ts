@@ -52,7 +52,7 @@ export function createCkanClient(http: Readonly<OpenDataHttp>): CkanClient {
       });
       const result = unwrapCkanActionEnvelope(
         "package_show",
-        await http.getJson(url),
+        await http.get(url),
       );
       const wire = CkanPackageSchema.parse(result);
       return {

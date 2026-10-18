@@ -69,7 +69,7 @@ function _ckanHttp(
   options: { resources?: readonly unknown[] } = {},
 ): OpenDataHttp {
   return {
-    getJson: vi.fn(async () => {
+    get: vi.fn(async () => {
       return {
         success: true,
         result: {
@@ -104,7 +104,7 @@ function _socrataEntry(
 
 function _socrataHttp(options: { rowsUpdatedAt?: number } = {}): OpenDataHttp {
   return {
-    getJson: vi.fn(async () => {
+    get: vi.fn(async () => {
       return {
         id: SOCRATA_DATASET_ID,
         name: "311",

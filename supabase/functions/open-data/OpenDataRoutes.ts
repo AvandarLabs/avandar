@@ -6,10 +6,10 @@ import { string } from "zod";
 import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache/acquireOpenDataResourceWithCache.ts";
 import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.ts";
-import { createOpenDataHttp } from "$/connectors/open-data/createOpenDataHttp.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
 import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
+import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.ts";
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
@@ -70,7 +70,9 @@ async function _persistOpenDataCache(params: {
 async function _resolveOpenDataAcquisition(
   entry: Readonly<DataCatalogListing.T>,
 ): Promise<OpenDataAcquisition> {
-  const http = createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES });
+  const http = HttpClientFactory.create("OpenDataRouteHttpClient", {
+    state: { maxResponseBytes: MAX_RESOURCE_BYTES },
+  });
   const storage = createAvandarSupabaseStorageClient(
     SupabaseAdmin.storage.from("open-data-catalog"),
   );

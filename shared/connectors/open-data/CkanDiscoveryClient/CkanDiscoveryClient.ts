@@ -27,7 +27,7 @@ export function createCkanDiscoveryClient(
       });
       const result = unwrapCkanActionEnvelope(
         "package_list",
-        await http.getJson(url),
+        await http.get(url),
       );
       return CkanPackageListResultSchema.parse(result);
     },

@@ -6,7 +6,7 @@ const DISCOVERY_BASE_URL = "https://api.us.socrata.com/api/catalog/v1";
 
 function _http(overrides: Partial<OpenDataHttp> = {}): OpenDataHttp {
   return {
-    getJson: vi.fn(async () => {
+    get: vi.fn(async () => {
       return {
         results: [
           {
@@ -27,7 +27,7 @@ describe("SocrataDiscoveryClient.search", () => {
 
     await createSocrataDiscoveryClient(http).search({ query: "measles" });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${DISCOVERY_BASE_URL}?q=measles`,
     );
   });
@@ -40,7 +40,7 @@ describe("SocrataDiscoveryClient.search", () => {
       domains: ["data.cityofnewyork.us"],
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${DISCOVERY_BASE_URL}?q=measles&domains=data.cityofnewyork.us`,
     );
   });
@@ -62,7 +62,7 @@ describe("SocrataDiscoveryClient.search", () => {
 
     await createSocrataDiscoveryClient(http).search({ query: "measles", limit: 3 });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${DISCOVERY_BASE_URL}?q=measles&limit=3`,
     );
   });
@@ -74,7 +74,7 @@ describe("SocrataDiscoveryClient.search", () => {
       domains: ["data.cityofnewyork.us"],
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${DISCOVERY_BASE_URL}?domains=data.cityofnewyork.us`,
     );
   });
@@ -88,7 +88,7 @@ describe("SocrataDiscoveryClient.search", () => {
       offset: 200,
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${DISCOVERY_BASE_URL}?domains=data.cityofnewyork.us&limit=100&offset=200`,
     );
   });

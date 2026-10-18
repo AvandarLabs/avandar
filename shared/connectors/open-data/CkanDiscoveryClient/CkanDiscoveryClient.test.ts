@@ -7,7 +7,7 @@ const BASE_URL = "https://data.humdata.org";
 
 function _http(overrides: Partial<OpenDataHttp> = {}): OpenDataHttp {
   return {
-    getJson: vi.fn(async () => {
+    get: vi.fn(async () => {
       return {
         success: true,
         result: ["movement-range-maps", "hdx-hapi-operational-presence"],
@@ -24,7 +24,7 @@ describe("CkanDiscoveryClient.listDatasets", () => {
 
     await createCkanDiscoveryClient(http).listDatasets({ baseUrl: BASE_URL });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${BASE_URL}/api/3/action/package_list?`,
     );
   });
@@ -44,7 +44,7 @@ describe("CkanDiscoveryClient.listDatasets", () => {
 
   it("raises ckan-action-failed when the action reports failure", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return {
           success: false,
           error: { __type: "Some Error", message: "boom" },

@@ -1,6 +1,12 @@
+import type { HttpClient } from "$/utils/HttpClientFactory/HttpClientFactory.types.ts";
 /**
  * The HTTP layer a CKAN read needs, injected so nothing here reaches the
  * network on its own and every test runs offline.
+ *
+ * It is the part of an `HttpClient` the open-data clients use, so a test can
+ * pass a two-function fake. `get` reads a JSON document, parsed but not
+ * validated: the caller validates. `getBytes` reads raw bytes and follows
+ * redirects.
  *
  * The two members are separate rather than one `fetch`-shaped dependency
  * because they do not have the same reachability. CKAN's `/api/3/action/*`
@@ -10,13 +16,7 @@
  * be read from another origin in a browser at all and have to come through a
  * server-side reader. Collapsing the two would hide that.
  */
-export type OpenDataHttp = {
-  /** Reads a JSON document. Parsed but not validated; the caller validates. */
-  getJson: (url: string) => Promise<unknown>;
-
-  /** Reads raw bytes. Must follow redirects and must not cache the target. */
-  getBytes: (url: string) => Promise<Uint8Array<ArrayBuffer>>;
-};
+export type OpenDataHttp = Pick<HttpClient, "get" | "getBytes">;
 
 /**
  * One file or endpoint inside a CKAN dataset. Field names are CKAN's own

@@ -53,7 +53,7 @@ function _packageResponse(resources: readonly unknown[] = [README_RESOURCE]) {
 
 function _http(overrides: Partial<OpenDataHttp> = {}): OpenDataHttp {
   return {
-    getJson: vi.fn(async () => {
+    get: vi.fn(async () => {
       return _packageResponse();
     }),
     getBytes: vi.fn(async () => {
@@ -72,7 +72,7 @@ describe("CkanClient.getPackage", () => {
       ckanDatasetId: DATASET_ID,
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${BASE_URL}/api/3/action/package_show?id=${DATASET_ID}`,
     );
   });
@@ -88,7 +88,7 @@ describe("CkanClient.getPackage", () => {
       ckanDatasetId: "a b&rows=999",
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${BASE_URL}/api/3/action/package_show?id=a+b%26rows%3D999`,
     );
   });
@@ -101,14 +101,14 @@ describe("CkanClient.getPackage", () => {
       ckanDatasetId: DATASET_ID,
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${BASE_URL}/api/3/action/package_show?id=${DATASET_ID}`,
     );
   });
 
   it("returns every resource the dataset lists, in order", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return _packageResponse([README_RESOURCE, CSV_RESOURCE]);
       }),
     });
@@ -129,7 +129,7 @@ describe("CkanClient.getPackage", () => {
   // of real HDX resources, so requiring it would reject most of the catalog.
   it("parses a resource with no mimetype", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return _packageResponse([CSV_RESOURCE]);
       }),
     });
@@ -146,7 +146,7 @@ describe("CkanClient.getPackage", () => {
   // `success` would hand back undefined where a package was expected.
   it("raises ckan-action-failed on a 200 body with success false", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return {
           success: false,
           error: { __type: "Validation Error", message: "Missing value" },
@@ -170,7 +170,7 @@ describe("CkanClient.getPackage", () => {
 
   it("raises ckan-authorization-required on an authorization error body", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return {
           success: false,
           error: {
@@ -194,7 +194,7 @@ describe("CkanClient.getPackage", () => {
 
   it("rejects a package result carrying no resources array", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return { success: true, result: { id: "x", name: DATASET_ID } };
       }),
     });

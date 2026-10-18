@@ -39,7 +39,7 @@ export function createSocrataDiscoveryClient(
       if (offset !== undefined) {
         params.set("offset", String(offset));
       }
-      const body = await http.getJson(
+      const body = await http.get(
         `${DISCOVERY_BASE_URL}?${params.toString()}`,
       );
       const parsed = SocrataDiscoveryResponseSchema.parse(body);

@@ -33,7 +33,7 @@ export function createSocrataClient(
       const url = `${root}/api/views/${socrataDatasetId}.json`;
       let body: unknown;
       try {
-        body = await http.getJson(url);
+        body = await http.get(url);
       } catch (cause) {
         throw new OpenDataAcquisitionFailed(
           { code: "socrata-unreachable", socrataDatasetId },
@@ -54,7 +54,7 @@ export function createSocrataClient(
       const url = `${root}/resource/${socrataDatasetId}.json?%24select=count(*)`;
       let body: unknown;
       try {
-        body = await http.getJson(url);
+        body = await http.get(url);
       } catch (cause) {
         throw new OpenDataAcquisitionFailed(
           { code: "socrata-unreachable", socrataDatasetId },

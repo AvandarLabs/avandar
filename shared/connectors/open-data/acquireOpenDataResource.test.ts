@@ -74,7 +74,7 @@ function _http(
   } = {},
 ): OpenDataHttp {
   return {
-    getJson: vi.fn(async () => {
+    get: vi.fn(async () => {
       return {
         success: true,
         result: {
@@ -141,7 +141,7 @@ describe("acquireOpenDataResource", () => {
 
     await acquireOpenDataResource({ entry: _entry(), http });
 
-    expect(http.getJson).toHaveBeenCalledTimes(1);
+    expect(http.get).toHaveBeenCalledTimes(1);
   });
 
   // A populated query endpoint is reported and not acted on, because reaching
@@ -261,7 +261,7 @@ describe("acquireOpenDataResource", () => {
 
   it("surfaces a CKAN authorization refusal as its own condition", async () => {
     const http: OpenDataHttp = {
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return {
           success: false,
           error: {
@@ -309,7 +309,7 @@ function _socrataHttp(
   } = {},
 ): OpenDataHttp {
   return {
-    getJson: vi.fn(async (url: string) => {
+    get: vi.fn(async (url: string) => {
       if (url.includes("/api/views/")) {
         return {
           id: SOCRATA_DATASET_ID,

@@ -8,7 +8,7 @@ const DATASET_ID = "erm2-nwe9";
 
 function _http(overrides: Partial<OpenDataHttp> = {}): OpenDataHttp {
   return {
-    getJson: vi.fn(async () => {
+    get: vi.fn(async () => {
       return {
         id: DATASET_ID,
         name: "311 Service Requests from 2020 to Present",
@@ -32,7 +32,7 @@ describe("SocrataClient.getMetadata", () => {
       socrataDatasetId: DATASET_ID,
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${BASE_URL}/api/views/${DATASET_ID}.json`,
     );
   });
@@ -55,7 +55,7 @@ describe("SocrataClient.getMetadata", () => {
 
   it("tolerates a view with no rowsUpdatedAt", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return { id: DATASET_ID, name: "No freshness fields" };
       }),
     });
@@ -72,7 +72,7 @@ describe("SocrataClient.getMetadata", () => {
 describe("SocrataClient.getRowCount", () => {
   it("requests a count(*) select", async () => {
     const http = _http({
-      getJson: vi.fn(async () => {
+      get: vi.fn(async () => {
         return [{ count: "22811427" }];
       }),
     });
@@ -82,7 +82,7 @@ describe("SocrataClient.getRowCount", () => {
       socrataDatasetId: DATASET_ID,
     });
 
-    expect(http.getJson).toHaveBeenCalledWith(
+    expect(http.get).toHaveBeenCalledWith(
       `${BASE_URL}/resource/${DATASET_ID}.json?%24select=count(*)`,
     );
     expect(rowCount).toBe(22811427);
