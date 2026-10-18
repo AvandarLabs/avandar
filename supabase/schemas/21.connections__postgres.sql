@@ -23,8 +23,10 @@ create table public.connections__postgres (
   -- application's schema, so this column trusts the single write path
   -- (the `connectors` edge function via the security-definer
   -- wrapper below) to keep it valid rather than coupling the declarative
-  -- schema to an extension-managed table.
-  vault_secret_id uuid not null,
+  -- schema to an extension-managed table. Unique because the secret is
+  -- deleted along with this row (see the trigger below), so a shared secret
+  -- would be deleted out from under its other connection.
+  vault_secret_id uuid not null unique,
   -- Set on every successful test-and-save or table listing; drives
   -- "last connected" UI copy.
   last_verified_at timestamptz,
@@ -61,3 +63,32 @@ select
 create trigger tr_connections__postgres__set_updated_at before
 update on public.connections__postgres for each row
 execute function public.util__set_updated_at ();
+
+/**
+ * Deletes a Postgres connection's Vault secret when its row is deleted,
+ * including when a workspace delete cascades the row away, so a decryptable
+ * credential never outlives the connection that pointed at it.
+ *
+ * `security definer` because only the owner can delete from `vault.secrets`.
+ */
+create or replace function public.util__connections__postgres__delete_vault_secret () returns trigger language plpgsql security definer
+set
+  search_path = '' as $$
+begin
+  delete from vault.secrets where id = old.vault_secret_id;
+  return old;
+end;
+$$;
+
+-- A trigger function needs no `execute` grant: Postgres checks it when the
+-- trigger is created, not when it fires.
+revoke all on function public.util__connections__postgres__delete_vault_secret ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr_connections__postgres__delete_vault_secret
+after delete on public.connections__postgres for each row
+execute function public.util__connections__postgres__delete_vault_secret ();
