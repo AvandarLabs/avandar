@@ -32,7 +32,7 @@ const DUCKDB_TYPE_BY_POSTGRES_DATA_TYPE: Readonly<
  * to it, instead of trusting whatever DuckDB's CSV sniff guesses from the
  * values.
  */
-export function postgresDataTypeToDuckDbType(
+export function getDuckDbTypeFromPostgresDataType(
   postgresDataType: string,
 ): DuckDbSniffableDataType {
   return DUCKDB_TYPE_BY_POSTGRES_DATA_TYPE[postgresDataType] ?? "VARCHAR";

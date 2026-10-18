@@ -1,27 +1,25 @@
-import { snakeCaseKeysShallow } from "@avandar/utils";
+import { setPropValue, snakeCaseKeysShallow } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { duckDbColumnsToImportedColumns } from "./duckDbColumnsToImportedColumns";
-import type { DatasetInsertContext } from "./useSaveDataset";
+import { duckDbColumnsToImportedColumns } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/duckDbColumnsToImportedColumns";
+import type { DatasetInsertContext } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DataSourceMetadata } from "../DatasetImportForm.types";
+import type { DataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 
 /**
- * The columns a Postgres dataset stores. The `connectors` proxy sends every
- * row as CSV text, so `detectedDataType` is `VARCHAR`: that is what the
- * rows arrive as. `dataType` keeps the column's declared Postgres type, so
- * relation loading casts every non-text column to it rather than trusting
- * DuckDB's sniff of the values (an all-null integer column sniffs as text,
- * for example). A text column is not cast, so it keeps whatever type the
- * sniff picks.
+ * The columns a Postgres dataset stores. Acquisition reads every column of
+ * the `connectors` proxy's CSV as text (`readPostgresTableCsvAsText`), so
+ * `detectedDataType` is `VARCHAR`. `dataType` is the DuckDB type mapped from
+ * the column's declared Postgres type, which relation loading casts that
+ * text to.
  */
 function _getStoredColumns(
   columns: readonly DuckDbColumnSchema[],
 ): DatasetColumn.Imported[] {
-  return duckDbColumnsToImportedColumns(columns).map((column) => {
-    return { ...column, detectedDataType: "VARCHAR" };
-  });
+  return duckDbColumnsToImportedColumns(columns).map(
+    setPropValue("detectedDataType", "VARCHAR"),
+  );
 }
 
 /** Inserts a dataset backed by a Postgres table or view. */

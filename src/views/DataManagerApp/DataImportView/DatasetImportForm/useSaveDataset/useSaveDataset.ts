@@ -16,7 +16,7 @@ import { makeDatasetImportedPayloadFromSaveResult } from "./makeDatasetImportedP
 import { saveCsvDataset } from "./saveCsvDataset";
 import { saveGoogleSheetsDataset } from "./saveGoogleSheetsDataset";
 import { savePdfDataset } from "./savePdfDataset";
-import { savePostgresTableDataset } from "./savePostgresTableDataset";
+import { savePostgresTableDataset } from "./savePostgresTableDataset/savePostgresTableDataset";
 import { saveXlsxDataset } from "./saveXlsxDataset";
 import { startOriginalFileUploadIfNeeded } from "./startOriginalFileUploadIfNeeded/startOriginalFileUploadIfNeeded";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

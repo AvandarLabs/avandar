@@ -1,14 +1,15 @@
 import { useMutation } from "@avandar/query-hooks";
 import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DatabaseConnectionClient } from "@/clients/connections/DatabaseConnectionClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
-import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/copy/postgresConnectorImportErrorCopy";
+import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy";
 import { listPostgresRelations } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/listPostgresRelations";
-import { previewPostgresRelation } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/previewPostgresRelation";
+import { previewPostgresRelation } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/previewPostgresRelation/previewPostgresRelation";
 import { testAndSavePostgresConnection } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/testAndSavePostgresConnection";
+import { useLatestRequest } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/useLatestRequest";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDatabaseConnection/PostgresDatabaseConnection";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
@@ -109,9 +110,9 @@ function _isPostgresRelationKind(
 
 /** Converts a failed `connectors` request into the error shown inline. */
 function _toConnectionError(
-  error: unknown,
-  i18n: I18n,
+  options: Readonly<{ error: unknown; i18n: I18n }>,
 ): PostgresConnectionError {
+  const { error, i18n } = options;
   const code =
     error instanceof Error && "code" in error
       ? (error as { code: ConnectorErrorCode }).code
@@ -164,23 +165,19 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     PostgresTableDataSourceMetadata | undefined
   >();
 
-  // The variables of the latest list and preview requests. A response to
-  // any earlier request is stale, because the user has picked a different
-  // connection or relation since, so it is dropped rather than overwriting
-  // the newer state.
-  const latestListRequestRef = useRef<ListRelationsVariables | undefined>(
-    undefined,
-  );
-  const latestPreviewRequestRef = useRef<PreviewRelationVariables | undefined>(
-    undefined,
-  );
+  // A response to any request but the latest of its kind is stale, because
+  // the user has picked a different connection or relation since, so it is
+  // dropped rather than overwriting the newer state.
+  const latestListRequest = useLatestRequest<ListRelationsVariables>();
+  const latestPreviewRequest = useLatestRequest<PreviewRelationVariables>();
+  const latestSubmitRequest = useLatestRequest<PostgresConnectionFormValues>();
 
   const [listRelations, isLoadingRelations] = useMutation({
     mutationFn: (params: ListRelationsVariables) => {
       return listPostgresRelations(params.connectionId);
     },
     onSuccess: (newRelations, variables) => {
-      if (variables !== latestListRequestRef.current) {
+      if (!latestListRequest.isLatest(variables)) {
         return;
       }
       setConnectionError(undefined);
@@ -188,20 +185,18 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     },
     onError: (error, variables) => {
       Logger.error(error, { devMsg: "Failed to list Postgres relations" });
-      if (variables !== latestListRequestRef.current) {
+      if (!latestListRequest.isLatest(variables)) {
         return;
       }
-      setConnectionError(_toConnectionError(error, i18n));
+      setConnectionError(_toConnectionError({ error, i18n }));
     },
   });
 
   const requestRelations = useCallback(
     (connectionId: DatabaseConnection.Id) => {
-      const variables = { connectionId };
-      latestListRequestRef.current = variables;
-      listRelations(variables);
+      listRelations(latestListRequest.claim({ connectionId }));
     },
-    [listRelations],
+    [latestListRequest, listRelations],
   );
 
   // Defaults the picker to the most-recently-verified saved connection, and
@@ -235,21 +230,32 @@ export function useLoadPostgresTable(): PostgresTableLoad {
         i18n,
       });
     },
-    onSuccess: (result) => {
+    onSuccess: (result, variables) => {
+      // The connection is saved either way, and the invalidation above lists
+      // it, but a save the user has since moved away from must not take back
+      // the picker.
+      if (!latestSubmitRequest.isLatest(variables)) {
+        return;
+      }
+      latestListRequest.forget();
+      latestPreviewRequest.forget();
       setConnectionError(undefined);
       setSelectedConnectionId(result.connectionId as DatabaseConnection.Id);
       setRelations(result.relations);
     },
-    onError: (error: unknown) => {
+    onError: (error: unknown, variables) => {
       Logger.error(error, { devMsg: "Postgres test-and-save failed" });
-      setConnectionError(_toConnectionError(error, i18n));
+      if (!latestSubmitRequest.isLatest(variables)) {
+        return;
+      }
+      setConnectionError(_toConnectionError({ error, i18n }));
     },
   });
 
   const [previewRelation, isLoadingPreview] = useMutation({
     mutationFn: previewPostgresRelation,
     onSuccess: (metadata, variables) => {
-      if (variables !== latestPreviewRequestRef.current) {
+      if (!latestPreviewRequest.isLatest(variables)) {
         return;
       }
       setConnectionError(undefined);
@@ -257,19 +263,18 @@ export function useLoadPostgresTable(): PostgresTableLoad {
     },
     onError: (error, variables) => {
       Logger.error(error, { devMsg: "Failed to preview Postgres relation" });
-      if (variables !== latestPreviewRequestRef.current) {
+      if (!latestPreviewRequest.isLatest(variables)) {
         return;
       }
-      setConnectionError(_toConnectionError(error, i18n));
+      setConnectionError(_toConnectionError({ error, i18n }));
     },
   });
 
   const requestPreview = useCallback(
     (variables: PreviewRelationVariables) => {
-      latestPreviewRequestRef.current = variables;
-      previewRelation(variables);
+      previewRelation(latestPreviewRequest.claim(variables));
     },
-    [previewRelation],
+    [latestPreviewRequest, previewRelation],
   );
 
   const onSelectConnection = useCallback(
@@ -279,20 +284,26 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       setRelations(undefined);
       setSelectedRelationId(undefined);
       setDataSourceMetadata(undefined);
-      latestListRequestRef.current = undefined;
-      latestPreviewRequestRef.current = undefined;
+      latestListRequest.forget();
+      latestPreviewRequest.forget();
+      latestSubmitRequest.forget();
       if (id !== "new") {
         requestRelations(id);
       }
     },
-    [requestRelations],
+    [
+      latestListRequest,
+      latestPreviewRequest,
+      latestSubmitRequest,
+      requestRelations,
+    ],
   );
 
   const onSubmitConnectionForm = useCallback(
     (values: PostgresConnectionFormValues) => {
-      submitConnectionForm(values);
+      submitConnectionForm(latestSubmitRequest.claim(values));
     },
-    [submitConnectionForm],
+    [latestSubmitRequest, submitConnectionForm],
   );
 
   const onSelectRelation = useCallback(
@@ -302,7 +313,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
       // one loads, or if this one fails.
       setDataSourceMetadata(undefined);
       setConnectionError(undefined);
-      latestPreviewRequestRef.current = undefined;
+      latestPreviewRequest.forget();
       const relation = relations?.find(propEq("relationId", relationId));
       if (
         !relation ||
@@ -318,7 +329,7 @@ export function useLoadPostgresTable(): PostgresTableLoad {
         relationKind: relation.kind,
       });
     },
-    [requestPreview, relations, selectedConnectionId],
+    [latestPreviewRequest, requestPreview, relations, selectedConnectionId],
   );
 
   const onRequestDataReparse = useCallback(

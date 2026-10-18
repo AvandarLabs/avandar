@@ -2,7 +2,7 @@ import { MIMEType } from "@avandar/utils";
 import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { uuid } from "$/lib/uuid";
 import { APIClient } from "@/clients/APIClient";
-import { postgresDataTypeToDuckDbType } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/postgresDataTypeToDuckDbType";
+import { getDuckDbTypeFromPostgresDataType } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/getDuckDbTypeFromPostgresDataType/getDuckDbTypeFromPostgresDataType";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
@@ -71,7 +71,7 @@ export async function previewPostgresRelation(
         Columns: result.columns.map((column) => {
           return {
             name: column.columnName,
-            type: postgresDataTypeToDuckDbType(column.sourceType),
+            type: getDuckDbTypeFromPostgresDataType(column.sourceType),
           };
         }),
         DateFormat: null,
@@ -86,9 +86,9 @@ export async function previewPostgresRelation(
       columns: result.columns.map((column) => {
         return {
           column_name: column.columnName,
-          // The declared Postgres type, which is what the saved dataset
-          // casts this column to at query time (`savePostgresTableDataset`).
-          column_type: postgresDataTypeToDuckDbType(column.sourceType),
+          // The DuckDB type mapped from the column's declared Postgres type,
+          // which relation loading casts the column's text to at query time.
+          column_type: getDuckDbTypeFromPostgresDataType(column.sourceType),
           default: undefined,
           extra: null,
           key: null,

@@ -1,6 +1,6 @@
 import { i18n } from "@lingui/core";
 import { beforeAll, describe, expect, it } from "vitest";
-import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/copy/postgresConnectorImportErrorCopy";
+import { postgresConnectorImportErrorCopy } from "@/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy";
 import type { ConnectorErrorCode } from "@sbfn/connectors/Connector";
 
 describe("postgresConnectorImportErrorCopy", () => {

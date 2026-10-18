@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { postgresDataTypeToDuckDbType } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/postgresDataTypeToDuckDbType";
+import { getDuckDbTypeFromPostgresDataType } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/getDuckDbTypeFromPostgresDataType/getDuckDbTypeFromPostgresDataType";
 
-describe("postgresDataTypeToDuckDbType", () => {
+describe("getDuckDbTypeFromPostgresDataType", () => {
   it.each([
     ["smallint", "BIGINT"],
     ["integer", "BIGINT"],
@@ -15,7 +15,9 @@ describe("postgresDataTypeToDuckDbType", () => {
     ["timestamp with time zone", "TIMESTAMP"],
     ["time without time zone", "TIME"],
   ])("maps %s to %s", (postgresDataType, duckDbType) => {
-    expect(postgresDataTypeToDuckDbType(postgresDataType)).toBe(duckDbType);
+    expect(getDuckDbTypeFromPostgresDataType(postgresDataType)).toBe(
+      duckDbType,
+    );
   });
 
   it.each([
@@ -30,6 +32,6 @@ describe("postgresDataTypeToDuckDbType", () => {
     "ARRAY",
     "USER-DEFINED",
   ])("keeps %s as text, since no other queryable type holds it", (postgresDataType) => {
-    expect(postgresDataTypeToDuckDbType(postgresDataType)).toBe("VARCHAR");
+    expect(getDuckDbTypeFromPostgresDataType(postgresDataType)).toBe("VARCHAR");
   });
 });

@@ -1,4 +1,5 @@
 import { makeIdLookupRecord, makeObject, prop } from "@avandar/utils";
+import { readPostgresTableCsvAsText } from "@/clients/qetl/QueryMediator/relationLoading/readPostgresTableCsvAsText/readPostgresTableCsvAsText";
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -92,16 +93,11 @@ function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
       datasetId: Dataset.Id;
       csvText: string;
     }) => {
-      // Unlike Sheets, the import path never sniffs a Postgres table. It
-      // stores each column's declared Postgres type, and relation loading
-      // casts every non-text column to that type, so this sniff's guesses
-      // do not decide those columns' types.
-      const loaded = await DuckDbClient.loadCsv({
-        tableName: datasetId,
-        fileText: csvText,
+      return await readPostgresTableCsvAsText({
+        datasetId,
+        csvText,
         datasetDuckDbLease,
       });
-      return { parquetBlob: loaded.parquetData };
     },
     transcodeCsvToParquet: async ({
       datasetId,

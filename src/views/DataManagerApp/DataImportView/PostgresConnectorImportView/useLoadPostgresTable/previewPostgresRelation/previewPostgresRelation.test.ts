@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { previewPostgresRelation } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/previewPostgresRelation";
+import { previewPostgresRelation } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/previewPostgresRelation/previewPostgresRelation";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 
 const { apiGetMock } = vi.hoisted(() => {

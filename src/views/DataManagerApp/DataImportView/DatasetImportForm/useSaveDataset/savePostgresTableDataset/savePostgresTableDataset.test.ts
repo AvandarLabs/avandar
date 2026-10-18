@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { savePostgresTableDataset } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/savePostgresTableDataset";
+import { savePostgresTableDataset } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/savePostgresTableDataset/savePostgresTableDataset";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { DataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
+import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
 
 const { insertPostgresTableDatasetMock } = vi.hoisted(() => {
   return { insertPostgresTableDatasetMock: vi.fn() };
@@ -45,10 +45,7 @@ describe("savePostgresTableDataset", () => {
         columns: [_column("id", "BIGINT"), _column("zip_code", "VARCHAR")],
       },
       parseOptions: { type: "postgres_table" },
-    } as unknown as Extract<
-      DataSourceMetadata,
-      { sourceType: "postgres_table" }
-    >;
+    } as PostgresTableDataSourceMetadata;
 
     await savePostgresTableDataset({
       context: {
