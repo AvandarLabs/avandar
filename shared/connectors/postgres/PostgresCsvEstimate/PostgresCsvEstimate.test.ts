@@ -23,13 +23,38 @@ function _column(
 }
 
 describe("PostgresCsvEstimate.estimateColumnCsvBytes", () => {
-  it("uses the declared length for a bounded varchar, never a guess", () => {
+  it("never estimates a bounded varchar wider than its declared length", () => {
     const column = _column({
       columnName: "anything_at_all",
       dataType: "character varying",
       characterMaximumLength: 40,
     });
     expect(estimateColumnCsvBytes(column)).toBe(40);
+  });
+
+  it("treats a varchar's declared length as a ceiling, not its average width", () => {
+    // `varchar(255)` is a framework default, so most values are far shorter.
+    const emailColumn = _column({
+      columnName: "email",
+      dataType: "character varying",
+      characterMaximumLength: 255,
+    });
+    const wideColumn = _column({
+      columnName: "anything_at_all",
+      dataType: "character varying",
+      characterMaximumLength: 65535,
+    });
+    expect(estimateColumnCsvBytes(emailColumn)).toBe(24);
+    expect(estimateColumnCsvBytes(wideColumn)).toBe(50);
+  });
+
+  it("uses the declared length for a fixed-width character column, which is always padded to it", () => {
+    const column = _column({
+      columnName: "description",
+      dataType: "character",
+      characterMaximumLength: 10,
+    });
+    expect(estimateColumnCsvBytes(column)).toBe(10);
   });
 
   it("returns a fixed width for a uuid regardless of column name", () => {

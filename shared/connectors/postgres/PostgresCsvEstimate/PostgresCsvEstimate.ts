@@ -104,16 +104,23 @@ function _estimateUnboundedTextBytes(columnName: string): number {
 
 /**
  * Estimates one column's average CSV-serialized width in bytes, from its
- * declared type alone - never reads a row. A `character`/`character varying`
- * column with a declared `(n)` uses `n` directly, since that is an exact
- * bound, not a guess; everything else without a fixed width falls to the
- * name-based heuristics above.
+ * declared type alone - never reads a row. A fixed-width `character(n)` is
+ * always padded to `n`, so it uses `n` directly. A `character varying(n)`
+ * only bounds its values: `varchar(255)` is a common framework default whose
+ * values are usually far shorter, so it uses the name-based heuristics below,
+ * capped at `n`. Everything else without a fixed width falls to those
+ * heuristics too.
  */
 function _estimateColumnCsvBytes(column: ColumnSizeInfo): number {
   const { dataType, characterMaximumLength, columnName } = column;
 
   if (characterMaximumLength !== null) {
-    return characterMaximumLength;
+    return dataType === "character" ?
+        characterMaximumLength
+      : Math.min(
+          characterMaximumLength,
+          _estimateUnboundedTextBytes(columnName),
+        );
   }
 
   if (dataType === "json" || dataType === "jsonb") {
