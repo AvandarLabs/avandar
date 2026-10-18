@@ -92,9 +92,10 @@ function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
       datasetId: Dataset.Id;
       csvText: string;
     }) => {
-      // Same reasoning as `readGoogleSheetTabCsv`: query-time acquisition
-      // reads through the same CSV->Parquet loader the import path used, so
-      // a dataset's columns are typed identically either way.
+      // Unlike Sheets, the import path never sniffs a Postgres table. It
+      // stores each column's declared Postgres type, and relation loading
+      // casts every non-text column to that type, so this sniff's guesses
+      // do not decide those columns' types.
       const loaded = await DuckDbClient.loadCsv({
         tableName: datasetId,
         fileText: csvText,

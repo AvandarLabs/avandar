@@ -2,6 +2,7 @@ import { MIMEType } from "@avandar/utils";
 import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { uuid } from "$/lib/uuid";
 import { APIClient } from "@/clients/APIClient";
+import { postgresDataTypeToDuckDbType } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/postgresDataTypeToDuckDbType";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
@@ -25,7 +26,8 @@ export async function previewPostgresRelation(
     pathParams: {
       connectorType: "postgres",
       connectionId: params.connectionId,
-      relationId: encodeURIComponent(params.relationId),
+      // Not encoded here: the API client already encodes every path param.
+      relationId: params.relationId,
     },
   });
   if ("error" in result) {
@@ -55,10 +57,9 @@ export async function previewPostgresRelation(
       tableName,
       numRejectedRows: 0,
       errors: { rejectedScans: [], rejectedRows: [] },
-      // Cosmetic for this preview only - not a real sniff, since
-      // Postgres's column types already come from `information_schema`
-      // (`result.columns` below), not from DuckDB auto-detection. The
-      // real transcode at acquire time runs its own real sniff.
+      // Not a real sniff: Postgres's column types come from
+      // `information_schema` (`result.columns` below), not from DuckDB
+      // auto-detection.
       csvSniff: {
         Delimiter: ",",
         Quote: '"',
@@ -68,7 +69,10 @@ export async function previewPostgresRelation(
         SkipRows: 0,
         HasHeader: true,
         Columns: result.columns.map((column) => {
-          return { name: column.columnName, type: "VARCHAR" };
+          return {
+            name: column.columnName,
+            type: postgresDataTypeToDuckDbType(column.sourceType),
+          };
         }),
         DateFormat: null,
         TimestampFormat: null,
@@ -82,11 +86,9 @@ export async function previewPostgresRelation(
       columns: result.columns.map((column) => {
         return {
           column_name: column.columnName,
-          // Postgres's `information_schema.data_type` string (e.g.
-          // "integer"), not a real DuckDB type - good enough for this
-          // preview table's column headers; the acquire-time transcode
-          // infers real DuckDB types independently.
-          column_type: "VARCHAR",
+          // The declared Postgres type, which is what the saved dataset
+          // casts this column to at query time (`savePostgresTableDataset`).
+          column_type: postgresDataTypeToDuckDbType(column.sourceType),
           default: undefined,
           extra: null,
           key: null,
