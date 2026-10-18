@@ -83,10 +83,11 @@ mixin left to right.
   `state` output is ignored and only its `members` are rebuilt. Otherwise a
   setter would silently reset whatever the mixin set, and an appending mixin
   like `withRateLimit` would append again on every change.
-- **Mixin functions must be pure.** A mixin runs once when applied and once
-  more on each later state change. Resources such as a Bottleneck limiter are
-  created in the outer `withX(options)` call, never inside the function it
-  returns.
+- **Mixin functions must be pure.** A mixin runs twice when applied (once to
+  read its state, once to build its members against the merged state) and
+  once more on every later state change. Resources such as a Bottleneck
+  limiter are created in the outer `withX(options)` call, never inside the
+  function it returns.
 
 ### 3.4 Overrides
 
@@ -146,6 +147,24 @@ const HdxHttpClient = HttpClientFactory.create("HdxHttpClient", {
 });
 ```
 
+### 4.1 Default state
+
+Accessors are generated from the keys a module's state actually has at
+runtime, and no type can produce a runtime key. So `createModuleFactory`
+takes a `defaultState` with a value (even `undefined`) for every **optional**
+state key of the kind; it is typed so that leaving one out fails to compile.
+A kind whose state has only required keys passes `defaultState: {}`. `create`
+merges its own `state` over the defaults.
+
+```ts
+const HttpClientFactory = createModuleFactory("HttpClient", {
+  defaultState: { baseUrl: undefined, auth: undefined, defaultHeaders: undefined, middlewares: [], fetchImpl: undefined },
+  builder: (module: BuilderModule<HttpClientState>) => ({ /* ... */ }),
+});
+```
+
+### 4.2 `create`
+
 `Factory.create(name, options)`:
 
 | Option | Required | Meaning |
@@ -156,11 +175,26 @@ const HdxHttpClient = HttpClientFactory.create("HdxHttpClient", {
 
 The result is a normal module: it keeps `.mixin()` and every accessor.
 
-**Exports:** `createModule`, `createModuleFactory`, `withNewMembers`, and the
-types `Module`, `BuilderModule`, `Mixin`, `AnyMixin`, `LambdaMixin`,
-`MixinTypeLambda`, `ModuleFactory`, `AnyModule`, `UnknownModule`,
-`NameOfModule`, `StateOfModule`, `MembersOfModule`. The `BaseModule` alias is
-removed; its one consumer (`EtlEngine.ts`) moves to `BuilderModule`.
+A builder is always a function. The plain-object builder form is removed: no
+caller used it, and accepting either form made TypeScript widen the inferred
+members to `unknown`. A builder's `module` argument is typed
+`BuilderModule<State, Members, Name>`, so `module.getModuleName()` returns the
+literal name.
+
+**Exports:** `createModule`, `createModuleFactory`, `createLambdaMixin`,
+`withNewMembers`, and the types `Module`, `BuilderModule`, `Merge`, `Mixin`,
+`AnyMixin`, `MixinResult`, `LambdaMixin`, `MixinTypeLambda`, `FoldMixins`,
+`MixinRequirement`, `MixinRequirementCheck`, `MixinState`, `MixinMembers`,
+`ModuleFactory`, `ModuleFactoryCreateOptions`, `KindDefaultState`,
+`NoReservedMembers`, `NoReservedStateKeys`, `ReservedMemberName`,
+`ReservedStateKey`, `UnknownModule`, `NameOfModule`, `StateOfModule`.
+
+`UnknownModule` becomes the minimal structural shape every module satisfies
+(`getModuleName` and `getState`), which is what `withLogger` and
+`withSupabaseClient` use it for. `AnyModule` and `MembersOfModule` are
+removed: neither has a consumer outside the package, and a module's members
+cannot be recovered from its merged type. The `BaseModule` alias is removed;
+its one consumer (`EtlEngine.ts`) moves to `BuilderModule`.
 
 ## 5. Type design
 
@@ -253,6 +287,7 @@ shared/utils/HttpClientFactory/
   HttpClientFactory.test.ts
   HttpClientError.ts
   readBoundedBody.ts            moved from createOpenDataHttp.ts
+  sendHttpRequest.ts            URL, headers, middlewares, credentials, redirects
   mixins/withRateLimit/withRateLimit.ts
   mixins/withRateLimit/withRateLimit.test.ts
 ```
@@ -294,8 +329,8 @@ Because this is module state, `client.setBaseUrl(url)` and
 | `delete(url, options?)` | Parsed JSON, or `undefined` for an empty body. |
 | `getBytes(url, options?)` | `Uint8Array<ArrayBuffer>`. Follows redirects. |
 
-Every member accepts `query` (built with `buildHttpQueryString`), `headers`
-and `signal`. A JSON member returns `undefined` for a 204 response or an
+Every member accepts `query` (set on the URL's `searchParams`, leaving out
+`undefined` values), `headers` and `signal`. A JSON member returns `undefined` for a 204 response or an
 empty body. `getBytes` returns an empty array for an empty body.
 
 ### 6.4 Request pipeline
@@ -309,14 +344,17 @@ empty body. `getBytes` returns an empty array for an empty body.
    request's origin equals `baseUrl`'s origin. Credentials therefore never
    reach a middleware and never go to another host. That second guarantee
    matters for the open-data clients, which follow absolute resource URLs to
-   arbitrary hosts.
+   arbitrary hosts. A credentialed request is sent with `redirect: "manual"`
+   and its redirects are followed by hand (at most 5): a hop that stays on
+   `baseUrl`'s origin keeps the credentials, and a hop to any other origin is
+   sent without them. Uncredentialed requests let `fetch` follow redirects.
 4. `fetch`. A non-2xx status throws `HttpClientError`.
 5. Read the body with the `maxResponseBytes` cap: the declared
    `content-length` is checked first, then the streamed read aborts past the
    cap.
 
 `HttpClientError` carries `method`, `status` and a `kind` of
-`"status" | "responseTooLarge"`. **No error message ever names a URL.** After
+`"status" | "responseTooLarge" | "tooManyRedirects"`. **No error message ever names a URL.** After
 redirects, the URL can be a presigned object-store URL, which is a
 credential. This keeps `createOpenDataHttp`'s existing rule.
 
@@ -411,5 +449,9 @@ package.
   goes in its own commits, with no other files, so AVA-383 can lift them
   onto a branch off `develop`.
 - That PR is titled `feat(modules)!: ...`, a breaking change that bumps the
-  minor version while the package is at 0.x. The README, the `mixin` doc
-  comment and the `CHANGELOG` are rewritten to match section 3.
+  minor version while the package is at 0.x. The README and the `mixin` doc
+  comment are rewritten to match section 3. The `CHANGELOG` is not edited by
+  hand: the release workflow's auto-changeset step writes it from the PR
+  title.
+- The step-by-step plan is
+  `docs/measles-demo/modules-factory-and-http-client-plan.md`.
