@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { makePrincipalKeyFromWorkspaceSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { GOOGLE_SHEET_FRESHNESS_CACHE } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
+import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -83,16 +84,24 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
-function _wrapper({ children }: { children: ReactNode }): JSX.Element {
-  const queryClient = new QueryClient({
+function _makeQueryClient(): QueryClient {
+  return new QueryClient({
     defaultOptions: { mutations: { retry: false }, queries: { retry: false } },
   });
-  // `TestProviders` supplies the Lingui provider the hook's `useLingui` needs.
-  return createElement(
-    TestProviders,
-    null,
-    createElement(QueryClientProvider, { client: queryClient }, children),
-  );
+}
+
+function _makeWrapper(
+  queryClient: QueryClient,
+): (props: { children: ReactNode }) => JSX.Element {
+  return ({ children }) => {
+    // `TestProviders` supplies the Lingui provider the hook's `useLingui`
+    // needs.
+    return createElement(
+      TestProviders,
+      null,
+      createElement(QueryClientProvider, { client: queryClient }, children),
+    );
+  };
 }
 
 function _sourceDataset(
@@ -109,12 +118,18 @@ function _sourceDataset(
   };
 }
 
-async function _refresh(sheetName: string | null = "Kenya"): Promise<void> {
+async function _refresh(
+  options: Readonly<{
+    sheetName?: string | null;
+    queryClient?: QueryClient;
+  }> = {},
+): Promise<void> {
+  const { sheetName = "Kenya", queryClient = _makeQueryClient() } = options;
   const { result } = renderHook(
     () => {
       return useRefreshGoogleSheetDataset();
     },
-    { wrapper: _wrapper },
+    { wrapper: _makeWrapper(queryClient) },
   );
 
   await act(async () => {
@@ -208,7 +223,7 @@ describe("useRefreshGoogleSheetDataset", () => {
     // Resolving the name to a tab is `getStoredGoogleSheetTabCsv`'s job, and it
     // is shared with import and query-time acquisition so all three read a
     // dataset's rows the same way.
-    await _refresh("Kenya");
+    await _refresh({ sheetName: "Kenya" });
 
     expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
       expect.objectContaining({ sheetName: "Kenya" }),
@@ -218,7 +233,7 @@ describe("useRefreshGoogleSheetDataset", () => {
   it("passes a null stored tab through, which means the first tab", async () => {
     // Positive control for the test above, and the legacy-row contract: `null`
     // means the workbook's first tab, which is what those rows already read.
-    await _refresh(null);
+    await _refresh({ sheetName: null });
 
     expect(getStoredGoogleSheetTabCsvMock).toHaveBeenCalledWith(
       expect.objectContaining({ sheetName: null }),
@@ -233,6 +248,48 @@ describe("useRefreshGoogleSheetDataset", () => {
         fileId: "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789",
         accessToken: "ya29.refresh-test-token",
       }),
+    );
+  });
+
+  it("marks the dataset page's queries and open data queries stale once the sheet is re-imported", async () => {
+    const queryClient = _makeQueryClient();
+    const previewQueryKey = [
+      "DatasetQueryClient",
+      "getPreviewData",
+      { datasetId: DATASET_ID },
+    ];
+    const dataQueryKey = [
+      { auth: "workspace", workspaceId: WORKSPACE_ID },
+      undefined,
+      RAW_SQL_KEY_MARKER,
+      "select 1",
+    ];
+    const unrelatedQueryKey = ["datasets", "getAll"];
+    queryClient.setQueryData(previewQueryKey, []);
+    queryClient.setQueryData(dataQueryKey, { rows: [] });
+    queryClient.setQueryData(unrelatedQueryKey, []);
+    startCsvImportMock.mockImplementation(async () => {
+      // Nothing may be marked stale before the new rows are imported, or
+      // the page would re-run its queries against the old ones.
+      expect(queryClient.getQueryState(previewQueryKey)?.isInvalidated).toBe(
+        false,
+      );
+      return {
+        columns: [{ column_name: "county", column_type: "VARCHAR" }],
+        previewRows: [{ county: "Nairobi" }],
+        csvSniff: {},
+      };
+    });
+
+    await _refresh({ queryClient });
+
+    expect(notifyErrorMock).not.toHaveBeenCalled();
+    expect(queryClient.getQueryState(previewQueryKey)?.isInvalidated).toBe(
+      true,
+    );
+    expect(queryClient.getQueryState(dataQueryKey)?.isInvalidated).toBe(true);
+    expect(queryClient.getQueryState(unrelatedQueryKey)?.isInvalidated).toBe(
+      false,
     );
   });
 

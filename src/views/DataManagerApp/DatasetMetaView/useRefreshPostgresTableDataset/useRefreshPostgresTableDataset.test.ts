@@ -105,8 +105,13 @@ describe("useRefreshPostgresTableDataset", () => {
     });
   });
 
-  it("marks open data queries stale so they show the table's current rows", async () => {
+  it("marks the dataset page's queries and open data queries stale so they show the table's current rows", async () => {
     const queryClient = new QueryClient();
+    const previewQueryKey = [
+      "DatasetQueryClient",
+      "getPreviewData",
+      { datasetId: DATASET_ID },
+    ];
     const dataQueryKey = [
       { auth: "workspace", workspaceId: WORKSPACE_ID },
       undefined,
@@ -114,6 +119,7 @@ describe("useRefreshPostgresTableDataset", () => {
       "select 1",
     ];
     const unrelatedQueryKey = ["datasets", "getAll"];
+    queryClient.setQueryData(previewQueryKey, []);
     queryClient.setQueryData(dataQueryKey, { rows: [] });
     queryClient.setQueryData(unrelatedQueryKey, []);
     const { result } = renderHook(useRefreshPostgresTableDataset, {
@@ -127,6 +133,9 @@ describe("useRefreshPostgresTableDataset", () => {
     await waitFor(() => {
       expect(notifySuccessMock).toHaveBeenCalledTimes(1);
     });
+    expect(queryClient.getQueryState(previewQueryKey)?.isInvalidated).toBe(
+      true,
+    );
     expect(queryClient.getQueryState(dataQueryKey)?.isInvalidated).toBe(true);
     expect(queryClient.getQueryState(unrelatedQueryKey)?.isInvalidated).toBe(
       false,
