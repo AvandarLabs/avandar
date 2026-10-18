@@ -24,6 +24,8 @@ async function _readStreamWithLimit(params: {
           maxBytes,
         });
       }
+      // A stream's chunk type is `Uint8Array<ArrayBufferLike>`, but `fetch`
+      // body streams are backed by `ArrayBuffer`, so the narrower type holds.
       chunks.push(value as Uint8Array<ArrayBuffer>);
     }
   } finally {

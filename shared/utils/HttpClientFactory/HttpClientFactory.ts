@@ -15,6 +15,52 @@ function _parseJsonBody(bytes: Uint8Array): unknown {
     : JSON.parse(new TextDecoder().decode(bytes));
 }
 
+async function _requestJson(params: {
+  state: Readonly<HttpClientState>;
+  method: HttpMethod;
+  url: string;
+  options: Readonly<HttpRequestWithBodyOptions> | undefined;
+}): Promise<unknown> {
+  const { state, method } = params;
+  const response = await sendHttpRequest({
+    state,
+    method,
+    url: params.url,
+    options: params.options ?? {},
+    accept: "application/json",
+  });
+  if (response.status === 204) {
+    return undefined;
+  }
+  return _parseJsonBody(
+    await readBoundedBody({
+      response,
+      maxBytes: state.maxResponseBytes,
+      method,
+    }),
+  );
+}
+
+async function _getBytes(params: {
+  state: Readonly<HttpClientState>;
+  url: string;
+  options: Readonly<HttpRequestWithBodyOptions> | undefined;
+}): Promise<Uint8Array<ArrayBuffer>> {
+  const { state } = params;
+  const response = await sendHttpRequest({
+    state,
+    method: "GET",
+    url: params.url,
+    options: params.options ?? {},
+    accept: undefined,
+  });
+  return await readBoundedBody({
+    response,
+    maxBytes: state.maxResponseBytes,
+    method: "GET",
+  });
+}
+
 /**
  * The HttpClient kind: a small `fetch`-based client with named auth
  * strategies, a response size cap, and middlewares. Make one with
@@ -36,58 +82,24 @@ export const HttpClientFactory = createModuleFactory("HttpClient", {
         `HttpClient "${module.getModuleName()}" has auth but no baseUrl, so it cannot tell which origin may receive the credentials.`,
       );
     }
-    const requestJson = async (
-      method: HttpMethod,
-      url: string,
-      options: HttpRequestWithBodyOptions = {},
-    ): Promise<unknown> => {
-      const response = await sendHttpRequest({
-        state,
-        method,
-        url,
-        options,
-        accept: "application/json",
-      });
-      if (response.status === 204) {
-        return undefined;
-      }
-      return _parseJsonBody(
-        await readBoundedBody({
-          response,
-          maxBytes: state.maxResponseBytes,
-          method,
-        }),
-      );
-    };
     return {
       get: (url, options) => {
-        return requestJson("GET", url, options);
+        return _requestJson({ state, method: "GET", url, options });
       },
       post: (url, options) => {
-        return requestJson("POST", url, options);
+        return _requestJson({ state, method: "POST", url, options });
       },
       put: (url, options) => {
-        return requestJson("PUT", url, options);
+        return _requestJson({ state, method: "PUT", url, options });
       },
       patch: (url, options) => {
-        return requestJson("PATCH", url, options);
+        return _requestJson({ state, method: "PATCH", url, options });
       },
       delete: (url, options) => {
-        return requestJson("DELETE", url, options);
+        return _requestJson({ state, method: "DELETE", url, options });
       },
-      getBytes: async (url, options = {}) => {
-        const response = await sendHttpRequest({
-          state,
-          method: "GET",
-          url,
-          options,
-          accept: undefined,
-        });
-        return await readBoundedBody({
-          response,
-          maxBytes: state.maxResponseBytes,
-          method: "GET",
-        });
+      getBytes: (url, options) => {
+        return _getBytes({ state, url, options });
       },
     };
   },

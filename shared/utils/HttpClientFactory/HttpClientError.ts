@@ -4,7 +4,8 @@ import type { HttpMethod } from "$/utils/HttpClientFactory/HttpClientFactory.typ
 export type HttpClientErrorKind =
   | "status"
   | "responseTooLarge"
-  | "tooManyRedirects";
+  | "tooManyRedirects"
+  | "network";
 
 type _HttpClientErrorDetails = {
   kind: HttpClientErrorKind;
@@ -20,6 +21,9 @@ function _buildHttpClientErrorMessage(
   const { kind, method, status, maxBytes, declaredBytes } = details;
   if (kind === "status") {
     return `HTTP ${method} request failed with status ${status}.`;
+  }
+  if (kind === "network") {
+    return `HTTP ${method} request failed before a response arrived.`;
   }
   if (kind === "tooManyRedirects") {
     return `HTTP ${method} request was redirected too many times.`;

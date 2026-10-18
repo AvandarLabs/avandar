@@ -224,6 +224,22 @@ describe("HttpClient: auth", () => {
     );
   });
 
+  it("sends the GET that follows a 303 after a POST with no body and no content type", async () => {
+    const fetchImpl: FetchLike = vi.fn(async (url: string) => {
+      return url.includes("/submit")
+        ? new Response(null, { status: 303, headers: { location: "/done" } })
+        : _jsonResponse({});
+    });
+    await _createClient(fetchImpl, {
+      baseUrl: BASE_URL,
+      auth: { type: "bearer", token: "t0k" },
+    }).post("/submit", { body: { name: "a" } });
+    const followUpInit = vi.mocked(fetchImpl).mock.calls[1]?.[1];
+    expect(followUpInit?.method).toBe("GET");
+    expect(followUpInit?.body).toBeUndefined();
+    expect(_requestedHeaders(fetchImpl, 1).has("content-type")).toBe(false);
+  });
+
   it("throws when created with auth but no baseUrl", () => {
     const fetchImpl: FetchLike = vi.fn();
     expect(() => {
@@ -371,6 +387,35 @@ describe("HttpClient: getBytes", () => {
     await expect(
       _createClient(fetchImpl).getBytes(`${BASE_URL}/f`),
     ).rejects.toThrow(/status 502/);
+  });
+});
+
+describe("HttpClient: network failures", () => {
+  it("names no URL or API key when fetch rejects before a response", async () => {
+    const fetchImpl: FetchLike = vi.fn(async () => {
+      throw new TypeError(
+        "error sending request for url (https://api.example.org/x?api_key=SECRET)",
+      );
+    });
+    const error = await _createClient(fetchImpl, {
+      baseUrl: BASE_URL,
+      auth: { type: "apiKeyQuery", paramName: "api_key", apiKey: "SECRET" },
+    })
+      .get("/x")
+      .catch((caught: unknown) => {
+        return caught;
+      });
+    expect((error as Error).message).not.toMatch(/SECRET|api\.example\.org/);
+  });
+
+  it("rethrows an abort unchanged", async () => {
+    const abortError = new DOMException("aborted", "AbortError");
+    const fetchImpl: FetchLike = vi.fn(async () => {
+      throw abortError;
+    });
+    await expect(
+      _createClient(fetchImpl).get(`${BASE_URL}/x`),
+    ).rejects.toBe(abortError);
   });
 });
 
