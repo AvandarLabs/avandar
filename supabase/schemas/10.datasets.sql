@@ -35,7 +35,10 @@ create table public.datasets (
   -- Description of the dataset
   description text,
   -- When true, tag-based app roles do not apply; shares still can
-  is_restricted boolean not null default false
+  is_restricted boolean not null default false,
+  -- The target of a `datasets__<type>` table's `(dataset_id, workspace_id)`
+  -- foreign key, which keeps that row's workspace equal to its dataset's.
+  constraint datasets__id_workspace_id_key unique (id, workspace_id)
 );
 
 -- Enable row level security

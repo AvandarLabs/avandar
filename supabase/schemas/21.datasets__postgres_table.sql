@@ -9,9 +9,10 @@
 create table public.datasets__postgres_table (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
-  -- Dataset this metadata belongs to
-  dataset_id uuid not null unique references public.datasets (id) on update cascade on delete cascade,
-  -- Workspace this dataset belongs to
+  -- Dataset this metadata belongs to, constrained below together with
+  -- `workspace_id`.
+  dataset_id uuid not null unique,
+  -- Workspace this dataset belongs to, which must be the dataset's own
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- The saved connection this dataset reads through, constrained below to a
   -- connection in this dataset's own workspace.
@@ -22,12 +23,15 @@ create table public.datasets__postgres_table (
   -- Timestamps
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  -- Keyed on the workspace as well as the connection, so a dataset can never
-  -- read through another workspace's connection. A foreign key check bypasses
-  -- RLS, so a key on `connection_id` alone would accept any connection id in
-  -- any workspace. `restrict`, not `cascade`: deleting a connection with
-  -- live datasets must be an explicit, informed action - the FK must not
-  -- silently orphan a queryable dataset.
+  -- Both keys below include `workspace_id`, so a dataset can never read
+  -- through another workspace's connection: this row's workspace is its
+  -- dataset's, and its connection's workspace is this row's. A foreign key
+  -- check bypasses RLS, so keys on `dataset_id` and `connection_id` alone
+  -- would accept a client-supplied workspace that matched neither.
+  constraint datasets__postgres_table__dataset_in_workspace_fkey foreign key (dataset_id, workspace_id) references public.datasets (id, workspace_id) on update cascade on delete cascade,
+  -- `restrict`, not `cascade`: deleting a connection with live datasets must
+  -- be an explicit, informed action - the FK must not silently orphan a
+  -- queryable dataset.
   constraint datasets__postgres_table__connection_in_workspace_fkey foreign key (connection_id, workspace_id) references public.connections (id, workspace_id) on update cascade on delete restrict
 );
 

@@ -79,7 +79,7 @@ values (
 )
 on conflict (id) do nothing;
 
-select plan (7);
+select plan (9);
 
 -- 1. A member of the owning workspace reads the row.
 select lives_ok (
@@ -215,6 +215,7 @@ select throws_ok (
 -- dataset's own workspace.
 select throws_ok (
   $t7$
+  reset role;
   insert into public.datasets__postgres_table (dataset_id, workspace_id, connection_id, schema_name, table_name, relation_kind)
   values (
     '0c025004-0000-4000-8000-000000000004'::uuid,
@@ -228,6 +229,40 @@ select throws_ok (
   '23503',
   null,
   'a datasets__postgres_table row cannot reference a connection in another workspace'
+);
+
+-- 8. Nor can a row claim the connection's workspace while belonging to a
+-- dataset in another workspace: the row's workspace is keyed to its
+-- dataset's, so the connection's workspace is the dataset's too.
+select throws_ok (
+  $t8$
+  reset role;
+  insert into public.datasets__postgres_table (dataset_id, workspace_id, connection_id, schema_name, table_name, relation_kind)
+  values (
+    '0c025004-0000-4000-8000-000000000004'::uuid,
+    '0c021001-0000-4000-8000-000000000001'::uuid,
+    '0c024001-0000-4000-8000-000000000001'::uuid,
+    'public',
+    'customers',
+    'table'::public.datasets__postgres_table_relation_kind
+  );
+  $t8$,
+  '23503',
+  null,
+  'a datasets__postgres_table row cannot claim a workspace other than its dataset''s'
+);
+
+-- 9. An existing row cannot be moved to another workspace either.
+select throws_ok (
+  $t9$
+  reset role;
+  update public.datasets__postgres_table
+  set workspace_id = '0c021002-0000-4000-8000-000000000002'::uuid
+  where id = '0c026001-0000-4000-8000-000000000001'::uuid;
+  $t9$,
+  '23503',
+  null,
+  'a datasets__postgres_table row cannot be moved to a workspace other than its dataset''s'
 );
 
 select * from finish ();

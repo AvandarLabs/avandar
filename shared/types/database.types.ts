@@ -958,11 +958,11 @@ export type Database = {
             referencedColumns: ["id", "workspace_id"]
           },
           {
-            foreignKeyName: "datasets__postgres_table_dataset_id_fkey"
-            columns: ["dataset_id"]
-            isOneToOne: true
+            foreignKeyName: "datasets__postgres_table__dataset_in_workspace_fkey"
+            columns: ["dataset_id", "workspace_id"]
+            isOneToOne: false
             referencedRelation: "datasets"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "workspace_id"]
           },
           {
             foreignKeyName: "datasets__postgres_table_workspace_id_fkey"
