@@ -114,8 +114,8 @@ function _estimateColumnCsvBytes(column: ColumnSizeInfo): number {
     // `character varying(n)` only bounds its values: `varchar(255)` is a
     // common framework default whose values are usually far shorter, so it
     // uses the name-based heuristics, capped at `n`.
-    return dataType === "character" ?
-        characterMaximumLength
+    return dataType === "character"
+      ? characterMaximumLength
       : Math.min(
           characterMaximumLength,
           _estimateUnboundedTextBytes(columnName),

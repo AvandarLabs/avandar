@@ -1,3 +1,7 @@
+import { QueryClient } from "@tanstack/react-query";
+import { fireEvent } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, screen, waitFor } from "@/test-utils";
 import {
   apiGetMock,
   apiPostMock,
@@ -8,10 +12,6 @@ import {
   resetPostgresConnectorImportViewMocks,
   TWO_RELATIONS_SAVE_RESULT,
 } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/__tests__/PostgresConnectorImportView.fixtures";
-import { QueryClient } from "@tanstack/react-query";
-import { fireEvent } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, screen, waitFor } from "@/test-utils";
 import { PostgresConnectorImportView } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView";
 
 /** One saved database, so the database picker is shown. */
@@ -64,10 +64,16 @@ describe("PostgresConnectorImportView - keeping the picker in sync", () => {
 
     renderWithProviders(<PostgresConnectorImportView />);
     await connectThroughForm();
-    await pickSelectOption({ selectName: /table or view to import/i, optionLabel: "public.customers" });
+    await pickSelectOption({
+      selectName: /table or view to import/i,
+      optionLabel: "public.customers",
+    });
     expect(await screen.findByText(/1 detected/i)).toBeInTheDocument();
 
-    await pickSelectOption({ selectName: /table or view to import/i, optionLabel: "public.orders" });
+    await pickSelectOption({
+      selectName: /table or view to import/i,
+      optionLabel: "public.orders",
+    });
 
     await waitFor(() => {
       expect(screen.queryByText(/1 detected/i)).not.toBeInTheDocument();
@@ -93,8 +99,14 @@ describe("PostgresConnectorImportView - keeping the picker in sync", () => {
 
     renderWithProviders(<PostgresConnectorImportView />);
     await connectThroughForm();
-    await pickSelectOption({ selectName: /table or view to import/i, optionLabel: "public.customers" });
-    await pickSelectOption({ selectName: /table or view to import/i, optionLabel: "public.orders" });
+    await pickSelectOption({
+      selectName: /table or view to import/i,
+      optionLabel: "public.customers",
+    });
+    await pickSelectOption({
+      selectName: /table or view to import/i,
+      optionLabel: "public.orders",
+    });
     expect(await screen.findByText(/2 detected/i)).toBeInTheDocument();
 
     await act(async () => {

@@ -10,7 +10,8 @@ vi.mock("@/clients/APIClient", () => {
   return { APIClient: { get: apiGetMock } };
 });
 
-const CONNECTION_ID = "10000000-0000-4000-8000-000000000001" as DatabaseConnection.Id;
+const CONNECTION_ID =
+  "10000000-0000-4000-8000-000000000001" as DatabaseConnection.Id;
 
 describe("previewPostgresRelation", () => {
   beforeEach(() => {

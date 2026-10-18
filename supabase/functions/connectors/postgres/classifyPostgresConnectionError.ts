@@ -100,7 +100,10 @@ export function classifyPostgresConnectionError(
   // A server that only accepts SSL rejects a plain connection through
   // pg_hba.conf with SQLSTATE 28000, the same class as a wrong password, so
   // its message has to be checked ahead of the code.
-  if (message.includes("no pg_hba.conf entry") && message.includes("no encryption")) {
+  if (
+    message.includes("no pg_hba.conf entry") &&
+    message.includes("no encryption")
+  ) {
     return "ssl_required";
   }
 

@@ -1,11 +1,11 @@
 import { setPropValue, snakeCaseKeysShallow } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { duckDbColumnsToImportedColumns } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/duckDbColumnsToImportedColumns";
-import type { DatasetInsertContext } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
+import type { DatasetInsertContext } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 
 /**
  * The columns a Postgres dataset stores. Acquisition reads every column of

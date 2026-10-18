@@ -31,7 +31,12 @@ describe("getDuckDbTypeFromPostgresDataType", () => {
     "bytea",
     "ARRAY",
     "USER-DEFINED",
-  ])("keeps %s as text, since no other queryable type holds it", (postgresDataType) => {
-    expect(getDuckDbTypeFromPostgresDataType(postgresDataType)).toBe("VARCHAR");
-  });
+  ])(
+    "keeps %s as text, since no other queryable type holds it",
+    (postgresDataType) => {
+      expect(getDuckDbTypeFromPostgresDataType(postgresDataType)).toBe(
+        "VARCHAR",
+      );
+    },
+  );
 });

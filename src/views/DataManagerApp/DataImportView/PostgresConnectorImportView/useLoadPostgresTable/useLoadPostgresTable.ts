@@ -15,8 +15,8 @@ import type { PostgresDatabaseConnection } from "$/models/connections/PostgresDa
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { PostgresDatabaseConnectionWithDetails } from "@/clients/connections/DatabaseConnectionClient";
 import type { PostgresTableDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
-import type { I18n } from "@lingui/core";
 import type { FileParseOptions } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
+import type { I18n } from "@lingui/core";
 import type {
   ConnectorErrorCode,
   ConnectorRelation,

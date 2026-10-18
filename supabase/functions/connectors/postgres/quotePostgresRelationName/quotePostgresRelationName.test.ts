@@ -12,13 +12,13 @@ function _makeFakeSql(): PostgresSql {
 
 describe("quotePostgresRelationName", () => {
   it("quotes the schema and the table as two separate identifiers", () => {
-    expect(quotePostgresRelationName({
+    expect(
+      quotePostgresRelationName({
         sql: _makeFakeSql(),
         schemaName: "public",
         tableName: "orders",
-      })).toBe(
-      '"public"."orders"',
-    );
+      }),
+    ).toBe('"public"."orders"');
   });
 
   it("keeps a dot inside a name as part of that one identifier", () => {

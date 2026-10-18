@@ -1,3 +1,6 @@
+import { fireEvent } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { act, screen, waitFor } from "@/test-utils";
 import {
   apiGetMock,
   apiPostMock,
@@ -5,9 +8,6 @@ import {
   renderWithProviders,
   resetPostgresConnectorImportViewMocks,
 } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/__tests__/PostgresConnectorImportView.fixtures";
-import { fireEvent } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
-import { act, screen, waitFor } from "@/test-utils";
 import { PostgresConnectorImportView } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView";
 
 describe("PostgresConnectorImportView - connecting and importing", () => {
@@ -27,7 +27,11 @@ describe("PostgresConnectorImportView - connecting and importing", () => {
     apiPostMock.mockResolvedValue({
       connectionId: "10000000-0000-4000-8000-000000000001",
       relations: [
-        { relationId: "public.customers", label: "public.customers", kind: "table" },
+        {
+          relationId: "public.customers",
+          label: "public.customers",
+          kind: "table",
+        },
       ],
     });
     apiGetMock.mockResolvedValue({
@@ -176,9 +180,7 @@ describe("PostgresConnectorImportView - connecting and importing", () => {
 
     renderWithProviders(<PostgresConnectorImportView />);
 
-    expect(
-      screen.queryByLabelText(/^host$/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^host$/i)).not.toBeInTheDocument();
     await waitFor(() => {
       expect(apiGetMock).toHaveBeenCalledWith(
         expect.objectContaining({

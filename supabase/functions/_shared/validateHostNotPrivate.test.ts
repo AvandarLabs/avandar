@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import {
   assertHostIsSafeToConnect,
   isPrivateOrLoopbackAddress,
   UnsafeHostError,
 } from "@sbfn/_shared/validateHostNotPrivate.ts";
+import { describe, expect, it } from "vitest";
 
 describe("isPrivateOrLoopbackAddress", () => {
   it.each([

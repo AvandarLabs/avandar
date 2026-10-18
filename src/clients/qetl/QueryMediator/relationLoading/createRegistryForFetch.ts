@@ -1,7 +1,7 @@
 import { makeIdLookupRecord, makeObject, prop } from "@avandar/utils";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { readPostgresTableCsvAsText } from "@/clients/qetl/QueryMediator/relationLoading/readPostgresTableCsvAsText/readPostgresTableCsvAsText";
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";

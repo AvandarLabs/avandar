@@ -36,7 +36,8 @@ describe("savePostgresTableDataset", () => {
   it("stores each column as text on the wire and its declared type as the queryable type", async () => {
     const payload = {
       sourceType: "postgres_table",
-      connectionId: "10000000-0000-4000-8000-000000000001" as DatabaseConnection.Id,
+      connectionId:
+        "10000000-0000-4000-8000-000000000001" as DatabaseConnection.Id,
       datasetLoadResult: {
         datasetId: "30000000-0000-4000-8000-000000000001" as Dataset.Id,
         schemaName: "public",

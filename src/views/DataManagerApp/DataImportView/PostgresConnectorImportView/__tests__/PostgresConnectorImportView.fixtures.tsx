@@ -21,7 +21,11 @@ import type { ReactElement, ReactNode } from "react";
 export const TWO_RELATIONS_SAVE_RESULT = {
   connectionId: "10000000-0000-4000-8000-000000000001",
   relations: [
-    { relationId: "public.customers", label: "public.customers", kind: "table" },
+    {
+      relationId: "public.customers",
+      label: "public.customers",
+      kind: "table",
+    },
     { relationId: "public.orders", label: "public.orders", kind: "table" },
   ],
 };

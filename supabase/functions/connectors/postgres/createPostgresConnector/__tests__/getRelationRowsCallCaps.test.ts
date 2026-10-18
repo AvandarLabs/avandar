@@ -103,7 +103,8 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
     const connector = createPostgresConnector({ connectToPostgres });
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
       supabaseAdminClient:
         _makeSavedConnectionAdminClient() as unknown as ConnectorContext["supabaseAdminClient"],
     };
@@ -131,7 +132,8 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
     const connector = createPostgresConnector({ connectToPostgres });
     const context: ConnectorContext = {
       workspaceId: "33333333-3333-3333-3333-333333333333",
-      supabaseClient: undefined as unknown as ConnectorContext["supabaseClient"],
+      supabaseClient:
+        undefined as unknown as ConnectorContext["supabaseClient"],
       supabaseAdminClient:
         _makeSavedConnectionAdminClient() as unknown as ConnectorContext["supabaseAdminClient"],
     };

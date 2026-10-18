@@ -1,6 +1,6 @@
-import { prop, valEq } from "@avandar/utils";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { prop, valEq } from "@avandar/utils";
 
 /**
  * Thrown when a user-supplied host resolves (or is written as a literal) to
@@ -152,8 +152,7 @@ function _groupsToIpv4(highGroup: number, lowGroup: number): string {
  */
 function _getEmbeddedIpv4(groups: readonly number[]): string | undefined {
   const [firstGroup = 0, secondGroup = 0, thirdGroup = 0] = groups;
-  const [fifthGroup, sixthGroup, highGroup = 0, lowGroup = 0] =
-    groups.slice(4);
+  const [fifthGroup, sixthGroup, highGroup = 0, lowGroup = 0] = groups.slice(4);
   const isMappedOrCompatible =
     groups.slice(0, 5).every(valEq(0)) &&
     (sixthGroup === 0xffff || sixthGroup === 0);
@@ -167,10 +166,11 @@ function _getEmbeddedIpv4(groups: readonly number[]): string | undefined {
     groups.slice(2, 6).every(valEq(0));
   const is6to4 = firstGroup === 0x2002;
 
-  return isMappedOrCompatible || isTranslated || isNat64 ?
-      _groupsToIpv4(highGroup, lowGroup)
-    : is6to4 ? _groupsToIpv4(secondGroup, thirdGroup)
-    : undefined;
+  return isMappedOrCompatible || isTranslated || isNat64
+    ? _groupsToIpv4(highGroup, lowGroup)
+    : is6to4
+      ? _groupsToIpv4(secondGroup, thirdGroup)
+      : undefined;
 }
 
 function _isPrivateOrLoopbackIpv6(address: string): boolean {
