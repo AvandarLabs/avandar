@@ -117,7 +117,7 @@ function _createWorkspaceQetlClient(
   const getAllDatasetIds = async (): Promise<Dataset.Id[]> => {
     return await _getAllWorkspaceDatasetIds(options.workspaceId);
   };
-  return QueryMediatorFactory.create({
+  return QueryMediatorFactory.create("QueryMediator", { state: {
     // The per-relation half of authorization. Membership is checked once per
     // `runQuery` above; this checks what the statement actually named, and
     // refuses rather than silently dropping a reference the workspace does not
@@ -150,7 +150,7 @@ function _createWorkspaceQetlClient(
       userId: options.userId,
     }),
     prepareDuckDbDatasets: _prepareWorkspaceDatasets,
-  });
+  } });
 }
 
 function _createGetWorkspaceQetlClient(): (

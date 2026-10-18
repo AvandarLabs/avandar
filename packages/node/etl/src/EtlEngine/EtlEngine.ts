@@ -6,7 +6,7 @@ import { getEtlLoadDir, getEtlOutputDir } from "@etl/EtlEngine/etlPaths";
 import { transformedCsvsToParquetBlobs } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
 import { createClient } from "@supabase/supabase-js";
 import type {
-  BaseModule,
+  BuilderModule,
   Module,
   ModuleFactory,
   StateOfModule,
@@ -285,17 +285,11 @@ async function uploadParquetToStorage(options: {
   );
 }
 
-const EtlEngineFactory = createModuleFactory<IEtlEngine>("EtlEngine", {
-  // TODO(jpsyx): fix the types of `childBuilder` to better support factory
-  // patterns in modules
-  // @ts-expect-error - this needs to be fixed
-  childBuilder: (
-    accessors: BaseModule<
-      "EtlEngine",
-      StateOfModule<IEtlEngine>,
-      { run: () => Promise<EtlContext> }
-    >,
-  ) => {
+const EtlEngineFactory = createModuleFactory("EtlEngine", {
+  defaultState: {},
+  builder: (
+    accessors: BuilderModule<StateOfModule<IEtlEngine>>,
+  ): Pick<IEtlEngine, "run"> => {
     const pipelineRunId = randomUUID() as PipelineRunId;
 
     return {
@@ -361,7 +355,7 @@ const EtlEngineFactory = createModuleFactory<IEtlEngine>("EtlEngine", {
  * The public shape of {@link EtlEngine}: the module factory plus the helper
  * functions attached to it.
  *
- * This is written out explicitly rather than left to inference. `Accessors`
+ * This is written out explicitly rather than left to inference. `Module`
  * (which `ModuleFactory` builds on) types its `set()` method with type-fest's
  * `Paths<State>`. Inferring the type of a concrete module value therefore
  * forces TypeScript to serialise that generic during declaration emit, which
@@ -375,7 +369,11 @@ const EtlEngineFactory = createModuleFactory<IEtlEngine>("EtlEngine", {
  * treatment. `@avandar/logger` escapes it only because it exports functions
  * and named types rather than a module instance.
  */
-export type EtlEngineApi = ModuleFactory<IEtlEngine> & {
+export type EtlEngineApi = ModuleFactory<
+  "EtlEngine",
+  StateOfModule<IEtlEngine>,
+  Pick<IEtlEngine, "run">
+> & {
   storeExtractedData: typeof storeExtractedData;
   getLoadParquetPathForTable: typeof getLoadParquetPathForTable;
   uploadParquetToStorage: typeof uploadParquetToStorage;
@@ -385,8 +383,9 @@ export type EtlEngineApi = ModuleFactory<IEtlEngine> & {
  * Factory for ETL pipelines plus helpers for extract paths and load Parquet
  * paths.
  */
-export const EtlEngine: EtlEngineApi = Object.assign(EtlEngineFactory, {
+export const EtlEngine: EtlEngineApi = {
+  ...EtlEngineFactory,
   storeExtractedData,
   getLoadParquetPathForTable,
   uploadParquetToStorage,
-});
+};

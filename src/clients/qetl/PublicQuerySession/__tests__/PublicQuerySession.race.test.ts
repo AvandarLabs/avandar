@@ -1,6 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { QueryMediatorFactory } from "@/clients/qetl/QueryMediator/QueryMediator";
+
+/**
+ * The real `QueryMediatorFactory.create` parameters, so the fake tracks its
+ * signature.
+ */
+type QueryMediatorCreateParameters = Parameters<
+  typeof QueryMediatorFactory.create
+>;
 
 const DASHBOARD_ID = "11111111-1111-4111-8111-111111111111" as Dashboard.Id;
 const DATASET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
@@ -151,14 +160,6 @@ type SnapshotState = {
   loadedRevision: string | undefined;
 };
 
-type QetlOptions = {
-  getQueryDependencies: (rawSql: string) => Promise<Dataset.Id[]>;
-  prepareDuckDbDatasets: (params: {
-    datasetIds: readonly Dataset.Id[];
-    datasetDuckDbLease: unknown;
-  }) => Promise<void>;
-};
-
 function _configureSnapshotStorage(state: SnapshotState): void {
   hasTableOrViewMock.mockImplementation(async () => {
     return state.loadedRevision !== undefined;
@@ -186,7 +187,11 @@ function _configureSnapshotStorage(state: SnapshotState): void {
 function _configureCoordinatedQuery(
   executeQuery: () => Promise<unknown>,
 ): void {
-  createQetlClientMock.mockImplementation((options: QetlOptions) => {
+  createQetlClientMock.mockImplementation(
+    (
+      _name: QueryMediatorCreateParameters[0],
+      { state: options }: QueryMediatorCreateParameters[1],
+    ) => {
     return {
       runQuery: async ({ rawSql }: { rawSql: string }) => {
         const datasetIds = await options.getQueryDependencies(rawSql);
@@ -197,7 +202,7 @@ function _configureCoordinatedQuery(
         return await runCoordinatedDatasetDuckDbOperation({
           datasetIds,
           operation: async (datasetDuckDbLease) => {
-            await options.prepareDuckDbDatasets({
+            await options.prepareDuckDbDatasets?.({
               datasetIds,
               datasetDuckDbLease,
             });

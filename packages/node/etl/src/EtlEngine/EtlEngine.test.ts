@@ -143,7 +143,7 @@ describe("EtlEngine", () => {
 
     const pipelineName = "test-pipeline";
 
-    const pipeline = EtlEngine.create({
+    const pipeline = EtlEngine.create("EtlEngine", { state: {
       name: pipelineName,
       extract: async ({ pipelineRunId }) => {
         const extractDir = getEtlOutputDir(
@@ -175,7 +175,7 @@ describe("EtlEngine", () => {
       load: async (options) => {
         loadCalls.push(options);
       },
-    });
+    } });
 
     const { pipelineRunId } = await pipeline.run();
     expect(loadCalls).toEqual([

@@ -17,7 +17,7 @@ import type { WdiTableParquetSummary } from "@pipelines/world-bank__wdi/catalogO
 
 const PIPELINE_NAME = "world-bank__wdi" as const;
 
-const worldBankWdiEtl = EtlEngine.create({
+const worldBankWdiEtl = EtlEngine.create("EtlEngine", { state: {
   name: PIPELINE_NAME,
   extract: async ({ pipelineRunId }) => {
     const inputDir = getEtlPipelineInputDir(PIPELINE_NAME);
@@ -131,7 +131,7 @@ const worldBankWdiEtl = EtlEngine.create({
       await db.close();
     }
   },
-});
+} });
 
 /**
  * Runs the World Bank WDI pipeline and returns the pipeline run id.

@@ -156,12 +156,12 @@ async function _createQetlClient(
     columns: "all",
     payload: new Blob(["cached"]),
   });
-  return QueryMediatorFactory.create({
+  return QueryMediatorFactory.create("QueryMediator", { state: {
     getQueryDependencies: options.getQueryDependencies,
     planConceptRelations: options.planConceptRelations,
     relationCache,
     principalKey: PRINCIPAL_KEY,
-  });
+  } });
 }
 
 beforeEach(() => {

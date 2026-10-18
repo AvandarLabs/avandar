@@ -293,13 +293,13 @@ describe("QueryMediator DuckDB coordination", () => {
     });
     const { QueryMediatorFactory } =
       await import("@/clients/qetl/QueryMediator/QueryMediator");
-    const qetlClient = QueryMediatorFactory.create({
+    const qetlClient = QueryMediatorFactory.create("QueryMediator", { state: {
       getQueryDependencies: async () => {
         return [DATASET_ID];
       },
       relationCache: fakeRelationCache,
       principalKey: PRINCIPAL_KEY,
-    });
+    } });
 
     const queryPromise = qetlClient.runQuery({
       rawSql: `SELECT * FROM "${DATASET_ID}"`,
@@ -316,7 +316,7 @@ describe("QueryMediator DuckDB coordination", () => {
     _configureVirtualDependencyMocks(workspaceId);
     const { QueryMediatorFactory } =
       await import("@/clients/qetl/QueryMediator/QueryMediator");
-    const qetlClient = QueryMediatorFactory.create({
+    const qetlClient = QueryMediatorFactory.create("QueryMediator", { state: {
       getQueryDependencies: async (rawSql) => {
         return rawSql.includes(VIRTUAL_DATASET_ID)
           ? [VIRTUAL_DATASET_ID]
@@ -327,7 +327,7 @@ describe("QueryMediator DuckDB coordination", () => {
       },
       relationCache: fakeRelationCache,
       principalKey: PRINCIPAL_KEY,
-    });
+    } });
     const completedBeforeTimeout = await Promise.race([
       qetlClient
         .runQuery({
@@ -359,7 +359,7 @@ describe("QueryMediator DuckDB coordination", () => {
     });
     const { QueryMediatorFactory } =
       await import("@/clients/qetl/QueryMediator/QueryMediator");
-    const qetlClient = QueryMediatorFactory.create({
+    const qetlClient = QueryMediatorFactory.create("QueryMediator", { state: {
       getQueryDependencies: async (rawSql) => {
         return rawSql.includes(VIRTUAL_DATASET_ID)
           ? [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID]
@@ -370,7 +370,7 @@ describe("QueryMediator DuckDB coordination", () => {
       },
       relationCache: fakeRelationCache,
       principalKey: PRINCIPAL_KEY,
-    });
+    } });
     const queryPromise = qetlClient.runQuery({
       rawSql: `SELECT * FROM "${VIRTUAL_DATASET_ID}" JOIN "${SECOND_VIRTUAL_DATASET_ID}" ON true`,
     });

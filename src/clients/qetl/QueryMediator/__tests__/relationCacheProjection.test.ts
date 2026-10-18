@@ -171,7 +171,7 @@ async function _runSelect(columnNames: readonly string[]): Promise<void> {
       return `"${columnName}"`;
     })
     .join(", ");
-  const mediator = QueryMediatorFactory.create({
+  const mediator = QueryMediatorFactory.create("QueryMediator", { state: {
     getQueryDependencies: async () => {
       return [DATASET_ID];
     },
@@ -180,7 +180,7 @@ async function _runSelect(columnNames: readonly string[]): Promise<void> {
     },
     relationCache,
     principalKey: PRINCIPAL_KEY,
-  });
+  } });
   await mediator.runQuery({
     rawSql: `SELECT ${selectList} FROM "${DATASET_ID}"`,
   });
@@ -189,7 +189,7 @@ async function _runSelect(columnNames: readonly string[]): Promise<void> {
 async function _runCreateTableAs(
   neededColumnsByDatasetId?: Record<string, readonly string[] | "all">,
 ): Promise<void> {
-  const mediator = QueryMediatorFactory.create({
+  const mediator = QueryMediatorFactory.create("QueryMediator", { state: {
     getQueryDependencies: async () => {
       return [DATASET_ID];
     },
@@ -198,7 +198,7 @@ async function _runCreateTableAs(
     },
     relationCache,
     principalKey: PRINCIPAL_KEY,
-  });
+  } });
   await mediator.runQuery({
     rawSql: `CREATE TABLE "ava_staging_individuals_${CONCEPT_ID}" AS (
       SELECT DISTINCT "a" AS external_id FROM "${DATASET_ID}"

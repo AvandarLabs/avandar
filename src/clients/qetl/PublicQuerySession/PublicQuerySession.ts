@@ -77,7 +77,7 @@ function _createQetlClient(
   const { bucket, dashboardId, publishedDatasetIds, snapshotRevision } =
     options;
   const owner = { bucket, dashboardId, snapshotRevision } as const;
-  return QueryMediatorFactory.create({
+  return QueryMediatorFactory.create("QueryMediator", { state: {
     duckDbReadMode: "public",
     publicSnapshotDuckDbOwner: owner,
     getQueryDependencies: async (rawSql) => {
@@ -104,7 +104,7 @@ function _createQetlClient(
         owner,
       });
     },
-  });
+  } });
 }
 
 async function _getClient(
