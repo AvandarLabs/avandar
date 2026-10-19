@@ -24,9 +24,15 @@ export type ConfiguredDrive = {
  * shared across deployments. See `open-data-catalog-architecture.md`
  * section 6.2.
  *
- * Empty by default. Before adding a drive here, confirm its real total
- * dataset count is small enough to fully enumerate in one run (`ava
- * pipeline run socrata` has no retry/backoff for a rate limit, and makes
- * one sequential Discovery API page request per drive).
+ * Before adding a drive here, confirm its real total dataset count can be
+ * fully enumerated in one run. `ava pipeline run socrata` paginates each
+ * drive to exhaustion (100 datasets per page) but has no retry/backoff for
+ * a rate limit, so a limit hit partway through drops that drive's entire
+ * run rather than silently under-indexing it.
  */
-export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [];
+export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
+  {
+    baseUrl: "https://data.cityofnewyork.us",
+    organizationName: "City of New York",
+  },
+];
