@@ -482,7 +482,8 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 37 | `src/clients/qetl/wrappers/datasetSourceTypeContract.test.ts` | the source type's contract entry: whether it is live, and for a live source its `columnTypes` and a wrapper built from fakes | compiler (`Record` over every source type), then the shared checks in section 10.3 |
 | 38 | `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/` | the manual refresh a live source offers, and its menu item in `DatasetActionsMenu.tsx` | compiler (exhaustive `match`) and `getDatasetRefreshFromSourceType.test.ts`, whose expectations are a `Record` over every source type |
 | 39 | the edge connector's `previewRelation` | report each column's `dataType`, read from the source's own schema (`ConnectorPreviewColumn`, `Connector.ts`) | compiler (`dataType` is required) |
-| 40 | a server route keyed by dataset, for example `connectors`' `/:connectorType/datasets/:datasetId/rows` | check `util__auth_user_may_select_dataset` with the caller's client, then read with the service role through the credential the dataset was imported with, so anyone who can see the dataset can read it | the contract test, and route tests modelled on `ConnectorRoutes.datasetRows.test.ts` |
+| 40 | a server route keyed by dataset, for example `connectors`' `/:connectorType/datasets/:datasetId/rows` | check `util__auth_user_may_select_dataset` with the caller's client, then read with the service role through the credential the dataset was imported with, so anyone who can see the dataset can read it | the contract test, and route tests modelled on `ConnectorRoutes/ConnectorRoutes.test.ts` |
+| 41 | `tests/e2e/helpers/liveConnectors/LiveConnectorE2eRegistry.ts` | the source type's entry: a `LiveConnectorE2e` adapter if it is live, or `"not-live"` | compiler (`Record` over every source type), then `live-connector-datasets.spec.ts`, whose first test checks the entry against row 38 |
 
 Not needed: `Dataset/DatasetParsers.ts` (derives from `SourceTypes`), chat schema
 code, `assertWorkspaceRelations`, and both cache ports, which are source-type
@@ -491,9 +492,9 @@ agnostic.
 ```mermaid
 flowchart TD
   U["Rows 1 and 5: new enum<br/>value, then pnpm<br/>db:gen-types widens the<br/>datasets__source_type#nbsp;union"]
-  G["Compiler reports until<br/>handled: rows 9 to 11,<br/>13, 14, 19 to 24,<br/>28 to 33 and 37 to 39"]
+  G["Compiler reports until<br/>handled: rows 9 to 11,<br/>13, 14, 19 to 24,<br/>28 to 33, 37 to 39<br/>and 41"]
   T["Contract tests check every<br/>source type the same way:<br/>publishing, staleness,<br/>refresh, column types and<br/>credential reuse"]
-  E["Only the e2e specs in<br/>section 10.3 cover the<br/>flows through the UI"]
+  E["The live connector e2e<br/>spec runs the same UI<br/>flows for every live<br/>source in its registry"]
   U -->|"exhaustive Record or<br/>match on the union"| G
   G --> T
   T --> E
@@ -501,7 +502,8 @@ flowchart TD
 
 _After regenerating types, the compiler lists every guarded site, and the
 contract tests then hold the new source type to the same behaviour as every
-other. The e2e specs in section 10.3 are the part no compiler catches._
+other. The live connector e2e spec (section 10.3) is the part no compiler
+catches, so its registry is keyed by every source type too._
 
 ### 10.3 Required tests
 
@@ -511,7 +513,7 @@ person who imported it could read it. None of those was caught, because each
 connector's tests stopped at import. A new source type must add all of the
 following.
 
-**Automatic, once its entries exist (rows 24 and 37):**
+**Automatic, once its entries exist (rows 24, 37 and 41):**
 
 - **Publishing:** `DashboardClient.publishSnapshotSources.test.ts` publishes
   a whole-dataset slice of every source type and checks where its rows come
@@ -529,18 +531,35 @@ following.
 - **Credential reuse:** the contract test also checks that a live source reads its
   rows through a server route keyed by the dataset, with only the caller's
   session, never a third-party token in the browser.
+- **The UI flows, end to end:** `tests/e2e/live-connector-datasets.spec.ts`
+  runs the same six checks for every live source in
+  `LiveConnectorE2eRegistry`, each through the UI: a whole-number and a date
+  column arrive as numbers and dates, both in the stored types and in DuckDB;
+  a refresh shows an edited source row, in the data preview and in the
+  summary; a member other than the importer reads its rows through the
+  dataset's own route; a dashboard widget renders its rows; and a dashboard
+  published with a whole-dataset slice, and with a queried one, keeps showing
+  the published rows after the source changes. The registry is keyed by
+  every source type, so a new one fails to compile until it is given an
+  adapter or marked `"not-live"`, and the spec's first test fails if that
+  choice disagrees with `getDatasetRefreshFromSourceType`.
 
 **Written for the connector:**
 
 - Route tests for its dataset-keyed route: a caller who may not see the
   dataset gets a 403 before anything is read with the service role, and an
   allowed caller reads through the stored credential.
-- e2e specs that drive the UI, one at a time, for: importing it; a dashboard
-  widget querying it; publishing a dashboard with a whole-dataset slice and
-  a queried one; refreshing it, if it is live; a member other than the
-  importer reading it; and a numeric and a date column arriving as numbers
-  and dates rather than text. Tag a spec `@third-party` only when it reaches
-  a real external service (`docs/rules/e2e-testing.md`).
+- Its `LiveConnectorE2e` adapter, next to
+  `tests/e2e/helpers/liveConnectors/postgresTableLiveConnectorE2e.ts`: seed
+  its account or connection, stub its boundary at the browser (its own
+  dataset-keyed route, plus any third-party endpoint the browser calls
+  during import), and drive its import form to a saved dataset. Serve
+  `LiveSourceTable`'s rows, and keep serving whatever `setSourceRows` last
+  set. The six checks above then run for it with no new spec.
+- An import spec for anything particular to its import form, such as
+  `postgres-connector-import.spec.ts`'s schema-grouped picker. Tag a spec
+  `@third-party` only when it reaches a real external service
+  (`docs/rules/e2e-testing.md`).
 
 ## 11. Adding a new relation kind
 

@@ -1,5 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { PostgresConnectionSeed } from "./helpers/liveConnectors/PostgresConnectionSeed";
 import { parseDatasetIdFromDataManagerUrl } from "./helpers/manualUploadCloudSyncFlow";
 import {
   createSupabaseAdminClient,
@@ -7,7 +8,7 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import type { SeededPostgresConnection } from "./helpers/liveConnectors/PostgresConnectionSeed";
 import type { Page, Route } from "@playwright/test";
 
 /**
@@ -98,104 +99,6 @@ async function _stubConnectorRoutes(page: Page): Promise<void> {
   );
 }
 
-/**
- * Seeds one saved Postgres connection (`connections` +
- * `connections__postgres`) for the workspace, with a real Vault secret
- * (the password value is never dialed in this spec, since the live-DB round
- * trip is stubbed, but the FK and the RLS/Vault shape are real). Returns the
- * ids so cleanup can remove exactly what this test created.
- */
-async function _seedSavedConnection(options: {
-  admin: AvaSupabaseDBClient;
-  workspaceId: string;
-}): Promise<{ connectionId: string; vaultSecretId: string }> {
-  const { admin, workspaceId } = options;
-
-  const { data: secretId, error: secretError } = await admin.rpc(
-    "rpc_connections__create_vault_secret",
-    {
-      p_secret: "e2e-throwaway-password",
-      p_name: `e2e-postgres-connector-${Date.now()}`,
-      p_description:
-        "Created by postgres-connector-import.spec.ts; safe to delete.",
-    },
-  );
-  if (secretError || !secretId) {
-    throw new Error(`vault secret seed failed: ${secretError?.message}`);
-  }
-
-  // From here, a failure must roll back whatever already succeeded (the
-  // Vault secret at minimum) before rethrowing, so a mid-seed failure never
-  // leaves a row behind that the caller has no id to clean up.
-  try {
-    const { data: connection, error: connectionError } = await admin
-      .from("connections")
-      .insert({
-        workspace_id: workspaceId,
-        connection_type: "postgres",
-        name: "E2E reporting replica",
-      })
-      .select("id")
-      .single();
-    if (connectionError || !connection) {
-      throw new Error(`connections seed failed: ${connectionError?.message}`);
-    }
-
-    const { error: postgresError } = await admin
-      .from("connections__postgres")
-      .insert({
-        connection_id: connection.id,
-        workspace_id: workspaceId,
-        host: "db.e2e-fixture.invalid",
-        port: 5432,
-        database_name: "reporting",
-        username: "readonly_user",
-        ssl_mode: "require",
-        vault_secret_id: secretId,
-        last_verified_at: new Date().toISOString(),
-      });
-    if (postgresError) {
-      await admin.from("connections").delete().eq("id", connection.id);
-      throw new Error(
-        `connections__postgres seed failed: ${postgresError.message}`,
-      );
-    }
-
-    return { connectionId: connection.id, vaultSecretId: secretId };
-  } catch (error) {
-    await admin.rpc("rpc_connections__delete_vault_secret", {
-      p_secret_id: secretId,
-      p_workspace_id: workspaceId,
-    });
-    throw error;
-  }
-}
-
-/**
- * Deletes the seeded `connections`/`connections__postgres` rows and
- * the Vault secret they point at, so nothing from this test outlives it.
- */
-async function _cleanUpSavedConnection(options: {
-  admin: AvaSupabaseDBClient;
-  connectionId: string;
-  vaultSecretId: string;
-  workspaceId: string;
-}): Promise<void> {
-  const { admin, connectionId, vaultSecretId, workspaceId } = options;
-
-  // Children before the parent: `connections__postgres.connection_id` is
-  // a foreign key onto `connections.id`.
-  await admin
-    .from("connections__postgres")
-    .delete()
-    .eq("connection_id", connectionId);
-  await admin.from("connections").delete().eq("id", connectionId);
-  await admin.rpc("rpc_connections__delete_vault_secret", {
-    p_secret_id: vaultSecretId,
-    p_workspace_id: workspaceId,
-  });
-}
-
 test.describe("Postgres connector", () => {
   test("imports a table from a saved connection", async ({
     page,
@@ -207,13 +110,9 @@ test.describe("Postgres connector", () => {
       slug: e2eWorkerDb.workspaceSlug,
     });
 
-    let connectionId: string | undefined;
-    let vaultSecretId: string | undefined;
+    let connection: SeededPostgresConnection | undefined;
     try {
-      ({ connectionId, vaultSecretId } = await _seedSavedConnection({
-        admin,
-        workspaceId,
-      }));
+      connection = await PostgresConnectionSeed.create({ admin, workspaceId });
 
       await _stubConnectorRoutes(page);
 
@@ -267,13 +166,8 @@ test.describe("Postgres connector", () => {
         supabaseAdminClient: admin,
         workspaceId,
       });
-      if (connectionId && vaultSecretId) {
-        await _cleanUpSavedConnection({
-          admin,
-          connectionId,
-          vaultSecretId,
-          workspaceId,
-        });
+      if (connection) {
+        await PostgresConnectionSeed.remove({ admin, workspaceId, connection });
       }
     }
   });
