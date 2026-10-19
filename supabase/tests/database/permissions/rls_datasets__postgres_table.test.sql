@@ -10,6 +10,11 @@
  * the same way every other `datasets__<type>` satellite table is, unlike
  * `connections`/`connections__postgres` (app-role gated, tested
  * separately in `rls_connections.test.sql`).
+ *
+ * A row also decides which table anyone who can see its dataset reads
+ * through the workspace's saved credential, so only a `data_sources` editor
+ * may create one, and nobody may repoint an existing one at another
+ * connection or table.
  */
 begin;
 
@@ -79,7 +84,43 @@ values (
 )
 on conflict (id) do nothing;
 
-select plan (10);
+-- A member who can edit the spare dataset through a share, but holds only
+-- `data_sources` viewer, so may not pick which table it reads.
+insert into auth.users (id, email, aud, role)
+values ('0c020003-0000-4000-8000-000000000003'::uuid, 'pgtable_shared_editor@test.dev', 'authenticated', 'authenticated')
+on conflict (id) do nothing;
+
+insert into public.role_groups (id, workspace_id, name, is_builtin)
+values ('0c027001-0000-4000-8000-000000000001'::uuid, '0c021001-0000-4000-8000-000000000001'::uuid, 'pgtable data_sources viewers', false)
+on conflict (id) do nothing;
+
+insert into public.role_group_app_roles (role_group_id, app, role)
+values ('0c027001-0000-4000-8000-000000000001'::uuid, 'data_sources'::public.app_type, 'viewer'::public.role_level)
+on conflict do nothing;
+
+insert into public.workspace_memberships (id, workspace_id, user_id, role_group_id)
+values ('0c022003-0000-4000-8000-000000000003'::uuid, '0c021001-0000-4000-8000-000000000001'::uuid, '0c020003-0000-4000-8000-000000000003'::uuid, '0c027001-0000-4000-8000-000000000001'::uuid)
+on conflict (id) do nothing;
+
+insert into public.user_profiles (
+  id, user_id, workspace_id, membership_id, full_name, display_name
+)
+values ('0c023003-0000-4000-8000-000000000003'::uuid, '0c020003-0000-4000-8000-000000000003'::uuid, '0c021001-0000-4000-8000-000000000001'::uuid, '0c022003-0000-4000-8000-000000000003'::uuid, 'Shared Editor', 'Shared Editor')
+on conflict (id) do nothing;
+
+insert into public.resource_shares (
+  workspace_id, resource_type, resource_id, principal_type, principal_id, role
+)
+values (
+  '0c021001-0000-4000-8000-000000000001'::uuid,
+  'dataset'::public.resource_type,
+  '0c025003-0000-4000-8000-000000000003'::uuid,
+  'user'::public.share_principal_type,
+  '0c020003-0000-4000-8000-000000000003'::uuid,
+  'editor'::public.role_level
+);
+
+select plan (14);
 
 -- 1. A member of the owning workspace reads the row.
 select lives_ok (
@@ -277,6 +318,94 @@ select throws_ok (
   '23503',
   null,
   'a datasets__postgres_table row cannot be repointed at another workspace''s dataset'
+);
+
+-- 11. Positive control for 12: the shared editor really can edit the spare
+-- dataset, so a refused insert is down to the app role alone.
+select lives_ok (
+  $t11$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c020003-0000-4000-8000-000000000003","role":"authenticated"}',
+    true
+  );
+  do $chk$
+  begin
+    if not public.util__auth_user_can_access_resource (
+      'dataset',
+      '0c025003-0000-4000-8000-000000000003'::uuid,
+      'editor'
+    ) then
+      raise exception 'the shared editor cannot edit the spare dataset';
+    end if;
+  end $chk$;
+  $t11$,
+  'a member the dataset is shared with as editor can edit it'
+);
+
+-- 12. That editor still cannot pick the table a Postgres dataset reads,
+-- because they are not a `data_sources` editor.
+select throws_ok (
+  $t12$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c020003-0000-4000-8000-000000000003","role":"authenticated"}',
+    true
+  );
+  insert into public.datasets__postgres_table (dataset_id, workspace_id, connection_id, schema_name, table_name, relation_kind)
+  values (
+    '0c025003-0000-4000-8000-000000000003'::uuid,
+    '0c021001-0000-4000-8000-000000000001'::uuid,
+    '0c024001-0000-4000-8000-000000000001'::uuid,
+    'public',
+    'payroll',
+    'table'::public.datasets__postgres_table_relation_kind
+  );
+  $t12$,
+  '42501',
+  null,
+  'only a data_sources editor can create a datasets__postgres_table row'
+);
+
+-- 13. Not even the workspace owner can repoint a row at another table.
+select throws_ok (
+  $t13$
+  set local role authenticated;
+  select set_config(
+    'request.jwt.claims',
+    '{"sub":"0c020001-0000-4000-8000-000000000001","role":"authenticated"}',
+    true
+  );
+  update public.datasets__postgres_table
+  set table_name = 'payroll'
+  where id = '0c026001-0000-4000-8000-000000000001'::uuid;
+  $t13$,
+  '23514',
+  null,
+  'a datasets__postgres_table row cannot be repointed at another table'
+);
+
+-- 14. Nor at another connection, whatever role makes the change.
+select throws_ok (
+  $t14$
+  reset role;
+  insert into public.connections (id, workspace_id, connection_type, name, created_by)
+  values (
+    '0c024002-0000-4000-8000-000000000002'::uuid,
+    '0c021001-0000-4000-8000-000000000001'::uuid,
+    'postgres'::public.connections__connection_type,
+    'ws a second connection',
+    '0c020001-0000-4000-8000-000000000001'::uuid
+  );
+  update public.datasets__postgres_table
+  set connection_id = '0c024002-0000-4000-8000-000000000002'::uuid
+  where id = '0c026001-0000-4000-8000-000000000001'::uuid;
+  $t14$,
+  '23514',
+  null,
+  'a datasets__postgres_table row cannot be repointed at another connection'
 );
 
 select * from finish ();

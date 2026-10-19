@@ -58,12 +58,20 @@ select
     )
   );
 
+-- Inserting also requires `data_sources` editor, the role that can see
+-- connections at all: this row decides which table everyone who can see
+-- the dataset reads through the workspace's saved credential.
 create policy "User can insert datasets__postgres_table in their workspace" on public.datasets__postgres_table for insert to authenticated
 with
   check (
     public.util__auth_user_can_access_resource (
       'dataset',
       public.datasets__postgres_table.dataset_id,
+      'editor'
+    ) and
+    public.util__auth_user_meets_min_app_role (
+      public.datasets__postgres_table.workspace_id,
+      'data_sources',
       'editor'
     )
   );
@@ -97,3 +105,42 @@ create policy "User can delete datasets__postgres_table in their workspace" on p
 create trigger tr_datasets__postgres_table__set_updated_at before
 update on public.datasets__postgres_table for each row
 execute function public.util__set_updated_at ();
+
+/**
+ * Refuses any change to the connection, schema or table a Postgres dataset
+ * reads. Everyone who can see the dataset reads that table through the
+ * workspace's saved credential, so editing the dataset must never be a way
+ * to point it at a different table.
+ */
+create or replace function public.datasets__postgres_table__prevent_source_change () returns trigger language plpgsql
+set
+  search_path = public as $$
+begin
+  if
+    new.connection_id is distinct from old.connection_id or
+    new.schema_name is distinct from old.schema_name or
+    new.table_name is distinct from old.table_name
+  then
+    raise exception 'a Postgres dataset cannot be repointed at another table'
+      using errcode = '23514';
+  end if;
+
+  return new;
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.datasets__postgres_table__prevent_source_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__datasets__postgres_table__prevent_source_change before
+update of connection_id,
+schema_name,
+table_name on public.datasets__postgres_table for each row
+execute function public.datasets__postgres_table__prevent_source_change ();
