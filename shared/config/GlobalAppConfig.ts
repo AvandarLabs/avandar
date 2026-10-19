@@ -109,6 +109,25 @@ export const GlobalAppConfig = {
     },
 
     /**
+     * When the size check before a read trusts the planner's row estimate
+     * instead of counting a relation's rows exactly, which scans all of
+     * them. As fractions of `maxBytesPerAcquire`, at the relation's
+     * estimated row width.
+     */
+    rowCountEstimate: {
+      /** At or under this fraction of the cap, the estimate says it fits. */
+      trustBelowCapFraction: 0.5,
+
+      /**
+       * Over this multiple of the cap, the estimate says it is too large.
+       * Counting a relation that large exactly could itself outlast the
+       * statement timeout, and the estimate scales with the relation's
+       * current size on disk, so it is rarely off by this much.
+       */
+      trustAboveCapMultiple: 10,
+    },
+
+    /**
      * The most CSV one acquisition may return, in bytes. This is a memory
      * ceiling, not a free choice: an isolate is killed with a 546 at
      * whichever limit it hits first

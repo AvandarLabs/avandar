@@ -1,5 +1,6 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import {
+  makeFakeQueryPlan,
   makeFakeRowsCursor,
   makeFakeSql,
   makeSavedConnectionContext,
@@ -36,6 +37,9 @@ async function _readDatasetRows(
     sentQueries.push({ queryText, values });
     if (queryText.includes("limit 1")) {
       return Promise.resolve([{ table_type: "BASE TABLE" }]);
+    }
+    if (queryText.includes("explain")) {
+      return makeFakeQueryPlan(1);
     }
     if (queryText.includes("count(*)")) {
       return Promise.resolve([{ exact_count: "1" }]);

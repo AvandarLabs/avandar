@@ -139,11 +139,11 @@ function _estimateRowCsvBytes(columns: readonly ColumnSizeInfo[]): number {
 }
 
 /**
- * Estimates a relation's total CSV byte size from its column types and
- * actual row count, with no row ever read. The row count is exact
- * (`count(*)`); the per-row width is the estimate - this product is only as
- * reliable as that estimate, which is why `getRelationRows` still checks the
- * real byte count once the CSV is actually built.
+ * Estimates a relation's total CSV byte size from its column types and a row
+ * count, with no row ever read. The per-row width is always an estimate, and
+ * the row count may be one too (the planner's, when it decides the size
+ * check) - this product is only as reliable as those, which is why
+ * `getRelationRows` still checks the real byte count once the CSV is built.
  */
 function _estimateRelationCsvBytes(
   options: Readonly<{

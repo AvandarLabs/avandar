@@ -1,5 +1,6 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import {
+  makeFakeQueryPlan,
   makeFakeRowsCursor,
   makeFakeSql,
   readBlobText,
@@ -64,7 +65,8 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
   /**
    * Dispatches on each query's own text, since `getRelationRows` issues
    * distinct queries against the same fake `sql` in sequence: the
-   * still-exists check, the sized columns read, the exact row count, and the
+   * still-exists check, the planner's row estimate, the sized columns read,
+   * the exact row count when the estimate is close to the cap, and the
    * cursor the rows are fetched through. `sql.unsafe(text)` (each quoted
    * name and row count the queries interpolate) just echoes its argument
    * back - this fake never actually interprets SQL.
@@ -77,6 +79,9 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
     return makeFakeSql((queryText, values) => {
       if (queryText.includes("limit 1")) {
         return Promise.resolve([{ table_type: "BASE TABLE" }]);
+      }
+      if (queryText.includes("explain")) {
+        return makeFakeQueryPlan(options.rowCount);
       }
       if (queryText.includes("count(*)")) {
         return Promise.resolve([{ exact_count: options.rowCount }]);

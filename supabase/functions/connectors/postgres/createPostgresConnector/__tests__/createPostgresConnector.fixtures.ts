@@ -194,12 +194,31 @@ export function makeFakeRowsCursor(
   };
 }
 
+/**
+ * What `explain (format json)` returns for a plan the planner expects to
+ * produce `plannedRowCount` rows.
+ */
+export function makeFakeQueryPlan(plannedRowCount: number): Promise<unknown[]> {
+  return Promise.resolve([
+    { "QUERY PLAN": [{ Plan: { "Plan Rows": plannedRowCount } }] },
+  ]);
+}
+
 /** A relation of one column, read through a fake cursor. */
 type FakeCursorReadOptions = {
   cursor: FakeRowsCursor;
 
   /** The row count the relation's `count(*)` reports. */
   rowCount: number;
+
+  /** The row count the planner estimates. Defaults to `rowCount`. */
+  plannedRowCount?: number;
+
+  /**
+   * The relation's `information_schema.tables.table_type`. Defaults to
+   * `BASE TABLE`.
+   */
+  tableType?: string;
   columnName: string;
 
   /** The column's type, as `information_schema.columns` names it. */
@@ -211,8 +230,8 @@ type FakeCursorReadOptions = {
 
 /**
  * A fake connection to a one-column relation whose rows are read through
- * `cursor`: it answers the still-exists check, the row count, the column
- * sizes, and the cursor's own queries.
+ * `cursor`: it answers the still-exists check, the planner's row estimate,
+ * the exact row count, the column sizes, and the cursor's own queries.
  */
 export function makeFakeSqlForCursorRead(
   options: Readonly<FakeCursorReadOptions>,
@@ -220,7 +239,12 @@ export function makeFakeSqlForCursorRead(
   return makeFakeSql((queryText, values) => {
     options.onQuery?.(queryText);
     if (queryText.includes("limit 1")) {
-      return Promise.resolve([{ table_type: "BASE TABLE" }]);
+      return Promise.resolve([
+        { table_type: options.tableType ?? "BASE TABLE" },
+      ]);
+    }
+    if (queryText.includes("explain")) {
+      return makeFakeQueryPlan(options.plannedRowCount ?? options.rowCount);
     }
     if (queryText.includes("count(*)")) {
       return Promise.resolve([{ exact_count: String(options.rowCount) }]);

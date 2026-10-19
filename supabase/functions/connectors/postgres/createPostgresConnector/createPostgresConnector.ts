@@ -12,7 +12,7 @@ import {
   openSavedConnection,
   type OpenSavedConnectionOptions,
 } from "@sbfn/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
-import { readRelationCsvWithinCaps } from "@sbfn/connectors/postgres/createPostgresConnector/readRelationCsvWithinCaps.ts";
+import { readRelationCsvWithinCaps } from "@sbfn/connectors/postgres/createPostgresConnector/readRelationCsvWithinCaps/readRelationCsvWithinCaps.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName/quotePostgresRelationName.ts";
 import { runReadOnlyTransaction } from "@sbfn/connectors/postgres/runReadOnlyTransaction/runReadOnlyTransaction.ts";
@@ -160,7 +160,7 @@ async function _getRelationRows(
     statementTimeoutMs:
       GlobalAppConfig.postgresConnector.rowsStatementTimeoutMs,
     run: async (transaction) => {
-      await PostgresCatalog.assertRelationStillExists(
+      const relationKind = await PostgresCatalog.assertRelationStillExists(
         transaction,
         schemaName,
         tableName,
@@ -169,6 +169,7 @@ async function _getRelationRows(
         transaction,
         schemaName,
         tableName,
+        relationKind,
         columnNames: options.columnNames,
         deadlineAt,
       });
