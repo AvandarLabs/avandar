@@ -10,7 +10,7 @@ Out of scope: the Postgres connector. It came in through
 own branch.
 
 Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
-`a325df511`.
+`f78be622b`.
 
 ## How to use this log (for the agent building a PR)
 
@@ -52,13 +52,14 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 |---|---|---|---|---|
 | F1 | `@avandar/modules` factory and mixin refactor | not started | none | [AVA-383](https://linear.app/avandar/issue/AVA-383) |
 | F2 | `HttpClientFactory` with rate limiting, and open data read through it | not started | F1, F3 | |
-| F3 | Move `shared/open-data` to `shared/connectors/open-data` *(proposed, confirm with user)* | not started | none | |
+| F3 | Move `shared/open-data` to `shared/connectors/open-data` | not started | none | |
 | F4 | The drive concept: data catalog listings schema, drive index infrastructure | not started | F3 | [AVA-381](https://linear.app/avandar/issue/AVA-381) (follow-up) |
-| F5 | Rename the `external-datasets` edge function to `connectors` *(proposed, confirm with user)* | not started | Postgres branch | |
-| F6 | Socrata connector and drive index pipeline | not started | F2, F4 | [AVA-382](https://linear.app/avandar/issue/AVA-382) (licensing) |
-| F7 | HDX (CKAN) connector refactor and drive index pipeline | not started | F2, F4 | [AVA-382](https://linear.app/avandar/issue/AVA-382) (licensing) |
-| F8 | Open-data write-back cache *(proposed, confirm with user)* | not started | F4, F6 | |
-| F9 | Measles demo docs: use case, specs, plans *(proposed, confirm with user)* | not started | F1 to F8 | |
+| F5 | ~~Rename the `external-datasets` edge function to `connectors`~~ | dropped: the Postgres branch carries it | | |
+| F6 | Socrata connector and drive index pipeline | not started | F2, F4, F10 | [AVA-382](https://linear.app/avandar/issue/AVA-382) (licensing) |
+| F7 | HDX (CKAN) connector refactor and drive index pipeline | not started | F2, F4, F10 | [AVA-382](https://linear.app/avandar/issue/AVA-382) (licensing) |
+| F8 | Open-data write-back cache | not started | F4, F6 | |
+| F9 | Measles demo docs: use case, specs, plans | not started | every other feature | |
+| F10 | Pipeline run options: `ava pipeline run --limit` and `.env.pipelines.local` | not started | F4 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -72,11 +73,14 @@ API. It's new work, not something this branch built.
 | 2 | F3 | A pure move. Every open-data PR after it edits paths under `shared/connectors/open-data`. F1 and F3 can go in either order. |
 | 3 | F2 | Needs F1 (it is built on `createModuleFactory`) and F3 (it rewrites the moved open-data files onto the HttpClient). |
 | 4 | F4 | Renames the schema that F6, F7 and F8 extend, and adds the shared pipeline upsert that F6 and F7 call. Schema lands before code that uses it. |
-| 5 | F6 | Needs F2 (`OpenDataHttp` is a `Pick` of `HttpClient`) and F4 (the `data_catalog_listings` table and the shared upsert). |
-| 6 | F7 | Same dependencies as F6. Independent of F6, so the two can merge in either order. |
-| 7 | F8 | Adds columns to the F4 table, and its freshness check reads Socrata metadata through F6's `SocrataClient`. |
-| 8 | F5 | Any time after the Postgres branch merges. Every file it touches is Postgres code. See F4's note about `ExternalDatasetRoutes.types.ts`. |
+| 5 | F10 | Runner plumbing (`--limit`, `PipelineRunOptions`, `.env.pipelines.local`) that F6 and F7 use. Its new files live in `apps/pipeline-server/pipelines/shared/`, which F4 creates. |
+| 6 | F6 | Needs F2 (`OpenDataHttp` is a `Pick` of `HttpClient`), F4 (the `data_catalog_listings` table and the shared upsert) and F10 (`PipelineRunOptions`, `getOptionalEnvVar`). |
+| 7 | F7 | Same dependencies as F6. Independent of F6, so the two can merge in either order. |
+| 8 | F8 | Adds columns to the F4 table, and its freshness check reads Socrata metadata through F6's `SocrataClient`. |
 | 9 | F9 | Last, because the docs describe the merged features. |
+
+F5 is dropped: the Postgres branch carries the `external-datasets` to
+`connectors` rename.
 
 ## Files shared by several features
 
@@ -95,7 +99,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/schemas/00.enum.data_catalog_listings__api_service.sql` | F4, F6 | F4: rename. F6: the `socrata` value. |
 | `supabase/schemas/10.data_catalog_listings.sql` | F4, F8 | F4: rename and the non-partial `api_resource` unique index. F8: cache columns and their CHECK clauses. |
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
-| `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. |
+| `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
 | `shared/types/database.types.ts` | F4, F6, F8 | Generated: regenerate in each. |
 
 ---
@@ -183,7 +187,7 @@ pnpm vitest run shared/utils/HttpClientFactory shared/connectors/open-data && pn
 
 ---
 
-## F3: Move `shared/open-data` to `shared/connectors/open-data` *(proposed, confirm with user)*
+## F3: Move `shared/open-data` to `shared/connectors/open-data`
 
 **Purpose:**
 - Move the open-data code under `shared/connectors/`.
@@ -252,7 +256,7 @@ connector's pipeline can fill.
 - the rename hunks in `OpenDataRoutes.ts` and `acquireOpenDataResource*`
 - `apps/pipeline-server/pipelines/shared/createSupabaseAdminClient.ts`
 - `world-bank__wdi/catalogOpenDataInsert.ts` and `run.ts` (the `createSupabaseAdminClient` move)
-- `supabase/functions/connectors/ExternalDatasetRoutes.types.ts` (a comment rename). If F5 hasn't merged, apply it to `supabase/functions/external-datasets/ExternalDatasetRoutes.types.ts`.
+- `supabase/functions/connectors/ExternalDatasetRoutes.types.ts` (a comment rename). If the Postgres branch hasn't renamed `external-datasets` to `connectors` yet, apply it to `supabase/functions/external-datasets/ExternalDatasetRoutes.types.ts`.
 
 Its CKAN files go to F7 and `makeListingRowFromSocrataResult` to F6.
 
@@ -302,31 +306,50 @@ pnpm vitest run shared src/clients src/views/DataManagerApp && pnpm test:pipelin
 
 ---
 
-## F5: Rename the `external-datasets` edge function to `connectors` *(proposed, confirm with user)*
+## F5: dropped
 
-**Purpose:** Rename the edge function that proxies external databases.
-**Value:** The name matches the connector nomenclature. Every file it touches
-is Postgres-connector code, so it can't merge before the Postgres branch.
-Folding these two commits into `feat/postgres-connector` before that branch
-merges is the simpler alternative.
+The `external-datasets` to `connectors` edge-function rename (`b3da0b439`,
+`4617cf53b`) only touches Postgres-connector code. The Postgres branch carries
+it, so nothing here is ported.
 
-**PR title:** `refactor(connectors): rename the external-datasets edge function to connectors`
+---
+
+## F10: Pipeline run options: `ava pipeline run --limit` and `.env.pipelines.local`
+
+**Purpose:** `ava pipeline run <name> --limit <n>` stops a pipeline after `n`
+datasets, in `--local` mode and through the pipeline-server. Pipeline-only
+secrets (API keys) live in a gitignored `.env.pipelines.local`, copied from
+the committed `.env.pipelines.example`. **Value:** a pipeline can be tried
+against a real source in seconds instead of a full run, and API keys stay out
+of `.env.development`.
+
+**PR title:** `feat(pipelines): add ava pipeline run --limit and a .env.pipelines.local secrets file`
 
 **Commits to read:**
 
 | SHA | Subject | Take |
 |---|---|---|
-| `b3da0b439` | refactor: rename external-datasets edge function to connectors | all (renames under `supabase/functions/`, Postgres wrapper and view call sites, `src/types/http-api.types.ts`, db_connections schema comments, RLS test, e2e spec) |
-| `4617cf53b` | refactor: finish external-datasets to connectors rename in DatabaseConnection error messages | all |
+| `eba708217` | feat(pipelines): add ava pipeline run --limit and a .env.pipelines.local secrets file | all |
 
-**Schema:** comment-only edits in `supabase/schemas/20.db_connections.sql`,
-`21.db_connections__postgres.sql` and `50.rpc_db_connections__*`.
-Comments inside function bodies count as schema changes, so regenerate the
-migration declaratively.
+**Files:**
+- `apps/ava-cli/src/PipelineCli/RunPipelineCli/RunPipelineCli.ts` and its test, `runPipelineLocal.ts`, `sendRunPipelineRequest.ts`
+- `apps/pipeline-server/src/routes/pipeline-name/registerPipelineRoutes.ts` and its test, `run/run.ts`
+- `apps/pipeline-server/pipelines/shared/PipelineRunOptions.types.ts`, `parsePipelineRunLimit/**`, `getOptionalEnvVar/**`
+- `apps/pipeline-server/pipelines/world-bank__wdi/run.ts`: only the `run(options)` hunk that rejects `--limit` (shared file)
+- `scripts/runPipelineOnce.ts`
+- `.env.pipelines.example`, `.gitignore` (the `.env.pipelines.local` line), `package.json` (the `-e .env.pipelines.local` in `dev:pipeline-server` and `dev:pipeline-server-prod`)
+- `apps/pipeline-server/README.md`: the API-key bullet and the "Running one pipeline" section
+
+**Schema:** none.
+
+**Notes:**
+- `.env.pipelines.local` never overrides a key `.env.development` defines: `runPipelineOnce.ts` loads it with `process.loadEnvFile`, which keeps existing variables, and `dotenv-cli` loads it before `.env.development`.
+- The `ava` binary is built (`pnpm build:ava-cli`). Test the new flag with this worktree's build, `node apps/ava-cli/dist/main.cjs pipeline run ...`, or rebuild.
 
 **Verification:**
 ```sh
-pnpm type-check && pnpm test:db && pnpm test:e2e postgres-connector-import.spec.ts
+pnpm test:pipeline-server && pnpm --filter @avandar/ava-cli test && pnpm exec tsc -b --noEmit
+pnpm --filter @avandar/ava-cli build && node apps/ava-cli/dist/main.cjs pipeline run world-bank__wdi --local --limit 1   # expect the "does not support --limit" error
 ```
 
 ---
@@ -381,14 +404,14 @@ CDC data, become discoverable and queryable.
 **Also take:**
 - `b989283ed` feat(socrata): add the NYC Open Data drive to the Socrata pipeline. All of it: `configuredDrives.ts` gains the NYC drive and an updated docstring.
 
-**Uncommitted on the branch:**
-- Formatting-only edits to `SocrataClient*`, `SocrataDiscoveryClient*` and `makeSourceVersionFromSocrataViewMetadata.ts` (import order, line wrapping). Running Prettier reproduces them.
+- `b7cbe395a` feat(socrata): honor --limit and send SOCRATA_APP_TOKEN in the Socrata pipeline. All of it: `socrata/run.ts`, `createSocrataHttpClient/**`, `enumerateSocrataDrive/**`.
+- From `7dbb2210a` (**MIXED**), only the formatting of `SocrataClient*`, `SocrataDiscoveryClient*` and `makeSourceVersionFromSocrataViewMetadata.ts`. Taking the final file state includes it.
 
 **Verification:**
 ```sh
 ava supabase status && pnpm db:reset && pnpm test:db && pnpm db:gen-types && pnpm desktop:sqlite:check-migrations
 pnpm vitest run shared/connectors/open-data && pnpm test:pipeline-server && pnpm type-check
-ava pipeline run socrata --local   # smoke test against the switched local Supabase
+ava pipeline run socrata --local --limit 3   # smoke test against the switched local Supabase
 ```
 
 ---
@@ -430,9 +453,9 @@ catalog of more than 42,000 datasets needs retry and backoff first.
 - `apps/pipeline-server/pipelines/hdx/**`
 - delete `apps/pipeline-server/pipelines/hdx__sudan-cholera-2025/`
 
-**Uncommitted on the branch:** a formatting-only edit to
-`shared/connectors/open-data/buildCkanSourceVersion.ts` (import order).
-Running Prettier reproduces it.
+**Also take:**
+- `f78be622b` feat(hdx): honor --limit and send HDX_API_KEY in the HDX pipeline. All of it: `hdx/run.ts`, `createHdxHttpClient/**`.
+- From `7dbb2210a` (**MIXED**), only the import-order fix in `shared/connectors/open-data/buildCkanSourceVersion.ts`. Taking the final file state includes it.
 
 **Schema:** none.
 
@@ -443,7 +466,7 @@ pnpm vitest run shared/connectors/open-data && pnpm test:pipeline-server && pnpm
 
 ---
 
-## F8: Open-data write-back cache *(proposed, confirm with user)*
+## F8: Open-data write-back cache
 
 **Purpose:**
 - Cache a live open-data read as an object in a private `open-data-catalog` storage bucket.
@@ -485,9 +508,9 @@ pnpm vitest run shared/connectors/open-data && pnpm test:pipeline-server && pnpm
 - `formatToContentKind.ts`
 - the cache hunks in `acquireOpenDataResource.ts`, `OpenDataRoutes.ts` and `shared/models/data-catalog-listings/**`
 
-**Uncommitted on the branch:** formatting-only edits to
-`AvandarSupabaseStorageClient.ts` and its test. Running Prettier reproduces
-them.
+**Also take:** from `7dbb2210a` (**MIXED**), only the formatting of
+`AvandarSupabaseStorageClient.ts` and its test. Taking the final file state
+includes it.
 
 **Verification:**
 ```sh
@@ -497,7 +520,7 @@ pnpm vitest run shared/connectors/open-data && pnpm type-check
 
 ---
 
-## F9: Measles demo docs *(proposed, confirm with user)*
+## F9: Measles demo docs
 
 **Purpose:** Land the branch's specs, plans and use case. **Value:** They
 record why the merged features look the way they do.
@@ -529,7 +552,7 @@ drive index invariant (AVA-381).
 
 ## Branch coverage checklist
 
-Every non-Postgres commit in `9cc48c3e4..HEAD` (84, oldest first) and the
+Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
 feature(s) it feeds. "History" means the commit's files were later superseded:
 port the final files, not the commit.
 
@@ -619,9 +642,15 @@ port the final files, not the commit.
 | 82 | `625458385` | F2 |
 | 83 | `b989283ed` | F6 |
 | 84 | `a325df511` | F9 |
+| 85 | `b4b039511` | branch-only: this log. Don't port. |
+| 86 | `7dbb2210a` | F6, F7, F8 (MIXED, formatting only). Its other files are Postgres-branch formatting and `supabase/config.toml`: see below. |
+| 87 | `eba708217` | F10 |
+| 88 | `b7cbe395a` | F6 |
+| 89 | `f78be622b` | F7 |
+
+Commits that only update this log are branch-only and are not listed.
 
 **Not part of any feature:**
 - `b920bee1b` (desktop SQLite generator catch-up) is on the Postgres branch.
-- The formatting-only uncommitted edits outside open-data (`createRegistryForFetch.ts`, `http-api.types.ts`, `ConnectorsAdvisory.tsx`, `save*Dataset.ts`, `supabase/functions/_shared/*`) are Postgres-branch or repo-wide Prettier churn.
-- The remaining uncommitted files (`db_connections*`, `PostgresTableWrapper*`, Postgres views, `supabase/functions/connectors/*` Postgres code, `postgres-connector-option-a-prototype.html`, `tests/e2e/postgres-connector-import.spec.ts`) belong to the Postgres branch.
-- `supabase/config.toml` is this branch's Supabase switch and is never committed.
+- `7dbb2210a`'s non-open-data files (`db_connections*`, `PostgresTableWrapper*`, the Postgres import views, `supabase/functions/connectors/*`, `supabase/functions/_shared/*`, `createRegistryForFetch.ts`, `http-api.types.ts`, `ConnectorsAdvisory.tsx`, `save*Dataset.ts`, `postgres-connector-option-a-prototype.html`, `tests/e2e/postgres-connector-import.spec.ts`) are formatting and Postgres work. They belong to the Postgres branch, not to any feature here.
+- `supabase/config.toml`: `7dbb2210a` committed this branch's Supabase switch (project `feat-demo-measles`, ports 553xx). Never port it. Run `ava supabase restore` and commit the standard config before this branch itself is ever merged anywhere.
