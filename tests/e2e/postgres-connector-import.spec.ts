@@ -1,7 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { PostgresConnectionSeed } from "./helpers/liveConnectors/PostgresConnectionSeed";
-import { parseDatasetIdFromDataManagerUrl } from "./helpers/manualUploadCloudSyncFlow";
+import { pickPostgresRelation } from "./helpers/pickPostgresRelation";
+import { saveCloudOnlyDataset } from "./helpers/saveCloudOnlyDataset";
 import {
   createSupabaseAdminClient,
   deleteAllDatasetsInWorkspaceForE2E,
@@ -60,12 +61,6 @@ const PREVIEW_ROWS = [
   { id: 2, full_name: "Grace Hopper" },
 ];
 
-/** Matches the dataset detail URL a completed save lands on. */
-function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
-  const escaped = workspaceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`/${escaped}/data-manager/[0-9a-f-]{36}`, "i");
-}
-
 /**
  * Answers the two `connectors` routes this view calls for an
  * already-saved connection, out of the fixture above. `test-and-save` is
@@ -112,7 +107,10 @@ test.describe("Postgres connector", () => {
 
     let connection: SeededPostgresConnection | undefined;
     try {
-      connection = await PostgresConnectionSeed.create({ admin, workspaceId });
+      connection = await PostgresConnectionSeed.create({
+        supabaseAdminClient: admin,
+        workspaceId,
+      });
 
       await _stubConnectorRoutes(page);
 
@@ -125,17 +123,10 @@ test.describe("Postgres connector", () => {
       await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-manager/data-import`);
       await page.getByRole("tab", { name: "Connectors" }).click();
 
-      // The most-recently-verified saved connection is picked automatically
-      // and its relations are listed eagerly - no click needed to reach the
-      // table picker.
-      const relationSelect = page.getByRole("combobox", {
-        name: "Table or view to import",
+      await pickPostgresRelation({
+        page,
+        relationLabel: SEEDED_RELATION.label,
       });
-      await expect(relationSelect).toBeVisible({ timeout: LONG_WAIT });
-      await relationSelect.click();
-      await page
-        .getByRole("option", { name: SEEDED_RELATION.label, exact: true })
-        .click();
 
       await expect(
         page.getByRole("heading", { name: "Data preview" }),
@@ -144,30 +135,21 @@ test.describe("Postgres connector", () => {
         page.getByRole("columnheader", { name: "full_name" }),
       ).toBeVisible({ timeout: SHORT_WAIT });
 
-      await page.getByRole("button", { name: "Save Dataset" }).click();
-      await expect
-        .poll(
-          () => {
-            return _datasetMetaUrlPattern(e2eWorkerDb.workspaceSlug).test(
-              page.url(),
-            );
-          },
-          { timeout: LONG_WAIT },
-        )
-        .toBe(true);
-
-      const datasetId = parseDatasetIdFromDataManagerUrl({
-        url: page.url(),
+      await saveCloudOnlyDataset({
+        page,
         workspaceSlug: e2eWorkerDb.workspaceSlug,
       });
-      expect(datasetId).toBeTruthy();
     } finally {
       await deleteAllDatasetsInWorkspaceForE2E({
         supabaseAdminClient: admin,
         workspaceId,
       });
       if (connection) {
-        await PostgresConnectionSeed.remove({ admin, workspaceId, connection });
+        await PostgresConnectionSeed.remove({
+          supabaseAdminClient: admin,
+          workspaceId,
+          connection,
+        });
       }
     }
   });

@@ -1,23 +1,19 @@
 import { expect } from "@playwright/test";
+import { importGoogleSheetTab } from "../importGoogleSheetTab";
 import { installFakeGooglePicker } from "../installFakeGooglePicker";
+import { saveCloudOnlyDataset } from "../saveCloudOnlyDataset";
 import { removeGoogleTokens, seedGoogleToken } from "../seedGoogleToken";
 import { deleteAllDatasetsInWorkspaceForE2E } from "../supabaseAdminClient";
 import { LONG_WAIT } from "../timeouts";
 import { LiveSourceTable } from "./LiveSourceTable";
-import { saveImportedLiveDataset } from "./saveImportedLiveDataset";
+import type { SavedDataset } from "../saveCloudOnlyDataset";
 import type {
-  ImportedLiveDataset,
   LiveConnectorE2e,
   LiveConnectorInstallOptions,
   LiveConnectorSession,
   LiveSourceRow,
 } from "./LiveConnectorE2e.types";
-import type { Page, Route } from "@playwright/test";
-
-const FIXTURE_SHEET = {
-  id: "1LiveConnectorSheetIdAbCdEfGhIjKlMnOp",
-  name: "e2e-live-case-counts",
-};
+import type { Page } from "@playwright/test";
 
 /**
  * Two tabs, so the import asks which one to read. The gids are this stub's
@@ -26,23 +22,17 @@ const FIXTURE_SHEET = {
 const FIXTURE_TABS = [
   { sheetId: 0, title: "Cases", index: 0 },
   { sheetId: 1234567, title: "Notes", index: 1 },
-];
+] as const;
 
-/** The sheet's current rows and Drive version, shared by every stub. */
+/**
+ * The sheet's current rows and Drive version, and every dataset read its CSV
+ * route saw.
+ */
 type SourceState = {
   rows: readonly LiveSourceRow[];
   version: number;
   datasetReadUrls: string[];
 };
-
-/** Answers a stubbed route with a JSON body. */
-async function _fulfillJson(route: Route, body: unknown): Promise<void> {
-  await route.fulfill({
-    status: 200,
-    contentType: "application/json",
-    body: JSON.stringify(body),
-  });
-}
 
 /**
  * Stubs the three Google endpoints the import calls from the browser: Drive
@@ -54,15 +44,17 @@ async function _stubGoogleImportRoutes(
 ): Promise<void> {
   const { page, source } = options;
   await page.route("**/drive/v3/files/**", async (route) => {
-    await _fulfillJson(route, { version: String(source.version) });
+    await route.fulfill({ json: { version: String(source.version) } });
   });
   await page.route(
     "**/sheets.googleapis.com/v4/spreadsheets/**",
     async (route) => {
-      await _fulfillJson(route, {
-        sheets: FIXTURE_TABS.map((properties) => {
-          return { properties };
-        }),
+      await route.fulfill({
+        json: {
+          sheets: FIXTURE_TABS.map((properties) => {
+            return { properties };
+          }),
+        },
       });
     },
   );
@@ -104,15 +96,31 @@ async function _stubDatasetRoutes(
   await page.route(
     "**/functions/v1/google-sheets/datasets/*/version",
     async (route) => {
-      await _fulfillJson(route, { sourceVersion: String(source.version) });
+      await route.fulfill({
+        json: { sourceVersion: String(source.version) },
+      });
     },
   );
+}
+
+/**
+ * Seeds a Google token for `email` that expires in an hour, so
+ * `google-auth/tokens` returns it untouched instead of trying to refresh a
+ * fake one against Google.
+ */
+async function _seedUnexpiredGoogleToken(email: string): Promise<void> {
+  await seedGoogleToken({
+    email,
+    accessToken: "ya29.e2e-stubbed-access-token",
+    refreshToken: "1//e2e-stubbed-refresh-token",
+    expiryDate: new Date(Date.now() + 60 * 60 * 1000),
+  });
 }
 
 /** Picks the sheet through the stubbed Picker, imports its tab, and saves. */
 async function _importDataset(
   options: Readonly<{ page: Page; workspaceSlug: string }>,
-): Promise<ImportedLiveDataset> {
+): Promise<SavedDataset> {
   const { page, workspaceSlug } = options;
   await page.getByRole("link", { name: "Data Sources" }).click();
   await page.getByRole("button", { name: "Add new dataset" }).click();
@@ -121,40 +129,28 @@ async function _importDataset(
   const pickButton = page.getByRole("button", { name: /pick a sheet/i });
   await expect(pickButton).toBeVisible({ timeout: LONG_WAIT });
   await pickButton.click();
-
-  const tabSelect = page.getByRole("combobox", { name: "Tab to import" });
-  await expect(tabSelect).toBeVisible({ timeout: LONG_WAIT });
-  await tabSelect.click();
-  await page
-    .getByRole("option", { name: FIXTURE_TABS[0]!.title, exact: true })
-    .click();
-  await page.getByRole("button", { name: "Process", exact: true }).click();
+  await importGoogleSheetTab({ page, tabTitle: FIXTURE_TABS[0].title });
   await expect(
     page.getByRole("columnheader", { name: "reported_on" }),
   ).toBeVisible({ timeout: LONG_WAIT });
 
-  return await saveImportedLiveDataset({ page, workspaceSlug });
+  return await saveCloudOnlyDataset({ page, workspaceSlug });
 }
 
 async function _install(
-  options: LiveConnectorInstallOptions,
+  options: Readonly<LiveConnectorInstallOptions>,
 ): Promise<LiveConnectorSession> {
-  const { admin, e2eWorkerDb, page, workspaceId } = options;
+  const { supabaseAdminClient, e2eWorkerDb, page, workspaceId } = options;
   const source: SourceState = {
     rows: LiveSourceTable.initialRows,
     version: 1,
     datasetReadUrls: [],
   };
-
-  // A future expiry, so `google-auth/tokens` returns this token untouched
-  // instead of trying to refresh a fake one against Google.
-  await seedGoogleToken({
-    email: e2eWorkerDb.primaryUser.email,
-    accessToken: "ya29.e2e-stubbed-access-token",
-    refreshToken: "1//e2e-stubbed-refresh-token",
-    expiryDate: new Date(Date.now() + 60 * 60 * 1000),
+  await _seedUnexpiredGoogleToken(e2eWorkerDb.primaryUser.email);
+  await installFakeGooglePicker(page, {
+    id: "1LiveConnectorSheetIdAbCdEfGhIjKlMnOp",
+    name: "e2e-live-case-counts",
   });
-  await installFakeGooglePicker(page, FIXTURE_SHEET);
   await _stubGoogleImportRoutes({ page, source });
   await _stubDatasetRoutes({ page, source });
 
@@ -176,7 +172,7 @@ async function _install(
       // Datasets first: `datasets__google_sheets.google_account_id` is a
       // foreign key onto the token row.
       await deleteAllDatasetsInWorkspaceForE2E({
-        supabaseAdminClient: admin,
+        supabaseAdminClient,
         workspaceId,
       });
       await removeGoogleTokens(e2eWorkerDb.primaryUser.email);

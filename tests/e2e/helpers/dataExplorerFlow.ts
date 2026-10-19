@@ -63,6 +63,16 @@ export async function openDataExplorerDrawerTab({
   });
 }
 
+/** A query to run over one saved dataset in the Data Explorer. */
+type RunSqlOverDatasetOptions = {
+  page: Page;
+  datasetName: string;
+
+  /** One of the dataset's columns, chosen to start the query from. */
+  columnName: string;
+  sql: string;
+};
+
 /**
  * Opens the Data Explorer from the nav and runs `sql` over a saved dataset
  * through its SQL editor. The dataset is chosen as the query's source first,
@@ -70,19 +80,16 @@ export async function openDataExplorerDrawerTab({
  * SQL can name it. Waiting for the result is left to the caller.
  */
 export async function runSqlOverDataset(
-  options: Readonly<{
-    page: Page;
-    datasetName: string;
-    columnName: string;
-    sql: string;
-  }>,
+  options: Readonly<RunSqlOverDatasetOptions>,
 ): Promise<void> {
   const { page } = options;
   await page.getByRole("link", { name: "Data Explorer", exact: true }).click();
   await dismissBlockingOverlays(page);
   await openDataExplorerDrawerTab({ page, tab: "query" });
 
-  const queryPanel = page.getByRole("tabpanel", { name: /^query$/i });
+  const queryPanel = page.getByRole("tabpanel", {
+    name: DRAWER_TAB_NAME_PATTERNS.query,
+  });
   await queryPanel
     .getByRole("combobox", { name: "Data source", exact: true })
     .click();

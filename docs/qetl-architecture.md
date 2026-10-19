@@ -483,7 +483,7 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 38 | `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/` | the manual refresh a live source offers, and its menu item in `DatasetActionsMenu.tsx` | compiler (exhaustive `match`) and `getDatasetRefreshFromSourceType.test.ts`, whose expectations are a `Record` over every source type |
 | 39 | the edge connector's `previewRelation` | report each column's `dataType`, read from the source's own schema (`ConnectorPreviewColumn`, `Connector.ts`) | compiler (`dataType` is required) |
 | 40 | a server route keyed by dataset, for example `connectors`' `/:connectorType/datasets/:datasetId/rows` | check `util__auth_user_may_select_dataset` with the caller's client, then read with the service role through the credential the dataset was imported with, so anyone who can see the dataset can read it | the contract test, and route tests modelled on `ConnectorRoutes/ConnectorRoutes.test.ts` |
-| 41 | `tests/e2e/helpers/liveConnectors/LiveConnectorE2eRegistry.ts` | the source type's entry: a `LiveConnectorE2e` adapter if it is live, or `"not-live"` | compiler (`Record` over every source type), then `live-connector-datasets.spec.ts`, whose first test checks the entry against row 38 |
+| 41 | `tests/e2e/helpers/liveConnectors/LiveConnectorE2eRegistry.ts` | a live source type's `LiveConnectorE2e` adapter | compiler (`Record` over `DatasetRefresh`, row 38), then `live-connector-datasets.spec.ts` |
 
 Not needed: `Dataset/DatasetParsers.ts` (derives from `SourceTypes`), chat schema
 code, `assertWorkspaceRelations`, and both cache ports, which are source-type
@@ -538,11 +538,11 @@ following.
   a refresh shows an edited source row, in the data preview and in the
   summary; a member other than the importer reads its rows through the
   dataset's own route; a dashboard widget renders its rows; and a dashboard
-  published with a whole-dataset slice, and with a queried one, keeps showing
-  the published rows after the source changes. The registry is keyed by
-  every source type, so a new one fails to compile until it is given an
-  adapter or marked `"not-live"`, and the spec's first test fails if that
-  choice disagrees with `getDatasetRefreshFromSourceType`.
+  published with a whole-dataset slice, and with a queried one, shows a
+  member the published rows after the source changes, without reading the
+  source. The registry is keyed by `DatasetRefresh`, the manual refresh
+  `getDatasetRefreshFromSourceType` offers (row 38), so a new source type
+  that offers one fails to compile until it has an adapter.
 
 **Written for the connector:**
 
