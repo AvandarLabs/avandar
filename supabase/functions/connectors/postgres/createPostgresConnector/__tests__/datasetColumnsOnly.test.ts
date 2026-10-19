@@ -89,9 +89,7 @@ describe("createPostgresConnector - reading only a dataset's columns", () => {
       sentQueries,
       columnList: '"name", "id"',
     });
-    expect(rowsQuery?.queryText).toMatch(
-      /^\s*declare\s+no scroll cursor for select\s+from\s*$/,
-    );
+    expect(rowsQuery?.queryText).toMatch(/cursor for select\s+from\s*$/);
   });
 
   it("refuses a table that no longer has one of the dataset's columns, without reading a row", async () => {

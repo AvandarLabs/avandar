@@ -87,7 +87,8 @@ export const GlobalAppConfig = {
      * one `FETCH`, so one network round trip. A row's width is unknown until
      * it arrives (a `text` or `jsonb` column can hold anything), so the first
      * batch asks for `minRows`. Each later batch is sized from the widest
-     * row of the batch before it, to hold about `targetBytes` of CSV, within
+     * row, in bytes, of the batch before it, to hold about `targetBytes` of
+     * CSV, within
      * `minRows` and `maxRows`. A narrow table arrives in a few large batches
      * and a wide one in many small ones, so neither the round trips nor the
      * rows held in memory grow without bound.
@@ -98,9 +99,11 @@ export const GlobalAppConfig = {
       maxRows: 50_000,
 
       /**
-       * The most a batch may grow over the batch before it, so a table
-       * whose rows widen partway through never jumps straight from a narrow
-       * row's batch size to a huge batch of wide rows.
+       * The most a batch may grow over the batch before it, so the narrow
+       * rows a table may start with never size the next batch straight to
+       * `maxRows`. Once batches reach `maxRows`, only `maxRows` bounds the
+       * next one: rows that widen after that arrive in one batch of
+       * `maxRows` before the batch after it is sized for them.
        */
       maxGrowthFactor: 10,
     },

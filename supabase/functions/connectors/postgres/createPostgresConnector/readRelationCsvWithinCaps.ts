@@ -13,9 +13,6 @@ import type { ColumnSizeInfo } from "$/connectors/postgres/PostgresCsvEstimate/P
 import type { RelationRowDescriptor } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 import type { PostgresQueryRunner } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
-/** The server-side cursor a relation's rows are fetched through. */
-const ROWS_CURSOR_NAME = "ava_relation_rows";
-
 /** CSV text encoded as bytes, as `TextEncoder` returns it. */
 type CsvBytes = ReturnType<TextEncoder["encode"]>;
 
@@ -53,6 +50,19 @@ type RelationToMeasure = Omit<
   /** The quoted relation name fragment the size query interpolates. */
   relationName: unknown;
 };
+
+/** A relation's measured size, before any of its rows are read. */
+type RelationSize = {
+  rowCount: number;
+  descriptor: RelationRowDescriptor;
+};
+
+/** A declared rows cursor to fetch, and the caps its CSV is held to. */
+type CursorReadOptions = ReadRelationCsvWithinCapsOptions &
+  RelationSize & {
+    /** The cursor's name, as a fragment the fetch interpolates. */
+    cursorName: unknown;
+  };
 
 /**
  * Throws `too_large` unless `byteCount`/`rowCount` both stay within the
@@ -134,7 +144,7 @@ async function _getReadColumnSizeInfo(
  */
 async function _getRelationSizeWithinCaps(
   options: Readonly<RelationToMeasure>,
-): Promise<{ rowCount: number; descriptor: RelationRowDescriptor }> {
+): Promise<RelationSize> {
   const { transaction, relationName, schemaName, tableName } = options;
   // `count(*)` is a `bigint`, which the driver returns as a string. Casting
   // it to `int` instead would fail outright past 2^31 rows rather than
@@ -164,12 +174,12 @@ async function _getRelationSizeWithinCaps(
 
 /**
  * How many rows the next cursor batch asks for, after a batch of
- * `previousBatchRows` whose widest row was `widestRowBytes` of CSV: about the
- * configured target bytes at that width, at most the configured growth over
- * the previous batch, and within the configured bounds.
+ * `previousBatchRowCount` rows whose widest was `widestRowBytes` of CSV:
+ * about the configured target bytes at that width, at most the configured
+ * growth over the previous batch, and within the configured bounds.
  */
-function _getNextBatchRows(
-  options: Readonly<{ previousBatchRows: number; widestRowBytes: number }>,
+function _getNextBatchRowCount(
+  options: Readonly<{ previousBatchRowCount: number; widestRowBytes: number }>,
 ): number {
   const { targetBytes, minRows, maxRows, maxGrowthFactor } =
     GlobalAppConfig.postgresConnector.rowsPerCursorBatch;
@@ -180,30 +190,60 @@ function _getNextBatchRows(
     minRows,
     Math.min(
       rowsForTarget,
-      options.previousBatchRows * maxGrowthFactor,
+      options.previousBatchRowCount * maxGrowthFactor,
       maxRows,
     ),
   );
 }
 
 /**
- * Writes one batch of rows as CSV bytes, and measures its widest row in
- * bytes. Rows are compared by length, and only the longest is encoded again.
+ * The size in bytes of the widest of a batch's CSV lines, given how many
+ * bytes the whole batch encodes to.
  */
-function _makeCsvBatchFromRows(
+function _getWidestLineBytes(
   options: Readonly<{
     encoder: TextEncoder;
-    columnNames: readonly string[];
-    rows: ReadonlyArray<Record<string, unknown>>;
+    lines: readonly string[];
+    batchByteLength: number;
   }>,
+): number {
+  const { encoder, lines } = options;
+  const longestLineLength = lines.reduce((longestSoFar, line) => {
+    return Math.max(longestSoFar, line.length);
+  }, 0);
+  const batchLength = lines.reduce((lengthSoFar, line) => {
+    return lengthSoFar + line.length;
+  }, 0);
+  // All ASCII: every character is one byte, so the longest line is widest.
+  if (options.batchByteLength === batchLength) {
+    return longestLineLength;
+  }
+  // Each UTF-16 unit of a line encodes to at most 3 bytes, so only a line at
+  // least a third as long as the widest found so far can be wider.
+  return lines.reduce((widestBytesSoFar, line) => {
+    return line.length * 3 > widestBytesSoFar
+      ? Math.max(widestBytesSoFar, encoder.encode(line).byteLength)
+      : widestBytesSoFar;
+  }, longestLineLength);
+}
+
+/** One batch of rows written as CSV bytes, with its widest row's size. */
+function _makeCsvBatchFromRows(
+  options: Readonly<
+    Parameters<typeof PostgresCsv.makeRowLinesFromRows>[0] & {
+      encoder: TextEncoder;
+    }
+  >,
 ): { chunk: CsvBytes; widestRowBytes: number } {
   const lines = PostgresCsv.makeRowLinesFromRows(options);
-  const widestLine = lines.reduce((widest, line) => {
-    return line.length > widest.length ? line : widest;
-  }, "");
+  const chunk = options.encoder.encode(lines.join(""));
   return {
-    chunk: options.encoder.encode(lines.join("")),
-    widestRowBytes: options.encoder.encode(widestLine).byteLength,
+    chunk,
+    widestRowBytes: _getWidestLineBytes({
+      encoder: options.encoder,
+      lines,
+      batchByteLength: chunk.byteLength,
+    }),
   };
 }
 
@@ -226,14 +266,6 @@ function _assertBeforeReadDeadline(
   }
 }
 
-/** A declared rows cursor to fetch, and the caps its CSV is held to. */
-type CursorReadOptions = ReadRelationCsvWithinCapsOptions & {
-  /** The cursor's name, as a fragment the fetch interpolates. */
-  cursorName: unknown;
-  rowCount: number;
-  descriptor: RelationRowDescriptor;
-};
-
 /**
  * Fetches every row of the declared cursor as CSV bytes, header first,
  * refusing the relation as `too_large` as soon as the CSV crosses the caps
@@ -249,7 +281,7 @@ async function _fetchCursorAsCsvChunks(
   );
   const chunks = [headerChunk];
   let byteCount = headerChunk.byteLength;
-  let batchRows: number =
+  let batchRowCount: number =
     GlobalAppConfig.postgresConnector.rowsPerCursorBatch.minRows;
   let hasMoreRows = true;
   // Each batch is its own FETCH, sized from the widest row of the one before,
@@ -260,8 +292,12 @@ async function _fetchCursorAsCsvChunks(
   // same connection would otherwise be parsed with this one's columns.
   while (hasMoreRows) {
     const rows = await transaction<Record<string, unknown>>`
-      fetch forward ${transaction.unsafe(String(batchRows))} from ${options.cursorName}
+      fetch forward ${transaction.unsafe(String(batchRowCount))} from ${options.cursorName}
     `.simple();
+    // An empty fetch follows a full last batch: every row has arrived.
+    if (rows.length === 0) {
+      break;
+    }
     _assertBeforeReadDeadline(options);
     const batch = _makeCsvBatchFromRows({ encoder, columnNames, rows });
     byteCount += batch.chunk.byteLength;
@@ -272,9 +308,9 @@ async function _fetchCursorAsCsvChunks(
       message: `'${schemaName}.${tableName}' passed ${byteCount} bytes as CSV, over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
     });
     chunks.push(batch.chunk);
-    hasMoreRows = rows.length === batchRows;
-    batchRows = _getNextBatchRows({
-      previousBatchRows: batchRows,
+    hasMoreRows = rows.length === batchRowCount;
+    batchRowCount = _getNextBatchRowCount({
+      previousBatchRowCount: batchRowCount,
       widestRowBytes: batch.widestRowBytes,
     });
   }
@@ -306,7 +342,7 @@ export async function readRelationCsvWithinCaps(
   const columnList = transaction.unsafe(
     columnNames.map(quoteSqlIdentifier).join(", "),
   );
-  const cursorName = transaction.unsafe(ROWS_CURSOR_NAME);
+  const cursorName = transaction.unsafe("ava_relation_rows");
 
   // A server-side cursor rather than the driver's own, so each batch can ask
   // for a different number of rows. It closes when the read's transaction

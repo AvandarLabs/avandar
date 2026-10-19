@@ -86,55 +86,156 @@ export function makeFakeSql(
 /** A fake server-side cursor over a relation's rows. */
 export type FakeRowsCursor = {
   /**
-   * Answers the cursor's `declare` and each `fetch forward <n>` the way
-   * Postgres does, handing out up to `n` of the remaining rows. Returns
-   * `undefined` for any other query.
+   * Answers the cursor's `declare`, once awaited, and each
+   * `fetch forward <n>` from it the way Postgres does: handing out up to `n`
+   * of the remaining rows, and failing for a cursor that was never declared.
+   * Returns `undefined` for any other query.
    */
-  respond: (queryText: string, values: unknown[]) => unknown;
+  respond: Parameters<typeof makeFakeSql>[0];
 
   /** How many rows each fetch asked for, in order. */
-  requestedBatchRows: number[];
+  requestedBatchRowCounts: number[];
+
+  /** How many rows the fetches have handed out so far. */
+  fetchedRowCount: () => number;
 
   /** How many fetches were sent unprepared, through `simple()`. */
   unpreparedFetchCount: () => number;
 };
 
+/** What a fake cursor has declared and handed out so far. */
+type FakeCursorState = {
+  rows: ReadonlyArray<Record<string, unknown>>;
+  declaredCursorName: unknown;
+  fetchedRowCount: number;
+  unpreparedFetchCount: number;
+  requestedBatchRowCounts: number[];
+};
+
+/**
+ * A fake `declare`. A postgres.js query only runs once awaited, so the cursor
+ * only exists from then on.
+ */
+function _makeFakeDeclare(
+  options: Readonly<{ state: FakeCursorState; cursorName: unknown }>,
+): PromiseLike<unknown[]> {
+  return {
+    then: (onDeclared, onFailed) => {
+      options.state.declaredCursorName = options.cursorName;
+      return Promise.resolve([]).then(onDeclared, onFailed);
+    },
+  };
+}
+
+/** A fetch's result, which records being sent unprepared. */
+function _makeFakeFetchResult(
+  options: Readonly<{ state: FakeCursorState; result: Promise<unknown[]> }>,
+): Promise<unknown[]> {
+  // Awaited through `simple()`, so a refused fetch is never unhandled.
+  options.result.catch(() => {});
+  return Object.assign(options.result, {
+    simple: () => {
+      options.state.unpreparedFetchCount += 1;
+      return options.result;
+    },
+  });
+}
+
+/**
+ * A fake `fetch forward <n> from <cursor>`. The fake's `unsafe` returns its
+ * text, so the row count and cursor name arrive as the interpolated values.
+ */
+function _makeFakeFetch(
+  options: Readonly<{ state: FakeCursorState; values: unknown[] }>,
+): Promise<unknown[]> {
+  const { state } = options;
+  const [batchRowCountText, cursorName] = options.values;
+  if (cursorName !== state.declaredCursorName) {
+    const error = new Error(`cursor "${String(cursorName)}" does not exist`);
+    return _makeFakeFetchResult({ state, result: Promise.reject(error) });
+  }
+  const batchRowCount = Number(batchRowCountText);
+  state.requestedBatchRowCounts.push(batchRowCount);
+  const batch = state.rows.slice(
+    state.fetchedRowCount,
+    state.fetchedRowCount + batchRowCount,
+  );
+  state.fetchedRowCount += batch.length;
+  return _makeFakeFetchResult({ state, result: Promise.resolve(batch) });
+}
+
 /** A fake server-side cursor that reads `rows` in order. */
 export function makeFakeRowsCursor(
   rows: ReadonlyArray<Record<string, unknown>>,
 ): FakeRowsCursor {
-  const requestedBatchRows: number[] = [];
-  const cursorPosition = { fetchedRowCount: 0, unpreparedFetchCount: 0 };
+  const state: FakeCursorState = {
+    rows,
+    declaredCursorName: undefined,
+    fetchedRowCount: 0,
+    unpreparedFetchCount: 0,
+    requestedBatchRowCounts: [],
+  };
   return {
-    requestedBatchRows,
+    requestedBatchRowCounts: state.requestedBatchRowCounts,
+    fetchedRowCount: () => {
+      return state.fetchedRowCount;
+    },
     unpreparedFetchCount: () => {
-      return cursorPosition.unpreparedFetchCount;
+      return state.unpreparedFetchCount;
     },
     respond: (queryText, values) => {
       if (queryText.includes("declare")) {
-        return Promise.resolve([]);
+        return _makeFakeDeclare({ state, cursorName: values[0] });
       }
-      if (!queryText.includes("fetch forward")) {
-        return undefined;
-      }
-      // The fake's `unsafe` returns its text, so the row count arrives as
-      // the first interpolated value.
-      const batchRows = Number(values[0]);
-      requestedBatchRows.push(batchRows);
-      const batch = rows.slice(
-        cursorPosition.fetchedRowCount,
-        cursorPosition.fetchedRowCount + batchRows,
-      );
-      cursorPosition.fetchedRowCount += batch.length;
-      const fetchedBatch = Promise.resolve(batch);
-      return Object.assign(fetchedBatch, {
-        simple: () => {
-          cursorPosition.unpreparedFetchCount += 1;
-          return fetchedBatch;
-        },
-      });
+      return queryText.includes("fetch forward")
+        ? _makeFakeFetch({ state, values })
+        : undefined;
     },
   };
+}
+
+/** A relation of one column, read through a fake cursor. */
+type FakeCursorReadOptions = {
+  cursor: FakeRowsCursor;
+
+  /** The row count the relation's `count(*)` reports. */
+  rowCount: number;
+  columnName: string;
+
+  /** The column's type, as `information_schema.columns` names it. */
+  dataType: string;
+
+  /** Runs before each query is answered, with that query's text. */
+  onQuery?: (queryText: string) => void;
+};
+
+/**
+ * A fake connection to a one-column relation whose rows are read through
+ * `cursor`: it answers the still-exists check, the row count, the column
+ * sizes, and the cursor's own queries.
+ */
+export function makeFakeSqlForCursorRead(
+  options: Readonly<FakeCursorReadOptions>,
+): PostgresSql {
+  return makeFakeSql((queryText, values) => {
+    options.onQuery?.(queryText);
+    if (queryText.includes("limit 1")) {
+      return Promise.resolve([{ table_type: "BASE TABLE" }]);
+    }
+    if (queryText.includes("count(*)")) {
+      return Promise.resolve([{ exact_count: String(options.rowCount) }]);
+    }
+    if (queryText.includes("character_maximum_length")) {
+      return Promise.resolve([
+        {
+          column_name: options.columnName,
+          data_type: options.dataType,
+          character_maximum_length: null,
+        },
+      ]);
+    }
+    return options.cursor.respond(queryText, values);
+  });
 }
 
 /**

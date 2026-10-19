@@ -66,4 +66,22 @@ describe("runReadOnlyTransaction", () => {
     expect(queries[0]?.values).toEqual(["15000"]);
     expect(queries[1]?.text).toContain("select 1");
   });
+
+  // Postgres plans a declared cursor to return its first tenth of rows
+  // fastest, which can make a view's full read much slower.
+  it("plans any cursor the transaction declares to read every row, before running anything else", async () => {
+    const { sql, queries } = _makeRecordingSql();
+
+    await runReadOnlyTransaction({
+      sql,
+      statementTimeoutMs: 15_000,
+      run: async () => {
+        return "done";
+      },
+    });
+
+    expect(queries[0]?.text).toContain(
+      "set_config('cursor_tuple_fraction', '1', true)",
+    );
+  });
 });

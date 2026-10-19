@@ -16,12 +16,12 @@ export type PostgresQuery<Row> = Promise<Row[]> & {
  * What a query runs against: a live connection, or one transaction on it.
  * Tagged-template query execution, plus `unsafe(text)` to build a fragment
  * the template interpolates verbatim. `unsafe` is used only for text the
- * connector builds itself from quoted identifiers or integers: the quoted
- * `"schema"."table"` name `quotePostgresRelationName.ts` builds (the
- * driver's own `sql(identifier)` helper splits a name containing a dot), a
- * quoted column list, the rows cursor's name, and a fetch's row count, which
- * `FETCH` cannot take as a parameter. Every value still goes through the
- * tagged template as a bound parameter.
+ * connector builds itself from quoted identifiers, integers or a fixed
+ * literal: the quoted `"schema"."table"` name `quotePostgresRelationName.ts`
+ * builds (the driver's own `sql(identifier)` helper splits a name containing
+ * a dot), a quoted column list, the rows cursor's fixed name, and a fetch's
+ * row count, which `FETCH` cannot take as a parameter. Every value still goes
+ * through the tagged template as a bound parameter.
  */
 export type PostgresQueryRunner = {
   <Row extends object = Record<string, unknown>>(
