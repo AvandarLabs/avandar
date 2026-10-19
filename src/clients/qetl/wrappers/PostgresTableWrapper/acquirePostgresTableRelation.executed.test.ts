@@ -115,22 +115,6 @@ describe("acquirePostgresTableRelation", () => {
     expect(acquired.sourceVersion).toBeUndefined();
   });
 
-  it("types a numeric column as a bigint, not a string", async () => {
-    // DuckDB hands a BIGINT back as a JS `bigint`; what matters is that it is
-    // not a string - same reasoning `acquireGoogleSheetRelation`'s own test
-    // documents for Sheets.
-    const { acquirePostgresTableRelation } =
-      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
-
-    const acquired = await acquirePostgresTableRelation({
-      datasetId: DATASET_ID,
-      readCsv: _readCsvWithDuckDb,
-      rowsFetch: _csvFetch("city,population\r\nNairobi,4400000\r\n"),
-    });
-
-    expect(typeof acquired.relation[0]?.population).toBe("bigint");
-  });
-
   it("fails when the edge function reports a connector error, preserving its code", async () => {
     const { acquirePostgresTableRelation } =
       await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");

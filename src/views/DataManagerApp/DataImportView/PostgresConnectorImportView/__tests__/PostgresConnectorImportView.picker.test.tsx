@@ -55,7 +55,9 @@ describe("PostgresConnectorImportView - keeping the picker in sync", () => {
     apiPostMock.mockResolvedValue(TWO_RELATIONS_SAVE_RESULT);
     apiGetMock
       .mockResolvedValueOnce({
-        columns: [{ columnName: "id", sourceType: "integer" }],
+        columns: [
+          { columnName: "id", sourceType: "integer", dataType: "bigint" },
+        ],
         previewRows: [{ id: 1 }],
       })
       .mockResolvedValueOnce({
@@ -91,8 +93,8 @@ describe("PostgresConnectorImportView - keeping the picker in sync", () => {
       })
       .mockResolvedValueOnce({
         columns: [
-          { columnName: "id", sourceType: "integer" },
-          { columnName: "total", sourceType: "numeric" },
+          { columnName: "id", sourceType: "integer", dataType: "bigint" },
+          { columnName: "total", sourceType: "numeric", dataType: "double" },
         ],
         previewRows: [{ id: 1, total: "9.50" }],
       });
@@ -111,7 +113,9 @@ describe("PostgresConnectorImportView - keeping the picker in sync", () => {
 
     await act(async () => {
       resolveCustomersPreview({
-        columns: [{ columnName: "id", sourceType: "integer" }],
+        columns: [
+          { columnName: "id", sourceType: "integer", dataType: "bigint" },
+        ],
         previewRows: [{ id: 1 }],
       });
     });

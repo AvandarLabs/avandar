@@ -98,6 +98,8 @@ describe("PostgresTableWrapper", () => {
     expect(readCsv).toHaveBeenCalledWith({
       datasetId: DATASET_REF.id,
       csvText: "city\r\nNairobi\r\n",
+      // A table declares its column types, so they come from its schema.
+      columnTypes: "source-schema",
     });
     expect(acquired).toEqual({
       ref: DATASET_REF,

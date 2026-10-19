@@ -1,3 +1,4 @@
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { Database } from "$/types/database.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -16,14 +17,11 @@ export type ConnectorRelation = {
 };
 
 /**
- * A single column in a relation's preview, as the edge function reports it.
- * Deliberately not the browser-only `DuckDbColumnSchema`
- * (`src/clients/DuckDbClient/DuckDbClient.types.ts`) - edge functions only
- * resolve `$/` (`shared/`) and `@sbfn/` (`supabase/functions/`), so they
- * cannot import from `src/`. The real, DuckDB-typed schema is derived once
- * the `rows` route's CSV is transcoded client-side, exactly like Google
- * Sheets; this preview type exists only to describe what the picker shows
- * before that happens.
+ * A single column of a relation, and its type as the source's own schema
+ * declares it. Every connector reports both: a connector's column types are
+ * always read from the source, never inferred from its rows, so a dataset
+ * imported through any connector stores the types its source declares and
+ * its rows are cast to them (see `CsvColumnTypes`'s `source-schema`).
  */
 export type ConnectorPreviewColumn = {
   columnName: string;
@@ -32,6 +30,8 @@ export type ConnectorPreviewColumn = {
    * `information_schema.columns.data_type`.
    */
   sourceType: string;
+  /** The type the column is queried as, mapped from `sourceType`. */
+  dataType: AvaDataType.T;
 };
 
 export type ConnectorErrorCode =

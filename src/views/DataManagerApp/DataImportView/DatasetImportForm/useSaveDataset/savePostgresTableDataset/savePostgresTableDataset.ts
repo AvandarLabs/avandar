@@ -8,11 +8,11 @@ import type { DataSourceMetadata } from "@/views/DataManagerApp/DataImportView/D
 import type { DatasetInsertContext } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/useSaveDataset/useSaveDataset";
 
 /**
- * The columns a Postgres dataset stores. Acquisition reads every column of
- * the `connectors` proxy's CSV as text (`readPostgresTableCsvAsText`), so
- * `detectedDataType` is `VARCHAR`. `originalDataType` is the DuckDB type
- * mapped from the column's declared Postgres type and `dataType` is its
- * queryable type, so relation loading casts that text to it.
+ * The columns a Postgres dataset stores. A Postgres table's column types
+ * come from its schema (`source-schema`), so acquisition reads every column
+ * of the `connectors` proxy's CSV as text and `detectedDataType` is
+ * `VARCHAR`. `dataType` is the type the connector read from the schema, so
+ * relation loading casts that text to it.
  */
 function _getStoredColumns(
   columns: readonly DuckDbColumnSchema[],

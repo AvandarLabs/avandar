@@ -17,9 +17,13 @@ describe("previewPostgresRelation", () => {
   beforeEach(() => {
     apiGetMock.mockReset().mockResolvedValue({
       columns: [
-        { columnName: "id", sourceType: "integer" },
-        { columnName: "zip_code", sourceType: "text" },
-        { columnName: "created_at", sourceType: "timestamp with time zone" },
+        { columnName: "id", sourceType: "integer", dataType: "bigint" },
+        { columnName: "zip_code", sourceType: "text", dataType: "varchar" },
+        {
+          columnName: "created_at",
+          sourceType: "timestamp with time zone",
+          dataType: "timestamp",
+        },
       ],
       previewRows: [{ id: "1", zip_code: "02134", created_at: "2024-01-01" }],
     });
@@ -43,7 +47,7 @@ describe("previewPostgresRelation", () => {
     );
   });
 
-  it("types each column from its declared Postgres type, not as text across the board", async () => {
+  it("types each column as the connector read it from the table's schema, not as text across the board", async () => {
     const metadata = await previewPostgresRelation({
       connectionId: CONNECTION_ID,
       relationId: "public.customers",

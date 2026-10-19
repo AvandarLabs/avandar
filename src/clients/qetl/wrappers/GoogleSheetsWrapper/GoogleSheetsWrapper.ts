@@ -4,18 +4,17 @@ import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/a
 import { getGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import { GoogleSheetDatasetProxy } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
+  CsvColumnTypes,
+  RelationCsvReader,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { GoogleSheetDatasetFetch } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
-
-type GoogleSheetParquetRelation = { parquetBlob: Blob };
 
 /**
  * Dependencies the Sheets wrapper closes over so it never imports a client
@@ -29,14 +28,17 @@ export type GoogleSheetsWrapperOptions = {
    * lease so acquisition does not race the outer query. `datasetId` is the
    * bare table the lease already covers.
    */
-  readCsv: (params: {
-    datasetId: Dataset.Id;
-    csvText: string;
-  }) => Promise<GoogleSheetParquetRelation>;
+  readCsv: RelationCsvReader;
 
   /** Injected transport; omitted in production, where `fetch` is used. */
   datasetFetch?: GoogleSheetDatasetFetch;
 };
+
+/**
+ * A sheet declares no column types, so DuckDB infers them from the values,
+ * the same way the import did.
+ */
+const COLUMN_TYPES: CsvColumnTypes = "inferred";
 
 const CAPABILITIES = {
   /**
@@ -95,7 +97,11 @@ async function _acquireGoogleSheet(
   const acquired = await acquireGoogleSheetRelation({
     datasetId: ref.id,
     readCsv: async ({ csvText }) => {
-      return await wrapperOptions.readCsv({ datasetId: ref.id, csvText });
+      return await wrapperOptions.readCsv({
+        datasetId: ref.id,
+        csvText,
+        columnTypes: COLUMN_TYPES,
+      });
     },
     datasetFetch: wrapperOptions.datasetFetch,
   });

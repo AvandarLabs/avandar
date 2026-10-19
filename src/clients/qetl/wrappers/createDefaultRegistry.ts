@@ -15,12 +15,11 @@ import type { RelationCapabilities } from "$/models/relations/RelationCapabiliti
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
+  RelationCsvReader,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
-import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
-import type { PostgresTableWrapperOptions } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
@@ -59,11 +58,11 @@ export type DefaultRegistryOptions = {
    */
   getRawSql?: (ref: DatasetRef) => Promise<string>;
 
-  /** Reads one Sheets tab under the caller's DuckDB lease. */
-  readGoogleSheetTabCsv?: GoogleSheetsWrapperOptions["readCsv"];
-
-  /** Reads one Postgres relation's CSV under the caller's DuckDB lease. */
-  readPostgresTableCsv?: PostgresTableWrapperOptions["readCsv"];
+  /**
+   * Reads a live source's acquired CSV under the caller's DuckDB lease, typing
+   * its columns the way the wrapper that acquired it says.
+   */
+  readRelationCsv?: RelationCsvReader;
 
   /** Fetches one API-backed catalog resource through the open-data proxy. */
   fetchApiOpenDataResource?: (
@@ -236,10 +235,10 @@ export function createDefaultRegistry(
         getRawSql: options.getRawSql,
       }),
       googleSheets: createGoogleSheetsWrapper({
-        readCsv: options.readGoogleSheetTabCsv,
+        readCsv: options.readRelationCsv,
       }),
       postgres: createPostgresTableWrapper({
-        readCsv: options.readPostgresTableCsv,
+        readCsv: options.readRelationCsv,
       }),
     }),
     createConceptWrapper(),

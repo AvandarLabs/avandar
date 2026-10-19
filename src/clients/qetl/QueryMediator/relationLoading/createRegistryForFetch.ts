@@ -1,8 +1,9 @@
 import { makeIdLookupRecord, makeObject, prop } from "@avandar/utils";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { readPostgresTableCsvAsText } from "@/clients/qetl/QueryMediator/relationLoading/readPostgresTableCsvAsText/readPostgresTableCsvAsText";
+import { readRelationCsv } from "@/clients/qetl/QueryMediator/relationLoading/readRelationCsv/readRelationCsv";
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { RelationCsvReader } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   QetlRunQuery,
@@ -36,34 +37,8 @@ function _lookupsForFetch(relationSources: readonly RelationSource[]) {
 
 function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
   return {
-    readGoogleSheetTabCsv: async ({
-      datasetId,
-      csvText,
-    }: {
-      datasetId: Dataset.Id;
-      csvText: string;
-    }) => {
-      // The same reader the import path uses, so a dataset's columns are typed
-      // the same whether the rows arrived at import or at query time.
-      const loaded = await DuckDbClient.loadCsv({
-        tableName: datasetId,
-        fileText: csvText,
-        datasetDuckDbLease,
-      });
-      return { parquetBlob: loaded.parquetData };
-    },
-    readPostgresTableCsv: async ({
-      datasetId,
-      csvText,
-    }: {
-      datasetId: Dataset.Id;
-      csvText: string;
-    }) => {
-      return await readPostgresTableCsvAsText({
-        datasetId,
-        csvText,
-        datasetDuckDbLease,
-      });
+    readRelationCsv: async (params: Parameters<RelationCsvReader>[0]) => {
+      return await readRelationCsv({ ...params, datasetDuckDbLease });
     },
     transcodeCsvToParquet: async ({
       datasetId,

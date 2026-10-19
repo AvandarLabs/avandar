@@ -2,7 +2,7 @@ import { MIMEType } from "@avandar/utils";
 import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { uuid } from "$/lib/uuid";
 import { APIClient } from "@/clients/APIClient";
-import { getDuckDbTypeFromPostgresDataType } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable/getDuckDbTypeFromPostgresDataType/getDuckDbTypeFromPostgresDataType";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import type { DatabaseConnection } from "$/models/connections/DatabaseConnection/DatabaseConnection";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
@@ -57,9 +57,9 @@ export async function previewPostgresRelation(
       tableName,
       numRejectedRows: 0,
       errors: { rejectedScans: [], rejectedRows: [] },
-      // Not a real sniff: Postgres's column types come from
-      // `information_schema` (`result.columns` below), not from DuckDB
-      // auto-detection.
+      // Not a real sniff: the connector reads each column's type from the
+      // table's own schema (`result.columns` below), so DuckDB never guesses
+      // it.
       csvSniff: {
         Delimiter: ",",
         Quote: '"',
@@ -71,7 +71,7 @@ export async function previewPostgresRelation(
         Columns: result.columns.map((column) => {
           return {
             name: column.columnName,
-            type: getDuckDbTypeFromPostgresDataType(column.sourceType),
+            type: DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType),
           };
         }),
         DateFormat: null,
@@ -86,9 +86,11 @@ export async function previewPostgresRelation(
       columns: result.columns.map((column) => {
         return {
           column_name: column.columnName,
-          // The DuckDB type mapped from the column's declared Postgres type,
-          // which relation loading casts the column's text to at query time.
-          column_type: getDuckDbTypeFromPostgresDataType(column.sourceType),
+          // The type the connector read from the table's schema, which
+          // relation loading casts the column's text to at query time.
+          column_type: DuckDbDataTypeUtils.fromDatasetColumnType(
+            column.dataType,
+          ),
           default: undefined,
           extra: null,
           key: null,

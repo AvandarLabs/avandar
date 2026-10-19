@@ -9,9 +9,9 @@ import {
 import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
+import { getColumnReplacementsFromColumns } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { Logger } from "@/utils/Logger";
@@ -29,7 +29,6 @@ import type {
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   AcquiredRelationBytes,
-  ColumnReplacement,
   NeededColumnsByDatasetId,
   QetlRunQuery,
   RelationSource,
@@ -94,28 +93,6 @@ function _isColumnInLoadedRelation(
     loadedColumns.includes(column.originalName) ||
     loadedColumns.includes(column.name)
   );
-}
-
-function _getColumnReplacements(
-  columns: readonly DatasetColumn.T[],
-): ColumnReplacement[] {
-  return columns
-    .map((column) => {
-      const hasChangedName = column.name !== column.originalName;
-      const hasChangedDataType =
-        column.dataType !==
-        DuckDbDataTypeUtils.toAvaDataType(column.detectedDataType);
-      return hasChangedName || hasChangedDataType
-        ? {
-            originalName: column.originalName,
-            alias: hasChangedName ? column.name : undefined,
-            dataType: hasChangedDataType
-              ? DuckDbDataTypeUtils.fromDatasetColumnType(column.dataType)
-              : undefined,
-          }
-        : undefined;
-    })
-    .filter(isDefined);
 }
 
 /**
@@ -413,7 +390,7 @@ async function _loadRelationBytes(
       blob: relation.parquetBlob,
       datasetDuckDbLease: options.datasetDuckDbLease,
       columnReplacements: makeIdLookupRecord(
-        _getColumnReplacements(
+        getColumnReplacementsFromColumns(
           (columnsByDatasetId[relation.datasetId] ?? []).filter((column) => {
             return _isColumnInLoadedRelation(relation.columns, column);
           }),

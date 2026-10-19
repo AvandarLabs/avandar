@@ -1,6 +1,10 @@
-import { ConnectorError } from "@sbfn/connectors/Connector.ts";
+import {
+  ConnectorError,
+  type ConnectorPreviewColumn,
+  type ConnectorRelation,
+} from "@sbfn/connectors/Connector.ts";
+import { getAvaDataTypeFromPostgresDataType } from "$/connectors/postgres/getAvaDataTypeFromPostgresDataType/getAvaDataTypeFromPostgresDataType.ts";
 import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId.ts";
-import type { ConnectorRelation } from "@sbfn/connectors/Connector.ts";
 import type { PostgresQueryRunner } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 function _makeRelationFromCatalogRow(row: {
@@ -78,6 +82,26 @@ async function _assertRelationStillExists(
   return row.table_type === "VIEW" ? "view" : "table";
 }
 
+async function _readColumnTypes(
+  sql: PostgresQueryRunner,
+  schemaName: string,
+  tableName: string,
+): Promise<ConnectorPreviewColumn[]> {
+  const columns = await sql<{ column_name: string; data_type: string }>`
+    select column_name, data_type
+    from information_schema.columns
+    where table_schema = ${schemaName} and table_name = ${tableName}
+    order by ordinal_position
+  `;
+  return columns.map((column) => {
+    return {
+      columnName: column.column_name,
+      sourceType: column.data_type,
+      dataType: getAvaDataTypeFromPostgresDataType(column.data_type),
+    };
+  });
+}
+
 /**
  * Parses a relation id built by {@link PostgresRelationId.makeRelationId},
  * throwing a classified `ConnectorError` rather than returning `undefined` -
@@ -102,5 +126,14 @@ function _parseRelationId(relationId: string): {
 export const PostgresCatalog = {
   listCatalogRelations: _listCatalogRelations,
   assertRelationStillExists: _assertRelationStillExists,
+
+  /**
+   * Reads a relation's columns, in table order, with the type each is
+   * queried as, from the type its table declares in `information_schema`.
+   * This is how the Postgres connector extracts column types: from the
+   * schema, so nothing has to guess them from the values.
+   */
+  readColumnTypes: _readColumnTypes,
+
   parseRelationId: _parseRelationId,
 };

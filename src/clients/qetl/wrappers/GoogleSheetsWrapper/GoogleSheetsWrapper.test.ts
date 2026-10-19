@@ -95,6 +95,8 @@ describe("GoogleSheetsWrapper", () => {
     expect(readCsv).toHaveBeenCalledWith({
       datasetId: DATASET_REF.id,
       csvText: "city\r\ntab-77\r\n",
+      // A sheet declares no column types, so they are inferred.
+      columnTypes: "inferred",
     });
     expect(acquired).toMatchObject({
       ref: DATASET_REF,

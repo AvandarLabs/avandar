@@ -50,8 +50,8 @@ const SEEDED_RELATION = {
 };
 
 const PREVIEW_COLUMNS = [
-  { columnName: "id", sourceType: "integer" },
-  { columnName: "full_name", sourceType: "text" },
+  { columnName: "id", sourceType: "integer", dataType: "bigint" },
+  { columnName: "full_name", sourceType: "text", dataType: "varchar" },
 ];
 
 const PREVIEW_ROWS = [

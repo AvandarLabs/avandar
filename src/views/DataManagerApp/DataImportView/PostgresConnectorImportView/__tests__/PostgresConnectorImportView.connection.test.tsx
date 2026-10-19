@@ -35,7 +35,9 @@ describe("PostgresConnectorImportView - connecting and importing", () => {
       ],
     });
     apiGetMock.mockResolvedValue({
-      columns: [{ columnName: "id", sourceType: "integer" }],
+      columns: [
+        { columnName: "id", sourceType: "integer", dataType: "bigint" },
+      ],
       previewRows: [{ id: 1 }],
     });
 

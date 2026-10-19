@@ -110,27 +110,18 @@ async function _previewRelationRows(
     schemaName,
     tableName,
   );
-  const columns = await transaction<{
-    column_name: string;
-    data_type: string;
-  }>`
-    select column_name, data_type
-    from information_schema.columns
-    where table_schema = ${schemaName} and table_name = ${tableName}
-    order by ordinal_position
-  `;
+  const columns = await PostgresCatalog.readColumnTypes(
+    transaction,
+    schemaName,
+    tableName,
+  );
   // The schema and table are quoted as two separate identifiers (see
   // `quotePostgresRelationName.ts`), so a dot inside either name stays part
   // of that name.
   const previewRows = await transaction<Record<string, unknown>>`
     select * from ${quotePostgresRelationName({ sql: transaction, schemaName, tableName })} limit ${MAX_PREVIEW_ROWS}
   `;
-  return {
-    columns: columns.map((column) => {
-      return { columnName: column.column_name, sourceType: column.data_type };
-    }),
-    previewRows,
-  };
+  return { columns, previewRows };
 }
 
 /** Previews one relation on a saved connection. */

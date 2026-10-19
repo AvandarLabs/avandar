@@ -5,18 +5,25 @@ import {
 } from "$/connectors/postgres/PostgresCsvEstimate/PostgresCsvEstimate";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import { acquirePostgresTableRelation } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
+  CsvColumnTypes,
+  RelationCsvReader,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { PostgresRowsFetch } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
-type PostgresTableParquetRelation = { parquetBlob: Blob };
+/**
+ * A Postgres table declares every column's type, which the `connectors` edge
+ * function reads from `information_schema` when the dataset is imported. The
+ * dataset stores those types, so acquired rows are read as text and cast to
+ * them rather than guessed from the values.
+ */
+const COLUMN_TYPES: CsvColumnTypes = "source-schema";
 
 /**
  * Dependencies the Postgres wrapper closes over so it never imports a client
@@ -32,10 +39,7 @@ export type PostgresTableWrapperOptions = {
    * Reads one relation's CSV and returns Parquet. Bound to the caller's
    * DuckDB lease so acquisition does not race the outer query.
    */
-  readCsv: (params: {
-    datasetId: Dataset.Id;
-    csvText: string;
-  }) => Promise<PostgresTableParquetRelation>;
+  readCsv: RelationCsvReader;
 
   /**
    * Injected transport for `acquirePostgresTableRelation`'s `rows` fetch;
@@ -103,7 +107,11 @@ async function _acquirePostgresTable(
   const acquired = await acquirePostgresTableRelation({
     datasetId: ref.id,
     readCsv: async ({ csvText }) => {
-      return await wrapperOptions.readCsv({ datasetId: ref.id, csvText });
+      return await wrapperOptions.readCsv({
+        datasetId: ref.id,
+        csvText,
+        columnTypes: COLUMN_TYPES,
+      });
     },
     rowsFetch: wrapperOptions.rowsFetch,
   });
