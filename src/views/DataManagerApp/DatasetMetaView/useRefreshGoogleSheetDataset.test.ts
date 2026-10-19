@@ -107,9 +107,8 @@ function _makeWrapper(
 }
 
 async function _refresh(
-  options: Readonly<{ queryClient?: QueryClient }> = {},
+  queryClient: QueryClient = _makeQueryClient(),
 ): Promise<void> {
-  const { queryClient = _makeQueryClient() } = options;
   const { result } = renderHook(
     () => {
       return useRefreshGoogleSheetDataset();
@@ -231,7 +230,7 @@ describe("useRefreshGoogleSheetDataset", () => {
       };
     });
 
-    await _refresh({ queryClient });
+    await _refresh(queryClient);
 
     expect(notifyErrorMock).not.toHaveBeenCalled();
     expect(queryClient.getQueryState(previewQueryKey)?.isInvalidated).toBe(

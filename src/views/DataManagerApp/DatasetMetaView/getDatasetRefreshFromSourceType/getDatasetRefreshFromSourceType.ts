@@ -9,18 +9,20 @@ export type DatasetRefresh = "google_sheets" | "postgres_table";
  * live source, whose rows can change without anyone re-importing it, must
  * offer one: its cached rows only go stale after
  * `GlobalAppConfig.timing.liveRelationMaxAgeMs`, and this is the escape hatch
- * for a user who has just edited the source. The match is exhaustive, so a
- * new source type has to decide.
+ * for a user who has just edited the source.
  */
 export function getDatasetRefreshFromSourceType(
   sourceType: DatasetSource.SourceType,
 ): DatasetRefresh | undefined {
-  return match(sourceType)
-    .with("google_sheets", "postgres_table", (liveSourceType) => {
-      return liveSourceType;
-    })
-    .with("csv_file", "xlsx_file", "pdf_file", "open_data", "virtual", () => {
-      return undefined;
-    })
-    .exhaustive();
+  return (
+    match(sourceType)
+      .with("google_sheets", "postgres_table", (liveSourceType) => {
+        return liveSourceType;
+      })
+      .with("csv_file", "xlsx_file", "pdf_file", "open_data", "virtual", () => {
+        return undefined;
+      })
+      // Exhaustive, so a new source type has to decide.
+      .exhaustive()
+  );
 }

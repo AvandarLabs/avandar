@@ -2,22 +2,22 @@ import { useMutation } from "@avandar/query-hooks";
 import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
-import { uuid } from "$/lib/uuid";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import {
   getGoogleSheetTabCsvExport,
   getGoogleSheetTabs,
-} from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
+} from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient";
+import { uuid } from "$/lib/uuid";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
 import { notifyError } from "@/utils/notifications/notify";
 import { getGoogleSheetImportErrorCopy } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy";
+import type { GoogleSheetTab } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserId } from "$/models/User/User.types";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { GoogleSheetTab } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type { GPickerDocumentObject } from "@/lib/types/google-picker";
 import type {

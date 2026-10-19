@@ -9,7 +9,7 @@ import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTabl
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { PostgresRowsFetch } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 import type { ILogger } from "@avandar/logger";
 
 const DATASET_REF = {
@@ -62,7 +62,7 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
 });
 
 /** A fetch stub returning CSV text with the real route's content type. */
-function _csvFetch(csvText: string): PostgresRowsFetch {
+function _csvFetch(csvText: string): EdgeFunctionFetch {
   return async () => {
     return new Response(csvText, {
       status: 200,
@@ -72,7 +72,7 @@ function _csvFetch(csvText: string): PostgresRowsFetch {
 }
 
 /** A fetch stub returning the edge function's `{error}` JSON shape. */
-function _errorFetch(code: string, message: string): PostgresRowsFetch {
+function _errorFetch(code: string, message: string): EdgeFunctionFetch {
   return async () => {
     return new Response(JSON.stringify({ error: { code, message } }), {
       status: 200,

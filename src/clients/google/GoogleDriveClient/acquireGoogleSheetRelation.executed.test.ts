@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 import type { GoogleSheetTabCsvReader } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
-import type { GoogleSheetDatasetFetch } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 
 /**
  * Acquisition read against a real reader rather than against a spy.
@@ -19,31 +19,17 @@ import type { GoogleSheetDatasetFetch } from "@/clients/google/GoogleSheetDatase
  */
 
 const DATASET_ID = "11111111-1111-4111-8111-111111111111" as Dataset.Id;
-const KENYA_TAB_CSV = "city,population\r\nNairobi,4400000\r\n";
 
-vi.mock("$/db/supabase/AvaSupabase", () => {
-  return {
-    AvaSupabase: {
-      db: () => {
-        return {
-          auth: {
-            getSession: async () => {
-              return { data: { session: { access_token: "session-token" } } };
-            },
-          },
-        };
-      },
-      getEdgeFunctionsURL: () => {
-        return "https://edge.test/functions/v1";
-      },
-    },
-  };
+vi.mock("$/db/supabase/AvaSupabase", async () => {
+  return (
+    await import("@/test-utils/createAvaSupabaseSessionMock")
+  ).createAvaSupabaseSessionMock();
 });
 
 /** Answers the dataset's CSV route with the Kenya tab at `version`. */
-function _makeDatasetFetch(version: string): GoogleSheetDatasetFetch {
+function _makeDatasetFetch(version: string): EdgeFunctionFetch {
   return async () => {
-    return new Response(KENYA_TAB_CSV, {
+    return new Response("city,population\r\nNairobi,4400000\r\n", {
       status: 200,
       headers: { "Content-Type": "text/csv", "X-Ava-Source-Version": version },
     });

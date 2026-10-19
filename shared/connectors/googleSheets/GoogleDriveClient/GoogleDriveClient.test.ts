@@ -530,11 +530,9 @@ describe("getStoredGoogleSheetTabCsv", () => {
   const FIRST_TAB_CSV = "city,population\nBogota,7900000\n";
   const SECOND_TAB_CSV = "county,residents\nNairobi,4400000\n";
 
-  /**
-   * Answers the tab list, the version read and the tab export. The two tabs
-   * return different CSV, so an assertion about one cannot pass while the
-   * other was downloaded.
-   */
+  // Answers the tab list, the version read and the tab export. The two tabs
+  // return different CSV, so an assertion about one cannot pass while the
+  // other was downloaded.
   const driveFetch: GoogleDriveFetch = async (url) => {
     if (url.includes("sheets.googleapis.com")) {
       return new Response(

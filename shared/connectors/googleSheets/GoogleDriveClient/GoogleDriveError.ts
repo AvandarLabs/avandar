@@ -1,11 +1,16 @@
-/** Machine-readable reason a Google Drive call failed. */
-export type GoogleDriveErrorCode =
+import { valEq } from "@avandar/utils";
+
+/**
+ * Every machine-readable reason a Google Drive call can fail, written once so
+ * the code type and its runtime check cannot drift apart.
+ */
+const GOOGLE_DRIVE_ERROR_CODES = [
   /**
    * The Drive API is not enabled on the Cloud project behind the OAuth client.
    * A deployment error that arrives dressed as a permission error, which is why
    * it gets its own code instead of joining `file-not-accessible`.
    */
-  | "drive-api-not-configured"
+  "drive-api-not-configured",
 
   /**
    * Drive refused to export because the rendered workbook exceeds its export
@@ -15,7 +20,7 @@ export type GoogleDriveErrorCode =
    * of the `.xlsx` Drive produces, and `files.get` reports no `size` for a
    * Google Workspace file. The refusal is the only signal.
    */
-  | "export-too-large"
+  "export-too-large",
 
   /**
    * Drive will not open the file. Under the per-file `drive.file` scope this
@@ -25,7 +30,7 @@ export type GoogleDriveErrorCode =
    * forbidden, so Drive answers "not found" either way. Inventing a distinction
    * here would be inventing information.
    */
-  | "file-not-accessible"
+  "file-not-accessible",
 
   /**
    * The workbook no longer has the tab a dataset points at.
@@ -35,10 +40,10 @@ export type GoogleDriveErrorCode =
    * renameable, so this is what a rename looks like from here. Storing each
    * tab's `gid` at import would make renames stop mattering.
    */
-  | "sheet-not-found"
+  "sheet-not-found",
 
   /** The access token is expired or its grant was revoked. */
-  | "google-auth-expired"
+  "google-auth-expired",
 
   /**
    * The Google account that added a dataset's sheet can no longer read it on
@@ -47,13 +52,17 @@ export type GoogleDriveErrorCode =
    * can fix it, by reconnecting Google, which is why it is distinct from
    * `google-auth-expired`, the caller's own connection.
    */
-  | "owner-reconnect-required"
+  "owner-reconnect-required",
 
   /** Drive is throttling. Retryable. */
-  | "rate-limited"
+  "rate-limited",
 
   /** Anything not recognized above, kept distinct so it is never mistaken. */
-  | "unknown";
+  "unknown",
+] as const;
+
+/** Machine-readable reason a Google Drive call failed. */
+export type GoogleDriveErrorCode = (typeof GOOGLE_DRIVE_ERROR_CODES)[number];
 
 /** Builds the developer-facing message. Display copy belongs to the caller. */
 function _buildDriveErrorMessage(
@@ -107,5 +116,14 @@ export class GoogleDriveError extends Error {
     this.code = options.code;
     this.status = options.status;
     this.reason = options.reason;
+  }
+
+  /**
+   * Whether `value` is one of the codes a `GoogleDriveError` carries, for a
+   * code that arrived over the wire, such as in an edge function's error
+   * body.
+   */
+  static isCode(value: unknown): value is GoogleDriveErrorCode {
+    return GOOGLE_DRIVE_ERROR_CODES.some(valEq(value));
   }
 }

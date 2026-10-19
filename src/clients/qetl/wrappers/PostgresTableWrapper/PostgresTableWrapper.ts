@@ -9,28 +9,19 @@ import type { RelationCapabilities } from "$/models/relations/RelationCapabiliti
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
-  CsvColumnTypes,
   RelationCsvReader,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
-import type { PostgresRowsFetch } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
 /**
- * A Postgres table declares every column's type, which the `connectors` edge
- * function reads from `information_schema` when the dataset is imported. The
- * dataset stores those types, so acquired rows are read as text and cast to
- * them rather than guessed from the values.
- */
-const COLUMN_TYPES: CsvColumnTypes = "source-schema";
-
-/**
  * Dependencies the Postgres wrapper closes over so it never imports a client
  * singleton, mirroring `GoogleSheetsWrapperOptions`. No access-token option:
- * unlike Sheets' third-party OAuth token, the edge function call carries the
- * caller's own Supabase session (attached in `acquirePostgresTableRelation.ts`
- * itself), and the connection credential never leaves the server. No
+ * the edge function call carries the caller's own Supabase session
+ * (attached by `fetchEdgeFunctionRoute`), and the connection
+ * credential never leaves the server. No
  * source-record option either: the edge function reads which connection and
  * table a dataset names from the dataset itself.
  */
@@ -45,7 +36,7 @@ export type PostgresTableWrapperOptions = {
    * Injected transport for `acquirePostgresTableRelation`'s `rows` fetch;
    * omitted in production, where `fetch` is used.
    */
-  rowsFetch?: PostgresRowsFetch;
+  rowsFetch?: EdgeFunctionFetch;
 };
 
 /**
@@ -110,7 +101,11 @@ async function _acquirePostgresTable(
       return await wrapperOptions.readCsv({
         datasetId: ref.id,
         csvText,
-        columnTypes: COLUMN_TYPES,
+        // A Postgres table declares every column's type, which the
+        // `connectors` edge function reads from `information_schema` at
+        // import. The dataset stores those types, so the rows are read as
+        // text and cast to them rather than guessed from the values.
+        columnTypes: "source-schema",
       });
     },
     rowsFetch: wrapperOptions.rowsFetch,

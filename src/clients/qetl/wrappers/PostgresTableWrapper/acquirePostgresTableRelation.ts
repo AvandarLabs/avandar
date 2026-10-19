@@ -1,18 +1,18 @@
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { fetchEdgeFunctionRoute } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 
 /**
  * Reads one Postgres relation's rows into a relation.
  *
  * Injected rather than imported so this module stays free of DuckDB,
  * mirroring `acquireGoogleSheetRelation`
- * (`src/clients/google/GoogleDriveClient/`). Unlike Sheets, there is no
- * separate access token to thread through: the
- * edge function call carries the caller's own Supabase session, and the
- * edge function itself resolves the connection's decrypted password from
- * Vault server-side - this module never sees a credential, and neither does
- * anyone the dataset is shared with.
+ * (`src/clients/google/GoogleDriveClient/`). There is no access token to
+ * thread through: the edge function call carries the caller's own Supabase
+ * session, and the edge function itself resolves the connection's decrypted
+ * password from Vault server-side - this module never sees a credential,
+ * and neither does anyone the dataset is shared with.
  */
 export type PostgresRelationCsvReader<TRelation> = (
   params: Readonly<{ csvText: string }>,
@@ -27,22 +27,11 @@ export type AcquiredPostgresTableRelation<TRelation> = {
   sourceVersion: SourceVersion | undefined;
 };
 
-/**
- * Injectable in place of the real `fetch`, for tests. The minimal call
- * signature this module actually uses, not `typeof fetch` itself (whose
- * static `preconnect` member a plain stub function does not have to
- * implement).
- */
-export type PostgresRowsFetch = (
-  url: string,
-  init?: RequestInit,
-) => Promise<Response>;
-
 /** Input to {@link acquirePostgresTableRelation}. */
 export type AcquirePostgresTableRelationParams<TRelation> = {
   datasetId: Dataset.Id;
   readCsv: PostgresRelationCsvReader<TRelation>;
-  rowsFetch?: PostgresRowsFetch;
+  rowsFetch?: EdgeFunctionFetch;
 };
 
 /**
@@ -66,9 +55,9 @@ export type AcquirePostgresTableRelationParams<TRelation> = {
  * dataset, so it is reported as `forbidden` instead.
  */
 async function _throwForFailedRowsResponse(
-  response: Response,
-  datasetId: Dataset.Id,
+  options: Readonly<{ response: Response; datasetId: Dataset.Id }>,
 ): Promise<never> {
+  const { response, datasetId } = options;
   const contentType = response.headers.get("Content-Type") ?? "";
   const body: unknown = contentType.includes("application/json")
     ? await response.json()
@@ -108,14 +97,11 @@ async function _throwForFailedRowsResponse(
  * see the dataset can read it through the connection it was imported with.
  *
  * This route returns raw CSV text (`Content-Type: text/csv`), not a JSON
- * object, so it is fetched directly rather than through
+ * object, so it is fetched through `fetchEdgeFunctionRoute` rather than
  * `APIClient`/`supabase.functions.invoke`: that call's own content-type
  * parsing would resolve the body to a plain string before this function
  * ever saw it, and the route's declared type can only be `Response`
- * (`ConnectorRoutes.types.ts`'s comment explains why). This mirrors
- * `fetchOpenDataCatalogResource.ts`, the one other raw-bytes route in this
- * codebase, including its auth pattern (a manually attached session Bearer
- * token).
+ * (`ConnectorRoutes.types.ts`'s comment explains why).
  *
  * @param params The dataset to acquire, and the reader to read the CSV
  *   through.
@@ -125,24 +111,17 @@ async function _throwForFailedRowsResponse(
 export async function acquirePostgresTableRelation<TRelation>(
   params: Readonly<AcquirePostgresTableRelationParams<TRelation>>,
 ): Promise<AcquiredPostgresTableRelation<TRelation>> {
-  const doFetch = params.rowsFetch ?? fetch;
-
-  const { data } = await AvaSupabase.db().auth.getSession();
-  const accessToken = data.session?.access_token;
-  if (accessToken === undefined) {
-    throw new Error("No session is available to acquire a Postgres relation");
-  }
-
-  const url =
-    `${AvaSupabase.getEdgeFunctionsURL()}/connectors/postgres/datasets/` +
-    `${encodeURIComponent(params.datasetId)}/rows`;
-  const response = await doFetch(url, {
-    headers: { Authorization: `Bearer ${accessToken}` },
+  const response = await fetchEdgeFunctionRoute({
+    path: `connectors/postgres/datasets/${encodeURIComponent(params.datasetId)}/rows`,
+    fetch: params.rowsFetch,
   });
 
   const contentType = response.headers.get("Content-Type") ?? "";
   if (!response.ok || !contentType.includes("text/csv")) {
-    await _throwForFailedRowsResponse(response, params.datasetId);
+    await _throwForFailedRowsResponse({
+      response,
+      datasetId: params.datasetId,
+    });
   }
 
   const csvText = await response.text();

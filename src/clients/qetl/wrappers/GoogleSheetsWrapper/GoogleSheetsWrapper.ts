@@ -8,11 +8,10 @@ import type { RelationCapabilities } from "$/models/relations/RelationCapabiliti
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
-  CsvColumnTypes,
   RelationCsvReader,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
-import type { GoogleSheetDatasetFetch } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
@@ -31,14 +30,8 @@ export type GoogleSheetsWrapperOptions = {
   readCsv: RelationCsvReader;
 
   /** Injected transport; omitted in production, where `fetch` is used. */
-  datasetFetch?: GoogleSheetDatasetFetch;
+  datasetFetch?: EdgeFunctionFetch;
 };
-
-/**
- * A sheet declares no column types, so DuckDB infers them from the values,
- * the same way the import did.
- */
-const COLUMN_TYPES: CsvColumnTypes = "inferred";
 
 const CAPABILITIES = {
   /**
@@ -100,7 +93,9 @@ async function _acquireGoogleSheet(
       return await wrapperOptions.readCsv({
         datasetId: ref.id,
         csvText,
-        columnTypes: COLUMN_TYPES,
+        // A sheet declares no column types, so DuckDB infers them from the
+        // values, the same way the import did.
+        columnTypes: "inferred",
       });
     },
     datasetFetch: wrapperOptions.datasetFetch,

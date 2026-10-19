@@ -19,7 +19,7 @@ import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppR
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu";
+import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView.module.css";
 import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/DatasetSourceRail";

@@ -9,7 +9,9 @@ import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsW
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 import type { ILogger } from "@avandar/logger";
+import type { Mock } from "vitest";
 
 const DATASET_REF = {
   kind: "dataset",
@@ -39,23 +41,10 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
-vi.mock("$/db/supabase/AvaSupabase", () => {
-  return {
-    AvaSupabase: {
-      db: () => {
-        return {
-          auth: {
-            getSession: async () => {
-              return { data: { session: { access_token: "session-token" } } };
-            },
-          },
-        };
-      },
-      getEdgeFunctionsURL: () => {
-        return "https://edge.test/functions/v1";
-      },
-    },
-  };
+vi.mock("$/db/supabase/AvaSupabase", async () => {
+  return (
+    await import("@/test-utils/createAvaSupabaseSessionMock")
+  ).createAvaSupabaseSessionMock();
 });
 
 const { apiGetMock } = vi.hoisted(() => {
@@ -67,8 +56,8 @@ vi.mock("@/clients/APIClient", () => {
 });
 
 /** Answers the dataset's CSV route with one tab at version `version`. */
-function _makeDatasetFetch(version: string) {
-  return vi.fn(async (_url: string, _init: RequestInit) => {
+function _makeDatasetFetch(version: string): Mock<EdgeFunctionFetch> {
+  return vi.fn<EdgeFunctionFetch>(async () => {
     return new Response("city\r\ntab-77\r\n", {
       status: 200,
       headers: { "Content-Type": "text/csv", "X-Ava-Source-Version": version },
@@ -135,7 +124,7 @@ describe("GoogleSheetsWrapper", () => {
   });
 
   it("reads freshness from the dataset's version route", async () => {
-    const datasetFetch = vi.fn(async (_url: string, _init: RequestInit) => {
+    const datasetFetch = vi.fn<EdgeFunctionFetch>(async () => {
       return Response.json({ sourceVersion: "9" });
     });
     const wrapper = createGoogleSheetsWrapper({ datasetFetch });

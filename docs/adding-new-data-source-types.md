@@ -206,7 +206,8 @@ the main touch points today; re-run the ripgrep commands in §1 to catch strays.
 | File / area                                             | Why                                                                                                   |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `tests/e2e/*import*.spec.ts`                            | Add or extend flows for new import path.                                                              |
-| `src/clients/qetl/wrappers/__tests__/datasetSourceTypeContract.test.ts` | Add the source type's contract entry. It then checks staleness, refresh, column types and credential reuse the same way as every other live source. |
+| `src/clients/qetl/wrappers/datasetSourceTypeContract.test.ts` | Add the source type's contract entry. It then checks staleness, column types and credential reuse the same way as every other live source. |
+| `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/getDatasetRefreshFromSourceType.test.ts` | Add the manual refresh the source type offers, if it is live. |
 | `src/clients/dashboards/DashboardClient/__tests__/DashboardClient.publishSnapshotSources.test.ts` | Add where a whole-dataset slice of the source type publishes from. |
 | `tests/e2e/` | The e2e specs `docs/qetl-architecture.md` section 10.3 requires of every connector: import, a dashboard widget, publishing, refresh, a non-importer reading it, and non-text column types. |
 | `src/views/DataManagerApp/DataImportView/**/**.test.ts` | Unit tests for hooks/forms (`useSaveDataset`, `useImportedColumns`, `useLoadManualUploadFile`, etc.). |

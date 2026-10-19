@@ -24,7 +24,7 @@ async function _readStoredColumnsAsText(
   const columnsInTableOrder = sortObjList(storedColumns, {
     sortBy: prop("columnIdx"),
   });
-  const loaded = await DuckDbClient.loadCsv({
+  const loadedCsv = await DuckDbClient.loadCsv({
     tableName: options.datasetId,
     fileText: options.csvText,
     datasetDuckDbLease: options.datasetDuckDbLease,
@@ -32,19 +32,19 @@ async function _readStoredColumnsAsText(
       return [column.originalName, "VARCHAR"] as const;
     }),
   });
-  return { parquetBlob: loaded.parquetData };
+  return { parquetBlob: loadedCsv.parquetData };
 }
 
 /** Loads the CSV with DuckDB inferring each column's type from its values. */
 async function _readInferringTypes(
   options: Readonly<ReadRelationCsvOptions>,
 ): Promise<{ parquetBlob: Blob }> {
-  const loaded = await DuckDbClient.loadCsv({
+  const loadedCsv = await DuckDbClient.loadCsv({
     tableName: options.datasetId,
     fileText: options.csvText,
     datasetDuckDbLease: options.datasetDuckDbLease,
   });
-  return { parquetBlob: loaded.parquetData };
+  return { parquetBlob: loadedCsv.parquetData };
 }
 
 /**

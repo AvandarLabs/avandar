@@ -1,7 +1,7 @@
 import { GoogleSheetDatasetProxy } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
-import type { GoogleSheetDatasetFetch } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 
 /**
  * Reads one tab's CSV into a relation.
@@ -38,7 +38,7 @@ export async function acquireGoogleSheetRelation<TRelation>(
   params: Readonly<{
     datasetId: Dataset.Id;
     readCsv: GoogleSheetTabCsvReader<TRelation>;
-    datasetFetch?: GoogleSheetDatasetFetch;
+    datasetFetch?: EdgeFunctionFetch;
   }>,
 ): Promise<AcquiredGoogleSheetRelation<TRelation>> {
   const { csvText, sourceVersion } = await GoogleSheetDatasetProxy.fetchCsv({

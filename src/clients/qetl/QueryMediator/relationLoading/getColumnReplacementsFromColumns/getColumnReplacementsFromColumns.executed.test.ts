@@ -1,13 +1,17 @@
 import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { Model } from "@avandar/models";
 import { makeIdLookupRecord } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { getParquetProjectionClauses } from "@/clients/DuckDbClient/duckDbSqlText";
 import { getColumnReplacementsFromColumns } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * A Postgres table's rows exactly as the `connectors` edge function writes
@@ -26,13 +30,20 @@ function _makeStoredColumn(
   originalName: string,
   dataType: AvaDataType.T,
 ): DatasetColumn.T {
-  // Only the fields the replacements read; the rest are database metadata.
-  return {
-    originalName,
+  return Model.make("DatasetColumn", {
+    id: uuid<DatasetColumn.Id>(),
+    datasetId: "33333333-3333-4333-8333-333333333333" as Dataset.Id,
+    workspaceId: "22222222-2222-4222-8222-222222222222" as Workspace.Id,
+    createdAt: "2026-10-19T00:00:00.000Z",
+    updatedAt: "2026-10-19T00:00:00.000Z",
     name: originalName,
+    originalName,
+    originalDataType: dataType,
     detectedDataType: "VARCHAR",
     dataType,
-  } as DatasetColumn.T;
+    description: undefined,
+    columnIdx: 0,
+  });
 }
 
 const STORED_COLUMNS = [
@@ -68,10 +79,12 @@ async function _loadAsSourceSchemaRelation(): Promise<{
   const projection = `SELECT * ${excludeClause}${replaceClause} FROM read_csv('${stagedFile}', header = true, columns = {${textColumns}})`;
 
   return await withDuckDb(async (connection) => {
-    const described = await connection.runAndReadAll(`DESCRIBE ${projection}`);
+    const describeResult = await connection.runAndReadAll(
+      `DESCRIBE ${projection}`,
+    );
     const rows = await connection.runAndReadAll(projection);
     const columnTypes = Object.fromEntries(
-      described.getRowObjects().map((describedColumn) => {
+      describeResult.getRowObjects().map((describedColumn) => {
         return [
           String(describedColumn.column_name),
           String(describedColumn.column_type),
@@ -96,10 +109,22 @@ describe("getColumnReplacementsFromColumns", () => {
     });
   });
 
-  it("keeps a text column's leading zero, since nothing guesses it is a number", async () => {
+  it("casts each declared column's text to its value, leaving a text column's text as written", async () => {
     const { row } = await _loadAsSourceSchemaRelation();
 
-    expect(row.zip_code).toBe("02134");
-    expect(row.id).toBe(7n);
+    // DuckDB hands dates and timestamps back as value objects, so they are
+    // compared by the text they print as.
+    expect({
+      ...row,
+      signed_up_at: String(row.signed_up_at),
+      birthday: String(row.birthday),
+    }).toEqual({
+      id: 7n,
+      zip_code: "02134",
+      signed_up_at: "2024-03-04 05:06:07",
+      birthday: "1990-12-31",
+      score: 98.5,
+      is_active: true,
+    });
   });
 });

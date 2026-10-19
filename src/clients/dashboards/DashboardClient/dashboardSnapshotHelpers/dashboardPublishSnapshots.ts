@@ -121,24 +121,7 @@ async function _queryDatasetSnapshotBlob(
   });
 }
 
-async function _downloadStoredDatasetSnapshot(
-  options: Readonly<SnapshotDatasetOptions>,
-): Promise<Blob> {
-  return await DatasetParquetStorageClient.downloadDataset({
-    workspaceId: options.workspaceId,
-    datasetId: options.dataset.id,
-    throwIfNotFound: true,
-  });
-}
-
-/**
- * The parquet a dataset's snapshot is published from. A whole-dataset
- * (`all_columns`) slice of an uploaded file or an open dataset is copied
- * from the parquet already stored for it. Every other slice, and every slice
- * of a source acquired live at query time (a Google Sheet or a Postgres
- * table, which keep no parquet in Storage), is read through the workspace
- * query. The match is exhaustive, so a new source type has to choose.
- */
+/** The parquet a dataset's snapshot is published from. */
 async function _getSnapshotDatasetBlob(
   options: Readonly<SnapshotDatasetOptions>,
 ): Promise<Blob> {
@@ -149,11 +132,19 @@ async function _getSnapshotDatasetBlob(
       return _getVirtualDatasetSnapshotBlob(options);
     })
     .with("google_sheets", "postgres_table", () => {
+      // Acquired live at query time, so there is no parquet in Storage to
+      // copy: every slice is read through the workspace query.
       return _queryDatasetSnapshotBlob(options);
     })
     .with("csv_file", "xlsx_file", "pdf_file", () => {
+      // A whole-dataset slice is copied from the parquet already stored for
+      // the upload; any narrower slice is queried.
       return isWholeDataset
-        ? _downloadStoredDatasetSnapshot(options)
+        ? DatasetParquetStorageClient.downloadDataset({
+            workspaceId: options.workspaceId,
+            datasetId: dataset.id,
+            throwIfNotFound: true,
+          })
         : _queryDatasetSnapshotBlob(options);
     })
     .with("open_data", () => {
@@ -161,6 +152,7 @@ async function _getSnapshotDatasetBlob(
         ? _downloadOpenDataSnapshot(dataset)
         : _queryDatasetSnapshotBlob(options);
     })
+    // Exhaustive, so a new source type has to choose where its rows come from.
     .exhaustive();
 }
 

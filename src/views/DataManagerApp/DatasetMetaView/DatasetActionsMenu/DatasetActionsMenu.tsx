@@ -2,16 +2,14 @@ import { ActionIcon } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Menu, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { IconDotsVertical, IconRefresh, IconTrash } from "@tabler/icons-react";
+import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { POPOVER_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
-import { getDatasetRefreshFromSourceType } from "@/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/getDatasetRefreshFromSourceType";
-import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
-import { useRefreshPostgresTableDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset";
+import { DatasetRefreshMenuItem } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
@@ -34,11 +32,6 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
-  const [refreshGoogleSheetDataset, isRefreshPending] =
-    useRefreshGoogleSheetDataset();
-  const [refreshPostgresTableDataset, isPostgresRefreshPending] =
-    useRefreshPostgresTableDataset();
-  const datasetRefresh = getDatasetRefreshFromSourceType(dataset.sourceType);
 
   const onDelete = (): void => {
     modals.openConfirmModal({
@@ -83,35 +76,7 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        {/*
-          Google Sheets and Postgres tables are the source types whose rows
-          can change under the dataset without anyone re-importing it. Their
-          cached rows only go stale after a few minutes, so these are the
-          escape hatch for a user who has just edited the source and does not
-          want to wait for that window to close.
-        */}
-        {datasetRefresh === "google_sheets" ? (
-          <Menu.Item
-            leftSection={<IconRefresh size={16} />}
-            disabled={isRefreshPending}
-            onClick={() => {
-              refreshGoogleSheetDataset({ datasetId: dataset.id });
-            }}
-          >
-            <Trans>Refresh from Google Sheets</Trans>
-          </Menu.Item>
-        ) : null}
-        {datasetRefresh === "postgres_table" ? (
-          <Menu.Item
-            leftSection={<IconRefresh size={16} />}
-            disabled={isPostgresRefreshPending}
-            onClick={() => {
-              refreshPostgresTableDataset({ datasetId: dataset.id });
-            }}
-          >
-            <Trans>Refresh from the database</Trans>
-          </Menu.Item>
-        ) : null}
+        <DatasetRefreshMenuItem dataset={dataset} />
         <Menu.Item
           color="danger"
           leftSection={<IconTrash size={16} />}

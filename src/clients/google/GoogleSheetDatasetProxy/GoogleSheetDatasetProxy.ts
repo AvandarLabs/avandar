@@ -1,45 +1,16 @@
+import { isPlainObject } from "@avandar/utils";
 import { GoogleDriveError } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { fetchEdgeFunctionRoute } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 import type { AcquiredGoogleSheetTabCsv } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient.types";
-import type { GoogleDriveErrorCode } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
-
-/**
- * Injectable in place of the real `fetch`, for tests: the minimal call
- * signature this module uses rather than `typeof fetch`.
- */
-export type GoogleSheetDatasetFetch = (
-  url: string,
-  init: RequestInit,
-) => Promise<Response>;
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 
 /** One saved Sheets dataset to read, and the transport to read it with. */
 type DatasetReadOptions = {
   datasetId: Dataset.Id;
-  datasetFetch?: GoogleSheetDatasetFetch;
+  datasetFetch?: EdgeFunctionFetch;
 };
-
-/**
- * Every code the edge function may answer with. A `Record` rather than a
- * list, so a new `GoogleDriveErrorCode` fails to compile until it is added.
- */
-const KNOWN_ERROR_CODES: Record<GoogleDriveErrorCode, true> = {
-  "drive-api-not-configured": true,
-  "export-too-large": true,
-  "file-not-accessible": true,
-  "sheet-not-found": true,
-  "google-auth-expired": true,
-  "owner-reconnect-required": true,
-  "rate-limited": true,
-  unknown: true,
-};
-
-function _isGoogleDriveErrorCode(
-  value: unknown,
-): value is GoogleDriveErrorCode {
-  return typeof value === "string" && Object.hasOwn(KNOWN_ERROR_CODES, value);
-}
 
 /**
  * The error a failed route answered with: a `GoogleDriveError` when the edge
@@ -52,17 +23,12 @@ async function _getErrorFromResponse(response: Response): Promise<Error> {
     return undefined;
   })) as { error?: unknown } | undefined;
   const routeError = body?.error;
-  if (
-    typeof routeError === "object" &&
-    routeError !== null &&
-    "code" in routeError &&
-    _isGoogleDriveErrorCode(routeError.code)
-  ) {
-    const reason = "reason" in routeError ? routeError.reason : undefined;
+  if (isPlainObject(routeError) && GoogleDriveError.isCode(routeError.code)) {
     return new GoogleDriveError({
       code: routeError.code,
       status: response.status,
-      reason: typeof reason === "string" ? reason : undefined,
+      reason:
+        typeof routeError.reason === "string" ? routeError.reason : undefined,
     });
   }
   const detail =
@@ -79,16 +45,9 @@ async function _getErrorFromResponse(response: Response): Promise<Error> {
 async function _fetchDatasetRoute(
   options: Readonly<DatasetReadOptions & { route: "csv" | "version" }>,
 ): Promise<Response> {
-  const { data } = await AvaSupabase.db().auth.getSession();
-  const accessToken = data.session?.access_token;
-  if (accessToken === undefined) {
-    throw new Error("No session is available to read a Google Sheet");
-  }
-  const url =
-    `${AvaSupabase.getEdgeFunctionsURL()}/google-sheets/datasets/` +
-    `${encodeURIComponent(options.datasetId)}/${options.route}`;
-  const response = await (options.datasetFetch ?? fetch)(url, {
-    headers: { Authorization: `Bearer ${accessToken}` },
+  const response = await fetchEdgeFunctionRoute({
+    path: `google-sheets/datasets/${encodeURIComponent(options.datasetId)}/${options.route}`,
+    fetch: options.datasetFetch,
   });
   if (!response.ok) {
     throw await _getErrorFromResponse(response);

@@ -4,10 +4,8 @@ import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type {
-  PostgresRelationCsvReader,
-  PostgresRowsFetch,
-} from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
+import type { PostgresRelationCsvReader } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 
 /**
  * Acquisition read against a real reader rather than against a spy, mirroring
@@ -64,7 +62,7 @@ const _readCsvWithDuckDb: PostgresRelationCsvReader<Row[]> = async ({
 };
 
 /** A fetch stub returning CSV text with the real route's content type. */
-function _csvFetch(csvText: string): PostgresRowsFetch {
+function _csvFetch(csvText: string): EdgeFunctionFetch {
   return async () => {
     return new Response(csvText, {
       status: 200,
@@ -74,7 +72,7 @@ function _csvFetch(csvText: string): PostgresRowsFetch {
 }
 
 /** A fetch stub returning the edge function's `{error}` JSON shape. */
-function _errorFetch(code: string, message: string): PostgresRowsFetch {
+function _errorFetch(code: string, message: string): EdgeFunctionFetch {
   return async () => {
     return new Response(JSON.stringify({ error: { code, message } }), {
       status: 200,
@@ -89,7 +87,7 @@ function _errorFetch(code: string, message: string): PostgresRowsFetch {
  * not a connector-classified failure. No `{error:{code,message}}` body, since
  * no line of this connector's own code ran to produce one.
  */
-function _resourceLimitKillFetch(): PostgresRowsFetch {
+function _resourceLimitKillFetch(): EdgeFunctionFetch {
   return async () => {
     return new Response("WORKER_LIMIT", {
       status: 546,

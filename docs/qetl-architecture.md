@@ -479,8 +479,8 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 34 | `ResyncDatasetCard.tsx` | an arm only if the type is restored from a local file | inherent, situational |
 | 35 | `src/i18n/locales/*/messages.po` | `pnpm i18n:extract` | generated |
 | 36 | `getRelationSources.characterization.test.ts`, an e2e import spec | pin the reader and the flow | inherent |
-| 37 | `src/clients/qetl/wrappers/__tests__/datasetSourceTypeContract.test.ts` | the source type's contract entry: whether it is live, and for a live source its `columnTypes` and a wrapper built from fakes | compiler (`Record` over every source type), then the shared checks in section 10.3 |
-| 38 | `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/` | the manual refresh a live source offers, and its menu item in `DatasetActionsMenu.tsx` | compiler (exhaustive `match`) and the contract test |
+| 37 | `src/clients/qetl/wrappers/datasetSourceTypeContract.test.ts` | the source type's contract entry: whether it is live, and for a live source its `columnTypes` and a wrapper built from fakes | compiler (`Record` over every source type), then the shared checks in section 10.3 |
+| 38 | `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/` | the manual refresh a live source offers, and its menu item in `DatasetActionsMenu.tsx` | compiler (exhaustive `match`) and `getDatasetRefreshFromSourceType.test.ts`, whose expectations are a `Record` over every source type |
 | 39 | the edge connector's `previewRelation` | report each column's `dataType`, read from the source's own schema (`ConnectorPreviewColumn`, `Connector.ts`) | compiler (`dataType` is required) |
 | 40 | a server route keyed by dataset, for example `connectors`' `/:connectorType/datasets/:datasetId/rows` | check `util__auth_user_may_select_dataset` with the caller's client, then read with the service role through the credential the dataset was imported with, so anyone who can see the dataset can read it | the contract test, and route tests modelled on `ConnectorRoutes.datasetRows.test.ts` |
 
@@ -516,16 +516,17 @@ following.
 - **Publishing:** `DashboardClient.publishSnapshotSources.test.ts` publishes
   a whole-dataset slice of every source type and checks where its rows come
   from.
-- **Staleness and refresh:** `datasetSourceTypeContract.test.ts` checks that
-  a live source's acquired rows carry `GlobalAppConfig.timing.liveRelationMaxAgeMs`,
-  and that it offers a manual refresh.
-- **Column types:** the same test checks that its wrapper passes the
+- **Staleness:** `datasetSourceTypeContract.test.ts` checks that a live
+  source's acquired rows carry `GlobalAppConfig.timing.liveRelationMaxAgeMs`.
+- **Refresh:** `getDatasetRefreshFromSourceType.test.ts` checks which manual
+  refresh every source type offers.
+- **Column types:** the contract test also checks that its wrapper passes the
   `columnTypes` its contract declares to the CSV reader. A `source-schema`
   source must also store `detectedDataType: "VARCHAR"` and the type its
   schema declared, as `savePostgresTableDataset` does, so relation loading
   casts it; `getColumnReplacementsFromColumns.executed.test.ts` shows that
   cast landing in a real DuckDB.
-- **Credential reuse:** the same test checks that a live source reads its
+- **Credential reuse:** the contract test also checks that a live source reads its
   rows through a server route keyed by the dataset, with only the caller's
   session, never a third-party token in the browser.
 
