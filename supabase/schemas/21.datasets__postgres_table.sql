@@ -38,14 +38,21 @@ create table public.datasets__postgres_table (
 -- Enable row level security
 alter table public.datasets__postgres_table enable row level security;
 
--- Data API privileges.
+-- Data API privileges. `authenticated` gets no `update`: this row names the
+-- table everyone who can see the dataset reads through the workspace's saved
+-- credential, and nothing in the app changes a row once it exists.
+grant
+select
+,
+  insert,
+  delete on table public.datasets__postgres_table to authenticated;
+
 grant
 select
 ,
   insert,
 update,
-delete on table public.datasets__postgres_table to authenticated,
-service_role;
+delete on table public.datasets__postgres_table to service_role;
 
 -- Policies
 create policy "User can select datasets__postgres_table in their workspace" on public.datasets__postgres_table for
@@ -76,24 +83,6 @@ with
     )
   );
 
-create policy "User can update datasets__postgres_table in their workspace" on public.datasets__postgres_table
-for update
-  to authenticated using (
-    public.util__auth_user_can_access_resource (
-      'dataset',
-      public.datasets__postgres_table.dataset_id,
-      'editor'
-    )
-  )
-with
-  check (
-    public.util__auth_user_can_access_resource (
-      'dataset',
-      public.datasets__postgres_table.dataset_id,
-      'editor'
-    )
-  );
-
 create policy "User can delete datasets__postgres_table in their workspace" on public.datasets__postgres_table for delete to authenticated using (
   public.util__auth_user_can_access_resource (
     'dataset',
@@ -107,16 +96,18 @@ update on public.datasets__postgres_table for each row
 execute function public.util__set_updated_at ();
 
 /**
- * Refuses any change to the connection, schema or table a Postgres dataset
- * reads. Everyone who can see the dataset reads that table through the
- * workspace's saved credential, so editing the dataset must never be a way
- * to point it at a different table.
+ * Refuses any change to the dataset, connection, schema or table a Postgres
+ * satellite row names, whoever makes it. Everyone who can see the dataset
+ * reads that table through the workspace's saved credential, so moving a row
+ * onto another dataset, or pointing it at another table, must never be a way
+ * to change what a dataset reads.
  */
 create or replace function public.datasets__postgres_table__prevent_source_change () returns trigger language plpgsql
 set
   search_path = public as $$
 begin
   if
+    new.dataset_id is distinct from old.dataset_id or
     new.connection_id is distinct from old.connection_id or
     new.schema_name is distinct from old.schema_name or
     new.table_name is distinct from old.table_name
@@ -140,7 +131,8 @@ from
   service_role;
 
 create trigger tr__datasets__postgres_table__prevent_source_change before
-update of connection_id,
+update of dataset_id,
+connection_id,
 schema_name,
 table_name on public.datasets__postgres_table for each row
 execute function public.datasets__postgres_table__prevent_source_change ();

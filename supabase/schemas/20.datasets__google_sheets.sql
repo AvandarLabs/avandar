@@ -49,6 +49,9 @@ select
     )
   );
 
+-- The Google account named here must be the inserting user's own: everyone
+-- who can see the dataset reads the sheet with that account's grant, so
+-- naming someone else's account would read their files.
 create policy "User can insert datasets__google_sheets in their workspace" on public.datasets__google_sheets for insert to authenticated
 with
   check (
@@ -56,6 +59,18 @@ with
       'dataset',
       public.datasets__google_sheets.dataset_id,
       'editor'
+    ) and
+    exists (
+      select
+        1
+      from
+        public.tokens__google
+      where
+        public.tokens__google.google_account_id = public.datasets__google_sheets.google_account_id and
+        public.tokens__google.user_id = (
+          select
+            auth.uid ()
+        )
     )
   );
 
@@ -88,3 +103,45 @@ create policy "User can delete datasets__google_sheets in their workspace" on pu
 create trigger tr_datasets__google_sheets__set_updated_at before
 update on public.datasets__google_sheets for each row
 execute function public.util__set_updated_at ();
+
+/**
+ * Refuses any change to the dataset, Google account, document or tab a Sheets
+ * satellite row names, whoever makes it. Everyone who can see the dataset
+ * reads that tab with that account's Google grant, so editing the dataset
+ * must never be a way to read a different sheet, or to read with a different
+ * person's grant.
+ */
+create or replace function public.datasets__google_sheets__prevent_source_change () returns trigger language plpgsql
+set
+  search_path = public as $$
+begin
+  if
+    new.dataset_id is distinct from old.dataset_id or
+    new.google_account_id is distinct from old.google_account_id or
+    new.google_document_id is distinct from old.google_document_id or
+    new.sheet_name is distinct from old.sheet_name
+  then
+    raise exception 'a Google Sheets dataset cannot be repointed at another sheet'
+      using errcode = '23514';
+  end if;
+
+  return new;
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.datasets__google_sheets__prevent_source_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__datasets__google_sheets__prevent_source_change before
+update of dataset_id,
+google_account_id,
+google_document_id,
+sheet_name on public.datasets__google_sheets for each row
+execute function public.datasets__google_sheets__prevent_source_change ();

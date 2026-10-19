@@ -34,6 +34,7 @@ with public_tables as (
       'catalog_entries__open_data',
       'connections',
       'connections__postgres',
+      'datasets__postgres_table',
       'subscriptions',
       'usage_analytics_events',
       'user_group_memberships',
@@ -90,6 +91,16 @@ with public_tables as (
     false
   from
     unnest(array['INSERT', 'SELECT', 'UPDATE']) as privileges (privilege_type)
+  union all
+  -- No `update`: a Postgres satellite row names the table everyone who can
+  -- see its dataset reads, and no signed-in user may change it.
+  select
+    'datasets__postgres_table',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
   union all
   select
     'dashboards',

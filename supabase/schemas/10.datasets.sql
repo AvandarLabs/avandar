@@ -86,4 +86,104 @@ create trigger tr_datasets__set_updated_at before
 update on public.datasets for each row
 execute function public.util__set_updated_at ();
 
+/**
+ * Whether a dataset is backed by a Postgres table. `security definer` so a
+ * policy or trigger asking about a dataset gets the true answer even when the
+ * caller's own `datasets` policy hides the row: a guard that read "hidden" as
+ * "not Postgres" would wave the caller through.
+ */
+create or replace function public.datasets__is_postgres_table (p_dataset_id uuid) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select exists (
+    select 1
+    from public.datasets
+    where id = p_dataset_id and source_type = 'postgres_table'
+  );
+$$;
+
+-- Both Data API roles fire the `dataset_columns` trigger that calls it, which
+-- runs it as the role that made the change.
+revoke
+execute on function public.datasets__is_postgres_table (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.datasets__is_postgres_table (uuid) to authenticated,
+service_role;
+
+/**
+ * Whether the caller may add a column to a dataset, as far as its source is
+ * concerned: always for a dataset no Postgres table backs, and for a
+ * Postgres-backed one only as a `data_sources` editor in the dataset's own
+ * workspace, since its rows route reads exactly its columns from that table.
+ * `security definer` for the same reason as `datasets__is_postgres_table`.
+ */
+create or replace function public.datasets__auth_user_may_add_column (p_dataset_id uuid) returns boolean language sql security definer stable
+set
+  search_path = '' as $$
+  select coalesce(
+    (
+      select
+        d.source_type <> 'postgres_table' or
+        public.util__auth_user_meets_min_app_role (
+          d.workspace_id,
+          'data_sources',
+          'editor'
+        )
+      from public.datasets d
+      where d.id = p_dataset_id
+    ),
+    false
+  );
+$$;
+
+-- `authenticated` evaluates it inside the `dataset_columns` insert policy.
+revoke
+execute on function public.datasets__auth_user_may_add_column (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+grant
+execute on function public.datasets__auth_user_may_add_column (uuid) to authenticated;
+
+/**
+ * Prevents a dataset from changing its source type. What a dataset reads,
+ * and which guards protect that, follows from its source type, so editing
+ * the dataset must never be a way to switch them off.
+ */
+create or replace function public.datasets__prevent_source_type_change () returns trigger language plpgsql
+set
+  search_path = public as $$
+begin
+  if new.source_type is distinct from old.source_type then
+    raise exception 'dataset source_type cannot be changed'
+      using errcode = '23514';
+  end if;
+
+  return new;
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.datasets__prevent_source_type_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__datasets__prevent_source_type_change before
+update of source_type on public.datasets for each row
+execute function public.datasets__prevent_source_type_change ();
+
 create index idx_datasets__workspace_owner on public.datasets (workspace_id, owner_id);

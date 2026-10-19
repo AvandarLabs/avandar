@@ -1784,6 +1784,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      datasets__auth_user_may_add_column: {
+        Args: { p_dataset_id: string }
+        Returns: boolean
+      }
+      datasets__is_postgres_table: {
+        Args: { p_dataset_id: string }
+        Returns: boolean
+      }
       maps__auth_user_may_select: {
         Args: { p_map_id: string }
         Returns: boolean
