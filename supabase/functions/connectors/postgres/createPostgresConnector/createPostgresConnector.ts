@@ -15,6 +15,7 @@ import { readRelationCsvWithinCaps } from "@sbfn/connectors/postgres/createPostg
 import { testAndSaveConnection } from "@sbfn/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
 import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName/quotePostgresRelationName.ts";
 import { runReadOnlyTransaction } from "@sbfn/connectors/postgres/runReadOnlyTransaction/runReadOnlyTransaction.ts";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type {
   PostgresQueryRunner,
@@ -22,25 +23,6 @@ import type {
 } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
 const MAX_PREVIEW_ROWS = 50;
-
-/** Longest any one catalog or preview statement may run, in milliseconds. */
-const CATALOG_STATEMENT_TIMEOUT_MS = 15_000;
-
-/**
- * Longest any one statement reading a relation's rows may run, in
- * milliseconds. The rows arrive through a cursor whose every batch is its
- * own statement, so this bounds one batch, not the whole read.
- */
-const ROWS_STATEMENT_TIMEOUT_MS = 30_000;
-
-/**
- * Longest reading one relation's rows may take in all, in milliseconds,
- * checked as each batch of rows arrives. The batch in flight when it passes
- * can still run for up to {@link ROWS_STATEMENT_TIMEOUT_MS}, which keeps the
- * request inside the 150 seconds after which the Edge Function runtime
- * answers it with a 504, so a slow table is reported as `timeout` instead.
- */
-const ROWS_READ_DEADLINE_MS = 90_000;
 
 type CreatePostgresConnectorOptions = {
   /** Injectable for tests - defaults to opening a real connection. */
@@ -96,7 +78,8 @@ async function _listRelations(
   const { context, connectionId } = options;
   const relations = await _withSavedConnection({
     ...options,
-    statementTimeoutMs: CATALOG_STATEMENT_TIMEOUT_MS,
+    statementTimeoutMs:
+      GlobalAppConfig.postgresConnector.catalogStatementTimeoutMs,
     run: PostgresCatalog.listCatalogRelations,
   });
   await context.supabaseAdminClient
@@ -153,7 +136,8 @@ async function _previewRelation(
   );
   return await _withSavedConnection({
     ...options,
-    statementTimeoutMs: CATALOG_STATEMENT_TIMEOUT_MS,
+    statementTimeoutMs:
+      GlobalAppConfig.postgresConnector.catalogStatementTimeoutMs,
     run: (transaction) => {
       return _previewRelationRows({ transaction, schemaName, tableName });
     },
@@ -162,18 +146,22 @@ async function _previewRelation(
 
 /**
  * Reads one relation on a saved connection as CSV, refusing it as `timeout`
- * if it is still reading {@link ROWS_READ_DEADLINE_MS} after the call began.
+ * if it is still reading once the configured read deadline
+ * (`GlobalAppConfig.postgresConnector.rowsReadDeadlineMs`) has passed since
+ * the call began.
  */
 async function _getRelationRows(
   options: Readonly<SavedRelationTarget>,
 ): ReturnType<Connector["getRelationRows"]> {
-  const deadlineAt = Date.now() + ROWS_READ_DEADLINE_MS;
+  const deadlineAt =
+    Date.now() + GlobalAppConfig.postgresConnector.rowsReadDeadlineMs;
   const { schemaName, tableName } = PostgresCatalog.parseRelationId(
     options.relationId,
   );
   return await _withSavedConnection({
     ...options,
-    statementTimeoutMs: ROWS_STATEMENT_TIMEOUT_MS,
+    statementTimeoutMs:
+      GlobalAppConfig.postgresConnector.rowsStatementTimeoutMs,
     run: async (transaction) => {
       await PostgresCatalog.assertRelationStillExists(
         transaction,
@@ -216,7 +204,8 @@ export function createPostgresConnector(
     testAndSaveConnection: (context, rawInput) => {
       return testAndSaveConnection(context, rawInput, {
         ...dependencies,
-        statementTimeoutMs: CATALOG_STATEMENT_TIMEOUT_MS,
+        statementTimeoutMs:
+          GlobalAppConfig.postgresConnector.catalogStatementTimeoutMs,
       });
     },
 

@@ -2,6 +2,7 @@ import { camelCaseKeysShallow, prop } from "@avandar/utils";
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import { PostgresCsv } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCsv/PostgresCsv.ts";
 import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName/quotePostgresRelationName.ts";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 import {
   POSTGRES_MAX_BYTES_PER_ACQUIRE,
   PostgresCsvEstimate,
@@ -10,12 +11,6 @@ import { isWithinRelationCallCaps } from "$/models/relations/RelationCapabilitie
 import type { ColumnSizeInfo } from "$/connectors/postgres/PostgresCsvEstimate/PostgresCsvEstimate.ts";
 import type { RelationRowDescriptor } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 import type { PostgresQueryRunner } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
-
-/**
- * Rows the driver reads per batch while a relation is written out as CSV, so
- * only one batch of driver rows is ever held in memory at a time.
- */
-const CSV_ROWS_PER_BATCH = 5_000;
 
 /** Sizes to check against the shared Postgres cap contract. */
 type PostgresCallCapsCheck = {
@@ -144,6 +139,21 @@ async function _getRelationSizeWithinCaps(
 }
 
 /**
+ * How many rows each cursor batch asks for: about the configured target
+ * bytes of CSV at the relation's estimated row width, within the configured
+ * bounds. Each batch costs one network round trip, so a narrow table reads
+ * in a few large batches while a wide one never holds more than about the
+ * target in driver rows at once.
+ */
+function _getRowsPerCursorBatch(descriptor: RelationRowDescriptor): number {
+  const { targetBytes, minRows, maxRows } =
+    GlobalAppConfig.postgresConnector.rowsPerCursorBatch;
+  const estimatedRowBytes = Math.max(descriptor.estimatedRowBytes ?? 1, 1);
+  const rowsForTarget = Math.floor(targetBytes / estimatedRowBytes);
+  return Math.min(Math.max(rowsForTarget, minRows), maxRows);
+}
+
+/**
  * Throws `timeout` once `deadlineAt` has passed, so a relation whose rows
  * keep arriving slowly is refused before the request runs out of time.
  */
@@ -198,7 +208,7 @@ export async function readRelationCsvWithinCaps(
   // crosses the cap instead of after every row is in memory.
   const rowBatches = transaction<Record<string, unknown>>`
     select * from ${relationName}
-  `.cursor(CSV_ROWS_PER_BATCH);
+  `.cursor(_getRowsPerCursorBatch(descriptor));
   for await (const rows of rowBatches) {
     _assertBeforeReadDeadline(options);
     const chunk = encoder.encode(

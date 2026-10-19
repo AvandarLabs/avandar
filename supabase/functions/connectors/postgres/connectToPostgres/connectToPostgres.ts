@@ -1,5 +1,6 @@
 import { identity } from "@avandar/utils";
 import postgres from "postgres";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 import type { PostgresConnectionConfig } from "@sbfn/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
 
@@ -58,7 +59,7 @@ export function connectToPostgres(
     // A single, short-lived connection per request - this proxy opens a
     // fresh connection per call rather than pooling across requests.
     max: 1,
-    connect_timeout: 10,
+    connect_timeout: GlobalAppConfig.postgresConnector.connectTimeoutSeconds,
     idle_timeout: 0,
     types: { rawDateTimeText: RAW_DATE_TIME_TEXT_TYPE },
   }) as PostgresSql;
