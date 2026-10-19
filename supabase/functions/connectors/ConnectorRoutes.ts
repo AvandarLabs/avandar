@@ -54,6 +54,24 @@ async function _getOwningWorkspaceId(
 }
 
 /**
+ * Throws `FORBIDDEN` unless the caller may see this dataset, checked through
+ * the caller's own client with the same rule the `datasets` table's SELECT
+ * policy applies. Never distinguishes "doesn't exist" from "no permission".
+ */
+async function _assertMaySelectDataset(
+  supabaseClient: AvaSupabaseClient,
+  datasetId: string,
+): Promise<void> {
+  const { data: maySelect, error } = await supabaseClient.rpc(
+    "util__auth_user_may_select_dataset",
+    { p_dataset_id: datasetId },
+  );
+  if (error || !maySelect) {
+    throw new AvaHTTPError(`No dataset '${datasetId}' found`, FORBIDDEN);
+  }
+}
+
+/**
  * Converts a connector failure into the route table's closed error shape
  * (`{ error: { code, message } }`). Returned as a plain object, not a
  * `Response` with its own status code - MiniServer wraps any non-`Response`
@@ -73,7 +91,7 @@ function _toErrorResult(error: unknown): ConnectorErrorResponse {
 
 /**
  * Resolves the connector and per-request context shared by every route that
- * acts on an already-saved connection (`relations`, `preview`, `rows`):
+ * acts on an already-saved connection (`relations`, `preview`):
  * looks up the connector by type, derives the owning workspace from the
  * connection itself, and assembles the context object every connector method
  * takes. `test-and-save` does not use this - it may not have a
@@ -99,10 +117,15 @@ async function _buildConnectorContext(
 }
 
 /**
- * The `connectors` proxy's route table: test-and-save a connection,
- * list its relations, preview one, and read its full rows as CSV - all
+ * The `connectors` proxy's route table: test-and-save a connection, list
+ * its relations and preview one, and read a dataset's rows as CSV - all
  * dispatched through {@link getConnector} to the connector type named in
  * the path.
+ *
+ * The connection routes are for whoever manages connections, and the
+ * connections table's own policies gate them. The dataset rows route is for
+ * anyone who can see the dataset: it reads through the credential the
+ * dataset was imported with, which the caller never sees.
  */
 export const ConnectorRoutes = defineRoutes<ConnectorsApi>("connectors", {
   "/:connectorType/connections/test-and-save": {
@@ -198,27 +221,31 @@ export const ConnectorRoutes = defineRoutes<ConnectorsApi>("connectors", {
       }
     }),
   },
-  "/:connectorType/connections/:connectionId/relations/:relationId/rows": {
+  "/:connectorType/datasets/:datasetId/rows": {
     GET: GET({
-      path: "/:connectorType/connections/:connectionId/relations/:relationId/rows",
-      schema: {
-        connectorType: string(),
-        connectionId: string(),
-        relationId: string(),
-      },
+      path: "/:connectorType/datasets/:datasetId/rows",
+      schema: { connectorType: string(), datasetId: string() },
     }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-      const { connector, context } = await _buildConnectorContext(
-        pathParams,
+      const connector = getConnector(pathParams.connectorType);
+      await _assertMaySelectDataset(supabaseClient, pathParams.datasetId);
+      const relation = await connector.getDatasetRelation(
+        supabaseAdminClient,
+        pathParams.datasetId,
+      );
+      if (!relation) {
+        throw new AvaHTTPError(
+          `No dataset '${pathParams.datasetId}' found`,
+          FORBIDDEN,
+        );
+      }
+      const context: ConnectorContext = {
+        workspaceId: relation.workspaceId,
         supabaseClient,
         supabaseAdminClient,
-      );
+      };
 
       try {
-        const csvBytes = await connector.getRelationRows(
-          context,
-          pathParams.connectionId,
-          decodeURIComponent(pathParams.relationId),
-        );
+        const csvBytes = await connector.getRelationRows(context, relation);
         return new Response(csvBytes, {
           headers: { ...corsHeaders, "Content-Type": "text/csv" },
         });

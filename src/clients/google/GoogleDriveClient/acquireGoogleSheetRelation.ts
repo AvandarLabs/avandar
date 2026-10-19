@@ -1,6 +1,7 @@
-import { getStoredGoogleSheetTabCsv } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
+import { GoogleSheetDatasetProxy } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
-import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
+import type { GoogleSheetDatasetFetch } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 
 /**
  * Reads one tab's CSV into a relation.
@@ -21,44 +22,28 @@ export type AcquiredGoogleSheetRelation<TRelation> = {
 };
 
 /**
- * Acquires one tab of a Google Sheet: download that tab as CSV, then read it.
+ * Acquires a saved Google Sheets dataset: download its stored tab as CSV
+ * through the `google-sheets` edge function, then read it.
  *
- * This is the whole connector in one function, and it deliberately shares
- * `getStoredGoogleSheetTabCsv` with import and refresh. Do not acquire by
- * exporting the whole workbook and reading the tab back out with `read_xlsx`:
- * that reader has to be told to read everything as text, so a dataset would be
- * typed one way when imported and another way when re-acquired. One download
- * path, one set of types.
+ * The edge function resolves the stored tab by name with the same
+ * `getStoredGoogleSheetTabCsv` the import and refresh use, and reads it with
+ * the Google grant of the account that added the dataset. So whoever asks
+ * reads the dataset's rows the same way, and no Google token is held here.
  *
- * Everything it needs arrives as an argument. It reads no dataset record, holds
- * no token, and imports no client singleton, so the wrapper that eventually
- * calls it keeps `WrapperContext` as the only source of identity.
- *
- * @param params The file and tab to acquire, the token to acquire it with, and
- * the reader and transport to do it through.
+ * @param params The dataset to acquire, and the reader and transport to do it
+ * through.
  * @returns The reader's output and the Drive version the rows were read at.
  */
 export async function acquireGoogleSheetRelation<TRelation>(
   params: Readonly<{
-    fileId: string;
-    accessToken: string;
-
-    /**
-     * The stored tab name, or `null` for the workbook's first tab. This is
-     * `datasets__google_sheets.sheet_name` verbatim, so the `null` case is the
-     * legacy rows that predate the column.
-     */
-    sheetName: string | null;
-
+    datasetId: Dataset.Id;
     readCsv: GoogleSheetTabCsvReader<TRelation>;
-    driveFetch?: GoogleDriveFetch;
+    datasetFetch?: GoogleSheetDatasetFetch;
   }>,
 ): Promise<AcquiredGoogleSheetRelation<TRelation>> {
-  const { csvText, sourceVersion } = await getStoredGoogleSheetTabCsv({
-    fileId: params.fileId,
-    sheetName: params.sheetName,
-    accessToken: params.accessToken,
-    driveFetch: params.driveFetch,
+  const { csvText, sourceVersion } = await GoogleSheetDatasetProxy.fetchCsv({
+    datasetId: params.datasetId,
+    datasetFetch: params.datasetFetch,
   });
 
   const relation = await params.readCsv({ csvText });

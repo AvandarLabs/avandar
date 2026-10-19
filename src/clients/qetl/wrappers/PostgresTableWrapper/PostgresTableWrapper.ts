@@ -6,7 +6,6 @@ import {
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import { acquirePostgresTableRelation } from "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
@@ -17,11 +16,6 @@ import type { PostgresRowsFetch } from "@/clients/qetl/wrappers/PostgresTableWra
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
-type PostgresTableSource = Pick<
-  PostgresTableDataset.T,
-  "connectionId" | "schemaName" | "tableName"
->;
-
 type PostgresTableParquetRelation = { parquetBlob: Blob };
 
 /**
@@ -29,12 +23,11 @@ type PostgresTableParquetRelation = { parquetBlob: Blob };
  * singleton, mirroring `GoogleSheetsWrapperOptions`. No access-token option:
  * unlike Sheets' third-party OAuth token, the edge function call carries the
  * caller's own Supabase session (attached in `acquirePostgresTableRelation.ts`
- * itself), and the connection credential never leaves the server.
+ * itself), and the connection credential never leaves the server. No
+ * source-record option either: the edge function reads which connection and
+ * table a dataset names from the dataset itself.
  */
 export type PostgresTableWrapperOptions = {
-  /** The stored Postgres table row for one dataset. */
-  getPostgresTableSource: (id: Dataset.Id) => Promise<PostgresTableSource>;
-
   /**
    * Reads one relation's CSV and returns Parquet. Bound to the caller's
    * DuckDB lease so acquisition does not race the outer query.
@@ -107,11 +100,8 @@ async function _acquirePostgresTable(
   }>,
 ): Promise<AcquiredRelation> {
   const { ref, wrapperOptions } = options;
-  const source = await wrapperOptions.getPostgresTableSource(ref.id);
   const acquired = await acquirePostgresTableRelation({
-    connectionId: source.connectionId,
-    schemaName: source.schemaName,
-    tableName: source.tableName,
+    datasetId: ref.id,
     readCsv: async ({ csvText }) => {
       return await wrapperOptions.readCsv({ datasetId: ref.id, csvText });
     },
@@ -126,10 +116,6 @@ async function _acquirePostgresTable(
   };
 }
 
-function _missingPostgresTableSource(): Promise<never> {
-  throw new Error("Postgres acquisition needs the stored source record");
-}
-
 function _missingReadCsv(): Promise<never> {
   throw new Error("Postgres acquisition needs a CSV reader");
 }
@@ -139,16 +125,13 @@ function _missingReadCsv(): Promise<never> {
  * the `connectors` edge function.
  *
  * `acquire` is present because the capabilities declare the relation
- * acquirable. The source record and CSV reader arrive as options so this
- * wrapper never re-reads what the relation loader already holds, mirroring
- * `GoogleSheetsWrapper`.
+ * acquirable. The CSV reader arrives as an option, bound to the caller's
+ * DuckDB lease, mirroring `GoogleSheetsWrapper`.
  */
 export function createPostgresTableWrapper(
   options: Readonly<Partial<PostgresTableWrapperOptions>> = {},
 ): SourceWrapper<DatasetRef> {
   const wrapperOptions: PostgresTableWrapperOptions = {
-    getPostgresTableSource:
-      options.getPostgresTableSource ?? _missingPostgresTableSource,
     readCsv: options.readCsv ?? _missingReadCsv,
     rowsFetch: options.rowsFetch,
   };

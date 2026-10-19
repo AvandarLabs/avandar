@@ -4,10 +4,11 @@ import {
   getGoogleSheetTabs,
   getGoogleSheetVersion,
   getGoogleSheetXlsxExport,
-} from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
-import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
-import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
-import type { GoogleDriveErrorCode } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+  getStoredGoogleSheetTabCsv,
+} from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient.ts";
+import { GoogleDriveError } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError.ts";
+import type { GoogleDriveFetch } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient.types.ts";
+import type { GoogleDriveErrorCode } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError.ts";
 
 const FILE_ID = "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";
 const ACCESS_TOKEN = "ya29.test-access-token";
@@ -522,5 +523,78 @@ describe("getGoogleSheetTabCsvExport", () => {
         driveFetch,
       }),
     ).rejects.toBeInstanceOf(GoogleDriveError);
+  });
+});
+
+describe("getStoredGoogleSheetTabCsv", () => {
+  const FIRST_TAB_CSV = "city,population\nBogota,7900000\n";
+  const SECOND_TAB_CSV = "county,residents\nNairobi,4400000\n";
+
+  /**
+   * Answers the tab list, the version read and the tab export. The two tabs
+   * return different CSV, so an assertion about one cannot pass while the
+   * other was downloaded.
+   */
+  const driveFetch: GoogleDriveFetch = async (url) => {
+    if (url.includes("sheets.googleapis.com")) {
+      return new Response(
+        JSON.stringify({
+          sheets: [
+            { properties: { sheetId: 0, title: "Cities", index: 0 } },
+            { properties: { sheetId: 77, title: "Q3 data", index: 1 } },
+          ],
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    }
+    if (url.includes("fields=version")) {
+      return _versionResponse("12");
+    }
+    return new Response(
+      url.includes("gid=77") ? SECOND_TAB_CSV : FIRST_TAB_CSV,
+      { status: 200 },
+    );
+  };
+
+  it("downloads the stored tab, resolved by name", async () => {
+    const result = await getStoredGoogleSheetTabCsv({
+      fileId: FILE_ID,
+      sheetName: "Q3 data",
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(result.csvText).toBe(SECOND_TAB_CSV);
+    expect(result.sourceVersion).toBe("12");
+  });
+
+  it("reads the first tab when the stored tab name is null", async () => {
+    // `null` is what rows written before the tab column carry, and it means
+    // the workbook's first tab. Resolving it to anything else would silently
+    // re-point a dataset at another tab's rows.
+    const result = await getStoredGoogleSheetTabCsv({
+      fileId: FILE_ID,
+      sheetName: null,
+      accessToken: ACCESS_TOKEN,
+      driveFetch,
+    });
+
+    expect(result.csvText).toBe(FIRST_TAB_CSV);
+  });
+
+  it("names the tab when a rename means it is no longer there", async () => {
+    // A tab is stored by title, and a title is renameable. Failing by name
+    // beats returning some other tab's rows.
+    await expect(
+      getStoredGoogleSheetTabCsv({
+        fileId: FILE_ID,
+        sheetName: "Renamed away",
+        accessToken: ACCESS_TOKEN,
+        driveFetch,
+      }),
+    ).rejects.toMatchObject({
+      code: "sheet-not-found",
+      reason: "Renamed away",
+    });
   });
 });

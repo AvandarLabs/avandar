@@ -39,51 +39,59 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
-const TAB_LIST_BODY = JSON.stringify({
-  sheets: [
-    { properties: { sheetId: 0, title: "Colombia", index: 0 } },
-    { properties: { sheetId: 77, title: "Kenya", index: 1 } },
-  ],
+vi.mock("$/db/supabase/AvaSupabase", () => {
+  return {
+    AvaSupabase: {
+      db: () => {
+        return {
+          auth: {
+            getSession: async () => {
+              return { data: { session: { access_token: "session-token" } } };
+            },
+          },
+        };
+      },
+      getEdgeFunctionsURL: () => {
+        return "https://edge.test/functions/v1";
+      },
+    },
+  };
 });
 
-/** Answers the version read, the tab list, and the per-tab CSV download. */
-function _driveFetch(version: string) {
-  return async (url: string): Promise<Response> => {
-    if (url.includes("fields=version")) {
-      return new Response(JSON.stringify({ version }), { status: 200 });
-    }
-    if (url.includes("sheets.googleapis.com")) {
-      return new Response(TAB_LIST_BODY, { status: 200 });
-    }
-    const gid = new URL(url).searchParams.get("gid") ?? "0";
-    return new Response(`city\r\ntab-${gid}\r\n`, { status: 200 });
-  };
+const { apiGetMock } = vi.hoisted(() => {
+  return { apiGetMock: vi.fn() };
+});
+
+vi.mock("@/clients/APIClient", () => {
+  return { APIClient: { get: apiGetMock } };
+});
+
+/** Answers the dataset's CSV route with one tab at version `version`. */
+function _makeDatasetFetch(version: string) {
+  return vi.fn(async (_url: string, _init: RequestInit) => {
+    return new Response("city\r\ntab-77\r\n", {
+      status: 200,
+      headers: { "Content-Type": "text/csv", "X-Ava-Source-Version": version },
+    });
+  });
 }
 
 describe("GoogleSheetsWrapper", () => {
-  it("acquires the named tab as parquet and reports the Drive version", async () => {
+  it("acquires the dataset's tab through its edge route and reports the Drive version", async () => {
     const parquetBlob = new Blob(["sheet-parquet"]);
     const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
-    const getSheetSource = vi.fn().mockResolvedValue({
-      googleDocumentId: "1sheetFileId",
-      sheetName: "Kenya",
-      googleAccountId: "google-account-1",
-    });
-    const getAccessToken = vi.fn().mockResolvedValue("ya29.test-token");
-    const wrapper = createGoogleSheetsWrapper({
-      getSheetSource,
-      getAccessToken,
-      readCsv,
-      driveFetch: _driveFetch("42"),
-    });
+    const datasetFetch = _makeDatasetFetch("42");
+    const wrapper = createGoogleSheetsWrapper({ readCsv, datasetFetch });
 
     const acquired = await wrapper.acquire!(
       { ref: DATASET_REF, columns: "all" },
       CONTEXT,
     );
 
-    // The stored tab's gid, not the first tab's: the CSV names the gid it came
-    // from, so a download that ignored the tab cannot satisfy this.
+    expect(datasetFetch).toHaveBeenCalledWith(
+      `https://edge.test/functions/v1/google-sheets/datasets/${DATASET_REF.id}/csv`,
+      expect.anything(),
+    );
     expect(readCsv).toHaveBeenCalledWith({
       datasetId: DATASET_REF.id,
       csvText: "city\r\ntab-77\r\n",
@@ -95,22 +103,23 @@ describe("GoogleSheetsWrapper", () => {
     });
   });
 
+  it("never asks for a Google token of its own, so a viewer who never connected Google can read the sheet", async () => {
+    const wrapper = createGoogleSheetsWrapper({
+      readCsv: vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) }),
+      datasetFetch: _makeDatasetFetch("42"),
+    });
+
+    await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
+
+    expect(apiGetMock).not.toHaveBeenCalled();
+  });
+
   it("marks acquired rows stale after the live-source max age", async () => {
     const wrapper = createGoogleSheetsWrapper({
-      getSheetSource: async () => {
-        return {
-          googleDocumentId: "1sheetFileId",
-          sheetName: "Kenya",
-          googleAccountId: "google-account-1",
-        };
-      },
-      getAccessToken: async () => {
-        return "ya29.test-token";
-      },
       readCsv: async () => {
         return { parquetBlob: new Blob([]) };
       },
-      driveFetch: _driveFetch("42"),
+      datasetFetch: _makeDatasetFetch("42"),
     });
 
     const acquired = await wrapper.acquire!(
@@ -123,29 +132,19 @@ describe("GoogleSheetsWrapper", () => {
     );
   });
 
-  it("reads the first tab when the stored tab is null", async () => {
-    const readCsv = vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) });
-    const wrapper = createGoogleSheetsWrapper({
-      getSheetSource: async () => {
-        return {
-          googleDocumentId: "1sheetFileId",
-          sheetName: null,
-          googleAccountId: "google-account-1",
-        };
-      },
-      getAccessToken: async () => {
-        return "ya29.test-token";
-      },
-      readCsv,
-      driveFetch: _driveFetch("1"),
+  it("reads freshness from the dataset's version route", async () => {
+    const datasetFetch = vi.fn(async (_url: string, _init: RequestInit) => {
+      return Response.json({ sourceVersion: "9" });
     });
+    const wrapper = createGoogleSheetsWrapper({ datasetFetch });
 
-    await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
-
-    expect(readCsv).toHaveBeenCalledWith({
-      datasetId: DATASET_REF.id,
-      csvText: "city\r\ntab-0\r\n",
-    });
+    await expect(wrapper.readFreshness!(DATASET_REF, CONTEXT)).resolves.toBe(
+      "9",
+    );
+    expect(datasetFetch).toHaveBeenCalledWith(
+      `https://edge.test/functions/v1/google-sheets/datasets/${DATASET_REF.id}/version`,
+      expect.anything(),
+    );
   });
 
   it("describes a sheet from its stored columns", async () => {

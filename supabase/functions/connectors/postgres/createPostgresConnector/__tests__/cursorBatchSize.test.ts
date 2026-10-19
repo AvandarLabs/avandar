@@ -46,11 +46,13 @@ async function _readRowsPerBatch(
       return fakeSql;
     },
   });
-  await connector.getRelationRows(
-    makeSavedConnectionContext("8.8.8.8"),
-    SAVED_CONNECTION_ID,
-    "public.events",
-  );
+  await connector.getRelationRows(makeSavedConnectionContext("8.8.8.8"), {
+    connectionId: SAVED_CONNECTION_ID,
+    relationId: "public.events",
+    columnNames: columns.map((column) => {
+      return column.column_name;
+    }),
+  });
   return requestedRowsPerBatch;
 }
 

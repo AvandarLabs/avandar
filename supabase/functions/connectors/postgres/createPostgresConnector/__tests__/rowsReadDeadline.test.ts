@@ -61,8 +61,11 @@ describe("createPostgresConnector - whole-read deadline", () => {
 
     const result = connector.getRelationRows(
       makeSavedConnectionContext("8.8.8.8"),
-      SAVED_CONNECTION_ID,
-      "public.events",
+      {
+        connectionId: SAVED_CONNECTION_ID,
+        relationId: "public.events",
+        columnNames: ["id"],
+      },
     );
 
     await expect(result).rejects.toBeInstanceOf(ConnectorError);

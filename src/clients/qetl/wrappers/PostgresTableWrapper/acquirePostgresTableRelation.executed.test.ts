@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   PostgresRelationCsvReader,
   PostgresRowsFetch,
@@ -11,8 +12,8 @@ import type {
 /**
  * Acquisition read against a real reader rather than against a spy, mirroring
  * `acquireGoogleSheetRelation.executed.test.ts`: DuckDB really reads the CSV
- * the edge function's `rows` route returns, so the assertion is about rows
- * that came out of a reader, not about arguments that went into a mock.
+ * the edge function's dataset `rows` route returns, so the assertion is about
+ * rows that came out of a reader, not about arguments that went into a mock.
  */
 
 vi.mock("$/db/supabase/AvaSupabase", () => {
@@ -37,6 +38,8 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
 });
 
 type Row = { city: string; population: bigint };
+
+const DATASET_ID = "44444444-4444-4444-8444-444444444444" as Dataset.Id;
 
 /**
  * A reader backed by a real in-process DuckDB. `read_csv` takes a path, so the
@@ -97,14 +100,11 @@ function _resourceLimitKillFetch(): PostgresRowsFetch {
 
 describe("acquirePostgresTableRelation", () => {
   it("reads the relation's rows through the edge function and transcodes them with a real DuckDB reader", async () => {
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
+    const { acquirePostgresTableRelation } =
+      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
 
     const acquired = await acquirePostgresTableRelation({
-      connectionId: "connection-1",
-      schemaName: "public",
-      tableName: "cities",
+      datasetId: DATASET_ID,
       readCsv: _readCsvWithDuckDb,
       rowsFetch: _csvFetch("city,population\r\nNairobi,4400000\r\n"),
     });
@@ -119,14 +119,11 @@ describe("acquirePostgresTableRelation", () => {
     // DuckDB hands a BIGINT back as a JS `bigint`; what matters is that it is
     // not a string - same reasoning `acquireGoogleSheetRelation`'s own test
     // documents for Sheets.
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
+    const { acquirePostgresTableRelation } =
+      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
 
     const acquired = await acquirePostgresTableRelation({
-      connectionId: "connection-1",
-      schemaName: "public",
-      tableName: "cities",
+      datasetId: DATASET_ID,
       readCsv: _readCsvWithDuckDb,
       rowsFetch: _csvFetch("city,population\r\nNairobi,4400000\r\n"),
     });
@@ -134,49 +131,13 @@ describe("acquirePostgresTableRelation", () => {
     expect(typeof acquired.relation[0]?.population).toBe("bigint");
   });
 
-  it("encodes a dotted table name with PostgresRelationId.makeRelationId, not plain concatenation", async () => {
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
-
-    let requestedUrl = "";
-    const _capturingFetch: PostgresRowsFetch = async (url) => {
-      requestedUrl = url;
-      return new Response("city,population\r\nNairobi,4400000\r\n", {
-        status: 200,
-        headers: { "Content-Type": "text/csv" },
-      });
-    };
-
-    await acquirePostgresTableRelation({
-      connectionId: "connection-1",
-      schemaName: "public",
-      tableName: "weird.table",
-      readCsv: _readCsvWithDuckDb,
-      rowsFetch: _capturingFetch,
-    });
-
-    // `PostgresRelationId.makeRelationId` escapes the table name's own
-    // literal `.` before joining with the unescaped separator, so decoding
-    // it back on the edge function side (`splitRelationId`) can tell the
-    // separator from an escaped dot. Plain `${schemaName}.${tableName}`
-    // concatenation would instead produce `public.weird.table`,
-    // indistinguishable from schema `public.weird` and table `table`.
-    expect(decodeURIComponent(requestedUrl)).toContain(
-      "/relations/public.weird\\.table/rows",
-    );
-  });
-
   it("fails when the edge function reports a connector error, preserving its code", async () => {
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
+    const { acquirePostgresTableRelation } =
+      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
 
     try {
       await acquirePostgresTableRelation({
-        connectionId: "connection-1",
-        schemaName: "public",
-        tableName: "cities",
+        datasetId: DATASET_ID,
         readCsv: _readCsvWithDuckDb,
         rowsFetch: _errorFetch("unreachable", "could not connect to server"),
       });
@@ -189,15 +150,12 @@ describe("acquirePostgresTableRelation", () => {
   });
 
   it("defaults to too_large when the edge function's own isolate was killed outright, not a connector-classified failure", async () => {
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
+    const { acquirePostgresTableRelation } =
+      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
 
     try {
       await acquirePostgresTableRelation({
-        connectionId: "connection-1",
-        schemaName: "public",
-        tableName: "cities",
+        datasetId: DATASET_ID,
         readCsv: _readCsvWithDuckDb,
         rowsFetch: _resourceLimitKillFetch(),
       });

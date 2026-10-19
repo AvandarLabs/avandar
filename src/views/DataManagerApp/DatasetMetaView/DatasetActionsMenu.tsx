@@ -103,10 +103,7 @@ export function DatasetActionsMenu({
             leftSection={<IconRefresh size={16} />}
             disabled={isRefreshPending}
             onClick={() => {
-              refreshGoogleSheetDataset({
-                datasetId: dataset.id,
-                sourceDataset: googleSheetSource,
-              });
+              refreshGoogleSheetDataset({ datasetId: dataset.id });
             }}
           >
             <Trans>Refresh from Google Sheets</Trans>

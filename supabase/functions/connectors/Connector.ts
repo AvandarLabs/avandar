@@ -73,6 +73,19 @@ export type ConnectorContext = {
   supabaseAdminClient: SupabaseClient<Database>;
 };
 
+/**
+ * What a dataset backed by a connector reads: the saved connection and
+ * relation it names, and the columns it stores, in order. Only those
+ * columns are ever read, so a column added to the source table after
+ * import never reaches anyone through the dataset.
+ */
+export type ConnectorDatasetRelation = {
+  workspaceId: string;
+  connectionId: string;
+  relationId: string;
+  columnNames: readonly string[];
+};
+
 export type Connector = {
   testAndSaveConnection: (
     context: ConnectorContext,
@@ -93,10 +106,24 @@ export type Connector = {
     columns: ConnectorPreviewColumn[];
     previewRows: Array<Record<string, unknown>>;
   }>;
-  /** Returns the full relation as CSV bytes - what `acquire` calls. */
+  /**
+   * Looks up, with the service-role client, what a dataset backed by this
+   * connector reads, or `undefined` when there is no such dataset. Callers
+   * must already have checked that the user may see the dataset: this
+   * lookup is how a dataset's viewers reuse the credential it was imported
+   * with, without ever seeing it.
+   */
+  getDatasetRelation: (
+    supabaseAdminClient: ConnectorContext["supabaseAdminClient"],
+    datasetId: string,
+  ) => Promise<ConnectorDatasetRelation | undefined>;
+
+  /**
+   * Returns one relation's rows as CSV bytes, reading only `columnNames`, in
+   * that order. This is what a dataset's acquisition reads.
+   */
   getRelationRows: (
     context: ConnectorContext,
-    connectionId: string,
-    relationId: string,
+    relation: Readonly<Omit<ConnectorDatasetRelation, "workspaceId">>,
   ) => Promise<Blob>;
 };

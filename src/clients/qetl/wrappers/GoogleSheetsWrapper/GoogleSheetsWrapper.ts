@@ -1,38 +1,29 @@
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { GOOGLE_SHEET_MAX_EXPORT_BYTES } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient";
 import { acquireGoogleSheetRelation } from "@/clients/google/GoogleDriveClient/acquireGoogleSheetRelation";
 import { getGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
+import { GoogleSheetDatasetProxy } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
-import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
+import type { GoogleSheetDatasetFetch } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
-
-type GoogleSheetSource = Pick<
-  GoogleSheetsDataset.T,
-  "googleDocumentId" | "sheetName" | "googleAccountId"
->;
 
 type GoogleSheetParquetRelation = { parquetBlob: Blob };
 
 /**
  * Dependencies the Sheets wrapper closes over so it never imports a client
- * singleton. The relation loader already holds the source record and the
- * DuckDB lease, and it passes both through here.
+ * singleton. The relation loader holds the DuckDB lease and passes it through
+ * the CSV reader. No Google token is among them: the `google-sheets` edge
+ * function reads the sheet with the grant of the account that added it.
  */
 export type GoogleSheetsWrapperOptions = {
-  /** The stored Sheets row for one dataset. */
-  getSheetSource: (id: Dataset.Id) => Promise<GoogleSheetSource>;
-
-  /** A live Google access token for the stored account. */
-  getAccessToken: () => Promise<string>;
-
   /**
    * Reads one tab's CSV and returns Parquet. Bound to the caller's DuckDB
    * lease so acquisition does not race the outer query. `datasetId` is the
@@ -43,8 +34,8 @@ export type GoogleSheetsWrapperOptions = {
     csvText: string;
   }) => Promise<GoogleSheetParquetRelation>;
 
-  /** Injected Drive transport; omitted in production, where `fetch` is used. */
-  driveFetch?: GoogleDriveFetch;
+  /** Injected transport; omitted in production, where `fetch` is used. */
+  datasetFetch?: GoogleSheetDatasetFetch;
 };
 
 const CAPABILITIES = {
@@ -66,7 +57,7 @@ const CAPABILITIES = {
   maxRowsPerCall: "unbounded",
 
   /** Drive caps exported content at roughly 10 MB. */
-  maxBytesPerCall: 10 * 1024 * 1024,
+  maxBytesPerCall: GOOGLE_SHEET_MAX_EXPORT_BYTES,
 
   /** Drive reports `File.version`, which changes when the file changes. */
   freshnessSignal: "version-token",
@@ -80,10 +71,10 @@ const CAPABILITIES = {
   multiCallAtomicity: false,
 
   /**
-   * Acquisition touches three Google hosts: Drive for the file version, the
-   * Sheets API for the tab list, and the export host for the tab itself. Drive
-   * is the one that rate-limits an acquisition loop, so it is the scope
-   * declared here.
+   * Acquisition touches three Google hosts, from the `google-sheets` edge
+   * function: Drive for the file version, the Sheets API for the tab list,
+   * and the export host for the tab itself. Drive is the one that
+   * rate-limits an acquisition loop, so it is the scope declared here.
    */
   quotaScope: { kind: "per-host", host: "www.googleapis.com" },
 
@@ -101,16 +92,12 @@ async function _acquireGoogleSheet(
   }>,
 ): Promise<AcquiredRelation> {
   const { ref, wrapperOptions } = options;
-  const source = await wrapperOptions.getSheetSource(ref.id);
-  const accessToken = await wrapperOptions.getAccessToken();
   const acquired = await acquireGoogleSheetRelation({
-    fileId: source.googleDocumentId,
-    accessToken,
-    sheetName: source.sheetName,
+    datasetId: ref.id,
     readCsv: async ({ csvText }) => {
       return await wrapperOptions.readCsv({ datasetId: ref.id, csvText });
     },
-    driveFetch: wrapperOptions.driveFetch,
+    datasetFetch: wrapperOptions.datasetFetch,
   });
   return {
     ref,
@@ -121,33 +108,24 @@ async function _acquireGoogleSheet(
   };
 }
 
-function _missingSheetSource(): Promise<never> {
-  throw new Error("Google Sheets acquisition needs the stored source record");
-}
-
-function _missingAccessToken(): Promise<never> {
-  throw new Error("No Google token is available for this user");
-}
-
 function _missingReadCsv(): Promise<never> {
   throw new Error("Google Sheets acquisition needs a CSV reader");
 }
 
 /**
- * Acquires one Google Sheets tab as Parquet, downloading that tab as CSV.
+ * Acquires one Google Sheets tab as Parquet, downloading that tab as CSV
+ * through the `google-sheets` edge function.
  *
  * `acquire` is present because the capabilities declare the relation
- * acquirable. The source record, token, and CSV reader arrive as options so
- * this wrapper never re-reads what the relation loader already holds.
+ * acquirable. The CSV reader arrives as an option so this wrapper reads under
+ * the DuckDB lease the relation loader already holds.
  */
 export function createGoogleSheetsWrapper(
   options: Readonly<Partial<GoogleSheetsWrapperOptions>> = {},
 ): SourceWrapper<DatasetRef> {
   const wrapperOptions: GoogleSheetsWrapperOptions = {
-    getSheetSource: options.getSheetSource ?? _missingSheetSource,
-    getAccessToken: options.getAccessToken ?? _missingAccessToken,
     readCsv: options.readCsv ?? _missingReadCsv,
-    driveFetch: options.driveFetch,
+    datasetFetch: options.datasetFetch,
   };
 
   return {
@@ -167,12 +145,14 @@ export function createGoogleSheetsWrapper(
     },
 
     readFreshness: async (ref) => {
-      const source = await wrapperOptions.getSheetSource(ref.id);
       return await getGoogleSheetFreshness({
         datasetId: ref.id,
-        fileId: source.googleDocumentId,
-        accessToken: await wrapperOptions.getAccessToken(),
-        driveFetch: wrapperOptions.driveFetch,
+        readVersion: () => {
+          return GoogleSheetDatasetProxy.fetchVersion({
+            datasetId: ref.id,
+            datasetFetch: wrapperOptions.datasetFetch,
+          });
+        },
       });
     },
   };

@@ -1,4 +1,5 @@
-import { camelCaseKeysShallow, prop } from "@avandar/utils";
+import { camelCaseKeysShallow } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import { PostgresCsv } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCsv/PostgresCsv.ts";
 import { quotePostgresRelationName } from "@sbfn/connectors/postgres/quotePostgresRelationName/quotePostgresRelationName.ts";
@@ -30,6 +31,9 @@ type RelationToMeasure = {
   relationName: unknown;
   schemaName: string;
   tableName: string;
+
+  /** The only columns that will be read, in order. */
+  columnNames: readonly string[];
 };
 
 /** The relation whose rows {@link readRelationCsvWithinCaps} reads. */
@@ -37,6 +41,9 @@ export type ReadRelationCsvWithinCapsOptions = {
   transaction: PostgresQueryRunner;
   schemaName: string;
   tableName: string;
+
+  /** The only columns read, in the order the CSV lists them. */
+  columnNames: readonly string[];
 
   /**
    * Epoch ms after which the read is refused as `timeout`. Checked as each
@@ -96,17 +103,36 @@ async function _getColumnSizeInfo(
 }
 
 /**
+ * The type metadata of each column in `columnNames`, in that order. Throws
+ * when one of them no longer exists in the relation, rather than reading a
+ * table whose shape has drifted from the dataset's.
+ */
+async function _getReadColumnSizeInfo(
+  options: Readonly<Omit<RelationToMeasure, "relationName">>,
+): Promise<ColumnSizeInfo[]> {
+  const columns = await _getColumnSizeInfo(options);
+  return options.columnNames.map((columnName) => {
+    const column = columns.find((candidate) => {
+      return candidate.columnName === columnName;
+    });
+    if (column === undefined) {
+      throw new ConnectorError(
+        "unknown",
+        `Column '${columnName}' no longer exists in '${options.schemaName}.${options.tableName}'`,
+      );
+    }
+    return column;
+  });
+}
+
+/**
  * Measures a relation without reading a row, from an exact row count and an
  * estimated row width (see `PostgresCsvEstimate.ts`), and refuses it as
  * `too_large` if that estimate is already over the caps.
  */
 async function _getRelationSizeWithinCaps(
   options: Readonly<RelationToMeasure>,
-): Promise<{
-  rowCount: number;
-  descriptor: RelationRowDescriptor;
-  columnNames: string[];
-}> {
+): Promise<{ rowCount: number; descriptor: RelationRowDescriptor }> {
   const { transaction, relationName, schemaName, tableName } = options;
   // `count(*)` is a `bigint`, which the driver returns as a string. Casting
   // it to `int` instead would fail outright past 2^31 rows rather than
@@ -116,11 +142,7 @@ async function _getRelationSizeWithinCaps(
     from ${relationName}
   `;
   const rowCount = Number(countRow?.exact_count ?? 0);
-  const columns = await _getColumnSizeInfo({
-    transaction,
-    schemaName,
-    tableName,
-  });
+  const columns = await _getReadColumnSizeInfo(options);
   const descriptor = {
     columnCount: columns.length,
     estimatedRowBytes: PostgresCsvEstimate.estimateRowCsvBytes(columns),
@@ -135,7 +157,7 @@ async function _getRelationSizeWithinCaps(
     descriptor,
     message: `'${schemaName}.${tableName}' is estimated at ~${estimatedBytes} bytes as CSV (${rowCount} rows), over the ${POSTGRES_MAX_BYTES_PER_ACQUIRE}-byte limit for a single acquisition`,
   });
-  return { rowCount, descriptor, columnNames: columns.map(prop("columnName")) };
+  return { rowCount, descriptor };
 }
 
 /**
@@ -173,7 +195,8 @@ function _assertBeforeReadDeadline(
 }
 
 /**
- * Reads one relation's full rows as CSV bytes, refusing it as `too_large`
+ * Reads one relation's rows as CSV bytes, only the columns in `columnNames`
+ * and in that order, refusing it as `too_large`
  * before reading a row if its estimated size is over the shared call caps,
  * and again as soon as the CSV actually written crosses them. Refuses it as
  * `timeout` once its rows are still arriving past `deadlineAt`.
@@ -183,19 +206,19 @@ function _assertBeforeReadDeadline(
 export async function readRelationCsvWithinCaps(
   options: Readonly<ReadRelationCsvWithinCapsOptions>,
 ): Promise<Blob> {
-  const { transaction, schemaName, tableName } = options;
+  const { transaction, schemaName, tableName, columnNames } = options;
   const relationName = quotePostgresRelationName({
     sql: transaction,
     schemaName,
     tableName,
   });
-  const { rowCount, descriptor, columnNames } =
-    await _getRelationSizeWithinCaps({
-      transaction,
-      relationName,
-      schemaName,
-      tableName,
-    });
+  const { rowCount, descriptor } = await _getRelationSizeWithinCaps({
+    ...options,
+    relationName,
+  });
+  const columnList = transaction.unsafe(
+    columnNames.map(quoteSqlIdentifier).join(", "),
+  );
 
   const encoder = new TextEncoder();
   const headerChunk = encoder.encode(
@@ -207,7 +230,7 @@ export async function readRelationCsvWithinCaps(
   // to bytes, so a relation far wider than estimated is refused once it
   // crosses the cap instead of after every row is in memory.
   const rowBatches = transaction<Record<string, unknown>>`
-    select * from ${relationName}
+    select ${columnList} from ${relationName}
   `.cursor(_getRowsPerCursorBatch(descriptor));
   for await (const rows of rowBatches) {
     _assertBeforeReadDeadline(options);

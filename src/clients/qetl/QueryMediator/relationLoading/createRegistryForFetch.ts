@@ -3,8 +3,6 @@ import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { readPostgresTableCsvAsText } from "@/clients/qetl/QueryMediator/relationLoading/readPostgresTableCsvAsText/readPostgresTableCsvAsText";
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
-import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   QetlRunQuery,
@@ -23,36 +21,6 @@ function _isVirtualRelationSource(
   return relationSource.sourceType === "virtual";
 }
 
-function _isGoogleSheetsRelationSource(
-  relationSource: Readonly<RelationSource>,
-): relationSource is Extract<RelationSource, { sourceType: "google_sheets" }> {
-  return relationSource.sourceType === "google_sheets";
-}
-
-function _isPostgresTableRelationSource(
-  relationSource: Readonly<RelationSource>,
-): relationSource is Extract<RelationSource, { sourceType: "postgres_table" }> {
-  return relationSource.sourceType === "postgres_table";
-}
-
-function _googleSheetsSourceByDatasetId(
-  relationSources: readonly RelationSource[],
-): Record<string, GoogleSheetsDataset.T> {
-  return makeObject(relationSources.filter(_isGoogleSheetsRelationSource), {
-    keyFn: prop("dataset.id"),
-    valueFn: prop("sourceDataset"),
-  });
-}
-
-function _postgresTableSourceByDatasetId(
-  relationSources: readonly RelationSource[],
-): Record<string, PostgresTableDataset.T> {
-  return makeObject(relationSources.filter(_isPostgresTableRelationSource), {
-    keyFn: prop("dataset.id"),
-    valueFn: prop("sourceDataset"),
-  });
-}
-
 function _lookupsForFetch(relationSources: readonly RelationSource[]) {
   return {
     datasetsById: makeIdLookupRecord(relationSources.map(prop("dataset"))),
@@ -63,8 +31,6 @@ function _lookupsForFetch(relationSources: readonly RelationSource[]) {
         valueFn: prop("sourceDataset.rawSql"),
       },
     ),
-    googleSheetsByDatasetId: _googleSheetsSourceByDatasetId(relationSources),
-    postgresTableByDatasetId: _postgresTableSourceByDatasetId(relationSources),
   };
 }
 
@@ -152,18 +118,6 @@ export function createRegistryForFetch(
       return _getOrThrow(
         lookups.datasetsById[id],
         `Dataset '${id}' is not among the relations to fetch`,
-      );
-    },
-    getGoogleSheetsSource: async (id) => {
-      return _getOrThrow(
-        lookups.googleSheetsByDatasetId[id],
-        `Google Sheets dataset '${id}' is not among the relations to fetch`,
-      );
-    },
-    getPostgresTableSource: async (id) => {
-      return _getOrThrow(
-        lookups.postgresTableByDatasetId[id],
-        `Postgres table dataset '${id}' is not among the relations to fetch`,
       );
     },
     runParquetQuery: ({ rawSql }) => {

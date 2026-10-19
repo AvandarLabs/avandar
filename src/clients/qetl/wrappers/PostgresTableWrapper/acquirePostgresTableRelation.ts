@@ -1,5 +1,5 @@
-import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/PostgresRelationId";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 
 /**
@@ -11,7 +11,8 @@ import type { SourceVersion } from "$/models/relations/RelationCapabilities/Rela
  * separate access token to thread through: the
  * edge function call carries the caller's own Supabase session, and the
  * edge function itself resolves the connection's decrypted password from
- * Vault server-side - this module never sees a credential.
+ * Vault server-side - this module never sees a credential, and neither does
+ * anyone the dataset is shared with.
  */
 export type PostgresRelationCsvReader<TRelation> = (
   params: Readonly<{ csvText: string }>,
@@ -39,9 +40,7 @@ export type PostgresRowsFetch = (
 
 /** Input to {@link acquirePostgresTableRelation}. */
 export type AcquirePostgresTableRelationParams<TRelation> = {
-  connectionId: string;
-  schemaName: string;
-  tableName: string;
+  datasetId: Dataset.Id;
   readCsv: PostgresRelationCsvReader<TRelation>;
   rowsFetch?: PostgresRowsFetch;
 };
@@ -62,11 +61,13 @@ export type AcquirePostgresTableRelationParams<TRelation> = {
  * `too_large` is a deliberate assumption, not a detection: there is no
  * reliable way from here to distinguish that kill from any other
  * transport-level failure, and `too_large` is overwhelmingly the likely
- * cause for this specific route.
+ * cause for this specific route. A 403 is the one transport status the edge
+ * function does produce on purpose, when the caller may not see the
+ * dataset, so it is reported as `forbidden` instead.
  */
 async function _throwForFailedRowsResponse(
   response: Response,
-  relationId: string,
+  datasetId: Dataset.Id,
 ): Promise<never> {
   const contentType = response.headers.get("Content-Type") ?? "";
   const body: unknown = contentType.includes("application/json")
@@ -82,28 +83,29 @@ async function _throwForFailedRowsResponse(
       ? (body.error as { code?: unknown; message: unknown })
       : undefined;
 
+  const fallbackCode = response.status === 403 ? "forbidden" : "too_large";
   const code =
     typeof classifiedError?.code === "string"
       ? classifiedError.code
-      : "too_large";
+      : fallbackCode;
   const message =
     classifiedError !== undefined
       ? String(classifiedError.message)
-      : `Failed to read Postgres relation '${relationId}' (${response.status})`;
+      : `Failed to read the rows of Postgres dataset '${datasetId}' (${response.status})`;
   throw Object.assign(new Error(message), { code });
 }
 
 /**
- * Acquires one Postgres relation: fetch its rows as CSV through the
- * `connectors` edge function's `rows` route, then read it.
+ * Acquires one Postgres-backed dataset's rows: fetch them as CSV through the
+ * `connectors` edge function's dataset `rows` route, then read it.
  *
  * This is the whole connector in one function, same shape as
  * `acquireGoogleSheetRelation`: it reads no dataset record, holds no
  * connection credential, and imports no client singleton, so the wrapper
  * that eventually calls it keeps `WrapperContext` as the only source of
- * identity. `relationId` is built with
- * `PostgresRelationId.makeRelationId`, matching how the edge function's
- * `relations` route reports it.
+ * identity. The route works out the connection, table and columns from the
+ * dataset itself, after checking the caller may see it, so anyone who can
+ * see the dataset can read it through the connection it was imported with.
  *
  * This route returns raw CSV text (`Content-Type: text/csv`), not a JSON
  * object, so it is fetched directly rather than through
@@ -115,18 +117,14 @@ async function _throwForFailedRowsResponse(
  * codebase, including its auth pattern (a manually attached session Bearer
  * token).
  *
- * @param params The connection and relation to acquire, and the reader to
- *   read the CSV through.
+ * @param params The dataset to acquire, and the reader to read the CSV
+ *   through.
  * @returns The reader's output. `sourceVersion` is always `undefined` for v1
  *   (no freshness signal).
  */
 export async function acquirePostgresTableRelation<TRelation>(
   params: Readonly<AcquirePostgresTableRelationParams<TRelation>>,
 ): Promise<AcquiredPostgresTableRelation<TRelation>> {
-  const relationId = PostgresRelationId.makeRelationId(
-    params.schemaName,
-    params.tableName,
-  );
   const doFetch = params.rowsFetch ?? fetch;
 
   const { data } = await AvaSupabase.db().auth.getSession();
@@ -136,16 +134,15 @@ export async function acquirePostgresTableRelation<TRelation>(
   }
 
   const url =
-    `${AvaSupabase.getEdgeFunctionsURL()}/connectors/postgres/connections/` +
-    `${encodeURIComponent(params.connectionId)}/relations/` +
-    `${encodeURIComponent(relationId)}/rows`;
+    `${AvaSupabase.getEdgeFunctionsURL()}/connectors/postgres/datasets/` +
+    `${encodeURIComponent(params.datasetId)}/rows`;
   const response = await doFetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   const contentType = response.headers.get("Content-Type") ?? "";
   if (!response.ok || !contentType.includes("text/csv")) {
-    await _throwForFailedRowsResponse(response, relationId);
+    await _throwForFailedRowsResponse(response, params.datasetId);
   }
 
   const csvText = await response.text();

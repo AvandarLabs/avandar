@@ -82,3 +82,20 @@ export function makeFakeSql(
   fakeSql.end = vi.fn(async () => {});
   return fakeSql;
 }
+
+/**
+ * Reads CSV bytes back as text. Through `FileReader` because the test
+ * environment's jsdom `Blob` has no `text()` method.
+ */
+export function readBlobText(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      resolve(String(reader.result));
+    };
+    reader.onerror = () => {
+      reject(reader.error);
+    };
+    reader.readAsText(blob);
+  });
+}

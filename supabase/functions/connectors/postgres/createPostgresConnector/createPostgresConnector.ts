@@ -6,6 +6,7 @@ import {
 } from "@sbfn/connectors/Connector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/postgres/classifyPostgresConnectionError.ts";
 import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/postgres/connectToPostgres/connectToPostgres.ts";
+import { getPostgresDatasetRelation } from "@sbfn/connectors/postgres/createPostgresConnector/getPostgresDatasetRelation.ts";
 import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
 import {
   openSavedConnection,
@@ -39,6 +40,11 @@ type SavedConnectionTarget = OpenSavedConnectionOptions & {
 
 /** One relation on a saved connection, and how to open the connection. */
 type SavedRelationTarget = SavedConnectionTarget & { relationId: string };
+
+/** The columns to read from one relation on a saved connection. */
+type SavedRelationColumnsTarget = SavedRelationTarget & {
+  columnNames: readonly string[];
+};
 
 /** A saved connection to open, and what to run on it once it is open. */
 type WithSavedConnectionOptions<T> = SavedConnectionTarget & {
@@ -151,7 +157,7 @@ async function _previewRelation(
  * the call began.
  */
 async function _getRelationRows(
-  options: Readonly<SavedRelationTarget>,
+  options: Readonly<SavedRelationColumnsTarget>,
 ): ReturnType<Connector["getRelationRows"]> {
   const deadlineAt =
     Date.now() + GlobalAppConfig.postgresConnector.rowsReadDeadlineMs;
@@ -172,6 +178,7 @@ async function _getRelationRows(
         transaction,
         schemaName,
         tableName,
+        columnNames: options.columnNames,
         deadlineAt,
       });
     },
@@ -180,7 +187,8 @@ async function _getRelationRows(
 
 /**
  * Builds the `postgres` {@link Connector}: test-and-save a connection, list a
- * connection's tables/views, preview one, and read its full rows as CSV.
+ * connection's tables/views, preview one, find what a dataset reads, and
+ * read a relation's rows as CSV.
  * Every method re-checks the target host and connects to the address that
  * check vetted (never trusts a previously-saved host as still safe, since its
  * DNS records can change after it was saved), and every read/write against
@@ -222,13 +230,10 @@ export function createPostgresConnector(
       });
     },
 
-    getRelationRows: (context, connectionId, relationId) => {
-      return _getRelationRows({
-        ...dependencies,
-        context,
-        connectionId,
-        relationId,
-      });
+    getDatasetRelation: getPostgresDatasetRelation,
+
+    getRelationRows: (context, relation) => {
+      return _getRelationRows({ ...dependencies, ...relation, context });
     },
   };
 }

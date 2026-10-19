@@ -1,26 +1,12 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
-import { makeFakeSql } from "@sbfn/connectors/postgres/createPostgresConnector/__tests__/createPostgresConnector.fixtures.ts";
+import {
+  makeFakeSql,
+  readBlobText,
+} from "@sbfn/connectors/postgres/createPostgresConnector/__tests__/createPostgresConnector.fixtures.ts";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { describe, expect, it, vi } from "vitest";
 import type { ConnectorContext } from "@sbfn/connectors/Connector.ts";
 import type { PostgresSql } from "@sbfn/connectors/postgres/PostgresSql.types.ts";
-
-/**
- * Reads the CSV bytes back as text. Through `FileReader` because the test
- * environment's jsdom `Blob` has no `text()` method.
- */
-function _readBlobText(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      resolve(String(reader.result));
-    };
-    reader.onerror = () => {
-      reject(reader.error);
-    };
-    reader.readAsText(blob);
-  });
-}
 
 describe("createPostgresConnector - getRelationRows row/byte cap enforcement", () => {
   /**
@@ -127,11 +113,11 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
     };
 
     try {
-      await connector.getRelationRows(
-        context,
-        "44444444-4444-4444-4444-444444444444",
-        "public.customers",
-      );
+      await connector.getRelationRows(context, {
+        connectionId: "44444444-4444-4444-4444-444444444444",
+        relationId: "public.customers",
+        columnNames: ["id"],
+      });
       expect.unreachable("Expected getRelationRows to throw");
     } catch (error) {
       expect(error).toBeInstanceOf(ConnectorError);
@@ -155,13 +141,13 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
         _makeSavedConnectionAdminClient() as unknown as ConnectorContext["supabaseAdminClient"],
     };
 
-    const csv = await connector.getRelationRows(
-      context,
-      "44444444-4444-4444-4444-444444444444",
-      "public.customers",
-    );
+    const csv = await connector.getRelationRows(context, {
+      connectionId: "44444444-4444-4444-4444-444444444444",
+      relationId: "public.customers",
+      columnNames: ["id"],
+    });
 
-    const csvText = await _readBlobText(csv);
+    const csvText = await readBlobText(csv);
     expect(csvText).toContain("id");
     expect(csvText.split("\r\n")).toHaveLength(11); // header + 10 rows
   });

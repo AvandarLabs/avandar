@@ -61,8 +61,11 @@ describe("createPostgresConnector - streamed rows past the byte cap", () => {
 
     const result = connector.getRelationRows(
       makeSavedConnectionContext("8.8.8.8"),
-      SAVED_CONNECTION_ID,
-      "public.notes",
+      {
+        connectionId: SAVED_CONNECTION_ID,
+        relationId: "public.notes",
+        columnNames: ["notes"],
+      },
     );
 
     await expect(result).rejects.toBeInstanceOf(ConnectorError);

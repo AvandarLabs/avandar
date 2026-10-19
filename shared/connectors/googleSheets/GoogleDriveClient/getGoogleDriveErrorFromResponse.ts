@@ -1,5 +1,5 @@
-import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
-import type { GoogleDriveErrorCode } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+import { GoogleDriveError } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError.ts";
+import type { GoogleDriveErrorCode } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError.ts";
 
 /**
  * Drive's error envelope, as much of it as this module reads.

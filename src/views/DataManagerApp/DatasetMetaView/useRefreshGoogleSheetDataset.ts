@@ -2,10 +2,9 @@ import { useMutation } from "@avandar/query-hooks";
 import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
-import { APIClient } from "@/clients/APIClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
-import { getStoredGoogleSheetTabCsv } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import { clearGoogleSheetFreshness } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
+import { GoogleSheetDatasetProxy } from "@/clients/google/GoogleSheetDatasetProxy/GoogleSheetDatasetProxy";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
@@ -14,38 +13,14 @@ import { getGoogleSheetImportErrorCopy } from "@/views/DataManagerApp/DataImport
 import { clearCachedDatasetRows } from "@/views/DataManagerApp/DatasetMetaView/clearCachedDatasetRows";
 import { invalidateDatasetRowQueries } from "@/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";
 
-/** What one refresh needs. Every field comes from the caller's own state. */
+/** What one refresh needs. */
 export type RefreshGoogleSheetDatasetParams = {
   datasetId: Dataset.Id;
-
-  /**
-   * The dataset's Sheets source row, already loaded on the dataset page.
-   * Do not re-read it here: an extra query would not match the rest of this
-   * path.
-   */
-  sourceDataset: Pick<
-    GoogleSheetsDataset.T,
-    "googleDocumentId" | "googleAccountId" | "sheetName"
-  >;
 };
-
-async function _getGoogleAccessToken(): Promise<string> {
-  const { tokens } = await APIClient.get({ route: "google-auth/tokens" });
-  // TODO(jpsyx): take the token for `sourceDataset.googleAccountId` once
-  // multiple Google accounts are supported. Every other consumer in the repo
-  // takes `tokens[0]`, so this one does too rather than inventing a
-  // different rule.
-  const accessToken = tokens[0]?.access_token;
-  if (accessToken === undefined) {
-    throw new Error("No Google token is available for this user");
-  }
-  return accessToken;
-}
 
 /** Downloads the dataset's stored tab and imports it as the local copy. */
 async function _reimportGoogleSheetTab(
@@ -56,18 +31,14 @@ async function _reimportGoogleSheetTab(
     }
   >,
 ): Promise<void> {
-  const { datasetId, sourceDataset, userId, workspaceId } = options;
-  const accessToken = await _getGoogleAccessToken();
+  const { datasetId, userId, workspaceId } = options;
 
-  // The same download acquisition and import use, so a refreshed dataset is
-  // read exactly the way the original import read it. It resolves the stored
-  // tab name, and fails by name when a rename means it no longer matches,
-  // rather than quietly returning another tab's rows.
-  const { csvText } = await getStoredGoogleSheetTabCsv({
-    fileId: sourceDataset.googleDocumentId,
-    sheetName: sourceDataset.sheetName,
-    accessToken,
-  });
+  // The same download acquisition uses, so a refreshed dataset is read the
+  // way every other read of it is: by the edge function, with the Google
+  // grant of the account that added it, resolving the stored tab by name and
+  // failing by name when a rename means it no longer matches. Anyone who may
+  // see the dataset can refresh it, not only the person who added it.
+  const { csvText } = await GoogleSheetDatasetProxy.fetchCsv({ datasetId });
 
   // Re-imported the same way the dataset was first imported: one tab, as
   // CSV. Refreshing through a different reader would retype the columns.

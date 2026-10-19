@@ -85,13 +85,7 @@ describe("PostgresTableWrapper", () => {
   it("acquires the named relation as parquet, fresh for the live-source max age", async () => {
     const parquetBlob = new Blob(["postgres-parquet"]);
     const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
-    const getPostgresTableSource = vi.fn().mockResolvedValue({
-      connectionId: "connection-1",
-      schemaName: "public",
-      tableName: "customers",
-    });
     const wrapper = createPostgresTableWrapper({
-      getPostgresTableSource,
       readCsv,
       rowsFetch: _csvFetch("city\r\nNairobi\r\n"),
     });
@@ -113,14 +107,41 @@ describe("PostgresTableWrapper", () => {
     });
   });
 
-  it("throws when the edge function returns an error response", async () => {
-    const getPostgresTableSource = vi.fn().mockResolvedValue({
-      connectionId: "connection-1",
-      schemaName: "public",
-      tableName: "customers",
-    });
+  it("reads the rows by dataset, so the server picks the connection and table, not the caller", async () => {
+    const requestedUrls: string[] = [];
     const wrapper = createPostgresTableWrapper({
-      getPostgresTableSource,
+      readCsv: vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) }),
+      rowsFetch: async (url) => {
+        requestedUrls.push(url);
+        return await _csvFetch("city\r\n")(url);
+      },
+    });
+
+    await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
+
+    expect(requestedUrls).toEqual([
+      `https://project.supabase.co/functions/v1/connectors/postgres/datasets/${DATASET_REF.id}/rows`,
+    ]);
+  });
+
+  it("reports a refused dataset as forbidden rather than too large", async () => {
+    const wrapper = createPostgresTableWrapper({
+      readCsv: vi.fn(),
+      rowsFetch: async () => {
+        return new Response(JSON.stringify({ error: "No dataset found" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      },
+    });
+
+    await expect(
+      wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT),
+    ).rejects.toHaveProperty("code", "forbidden");
+  });
+
+  it("throws when the edge function returns an error response", async () => {
+    const wrapper = createPostgresTableWrapper({
       readCsv: vi.fn(),
       rowsFetch: _errorFetch("unreachable", "could not connect to server"),
     });

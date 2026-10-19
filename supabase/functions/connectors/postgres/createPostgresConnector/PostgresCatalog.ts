@@ -19,6 +19,16 @@ function _makeRelationFromCatalogRow(row: {
   };
 }
 
+/**
+ * Postgres's own catalogs, which `_listCatalogRelations` also leaves out.
+ * They describe the server rather than hold anyone's data, so no relation in
+ * them can be previewed or read.
+ */
+const SYSTEM_SCHEMA_NAMES: readonly string[] = [
+  "pg_catalog",
+  "information_schema",
+];
+
 /** Lists every table and view a connection can see, across every schema. */
 async function _listCatalogRelations(
   sql: PostgresQueryRunner,
@@ -46,6 +56,12 @@ async function _assertRelationStillExists(
   schemaName: string,
   tableName: string,
 ): Promise<"table" | "view"> {
+  if (SYSTEM_SCHEMA_NAMES.includes(schemaName)) {
+    throw new ConnectorError(
+      "unknown",
+      `'${schemaName}.${tableName}' is part of Postgres's own catalog`,
+    );
+  }
   const rows = await sql<{ table_type: string }>`
     select table_type
     from information_schema.tables

@@ -1,9 +1,9 @@
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type {
   ConnectorErrorCode,
   ConnectorPreviewColumn,
   ConnectorRelation,
 } from "@sbfn/connectors/Connector.ts";
-import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 /** The shared error shape every `connectors` route returns on failure. */
 export type ConnectorErrorResponse = {
@@ -17,7 +17,7 @@ export type ConnectorsApi = APITypeDef<
     "/:connectorType/connections/test-and-save",
     "/:connectorType/connections/:connectionId/relations",
     "/:connectorType/connections/:connectionId/relations/:relationId/preview",
-    "/:connectorType/connections/:connectionId/relations/:relationId/rows",
+    "/:connectorType/datasets/:datasetId/rows",
   ],
   {
     "/:connectorType/connections/test-and-save": {
@@ -35,9 +35,7 @@ export type ConnectorsApi = APITypeDef<
     "/:connectorType/connections/:connectionId/relations": {
       GET: {
         pathParams: { connectorType: string; connectionId: string };
-        returnType:
-          | { relations: ConnectorRelation[] }
-          | ConnectorErrorResponse;
+        returnType: { relations: ConnectorRelation[] } | ConnectorErrorResponse;
       };
     };
     "/:connectorType/connections/:connectionId/relations/:relationId/preview": {
@@ -55,13 +53,9 @@ export type ConnectorsApi = APITypeDef<
           | ConnectorErrorResponse;
       };
     };
-    "/:connectorType/connections/:connectionId/relations/:relationId/rows": {
+    "/:connectorType/datasets/:datasetId/rows": {
       GET: {
-        pathParams: {
-          connectorType: string;
-          connectionId: string;
-          relationId: string;
-        };
+        pathParams: { connectorType: string; datasetId: string };
         // The handler returns a raw `Response` with `Content-Type: text/csv`
         // - `ValidReturnType` (`MiniServer/api.types.ts`) only allows
         // `Record<string, unknown> | void | Response` here, so this must
