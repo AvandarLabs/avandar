@@ -1,5 +1,17 @@
+import { runPipelineLocal } from "@ava-cli/PipelineCli/runPipelineLocal";
 import { Acclimate } from "@avandar/acclimate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@ava-cli/PipelineCli/runPipelineLocal", () => {
+  return {
+    findAvandarRepoRoot: vi.fn(() => {
+      return "/repo";
+    }),
+    runPipelineLocal: vi.fn(() => {
+      return { ok: true, pipelineRunId: "local-run-id", errorText: "" };
+    }),
+  };
+});
 
 type FetchCall = readonly [
   input: string,
@@ -7,6 +19,7 @@ type FetchCall = readonly [
     | {
         method?: string;
         headers?: Record<string, string>;
+        body?: string;
       }
     | undefined,
 ];
@@ -97,5 +110,42 @@ describe("runPipelineCommand", () => {
 
     const logs = _getCombinedLogs();
     expect(logs).toContain("Failed to run pipeline: world-bank__wdi");
+  });
+
+  it("sends the limit to the pipeline server as a JSON body", async () => {
+    const fetchMock = _mockFetch(async () => {
+      return new Response("run-id", { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "socrata", local: false, limit: 5 });
+
+    const [, init] = fetchMock.mock.calls[0]!;
+    expect([init?.headers?.["content-type"], init?.body]).toEqual([
+      "application/json",
+      '{"limit":5}',
+    ]);
+  });
+
+  it("sends no body when no limit is given", async () => {
+    const fetchMock = _mockFetch(async () => {
+      return new Response("run-id", { status: 200 });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "socrata", local: false });
+
+    expect(fetchMock.mock.calls[0]?.[1]?.body).toBe(undefined);
+  });
+
+  it("passes the limit to a local run", async () => {
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+    await runPipelineCommand({ name: "hdx", local: true, limit: 3 });
+
+    expect(vi.mocked(runPipelineLocal)).toHaveBeenCalledWith({
+      pipelineName: "hdx",
+      repoRoot: "/repo",
+      limit: 3,
+    });
   });
 });

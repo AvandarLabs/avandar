@@ -1,3 +1,4 @@
+import { parsePipelineRunLimit } from "@pipelines/shared/parsePipelineRunLimit/parsePipelineRunLimit";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import { FastifyPluginAsync } from "fastify";
 import type { FastifyReply, FastifyRequest } from "fastify";
@@ -6,6 +7,7 @@ type RunPipelineRequest = FastifyRequest<{
   Params: {
     pipelineName: string;
   };
+  Body: { limit?: unknown } | undefined;
 }>;
 
 function _getServerSecret(): string | undefined {
@@ -60,9 +62,19 @@ export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
         return authError;
       }
 
+      let limit: number | undefined;
+      try {
+        limit = parsePipelineRunLimit(request.body?.limit);
+      } catch (error: unknown) {
+        const message: string =
+          error instanceof Error ? error.message : "Invalid limit.";
+        return await reply.status(400).send({ ok: false, error: message });
+      }
+
       try {
         const result: string = await run({
           pipelineName: request.params.pipelineName,
+          ...(limit === undefined ? {} : { limit }),
         });
 
         reply.type("text/plain; charset=utf-8");

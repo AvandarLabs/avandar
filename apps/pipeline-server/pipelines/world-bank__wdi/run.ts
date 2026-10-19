@@ -13,6 +13,7 @@ import {
   upsertWorldBankWdiCatalogEntry,
 } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
 import type { TransformedDataDescriptionForParquet } from "@avandar/etl";
+import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 import type { WdiTableParquetSummary } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
 
 const PIPELINE_NAME = "world-bank__wdi" as const;
@@ -136,7 +137,12 @@ const worldBankWdiEtl = EtlEngine.create("EtlEngine", { state: {
 /**
  * Runs the World Bank WDI pipeline and returns the pipeline run id.
  */
-export async function run(): Promise<string> {
+export async function run(options: PipelineRunOptions = {}): Promise<string> {
+  if (options.limit !== undefined) {
+    throw new Error(
+      "world-bank__wdi does not support --limit: it loads every CSV in its input directory.",
+    );
+  }
   const { pipelineRunId } = await worldBankWdiEtl.run();
   return pipelineRunId;
 }

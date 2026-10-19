@@ -39,6 +39,7 @@ export type RunPipelineLocalResult = Readonly<{
 export function runPipelineLocal(options: {
   pipelineName: string;
   repoRoot: string;
+  limit?: number;
 }): RunPipelineLocalResult {
   const scriptPath = join(options.repoRoot, "scripts", "runPipelineOnce.ts");
 
@@ -51,6 +52,9 @@ export function runPipelineLocal(options: {
       "vite.script.config.ts",
       scriptPath,
       options.pipelineName,
+      ...(options.limit === undefined
+        ? []
+        : ["--limit", String(options.limit)]),
     ],
     {
       cwd: options.repoRoot,

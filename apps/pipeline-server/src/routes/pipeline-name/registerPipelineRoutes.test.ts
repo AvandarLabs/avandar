@@ -111,4 +111,34 @@ describe("registerRunPipelineRoutes", () => {
       pipelineName: "example-pipeline",
     });
   });
+
+  it("passes the limit from a JSON body to the pipeline run", async () => {
+    server = await _createServer();
+
+    await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { limit: 5 },
+    });
+
+    expect(vi.mocked(run)).toHaveBeenCalledWith({
+      pipelineName: "example-pipeline",
+      limit: 5,
+    });
+  });
+
+  it("returns 400 and skips the run when the limit is not a positive integer", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { limit: 0 },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(vi.mocked(run)).not.toHaveBeenCalled();
+  });
 });

@@ -10,11 +10,19 @@ import {
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
+/**
+ * Runs a pipeline, on the pipeline-server or locally through vite-node.
+ *
+ * @param options.name - The pipeline's directory name.
+ * @param options.local - Run it in-process instead of on the server.
+ * @param options.limit - Process at most this many datasets.
+ */
 export async function runPipelineCommand(options: {
   name: string;
   local: boolean;
+  limit?: number;
 }): Promise<void> {
-  const { name, local } = options;
+  const { name, local, limit } = options;
 
   try {
     printInfo(`Running pipeline: ${name}`);
@@ -30,6 +38,7 @@ export async function runPipelineCommand(options: {
       const localResult = runPipelineLocal({
         pipelineName: name,
         repoRoot,
+        limit,
       });
       if (!localResult.ok) {
         throw new Error(localResult.errorText);
@@ -40,6 +49,7 @@ export async function runPipelineCommand(options: {
 
     const result: string = await sendRunPipelineRequest({
       pipelineName: name,
+      limit,
     });
     printSuccess(result);
   } catch (error: unknown) {
@@ -72,6 +82,29 @@ export const RunPipelineCli = Acclimate.createCLI("run")
     description:
       "Run the pipeline TypeScript module locally (no HTTP server required).",
   })
-  .action(({ name, local }: Readonly<{ name: string; local: boolean }>) => {
-    return runPipelineCommand({ name, local });
-  });
+  .addOption({
+    name: "--limit",
+    type: "number",
+    required: false,
+    description:
+      "Process at most this many datasets. For testing a pipeline without " +
+      "a full run. The hdx and socrata pipelines support it.",
+    parser: (value: string) => {
+      return Number(value);
+    },
+    validator: (value: number) => {
+      return (
+        (Number.isInteger(value) && value >= 1) ||
+        "--limit must be a positive integer."
+      );
+    },
+  })
+  .action(
+    ({
+      name,
+      local,
+      limit,
+    }: Readonly<{ name: string; local: boolean; limit?: number }>) => {
+      return runPipelineCommand({ name, local, limit });
+    },
+  );

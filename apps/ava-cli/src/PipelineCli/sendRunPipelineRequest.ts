@@ -25,6 +25,7 @@ async function _readErrorBody(res: Response): Promise<string> {
 
 export async function sendRunPipelineRequest(options: {
   pipelineName: string;
+  limit?: number;
 }): Promise<string> {
   const config = getPipelineServerClientConfig();
   const encodedPipelineName: string = encodeURIComponent(options.pipelineName);
@@ -35,7 +36,15 @@ export async function sendRunPipelineRequest(options: {
       method: "POST",
       headers: {
         authorization: `Bearer ${config.serverSecret}`,
+        // Fastify rejects an empty body sent as JSON, so a body is only sent
+        // when there is an option to carry.
+        ...(options.limit === undefined
+          ? {}
+          : { "content-type": "application/json" }),
       },
+      ...(options.limit === undefined
+        ? {}
+        : { body: JSON.stringify({ limit: options.limit }) }),
     });
   } catch (error: unknown) {
     const cause: unknown =

@@ -29,6 +29,7 @@ dist-ssr
 .env.development*
 .env.staging*
 .env.production*
+.env.pipelines.local
 *client_secret*
 
 # Ignorable development files 

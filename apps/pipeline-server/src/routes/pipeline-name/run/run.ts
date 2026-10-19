@@ -1,9 +1,12 @@
-type RunPipelineOptions = Readonly<{
-  pipelineName: string;
-}>;
+import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
+
+type RunPipelineOptions = PipelineRunOptions &
+  Readonly<{
+    pipelineName: string;
+  }>;
 
 type PipelineRunModule = Readonly<{
-  run: () => Promise<string>;
+  run: (options: PipelineRunOptions) => Promise<string>;
 }>;
 
 function _getPipelineModuleURL(pipelineName: string): URL {
@@ -29,5 +32,7 @@ export async function run(options: RunPipelineOptions): Promise<string> {
     );
   }
 
-  return await (pipelineModule as PipelineRunModule).run();
+  return await (pipelineModule as PipelineRunModule).run({
+    limit: options.limit,
+  });
 }
