@@ -3,7 +3,6 @@ import { createHdxHttpClient } from "@pipelines/hdx/createHdxHttpClient/createHd
 import { HDX_DRIVE } from "@pipelines/hdx/hdxDrive";
 import { makeCkanListingRowsFromPackage } from "@pipelines/hdx/makeCkanListingRowsFromPackage/makeCkanListingRowsFromPackage";
 import { createSupabaseAdminClient } from "@pipelines/shared/createSupabaseAdminClient";
-import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import { upsertDataCatalogListingRows } from "@pipelines/shared/upsertDataCatalogListingRows/upsertDataCatalogListingRows";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient";
 import { createCkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient";
@@ -13,7 +12,6 @@ import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.ty
 /**
  * Enumerates the HDX drive, if one is configured (`hdxDrive.ts`), and
  * upserts one `data_catalog_listings` row per readable resource it finds.
- * Set `HDX_API_KEY` (see `.env.pipelines.example`) to send an API token.
  *
  * Not an `EtlEngine` pipeline: nothing here extracts, transforms, or loads
  * data into Parquet. It only discovers metadata and writes catalog rows -
@@ -33,10 +31,7 @@ export async function run(options: PipelineRunOptions = {}): Promise<string> {
   }
 
   const supabase = createSupabaseAdminClient();
-  const http = createHdxHttpClient({
-    baseUrl: HDX_DRIVE.baseUrl,
-    apiKey: getOptionalEnvVar("HDX_API_KEY"),
-  });
+  const http = createHdxHttpClient({ baseUrl: HDX_DRIVE.baseUrl });
   const discovery = createCkanDiscoveryClient(http);
   const client = createCkanClient(http);
 

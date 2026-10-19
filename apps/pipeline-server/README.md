@@ -18,10 +18,11 @@ response.
   pipeline run.
 - `HOST` (optional): Defaults to `0.0.0.0`.
 - `PORT` (optional): For localhost only, defaults to `4611`.
-- `HDX_API_KEY`, `SOCRATA_APP_TOKEN` (optional): API keys for the `hdx` and
-  `socrata` pipelines, which raise those APIs' rate limits. Locally, copy
-  `.env.pipelines.example` at the repo root to `.env.pipelines.local` and fill
-  them in. In production, set them as Fly secrets.
+- `SOCRATA_APP_TOKEN` (optional): App token for the `socrata` pipeline, which
+  raises the Socrata API's rate limit. Locally, copy `.env.pipelines.example`
+  at the repo root to `.env.pipelines.local` and fill it in. In production,
+  set it as a Fly secret. The `hdx` pipeline needs no key: HDX API tokens only
+  grant write access and do not raise read rate limits.
 
 ## Running one pipeline
 
