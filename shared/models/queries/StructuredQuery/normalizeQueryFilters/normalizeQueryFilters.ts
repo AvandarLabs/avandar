@@ -1,3 +1,5 @@
+import { prop, propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
@@ -11,55 +13,21 @@ type BindingIssue = {
   nodeId: string | undefined;
   reason: "missing" | "ambiguous";
 };
-type Options = {
-  filter: QueryFilterGroup | LegacyQueryFilterGroup;
+type NodeOutcome = { rules: QueryFilterGroup["rules"]; issues: BindingIssue[] };
+
+function _getMatches({
+  node,
+  columns,
+  clause,
+}: {
+  node: QueryFilterRule | LegacyQueryFilterRule;
   columns: readonly QueryColumn.T[];
   clause: "where" | "having";
-};
-
-/** Binds legacy names once and validates existing identity-based targets. */
-export function normalizeQueryFilters(options: Readonly<Options>): {
-  filter: QueryFilterGroup;
-  issues: readonly BindingIssue[];
-} {
-  const { filter, columns, clause } = options;
-  const issues: BindingIssue[] = [];
-  const rules = filter.rules.flatMap((node): QueryFilterGroup["rules"] => {
-    if (node.type === "group") {
-      const result = normalizeQueryFilters({ filter: node, columns, clause });
-      issues.push(...result.issues);
-      return result.filter.rules.length > 0 || result.issues.length === 0
-        ? [result.filter]
-        : [];
-    }
-    const matches = _getMatches(node, columns, clause);
-    const column = matches.length === 1 ? matches[0] : undefined;
-    if (!column) {
-      issues.push({
-        nodeId: node.id,
-        reason: matches.length > 1 ? "ambiguous" : "missing",
-      });
-      return [];
-    }
-    if ("columnId" in node) {
-      return [node];
-    }
-    return [_getBoundRule(node, column, clause)];
-  });
-  return { filter: { ...filter, rules }, issues };
-}
-
-function _getMatches(
-  node: QueryFilterRule | LegacyQueryFilterRule,
-  columns: readonly QueryColumn.T[],
-  clause: "where" | "having",
-): readonly QueryColumn.T[] {
+}): QueryColumn.T[] {
   if ("columnId" in node) {
-    return columns.filter((column) => {
-      return column.id === node.columnId;
-    });
+    return columns.filter(propEq("id", node.columnId));
   }
-  const getNames = (column: QueryColumn.T): readonly string[] => {
+  const getNames = (column: QueryColumn.T): string[] => {
     return clause === "where"
       ? [column.baseColumn.name]
       : [
@@ -82,16 +50,86 @@ function _getMatches(
       });
 }
 
-function _getBoundRule(
-  node: LegacyQueryFilterRule,
-  column: QueryColumn.T,
-  clause: "where" | "having",
-): QueryFilterRule {
+function _getBoundRule({
+  node,
+  column,
+  clause,
+}: {
+  node: LegacyQueryFilterRule;
+  column: QueryColumn.T;
+  clause: "where" | "having";
+}): QueryFilterRule {
   const { columnName: _columnName, ...rule } = node;
   const aggregation = clause === "having" ? column.aggregation : undefined;
-  const columnDataType = QueryAggregationType.getResultDataType(
+  const columnDataType = QueryAggregationType.getResultDataType({
     aggregation,
-    column.baseColumn.dataType,
-  );
+    sourceDataType: column.baseColumn.dataType,
+  });
   return { ...rule, columnId: column.id, columnDataType };
+}
+
+function _getRuleOutcome({
+  node,
+  columns,
+  clause,
+}: {
+  node: QueryFilterRule | LegacyQueryFilterRule;
+  columns: readonly QueryColumn.T[];
+  clause: "where" | "having";
+}): NodeOutcome {
+  const matches = _getMatches({ node, columns, clause });
+  const column = matches.length === 1 ? matches[0] : undefined;
+  return column
+    ? {
+        rules: [
+          "columnId" in node ? node : _getBoundRule({ node, column, clause }),
+        ],
+        issues: [],
+      }
+    : {
+        rules: [],
+        issues: [
+          {
+            nodeId: node.id,
+            reason: matches.length > 1 ? "ambiguous" : "missing",
+          },
+        ],
+      };
+}
+
+/** Binds legacy names once and validates existing identity-based targets. */
+export function normalizeQueryFilters({
+  filter,
+  columns,
+  clause,
+}: Readonly<{
+  filter: QueryFilterGroup | LegacyQueryFilterGroup;
+  columns: readonly QueryColumn.T[];
+  clause: "where" | "having";
+}>): { filter: QueryFilterGroup; issues: BindingIssue[] } {
+  const outcomes = filter.rules.map((node): NodeOutcome => {
+    return match(node)
+      .with({ type: "group" }, (group) => {
+        const result = normalizeQueryFilters({
+          filter: group,
+          columns,
+          clause,
+        });
+        return {
+          rules:
+            result.filter.rules.length > 0 || result.issues.length === 0
+              ? [result.filter]
+              : [],
+          issues: result.issues,
+        };
+      })
+      .with({ type: "rule" }, (rule) => {
+        return _getRuleOutcome({ node: rule, columns, clause });
+      })
+      .exhaustive();
+  });
+  return {
+    filter: { ...filter, rules: outcomes.flatMap(prop("rules")) },
+    issues: outcomes.flatMap(prop("issues")),
+  };
 }

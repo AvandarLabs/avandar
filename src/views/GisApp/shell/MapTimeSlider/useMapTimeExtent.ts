@@ -20,7 +20,7 @@ function _participatingTimeLayers(
   return layers.flatMap((layer) => {
     if (
       !layer.timeColumn ||
-      !MapLayerData.hasReadySourceFilters(layer, layers)
+      !MapLayerData.hasReadySourceFilters({ layer: layer, stack: layers })
     ) {
       return [];
     }

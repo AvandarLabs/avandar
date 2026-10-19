@@ -14,8 +14,8 @@ import {
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { describeQueryProjections } from "$/models/queries/QueryColumnBindings/describeQueryProjections/describeQueryProjections";
-import { describeSqlProjections } from "$/models/queries/QueryColumnBindings/describeSqlProjections/describeSqlProjections";
+import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
+import { makeProjectionDescriptorsFromStructuredQuery } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromStructuredQuery/makeProjectionDescriptorsFromStructuredQuery";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
@@ -146,11 +146,11 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   const bindingScope = useRef(crypto.randomUUID());
   const projections = useMemo(() => {
     const structured = state.isStructuredQueryInSync
-      ? describeQueryProjections(state.query)
+      ? makeProjectionDescriptorsFromStructuredQuery(state.query)
       : [];
     return structured.length
       ? structured
-      : describeSqlProjections({
+      : makeProjectionDescriptorsFromSql({
           sql: savableSql ?? "",
           columns: queryResults?.columns ?? [],
         });

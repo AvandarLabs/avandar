@@ -5,13 +5,13 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
-import { getDataVizQueryAuth } from "../getDataVizQueryAuth";
+import { makeQueryAuthFromAvaPageMetadata } from "../makeQueryAuthFromAvaPageMetadata";
 import { useRefreshDataVizColumnBindings } from "../useDataVizColumnBindings/useRefreshDataVizColumnBindings";
 import { useResolvedDataVizBindings } from "../useResolvedDataVizBindings/useResolvedDataVizBindings";
 import { DataVizContent } from "./DataVizContent";
 import { useLocalFilterState } from "./useLocalFilterState";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
-import type { DataVizBindingProps } from "../resolveSavedDataVizBindings/resolveSavedDataVizBindings";
+import type { DataVizBindingProps } from "../makeSavedBindingsFromDataVizProps/makeSavedBindingsFromDataVizProps";
 import type { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import type { WithPuckProps } from "@puckeditor/core";
 import type { ReactElement } from "react";
@@ -22,16 +22,13 @@ export type Props = {
   vizType: VizConfig.Type;
 } & DataVizBindingProps;
 
-/**
- * Discovers identities before applying predicates and executing dashboard
- * SQL.
- */
+/** Renders a saved chart with its local and subscribed dashboard filters. */
 export function DataVizPBlock(
   props: Readonly<WithPuckProps<Props & { id: string }>>,
 ): ReactElement {
   const metadata = useAvaPageMetadata(props.puck);
-  const auth = getDataVizQueryAuth(metadata);
-  const bindings = useResolvedDataVizBindings(props, auth);
+  const auth = makeQueryAuthFromAvaPageMetadata(metadata);
+  const bindings = useResolvedDataVizBindings({ props: props, auth: auth });
   const localFilters = bindings.resolved?.localFilters ?? [];
   const localFilterState = useLocalFilterState(localFilters);
   const filteredSql = useApplyDashboardFiltersToSql({

@@ -1,30 +1,38 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
+import { normalizeSqlForSubquery } from "@/lib/sql/normalizeSqlForSubquery";
 import type {
   BoundResultSchema,
   ProjectionDescriptor,
   ResultBindingRegistry,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
+} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 
-type Options = Readonly<{
+type Options = {
   scopeKey: string;
   sqlKey: string;
   resultSqlKey: string | undefined;
   result: QueryResult.T | undefined;
   projections: readonly ProjectionDescriptor[];
   initialRegistry: ResultBindingRegistry | undefined;
-}>;
+};
 
-function _getSchema(
-  options: Options,
-  previous: BoundResultSchema | undefined,
-): BoundResultSchema | undefined {
-  const sqlKey = options.sqlKey.trim().replace(/;$/, "").trimEnd();
+function _getSchema({
+  options,
+  previous,
+}: {
+  options: Readonly<Options>;
+  previous: BoundResultSchema | undefined;
+}): BoundResultSchema | undefined {
+  const sqlKey = normalizeSqlForSubquery(options.sqlKey);
   if (options.result === undefined) {
     return previous?.registry.sqlKey === sqlKey ? previous : undefined;
   }
-  if (options.resultSqlKey?.trim().replace(/;$/, "").trimEnd() !== sqlKey) {
+  if (
+    (options.resultSqlKey === undefined
+      ? undefined
+      : normalizeSqlForSubquery(options.resultSqlKey)) !== sqlKey
+  ) {
     return undefined;
   }
   const schema = reconcileResultBindings({
@@ -44,7 +52,7 @@ function _getSchema(
  * Structured descriptors replace provisional SQL IDs authoritatively.
  */
 export function useBoundQueryResult(
-  options: Options,
+  options: Readonly<Options>,
 ): BoundResultSchema | undefined {
   const previousRef = useRef<BoundResultSchema | undefined>(undefined);
   const {
@@ -60,10 +68,17 @@ export function useBoundQueryResult(
       previousRef.current?.registry.scopeKey === scopeKey
         ? previousRef.current
         : undefined;
-    return _getSchema(
-      { scopeKey, sqlKey, resultSqlKey, result, projections, initialRegistry },
-      previous,
-    );
+    return _getSchema({
+      options: {
+        scopeKey,
+        sqlKey,
+        resultSqlKey,
+        result,
+        projections,
+        initialRegistry,
+      },
+      previous: previous,
+    });
   }, [scopeKey, sqlKey, resultSqlKey, result, projections, initialRegistry]);
   useLayoutEffect(() => {
     if (schema || previousRef.current?.registry.scopeKey !== scopeKey) {

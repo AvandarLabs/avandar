@@ -1,3 +1,7 @@
+import { writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
 /**
  * Round-trip tests for the concept spine's CSV writer.
  *
@@ -8,12 +12,8 @@
  * round trip silently drops or merges individuals, so the spine's grain depends
  * on this.
  */
-import { writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { describe, expect, it } from "vitest";
 import { toCsvColumn } from "@/clients/qetl/QueryMediator/conceptRelation/toCsvColumn";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../tests/integration/queries/executedDuckDb";
 
 /**
  * Writes the CSV, reads it back through DuckDB, returns the column values.

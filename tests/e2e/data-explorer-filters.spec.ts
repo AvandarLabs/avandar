@@ -1,18 +1,3 @@
-/**
- * Filter semantics, driven through the filter panel.
- *
- * These tests build a rule the way a person does (pick a column, pick an
- * operator, type a value) and then judge the rows that come back, so they cover
- * the whole path from the panel through `renderFilterRule` to DuckDB. The exact
- * SQL each operator emits is pinned by `renderFilterRule.test.ts`, and the
- * panel's own interaction (typing, focus, combinator display) by
- * `QueryFiltersField.test.tsx`; what only an end-to-end run can show is that
- * the SQL the panel generates selects the rows its label promises.
- *
- * Case-insensitive-by-default text comparison, and the per-rule `Match case`
- * toggle that turns it off, are what these cover: they are the semantics with
- * no other end-to-end coverage and the ones a person is most likely to notice.
- */
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
@@ -30,6 +15,21 @@ import {
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
+/**
+ * Filter semantics, driven through the filter panel.
+ *
+ * These tests build a rule the way a person does (pick a column, pick an
+ * operator, type a value) and then judge the rows that come back, so they cover
+ * the whole path from the panel through `renderFilterRule` to DuckDB. The exact
+ * SQL each operator emits is pinned by `renderFilterRule.test.ts`, and the
+ * panel's own interaction (typing, focus, combinator display) by
+ * `QueryFiltersField.test.tsx`; what only an end-to-end run can show is that
+ * the SQL the panel generates selects the rows its label promises.
+ *
+ * Case-insensitive-by-default text comparison, and the per-rule `Match case`
+ * toggle that turns it off, are what these cover: they are the semantics with
+ * no other end-to-end coverage and the ones a person is most likely to notice.
+ */
 import type { Page } from "@playwright/test";
 
 test.use({ trace: "retain-on-failure" });
@@ -159,8 +159,6 @@ async function _getColumnCellTexts(options: {
 }
 
 test.describe("Data Explorer filter semantics", () => {
-  test.setTimeout(45_000);
-
   test("a text filter built in the panel matches regardless of case, until Match case is on", async ({
     page,
     e2eWorkerDb,

@@ -11,7 +11,7 @@ import { useGlobalFilterSubscriptionPFieldConfig } from "@/views/DashboardApp/Av
 import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/useLocalFiltersPFieldConfig";
 import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig";
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig";
-import { prepareDataVizBindings } from "../../utils/prepareDashboardBindings/prepareDashboardBindings";
+import { DashboardBindingPreparation } from "../../utils/DashboardBindingPreparation/DashboardBindingPreparation";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaPageConfig } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
@@ -37,7 +37,7 @@ const defaultProps: DataVizPBlockProps = {
 };
 
 type DataVizPBlockConfigOptions = {
-  resolveBindings: (
+  prepareBindings: (
     props: DataVizPBlockProps & { id: string },
   ) => Promise<DataVizPBlockProps>;
   label: string;
@@ -97,7 +97,7 @@ function _getDataVizPBlockConfig(
           props.bindingVersion === 0 ||
           !props.nlQuery.rawSql.trim()
             ? props
-            : await options.resolveBindings({ ...props, id: data.props.id }),
+            : await options.prepareBindings({ ...props, id: data.props.id }),
       };
     },
     // Puck maps branded strings as objects. Runtime serialized IDs remain
@@ -150,8 +150,13 @@ export function useDataVizPBlockConfig(
 
   return useMemo(() => {
     return _getDataVizPBlockConfig({
-      resolveBindings: (props) => {
-        return prepareDataVizBindings(props, auth, queryClient, []);
+      prepareBindings: (props) => {
+        return DashboardBindingPreparation.prepareChart({
+          props: props,
+          auth: auth,
+          queryClient: queryClient,
+          filters: [],
+        });
       },
       label: t`Data Visualization`,
       nlQueryField: nlQueryFieldConfig,

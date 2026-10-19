@@ -1,14 +1,18 @@
-/** Verifies local catalog ownership for standalone source controls. */
 import { Model } from "@avandar/models";
 import { expect, it, vi } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { renderHook } from "@/test-utils";
 import { useSourceColumnCatalog } from "@/views/DataExplorerApp/useSourceColumnCatalog/useSourceColumnCatalog";
+/** Verifies local catalog ownership for standalone source controls. */
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
-const loader = vi.hoisted(() => {
+const loader = vi.hoisted<{
+  columns: QueryColumn.T[];
+  isLoading: boolean;
+  isReady: boolean;
+}>(() => {
   return { columns: [] as QueryColumn.T[], isLoading: true, isReady: false };
 });
 vi.mock("@/views/DataExplorerApp/useQueryColumnsForDataSource", () => {

@@ -1,13 +1,14 @@
-/** Verifies stable source identities and unambiguous projection retention. */
 import { Model } from "@avandar/models";
+import { pickProps } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation.ts";
+/** Verifies stable source identities and unambiguous projection retention. */
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.ts";
 
-function _createColumn(name = "revenue"): QueryColumn.T {
+function _createColumn(name: string = "revenue"): QueryColumn.T {
   return QueryColumn.makeFromDatasetColumn(
     Model.make("DatasetColumn", {
       id: "dc_revenue",
@@ -115,11 +116,7 @@ describe("QueryColumnReconciliation", () => {
       incoming: [previous, additional],
       aggregations: { [previous.id]: "sum" },
     });
-    expect(
-      result.columns.map(({ id, aggregation }) => {
-        return { id, aggregation };
-      }),
-    ).toEqual([
+    expect(result.columns.map(pickProps(["id", "aggregation"]))).toEqual([
       { id: previous.id, aggregation: "sum" },
       { id: additional.id, aggregation: undefined },
     ]);

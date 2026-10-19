@@ -1,3 +1,4 @@
+import { identity } from "@avandar/utils";
 import { createUsePuck } from "@puckeditor/core";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { useResolvedDataVizBindings } from "../../pblocks/DataVizPBlock/useResolvedDataVizBindings/useResolvedDataVizBindings";
@@ -16,10 +17,11 @@ type Authoring = ReturnType<typeof useResolvedDataVizBindings> & {
   ) => void;
 };
 
-function useSelectedDataVizOwner() {
-  const editor = usePuckSelector((state) => {
-    return state;
-  });
+function useSelectedDataVizOwner(): {
+  props: Props & { id: string };
+  replace: (updatedProps: Props) => void;
+} {
+  const editor = usePuckSelector(identity);
   const selected = editor.selectedItem;
   const props = selected?.props as Props & { id: string };
   const replace = (updatedProps: Props): void => {
@@ -41,10 +43,12 @@ function useSelectedDataVizOwner() {
 }
 
 /** Commits owning-block bindings only on explicit field edits. */
-export function useDataVizAuthoring(auth: StructuredQueryAuth): Authoring {
+export function useDataVizAuthoring(
+  auth: Readonly<StructuredQueryAuth>,
+): Authoring {
   const { props, replace } = useSelectedDataVizOwner();
   const { filtersById } = DashboardFilterStateManager.useState();
-  const bindings = useResolvedDataVizBindings(props, auth);
+  const bindings = useResolvedDataVizBindings({ props: props, auth: auth });
   const update = (change: DataVizAuthoringChange): void => {
     const updated = getDataVizAuthoringProps({
       props,

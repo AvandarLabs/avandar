@@ -1,7 +1,4 @@
-import {
-  pickCategoryColumnId,
-  pickFirstNumericColumnId,
-} from "$/models/vizs/hydrateColumnPicking.ts";
+import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
@@ -29,18 +26,21 @@ export function hydrateXYFromQueryResult<VConfig extends XYAxesConfig>(
   let next: VConfig = { ...currVizConfig };
 
   if (next.yAxisKey === undefined) {
-    const yName = pickFirstNumericColumnId(columns);
-    if (yName !== undefined) {
-      next = { ...next, yAxisKey: yName };
+    const yColumnId = VizHydrationColumns.getFirstNumericColumnId(columns);
+    if (yColumnId !== undefined) {
+      next = { ...next, yAxisKey: yColumnId };
     }
   }
 
   const yKey = next.yAxisKey;
 
   if (next.xAxisKey === undefined && yKey !== undefined) {
-    const xName = pickCategoryColumnId(columns, new Set([yKey]));
-    if (xName !== undefined) {
-      next = { ...next, xAxisKey: xName };
+    const xColumnId = VizHydrationColumns.getCategoryColumnId({
+      columns,
+      excludedIds: new Set([yKey]),
+    });
+    if (xColumnId !== undefined) {
+      next = { ...next, xAxisKey: xColumnId };
     }
   }
 

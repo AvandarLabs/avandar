@@ -12,8 +12,8 @@ import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter
 import { applyFilters } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyFilters.ts";
 import { applyHaving } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyHaving/applyHaving.ts";
 import { applyJoins } from "$/models/queries/StructuredQuery/structuredQueryToSql/applyJoins.ts";
-import { buildProjectionExpression } from "$/models/queries/StructuredQuery/structuredQueryToSql/buildProjectionExpression/buildProjectionExpression.ts";
-import { resolveFilterColumn } from "$/models/queries/StructuredQuery/structuredQueryToSql/resolveFilterColumn/resolveFilterColumn.ts";
+import { makeFilterColumnFromStructuredQuery } from "$/models/queries/StructuredQuery/structuredQueryToSql/makeFilterColumnFromStructuredQuery.ts";
+import { makeSqlExpressionFromQueryColumn } from "$/models/queries/StructuredQuery/structuredQueryToSql/makeSqlExpressionFromQueryColumn.ts";
 import { sqlBuilder } from "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder.ts";
 import { makeRelationRefFromQueryDataSource } from "$/models/relations/RelationRef/makeRelationRefFromQueryDataSource.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
@@ -103,7 +103,10 @@ export function structuredQueryToSql(
 
   const adjustedColumnNames = sortedQueryColumns.map((column) => {
     const aggregation = aggregations[column.id];
-    const expression = buildProjectionExpression(column, aggregation);
+    const expression = makeSqlExpressionFromQueryColumn({
+      column: column,
+      aggregation: aggregation,
+    });
     const isPlain =
       aggregation === undefined ||
       aggregation === "none" ||
@@ -144,7 +147,11 @@ export function structuredQueryToSql(
     sqlQuery = applyFilters(sqlQuery, filters, {
       columnTypes,
       getColumn: (columnId) => {
-        return resolveFilterColumn({ columnId, clause: "where", query });
+        return makeFilterColumnFromStructuredQuery({
+          columnId,
+          clause: "where",
+          query,
+        });
       },
     });
   }
@@ -159,7 +166,11 @@ export function structuredQueryToSql(
     sqlQuery = applyHaving(sqlQuery, having, {
       columnTypes,
       getColumn: (columnId) => {
-        return resolveFilterColumn({ columnId, clause: "having", query });
+        return makeFilterColumnFromStructuredQuery({
+          columnId,
+          clause: "having",
+          query,
+        });
       },
     });
   }

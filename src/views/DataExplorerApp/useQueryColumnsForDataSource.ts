@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { where } from "@avandar/utils";
 import { useMemo } from "react";
+import { match } from "ts-pattern";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
@@ -63,16 +64,22 @@ export function useQueryColumnsForDataSource(
 
   return {
     columns,
-    isReady:
-      sourceType === "Dataset"
-        ? datasetQuery.isSuccess
-        : sourceType === "Concept"
-          ? conceptQuery.isSuccess
-          : true,
-    isLoading: Model.isOfModelType(dataSourceId, "Dataset")
-      ? isLoadingDatasetColumns
-      : Model.isOfModelType(dataSourceId, "Concept")
-        ? isLoadingConceptAttributes
-        : false,
+    ...match(sourceType)
+      .with("Dataset", () => {
+        return {
+          isReady: datasetQuery.isSuccess,
+          isLoading: isLoadingDatasetColumns,
+        };
+      })
+      .with("Concept", () => {
+        return {
+          isReady: conceptQuery.isSuccess,
+          isLoading: isLoadingConceptAttributes,
+        };
+      })
+      .with(undefined, () => {
+        return { isReady: true, isLoading: false };
+      })
+      .exhaustive(),
   };
 }

@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
 import { rebindProvisionalVizConfig } from "$/models/vizs/rebindProvisionalVizConfig/rebindProvisionalVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.ts";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 
-it("moves an owned SQL selection to a structured ID only with unique physical expression proof", () => {
+it("rebinds matching physical expressions and preserves unrelated selections", () => {
   const oldId = "sql-id" as QueryColumn.Id;
   const newId = "structured-id" as QueryColumn.Id;
   const config = {
@@ -35,13 +35,23 @@ it("moves an owned SQL selection to a structured ID only with unique physical ex
       },
     ],
   };
-  expect(rebindProvisionalVizConfig(config, previous, current)).toMatchObject({
+  expect(
+    rebindProvisionalVizConfig({
+      config: config,
+      previous: previous,
+      current: current,
+    }),
+  ).toMatchObject({
     series: [{ xKey: newId, key: newId, color: "#123456" }],
   });
   expect(
-    rebindProvisionalVizConfig(config, previous, {
-      ...current,
-      columns: [{ ...current.columns[0]!, sqlExpressionKey: "unrelated" }],
+    rebindProvisionalVizConfig({
+      config: config,
+      previous: previous,
+      current: {
+        ...current,
+        columns: [{ ...current.columns[0]!, sqlExpressionKey: "unrelated" }],
+      },
     }),
   ).toEqual(config);
 });

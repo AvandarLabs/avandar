@@ -1,29 +1,89 @@
+type LegacyVizConfigBar = {
+  vizType: "bar";
+  xAxisKey: string | undefined;
+  series: LegacyXYSeries[];
+  layout: "group" | "stack" | "percent";
+  withLegend: boolean;
+  chartStyle?: LegacyChartStyle;
+};
+
+type LegacyVizConfigLine = {
+  vizType: "line";
+  xAxisKey: string | undefined;
+  series: LegacyXYSeries[];
+  withLegend: boolean;
+  chartStyle?: LegacyChartStyle;
+};
+
+type LegacyVizConfigArea = {
+  vizType: "area";
+  xAxisKey: string | undefined;
+  series: LegacyXYSeries[];
+  layout: "default" | "stacked" | "percent" | "split";
+  withLegend: boolean;
+  chartStyle?: LegacyChartStyle;
+};
+
+type LegacyVizConfigRadar = {
+  vizType: "radar";
+  nameKey: string | undefined;
+  series: LegacyRadarSeries[];
+  withLegend?: boolean;
+  chartStyle?: LegacyChartStyle;
+};
+
+type LegacyVizConfigPie = {
+  vizType: "pie";
+  nameKey: string | undefined;
+  valueKey: string | undefined;
+  isDonut: boolean;
+  withLabels: boolean;
+  labelsType: "value" | "percent";
+  seriesColors?: Record<string, string>;
+};
+
+type LegacyVizConfigFunnel = {
+  vizType: "funnel";
+  nameKey: string | undefined;
+  valueKey: string | undefined;
+  seriesColors?: Record<string, string>;
+};
+
+type LegacyBarSeriesShape = {
+  renderAs: "bar";
+  key: string;
+  label?: string;
+  color?: string;
+  fillOpacity?: number;
+  stackId?: string;
+};
+
+type LegacyLineSeriesShape = {
+  renderAs: "line";
+  key: string;
+  label?: string;
+  color?: string;
+  curveType?: "linear" | "natural" | "monotone" | "step";
+  strokeWidth?: number;
+  withDots?: boolean;
+};
+
+type LegacyAreaSeriesShape = {
+  renderAs: "area";
+  key: string;
+  label?: string;
+  color?: string;
+  curveType?: "linear" | "natural" | "monotone" | "step";
+  strokeWidth?: number;
+  fillOpacity?: number;
+  withDots?: boolean;
+};
 /** Frozen row-key chart shapes for legacy ingress and renderer output. */
 export type LegacyVizConfig =
   | { vizType: "table" }
-  | {
-      vizType: "bar";
-      xAxisKey: string | undefined;
-      series: LegacyXYSeries[];
-      layout: "group" | "stack" | "percent";
-      withLegend: boolean;
-      chartStyle?: LegacyChartStyle;
-    }
-  | {
-      vizType: "line";
-      xAxisKey: string | undefined;
-      series: LegacyXYSeries[];
-      withLegend: boolean;
-      chartStyle?: LegacyChartStyle;
-    }
-  | {
-      vizType: "area";
-      xAxisKey: string | undefined;
-      series: LegacyXYSeries[];
-      layout: "default" | "stacked" | "percent" | "split";
-      withLegend: boolean;
-      chartStyle?: LegacyChartStyle;
-    }
+  | LegacyVizConfigBar
+  | LegacyVizConfigLine
+  | LegacyVizConfigArea
   | {
       vizType: "scatter";
       series: LegacyScatterSeries[];
@@ -34,58 +94,15 @@ export type LegacyVizConfig =
       series: LegacyBubbleSeries[];
       chartStyle?: LegacyChartStyle;
     }
-  | {
-      vizType: "radar";
-      nameKey: string | undefined;
-      series: LegacyRadarSeries[];
-      withLegend?: boolean;
-      chartStyle?: LegacyChartStyle;
-    }
-  | {
-      vizType: "pie";
-      nameKey: string | undefined;
-      valueKey: string | undefined;
-      isDonut: boolean;
-      withLabels: boolean;
-      labelsType: "value" | "percent";
-      seriesColors?: Record<string, string>;
-    }
-  | {
-      vizType: "funnel";
-      nameKey: string | undefined;
-      valueKey: string | undefined;
-      seriesColors?: Record<string, string>;
-    };
+  | LegacyVizConfigRadar
+  | LegacyVizConfigPie
+  | LegacyVizConfigFunnel;
 
 /** Frozen mark settings for mixed XY charts. */
 export type LegacyXYSeries =
-  | {
-      renderAs: "bar";
-      key: string;
-      label?: string;
-      color?: string;
-      fillOpacity?: number;
-      stackId?: string;
-    }
-  | {
-      renderAs: "line";
-      key: string;
-      label?: string;
-      color?: string;
-      curveType?: "linear" | "natural" | "monotone" | "step";
-      strokeWidth?: number;
-      withDots?: boolean;
-    }
-  | {
-      renderAs: "area";
-      key: string;
-      label?: string;
-      color?: string;
-      curveType?: "linear" | "natural" | "monotone" | "step";
-      strokeWidth?: number;
-      fillOpacity?: number;
-      withDots?: boolean;
-    };
+  | LegacyBarSeriesShape
+  | LegacyLineSeriesShape
+  | LegacyAreaSeriesShape;
 
 /** Frozen scatter cloud settings. */
 export type LegacyScatterSeries = {

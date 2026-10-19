@@ -274,7 +274,7 @@ describe("renderFilterRule, exclusions", () => {
     ).toBeUndefined();
   });
 
-  it("quotes identifiers that contain punctuation", () => {
+  it("uses the supplied quoted expression in a case-insensitive predicate", () => {
     expect(
       _render({ columnId: "Country/Region" as QueryColumn.Id, value: "Chad" })
         ?.sql,

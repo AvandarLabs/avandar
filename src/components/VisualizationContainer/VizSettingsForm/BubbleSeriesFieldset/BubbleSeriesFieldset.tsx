@@ -1,4 +1,4 @@
-import { makeSelectOptions, Select } from "@avandar/ui";
+import { Select, makeSelectOptions } from "@avandar/ui";
 import { propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {

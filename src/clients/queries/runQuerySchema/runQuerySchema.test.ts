@@ -6,7 +6,11 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
-const { workspaceRead, snapshotRead, logEvent } = vi.hoisted(() => {
+const { workspaceRead, snapshotRead, logEvent } = vi.hoisted<{
+  workspaceRead: ReturnType<typeof vi.fn>;
+  snapshotRead: ReturnType<typeof vi.fn>;
+  logEvent: ReturnType<typeof vi.fn>;
+}>(() => {
   return { workspaceRead: vi.fn(), snapshotRead: vi.fn(), logEvent: vi.fn() };
 });
 vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {

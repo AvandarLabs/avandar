@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { prop, propEq } from "@avandar/utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters";
@@ -6,6 +7,12 @@ import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+type GetQueryOptions = {
+  query: StructuredQuery.Partial;
+  previous: StructuredQuery.Partial | undefined;
+  previousInput: StructuredQuery.Partial | undefined;
+  columns: readonly QueryColumn.T[];
+};
 
 type Options = {
   config: AvaMapConfig.T;
@@ -20,30 +27,13 @@ type HydrationResult = {
   issues: ReturnType<typeof normalizeQueryFilters>["issues"];
 };
 
-/** Hydrates persisted layer source filters without scheduling a map save. */
-export const MapSourceHydration = {
-  fromMetadata: (options: Readonly<Options>): HydrationResult => {
-    const results = options.config.layers.map((layer) => {
-      return _getLayerFromMetadata(layer, options);
-    });
-    return {
-      config: {
-        ...options.config,
-        layers: results.map((result) => {
-          return result.layer;
-        }),
-      },
-      issues: results.flatMap((result) => {
-        return result.issues;
-      }),
-    };
-  },
-};
-
-function _getLayerFromMetadata(
-  layer: AvaMapConfig.T["layers"][number],
-  options: Readonly<Options>,
-): {
+function _getLayerFromMetadata({
+  layer,
+  options,
+}: {
+  layer: AvaMapConfig.T["layers"][number];
+  options: Readonly<Options>;
+}): {
   layer: AvaMapConfig.T["layers"][number];
   issues: HydrationResult["issues"];
 } {
@@ -51,16 +41,20 @@ function _getLayerFromMetadata(
   if (!source) {
     return { layer, issues: [] };
   }
-  const metadata = _getColumns(source, options);
-  const previous = options.previousConfig?.layers.find((candidate) => {
-    return candidate.id === layer.id;
-  })?.source;
-  const previousInput = options.previousInput?.layers.find((candidate) => {
-    return candidate.id === layer.id;
-  })?.source;
+  const metadata = _getColumns({ source: source, options: options });
+  const previous = options.previousConfig?.layers.find(
+    propEq("id", layer.id),
+  )?.source;
+  const previousInput = options.previousInput?.layers.find(
+    propEq("id", layer.id),
+  )?.source;
   if (metadata === undefined) {
     return {
-      layer: _getPendingLayer(layer, previous, previousInput),
+      layer: _getPendingLayer({
+        layer: layer,
+        previous: previous,
+        previousInput: previousInput,
+      }),
       issues: [],
     };
   }
@@ -100,29 +94,23 @@ function _getHavingColumns(query: StructuredQuery.Partial): QueryColumn.T[] {
     });
 }
 
-function _getColumns(
-  source: NonNullable<StructuredQuery.Partial["dataSource"]>,
-  options: Readonly<Options>,
-): QueryColumn.T[] | undefined {
+function _getColumns({
+  source,
+  options,
+}: {
+  source: NonNullable<StructuredQuery.Partial["dataSource"]>;
+  options: Readonly<Options>;
+}): QueryColumn.T[] | undefined {
   return Model.isOfModelType(source, "Dataset")
     ? options.datasetColumns
-        ?.filter((column) => {
-          return column.datasetId === source.id;
-        })
+        ?.filter(propEq("datasetId", source.id))
         .map(QueryColumn.makeFromDatasetColumn)
     : options.conceptAttributes
-        ?.filter((attribute) => {
-          return attribute.conceptId === source.id;
-        })
+        ?.filter(propEq("conceptId", source.id))
         .map(QueryColumn.makeFromConceptAttribute);
 }
 
-function _getQuery(options: {
-  query: StructuredQuery.Partial;
-  previous: StructuredQuery.Partial | undefined;
-  previousInput: StructuredQuery.Partial | undefined;
-  columns: readonly QueryColumn.T[];
-}): StructuredQuery.Partial {
+function _getQuery(options: GetQueryOptions): StructuredQuery.Partial {
   const { query, previous, previousInput, columns } = options;
   const sourceKey = Model.getTypedId(query.dataSource!);
   const previousSourceKey = previous?.dataSource
@@ -157,11 +145,15 @@ function _getQuery(options: {
   };
 }
 
-function _getPendingLayer(
-  layer: AvaMapConfig.T["layers"][number],
-  previous: StructuredQuery.Partial | undefined,
-  previousInput: StructuredQuery.Partial | undefined,
-): AvaMapConfig.T["layers"][number] {
+function _getPendingLayer({
+  layer,
+  previous,
+  previousInput,
+}: {
+  layer: AvaMapConfig.T["layers"][number];
+  previous: StructuredQuery.Partial | undefined;
+  previousInput: StructuredQuery.Partial | undefined;
+}): AvaMapConfig.T["layers"][number] {
   const source = layer.source.dataSource;
   const isRetained =
     previousInput?.filters === layer.source.filters &&
@@ -179,3 +171,19 @@ function _getPendingLayer(
       }
     : layer;
 }
+
+/** Hydrates persisted layer source filters without scheduling a map save. */
+export const MapSourceHydration = {
+  fromMetadata: (options: Readonly<Options>): HydrationResult => {
+    const results = options.config.layers.map((layer) => {
+      return _getLayerFromMetadata({ layer: layer, options: options });
+    });
+    return {
+      config: {
+        ...options.config,
+        layers: results.map(prop("layer")),
+      },
+      issues: results.flatMap(prop("issues")),
+    };
+  },
+};

@@ -18,7 +18,7 @@ import { SaveToDashboardCreateMode } from "@/views/DataExplorerApp/SaveToDashboa
 import { SaveToDashboardListMode } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type {
   VizConfig,
   VizType,

@@ -1,4 +1,4 @@
-import { makeSelectOptions, Select } from "@avandar/ui";
+import { Select, makeSelectOptions } from "@avandar/ui";
 import { propPasses, removeAtIndex } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -63,8 +63,8 @@ export function PairSeriesFieldset({
       return;
     }
     const yField = numericFields[1] ?? xField;
-    const next: ScatterSeries = { xKey: xField.id, key: yField.id };
-    onChange([...series, next]);
+    const nextSeries: ScatterSeries = { xKey: xField.id, key: yField.id };
+    onChange([...series, nextSeries]);
   }, [numericFields, series, onChange]);
 
   const updateAt = useCallback(

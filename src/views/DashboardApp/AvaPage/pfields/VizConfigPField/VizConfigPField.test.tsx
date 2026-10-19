@@ -11,13 +11,23 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { LegacyLocalFilter } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+type RenderFieldOptions = {
+  value: VizConfig.T | VizConfig.Legacy;
+  legacy?: boolean;
+  localFilters?: readonly LegacyLocalFilter[];
+  local?: boolean;
+};
 
 const TEST_WORKSPACE_ID =
   "00000000-0000-4000-8000-000000000001" as Workspace.Id;
 const TEST_DASHBOARD_ID =
   "00000000-0000-4000-8000-000000000002" as Dashboard.Id;
 
-const editor = vi.hoisted(() => {
+const editor = vi.hoisted<{
+  dispatch: ReturnType<typeof vi.fn>;
+  selectedItem: { type: string; props: Record<string, unknown> };
+  getSelectorForId: () => { index: number; zone: undefined };
+}>(() => {
   return {
     dispatch: vi.fn(),
     selectedItem: { type: "DataViz", props: {} as Record<string, unknown> },
@@ -56,7 +66,9 @@ vi.mock(
   },
 );
 
-const { useDataQueryMock } = vi.hoisted(() => {
+const { useDataQueryMock } = vi.hoisted<{
+  useDataQueryMock: ReturnType<typeof vi.fn>;
+}>(() => {
   return {
     useDataQueryMock: vi.fn(() => {
       return [
@@ -82,12 +94,7 @@ vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
   return { useDataQuery: useDataQueryMock };
 });
 
-function renderField(props: {
-  value: VizConfig.T | VizConfig.Legacy;
-  legacy?: boolean;
-  localFilters?: readonly LegacyLocalFilter[];
-  local?: boolean;
-}): {
+function _renderField(props: RenderFieldOptions): {
   onChange: ReturnType<typeof vi.fn>;
 } {
   const onChange = vi.fn();
@@ -138,20 +145,20 @@ describe("VizConfigPField", () => {
     return vi.clearAllMocks();
   });
   it("runs its preview query under the viz_config analytics surface", () => {
-    renderField({ value: { vizType: "table" } });
+    _renderField({ value: { vizType: "table" } });
     expect(useDataQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({ analyticsSurface: "viz_config" }),
     );
   });
 
   it("shows a hint and no axis controls for the table viz type", () => {
-    renderField({ value: { vizType: "table" } });
+    _renderField({ value: { vizType: "table" } });
     expect(screen.getByText(/no extra settings/i)).toBeInTheDocument();
     expect(screen.queryByRole("combobox", { name: /X Axis/i })).toBeNull();
   });
 
   it("renders the bar form when vizType is bar", () => {
-    renderField({
+    _renderField({
       value: {
         vizType: "bar",
         xAxisKey: undefined,
@@ -166,7 +173,7 @@ describe("VizConfigPField", () => {
   });
 
   it("atomically stores the selected ID and owning registry when an axis option is picked", () => {
-    const { onChange } = renderField({
+    const { onChange } = _renderField({
       value: {
         vizType: "bar",
         xAxisKey: undefined,
@@ -207,7 +214,7 @@ it("preserves unresolved legacy siblings when an existing field explicitly chang
       { key: "value", renderAs: "bar", label: "Existing", color: "#123456" },
     ],
   };
-  renderField({ value: original, legacy: true });
+  _renderField({ value: original, legacy: true });
   expect(editor.dispatch).not.toHaveBeenCalled();
   pickMantineSelectOption(/X axis/i, "category");
   expect(editor.dispatch).toHaveBeenLastCalledWith(
@@ -245,7 +252,7 @@ it("preserves unresolved legacy siblings when an existing field explicitly chang
 
 it("edits legacy local controls without discarding an unresolved sibling", () => {
   vi.clearAllMocks();
-  const localFilters: readonly LegacyLocalFilter[] = [
+  const localFilters: LegacyLocalFilter[] = [
     {
       id: "one",
       columnName: "missing-one",
@@ -263,7 +270,7 @@ it("edits legacy local controls without discarding an unresolved sibling", () =>
       defaultValue: "B",
     },
   ];
-  renderField({
+  _renderField({
     value: { vizType: "table" },
     legacy: true,
     local: true,

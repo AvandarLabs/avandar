@@ -1,11 +1,16 @@
+import { identity, propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
-import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.ts";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.ts";
 
-function _createTransitionMap(
-  previous: ResultBindingRegistry,
-  current: ResultBindingRegistry,
-): Map<QueryColumn.Id, QueryColumn.Id> {
+function _createTransitionMap({
+  previous,
+  current,
+}: {
+  previous: ResultBindingRegistry;
+  current: ResultBindingRegistry;
+}): Map<QueryColumn.Id, QueryColumn.Id> {
   const mappings = new Map<QueryColumn.Id, QueryColumn.Id>();
   if (previous.scopeKey !== current.scopeKey) {
     return mappings;
@@ -17,9 +22,9 @@ function _createTransitionMap(
     ) {
       return;
     }
-    const oldMatches = previous.columns.filter((candidate) => {
-      return candidate.sqlExpressionKey === column.sqlExpressionKey;
-    });
+    const oldMatches = previous.columns.filter(
+      propEq("sqlExpressionKey", column.sqlExpressionKey),
+    );
     const newMatches = current.columns.filter((candidate) => {
       return (
         candidate.sqlExpressionKey === column.sqlExpressionKey &&
@@ -32,9 +37,7 @@ function _createTransitionMap(
         : newMatches.filter((candidate) => {
             return (
               candidate.name === column.name &&
-              oldMatches.filter((old) => {
-                return old.name === column.name;
-              }).length === 1
+              oldMatches.filter(propEq("name", column.name)).length === 1
             );
           });
     if (matches.length === 1) {
@@ -48,42 +51,87 @@ function _createTransitionMap(
  * Migrates owned provisional IDs using unique expression proof, preserving
  * unresolved slots.
  */
-export function rebindProvisionalVizConfig(
-  config: VizConfig.T,
-  previous: ResultBindingRegistry,
-  current: ResultBindingRegistry,
-): VizConfig.T {
-  const mappings = _createTransitionMap(previous, current);
+export function rebindProvisionalVizConfig({
+  config,
+  previous,
+  current,
+}: Readonly<{
+  config: VizConfig.T;
+  previous: ResultBindingRegistry;
+  current: ResultBindingRegistry;
+}>): VizConfig.T {
+  const mappings = _createTransitionMap({
+    previous: previous,
+    current: current,
+  });
   const mapKey = (id: QueryColumn.Id | undefined) => {
     return id ? (mappings.get(id) ?? id) : undefined;
   };
-  if (config.vizType === "table" || mappings.size === 0) {
+  if (mappings.size === 0) {
     return config;
   }
-  if (config.vizType === "pie" || config.vizType === "funnel") {
-    return {
-      ...config,
-      nameKey: mapKey(config.nameKey),
-      valueKey: mapKey(config.valueKey),
-    };
-  }
-  if (config.vizType === "scatter" || config.vizType === "bubble") {
-    return {
-      ...config,
-      series: config.series.map((series) => {
+  return match(config)
+    .with({ vizType: "table" }, identity)
+    .with({ vizType: "pie" }, { vizType: "funnel" }, (chart) => {
+      return {
+        ...chart,
+        nameKey: mapKey(chart.nameKey),
+        valueKey: mapKey(chart.valueKey),
+      };
+    })
+    .with({ vizType: "scatter" }, (chart) => {
+      return {
+        ...chart,
+        series: chart.series.map((series) => {
+          return {
+            ...series,
+            key: mappings.get(series.key) ?? series.key,
+            xKey: mappings.get(series.xKey) ?? series.xKey,
+          };
+        }),
+      };
+    })
+    .with({ vizType: "bubble" }, (chart) => {
+      return {
+        ...chart,
+        series: chart.series.map((series) => {
+          return {
+            ...series,
+            key: mappings.get(series.key) ?? series.key,
+            xKey: mappings.get(series.xKey) ?? series.xKey,
+            sizeKey: mappings.get(series.sizeKey) ?? series.sizeKey,
+          };
+        }),
+      };
+    })
+    .with({ vizType: "radar" }, (chart) => {
+      return {
+        ...chart,
+        nameKey: mapKey(chart.nameKey),
+        series: chart.series.map((series) => {
+          return {
+            ...series,
+            key: mappings.get(series.key) ?? series.key,
+          };
+        }),
+      };
+    })
+    .with(
+      { vizType: "bar" },
+      { vizType: "line" },
+      { vizType: "area" },
+      (chart) => {
         return {
-          ...series,
-          key: mapKey(series.key)!,
-          xKey: mapKey(series.xKey)!,
-          ...("sizeKey" in series ? { sizeKey: mapKey(series.sizeKey)! } : {}),
+          ...chart,
+          xAxisKey: mapKey(chart.xAxisKey),
+          series: chart.series.map((series) => {
+            return {
+              ...series,
+              key: mappings.get(series.key) ?? series.key,
+            };
+          }),
         };
-      }),
-    } as VizConfig.T;
-  }
-  const series = config.series.map((item) => {
-    return { ...item, key: mapKey(item.key)! };
-  });
-  return config.vizType === "radar"
-    ? { ...config, nameKey: mapKey(config.nameKey), series }
-    : ({ ...config, xAxisKey: mapKey(config.xAxisKey), series } as VizConfig.T);
+      },
+    )
+    .exhaustive();
 }

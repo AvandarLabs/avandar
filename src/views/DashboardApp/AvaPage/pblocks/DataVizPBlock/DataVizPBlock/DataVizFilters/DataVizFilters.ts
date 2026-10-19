@@ -5,6 +5,7 @@ import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilter
 
 export type GlobalFilterSubscriptionMode = "all" | "selected" | "none";
 
+/** Saved local filter addressed by its historical output column name. */
 export type LegacyLocalFilter = {
   /** Stable identifier used for viewer state. */
   id: string;

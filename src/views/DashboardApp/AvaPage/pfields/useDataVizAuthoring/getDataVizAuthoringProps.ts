@@ -1,8 +1,14 @@
-import { resolveDataVizRuntimeBindings } from "../../pblocks/DataVizPBlock/resolveSavedDataVizBindings/resolveDataVizRuntimeBindings";
+import { makeRuntimeBindingsFromDataVizProps } from "../../pblocks/DataVizPBlock/makeSavedBindingsFromDataVizProps/makeRuntimeBindingsFromDataVizProps";
 import { mergeLegacyVizConfigEdit } from "./mergeLegacyVizConfigEdit";
 import type { Props } from "../../pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { useResolvedDataVizBindings } from "../../pblocks/DataVizPBlock/useResolvedDataVizBindings/useResolvedDataVizBindings";
 import type { DashboardFilterRecord } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+type GetDataVizAuthoringPropsOptions = {
+  props: Props;
+  bindings: ReturnType<typeof useResolvedDataVizBindings>;
+  filters: readonly DashboardFilterRecord[];
+  change: DataVizAuthoringChange;
+};
 
 /** Explicit edits accepted by current and unresolved legacy field controls. */
 export type DataVizAuthoringChange =
@@ -11,12 +17,7 @@ export type DataVizAuthoringChange =
 
 /** Returns an atomic field edit without losing unresolved legacy siblings. */
 export function getDataVizAuthoringProps(
-  options: Readonly<{
-    props: Props;
-    bindings: ReturnType<typeof useResolvedDataVizBindings>;
-    filters: readonly DashboardFilterRecord[];
-    change: DataVizAuthoringChange;
-  }>,
+  options: Readonly<GetDataVizAuthoringPropsOptions>,
 ): Props | undefined {
   const { props, bindings, filters, change } = options;
   if (
@@ -33,12 +34,12 @@ export function getDataVizAuthoringProps(
       ? change.props
       : change.props.vizConfig && bindings.resolved && bindings.schema
         ? {
-            vizConfig: mergeLegacyVizConfigEdit(
-              props.vizConfig,
-              bindings.resolved.runtimeConfig,
-              change.props.vizConfig,
-              bindings.schema.columns,
-            ),
+            vizConfig: mergeLegacyVizConfigEdit({
+              legacy: props.vizConfig,
+              before: bindings.resolved.runtimeConfig,
+              after: change.props.vizConfig,
+              columns: bindings.schema.columns,
+            }),
           }
         : undefined;
   if (!changes) {
@@ -46,7 +47,11 @@ export function getDataVizAuthoringProps(
   }
   const editedProps = { ...props, ...changes };
   const resolvedProps = bindings.schema
-    ? resolveDataVizRuntimeBindings(editedProps, bindings.schema, filters).props
+    ? makeRuntimeBindingsFromDataVizProps({
+        props: editedProps,
+        schema: bindings.schema,
+        filters: filters,
+      }).props
     : editedProps;
   return { ...editedProps, ...resolvedProps };
 }

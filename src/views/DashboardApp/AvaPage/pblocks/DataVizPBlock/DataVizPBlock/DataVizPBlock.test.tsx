@@ -1,21 +1,19 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { reconcileResultBindings } from "$/models/queries/QueryColumnBindings/reconcileResultBindings/reconcileResultBindings";
-import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
-import { render, screen, TestProviders } from "@/test-utils";
-import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import { screen } from "@/test-utils";
 import { upgradeAvaPageData } from "../../../utils/upgradeAvaPageData";
 import { useDataVizPBlockConfig } from "../useDataVizPBlockConfig";
+import { createDataVizTestWrapper } from "./createDataVizTestWrapper";
+import { DataVizPBlockTestFixtures } from "./DataVizPBlockTestFixtures";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Props } from "./DataVizPBlock";
-import type { PuckContext } from "@puckeditor/core";
-import type { ReactElement } from "react";
 
-const { useDataQueryMock } = vi.hoisted(() => {
+const { useDataQueryMock } = vi.hoisted<{
+  useDataQueryMock: ReturnType<typeof vi.fn>;
+}>(() => {
   return {
     useDataQueryMock: vi.fn(() => {
       return [
@@ -92,58 +90,8 @@ vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
   };
 });
 
-const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000001";
-const TEST_WORKSPACE_ID = "00000000-0000-4000-8000-000000000002";
-
-function fakePuckContext(): PuckContext {
-  return {
-    renderDropZone: () => {
-      return null;
-    },
-    metadata: {
-      auth: "workspace",
-      workspaceId: TEST_WORKSPACE_ID,
-      dashboardId: TEST_DASHBOARD_ID,
-    },
-    isEditing: true,
-    dragRef: null,
-  };
-}
-
-function renderBlock(props: {
-  prompt: string;
-  rawSql: string;
-  vizType: string;
-  vizConfig: VizConfig.Legacy;
-}): ReactElement {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <AvandarAppProvider>
-        <DashboardFilterStateManager.Provider>
-          <DataVizPBlock
-            id="chart"
-            bindingVersion={0}
-            puck={fakePuckContext()}
-            nlQuery={{
-              prompt: props.prompt,
-              rawSql: props.rawSql,
-              generations: [],
-            }}
-            vizType={
-              props.vizType as Parameters<typeof DataVizPBlock>[0]["vizType"]
-            }
-            vizConfig={props.vizConfig}
-            globalFilterSubscription={{ mode: "all", subscribedFilterIds: [] }}
-            localFilters={[]}
-          />
-        </DashboardFilterStateManager.Provider>
-      </AvandarAppProvider>
-    </QueryClientProvider>,
-  ) as unknown as ReactElement;
-}
+const { TEST_DASHBOARD_ID, TEST_WORKSPACE_ID, renderBlock } =
+  DataVizPBlockTestFixtures;
 
 describe("DataVizPBlock", () => {
   it("runs its query under the dashboard_block analytics surface", () => {
@@ -382,13 +330,7 @@ it("converts the migrated top-level type picker and restores unresolved legacy s
       });
     },
     {
-      wrapper: ({ children }) => {
-        return (
-          <QueryClientProvider client={client}>
-            <TestProviders>{children}</TestProviders>
-          </QueryClientProvider>
-        );
-      },
+      wrapper: createDataVizTestWrapper(client),
     },
   );
   const resolveData = result.current.resolveData!;

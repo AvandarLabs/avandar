@@ -5,7 +5,7 @@ export type QueryMetadataProvenance = {
 };
 
 const session = Symbol("query-metadata-session");
-let sequence = 0;
+let sequence: number = 0;
 
 /**
  * Orders completions independently of wall-clock precision. JSON persistence

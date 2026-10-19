@@ -1,7 +1,4 @@
-import {
-  pickCategoryColumnId,
-  pickFirstNumericColumnId,
-} from "$/models/vizs/hydrateColumnPicking.ts";
+import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
@@ -27,7 +24,7 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
   let nextSeries: XYSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
-    const firstNumericId = pickFirstNumericColumnId(columns);
+    const firstNumericId = VizHydrationColumns.getFirstNumericColumnId(columns);
     if (firstNumericId !== undefined) {
       nextSeries = [{ renderAs: defaultRenderAs, key: firstNumericId }];
     }
@@ -40,7 +37,10 @@ export function hydrateXYSeriesFromQueryResult<VConfig extends XYSeriesConfig>(
         return s.key;
       }),
     );
-    nextXAxisKey = pickCategoryColumnId(columns, seriesKeys);
+    nextXAxisKey = VizHydrationColumns.getCategoryColumnId({
+      columns,
+      excludedIds: seriesKeys,
+    });
   }
 
   return {

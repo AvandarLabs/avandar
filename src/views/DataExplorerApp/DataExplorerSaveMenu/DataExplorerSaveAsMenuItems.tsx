@@ -5,10 +5,26 @@ import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
-import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings";
+import type { ResultBindingRegistry } from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UnknownDataFrame } from "@avandar/utils";
 import type { ReactNode } from "react";
+type OpenSaveAsNewDatasetModalOptions = {
+  dateColumns: ReadonlySet<string>;
+  queryResultColumns: readonly QueryResult.Column[];
+  queryResultData: UnknownDataFrame;
+  savableSql: string;
+  title: string;
+};
+
+type OpenSaveToDashboardModalOptions = {
+  columnBindings: ResultBindingRegistry;
+  forceCreateMode: boolean;
+  nlPrompt: string | undefined;
+  savableSql: string;
+  vizConfig: ReturnType<typeof DataExplorerStateManager.useState>["vizConfig"];
+  workspaceSlug: string;
+};
 
 type Props = {
   savableSql: string;
@@ -21,13 +37,9 @@ type Props = {
   shouldForceCreateMode: boolean;
 };
 
-function _openSaveAsNewDatasetModal(options: {
-  dateColumns: ReadonlySet<string>;
-  queryResultColumns: readonly QueryResult.Column[];
-  queryResultData: UnknownDataFrame;
-  savableSql: string;
-  title: string;
-}): void {
+function _openSaveAsNewDatasetModal(
+  options: OpenSaveAsNewDatasetModalOptions,
+): void {
   const modalId = modals.open({
     title: options.title,
     size: "xl",
@@ -45,14 +57,9 @@ function _openSaveAsNewDatasetModal(options: {
   });
 }
 
-function _openSaveToDashboardModal(options: {
-  columnBindings: ResultBindingRegistry;
-  forceCreateMode: boolean;
-  nlPrompt: string | undefined;
-  savableSql: string;
-  vizConfig: ReturnType<typeof DataExplorerStateManager.useState>["vizConfig"];
-  workspaceSlug: string;
-}): void {
+function _openSaveToDashboardModal(
+  options: OpenSaveToDashboardModalOptions,
+): void {
   const modalId = modals.open({
     withCloseButton: true,
     size: "lg",

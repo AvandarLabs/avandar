@@ -29,12 +29,24 @@ export function hydrateBubbleSeriesFromQuery<
         },
       ];
     } else if (numerics.length === 2) {
-      const n0 = numerics[0]!.id;
-      const n1 = numerics[1]!.id;
-      nextSeries = [{ xKey: n0, key: n1, sizeKey: n1 }];
+      const firstNumericColumnId = numerics[0]!.id;
+      const secondNumericColumnId = numerics[1]!.id;
+      nextSeries = [
+        {
+          xKey: firstNumericColumnId,
+          key: secondNumericColumnId,
+          sizeKey: secondNumericColumnId,
+        },
+      ];
     } else if (numerics.length === 1) {
-      const only = numerics[0]!.id;
-      nextSeries = [{ xKey: only, key: only, sizeKey: only }];
+      const onlyNumericColumnId = numerics[0]!.id;
+      nextSeries = [
+        {
+          xKey: onlyNumericColumnId,
+          key: onlyNumericColumnId,
+          sizeKey: onlyNumericColumnId,
+        },
+      ];
     }
   }
 

@@ -25,8 +25,7 @@ export function hydrateXYSeriesFromQuery<VConfig extends XYSeriesConfig>(
 
   if (nextSeries.length === 0 && isNonEmptyArray(queryColumns)) {
     const firstNumeric = queryColumns.find((col) => {
-      const name = col.id;
-      return QueryColumn.isNumeric(col) && name !== nextXAxisKey;
+      return QueryColumn.isNumeric(col) && col.id !== nextXAxisKey;
     });
     if (firstNumeric !== undefined) {
       nextSeries = [
@@ -45,8 +44,7 @@ export function hydrateXYSeriesFromQuery<VConfig extends XYSeriesConfig>(
       }),
     );
     const firstNonSeries = queryColumns.find((col) => {
-      const name = col.id;
-      return !seriesKeys.has(name);
+      return !seriesKeys.has(col.id);
     });
     if (firstNonSeries !== undefined) {
       nextXAxisKey = firstNonSeries.id;

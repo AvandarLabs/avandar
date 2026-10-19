@@ -33,10 +33,13 @@ export type ManualQueryFormHandlers = {
     direction: StructuredQuery.OrderByDirection | undefined,
   ) => void;
   onSetLimit: (limit: number | undefined) => void;
-  onSetFilters: (
-    filters: StructuredQuery.FilterGroup,
-    sourceColumns?: readonly QueryColumn.T[],
-  ) => void;
+  onSetFilters: ({
+    filters,
+    sourceColumns,
+  }: Readonly<{
+    filters: StructuredQuery.FilterGroup;
+    sourceColumns?: readonly QueryColumn.T[];
+  }>) => void;
 };
 
 type ControlledProps = {

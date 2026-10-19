@@ -1,19 +1,20 @@
 import { applyDashboardFiltersToSql } from "./applyDashboardFiltersToSql/applyDashboardFiltersToSql";
-import { resolveLocalDashboardFilterBindings } from "./resolveLocalDashboardFilterBindings/resolveLocalDashboardFilterBindings";
+import { makeLocalFilterBindingsFromLocalFilters } from "./makeLocalFilterBindingsFromLocalFilters/makeLocalFilterBindingsFromLocalFilters";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DashboardFilterRecord } from "./DashboardFilterStateManager";
 import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { LocalFilterStateApi } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+type UseApplyDashboardFiltersToSqlOptions = {
+  rawSql: string;
+  columns: readonly QueryResult.BoundColumn[] | undefined;
+  globalFilters: readonly DashboardFilterRecord[];
+  localFilters: readonly LocalFilter[];
+  localFilterState: LocalFilterStateApi;
+};
 
 /** Builds predicates only from resolved targets after unfiltered discovery. */
 export function useApplyDashboardFiltersToSql(
-  options: Readonly<{
-    rawSql: string;
-    columns: readonly QueryResult.BoundColumn[] | undefined;
-    globalFilters: readonly DashboardFilterRecord[];
-    localFilters: readonly LocalFilter[];
-    localFilterState: LocalFilterStateApi;
-  }>,
+  options: Readonly<UseApplyDashboardFiltersToSqlOptions>,
 ): string | undefined {
   if (!options.columns) {
     return undefined;
@@ -22,7 +23,7 @@ export function useApplyDashboardFiltersToSql(
     sql: options.rawSql,
     filters: options.globalFilters,
   });
-  const local = resolveLocalDashboardFilterBindings({
+  const local = makeLocalFilterBindingsFromLocalFilters({
     filters: options.localFilters,
     columns: options.columns,
     valuesById: options.localFilterState.valuesById,

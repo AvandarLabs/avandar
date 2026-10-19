@@ -1,3 +1,4 @@
+import { isDefined, propEq } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
@@ -48,20 +49,14 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
         if ("columnName" in filter) {
           return filter;
         }
-        const column = columns.find((candidate) => {
-          return candidate.id === filter.columnId;
-        });
+        const column = columns.find(propEq("id", filter.columnId));
         if (!column) {
           return undefined;
         }
         const { columnId: _columnId, ...definition } = filter;
         return { ...definition, columnName: column.name };
       });
-      if (
-        legacyFilters.every((filter) => {
-          return filter !== undefined;
-        })
-      ) {
+      if (legacyFilters.every(isDefined)) {
         authoring.updateLegacy({ localFilters: legacyFilters });
       }
     } else if (

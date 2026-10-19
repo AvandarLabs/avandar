@@ -1,5 +1,5 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { pickFirstNumericColumnId } from "$/models/vizs/hydrateColumnPicking.ts";
+import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
@@ -26,7 +26,7 @@ export function hydrateRadarSeriesFromQueryResult<
   let nextSeries: RadarSeries[] = [...currVizConfig.series];
 
   if (nextSeries.length === 0) {
-    const firstNumericId = pickFirstNumericColumnId(columns);
+    const firstNumericId = VizHydrationColumns.getFirstNumericColumnId(columns);
     if (firstNumericId !== undefined) {
       nextSeries = [{ key: firstNumericId }];
     }

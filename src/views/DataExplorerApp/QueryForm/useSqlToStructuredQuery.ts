@@ -16,10 +16,13 @@ import type { StructuredQuery } from "$/models/queries/StructuredQuery/Structure
  * memoized callback is pure and may be used to derive render state.
  */
 export function useSqlToStructuredQuery(): {
-  parseSql: (
-    sql: string,
-    previousQuery?: StructuredQuery.Partial,
-  ) => SqlMappingResult;
+  parseSql: ({
+    sql,
+    previousQuery,
+  }: Readonly<{
+    sql: string;
+    previousQuery?: StructuredQuery.Partial;
+  }>) => SqlMappingResult;
   isReady: boolean;
 } {
   const workspace = useCurrentWorkspace();
@@ -33,10 +36,13 @@ export function useSqlToStructuredQuery(): {
   const isReady = datasets !== undefined && allColumns !== undefined;
 
   const parseSql = useCallback(
-    (
-      sql: string,
-      previousQuery?: StructuredQuery.Partial,
-    ): SqlMappingResult => {
+    ({
+      sql,
+      previousQuery,
+    }: {
+      sql: string;
+      previousQuery?: StructuredQuery.Partial;
+    }): SqlMappingResult => {
       return sqlToStructuredQuery({
         sql,
         previousQuery,

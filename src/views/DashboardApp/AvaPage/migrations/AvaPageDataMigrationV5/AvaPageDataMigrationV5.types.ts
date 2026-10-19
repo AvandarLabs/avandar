@@ -1,4 +1,4 @@
-import type { DataVizBindingProps } from "../../pblocks/DataVizPBlock/resolveSavedDataVizBindings/resolveSavedDataVizBindings";
+import type { DataVizBindingProps } from "../../pblocks/DataVizPBlock/makeSavedBindingsFromDataVizProps/makeSavedBindingsFromDataVizProps";
 import type {
   V4_AvaPageData,
   V4_AvaPageRootProps,
@@ -15,7 +15,9 @@ export type V5_PBlockPropsRegistry = Omit<V4_PBlockPropsRegistry, "DataViz"> & {
   > &
     DataVizBindingProps;
 };
+/** Document root properties with the current binding-aware schema version. */
 export type V5_AvaPageRootProps = Omit<V4_AvaPageRootProps, "schemaVersion"> & {
   schemaVersion: 5;
 };
+/** Saved document shape including chart-owned binding identities. */
 export type V5_AvaPageData = Data<V5_PBlockPropsRegistry, V5_AvaPageRootProps>;

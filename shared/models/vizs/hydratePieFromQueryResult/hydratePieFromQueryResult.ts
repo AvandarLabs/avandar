@@ -1,5 +1,5 @@
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { pickFirstNumericColumnId } from "$/models/vizs/hydrateColumnPicking.ts";
+import { VizHydrationColumns } from "$/models/vizs/VizHydrationColumns.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
@@ -27,7 +27,7 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
   };
 
   if (nextConfig.valueKey === undefined) {
-    const valueColumnId = pickFirstNumericColumnId(columns);
+    const valueColumnId = VizHydrationColumns.getFirstNumericColumnId(columns);
     if (valueColumnId !== undefined) {
       nextConfig = { ...nextConfig, valueKey: valueColumnId };
     }

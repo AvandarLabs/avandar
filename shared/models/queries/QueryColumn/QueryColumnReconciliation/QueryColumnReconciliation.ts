@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { makeObject, propEq } from "@avandar/utils";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.ts";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
@@ -10,7 +11,13 @@ type SourceOptions = {
   incoming: readonly QueryColumn.T[];
 };
 
-function _isSameSource(left: QueryColumn.T, right: QueryColumn.T): boolean {
+function _isSameSource({
+  left,
+  right,
+}: {
+  left: QueryColumn.T;
+  right: QueryColumn.T;
+}): boolean {
   const leftKey = Model.getTypedId(left.baseColumn);
   const rightKey = Model.getTypedId(right.baseColumn);
   return leftKey.__type === rightKey.__type && leftKey.id === rightKey.id;
@@ -22,15 +29,13 @@ function _getRetainedProjection(options: {
   incomingColumn: QueryColumn.T;
 }): QueryColumn.T | undefined {
   const { previous, incoming, incomingColumn } = options;
-  const explicit = previous.find((column) => {
-    return column.id === incomingColumn.id;
-  });
+  const explicit = previous.find(propEq("id", incomingColumn.id));
   const sameSource = previous.filter((column) => {
-    return _isSameSource(column, incomingColumn);
+    return _isSameSource({ left: column, right: incomingColumn });
   });
   const isUniqueIncomingSource =
     incoming.filter((column) => {
-      return _isSameSource(column, incomingColumn);
+      return _isSameSource({ left: column, right: incomingColumn });
     }).length === 1;
   return (
     explicit ??
@@ -44,8 +49,8 @@ function _getRetainedProjection(options: {
 export const QueryColumnReconciliation = {
   /** Reconciles source metadata without carrying projection settings. */
   reconcileSourceColumns: (
-    options: SourceOptions,
-  ): readonly QueryColumn.T[] => {
+    options: Readonly<SourceOptions>,
+  ): QueryColumn.T[] => {
     const { sourceKey, previousSourceKey, previous, incoming } = options;
     const isSameScope =
       sourceKey.__type === previousSourceKey?.__type &&
@@ -53,7 +58,7 @@ export const QueryColumnReconciliation = {
     return incoming.map((incomingColumn) => {
       const retained = isSameScope
         ? previous.find((column) => {
-            return _isSameSource(column, incomingColumn);
+            return _isSameSource({ left: column, right: incomingColumn });
           })
         : undefined;
       const { outputAlias: _outputAlias, ...column } = incomingColumn;
@@ -65,12 +70,16 @@ export const QueryColumnReconciliation = {
     });
   },
 
-  /** Retains projection identity, aggregation, and refreshed source metadata. */
-  reconcileSelectedColumns: (options: {
-    previous: readonly QueryColumn.T[];
-    incoming: readonly QueryColumn.T[];
-    aggregations: StructuredQuery.Partial["aggregations"];
-  }): {
+  /**
+   * Retains projection identity, aggregation, and refreshed source metadata.
+   */
+  reconcileSelectedColumns: (
+    options: Readonly<{
+      previous: readonly QueryColumn.T[];
+      incoming: readonly QueryColumn.T[];
+      aggregations: StructuredQuery.Partial["aggregations"];
+    }>,
+  ): {
     columns: QueryColumn.T[];
     aggregations: StructuredQuery.Partial["aggregations"];
   } => {
@@ -91,11 +100,12 @@ export const QueryColumnReconciliation = {
     });
     return {
       columns,
-      aggregations: Object.fromEntries(
-        columns.map((column) => {
-          return [column.id, column.aggregation ?? "none"];
-        }),
-      ),
+      aggregations: makeObject(columns, {
+        key: "id",
+        valueFn: (column) => {
+          return column.aggregation ?? "none";
+        },
+      }),
     };
   },
 };

@@ -1,14 +1,20 @@
 import { renderHook } from "@testing-library/react";
-/** Execution identity gates publication without clearing loading state. */
 import { describe, expect, it } from "vitest";
-import { describeSqlProjections } from "$/models/queries/QueryColumnBindings/describeSqlProjections/describeSqlProjections";
+/** Execution identity gates publication without clearing loading state. */
+import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { useBoundQueryResult } from "@/views/DataExplorerApp/useBoundQueryResult/useBoundQueryResult";
 
 type Options = Parameters<typeof useBoundQueryResult>[0];
 const SQL_A = "SELECT revenue AS total FROM sales";
 const SQL_B = "SELECT revenue AS amount FROM sales";
-function _options(sqlKey = SQL_A, name = "total"): Options {
+function _options({
+  sqlKey = SQL_A,
+  name = "total",
+}: {
+  sqlKey?: string;
+  name?: string;
+} = {}): Options {
   const result = {
     ...QueryResult.makeEmpty(),
     columns: [{ name, dataType: "double" as const }],
@@ -20,7 +26,7 @@ function _options(sqlKey = SQL_A, name = "total"): Options {
     sqlKey,
     resultSqlKey: sqlKey,
     result,
-    projections: describeSqlProjections({
+    projections: makeProjectionDescriptorsFromSql({
       sql: sqlKey,
       columns: result.columns,
     }),
@@ -63,7 +69,7 @@ describe("useBoundQueryResult", () => {
     const savedId = result.current?.columns[0]?.id;
     rerender({ ..._options(), sqlKey: SQL_B });
     expect(result.current).toBeUndefined();
-    rerender(_options(SQL_B, "amount"));
+    rerender(_options({ sqlKey: SQL_B, name: "amount" }));
     expect(result.current?.columns[0]).toMatchObject({
       id: savedId,
       name: "amount",

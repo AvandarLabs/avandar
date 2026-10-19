@@ -3,10 +3,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
-import { notifySuccess, notifyError } from "@/utils/notifications/notify";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
+import { DashboardBindingPreparation } from "@/views/DashboardApp/AvaPage/utils/DashboardBindingPreparation/DashboardBindingPreparation";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
-import { prepareDashboardBindings } from "@/views/DashboardApp/AvaPage/utils/prepareDashboardBindings/prepareDashboardBindings";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DashboardEditorContent } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorContent";
@@ -14,8 +14,8 @@ import {
   getDashboardTitleFromPuckData,
   useDashboardPuckConfig,
 } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import "@puckeditor/core/puck.css";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ReactElement } from "react";
 
@@ -103,11 +103,11 @@ function useSaveDashboard(
   const { dashboardTitle } = options;
   return useCallback(
     (savedData: AvaPageData): void => {
-      void prepareDashboardBindings(
-        savedData,
-        { auth: "workspace", workspaceId },
-        queryClient,
-      )
+      void DashboardBindingPreparation.prepareDocument({
+        data: savedData,
+        auth: { auth: "workspace", workspaceId },
+        queryClient: queryClient,
+      })
         .then((preparedData) => {
           return saveDashboard({
             id: dashboardId,

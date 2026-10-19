@@ -10,6 +10,86 @@ import type {
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
 import type { Config as PuckConfig, Data as PuckData } from "@puckeditor/core";
 import type { Simplify } from "type-fest";
+type V4_BarSeries = {
+  renderAs: "bar";
+  key: string;
+  label?: string;
+  color?: string;
+  fillOpacity?: number;
+  stackId?: string;
+};
+
+type V4_LineSeries = {
+  renderAs: "line";
+  key: string;
+  label?: string;
+  color?: string;
+  curveType?: V4_CurveType;
+  strokeWidth?: number;
+  withDots?: boolean;
+};
+
+type V4_AreaSeries = {
+  renderAs: "area";
+  key: string;
+  label?: string;
+  color?: string;
+  curveType?: V4_CurveType;
+  strokeWidth?: number;
+  fillOpacity?: number;
+  withDots?: boolean;
+};
+
+type V4_VizConfigBar = {
+  vizType: "bar";
+  xAxisKey: string | undefined;
+  series: V4_XYSeries[];
+  layout: "group" | "stack" | "percent";
+  withLegend: boolean;
+  chartStyle?: V4_ChartStyle;
+};
+
+type V4_VizConfigLine = {
+  vizType: "line";
+  xAxisKey: string | undefined;
+  series: V4_XYSeries[];
+  withLegend: boolean;
+  chartStyle?: V4_ChartStyle;
+};
+
+type V4_VizConfigArea = {
+  vizType: "area";
+  xAxisKey: string | undefined;
+  series: V4_XYSeries[];
+  layout: "default" | "stacked" | "percent" | "split";
+  withLegend: boolean;
+  chartStyle?: V4_ChartStyle;
+};
+
+type V4_VizConfigPie = {
+  vizType: "pie";
+  nameKey: string | undefined;
+  valueKey: string | undefined;
+  isDonut: boolean;
+  withLabels: boolean;
+  labelsType: "value" | "percent";
+  seriesColors?: Record<string, string>;
+};
+
+type V4_VizConfigFunnel = {
+  vizType: "funnel";
+  nameKey: string | undefined;
+  valueKey: string | undefined;
+  seriesColors?: Record<string, string>;
+};
+
+type V4_VizConfigRadar = {
+  vizType: "radar";
+  nameKey: string | undefined;
+  series: V4_RadarSeries[];
+  withLegend?: boolean;
+  chartStyle?: V4_ChartStyle;
+};
 
 export type {
   V3_AvaPageData,
@@ -18,20 +98,9 @@ export type {
   V3_VizConfig,
 };
 
-type V4_AvaPageRootWidthUnit = "%" | "px";
-
 type V4_RootPadding = "none" | "xs" | "sm" | "md" | "lg" | "xl";
 
-type V4_AvaPageThemeName =
-  | "default"
-  | "ocean"
-  | "forest"
-  | "rose"
-  | "amber"
-  | "graphite";
-
-type V4_AvaPageTypographyName = "system" | "serif" | "mono";
-
+/** Frozen document-level presentation properties for schema version 4. */
 export type V4_AvaPageRootProps = {
   author: string;
   publishedAt: string;
@@ -40,11 +109,11 @@ export type V4_AvaPageRootProps = {
   horizontalPadding: V4_RootPadding;
   verticalPadding: V4_RootPadding;
   containerMaxWidth: {
-    unit: V4_AvaPageRootWidthUnit;
+    unit: "%" | "px";
     value: number;
   };
-  theme: V4_AvaPageThemeName;
-  typography: V4_AvaPageTypographyName;
+  theme: "default" | "ocean" | "forest" | "rose" | "amber" | "graphite";
+  typography: "system" | "serif" | "mono";
   isAuthorHidden: boolean;
   isPublishedAtHidden: boolean;
   isSubtitleHidden: boolean;
@@ -76,34 +145,7 @@ type V4_ChartStyle = {
   legend?: { position?: "top" | "bottom" | "left" | "right" };
 };
 
-type V4_XYSeries =
-  | {
-      renderAs: "bar";
-      key: string;
-      label?: string;
-      color?: string;
-      fillOpacity?: number;
-      stackId?: string;
-    }
-  | {
-      renderAs: "line";
-      key: string;
-      label?: string;
-      color?: string;
-      curveType?: V4_CurveType;
-      strokeWidth?: number;
-      withDots?: boolean;
-    }
-  | {
-      renderAs: "area";
-      key: string;
-      label?: string;
-      color?: string;
-      curveType?: V4_CurveType;
-      strokeWidth?: number;
-      fillOpacity?: number;
-      withDots?: boolean;
-    };
+type V4_XYSeries = V4_BarSeries | V4_LineSeries | V4_AreaSeries;
 
 type V4_ScatterSeries = {
   key: string;
@@ -120,75 +162,35 @@ type V4_RadarSeries = {
   fillOpacity?: number;
 };
 
+/** Frozen name-based visualization configurations for schema version 4. */
 export type V4_VizConfig =
   | { vizType: "table" }
-  | {
-      vizType: "bar";
-      xAxisKey: string | undefined;
-      series: V4_XYSeries[];
-      layout: "group" | "stack" | "percent";
-      withLegend: boolean;
-      chartStyle?: V4_ChartStyle;
-    }
-  | {
-      vizType: "line";
-      xAxisKey: string | undefined;
-      series: V4_XYSeries[];
-      withLegend: boolean;
-      chartStyle?: V4_ChartStyle;
-    }
-  | {
-      vizType: "area";
-      xAxisKey: string | undefined;
-      series: V4_XYSeries[];
-      layout: "default" | "stacked" | "percent" | "split";
-      withLegend: boolean;
-      chartStyle?: V4_ChartStyle;
-    }
+  | V4_VizConfigBar
+  | V4_VizConfigLine
+  | V4_VizConfigArea
   | {
       vizType: "scatter";
       series: V4_ScatterSeries[];
       chartStyle?: V4_ChartStyle;
     }
-  | {
-      vizType: "pie";
-      nameKey: string | undefined;
-      valueKey: string | undefined;
-      isDonut: boolean;
-      withLabels: boolean;
-      labelsType: "value" | "percent";
-      seriesColors?: Record<string, string>;
-    }
-  | {
-      vizType: "funnel";
-      nameKey: string | undefined;
-      valueKey: string | undefined;
-      seriesColors?: Record<string, string>;
-    }
-  | {
-      vizType: "radar";
-      nameKey: string | undefined;
-      series: V4_RadarSeries[];
-      withLegend?: boolean;
-      chartStyle?: V4_ChartStyle;
-    }
+  | V4_VizConfigPie
+  | V4_VizConfigFunnel
+  | V4_VizConfigRadar
   | {
       vizType: "bubble";
       series: Array<V4_ScatterSeries & { sizeKey: string }>;
       chartStyle?: V4_ChartStyle;
     };
 
-type V4_NLQuery = {
-  prompt: string;
-  rawSql: string;
-  generations: ReadonlyArray<
-    | { prompt: string; rawSql: string; error?: undefined }
-    | { prompt: string; rawSql: undefined; error: string }
-  >;
-};
-
 type V4_DataVizProps = {
-  nlQuery: V4_NLQuery;
+  nlQuery: {
+    prompt: string;
+    rawSql: string;
+    generations: ReadonlyArray<
+      | { prompt: string; rawSql: string; error?: undefined }
+      | { prompt: string; rawSql: undefined; error: string }
+    >;
+  };
   vizType: V4_VizConfig["vizType"];
   vizConfig: V4_VizConfig;
   globalFilterSubscription: {
@@ -318,6 +320,7 @@ type V4_CardProps = {
   title: string;
 };
 
+/** Frozen saved block properties for schema version 4. */
 export type V4_PBlockPropsRegistry = {
   Card: V4_CardProps;
   CalloutBlock: V4_CalloutBlockProps;
@@ -338,7 +341,9 @@ export type V4_PBlockPropsRegistry = {
   TableBlock: V4_TableBlockProps;
 };
 
+/** Saved document shape for schema version 4. */
 export type V4_AvaPageData = Simplify<
   PuckData<V4_PBlockPropsRegistry, V4_AvaPageRootProps>
 >;
+/** Editor configuration corresponding to schema version 4. */
 export type V4_AvaPageConfig = PuckConfig<V4_PBlockPropsRegistry>;

@@ -14,7 +14,7 @@ import type {
  * be invoked from a React component / hook.
  */
 export function useLocalFiltersPFieldConfig(
-  auth: StructuredQueryAuth,
+  auth: Readonly<StructuredQueryAuth>,
 ): CustomField<readonly LocalFilter[] | readonly LegacyLocalFilter[]> {
   const { t } = useLingui();
   return useMemo(() => {

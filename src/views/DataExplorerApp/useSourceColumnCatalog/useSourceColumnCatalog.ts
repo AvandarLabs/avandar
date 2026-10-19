@@ -32,10 +32,10 @@ function _createCatalog(options: {
 
 /** Owns stable source wrappers for controls outside the Explorer provider. */
 export function useSourceColumnCatalog(
-  sourceKey: QueryDataSource.TypedId | undefined,
+  sourceKey: Readonly<QueryDataSource.TypedId> | undefined,
 ): SourceColumnCatalog {
   const incoming = useQueryColumnsForDataSource(sourceKey);
-  const [previous, setPrevious] = useState<{
+  const [previousCatalogState, setPreviousCatalogState] = useState<{
     incoming: ReturnType<typeof useQueryColumnsForDataSource>;
     catalog: SourceColumnCatalog;
   }>(() => {
@@ -45,21 +45,21 @@ export function useSourceColumnCatalog(
     };
   });
   const isSameScope =
-    sourceKey?.__type === previous.catalog.sourceKey?.__type &&
-    sourceKey?.id === previous.catalog.sourceKey?.id;
+    sourceKey?.__type === previousCatalogState.catalog.sourceKey?.__type &&
+    sourceKey?.id === previousCatalogState.catalog.sourceKey?.id;
   if (
-    incoming.columns === previous.incoming.columns &&
-    incoming.isLoading === previous.incoming.isLoading &&
-    incoming.isReady === previous.incoming.isReady &&
+    incoming.columns === previousCatalogState.incoming.columns &&
+    incoming.isLoading === previousCatalogState.incoming.isLoading &&
+    incoming.isReady === previousCatalogState.incoming.isReady &&
     isSameScope
   ) {
-    return previous.catalog;
+    return previousCatalogState.catalog;
   }
   const catalog = _createCatalog({
     sourceKey,
-    previous: previous.catalog,
+    previous: previousCatalogState.catalog,
     incoming,
   });
-  setPrevious({ incoming, catalog });
+  setPreviousCatalogState({ incoming, catalog });
   return catalog;
 }

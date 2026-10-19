@@ -1,5 +1,6 @@
 import { Select, Tabs } from "@avandar/ui";
-import { Box, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import { propEq } from "@avandar/utils";
+import { Box, Button, Group, Stack, Text } from "@mantine/core";
 import {
   IconChevronDown,
   IconDownload,
@@ -7,13 +8,12 @@ import {
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import drawerCss from "@/components/CanvasDrawer/CanvasDrawer.module.css";
 import drawerBodyCss from "@/components/CanvasDrawer/CanvasDrawerBody/CanvasDrawerBody.module.css";
 import { CanvasDrawerContext } from "@/components/CanvasDrawer/CanvasDrawerContext";
 import { CanvasDrawerResizeHandle } from "@/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -25,7 +25,6 @@ import { AggregationFields } from "@/views/DataExplorerApp/QueryForm/ManualQuery
 import { LimitFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields";
 import { SortFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
-import sqlCss from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView.module.css";
 import { DUR, caretOn, enter } from "../../src/motion";
 import {
   EXPLORER_CASES,
@@ -35,22 +34,22 @@ import {
   EXPLORER_DISPLAY_COLUMNS,
   EXPLORER_DISTRICT_COUNTS,
   EXPLORER_SELECTED_COLUMNS,
-  EXPLORER_SQL_CATALOG,
 } from "../Explorer.constants";
 import css from "./ExplorerScreen.module.css";
+import { ExplorerSqlEditor } from "./ExplorerSqlEditor";
 import {
   aggregateColumns,
   barConfig,
   emptyFilter,
   explorerStage,
 } from "./explorerStage";
+import { useExplorerVideoTargets } from "./useExplorerVideoTargets";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ExplorerMode } from "./explorerStage";
-import type { EditorView } from "@codemirror/view";
 
-export type { ExplorerMode };
 export { EXPLORER_BEATS, explorerBeats } from "./explorerStage";
+export type { ExplorerMode };
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 const _noop = () => {};
@@ -65,8 +64,7 @@ export type Props = {
 /** Real product leaves, with fixture bindings and a frame-owned controller replacing app/network state. */
 export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
   const stage = explorerStage(frame, mode);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const sqlViewRef = useRef<EditorView | null>(null);
+  const rootRef = useExplorerVideoTargets({ frame, mode, time: stage.time });
   const filters: StructuredQuery.FilterGroup = useMemo(
     () =>
       stage.hasFilterRule
@@ -77,7 +75,7 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
                 type: "rule",
                 id: "demo-district-filter",
                 columnId: (EXPLORER_COLUMNS.find(
-                  (column) => column.baseColumn.name === stage.filterColumn,
+                  propEq("baseColumn.name", stage.filterColumn),
                 )?.id ?? "") as QueryColumn.Id,
                 columnDataType: "varchar",
                 operator: "=",
@@ -105,50 +103,6 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
     }),
     [stage.drawerProgress, drawerHeight],
   );
-
-  // Attribute-only instrumentation preserves the product DOM and styles.
-  // Targets come from the actual rendered leaves, never estimated CSS coordinates.
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const targets: Array<[string, string]> = [
-      ['[data-testid="filter-value-scalar"]', "explorer-filter-value"],
-      ['[aria-label="Visualization Type"]', "explorer-viz-type"],
-      ['[aria-label="Column"]', "explorer-filter-column"],
-      ['[aria-label="Condition"]', "explorer-filter-operator"],
-    ];
-    targets.forEach(([selector, target]) =>
-      root.querySelector(selector)?.setAttribute("data-video-target", target),
-    );
-    root.querySelectorAll("button").forEach((button) => {
-      if (button.textContent?.trim() === "+ Condition")
-        button.setAttribute("data-video-target", "explorer-add-condition");
-    });
-    root.querySelectorAll("label").forEach((label) => {
-      if (label.textContent?.trim() === "SQL")
-        label.setAttribute("data-video-target", "explorer-sql-mode");
-    });
-    const filterInput = root.querySelector<HTMLInputElement>(
-      '[data-testid="filter-value-scalar"]',
-    );
-    if (filterInput && stage.time >= 132 && stage.time < 190) {
-      filterInput.focus();
-      filterInput.setSelectionRange(
-        filterInput.value.length,
-        filterInput.value.length,
-      );
-    } else if (filterInput && document.activeElement === filterInput) {
-      filterInput.blur();
-    }
-  }, [frame, mode, stage.time]);
-
-  useEffect(() => {
-    if (stage.isEditingSql && sqlViewRef.current) {
-      const view = sqlViewRef.current;
-      view.focus();
-      view.dispatch({ selection: { anchor: view.state.doc.length } });
-    }
-  }, [stage.sql, stage.isEditingSql]);
 
   const query = {
     queryColumns: EXPLORER_SELECTED_COLUMNS,
@@ -240,64 +194,7 @@ export function ExplorerScreen({ frame, width, height, mode = "full" }: Props) {
   ];
 
   const sqlEditor = (
-    <div className={css.explorerSqlGroup}>
-      <Stack gap={stage.isEditingSql ? "sm" : "xs"}>
-        {stage.isEditingSql ? (
-          <div data-video-target="explorer-sql-editor">
-            <SqlEditor
-              value={stage.sql}
-              catalog={EXPLORER_SQL_CATALOG}
-              onChange={_noop}
-              minRows={9}
-              onEditorReady={(view) => {
-                sqlViewRef.current = view;
-              }}
-            />
-          </div>
-        ) : (
-          <Paper p="sm" className={sqlCss.sqlPaper}>
-            <SqlEditor
-              value={stage.sql}
-              catalog={EXPLORER_SQL_CATALOG}
-              onChange={_noop}
-              readOnly
-              minRows={9}
-            />
-          </Paper>
-        )}
-        <Group
-          justify="flex-end"
-          gap="xs"
-          className={stage.isEditingSql ? undefined : sqlCss.editQueryRow}
-        >
-          {stage.isEditingSql ? (
-            <>
-              <Button
-                data-video-target="explorer-run-query"
-                size="sm"
-                variant="default"
-                disabled={stage.sql.trim().length === 0}
-                onClick={_noop}
-              >
-                Re-run query
-              </Button>
-              <Button size="sm" variant="subtle" onClick={_noop}>
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <Button
-              data-video-target="explorer-edit-query"
-              size="xs"
-              variant="subtle"
-              onClick={_noop}
-            >
-              Edit query
-            </Button>
-          )}
-        </Group>
-      </Stack>
-    </div>
+    <ExplorerSqlEditor sql={stage.sql} isEditingSql={stage.isEditingSql} />
   );
 
   // The drawer, toolbar and canvas below remain inline rather than further split:

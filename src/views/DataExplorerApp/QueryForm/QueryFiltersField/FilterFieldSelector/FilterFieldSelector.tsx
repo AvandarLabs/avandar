@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Select, Tooltip } from "@mantine/core";
 import { getOptionNameFromUnknown } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/filterControlHelpers";
@@ -23,10 +24,7 @@ export function FilterFieldSelector({
     const label = "label" in option ? String(option.label) : name;
     return { value: name, label };
   });
-  const label =
-    data.find((option) => {
-      return option.value === selected;
-    })?.label ?? "";
+  const label = data.find(propEq("value", selected))?.label ?? "";
   return (
     <Tooltip label={label} disabled={selected === ""} withinPortal>
       <Select

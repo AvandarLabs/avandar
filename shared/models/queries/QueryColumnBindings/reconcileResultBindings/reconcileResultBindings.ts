@@ -1,3 +1,4 @@
+import { isDefined, prop, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
@@ -6,21 +7,25 @@ import type {
   ProjectionDescriptor,
   ResultBinding,
   ResultBindingRegistry,
-} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.ts";
+} from "$/models/queries/QueryColumnBindings/QueryColumnBindings.types.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
-type Options = Readonly<{
+type Options = {
   scopeKey: string;
   sqlKey: string;
   columns: readonly QueryResult.Column[];
   projections: readonly ProjectionDescriptor[];
   previous: ResultBindingRegistry | undefined;
-}>;
+};
+type BindingOutcome = { binding?: ResultBinding; issue?: BindingIssue };
 
-function _hasSameExpression(
-  left: Readonly<Pick<ResultBinding, "expressionKey" | "sqlExpressionKey">>,
-  right: Readonly<ProjectionDescriptor>,
-): boolean {
+function _hasSameExpression({
+  left,
+  right,
+}: {
+  left: Readonly<Pick<ResultBinding, "expressionKey" | "sqlExpressionKey">>;
+  right: Readonly<ProjectionDescriptor>;
+}): boolean {
   if (left.expressionKey === right.expressionKey) {
     return true;
   }
@@ -34,108 +39,119 @@ function _hasSameExpression(
   );
 }
 
-function _getPriorMatch(
-  projection: Readonly<ProjectionDescriptor>,
-  options: Options,
-): ResultBinding | "ambiguous" | undefined {
+function _getPriorMatch({
+  projection,
+  context,
+}: {
+  projection: Readonly<ProjectionDescriptor>;
+  context: Readonly<Options>;
+}): ResultBinding | "ambiguous" | undefined {
   const candidates =
-    options.previous?.columns.filter((column) => {
-      return _hasSameExpression(column, projection);
+    context.previous?.columns.filter((column) => {
+      return _hasSameExpression({ left: column, right: projection });
     }) ?? [];
-  const peers = options.projections.filter((other) => {
-    return _hasSameExpression(other, projection);
+  const peers = context.projections.filter((other) => {
+    return _hasSameExpression({ left: other, right: projection });
   });
   if (candidates.length <= 1 && peers.length === 1) {
     return candidates[0];
   }
-  const namedCandidates = candidates.filter((column) => {
-    return column.name === projection.outputName;
-  });
-  const namedPeers = peers.filter((other) => {
-    return other.outputName === projection.outputName;
-  });
-  if (namedCandidates.length === 1 && namedPeers.length === 1) {
-    return namedCandidates[0];
-  }
-  return candidates.length > 0 ? "ambiguous" : undefined;
+  const namedCandidates = candidates.filter(
+    propEq("name", projection.outputName),
+  );
+  const namedPeers = peers.filter(propEq("outputName", projection.outputName));
+  return namedCandidates.length === 1 && namedPeers.length === 1
+    ? namedCandidates[0]
+    : candidates.length > 0
+      ? "ambiguous"
+      : undefined;
 }
 
-function _bindOpaqueColumn(
-  column: Readonly<QueryResult.Column>,
-  options: Options,
-  issues: BindingIssue[],
-): ResultBinding | undefined {
-  if (options.projections.length > 0) {
-    issues.push({ target: column.name, reason: "unsupported" });
-    return undefined;
+function _bindOpaqueColumn({
+  column,
+  context,
+}: {
+  column: Readonly<QueryResult.Column>;
+  context: Readonly<Options>;
+}): BindingOutcome {
+  if (context.projections.length > 0) {
+    return { issue: { target: column.name, reason: "unsupported" } };
   }
   const prior =
-    options.previous?.sqlKey === options.sqlKey
-      ? options.previous.columns.filter((other) => {
-          return other.name === column.name;
-        })
+    context.previous?.sqlKey === context.sqlKey
+      ? context.previous.columns.filter(propEq("name", column.name))
       : [];
-  if (prior.length > 1) {
-    issues.push({ target: column.name, reason: "ambiguous" });
-    return undefined;
-  }
-  return { ...prior[0], ...column, id: prior[0]?.id ?? uuid<QueryColumn.Id>() };
+  return prior.length > 1
+    ? { issue: { target: column.name, reason: "ambiguous" } }
+    : {
+        binding: {
+          ...prior[0],
+          ...column,
+          id: prior[0]?.id ?? uuid<QueryColumn.Id>(),
+        },
+      };
 }
 
-function _bindProjection(
-  column: Readonly<QueryResult.Column>,
-  projection: Readonly<ProjectionDescriptor>,
-  options: Options,
-  issues: BindingIssue[],
-): ResultBinding | undefined {
-  const prior = _getPriorMatch(projection, options);
+function _bindProjection({
+  column,
+  projection,
+  context,
+}: {
+  column: Readonly<QueryResult.Column>;
+  projection: Readonly<ProjectionDescriptor>;
+  context: Readonly<Options>;
+}): BindingOutcome {
+  const prior = _getPriorMatch({ projection, context });
   if (projection.identity !== "structured" && prior === "ambiguous") {
-    issues.push({ target: column.name, reason: "ambiguous" });
-    return undefined;
+    return { issue: { target: column.name, reason: "ambiguous" } };
   }
   const matched = prior === "ambiguous" ? undefined : prior;
   return {
-    ...column,
-    id:
-      projection.identity === "structured"
-        ? projection.id
-        : (matched?.id ?? projection.id),
-    expressionKey:
-      projection.identity === "sql" && matched?.expressionKey
-        ? matched.expressionKey
-        : projection.expressionKey,
-    sqlExpressionKey: projection.sqlExpressionKey,
+    binding: {
+      ...column,
+      id:
+        projection.identity === "structured"
+          ? projection.id
+          : (matched?.id ?? projection.id),
+      expressionKey:
+        projection.identity === "sql" && matched?.expressionKey
+          ? matched.expressionKey
+          : projection.expressionKey,
+      sqlExpressionKey: projection.sqlExpressionKey,
+    },
   };
 }
 
-function _bindColumn(
-  column: Readonly<QueryResult.Column>,
-  options: Options,
-  issues: BindingIssue[],
-): ResultBinding | undefined {
-  const names = options.columns.filter((other) => {
+function _bindColumn({
+  column,
+  context,
+}: {
+  column: Readonly<QueryResult.Column>;
+  context: Readonly<Options>;
+}): BindingOutcome {
+  const names = context.columns.filter((other) => {
     return other.name.toLowerCase() === column.name.toLowerCase();
   });
-  const descriptors = options.projections.filter((projection) => {
-    return projection.outputName === column.name;
-  });
+  const descriptors = context.projections.filter(
+    propEq("outputName", column.name),
+  );
   if (!column.name || names.length !== 1 || descriptors.length > 1) {
-    issues.push({ target: column.name, reason: "ambiguous" });
-    return undefined;
+    return { issue: { target: column.name, reason: "ambiguous" } };
   }
   return descriptors[0]
-    ? _bindProjection(column, descriptors[0], options, issues)
-    : _bindOpaqueColumn(column, options, issues);
+    ? _bindProjection({ column, projection: descriptors[0], context })
+    : _bindOpaqueColumn({ column, context });
 }
 
-function _reuseColumns(
-  columns: readonly ResultBinding[],
-  previous: ResultBindingRegistry | undefined,
-): readonly ResultBinding[] {
+function _reuseColumns({
+  columns,
+  previous,
+}: {
+  columns: readonly ResultBinding[];
+  previous: ResultBindingRegistry | undefined;
+}): readonly ResultBinding[] {
   const reused = columns.map((column) => {
-    const prior = previous?.columns.find((other) => {
-      return other.id === column.id;
-    });
+    const prior = previous?.columns.find(propEq("id", column.id));
     return prior &&
       prior.name === column.name &&
       prior.dataType === column.dataType &&
@@ -153,40 +169,48 @@ function _reuseColumns(
     : reused;
 }
 
+function _getUniqueOutcomes(
+  candidates: readonly ResultBinding[],
+): BindingOutcome[] {
+  return candidates.map((column) => {
+    return candidates.filter(propEq("id", column.id)).length > 1
+      ? { issue: { target: column.name, reason: "ambiguous" } }
+      : { binding: column };
+  });
+}
+
 /** Binds completed output metadata within its owning query scope. */
-export function reconcileResultBindings(options: Options): BoundResultSchema {
+export function reconcileResultBindings(
+  options: Readonly<Options>,
+): BoundResultSchema {
   const sqlKey = options.sqlKey.trim().replace(/;$/, "").trimEnd();
   const previous =
     options.previous?.scopeKey === options.scopeKey
       ? options.previous
       : undefined;
   const context = { ...options, sqlKey, previous };
-  const issues: BindingIssue[] = [];
-  options.projections.forEach((projection) => {
-    if (
-      !options.columns.some((column) => {
-        return column.name === projection.outputName;
-      })
-    ) {
-      issues.push({ target: projection.outputName, reason: "missing" });
-    }
+  const missingIssues = options.projections
+    .map((projection) => {
+      return options.columns.some(propEq("name", projection.outputName))
+        ? undefined
+        : { target: projection.outputName, reason: "missing" as const };
+    })
+    .filter(isDefined);
+  const outcomes = options.columns.map((column) => {
+    return _bindColumn({ column, context });
   });
-  const candidates = options.columns.flatMap((column) => {
-    const binding = _bindColumn(column, context, issues);
-    return binding ? [binding] : [];
+  const unique = _getUniqueOutcomes(
+    outcomes.map(prop("binding")).filter(isDefined),
+  );
+  const issues = [
+    ...missingIssues,
+    ...outcomes.map(prop("issue")).filter(isDefined),
+    ...unique.map(prop("issue")).filter(isDefined),
+  ];
+  const columns = _reuseColumns({
+    columns: unique.map(prop("binding")).filter(isDefined),
+    previous,
   });
-  const unique = candidates.filter((column) => {
-    if (
-      candidates.filter((other) => {
-        return other.id === column.id;
-      }).length > 1
-    ) {
-      issues.push({ target: column.name, reason: "ambiguous" });
-      return false;
-    }
-    return true;
-  });
-  const columns = _reuseColumns(unique, previous);
   const registry: ResultBindingRegistry =
     previous?.sqlKey === sqlKey && columns === previous.columns
       ? previous

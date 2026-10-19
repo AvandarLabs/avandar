@@ -2,7 +2,7 @@ import { Model } from "@avandar/models";
 import { useEffect, useMemo } from "react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useQueryColumnsForDataSource } from "@/views/DataExplorerApp/useQueryColumnsForDataSource";
-import { ManualQueryFormView } from "./ManualQueryFormView";
+import { ManualQueryFormView } from "./ManualQueryFormView/ManualQueryFormView";
 import type { ManualQueryFormHandlers } from "./ManualQueryForm";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
 import type { ReactNode } from "react";
@@ -44,7 +44,9 @@ export function DataExplorerManualQueryForm({
     onSetOrderByColumn: dispatch.setOrderByColumn,
     onSetOrderByDirection: dispatch.setOrderByDirection,
     onSetLimit: dispatch.setLimit,
-    onSetFilters: dispatch.setFilters,
+    onSetFilters: ({ filters }) => {
+      dispatch.setFilters(filters);
+    },
   };
 
   return (

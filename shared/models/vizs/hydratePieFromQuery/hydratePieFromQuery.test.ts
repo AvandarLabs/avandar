@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
@@ -21,12 +22,14 @@ function makePieConfig(
 
 function makeCol(name: string, dataType: DatasetColumn.T["dataType"]) {
   return {
-    ...QueryColumn.makeFromDatasetColumn({
-      id: name as DatasetColumn.T["id"],
-      name,
-      dataType,
-      columnIdx: 0,
-    } as DatasetColumn.T),
+    ...QueryColumn.makeFromDatasetColumn(
+      Model.make("DatasetColumn", {
+        id: name as DatasetColumn.T["id"],
+        name,
+        dataType,
+        columnIdx: 0,
+      }) as DatasetColumn.T,
+    ),
     id: name as QueryColumn.Id,
   };
 }

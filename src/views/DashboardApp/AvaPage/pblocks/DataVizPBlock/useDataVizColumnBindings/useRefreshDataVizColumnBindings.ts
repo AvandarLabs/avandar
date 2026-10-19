@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { refreshDataVizColumnBindings } from "./useDataVizColumnBindings";
+import { DataVizColumnBindings } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizColumnBindings";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
@@ -28,18 +28,18 @@ export function useRefreshDataVizColumnBindings(
   useEffect(
     function refreshCompletedMetadata() {
       if (isSuccess && result && expectedSql !== undefined) {
-        refreshDataVizColumnBindings(
-          {
+        DataVizColumnBindings.refresh({
+          options: {
             scopeKey: id,
             rawSql,
             auth,
             projections: [],
             initialRegistry: undefined,
           },
-          queryClient,
-          result,
-          expectedSql,
-        );
+          queryClient: queryClient,
+          result: result,
+          expectedSql: expectedSql,
+        });
       }
     },
     [queryClient, id, rawSql, auth, expectedSql, result, isSuccess],

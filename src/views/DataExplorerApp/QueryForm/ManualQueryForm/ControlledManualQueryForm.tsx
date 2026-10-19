@@ -1,6 +1,6 @@
 import { Model } from "@avandar/models";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation";
-import { ManualQueryFormView } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView";
+import { ManualQueryFormView } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormView";
 import { useSourceColumnCatalog } from "@/views/DataExplorerApp/useSourceColumnCatalog/useSourceColumnCatalog";
 import type { ComponentProps, ReactNode } from "react";
 
@@ -36,8 +36,11 @@ export function ControlledManualQueryForm({
       sourceCatalog={{ ...loaded, columns }}
       handlers={{
         ...handlers,
-        onSetFilters: (filters) => {
-          return handlers.onSetFilters(filters, columns);
+        onSetFilters: ({ filters }) => {
+          return handlers.onSetFilters({
+            filters: filters,
+            sourceColumns: columns,
+          });
         },
       }}
     />

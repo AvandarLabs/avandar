@@ -1,11 +1,12 @@
-import { resolveVizColumnBindings } from "$/models/vizs/resolveVizColumnBindings/resolveVizColumnBindings";
-import { transformAvaPageProps } from "../../utils/createAvaPageTraversalConfig/transformAvaPageProps";
+import { propEq } from "@avandar/utils";
+import { makeResolvedVizConfigFromBoundConfig } from "$/models/vizs/makeResolvedVizConfigFromBoundConfig/makeResolvedVizConfigFromBoundConfig";
+import { transformAvaPageProps } from "../../utils/makeTraversalConfigFromAvaPageData/transformAvaPageProps";
 import type { AvaPageDataMigration } from "../AvaPageDataMigrator";
 import type {
   V4_AvaPageData,
   V5_AvaPageData,
-  V5_PBlockPropsRegistry,
   V5_AvaPageRootProps,
+  V5_PBlockPropsRegistry,
 } from "./AvaPageDataMigrationV5.types";
 
 function _downgradeChart(
@@ -25,9 +26,7 @@ function _downgradeChart(
     if (target.kind !== "bound") {
       return;
     }
-    const column = columnBindings.columns.find((candidate) => {
-      return candidate.id === target.columnId;
-    });
+    const column = columnBindings.columns.find(propEq("id", target.columnId));
     if (!column) {
       throw new Error(
         "Cannot downgrade DataViz: a global filter has no persisted binding",
@@ -39,19 +38,17 @@ function _downgradeChart(
       );
     }
   });
-  const resolved = resolveVizColumnBindings(
-    props.vizConfig,
-    columnBindings.columns,
-  );
+  const resolved = makeResolvedVizConfigFromBoundConfig({
+    config: props.vizConfig,
+    columns: columnBindings.columns,
+  });
   if (resolved.issues.length) {
     throw new Error(
       "Cannot downgrade DataViz: a chart column has no persisted binding",
     );
   }
   const localFilters = props.localFilters.map(({ columnId, ...filter }) => {
-    const column = columnBindings.columns.find((candidate) => {
-      return candidate.id === columnId;
-    });
+    const column = columnBindings.columns.find(propEq("id", columnId));
     if (!column) {
       throw new Error(
         "Cannot downgrade DataViz: a local filter has no persisted binding",
@@ -69,9 +66,9 @@ export const AvaPageDataMigrationV5 = {
   downgradedVersion: 4,
   upgradedVersion: 5,
   upgrade: (data: V4_AvaPageData): V5_AvaPageData => {
-    return transformAvaPageProps<V5_PBlockPropsRegistry, V5_AvaPageRootProps>(
-      data as unknown as V5_AvaPageData,
-      {
+    return transformAvaPageProps<V5_PBlockPropsRegistry, V5_AvaPageRootProps>({
+      data: data as unknown as V5_AvaPageData,
+      transforms: {
         root: (props) => {
           return { ...props, schemaVersion: 5 };
         },
@@ -82,12 +79,12 @@ export const AvaPageDataMigrationV5 = {
           } as V5_PBlockPropsRegistry["DataViz"];
         },
       },
-    ) as V5_AvaPageData;
+    }) as V5_AvaPageData;
   },
   downgrade: (data: V5_AvaPageData): V4_AvaPageData => {
-    return transformAvaPageProps<V5_PBlockPropsRegistry, V5_AvaPageRootProps>(
-      data,
-      {
+    return transformAvaPageProps<V5_PBlockPropsRegistry, V5_AvaPageRootProps>({
+      data: data,
+      transforms: {
         root: (props) => {
           return {
             ...props,
@@ -98,6 +95,6 @@ export const AvaPageDataMigrationV5 = {
           return _downgradeChart(props) as V5_PBlockPropsRegistry["DataViz"];
         },
       },
-    ) as unknown as V4_AvaPageData;
+    }) as unknown as V4_AvaPageData;
   },
 } satisfies AvaPageDataMigration<V4_AvaPageData, V5_AvaPageData>;

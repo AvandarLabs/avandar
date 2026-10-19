@@ -1,11 +1,11 @@
 import { DangerText } from "@avandar/ui";
-import { prop, UnknownDataFrame } from "@avandar/utils";
+import { UnknownDataFrame, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
-import { resolveVizColumnBindings } from "$/models/vizs/resolveVizColumnBindings/resolveVizColumnBindings";
+import { makeResolvedVizConfigFromBoundConfig } from "$/models/vizs/makeResolvedVizConfigFromBoundConfig/makeResolvedVizConfigFromBoundConfig";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -139,7 +139,10 @@ export function VisualizationContainer({
   const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
-  const resolved = resolveVizColumnBindings(vizConfig, columns);
+  const resolved = makeResolvedVizConfigFromBoundConfig({
+    config: vizConfig,
+    columns: columns,
+  });
   return match(resolved.config)
     .with({ vizType: "table" }, () => {
       return (

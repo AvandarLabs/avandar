@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { resolveLegacyColumnName } from "$/models/queries/QueryColumnBindings/resolveLegacyColumnName/resolveLegacyColumnName";
+import { getColumnIdFromLegacyName } from "$/models/queries/QueryColumnBindings/getColumnIdFromLegacyName/getColumnIdFromLegacyName";
 import css from "./LocalFiltersPField.module.css";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
@@ -74,7 +74,10 @@ export function LocalFilterEditor({
           value={
             "columnId" in filter
               ? filter.columnId
-              : (resolveLegacyColumnName(filter.columnName, columns) ?? null)
+              : (getColumnIdFromLegacyName({
+                  name: filter.columnName,
+                  columns: columns,
+                }) ?? null)
           }
           allowDeselect={false}
           onChange={(value) => {

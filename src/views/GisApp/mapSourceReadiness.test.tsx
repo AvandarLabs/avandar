@@ -1,23 +1,30 @@
-/** Persisted filter trees must hydrate before any map compiler reads them. */
 import { Model } from "@avandar/models";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, expect, it, vi } from "vitest";
+import { makeBufferLayersFromSource } from "./makeBufferLayersFromSource";
+import type { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
+type Props = { children: ReactNode };
+/** Persisted filter trees must hydrate before any map compiler reads them. */
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import * as StructuredQueryCompiler from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import * as SpatialCompiler from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
-import { renderHook, TestProviders, waitFor } from "@/test-utils";
+import { TestProviders, renderHook, waitFor } from "@/test-utils";
 import { useMapLayersData } from "./layers/useMapLayersData/useMapLayersData";
 import { useMapTimeExtent } from "./shell/MapTimeSlider/useMapTimeExtent";
-import { useHydratedMapSources } from "./useGisApp/MapSourceHydration/useHydratedMapSources";
+import { useHydratedMapSources } from "./useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactNode } from "react";
 
-const boundary = vi.hoisted(() => {
+const boundary = vi.hoisted<{
+  columns: DatasetColumn.T[];
+  status: "pending" | "error" | "success";
+  runQuery: ReturnType<typeof vi.fn>;
+}>(() => {
   return {
     columns: [] as DatasetColumn.T[],
     status: "pending" as "pending" | "error" | "success",
@@ -78,7 +85,13 @@ const spatialCompiler = vi.spyOn(
   "compileMapLayerSpatialQuery",
 );
 
-function _createFixture(clause: "where" | "having", bufferDepth = 0) {
+function _createFixture({
+  clause,
+  bufferDepth = 0,
+}: {
+  clause: "where" | "having";
+  bufferDepth?: number;
+}): { config: AvaMapConfig.T; columns: DatasetColumn.T[] } {
   const columns = (
     [
       { name: "shape", dataType: "varchar" },
@@ -145,21 +158,10 @@ function _createFixture(clause: "where" | "having", bufferDepth = 0) {
       },
     },
   ];
-  const buffers = [];
-  let sourceId = empty.id;
-  for (let index = 0; index < bufferDepth; index++) {
-    const buffer = MapLayer.makeEmpty(`buffer ${index}`);
-    buffers.push({
-      ...buffer,
-      geoBinding: {
-        type: "bufferOfLayer",
-        layerId: sourceId,
-        distanceMeters: 100,
-        dissolve: false,
-      },
-    });
-    sourceId = buffer.id;
-  }
+  const buffers = makeBufferLayersFromSource({
+    sourceId: empty.id,
+    bufferDepth,
+  });
   const config = AvaMapConfigSchema.fromJson({
     ...AvaMapConfig.makeEmpty(),
     layers: [...layers, ...buffers],
@@ -167,7 +169,9 @@ function _createFixture(clause: "where" | "having", bufferDepth = 0) {
   return { config, columns };
 }
 
-function _createEditor(mapConfig: AvaMapConfig.T) {
+function _createEditor(
+  mapConfig: AvaMapConfig.T,
+): ReturnType<typeof useAvaMapEditor> {
   return {
     name: "map",
     mapConfig,
@@ -178,21 +182,22 @@ function _createEditor(mapConfig: AvaMapConfig.T) {
   };
 }
 
-function _createWrapper() {
+function _createWrapper(): (props: Readonly<Props>) => ReactNode {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  function Wrapper({ children }: { children: ReactNode }) {
+  return ({ children }: Readonly<Props>): ReactNode => {
     return (
       <TestProviders>
         <QueryClientProvider client={client}>{children}</QueryClientProvider>
       </TestProviders>
     );
-  }
-  return Wrapper;
+  };
 }
 
-function useLayerQueries(layers: readonly MapLayer.T[]) {
+function useLayerQueries(
+  layers: readonly MapLayer.T[],
+): ReturnType<typeof useMapLayersData> {
   return useMapLayersData({
     layers,
     workspaceId,
@@ -200,7 +205,9 @@ function useLayerQueries(layers: readonly MapLayer.T[]) {
   });
 }
 
-function useTimeQuery(layers: readonly MapLayer.T[]) {
+function useTimeQuery(
+  layers: readonly MapLayer.T[],
+): ReturnType<typeof useMapTimeExtent> {
   return useMapTimeExtent({ layers, workspaceId });
 }
 
@@ -243,11 +250,14 @@ it.each([
 ])(
   "defers $name compilation of legacy HAVING until metadata recovers",
   async ({ useConsumer }) => {
-    const { config, columns } = _createFixture("having");
+    const { config, columns } = _createFixture({ clause: "having" });
     const editor = _createEditor(config);
     const { result, rerender } = renderHook(
       () => {
-        const hydrated = useHydratedMapSources(editor, workspaceId);
+        const hydrated = useHydratedMapSources({
+          editor: editor,
+          workspaceId: workspaceId,
+        });
         useConsumer(hydrated.mapConfig.layers);
         return hydrated;
       },
@@ -277,11 +287,17 @@ it.each([
 );
 
 it("defers buffered legacy source compilation through every dependency until metadata recovers", async () => {
-  const { config, columns } = _createFixture("where", 2);
+  const { config, columns } = _createFixture({
+    clause: "where",
+    bufferDepth: 2,
+  });
   const editor = _createEditor(config);
   const { result, rerender } = renderHook(
     () => {
-      const hydrated = useHydratedMapSources(editor, workspaceId);
+      const hydrated = useHydratedMapSources({
+        editor: editor,
+        workspaceId: workspaceId,
+      });
       const queries = useLayerQueries(hydrated.mapConfig.layers);
       return { hydrated, queries };
     },
@@ -297,9 +313,9 @@ it("defers buffered legacy source compilation through every dependency until met
   boundary.columns = columns;
   rerender();
   await waitFor(() => {
-    for (const layer of config.layers) {
+    config.layers.forEach((layer) => {
       expect(result.current.queries.get(layer.id)?.data?.type).toBe("spatial");
-    }
+    });
   });
   expect(boundary.runQuery.mock.calls).toHaveLength(3);
   expect(

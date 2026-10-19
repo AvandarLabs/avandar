@@ -1,9 +1,9 @@
-/** Exercises selection IDs against supplied source metadata. */
 import { Model } from "@avandar/models";
 import { expect, it, vi } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { fireEvent, render, screen } from "@/test-utils";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
+/** Exercises selection IDs against supplied source metadata. */
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
@@ -33,7 +33,7 @@ it("allocates a separate projection ID when adding a source field", async () => 
       dataType: "double",
     }) as DatasetColumn.T,
   );
-  let selection: readonly QueryColumn.T[] = [];
+  let selection: QueryColumn.T[] = [];
   render(
     <QueryColumnMultiSelect
       label="Columns"
@@ -44,7 +44,7 @@ it("allocates a separate projection ID when adding a source field", async () => 
         columns: [source],
       }}
       onChange={(columns) => {
-        selection = columns;
+        selection = [...columns];
       }}
     />,
   );

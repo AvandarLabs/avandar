@@ -1,7 +1,8 @@
 import { propEq } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 
@@ -43,11 +44,14 @@ function _getBufferSourceQueryKey(
   };
 }
 
-function _hasBoundFilterTargets(filters: QueryFilterGroup): boolean {
+function _hasBoundFilterTargets(filters: StructuredQuery.FilterGroup): boolean {
   return filters.rules.every((node) => {
-    return node.type === "group"
-      ? _hasBoundFilterTargets(node)
-      : typeof node.columnId === "string";
+    return match(node)
+      .with({ type: "group" }, _hasBoundFilterTargets)
+      .with({ type: "rule" }, (rule) => {
+        return typeof rule.columnId === "string";
+      })
+      .exhaustive();
   });
 }
 
@@ -67,10 +71,13 @@ export const MapLayerData = {
    * True when both filter clauses are hydrated for this layer and its buffer
    * dependencies. Missing sources and cycles retain the compiler's diagnostics.
    */
-  hasReadySourceFilters: (
-    layer: MapLayer.T,
-    stack: readonly MapLayer.T[],
-  ): boolean => {
+  hasReadySourceFilters: ({
+    layer,
+    stack,
+  }: Readonly<{
+    layer: MapLayer.T;
+    stack: readonly MapLayer.T[];
+  }>): boolean => {
     const visited = new Set<MapLayer.Id>();
     let current: MapLayer.T | undefined = layer;
     while (current && !visited.has(current.id)) {

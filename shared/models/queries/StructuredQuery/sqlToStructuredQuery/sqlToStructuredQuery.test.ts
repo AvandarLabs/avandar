@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
@@ -90,9 +91,8 @@ describe("sqlToStructuredQuery", () => {
     expect(rule?.type).toBe("rule");
     if (rule && rule.type === "rule") {
       expect(
-        result.query.sourceColumns?.find((column) => {
-          return column.id === rule.columnId;
-        })?.baseColumn.name,
+        result.query.sourceColumns?.find(propEq("id", rule.columnId))
+          ?.baseColumn.name,
       ).toBe("age");
       expect(rule.operator).toBe(">");
       expect(rule.value).toBe(30);
@@ -204,14 +204,12 @@ describe("sqlToStructuredQuery", () => {
     expect(rule?.type).toBe("rule");
     if (rule && rule.type === "rule") {
       expect(
-        result.query.queryColumns.find((column) => {
-          return column.id === rule.columnId;
-        })?.aggregation,
+        result.query.queryColumns.find(propEq("id", rule.columnId))
+          ?.aggregation,
       ).toBe("count");
       expect(
-        result.query.queryColumns.find((column) => {
-          return column.id === rule.columnId;
-        })?.baseColumn.name,
+        result.query.queryColumns.find(propEq("id", rule.columnId))?.baseColumn
+          .name,
       ).toBe("age");
       expect(rule.operator).toBe(">");
       expect(rule.value).toBe(1);

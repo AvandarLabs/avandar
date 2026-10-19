@@ -14,7 +14,7 @@
  * `tests/e2e/gis-geometry-crs.spec.ts` reproject the same coordinates.
  */
 import { describe, expect, it } from "vitest";
-import { withDuckDb } from "@/lib/sql/__tests__/executedDuckDb";
+import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
 import { makeSourceCrsTransformFromGeometrySql } from "../makeSourceCrsTransformFromGeometrySql";
 
 /** The three Web Mercator points the GIS CRS fixture carries. */

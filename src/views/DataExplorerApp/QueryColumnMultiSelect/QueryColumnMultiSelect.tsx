@@ -1,10 +1,10 @@
 import { makeSelectOptions } from "@avandar/ui";
-import { isNonNullish, makeIdLookupMap, prop } from "@avandar/utils";
+import { isNonNullish, makeIdLookupMap, prop, propEq } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import {
+  MultiSelect,
   defaultOptionsFilter,
   isOptionsGroup,
-  MultiSelect,
 } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { matchSorter } from "match-sorter";
@@ -161,9 +161,7 @@ export function QueryColumnMultiSelect({
             const column = queryColumnLookup.get(columnId as QueryColumn.Id);
             if (
               !column ||
-              currentSelectedColumns.some((selected) => {
-                return selected.id === column.id;
-              })
+              currentSelectedColumns.some(propEq("id", column.id))
             ) {
               return column;
             }

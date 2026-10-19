@@ -2,10 +2,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLayoutEffect, useMemo } from "react";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { DataVizRuntimeTargets } from "../DataVizRuntimeTargets";
-import { resolveDataVizRuntimeBindings } from "../resolveSavedDataVizBindings/resolveDataVizRuntimeBindings";
+import { makeRuntimeBindingsFromDataVizProps } from "../makeSavedBindingsFromDataVizProps/makeRuntimeBindingsFromDataVizProps";
 import { useDataVizColumnBindings } from "../useDataVizColumnBindings/useDataVizColumnBindings";
 import type { Props } from "../DataVizPBlock/DataVizPBlock";
-import type { DataVizRuntimeBindings } from "../resolveSavedDataVizBindings/resolveDataVizRuntimeBindings";
+import type { DataVizRuntimeBindings } from "../makeSavedBindingsFromDataVizProps/makeRuntimeBindingsFromDataVizProps";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
 
 type Resolution = ReturnType<typeof useDataVizColumnBindings> & {
@@ -13,10 +13,13 @@ type Resolution = ReturnType<typeof useDataVizColumnBindings> & {
 };
 
 /** Shares unfiltered bindings without saving viewer state. */
-export function useResolvedDataVizBindings(
-  props: Readonly<Props & { id: string }>,
-  auth: StructuredQueryAuth,
-): Resolution {
+export function useResolvedDataVizBindings({
+  props,
+  auth,
+}: Readonly<{
+  props: Readonly<Props & { id: string }>;
+  auth: StructuredQueryAuth;
+}>): Resolution {
   const queryClient = useQueryClient();
   const { filtersById } = DashboardFilterStateManager.useState();
   const discovery = useDataVizColumnBindings({
@@ -33,29 +36,32 @@ export function useResolvedDataVizBindings(
     if (!discovery.schema) {
       return undefined;
     }
-    return resolveDataVizRuntimeBindings(
-      props,
-      discovery.schema,
-      Object.values(filtersById),
-      DataVizRuntimeTargets.get(queryClient, {
-        id: props.id,
-        auth,
-        rawSql: props.nlQuery.rawSql,
+    return makeRuntimeBindingsFromDataVizProps({
+      props: props,
+      schema: discovery.schema,
+      filters: Object.values(filtersById),
+      cachedTargets: DataVizRuntimeTargets.get({
+        queryClient: queryClient,
+        scope: {
+          id: props.id,
+          auth,
+          rawSql: props.nlQuery.rawSql,
+        },
       }),
-    );
+    });
   }, [discovery.schema, props, filtersById, queryClient, auth]);
   useLayoutEffect(
     function rememberRuntimeTargets() {
       if (resolved) {
-        DataVizRuntimeTargets.set(
-          queryClient,
-          {
+        DataVizRuntimeTargets.set({
+          queryClient: queryClient,
+          scope: {
             id: props.id,
             auth,
             rawSql: props.nlQuery.rawSql,
           },
-          resolved.global.targets,
-        );
+          targets: resolved.global.targets,
+        });
       }
     },
     [queryClient, props.id, auth, props.nlQuery.rawSql, resolved],

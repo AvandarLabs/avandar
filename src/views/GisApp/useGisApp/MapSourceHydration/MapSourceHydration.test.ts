@@ -1,6 +1,7 @@
-/** Saved GIS filters bind against all metadata, not just selected fields. */
 import { Model } from "@avandar/models";
+import { prop } from "@avandar/utils";
 import { expect, it } from "vitest";
+/** Saved GIS filters bind against all metadata, not just selected fields. */
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -61,11 +62,9 @@ it("keeps an unselected persisted WHERE target through metadata hydration and re
   expect(loaded.issues).toEqual([]);
   const source = loaded.config.layers[0]!.source;
   expect(structuredQueryToSql(source)).toContain('where "cnt" >= 5');
-  expect(
-    source.queryColumns.map((column) => {
-      return column.baseColumn.name;
-    }),
-  ).toEqual(["district"]);
+  expect(source.queryColumns.map(prop("baseColumn.name"))).toEqual([
+    "district",
+  ]);
   const renamed = MapSourceHydration.fromMetadata({
     config,
     previousInput: config,

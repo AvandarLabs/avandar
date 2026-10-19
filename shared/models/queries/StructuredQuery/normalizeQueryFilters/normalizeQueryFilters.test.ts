@@ -1,12 +1,12 @@
-/** Legacy ingress binds only unique names, while runtime rules require IDs. */
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters.ts";
+/** Legacy ingress binds only unique names, while runtime rules require IDs. */
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
 import type { LegacyQueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
-function _column(id: string, name: string): QueryColumn.T {
+function _column({ id, name }: { id: string; name: string }): QueryColumn.T {
   return Model.make("QueryColumn", {
     id: id as QueryColumn.Id,
     baseColumn: Model.make("DatasetColumn", {
@@ -30,7 +30,7 @@ describe("normalizeQueryFilters", () => {
     expect(
       normalizeQueryFilters({
         filter: LEGACY_FILTER,
-        columns: [_column("source", "cnt")],
+        columns: [_column({ id: "source", name: "cnt" })],
         clause: "where",
       }),
     ).toEqual({
@@ -55,7 +55,10 @@ describe("normalizeQueryFilters", () => {
   it("omits an ambiguous legacy name and reports its rule", () => {
     const result = normalizeQueryFilters({
       filter: LEGACY_FILTER,
-      columns: [_column("one", "cnt"), _column("two", "cnt")],
+      columns: [
+        _column({ id: "one", name: "cnt" }),
+        _column({ id: "two", name: "cnt" }),
+      ],
       clause: "where",
     });
     expect(result.filter.rules).toEqual([]);
@@ -64,12 +67,12 @@ describe("normalizeQueryFilters", () => {
   it("never rebinds an absent ID to an unrelated source with the old name", () => {
     const bound = normalizeQueryFilters({
       filter: LEGACY_FILTER,
-      columns: [_column("original", "cnt")],
+      columns: [_column({ id: "original", name: "cnt" })],
       clause: "where",
     }).filter;
     const result = normalizeQueryFilters({
       filter: bound,
-      columns: [_column("unrelated", "cnt")],
+      columns: [_column({ id: "unrelated", name: "cnt" })],
       clause: "where",
     });
     expect(result.filter.rules).toEqual([]);
