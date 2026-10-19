@@ -1,5 +1,6 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import {
+  makeFakeRowsCursor,
   makeFakeSql,
   makeSavedConnectionContext,
   SAVED_CONNECTION_ID,
@@ -21,21 +22,15 @@ vi.mock(
 
 describe("createPostgresConnector - streamed rows past the byte cap", () => {
   it("refuses a table wider than estimated as soon as its CSV crosses the cap, without reading the rest", async () => {
-    const pulledBatchIndexes: number[] = [];
-    let isCursorClosed = false;
-    // Each batch is one ~600-byte row, though the `notes` column is
-    // estimated at 280 bytes, so the pre-read check lets three rows through.
-    async function* readRowBatches() {
-      try {
-        for (const batchIndex of [0, 1, 2]) {
-          pulledBatchIndexes.push(batchIndex);
-          yield [{ notes: "x".repeat(600) }];
-        }
-      } finally {
-        isCursorClosed = true;
-      }
-    }
-    const fakeSql = makeFakeSql((queryText) => {
+    // Each row is ~600 bytes of CSV, though the `notes` column is estimated
+    // at 280 bytes and the count says three rows, so the pre-read check lets
+    // the table through. The cursor holds far more rows than one batch.
+    const cursor = makeFakeRowsCursor(
+      Array.from({ length: 25 }, () => {
+        return { notes: "x".repeat(600) };
+      }),
+    );
+    const fakeSql = makeFakeSql((queryText, values) => {
       if (queryText.includes("limit 1")) {
         return Promise.resolve([{ table_type: "BASE TABLE" }]);
       }
@@ -51,7 +46,7 @@ describe("createPostgresConnector - streamed rows past the byte cap", () => {
           },
         ]);
       }
-      return Object.assign(Promise.resolve([]), { cursor: readRowBatches });
+      return cursor.respond(queryText, values);
     });
     const connector = createPostgresConnector({
       connectToPostgres: () => {
@@ -70,7 +65,6 @@ describe("createPostgresConnector - streamed rows past the byte cap", () => {
 
     await expect(result).rejects.toBeInstanceOf(ConnectorError);
     await expect(result).rejects.toHaveProperty("code", "too_large");
-    expect(pulledBatchIndexes).toEqual([0, 1]);
-    expect(isCursorClosed).toBe(true);
+    expect(cursor.requestedBatchRows).toHaveLength(1);
   });
 });

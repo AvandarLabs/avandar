@@ -1,5 +1,6 @@
-import { prop } from "@avandar/utils";
 import {
+  type FakeRowsCursor,
+  makeFakeRowsCursor,
   makeFakeSql,
   makeSavedConnectionContext,
   SAVED_CONNECTION_ID,
@@ -8,37 +9,39 @@ import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgre
 import { describe, expect, it } from "vitest";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 
-const { targetBytes, minRows, maxRows } =
+const { targetBytes, minRows, maxRows, maxGrowthFactor } =
   GlobalAppConfig.postgresConnector.rowsPerCursorBatch;
 
+/** A row whose CSV line is `notes`, plus the line's `\r\n`. */
+function _makeNotesRow(noteLength: number): Record<string, unknown> {
+  return { notes: "x".repeat(noteLength) };
+}
+
 /**
- * Reads a three-row relation with these columns, and returns how many rows
- * each cursor batch asked the database for.
+ * Reads a one-column `text` relation holding `rows` through a fake cursor,
+ * and returns that cursor.
  */
-async function _readRowsPerBatch(
-  columns: ReadonlyArray<{
-    column_name: string;
-    data_type: string;
-    character_maximum_length: number | null;
-  }>,
-): Promise<number[]> {
-  const requestedRowsPerBatch: number[] = [];
-  const fakeSql = makeFakeSql((queryText) => {
+async function _readThroughFakeCursor(
+  rows: ReadonlyArray<Record<string, unknown>>,
+): Promise<FakeRowsCursor> {
+  const cursor = makeFakeRowsCursor(rows);
+  const fakeSql = makeFakeSql((queryText, values) => {
     if (queryText.includes("limit 1")) {
       return Promise.resolve([{ table_type: "BASE TABLE" }]);
     }
     if (queryText.includes("count(*)")) {
-      return Promise.resolve([{ exact_count: "3" }]);
+      return Promise.resolve([{ exact_count: String(rows.length) }]);
     }
     if (queryText.includes("character_maximum_length")) {
-      return Promise.resolve(columns);
+      return Promise.resolve([
+        {
+          column_name: "notes",
+          data_type: "text",
+          character_maximum_length: null,
+        },
+      ]);
     }
-    return Object.assign(Promise.resolve([]), {
-      cursor: async function* (rowsPerBatch: number) {
-        requestedRowsPerBatch.push(rowsPerBatch);
-        yield [];
-      },
-    });
+    return cursor.respond(queryText, values);
   });
   const connector = createPostgresConnector({
     connectToPostgres: () => {
@@ -47,55 +50,110 @@ async function _readRowsPerBatch(
   });
   await connector.getRelationRows(makeSavedConnectionContext("8.8.8.8"), {
     connectionId: SAVED_CONNECTION_ID,
-    relationId: "public.events",
-    columnNames: columns.map(prop("column_name")),
+    relationId: "public.notes",
+    columnNames: ["notes"],
   });
-  return requestedRowsPerBatch;
+  return cursor;
+}
+
+/** How many rows each cursor batch asked for, reading `rows`. */
+async function _readRowsPerBatch(
+  rows: ReadonlyArray<Record<string, unknown>>,
+): Promise<number[]> {
+  return (await _readThroughFakeCursor(rows)).requestedBatchRows;
 }
 
 describe("createPostgresConnector - cursor batch size", () => {
-  it("reads a narrow table in the largest batches, so a small one arrives in one round trip", async () => {
-    const rowsPerBatch = await _readRowsPerBatch([
-      {
-        column_name: "id",
-        data_type: "integer",
-        character_maximum_length: null,
-      },
-      {
-        column_name: "is_active",
-        data_type: "boolean",
-        character_maximum_length: null,
-      },
-    ]);
+  it("reads a table no larger than the smallest batch in one round trip", async () => {
+    const rows = Array.from({ length: minRows - 1 }, () => {
+      return _makeNotesRow(5);
+    });
 
-    expect(rowsPerBatch).toEqual([maxRows]);
+    await expect(_readRowsPerBatch(rows)).resolves.toEqual([minRows]);
   });
 
-  it("sizes each batch of a wide table to hold about the target bytes of CSV", async () => {
-    // A `character(4096)` value is always padded to 4,096 bytes, plus the
-    // row's `\r\n`.
-    const estimatedRowBytes = 4_096 + 2;
+  it("grows a narrow table's batches by at most the growth factor each, up to the largest batch", async () => {
+    // Narrow enough that the target bytes never bind: only growth and the
+    // largest batch do.
+    const rows = Array.from({ length: 70_000 }, () => {
+      return _makeNotesRow(5);
+    });
 
-    const rowsPerBatch = await _readRowsPerBatch([
-      {
-        column_name: "payload",
-        data_type: "character",
-        character_maximum_length: 4_096,
-      },
+    const rowsPerBatch = await _readRowsPerBatch(rows);
+
+    expect(rowsPerBatch.slice(0, 4)).toEqual([
+      minRows,
+      minRows * maxGrowthFactor,
+      minRows * maxGrowthFactor ** 2,
+      minRows * maxGrowthFactor ** 3,
     ]);
+    expect(rowsPerBatch.slice(4)).toEqual([maxRows, maxRows]);
+  });
 
-    expect(rowsPerBatch).toEqual([Math.floor(targetBytes / estimatedRowBytes)]);
+  it("sizes a wide table's batches to hold about the target bytes, measured from its widest row", async () => {
+    // A 100KB note, plus its line's `\r\n`.
+    const widestRowBytes = 100_000 + 2;
+    const rows = Array.from({ length: 200 }, () => {
+      return _makeNotesRow(100_000);
+    });
+
+    const rowsPerBatch = await _readRowsPerBatch(rows);
+
+    const rowsForTarget = Math.floor(targetBytes / widestRowBytes);
+    expect(rowsPerBatch).toEqual([
+      minRows,
+      rowsForTarget,
+      rowsForTarget,
+      rowsForTarget,
+    ]);
+  });
+
+  it("shrinks the next batch as soon as rows get wider partway through", async () => {
+    const narrowRows = Array.from({ length: minRows }, () => {
+      return _makeNotesRow(5);
+    });
+    const wideRows = Array.from({ length: 300 }, () => {
+      return _makeNotesRow(100_000);
+    });
+
+    const rowsPerBatch = await _readRowsPerBatch([...narrowRows, ...wideRows]);
+
+    // The first batch is all narrow, so the second may grow. It holds wide
+    // rows, so the third is sized for them.
+    expect(rowsPerBatch.slice(0, 3)).toEqual([
+      minRows,
+      minRows * maxGrowthFactor,
+      Math.floor(targetBytes / (100_000 + 2)),
+    ]);
+  });
+
+  // A prepared `fetch forward 10 from ...` keeps the row description of the
+  // first relation it read. Another relation fetched with the same text on
+  // that connection would be parsed with the wrong columns.
+  it("sends every fetch unprepared, so no fetch reuses another cursor's row description", async () => {
+    const rows = Array.from({ length: 500 }, () => {
+      return _makeNotesRow(5);
+    });
+
+    const cursor = await _readThroughFakeCursor(rows);
+
+    expect(cursor.requestedBatchRows.length).toBeGreaterThan(1);
+    expect(cursor.unpreparedFetchCount()).toBe(
+      cursor.requestedBatchRows.length,
+    );
   });
 
   it("never asks for fewer than the smallest batch, however wide a row is", async () => {
-    const rowsPerBatch = await _readRowsPerBatch([
-      {
-        column_name: "payload",
-        data_type: "character",
-        character_maximum_length: 10_000_000,
-      },
-    ]);
+    // Each row alone is more than a tenth of the target bytes.
+    const hugeNote = "x".repeat(Math.ceil(targetBytes / minRows) + 1);
+    const rows = Array.from({ length: minRows * 2 + 1 }, () => {
+      return { notes: hugeNote };
+    });
 
-    expect(rowsPerBatch).toEqual([minRows]);
+    await expect(_readRowsPerBatch(rows)).resolves.toEqual([
+      minRows,
+      minRows,
+      minRows,
+    ]);
   });
 });

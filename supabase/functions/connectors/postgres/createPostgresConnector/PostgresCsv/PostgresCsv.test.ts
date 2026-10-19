@@ -7,7 +7,9 @@ function _toCsvField(value: unknown): string {
   return PostgresCsv.makeRowLinesFromRows({
     columnNames: ["value"],
     rows: [{ value }],
-  }).slice(2);
+  })
+    .join("")
+    .slice(2);
 }
 
 describe("PostgresCsv", () => {
@@ -15,11 +17,11 @@ describe("PostgresCsv", () => {
     const columnNames = ["id", "name"];
     const csv = [
       PostgresCsv.makeHeaderLineFromColumnNames(columnNames),
-      PostgresCsv.makeRowLinesFromRows({
+      ...PostgresCsv.makeRowLinesFromRows({
         columnNames,
         rows: [{ id: 1, name: "Ada" }],
       }),
-      PostgresCsv.makeRowLinesFromRows({
+      ...PostgresCsv.makeRowLinesFromRows({
         columnNames,
         rows: [{ id: 2, name: "Grace, Hopper" }],
       }),
@@ -28,10 +30,16 @@ describe("PostgresCsv", () => {
     expect(csv).toBe('id,name\r\n1,Ada\r\n2,"Grace, Hopper"');
   });
 
-  it("writes nothing for an empty batch", () => {
+  it("writes one line per row, and none for an empty batch", () => {
+    expect(
+      PostgresCsv.makeRowLinesFromRows({
+        columnNames: ["id"],
+        rows: [{ id: 1 }, { id: 2 }],
+      }),
+    ).toEqual(["\r\n1", "\r\n2"]);
     expect(
       PostgresCsv.makeRowLinesFromRows({ columnNames: ["id"], rows: [] }),
-    ).toBe("");
+    ).toEqual([]);
   });
 
   it("writes a Date as a bare ISO timestamp, never wrapped in literal quote characters", () => {

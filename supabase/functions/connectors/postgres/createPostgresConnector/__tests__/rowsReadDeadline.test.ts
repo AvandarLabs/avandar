@@ -1,5 +1,6 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import {
+  makeFakeRowsCursor,
   makeFakeSql,
   makeSavedConnectionContext,
   SAVED_CONNECTION_ID,
@@ -18,24 +19,12 @@ describe("createPostgresConnector - whole-read deadline", () => {
   });
 
   it("refuses a table as timeout once reading its rows runs past the deadline, without reading the rest", async () => {
-    const pulledBatchIndexes: number[] = [];
-    let isCursorClosed = false;
-    // Each batch returns well inside the statement timeout, but the second
-    // one arrives after the whole read's deadline has passed.
-    async function* readRowBatches() {
-      try {
-        for (const batchIndex of [0, 1, 2]) {
-          pulledBatchIndexes.push(batchIndex);
-          if (batchIndex === 1) {
-            vi.setSystemTime(10 * 60_000);
-          }
-          yield [{ id: batchIndex }];
-        }
-      } finally {
-        isCursorClosed = true;
-      }
-    }
-    const fakeSql = makeFakeSql((queryText) => {
+    const cursor = makeFakeRowsCursor(
+      Array.from({ length: 500 }, (_, index) => {
+        return { id: index };
+      }),
+    );
+    const fakeSql = makeFakeSql((queryText, values) => {
       if (queryText.includes("limit 1")) {
         return Promise.resolve([{ table_type: "BASE TABLE" }]);
       }
@@ -51,7 +40,15 @@ describe("createPostgresConnector - whole-read deadline", () => {
           },
         ]);
       }
-      return Object.assign(Promise.resolve([]), { cursor: readRowBatches });
+      // Each batch returns well inside the statement timeout, but the second
+      // one arrives after the whole read's deadline has passed.
+      if (
+        queryText.includes("fetch forward") &&
+        cursor.requestedBatchRows.length === 1
+      ) {
+        vi.setSystemTime(10 * 60_000);
+      }
+      return cursor.respond(queryText, values);
     });
     const connector = createPostgresConnector({
       connectToPostgres: () => {
@@ -70,7 +67,6 @@ describe("createPostgresConnector - whole-read deadline", () => {
 
     await expect(result).rejects.toBeInstanceOf(ConnectorError);
     await expect(result).rejects.toHaveProperty("code", "timeout");
-    expect(pulledBatchIndexes).toEqual([0, 1]);
-    expect(isCursorClosed).toBe(true);
+    expect(cursor.requestedBatchRows).toHaveLength(2);
   });
 });

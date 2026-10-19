@@ -49,15 +49,13 @@ function _makeRowLinesFromRows(
     columnNames: readonly string[];
     rows: ReadonlyArray<Record<string, unknown>>;
   }>,
-): string {
-  return options.rows
-    .map((row) => {
-      const fields = options.columnNames.map((columnName) => {
-        return _csvField(row[columnName]);
-      });
-      return `\r\n${fields.join(",")}`;
-    })
-    .join("");
+): string[] {
+  return options.rows.map((row) => {
+    const fields = options.columnNames.map((columnName) => {
+      return _csvField(row[columnName]);
+    });
+    return `\r\n${fields.join(",")}`;
+  });
 }
 
 /** Writes a Postgres relation's rows as CSV text, a batch at a time. */
@@ -73,9 +71,9 @@ export const PostgresCsv = {
   },
 
   /**
-   * The CSV lines for one batch of rows, each starting with the `\r\n` that
-   * ends the line before it, so a header and any number of batches join into
-   * one document without tracking which batch came first.
+   * The CSV line for each row of one batch, each starting with the `\r\n`
+   * that ends the line before it, so a header and any number of batches join
+   * into one document without tracking which batch came first.
    */
   makeRowLinesFromRows: _makeRowLinesFromRows,
 };

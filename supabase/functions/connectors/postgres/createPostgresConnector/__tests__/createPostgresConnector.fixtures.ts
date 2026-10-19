@@ -83,6 +83,60 @@ export function makeFakeSql(
   return fakeSql;
 }
 
+/** A fake server-side cursor over a relation's rows. */
+export type FakeRowsCursor = {
+  /**
+   * Answers the cursor's `declare` and each `fetch forward <n>` the way
+   * Postgres does, handing out up to `n` of the remaining rows. Returns
+   * `undefined` for any other query.
+   */
+  respond: (queryText: string, values: unknown[]) => unknown;
+
+  /** How many rows each fetch asked for, in order. */
+  requestedBatchRows: number[];
+
+  /** How many fetches were sent unprepared, through `simple()`. */
+  unpreparedFetchCount: () => number;
+};
+
+/** A fake server-side cursor that reads `rows` in order. */
+export function makeFakeRowsCursor(
+  rows: ReadonlyArray<Record<string, unknown>>,
+): FakeRowsCursor {
+  const requestedBatchRows: number[] = [];
+  const cursorPosition = { fetchedRowCount: 0, unpreparedFetchCount: 0 };
+  return {
+    requestedBatchRows,
+    unpreparedFetchCount: () => {
+      return cursorPosition.unpreparedFetchCount;
+    },
+    respond: (queryText, values) => {
+      if (queryText.includes("declare")) {
+        return Promise.resolve([]);
+      }
+      if (!queryText.includes("fetch forward")) {
+        return undefined;
+      }
+      // The fake's `unsafe` returns its text, so the row count arrives as
+      // the first interpolated value.
+      const batchRows = Number(values[0]);
+      requestedBatchRows.push(batchRows);
+      const batch = rows.slice(
+        cursorPosition.fetchedRowCount,
+        cursorPosition.fetchedRowCount + batchRows,
+      );
+      cursorPosition.fetchedRowCount += batch.length;
+      const fetchedBatch = Promise.resolve(batch);
+      return Object.assign(fetchedBatch, {
+        simple: () => {
+          cursorPosition.unpreparedFetchCount += 1;
+          return fetchedBatch;
+        },
+      });
+    },
+  };
+}
+
 /**
  * Reads CSV bytes back as text. Through `FileReader` because the test
  * environment's jsdom `Blob` has no `text()` method.

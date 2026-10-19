@@ -1,5 +1,6 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import {
+  makeFakeRowsCursor,
   makeFakeSql,
   makeSavedConnectionContext,
   readBlobText,
@@ -30,6 +31,7 @@ async function _readDatasetRows(
   columnNames: readonly string[],
 ): Promise<{ csvText: Promise<string>; sentQueries: SentQuery[] }> {
   const sentQueries: SentQuery[] = [];
+  const cursor = makeFakeRowsCursor([{ id: 7, salary: 90_000, name: "Ada" }]);
   const fakeSql = makeFakeSql((queryText, values) => {
     sentQueries.push({ queryText, values });
     if (queryText.includes("limit 1")) {
@@ -41,11 +43,7 @@ async function _readDatasetRows(
     if (queryText.includes("character_maximum_length")) {
       return Promise.resolve(TABLE_COLUMNS);
     }
-    return Object.assign(Promise.resolve([]), {
-      cursor: async function* () {
-        yield [{ id: 7, salary: 90_000, name: "Ada" }];
-      },
-    });
+    return cursor.respond(queryText, values);
   });
   const connector = createPostgresConnector({
     connectToPostgres: () => {
@@ -67,12 +65,18 @@ async function _readDatasetRows(
   return { csvText, sentQueries };
 }
 
-/** The query that reads rows, found by the column list it selects. */
+/**
+ * The cursor declaration that reads rows, found by the column list it
+ * selects.
+ */
 function _findRowsQuery(
   options: Readonly<{ sentQueries: readonly SentQuery[]; columnList: string }>,
 ): SentQuery | undefined {
   return options.sentQueries.find((sentQuery) => {
-    return sentQuery.values[0] === options.columnList;
+    return (
+      sentQuery.queryText.includes("cursor for select") &&
+      sentQuery.values.includes(options.columnList)
+    );
   });
 }
 
@@ -85,7 +89,9 @@ describe("createPostgresConnector - reading only a dataset's columns", () => {
       sentQueries,
       columnList: '"name", "id"',
     });
-    expect(rowsQuery?.queryText).toMatch(/^\s*select\s+from\s*$/);
+    expect(rowsQuery?.queryText).toMatch(
+      /^\s*declare\s+no scroll cursor for select\s+from\s*$/,
+    );
   });
 
   it("refuses a table that no longer has one of the dataset's columns, without reading a row", async () => {

@@ -1,5 +1,6 @@
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import {
+  makeFakeRowsCursor,
   makeFakeSql,
   readBlobText,
 } from "@sbfn/connectors/postgres/createPostgresConnector/__tests__/createPostgresConnector.fixtures.ts";
@@ -61,18 +62,19 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
   }
 
   /**
-   * Dispatches on each query's own text, since `getRelationRows` issues four
+   * Dispatches on each query's own text, since `getRelationRows` issues
    * distinct queries against the same fake `sql` in sequence: the
    * still-exists check, the sized columns read, the exact row count, and the
-   * full row read. `sql.unsafe(text)` (the quoted `"schema"."table"`
-   * fragment in the final two queries) just echoes its argument back - this
-   * fake never actually interprets SQL, so the quoted value itself is unused.
+   * cursor the rows are fetched through. `sql.unsafe(text)` (each quoted
+   * name and row count the queries interpolate) just echoes its argument
+   * back - this fake never actually interprets SQL.
    */
   function _makeFakeSqlForRows(options: {
     rowCount: number;
     dataRows: Array<Record<string, unknown>>;
   }): PostgresSql {
-    return makeFakeSql((queryText) => {
+    const cursor = makeFakeRowsCursor(options.dataRows);
+    return makeFakeSql((queryText, values) => {
       if (queryText.includes("limit 1")) {
         return Promise.resolve([{ table_type: "BASE TABLE" }]);
       }
@@ -88,11 +90,7 @@ describe("createPostgresConnector - getRelationRows row/byte cap enforcement", (
           },
         ]);
       }
-      return Object.assign(Promise.resolve(options.dataRows), {
-        cursor: async function* () {
-          yield options.dataRows;
-        },
-      });
+      return cursor.respond(queryText, values);
     });
   }
 

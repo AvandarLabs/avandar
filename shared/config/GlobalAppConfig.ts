@@ -83,17 +83,26 @@ export const GlobalAppConfig = {
     rowsReadDeadlineMs: 90_000,
 
     /**
-     * How many rows each cursor batch asks the database for. Every batch
-     * costs one network round trip, so a batch is sized to hold about
-     * `targetBytes` of CSV, from the relation's estimated row width, within
+     * How many rows each cursor batch asks the database for. Every batch is
+     * one `FETCH`, so one network round trip. A row's width is unknown until
+     * it arrives (a `text` or `jsonb` column can hold anything), so the first
+     * batch asks for `minRows`. Each later batch is sized from the widest
+     * row of the batch before it, to hold about `targetBytes` of CSV, within
      * `minRows` and `maxRows`. A narrow table arrives in a few large batches
      * and a wide one in many small ones, so neither the round trips nor the
      * rows held in memory grow without bound.
      */
     rowsPerCursorBatch: {
       targetBytes: 8 * 1024 * 1024,
-      minRows: 1_000,
+      minRows: 10,
       maxRows: 50_000,
+
+      /**
+       * The most a batch may grow over the batch before it, so a table
+       * whose rows widen partway through never jumps straight from a narrow
+       * row's batch size to a huge batch of wide rows.
+       */
+      maxGrowthFactor: 10,
     },
 
     /**
