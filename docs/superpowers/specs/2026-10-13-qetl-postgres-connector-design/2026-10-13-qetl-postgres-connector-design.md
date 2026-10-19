@@ -632,7 +632,7 @@ this spec adds (marked **new**).
 | 24 | `src/clients/qetl/wrappers/createDefaultRegistry.ts` | options field, delegate, `match` arm |
 | 25 | `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts` | add `postgres_table` to the refusing arm |
 | 26 | `src/clients/qetl/QueryMediator/relationLoading.ts` | type guard, lookup, lease-bound CSV transcoder (the wrapper returns CSV per section 5.4's `rows` route, same as Sheets) |
-| 27 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | branch in `_getSnapshotDatasetBlob` - **note this is the exact spot Google Sheets' own known gap lives** (architecture doc section 13: "Snapshot publishing of an `all_columns` slice fails over Google Sheets, no Storage object exists"). Postgres will have the same gap unless this is addressed; at minimum, do not regress it silently - either fix both or document both as a known limitation in the same place |
+| 27 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | arm in `_getSnapshotDatasetBlob`'s exhaustive `match` on source type. `google_sheets` and `postgres_table` keep no parquet in Storage, so every slice of theirs, `all_columns` included, is read through the workspace query. `DashboardClient.publishSnapshotSources.test.ts` pins the path for every source type |
 | 28 | `getRelationSources.characterization.test.ts` | reader-per-source-type pin, add the `postgres_table` arm |
 | 29 | an executed-DuckDb test for the CSV-to-Parquet transcode, mirroring `acquireGoogleSheetRelation.executed.test.ts` | |
 

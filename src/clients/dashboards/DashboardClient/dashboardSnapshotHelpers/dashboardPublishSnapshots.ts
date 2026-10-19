@@ -7,6 +7,7 @@ import {
 } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+import { match } from "ts-pattern";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -93,45 +94,74 @@ async function _downloadOpenDataSnapshot(
   });
 }
 
+async function _getVirtualDatasetSnapshotBlob(
+  options: Readonly<SnapshotDatasetOptions>,
+): Promise<Blob> {
+  const virtualDataset = await VirtualDatasetClient.getOne(
+    where("dataset_id", "eq", options.dataset.id),
+  );
+  assertIsDefined(virtualDataset, { name: "virtualDataset" });
+  return await _runWorkspaceSnapshotQuery({
+    ...options,
+    baseSelectExpr: virtualDataset.rawSql,
+  });
+}
+
+/**
+ * Reads the slice's rows through the same workspace query a dashboard
+ * widget runs, so they arrive in their query-facing shape: renamed and cast
+ * columns, acquired from a live source when that is where they live.
+ */
+async function _queryDatasetSnapshotBlob(
+  options: Readonly<SnapshotDatasetOptions>,
+): Promise<Blob> {
+  return await _runWorkspaceSnapshotQuery({
+    ...options,
+    baseSelectExpr: `SELECT * FROM "${options.dataset.id}"`,
+  });
+}
+
+async function _downloadStoredDatasetSnapshot(
+  options: Readonly<SnapshotDatasetOptions>,
+): Promise<Blob> {
+  return await DatasetParquetStorageClient.downloadDataset({
+    workspaceId: options.workspaceId,
+    datasetId: options.dataset.id,
+    throwIfNotFound: true,
+  });
+}
+
+/**
+ * The parquet a dataset's snapshot is published from. A whole-dataset
+ * (`all_columns`) slice of an uploaded file or an open dataset is copied
+ * from the parquet already stored for it. Every other slice, and every slice
+ * of a source acquired live at query time (a Google Sheet or a Postgres
+ * table, which keep no parquet in Storage), is read through the workspace
+ * query. The match is exhaustive, so a new source type has to choose.
+ */
 async function _getSnapshotDatasetBlob(
   options: Readonly<SnapshotDatasetOptions>,
 ): Promise<Blob> {
-  const { dataset, slice, workspaceId } = options;
-  if (dataset.sourceType === "virtual") {
-    const virtualDataset = await VirtualDatasetClient.getOne(
-      where("dataset_id", "eq", dataset.id),
-    );
-    assertIsDefined(virtualDataset, { name: "virtualDataset" });
-    return await _runWorkspaceSnapshotQuery({
-      ...options,
-      baseSelectExpr: virtualDataset.rawSql,
-    });
-  }
-  const hasRowFilters = slice.mode === "custom" && slice.rowFilters.length > 0;
-  if (slice.mode !== "all_columns" || hasRowFilters) {
-    return await _runWorkspaceSnapshotQuery({
-      ...options,
-      baseSelectExpr: `SELECT * FROM "${dataset.id}"`,
-    });
-  }
-  if (dataset.sourceType === "open_data") {
-    return await _downloadOpenDataSnapshot(dataset);
-  }
-  // `google_sheets` and `postgres_table` fall through to here for an
-  // `all_columns` slice with no row filters: neither has a stored Storage
-  // blob to download (both are live-acquired, never uploaded), so this call
-  // throws (`throwIfNotFound: true`). This is a known, already-documented gap
-  // (`docs/qetl-architecture.md` section 13: "Snapshot publishing of an
-  // `all_columns` slice fails over Google Sheets, no Storage object exists"),
-  // and `postgres_table` inherits it unchanged rather than silently papering
-  // over it here - fixing it is shared work across every live-acquired
-  // source, not a Postgres-specific fix, so it belongs in that gap's own
-  // follow-up, not folded into this connector.
-  return await DatasetParquetStorageClient.downloadDataset({
-    workspaceId,
-    datasetId: dataset.id,
-    throwIfNotFound: true,
-  });
+  const { dataset, slice } = options;
+  const isWholeDataset = slice.mode === "all_columns";
+  return await match(dataset.sourceType)
+    .with("virtual", () => {
+      return _getVirtualDatasetSnapshotBlob(options);
+    })
+    .with("google_sheets", "postgres_table", () => {
+      return _queryDatasetSnapshotBlob(options);
+    })
+    .with("csv_file", "xlsx_file", "pdf_file", () => {
+      return isWholeDataset
+        ? _downloadStoredDatasetSnapshot(options)
+        : _queryDatasetSnapshotBlob(options);
+    })
+    .with("open_data", () => {
+      return isWholeDataset
+        ? _downloadOpenDataSnapshot(dataset)
+        : _queryDatasetSnapshotBlob(options);
+    })
+    .exhaustive();
 }
 
 async function _uploadDatasetSnapshot(
