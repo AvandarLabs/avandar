@@ -43,10 +43,13 @@ alter table public.db_connections enable row level security;
 -- workspace_id, but it cannot stop a row from pointing at a secret it
 -- never created.
 grant
-select on table public.db_connections to authenticated,
-service_role;
+select
+  on table public.db_connections to authenticated,
+  service_role;
 
-grant insert, update, delete on table public.db_connections to service_role;
+grant insert,
+update,
+delete on table public.db_connections to service_role;
 
 -- Policies
 create policy "User can select db_connections in their workspace" on public.db_connections for

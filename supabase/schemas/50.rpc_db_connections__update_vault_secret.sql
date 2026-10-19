@@ -13,12 +13,10 @@
  * @param p_secret_id The existing secret id (`db_connections__postgres.vault_secret_id`).
  * @param p_new_secret The new plaintext value to encrypt.
  */
-create or replace function public.rpc_db_connections__update_vault_secret (
-  p_secret_id uuid,
-  p_new_secret text
-) returns void language plpgsql security definer
+create or replace function public.rpc_db_connections__update_vault_secret (p_secret_id uuid, p_new_secret text) returns void language plpgsql security definer
 set
-  search_path = public, vault as $$
+  search_path = public,
+  vault as $$
 begin
   perform vault.update_secret(p_secret_id, p_new_secret);
 end;

@@ -5,13 +5,13 @@ import {
   type ExternalDatasetRelation,
 } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/connectors/postgres/classifyPostgresConnectionError.ts";
+import { listCatalogRelations } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
+import { fetchConnectionRow } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { toPostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   postgresTestAndSaveInputSchema,
   type PostgresTestAndSaveInput,
 } from "@sbfn/connectors/connectors/postgres/PostgresConnectorInput.ts";
-import { fetchConnectionRow } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
-import { listCatalogRelations } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresCatalog.ts";
 import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
 
 type ConnectFn = (
@@ -116,10 +116,7 @@ async function _rotateConnection(
     .eq("connection_id", connectionId)
     .eq("workspace_id", context.workspaceId);
   if (updatePostgresRowError) {
-    throw new ExternalDatasetError(
-      "unknown",
-      updatePostgresRowError.message,
-    );
+    throw new ExternalDatasetError("unknown", updatePostgresRowError.message);
   }
 
   return connectionId;

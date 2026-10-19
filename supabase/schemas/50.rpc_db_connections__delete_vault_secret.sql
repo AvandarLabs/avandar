@@ -11,11 +11,10 @@
  * @param p_secret_id The secret id to delete
  *   (`db_connections__postgres.vault_secret_id`).
  */
-create or replace function public.rpc_db_connections__delete_vault_secret (
-  p_secret_id uuid
-) returns void language plpgsql security definer
+create or replace function public.rpc_db_connections__delete_vault_secret (p_secret_id uuid) returns void language plpgsql security definer
 set
-  search_path = public, vault as $$
+  search_path = public,
+  vault as $$
 begin
   delete from vault.secrets where id = p_secret_id;
 end;

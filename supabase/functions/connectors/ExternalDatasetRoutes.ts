@@ -2,18 +2,22 @@ import { assertMeetsMinAppRole } from "@sbfn/_shared/assertMeetsMinAppRole.ts";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
-import { defineRoutes, GET, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import {
+  defineRoutes,
+  GET,
+  POST,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getConnector } from "@sbfn/connectors/connectorRegistry.ts";
 import {
   ExternalDatasetError,
   type ExternalDatasetConnectorContext,
 } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 import { object, string } from "zod";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type {
   ExternalDatasetErrorResponse,
   ExternalDatasetsApi,
 } from "@sbfn/connectors/ExternalDatasetRoutes.types.ts";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 /**
  * `{ workspaceId, connectionId?, ...connectorFields }` - every connector
@@ -44,10 +48,7 @@ async function _getOwningWorkspaceId(
     .maybeSingle();
 
   if (error || !data) {
-    throw new AvaHTTPError(
-      `No connection '${connectionId}' found`,
-      FORBIDDEN,
-    );
+    throw new AvaHTTPError(`No connection '${connectionId}' found`, FORBIDDEN);
   }
   return data.workspace_id;
 }
@@ -112,93 +113,85 @@ export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsApi>(
         schema: { connectorType: string() },
       })
         .bodySchema(testAndSaveBodySchema)
-        .action(async ({
-          pathParams,
-          body,
-          supabaseClient,
-          supabaseAdminClient,
-        }) => {
-          const connector = getConnector(pathParams.connectorType);
+        .action(
+          async ({ pathParams, body, supabaseClient, supabaseAdminClient }) => {
+            const connector = getConnector(pathParams.connectorType);
 
-          const workspaceId = body.connectionId
-            ? await _getOwningWorkspaceId(supabaseClient, body.connectionId)
-            : body.workspaceId;
+            const workspaceId = body.connectionId
+              ? await _getOwningWorkspaceId(supabaseClient, body.connectionId)
+              : body.workspaceId;
 
-          if (!body.connectionId) {
-            await assertMeetsMinAppRole({
-              supabaseClient,
+            if (!body.connectionId) {
+              await assertMeetsMinAppRole({
+                supabaseClient,
+                workspaceId,
+                app: "data_sources",
+                minRole: "editor",
+              });
+            }
+
+            const context: ExternalDatasetConnectorContext = {
               workspaceId,
-              app: "data_sources",
-              minRole: "editor",
-            });
-          }
-
-          const context: ExternalDatasetConnectorContext = {
-            workspaceId,
-            supabaseClient,
-            supabaseAdminClient,
-          };
-
-          try {
-            return await connector.testAndSaveConnection(context, body);
-          } catch (error) {
-            return _toErrorResult(error);
-          }
-        }),
-    },
-    "/:connectorType/connections/:connectionId/relations": {
-      GET: GET({
-        path: "/:connectorType/connections/:connectionId/relations",
-        schema: { connectorType: string(), connectionId: string() },
-      }).action(
-        async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const { connector, context } = await _resolveConnectorContext(
-            pathParams,
-            supabaseClient,
-            supabaseAdminClient,
-          );
-
-          try {
-            const relations = await connector.listRelations(
-              context,
-              pathParams.connectionId,
-            );
-            return { relations };
-          } catch (error) {
-            return _toErrorResult(error);
-          }
-        },
-      ),
-    },
-    "/:connectorType/connections/:connectionId/relations/:relationId/preview":
-      {
-        GET: GET({
-          path: "/:connectorType/connections/:connectionId/relations/:relationId/preview",
-          schema: {
-            connectorType: string(),
-            connectionId: string(),
-            relationId: string(),
-          },
-        }).action(
-          async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-            const { connector, context } = await _resolveConnectorContext(
-              pathParams,
               supabaseClient,
               supabaseAdminClient,
-            );
+            };
 
             try {
-              return await connector.previewRelation(
-                context,
-                pathParams.connectionId,
-                decodeURIComponent(pathParams.relationId),
-              );
+              return await connector.testAndSaveConnection(context, body);
             } catch (error) {
               return _toErrorResult(error);
             }
           },
         ),
-      },
+    },
+    "/:connectorType/connections/:connectionId/relations": {
+      GET: GET({
+        path: "/:connectorType/connections/:connectionId/relations",
+        schema: { connectorType: string(), connectionId: string() },
+      }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
+        const { connector, context } = await _resolveConnectorContext(
+          pathParams,
+          supabaseClient,
+          supabaseAdminClient,
+        );
+
+        try {
+          const relations = await connector.listRelations(
+            context,
+            pathParams.connectionId,
+          );
+          return { relations };
+        } catch (error) {
+          return _toErrorResult(error);
+        }
+      }),
+    },
+    "/:connectorType/connections/:connectionId/relations/:relationId/preview": {
+      GET: GET({
+        path: "/:connectorType/connections/:connectionId/relations/:relationId/preview",
+        schema: {
+          connectorType: string(),
+          connectionId: string(),
+          relationId: string(),
+        },
+      }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
+        const { connector, context } = await _resolveConnectorContext(
+          pathParams,
+          supabaseClient,
+          supabaseAdminClient,
+        );
+
+        try {
+          return await connector.previewRelation(
+            context,
+            pathParams.connectionId,
+            decodeURIComponent(pathParams.relationId),
+          );
+        } catch (error) {
+          return _toErrorResult(error);
+        }
+      }),
+    },
     "/:connectorType/connections/:connectionId/relations/:relationId/rows": {
       GET: GET({
         path: "/:connectorType/connections/:connectionId/relations/:relationId/rows",
@@ -207,28 +200,26 @@ export const ExternalDatasetRoutes = defineRoutes<ExternalDatasetsApi>(
           connectionId: string(),
           relationId: string(),
         },
-      }).action(
-        async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
-          const { connector, context } = await _resolveConnectorContext(
-            pathParams,
-            supabaseClient,
-            supabaseAdminClient,
-          );
+      }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
+        const { connector, context } = await _resolveConnectorContext(
+          pathParams,
+          supabaseClient,
+          supabaseAdminClient,
+        );
 
-          try {
-            const csv = await connector.getRelationRows(
-              context,
-              pathParams.connectionId,
-              decodeURIComponent(pathParams.relationId),
-            );
-            return new Response(csv, {
-              headers: { ...corsHeaders, "Content-Type": "text/csv" },
-            });
-          } catch (error) {
-            return _toErrorResult(error);
-          }
-        },
-      ),
+        try {
+          const csv = await connector.getRelationRows(
+            context,
+            pathParams.connectionId,
+            decodeURIComponent(pathParams.relationId),
+          );
+          return new Response(csv, {
+            headers: { ...corsHeaders, "Content-Type": "text/csv" },
+          });
+        } catch (error) {
+          return _toErrorResult(error);
+        }
+      }),
     },
   },
 );

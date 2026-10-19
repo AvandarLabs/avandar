@@ -1,7 +1,7 @@
 import { matchLiteral } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
-import type { ExternalDatasetErrorCode } from "@sbfn/connectors/connectors/ExternalDatasetConnector";
 import type { I18n, MessageDescriptor } from "@lingui/core";
+import type { ExternalDatasetErrorCode } from "@sbfn/connectors/connectors/ExternalDatasetConnector";
 
 /** The notification a failed Postgres connection attempt shows. */
 export type PostgresConnectorImportErrorCopy = {

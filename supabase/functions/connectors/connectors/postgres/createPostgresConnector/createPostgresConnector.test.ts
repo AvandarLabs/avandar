@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { describe, expect, it, vi } from "vitest";
 import { createPostgresConnector } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
+import { describe, expect, it, vi } from "vitest";
 import type { ExternalDatasetConnectorContext } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 import type { PostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
@@ -34,8 +34,7 @@ function _makeFakeSql(
 
 function _makeFakeSupabaseAdminClient() {
   const insertedRows: Record<string, Array<Record<string, unknown>>> = {};
-  const rpcCalls: Array<{ name: string; params: Record<string, unknown> }> =
-    [];
+  const rpcCalls: Array<{ name: string; params: Record<string, unknown> }> = [];
 
   const client = {
     rpc: vi.fn(async (name: string, params: Record<string, unknown>) => {
@@ -57,7 +56,10 @@ function _makeFakeSupabaseAdminClient() {
           return { data: null, error: null };
         }),
         single: vi.fn(async () => {
-          return { data: { id: "22222222-2222-2222-2222-222222222222" }, error: null };
+          return {
+            data: { id: "22222222-2222-2222-2222-222222222222" },
+            error: null,
+          };
         }),
         insert: vi.fn((row: Record<string, unknown>) => {
           insertedRows[table] = [...(insertedRows[table] ?? []), row];
@@ -81,7 +83,11 @@ describe("createPostgresConnector - field parameterization", () => {
     const connectToPostgres = vi.fn((config: PostgresConnectionConfig) => {
       capturedConfig = config;
       return _makeFakeSql([
-        { table_schema: "public", table_name: "customers", table_type: "BASE TABLE" },
+        {
+          table_schema: "public",
+          table_name: "customers",
+          table_type: "BASE TABLE",
+        },
       ]);
     });
 
@@ -141,7 +147,11 @@ describe("createPostgresConnector - field parameterization", () => {
     expect(connectionRow?.database_name).toBe(INJECTION_PAYLOAD);
 
     expect(result.relations).toEqual([
-      { relationId: "public.customers", label: "public.customers", kind: "table" },
+      {
+        relationId: "public.customers",
+        label: "public.customers",
+        kind: "table",
+      },
     ]);
   });
 

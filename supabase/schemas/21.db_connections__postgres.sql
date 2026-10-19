@@ -42,10 +42,13 @@ alter table public.db_connections__postgres enable row level security;
 -- go through the edge function's `service_role` client, never a direct
 -- Data API insert/update/delete.
 grant
-select on table public.db_connections__postgres to authenticated,
-service_role;
+select
+  on table public.db_connections__postgres to authenticated,
+  service_role;
 
-grant insert, update, delete on table public.db_connections__postgres to service_role;
+grant insert,
+update,
+delete on table public.db_connections__postgres to service_role;
 
 -- Policies
 create policy "User can select db_connections__postgres in their workspace" on public.db_connections__postgres for

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
 const BASE_URL = "https://data.cityofnewyork.us";

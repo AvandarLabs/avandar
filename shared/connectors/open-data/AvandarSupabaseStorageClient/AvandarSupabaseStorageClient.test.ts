@@ -23,11 +23,10 @@ describe("AvandarSupabaseStorageClient.downloadCachedResource", () => {
   it("reads the object at the given path", async () => {
     const handle = _handle();
 
-    const blob = await createAvandarSupabaseStorageClient(
-      handle,
-    ).downloadCachedResource(
-      "aaaaaaaa.parquet",
-    );
+    const blob =
+      await createAvandarSupabaseStorageClient(handle).downloadCachedResource(
+        "aaaaaaaa.parquet",
+      );
 
     expect(handle.download).toHaveBeenCalledWith("aaaaaaaa.parquet");
     expect(blob).toBeInstanceOf(Blob);
@@ -40,11 +39,10 @@ describe("AvandarSupabaseStorageClient.downloadCachedResource", () => {
       }),
     });
 
-    const blob = await createAvandarSupabaseStorageClient(
-      handle,
-    ).downloadCachedResource(
-      "missing.parquet",
-    );
+    const blob =
+      await createAvandarSupabaseStorageClient(handle).downloadCachedResource(
+        "missing.parquet",
+      );
 
     expect(blob).toBeUndefined();
   });
@@ -86,7 +84,9 @@ describe("AvandarSupabaseStorageClient.removeCachedResource", () => {
   it("removes the object at the given path", async () => {
     const handle = _handle();
 
-    await createAvandarSupabaseStorageClient(handle).removeCachedResource("aaaaaaaa.parquet");
+    await createAvandarSupabaseStorageClient(handle).removeCachedResource(
+      "aaaaaaaa.parquet",
+    );
 
     expect(handle.remove).toHaveBeenCalledWith(["aaaaaaaa.parquet"]);
   });

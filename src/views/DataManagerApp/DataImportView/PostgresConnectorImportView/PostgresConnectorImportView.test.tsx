@@ -133,7 +133,11 @@ describe("PostgresConnectorImportView", () => {
     apiPostMock.mockResolvedValue({
       connectionId: "10000000-0000-4000-8000-000000000001",
       relations: [
-        { relationId: "public.customers", label: "public.customers", kind: "table" },
+        {
+          relationId: "public.customers",
+          label: "public.customers",
+          kind: "table",
+        },
       ],
     });
     apiGetMock.mockResolvedValue({
@@ -256,9 +260,7 @@ describe("PostgresConnectorImportView", () => {
 
     renderWithProviders(<PostgresConnectorImportView />);
 
-    expect(
-      screen.queryByLabelText(/^host$/i),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^host$/i)).not.toBeInTheDocument();
     await waitFor(() => {
       expect(apiGetMock).toHaveBeenCalledWith(
         expect.objectContaining({

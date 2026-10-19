@@ -1,6 +1,6 @@
-import { prop } from "@avandar/utils";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import { prop } from "@avandar/utils";
 
 /**
  * Thrown when a user-supplied host resolves (or is written as a literal) to

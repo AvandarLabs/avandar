@@ -47,7 +47,8 @@ describe("PostgresDatabaseConnectionParsers", () => {
   it("refuses to build an insert payload from client code", () => {
     const insert: PostgresDatabaseConnection.T<"Insert"> = {
       __type: "PostgresDatabaseConnection",
-      connectionId: "11111111-1111-4111-8111-111111111111" as DatabaseConnection.Id,
+      connectionId:
+        "11111111-1111-4111-8111-111111111111" as DatabaseConnection.Id,
       databaseName: "reporting",
       host: "db.example.org",
       port: 5432,

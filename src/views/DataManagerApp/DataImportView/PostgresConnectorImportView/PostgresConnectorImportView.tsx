@@ -5,12 +5,12 @@ import { IconDatabase } from "@tabler/icons-react";
 import { useState } from "react";
 import { ConnectorRow } from "@/views/DataManagerApp/DataImportView/ConnectorRow/ConnectorRow";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
-import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
 import { formatSavedConnectionLabel } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/formatSavedConnectionLabel";
+import { PostgresConnectionForm } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm";
 import { useLoadPostgresTable } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
-import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PostgresConnectionFormValues } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
 
 type Props = BoxProps & {
   /**

@@ -7,7 +7,6 @@ import {
 } from "@sbfn/connectors/connectors/ExternalDatasetConnector.ts";
 import { classifyPostgresConnectionError } from "@sbfn/connectors/connectors/postgres/classifyPostgresConnectionError.ts";
 import { connectToPostgres as defaultConnectToPostgres } from "@sbfn/connectors/connectors/postgres/connectToPostgres.ts";
-import { toPostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
 import {
   assertRelationStillExists,
   listCatalogRelations,
@@ -16,6 +15,7 @@ import {
 import { openSavedConnection } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresConnectionRow.ts";
 import { rowsToCsv } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/postgresCsv.ts";
 import { testAndSaveConnection } from "@sbfn/connectors/connectors/postgres/createPostgresConnector/testAndSaveConnection.ts";
+import { toPostgresConnectionConfig } from "@sbfn/connectors/connectors/postgres/PostgresConnectionConfig.ts";
 import type { PostgresSql } from "@sbfn/connectors/connectors/postgres/PostgresSql.types.ts";
 
 /**

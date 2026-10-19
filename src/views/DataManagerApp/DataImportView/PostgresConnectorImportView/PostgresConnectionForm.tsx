@@ -9,11 +9,11 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection";
 import type {
   PostgresConnectionError,
   PostgresConnectionFormValues,
 } from "@/views/DataManagerApp/DataImportView/PostgresConnectorImportView/useLoadPostgresTable";
-import type { PostgresDatabaseConnection } from "$/models/DatabaseConnection/PostgresDatabaseConnection/PostgresDatabaseConnection";
 
 const SSL_MODES = [
   "require",
@@ -75,7 +75,10 @@ export function PostgresConnectionForm({
         <Select
           label={t`SSL mode`}
           data={SSL_MODES.map((mode) => {
-            return { value: mode, label: mode === "require" ? t`Require` : t`Disable` };
+            return {
+              value: mode,
+              label: mode === "require" ? t`Require` : t`Disable`,
+            };
           })}
           value={formValues.sslMode}
           onChange={(value) => {
@@ -122,8 +125,8 @@ export function PostgresConnectionForm({
       />
       <Text size="xs" c="dimmed">
         <Trans>
-          The database user should ideally have read-only access to the table
-          or view you plan to import.
+          The database user should ideally have read-only access to the table or
+          view you plan to import.
         </Trans>
       </Text>
       {connectionError ? (

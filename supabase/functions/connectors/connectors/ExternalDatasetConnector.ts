@@ -1,6 +1,6 @@
+import type { Database } from "$/types/database.types.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "$/types/database.types.ts";
 
 /** Widens per future connector (MySQL, MSSQL, Snowflake, ...). */
 export type ExternalDatasetConnectorType = "postgres";

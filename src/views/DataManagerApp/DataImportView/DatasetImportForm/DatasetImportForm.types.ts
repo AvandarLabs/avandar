@@ -1,5 +1,5 @@
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatabaseConnection } from "$/models/DatabaseConnection/DatabaseConnection";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type {
   CsvFileLoadResult,

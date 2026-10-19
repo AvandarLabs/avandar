@@ -1,9 +1,9 @@
 import { snakeCaseKeysShallow } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { duckDbColumnsToImportedColumns } from "../duckDbColumnsToImportedColumns/duckDbColumnsToImportedColumns";
-import type { DatasetInsertContext } from "../useSaveDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DataSourceMetadata } from "../../DatasetImportForm.types";
+import type { DatasetInsertContext } from "../useSaveDataset";
 
 /** Inserts a dataset backed by an uploaded CSV file. */
 export async function saveCsvDataset(

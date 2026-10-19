@@ -18,9 +18,7 @@ export const CONNECTORS: Record<
 };
 
 /** Looks up a connector by type; throws if the type is unrecognized. */
-export function getConnector(
-  connectorType: string,
-): ExternalDatasetConnector {
+export function getConnector(connectorType: string): ExternalDatasetConnector {
   const connector = CONNECTORS[connectorType as ExternalDatasetConnectorType];
   if (!connector) {
     throw new Error(`Unknown connector type: '${connectorType}'`);

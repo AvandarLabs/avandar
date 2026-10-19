@@ -82,9 +82,8 @@ function _errorFetch(code: string, message: string): PostgresRowsFetch {
 
 describe("acquirePostgresTableRelation", () => {
   it("reads the relation's rows through the edge function and transcodes them with a real DuckDB reader", async () => {
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
+    const { acquirePostgresTableRelation } =
+      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
 
     const acquired = await acquirePostgresTableRelation({
       connectionId: "connection-1",
@@ -104,9 +103,8 @@ describe("acquirePostgresTableRelation", () => {
     // DuckDB hands a BIGINT back as a JS `bigint`; what matters is that it is
     // not a string - same reasoning `acquireGoogleSheetRelation`'s own test
     // documents for Sheets.
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
+    const { acquirePostgresTableRelation } =
+      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
 
     const acquired = await acquirePostgresTableRelation({
       connectionId: "connection-1",
@@ -120,9 +118,8 @@ describe("acquirePostgresTableRelation", () => {
   });
 
   it("fails when the edge function reports a connector error", async () => {
-    const { acquirePostgresTableRelation } = await import(
-      "@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation"
-    );
+    const { acquirePostgresTableRelation } =
+      await import("@/clients/qetl/wrappers/PostgresTableWrapper/acquirePostgresTableRelation");
 
     await expect(
       acquirePostgresTableRelation({

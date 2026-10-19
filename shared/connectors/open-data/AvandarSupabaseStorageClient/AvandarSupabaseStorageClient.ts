@@ -41,9 +41,7 @@ export function createAvandarSupabaseStorageClient(
       }
     },
 
-    removeCachedResource: async (
-      objectPath: string,
-    ): Promise<void> => {
+    removeCachedResource: async (objectPath: string): Promise<void> => {
       const { error } = await handle.remove([objectPath]);
       if (error) {
         throw new Error(error.message);

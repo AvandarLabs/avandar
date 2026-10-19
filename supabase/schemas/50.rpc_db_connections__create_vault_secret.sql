@@ -22,7 +22,8 @@ create or replace function public.rpc_db_connections__create_vault_secret (
   p_description text
 ) returns uuid language plpgsql security definer
 set
-  search_path = public, vault as $$
+  search_path = public,
+  vault as $$
 declare
   v_secret_id uuid;
 begin

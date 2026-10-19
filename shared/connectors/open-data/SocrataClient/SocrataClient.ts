@@ -1,8 +1,8 @@
+import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import {
   SocrataCountResponseSchema,
   SocrataViewMetadataSchema,
 } from "$/connectors/open-data/SocrataClient/SocrataClient.schemas.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type {
   SocrataClient,

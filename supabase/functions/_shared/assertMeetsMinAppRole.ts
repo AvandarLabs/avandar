@@ -1,7 +1,7 @@
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { Database } from "$/types/database.types.ts";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 type AppType = Database["public"]["Enums"]["app_type"];
 type RoleLevel = Database["public"]["Enums"]["role_level"];

@@ -16,8 +16,8 @@ export function ConnectorsAdvisory(): JSX.Element {
   return (
     <Text size="xs" c="dimmed" maw="65ch">
       <Trans>
-        New connectors are added every month. If there is a database or
-        service you need,{" "}
+        New connectors are added every month. If there is a database or service
+        you need,{" "}
         <UnstyledButton
           type="button"
           aria-label={t`Request a data source connection via feedback`}

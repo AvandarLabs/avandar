@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
 import {
   quotePostgresIdentifier,
   quoteQualifiedPostgresIdentifier,
 } from "@sbfn/_shared/quotePostgresIdentifier.ts";
+import { describe, expect, it } from "vitest";
 
 describe("quotePostgresIdentifier", () => {
   it("quotes an ordinary identifier", () => {

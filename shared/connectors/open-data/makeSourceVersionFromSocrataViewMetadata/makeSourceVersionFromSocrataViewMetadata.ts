@@ -1,5 +1,5 @@
-import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 import type { SocrataViewMetadata } from "$/connectors/open-data/SocrataClient/SocrataClient.types.ts";
+import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types.ts";
 
 const ROWS_UPDATED_PREFIX = "socrata:rowsUpdatedAt:";
 const VIEW_MODIFIED_PREFIX = "socrata:viewLastModified:";

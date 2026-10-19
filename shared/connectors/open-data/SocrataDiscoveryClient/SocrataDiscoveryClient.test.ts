@@ -10,7 +10,10 @@ function _http(overrides: Partial<OpenDataHttp> = {}): OpenDataHttp {
       return {
         results: [
           {
-            resource: { id: "akvg-8vrb", name: "CDC Wastewater Data for Measles" },
+            resource: {
+              id: "akvg-8vrb",
+              name: "CDC Wastewater Data for Measles",
+            },
             metadata: { domain: "data.cdc.gov" },
           },
         ],
@@ -53,14 +56,21 @@ describe("SocrataDiscoveryClient.search", () => {
     });
 
     expect(results).toEqual([
-      { datasetId: "akvg-8vrb", name: "CDC Wastewater Data for Measles", domain: "data.cdc.gov" },
+      {
+        datasetId: "akvg-8vrb",
+        name: "CDC Wastewater Data for Measles",
+        domain: "data.cdc.gov",
+      },
     ]);
   });
 
   it("passes a limit through when given", async () => {
     const http = _http();
 
-    await createSocrataDiscoveryClient(http).search({ query: "measles", limit: 3 });
+    await createSocrataDiscoveryClient(http).search({
+      query: "measles",
+      limit: 3,
+    });
 
     expect(http.get).toHaveBeenCalledWith(
       `${DISCOVERY_BASE_URL}?q=measles&limit=3`,
