@@ -1,30 +1,30 @@
 import { randomUUID } from "node:crypto";
+import { createHdxHttpClient } from "@pipelines/hdx/createHdxHttpClient/createHdxHttpClient";
 import { HDX_DRIVE } from "@pipelines/hdx/hdxDrive";
 import { makeCkanListingRowsFromPackage } from "@pipelines/hdx/makeCkanListingRowsFromPackage/makeCkanListingRowsFromPackage";
 import { createSupabaseAdminClient } from "@pipelines/shared/createSupabaseAdminClient";
+import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import { upsertDataCatalogListingRows } from "@pipelines/shared/upsertDataCatalogListingRows/upsertDataCatalogListingRows";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient";
 import { createCkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient";
-import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory";
-import { withRateLimit } from "$/utils/HttpClientFactory/mixins/withRateLimit/withRateLimit";
 import type { DataCatalogListingRow } from "@pipelines/shared/DataCatalogListingRow.types";
-
-/** Ceiling for a metadata JSON response - never a resource download. */
-const MAX_METADATA_BYTES = 10 * 1024 * 1024;
-
-/** HDX asks API clients to send at most one request per second. */
-const MIN_TIME_BETWEEN_REQUESTS_MS = 1000;
+import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 
 /**
  * Enumerates the HDX drive, if one is configured (`hdxDrive.ts`), and
  * upserts one `data_catalog_listings` row per readable resource it finds.
+ * Set `HDX_API_KEY` (see `.env.pipelines.example`) to send an API token.
  *
  * Not an `EtlEngine` pipeline: nothing here extracts, transforms, or loads
  * data into Parquet. It only discovers metadata and writes catalog rows -
  * the actual resource bytes are still fetched live on first query, by the
  * existing `acquireOpenDataResourceWithCache` path, completely unchanged.
+ *
+ * @param options.limit - Read at most this many datasets. One dataset can
+ * produce several rows, one per readable resource.
+ * @returns The pipeline run id.
  */
-export async function run(): Promise<string> {
+export async function run(options: PipelineRunOptions = {}): Promise<string> {
   const pipelineRunId = randomUUID();
 
   if (HDX_DRIVE === undefined) {
@@ -33,14 +33,16 @@ export async function run(): Promise<string> {
   }
 
   const supabase = createSupabaseAdminClient();
-  const http = HttpClientFactory.create("HdxPipelineHttpClient", {
-    state: { maxResponseBytes: MAX_METADATA_BYTES },
-    mixins: [withRateLimit({ minTimeMs: MIN_TIME_BETWEEN_REQUESTS_MS })],
+  const http = createHdxHttpClient({
+    baseUrl: HDX_DRIVE.baseUrl,
+    apiKey: getOptionalEnvVar("HDX_API_KEY"),
   });
   const discovery = createCkanDiscoveryClient(http);
   const client = createCkanClient(http);
 
-  const slugs = await discovery.listDatasets({ baseUrl: HDX_DRIVE.baseUrl });
+  const allSlugs = await discovery.listDatasets({ baseUrl: HDX_DRIVE.baseUrl });
+  const slugs =
+    options.limit === undefined ? allSlugs : allSlugs.slice(0, options.limit);
   const rows: DataCatalogListingRow[] = [];
   // Sequential on purpose: the rate limiter already spaces requests, and an
   // offline batch job gains nothing from racing them.
