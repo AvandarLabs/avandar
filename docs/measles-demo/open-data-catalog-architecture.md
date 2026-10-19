@@ -493,6 +493,32 @@ Both pipelines send every request through an `HttpClientFactory` client with
 second. The Socrata pipeline shares one client across all of its drives,
 because every drive is enumerated through the same Discovery API host.
 
+### 6.7 What every pipeline must write
+
+Every pipeline under `apps/pipeline-server/pipelines/` must always upsert a
+`data_catalog_listings` row for each dataset it discovers, regardless of
+`access_kind`. A dataset a pipeline knows about but never upserts into the
+drive index does not exist for query or discovery purposes - there is no
+other path by which `data_catalog_listings` gets populated.
+
+Prebuilding a Parquet file is not symmetric across `access_kind`:
+
+- `access_kind = 'api_resource'` (`hdx`, `socrata`): prebuilding Parquet is
+  optional. These pipelines only enumerate drives and upsert metadata; the
+  write-back cache (section 5) builds the Parquet object lazily on first live
+  query instead.
+- `access_kind = 'pipeline_parquet'` (`world-bank__wdi` and any future
+  `EtlEngine`-based pipeline): prebuilding Parquet is mandatory. A
+  `pipeline_parquet` row with no corresponding Parquet object is invalid data,
+  not a lazily-filled cache miss - nothing else will ever populate it. This
+  is also what the `data_catalog_listings__pipeline_access_complete` CHECK
+  constraint (`supabase/schemas/10.data_catalog_listings.sql`) enforces at the
+  database level for the columns it covers.
+
+Today both halves of this invariant are upheld by convention (each pipeline's
+own code), not by a shared enforcement mechanism outside that CHECK
+constraint. See section 7's deferred list for enforcing it programmatically.
+
 ## 7. What this spec builds vs. what it does not
 
 **In scope, built by this spec:**
