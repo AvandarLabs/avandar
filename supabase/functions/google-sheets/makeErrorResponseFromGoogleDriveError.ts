@@ -26,23 +26,21 @@ const HTTP_STATUS_BY_CODE: Record<GoogleDriveErrorCode, number> = {
 /**
  * Answers a failed sheet read with `{ error: { code, message, reason } }`,
  * where `code` is the `GoogleDriveErrorCode` the browser already turns into
- * copy. Google refusing the token is reported as `owner-reconnect-required`:
- * the token belongs to the account that added the sheet, so only its owner
- * can fix it, whoever is reading.
+ * copy.
  */
-export function makeGoogleSheetErrorResponse(
+export function makeErrorResponseFromGoogleDriveError(
   error: GoogleDriveError,
 ): Response {
-  const code: GoogleDriveErrorCode =
-    error.code === "google-auth-expired"
-      ? "owner-reconnect-required"
-      : error.code;
   return new Response(
     JSON.stringify({
-      error: { code, message: error.message, reason: error.reason },
+      error: {
+        code: error.code,
+        message: error.message,
+        reason: error.reason,
+      },
     }),
     {
-      status: HTTP_STATUS_BY_CODE[code],
+      status: HTTP_STATUS_BY_CODE[error.code],
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     },
   );

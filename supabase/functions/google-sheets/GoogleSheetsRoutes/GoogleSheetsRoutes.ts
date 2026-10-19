@@ -4,9 +4,12 @@ import { getGoogleAuthClient } from "@sbfn/_shared/getGoogleAuthClient.ts";
 import { PAYLOAD_TOO_LARGE } from "@sbfn/_shared/httpCodes.ts";
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";
-import { getAuthorizedSheetSource } from "@sbfn/google-sheets/getAuthorizedSheetSource/getAuthorizedSheetSource.ts";
-import { getDatasetOwnerAccessToken } from "@sbfn/google-sheets/getDatasetOwnerAccessToken/getDatasetOwnerAccessToken.ts";
-import { makeGoogleSheetErrorResponse } from "@sbfn/google-sheets/makeGoogleSheetErrorResponse/makeGoogleSheetErrorResponse.ts";
+import {
+  getAuthorizedSheetRead,
+  type AuthorizedSheetRead,
+  type AuthorizedSheetReadOptions,
+} from "@sbfn/google-sheets/getAuthorizedSheetRead.ts";
+import { makeErrorResponseFromGoogleDriveError } from "@sbfn/google-sheets/makeErrorResponseFromGoogleDriveError.ts";
 import { google } from "googleapis";
 import { string } from "zod";
 import {
@@ -15,21 +18,7 @@ import {
   getStoredGoogleSheetTabCsv,
 } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient.ts";
 import { GoogleDriveError } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError.ts";
-import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
-import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types.ts";
-
-/**
- * Lets the browser read the source version off a cross-origin response,
- * which otherwise exposes only the CORS-safelisted headers.
- */
-const EXPOSED_HEADERS = "X-Ava-Source-Version";
-
-/** The caller's session and the service role, as every dataset route has. */
-type DatasetRouteClients = {
-  datasetId: string;
-  supabaseClient: AvaSupabaseClient;
-  supabaseAdminClient: AvaSupabaseClient;
-};
+import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes/GoogleSheetsRoutes.types.ts";
 
 /**
  * Runs one dataset read, answering a Google failure with its typed error
@@ -43,9 +32,38 @@ async function _respondWithGoogleSheetErrors(
     return await read();
   } catch (error) {
     if (error instanceof GoogleDriveError) {
-      return makeGoogleSheetErrorResponse(error);
+      return makeErrorResponseFromGoogleDriveError(error);
     }
     throw error;
+  }
+}
+
+/**
+ * Runs the Google calls of one dataset read with the owner's token. A token
+ * Google rejects mid-read is reported the same way as one that could not be
+ * refreshed: as the owner's to fix by reconnecting, to the owner, and as
+ * needing the owner, to everyone else.
+ */
+async function _callGoogleWithOwnerGrant<T>(
+  options: Readonly<{
+    sheetRead: AuthorizedSheetRead;
+    call: (accessToken: string) => Promise<T>;
+  }>,
+): Promise<T> {
+  try {
+    return await options.call(options.sheetRead.accessToken);
+  } catch (error) {
+    const isOwnerGrantRejected =
+      error instanceof GoogleDriveError &&
+      error.code === "google-auth-expired" &&
+      !options.sheetRead.isCallerTheOwner;
+    throw isOwnerGrantRejected
+      ? new GoogleDriveError({
+          code: "owner-reconnect-required",
+          status: error.status,
+          reason: error.reason,
+        })
+      : error;
   }
 }
 
@@ -54,17 +72,18 @@ async function _respondWithGoogleSheetErrors(
  * that added it once the caller's own access to the dataset is checked.
  */
 async function _readDatasetSheetCsv(
-  options: Readonly<DatasetRouteClients>,
+  options: Readonly<AuthorizedSheetReadOptions>,
 ): Promise<Response> {
-  const source = await getAuthorizedSheetSource(options);
-  const accessToken = await getDatasetOwnerAccessToken({
-    supabaseAdminClient: options.supabaseAdminClient,
-    googleAccountId: source.googleAccountId,
-  });
-  const { csvText, sourceVersion } = await getStoredGoogleSheetTabCsv({
-    fileId: source.googleDocumentId,
-    sheetName: source.sheetName,
-    accessToken,
+  const sheetRead = await getAuthorizedSheetRead(options);
+  const { csvText, sourceVersion } = await _callGoogleWithOwnerGrant({
+    sheetRead,
+    call: (accessToken) => {
+      return getStoredGoogleSheetTabCsv({
+        fileId: sheetRead.source.googleDocumentId,
+        sheetName: sheetRead.source.sheetName,
+        accessToken,
+      });
+    },
   });
   if (
     new TextEncoder().encode(csvText).byteLength > GOOGLE_SHEET_MAX_EXPORT_BYTES
@@ -79,7 +98,9 @@ async function _readDatasetSheetCsv(
     status: 200,
     headers: {
       ...corsHeaders,
-      "Access-Control-Expose-Headers": EXPOSED_HEADERS,
+      // Lets the browser read the source version off a cross-origin
+      // response, which otherwise exposes only the CORS-safelisted headers.
+      "Access-Control-Expose-Headers": "X-Ava-Source-Version",
       "Content-Type": "text/csv",
       "X-Ava-Source-Version": sourceVersion,
     },
@@ -88,16 +109,17 @@ async function _readDatasetSheetCsv(
 
 /** The dataset's Drive `File.version`, checked the same way as its rows. */
 async function _readDatasetSheetVersion(
-  options: Readonly<DatasetRouteClients>,
+  options: Readonly<AuthorizedSheetReadOptions>,
 ): Promise<Response> {
-  const source = await getAuthorizedSheetSource(options);
-  const accessToken = await getDatasetOwnerAccessToken({
-    supabaseAdminClient: options.supabaseAdminClient,
-    googleAccountId: source.googleAccountId,
-  });
-  const sourceVersion = await getGoogleSheetVersion({
-    fileId: source.googleDocumentId,
-    accessToken,
+  const sheetRead = await getAuthorizedSheetRead(options);
+  const sourceVersion = await _callGoogleWithOwnerGrant({
+    sheetRead,
+    call: (accessToken) => {
+      return getGoogleSheetVersion({
+        fileId: sheetRead.source.googleDocumentId,
+        accessToken,
+      });
+    },
   });
   return new Response(JSON.stringify({ sourceVersion }), {
     status: 200,
@@ -124,12 +146,14 @@ export const GoogleSheetsRoutes = defineRoutes<GoogleSheetsAPI>(
           pathParams,
           supabaseClient,
           supabaseAdminClient,
+          user,
         }): Promise<Response> => {
           return await _respondWithGoogleSheetErrors(() => {
             return _readDatasetSheetCsv({
               datasetId: pathParams.datasetId,
               supabaseClient,
               supabaseAdminClient,
+              callerUserId: user.id,
             });
           });
         },
@@ -145,12 +169,14 @@ export const GoogleSheetsRoutes = defineRoutes<GoogleSheetsAPI>(
           pathParams,
           supabaseClient,
           supabaseAdminClient,
+          user,
         }): Promise<Response> => {
           return await _respondWithGoogleSheetErrors(() => {
             return _readDatasetSheetVersion({
               datasetId: pathParams.datasetId,
               supabaseClient,
               supabaseAdminClient,
+              callerUserId: user.id,
             });
           });
         },

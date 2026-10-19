@@ -1,4 +1,4 @@
-import { camelCaseKeysShallow } from "@avandar/utils";
+import { camelCaseKeysShallow, makeIdLookupMap } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { ConnectorError } from "@sbfn/connectors/Connector.ts";
 import { PostgresCsv } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCsv/PostgresCsv.ts";
@@ -23,19 +23,6 @@ type PostgresCallCapsCheck = {
   message: string;
 };
 
-/** A relation to measure before any of its rows are read. */
-type RelationToMeasure = {
-  transaction: PostgresQueryRunner;
-
-  /** The quoted relation name fragment the size query interpolates. */
-  relationName: unknown;
-  schemaName: string;
-  tableName: string;
-
-  /** The only columns that will be read, in order. */
-  columnNames: readonly string[];
-};
-
 /** The relation whose rows {@link readRelationCsvWithinCaps} reads. */
 export type ReadRelationCsvWithinCapsOptions = {
   transaction: PostgresQueryRunner;
@@ -50,6 +37,15 @@ export type ReadRelationCsvWithinCapsOptions = {
    * batch of rows arrives, since the statement timeout bounds only one batch.
    */
   deadlineAt: number;
+};
+
+/** A relation to measure before any of its rows are read. */
+type RelationToMeasure = Omit<
+  ReadRelationCsvWithinCapsOptions,
+  "deadlineAt"
+> & {
+  /** The quoted relation name fragment the size query interpolates. */
+  relationName: unknown;
 };
 
 /**
@@ -108,13 +104,13 @@ async function _getColumnSizeInfo(
  * table whose shape has drifted from the dataset's.
  */
 async function _getReadColumnSizeInfo(
-  options: Readonly<Omit<RelationToMeasure, "relationName">>,
+  options: Readonly<Omit<ReadRelationCsvWithinCapsOptions, "deadlineAt">>,
 ): Promise<ColumnSizeInfo[]> {
-  const columns = await _getColumnSizeInfo(options);
+  const columnsByName = makeIdLookupMap(await _getColumnSizeInfo(options), {
+    key: "columnName",
+  });
   return options.columnNames.map((columnName) => {
-    const column = columns.find((candidate) => {
-      return candidate.columnName === columnName;
-    });
+    const column = columnsByName.get(columnName);
     if (column === undefined) {
       throw new ConnectorError(
         "unknown",

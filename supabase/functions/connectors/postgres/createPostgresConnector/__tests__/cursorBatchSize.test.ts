@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import {
   makeFakeSql,
   makeSavedConnectionContext,
@@ -10,18 +11,16 @@ import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 const { targetBytes, minRows, maxRows } =
   GlobalAppConfig.postgresConnector.rowsPerCursorBatch;
 
-type ColumnInfoRow = {
-  column_name: string;
-  data_type: string;
-  character_maximum_length: number | null;
-};
-
 /**
  * Reads a three-row relation with these columns, and returns how many rows
  * each cursor batch asked the database for.
  */
 async function _readRowsPerBatch(
-  columns: readonly ColumnInfoRow[],
+  columns: ReadonlyArray<{
+    column_name: string;
+    data_type: string;
+    character_maximum_length: number | null;
+  }>,
 ): Promise<number[]> {
   const requestedRowsPerBatch: number[] = [];
   const fakeSql = makeFakeSql((queryText) => {
@@ -49,9 +48,7 @@ async function _readRowsPerBatch(
   await connector.getRelationRows(makeSavedConnectionContext("8.8.8.8"), {
     connectionId: SAVED_CONNECTION_ID,
     relationId: "public.events",
-    columnNames: columns.map((column) => {
-      return column.column_name;
-    }),
+    columnNames: columns.map(prop("column_name")),
   });
   return requestedRowsPerBatch;
 }

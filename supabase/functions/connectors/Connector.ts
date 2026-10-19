@@ -83,7 +83,7 @@ export type ConnectorDatasetRelation = {
   workspaceId: string;
   connectionId: string;
   relationId: string;
-  columnNames: readonly string[];
+  columnNames: string[];
 };
 
 export type Connector = {
@@ -114,8 +114,10 @@ export type Connector = {
    * with, without ever seeing it.
    */
   getDatasetRelation: (
-    supabaseAdminClient: ConnectorContext["supabaseAdminClient"],
-    datasetId: string,
+    options: Readonly<{
+      supabaseAdminClient: ConnectorContext["supabaseAdminClient"];
+      datasetId: string;
+    }>,
   ) => Promise<ConnectorDatasetRelation | undefined>;
 
   /**
@@ -124,6 +126,10 @@ export type Connector = {
    */
   getRelationRows: (
     context: ConnectorContext,
-    relation: Readonly<Omit<ConnectorDatasetRelation, "workspaceId">>,
+    relation: Readonly<
+      Omit<ConnectorDatasetRelation, "workspaceId" | "columnNames"> & {
+        columnNames: readonly string[];
+      }
+    >,
   ) => Promise<Blob>;
 };

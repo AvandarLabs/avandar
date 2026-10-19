@@ -1,5 +1,5 @@
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi, type Mock } from "vitest";
 
 vi.mock("@sbfn/_shared/MiniServer/MiniServer.ts", () => {
   return {
@@ -30,20 +30,22 @@ vi.mock("googleapis", () => {
 });
 
 const { GoogleSheetsRoutes } =
-  await import("@sbfn/google-sheets/GoogleSheetsRoutes.ts");
+  await import("@sbfn/google-sheets/GoogleSheetsRoutes/GoogleSheetsRoutes.ts");
 
 const DATASET_ID = "11111111-1111-4111-8111-111111111111";
+const OWNER_USER_ID = "22222222-2222-4222-8222-222222222222";
+const VIEWER_USER_ID = "33333333-3333-4333-8333-333333333333";
 const OWNER_GOOGLE_ACCOUNT_ID = "108374652910384756291";
 
-type RouteAction = (options: {
-  pathParams: { datasetId: string };
-  supabaseClient: unknown;
-  supabaseAdminClient: unknown;
-}) => Promise<Response>;
+type DatasetRoutePath =
+  | "/datasets/:datasetId/csv"
+  | "/datasets/:datasetId/version";
 
 type Scenario = {
   /** Whether the caller may see the dataset. */
   maySelect: boolean;
+  /** Who is calling: the account that added the sheet, or anyone else. */
+  callerUserId: string;
   sheetName: string | null;
   tokenExpiresInMs: number;
   refreshTokenStatus: number;
@@ -51,26 +53,47 @@ type Scenario = {
 
 const DEFAULT_SCENARIO: Scenario = {
   maySelect: true,
+  callerUserId: VIEWER_USER_ID,
   sheetName: "Kenya",
   tokenExpiresInMs: 60 * 60 * 1000,
   refreshTokenStatus: 200,
 };
 
-function _getAction(path: string): RouteAction {
-  const routes = (
-    GoogleSheetsRoutes as unknown as Record<
-      string,
-      Record<string, { GET: { state: { action: RouteAction } } }>
-    >
-  )["google-sheets"];
-  return routes![path]!.GET.state.action;
-}
+/** A fake query builder, as much of one as the dataset routes call. */
+type FakeQuery = {
+  select: Mock;
+  update: Mock;
+  eq: Mock;
+  maybeSingle: Mock;
+};
+
+/** The fake service-role client, and what the routes asked it for. */
+type AdminClientFake = {
+  queriedTables: string[];
+  filters: Array<[string, unknown]>;
+  tokenQuery: FakeQuery;
+  client: { from: Mock };
+};
+
+/** The fake Google transport, and the bearer token each request carried. */
+type GoogleFetchFake = {
+  bearerTokens: string[];
+  googleFetch: Mock;
+};
+
+/** Everything one route test needs to call a route and inspect its fakes. */
+type RouteTestSetup = {
+  adminClientFake: AdminClientFake;
+  googleFetchFake: GoogleFetchFake;
+  supabaseClient: { rpc: Mock };
+  callRoute: (path: DatasetRoutePath) => Promise<Response>;
+};
 
 /** A query builder whose `maybeSingle` answers with `row`. */
 function _makeQuery(
   options: Readonly<{ row: unknown; filters: Array<[string, unknown]> }>,
-) {
-  const query = {
+): FakeQuery {
+  const query: FakeQuery = {
     select: vi.fn(() => {
       return query;
     }),
@@ -92,7 +115,7 @@ function _makeQuery(
   return query;
 }
 
-function _makeAdminClient(scenario: Scenario) {
+function _makeAdminClient(scenario: Scenario): AdminClientFake {
   const queriedTables: string[] = [];
   const filters: Array<[string, unknown]> = [];
   const tokenQuery = _makeQuery({
@@ -102,6 +125,7 @@ function _makeAdminClient(scenario: Scenario) {
       expiry_date: new Date(
         Date.now() + scenario.tokenExpiresInMs,
       ).toISOString(),
+      user_id: OWNER_USER_ID,
     },
     filters,
   });
@@ -130,7 +154,7 @@ function _makeAdminClient(scenario: Scenario) {
  * Answers Google's token endpoint, tab list, version read and tab export,
  * recording the bearer token each Sheets or Drive request carried.
  */
-function _makeGoogleFetch(scenario: Scenario) {
+function _makeGoogleFetch(scenario: Scenario): GoogleFetchFake {
   const bearerTokens: string[] = [];
   const googleFetch = vi.fn(async (url: string, init?: RequestInit) => {
     if (url.startsWith("https://oauth2.googleapis.com/token")) {
@@ -157,11 +181,11 @@ function _makeGoogleFetch(scenario: Scenario) {
   return { bearerTokens, googleFetch };
 }
 
-function _setUp(overrides: Partial<Scenario> = {}) {
+function _setUp(overrides: Partial<Scenario> = {}): RouteTestSetup {
   const scenario = { ...DEFAULT_SCENARIO, ...overrides };
-  const admin = _makeAdminClient(scenario);
-  const google = _makeGoogleFetch(scenario);
-  vi.stubGlobal("fetch", google.googleFetch);
+  const adminClientFake = _makeAdminClient(scenario);
+  const googleFetchFake = _makeGoogleFetch(scenario);
+  vi.stubGlobal("fetch", googleFetchFake.googleFetch);
   vi.stubGlobal("Deno", {
     env: {
       get: (name: string) => {
@@ -174,14 +198,18 @@ function _setUp(overrides: Partial<Scenario> = {}) {
       return { data: scenario.maySelect, error: null };
     }),
   };
-  const callRoute = (path: string): Promise<Response> => {
-    return _getAction(path)({
-      pathParams: { datasetId: DATASET_ID },
-      supabaseClient,
-      supabaseAdminClient: admin.client,
-    });
+  const callRoute = (path: DatasetRoutePath): Promise<Response> => {
+    return Promise.resolve(
+      GoogleSheetsRoutes["google-sheets"][path].GET.state.action({
+        pathParams: { datasetId: DATASET_ID },
+        supabaseClient,
+        supabaseAdminClient: adminClientFake.client,
+        user: { id: scenario.callerUserId },
+        // The fake clients and user cover only what these routes read.
+      } as never),
+    );
   };
-  return { admin, google, supabaseClient, callRoute };
+  return { adminClientFake, googleFetchFake, supabaseClient, callRoute };
 }
 
 afterEach(() => {
@@ -189,22 +217,30 @@ afterEach(() => {
 });
 
 describe("google-sheets dataset routes", () => {
-  it("refuses a caller who may not see the dataset, before reading its source or any token", async () => {
-    const { admin, supabaseClient, callRoute } = _setUp({ maySelect: false });
+  it.each<DatasetRoutePath>([
+    "/datasets/:datasetId/csv",
+    "/datasets/:datasetId/version",
+  ])(
+    "refuses a caller who may not see the dataset on %s, before reading its source or any token",
+    async (path) => {
+      const { adminClientFake, supabaseClient, callRoute } = _setUp({
+        maySelect: false,
+      });
 
-    const result = callRoute("/datasets/:datasetId/csv");
+      const result = callRoute(path);
 
-    await expect(result).rejects.toBeInstanceOf(AvaHTTPError);
-    await expect(result).rejects.toHaveProperty("httpCode", 403);
-    expect(supabaseClient.rpc).toHaveBeenCalledWith(
-      "util__auth_user_may_select_dataset",
-      { p_dataset_id: DATASET_ID },
-    );
-    expect(admin.queriedTables).toEqual([]);
-  });
+      await expect(result).rejects.toBeInstanceOf(AvaHTTPError);
+      await expect(result).rejects.toHaveProperty("httpCode", 403);
+      expect(supabaseClient.rpc).toHaveBeenCalledWith(
+        "util__auth_user_may_select_dataset",
+        { p_dataset_id: DATASET_ID },
+      );
+      expect(adminClientFake.queriedTables).toEqual([]);
+    },
+  );
 
   it("returns the stored tab as CSV, read with the token of the account that added the sheet", async () => {
-    const { admin, google, callRoute } = _setUp();
+    const { adminClientFake, googleFetchFake, callRoute } = _setUp();
 
     const response = await callRoute("/datasets/:datasetId/csv");
 
@@ -215,33 +251,34 @@ describe("google-sheets dataset routes", () => {
       "X-Ava-Source-Version",
     );
     await expect(response.text()).resolves.toBe("city\r\ntab-77\r\n");
-    expect(admin.filters).toContainEqual([
+    expect(adminClientFake.filters).toContainEqual([
       "google_account_id",
       OWNER_GOOGLE_ACCOUNT_ID,
     ]);
-    expect(new Set(google.bearerTokens)).toEqual(
+    expect(new Set(googleFetchFake.bearerTokens)).toEqual(
       new Set(["Bearer ya29.owner"]),
     );
   });
 
   it("refreshes the owner's token when it is about to expire, and stores the new one", async () => {
-    const { admin, google, callRoute } = _setUp({
+    const { adminClientFake, googleFetchFake, callRoute } = _setUp({
       tokenExpiresInMs: 60 * 1000,
     });
 
     const response = await callRoute("/datasets/:datasetId/csv");
 
     expect(response.status).toBe(200);
-    expect(new Set(google.bearerTokens)).toEqual(
+    expect(new Set(googleFetchFake.bearerTokens)).toEqual(
       new Set(["Bearer ya29.refreshed"]),
     );
-    expect(admin.tokenQuery.update).toHaveBeenCalledWith(
+    expect(adminClientFake.tokenQuery.update).toHaveBeenCalledWith(
       expect.objectContaining({ access_token: "ya29.refreshed" }),
     );
   });
 
-  it("reports that the owner must reconnect when Google refuses to refresh their token", async () => {
-    const { google, callRoute } = _setUp({
+  it("tells anyone but the owner that the owner must reconnect when Google refuses to refresh the token", async () => {
+    const { googleFetchFake, callRoute } = _setUp({
+      callerUserId: VIEWER_USER_ID,
       tokenExpiresInMs: 60 * 1000,
       refreshTokenStatus: 400,
     });
@@ -252,7 +289,22 @@ describe("google-sheets dataset routes", () => {
     await expect(response.json()).resolves.toMatchObject({
       error: { code: "owner-reconnect-required" },
     });
-    expect(google.bearerTokens).toEqual([]);
+    expect(googleFetchFake.bearerTokens).toEqual([]);
+  });
+
+  it("tells the owner their own Google connection expired when Google refuses to refresh their token", async () => {
+    const { callRoute } = _setUp({
+      callerUserId: OWNER_USER_ID,
+      tokenExpiresInMs: 60 * 1000,
+      refreshTokenStatus: 400,
+    });
+
+    const response = await callRoute("/datasets/:datasetId/csv");
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toMatchObject({
+      error: { code: "google-auth-expired" },
+    });
   });
 
   it("names the stored tab when it is no longer in the workbook", async () => {

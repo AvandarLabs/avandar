@@ -110,11 +110,11 @@ async function _previewRelationRows(
     schemaName,
     tableName,
   );
-  const columns = await PostgresCatalog.readColumnTypes(
-    transaction,
+  const columns = await PostgresCatalog.readColumnTypes({
+    sql: transaction,
     schemaName,
     tableName,
-  );
+  });
   // The schema and table are quoted as two separate identifiers (see
   // `quotePostgresRelationName.ts`), so a dot inside either name stays part
   // of that name.

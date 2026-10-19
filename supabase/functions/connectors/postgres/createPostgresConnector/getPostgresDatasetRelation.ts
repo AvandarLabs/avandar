@@ -14,9 +14,12 @@ import { PostgresRelationId } from "$/connectors/postgres/PostgresRelationId/Pos
  * @returns `undefined` when no Postgres-backed dataset has this id.
  */
 export async function getPostgresDatasetRelation(
-  supabaseAdminClient: ConnectorContext["supabaseAdminClient"],
-  datasetId: string,
+  options: Readonly<{
+    supabaseAdminClient: ConnectorContext["supabaseAdminClient"];
+    datasetId: string;
+  }>,
 ): Promise<ConnectorDatasetRelation | undefined> {
+  const { supabaseAdminClient, datasetId } = options;
   const { data: source, error: sourceError } = await supabaseAdminClient
     .from("datasets__postgres_table")
     .select("workspace_id, connection_id, schema_name, table_name")

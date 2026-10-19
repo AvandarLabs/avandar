@@ -69,11 +69,10 @@ async function _readDatasetRows(
 
 /** The query that reads rows, found by the column list it selects. */
 function _findRowsQuery(
-  sentQueries: readonly SentQuery[],
-  columnList: string,
+  options: Readonly<{ sentQueries: readonly SentQuery[]; columnList: string }>,
 ): SentQuery | undefined {
-  return sentQueries.find((sentQuery) => {
-    return sentQuery.values[0] === columnList;
+  return options.sentQueries.find((sentQuery) => {
+    return sentQuery.values[0] === options.columnList;
   });
 }
 
@@ -82,7 +81,10 @@ describe("createPostgresConnector - reading only a dataset's columns", () => {
     const { csvText, sentQueries } = await _readDatasetRows(["name", "id"]);
 
     await expect(csvText).resolves.toBe("name,id\r\nAda,7");
-    const rowsQuery = _findRowsQuery(sentQueries, '"name", "id"');
+    const rowsQuery = _findRowsQuery({
+      sentQueries,
+      columnList: '"name", "id"',
+    });
     expect(rowsQuery?.queryText).toMatch(/^\s*select\s+from\s*$/);
   });
 
@@ -91,6 +93,8 @@ describe("createPostgresConnector - reading only a dataset's columns", () => {
 
     await expect(csvText).rejects.toBeInstanceOf(ConnectorError);
     await expect(csvText).rejects.toThrow("'email'");
-    expect(_findRowsQuery(sentQueries, '"id", "email"')).toBeUndefined();
+    expect(
+      _findRowsQuery({ sentQueries, columnList: '"id", "email"' }),
+    ).toBeUndefined();
   });
 });

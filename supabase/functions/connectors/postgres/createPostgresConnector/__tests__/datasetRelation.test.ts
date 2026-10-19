@@ -1,3 +1,4 @@
+import { prop, sortObjList } from "@avandar/utils";
 import { createPostgresConnector } from "@sbfn/connectors/postgres/createPostgresConnector/createPostgresConnector.ts";
 import { PostgresCatalog } from "@sbfn/connectors/postgres/createPostgresConnector/PostgresCatalog.ts";
 import { describe, expect, it, vi } from "vitest";
@@ -8,15 +9,41 @@ const WORKSPACE_ID = "33333333-3333-4333-8333-333333333333";
 
 type QueryLog = Array<{ table: string; filters: Record<string, unknown> }>;
 
+/** A `dataset_columns` row, as much of it as this lookup reads or sorts. */
+type StoredColumnRow = { original_name: string; column_idx: number };
+
+/**
+ * The stored columns' names as the database would return them, ordered by
+ * `column` in the direction asked for.
+ */
+function _orderStoredColumns(
+  options: Readonly<{
+    storedColumns: readonly StoredColumnRow[];
+    column: keyof StoredColumnRow;
+    ascending: boolean;
+  }>,
+): Array<{ original_name: string }> {
+  const sortedColumns = sortObjList(options.storedColumns, {
+    sortBy: prop(options.column),
+  });
+  const orderedColumns = options.ascending
+    ? sortedColumns
+    : sortedColumns.reverse();
+  return orderedColumns.map((storedColumn) => {
+    return { original_name: storedColumn.original_name };
+  });
+}
+
 /**
  * A service-role client holding one dataset's Postgres source row (or none)
  * and its stored columns, logging each table it is asked for and the
- * filters applied.
+ * filters applied. Its `order` really sorts by the column and direction it
+ * is given, so a lookup that asked for the wrong order would get it.
  */
 function _makeAdminClient(
   options: Readonly<{
     sourceRow: Record<string, unknown> | null;
-    storedColumnNames: readonly string[];
+    storedColumns: readonly StoredColumnRow[];
     queryLog: QueryLog;
   }>,
 ): ConnectorContext["supabaseAdminClient"] {
@@ -34,14 +61,21 @@ function _makeAdminClient(
       maybeSingle: vi.fn(async () => {
         return { data: options.sourceRow, error: null };
       }),
-      order: vi.fn(async () => {
-        return {
-          data: options.storedColumnNames.map((originalName) => {
-            return { original_name: originalName };
-          }),
-          error: null,
-        };
-      }),
+      order: vi.fn(
+        async (
+          column: keyof StoredColumnRow,
+          { ascending = true }: { ascending?: boolean } = {},
+        ) => {
+          return {
+            data: _orderStoredColumns({
+              storedColumns: options.storedColumns,
+              column,
+              ascending,
+            }),
+            error: null,
+          };
+        },
+      ),
     };
     return builder;
   });
@@ -54,24 +88,29 @@ describe("createPostgresConnector - what a dataset reads", () => {
     const queryLog: QueryLog = [];
     const connector = createPostgresConnector();
 
-    const relation = await connector.getDatasetRelation(
-      _makeAdminClient({
+    const relation = await connector.getDatasetRelation({
+      supabaseAdminClient: _makeAdminClient({
         sourceRow: {
           workspace_id: WORKSPACE_ID,
           connection_id: "44444444-4444-4444-8444-444444444444",
           schema_name: "sales",
           table_name: "orders.2024",
         },
-        storedColumnNames: ["order_id", "placed_at"],
+        // Neither alphabetical nor reversed order matches the stored one.
+        storedColumns: [
+          { original_name: "placed_at", column_idx: 1 },
+          { original_name: "order_id", column_idx: 0 },
+          { original_name: "amount", column_idx: 2 },
+        ],
         queryLog,
       }),
-      DATASET_ID,
-    );
+      datasetId: DATASET_ID,
+    });
 
     expect(relation).toMatchObject({
       workspaceId: WORKSPACE_ID,
       connectionId: "44444444-4444-4444-8444-444444444444",
-      columnNames: ["order_id", "placed_at"],
+      columnNames: ["order_id", "placed_at", "amount"],
     });
     // The table name's own dot survives the round trip through the id.
     expect(PostgresCatalog.parseRelationId(relation!.relationId)).toEqual({
@@ -84,19 +123,19 @@ describe("createPostgresConnector - what a dataset reads", () => {
     const queryLog: QueryLog = [];
     const connector = createPostgresConnector();
 
-    await connector.getDatasetRelation(
-      _makeAdminClient({
+    await connector.getDatasetRelation({
+      supabaseAdminClient: _makeAdminClient({
         sourceRow: {
           workspace_id: WORKSPACE_ID,
           connection_id: "44444444-4444-4444-8444-444444444444",
           schema_name: "public",
           table_name: "customers",
         },
-        storedColumnNames: ["id"],
+        storedColumns: [{ original_name: "id", column_idx: 0 }],
         queryLog,
       }),
-      DATASET_ID,
-    );
+      datasetId: DATASET_ID,
+    });
 
     expect(queryLog).toEqual([
       {
@@ -113,14 +152,14 @@ describe("createPostgresConnector - what a dataset reads", () => {
   it("finds nothing for a dataset no Postgres table backs", async () => {
     const connector = createPostgresConnector();
 
-    const relation = await connector.getDatasetRelation(
-      _makeAdminClient({
+    const relation = await connector.getDatasetRelation({
+      supabaseAdminClient: _makeAdminClient({
         sourceRow: null,
-        storedColumnNames: [],
+        storedColumns: [],
         queryLog: [],
       }),
-      DATASET_ID,
-    );
+      datasetId: DATASET_ID,
+    });
 
     expect(relation).toBeUndefined();
   });

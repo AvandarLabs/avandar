@@ -15,11 +15,22 @@ type RefreshedGoogleToken = {
   refreshToken: string | undefined;
 };
 
-function _makeOwnerReconnectRequiredError(
-  options: Readonly<{ status: number; reason: string }>,
+/**
+ * The error for a Google grant that can no longer be used, worded for who is
+ * reading: the owner can reconnect their own account, while anyone else has
+ * to ask the owner to.
+ */
+function _makeReconnectError(
+  options: Readonly<{
+    isCallerTheOwner: boolean;
+    status: number;
+    reason: string;
+  }>,
 ): GoogleDriveError {
   return new GoogleDriveError({
-    code: "owner-reconnect-required",
+    code: options.isCallerTheOwner
+      ? "google-auth-expired"
+      : "owner-reconnect-required",
     status: options.status,
     reason: options.reason,
   });
@@ -45,7 +56,7 @@ function _readOAuthClientCredentials(): {
  * owner revoked or let the grant lapse, which only that owner can fix.
  */
 async function _refreshAccessToken(
-  refreshToken: string,
+  options: Readonly<{ refreshToken: string; isCallerTheOwner: boolean }>,
 ): Promise<RefreshedGoogleToken> {
   const { clientId, clientSecret } = _readOAuthClientCredentials();
   const response = await fetch(GOOGLE_TOKEN_URL, {
@@ -54,7 +65,7 @@ async function _refreshAccessToken(
     body: new URLSearchParams({
       client_id: clientId,
       client_secret: clientSecret,
-      refresh_token: refreshToken,
+      refresh_token: options.refreshToken,
       grant_type: "refresh_token",
     }),
   });
@@ -70,7 +81,8 @@ async function _refreshAccessToken(
     typeof body.access_token !== "string" ||
     typeof body.expires_in !== "number"
   ) {
-    throw _makeOwnerReconnectRequiredError({
+    throw _makeReconnectError({
+      isCallerTheOwner: options.isCallerTheOwner,
       status: response.status,
       reason: "token-refresh-refused",
     });
@@ -92,18 +104,18 @@ async function _saveRefreshedToken(
   options: Readonly<{
     supabaseAdminClient: AvaSupabaseClient;
     googleAccountId: string;
-    refreshed: RefreshedGoogleToken;
+    refreshedToken: RefreshedGoogleToken;
   }>,
 ): Promise<void> {
-  const { refreshed } = options;
+  const { refreshedToken } = options;
   const { error } = await options.supabaseAdminClient
     .from("tokens__google")
     .update({
-      access_token: refreshed.accessToken,
-      expiry_date: refreshed.expiryDate,
-      ...(refreshed.refreshToken === undefined
+      access_token: refreshedToken.accessToken,
+      expiry_date: refreshedToken.expiryDate,
+      ...(refreshedToken.refreshToken === undefined
         ? {}
-        : { refresh_token: refreshed.refreshToken }),
+        : { refresh_token: refreshedToken.refreshToken }),
     })
     .eq("google_account_id", options.googleAccountId);
   if (error) {
@@ -118,40 +130,49 @@ async function _saveRefreshedToken(
  * the caller, whose own access to the dataset the caller already checked.
  * The token is used server-side only and never returned to a browser.
  *
- * @returns The access token.
- * @throws GoogleDriveError `owner-reconnect-required` when the account has no
- *   stored token or Google refuses to refresh it.
+ * @returns The access token, and whether the caller owns it.
+ * @throws GoogleDriveError `owner-reconnect-required` when the account has
+ *   no stored token, since nobody can tell whose it was. When Google refuses
+ *   to refresh it: `google-auth-expired` for the owner, who can reconnect,
+ *   and `owner-reconnect-required` for everyone else.
  */
 export async function getDatasetOwnerAccessToken(
   options: Readonly<{
     supabaseAdminClient: AvaSupabaseClient;
     googleAccountId: string;
+    callerUserId: string;
   }>,
-): Promise<string> {
+): Promise<{ accessToken: string; isCallerTheOwner: boolean }> {
   const { supabaseAdminClient, googleAccountId } = options;
   const { data: token, error } = await supabaseAdminClient
     .from("tokens__google")
-    .select("access_token, refresh_token, expiry_date")
+    .select("access_token, refresh_token, expiry_date, user_id")
     .eq("google_account_id", googleAccountId)
     .maybeSingle();
   if (error) {
     throw error;
   }
   if (!token) {
-    throw _makeOwnerReconnectRequiredError({
+    // With no stored token, nobody can tell whose account it was.
+    throw _makeReconnectError({
+      isCallerTheOwner: false,
       status: 401,
       reason: "no-stored-token",
     });
   }
+  const isCallerTheOwner = token.user_id === options.callerUserId;
   const msUntilExpiry = new Date(token.expiry_date).getTime() - Date.now();
   if (msUntilExpiry > REFRESH_THRESHOLD_MS) {
-    return token.access_token;
+    return { accessToken: token.access_token, isCallerTheOwner };
   }
-  const refreshed = await _refreshAccessToken(token.refresh_token);
+  const refreshedToken = await _refreshAccessToken({
+    refreshToken: token.refresh_token,
+    isCallerTheOwner,
+  });
   await _saveRefreshedToken({
     supabaseAdminClient,
     googleAccountId,
-    refreshed,
+    refreshedToken,
   });
-  return refreshed.accessToken;
+  return { accessToken: refreshedToken.accessToken, isCallerTheOwner };
 }

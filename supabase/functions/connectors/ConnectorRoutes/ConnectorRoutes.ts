@@ -1,3 +1,4 @@
+import { assertMaySelectDataset } from "@sbfn/_shared/assertMaySelectDataset/assertMaySelectDataset.ts";
 import { assertMeetsMinAppRole } from "@sbfn/_shared/assertMeetsMinAppRole.ts";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
@@ -17,7 +18,7 @@ import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type {
   ConnectorErrorResponse,
   ConnectorsApi,
-} from "@sbfn/connectors/ConnectorRoutes.types.ts";
+} from "@sbfn/connectors/ConnectorRoutes/ConnectorRoutes.types.ts";
 
 /**
  * `{ workspaceId, connectionId?, ...connectorFields }` - every connector
@@ -51,24 +52,6 @@ async function _getOwningWorkspaceId(
     throw new AvaHTTPError(`No connection '${connectionId}' found`, FORBIDDEN);
   }
   return data.workspace_id;
-}
-
-/**
- * Throws `FORBIDDEN` unless the caller may see this dataset, checked through
- * the caller's own client with the same rule the `datasets` table's SELECT
- * policy applies. Never distinguishes "doesn't exist" from "no permission".
- */
-async function _assertMaySelectDataset(
-  supabaseClient: AvaSupabaseClient,
-  datasetId: string,
-): Promise<void> {
-  const { data: maySelect, error } = await supabaseClient.rpc(
-    "util__auth_user_may_select_dataset",
-    { p_dataset_id: datasetId },
-  );
-  if (error || !maySelect) {
-    throw new AvaHTTPError(`No dataset '${datasetId}' found`, FORBIDDEN);
-  }
 }
 
 /**
@@ -227,11 +210,14 @@ export const ConnectorRoutes = defineRoutes<ConnectorsApi>("connectors", {
       schema: { connectorType: string(), datasetId: string() },
     }).action(async ({ pathParams, supabaseClient, supabaseAdminClient }) => {
       const connector = getConnector(pathParams.connectorType);
-      await _assertMaySelectDataset(supabaseClient, pathParams.datasetId);
-      const relation = await connector.getDatasetRelation(
+      await assertMaySelectDataset({
+        supabaseClient,
+        datasetId: pathParams.datasetId,
+      });
+      const relation = await connector.getDatasetRelation({
         supabaseAdminClient,
-        pathParams.datasetId,
-      );
+        datasetId: pathParams.datasetId,
+      });
       if (!relation) {
         throw new AvaHTTPError(
           `No dataset '${pathParams.datasetId}' found`,
