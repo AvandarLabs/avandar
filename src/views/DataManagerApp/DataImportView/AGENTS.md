@@ -138,5 +138,9 @@ drives real workbook bytes through a real sniff for this reason, and the
 4. Write the unit test against real bytes, and an e2e spec. Tag the spec
    `@third-party` only if it reaches a real external service, and read
    [`docs/rules/e2e-testing.md`](../../../../docs/rules/e2e-testing.md) first.
+   Importing is only the first of the flows a new source needs tests for:
+   [`docs/qetl-architecture.md` section 10.3](../../../../docs/qetl-architecture.md#103-required-tests)
+   lists the rest (dashboards, publishing, refresh, column types, and
+   someone other than the importer reading it).
 5. Update the side-by-side table above, so this file keeps describing every
    view rather than the two that were here first.

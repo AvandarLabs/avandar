@@ -470,8 +470,8 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 20 | `src/clients/qetl/QueryMediator/getRelationSources.ts` | reader function and `Record` entry | compiler |
 | 21 | `src/clients/qetl/wrappers/createDefaultRegistry.ts` | options field, delegate, `match` arm, construction | compiler |
 | 22 | `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts` | add the type to the refusing arm | compiler |
-| 23 | `src/clients/qetl/QueryMediator/relationLoading.ts` | type guard, lookup, and registry option if the wrapper needs its source row; a lease-bound transcoder if it returns CSV or JSON | **nothing: fails at query time** |
-| 24 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | branch in `_getSnapshotDatasetBlob`; the default downloads a Storage object that may not exist | **nothing: fails at publish time** |
+| 23 | `src/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch.ts` | registry option if the wrapper needs its source row; a wrapper that acquires CSV reads it through the shared `RelationCsvReader`, passing its `columnTypes` (`source-schema` or `inferred`, `SourceWrapper.types.ts`) | compiler (`columnTypes` is required) and the contract test (row 37) |
+| 24 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts` | an arm in `_getSnapshotDatasetBlob`: copy a stored parquet, or read the rows through the workspace query (any source that keeps no parquet in Storage) | compiler (exhaustive `match`) and `DashboardClient.publishSnapshotSources.test.ts`, whose expectations are a `Record` over every source type |
 | 25 | `src/views/DataManagerApp/DataImportView/` | connector card or tab and its view | inherent |
 | 26 | `DatasetImportForm.types.ts`, `DatasetParseControls.tsx`, `useImportedColumns.ts` | metadata union and controls | inherent |
 | 27 | `useSaveDataset.ts`, `makeDatasetImportedPayloadFromSaveResult.ts` | save branch, upload gating | inherent |
@@ -479,6 +479,10 @@ come with proxying a connection to an arbitrary user-supplied host.
 | 34 | `ResyncDatasetCard.tsx` | an arm only if the type is restored from a local file | inherent, situational |
 | 35 | `src/i18n/locales/*/messages.po` | `pnpm i18n:extract` | generated |
 | 36 | `getRelationSources.characterization.test.ts`, an e2e import spec | pin the reader and the flow | inherent |
+| 37 | `src/clients/qetl/wrappers/__tests__/datasetSourceTypeContract.test.ts` | the source type's contract entry: whether it is live, and for a live source its `columnTypes` and a wrapper built from fakes | compiler (`Record` over every source type), then the shared checks in section 10.3 |
+| 38 | `src/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/` | the manual refresh a live source offers, and its menu item in `DatasetActionsMenu.tsx` | compiler (exhaustive `match`) and the contract test |
+| 39 | the edge connector's `previewRelation` | report each column's `dataType`, read from the source's own schema (`ConnectorPreviewColumn`, `Connector.ts`) | compiler (`dataType` is required) |
+| 40 | a server route keyed by dataset, for example `connectors`' `/:connectorType/datasets/:datasetId/rows` | check `util__auth_user_may_select_dataset` with the caller's client, then read with the service role through the credential the dataset was imported with, so anyone who can see the dataset can read it | the contract test, and route tests modelled on `ConnectorRoutes.datasetRows.test.ts` |
 
 Not needed: `Dataset/DatasetParsers.ts` (derives from `SourceTypes`), chat schema
 code, `assertWorkspaceRelations`, and both cache ports, which are source-type
@@ -487,14 +491,55 @@ agnostic.
 ```mermaid
 flowchart TD
   U["Rows 1 and 5: new enum<br/>value, then pnpm<br/>db:gen-types widens the<br/>datasets__source_type#nbsp;union"]
-  G["Compiler reports until<br/>handled: rows 9 to 11,<br/>13, 14, 19 to 22,<br/>and 28 to 33"]
-  N["Nothing reports: row 23 in<br/>relationLoading.ts<br/>(query time) and row 24 in<br/>dashboardPublishSnapshots.ts<br/>(publish time)"]
+  G["Compiler reports until<br/>handled: rows 9 to 11,<br/>13, 14, 19 to 24,<br/>28 to 33 and 37 to 39"]
+  T["Contract tests check every<br/>source type the same way:<br/>publishing, staleness,<br/>refresh, column types and<br/>credential reuse"]
+  E["Only the e2e specs in<br/>section 10.3 cover the<br/>flows through the UI"]
   U -->|"exhaustive Record or<br/>match on the union"| G
-  U -.->|"no exhaustive check<br/>on the union"| N
+  G --> T
+  T --> E
 ```
 
-_After regenerating types, the compiler lists every guarded site; check rows 23
-and 24 by hand, because nothing else will._
+_After regenerating types, the compiler lists every guarded site, and the
+contract tests then hold the new source type to the same behaviour as every
+other. The e2e specs in section 10.3 are the part no compiler catches._
+
+### 10.3 Required tests
+
+Every connector shipped so far broke in the same places: its dataset failed
+to publish, its rows never refreshed, its columns were all text, and only the
+person who imported it could read it. None of those was caught, because each
+connector's tests stopped at import. A new source type must add all of the
+following.
+
+**Automatic, once its entries exist (rows 24 and 37):**
+
+- **Publishing:** `DashboardClient.publishSnapshotSources.test.ts` publishes
+  a whole-dataset slice of every source type and checks where its rows come
+  from.
+- **Staleness and refresh:** `datasetSourceTypeContract.test.ts` checks that
+  a live source's acquired rows carry `GlobalAppConfig.timing.liveRelationMaxAgeMs`,
+  and that it offers a manual refresh.
+- **Column types:** the same test checks that its wrapper passes the
+  `columnTypes` its contract declares to the CSV reader. A `source-schema`
+  source must also store `detectedDataType: "VARCHAR"` and the type its
+  schema declared, as `savePostgresTableDataset` does, so relation loading
+  casts it; `getColumnReplacementsFromColumns.executed.test.ts` shows that
+  cast landing in a real DuckDB.
+- **Credential reuse:** the same test checks that a live source reads its
+  rows through a server route keyed by the dataset, with only the caller's
+  session, never a third-party token in the browser.
+
+**Written for the connector:**
+
+- Route tests for its dataset-keyed route: a caller who may not see the
+  dataset gets a 403 before anything is read with the service role, and an
+  allowed caller reads through the stored credential.
+- e2e specs that drive the UI, one at a time, for: importing it; a dashboard
+  widget querying it; publishing a dashboard with a whole-dataset slice and
+  a queried one; refreshing it, if it is live; a member other than the
+  importer reading it; and a numeric and a date column arriving as numbers
+  and dates rather than text. Tag a spec `@third-party` only when it reaches
+  a real external service (`docs/rules/e2e-testing.md`).
 
 ## 11. Adding a new relation kind
 

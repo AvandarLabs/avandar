@@ -154,6 +154,19 @@ protection stopped at the database. When adding a new bucket or a new object
 path, gate it the same way or the guarantee silently weakens again: Storage is a
 separate read path and RLS on `public` tables does not reach it.
 
+A live source's rows are a third read path, and they are read with a
+credential the caller does not hold: the importer's Google grant for a Sheets
+dataset, or the workspace's saved connection for a Postgres one. Adding the
+dataset is consent for anyone who can see it to reuse that credential, so the
+edge function routes keyed by dataset (`connectors`'
+`/:connectorType/datasets/:datasetId/rows`, and `google-sheets`'
+`/datasets/:datasetId/csv` and `/version`) first ask
+`util__auth_user_may_select_dataset` with the caller's own client, the same
+rule as the `datasets` row's SELECT policy, and only then read with the
+service role. The credential never reaches the caller's browser. A Postgres
+dataset's satellite row names the table read, so only a `data_sources`
+editor may create one and nobody may repoint it afterwards.
+
 **Workspace owner** - `workspaces.owner_id`; effective `admin` on workspace
 settings and, for resources, via `util__can_manage_workspace_settings` in the
 `util__auth_user_may_select_*` helpers (not via a short-circuit inside

@@ -253,14 +253,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
               resourceType="dataset"
               resourceId={dataset.id}
             />
-            <DatasetActionsMenu
-              dataset={dataset}
-              googleSheetSource={
-                sourceDataset?.__type === "GoogleSheetsDataset"
-                  ? sourceDataset
-                  : undefined
-              }
-            />
+            <DatasetActionsMenu dataset={dataset} />
           </>
         }
       />

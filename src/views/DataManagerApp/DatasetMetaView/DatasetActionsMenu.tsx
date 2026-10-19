@@ -9,20 +9,14 @@ import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { POPOVER_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
+import { getDatasetRefreshFromSourceType } from "@/views/DataManagerApp/DatasetMetaView/getDatasetRefreshFromSourceType/getDatasetRefreshFromSourceType";
 import { useRefreshGoogleSheetDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset";
 import { useRefreshPostgresTableDataset } from "@/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { ReactNode } from "react";
 
 type Props = {
   dataset: Dataset.T;
-
-  /**
-   * The Google Sheets record behind this dataset, when there is one. It is
-   * what a manual refresh reads again.
-   */
-  googleSheetSource: GoogleSheetsDataset.T | undefined;
 };
 
 /**
@@ -33,10 +27,7 @@ type Props = {
  * the page: making the most destructive action the largest and lowest thing
  * on a scrolling page is backwards twice over.
  */
-export function DatasetActionsMenu({
-  dataset,
-  googleSheetSource,
-}: Readonly<Props>): ReactNode {
+export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
@@ -47,6 +38,7 @@ export function DatasetActionsMenu({
     useRefreshGoogleSheetDataset();
   const [refreshPostgresTableDataset, isPostgresRefreshPending] =
     useRefreshPostgresTableDataset();
+  const datasetRefresh = getDatasetRefreshFromSourceType(dataset.sourceType);
 
   const onDelete = (): void => {
     modals.openConfirmModal({
@@ -98,7 +90,7 @@ export function DatasetActionsMenu({
           escape hatch for a user who has just edited the source and does not
           want to wait for that window to close.
         */}
-        {googleSheetSource ? (
+        {datasetRefresh === "google_sheets" ? (
           <Menu.Item
             leftSection={<IconRefresh size={16} />}
             disabled={isRefreshPending}
@@ -109,7 +101,7 @@ export function DatasetActionsMenu({
             <Trans>Refresh from Google Sheets</Trans>
           </Menu.Item>
         ) : null}
-        {dataset.sourceType === "postgres_table" ? (
+        {datasetRefresh === "postgres_table" ? (
           <Menu.Item
             leftSection={<IconRefresh size={16} />}
             disabled={isPostgresRefreshPending}
