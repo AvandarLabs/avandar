@@ -2,6 +2,7 @@ import { GoogleTokenCli } from "@ava-cli/SupabaseCli/GoogleTokenCli/GoogleTokenC
 import { SupabaseMigrationsCli } from "@ava-cli/SupabaseCli/SupabaseMigrationsCli/SupabaseMigrationsCli";
 import { SupabaseRestoreCli } from "@ava-cli/SupabaseCli/SupabaseRestoreCli";
 import { SupabaseRunCli } from "@ava-cli/SupabaseCli/SupabaseRunCli/SupabaseRunCli";
+import { SupabaseSqlCli } from "@ava-cli/SupabaseCli/SupabaseSqlCli/SupabaseSqlCli";
 import { SupabaseStatusCli } from "@ava-cli/SupabaseCli/SupabaseStatusCli";
 import { SupabaseSwitchCli } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/SupabaseSwitchCli";
 import { Acclimate } from "@avandar/acclimate";
@@ -15,5 +16,6 @@ export const SupabaseCli = Acclimate.createCLI("supabase")
   .addCommand("migrations", SupabaseMigrationsCli)
   .addCommand("restore", SupabaseRestoreCli)
   .addCommand("run", SupabaseRunCli)
+  .addCommand("sql", SupabaseSqlCli)
   .addCommand("status", SupabaseStatusCli)
   .addCommand("switch", SupabaseSwitchCli);

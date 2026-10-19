@@ -77,8 +77,6 @@
     "db:reset": "supabase start && dotenv -e .env.development -- ./scripts/resetDatabase.sh",
     "db:seed": "supabase start && dotenv -e .env.development -- pnpm vite-script scripts/seedDatabaseScript.ts",
     "db:validate-migrations": "ava supabase migrations validate",
-    "db:sql": "PGPASSWORD=postgres psql -d postgres -U postgres -h 127.0.0.1 -p 54322",
-    "db:sql-cmd": "PGPASSWORD=postgres psql -d postgres -U postgres -h 127.0.0.1 -p 54322 -c",
     "env:reset": "cp .env.example .env.development && cp .env.example.edge .env.development.edge",
     "email:send-email": "./scripts/emails/send-transactional-email/send-transactional-email.sh",
     "new:component": "./scripts/newComponent.sh",
