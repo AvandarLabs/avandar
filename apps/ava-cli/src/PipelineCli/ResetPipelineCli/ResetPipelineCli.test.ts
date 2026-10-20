@@ -108,7 +108,7 @@ describe("resetPipelineCommand", () => {
       deletes.map((request) => {
         return [request.table, request.params.toString()];
       }),
-    ).toEqual([["data_catalog_listings", "api_service=eq.socrata"]]);
+    ).toEqual([["data_catalog_listings", "pipeline_name=eq.socrata"]]);
   });
 
   it("deletes nothing when the reset is declined", async () => {
@@ -164,7 +164,7 @@ describe("resetPipelineCommand", () => {
     const lookup = requests.find((request) => {
       return request.table === "datasets__open_data";
     });
-    expect(lookup?.params.get("data_catalog_listings.api_service")).toBe(
+    expect(lookup?.params.get("data_catalog_listings.pipeline_name")).toBe(
       "eq.socrata",
     );
   });
@@ -201,21 +201,8 @@ describe("resetPipelineCommand", () => {
     ).toEqual([
       ["datasets", new URLSearchParams({ id: "in.(dataset-1,dataset-2)" })
         .toString()],
-      ["data_catalog_listings", "api_service=eq.socrata"],
+      ["data_catalog_listings", "pipeline_name=eq.socrata"],
     ]);
-  });
-
-  it("selects hdx listings by the CKAN service and the HDX base URL", async () => {
-    const requests = _mockPostgrest({ listingCount: 1 });
-
-    await resetPipelineCommand({ name: "hdx" });
-
-    expect(_getDeletes(requests)[0]?.params.toString()).toBe(
-      new URLSearchParams({
-        api_service: "eq.ckan",
-        api_base_url: "eq.https://data.humdata.org",
-      }).toString(),
-    );
   });
 
   it("selects any other pipeline's listings by pipeline_name", async () => {

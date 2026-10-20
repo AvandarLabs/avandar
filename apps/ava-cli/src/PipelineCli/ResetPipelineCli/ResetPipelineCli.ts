@@ -24,28 +24,15 @@ import type {
 } from "@ava-cli/PipelineCli/ResetPipelineCli/pipelineListingsRest";
 
 /**
- * Filters for the pipelines whose listings are API resources. Those rows have
- * no `pipeline_name`, so they are selected by the API that serves them
- * instead. Every other pipeline writes `pipeline_name` on its rows.
+ * Builds the filter that selects the listings `pipelineName` wrote. Every
+ * pipeline records itself in `pipeline_name`, on API listings as well as
+ * Parquet ones, so one rule covers all of them. A hand-curated listing has
+ * no `pipeline_name` and is never selected.
  */
-const API_LISTING_FILTER_FROM_PIPELINE: Readonly<
-  Record<string, ListingFilter>
-> = {
-  socrata: { api_service: "eq.socrata" },
-  // HDX is a CKAN deployment, so its base URL is what tells its listings
-  // apart from another CKAN instance's.
-  hdx: { api_service: "eq.ckan", api_base_url: "eq.https://data.humdata.org" },
-};
-
-/** Builds the filter that selects the listings `pipelineName` wrote. */
 export function buildListingFilterFromPipeline(
   pipelineName: string,
 ): ListingFilter {
-  return (
-    API_LISTING_FILTER_FROM_PIPELINE[pipelineName] ?? {
-      pipeline_name: `eq.${pipelineName}`,
-    }
-  );
+  return { pipeline_name: `eq.${pipelineName}` };
 }
 
 /**
