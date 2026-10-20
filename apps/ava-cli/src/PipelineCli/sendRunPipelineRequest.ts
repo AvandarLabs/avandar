@@ -3,9 +3,19 @@ import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/P
 import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
 import type { ReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
 import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
+import { Agent } from "undici";
 
 /** HTTP status the server answers for invalid run options. */
 const _BAD_REQUEST_STATUS = 400;
+
+/**
+ * How long the CLI waits for a run's response headers, and then between
+ * body chunks. The server answers only once the run ends, and a full run can
+ * take many minutes, past `fetch`'s default 300 s headers timeout. Two hours
+ * still bounds a request to a server that died without closing the
+ * connection.
+ */
+const _RUN_RESPONSE_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 
 /** What an error response says: its message, and a report if it sent one. */
 type _ErrorBody = Readonly<{
@@ -121,12 +131,17 @@ async function _postRunRequest(
     baseURL: string;
     serverSecret: string;
     body: Record<string, unknown> | undefined;
+    dispatcher: Agent;
   }>,
 ): Promise<Response> {
   const { body } = args;
   try {
     return await fetch(args.url, {
       method: "POST",
+      // The global `fetch` types come from the older `undici-types` that
+      // `@types/node` pins, so they do not match this `undici` Agent's types.
+      // At runtime Node's bundled undici accepts it.
+      dispatcher: args.dispatcher as unknown as RequestInit["dispatcher"],
       headers: {
         authorization: `Bearer ${args.serverSecret}`,
         // Fastify rejects an empty body sent as JSON, so a body is only sent
@@ -164,16 +179,23 @@ export async function sendRunPipelineRequest(options: {
   const encodedPipelineName: string = encodeURIComponent(options.pipelineName);
   const url: string = `${config.baseURL}/${encodedPipelineName}/run`;
   const body = _buildRunBody(options.runOptions);
-  const res: Response = await _postRunRequest({
-    url,
-    baseURL: config.baseURL,
-    serverSecret: config.serverSecret,
-    body,
+  const dispatcher = new Agent({
+    headersTimeout: _RUN_RESPONSE_TIMEOUT_MS,
+    bodyTimeout: _RUN_RESPONSE_TIMEOUT_MS,
   });
-
-  if (!res.ok) {
-    await _throwResponseError(res);
+  try {
+    const res: Response = await _postRunRequest({
+      url,
+      baseURL: config.baseURL,
+      serverSecret: config.serverSecret,
+      body,
+      dispatcher,
+    });
+    if (!res.ok) {
+      await _throwResponseError(res);
+    }
+    return readPipelineRunReport(await res.json());
+  } finally {
+    await dispatcher.close();
   }
-
-  return readPipelineRunReport(await res.json());
 }
