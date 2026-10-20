@@ -236,6 +236,36 @@ describe("runPipelineCommand", () => {
     expect(vi.mocked(runPipelineLocal)).not.toHaveBeenCalled();
   });
 
+  it("shows a 400 body that is not JSON", async () => {
+    _mockFetch(async () => {
+      return new Response("Bad options text", {
+        status: 400,
+        statusText: "Bad Request",
+      });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({ name: "socrata", local: false, limit: 1 }),
+    ).rejects.toThrow(/^Bad options text$/);
+  });
+
+  it("keeps the status line for a 500 with a JSON error", async () => {
+    _mockFetch(async () => {
+      return new Response(JSON.stringify({ ok: false, error: "Boom." }), {
+        status: 500,
+        statusText: "Internal Server Error",
+      });
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({ name: "socrata", local: false }),
+    ).rejects.toThrow(/^500 Internal Server Error: Boom\.$/);
+  });
+
   it("shows the server's own message when it answers 400", async () => {
     _mockFetch(async () => {
       return new Response(

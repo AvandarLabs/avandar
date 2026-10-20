@@ -4,27 +4,32 @@ import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRun
 /** HTTP status the server answers for invalid run options. */
 const _BAD_REQUEST_STATUS = 400;
 
-async function _readErrorBody(res: Response): Promise<string> {
+/** The `error` string of a JSON error body, or `undefined` if it has none. */
+function _readJsonErrorMessage(text: string): string | undefined {
   try {
-    const json: unknown = await res.json();
-
-    if (
-      typeof json === "object" &&
-      json !== null &&
-      "error" in json &&
-      typeof (json as { error?: unknown }).error === "string"
-    ) {
-      return (json as { error: string }).error;
+    const json: unknown = JSON.parse(text);
+    if (typeof json !== "object" || json === null || !("error" in json)) {
+      return undefined;
     }
-
-    return JSON.stringify(json);
+    return typeof json.error === "string" ? json.error : undefined;
   } catch {
-    try {
-      return await res.text();
-    } catch {
-      return `HTTP ${res.status}`;
-    }
+    return undefined;
   }
+}
+
+/**
+ * The most useful message in an error response: the JSON `error` string if
+ * there is one, otherwise the body text if it is non-empty, otherwise the
+ * status line. The body is read once, since a stream cannot be read twice.
+ */
+async function _readErrorBody(res: Response): Promise<string> {
+  let text: string;
+  try {
+    text = (await res.text()).trim();
+  } catch {
+    return `HTTP ${res.status}`;
+  }
+  return _readJsonErrorMessage(text) ?? (text === "" ? `HTTP ${res.status}` : text);
 }
 
 /**

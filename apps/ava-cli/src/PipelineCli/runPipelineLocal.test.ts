@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { runPipelineLocal } from "@ava-cli/PipelineCli/runPipelineLocal";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:child_process", () => {
   return {
@@ -11,6 +11,10 @@ vi.mock("node:child_process", () => {
 });
 
 describe("runPipelineLocal", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("passes every run option to the runner as flags", () => {
     runPipelineLocal({
       pipelineName: "socrata",
@@ -42,7 +46,7 @@ describe("runPipelineLocal", () => {
       runOptions: {},
     });
 
-    expect(vi.mocked(spawnSync).mock.calls.at(-1)?.[1]?.slice(-1)).toEqual([
+    expect(vi.mocked(spawnSync).mock.calls[0]?.[1]?.slice(-1)).toEqual([
       "hdx",
     ]);
   });
