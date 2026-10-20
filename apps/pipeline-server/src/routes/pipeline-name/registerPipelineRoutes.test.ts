@@ -1,3 +1,4 @@
+import { EtlRunOptionsError } from "@avandar/etl";
 import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import Fastify from "fastify";
@@ -190,5 +191,80 @@ describe("registerRunPipelineRoutes", () => {
 
     expect(res.statusCode).toBe(400);
     expect(vi.mocked(run)).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 and skips the run when the body has an unknown option", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { incremntal: true },
+    });
+
+    expect([
+      res.statusCode,
+      res.json().error,
+      vi.mocked(run).mock.calls.length,
+    ]).toEqual([
+      400,
+      expect.stringContaining(
+        "accepts only incremental, since, until, and limit",
+      ),
+      0,
+    ]);
+  });
+
+  it("returns 401 before checking the body when auth is missing", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      payload: { incremntal: true },
+    });
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("returns 400 with the message when the engine rejects the options", async () => {
+    vi.mocked(run).mockRejectedValue(
+      new EtlRunOptionsError(
+        "The wdi pipeline does not support incremental runs.",
+      ),
+    );
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { incremental: true },
+    });
+
+    expect([res.statusCode, res.json()]).toEqual([
+      400,
+      {
+        ok: false,
+        error: "The wdi pipeline does not support incremental runs.",
+      },
+    ]);
+  });
+
+  it("returns 500 with the message when the run fails for another reason", async () => {
+    vi.mocked(run).mockRejectedValue(new Error("Source is down."));
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+    });
+
+    expect([res.statusCode, res.json()]).toEqual([
+      500,
+      { ok: false, error: "Source is down." },
+    ]);
   });
 });

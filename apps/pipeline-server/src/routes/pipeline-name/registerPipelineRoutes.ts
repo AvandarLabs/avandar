@@ -61,41 +61,85 @@ async function _requireRunAuth(options: {
   return undefined;
 }
 
+/**
+ * The run body's shape. Unknown keys are rejected, so a typo such as
+ * `incremntal` answers 400 instead of silently running in full. This uses
+ * `propertyNames`, not `additionalProperties: false`, because Fastify's
+ * default Ajv option `removeAdditional: true` would delete the unknown key
+ * and let the run through. Values are left untyped here:
+ * `parsePipelineRunOptions` validates them.
+ */
+const RUN_BODY_SCHEMA = {
+  type: "object",
+  propertyNames: { enum: ["incremental", "since", "until", "limit"] },
+} as const;
+
+/** The engine's options error, matched by name in case it loads twice. */
+const ETL_RUN_OPTIONS_ERROR_NAME = "EtlRunOptionsError";
+
+function _getRunErrorStatus(error: unknown): 400 | 500 {
+  return error instanceof Error && error.name === ETL_RUN_OPTIONS_ERROR_NAME
+    ? 400
+    : 500;
+}
+
+async function _runPipeline(
+  request: RunPipelineRequest,
+  reply: FastifyReply,
+): Promise<FastifyReply> {
+  if (request.validationError) {
+    return await reply.status(400).send({
+      ok: false,
+      error: `The run body accepts only incremental, since, until, and limit. ${request.validationError.message}`,
+    });
+  }
+
+  let options: PipelineRunOptions;
+  try {
+    options = parsePipelineRunOptions(request.body ?? {});
+  } catch (error: unknown) {
+    const message: string =
+      error instanceof Error ? error.message : "Invalid run options.";
+    return await reply.status(400).send({ ok: false, error: message });
+  }
+
+  try {
+    const result: string = await run({
+      pipelineName: request.params.pipelineName,
+      ...options,
+    });
+
+    reply.type("text/plain; charset=utf-8");
+    return await reply.send(result);
+  } catch (error: unknown) {
+    const message: string =
+      error instanceof Error ? error.message : "Unknown error";
+
+    return await reply.status(_getRunErrorStatus(error)).send({
+      ok: false,
+      error: message,
+    });
+  }
+}
+
+/**
+ * Registers `POST /:pipelineName/run`. Auth is checked before the body is
+ * validated, so an unauthenticated caller gets 401 whatever it sends.
+ * Invalid options answer 400, and the pipeline does not run.
+ */
 export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
   server.post(
     "/:pipelineName/run",
-    async (request: RunPipelineRequest, reply: FastifyReply) => {
-      const authError = await _requireRunAuth({ request, reply });
-      if (authError) {
+    {
+      schema: { body: RUN_BODY_SCHEMA },
+      attachValidation: true,
+      preValidation: async (request, reply) => {
+        const authError = await _requireRunAuth({ request, reply });
+        // A request with no body is a full run, so it validates as `{}`.
+        request.body ??= {};
         return authError;
-      }
-
-      let options: PipelineRunOptions;
-      try {
-        options = parsePipelineRunOptions(request.body ?? {});
-      } catch (error: unknown) {
-        const message: string =
-          error instanceof Error ? error.message : "Invalid run options.";
-        return await reply.status(400).send({ ok: false, error: message });
-      }
-
-      try {
-        const result: string = await run({
-          pipelineName: request.params.pipelineName,
-          ...options,
-        });
-
-        reply.type("text/plain; charset=utf-8");
-        return await reply.send(result);
-      } catch (error: unknown) {
-        const message: string =
-          error instanceof Error ? error.message : "Unknown error";
-
-        return await reply.status(500).send({
-          ok: false,
-          error: message,
-        });
-      }
+      },
     },
+    _runPipeline,
   );
 };

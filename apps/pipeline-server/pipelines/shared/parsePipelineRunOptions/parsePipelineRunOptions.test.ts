@@ -63,6 +63,22 @@ describe("parsePipelineRunOptions", () => {
     }).toThrow("timezone");
   });
 
+  it.each([
+    "2026-02-30T00:00:00Z",
+    "2026-10-01T24:00:00Z",
+    "2026-13-01T00:00Z",
+  ])("rejects %s, which rolls over to another date", (since) => {
+    expect(() => {
+      return parsePipelineRunOptions({ since });
+    }).toThrow("timezone");
+  });
+
+  it("accepts a timestamp with fractional seconds and a negative offset", () => {
+    expect(
+      parsePipelineRunOptions({ until: "2026-09-30T19:00:00.000-05:00" }).until,
+    ).toEqual(new Date(SINCE));
+  });
+
   it("rejects a since at or after until", () => {
     expect(() => {
       return parsePipelineRunOptions({ since: UNTIL, until: UNTIL });
@@ -74,6 +90,15 @@ describe("parsePipelineRunOptions", () => {
       return parsePipelineRunOptions({ limit: 0 });
     }).toThrow("positive integer");
   });
+
+  it.each(["0x10", "1e3", " 5", "5.0", "-1"])(
+    "rejects the limit string %j, which is not plain digits",
+    (limit) => {
+      expect(() => {
+        return parsePipelineRunOptions({ limit });
+      }).toThrow("positive integer");
+    },
+  );
 
   it("rejects an incremental flag that is not a boolean", () => {
     expect(() => {

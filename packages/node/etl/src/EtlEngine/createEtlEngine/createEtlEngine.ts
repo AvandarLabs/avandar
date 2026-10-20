@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { promiseReduce } from "@avandar/utils";
 import { crawlDrive } from "@etl/EtlEngine/crawlDrive/crawlDrive";
 import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
+import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import { createSupabaseListingsStore } from "@etl/stores/SupabaseListingsStore/createSupabaseListingsStore";
 import { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 import { createClient } from "@supabase/supabase-js";
@@ -31,13 +32,19 @@ function _assertCanRun<TDrive, TConnection>(args: {
 }): void {
   const { config, options } = args;
   if (options.mode === "incremental" && config.incremental === undefined) {
-    throw new Error(
+    throw new EtlRunOptionsError(
       `The ${config.name} pipeline does not support incremental runs.`,
+    );
+  }
+  const hasWindow = options.since !== undefined || options.until !== undefined;
+  if (hasWindow && config.incremental === undefined) {
+    throw new EtlRunOptionsError(
+      `The ${config.name} pipeline does not support --since or --until, because its sources carry no modification time.`,
     );
   }
   const { limit } = options;
   if (limit !== undefined && !(Number.isInteger(limit) && limit >= 0)) {
-    throw new Error(
+    throw new EtlRunOptionsError(
       `The ${config.name} pipeline got a limit of ${limit}, but a limit must be an integer of 0 or more.`,
     );
   }

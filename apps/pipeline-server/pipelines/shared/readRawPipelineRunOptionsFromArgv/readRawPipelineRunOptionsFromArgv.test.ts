@@ -21,8 +21,32 @@ describe("readRawPipelineRunOptionsFromArgv", () => {
     ).toBe("2026-10-01T00:00:00Z");
   });
 
-  it("reads a flag with no value as an empty string, so parsing rejects it", () => {
-    expect(readRawPipelineRunOptionsFromArgv(["--since"]).since).toBe("");
+  it("reads --name=value as well as --name value", () => {
+    expect(readRawPipelineRunOptionsFromArgv(["--limit=5"]).limit).toBe("5");
+  });
+
+  it("throws for a flag with no value", () => {
+    expect(() => {
+      return readRawPipelineRunOptionsFromArgv(["--since"]);
+    }).toThrow("--since");
+  });
+
+  it("throws for an unknown flag, such as a misspelled --incremental", () => {
+    expect(() => {
+      return readRawPipelineRunOptionsFromArgv(["--incremetal"]);
+    }).toThrow("--incremetal");
+  });
+
+  it("throws for a flag given twice", () => {
+    expect(() => {
+      return readRawPipelineRunOptionsFromArgv(["--limit", "5", "--limit=6"]);
+    }).toThrow("--limit more than once");
+  });
+
+  it("throws for a stray positional argument", () => {
+    expect(() => {
+      return readRawPipelineRunOptionsFromArgv(["5"]);
+    }).toThrow();
   });
 
   it("leaves every option unset when no flag is given", () => {

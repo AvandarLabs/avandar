@@ -25,6 +25,34 @@ function _loadPipelinesEnvFile(rootDir: string): void {
   }
 }
 
+/** The engine's options error, matched by name in case it loads twice. */
+const _ETL_RUN_OPTIONS_ERROR_NAME = "EtlRunOptionsError";
+
+/** Prints why the options were rejected and the usage line, then exits 1. */
+function _exitWithUsage(error: unknown): never {
+  console.error(error instanceof Error ? error.message : String(error));
+  console.error(_USAGE);
+  process.exit(1);
+}
+
+/**
+ * Runs the pipeline. An `EtlRunOptionsError` exits with its message and the
+ * usage line, with no stack trace. Any other error is rethrown.
+ */
+async function _runPipeline(
+  run: (options: PipelineRunOptions) => Promise<string>,
+  options: PipelineRunOptions,
+): Promise<string> {
+  try {
+    return await run(options);
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === _ETL_RUN_OPTIONS_ERROR_NAME) {
+      _exitWithUsage(error);
+    }
+    throw error;
+  }
+}
+
 /**
  * Loads `apps/pipeline-server/pipelines/<name>/run.ts` and prints the return
  * value of `run()` (pipeline run id) as the last line of stdout.
@@ -41,9 +69,7 @@ async function main(): Promise<void> {
       readRawPipelineRunOptionsFromArgv(optionArgs),
     );
   } catch (error: unknown) {
-    console.error(error instanceof Error ? error.message : String(error));
-    console.error(_USAGE);
-    process.exit(1);
+    _exitWithUsage(error);
   }
 
   const rootDir = fileURLToPath(new URL("..", import.meta.url));
@@ -66,7 +92,7 @@ async function main(): Promise<void> {
 
   const moduleUrl = pathToFileURL(runPath).href;
   const { run } = await import(moduleUrl);
-  const pipelineRunId: string = await run(options);
+  const pipelineRunId = await _runPipeline(run, options);
   console.log(pipelineRunId);
 }
 

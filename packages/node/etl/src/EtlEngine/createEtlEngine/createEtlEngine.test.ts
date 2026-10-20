@@ -1,5 +1,6 @@
 import { createEtlEngine } from "@etl/EtlEngine/createEtlEngine/createEtlEngine";
 import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
+import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
 import { createInMemoryListingsStore } from "@etl/stores/InMemoryListingsStore/createInMemoryListingsStore";
 import { describe, expect, it, vi } from "vitest";
@@ -932,19 +933,46 @@ describe("createEtlEngine", () => {
     it("rejects an incremental run without incremental config before listing drives", async () => {
       const recorder = _recorder();
 
-      await expect(
-        _run(
+      const run = _run(
+        _config({
+          drives: [_drive("a", [[]])],
+          recorder,
+          stores: _stores(),
+          isIncremental: false,
+        }),
+        { mode: "incremental" },
+      );
+
+      await expect(run).rejects.toThrow(EtlRunOptionsError);
+      await expect(run).rejects.toThrow("does not support incremental runs");
+      expect(recorder.events).toEqual([]);
+    });
+
+    it.each([
+      ["since", { since: new Date("2026-10-01T00:00:00Z") }],
+      ["until", { until: new Date("2026-10-15T00:00:00Z") }],
+    ])(
+      "rejects a %s window without incremental config before listing drives",
+      async (_name, window) => {
+        const recorder = _recorder();
+
+        const run = _run(
           _config({
             drives: [_drive("a", [[]])],
             recorder,
             stores: _stores(),
             isIncremental: false,
           }),
-          { mode: "incremental" },
-        ),
-      ).rejects.toThrow("does not support incremental runs");
-      expect(recorder.events).toEqual([]);
-    });
+          { mode: "full", ...window },
+        );
+
+        await expect(run).rejects.toThrow(EtlRunOptionsError);
+        await expect(run).rejects.toThrow(
+          "does not support --since or --until",
+        );
+        expect(recorder.events).toEqual([]);
+      },
+    );
 
     it("rejects missing Supabase credentials before listing drives", async () => {
       const recorder = _recorder();
@@ -966,16 +994,19 @@ describe("createEtlEngine", () => {
       async (limit) => {
         const recorder = _recorder();
 
-        await expect(
-          _run(
-            _config({
-              drives: [_drive("a", [[]])],
-              recorder,
-              stores: _stores(),
-            }),
-            { mode: "full", limit },
-          ),
-        ).rejects.toThrow("limit must be an integer of 0 or more");
+        const run = _run(
+          _config({
+            drives: [_drive("a", [[]])],
+            recorder,
+            stores: _stores(),
+          }),
+          { mode: "full", limit },
+        );
+
+        await expect(run).rejects.toThrow(EtlRunOptionsError);
+        await expect(run).rejects.toThrow(
+          "limit must be an integer of 0 or more",
+        );
         expect(recorder.events).toEqual([]);
       },
     );
