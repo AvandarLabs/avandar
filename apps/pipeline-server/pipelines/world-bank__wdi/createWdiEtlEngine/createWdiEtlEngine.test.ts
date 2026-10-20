@@ -1,11 +1,12 @@
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   createInMemoryListingsStore,
   createInMemoryObjectStore,
   EtlRunFailedError,
+  getEtlOutputDir,
   getEtlPipelineInputDir,
   resetEtlPathsRootForTesting,
   setEtlPathsRootForTesting,
@@ -124,6 +125,37 @@ describe("createWdiEtlEngine", () => {
       year_coverage: { min_year: 1960, max_year: 2020 },
       storage_object_path: "world-bank__wdi/datasets/WDIfootnote.parquet",
     });
+  });
+
+  it("copies only the CSVs a limited run uses, in sorted order", async () => {
+    const inputDir = getEtlPipelineInputDir(WDI_PIPELINE_NAME);
+    await mkdir(inputDir, { recursive: true });
+    await Promise.all(
+      ["WDISeries.csv", "WDICountry.csv", "WDICSV.csv"].map((filename) => {
+        return writeFile(join(inputDir, filename), "Code,Name\nA,B\n");
+      }),
+    );
+    const listings = createInMemoryListingsStore();
+
+    const report = await createWdiEtlEngine({
+      output: OUTPUT,
+      stores: { listings, objects: createInMemoryObjectStore() },
+    }).run({ mode: "full", limit: 2 });
+
+    const extractDir = getEtlOutputDir(
+      WDI_PIPELINE_NAME,
+      report.pipelineRunId,
+      "extract",
+    );
+    expect([
+      (await readdir(extractDir)).sort(),
+      listings.getRows().map((row) => {
+        return row.parquet_file_name;
+      }),
+    ]).toEqual([
+      ["WDICSV.csv", "WDICountry.csv"],
+      ["WDICSV.parquet", "WDICountry.parquet"],
+    ]);
   });
 
   it("rejects with the missing-CSV error when the input directory is empty", async () => {
