@@ -22,7 +22,9 @@ import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.ty
  * produce several rows, one per readable resource.
  * @returns The pipeline run id.
  */
-export async function run(options: PipelineRunOptions = {}): Promise<string> {
+export async function run(
+  options: PipelineRunOptions = { mode: "full" },
+): Promise<string> {
   const pipelineRunId = randomUUID();
 
   if (HDX_DRIVE === undefined) {

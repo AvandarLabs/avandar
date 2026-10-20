@@ -7,10 +7,11 @@ import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.ty
  *
  * @param options.limit - Process at most this many input CSVs.
  */
-export async function run(options: PipelineRunOptions = {}): Promise<string> {
-  const report = await createWdiEtlEngine(getPipelineEtlDestination()).run({
-    mode: "full",
-    limit: options.limit,
-  });
+export async function run(
+  options: PipelineRunOptions = { mode: "full" },
+): Promise<string> {
+  const report = await createWdiEtlEngine(getPipelineEtlDestination()).run(
+    options,
+  );
   return report.pipelineRunId;
 }

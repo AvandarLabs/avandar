@@ -32,7 +32,11 @@ export async function run(options: RunPipelineOptions): Promise<string> {
     );
   }
 
+  const { mode, since, until, limit } = options;
   return await (pipelineModule as PipelineRunModule).run({
-    limit: options.limit,
+    mode,
+    since,
+    until,
+    limit,
   });
 }

@@ -1,7 +1,9 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { parsePipelineRunLimit } from "@pipelines/shared/parsePipelineRunLimit/parsePipelineRunLimit";
+import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
+import { readRawPipelineRunOptionsFromArgv } from "@pipelines/shared/readRawPipelineRunOptionsFromArgv/readRawPipelineRunOptionsFromArgv";
+import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 
 /** Env name for ETL root; matches etl `ETL_PATHS_ROOT_ENV`. */
 const _ETL_PATHS_ROOT_ENV = "ETL_PATHS_ROOT";
@@ -9,7 +11,8 @@ const _ETL_PATHS_ROOT_ENV = "ETL_PATHS_ROOT";
 /** API keys and other secrets only pipelines use. Optional and gitignored. */
 const _PIPELINES_ENV_FILE = ".env.pipelines.local";
 
-const _USAGE = "Usage: runPipelineOnce <pipeline-name> [--limit <n>]";
+const _USAGE =
+  "Usage: runPipelineOnce <pipeline-name> [--incremental] [--since <ISO 8601>] [--until <ISO 8601>] [--limit <n>]";
 
 /**
  * Loads `.env.pipelines.local` if it exists. Variables already set (from
@@ -22,13 +25,6 @@ function _loadPipelinesEnvFile(rootDir: string): void {
   }
 }
 
-function _readLimitArg(args: readonly string[]): number | undefined {
-  const flagIndex = args.indexOf("--limit");
-  return flagIndex === -1
-    ? undefined
-    : parsePipelineRunLimit(args[flagIndex + 1] ?? "");
-}
-
 /**
  * Loads `apps/pipeline-server/pipelines/<name>/run.ts` and prints the return
  * value of `run()` (pipeline run id) as the last line of stdout.
@@ -39,7 +35,16 @@ async function main(): Promise<void> {
     console.error(_USAGE);
     process.exit(1);
   }
-  const limit = _readLimitArg(optionArgs);
+  let options: PipelineRunOptions;
+  try {
+    options = parsePipelineRunOptions(
+      readRawPipelineRunOptionsFromArgv(optionArgs),
+    );
+  } catch (error: unknown) {
+    console.error(error instanceof Error ? error.message : String(error));
+    console.error(_USAGE);
+    process.exit(1);
+  }
 
   const rootDir = fileURLToPath(new URL("..", import.meta.url));
   _loadPipelinesEnvFile(rootDir);
@@ -61,7 +66,7 @@ async function main(): Promise<void> {
 
   const moduleUrl = pathToFileURL(runPath).href;
   const { run } = await import(moduleUrl);
-  const pipelineRunId: string = await run({ limit });
+  const pipelineRunId: string = await run(options);
   console.log(pipelineRunId);
 }
 

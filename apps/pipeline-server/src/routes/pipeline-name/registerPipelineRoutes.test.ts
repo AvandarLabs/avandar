@@ -109,6 +109,7 @@ describe("registerRunPipelineRoutes", () => {
     expect(res.body).toBe("00000000-0000-4000-8000-000000000001");
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      mode: "full",
     });
   });
 
@@ -124,8 +125,57 @@ describe("registerRunPipelineRoutes", () => {
 
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
+      mode: "full",
       limit: 5,
     });
+  });
+
+  it("passes incremental, until, and limit from a JSON body to the run", async () => {
+    server = await _createServer();
+
+    await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { incremental: true, until: "2026-10-15T00:00:00Z", limit: 5 },
+    });
+
+    expect(vi.mocked(run)).toHaveBeenCalledWith({
+      pipelineName: "example-pipeline",
+      mode: "incremental",
+      until: new Date("2026-10-15T00:00:00Z"),
+      limit: 5,
+    });
+  });
+
+  it("returns 400 and skips the run when incremental and since are combined", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { incremental: true, since: "2026-10-01T00:00:00Z" },
+    });
+
+    expect([res.statusCode, vi.mocked(run).mock.calls.length]).toEqual([
+      400, 0,
+    ]);
+  });
+
+  it("returns 400 and skips the run when since has no timezone", async () => {
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+      payload: { since: "2026-10-01" },
+    });
+
+    expect([res.statusCode, vi.mocked(run).mock.calls.length]).toEqual([
+      400, 0,
+    ]);
   });
 
   it("returns 400 and skips the run when the limit is not a positive integer", async () => {

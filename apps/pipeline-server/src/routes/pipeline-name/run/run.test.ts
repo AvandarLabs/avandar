@@ -6,6 +6,7 @@ describe("run pipeline", () => {
     await expect(
       run({
         pipelineName: "missing-pipeline",
+        mode: "full",
       }),
     ).rejects.toThrow();
   });

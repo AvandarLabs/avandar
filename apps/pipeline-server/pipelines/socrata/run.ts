@@ -23,7 +23,9 @@ import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.ty
  * @param options.limit - Upsert at most this many datasets in total.
  * @returns The pipeline run id.
  */
-export async function run(options: PipelineRunOptions = {}): Promise<string> {
+export async function run(
+  options: PipelineRunOptions = { mode: "full" },
+): Promise<string> {
   const { limit } = options;
   const pipelineRunId = randomUUID();
   const supabase = createSupabaseAdminClient();
