@@ -36,26 +36,37 @@ type SocrataRawPage = Readonly<{
   /** Valid plus skipped results: the page's length in the server's order. */
   rawCount: number;
   resultSetSize: number;
-  /** Every dataset id on the page, valid or skipped. */
-  datasetIds: ReadonlySet<string>;
-  /** The ids the next page must share at least one of. */
-  overlapIds: ReadonlySet<string>;
+  /**
+   * What a previous page's overlap key can match on this page: each valid
+   * result's overlap key, and every dataset id, valid or skipped.
+   */
+  matchKeys: ReadonlySet<string>;
+  /** The keys the next page must share at least one of. */
+  overlapKeys: ReadonlySet<string>;
 }>;
 
 /**
- * The ids of a page's last `SOCRATA_PAGE_OVERLAP` raw rows. The client does
- * not say where among the valid results a skipped one sat, so this takes the
- * last `SOCRATA_PAGE_OVERLAP` valid ids plus every skipped id: a small
- * superset whenever the page skipped a result.
+ * A valid result's overlap key: its id and `updatedAt`, so a dataset that
+ * was modified and moved to the end does not count as the same row. A
+ * Socrata 4x4 id has no `@`, so a key never equals a bare id.
  */
-function _getOverlapIds(
+function _buildOverlapKey(result: SocrataDiscoveryResult): string {
+  return `${result.datasetId}@${result.updatedAt}`;
+}
+
+/**
+ * The keys of a page's last `SOCRATA_PAGE_OVERLAP` raw rows. The client does
+ * not say where among the valid results a skipped one sat, so this takes the
+ * last `SOCRATA_PAGE_OVERLAP` valid results plus every skipped result: a
+ * small superset whenever the page skipped a result. A skipped result has no
+ * reliable timestamp, so it is keyed by its bare id.
+ */
+function _getOverlapKeys(
   results: readonly SocrataDiscoveryResult[],
   skippedIds: readonly string[],
 ): ReadonlySet<string> {
-  const tailIds = results.slice(-SOCRATA_PAGE_OVERLAP).map((result) => {
-    return result.datasetId;
-  });
-  return new Set([...tailIds, ...skippedIds]);
+  const tailKeys = results.slice(-SOCRATA_PAGE_OVERLAP).map(_buildOverlapKey);
+  return new Set([...tailKeys, ...skippedIds]);
 }
 
 /**
@@ -70,15 +81,15 @@ function _getOverlapIds(
 function _assertOverlapKept(args: {
   drive: Readonly<ConfiguredDrive>;
   offset: number;
-  previousOverlapIds: ReadonlySet<string> | undefined;
-  datasetIds: ReadonlySet<string>;
+  previousOverlapKeys: ReadonlySet<string> | undefined;
+  matchKeys: ReadonlySet<string>;
 }): void {
-  const { previousOverlapIds, datasetIds } = args;
-  if (previousOverlapIds === undefined) {
+  const { previousOverlapKeys, matchKeys } = args;
+  if (previousOverlapKeys === undefined) {
     return;
   }
-  const hasOverlap = [...previousOverlapIds].some((datasetId) => {
-    return datasetIds.has(datasetId);
+  const hasOverlap = [...previousOverlapKeys].some((overlapKey) => {
+    return matchKeys.has(overlapKey);
   });
   if (!hasOverlap) {
     throw new Error(
@@ -141,13 +152,14 @@ async function _fetchPage(
     results,
     rawCount: results.length + skippedResults.length,
     resultSetSize,
-    datasetIds: new Set([
+    matchKeys: new Set([
+      ...results.map(_buildOverlapKey),
       ...results.map((result) => {
         return result.datasetId;
       }),
       ...skippedIds,
     ]),
-    overlapIds: _getOverlapIds(results, skippedIds),
+    overlapKeys: _getOverlapKeys(results, skippedIds),
   };
 }
 
@@ -155,12 +167,12 @@ async function* _pagesFrom(
   args: ExtractSocrataDriveArgs &
     Readonly<{
       offset: number;
-      previousOverlapIds: ReadonlySet<string> | undefined;
+      previousOverlapKeys: ReadonlySet<string> | undefined;
     }>,
 ): AsyncGenerator<readonly SocrataDiscoveryResult[]> {
   const limit = Math.min(SOCRATA_PAGE_SIZE, SOCRATA_MAX_RESULTS - args.offset);
   const page = await _fetchPage({ ...args, limit });
-  _assertOverlapKept({ ...args, datasetIds: page.datasetIds });
+  _assertOverlapKept({ ...args, matchKeys: page.matchKeys });
   const { results, rawCount, resultSetSize } = page;
   // The engine filters by the window too. This filter exists so the crawl
   // can stop early at `until`.
@@ -179,7 +191,7 @@ async function* _pagesFrom(
   yield* _pagesFrom({
     ...args,
     offset: args.offset + rawCount - SOCRATA_PAGE_OVERLAP,
-    previousOverlapIds: page.overlapIds,
+    previousOverlapKeys: page.overlapKeys,
   });
 }
 
@@ -196,5 +208,5 @@ async function* _pagesFrom(
 export function extractSocrataDrive(
   args: ExtractSocrataDriveArgs,
 ): AsyncGenerator<readonly SocrataDiscoveryResult[]> {
-  return _pagesFrom({ ...args, offset: 0, previousOverlapIds: undefined });
+  return _pagesFrom({ ...args, offset: 0, previousOverlapKeys: undefined });
 }

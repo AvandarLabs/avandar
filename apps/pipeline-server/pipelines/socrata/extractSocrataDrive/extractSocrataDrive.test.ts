@@ -199,6 +199,29 @@ describe("extractSocrataDrive", () => {
     );
   });
 
+  it("fails when an overlap dataset reappears only with a newer updatedAt", async () => {
+    const moveFirst21 = _modifyFirst(21);
+    const discovery = _discoveryChangingAfterFirstPage(_catalog(1500), {
+      changeCatalog: (catalog) => {
+        const moved = moveFirst21(catalog);
+        const overlapDataset = moved.find((result) => {
+          return result.datasetId === "ds-990";
+        });
+        const updatedAt = _at(2000).toISOString();
+        return [
+          ...moved.filter((result) => {
+            return result.datasetId !== "ds-990";
+          }),
+          ...(overlapDataset ? [{ ...overlapDataset, updatedAt }] : []),
+        ];
+      },
+    });
+
+    await expect(_collect(OPEN_WINDOW, discovery)).rejects.toThrow(
+      "lost its page overlap at offset 980",
+    );
+  });
+
   it("continues when fewer datasets move than the page overlap covers", async () => {
     const discovery = _discoveryChangingAfterFirstPage(_catalog(1500), {
       changeCatalog: _modifyFirst(19),
