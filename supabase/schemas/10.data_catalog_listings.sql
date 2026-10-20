@@ -30,8 +30,8 @@ create table public.data_catalog_listings (
   -- Name of the pipeline that last wrote this listing. Null on a listing no
   -- pipeline produces, such as a hand-curated `api_resource` listing.
   pipeline_name text,
-  -- ID of the pipeline run that last wrote this listing. Null whenever
-  -- `pipeline_name` is.
+  -- ID of the pipeline run that last wrote this listing, when a pipeline wrote
+  -- it.
   pipeline_run_id text,
   -- External organization this dataset comes from (e.g. World Bank)
   external_organization_name text not null,

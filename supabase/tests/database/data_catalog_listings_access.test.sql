@@ -13,8 +13,9 @@ begin;
 select plan(26);
 
 -- ---------------------------------------------------------------------------
--- The three pipeline columns become nullable, because only a pipeline-produced
--- listing has a Parquet object and a pipeline run behind it.
+-- The three pipeline columns become nullable. A Parquet pipeline listing must
+-- name its pipeline and run, while an API listing may, and has no Parquet
+-- object.
 -- ---------------------------------------------------------------------------
 
 select col_is_null(
