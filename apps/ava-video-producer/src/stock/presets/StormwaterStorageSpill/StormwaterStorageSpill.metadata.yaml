@@ -1,0 +1,100 @@
+name:
+  id: motionAtlas.stormwater-storage-spill.name
+  message: Hold water, show the spill
+description:
+  id: motionAtlas.stormwater-storage-spill.description
+  message: A local cutaway routes a bounded stormwater volume through infiltration,
+    controlled discharge and finite detention. Any remaining water visibly spills
+    instead of disappearing.
+category:
+  id: motionAtlas.stormwater-storage-spill.category
+  message: Terrain cutaway with overflow crest
+useWhen:
+  id: motionAtlas.stormwater-storage-spill.useWhen
+  message: Make the limit of an adaptation measure visible alongside the water it manages.
+prompt:
+  id: motionAtlas.stormwater-storage-spill.prompt
+  message: Reveal a schematic street and basin with a marked storage lip. At the operator
+    cue, the supplied inflow divides into infiltration, controlled outflow and detention
+    compartments. Once detention reaches its capacity, the remaining water crosses a
+    distinct overflow crest. Hold all destinations with an explicit conserved-volume
+    equation before fading.
+creativeDirection:
+  id: motionAtlas.stormwater-storage-spill.creativeDirection
+  message: Reveal a schematic street and basin with a marked storage lip. At the operator
+    cue, the supplied inflow divides into infiltration, controlled outflow and detention
+    compartments. Once detention reaches its capacity, the remaining water crosses a
+    distinct overflow crest. Hold all destinations with an explicit conserved-volume
+    equation before fading.
+intent:
+  id: motionAtlas.stormwater-storage-spill.intent
+  message: Make the limit of an adaptation measure visible alongside the water it manages.
+distinction:
+  id: motionAtlas.stormwater-storage-spill.distinction
+  message: A vessel physically reaches capacity and activates a spill path. This explains
+    a finite storage boundary rather than a generic stream or state progression.
+tags:
+  - id: motionAtlas.stormwater-storage-spill.tags.0
+    message: flood adaptation
+  - id: motionAtlas.stormwater-storage-spill.tags.1
+    message: stormwater
+  - id: motionAtlas.stormwater-storage-spill.tags.2
+    message: detention basin
+  - id: motionAtlas.stormwater-storage-spill.tags.3
+    message: retention capacity
+  - id: motionAtlas.stormwater-storage-spill.tags.4
+    message: overflow
+  - id: motionAtlas.stormwater-storage-spill.tags.5
+    message: infiltration
+  - id: motionAtlas.stormwater-storage-spill.tags.6
+    message: urban resilience
+  - id: motionAtlas.stormwater-storage-spill.tags.7
+    message: water balance
+goodFor:
+  - id: motionAtlas.stormwater-storage-spill.goodFor.0
+    message: Explain finite stormwater storage and overflow
+  - id: motionAtlas.stormwater-storage-spill.goodFor.1
+    message: Introduce a supplied event water balance
+  - id: motionAtlas.stormwater-storage-spill.goodFor.2
+    message: Show what an outlet operating choice accounts for
+domains:
+  - id: motionAtlas.stormwater-storage-spill.domains.0
+    message: Terrain cutaway with overflow crest
+aliases:
+  - id: motionAtlas.stormwater-storage-spill.aliases.0
+    message: flood adaptation
+  - id: motionAtlas.stormwater-storage-spill.aliases.1
+    message: stormwater
+  - id: motionAtlas.stormwater-storage-spill.aliases.2
+    message: detention basin
+notFor:
+  - id: motionAtlas.stormwater-storage-spill.notFor.0
+    message: The basin begins empty. Incoming = infiltrated + controlled discharge + final
+      detention + overflow; no water is deleted or counted in two destinations.
+  - id: motionAtlas.stormwater-storage-spill.notFor.1
+    message: Inputs describe aggregate event volumes, not simultaneous flow rates. Terrain,
+      drainage capacity, soil and downstream risk are not simulated.
+  - id: motionAtlas.stormwater-storage-spill.notFor.2
+    message: The scene does not claim flood prevention or predict a real flood extent.
+      Defaults and local geography are fictional.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.stormwater-storage-spill.motionBeats.0
+      message: Reveal the supplied quantities and their physical boundary.
+  - startFrame: 36
+    endFrame: 108
+    description:
+      id: motionAtlas.stormwater-storage-spill.motionBeats.1
+      message: Reveal a schematic street and basin with a marked storage lip. At the operator
+        cue, the supplied inflow divides into infiltration, controlled outflow and
+        detention compartments. Once detention reaches its capacity, the remaining water
+        crosses a distinct overflow crest. Hold all destinations with an explicit
+        conserved-volume equation before fading.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.stormwater-storage-spill.motionBeats.2
+      message: Hold conserved quantities and visible destinations. The outer envelope returns
+        to ground.

@@ -1,0 +1,153 @@
+name:
+  id: motionAtlas.saved-seed-season-return.name
+  message: Save seed for the next planting
+description:
+  id: motionAtlas.saved-seed-season-return.description
+  message: A household or cooperative chooses how much of its supplied harvest to retain
+    as seed. The same seed lot crosses a fallow interval and returns to the same plot
+    for sowing, with current use, recorded storage loss, and remaining seed kept
+    visible.
+category:
+  id: motionAtlas.saved-seed-season-return.category
+  message: Seasonal livelihood continuity
+useWhen:
+  id: motionAtlas.saved-seed-season-return.useWhen
+  message: Explain how retaining part of a harvest connects one season's work to the next
+    planting without promising a future yield.
+prompt:
+  id: motionAtlas.saved-seed-season-return.prompt
+  message: Frames 0-11 reveal a schematic plot, harvested crop on a mat, and its named
+    cultivator. Frames 12-48 show the cultivator sliding a chosen portion into a seed
+    jar while the current-use portion stays on the mat. Frames 49-100 first close the
+    jar as the backdrop changes to fallow ground. Only nonzero supplied storage loss
+    briefly reopens it for extraction into the visible tray; the full loss portion
+    clears before a smooth reclosure completed before frame 101. With zero loss, the
+    storage jar stays closed after its initial closure. Frames 101-144 reopen the same
+    jar as the cultivator draws a furrow in the same plot and sows the supplied amount.
+    Frames 145-167 hold the sown furrow, remaining seed, current-use portion, and loss
+    tray together. No sprouts or next harvest appear. Frames 168-179 fade to the common
+    opaque ground for the six-second seam.
+creativeDirection:
+  id: motionAtlas.saved-seed-season-return.creativeDirection
+  message: Frames 0-11 reveal a schematic plot, harvested crop on a mat, and its named
+    cultivator. Frames 12-48 show the cultivator sliding a chosen portion into a seed
+    jar while the current-use portion stays on the mat. Frames 49-100 first close the
+    jar as the backdrop changes to fallow ground. Only nonzero supplied storage loss
+    briefly reopens it for extraction into the visible tray; the full loss portion
+    clears before a smooth reclosure completed before frame 101. With zero loss, the
+    storage jar stays closed after its initial closure. Frames 101-144 reopen the same
+    jar as the cultivator draws a furrow in the same plot and sows the supplied amount.
+    Frames 145-167 hold the sown furrow, remaining seed, current-use portion, and loss
+    tray together. No sprouts or next harvest appear. Frames 168-179 fade to the common
+    opaque ground for the six-second seam.
+intent:
+  id: motionAtlas.saved-seed-season-return.intent
+  message: Explain how retaining part of a harvest connects one season's work to the next
+    planting without promising a future yield.
+distinction:
+  id: motionAtlas.saved-seed-season-return.distinction
+  message: The same cultivator sets aside part of its own harvest and returns that
+    physical seed to the same plot after a visible fallow interval. Its defining action
+    is seasonal reuse as planting material, not donor allocation, replenishing retail
+    shelves, a service handoff, or movement through pipeline boxes. Unlike
+    battery-dispatch-balance, the material is placed into cultivated soil and the scene
+    deliberately leaves biological outcomes unshown. No delivery, purchase, or new
+    external stock restores the jar.
+tags:
+  - id: motionAtlas.saved-seed-season-return.tags.0
+    message: seed saving
+  - id: motionAtlas.saved-seed-season-return.tags.1
+    message: seed retention
+  - id: motionAtlas.saved-seed-season-return.tags.2
+    message: agricultural livelihoods
+  - id: motionAtlas.saved-seed-season-return.tags.3
+    message: harvest
+  - id: motionAtlas.saved-seed-season-return.tags.4
+    message: planting season
+  - id: motionAtlas.saved-seed-season-return.tags.5
+    message: fallow interval
+  - id: motionAtlas.saved-seed-season-return.tags.6
+    message: household choice
+  - id: motionAtlas.saved-seed-season-return.tags.7
+    message: cooperative
+  - id: motionAtlas.saved-seed-season-return.tags.8
+    message: sowing
+  - id: motionAtlas.saved-seed-season-return.tags.9
+    message: seed storage
+goodFor:
+  - id: motionAtlas.saved-seed-season-return.goodFor.0
+    message: Explain a household's choice to retain seed from its own harvest
+  - id: motionAtlas.saved-seed-season-return.goodFor.1
+    message: Show how a cooperative carries a seed lot between agricultural seasons
+  - id: motionAtlas.saved-seed-season-return.goodFor.2
+    message: Distinguish seed reserved, seed actually sown, and seed remaining
+notFor:
+  - id: motionAtlas.saved-seed-season-return.notFor.0
+    message: One crop, one decision maker, one schematic plot, and one harvest-to-planting
+      interval. No real geography, household demographics, or cooperative membership
+      count is inferred.
+  - id: motionAtlas.saved-seed-season-return.notFor.1
+    message: All material quantities are supplied or exact balance differences. The final
+      balance is harvest = current use + storage loss + sown seed + remaining seed.
+      Reservation is an intermediate subtotal, not an extra destination.
+  - id: motionAtlas.saved-seed-season-return.notFor.2
+    message: The seed glyphs illustrate the material and are not individual seeds, yield
+      units, or counts of plants. Material bands use one common mass scale across the
+      mat, jar, tray, and furrow; labels provide precise quantities.
+  - id: motionAtlas.saved-seed-season-return.notFor.3
+    message: Zero reservation leaves the jar empty and suppresses sowing. Zero storage loss
+      leaves a labeled empty loss tray. Zero sowing keeps usable seed in storage. These
+      cases never receive invented motion suggesting use.
+  - id: motionAtlas.saved-seed-season-return.notFor.4
+    message: This is neither seed-storage advice nor a germination, food-security, income,
+      or efficacy claim. Storage practices, viability, weather, harvest costs, and the
+      next yield are outside the scene. The supplied storage loss is recorded, never
+      estimated from duration.
+  - id: motionAtlas.saved-seed-season-return.notFor.5
+    message: Sowing concludes the narrative. The editorial loop fades out before returning
+      to the earlier harvest and does not imply that the sown seed immediately produced
+      that harvest. All visible text comes from the supplied inputs or formatted
+      quantities.
+domains:
+  - id: motionAtlas.saved-seed-season-return.domains.0
+    message: Seasonal livelihood continuity
+aliases:
+  - id: motionAtlas.saved-seed-season-return.aliases.0
+    message: seed saving
+  - id: motionAtlas.saved-seed-season-return.aliases.1
+    message: seed retention
+  - id: motionAtlas.saved-seed-season-return.aliases.2
+    message: agricultural livelihoods
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.saved-seed-season-return.beat.0
+      message: Reveal the plot, harvest mat and cultivator.
+  - startFrame: 12
+    endFrame: 48
+    description:
+      id: motionAtlas.saved-seed-season-return.beat.1
+      message: Move the reserved portion into the open jar with the cultivator hand.
+  - startFrame: 49
+    endFrame: 100
+    description:
+      id: motionAtlas.saved-seed-season-return.beat.2
+      message: Close the jar for storage. Only nonzero supplied loss briefly opens it for
+        extraction, with full clearance and smooth reclosure before planting at frame
+        101. Zero-loss storage stays closed.
+  - startFrame: 101
+    endFrame: 144
+    description:
+      id: motionAtlas.saved-seed-season-return.beat.3
+      message: Reopen the same jar and sow the supplied amount into the same plot.
+  - startFrame: 145
+    endFrame: 167
+    description:
+      id: motionAtlas.saved-seed-season-return.beat.4
+      message: Hold current use, loss, sown seed and remaining seed.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.saved-seed-season-return.beat.5
+      message: Fade to the common opaque ground without germination or a new harvest.

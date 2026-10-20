@@ -1,0 +1,112 @@
+name:
+  id: motionAtlas.shared-workshop-booking.name
+  message: Agree who uses the shared machine when
+description:
+  id: motionAtlas.shared-workshop-booking.description
+  message: Two or three livelihood participants resolve a supplied overlap in requests for
+    one shared machine. Their agreed bookings become separate usage windows while the
+    machine itself remains a single finite resource.
+category:
+  id: motionAtlas.shared-workshop-booking.category
+  message: Finite equipment and negotiated time
+useWhen:
+  id: motionAtlas.shared-workshop-booking.useWhen
+  message: Show how people share one productive asset by agreeing distinct times.
+prompt:
+  id: motionAtlas.shared-workshop-booking.prompt
+  message: Show one sewing machine beside a compact time ruler, with the supplied
+    participant request strips overlapping above it. The participants slide only the
+    authored changed strips into their agreed non-overlapping windows and place
+    agreement tabs. A short physical turn at the same machine is shown for each booked
+    participant in order, with the others' named strips remaining visible. Hold the one
+    machine and the agreed schedule; unresolved requests stay above the ruler rather
+    than masquerading as bookings.
+creativeDirection:
+  id: motionAtlas.shared-workshop-booking.creativeDirection
+  message: Show one sewing machine beside a compact time ruler, with the supplied
+    participant request strips overlapping above it. The participants slide only the
+    authored changed strips into their agreed non-overlapping windows and place
+    agreement tabs. A short physical turn at the same machine is shown for each booked
+    participant in order, with the others' named strips remaining visible. Hold the one
+    machine and the agreed schedule; unresolved requests stay above the ruler rather
+    than masquerading as bookings.
+intent:
+  id: motionAtlas.shared-workshop-booking.intent
+  message: Show how people share one productive asset by agreeing distinct times.
+distinction:
+  id: motionAtlas.shared-workshop-booking.distinction
+  message: The participants negotiate contention over a physical machine that remains
+    single, then occupy it at separate authored times. Unlike queue-relief, capacity
+    never increases; unlike schedule-buffer, no deadline reserve absorbs a delay; unlike
+    priority-insertion, the change is a mutually agreed reservation rather than imposed
+    precedence.
+tags:
+  - id: motionAtlas.shared-workshop-booking.tags.0
+    message: livelihood support
+  - id: motionAtlas.shared-workshop-booking.tags.1
+    message: shared equipment
+  - id: motionAtlas.shared-workshop-booking.tags.2
+    message: workshop booking
+  - id: motionAtlas.shared-workshop-booking.tags.3
+    message: sewing machine
+  - id: motionAtlas.shared-workshop-booking.tags.4
+    message: resource scheduling
+  - id: motionAtlas.shared-workshop-booking.tags.5
+    message: participant negotiation
+  - id: motionAtlas.shared-workshop-booking.tags.6
+    message: cooperative
+  - id: motionAtlas.shared-workshop-booking.tags.7
+    message: time slots
+goodFor:
+  - id: motionAtlas.shared-workshop-booking.goodFor.0
+    message: Explaining scheduling for a shared livelihood asset
+  - id: motionAtlas.shared-workshop-booking.goodFor.1
+    message: Showing a negotiated solution to simultaneous equipment demand
+  - id: motionAtlas.shared-workshop-booking.goodFor.2
+    message: Distinguishing a request from an agreed reservation
+notFor:
+  - id: motionAtlas.shared-workshop-booking.notFor.0
+    message: This is a small authored schedule, not an allocation algorithm or a
+      demonstration of fair access at scale.
+  - id: motionAtlas.shared-workshop-booking.notFor.1
+    message: No revenue, employment or productivity outcome is implied by a booked or
+      illustrated equipment turn.
+  - id: motionAtlas.shared-workshop-booking.notFor.2
+    message: A null agreed slot stays unresolved and never receives a use gesture.
+domains:
+  - id: motionAtlas.shared-workshop-booking.domains.0
+    message: Finite equipment and negotiated time
+aliases:
+  - id: motionAtlas.shared-workshop-booking.aliases.0
+    message: livelihood support
+  - id: motionAtlas.shared-workshop-booking.aliases.1
+    message: shared equipment
+  - id: motionAtlas.shared-workshop-booking.aliases.2
+    message: workshop booking
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.shared-workshop-booking.beat.0
+      message: Establish the authored people, objects and supplied starting state.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.shared-workshop-booking.beat.1
+      message: Show one sewing machine beside a compact time ruler, with the supplied
+        participant request strips overlapping above it. The participants slide only the
+        authored changed strips into their agreed non-overlapping windows and place
+        agreement tabs. A short physical turn at the same machine is shown for each
+        booked participant in order, with the others' named strips remaining visible.
+        Hold the one machine and the agreed schedule; unresolved requests stay above the
+        ruler rather than masquerading as bookings.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.shared-workshop-booking.beat.2
+      message: Hold the supplied result, identities and limits.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.shared-workshop-booking.beat.3
+      message: The shared opaque envelope fades the illustration for its loop seam.

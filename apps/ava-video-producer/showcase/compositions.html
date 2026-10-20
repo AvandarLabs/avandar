@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>Motion Atlas</title></head>
+  <body><script>
+    const parameters = new URLSearchParams(location.search);
+    if (!parameters.has("section")) parameters.set("section", "compositions");
+    location.replace(`motion.html?${parameters}${location.hash}`);
+  </script><a href="motion.html?section=compositions">Open Motion Atlas</a></body>
+</html>

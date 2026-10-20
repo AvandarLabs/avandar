@@ -1,0 +1,115 @@
+name:
+  id: motionAtlas.protected-work-boundary.name
+  message: Keep protected time inside a finite schedule
+description:
+  id: motionAtlas.protected-work-boundary.description
+  message: A worker declines to squeeze a new request into a protected time block. The
+    request moves to a visible deferred tray, or to an explicitly available work block,
+    while the schedule retains its original size.
+category:
+  id: motionAtlas.protected-work-boundary.category
+  message: Work and wellbeing
+useWhen:
+  id: motionAtlas.protected-work-boundary.useWhen
+  message: Make a work boundary concrete without claiming a productivity or health effect.
+intent:
+  id: motionAtlas.protected-work-boundary.intent
+  message: Make a work boundary concrete without claiming a productivity or health effect.
+creativeDirection:
+  id: motionAtlas.protected-work-boundary.creativeDirection
+  message: Frames 12..38 reveal one fixed strip of equal time blocks containing existing
+    commitments and protected rest, learning or community time. Frames 39..76 bring a
+    new request toward its named protected block. The worker lifts the request away
+    before it covers that block. Frames 77..130 place it in the deferred tray or the
+    supplied empty work slot. Frames 131..167 hold the unchanged protected blocks,
+    retained commitments and visible request disposition. Never stretch the strip or
+    accelerate existing work to create room. Use deterministic frame-driven React/SVG at
+    960x600, 180 frames and 30 fps, with the shared palette. Reveal during frames 0..11
+    and fade to the common opaque ground during frames 168..179.
+distinction:
+  id: motionAtlas.protected-work-boundary.distinction
+  message: Unlike schedule-buffer, no interruption consumes reserve time. Unlike
+    person-led-support-calendar, the central decision can leave work deliberately
+    unscheduled, preserving a finite workload boundary instead of finding a new
+    appointment.
+prompt:
+  id: motionAtlas.protected-work-boundary.prompt
+  message: A worker declines to squeeze a new request into a protected time block. The
+    request moves to a visible deferred tray, or to an explicitly available work block,
+    while the schedule retains its original size.
+tags:
+  - id: motionAtlas.protected-work-boundary.tags.0
+    message: sustainable work
+  - id: motionAtlas.protected-work-boundary.tags.1
+    message: protected time
+  - id: motionAtlas.protected-work-boundary.tags.2
+    message: capacity
+  - id: motionAtlas.protected-work-boundary.tags.3
+    message: rest
+  - id: motionAtlas.protected-work-boundary.tags.4
+    message: learning
+  - id: motionAtlas.protected-work-boundary.tags.5
+    message: community
+  - id: motionAtlas.protected-work-boundary.tags.6
+    message: deferral
+goodFor:
+  - id: motionAtlas.protected-work-boundary.goodFor.0
+    message: Explain finite capacity without glorifying overtime
+  - id: motionAtlas.protected-work-boundary.goodFor.1
+    message: Show personal control over protected learning time
+  - id: motionAtlas.protected-work-boundary.goodFor.2
+    message: Depict an explicit deferral rather than invisible extra work
+domains:
+  - id: motionAtlas.protected-work-boundary.domains.0
+    message: Work and wellbeing
+aliases:
+  - id: motionAtlas.protected-work-boundary.aliases.0
+    message: sustainable work
+  - id: motionAtlas.protected-work-boundary.aliases.1
+    message: protected time
+  - id: motionAtlas.protected-work-boundary.aliases.2
+    message: capacity
+notFor:
+  - id: motionAtlas.protected-work-boundary.notFor.0
+    message: This is an authored scheduling decision, not a clinical burnout model or a
+      claim about productivity.
+  - id: motionAtlas.protected-work-boundary.notFor.1
+    message: Rest, learning and community time are illustrative categories. The animation
+      does not reproduce any company leave or working-hours policy.
+  - id: motionAtlas.protected-work-boundary.notFor.2
+    message: A deferred request remains outstanding. Deferral does not assign it to someone
+      else or invent future capacity.
+  - id: motionAtlas.protected-work-boundary.notFor.3
+    message: Free prose is author supplied; only structural, reference, numeric and
+      documented lexical constraints are runtime-validated.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.protected-work-boundary.beats.0
+      message: Reveal the authored scene.
+  - startFrame: 12
+    endFrame: 38
+    description:
+      id: motionAtlas.protected-work-boundary.beats.1
+      message: Reveal the fixed strip and its existing commitments.
+  - startFrame: 39
+    endFrame: 76
+    description:
+      id: motionAtlas.protected-work-boundary.beats.2
+      message: The worker lifts the incoming request clear of protected time.
+  - startFrame: 77
+    endFrame: 130
+    description:
+      id: motionAtlas.protected-work-boundary.beats.3
+      message: Move the request to the deferred tray or supplied empty work block.
+  - startFrame: 131
+    endFrame: 167
+    description:
+      id: motionAtlas.protected-work-boundary.beats.4
+      message: Hold unchanged commitments and the visible outstanding request.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.protected-work-boundary.beats.5
+      message: Return to the common opaque ground.

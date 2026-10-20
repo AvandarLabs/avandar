@@ -1,3 +1,4 @@
+import { StockRect } from "../primitives/StockRect/StockRect";
 import { EASE, ramp } from "../../motion";
 import {
   Arrive,
@@ -9,23 +10,35 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { DataPipelineInput } from "../presets/DataPipeline/DataPipeline.schema";
+import type { ReactNode } from "react";
 
-const PIPELINE_STAGES = [
-  { label: "Collect", detail: "Sources", x: 64 },
-  { label: "Transform", detail: "Rules", x: 284 },
-  { label: "Validate", detail: "Checks", x: 504 },
-  { label: "Deliver", detail: "Destination", x: 724 },
-] as const;
+type Props = GraphicProps & { input: DataPipelineInput };
 
-export function DataPipeline({ frame, accent }: GraphicProps) {
-  const progress = ramp(frame, 30, 92, EASE.inOut) * 4;
+/** Draws the bounded authored data-pipeline study at an explicit frame. */
+export function DataPipeline({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const stages = input.stages.map((stage, index) => ({
+    ...stage,
+    x: 64 + index * 220,
+  }));
+  const progress = ramp(frame, 30, 92, EASE.inOut) * stages.length;
   return (
     <g>
-      <Eyebrow>DATA PIPELINE</Eyebrow>
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["data-pipeline"].dataPipeline,
+        })}
+      </Eyebrow>
       <Text x={64} y={115} size={32} weight={600}>
-        Every stage, connected.
+        {input.heading}
       </Text>
-      {PIPELINE_STAGES.slice(0, -1).map((stage, i) => (
+      {stages.slice(0, -1).map((stage, i) => (
         <g key={stage.label}>
           <path
             d={`M${stage.x + 172} 303 H${stage.x + 220}`}
@@ -42,12 +55,12 @@ export function DataPipeline({ frame, accent }: GraphicProps) {
           />
         </g>
       ))}
-      {PIPELINE_STAGES.map((stage, i) => {
+      {stages.map((stage, i) => {
         const active = Math.min(1, Math.max(0, progress - i));
         return (
           <Arrive frame={frame} index={i} at={16} key={stage.label}>
             <Panel x={stage.x} y={206} width={172} height={205}>
-              <rect
+              <StockRect
                 x={stage.x}
                 y={206}
                 width={172}
@@ -98,20 +111,35 @@ export function DataPipeline({ frame, accent }: GraphicProps) {
           </Arrive>
         );
       })}
-      <rect x={64} y={464} width={832} height={3} rx={1.5} fill={STOCK.line} />
-      <rect
-        x={64}
-        y={464}
-        width={832 * Math.min(1, progress / 4)}
-        height={3}
-        rx={1.5}
-        fill={accent}
-      />
+      {input.showProgress ? (
+        <>
+          <StockRect
+            x={64}
+            y={464}
+            width={832}
+            height={3}
+            rx={1.5}
+            fill={STOCK.line}
+          />
+          <StockRect
+            x={64}
+            y={464}
+            width={832 * Math.min(1, progress / stages.length)}
+            height={3}
+            rx={1.5}
+            fill={accent}
+          />
+        </>
+      ) : null}
       <Text x={64} y={506} size={15} fill={STOCK.muted} mono>
-        INPUT
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["data-pipeline"].input,
+        })}
       </Text>
       <Text x={896} y={506} size={15} fill={accent} mono anchor="end">
-        OUTPUT
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["data-pipeline"].output,
+        })}
       </Text>
     </g>
   );

@@ -1,0 +1,56 @@
+name:
+  id: motionAtlas.scan-lines.name
+  message: Document scan
+description:
+  id: motionAtlas.scan-lines.description
+  message: A scanning band examines a structured document.
+category:
+  id: motionAtlas.scan-lines.category
+  message: Code
+tags:
+  - id: motionAtlas.scan-lines.tags.0
+    message: scan
+  - id: motionAtlas.scan-lines.tags.1
+    message: document
+  - id: motionAtlas.scan-lines.tags.2
+    message: parsing
+  - id: motionAtlas.scan-lines.tags.3
+    message: validation
+useWhen:
+  id: motionAtlas.scan-lines.useWhen
+  message: Bridge a document or data intake story into a verified result.
+prompt:
+  id: motionAtlas.scan-lines.prompt
+  message: Use Motion Atlas "Document scan" (scan-lines) as a conceptual graphic. Bridge a
+    document or data intake story into a verified result. Keep the restrained motion and
+    readable labels; replace sample content with approved facts before making product
+    claims.
+creativeDirection:
+  id: motionAtlas.scan-lines.creativeDirection
+  message: A scanning band examines a structured document.
+goodFor:
+  - id: motionAtlas.scan-lines.goodFor.0
+    message: Bridge a document or data intake story into a verified result.
+intent:
+  id: motionAtlas.scan-lines.intent
+  message: Bridge a document or data intake story into a verified result.
+domains:
+  - id: motionAtlas.scan-lines.domains.0
+    message: Code
+aliases:
+  - id: motionAtlas.scan-lines.aliases.0
+    message: scan
+  - id: motionAtlas.scan-lines.aliases.1
+    message: document
+  - id: motionAtlas.scan-lines.aliases.2
+    message: parsing
+  - id: motionAtlas.scan-lines.aliases.3
+    message: validation
+notFor:
+  - id: motionAtlas.scan-lines.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.scan-lines.distinction
+  message: A scanning band examines a structured document.

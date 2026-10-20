@@ -1,0 +1,129 @@
+name:
+  id: motionAtlas.charge-reference-alignment.name
+  message: Match the reference before comparing a charge
+description:
+  id: motionAtlas.charge-reference-alignment.description
+  message: A fictional invoice line is laid over a separate price reference. Only matching
+    procedure, provider, payer, period, and quantity windows permit the amounts to align
+    on one scale; an unmatched context leaves the comparison unresolved.
+category:
+  id: motionAtlas.charge-reference-alignment.category
+  message: Reference reconciliation
+useWhen:
+  id: motionAtlas.charge-reference-alignment.useWhen
+  message: Make the context required for a monetary comparison explicit before showing a
+    difference.
+creativeDirection:
+  id: motionAtlas.charge-reference-alignment.creativeDirection
+  message: Frames 0-11 reveal a short invoice strip and a separate reference sheet on a
+    960x600 canvas. Frames 12-70 slide their context windows into vertical registration,
+    retaining a visible notch at each mismatched key. When every key and quantity
+    agrees, frames 71-125 extend the two total-amount rulers from the same zero and open
+    a signed difference bracket. Otherwise the amounts stay separate without a
+    difference bracket. Frames 126-167 hold the matched or unresolved context, source
+    labels, and review caption. Exit to the shared opaque ground at frames 168-179. The
+    six-second React/SVG sequence is deterministic at 30fps.
+intent:
+  id: motionAtlas.charge-reference-alignment.intent
+  message: Make the context required for a monetary comparison explicit before showing a
+    difference.
+distinction:
+  id: motionAtlas.charge-reference-alignment.distinction
+  message: Unlike benefit-shortfall-correction, no payment is corrected and no unpaid
+    amount is treated as an entitlement. Unlike paired-contrast, exact context keys
+    govern whether a numeric comparison is allowed. Unlike keyed-row-zipper, the records
+    remain separate and open an amount ruler rather than becoming a joined dataset.
+prompt:
+  id: motionAtlas.charge-reference-alignment.prompt
+  message: Use Motion Atlas "Match the reference before comparing a charge"
+    (charge-reference-alignment) as a conceptual graphic. Make the context required for
+    a monetary comparison explicit before showing a difference. Replace fictional
+    examples with approved authored content before making product claims.
+tags:
+  - id: motionAtlas.charge-reference-alignment.tags.0
+    message: price transparency
+  - id: motionAtlas.charge-reference-alignment.tags.1
+    message: invoice review
+  - id: motionAtlas.charge-reference-alignment.tags.2
+    message: reference price
+  - id: motionAtlas.charge-reference-alignment.tags.3
+    message: billing context
+  - id: motionAtlas.charge-reference-alignment.tags.4
+    message: matched keys
+  - id: motionAtlas.charge-reference-alignment.tags.5
+    message: charge comparison
+  - id: motionAtlas.charge-reference-alignment.tags.6
+    message: healthcare costs
+goodFor:
+  - id: motionAtlas.charge-reference-alignment.goodFor.0
+    message: Explain why published prices need the same billing context
+  - id: motionAtlas.charge-reference-alignment.goodFor.1
+    message: Support a fictional price-transparency investigation
+  - id: motionAtlas.charge-reference-alignment.goodFor.2
+    message: Show a discrepancy for review without implying a refund or legal entitlement
+domains:
+  - id: motionAtlas.charge-reference-alignment.domains.0
+    message: Reference reconciliation
+aliases:
+  - id: motionAtlas.charge-reference-alignment.aliases.0
+    message: price transparency
+  - id: motionAtlas.charge-reference-alignment.aliases.1
+    message: invoice review
+  - id: motionAtlas.charge-reference-alignment.aliases.2
+    message: reference price
+  - id: motionAtlas.charge-reference-alignment.aliases.3
+    message: billing context
+notFor:
+  - id: motionAtlas.charge-reference-alignment.notFor.0
+    message: This is a fictional one-line comparison. It is not a medical billing
+      interpretation, legal determination, price guarantee, negotiation result, or
+      refund claim.
+  - id: motionAtlas.charge-reference-alignment.notFor.1
+    message: Totals use exact integer arithmetic in the shared smallest unit. The signed
+      difference may be negative, positive, or zero; no automatic favorable result is
+      implied.
+  - id: motionAtlas.charge-reference-alignment.notFor.2
+    message: A mismatch in any context key or quantity leaves the comparison unresolved.
+      Similar text is not treated as a match, and no real CPT or payer taxonomy is
+      inferred.
+  - id: motionAtlas.charge-reference-alignment.notFor.3
+    message: The ruler uses a common zero and a domain derived from the larger supplied
+      total. For two zero totals use a one-minor-unit display domain without changing
+      either value.
+  - id: motionAtlas.charge-reference-alignment.notFor.4
+    message: Currency, quantities, source label, period, and fictional status stay visible
+      at the resolved hold. Published reference prices can have qualifications outside
+      this bounded example.
+  - id: motionAtlas.charge-reference-alignment.notFor.5
+    message: Supplied prose meaning, fictional status and agreement with structured choices
+      are authoring responsibilities. Runtime validation enforces structure, numeric
+      bounds, identities and references.
+  - id: motionAtlas.charge-reference-alignment.notFor.literal-whitespace
+    message: Exact context values render whitespace as distinct amber underlined marks.
+      Input values, accessible labels and equality remain unchanged.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.charge-reference-alignment.motionBeats.0
+      message: Reveal separate billed and reference lines.
+  - startFrame: 12
+    endFrame: 70
+    description:
+      id: motionAtlas.charge-reference-alignment.motionBeats.1
+      message: Register context windows with visible mismatch notches.
+  - startFrame: 71
+    endFrame: 125
+    description:
+      id: motionAtlas.charge-reference-alignment.motionBeats.2
+      message: Matching contexts open common-scale rulers and optional difference.
+  - startFrame: 126
+    endFrame: 167
+    description:
+      id: motionAtlas.charge-reference-alignment.motionBeats.3
+      message: Hold sources and unresolved or matched context.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.charge-reference-alignment.motionBeats.4
+      message: Shared opaque exit.

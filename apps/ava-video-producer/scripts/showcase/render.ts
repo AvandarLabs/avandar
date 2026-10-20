@@ -15,8 +15,10 @@ import {
   publicAsset,
   previewFrames,
 } from "../lib/planHelpers";
+import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "../require-license.mjs";
-import { appRoot } from "./loadFilm/loadFilm";
+import { StockFingerprintModule } from "../stock/StockFingerprintModule/StockFingerprintModule";
+import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
 
 async function _prepare(film: Film, directory: string) {
@@ -41,6 +43,7 @@ async function _prepare(film: Film, directory: string) {
     JSON.stringify(film, null, 2),
   );
   return bundle({
+    webpackOverride: withWorkspaceAliases,
     entryPoint: path.join(appRoot, "src/showcase/render-entry.tsx"),
     rootDir: appRoot,
     outDir: path.join(directory, "bundle"),
@@ -99,8 +102,18 @@ export async function renderFilm(
   film: Film,
   id: string,
   progress: (message: string) => void,
+  expectedStockSourceHash?: string,
 ): Promise<string> {
   const { privateKey } = requireLicense();
+  const stockFingerprint =
+    film.kind === "stock"
+      ? await StockFingerprintModule.fromRequest({
+          root: appRoot,
+          request: film,
+          expectedSourceHash: expectedStockSourceHash,
+        })
+      : undefined;
+  const stockSourceHash = stockFingerprint?.sourceHash;
   const directory = path.join(appRoot, "out/showcase/exports", id);
   const serveUrl = await _prepare(film, directory);
   const options = {
@@ -121,7 +134,9 @@ export async function renderFilm(
     });
     const samples = film.plan
       ? previewFrames(film.plan)
-      : [0, 30, Math.floor(film.frames / 2), film.frames - 1];
+      : film.kind === "stock"
+        ? StockFingerprintModule.SAMPLE_PARAMETERS.samples
+        : [0, 30, Math.floor(film.frames / 2), film.frames - 1];
     await fs.mkdir(path.join(directory, "preview"));
     for (const frame of samples) {
       progress(`Checking preview frame ${frame + 1} of ${film.frames}…`);
@@ -181,6 +196,7 @@ export async function renderFilm(
     JSON.stringify(
       {
         film: film.id,
+        ...(stockFingerprint ? { fingerprint: stockFingerprint } : {}),
         gate: "passed",
         metadata,
         sha256: createHash("sha256")
@@ -192,5 +208,11 @@ export async function renderFilm(
     ),
   );
   await fs.rm(path.join(directory, "frames"), { recursive: true });
+  if (stockSourceHash) {
+    await StockFingerprintModule.verifySources({
+      root: appRoot,
+      sourceHash: stockSourceHash,
+    });
+  }
   return final;
 }

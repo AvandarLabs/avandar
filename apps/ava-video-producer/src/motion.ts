@@ -147,7 +147,7 @@ function _settleTime(config: SpringConfig, eps = 1e-3): number {
 /** Four curves, and you need four. Names match the CSS custom properties
  *  they were lifted from, so a value can be traced back to the stylesheet. */
 export const EASE = {
-  /** ease-out-expo. The default. Everything entering or leaving. */
+  /** ease-out-expo. The default for entrances and responsive feedback. */
   out: bezier(0.16, 1, 0.3, 1),
   /** ease-out-back. Overshoots. Only for a thing landing in its slot, and
    *  only once per clip: an overshoot everywhere reads as a toy. */
@@ -162,8 +162,9 @@ export const EASE = {
   word: bezier(0.22, 1, 0.36, 1),
 } as const;
 
-/* Never ease-in. It starts slow, which delays the exact moment the eye is
- * waiting on. There is no entrance it improves. */
+/* Prefer ease-out for arrivals, ease-in for accelerating departures, and
+ * ease-in-out for travel between visible landmarks. Configurable presets
+ * and bounded custom cubic Bezier curves live in motion-components. */
 
 /* -------------------------------------------------------------- durations -- */
 

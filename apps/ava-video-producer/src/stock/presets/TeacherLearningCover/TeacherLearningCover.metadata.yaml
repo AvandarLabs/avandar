@@ -1,0 +1,120 @@
+name:
+  id: motionAtlas.teacher-learning-cover.name
+  message: Make room for teacher learning
+description:
+  id: motionAtlas.teacher-learning-cover.description
+  message: A colleague covers a fictional class while its teacher works with a mentor
+    nearby, then the teacher returns. The classroom remains visibly attended throughout
+    the handoff.
+category:
+  id: motionAtlas.teacher-learning-cover.category
+  message: Staff movement between learning spaces
+useWhen:
+  id: motionAtlas.teacher-learning-cover.useWhen
+  message: Show that a teacher support session requires an explicit classroom cover arrangement.
+prompt:
+  id: motionAtlas.teacher-learning-cover.prompt
+  message: Open on one teacher and a fixed group of learners in a classroom with a small
+    adjacent planning alcove. A covering colleague arrives before the teacher moves to
+    the mentor; the two adults rehearse a prompt with a small teaching board while the
+    colleague stays with the class. Return the teacher before the colleague leaves. Hold
+    the class and the retained prompt together, then fade out.
+creativeDirection:
+  id: motionAtlas.teacher-learning-cover.creativeDirection
+  message: Open on one teacher and a fixed group of learners in a classroom with a small
+    adjacent planning alcove. A covering colleague arrives before the teacher moves to
+    the mentor; the two adults rehearse a prompt with a small teaching board while the
+    colleague stays with the class. Return the teacher before the colleague leaves. Hold
+    the class and the retained prompt together, then fade out.
+intent:
+  id: motionAtlas.teacher-learning-cover.intent
+  message: Show that a teacher support session requires an explicit classroom cover arrangement.
+distinction:
+  id: motionAtlas.teacher-learning-cover.distinction
+  message: The explanatory motion is adult coverage across two real learning spaces, with
+    overlap at both handoffs. It is not a generic custody transfer, approval gate, or
+    claim that a coaching session produces an educational improvement.
+tags:
+  - id: motionAtlas.teacher-learning-cover.tags.0
+    message: teacher support
+  - id: motionAtlas.teacher-learning-cover.tags.1
+    message: professional development
+  - id: motionAtlas.teacher-learning-cover.tags.2
+    message: classroom cover
+  - id: motionAtlas.teacher-learning-cover.tags.3
+    message: mentoring
+  - id: motionAtlas.teacher-learning-cover.tags.4
+    message: teaching practice
+  - id: motionAtlas.teacher-learning-cover.tags.5
+    message: staff coordination
+  - id: motionAtlas.teacher-learning-cover.tags.6
+    message: coaching time
+  - id: motionAtlas.teacher-learning-cover.tags.7
+    message: school staffing
+goodFor:
+  - id: motionAtlas.teacher-learning-cover.goodFor.0
+    message: Explain scheduled cover that enables teacher development
+  - id: motionAtlas.teacher-learning-cover.goodFor.1
+    message: Describe a fictional mentoring or rehearsal session
+  - id: motionAtlas.teacher-learning-cover.goodFor.2
+    message: Show the people needed to keep a class attended during teacher support
+domains:
+  - id: motionAtlas.teacher-learning-cover.domains.0
+    message: Staff movement between learning spaces
+aliases:
+  - id: motionAtlas.teacher-learning-cover.aliases.0
+    message: teacher support
+  - id: motionAtlas.teacher-learning-cover.aliases.1
+    message: professional development
+  - id: motionAtlas.teacher-learning-cover.aliases.2
+    message: classroom cover
+notFor:
+  - id: motionAtlas.teacher-learning-cover.notFor.0
+    message: Learner count is the learners array length; the three staff roles are separate
+      adults and are never part of that denominator.
+  - id: motionAtlas.teacher-learning-cover.notFor.1
+    message: This is a staged staffing arrangement, not a recommended supervision ratio, a
+      timetable optimizer, or evidence of professional-development impact.
+  - id: motionAtlas.teacher-learning-cover.notFor.2
+    message: The nearby alcove is schematic. Distance and transition duration do not claim
+      physical proximity or actual session length.
+  - id: motionAtlas.teacher-learning-cover.notFor.3
+    message: Default participants, activity, and class are fictional.
+motionBeats:
+  - startFrame: 0
+    endFrame: 23
+    description:
+      id: motionAtlas.teacher-learning-cover.motionBeats.0
+      message: Reveal three distinct staff and a fixed learner roster across the classroom and
+        mentor alcove.
+  - startFrame: 24
+    endFrame: 47
+    description:
+      id: motionAtlas.teacher-learning-cover.motionBeats.1
+      message: Cover arrives by frame 42 and overlaps with the teacher before departure.
+  - startFrame: 48
+    endFrame: 71
+    description:
+      id: motionAtlas.teacher-learning-cover.motionBeats.2
+      message: The teacher travels to the mentor while the covering colleague remains with the
+        class.
+  - startFrame: 72
+    endFrame: 103
+    description:
+      id: motionAtlas.teacher-learning-cover.motionBeats.3
+      message: Teacher and mentor rehearse or co-plan at the supplied teaching prompt.
+  - startFrame: 104
+    endFrame: 131
+    description:
+      id: motionAtlas.teacher-learning-cover.motionBeats.4
+      message: The teacher returns by frame 124 before the colleague departs.
+  - startFrame: 132
+    endFrame: 150
+    description:
+      id: motionAtlas.teacher-learning-cover.motionBeats.5
+      message: The colleague leaves only after the teacher is fully back in the classroom.
+  - startFrame: 151
+    endFrame: 179
+    description:
+      id: motionAtlas.teacher-learning-cover.motionBeats.6
+      message: Hold the attended class and retained prompt, then use the shared fade.

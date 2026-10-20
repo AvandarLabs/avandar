@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "status": "R67-resolved-task-source-reviewed-R68-continuity-satisfied-versioned-media-final-whole-branch-review-pending",
+  "baseHead": "498c717d53240d15a29396830759a571a938f492",
+  "historicalSourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "head": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+  "sourceHash": "38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9",
+  "report": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-sampling-summary-report.md",
+    "sha256": "9007d238e220fe5b6e142cc45d9ea7d09097589c97d8c445228cf2154e3e1885",
+    "bytes": 11034,
+    "rawUtf8": "# Spatial sampling summary correction\n\n**Complete within assigned scope. Controller review and post-fix media checks remain.**\n\n## Revisions and scope\n\n- BASE: `498c717d53240d15a29396830759a571a938f492`\n- HEAD: `e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e`\n- Commit: `fix(video): populate spatial sampling totals`\n- Candidate source: `38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9`\n- Worktree: `/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog`\n\nOnly these three tracked files changed, relative to `apps/ava-video-producer/`:\n\n1. `src/stock/presets/StratifiedSpatialSample/SampleCopy.tsx`: derive aggregate quantities from the existing validated collections, animate them with shared helpers, and reserve unit clearance.\n2. `src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.tsx`: pass the existing frame into the private caption component. Formatter also sorts existing imports.\n3. `src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.test.ts`: assert painted integer output, timing and text clearance using the real renderer. Formatter also sorts existing imports.\n\nNo tracked production files outside the assigned directory changed. No metadata, schema, fixtures, controls, registry, shared renderer, public API, or translation behavior changed. Report, logs, requests and generated evidence remain local and ignored. No push, merge, PR or publication occurred.\n\n## Root cause and correction\n\nThe native historical hold renders Selected, Eligible sites and Not selected without quantities. `SampleCopy` previously received only input and returned authored copy through `LabelSlots`; it had no frame or numeric output. The upper per-stratum fractions were already correct. I personally viewed the historical native hold in `final-mp4-default-016`, SHA-256 `b63ad64fb85a453fd71aadaa87009af71e1a11aa3a65c29e1a0e87f4f658f43a`, confirming the omission independently of source inspection.\n\nThe selected total is `selectedSiteIds.length`, eligible is `sites.length`, and unselected is their difference. Existing validation guarantees unique selected IDs that reference eligible sites. Shared `countTo`, `ramp`, `STAGGER` and `Text` introduce the numbers at frames 108, 110 and 112, after sampling resolves. All three settle by frame 140. Their fixed 24px baseline is 552 in the 960 x 600 SVG. Authored headings keep their slots at 490; the authored unit moves from 570 to 578. Map geometry, anchors, keys, per-stratum fractions and zero-selected denominators stay intact.\n\nThe controller corrected the brief's globally empty example because the existing public schema requires at least one selected ID. The accepted one-stratum-empty fixture uses `['a']`. No schema was widened and no bypassed globally empty input was introduced.\n\n| Accepted case | Selected | Eligible | Unselected | Retained stratum evidence |\n|---|---:|---:|---:|---|\n| Default | 2 | 5 | 3 | West 1/3, East 1/2 |\n| One stratum unsampled | 1 | 5 | 4 | West 1/3, East 0/2 |\n| All five sites selected | 5 | 5 | 0 | West 3/3, East 2/2 |\n| Existing dense fixture | 8 | 12 | 4 | 3/3, 3/3, 2/3, 0/3 |\n\n## Red/green and scoped checks\n\nCommands below ran from the producer directory unless specified otherwise. `REMOTION_KEYS_FILE` pointed to the main checkout's `apps/ava-video-producer/.env.local`. Its contents were never opened, printed or copied.\n\nThe exact RED invocation's arguments were:\n\n```sh\nnode --import ./scripts/require-license.mjs --import tsx \\\n  --test src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.test.ts\n```\n\nRED: exit 1, 17 tests, 12 passed and 5 expected failures. Four held-output cases produced no painted integer text (`[]`) instead of 2/5/3, 1/5/4, 5/5/0 and 8/12/4; the intermediate reading-phase test found zero quantities. The clearance test and all 11 existing tests passed. This directly established the missing visible output rather than just validating arithmetic or marker attributes.\n\nThe RED command imported the license module, whose main-only guard does not run on import. It launched no browser or telemetry. Subsequent final tests explicitly invoked the shared guard before the test runner:\n\n```sh\nnode scripts/require-license.mjs && node --import tsx \\\n  --test src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.test.ts\n```\n\nGREEN: exit 0, 17 tests passed, 0 failed. Final duration 1605.945ms. Painted-text extraction accounts for actual SVG text, inherited opacity and fill. Existing fixture seeks, semantics, anchor retention, schema rejection, whole-grapheme copy, all-frame canvas bounds and prefix tests remain green. Expected totals are independently specified literals. No global snapshots or duplicate arithmetic oracle were added.\n\nAll scoped checks below exited 0:\n\n- **Producer typechecks and gallery rebuild:** `pnpm run typecheck`, including the guarded pretypecheck gallery build. Both TypeScript projects passed.\n- **ESLint:** `pnpm exec eslint` on the three changed paths, from repository root. No diagnostics.\n- **Formatting:** `pnpm exec oxfmt --ignore-path .oxfmtignore --check` on those paths, from repository root. All 3 matched files formatted.\n- **React Doctor:** producer project, `--yes --verbose --scope changed --base 498c717d53240d15a29396830759a571a938f492 --no-score`. Three files scanned, no issues.\n- **Diff integrity:** `git diff --check`. No whitespace errors.\n\nAn initial formatting invocation without `--ignore-path` matched no files because of the repository's inverted Prettier ignore. The explicit scoped check above replaced it. React Doctor's current CLI uses changed scope instead of the skill's older `--diff` flag. Score was disabled, so no numerical health-score comparison is claimed. No whole unit or E2E suite was repeated.\n\nLogs are under `apps/ava-video-producer/.temp/`, prefixed `sampling-summary-`: `red.log`, `green.log`, `green-final.log`, `typecheck.log`, `eslint.log`, `format.log`, `react-doctor.log`, `preview-default.log`, `preview-dense.log`, and `stills.log`.\n\n## Current-source visual evidence\n\nGuarded public CLI commands completed serially with exit 0:\n\n```sh\npnpm motion -- preview stratified-spatial-sample\npnpm motion -- preview stratified-spatial-sample \\\n  --input .temp/sampling-summary-dense.json\n```\n\nThe configured request contains the unchanged existing dense fixture and default accent/background. Public previews use the six standard frames 0/18/36/90/150/179 and 1280 x 800 output. Both complete manifests bind the candidate source hash above.\n\n- Default configuration: `6991984f189122533365c44b71aca53c5a285f7339735b80ffc82195273d3bf2`\n- Dense configuration: `630b4dc2f79e24d46135f8f6396fe8382ea8593bb91b19daea566a47d6dcc4ee`\n- One-stratum-empty configuration: `c5c5d75fb78a38a7a78b5aeb0e50ebe109de038402339c83f0c698265b7e93d9`\n- All-selected configuration: `9f6af41e2c4b87c1a12bab8840e780f39227648d7079a9f639e99cacee5c699a`\n\nPublic preview directories are `apps/ava-video-producer/out/motion/preview/stratified-spatial-sample/<configuration>/`. Supplemental exact-input final-hold stills and their source/configuration manifest are in repository-root `.temp/feat-motion-catalog/sampling-summary/`. The guarded supplemental script used one headless browser and awaited each renderStill serially, with empty browser environment variables. Source verification passed before and after. The script closed its browser and removed its bundle in `finally`.\n\nI personally viewed each of the ten candidate images listed below, one actual image per tool call. Both contact sheets, both full-size frame-90 images and both full-size frame-150 images were inspected. I additionally viewed default/dense final holds at 164 and the accepted one-stratum-empty/all-selected holds at 150. Frame 90 correctly retains the existing headings without the later quantities. The reading holds show the expected totals below the captions, clear of the map and unit. Dense authored labels remain readable and inside the canvas. The 0/2 and 0/3 per-stratum denominators and all site keys remain visible. No concrete new defect was observed in those stills.\n\n### Personally inspected candidate image hashes\n\nThe `evidence/` paths below are the easy-to-find Downloads copies. `inspected-images.json` in the supplemental directory retains each authoritative absolute source path and identical hash.\n\n- **default: contact sheet, frames 0/18/36/90/150/179**. `evidence/default-contact-sheet.jpg`\n  SHA-256: `b6330cf02b61e0091a0c0a78f02c2bac70bf3f5a4b666da55ec42c541250c4e5`\n\n- **default: frame 90**. `evidence/default-still-003.jpg`\n  SHA-256: `bc751509784f0dca8a04ecd27e91d86ce0625b68c5ef529d7aef69fef2a1d0ac`\n\n- **default: frame 150**. `evidence/default-still-004.jpg`\n  SHA-256: `7b35e45fc4650debc1178aa22ea38a8dc313102f90b6e5f3eac21ae1b7c752a5`\n\n- **dense: contact sheet, frames 0/18/36/90/150/179**. `evidence/dense-contact-sheet.jpg`\n  SHA-256: `3b3f4a9d3868309d3d186dc07aae77c8de5b9bfc92d0846158ecd484178b9da9`\n\n- **dense: frame 90**. `evidence/dense-still-003.jpg`\n  SHA-256: `db818e4194a715cca89f46a297f42f172217e7f79b257af5eb38c61a4c09aebd`\n\n- **dense: frame 150**. `evidence/dense-still-004.jpg`\n  SHA-256: `b05b0adeab59254160abb29eeb70a49d30735cbca78a1ad2b8d40cb99ab20bea`\n\n- **default-hold-164**. `evidence/default-hold-164.png`\n  SHA-256: `ddacb3e5f251b30681e256941a177da04673954552403c297c871bcf03e168f5`\n\n- **dense-hold-164**. `evidence/dense-hold-164.png`\n  SHA-256: `0f9e8f27281724f553b940549d0f6a98b45ad8544c0004f6c00b630a5ab31138`\n\n- **one-stratum-empty-hold-150**. `evidence/one-stratum-empty-hold-150.png`\n  SHA-256: `08286a425f497b2de26a1db31cbb3d0ba0f7ee969b824f662b78130350f2b41d`\n\n- **all-selected-hold-150**. `evidence/all-selected-hold-150.png`\n  SHA-256: `a64365c68f19b454c3069342a72428accc2ddc81a4fbd4126ed5e7cc2936a573`\n\n## Evidence boundaries and remaining controller work\n\nThis handoff includes previews and bounded supplemental stills only. No fresh full MP4 was rendered, no native browser playback was performed, and no continuous motion acceptance is claimed. The controller owns review followed by fresh actual-browser and full-MP4 checks for the corrected preset. The previous 167 decoded MP4 observations retain their original source `2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae` and HEAD `498c717d53240d15a29396830759a571a938f492`; no old report or media was relabeled or altered.\n\nR68's complete pre/post static SVG fixture comparison for the other 169 presets is controller-owned and remains pending here. The strict file scope supports that comparison but does not replace it. No global acceptance is claimed.\n\n| # | Owner | Next action |\n|---|---|---|\n| 1 | Codex controller | Review commit e5aeb3e7c and run R68's complete unaffected-fixture hash comparison. |\n| 2 | Codex controller | Perform fresh actual-browser and full-MP4 checks at the new source, preserving historical identities. |\n| 3 | Pablo | Review copies under `~/Downloads/avandar_motion-catalog/sampling-summary/`; no input is required for this handoff. |\n"
+  },
+  "originalRootCorroboration": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-summary-root-corroboration.json",
+    "sha256": "1a94d609ca47e0424e4788e5198e459c8506503e9bac332f3c2d8b2307d99372",
+    "bytes": 1365,
+    "rawUtf8": "{\n  \"status\": \"Root independently corroborated confirmed held-display omission before correction\",\n  \"head\": \"498c717d53240d15a29396830759a571a938f492\",\n  \"sourceHash\": \"2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae\",\n  \"preset\": \"stratified-spatial-sample\",\n  \"configurationHash\": \"9a785e90b319a651145e955b3d963248acb31c59f44ae4105e4068f7643a28a6\",\n  \"personallyViewedImageCount\": 1,\n  \"viewedFiles\": [\n    {\n      \"path\": \"/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-default-016/records/default-stratified-spatial-sample/hold.png\",\n      \"sha256\": \"b63ad64fb85a453fd71aadaa87009af71e1a11aa3a65c29e1a0e87f4f658f43a\",\n      \"phase\": \"native decoded hold\",\n      \"captureWindow\": [\n        4.806438,\n        4.894701\n      ]\n    }\n  ],\n  \"observation\": \"Selected, Eligible sites and Not selected headings have empty numeric regions. West1/3 and East1/2 are readable above correct site geometry. All summaryregions lie inside the native image.\",\n  \"sourceRead\": \"SampleCopy.tsx renders only those captions and the parent has no aggregate countrenderer.\",\n  \"decision\": \"Correct underR67; preserve originalfindings and historicalmedia\",\n  \"globalAcceptance\": null\n}\n",
+    "document": {
+      "status": "Root independently corroborated confirmed held-display omission before correction",
+      "head": "498c717d53240d15a29396830759a571a938f492",
+      "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+      "preset": "stratified-spatial-sample",
+      "configurationHash": "9a785e90b319a651145e955b3d963248acb31c59f44ae4105e4068f7643a28a6",
+      "personallyViewedImageCount": 1,
+      "viewedFiles": [
+        {
+          "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-default-016/records/default-stratified-spatial-sample/hold.png",
+          "sha256": "b63ad64fb85a453fd71aadaa87009af71e1a11aa3a65c29e1a0e87f4f658f43a",
+          "phase": "native decoded hold",
+          "captureWindow": [
+            4.806438,
+            4.894701
+          ]
+        }
+      ],
+      "observation": "Selected, Eligible sites and Not selected headings have empty numeric regions. West1/3 and East1/2 are readable above correct site geometry. All summaryregions lie inside the native image.",
+      "sourceRead": "SampleCopy.tsx renders only those captions and the parent has no aggregate countrenderer.",
+      "decision": "Correct underR67; preserve originalfindings and historicalmedia",
+      "globalAcceptance": null
+    }
+  },
+  "acceptedCases": {
+    "default": [
+      2,
+      5,
+      3
+    ],
+    "oneStratumUnsampled": [
+      1,
+      5,
+      4
+    ],
+    "allSelected": [
+      5,
+      5,
+      0
+    ],
+    "dense": [
+      8,
+      12,
+      4
+    ]
+  },
+  "schemaBoundary": "selectedSiteIds min1 remains binding. The permitted ['a'] case has East0/2. No globally empty selection, schema widening or invalid-input bypass.",
+  "reportedTiming": "Numbers enter at108/110/112 and all settle by140. Authored headings retain490, quantity baseline552, unit578.",
+  "reportedChecks": "RED17:12pass/5expectedfail; GREEN17/17. Typecheck/gallery rebuild, scoped ESLint/format, React Doctor changed-scope and diff check passed in implementer report. Not rerun by documentation worker.",
+  "reportedVisualEvidence": "Default/dense public previews and10 personally inspected candidate stills at candidate source. No new native playback or full MP4 in implementer report.",
+  "pending": [
+    "Final whole-branch findings review including sampling-summary-test-helper-roro Minor"
+  ],
+  "acceptance": "Scoped R67/R68 checks complete. Whole-branch review remains pending; finite images are not continuous pixel or global production acceptance.",
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-sampling-summary-correction-e5aeb3e7c.json",
+    "sha256": "13c784198d81fbfa71bca6450355bbe1dfba022b457802ce132307ea48c6441c",
+    "bytes": 16359
+  },
+  "controllerVerification": {
+    "durableRecord": "implementation-sampling-correction-controller-verification.json",
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/sampling-correction-controller-verification.json",
+    "sha256": "ac5e2daad30c6b55df3b661219e6f798c9c591e05c4331587f3fb7f2a6a993fb",
+    "bytes": 16963
+  },
+  "review": {
+    "spec": "compliant",
+    "quality": "approved with minor",
+    "critical": 0,
+    "important": 0,
+    "minor": [
+      {
+        "id": "sampling-summary-test-helper-roro",
+        "file": "src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.test.ts:45",
+        "finding": "Two positional helper arguments violate RO-RO convention",
+        "status": "deferred to final whole-branch review"
+      }
+    ]
+  },
+  "R67": "closed by source review, actual current preview/gallery/decoded MP4 evidence",
+  "R68": {
+    "satisfied": true,
+    "unchangedPresets": 169,
+    "unchangedFixtures": 754,
+    "unchangedFrameHashes": 6786,
+    "historicalMediaRelabeled": false
+  }
+}

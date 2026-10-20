@@ -1,0 +1,56 @@
+name:
+  id: motionAtlas.node-traversal.name
+  message: Follow the connection
+description:
+  id: motionAtlas.node-traversal.description
+  message: A signal traces a route through a small network.
+category:
+  id: motionAtlas.node-traversal.category
+  message: Networks
+tags:
+  - id: motionAtlas.node-traversal.tags.0
+    message: graph
+  - id: motionAtlas.node-traversal.tags.1
+    message: path
+  - id: motionAtlas.node-traversal.tags.2
+    message: traversal
+  - id: motionAtlas.node-traversal.tags.3
+    message: highlight
+useWhen:
+  id: motionAtlas.node-traversal.useWhen
+  message: Follow one record or decision through a set of explicit connections.
+prompt:
+  id: motionAtlas.node-traversal.prompt
+  message: Use Motion Atlas "Follow the connection" (node-traversal) as a conceptual
+    graphic. Follow one record or decision through a set of explicit connections. Keep
+    the restrained motion and readable labels; replace sample content with approved
+    facts before making product claims.
+creativeDirection:
+  id: motionAtlas.node-traversal.creativeDirection
+  message: A signal traces a route through a small network.
+goodFor:
+  - id: motionAtlas.node-traversal.goodFor.0
+    message: Follow one record or decision through a set of explicit connections.
+intent:
+  id: motionAtlas.node-traversal.intent
+  message: Follow one record or decision through a set of explicit connections.
+domains:
+  - id: motionAtlas.node-traversal.domains.0
+    message: Networks
+aliases:
+  - id: motionAtlas.node-traversal.aliases.0
+    message: graph
+  - id: motionAtlas.node-traversal.aliases.1
+    message: path
+  - id: motionAtlas.node-traversal.aliases.2
+    message: traversal
+  - id: motionAtlas.node-traversal.aliases.3
+    message: highlight
+notFor:
+  - id: motionAtlas.node-traversal.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.node-traversal.distinction
+  message: A signal traces a route through a small network.

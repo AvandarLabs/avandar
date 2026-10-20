@@ -1,0 +1,122 @@
+.compositionViewer {
+  min-width: 0;
+  padding: 16px;
+}
+
+.compositionViewerPlayer {
+  aspect-ratio: 1.6;
+  background: #0b1219;
+  border: 0;
+  border-radius: 6px;
+  display: block;
+  width: 100%;
+}
+
+.compositionViewerSummary {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr auto;
+  padding-top: 24px;
+}
+
+.compositionViewerSummary h2 {
+  font-size: 27px;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+.compositionViewerSummary p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 8px 0;
+  max-width: 66ch;
+}
+
+.compositionViewerDuration {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.compositionViewerNotice {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 26px;
+  padding-top: 16px;
+}
+
+@media (width <= 900px) {
+  .compositionViewerSummary {
+    gap: 0;
+    grid-template-columns: 1fr;
+  }
+}
+
+.stage,
+.settings,
+.details,
+.guidance {
+  min-height: 0;
+  min-width: 0;
+}
+
+:global(dialog:modal) .compositionViewer {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+:global(dialog:modal) .stage {
+  align-items: center;
+  background: var(--ava-neutral-9);
+  border-radius: 6px;
+  container-type: size;
+  display: flex;
+  justify-content: center;
+}
+
+:global(dialog:modal) .compositionViewerPlayer {
+  flex: none;
+  height: min(100cqh, 62.5cqw);
+  width: min(100cqw, 160cqh);
+}
+
+:global(dialog:modal) .details,
+:global(dialog:modal) .guidance {
+  display: none;
+}
+/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
+:global(dialog:modal) .settings :global(.palette-controls) {
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px;
+}
+/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
+:global(dialog:modal) .settings :global(.palette-group) {
+  flex-basis: 100%;
+  gap: 6px;
+}
+/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
+:global(dialog:modal) .settings :global(.palette-help) {
+  display: none;
+}
+
+@media (width <= 800px) {
+  :global(dialog:modal) .compositionViewer {
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(80px, 1fr) auto;
+    padding: 10px;
+  }
+  /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
+  :global(dialog:modal) .settings :global(.palette-group) {
+    flex: 1 1 140px;
+  }
+
+  :global(dialog:modal) .settings :global(.swatches) {
+    display: none;
+  }
+}

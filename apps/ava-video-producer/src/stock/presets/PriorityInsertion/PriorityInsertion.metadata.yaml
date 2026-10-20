@@ -1,0 +1,109 @@
+name:
+  id: motionAtlas.priority-insertion.name
+  message: Make room for urgent work
+description:
+  id: motionAtlas.priority-insertion.description
+  message: A newly prioritized item enters an existing ordered queue. One slot opens ahead
+    of a chosen waiting item while every existing item keeps its relative order.
+category:
+  id: motionAtlas.priority-insertion.category
+  message: Work ordering
+useWhen:
+  id: motionAtlas.priority-insertion.useWhen
+  message: Show exactly which waiting work moves when one new item gains precedence.
+prompt:
+  id: motionAtlas.priority-insertion.prompt
+  message: Use Motion Atlas "Make room for urgent work" (priority-insertion) as a
+    conceptual graphic. Show exactly which waiting work moves when one new item gains
+    precedence. Replace fictional sample content with approved authored content before
+    making product claims.
+creativeDirection:
+  id: motionAtlas.priority-insertion.creativeDirection
+  message: During 12..38, lay an existing queue into numbered track slots, with its
+    service end visibly marked. During 38..64, the new item arrives on a small side spur
+    carrying the authored priority caption. During 64..108, the chosen insertion slot
+    opens and all items from that position onward shift exactly one slot away from
+    service as a single movement. During 108..132, the new item travels along the spur
+    into the opening. Hold the changed queue and optional faint original-position
+    markers through 168, then exit to ground. The new item gains precedence without
+    scrambling the order of existing work.
+intent:
+  id: motionAtlas.priority-insertion.intent
+  message: Show exactly which waiting work moves when one new item gains precedence.
+distinction:
+  id: motionAtlas.priority-insertion.distinction
+  message: Bar-race reorders measured rankings; this makes one explicit queue insertion
+    without scores or a wholesale sort. Queue-relief changes service capacity, whereas
+    this changes precedence while service capacity is absent from the argument.
+tags:
+  - id: motionAtlas.priority-insertion.tags.0
+    message: priority
+  - id: motionAtlas.priority-insertion.tags.1
+    message: reprioritize
+  - id: motionAtlas.priority-insertion.tags.2
+    message: urgent task
+  - id: motionAtlas.priority-insertion.tags.3
+    message: queue order
+  - id: motionAtlas.priority-insertion.tags.4
+    message: insertion
+  - id: motionAtlas.priority-insertion.tags.5
+    message: precedence
+  - id: motionAtlas.priority-insertion.tags.6
+    message: reschedule
+  - id: motionAtlas.priority-insertion.tags.7
+    message: stable ordering
+goodFor:
+  - id: motionAtlas.priority-insertion.goodFor.0
+    message: Explaining insertion of an urgent task into a waiting queue
+  - id: motionAtlas.priority-insertion.goodFor.1
+    message: Showing the effect of a priority change on already planned work
+  - id: motionAtlas.priority-insertion.goodFor.2
+    message: Introducing stable ordering while reprioritizing one new item
+domains:
+  - id: motionAtlas.priority-insertion.domains.0
+    message: Work ordering
+aliases:
+  - id: motionAtlas.priority-insertion.aliases.0
+    message: priority
+  - id: motionAtlas.priority-insertion.aliases.1
+    message: reprioritize
+  - id: motionAtlas.priority-insertion.aliases.2
+    message: urgent task
+  - id: motionAtlas.priority-insertion.aliases.3
+    message: queue order
+notFor:
+  - id: motionAtlas.priority-insertion.notFor.0
+    message: The default tasks and priority are fictional and do not prescribe a
+      prioritization policy.
+  - id: motionAtlas.priority-insertion.notFor.1
+    message: Only waiting items are reordered; there is no interruption of work already in
+      progress.
+  - id: motionAtlas.priority-insertion.notFor.2
+    message: Slot positions encode precedence only, not duration, importance scores,
+      fairness, or a delivery commitment.
+motionBeats:
+  - startFrame: 12
+    endFrame: 38
+    description:
+      id: motionAtlas.priority-insertion.motionBeats.0
+      message: Establish the existing numbered queue and service end.
+  - startFrame: 38
+    endFrame: 64
+    description:
+      id: motionAtlas.priority-insertion.motionBeats.1
+      message: Introduce priority work on the side spur.
+  - startFrame: 64
+    endFrame: 108
+    description:
+      id: motionAtlas.priority-insertion.motionBeats.2
+      message: Move the selected suffix back by one slot.
+  - startFrame: 108
+    endFrame: 132
+    description:
+      id: motionAtlas.priority-insertion.motionBeats.3
+      message: Place the incoming item into the opening.
+  - startFrame: 132
+    endFrame: 168
+    description:
+      id: motionAtlas.priority-insertion.motionBeats.4
+      message: Hold stable existing order around the inserted work.

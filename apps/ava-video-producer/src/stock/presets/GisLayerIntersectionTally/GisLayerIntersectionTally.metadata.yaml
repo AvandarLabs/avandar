@@ -1,0 +1,109 @@
+name:
+  id: motionAtlas.gis-layer-intersection-tally.name
+  message: Count where the layers meet
+description:
+  id: motionAtlas.gis-layer-intersection-tally.description
+  message: Two schematic geographic layers settle onto the same coordinate plane. Their
+    intersection or difference isolates the supplied population records that satisfy the
+    chosen spatial rule.
+category:
+  id: motionAtlas.gis-layer-intersection-tally.category
+  message: geographic set operations
+useWhen:
+  id: motionAtlas.gis-layer-intersection-tally.useWhen
+  message: Show how an explicit geometric rule selects records without establishing a
+    causal relationship.
+prompt:
+  id: motionAtlas.gis-layer-intersection-tally.prompt
+  message: Begin with offset translucent map sheets and stationary household markers.
+    Register the sheets, hatch the resulting geometry, then lift only qualifying markers
+    into a counting bracket while retaining their map positions. Hold the selected
+    quantity over the full supplied denominator.
+creativeDirection:
+  id: motionAtlas.gis-layer-intersection-tally.creativeDirection
+  message: Begin with offset translucent map sheets and stationary household markers.
+    Register the sheets, hatch the resulting geometry, then lift only qualifying markers
+    into a counting bracket while retaining their map positions. Hold the selected
+    quantity over the full supplied denominator.
+intent:
+  id: motionAtlas.gis-layer-intersection-tally.intent
+  message: Show how an explicit geometric rule selects records without establishing a
+    causal relationship.
+distinction:
+  id: motionAtlas.gis-layer-intersection-tally.distinction
+  message: The hero transformation registers two geometric sheets and computes a spatial
+    set before tallying records. It is neither field correspondence, a scope aperture, a
+    cloud observation mask, nor a routing animation.
+tags:
+  - id: motionAtlas.gis-layer-intersection-tally.tags.0
+    message: GIS
+  - id: motionAtlas.gis-layer-intersection-tally.tags.1
+    message: layer overlay
+  - id: motionAtlas.gis-layer-intersection-tally.tags.2
+    message: intersection
+  - id: motionAtlas.gis-layer-intersection-tally.tags.3
+    message: spatial query
+  - id: motionAtlas.gis-layer-intersection-tally.tags.4
+    message: population exposure
+  - id: motionAtlas.gis-layer-intersection-tally.tags.5
+    message: polygon difference
+  - id: motionAtlas.gis-layer-intersection-tally.tags.6
+    message: households
+  - id: motionAtlas.gis-layer-intersection-tally.tags.7
+    message: denominator
+goodFor:
+  - id: motionAtlas.gis-layer-intersection-tally.goodFor.0
+    message: Explain a GIS intersection query
+  - id: motionAtlas.gis-layer-intersection-tally.goodFor.1
+    message: Identify households inside two authored planning zones
+  - id: motionAtlas.gis-layer-intersection-tally.goodFor.2
+    message: Separate mapped exposure overlap from a health outcome
+domains:
+  - id: motionAtlas.gis-layer-intersection-tally.domains.0
+    message: geographic set operations
+aliases:
+  - id: motionAtlas.gis-layer-intersection-tally.aliases.0
+    message: GIS
+  - id: motionAtlas.gis-layer-intersection-tally.aliases.1
+    message: layer overlay
+  - id: motionAtlas.gis-layer-intersection-tally.aliases.2
+    message: intersection
+notFor:
+  - id: motionAtlas.gis-layer-intersection-tally.notFor.0
+    message: Defaults represent fictional local geometry, not real exposure or
+      epidemiological evidence.
+  - id: motionAtlas.gis-layer-intersection-tally.notFor.1
+    message: Only supplied point locations are classified; household members share that
+      location by explicit input convention.
+  - id: motionAtlas.gis-layer-intersection-tally.notFor.2
+    message: Selected members divided by all supplied members is a record-based share, not
+      population prevalence or an area-weighted estimate.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.GisLayerIntersectionTally.beat.0
+      message: Reveal offset map layers and stationary supplied household coordinate anchors.
+  - startFrame: 36
+    endFrame: 71
+    description:
+      id: motionAtlas.GisLayerIntersectionTally.beat.1
+      message: Register the two polygon sheets on the shared schematic plane.
+  - startFrame: 72
+    endFrame: 83
+    description:
+      id: motionAtlas.GisLayerIntersectionTally.beat.2
+      message: Hatch the chosen intersection or ordered difference and retain its inward
+        boundary.
+  - startFrame: 84
+    endFrame: 107
+    description:
+      id: motionAtlas.GisLayerIntersectionTally.beat.3
+      message: Lift qualifying keyed household markers into the counting bracket while
+        retaining their map anchors.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.GisLayerIntersectionTally.beat.4
+      message: Hold selected quantity against all supplied records under the same measure
+        through the shared fade.

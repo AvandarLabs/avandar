@@ -1,0 +1,102 @@
+name:
+  id: motionAtlas.contribution-weave.name
+  message: Distinct Work, Shared Fabric
+description:
+  id: motionAtlas.contribution-weave.description
+  message: Named contributions become a woven surface while keeping their own visible
+    thread patterns. Their interdependence is shown by alternating over-and-under
+    crossings rather than convergence into a hub.
+category:
+  id: motionAtlas.contribution-weave.category
+  message: Interlocking contributions
+useWhen:
+  id: motionAtlas.contribution-weave.useWhen
+  message: Show that a shared result depends on distinct contributions that remain identifiable.
+prompt:
+  id: motionAtlas.contribution-weave.prompt
+  message: Show that a shared result depends on distinct contributions that remain identifiable.
+creativeDirection:
+  id: motionAtlas.contribution-weave.creativeDirection
+  message: Reveal a small loom frame with two or three vertical bands and the same bounded
+    set of horizontal shuttles. Tension the vertical contributions first; sweep each
+    horizontal shuttle once through an alternating over-under mask so the crossing
+    pattern visibly locks together. Keep a short labeled end of every contributor's band
+    outside the frame. Hold the finished fabric with all identities still traceable,
+    then fade the complete textile within the six-second envelope.
+intent:
+  id: motionAtlas.contribution-weave.intent
+  message: Show that a shared result depends on distinct contributions that remain identifiable.
+distinction:
+  id: motionAtlas.contribution-weave.distinction
+  message: Source-merge collapses inputs toward a destination. This creates alternating
+    physical interlocks, preserves every contribution through the finished structure,
+    and uses neither nodes nor connecting paths.
+tags:
+  - id: motionAtlas.contribution-weave.tags.0
+    message: collaboration
+  - id: motionAtlas.contribution-weave.tags.1
+    message: interdependence
+  - id: motionAtlas.contribution-weave.tags.2
+    message: weaving
+  - id: motionAtlas.contribution-weave.tags.3
+    message: shared work
+  - id: motionAtlas.contribution-weave.tags.4
+    message: contribution
+  - id: motionAtlas.contribution-weave.tags.5
+    message: authorship
+  - id: motionAtlas.contribution-weave.tags.6
+    message: complementary skills
+  - id: motionAtlas.contribution-weave.tags.7
+    message: collective result
+  - id: motionAtlas.contribution-weave.tags.8
+    message: co-creation
+  - id: motionAtlas.contribution-weave.tags.9
+    message: partnership
+  - id: motionAtlas.contribution-weave.tags.10
+    message: community contribution
+goodFor:
+  - id: motionAtlas.contribution-weave.goodFor.0
+    message: Explain complementary work becoming one shared deliverable
+  - id: motionAtlas.contribution-weave.goodFor.1
+    message: Illustrate an editorial, design, or workshop collaboration
+  - id: motionAtlas.contribution-weave.goodFor.2
+    message: Show contributions staying attributable inside a collective result
+  - id: motionAtlas.contribution-weave.goodFor.3
+    message: Explain sector-wide co-creation without erasing contributor identity
+  - id: motionAtlas.contribution-weave.goodFor.4
+    message: Show partnership without a central savior
+domains:
+  - id: motionAtlas.contribution-weave.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.contribution-weave.aliases.0
+    message: Interlocking contributions
+notFor:
+  - id: motionAtlas.contribution-weave.notFor.0
+    message: Band count is the exact number of supplied contributions. Equal band width is
+      decorative and does not represent equal effort, value, ownership, or impact.
+  - id: motionAtlas.contribution-weave.notFor.1
+    message: Over-under order is a weave construction, not a ranking of contributors or a
+      chronology of all real work.
+  - id: motionAtlas.contribution-weave.notFor.2
+    message: The scene is not a dependency graph or proof of conflict-free collaborative
+      editing. Suppressing contributor ends reduces attribution clarity.
+  - id: motionAtlas.contribution-weave.notFor.3
+    message: The weave is a relationship metaphor. Thread widths and crossings do not
+      quantify labor, ownership, compensation or social impact.
+motionBeats:
+  - startFrame: 12
+    endFrame: 36
+    description:
+      id: motionAtlas.contribution-weave.motionBeats.0
+      message: Reveal the loom and tension vertical bands.
+  - startFrame: 36
+    endFrame: 108
+    description:
+      id: motionAtlas.contribution-weave.motionBeats.1
+      message: Each horizontal shuttle crosses once in array order.
+  - startFrame: 108
+    endFrame: 166
+    description:
+      id: motionAtlas.contribution-weave.motionBeats.2
+      message: Hold alternating crossings with traceable contributor ends.

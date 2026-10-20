@@ -1,0 +1,108 @@
+name:
+  id: motionAtlas.household-market-choice.name
+  message: A household chooses its basket
+description:
+  id: motionAtlas.household-market-choice.description
+  message: A household shopper chooses goods from a small market shelf and pays with
+    fictional cash assistance or a voucher. The scene connects assistance to an authored
+    choice instead of prescribing the same package for everyone.
+category:
+  id: motionAtlas.household-market-choice.category
+  message: Everyday purchasing decisions
+useWhen:
+  id: motionAtlas.household-market-choice.useWhen
+  message: Show that assistance can support a household making its own purchase choices.
+intent:
+  id: motionAtlas.household-market-choice.intent
+  message: Show that assistance can support a household making its own purchase choices.
+creativeDirection:
+  id: motionAtlas.household-market-choice.creativeDirection
+  message: Reveal a shelf of configurable products and a shopper holding the chosen tender
+    within six seconds. The shopper considers the shelf, reaches only for products
+    marked chosen, and places those items into their own basket while the other options
+    stay available. At the counter, move the cash or voucher to the retailer and show
+    the exact selected-price sum, with any remaining demo credits retained by the
+    shopper. Hold the chosen basket, then use the shared opaque exit fade.
+distinction:
+  id: motionAtlas.household-market-choice.distinction
+  message: The distinguishing action is an actor choosing among physical shelf goods and
+    completing a purchase. This is neither source-merge nor metric-counter; the
+    arithmetic supports the visible choice and does not become the hero motion.
+prompt:
+  id: motionAtlas.household-market-choice.prompt
+  message: A household chooses its basket. Show that assistance can support a household
+    making its own purchase choices.
+tags:
+  - id: motionAtlas.household-market-choice.tags.0
+    message: cash assistance
+  - id: motionAtlas.household-market-choice.tags.1
+    message: voucher
+  - id: motionAtlas.household-market-choice.tags.2
+    message: household choice
+  - id: motionAtlas.household-market-choice.tags.3
+    message: market basket
+  - id: motionAtlas.household-market-choice.tags.4
+    message: retailer
+  - id: motionAtlas.household-market-choice.tags.5
+    message: purchasing agency
+  - id: motionAtlas.household-market-choice.tags.6
+    message: food selection
+  - id: motionAtlas.household-market-choice.tags.7
+    message: cash transfer
+goodFor:
+  - id: motionAtlas.household-market-choice.goodFor.0
+    message: Explain household choice in an illustrative cash assistance program
+  - id: motionAtlas.household-market-choice.goodFor.1
+    message: Show a voucher redeemed for an authored basket
+  - id: motionAtlas.household-market-choice.goodFor.2
+    message: Bridge a funding story to the goods a shopper selects
+domains:
+  - id: motionAtlas.household-market-choice.domains.0
+    message: Everyday purchasing decisions
+aliases:
+  - id: motionAtlas.household-market-choice.aliases.0
+    message: cash assistance
+  - id: motionAtlas.household-market-choice.aliases.1
+    message: voucher
+  - id: motionAtlas.household-market-choice.aliases.2
+    message: household choice
+notFor:
+  - id: motionAtlas.household-market-choice.notFor.0
+    message: All prices and balances are small fictional values in demo credits, never real
+      currency or current market information.
+  - id: motionAtlas.household-market-choice.notFor.1
+    message: No nutritional, financial, or program eligibility recommendation is implied by
+      the selected basket.
+  - id: motionAtlas.household-market-choice.notFor.2
+    message: The scene assumes the authored goods are available and the authored tender is
+      accepted; it does not establish real program rules.
+  - id: motionAtlas.household-market-choice.notFor.3
+    message: One shopper represents the example household role, not household size or a
+      reported beneficiary count.
+motionBeats:
+  - startFrame: 12
+    endFrame: 29
+    description:
+      id: motionAtlas.household-market-choice.motionBeats.0
+      message: Reveal the shelf options, shopper and authored tender.
+  - startFrame: 30
+    endFrame: 107
+    description:
+      id: motionAtlas.household-market-choice.motionBeats.1
+      message: Carry only chosen products from the shelf into the household basket.
+  - startFrame: 108
+    endFrame: 126
+    description:
+      id: motionAtlas.household-market-choice.motionBeats.2
+      message: Move the chosen tender to the retailer and retain the exact remaining balance
+        with the household.
+  - startFrame: 127
+    endFrame: 167
+    description:
+      id: motionAtlas.household-market-choice.motionBeats.3
+      message: Hold the selected basket, unchanged shelf options and payment result.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.household-market-choice.motionBeats.4
+      message: Return to the opaque ground through the shared envelope.

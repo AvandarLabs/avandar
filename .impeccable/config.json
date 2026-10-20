@@ -18,6 +18,34 @@
         ],
         "createdAt": "2026-10-15T22:01:16.358Z",
         "reason": "URL string in a network-policy test fixture (fonts.googleapis.com/css2?family=Geist), not an actual typography choice"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "arial",
+        "files": ["apps/ava-video-producer/src/stock/StockGraphic.tsx"],
+        "createdAt": "2026-10-19T12:14:55.212Z",
+        "reason": "Codex: preserve the existing generic stock typography as required by producer AGENTS. This revision changes only transparent compositing."
+      },
+      {
+        "rule": "design-system-font",
+        "value": "inter",
+        "files": ["apps/ava-video-producer/showcase/motion.css"],
+        "createdAt": "2026-10-19T19:46:15.204Z",
+        "reason": "Codex: existing Motion Atlas typography shown in the user reference. User requested Compositions and Sample films match this theme; this change restores shared paper and ink tokens only."
+      },
+      {
+        "rule": "design-system-font",
+        "value": "georgia",
+        "files": ["apps/ava-video-producer/showcase/motion.css"],
+        "createdAt": "2026-10-19T19:46:15.225Z",
+        "reason": "Codex: existing Motion Atlas editorial accent font shown in the user reference. Preserve this standalone producer theme while restoring shared paper and ink tokens."
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": ["apps/ava-video-producer/showcase/motion.css"],
+        "createdAt": "2026-10-19T19:47:03.578Z",
+        "reason": "Codex: existing Motion Atlas typography shown in the user reference. The user requested matching the existing shared design theme; replacing its font is outside this styling regression fix."
       }
     ]
   }

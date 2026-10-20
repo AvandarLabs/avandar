@@ -1,0 +1,112 @@
+name:
+  id: motionAtlas.community-coordination-table.name
+  message: Rebalance a shared response
+description:
+  id: motionAtlas.community-coordination-table.description
+  message: Community representatives and response teams rearrange physical service markers
+    on a shared schematic tabletop map. An overlapping assignment moves to a requested
+    location so the final plan reflects an explicit community priority.
+category:
+  id: motionAtlas.community-coordination-table.category
+  message: Participatory spatial planning
+useWhen:
+  id: motionAtlas.community-coordination-table.useWhen
+  message: Show a community request changing a shared plan while preserving visibility of
+    what remains unassigned.
+intent:
+  id: motionAtlas.community-coordination-table.intent
+  message: Show a community request changing a shared plan while preserving visibility of
+    what remains unassigned.
+creativeDirection:
+  id: motionAtlas.community-coordination-table.creativeDirection
+  message: Within six seconds, reveal a tabletop map with authored community requests and
+    team markers at their starting assignments. Where two team markers overlap, the
+    community representative points to the requested destination; the reassigned team
+    lifts its own marker and places it at that destination. Turn the relevant request
+    tags face-up to show the configured final assignments, then hold the full plan with
+    all remaining requests still visible. Use the shared opaque entrance and exit
+    envelope, and avoid turning the whole map green.
+distinction:
+  id: motionAtlas.community-coordination-table.distinction
+  message: The main action is a participant lifting and relocating a physical assignment
+    in response to a visible community request. Unlike radial-network or schema-mapping,
+    no abstract hub distributes signals and the plan is revised rather than merely
+    connected.
+prompt:
+  id: motionAtlas.community-coordination-table.prompt
+  message: Rebalance a shared response. Show a community request changing a shared plan
+    while preserving visibility of what remains unassigned.
+tags:
+  - id: motionAtlas.community-coordination-table.tags.0
+    message: humanitarian coordination
+  - id: motionAtlas.community-coordination-table.tags.1
+    message: community priorities
+  - id: motionAtlas.community-coordination-table.tags.2
+    message: response planning
+  - id: motionAtlas.community-coordination-table.tags.3
+    message: overlapping assignments
+  - id: motionAtlas.community-coordination-table.tags.4
+    message: service coverage
+  - id: motionAtlas.community-coordination-table.tags.5
+    message: coordination table
+  - id: motionAtlas.community-coordination-table.tags.6
+    message: resource allocation
+  - id: motionAtlas.community-coordination-table.tags.7
+    message: schematic map
+goodFor:
+  - id: motionAtlas.community-coordination-table.goodFor.0
+    message: Explain a fictional coordination meeting about duplicated coverage
+  - id: motionAtlas.community-coordination-table.goodFor.1
+    message: Show community input changing where a team plans to work
+  - id: motionAtlas.community-coordination-table.goodFor.2
+    message: Contrast initial assignments with an agreed allocation
+domains:
+  - id: motionAtlas.community-coordination-table.domains.0
+    message: Participatory spatial planning
+aliases:
+  - id: motionAtlas.community-coordination-table.aliases.0
+    message: humanitarian coordination
+  - id: motionAtlas.community-coordination-table.aliases.1
+    message: community priorities
+  - id: motionAtlas.community-coordination-table.aliases.2
+    message: response planning
+notFor:
+  - id: motionAtlas.community-coordination-table.notFor.0
+    message: Markers represent authored team assignments, not measured coverage, beneficiary
+      counts, delivery capacity, or verified access.
+  - id: motionAtlas.community-coordination-table.notFor.1
+    message: The final scene is an agreed illustrative plan, not evidence that a service
+      reached a location.
+  - id: motionAtlas.community-coordination-table.notFor.2
+    message: The map is schematic and has no real geography or travel scale; no automatic
+      allocation or route calculation is implied.
+  - id: motionAtlas.community-coordination-table.notFor.3
+    message: Service compatibility is an author-validated semantic constraint; the renderer
+      cannot infer needs or determine an appropriate humanitarian response.
+motionBeats:
+  - startFrame: 12
+    endFrame: 43
+    description:
+      id: motionAtlas.community-coordination-table.motionBeats.0
+      message: Reveal the map and initial assignments; representative indicates the requested
+        destination.
+  - startFrame: 44
+    endFrame: 100
+    description:
+      id: motionAtlas.community-coordination-table.motionBeats.1
+      message: The moving team lifts, carries and places its own marker.
+  - startFrame: 101
+    endFrame: 120
+    description:
+      id: motionAtlas.community-coordination-table.motionBeats.2
+      message: Turn request tags face-up with the agreed assignments.
+  - startFrame: 121
+    endFrame: 167
+    description:
+      id: motionAtlas.community-coordination-table.motionBeats.3
+      message: Hold the full plan and every remaining request.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.community-coordination-table.motionBeats.4
+      message: Return to the opaque ground through the shared envelope.

@@ -1,0 +1,634 @@
+{
+  "head": "498c717d53240d15a29396830759a571a938f492",
+  "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "candidateId": "L3",
+  "preset": "schema-mapping",
+  "status": "Actual downloaded MP4 decoded to completion and five native captures personally inspected",
+  "createdAtUtc": "2026-10-18T01:55:17.948530+00:00",
+  "evidence": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-http-000-evidence.json",
+    "sha256": "eff647ddbf27f749165e2951cebaa4790d294e02493e4c127aa5a1fe26a4bfab"
+  },
+  "snapshot": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/configured-http-l3-delivery-snapshot.json",
+    "sha256": "d825798dbc7befaf944e236bdae07030db7114292b5e9d9b05c497f2d0f9243d"
+  },
+  "settings": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/mp4-witness-batches/mp4-000.json",
+    "sha256": "4d118d2bdfe52196983f11f24b01f934e58af7f79ec45f557e1bc0c61b7f46d3"
+  },
+  "verifiedDelivery": {
+    "key": "configured-l3",
+    "candidateId": "L3",
+    "preset": "schema-mapping",
+    "film": "stock-schema-mapping",
+    "head": "498c717d53240d15a29396830759a571a938f492",
+    "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+    "request": {
+      "preset": "schema-mapping",
+      "schemaVersion": 1,
+      "input": {
+        "mappings": [
+          {
+            "source": "person_key",
+            "target": "case_key",
+            "type": "string"
+          },
+          {
+            "source": "visit_day",
+            "target": "event_date",
+            "type": "date"
+          }
+        ],
+        "sourceLabel": "Field intake",
+        "targetLabel": "Case register",
+        "showChecks": true
+      },
+      "accent": "#d5e681",
+      "background": "#111318"
+    },
+    "filmInput": {
+      "id": "stock-schema-mapping",
+      "fps": 30,
+      "width": 1280,
+      "height": 800,
+      "delivery": {
+        "width": 1280,
+        "height": 800
+      },
+      "loop": true,
+      "showCaptions": true,
+      "kind": "stock",
+      "preset": "schema-mapping",
+      "schemaVersion": 1,
+      "input": {
+        "mappings": [
+          {
+            "source": "person_key",
+            "target": "case_key",
+            "type": "string"
+          },
+          {
+            "source": "visit_day",
+            "target": "event_date",
+            "type": "date"
+          }
+        ],
+        "sourceLabel": "Field intake",
+        "targetLabel": "Case register",
+        "showChecks": true
+      },
+      "accent": "#d5e681",
+      "background": "#111318",
+      "frames": 180,
+      "source": "apps/ava-video-producer/src/stock/StockGraphic.tsx"
+    },
+    "fingerprints": {
+      "stockRequest": {
+        "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+        "configurationHash": "b5a890418fecb49b849ece445337b4ed8a8e1ce5e34a0f78005c7bce6fbfb181"
+      },
+      "showcaseFilm": {
+        "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+        "configurationHash": "56701f8aa9d35c96191a735010b246c50f5a35d802589a12a3f86f5568766bc3"
+      },
+      "equal": false,
+      "reason": "Same authored preset/input/palette; production film includes delivery/id/loop/captions/source wrapper fields. Both use createStockFingerprint with identical parameters/current source, so envelope differences intentionally yield distinct configuration hashes."
+    },
+    "configurationHash": "56701f8aa9d35c96191a735010b246c50f5a35d802589a12a3f86f5568766bc3",
+    "configurationHashEnvelope": "resolved showcase film",
+    "stockRequestConfigurationHash": "b5a890418fecb49b849ece445337b4ed8a8e1ce5e34a0f78005c7bce6fbfb181",
+    "nativeSavedPath": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4",
+    "serverMp4Path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/stock-schema-mapping.mp4",
+    "gatedPicturePath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/picture.mp4",
+    "playbackFilename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/native/configured-schema-mapping.mp4",
+    "videoSha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+    "videoBytes": 116018,
+    "standalonePoster": null,
+    "posterEvidence": {
+      "frame": 150,
+      "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg",
+      "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/150.jpg",
+      "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+      "personallyViewed": true,
+      "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+    },
+    "previewEvidence": [
+      {
+        "frame": 0,
+        "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/0.jpg",
+        "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/0.jpg",
+        "sha256": "bbdb3b7fd2bc3968bd7d0aaad22343d0de81a24d98d61eef59f721f48d5cc3ca",
+        "personallyViewed": false,
+        "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+      },
+      {
+        "frame": 18,
+        "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/18.jpg",
+        "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/18.jpg",
+        "sha256": "979468d6d857eed2087b47eab73ac4cd7cc4b6c71a0eef36e7d3bf149acb71ae",
+        "personallyViewed": false,
+        "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+      },
+      {
+        "frame": 36,
+        "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/36.jpg",
+        "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/36.jpg",
+        "sha256": "2e2c66bb0dc1fdbe1305f36676a4ce3820818bc4789fe85ec2f61be0fbd12d69",
+        "personallyViewed": false,
+        "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+      },
+      {
+        "frame": 90,
+        "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/90.jpg",
+        "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/90.jpg",
+        "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+        "personallyViewed": true,
+        "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+      },
+      {
+        "frame": 150,
+        "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg",
+        "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/150.jpg",
+        "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+        "personallyViewed": true,
+        "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+      },
+      {
+        "frame": 179,
+        "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/179.jpg",
+        "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/179.jpg",
+        "sha256": "bbdb3b7fd2bc3968bd7d0aaad22343d0de81a24d98d61eef59f721f48d5cc3ca",
+        "personallyViewed": false,
+        "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+      }
+    ],
+    "deliveryRecord": {
+      "film": "stock-schema-mapping",
+      "fingerprint": {
+        "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+        "configurationHash": "56701f8aa9d35c96191a735010b246c50f5a35d802589a12a3f86f5568766bc3"
+      },
+      "gate": "passed",
+      "metadata": {
+        "duration": 6,
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.640028",
+            "width": 1280,
+            "height": 800,
+            "coded_width": 1280,
+            "coded_height": 800,
+            "has_b_frames": 0,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "8:5",
+            "pix_fmt": "yuvj420p",
+            "level": 40,
+            "color_range": "pc",
+            "color_space": "bt470bg",
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "30/1",
+            "avg_frame_rate": "30/1",
+            "time_base": "1/15360",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 92160,
+            "duration": "6.000000",
+            "bit_rate": "151941",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "180",
+            "extradata_size": 50,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc63.1.102 libx264"
+            },
+            "side_data_list": [
+              {
+                "side_data_type": "ICC Profile"
+              }
+            ]
+          }
+        ]
+      },
+      "sha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47"
+    },
+    "gateEvidence": {
+      "gateSha256": "ced692668c37cc06a5af82ddbf87406d865c710446fbf747f07a03c405462bd0",
+      "developGateSha256": "ced692668c37cc06a5af82ddbf87406d865c710446fbf747f07a03c405462bd0",
+      "byteIdenticalToDevelop": true,
+      "thresholds": {
+        "TILE_SPIKE_DB": "3",
+        "LUMA_JUMP": "25",
+        "FLAT": "120"
+      },
+      "failureExitPresent": true,
+      "actualGateLogPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/frame-check.txt",
+      "actualGateLogSha256": "97e269ba82a23a6eed96dc86aa8b2bb9a3fc9114125cbe3b53f504de81cf6ab0",
+      "actualGateOutput": "180 frames, 1280x800\n\ntiled frames: none\n\nluminance jumps over 25: none\n\nloop seam: frame 179 Y=19.0 -> frame 0 Y=19.0   jump 0.0\n",
+      "seam": {
+        "lastY": 19.0,
+        "firstY": 19.0,
+        "jump": 0.0
+      },
+      "gatedPicturePath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/picture.mp4",
+      "gatedPictureSha256": "4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47",
+      "gatedPictureEqualsNativeAndServer": true,
+      "gateRerun": false
+    },
+    "independentNativeFfprobe": {
+      "streams": [
+        {
+          "index": 0,
+          "codec_name": "h264",
+          "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+          "profile": "High",
+          "codec_type": "video",
+          "codec_tag_string": "avc1",
+          "codec_tag": "0x31637661",
+          "mime_codec_string": "avc1.640028",
+          "width": 1280,
+          "height": 800,
+          "coded_width": 1280,
+          "coded_height": 800,
+          "has_b_frames": 0,
+          "sample_aspect_ratio": "1:1",
+          "display_aspect_ratio": "8:5",
+          "pix_fmt": "yuvj420p",
+          "level": 40,
+          "color_range": "pc",
+          "color_space": "bt470bg",
+          "chroma_location": "left",
+          "field_order": "progressive",
+          "refs": 3,
+          "is_avc": "true",
+          "nal_length_size": "4",
+          "id": "0x1",
+          "r_frame_rate": "30/1",
+          "avg_frame_rate": "30/1",
+          "time_base": "1/15360",
+          "start_pts": 0,
+          "start_time": "0.000000",
+          "duration_ts": 92160,
+          "duration": "6.000000",
+          "bit_rate": "151941",
+          "bits_per_raw_sample": "8",
+          "nb_frames": "180",
+          "nb_read_frames": "180",
+          "extradata_size": 50,
+          "disposition": {
+            "default": 1,
+            "dub": 0,
+            "original": 0,
+            "comment": 0,
+            "lyrics": 0,
+            "karaoke": 0,
+            "forced": 0,
+            "hearing_impaired": 0,
+            "visual_impaired": 0,
+            "clean_effects": 0,
+            "attached_pic": 0,
+            "timed_thumbnails": 0,
+            "non_diegetic": 0,
+            "captions": 0,
+            "descriptions": 0,
+            "metadata": 0,
+            "dependent": 0,
+            "still_image": 0,
+            "multilayer": 0
+          },
+          "tags": {
+            "language": "und",
+            "handler_name": "VideoHandler",
+            "encoder": "Lavc63.1.102 libx264"
+          },
+          "side_data_list": [
+            {
+              "side_data_type": "ICC Profile"
+            }
+          ]
+        }
+      ],
+      "format": {
+        "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4",
+        "nb_streams": 1,
+        "nb_programs": 0,
+        "nb_stream_groups": 0,
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "start_time": "0.000000",
+        "duration": "6.000000",
+        "size": "116018",
+        "bit_rate": "154690",
+        "probe_score": 100,
+        "tags": {
+          "major_brand": "isom",
+          "minor_version": "512",
+          "compatible_brands": "isomiso2avc1mp41",
+          "encoder": "Lavf63.1.102"
+        }
+      }
+    },
+    "httpEvidence": {
+      "ruling": 66,
+      "post": {
+        "observedAt": 1792284878523,
+        "requestId": 1,
+        "method": "POST",
+        "url": "http://127.0.0.1:4183/api/exports",
+        "route": "/api/exports",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "rawBody": "{\"id\":\"stock-schema-mapping\",\"options\":{\"accent\":\"#d5e681\",\"background\":\"#111318\",\"input\":{\"mappings\":[{\"source\":\"person_key\",\"target\":\"case_key\",\"type\":\"string\"},{\"source\":\"visit_day\",\"target\":\"event_date\",\"type\":\"date\"}],\"showChecks\":true,\"sourceLabel\":\"Field intake\",\"targetLabel\":\"Case register\"},\"schemaVersion\":1}}",
+        "parsedBody": {
+          "id": "stock-schema-mapping",
+          "options": {
+            "accent": "#d5e681",
+            "background": "#111318",
+            "input": {
+              "mappings": [
+                {
+                  "source": "person_key",
+                  "target": "case_key",
+                  "type": "string"
+                },
+                {
+                  "source": "visit_day",
+                  "target": "event_date",
+                  "type": "date"
+                }
+              ],
+              "showChecks": true,
+              "sourceLabel": "Field intake",
+              "targetLabel": "Case register"
+            },
+            "schemaVersion": 1
+          }
+        },
+        "exactExpectedBody": true
+      },
+      "postResponse": {
+        "observedAt": 1792284878525,
+        "requestId": 1,
+        "method": "POST",
+        "url": "http://127.0.0.1:4183/api/exports",
+        "route": "/api/exports",
+        "status": 202,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"running\",\"message\":\"Preparing current composition…\"}",
+        "body": {
+          "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+          "state": "running",
+          "message": "Preparing current composition…"
+        }
+      },
+      "completedPoll": {
+        "observedAt": 1792284916372,
+        "requestId": 24,
+        "method": "GET",
+        "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+        "route": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+        "status": 200,
+        "headers": {
+          "content-type": "application/json"
+        },
+        "rawBody": "{\"id\":\"44a973da-32d7-48a7-9dfe-dfedd7a2add3\",\"state\":\"complete\",\"message\":\"Download ready\",\"download\":\"/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download\"}",
+        "body": {
+          "id": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
+          "state": "complete",
+          "message": "Download ready",
+          "download": "/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download"
+        }
+      },
+      "nativeDownload": {
+        "observedAt": 1792284916397,
+        "eventAt": 1792284916397,
+        "url": "http://127.0.0.1:4183/api/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/download",
+        "suggestedFilename": "stock-schema-mapping.mp4",
+        "savedPath": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/configured-schema-mapping.mp4",
+        "state": "saved",
+        "failure": null,
+        "savedAt": 1792284916399
+      },
+      "actualDownloadGetStatus": null,
+      "actualDownloadGetHeaders": null,
+      "pageDownloadGetResponseObserved": false,
+      "interpretation": "Successful direct native attachment is bound to exact same-origin completed-job URL. Independent native/server/gated-picture byte equality is verified. Page GET response status/headers remain unobserved.",
+      "galleryAndDialogPausedBeforeStart": {
+        "observedAt": 1792284877456,
+        "phase": "before-start",
+        "galleryControl": "Play all animations",
+        "activeCardIndicators": 0,
+        "previewFrame": "150",
+        "previewControl": "Play preview",
+        "notice": "Configured JSON copied",
+        "downloadControl": "Download MP4"
+      },
+      "observerErrors": [],
+      "originalStrictStatus02Path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-http-l3-498c717d-status-02.json",
+      "assessorRevision": {
+        "ruling": 66,
+        "originalFinalizer": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize.js",
+        "originalSha256": "be48fe373ba69664c408b92b1804e8d11e7331939aaf5a18614a0c041b08b859",
+        "revisedFinalizer": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/configured-http-download/498c717d53240d15a29396830759a571a938f492/final-2ad04707/0de114a4948dbf24/finalize-native-attachment.js",
+        "revisedSha256": "d8a7edf86c5afb606ee7e9a85fd671e04ff30ce5dfec453897af20b8c07286aa",
+        "changes": "Only cdAssess accepts direct native attachment at exact completed same-origin job URL when page GET response is not exposed. Blob path remains response-dependent. Original observation state/helper identity preserved. No status/headers invented."
+      }
+    },
+    "previewPixelInspection": {
+      "viewedFiles": [
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/90.jpg",
+        "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg"
+      ],
+      "viewedImageEvidence": [
+        {
+          "frame": 90,
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/90.jpg",
+          "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/90.jpg",
+          "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+          "personallyViewed": true,
+          "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+        },
+        {
+          "frame": 150,
+          "original": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/showcase/exports/44a973da-32d7-48a7-9dfe-dfedd7a2add3/preview/150.jpg",
+          "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-http-delivery-snapshots/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/44a973da-32d7-48a7-9dfe-dfedd7a2add3/export-preview/150.jpg",
+          "sha256": "c4b4b415006f0e8e229da928f3541f454a46ccff0b9304fabbbaa8c74efabd8f",
+          "personallyViewed": true,
+          "role": "Actual HTTP export preview JPEG. Not a standalone stock poster or decoded-video screenshot."
+        }
+      ],
+      "observations": [
+        "Personally viewed actual HTTP export JPEG previews 90 and 150 individually with view_image. Both show Field intake on the left and Case register on the right.",
+        "Exactly two visible relationships are person_key to case_key with string type, and visit_day to event_date with date type. Each has its own checked connector, with no crossing or wrong row association.",
+        "The first connector/check uses the authored yellow-green accent and the second retains the preset's cyan secondary series color, against the authored dark background. Exact hex values are established by copied input and production film props, rather than inferred solely from JPEG pixels.",
+        "Both native preview pictures keep all labels, checks, connectors and the footer caption intact. Type labels are subdued gray but readable at native size. No concrete clipping, overlap or incorrect relationship is visible in these two samples.",
+        "These existing export previews are poster evidence only. They are not screenshots of decoded saved MP4 playback and cannot establish all intermediate states or loop quality."
+      ],
+      "findings": []
+    },
+    "decodedBrowserPlayback": "pending",
+    "acceptance": null
+  },
+  "observation": {
+    "framesSummary": {
+      "count": 179,
+      "rawTracePreservedInIgnoredOriginal": true
+    },
+    "eventsSummary": {
+      "count": 2,
+      "rawTracePreservedInIgnoredOriginal": true
+    },
+    "error": null,
+    "quality": {
+      "totalVideoFrames": 180,
+      "droppedVideoFrames": 0
+    }
+  },
+  "viewedImageCount": 5,
+  "viewedFiles": [
+    {
+      "phase": "entrance",
+      "window": [
+        0.6,
+        1.3
+      ],
+      "before": 0.616173,
+      "after": 0.706436,
+      "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/entrance.png",
+      "sha256": "a3e723797e26adee764e2ec1783f73c8c7442ea10444eddfe0527dde5895e10f",
+      "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/entrance.png",
+      "personallyViewedBy": "root",
+      "nativeSize": [
+        1280,
+        800
+      ]
+    },
+    {
+      "phase": "action-early",
+      "window": [
+        2.8,
+        3.4
+      ],
+      "before": 2.81768,
+      "after": 2.901897,
+      "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/action-early.png",
+      "sha256": "6328b4f5a6d68bc2c78249c872a9e0a76e16c6f84d830f73a1ec50394f7b3c8d",
+      "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/action-early.png",
+      "personallyViewedBy": "root",
+      "nativeSize": [
+        1280,
+        800
+      ]
+    },
+    {
+      "phase": "action-late",
+      "window": [
+        4,
+        4.6
+      ],
+      "before": 4.015386,
+      "after": 4.100239,
+      "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/action-late.png",
+      "sha256": "59a16e01b18303473d3c4d074a0779289565d11cf7381da2c861a2f65e5c98ba",
+      "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/action-late.png",
+      "personallyViewedBy": "root",
+      "nativeSize": [
+        1280,
+        800
+      ]
+    },
+    {
+      "phase": "hold",
+      "window": [
+        4.8,
+        5.5
+      ],
+      "before": 4.820848,
+      "after": 4.901675,
+      "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/hold.png",
+      "sha256": "59a16e01b18303473d3c4d074a0779289565d11cf7381da2c861a2f65e5c98ba",
+      "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/hold.png",
+      "personallyViewedBy": "root",
+      "nativeSize": [
+        1280,
+        800
+      ]
+    },
+    {
+      "phase": "seam",
+      "window": [
+        5.8,
+        6
+      ],
+      "before": 5.815683,
+      "after": 5.901126,
+      "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/seam.png",
+      "sha256": "a859b261184db6001d96acbf75c25b90716572ddf4b5cee0c51079926079aba3",
+      "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/seam.png",
+      "personallyViewedBy": "root",
+      "nativeSize": [
+        1280,
+        800
+      ]
+    }
+  ],
+  "observations": [
+    "Entrance shows Field intake and Case register with the two authored source names; target cells and checks have not yet appeared. Native video controls are faintly present at the bottom of this browser capture, not claimed encoded content.",
+    "Action-early, action-late and hold show exactly person_key to case_key/string and visit_day to event_date/date, with both checkmarks and complete selected headers. No extra row or clipped identifier is visible.",
+    "The first connector/check is selected yellow-green, the second uses the existing blue secondary accent, and the dark ground is consistent across the held picture. Numeric color identity is established by exact request/configuration, not inferred from screenshot colors.",
+    "The footer Different names. Explicit connections. is readable in the hold. Type labels are subdued but legible. No new concrete picture defect is observed in these five native images.",
+    "The final sampled image fades toward the same dark ground. One pre-end image does not establish every transition frame or repeated-loop smoothness."
+  ],
+  "findings": [],
+  "limits": [
+    "No standalone stock poster is generated by HTTP; prior150preview inspection remains separate.",
+    "Native attachment GET response status/headers remain unobserved underR66.",
+    "Five natural captures and decoded callbacks are not continuous pixel inspection or a newly observed loop replay.",
+    "Original files/previous failed assessor and evidence identities remain unchanged.",
+    "No global catalog or production acceptance asserted."
+  ],
+  "imageInspectionComplete": true,
+  "globalAcceptance": null,
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-http-l3-decoded-inspection-498c717d.json",
+    "sha256": "7dca6a9c0f53b5ba1cd5107e5a923f1beeb891d07c3fa4cae4a5f14e8bb8c548",
+    "bytes": 52796
+  }
+}

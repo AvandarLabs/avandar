@@ -1,0 +1,36 @@
+{
+  "preset": "paired-contrast",
+  "schemaVersion": 1,
+  "input": {
+    "question": "How will the fictional exhibit be reviewed?",
+    "alternatives": [
+      {
+        "id": "solo",
+        "label": "Solo review"
+      },
+      {
+        "id": "pair",
+        "label": "Pair review"
+      }
+    ],
+    "criteria": [
+      {
+        "id": "reader",
+        "label": "Readers",
+        "leftText": "One author",
+        "rightText": "Two collaborators"
+      },
+      {
+        "id": "handoff",
+        "label": "Handoff",
+        "leftText": "A self-check",
+        "rightText": "A shared discussion"
+      }
+    ],
+    "focusCriterionId": "reader",
+    "comparisonLabel": "Fictional review approaches",
+    "showPairBrackets": true
+  },
+  "accent": "#9fefca",
+  "background": "#0b1219"
+}

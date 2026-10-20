@@ -1,0 +1,513 @@
+{
+  "version": 1,
+  "id": "qetl-motion",
+  "title": "Ask before moving data",
+  "description": "Batch ETL and query-led retrieval, connected through a persistent question and a selective data boundary.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1542,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Ask before moving data",
+        "category": "motion-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "question",
+            "title": "What if the question came first?",
+            "subtitle": "QETL and a conventional batch ETL example",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Prepare everything first?",
+                "Or begin with what you need?"
+              ],
+              "emphasis": "The order changes the work."
+            },
+            "duration": 308,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "batch",
+            "title": "First, the familiar batch pipeline.",
+            "subtitle": "An illustrative batch design, not every ETL system.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "data-pipeline",
+                "schemaVersion": 1,
+                "input": {
+                  "stages": [
+                    {
+                      "label": "Extract",
+                      "detail": "Scheduled sources"
+                    },
+                    {
+                      "label": "Transform",
+                      "detail": "Prepared dataset"
+                    },
+                    {
+                      "label": "Load",
+                      "detail": "Warehouse"
+                    },
+                    {
+                      "label": "Query",
+                      "detail": "Ask afterward"
+                    }
+                  ],
+                  "heading": "A batch ETL example",
+                  "showProgress": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 285,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 285,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 670,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 670,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ],
+              "flight": {
+                "at": 294,
+                "duration": 18,
+                "dx": 680,
+                "dy": -120,
+                "rect": {
+                  "x": 723,
+                  "y": 205,
+                  "width": 174,
+                  "height": 207
+                }
+              }
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "wipe",
+              "frames": 24
+            },
+            "token": {
+              "label": "The question",
+              "anchor": {
+                "x": 1120,
+                "y": 716,
+                "width": 360,
+                "height": 58
+              }
+            }
+          },
+          {
+            "id": "selection",
+            "title": "Now move the question upstream.",
+            "subtitle": "The query defines the subset that crosses the boundary.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "predicate-pushdown-boundary",
+                "schemaVersion": 1,
+                "input": {
+                  "rows": [
+                    {
+                      "id": "a",
+                      "value": 2
+                    },
+                    {
+                      "id": "b",
+                      "value": 7
+                    },
+                    {
+                      "id": "c",
+                      "value": 4
+                    },
+                    {
+                      "id": "d",
+                      "value": 9
+                    }
+                  ],
+                  "predicate": {
+                    "operator": ">=",
+                    "threshold": 5
+                  },
+                  "metric": {
+                    "label": "Recorded items",
+                    "unit": "items",
+                    "rowUnit": "records"
+                  },
+                  "labels": {
+                    "source": "Source system",
+                    "destination": "Local query",
+                    "condition": "Apply at source",
+                    "retained": "Remain at source",
+                    "transferred": "Transferred rows"
+                  },
+                  "showTotals": true,
+                  "copy": {
+                    "context": "Fictional document",
+                    "source": "Original",
+                    "result": "Extracted result"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 86,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 110,
+                  "x": 665,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 175,
+                  "x": 665,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 189,
+                  "x": 280,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 318,
+                  "x": 280,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 346,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 360,
+            "transition": {
+              "kind": "handoff",
+              "frames": 24
+            },
+            "token": {
+              "label": "The question",
+              "anchor": {
+                "x": 100,
+                "y": 700,
+                "width": 360,
+                "height": 58
+              }
+            }
+          },
+          {
+            "id": "cache",
+            "title": "Keep what this query needed.",
+            "subtitle": "An incremental cache grows with requested columns.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "query-column-cache-growth",
+                "schemaVersion": 1,
+                "input": {
+                  "columns": [
+                    {
+                      "id": "key",
+                      "label": "Case",
+                      "cells": [
+                        "HF-01",
+                        "HF-02",
+                        "HF-02"
+                      ]
+                    },
+                    {
+                      "id": "name",
+                      "label": "District",
+                      "cells": [
+                        "North",
+                        "South",
+                        "South"
+                      ]
+                    },
+                    {
+                      "id": "value",
+                      "label": "Items",
+                      "cells": [
+                        "2",
+                        "4",
+                        "4"
+                      ]
+                    }
+                  ],
+                  "cachedColumnIds": [
+                    "key",
+                    "name"
+                  ],
+                  "requests": [
+                    {
+                      "label": "Read names",
+                      "columnIds": [
+                        "name"
+                      ]
+                    },
+                    {
+                      "label": "Read items",
+                      "columnIds": [
+                        "key",
+                        "value"
+                      ]
+                    }
+                  ],
+                  "keyColumnId": "key",
+                  "showSetNotation": true,
+                  "copy": {
+                    "context": "Fictional example",
+                    "before": "Before",
+                    "after": "After"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 690,
+                  "y": 235,
+                  "zoom": 1.85,
+                  "ease": "push"
+                },
+                {
+                  "at": 163,
+                  "x": 690,
+                  "y": 235,
+                  "zoom": 1.85,
+                  "ease": "glide"
+                },
+                {
+                  "at": 177,
+                  "x": 480,
+                  "y": 415,
+                  "zoom": 1.85,
+                  "ease": "whip"
+                },
+                {
+                  "at": 288,
+                  "x": 480,
+                  "y": 415,
+                  "zoom": 1.85,
+                  "ease": "glide"
+                },
+                {
+                  "at": 316,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 330,
+            "transition": {
+              "kind": "spatial",
+              "frames": 24
+            }
+          },
+          {
+            "id": "payoff",
+            "title": "Query. Then retrieve and compute.",
+            "subtitle": "The architecture follows the question.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Ask for a subset.",
+                "Move and process what it needs."
+              ],
+              "emphasis": "Less unnecessary work is the aim."
+            },
+            "duration": 302,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "question-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 138,
+      "text": "A batch pipeline prepares data before the question arrives.",
+      "beatId": "question"
+    },
+    {
+      "id": "question-1",
+      "shotId": "explanation",
+      "startFrame": 143,
+      "endFrame": 263,
+      "text": "QETL starts with the question instead.",
+      "beatId": "question"
+    },
+    {
+      "id": "batch-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "This batch example prepares data on a schedule.",
+      "beatId": "batch"
+    },
+    {
+      "id": "batch-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "The user queries the prepared copy afterward.",
+      "beatId": "batch"
+    },
+    {
+      "id": "selection-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 176,
+      "text": "A query describes the records and columns it needs.",
+      "beatId": "selection"
+    },
+    {
+      "id": "selection-1",
+      "shotId": "explanation",
+      "startFrame": 181,
+      "endFrame": 315,
+      "text": "A supported source can apply the selection before transfer.",
+      "beatId": "selection"
+    },
+    {
+      "id": "cache-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 164,
+      "text": "The cache can retain previously requested columns.",
+      "beatId": "cache"
+    },
+    {
+      "id": "cache-1",
+      "shotId": "explanation",
+      "startFrame": 169,
+      "endFrame": 291,
+      "text": "A later query can add what is missing.",
+      "beatId": "cache"
+    },
+    {
+      "id": "payoff-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 156,
+      "text": "The architectural aim is less unnecessary transfer and work.",
+      "beatId": "payoff"
+    },
+    {
+      "id": "payoff-1",
+      "shotId": "explanation",
+      "startFrame": 161,
+      "endFrame": 281,
+      "text": "Actual savings depend on the sources and the workload.",
+      "beatId": "payoff"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

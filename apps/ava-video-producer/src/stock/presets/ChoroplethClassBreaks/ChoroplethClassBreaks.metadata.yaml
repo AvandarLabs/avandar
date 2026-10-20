@@ -1,0 +1,115 @@
+name:
+  id: motionAtlas.choropleth-class-breaks.name
+  message: The breaks change the map
+description:
+  id: motionAtlas.choropleth-class-breaks.description
+  message: The same zone values move between two authored classification schemes. Legend
+    thresholds slide while the zones recolor, showing that the visual impression can
+    change without any value changing.
+category:
+  id: motionAtlas.choropleth-class-breaks.category
+  message: Thematic classification
+useWhen:
+  id: motionAtlas.choropleth-class-breaks.useWhen
+  message: Expose the cartographic effect of classification choices.
+prompt:
+  id: motionAtlas.choropleth-class-breaks.prompt
+  message: Use Motion Atlas The breaks change the map (choropleth-class-breaks) to expose
+    the cartographic effect of classification choices. Supply approved authored content
+    before making claims.
+creativeDirection:
+  id: motionAtlas.choropleth-class-breaks.creativeDirection
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 align four zone tiles with one common value ruler and initial break markers.
+    Frames 51-110 slide markers to the second scheme and recolor each zone only as its
+    fixed value crosses a threshold. Frames 111-139 hold both labeled legends and
+    unchanged zone numbers. Hold at frames 140-165; fade to the same opaque ground at
+    frames 166-179 for an editorial loop.
+intent:
+  id: motionAtlas.choropleth-class-breaks.intent
+  message: Expose the cartographic effect of classification choices.
+distinction:
+  id: motionAtlas.choropleth-class-breaks.distinction
+  message: Population-normalized-map changes the measure by introducing a denominator.
+    This keeps all values fixed and changes only classification thresholds, exposing a
+    different cartographic choice.
+tags:
+  - id: motionAtlas.choropleth-class-breaks.tags.0
+    message: choropleth
+  - id: motionAtlas.choropleth-class-breaks.tags.1
+    message: class breaks
+  - id: motionAtlas.choropleth-class-breaks.tags.2
+    message: legend
+  - id: motionAtlas.choropleth-class-breaks.tags.3
+    message: classification
+  - id: motionAtlas.choropleth-class-breaks.tags.4
+    message: missing data
+goodFor:
+  - id: motionAtlas.choropleth-class-breaks.goodFor.0
+    message: Explain how legend breaks change a map without changing data
+  - id: motionAtlas.choropleth-class-breaks.goodFor.1
+    message: Compare authored cartographic classifications
+domains:
+  - id: motionAtlas.choropleth-class-breaks.domains.0
+    message: Thematic classification
+aliases:
+  - id: motionAtlas.choropleth-class-breaks.aliases.0
+    message: choropleth
+  - id: motionAtlas.choropleth-class-breaks.aliases.1
+    message: class breaks
+  - id: motionAtlas.choropleth-class-breaks.aliases.2
+    message: legend
+  - id: motionAtlas.choropleth-class-breaks.aliases.3
+    message: classification
+  - id: motionAtlas.choropleth-class-breaks.aliases.4
+    message: missing data
+notFor:
+  - id: motionAtlas.choropleth-class-breaks.notFor.0
+    message: Thresholds are authored; names do not assert an implemented Jenks, quantile or
+      other optimizer.
+  - id: motionAtlas.choropleth-class-breaks.notFor.1
+    message: A change of color is not a change in conditions or a ranking claim.
+  - id: motionAtlas.choropleth-class-breaks.notFor.2
+    message: Every legend uses explicit boundaries and a separate missing category.
+  - id: motionAtlas.choropleth-class-breaks.notFor.3
+    message: No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.choropleth-class-breaks.notFor.4
+    message: Authored prose and schematic context are the author's responsibility. Runtime
+      validation checks structural bounds and numeric, reference and geometry
+      constraints, without classifying natural-language claims.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.choropleth-class-breaks.motionBeats.0
+      message: Reveal the schematic scene.
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.choropleth-class-breaks.motionBeats.1
+      message: The same zone values move between two authored classification schemes. Legend
+        thresholds slide while the zones recolor, showing that the visual impression can
+        change without any value changing.
+  - startFrame: 51
+    endFrame: 110
+    description:
+      id: motionAtlas.choropleth-class-breaks.motionBeats.2
+      message: Expose the cartographic effect of classification choices.
+  - startFrame: 111
+    endFrame: 139
+    description:
+      id: motionAtlas.choropleth-class-breaks.motionBeats.3
+      message: Resolve the authored relationship without changing source data.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.choropleth-class-breaks.motionBeats.4
+      message: Hold the complete resolved relationship.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.choropleth-class-breaks.motionBeats.5
+      message: The outer stock envelope fades to the same opaque ground.

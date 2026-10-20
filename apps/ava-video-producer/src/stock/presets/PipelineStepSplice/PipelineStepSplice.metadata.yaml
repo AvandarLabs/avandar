@@ -1,0 +1,103 @@
+name:
+  id: motionAtlas.pipeline-step-splice.name
+  message: Insert a processing step
+description:
+  id: motionAtlas.pipeline-step-splice.description
+  message: A new operation is fitted into the middle of an existing processing sequence.
+    The sequence physically makes room, reconnects, and presents an authored
+    input/output example.
+category:
+  id: motionAtlas.pipeline-step-splice.category
+  message: Mechanical composition
+useWhen:
+  id: motionAtlas.pipeline-step-splice.useWhen
+  message: Show that a process can be changed by inserting one explicit operation.
+creativeDirection:
+  id: motionAtlas.pipeline-step-splice.creativeDirection
+  message: Frames 12-38 establish the existing strip of operations with the new module
+    parked above its future position. During frames 38-98, the strip separates at that
+    position, later modules move aside, and the inserted module slides down into the
+    open gap. End joints close across the new module. A small before/after preview opens
+    below the insertion during frames 98-132 and holds with the recomposed strip until
+    the exit envelope.
+intent:
+  id: motionAtlas.pipeline-step-splice.intent
+  message: Show that a process can be changed by inserting one explicit operation.
+distinction:
+  id: motionAtlas.pipeline-step-splice.distinction
+  message: Unlike data-pipeline, no packet walks through a fixed process. The process
+    topology itself changes through an observable insertion, with one new operation
+    taking a precise place.
+prompt:
+  id: motionAtlas.pipeline-step-splice.prompt
+  message: Use Motion Atlas "Insert a processing step" (pipeline-step-splice) as a
+    conceptual graphic. Show that a process can be changed by inserting one explicit
+    operation. Replace fictional sample content with approved authored content before
+    making product claims.
+tags:
+  - id: motionAtlas.pipeline-step-splice.tags.0
+    message: pipeline builder
+  - id: motionAtlas.pipeline-step-splice.tags.1
+    message: compose workflow
+  - id: motionAtlas.pipeline-step-splice.tags.2
+    message: insert step
+  - id: motionAtlas.pipeline-step-splice.tags.3
+    message: modular processing
+  - id: motionAtlas.pipeline-step-splice.tags.4
+    message: splice
+  - id: motionAtlas.pipeline-step-splice.tags.5
+    message: transformation step
+  - id: motionAtlas.pipeline-step-splice.tags.6
+    message: reusable operation
+  - id: motionAtlas.pipeline-step-splice.tags.7
+    message: edit sequence
+goodFor:
+  - id: motionAtlas.pipeline-step-splice.goodFor.0
+    message: Explain adding a reusable step to an existing workflow
+  - id: motionAtlas.pipeline-step-splice.goodFor.1
+    message: Show composing a transformation without rebuilding the whole sequence
+  - id: motionAtlas.pipeline-step-splice.goodFor.2
+    message: Introduce the effect of a newly inserted operation
+domains:
+  - id: motionAtlas.pipeline-step-splice.domains.0
+    message: Mechanical composition
+aliases:
+  - id: motionAtlas.pipeline-step-splice.aliases.0
+    message: pipeline builder
+  - id: motionAtlas.pipeline-step-splice.aliases.1
+    message: compose workflow
+  - id: motionAtlas.pipeline-step-splice.aliases.2
+    message: insert step
+  - id: motionAtlas.pipeline-step-splice.aliases.3
+    message: modular processing
+notFor:
+  - id: motionAtlas.pipeline-step-splice.notFor.0
+    message: All default operations and values are fictional.
+  - id: motionAtlas.pipeline-step-splice.notFor.1
+    message: This supports a single middle insertion, not branching, arbitrary execution, or
+      reorder validation.
+  - id: motionAtlas.pipeline-step-splice.notFor.2
+    message: Preview strings are supplied; the animation does not execute operations.
+  - id: motionAtlas.pipeline-step-splice.notFor.3
+    message: The final step array owns both order and count.
+motionBeats:
+  - startFrame: 12
+    endFrame: 38
+    description:
+      id: motionAtlas.pipeline-step-splice.motionBeats.0
+      message: Establish existing operations with the inserted module parked above its gap.
+  - startFrame: 38
+    endFrame: 98
+    description:
+      id: motionAtlas.pipeline-step-splice.motionBeats.1
+      message: Separate the strip and lower the sole inserted module into its final ordered gap.
+  - startFrame: 98
+    endFrame: 132
+    description:
+      id: motionAtlas.pipeline-step-splice.motionBeats.2
+      message: Close the joints and unfold the authored before/after preview.
+  - startFrame: 132
+    endFrame: 166
+    description:
+      id: motionAtlas.pipeline-step-splice.motionBeats.3
+      message: Hold the recomposed sequence and optional preview.

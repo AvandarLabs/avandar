@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 1,
+  "head": "02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+  "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "status": "unfiltered-browser-findings-supplement-not-a-new-adjudication",
+  "canonical108Unchanged": "implementation-findings.json",
+  "priorSupplementUnchanged": "implementation-findings-supplement.json",
+  "defaultFindings": [
+    {
+      "batch": 0,
+      "id": "network-graph",
+      "reportSha256": "fb9670ef2c021db9499b1bd1aba2d1d66e7c009bca0bac99df92cc3cd8c235eb",
+      "finding": {
+        "findingId": "network-label-connector-overlap",
+        "severity": "low",
+        "category": "readability",
+        "status": "retained-baseline-concern",
+        "description": "Vertical network connectors pass behind Gamma, Nexus, and CENTRAL NODE in the native hold. The words remain readable, but connector paint visibly weakens text separation.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph/hold.png"
+        ],
+        "observedClockBracket": [
+          145,
+          147
+        ],
+        "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
+        "priorDisposition": "preserve-baseline-carry-to-final-review",
+        "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
+      }
+    },
+    {
+      "batch": 0,
+      "id": "radial-network",
+      "reportSha256": "fb9670ef2c021db9499b1bd1aba2d1d66e7c009bca0bac99df92cc3cd8c235eb",
+      "finding": {
+        "findingId": "radial-input-connector-overlap",
+        "severity": "low",
+        "category": "readability",
+        "status": "retained-baseline-concern",
+        "description": "The top Input-to-hub spoke continues through the Input label in the native hold. Input remains readable; the line/text separation concern remains visible.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/radial-network/hold.png"
+        ],
+        "observedClockBracket": [
+          145,
+          148
+        ],
+        "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
+        "priorDisposition": "preserve-baseline-carry-to-final-review",
+        "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
+      }
+    },
+    {
+      "batch": 0,
+      "id": "orbital-system",
+      "reportSha256": "fb9670ef2c021db9499b1bd1aba2d1d66e7c009bca0bac99df92cc3cd8c235eb",
+      "finding": {
+        "findingId": "orbital-label-orbit-overlap",
+        "severity": "low",
+        "category": "readability",
+        "status": "retained-baseline-concern",
+        "description": "The blue orbit curve runs through the lower GAMMA text area in the native hold. The amber label remains readable, but orbit paint competes with its letter area.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/orbital-system/hold.png"
+        ],
+        "observedClockBracket": [
+          145,
+          147
+        ],
+        "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
+        "priorDisposition": "preserve-baseline-carry-to-final-review",
+        "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
+      }
+    },
+    {
+      "batch": 2,
+      "id": "bar-race",
+      "reportSha256": "61f2ef8f277ad10d6929583ef9e1931c078f0e13565d3a80a81d61ac3ebf4c7c",
+      "finding": {
+        "classification": "preserved-legacy-action-observation",
+        "severity": "editorial-review",
+        "observedClockBrackets": [
+          [
+            85,
+            87
+          ]
+        ],
+        "files": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race/action-early.png"
+        ],
+        "location": "Two overlapping bar pairs around x258..790,y278..357 and x258..622,y432..510 in the native action image.",
+        "observation": "Four series collapse visually into two overlapping pairs at this sampled crossing, and row names/values are absent. The persistent legend remains.",
+        "consequence": "Series cannot be read independently at this action sample. The final hold is separately readable and correct.",
+        "disposition": "Retain the visual-correction-dispositions.json preserve-baseline-carry-to-final-review decision. This is not a new correction request or a lasting hold defect.",
+        "priorEvidence": "default-visual-005-015.json / bar-race-default-frame90-series-identity"
+      }
+    },
+    {
+      "batch": 4,
+      "id": "capability-matrix",
+      "reportSha256": "575afac93344d77737425ffd831eaa758bbe6c80b0ccea0706d039069518e1ca",
+      "finding": {
+        "findingId": "dense-capability-reveal-line-text-overlap",
+        "severity": "low",
+        "category": "readability",
+        "status": "retained-transient-concern",
+        "description": "The natural action-early mint scan line crosses the lower parts of the Refill conditional and unknown symbols. Both remain decipherable. Decisive90 and the native hold are clear.",
+        "impact": "No sustained wrong final state. This is a retained transient symbol/scan-line readability concern.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/capability-matrix/action-early.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/capability-matrix/decisive.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/capability-matrix/hold.png"
+        ],
+        "naturalObservedClockBracket": [
+          85,
+          87
+        ],
+        "clearKeyboardScrubbedFrame": 90,
+        "clearNaturalHoldClockBracket": [
+          145,
+          147
+        ],
+        "priorDisposition": "retain-transient-observation-no-source-change",
+        "temporalLimits": "One natural action bracket and separated clear samples do not establish exact duration or continuous perceptual severity."
+      }
+    },
+    {
+      "batch": 5,
+      "id": "shared-foundation",
+      "reportSha256": "bfb3ccedebceb1a3ffee727345bb31048c33d2dbac516108d19e2a25b4e50329",
+      "finding": {
+        "findingId": "shared-foundation-action-text-mask",
+        "severity": "medium",
+        "category": "readability",
+        "status": "retained-transient-concern",
+        "description": "The natural action-early dark center gap removes middle letters from both already-visible foundation statements while the halves are separated. Decisive114 and native hold show complete statements.",
+        "impact": "The shared statement is incomplete in that sampled action state. The joined foundation and hold recover all text. Earlier disposition retained the intentional joining observation without a source change.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/shared-foundation/action-early.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/shared-foundation/decisive.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/shared-foundation/hold.png"
+        ],
+        "naturalObservedClockBracket": [
+          85,
+          87
+        ],
+        "clearKeyboardScrubbedFrame": 114,
+        "clearNaturalHoldClockBracket": [
+          145,
+          147
+        ],
+        "priorDisposition": "retain-transient-observation-no-source-change",
+        "temporalLimits": "One natural action bracket and separated clear samples do not establish exact duration or continuous perceptual severity."
+      }
+    },
+    {
+      "batch": 8,
+      "id": "cell-normalization",
+      "reportSha256": "6c5d05494a6083b8d4a18d379e6dd54627eb6e59ec865ec0fe736e0a7449e1e4",
+      "finding": {
+        "findingId": "cell-normalization-crossfade-text-overprint",
+        "severity": "low",
+        "category": "sampled-transition-readability",
+        "status": "new-sampled-concern-for-controller-disposition",
+        "description": "At keyboard-scrubbed76, the Original/Prepared value left header layers and the first-row old/new value layers are simultaneously overprinted. In the natural85..87capture a faint displaced old Bay A still competes with the prepared Bay A.",
+        "impact": "The prepared value remains decipherable but local text separation is reduced during the sampled crossfade. Native hold is fully clear; no sustained wrong value is established.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cell-normalization/decisive.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cell-normalization/action-early.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cell-normalization/hold.png"
+        ],
+        "keyboardScrubbedFrame": 76,
+        "naturalObservedClockBracket": [
+          85,
+          87
+        ],
+        "clearNaturalHoldClockBracket": [
+          145,
+          147
+        ],
+        "temporalLimits": "This appears to be the authored old-to-prepared crossfade. Exact duration and full perceptual severity cannot be inferred from these pictures. No source correction or acceptance is prescribed."
+      }
+    },
+    {
+      "batch": 25,
+      "id": "actor-attribution-split",
+      "reportSha256": "1f4312d592ed785cc9258cbb664db2e8a0d77fb13c5e1a3a27c833b130b9af8a",
+      "finding": {
+        "findingId": "actor-attribution-moving-stamp-covers-prior-attribution",
+        "classification": "sampled-transitional-readability-concern",
+        "severity": "pending-temporal-review",
+        "status": "new-sampled-transition-observation; duration-and-change-disposition-unresolved",
+        "description": "During natural120..122, the moving Demo account B stamp covers the start of the existing Demo account A label in the Draft revised history row. Only the attribution suffix remains visible behind the moving opaque stamp.",
+        "location": "Natural action-late native image: moving B stamp across the third history entry, around y414..468 in the1210×757 capture.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/action-late.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/hold.png"
+        ],
+        "observedClockBracket": [
+          120,
+          122
+        ],
+        "resolvedHold": "Native145..147 displays correct separate A and B attributions, with earlier shared labels unchanged.",
+        "limits": "This finding records actual sampled occlusion. It does not infer sustained duration, a permanent false attribution, or the need for a source change without temporal review."
+      }
+    },
+    {
+      "batch": 25,
+      "id": "expectation-overlay-check",
+      "reportSha256": "1f4312d592ed785cc9258cbb664db2e8a0d77fb13c5e1a3a27c833b130b9af8a",
+      "finding": {
+        "findingId": "expectation-overlay-default-overprint-current-natural-window",
+        "relatedPriorFindingId": "expectation-overlay-default-frame90-overprint",
+        "classification": "sampled-correctness-readability-concern",
+        "severity": "pending-playback",
+        "status": "retained-transient-observation-no-source-change",
+        "description": "Hold and Admit overprint into merged glyphs in the expired-ticket row during the current natural85..87 window. They are separately readable in the native resolved hold.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/action-early.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/decisive.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/hold.png"
+        ],
+        "observedClockBracket": [
+          85,
+          87
+        ],
+        "priorControllerDisposition": "Retain the intentional registration/transition observation for final editorial review, without claiming every action frame is unobstructed.",
+        "limits": "No exact overlap duration, continuous readability or new permanent mismatch is established. Correct hold does not erase current transition overprint."
+      }
+    },
+    {
+      "batch": 32,
+      "id": "spatial-grid-binning",
+      "reportSha256": "df2fc927a5a965047e297f79c6964c5f3dba3505dd3d7f6382e075f1dcf41337",
+      "finding": {
+        "severity": "low",
+        "category": "sampled-transition-readability",
+        "title": "Two moving bin tokens overlap at decisive frame80",
+        "observation": "The circles and numeral labels1 and2 overlap at the upper-left derived-ledger boundary in the native frame80 still, crowding their identities at that sampled instant.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/spatial-grid-binning/decisive.png"
+        ],
+        "counterEvidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/spatial-grid-binning/action-early.png",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/spatial-grid-binning/hold.png"
+        ],
+        "scope": "Separately keyboard-scrubbed transition still only. Native natural85..87 and hold separate the IDs and show correct final counts2/1/0/1.",
+        "durationEstablished": false,
+        "continuousPlaybackInspected": false,
+        "disposition": "Retain as a small visual transition concern for controller disposition. These stills do not establish lasting lost identity or motion severity."
+      }
+    }
+  ],
+  "defaultCounts": {
+    "batches": 34,
+    "registeredUniqueIds": 170,
+    "naturalPhaseCaptures": 850,
+    "separateKeyboardDecisiveStills": 150,
+    "legacyNativeHoldsRequired": 20,
+    "minimumUniqueNaturalFrames": 178,
+    "minimumNaturalWraps": 1,
+    "browserErrors": 0,
+    "reportedFindings": 10,
+    "reviewedImageCitations": 446,
+    "reviewObservationStrings": 553,
+    "hashedInputFiles": 2377,
+    "exactDownloadsReportCopies": 34,
+    "newSampledConcernRecords": 3,
+    "retainedOrBaselineFindingRecords": 7
+  },
+  "newSampledConcerns": [
+    {
+      "id": "cell-normalization",
+      "sourceReportBatch": 8,
+      "scope": "Keyboard76 and natural85..87 old/prepared text overprint; native hold clear. Exact duration and change disposition remain unresolved."
+    },
+    {
+      "id": "actor-attribution-split",
+      "sourceReportBatch": 25,
+      "scope": "Natural120..122 moving B stamp covers prior A attribution prefix; native hold correct. Duration and change disposition remain unresolved."
+    },
+    {
+      "id": "spatial-grid-binning",
+      "sourceReportBatch": 32,
+      "scope": "Keyboard80 tokens1/2 overlap; natural85..87 and hold separate them with correct counts. Low sampled concern without established duration."
+    }
+  ],
+  "retainedFindingIds": [
+    "network-graph",
+    "radial-network",
+    "orbital-system",
+    "bar-race",
+    "capability-matrix",
+    "shared-foundation",
+    "expectation-overlay-check"
+  ],
+  "explicitIntermediateAndEventCoverageLimits": [
+    {
+      "id": "saved-seed-season-return",
+      "frame": 122,
+      "limit": "Decisive picture is pre-sowing with zero sown. Native hold shows 2kg sown, 1kg stored and 1kg loss."
+    },
+    {
+      "id": "state-preserving-source-refresh",
+      "frame": 122,
+      "limit": "Replacement is in progress; absent-key flag and completed write counter appear in native hold, not this decisive still."
+    },
+    {
+      "id": "pdf-nearest-label-review",
+      "frame": 118,
+      "limit": "Default selected West is also the nearest candidate. This does not demonstrate a non-nearest human override."
+    },
+    {
+      "id": "minimum-count-map-suppression",
+      "frame": 122,
+      "limit": "Released 6 and 0 are still traveling, with complete public arrivals checked only in native hold."
+    },
+    {
+      "id": "coordinate-quality-triage",
+      "frame": 78,
+      "limit": "Rejection tokens are in transit and Plotted remains zero. This is not settled validity classification."
+    },
+    {
+      "id": "geometry-detail-budget",
+      "frame": 102,
+      "limit": "The later recursive deviation guide is partly drawn. This is partial event evidence, not a view of every recursive operation."
+    },
+    {
+      "id": "bounded-location-displacement",
+      "frame": 79,
+      "limit": "Public markers are already present. Blank entrance and later offset output bracket appearance without inspecting its exact first frame or all unsampled instants."
+    },
+    {
+      "id": "distance-buffer-envelope",
+      "frame": 120,
+      "limit": "Two moving circles are not yet settled named ledger entries. Native hold separately supplies Location A and B inclusion."
+    },
+    {
+      "id": "publication-snapshot-slice",
+      "frame": 112,
+      "limit": "Live West is blank during the edit and resolves to 15 in native hold. The blank duration is unknown."
+    },
+    {
+      "id": "filter-subscription-scope",
+      "frame": 115,
+      "limit": "East is masked before subscribed totals settle from 10/3 to 5/2. Continuous count/mask consistency is unverified."
+    },
+    {
+      "id": "shared-workshop-booking",
+      "frameRange": [
+        145,
+        147
+      ],
+      "limit": "The named natural hold window still contains sequential machine use. Earlier dense 150 transit and targeted 158 clarification remain separately scoped."
+    },
+    {
+      "id": "ordered-lock-acquisition",
+      "frameRange": [
+        145,
+        147
+      ],
+      "limit": "The named natural hold window still contains token returns. It must not be treated as a fully motionless terminal picture."
+    }
+  ],
+  "editorialAndHistoricalBoundaries": "Stratified bare lower captions are retained as editorial, with required per-stratum fractions present. Calendar blank moving outline/external callout, sealed-envelope opening cover, ballot lid/label overlap and entity contribution-card overlap remain sampled observations. Historical dense observations, all prior dispositions, low concerns and sampled limits remain unmodified in the aggregate and preserved narrative below. A clear hold does not erase an earlier action concern.",
+  "configuredPreviewDispositions": {
+    "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+    "records": [
+      {
+        "candidateId": "L4",
+        "classification": "QA expectation correction",
+        "source": "src/stock/graphics-networks/NetworkGraph.tsx:54",
+        "disposition": "First-edge packet deliberately uses cyan. Edited accent still controls first edge and node halos. Original expectation preserved and annotated; no production change."
+      },
+      {
+        "candidateId": "N10",
+        "classification": "QA expectation correction",
+        "sources": [
+          "src/stock/presets/BenefitShortfallCorrection/ReceivedToken.tsx:31",
+          "src/stock/presets/BenefitShortfallCorrection/PaymentQuantity.tsx:25"
+        ],
+        "disposition": "Correction tokens and legend deliberately use cyan to distinguish corrections from original receipts. Original receipts and recipient use selected accent. Preserve semantic secondary-color policy; annotate inaccurate expectedVisibleChanges without changing source or pinned input."
+      },
+      {
+        "candidateId": "N6",
+        "classification": "minor deferred for final review",
+        "findingId": "configured-N6-source-tick-connector-overlap",
+        "disposition": "Controller independently viewed frame90 and confirms connector crosses the lower edge of the negative endpoint tick label. Main values and relationships remain readable; final hold clear per reviewer. Preserve as concrete low concern for final whole-branch triage. No continuous-clearance claim."
+      }
+    ],
+    "reviewLedger": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-inspections/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/configured-preview-inspections.json",
+    "reviewLedgerSha256": "da0aa27fe619af7dc66a8542d0eb333cc8d369fd1da8c41fb0c83284080d3c60"
+  },
+  "configuredN1": {
+    "id": "tradeoff-pivot",
+    "configurationHash": "3ce94f9c299d6d61ed84efde4342c4a85ff3db743d946e0b79793fb6317d8bbf",
+    "status": "failed-native-exact-fixture-round-trip; no-fix-in-this-task",
+    "rawEvidence": {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-configured-live-2ad04707-01-evidence.json",
+      "sha256": "4e0cedc4bd1e23a95122721a2f6e098ad14c61f7bfd974b5a3ad184370113ec2",
+      "bytes": 717
+    },
+    "rawDocument": {
+      "records": [
+        {
+          "id": "tradeoff-pivot",
+          "head": "02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+          "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+          "configurationHash": "3ce94f9c299d6d61ed84efde4342c4a85ff3db743d946e0b79793fb6317d8bbf",
+          "status": "failed",
+          "error": "Error: Native configured JSON differs from exact supplied fixture",
+          "errors": [],
+          "visualInspection": null,
+          "outputDirectory": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1"
+        }
+      ],
+      "visualAcceptance": "not asserted"
+    },
+    "controllerReportedNativeRoundTrip": {
+      "expectedApproach": "A\nB\tC\nD\nE",
+      "observedApproach": "A B\tC D E",
+      "attribution": "Root controller reported actual native input/copy observation; this consolidator did not operate the browser."
+    },
+    "readOnlySourceCorroboration": {
+      "files": [
+        {
+          "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/src/gallery/MotionGallery/ContentControls/ScalarField.tsx",
+          "sha256": "1cf38628ceb77aec02423ed35ad1d74a4f0ac98bf89fe5fbfd00178bd6adb923",
+          "bytes": 2053
+        },
+        {
+          "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/src/stock/presets/TradeoffPivot/TradeoffPivot.metadata.ts",
+          "sha256": "c9999ad013fd1c56b41f2e1986b960286806edf4b50a20e8a39e61891b694452",
+          "bytes": 8242
+        },
+        {
+          "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/src/stock/presets/TradeoffPivot/TradeoffPivot.schema.ts",
+          "sha256": "399b74f1376381cc0bee2aecafde5ca21983f352dbf57380e9a6ff6ab5cf108c",
+          "bytes": 1547
+        }
+      ],
+      "observation": "ScalarField renders textarea only for text controls with control.multiline. TradeoffPivot approach control is kind text, minLength1/maxLength40, with no multiline flag. Its string schema has no newline exclusion. This supports a generic native editor representation gap for schema-accepted newline input, pending a separately authorized fix."
+    },
+    "visualInspection": null,
+    "configured17PassClaim": false,
+    "scopeBoundary": "Default coverage validation does not validate this configured failure or grant all17configured acceptance."
+  },
+  "statusOfN1Correction": "R65 source accepted; actual configured N1 retry completed at498c717d with exact LF/TAB fixture and no new sampled findings. Original02d6 failure remains historical.",
+  "durableDefaultEvidence": "implementation-live-evidence-2ad04707.json",
+  "durableConfiguredAndSpanEvidence": "implementation-additional-live-evidence-2ad04707.json",
+  "limits": [
+    "No finding removed or severity/disposition changed by this documentation preparation.",
+    "The ten default findings comprise seven retained/baseline records and three new sampled concerns.",
+    "N6 is a separate concrete low connector/tick concern; N1 is a failed exact native editor round-trip.",
+    "No whole-branch triage, continuous-pixel acceptance, all17 configured acceptance or MP4 result is inferred."
+  ],
+  "acceptedEditorCorrection": {
+    "head": "498c717d53240d15a29396830759a571a938f492",
+    "stockSourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+    "durableRecord": "implementation-editor-whitespace-498c717d.json",
+    "sourceOnlyAcceptance": true,
+    "N1RetryAcceptance": null,
+    "minorFindings": [
+      {
+        "id": "editor-whitespace-M1",
+        "description": "ScalarField newly imports enclosing editor stylesheet for generic .text class. Styling ownership/domain naming convention concern.",
+        "disposition": "Deferred to whole-branch review; no behavioral defect reported."
+      },
+      {
+        "id": "editor-whitespace-M2",
+        "description": "CSS lint42 inherited violations vs43base; inherited NO_COLOR/FORCE_COLOR warning in focused runs.",
+        "disposition": "Preserve baseline distinction; no unrelated formatting change in boundedfix."
+      }
+    ]
+  },
+  "configuredN1Resolution": {
+    "originalFailureRetained": true,
+    "head": "498c717d53240d15a29396830759a571a938f492",
+    "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+    "record": "implementation-n1-editor-retry-498c717d.json",
+    "status": "new-native-exact-fixture-and-sampled-inspection-recorded",
+    "newSampledFindings": [],
+    "remaining": "N6 low concern and final whole-branch findings triage remain separate. No MP4 acceptance."
+  },
+  "R66HttpAssessment": {
+    "record": "implementation-http-l3-delivery-498c717d.json",
+    "strictOriginalPreserved": true,
+    "attachmentGetStatus": null,
+    "attachmentGetHeaders": null,
+    "decodedPlayback": "pending"
+  },
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-browser-findings-2ad04707.json",
+    "sha256": "4113e1d434508950c1b1a28b116656577ab2d78f0654d6d7f23f9693557711f0",
+    "bytes": 28413
+  }
+}

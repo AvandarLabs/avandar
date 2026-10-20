@@ -1,5 +1,9 @@
 {
-  "screens": ["Data Sources import", "Dashboard editor", "Dashboard preview"],
+  "screens": [
+    "Data Sources import",
+    "Dashboard editor",
+    "Dashboard preview"
+  ],
   "layoutSources": [
     "src/views/DataManagerApp/DataImportView/DataImportView.tsx",
     "src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx",
@@ -65,5 +69,6 @@
     "renderedReview": "20 initial component frames and five rebuilt component frames captured with no console or runtime errors. Import fields, saved metadata, creation modal, Puck editor and preview visually inspected. The rebuilt review confirms selected tabs and First 200 rows text, descending chart order, the View target in the Puck toolbar, and collapsed typed-text selection. This review covers component frames, not a completed narrated film.",
     "reviewEvidence": "out/component-review/import-dashboard-final-inspection.json (rebuilt frames), out/component-review/import-dashboard-inspection.json (initial review)",
     "dateFormattingObservation": "The unchanged product DataGrid formats DATE strings in the browser timezone. In America/New_York, the preview reproduces the existing capture's previous-day presentation. Original CSV fixture values remain unchanged."
-  }
+  },
+  "dashboardLifecycle": "DashboardCanvas keeps native Puck render identities stable across frames. DashboardFixtureContext continues driving bar clipping in FixtureDataViz."
 }

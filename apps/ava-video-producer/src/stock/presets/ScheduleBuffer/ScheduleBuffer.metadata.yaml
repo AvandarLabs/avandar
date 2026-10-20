@@ -1,0 +1,95 @@
+name:
+  id: motionAtlas.schedule-buffer.name
+  message: Let the buffer absorb a delay
+description:
+  id: motionAtlas.schedule-buffer.description
+  message: A scheduled sequence leaves a visible reserve before a fixed deadline. An
+    interruption shifts later work into that reserve while the deadline stays in place.
+category:
+  id: motionAtlas.schedule-buffer.category
+  message: Time allocation
+useWhen:
+  id: motionAtlas.schedule-buffer.useWhen
+  message: Show how unused schedule capacity can absorb a specific interruption.
+prompt:
+  id: motionAtlas.schedule-buffer.prompt
+  message: Show how unused schedule capacity can absorb a specific interruption.
+creativeDirection:
+  id: motionAtlas.schedule-buffer.creativeDirection
+  message: During 12..44, assemble one horizontal schedule from proportionally sized task
+    blocks followed by a hatched reserve segment and a stationary deadline pin. During
+    44..74, reveal the supplied interruption block immediately after its named task.
+    During 74..118, the remaining task blocks translate together by the interruption's
+    width and the reserve shortens by exactly that width. A contour along the schedule
+    keeps the total endpoint aligned with the unchanged deadline pin. Hold the inserted
+    interruption, shifted tasks, and remaining reserve through 168, then exit to the
+    opaque ground. The viewer sees precisely where the delay was absorbed.
+intent:
+  id: motionAtlas.schedule-buffer.intent
+  message: Show how unused schedule capacity can absorb a specific interruption.
+distinction:
+  id: motionAtlas.schedule-buffer.distinction
+  message: This conserves one schedule's total width while reallocating reserve time. It
+    is neither a chart of changing rankings nor a pipeline whose stages merely activate
+    in order.
+tags:
+  - id: motionAtlas.schedule-buffer.tags.0
+    message: buffer
+  - id: motionAtlas.schedule-buffer.tags.1
+    message: slack
+  - id: motionAtlas.schedule-buffer.tags.2
+    message: schedule
+  - id: motionAtlas.schedule-buffer.tags.3
+    message: contingency
+  - id: motionAtlas.schedule-buffer.tags.4
+    message: deadline
+  - id: motionAtlas.schedule-buffer.tags.5
+    message: delay
+  - id: motionAtlas.schedule-buffer.tags.6
+    message: reserve time
+  - id: motionAtlas.schedule-buffer.tags.7
+    message: planning
+goodFor:
+  - id: motionAtlas.schedule-buffer.goodFor.0
+    message: Explaining planned slack in a schedule
+  - id: motionAtlas.schedule-buffer.goodFor.1
+    message: Showing a bounded delay absorbed before a deadline
+  - id: motionAtlas.schedule-buffer.goodFor.2
+    message: Discussing contingency without changing the scope of the planned work
+domains:
+  - id: motionAtlas.schedule-buffer.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.schedule-buffer.aliases.0
+    message: Time allocation
+notFor:
+  - id: motionAtlas.schedule-buffer.notFor.0
+    message: The default schedule is fictional; segment widths exactly encode supplied
+      duration units, not evidence of real delivery performance.
+  - id: motionAtlas.schedule-buffer.notFor.1
+    message: The interruption must fit within the supplied reserve; overruns and moving
+      deadlines are intentionally excluded.
+  - id: motionAtlas.schedule-buffer.notFor.2
+    message: Tasks are sequential, indivisible, and unchanged in duration; parallel work and
+      resource calendars are not modeled.
+motionBeats:
+  - startFrame: 12
+    endFrame: 44
+    description:
+      id: motionAtlas.schedule-buffer.motionBeats.0
+      message: Assemble proportional tasks, reserve, and a fixed deadline.
+  - startFrame: 44
+    endFrame: 74
+    description:
+      id: motionAtlas.schedule-buffer.motionBeats.1
+      message: Reveal the interruption after its named task.
+  - startFrame: 74
+    endFrame: 118
+    description:
+      id: motionAtlas.schedule-buffer.motionBeats.2
+      message: Translate later tasks and consume exactly the delay width.
+  - startFrame: 118
+    endFrame: 168
+    description:
+      id: motionAtlas.schedule-buffer.motionBeats.3
+      message: Hold the conserved schedule and remaining reserve.

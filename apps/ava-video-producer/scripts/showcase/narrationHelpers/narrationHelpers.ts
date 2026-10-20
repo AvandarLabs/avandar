@@ -7,7 +7,7 @@ import {
 } from "../../../src/storyboard/schema/schema";
 import { assetReferences, publicAsset } from "../../lib/planHelpers";
 import { scratchTts } from "../../video";
-import { appRoot, plans } from "../loadFilm/loadFilm";
+import { appRoot, PLANS } from "../ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../../src/showcase/showcase.types";
 
 type NarrationOptions = {
@@ -38,7 +38,7 @@ async function _prepareNarration(
   const filename = await synthesize(
     film.plan!,
     {
-      filename: path.join(root, "storyboards", `${plans[film.id]}.json`),
+      filename: path.join(root, "storyboards", `${PLANS[film.id]}.json`),
       voice: "Samantha",
       rate: 170,
     },

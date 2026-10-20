@@ -54,7 +54,8 @@ function createReloadController(players) {
  * Share one source watcher per gallery and let responsive players retain state.
  * Reload unresponsive same-origin iframes after an acknowledgement deadline.
  */
-export function watchFilms(players) {
+export function watchFilms(players, onReload) {
+  let galleryTimer;
   const events = new EventSource("/events");
   const reloads = createReloadController(players);
   let generation;
@@ -63,8 +64,13 @@ export function watchFilms(players) {
     generation = event.data;
     if (!hasChanged) return;
     players.forEach((player) => reloads.request(player));
+    if (onReload) {
+      clearTimeout(galleryTimer);
+      galleryTimer = setTimeout(onReload, 1100);
+    }
   });
   return () => {
+    clearTimeout(galleryTimer);
     events.close();
     reloads.dispose();
   };

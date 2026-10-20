@@ -1,0 +1,113 @@
+name:
+  id: motionAtlas.proportional-symbol-area.name
+  message: Make symbol area match the value
+description:
+  id: motionAtlas.proportional-symbol-area.description
+  message: Equal unit tiles assemble into circles whose area, rather than radius,
+    represents the supplied values. A size legend remains attached so the geometric
+    encoding can be checked.
+category:
+  id: motionAtlas.proportional-symbol-area.category
+  message: Area-proportional symbols
+useWhen:
+  id: motionAtlas.proportional-symbol-area.useWhen
+  message: Make quantity proportional to symbol area rather than radius.
+prompt:
+  id: motionAtlas.proportional-symbol-area.prompt
+  message: Use Motion Atlas Make symbol area match the value (proportional-symbol-area) to
+    make quantity proportional to symbol area rather than radius. Supply approved
+    authored content before making claims.
+creativeDirection:
+  id: motionAtlas.proportional-symbol-area.creativeDirection
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 reveal source values as equal-area tile counts. Frames 51-110 reshape each
+    tile bundle into a circle of matching total area. Frames 111-139 overlay a
+    reference-radius ruler and keep the area/value legend visible. Hold at frames
+    140-165; fade to the same opaque ground at frames 166-179 for an editorial loop.
+intent:
+  id: motionAtlas.proportional-symbol-area.intent
+  message: Make quantity proportional to symbol area rather than radius.
+distinction:
+  id: motionAtlas.proportional-symbol-area.distinction
+  message: Unlike bar-race, quantity is encoded by area without reordering. Unlike point
+    sizing by radius, the square-root relationship is the explanatory action.
+tags:
+  - id: motionAtlas.proportional-symbol-area.tags.0
+    message: proportional symbols
+  - id: motionAtlas.proportional-symbol-area.tags.1
+    message: square-root scale
+  - id: motionAtlas.proportional-symbol-area.tags.2
+    message: area encoding
+  - id: motionAtlas.proportional-symbol-area.tags.3
+    message: size legend
+goodFor:
+  - id: motionAtlas.proportional-symbol-area.goodFor.0
+    message: Explain why symbol radius uses a square root
+  - id: motionAtlas.proportional-symbol-area.goodFor.1
+    message: Prevent radius scaling from exaggerating map quantities
+domains:
+  - id: motionAtlas.proportional-symbol-area.domains.0
+    message: Area-proportional symbols
+aliases:
+  - id: motionAtlas.proportional-symbol-area.aliases.0
+    message: proportional symbols
+  - id: motionAtlas.proportional-symbol-area.aliases.1
+    message: square-root scale
+  - id: motionAtlas.proportional-symbol-area.aliases.2
+    message: area encoding
+  - id: motionAtlas.proportional-symbol-area.aliases.3
+    message: size legend
+notFor:
+  - id: motionAtlas.proportional-symbol-area.notFor.0
+    message: Not geographic area or physical footprint.
+  - id: motionAtlas.proportional-symbol-area.notFor.1
+    message: No zero or negative values in this preset.
+  - id: motionAtlas.proportional-symbol-area.notFor.2
+    message: The rendered symbol must not imply uncertainty radius or service catchment.
+  - id: motionAtlas.proportional-symbol-area.notFor.3
+    message: No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.proportional-symbol-area.notFor.4
+    message: The fixed plot is 400x400 rendered pixels. Map normalized centers to (x*4,y*4).
+      For each radius sqrt(value*areaPerUnit/pi), require r<=x*4<=400-r and
+      r<=y*4<=400-r. Every center separation must be >=r_i+r_j+12 rendered pixels.
+      Reject clipping and overlaps.
+  - id: motionAtlas.proportional-symbol-area.notFor.5
+    message: Authored prose and schematic context are the author's responsibility. Runtime
+      validation checks structural bounds and numeric, reference and geometry
+      constraints, without classifying natural-language claims.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.proportional-symbol-area.motionBeats.0
+      message: Reveal the schematic scene.
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.proportional-symbol-area.motionBeats.1
+      message: Equal unit tiles assemble into circles whose area, rather than radius,
+        represents the supplied values. A size legend remains attached so the geometric
+        encoding can be checked.
+  - startFrame: 51
+    endFrame: 110
+    description:
+      id: motionAtlas.proportional-symbol-area.motionBeats.2
+      message: Make quantity proportional to symbol area rather than radius.
+  - startFrame: 111
+    endFrame: 139
+    description:
+      id: motionAtlas.proportional-symbol-area.motionBeats.3
+      message: Resolve the authored relationship without changing source data.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.proportional-symbol-area.motionBeats.4
+      message: Hold the complete resolved relationship.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.proportional-symbol-area.motionBeats.5
+      message: The outer stock envelope fades to the same opaque ground.

@@ -1,0 +1,116 @@
+name:
+  id: motionAtlas.tradeoff-pivot.name
+  message: A choice has two sides
+description:
+  id: motionAtlas.tradeoff-pivot.description
+  message: A selected approach rotates into view with a benefit on one face and a
+    concession on the other. Both faces open into a single hinge so the final choice
+    retains its tradeoff.
+category:
+  id: motionAtlas.tradeoff-pivot.category
+  message: Tradeoffs and qualifications
+tags:
+  - id: motionAtlas.tradeoff-pivot.tags.0
+    message: tradeoff
+  - id: motionAtlas.tradeoff-pivot.tags.1
+    message: pros and cons
+  - id: motionAtlas.tradeoff-pivot.tags.2
+    message: benefit
+  - id: motionAtlas.tradeoff-pivot.tags.3
+    message: concession
+  - id: motionAtlas.tradeoff-pivot.tags.4
+    message: compromise
+  - id: motionAtlas.tradeoff-pivot.tags.5
+    message: priority
+  - id: motionAtlas.tradeoff-pivot.tags.6
+    message: two sides
+  - id: motionAtlas.tradeoff-pivot.tags.7
+    message: design rationale
+  - id: motionAtlas.tradeoff-pivot.tags.8
+    message: mission alignment
+  - id: motionAtlas.tradeoff-pivot.tags.9
+    message: relationship building
+  - id: motionAtlas.tradeoff-pivot.tags.10
+    message: growth tradeoff
+  - id: motionAtlas.tradeoff-pivot.tags.11
+    message: operating preference
+useWhen:
+  id: motionAtlas.tradeoff-pivot.useWhen
+  message: Keep a chosen approach's benefit and concession visible together.
+prompt:
+  id: motionAtlas.tradeoff-pivot.prompt
+  message: Use Motion Atlas "A choice has two sides" (tradeoff-pivot) as a conceptual
+    graphic. Keep a chosen approach's benefit and concession visible together. Keep the
+    restrained motion and readable labels; replace sample content with approved facts
+    before making product claims.
+creativeDirection:
+  id: motionAtlas.tradeoff-pivot.creativeDirection
+  message: A slim vertical hinge appears beneath the approach label. Its left leaf unfolds
+    to show the gained qualities, then the hinge pivots just enough to reveal the right
+    leaf with the concessions. Both settle open at equal readable size, and a short
+    priority statement locks beneath the hinge as the final hold. The angle is fixed
+    editorial motion rather than a numeric balance.
+goodFor:
+  - id: motionAtlas.tradeoff-pivot.goodFor.0
+    message: Explain a choice that gains one property at another's expense
+  - id: motionAtlas.tradeoff-pivot.goodFor.1
+    message: State the downside alongside an advantage
+  - id: motionAtlas.tradeoff-pivot.goodFor.2
+    message: Make a design rationale honest about its constraints
+  - id: motionAtlas.tradeoff-pivot.goodFor.3
+    message: Explain a relationship-intensive service choice with its time requirement
+  - id: motionAtlas.tradeoff-pivot.goodFor.4
+    message: Keep a mission constraint visible alongside a growth opportunity
+intent:
+  id: motionAtlas.tradeoff-pivot.intent
+  message: Keep a chosen approach's benefit and concession visible together.
+domains:
+  - id: motionAtlas.tradeoff-pivot.domains.0
+    message: Tradeoffs and qualifications
+aliases:
+  - id: motionAtlas.tradeoff-pivot.aliases.0
+    message: tradeoff
+  - id: motionAtlas.tradeoff-pivot.aliases.1
+    message: pros and cons
+  - id: motionAtlas.tradeoff-pivot.aliases.2
+    message: benefit
+  - id: motionAtlas.tradeoff-pivot.aliases.3
+    message: concession
+notFor:
+  - id: motionAtlas.tradeoff-pivot.notFor.0
+    message: The number of listed points is not a score and cannot establish which side
+      outweighs the other.
+  - id: motionAtlas.tradeoff-pivot.notFor.1
+    message: Leaf sizes and hinge angles carry no quantitative meaning.
+  - id: motionAtlas.tradeoff-pivot.notFor.2
+    message: No conclusion is calculated; the priority statement must be authored and
+      qualified for its context.
+  - id: motionAtlas.tradeoff-pivot.notFor.3
+    message: A stated strategic preference does not establish investor duties, future
+      behavior, customer conversion, financial return, or moral superiority. Keep the
+      authored context and concession visible.
+distinction:
+  id: motionAtlas.tradeoff-pivot.distinction
+  message: A single hinged argument exposes an inseparable benefit and concession. It does
+    not rank alternatives like bar-race or merely reveal a sibling collection like
+    stagger-cards.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.tradeoff-pivot.motionBeats.0
+      message: The labeled setup establishes the authored comparison.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.tradeoff-pivot.motionBeats.1
+      message: A slim vertical hinge appears beneath the approach label. Its left leaf unfolds
+        to show the gained qualities, then the hinge pivots just enough to reveal the
+        right leaf with the concessions. Both settle open at equal readable size, and a
+        short priority statement locks beneath the hinge as the final hold. The angle is
+        fixed editorial motion rather than a numeric balance.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.tradeoff-pivot.motionBeats.2
+      message: Both sides remain readable in the resolved hold.

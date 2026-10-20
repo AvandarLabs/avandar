@@ -1,0 +1,59 @@
+name:
+  id: motionAtlas.metric-counter.name
+  message: Metric landing
+description:
+  id: motionAtlas.metric-counter.description
+  message: A number counts into place above a small bar series.
+category:
+  id: motionAtlas.metric-counter.category
+  message: Charts
+tags:
+  - id: motionAtlas.metric-counter.tags.0
+    message: metric
+  - id: motionAtlas.metric-counter.tags.1
+    message: counter
+  - id: motionAtlas.metric-counter.tags.2
+    message: number
+  - id: motionAtlas.metric-counter.tags.3
+    message: progress
+useWhen:
+  id: motionAtlas.metric-counter.useWhen
+  message: Give one sourced number a clear visual emphasis without implying an unsupported
+    outcome.
+prompt:
+  id: motionAtlas.metric-counter.prompt
+  message: Use Motion Atlas "Metric landing" (metric-counter) as a conceptual graphic.
+    Give one sourced number a clear visual emphasis without implying an unsupported
+    outcome. Keep the restrained motion and readable labels; replace sample content with
+    approved facts before making product claims.
+creativeDirection:
+  id: motionAtlas.metric-counter.creativeDirection
+  message: A number counts into place above a small bar series.
+goodFor:
+  - id: motionAtlas.metric-counter.goodFor.0
+    message: Give one sourced number a clear visual emphasis without implying an unsupported
+      outcome.
+intent:
+  id: motionAtlas.metric-counter.intent
+  message: Give one sourced number a clear visual emphasis without implying an unsupported
+    outcome.
+domains:
+  - id: motionAtlas.metric-counter.domains.0
+    message: Charts
+aliases:
+  - id: motionAtlas.metric-counter.aliases.0
+    message: metric
+  - id: motionAtlas.metric-counter.aliases.1
+    message: counter
+  - id: motionAtlas.metric-counter.aliases.2
+    message: number
+  - id: motionAtlas.metric-counter.aliases.3
+    message: progress
+notFor:
+  - id: motionAtlas.metric-counter.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.metric-counter.distinction
+  message: A number counts into place above a small bar series.

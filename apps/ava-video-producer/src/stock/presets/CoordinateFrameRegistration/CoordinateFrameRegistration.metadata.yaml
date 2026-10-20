@@ -1,0 +1,110 @@
+name:
+  id: motionAtlas.coordinate-frame-registration.name
+  message: Transform coordinates before combining layers
+description:
+  id: motionAtlas.coordinate-frame-registration.description
+  message: Two schematic layers describe the same landmarks using different coordinate
+    frames. A supplied affine transformation moves one layer into the other frame so
+    matching landmarks register without changing their identities.
+category:
+  id: motionAtlas.coordinate-frame-registration.category
+  message: Coordinate reference transformation
+useWhen:
+  id: motionAtlas.coordinate-frame-registration.useWhen
+  message: Align spatial coordinate frames without implying physical movement.
+prompt:
+  id: motionAtlas.coordinate-frame-registration.prompt
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-52 show two labeled coordinate grids with corresponding landmarks offset. Frames
+    53-110 transform every source point using the same affine coefficients while axes
+    remain labeled. Frames 111-139 align matched IDs and show their target coordinates.
+    Hold at frames 140-165; fade to the same opaque ground at frames 166-179 for an
+    editorial loop.
+creativeDirection:
+  id: motionAtlas.coordinate-frame-registration.creativeDirection
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-52 show two labeled coordinate grids with corresponding landmarks offset. Frames
+    53-110 transform every source point using the same affine coefficients while axes
+    remain labeled. Frames 111-139 align matched IDs and show their target coordinates.
+    Hold at frames 140-165; fade to the same opaque ground at frames 166-179 for an
+    editorial loop.
+intent:
+  id: motionAtlas.coordinate-frame-registration.intent
+  message: Align spatial coordinate frames without implying physical movement.
+distinction:
+  id: motionAtlas.coordinate-frame-registration.distinction
+  message: Unlike GIS layer intersection, the action aligns coordinate systems before
+    overlay. Identity is stable even though coordinate numbers change.
+tags:
+  - id: motionAtlas.coordinate-frame-registration.tags.0
+    message: coordinate reference systems
+  - id: motionAtlas.coordinate-frame-registration.tags.1
+    message: reprojection
+  - id: motionAtlas.coordinate-frame-registration.tags.2
+    message: frame registration
+  - id: motionAtlas.coordinate-frame-registration.tags.3
+    message: map alignment
+goodFor:
+  - id: motionAtlas.coordinate-frame-registration.goodFor.0
+    message: Explain why spatial layers need a common coordinate frame
+  - id: motionAtlas.coordinate-frame-registration.goodFor.1
+    message: Illustrate coordinate changes without moving physical landmarks
+domains:
+  - id: motionAtlas.coordinate-frame-registration.domains.0
+    message: Coordinate reference transformation
+aliases:
+  - id: motionAtlas.coordinate-frame-registration.aliases.0
+    message: coordinate reference systems
+  - id: motionAtlas.coordinate-frame-registration.aliases.1
+    message: reprojection
+  - id: motionAtlas.coordinate-frame-registration.aliases.2
+    message: frame registration
+notFor:
+  - id: motionAtlas.coordinate-frame-registration.notFor.0
+    message: This is an affine teaching analogy, not a real geodetic projection or
+      Earth-curvature calculation.
+  - id: motionAtlas.coordinate-frame-registration.notFor.1
+    message: No inference of the correct CRS or transform from point positions.
+  - id: motionAtlas.coordinate-frame-registration.notFor.2
+    message: Spatial transformation must not be confused with moving the physical landmarks.
+  - id: motionAtlas.coordinate-frame-registration.notFor.3
+    message: No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.coordinate-frame-registration.notFor.4
+    message: Authored prose must identify schematic geography and accurately describe the
+      selected example. Runtime validation preserves supplied prose and checks explicit
+      structural and numeric rules without natural-language classification.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.coordinate-frame-registration.beat.0
+      message: Reveal the schematic study.
+  - startFrame: 13
+    endFrame: 52
+    description:
+      id: motionAtlas.coordinate-frame-registration.beat.1
+      message: Show labeled source and target coordinate grids with corresponding landmarks.
+  - startFrame: 53
+    endFrame: 110
+    description:
+      id: motionAtlas.coordinate-frame-registration.beat.2
+      message: Transform each source representation using the same affine coefficients.
+  - startFrame: 111
+    endFrame: 139
+    description:
+      id: motionAtlas.coordinate-frame-registration.beat.3
+      message: Register matching identities and target coordinate pairs.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.coordinate-frame-registration.beat.4
+      message: Hold both frame labels and units.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.coordinate-frame-registration.beat.5
+      message: The enclosing StockGraphic returns to opaque ground.

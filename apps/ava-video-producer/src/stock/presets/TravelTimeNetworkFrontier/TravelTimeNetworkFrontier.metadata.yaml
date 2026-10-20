@@ -1,0 +1,116 @@
+name:
+  id: motionAtlas.travel-time-network-frontier.name
+  message: Travel time follows the network
+description:
+  id: motionAtlas.travel-time-network-frontier.description
+  message: A time budget expands through a small weighted road network from one origin. A
+    farther-looking destination can be reached before a nearer-looking one because only
+    supplied edge travel times determine access.
+category:
+  id: motionAtlas.travel-time-network-frontier.category
+  message: Travel-time accessibility
+useWhen:
+  id: motionAtlas.travel-time-network-frontier.useWhen
+  message: Explain accessibility through cumulative network cost.
+prompt:
+  id: motionAtlas.travel-time-network-frontier.prompt
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-45 reveal schematic roads and their minute costs. Frames 46-110 propagate a
+    frontier along minimum cumulative travel time, filling reachable nodes and holding
+    beyond-budget nodes outside. Frames 111-139 hold each destination cost beside the
+    stated budget. Hold at frames 140-165; fade to the same opaque ground at frames
+    166-179 for an editorial loop.
+creativeDirection:
+  id: motionAtlas.travel-time-network-frontier.creativeDirection
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-45 reveal schematic roads and their minute costs. Frames 46-110 propagate a
+    frontier along minimum cumulative travel time, filling reachable nodes and holding
+    beyond-budget nodes outside. Frames 111-139 hold each destination cost beside the
+    stated budget. Hold at frames 140-165; fade to the same opaque ground at frames
+    166-179 for an editorial loop.
+intent:
+  id: motionAtlas.travel-time-network-frontier.intent
+  message: Explain accessibility through cumulative network cost.
+distinction:
+  id: motionAtlas.travel-time-network-frontier.distinction
+  message: Catchment-union-gaps starts from supplied polygons. This derives reachability
+    from weighted network cost, showing why a travel-time catchment is not a distance
+    circle.
+tags:
+  - id: motionAtlas.travel-time-network-frontier.tags.0
+    message: isochrone
+  - id: motionAtlas.travel-time-network-frontier.tags.1
+    message: travel-time access
+  - id: motionAtlas.travel-time-network-frontier.tags.2
+    message: shortest path
+  - id: motionAtlas.travel-time-network-frontier.tags.3
+    message: network cost
+goodFor:
+  - id: motionAtlas.travel-time-network-frontier.goodFor.0
+    message: Explain travel-time reachability as network cost
+  - id: motionAtlas.travel-time-network-frontier.goodFor.1
+    message: Contrast nearby-looking places with reachable destinations
+domains:
+  - id: motionAtlas.travel-time-network-frontier.domains.0
+    message: Travel-time accessibility
+aliases:
+  - id: motionAtlas.travel-time-network-frontier.aliases.0
+    message: isochrone
+  - id: motionAtlas.travel-time-network-frontier.aliases.1
+    message: travel-time access
+  - id: motionAtlas.travel-time-network-frontier.aliases.2
+    message: shortest path
+notFor:
+  - id: motionAtlas.travel-time-network-frontier.notFor.0
+    message: This graph illustrates minimum cumulative edge costs; it is not a
+      polygon-routing engine or a real routing-service result.
+  - id: motionAtlas.travel-time-network-frontier.notFor.1
+    message: Does not infer roads, safety, accessibility, facility capacity or actual travel
+      times.
+  - id: motionAtlas.travel-time-network-frontier.notFor.2
+    message: No polygons are invented from nodes; only represented network destinations are
+      classified.
+  - id: motionAtlas.travel-time-network-frontier.notFor.3
+    message: No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.travel-time-network-frontier.notFor.4
+    message: Shortest paths use nonnegative edge costs. On equal cumulative cost, keep the
+      first discovered predecessor using node input order for queue ties and road input
+      order for neighbor traversal. No random tie resolution.
+  - id: motionAtlas.travel-time-network-frontier.notFor.5
+    message: Authored prose remains the author’s responsibility. Runtime validation
+      preserves supplied text without classifying its language or factual claims.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.travel-time-network-frontier.beat.0
+      message: Reveal fixed network nodes.
+  - startFrame: 13
+    endFrame: 45
+    description:
+      id: motionAtlas.travel-time-network-frontier.beat.1
+      message: Reveal roads and supplied minute costs.
+  - startFrame: 46
+    endFrame: 110
+    description:
+      id: motionAtlas.travel-time-network-frontier.beat.2
+      message: Advance along minimum cumulative network costs.
+  - startFrame: 111
+    endFrame: 139
+    description:
+      id: motionAtlas.travel-time-network-frontier.beat.3
+      message: Hold destination costs beside the time budget.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.travel-time-network-frontier.beat.4
+      message: Hold the resolved study.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.travel-time-network-frontier.beat.5
+      message: The enclosing StockGraphic fades to opaque ground.

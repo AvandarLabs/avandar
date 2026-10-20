@@ -1,0 +1,174 @@
+{
+  "artifact": "final-review-deferred-findings-supplement",
+  "sourceIndexSha256": "e1600045d89d3c69c0e02c63ccc0d0c6eee4a254ca1e9d1542128ba6e072db4f",
+  "reviewSha256": "9c980280e37ec57231ab62b65c0377997ad5b846f185d6cc3367f6f097b574c5",
+  "reviewedHead": "042a6c0e174870829d9360c1e247be66b6f86faa",
+  "priorIndexPreserved": true,
+  "updates": [
+    {
+      "existingCanonicalId": "packet-02/review/M1",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 42,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "packet-27/rereview-1/N1",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 122,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "packet-27/rereview-2/N2",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 122,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "packet-29/review/M3",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 155,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/A21-22-P01",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 75,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/CR-01",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 65,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/PF-01",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 99,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/PF-02",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 99,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/R53-legacy-fixed-copy",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 107,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/SR-01",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 75,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/SR-02",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 75,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/SR-03",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 75,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/SR-04",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 88,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/SR-U01",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 75,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/decision-fork-grapheme",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 65,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/early-upper-only-minima",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 42,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/empty-reference-placeholder",
+      "disposition": "addressed-in-accepted-source-integration",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+      "line": 55,
+      "evidenceLimit": "Source-phase review and focused tests only. Final runtime/browser/media acceptance remains pending."
+    },
+    {
+      "existingCanonicalId": "integration/fixed-tuple-cardinality",
+      "disposition": "addressed-in-reviewed-task6",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-6-review.md",
+      "correctionReviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-6-rereview-1.md",
+      "head": "17225520c274163074c27ded23b64114db4f374a",
+      "evidenceLimit": "Structural/source acceptance. No media claim."
+    }
+  ],
+  "remainingIntegrationRequirement": "R55 addressed by Task6, accepted after scoped correction1 review at17225520c. Final runtime/browser/media gates remain pending.",
+  "carriedObservation": {
+    "id": "task-7-source/review/M1",
+    "path": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-7-source-integration-review.md",
+    "line": 182,
+    "finding": "SelectField index-based option key / retained Doctor warning",
+    "disposition": "deferred-final-triage",
+    "deduplication": "One carried diagnostic, not a claim of a new selection bug. Final reviewer should reconcile equivalent historical diagnostics."
+  },
+  "limits": "This adds reviewed closure pointers without regrading other108 canonical findings. Subsequent source changes must preserve the accepted fixes.",
+  "task6Deferred": [
+    {
+      "id": "task-6/review/M1",
+      "finding": "Missing-license regression observes the key-file temporary directory, not the CLI publication destination.",
+      "status": "deferred-final-triage",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-6-review.md",
+      "reviewSha256": "8658a8404de0bc36487e614cabc5cb46fb0358f7d32099efa62b23d89cd58185",
+      "line": 47
+    },
+    {
+      "id": "task-6/review/M2",
+      "finding": "New exportStockCatalog.test.ts is405 lines and crosses the repository400-line split threshold.",
+      "status": "deferred-final-triage",
+      "reviewPath": ".superpowers/sdd/2026-10-16-motion-atlas-expansion/task-6-review.md",
+      "reviewSha256": "8658a8404de0bc36487e614cabc5cb46fb0358f7d32099efa62b23d89cd58185",
+      "line": 53
+    }
+  ],
+  "task7FinalSourceDeferred": [
+    {
+      "id": "task-7-final-source/M1",
+      "severity": "Minor",
+      "summary": "NO_COLOR/FORCE_COLOR environment warning in focused E2E. Use one color policy in future invocations; no repeat E2E required solely for warning.",
+      "report": "task-7-final-source-review.md",
+      "reportSha256": "8be50185a572abdc181c411ee19615530017f24b9a697eca9f6ce6236b9eb083",
+      "disposition": "deferred to final triage; future controller commands unset FORCE_COLOR when using NO_COLOR"
+    }
+  ]
+}

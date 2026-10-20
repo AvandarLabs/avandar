@@ -1,0 +1,102 @@
+name:
+  id: motionAtlas.person-led-support-calendar.name
+  message: Fit support around the person's week
+description:
+  id: motionAtlas.person-led-support-calendar.description
+  message: A participant and caseworker arrange a support appointment around commitments
+    the participant has already named. The participant moves the proposed appointment,
+    while their existing commitments remain visible.
+category:
+  id: motionAtlas.person-led-support-calendar.category
+  message: Human planning at a shared table
+useWhen:
+  id: motionAtlas.person-led-support-calendar.useWhen
+  message: Show that support is scheduled around the person's stated commitments.
+prompt:
+  id: motionAtlas.person-led-support-calendar.prompt
+  message: Open on a tabletop weekly planner between two people, with existing commitments
+    already occupying time cells. The worker places a proposed support appointment
+    across an occupied cell; the participant lifts it into the explicitly agreed free
+    cell. The worker follows the participant's placement with an agreement mark. Hold
+    the unchanged commitments, moved appointment and participant's goal together before
+    the shared exit envelope.
+creativeDirection:
+  id: motionAtlas.person-led-support-calendar.creativeDirection
+  message: Open on a tabletop weekly planner between two people, with existing commitments
+    already occupying time cells. The worker places a proposed support appointment
+    across an occupied cell; the participant lifts it into the explicitly agreed free
+    cell. The worker follows the participant's placement with an agreement mark. Hold
+    the unchanged commitments, moved appointment and participant's goal together before
+    the shared exit envelope.
+intent:
+  id: motionAtlas.person-led-support-calendar.intent
+  message: Show that support is scheduled around the person's stated commitments.
+distinction:
+  id: motionAtlas.person-led-support-calendar.distinction
+  message: The participant physically revises a shared calendar around their existing
+    responsibilities. Unlike schedule-buffer, there is no delayed sequence consuming
+    reserve time; unlike priority-insertion, this is a negotiated appointment placement
+    rather than precedence in a queue.
+tags:
+  - id: motionAtlas.person-led-support-calendar.tags.0
+    message: case management
+  - id: motionAtlas.person-led-support-calendar.tags.1
+    message: person centered
+  - id: motionAtlas.person-led-support-calendar.tags.2
+    message: support plan
+  - id: motionAtlas.person-led-support-calendar.tags.3
+    message: caregiving
+  - id: motionAtlas.person-led-support-calendar.tags.4
+    message: appointment negotiation
+  - id: motionAtlas.person-led-support-calendar.tags.5
+    message: agency
+  - id: motionAtlas.person-led-support-calendar.tags.6
+    message: weekly planner
+  - id: motionAtlas.person-led-support-calendar.tags.7
+    message: co-design
+goodFor:
+  - id: motionAtlas.person-led-support-calendar.goodFor.0
+    message: Explaining a person-led case-planning meeting
+  - id: motionAtlas.person-led-support-calendar.goodFor.1
+    message: Showing why caregiving commitments affect appointment design
+  - id: motionAtlas.person-led-support-calendar.goodFor.2
+    message: Introducing an agreed support schedule without claiming attendance
+notFor:
+  - id: motionAtlas.person-led-support-calendar.notFor.0
+    message: All people, commitments and agreements are illustrative; agreement is not
+      attendance or an outcome.
+  - id: motionAtlas.person-led-support-calendar.notFor.1
+    message: Each item occupies exactly one discrete planner cell; this is not a scheduling
+      algorithm or a proportional duration chart.
+  - id: motionAtlas.person-led-support-calendar.notFor.2
+    message: No service is automatically withdrawn when a person proposes a different time.
+domains:
+  - id: motionAtlas.person-led-support-calendar.domains.0
+    message: Human planning at a shared table
+aliases:
+  - id: motionAtlas.person-led-support-calendar.aliases.0
+    message: case management
+  - id: motionAtlas.person-led-support-calendar.aliases.1
+    message: person centered
+  - id: motionAtlas.person-led-support-calendar.aliases.2
+    message: support plan
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.person-led-support-calendar.beat.0
+      message: The worker carries the proposal to the initially conflicting cell during frames
+        12 through 36.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.person-led-support-calendar.beat.1
+      message: The participant reaches the proposal, carries it to the agreed free cell during
+        frames 52 through 100, then releases it.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.person-led-support-calendar.beat.2
+      message: The worker reaches the agreement annotation by frame 120 and writes its mark
+        through 132. Hold every unchanged commitment, the sole moved appointment and the
+        goal.

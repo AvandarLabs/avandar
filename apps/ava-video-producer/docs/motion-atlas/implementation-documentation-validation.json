@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "baseHead": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+  "status": "focused-documentation-checks-passed-final-whole-branch-review-pending",
+  "requestStoryboardReact": {
+    "status": "passed-focused-documentation-examples",
+    "head": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+    "productionSchemas": [
+      "stockRequestSchema",
+      "storyboardSchema"
+    ],
+    "checks": {
+      "completeRequest": "passed with exact supplied-input preservation",
+      "completeStoryboard": "passed with exact supplied-input preservation",
+      "standaloneStoryboardContentParity": "passed",
+      "embeddedStoryboardParity": "passed",
+      "reactExampleTypecheck": "passed using exact snippet and app strict compiler options; noEmit; zero diagnostics",
+      "reactRequestSchemaAndJsonParity": "passed"
+    },
+    "runtimeRegistry": {
+      "count": 170,
+      "collections": {
+        "general": 106,
+        "social-sector": 64
+      }
+    },
+    "reactTypecheck": {
+      "exactSnippetFile": "validation/ConfiguredComparison.tsx",
+      "virtualAppRootModule": "apps/ava-video-producer/Task8ConfiguredComparison.documentation-example.tsx",
+      "trackedPlacementRequired": false,
+      "importsRewritten": false,
+      "compilerOptionsSource": "apps/ava-video-producer/tsconfig.json",
+      "diagnostics": 0,
+      "programSourceFiles": 2521,
+      "executableEvaluation": "Only the literal request is evaluated after type erasure. The React component is not executed."
+    },
+    "boundaries": [
+      "No browser, Chromium, SSR/pixel rendering, MP4, media acceptance or PDF operation.",
+      "No tracked file written. Relative module resolution uses a read-only virtual compiler host.",
+      "This does not rerun the full producer suite or establish asset/media existence for unrelated storyboard scenes."
+    ]
+  },
+  "renderer": {
+    "status": "passed-production-StockGraphic-static-render",
+    "frame": 150,
+    "preset": "paired-contrast",
+    "markupBytes": 3810,
+    "source": "exact tracked request through production StockGraphic",
+    "limits": "Static SVG output only. No browser, pixel, animation, MP4 or production acceptance."
+  },
+  "linksAndIds": {
+    "status": "passed",
+    "checkedAtUtc": "2026-10-18T02:17:07.138711+00:00",
+    "method": "Markdown inline relative links and GitHub-style heading IDs at intended repository paths, resolved through draft overlay. Existing source and unrelated target documents are read-only. External URLs/absolute provenance paths are counted, not network-verified.",
+    "counts": {
+      "draftMarkdownDocuments": 14,
+      "relativeLinks": 346,
+      "resolvedFragments": 3,
+      "externalOrAbsoluteLinksSkipped": 9,
+      "presetReferences": 171,
+      "uniquePresetIds": 170,
+      "runtimePresetIds": 170,
+      "issues": 0
+    },
+    "issues": [],
+    "boundaries": [
+      "No external network requests",
+      "No source mutation or product test execution",
+      "No browser, render, media acceptance or PDF"
+    ]
+  },
+  "commands": [
+    "REMOTION_KEYS_FILE=<existing-key-consumer-path> node --import tsx <ignored-task8>/validateDraftExamples.mts",
+    "REMOTION_KEYS_FILE=<existing-key-consumer-path> node --import tsx <ignored-task8>/validateFinalRenderer.mts",
+    "python3 <ignored-task8>/checkDraftLinksAndIds.py",
+    "git diff --check"
+  ],
+  "initialAttempt": "Example validation first stopped at the required license guard because the worktree-local key file was absent. Supplying the existing shared consumer path succeeded. No credential values were opened, printed or copied.",
+  "preservation": {
+    "canonical108ByteExact": true,
+    "reviewedSupplementByteExact": true,
+    "R1to69FullRulingsCostsPreserved": true,
+    "rawTracesRemainIgnored": true
+  },
+  "limits": [
+    "No full unit/E2E suite or unrelated source build repeated.",
+    "Static SVG rendering is not pixel/browser/media acceptance.",
+    "Links were checked against the final draft overlay, with byte equality to explicit tracked targets checked before commit.",
+    "External/absolute links counted but not network-verified.",
+    "Final whole-branch review and artifact PDF inspection are separate."
+  ],
+  "initialTask8ValidationBoundary": "Existing top-level result records describe the initial481405411 documentation commit checked at source-basee5a. Earlier historical command logs and reconstructed mirrors remain separate from the direct post-correction capture below.",
+  "scopedReviewAndCorrections": {
+    "reviewedBase": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+    "reviewedHead": "4814054116cb4be8cb0ca0096f22686022b4ff8e",
+    "report": {
+      "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-review.md",
+      "sha256": "0111dcd357f117fd77e981a7904b938893cc6940783dbbec57729e3c20790fdb"
+    },
+    "spec": "substantively compliant",
+    "quality": "approved with three Minor documentation corrections",
+    "critical": 0,
+    "important": 0,
+    "corrections": [
+      {
+        "id": "M1",
+        "path": "docs/motion-atlas/implementation-validation.md",
+        "finding": "Live aggregate prose overstated preservation of full original report envelopes after R69.",
+        "resolution": "Describe compact validated outcomes/narratives/findings/hashes and ignored/Downloads custody for full originals.",
+        "status": "implemented and focused checks passed; scoped rereview pending"
+      },
+      {
+        "id": "M2",
+        "paths": [
+          "docs/motion-atlas/proposal-ledger.md",
+          "docs/motion-atlas/source-expansion-ledger.md",
+          "docs/superpowers/specs/2026-10-16-motion-atlas-expansion-design.md",
+          "docs/superpowers/plans/2026-10-16-motion-atlas-expansion.md"
+        ],
+        "finding": "Opening status still reads like pending media draft despite later R67/R68 closure.",
+        "resolution": "Opening states source/versioned media evidence complete, with whole-branch review/artifact packaging pending. Historical chronology retained.",
+        "status": "implemented and focused checks passed; scoped rereview pending"
+      },
+      {
+        "id": "M3",
+        "path": "docs/stock-motion-library.md",
+        "finding": "StockScene export pointed at nonexistent src/scenes/index.ts.",
+        "resolution": "Link actual direct named-export module src/scenes/StockScene.tsx.",
+        "status": "implemented and focused checks passed; scoped rereview pending"
+      }
+    ],
+    "priorCommandProvenanceLimit": "Initial final stdout remained in tool transcript; later mirrors were reconstructed from actual result JSON. They are not independently retained original stdout. Direct post-correction stdout/stderr/exit files below close that retention gap without relabeling old logs.",
+    "wholeBranchAcceptance": null
+  },
+  "postCorrectionValidation": {
+    "checkedBaseHead": "4814054116cb4be8cb0ca0096f22686022b4ff8e",
+    "checkedWorkingDiff": "Six M1-M3 Markdown corrections only, before this results-record addition",
+    "commands": [
+      {
+        "label": "schema-react",
+        "argv": [
+          "node",
+          "--import",
+          "tsx",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validateDraftExamples.mts"
+        ],
+        "cwd": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer",
+        "startedAtUtc": "2026-10-18T02:27:36.429698+00:00",
+        "finishedAtUtc": "2026-10-18T02:27:42.580939+00:00",
+        "durationSeconds": 6.151103959,
+        "exitCode": 0,
+        "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/schema-react.stdout.log",
+        "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/schema-react.stderr.log",
+        "stdoutSha256": "73150215d19e3d445f91c7b1ad9ce9915f7a58f39898362d52ea87223da1f41f",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "recording": "Direct subprocess stdout/stderr files, not reconstructed"
+      },
+      {
+        "label": "renderer",
+        "argv": [
+          "node",
+          "--import",
+          "tsx",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validateFinalRenderer.mts"
+        ],
+        "cwd": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer",
+        "startedAtUtc": "2026-10-18T02:27:42.581392+00:00",
+        "finishedAtUtc": "2026-10-18T02:27:44.305240+00:00",
+        "durationSeconds": 1.7238625,
+        "exitCode": 0,
+        "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/renderer.stdout.log",
+        "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/renderer.stderr.log",
+        "stdoutSha256": "622f3a2c9db58e8e1309c45b3e74bd1ecd69eaf5bd5ab9f972ec6d68caaf6038",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "recording": "Direct subprocess stdout/stderr files, not reconstructed"
+      },
+      {
+        "label": "links-ids",
+        "argv": [
+          "python3",
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/checkDraftLinksAndIds.py"
+        ],
+        "cwd": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog",
+        "startedAtUtc": "2026-10-18T02:27:44.305622+00:00",
+        "finishedAtUtc": "2026-10-18T02:27:44.378420+00:00",
+        "durationSeconds": 0.07281745800000028,
+        "exitCode": 0,
+        "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/links-ids.stdout.log",
+        "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/links-ids.stderr.log",
+        "stdoutSha256": "46f351ba3eae561cfc927caa5abb945a56b183d6c94cb63544a97be4e7206774",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "recording": "Direct subprocess stdout/stderr files, not reconstructed"
+      },
+      {
+        "label": "diff-check",
+        "argv": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "cwd": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog",
+        "startedAtUtc": "2026-10-18T02:27:44.378907+00:00",
+        "finishedAtUtc": "2026-10-18T02:27:44.401982+00:00",
+        "durationSeconds": 0.023090666999999954,
+        "exitCode": 0,
+        "stdout": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/diff-check.stdout.log",
+        "stderr": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-draft/validation/review-correction-481405411/diff-check.stderr.log",
+        "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "recording": "Direct subprocess stdout/stderr files, not reconstructed"
+      }
+    ],
+    "schemaReact": {
+      "status": "passed-focused-documentation-examples",
+      "head": "4814054116cb4be8cb0ca0096f22686022b4ff8e",
+      "productionSchemas": [
+        "stockRequestSchema",
+        "storyboardSchema"
+      ],
+      "checks": {
+        "completeRequest": "passed with exact supplied-input preservation",
+        "completeStoryboard": "passed with exact supplied-input preservation",
+        "standaloneStoryboardContentParity": "passed",
+        "embeddedStoryboardParity": "passed",
+        "reactExampleTypecheck": "passed using exact snippet and app strict compiler options; noEmit; zero diagnostics",
+        "reactRequestSchemaAndJsonParity": "passed"
+      },
+      "runtimeRegistry": {
+        "count": 170,
+        "collections": {
+          "general": 106,
+          "social-sector": 64
+        }
+      },
+      "reactTypecheck": {
+        "exactSnippetFile": "validation/ConfiguredComparison.tsx",
+        "virtualAppRootModule": "apps/ava-video-producer/Task8ConfiguredComparison.documentation-example.tsx",
+        "trackedPlacementRequired": false,
+        "importsRewritten": false,
+        "compilerOptionsSource": "apps/ava-video-producer/tsconfig.json",
+        "diagnostics": 0,
+        "programSourceFiles": 2521,
+        "executableEvaluation": "Only the literal request is evaluated after type erasure. The React component is not executed."
+      },
+      "boundaries": [
+        "No browser, Chromium, SSR/pixel rendering, MP4, media acceptance or PDF operation.",
+        "No tracked file written. Relative module resolution uses a read-only virtual compiler host.",
+        "This does not rerun the full producer suite or establish asset/media existence for unrelated storyboard scenes."
+      ]
+    },
+    "renderer": {
+      "status": "passed-production-StockGraphic-static-render",
+      "frame": 150,
+      "preset": "paired-contrast",
+      "markupBytes": 3810,
+      "source": "exact tracked request through production StockGraphic",
+      "limits": "Static SVG output only. No browser, pixel, animation, MP4 or production acceptance."
+    },
+    "linksAndIds": {
+      "status": "passed",
+      "counts": {
+        "draftMarkdownDocuments": 14,
+        "relativeLinks": 347,
+        "resolvedFragments": 3,
+        "externalOrAbsoluteLinksSkipped": 9,
+        "presetReferences": 171,
+        "uniquePresetIds": 170,
+        "runtimePresetIds": 170,
+        "issues": 0
+      },
+      "issues": []
+    },
+    "stdoutAndStderrRetention": "Direct subprocess files, all exit0 and empty stderr. Not reconstructed.",
+    "limits": [
+      "No full unit/E2E suite or source build repeated.",
+      "Static SVG is not pixel/media acceptance.",
+      "Whole-branch review and final artifact page inspection remain separate."
+    ]
+  }
+}

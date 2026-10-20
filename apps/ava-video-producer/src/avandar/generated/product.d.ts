@@ -4,7 +4,9 @@ export type ProductFeature =
   | "explorer"
   | "dashboards"
   | "cases"
-  | "map";
+  | "map"
+  | "ontology"
+  | "attribute-mapping";
 export type ProductBeat = { frame: number; target: string; action: string };
 export const AvandarStage: ComponentType<{
   feature: ProductFeature;

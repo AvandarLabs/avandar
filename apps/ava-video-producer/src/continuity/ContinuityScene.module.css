@@ -1,0 +1,118 @@
+.continuityStage {
+  background: var(--continuity-ground, #0b1219);
+  color: var(--continuity-ink, #edf7f4);
+  font-family: var(--font-sans, Arial, sans-serif);
+  height: 840px;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 1600px;
+}
+
+.continuityBeat {
+  background: var(--continuity-ground, #0b1219);
+  inset: 0;
+  position: absolute;
+}
+
+.continuityHeading {
+  left: 96px;
+  position: absolute;
+  right: 96px;
+  top: 64px;
+}
+
+.continuityHeading h1 {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  margin: 0;
+}
+
+.continuityHeading p {
+  color: var(--continuity-ink, #b3c5cf);
+  font-size: 25px;
+  line-height: 1.35;
+  margin: 18px 0 0;
+}
+
+.continuityGraphic {
+  inset: 192px 60px 70px;
+  position: absolute;
+}
+
+.continuityEvidence {
+  bottom: 16px;
+  color: var(--continuity-ink, #b3c5cf);
+  display: flex;
+  font-size: 17px;
+  gap: 20px;
+  justify-content: space-between;
+  left: 32px;
+  pointer-events: none;
+  position: absolute;
+  right: 32px;
+  z-index: 30;
+}
+
+.continuityEvidence span {
+  background: var(--continuity-ground, #0b1219);
+  border-radius: 4px;
+  padding: 7px 12px;
+}
+
+.continuityToken {
+  align-items: center;
+  background: #101e28;
+  border: 2px solid currentcolor;
+  border-radius: 8px;
+  box-sizing: border-box;
+  display: flex;
+  font-size: 25px;
+  font-weight: 600;
+  justify-content: center;
+  position: absolute;
+  z-index: 22;
+}
+
+.continuityThesis {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  inset: 235px 110px 80px;
+  justify-content: center;
+  position: absolute;
+}
+
+.continuityThesisLine {
+  font-size: 63px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+.continuityEmphasis {
+  color: var(--continuity-ink, #b3c5cf);
+  font-size: 30px;
+  margin-top: 20px;
+}
+
+.continuityProduct {
+  background: #eaeef2;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  position: absolute;
+  z-index: 0;
+}
+
+.continuityProgress {
+  bottom: 0;
+  height: 3px;
+  left: 0;
+  position: absolute;
+  z-index: 40;
+}
+

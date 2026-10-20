@@ -1,0 +1,98 @@
+name:
+  id: motionAtlas.cluster-epicurve-link.name
+  message: Locate the cluster in time
+description:
+  id: motionAtlas.cluster-epicurve-link.description
+  message: A supplied investigation group on a schematic map is linked to its recorded
+    onset bins in an epidemic curve. The same selected case IDs remain highlighted in
+    both views, including an explicit unknown-time compartment.
+category:
+  id: motionAtlas.cluster-epicurve-link.category
+  message: linked geographic and temporal views
+useWhen:
+  id: motionAtlas.cluster-epicurve-link.useWhen
+  message: Connect place and recorded time for the same cases without inventing
+    transmission links.
+prompt:
+  id: motionAtlas.cluster-epicurve-link.prompt
+  message: Begin with all case pins and a complete histogram. An authored group receives a
+    map bracket; thin identity guides lift its highlighted tokens into the corresponding
+    histogram segments. A chosen time bin then outlines its matching map pins. Hold both
+    views with selected and total case counts.
+creativeDirection:
+  id: motionAtlas.cluster-epicurve-link.creativeDirection
+  message: Begin with all case pins and a complete histogram. An authored group receives a
+    map bracket; thin identity guides lift its highlighted tokens into the corresponding
+    histogram segments. A chosen time bin then outlines its matching map pins. Hold both
+    views with selected and total case counts.
+intent:
+  id: motionAtlas.cluster-epicurve-link.intent
+  message: Connect place and recorded time for the same cases without inventing
+    transmission links.
+distinction:
+  id: motionAtlas.cluster-epicurve-link.distinction
+  message: The same case identities drive a geographic selection and a binned epidemic
+    curve. Unlike contact-window-overlap, no venue intervals intersect; unlike
+    line-trace, the explanation is linked selection between two complete
+    representations.
+tags:
+  - id: motionAtlas.cluster-epicurve-link.tags.0
+    message: outbreak investigation
+  - id: motionAtlas.cluster-epicurve-link.tags.1
+    message: epidemic curve
+  - id: motionAtlas.cluster-epicurve-link.tags.2
+    message: epi curve
+  - id: motionAtlas.cluster-epicurve-link.tags.3
+    message: cluster
+  - id: motionAtlas.cluster-epicurve-link.tags.4
+    message: case map
+  - id: motionAtlas.cluster-epicurve-link.tags.5
+    message: onset date
+  - id: motionAtlas.cluster-epicurve-link.tags.6
+    message: linked brushing
+  - id: motionAtlas.cluster-epicurve-link.tags.7
+    message: surveillance
+goodFor:
+  - id: motionAtlas.cluster-epicurve-link.goodFor.0
+    message: Explain outbreak investigation cross-filtering
+  - id: motionAtlas.cluster-epicurve-link.goodFor.1
+    message: Relate a spatial case group to recorded onset time
+  - id: motionAtlas.cluster-epicurve-link.goodFor.2
+    message: Keep unknown onset dates visible during case review
+notFor:
+  - id: motionAtlas.cluster-epicurve-link.notFor.0
+    message: The investigation group is supplied, not statistically detected. Proximity and
+      timing do not establish a common source or transmission.
+  - id: motionAtlas.cluster-epicurve-link.notFor.1
+    message: Histogram bars plus unknown-time cases equal the entire case array; highlights
+      are subsets, not extra cases.
+  - id: motionAtlas.cluster-epicurve-link.notFor.2
+    message: Counts describe supplied case records only. No population denominator, disease
+      incidence, or clinical guidance is implied.
+domains:
+  - id: motionAtlas.cluster-epicurve-link.domains.0
+    message: linked geographic and temporal views
+aliases:
+  - id: motionAtlas.cluster-epicurve-link.aliases.0
+    message: outbreak investigation
+  - id: motionAtlas.cluster-epicurve-link.aliases.1
+    message: epidemic curve
+  - id: motionAtlas.cluster-epicurve-link.aliases.2
+    message: epi curve
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.cluster-epicurve-link.beat.0
+      message: Show all case pins and the complete histogram, then bracket the authored group.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.cluster-epicurve-link.beat.1
+      message: Lift selected identity copies to their bins during frames 36–84; focus returns
+        to matching map pins during 90–108.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.cluster-epicurve-link.beat.2
+      message: Hold both selections and all recorded and unknown onset cases.

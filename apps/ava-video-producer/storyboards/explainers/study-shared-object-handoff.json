@@ -1,0 +1,286 @@
+{
+  "version": 1,
+  "id": "shared-object-handoff",
+  "title": "Shared-object handoff",
+  "description": "Carry one identified object between two diagrams. Change its position while retaining a single rendered copy.",
+  "sourceNotes": [
+    "Extracted from qetl-motion; uses the same continuity renderer and typed content contracts.",
+    "Reusable geometry, timing and editorial relationships. Product state remains scripted demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 456,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Shared-object handoff",
+        "category": "motion-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "example-0",
+            "title": "First, the familiar batch pipeline.",
+            "subtitle": "An illustrative batch design, not every ETL system.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "data-pipeline",
+                "schemaVersion": 1,
+                "input": {
+                  "stages": [
+                    {
+                      "label": "Extract",
+                      "detail": "Scheduled sources"
+                    },
+                    {
+                      "label": "Transform",
+                      "detail": "Prepared dataset"
+                    },
+                    {
+                      "label": "Load",
+                      "detail": "Warehouse"
+                    },
+                    {
+                      "label": "Query",
+                      "detail": "Ask afterward"
+                    }
+                  ],
+                  "heading": "A batch ETL example",
+                  "showProgress": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 285,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 285,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 670,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 670,
+                  "y": 310,
+                  "zoom": 1.75,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ],
+              "flight": {
+                "at": 202,
+                "duration": 18,
+                "dx": 680,
+                "dy": -120,
+                "rect": {
+                  "x": 723,
+                  "y": 205,
+                  "width": 174,
+                  "height": 207
+                }
+              }
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            },
+            "token": {
+              "label": "The question",
+              "anchor": {
+                "x": 1120,
+                "y": 716,
+                "width": 360,
+                "height": 58
+              }
+            }
+          },
+          {
+            "id": "example-1",
+            "title": "Now move the question upstream.",
+            "subtitle": "The query defines the subset that crosses the boundary.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "predicate-pushdown-boundary",
+                "schemaVersion": 1,
+                "input": {
+                  "rows": [
+                    {
+                      "id": "a",
+                      "value": 2
+                    },
+                    {
+                      "id": "b",
+                      "value": 7
+                    },
+                    {
+                      "id": "c",
+                      "value": 4
+                    },
+                    {
+                      "id": "d",
+                      "value": 9
+                    }
+                  ],
+                  "predicate": {
+                    "operator": ">=",
+                    "threshold": 5
+                  },
+                  "metric": {
+                    "label": "Recorded items",
+                    "unit": "items",
+                    "rowUnit": "records"
+                  },
+                  "labels": {
+                    "source": "Source system",
+                    "destination": "Local query",
+                    "condition": "Apply at source",
+                    "retained": "Remain at source",
+                    "transferred": "Transferred rows"
+                  },
+                  "showTotals": true,
+                  "copy": {
+                    "context": "Fictional document",
+                    "source": "Original",
+                    "result": "Extracted result"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 665,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 665,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 280,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 280,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "handoff",
+              "frames": 24
+            },
+            "token": {
+              "label": "The question",
+              "anchor": {
+                "x": 100,
+                "y": 700,
+                "width": 360,
+                "height": 58
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "cue-0",
+      "shotId": "explanation",
+      "startFrame": 15,
+      "endFrame": 205,
+      "text": "Keep a meaningful object or relationship in view.",
+      "beatId": "example-0"
+    },
+    {
+      "id": "cue-1",
+      "shotId": "explanation",
+      "startFrame": 39,
+      "endFrame": 205,
+      "text": "Let the next scene continue the explanation.",
+      "beatId": "example-1"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

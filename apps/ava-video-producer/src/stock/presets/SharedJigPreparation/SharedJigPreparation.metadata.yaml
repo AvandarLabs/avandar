@@ -1,0 +1,96 @@
+name:
+  id: motionAtlas.shared-jig-preparation.name
+  message: Prepare one guide that the whole team can reuse
+description:
+  id: motionAtlas.shared-jig-preparation.description
+  message: One maker prepares a physical marking guide. The same guide then moves between
+    coworkers, who apply its pattern to their own supplied workpieces while keeping the
+    reusable guide intact.
+category:
+  id: motionAtlas.shared-jig-preparation.category
+  message: Learning and collaboration
+useWhen:
+  id: motionAtlas.shared-jig-preparation.useWhen
+  message: Make the benefit of shared preparation concrete without inventing a performance
+    multiplier.
+prompt:
+  id: motionAtlas.shared-jig-preparation.prompt
+  message: Make the benefit of shared preparation concrete without inventing a performance
+    multiplier.
+creativeDirection:
+  id: motionAtlas.shared-jig-preparation.creativeDirection
+  message: Frames 12..48 show a maker forming the authored guide by opening two marking
+    holes or a corner notch. Frames 49..130 carry that same guide to each collaborator
+    in input order. At each station the collaborator aligns the guide with their
+    existing blank workpiece and makes the matching marks, then releases the unchanged
+    guide for the next person. Frames 131..167 hold all separate marked workpieces and
+    the retained guide together. Do not turn the guide into copies of itself or show a
+    numeric acceleration. Use deterministic frame-driven React/SVG at 960x600, 180
+    frames and 30 fps, with the shared palette. Reveal during frames 0..11 and fade to
+    the common opaque ground during frames 168..179.
+intent:
+  id: motionAtlas.shared-jig-preparation.intent
+  message: Make the benefit of shared preparation concrete without inventing a performance
+    multiplier.
+distinction:
+  id: motionAtlas.shared-jig-preparation.distinction
+  message: Unlike contribution-weave, the team does not combine its outputs into one
+    object. Unlike practice-to-work-sample, the reusable artifact itself travels to
+    multiple coworkers. Unlike cache-reuse, different workpieces receive a repeatable
+    procedure rather than repeated requests receiving a stored answer.
+tags:
+  - id: motionAtlas.shared-jig-preparation.tags.0
+    message: team enablement
+  - id: motionAtlas.shared-jig-preparation.tags.1
+    message: reusable guide
+  - id: motionAtlas.shared-jig-preparation.tags.2
+    message: preparation
+  - id: motionAtlas.shared-jig-preparation.tags.3
+    message: shared tooling
+  - id: motionAtlas.shared-jig-preparation.tags.4
+    message: maintainability
+  - id: motionAtlas.shared-jig-preparation.tags.5
+    message: multiplying contribution
+goodFor:
+  - id: motionAtlas.shared-jig-preparation.goodFor.0
+    message: Explain preparatory work that supports teammates
+  - id: motionAtlas.shared-jig-preparation.goodFor.1
+    message: Show a reusable method applied to distinct outputs
+  - id: motionAtlas.shared-jig-preparation.goodFor.2
+    message: Distinguish shared enablement from an individual speed claim
+domains:
+  - id: motionAtlas.shared-jig-preparation.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.shared-jig-preparation.aliases.0
+    message: shared jig preparation
+notFor:
+  - id: motionAtlas.shared-jig-preparation.notFor.0
+    message: No elapsed-time comparison, productivity multiplier or quality improvement is
+      inferred from the choreography.
+  - id: motionAtlas.shared-jig-preparation.notFor.1
+    message: The physical guide is an authored preparation metaphor, not evidence of a
+      particular product workflow or a measured team effect.
+  - id: motionAtlas.shared-jig-preparation.notFor.2
+    message: All workpieces exist at the start. Applying a pattern creates marks, not extra
+      material or workers.
+  - id: motionAtlas.shared-jig-preparation.notFor.3
+    message: Supplied prose is preserved. Fictional framing, evidence, and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 48
+    description:
+      id: motionAtlas.shared-jig-preparation.motionBeats.0
+      message: Form the one reusable marking guide.
+  - startFrame: 49
+    endFrame: 130
+    description:
+      id: motionAtlas.shared-jig-preparation.motionBeats.1
+      message: Apply the same guide to each existing workpiece in order.
+  - startFrame: 131
+    endFrame: 167
+    description:
+      id: motionAtlas.shared-jig-preparation.motionBeats.2
+      message: Retain all marked workpieces and the unchanged guide.

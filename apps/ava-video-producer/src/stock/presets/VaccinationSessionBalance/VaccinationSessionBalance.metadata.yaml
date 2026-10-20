@@ -1,0 +1,108 @@
+name:
+  id: motionAtlas.vaccination-session-balance.name
+  message: Session dose balance
+description:
+  id: motionAtlas.vaccination-session-balance.description
+  message: "An opened supply carrier empties into three visible destinations: documented
+    use, remaining stock, and recorded loss. Every represented dose unit is accounted
+    for at the end."
+category:
+  id: motionAtlas.vaccination-session-balance.category
+  message: Physical stock reconciliation
+useWhen:
+  id: motionAtlas.vaccination-session-balance.useWhen
+  message: Make every dose unit visible in exactly one final accounting category.
+intent:
+  id: motionAtlas.vaccination-session-balance.intent
+  message: Make every dose unit visible in exactly one final accounting category.
+creativeDirection:
+  id: motionAtlas.vaccination-session-balance.creativeDirection
+  message: Open a carrier containing the supplied discrete dose tokens. Move each token
+    exactly once to the authored used, remaining or recorded-loss destination; only used
+    tokens settle beside recipient silhouettes. Hold every destination simultaneously
+    with a derived conservation equation and a separate people total, then fade to the
+    unchanged ground.
+distinction:
+  id: motionAtlas.vaccination-session-balance.distinction
+  message: Unlike metric-counter, dot-matrix, or data-pipeline, the same physical stock
+    units leave a carrier and partition into mutually exclusive destinations, with
+    conservation remaining visible throughout.
+prompt:
+  id: motionAtlas.vaccination-session-balance.prompt
+  message: Use Session dose balance (vaccination-session-balance) for a fictional or
+    approved authored example. Make every dose unit visible in exactly one final
+    accounting category.
+tags:
+  - id: motionAtlas.vaccination-session-balance.tags.0
+    message: vaccine inventory
+  - id: motionAtlas.vaccination-session-balance.tags.1
+    message: dose reconciliation
+  - id: motionAtlas.vaccination-session-balance.tags.2
+    message: session balance
+  - id: motionAtlas.vaccination-session-balance.tags.3
+    message: stock accounting
+  - id: motionAtlas.vaccination-session-balance.tags.4
+    message: remaining doses
+  - id: motionAtlas.vaccination-session-balance.tags.5
+    message: recorded loss
+  - id: motionAtlas.vaccination-session-balance.tags.6
+    message: administration records
+  - id: motionAtlas.vaccination-session-balance.tags.7
+    message: conservation
+goodFor:
+  - id: motionAtlas.vaccination-session-balance.goodFor.0
+    message: Explain a fictional end-of-session stock reconciliation.
+  - id: motionAtlas.vaccination-session-balance.goodFor.1
+    message: Distinguish administered-dose counts from the number of people served.
+  - id: motionAtlas.vaccination-session-balance.goodFor.2
+    message: Show why unused stock and recorded loss need separate categories.
+domains:
+  - id: motionAtlas.vaccination-session-balance.domains.0
+    message: Physical stock reconciliation
+aliases:
+  - id: motionAtlas.vaccination-session-balance.aliases.0
+    message: vaccine inventory
+  - id: motionAtlas.vaccination-session-balance.aliases.1
+    message: dose reconciliation
+  - id: motionAtlas.vaccination-session-balance.aliases.2
+    message: session balance
+notFor:
+  - id: motionAtlas.vaccination-session-balance.notFor.0
+    message: units.length is the opening dose-unit denominator. Final administered +
+      remaining + discarded always equals this denominator; no independent total input
+      is allowed.
+  - id: motionAtlas.vaccination-session-balance.notFor.1
+    message: The people denominator is the number of unique non-null recipientId values
+      among administered units. Multiple units may refer to one recipient, so doses and
+      people are never interchangeable.
+  - id: motionAtlas.vaccination-session-balance.notFor.2
+    message: This is a bookkeeping metaphor with no injection demonstration, dose size,
+      product, eligibility rule, or disposal procedure.
+  - id: motionAtlas.vaccination-session-balance.notFor.3
+    message: Loss is an authored accounting outcome. The animation does not determine
+      whether a product should be discarded or reused.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.vaccination-session-balance.motionBeats.0
+      message: Establish the supplied identities and setting.
+  - startFrame: 36
+    endFrame: 115
+    description:
+      id: motionAtlas.vaccination-session-balance.motionBeats.1
+      message: Open a carrier containing the supplied discrete dose tokens. Move each token
+        exactly once to the authored used, remaining or recorded-loss destination; only
+        used tokens settle beside recipient silhouettes. Hold every destination
+        simultaneously with a derived conservation equation and a separate people total,
+        then fade to the unchanged ground.
+  - startFrame: 116
+    endFrame: 167
+    description:
+      id: motionAtlas.vaccination-session-balance.motionBeats.2
+      message: Hold the authored final records and derived quantities.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.vaccination-session-balance.motionBeats.3
+      message: Return to the opaque ground through the shared envelope.

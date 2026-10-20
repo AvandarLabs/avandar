@@ -1,0 +1,56 @@
+name:
+  id: motionAtlas.network-graph.name
+  message: Connected entities
+description:
+  id: motionAtlas.network-graph.description
+  message: Nodes assemble into a connected relationship graph.
+category:
+  id: motionAtlas.network-graph.category
+  message: Networks
+tags:
+  - id: motionAtlas.network-graph.tags.0
+    message: graph
+  - id: motionAtlas.network-graph.tags.1
+    message: nodes
+  - id: motionAtlas.network-graph.tags.2
+    message: edges
+  - id: motionAtlas.network-graph.tags.3
+    message: relationships
+useWhen:
+  id: motionAtlas.network-graph.useWhen
+  message: Introduce relationships among people, places, records, or entities.
+prompt:
+  id: motionAtlas.network-graph.prompt
+  message: Use Motion Atlas "Connected entities" (network-graph) as a conceptual graphic.
+    Introduce relationships among people, places, records, or entities. Keep the
+    restrained motion and readable labels; replace sample content with approved facts
+    before making product claims.
+creativeDirection:
+  id: motionAtlas.network-graph.creativeDirection
+  message: Nodes assemble into a connected relationship graph.
+goodFor:
+  - id: motionAtlas.network-graph.goodFor.0
+    message: Introduce relationships among people, places, records, or entities.
+intent:
+  id: motionAtlas.network-graph.intent
+  message: Introduce relationships among people, places, records, or entities.
+domains:
+  - id: motionAtlas.network-graph.domains.0
+    message: Networks
+aliases:
+  - id: motionAtlas.network-graph.aliases.0
+    message: graph
+  - id: motionAtlas.network-graph.aliases.1
+    message: nodes
+  - id: motionAtlas.network-graph.aliases.2
+    message: edges
+  - id: motionAtlas.network-graph.aliases.3
+    message: relationships
+notFor:
+  - id: motionAtlas.network-graph.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.network-graph.distinction
+  message: Nodes assemble into a connected relationship graph.

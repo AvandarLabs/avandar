@@ -1,3 +1,5 @@
+import { getCueWindowFromShot } from "./getCueWindowFromShot";
+import { getContinuityTimeline } from "../../continuity/continuityTimeline";
 import { z } from "zod";
 import { captionBand } from "../../scenes/layout/layout";
 import { assetPathSchema, frame, id, positiveFrames, text } from "./primitives";
@@ -7,6 +9,7 @@ const cueSchema = z
   .object({
     id,
     shotId: id,
+    beatId: id.optional(),
     startFrame: frame,
     endFrame: positiveFrames,
     text: text.max(180),
@@ -135,6 +138,26 @@ export const storyboardSchema = z
       offset += shot.durationInFrames;
       if (shot.transitionInFrames >= shot.durationInFrames)
         issue(`${shot.id}: transition must be shorter than the shot`);
+      if (shot.scene === "continuity") {
+        const stageHeight =
+          plan.height -
+          (plan.captions
+            ? captionBand(plan.narration, plan.width, plan.height)
+            : 0);
+        if (plan.width !== 1600 || stageHeight !== 840)
+          issue(
+            `${shot.id}: continuity requires the validated 1600 by 840 stage`,
+          );
+        try {
+          const beats = getContinuityTimeline(shot.props.beats);
+          if (beats[beats.length - 1].end !== shot.durationInFrames)
+            issue(
+              `${shot.id}: continuity shot must contain the complete beat schedule`,
+            );
+        } catch {
+          issue(`${shot.id}: invalid continuity overlap`);
+        }
+      }
       if (shot.scene === "avandar") {
         const stageHeight =
           plan.height -
@@ -236,18 +259,24 @@ export const storyboardSchema = z
     let lastEnd = -1;
     for (const item of plan.narration) {
       const shot = plan.shots.find((candidate) => candidate.id === item.shotId);
+      let window = { start: 0, duration: shot?.durationInFrames ?? 0 };
+      try {
+        window = getCueWindowFromShot({ shot, beatId: item.beatId });
+      } catch {
+        issue(`${item.id}: unknown continuity beat`);
+      }
       if (
         !shot ||
         item.endFrame <= item.startFrame ||
-        item.endFrame > shot.durationInFrames
+        item.endFrame > window.duration
       ) {
         issue(`${item.id}: cue must fit its referenced shot`);
         continue;
       }
-      const start = starts.get(item.shotId)! + item.startFrame;
+      const start = starts.get(item.shotId)! + window.start + item.startFrame;
       if (start < lastEnd)
         issue("Narration cues must be chronological and non-overlapping");
-      lastEnd = starts.get(item.shotId)! + item.endFrame;
+      lastEnd = starts.get(item.shotId)! + window.start + item.endFrame;
       if (plan.narrationTrack && item.audio)
         issue("Choose one narration track or per-cue recordings, not both");
     }

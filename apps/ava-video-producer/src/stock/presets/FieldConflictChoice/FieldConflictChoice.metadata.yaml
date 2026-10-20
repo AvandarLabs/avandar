@@ -1,0 +1,103 @@
+name:
+  id: motionAtlas.field-conflict-choice.name
+  message: Reconcile conflicting values
+description:
+  id: motionAtlas.field-conflict-choice.description
+  message: Alternative values for the same record remain visible while explicit per-field
+    choices build a reconciled result. Unresolved fields stay open instead of receiving
+    an automatic answer.
+category:
+  id: motionAtlas.field-conflict-choice.category
+  message: Decision comparison
+useWhen:
+  id: motionAtlas.field-conflict-choice.useWhen
+  message: Show that combining records can require explicit decisions rather than silent
+    overwrites.
+creativeDirection:
+  id: motionAtlas.field-conflict-choice.creativeDirection
+  message: Frames 12-42 show one record with parallel source columns. Between frames
+    42-112, authored choice rails move toward the selected source for each resolved
+    field, lifting that value into the result column. An unresolved field keeps both
+    alternatives separated by a review bracket. Rejected alternatives remain in a
+    quieter side ledger when enabled. Hold resolved and unresolved fields together
+    through frame 166 before exiting.
+intent:
+  id: motionAtlas.field-conflict-choice.intent
+  message: Show that combining records can require explicit decisions rather than silent
+    overwrites.
+distinction:
+  id: motionAtlas.field-conflict-choice.distinction
+  message: Unlike source-merge and schema-mapping, this centers disagreement and explicit
+    per-field choices. It never turns multiple inputs into an unexplained single answer.
+prompt:
+  id: motionAtlas.field-conflict-choice.prompt
+  message: Use Motion Atlas "Reconcile conflicting values" (field-conflict-choice) as a
+    conceptual graphic. Show that combining records can require explicit decisions
+    rather than silent overwrites. Replace fictional sample content with approved
+    authored content before making product claims.
+tags:
+  - id: motionAtlas.field-conflict-choice.tags.0
+    message: reconciliation
+  - id: motionAtlas.field-conflict-choice.tags.1
+    message: conflicting values
+  - id: motionAtlas.field-conflict-choice.tags.2
+    message: record conflict
+  - id: motionAtlas.field-conflict-choice.tags.3
+    message: resolve differences
+  - id: motionAtlas.field-conflict-choice.tags.4
+    message: choose source
+  - id: motionAtlas.field-conflict-choice.tags.5
+    message: review alternatives
+  - id: motionAtlas.field-conflict-choice.tags.6
+    message: data stewardship
+  - id: motionAtlas.field-conflict-choice.tags.7
+    message: merge decision
+goodFor:
+  - id: motionAtlas.field-conflict-choice.goodFor.0
+    message: Explain reconciliation of disagreeing record values
+  - id: motionAtlas.field-conflict-choice.goodFor.1
+    message: Show a deliberate field-by-field choice
+  - id: motionAtlas.field-conflict-choice.goodFor.2
+    message: Communicate that unresolved conflicts require review
+domains:
+  - id: motionAtlas.field-conflict-choice.domains.0
+    message: Decision comparison
+aliases:
+  - id: motionAtlas.field-conflict-choice.aliases.0
+    message: reconciliation
+  - id: motionAtlas.field-conflict-choice.aliases.1
+    message: conflicting values
+  - id: motionAtlas.field-conflict-choice.aliases.2
+    message: record conflict
+  - id: motionAtlas.field-conflict-choice.aliases.3
+    message: resolve differences
+notFor:
+  - id: motionAtlas.field-conflict-choice.notFor.literal-whitespace
+    message: "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
+      breaks and other whitespace remain distinct from authored marker glyphs. Input,
+      accessible text and equality preserve the original values."
+  - id: motionAtlas.field-conflict-choice.notFor.0
+    message: All default values and choices are fictional.
+  - id: motionAtlas.field-conflict-choice.notFor.1
+    message: The supplied choice is an editorial decision, not a recommendation, confidence
+      score, or automatic truth finding.
+  - id: motionAtlas.field-conflict-choice.notFor.2
+    message: The animation neither edits source records nor discards alternatives.
+  - id: motionAtlas.field-conflict-choice.notFor.3
+    message: No timestamp priority or source authority is inferred.
+motionBeats:
+  - startFrame: 12
+    endFrame: 42
+    description:
+      id: motionAtlas.field-conflict-choice.motionBeats.0
+      message: Establish parallel source values.
+  - startFrame: 42
+    endFrame: 112
+    description:
+      id: motionAtlas.field-conflict-choice.motionBeats.1
+      message: Move authored choices into the result lane. Bracket unresolved fields.
+  - startFrame: 112
+    endFrame: 166
+    description:
+      id: motionAtlas.field-conflict-choice.motionBeats.2
+      message: Hold choices and retained alternatives.

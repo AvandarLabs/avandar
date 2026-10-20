@@ -1,0 +1,114 @@
+name:
+  id: motionAtlas.geometry-detail-budget.name
+  message: Remove detail without moving the kept vertices
+description:
+  id: motionAtlas.geometry-detail-budget.description
+  message: A schematic polyline shows all source vertices, then simplifies under a
+    supplied perpendicular-distance tolerance. Removed vertices stay as ghosts with
+    their deviation visible, while endpoints remain fixed.
+category:
+  id: motionAtlas.geometry-detail-budget.category
+  message: Polyline simplification
+useWhen:
+  id: motionAtlas.geometry-detail-budget.useWhen
+  message: Make geometric simplification and its tolerance inspectable.
+prompt:
+  id: motionAtlas.geometry-detail-budget.prompt
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 reveal a jagged source line and its vertices. Frames 51-110 run recursive
+    farthest-deviation splits, retaining a vertex only when its deviation exceeds the
+    tolerance. Frames 111-139 draw the simplified line over the ghost original and count
+    retained/removed vertices. Hold at frames 140-165; fade to the same opaque ground at
+    frames 166-179 for an editorial loop.
+creativeDirection:
+  id: motionAtlas.geometry-detail-budget.creativeDirection
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 reveal a jagged source line and its vertices. Frames 51-110 run recursive
+    farthest-deviation splits, retaining a vertex only when its deviation exceeds the
+    tolerance. Frames 111-139 draw the simplified line over the ghost original and count
+    retained/removed vertices. Hold at frames 140-165; fade to the same opaque ground at
+    frames 166-179 for an editorial loop.
+intent:
+  id: motionAtlas.geometry-detail-budget.intent
+  message: Make geometric simplification and its tolerance inspectable.
+distinction:
+  id: motionAtlas.geometry-detail-budget.distinction
+  message: Unlike chart-focus-edit, actual geometry detail is reduced under a stated
+    algorithmic tolerance. The original trace remains visible so simplification is
+    inspectable.
+tags:
+  - id: motionAtlas.geometry-detail-budget.tags.0
+    message: geometry simplification
+  - id: motionAtlas.geometry-detail-budget.tags.1
+    message: Douglas-Peucker
+  - id: motionAtlas.geometry-detail-budget.tags.2
+    message: vertex budget
+  - id: motionAtlas.geometry-detail-budget.tags.3
+    message: distance tolerance
+goodFor:
+  - id: motionAtlas.geometry-detail-budget.goodFor.0
+    message: Explain distance-tolerance polyline simplification
+  - id: motionAtlas.geometry-detail-budget.goodFor.1
+    message: Show original geometry beside a reduced vertex trace
+domains:
+  - id: motionAtlas.geometry-detail-budget.domains.0
+    message: Polyline simplification
+aliases:
+  - id: motionAtlas.geometry-detail-budget.aliases.0
+    message: geometry simplification
+  - id: motionAtlas.geometry-detail-budget.aliases.1
+    message: Douglas-Peucker
+  - id: motionAtlas.geometry-detail-budget.aliases.2
+    message: vertex budget
+notFor:
+  - id: motionAtlas.geometry-detail-budget.notFor.0
+    message: This is an open-polyline teaching example, not topology-preserving polygon
+      simplification.
+  - id: motionAtlas.geometry-detail-budget.notFor.1
+    message: Douglas-Peucker is the explicit teaching algorithm; other simplifiers may
+      produce different vertices.
+  - id: motionAtlas.geometry-detail-budget.notFor.2
+    message: Tolerance is not GPS accuracy or evidence uncertainty.
+  - id: motionAtlas.geometry-detail-budget.notFor.3
+    message: No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.geometry-detail-budget.notFor.4
+    message: Authored prose must identify schematic geography and accurately describe the
+      selected example. Runtime validation preserves supplied prose and checks explicit
+      structural and numeric rules without natural-language classification.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.geometry-detail-budget.beat.0
+      message: Reveal the schematic study.
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.geometry-detail-budget.beat.1
+      message: Reveal the complete source polyline and fixed vertices.
+  - startFrame: 51
+    endFrame: 110
+    description:
+      id: motionAtlas.geometry-detail-budget.beat.2
+      message: Inspect recursive finite-segment deviations and draw qualifying splits in
+        depth-first order.
+  - startFrame: 111
+    endFrame: 139
+    description:
+      id: motionAtlas.geometry-detail-budget.beat.3
+      message: Draw the simplified trace over the ghost original with retained and removed
+        counts.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.geometry-detail-budget.beat.4
+      message: Hold source geometry and optional deviation guides.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.geometry-detail-budget.beat.5
+      message: The enclosing StockGraphic returns to opaque ground.

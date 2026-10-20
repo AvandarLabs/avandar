@@ -1,0 +1,409 @@
+{
+  "version": 1,
+  "id": "product-to-ontology",
+  "title": "A record reveals its structure",
+  "description": "A Case Manager record opens into an explanatory relationship graph.",
+  "sourceNotes": [
+    "Authored explainer informed by Avandar business-plan arguments. Diagrams are conceptual, not measured backend telemetry.",
+    "Product leaves import current Avandar source. Navigation, queries and form state use deterministic fictional fixtures. No live backend behavior is asserted.",
+    "Continuity overlaps are internal to the explanation shot. Caption times include those overlaps. Stock poses hold before their loop reset."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 1641,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "A record reveals its structure",
+        "category": "product-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "case",
+            "title": "Inspect a response case.",
+            "subtitle": "Actual case components and related-observation fixture values.",
+            "content": {
+              "kind": "product",
+              "segment": {
+                "feature": "cases",
+                "mode": "full",
+                "fromFrame": 0,
+                "toFrame": 659,
+                "leadIn": 30
+              },
+              "annotations": [
+                {
+                  "at": 520,
+                  "until": 680,
+                  "kind": "circle",
+                  "target": {
+                    "x": 594,
+                    "y": 281.58,
+                    "width": 202,
+                    "height": 58.39
+                  },
+                  "seed": 37
+                }
+              ]
+            },
+            "duration": 720,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "trace",
+            "title": "Trace a field back through its structure.",
+            "subtitle": "The route is a conceptual explanation of a derived field.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "node-traversal",
+                "schemaVersion": 1,
+                "input": {
+                  "nodes": [
+                    {
+                      "x": 136,
+                      "y": 302,
+                      "label": "Record"
+                    },
+                    {
+                      "x": 310,
+                      "y": 170,
+                      "label": "Identity"
+                    },
+                    {
+                      "x": 310,
+                      "y": 424,
+                      "label": "Field"
+                    },
+                    {
+                      "x": 502,
+                      "y": 302,
+                      "label": "Mapping"
+                    },
+                    {
+                      "x": 680,
+                      "y": 170,
+                      "label": "Source"
+                    },
+                    {
+                      "x": 680,
+                      "y": 424,
+                      "label": "Rule"
+                    },
+                    {
+                      "x": 842,
+                      "y": 302,
+                      "label": "Value"
+                    }
+                  ],
+                  "edges": [
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      1,
+                      3
+                    ],
+                    [
+                      2,
+                      3
+                    ],
+                    [
+                      3,
+                      4
+                    ],
+                    [
+                      3,
+                      5
+                    ],
+                    [
+                      4,
+                      6
+                    ],
+                    [
+                      5,
+                      6
+                    ]
+                  ],
+                  "route": [
+                    0,
+                    2,
+                    3,
+                    4,
+                    6
+                  ],
+                  "showRouteLabel": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 79,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 103,
+                  "x": 275,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 275,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 680,
+                  "y": 275,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 290,
+                  "x": 680,
+                  "y": 275,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 318,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 332,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 24
+            }
+          },
+          {
+            "id": "relations",
+            "title": "The record belongs to a wider model.",
+            "subtitle": "Identity, descriptors and relationships give context.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "radial-network",
+                "schemaVersion": 1,
+                "input": {
+                  "hub": {
+                    "label": "Case",
+                    "detail": "IDENTITY"
+                  },
+                  "spokes": [
+                    "Identifier",
+                    "District",
+                    "Visit",
+                    "Facility",
+                    "Descriptor",
+                    "Mapping"
+                  ],
+                  "showOrbit": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 80,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 104,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 2.0,
+                  "ease": "push"
+                },
+                {
+                  "at": 161,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 2.0,
+                  "ease": "glide"
+                },
+                {
+                  "at": 175,
+                  "x": 650,
+                  "y": 350,
+                  "zoom": 2.0,
+                  "ease": "whip"
+                },
+                {
+                  "at": 292,
+                  "x": 650,
+                  "y": 350,
+                  "zoom": 2.0,
+                  "ease": "glide"
+                },
+                {
+                  "at": 320,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 334,
+            "transition": {
+              "kind": "aperture",
+              "frames": 24,
+              "origin": {
+                "x": 800,
+                "y": 480
+              }
+            }
+          },
+          {
+            "id": "meaning",
+            "title": "A useful record is connected.",
+            "subtitle": "The diagram explains structure, not a live synchronization.",
+            "content": {
+              "kind": "thesis",
+              "lines": [
+                "Keep identity stable.",
+                "Expose the relationships that matter."
+              ],
+              "emphasis": "From a visible field to its meaning."
+            },
+            "duration": 321,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 18
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "case-0",
+      "shotId": "explanation",
+      "startFrame": 18,
+      "endFrame": 176,
+      "text": "A response case brings related information into one record.",
+      "beatId": "case"
+    },
+    {
+      "id": "case-1",
+      "shotId": "explanation",
+      "startFrame": 181,
+      "endFrame": 339,
+      "text": "Its fields retain their connections to source data.",
+      "beatId": "case"
+    },
+    {
+      "id": "case-2",
+      "shotId": "explanation",
+      "startFrame": 344,
+      "endFrame": 502,
+      "text": "Repeated visit observations can contribute to a case field.",
+      "beatId": "case"
+    },
+    {
+      "id": "case-3",
+      "shotId": "explanation",
+      "startFrame": 507,
+      "endFrame": 673,
+      "text": "The displayed record is one view of a wider model.",
+      "beatId": "case"
+    },
+    {
+      "id": "trace-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Follow a field through its source and mapping.",
+      "beatId": "trace"
+    },
+    {
+      "id": "trace-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 287,
+      "text": "A rule turns observations into the displayed value.",
+      "beatId": "trace"
+    },
+    {
+      "id": "relations-0",
+      "shotId": "explanation",
+      "startFrame": 42,
+      "endFrame": 162,
+      "text": "Other relationships connect the case to its wider context.",
+      "beatId": "relations"
+    },
+    {
+      "id": "relations-1",
+      "shotId": "explanation",
+      "startFrame": 167,
+      "endFrame": 295,
+      "text": "Those links make the model useful beyond a single row.",
+      "beatId": "relations"
+    },
+    {
+      "id": "meaning-0",
+      "shotId": "explanation",
+      "startFrame": 36,
+      "endFrame": 156,
+      "text": "Configure identity, relationships and field behavior.",
+      "beatId": "meaning"
+    },
+    {
+      "id": "meaning-1",
+      "shotId": "explanation",
+      "startFrame": 161,
+      "endFrame": 300,
+      "text": "The workspace can then fit a particular mission.",
+      "beatId": "meaning"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

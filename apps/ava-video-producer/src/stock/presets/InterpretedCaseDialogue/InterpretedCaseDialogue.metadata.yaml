@@ -1,0 +1,113 @@
+name:
+  id: motionAtlas.interpreted-case-dialogue.name
+  message: Keep the participant at the center of interpretation
+description:
+  id: motionAtlas.interpreted-case-dialogue.description
+  message: A participant and worker exchange short statements through an interpreter while
+    continuing to face each other. Each translated statement remains visibly attributed
+    to its original speaker.
+category:
+  id: motionAtlas.interpreted-case-dialogue.category
+  message: Attributed human dialogue
+useWhen:
+  id: motionAtlas.interpreted-case-dialogue.useWhen
+  message: Show interpretation enabling a direct conversation with the participant.
+prompt:
+  id: motionAtlas.interpreted-case-dialogue.prompt
+  message: Place the participant and worker across a small table, with the interpreter
+    seated to one side. The first speaker's original bubble appears above them; the
+    interpreter's corresponding supplied wording forms a smaller adjacent echo while the
+    original speaker attribution stays anchored. Repeat once in the opposite direction,
+    with a pause between turns. Hold both paired statements and direct
+    participant-worker sightlines so the interpreter supports the conversation without
+    replacing the participant's voice.
+creativeDirection:
+  id: motionAtlas.interpreted-case-dialogue.creativeDirection
+  message: Place the participant and worker across a small table, with the interpreter
+    seated to one side. The first speaker's original bubble appears above them; the
+    interpreter's corresponding supplied wording forms a smaller adjacent echo while the
+    original speaker attribution stays anchored. Repeat once in the opposite direction,
+    with a pause between turns. Hold both paired statements and direct
+    participant-worker sightlines so the interpreter supports the conversation without
+    replacing the participant's voice.
+intent:
+  id: motionAtlas.interpreted-case-dialogue.intent
+  message: Show interpretation enabling a direct conversation with the participant.
+distinction:
+  id: motionAtlas.interpreted-case-dialogue.distinction
+  message: The scene maintains two-way human turn-taking, original-speaker attribution and
+    direct participant-worker orientation while an interpreter adds a second wording.
+    Unlike packet-stream or a data-pipeline, messages do not pass through anonymous
+    processing stages; unlike word-reveal, the explanatory action is who speaks, who
+    interprets and who is addressed.
+tags:
+  - id: motionAtlas.interpreted-case-dialogue.tags.0
+    message: interpreted conversation
+  - id: motionAtlas.interpreted-case-dialogue.tags.1
+    message: language access
+  - id: motionAtlas.interpreted-case-dialogue.tags.2
+    message: case management
+  - id: motionAtlas.interpreted-case-dialogue.tags.3
+    message: interpreter
+  - id: motionAtlas.interpreted-case-dialogue.tags.4
+    message: participant voice
+  - id: motionAtlas.interpreted-case-dialogue.tags.5
+    message: turn taking
+  - id: motionAtlas.interpreted-case-dialogue.tags.6
+    message: social service assessment
+  - id: motionAtlas.interpreted-case-dialogue.tags.7
+    message: supported communication
+goodFor:
+  - id: motionAtlas.interpreted-case-dialogue.goodFor.0
+    message: Explaining language support during a case assessment
+  - id: motionAtlas.interpreted-case-dialogue.goodFor.1
+    message: Showing turn-taking in an interpreted consultation
+  - id: motionAtlas.interpreted-case-dialogue.goodFor.2
+    message: Distinguishing a participant's words from a worker's response
+notFor:
+  - id: motionAtlas.interpreted-case-dialogue.notFor.0
+    message: The animation does not translate text or certify the accuracy, confidentiality
+      or quality of interpretation.
+  - id: motionAtlas.interpreted-case-dialogue.notFor.1
+    message: All supplied utterances must be brief enough for a six-second illustration;
+      longer dialogue belongs in a longer scene.
+  - id: motionAtlas.interpreted-case-dialogue.notFor.2
+    message: The default English copies under fictional language labels demonstrate bindings
+      only and must not be presented as an actual bilingual exchange.
+domains:
+  - id: motionAtlas.interpreted-case-dialogue.domains.0
+    message: Attributed human dialogue
+aliases:
+  - id: motionAtlas.interpreted-case-dialogue.aliases.0
+    message: interpreted conversation
+  - id: motionAtlas.interpreted-case-dialogue.aliases.1
+    message: language access
+  - id: motionAtlas.interpreted-case-dialogue.aliases.2
+    message: case management
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.interpreted-case-dialogue.beat.0
+      message: Establish the authored people, objects and supplied starting state.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.interpreted-case-dialogue.beat.1
+      message: Place the participant and worker across a small table, with the interpreter
+        seated to one side. The first speaker's original bubble appears above them; the
+        interpreter's corresponding supplied wording forms a smaller adjacent echo while
+        the original speaker attribution stays anchored. Repeat once in the opposite
+        direction, with a pause between turns. Hold both paired statements and direct
+        participant-worker sightlines so the interpreter supports the conversation
+        without replacing the participant's voice.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.interpreted-case-dialogue.beat.2
+      message: Hold the supplied result, identities and limits.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.interpreted-case-dialogue.beat.3
+      message: The shared opaque envelope fades the illustration for its loop seam.

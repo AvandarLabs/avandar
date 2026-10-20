@@ -23,7 +23,14 @@ test("the direct video command refuses to start without license keys", async () 
   try {
     const result = spawnSync(
       process.execPath,
-      ["--import", "tsx", "scripts/video.ts", "--help"],
+      [
+        "--import",
+        "tsx",
+        "--import",
+        "./scripts/yaml/registerYaml.mjs",
+        "scripts/video.ts",
+        "--help",
+      ],
       {
         cwd: APP_ROOT,
         env: licenseTestEnvironment(path.join(directory, ".env.local")),
@@ -141,6 +148,8 @@ test("direct exports with missing keys create no output directory", async () => 
       [
         "--import",
         "tsx",
+        "--import",
+        "./scripts/yaml/registerYaml.mjs",
         "--input-type=module",
         "-e",
         `
@@ -283,8 +292,27 @@ test("every package command fails before starting without license keys", async (
 
 test("direct script entry points reject missing keys before doing work", async (context) => {
   const commands = [
-    [process.execPath, ["--import", "tsx", "scripts/showcase/server.ts"]],
-    [process.execPath, ["--import", "tsx", "scripts/motion.ts", "list"]],
+    [
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "--import",
+        "./scripts/yaml/registerYaml.mjs",
+        "scripts/showcase/server.ts",
+      ],
+    ],
+    [
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "--import",
+        "./scripts/yaml/registerYaml.mjs",
+        "scripts/motion.ts",
+        "list",
+      ],
+    ],
     ...[
       "build-avandar",
       "build-motion-gallery",
@@ -298,7 +326,16 @@ test("direct script entry points reject missing keys before doing work", async (
       "curate-capture",
       "capture-avandar/capture-avandar",
     ].map((name) => [process.execPath, [`scripts/${name}.mjs`]]),
-    [process.execPath, ["--import", "tsx", "scripts/read-theme.mjs"]],
+    [
+      process.execPath,
+      [
+        "--import",
+        "tsx",
+        "--import",
+        "./scripts/yaml/registerYaml.mjs",
+        "scripts/read-theme.mjs",
+      ],
+    ],
     ...["studio", "preview", "render", "render-showcase", "add-sfx"].map(
       (name) => ["sh", [`scripts/${name}.sh`]],
     ),

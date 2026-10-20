@@ -8,6 +8,7 @@ import "@fontsource-variable/figtree";
 import { i18n } from "@lingui/core";
 import { compileMessage } from "@lingui/message-utils/compileMessage";
 import { I18nProvider } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 import {
   MantineProvider,
   Group,
@@ -30,6 +31,10 @@ import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
 import slateCss from "@/components/layouts/AppSlate/AppSlate.module.css";
 import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 import { Theme, cssVariablesResolver } from "@/config/Theme/Theme";
+import {
+  AttributeMappingScreen,
+  ATTRIBUTE_MAPPING_BEATS,
+} from "./AttributeMappingScreen/AttributeMappingScreen";
 import { CasesScreen, CASES_BEATS } from "./CasesScreen/CasesScreen";
 import {
   DashboardScreen,
@@ -41,6 +46,10 @@ import {
 } from "./ExplorerScreen/ExplorerScreen";
 import { ImportScreen, IMPORT_BEATS } from "./ImportScreen/ImportScreen";
 import { MapScreen, MAP_BEATS } from "./MapScreen/MapScreen";
+import {
+  OntologyScreen,
+  ONTOLOGY_BEATS,
+} from "./OntologyScreen/OntologyScreen";
 import { VideoRouteContext } from "./shims/router";
 import "./stage.css";
 
@@ -61,14 +70,26 @@ const names = {
   dashboards: "Dashboards",
   cases: "Case Manager",
   map: "Maps",
+  ontology: <Trans>Case Manager</Trans>,
+  "attribute-mapping": <Trans>Case Manager</Trans>,
 };
-const routeIndex = { import: 1, explorer: 2, dashboards: 3, map: 4, cases: 5 };
+const routeIndex = {
+  import: 1,
+  explorer: 2,
+  dashboards: 3,
+  map: 4,
+  cases: 5,
+  ontology: 5,
+  "attribute-mapping": 5,
+};
 export const FEATURE_BEATS = {
   import: IMPORT_BEATS,
   explorer: EXPLORER_BEATS,
   dashboards: DASHBOARD_BEATS,
   cases: CASES_BEATS,
   map: MAP_BEATS,
+  ontology: ONTOLOGY_BEATS,
+  "attribute-mapping": ATTRIBUTE_MAPPING_BEATS,
 };
 
 /** Actual source components and CSS, with frame-controlled fixtures replacing app services. */
@@ -203,6 +224,20 @@ export function AvandarStage({
                 ) : null}
                 {feature === "map" ? (
                   <MapScreen
+                    frame={frame}
+                    width={contentWidth}
+                    height={contentHeight}
+                  />
+                ) : null}
+                {feature === "ontology" ? (
+                  <OntologyScreen
+                    frame={frame}
+                    width={contentWidth}
+                    height={contentHeight}
+                  />
+                ) : null}
+                {feature === "attribute-mapping" ? (
+                  <AttributeMappingScreen
                     frame={frame}
                     width={contentWidth}
                     height={contentHeight}

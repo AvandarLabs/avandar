@@ -1,0 +1,97 @@
+name:
+  id: motionAtlas.batch-release.name
+  message: Collect, then release a batch
+description:
+  id: motionAtlas.batch-release.description
+  message: Individual items wait together inside a forming batch boundary. Once every item
+    in the supplied group arrives, the boundary closes and the group crosses the
+    dispatch boundary as one unit.
+category:
+  id: motionAtlas.batch-release.category
+  message: Work grouping
+useWhen:
+  id: motionAtlas.batch-release.useWhen
+  message: Show why individual arrivals are held and then handled together.
+prompt:
+  id: motionAtlas.batch-release.prompt
+  message: Show why individual arrivals are held and then handled together.
+creativeDirection:
+  id: motionAtlas.batch-release.creativeDirection
+  message: After the entrance, item tokens arrive separately at a shallow loading cradle
+    during 18..62. A bracket grows around the supplied group but remains open while any
+    member is missing. At 68, the final item docks, the bracket closes into an envelope,
+    and the supplied release caption appears. During 82..112, the envelope crosses one
+    dispatch line with its member tokens still visible inside. If a second batch is
+    supplied, its shorter arrival and release sequence occupies 94..146 in a second
+    cradle. Hold the released envelopes and their exact contents through 168, then fade
+    to ground. The transformation is many arrivals becoming one handled bundle without
+    combining their contents.
+intent:
+  id: motionAtlas.batch-release.intent
+  message: Show why individual arrivals are held and then handled together.
+distinction:
+  id: motionAtlas.batch-release.distinction
+  message: Source-merge converges inputs into a shared destination; this preserves
+    separate items inside a new handling boundary and explains the wait before one
+    dispatch. The batch envelope, not a relabeled row of cards, is the hero
+    transformation.
+tags:
+  - id: motionAtlas.batch-release.tags.0
+    message: batch
+  - id: motionAtlas.batch-release.tags.1
+    message: batching
+  - id: motionAtlas.batch-release.tags.2
+    message: bundle
+  - id: motionAtlas.batch-release.tags.3
+    message: collect
+  - id: motionAtlas.batch-release.tags.4
+    message: dispatch
+  - id: motionAtlas.batch-release.tags.5
+    message: grouped work
+  - id: motionAtlas.batch-release.tags.6
+    message: flush
+  - id: motionAtlas.batch-release.tags.7
+    message: accumulate
+goodFor:
+  - id: motionAtlas.batch-release.goodFor.0
+    message: Explaining grouped dispatch or scheduled collection
+  - id: motionAtlas.batch-release.goodFor.1
+    message: Showing that items wait for a complete supplied batch
+  - id: motionAtlas.batch-release.goodFor.2
+    message: Distinguishing item arrival from group release
+domains:
+  - id: motionAtlas.batch-release.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.batch-release.aliases.0
+    message: Work grouping
+notFor:
+  - id: motionAtlas.batch-release.notFor.0
+    message: Default groups and items are fictional; every token is one supplied item and
+      every envelope is one supplied batch.
+  - id: motionAtlas.batch-release.notFor.1
+    message: The authored membership defines completion; no scheduler, elapsed-time rule,
+      transaction guarantee, or automatic grouping algorithm is implied.
+  - id: motionAtlas.batch-release.notFor.2
+    message: No processing-efficiency or cost improvement is quantified by the animation.
+motionBeats:
+  - startFrame: 18
+    endFrame: 68
+    description:
+      id: motionAtlas.batch-release.motionBeats.0
+      message: Collect every member before closing the first envelope.
+  - startFrame: 82
+    endFrame: 112
+    description:
+      id: motionAtlas.batch-release.motionBeats.1
+      message: Move the complete envelope across dispatch.
+  - startFrame: 94
+    endFrame: 146
+    description:
+      id: motionAtlas.batch-release.motionBeats.2
+      message: Collect and release the optional second batch separately.
+  - startFrame: 146
+    endFrame: 168
+    description:
+      id: motionAtlas.batch-release.motionBeats.3
+      message: Hold exact contents inside separate released envelopes.

@@ -1,0 +1,98 @@
+name:
+  id: motionAtlas.expiring-lease.name
+  message: Borrowed Permission Returns
+description:
+  id: motionAtlas.expiring-lease.description
+  message: A single permission token temporarily occupies one participant's socket while
+    its authored lifetime runs down. When the lease ends, the token returns to neutral
+    custody before another participant can hold it.
+category:
+  id: motionAtlas.expiring-lease.category
+  message: Temporary ownership
+useWhen:
+  id: motionAtlas.expiring-lease.useWhen
+  message: Explain that temporary permission can end without transferring directly to
+    another holder.
+prompt:
+  id: motionAtlas.expiring-lease.prompt
+  message: Explain that temporary permission can end without transferring directly to
+    another holder.
+creativeDirection:
+  id: motionAtlas.expiring-lease.creativeDirection
+  message: Reveal a neutral permission dock and a short arc of participant sockets. Seat
+    the one token in the chosen holder's socket while all other sockets remain empty. A
+    finite segmented collar around that socket drains in evenly spaced editorial beats;
+    when it empties, the socket opens and the token retracts to the neutral dock. Hold
+    the unassigned token and the prior holder's empty socket, making expiration
+    different from a direct handoff, then fade to the opaque ground.
+intent:
+  id: motionAtlas.expiring-lease.intent
+  message: Explain that temporary permission can end without transferring directly to
+    another holder.
+distinction:
+  id: motionAtlas.expiring-lease.distinction
+  message: Custody-transfer moves responsibility after acceptance. This permission expires
+    and returns to neutral custody with no successor, while a physically exclusive token
+    makes its temporary nature visible. It is not an orbital ecosystem or a generic
+    status cycle.
+tags:
+  - id: motionAtlas.expiring-lease.tags.0
+    message: lease
+  - id: motionAtlas.expiring-lease.tags.1
+    message: temporary permission
+  - id: motionAtlas.expiring-lease.tags.2
+    message: exclusive access
+  - id: motionAtlas.expiring-lease.tags.3
+    message: expiration
+  - id: motionAtlas.expiring-lease.tags.4
+    message: resource checkout
+  - id: motionAtlas.expiring-lease.tags.5
+    message: time limit
+  - id: motionAtlas.expiring-lease.tags.6
+    message: lock
+  - id: motionAtlas.expiring-lease.tags.7
+    message: return to pool
+goodFor:
+  - id: motionAtlas.expiring-lease.goodFor.0
+    message: Explain a temporary edit lease
+  - id: motionAtlas.expiring-lease.goodFor.1
+    message: Illustrate a shared resource checked out for a limited period
+  - id: motionAtlas.expiring-lease.goodFor.2
+    message: Show permission returning to a pool after an authored expiry
+domains:
+  - id: motionAtlas.expiring-lease.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.expiring-lease.aliases.0
+    message: Temporary ownership
+notFor:
+  - id: motionAtlas.expiring-lease.notFor.0
+    message: There is always exactly one permission token. Socket count comes only from
+      participants, and collar segment count comes only from lifetime.value.
+  - id: motionAtlas.expiring-lease.notFor.1
+    message: The six-second loop compresses the supplied lifetime and must not be
+      interpreted as actual elapsed time or server-clock behavior.
+  - id: motionAtlas.expiring-lease.notFor.2
+    message: This illustrates an authored lease concept, not a verified distributed lock,
+      fairness guarantee, race-condition solution, or automatic permission policy.
+motionBeats:
+  - startFrame: 12
+    endFrame: 36
+    description:
+      id: motionAtlas.expiring-lease.motionBeats.0
+      message: Reveal the one held token and neutral dock.
+  - startFrame: 36
+    endFrame: 108
+    description:
+      id: motionAtlas.expiring-lease.motionBeats.1
+      message: Drain one collar segment per evenly spaced authored beat.
+  - startFrame: 108
+    endFrame: 136
+    description:
+      id: motionAtlas.expiring-lease.motionBeats.2
+      message: Release the expired socket and retract the token to neutral custody.
+  - startFrame: 136
+    endFrame: 166
+    description:
+      id: motionAtlas.expiring-lease.motionBeats.3
+      message: Hold the unassigned token and empty previous socket.

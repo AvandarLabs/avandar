@@ -1,18 +1,9 @@
+import { StockRect } from "./primitives/StockRect/StockRect";
 import { DUR, EASE, loopPhase, mix, ramp, STAGGER } from "../motion";
+import { STOCK } from "./stockPalette";
 import type { ReactNode } from "react";
 
-/** Palette belongs to these fictional stock studies, not to a product theme. */
-export const STOCK = {
-  ground: "#0b1219",
-  surface: "#101e28",
-  elevated: "#142632",
-  line: "#2a404e",
-  muted: "#728794",
-  text: "#edf7f4",
-  mint: "#9fefca",
-  cyan: "#82c8f2",
-  orange: "#f0ba83",
-} as const;
+export { STOCK } from "./stockPalette";
 
 export type GraphicProps = {
   frame: number;
@@ -98,7 +89,7 @@ export function Panel({
 }) {
   return (
     <g>
-      <rect
+      <StockRect
         x={x}
         y={y}
         width={width}
@@ -128,7 +119,7 @@ export function Pill({
 }) {
   return (
     <g>
-      <rect
+      <StockRect
         x={x}
         y={y}
         width={width}

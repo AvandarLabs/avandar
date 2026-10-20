@@ -1,0 +1,96 @@
+name:
+  id: motionAtlas.peer-contribution-recognition.name
+  message: Recognize the person behind a specific contribution
+description:
+  id: motionAtlas.peer-contribution-recognition.description
+  message: A colleague identifies a concrete contribution, turns toward its maker, and
+    gives a supplied acknowledgment. The contribution keeps its authorship and receives
+    no ranking or score.
+category:
+  id: motionAtlas.peer-contribution-recognition.category
+  message: Learning and collaboration
+useWhen:
+  id: motionAtlas.peer-contribution-recognition.useWhen
+  message: Tie appreciation to a person and a concrete contribution.
+prompt:
+  id: motionAtlas.peer-contribution-recognition.prompt
+  message: Tie appreciation to a person and a concrete contribution.
+creativeDirection:
+  id: motionAtlas.peer-contribution-recognition.creativeDirection
+  message: Frames 12..44 establish the contributor beside one or two authored work
+    objects. Frames 45..88 let the colleague point to the focused object and trace its
+    existing authorship tab back toward the contributor. Frames 89..128 turn the
+    colleague toward the person and deliver the acknowledgment as a speech bubble or
+    note. Frames 129..167 hold the contribution, authorship and acknowledgment together.
+    If the authorship tab is hidden, keep the contributor's supplied name as a fixed
+    byline beside the focused object instead. The colleague does not take the object or
+    the credit. Use deterministic frame-driven React/SVG at 960x600, 180 frames and 30
+    fps, with the shared palette. Reveal during frames 0..11 and fade to the common
+    opaque ground during frames 168..179.
+intent:
+  id: motionAtlas.peer-contribution-recognition.intent
+  message: Tie appreciation to a person and a concrete contribution.
+distinction:
+  id: motionAtlas.peer-contribution-recognition.distinction
+  message: Unlike word-reveal, meaning comes from one person identifying another person's
+    work and directing appreciation to them. Unlike feedback-refinement, the artifact
+    does not need to be corrected or returned for another approval.
+tags:
+  - id: motionAtlas.peer-contribution-recognition.tags.0
+    message: gratitude
+  - id: motionAtlas.peer-contribution-recognition.tags.1
+    message: recognition
+  - id: motionAtlas.peer-contribution-recognition.tags.2
+    message: credit
+  - id: motionAtlas.peer-contribution-recognition.tags.3
+    message: authorship
+  - id: motionAtlas.peer-contribution-recognition.tags.4
+    message: peer support
+  - id: motionAtlas.peer-contribution-recognition.tags.5
+    message: specific praise
+goodFor:
+  - id: motionAtlas.peer-contribution-recognition.goodFor.0
+    message: Express specific gratitude rather than generic praise
+  - id: motionAtlas.peer-contribution-recognition.goodFor.1
+    message: Show peer acknowledgment after a repair or useful guide
+  - id: motionAtlas.peer-contribution-recognition.goodFor.2
+    message: Recognize help without creating a competition
+domains:
+  - id: motionAtlas.peer-contribution-recognition.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.peer-contribution-recognition.aliases.0
+    message: peer contribution recognition
+notFor:
+  - id: motionAtlas.peer-contribution-recognition.notFor.0
+    message: Acknowledgment is not a measurement of performance, trust, wellbeing or team
+      success.
+  - id: motionAtlas.peer-contribution-recognition.notFor.1
+    message: The recipient is not obliged to respond with a prescribed emotion or gesture.
+  - id: motionAtlas.peer-contribution-recognition.notFor.2
+    message: The same work object and authorship remain intact throughout.
+  - id: motionAtlas.peer-contribution-recognition.notFor.3
+    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 44
+    description:
+      id: motionAtlas.peer-contribution-recognition.motionBeats.0
+      message: Establish the contributor and their authored objects.
+  - startFrame: 45
+    endFrame: 88
+    description:
+      id: motionAtlas.peer-contribution-recognition.motionBeats.1
+      message: Point to the focused object and trace authorship to its maker.
+  - startFrame: 89
+    endFrame: 128
+    description:
+      id: motionAtlas.peer-contribution-recognition.motionBeats.2
+      message: Turn toward the contributor and deliver the supplied acknowledgment.
+  - startFrame: 129
+    endFrame: 167
+    description:
+      id: motionAtlas.peer-contribution-recognition.motionBeats.3
+      message: Hold the focused work, named authorship and acknowledgment.

@@ -7,29 +7,42 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { CodeWindow } from "./CodeWindow";
+import type { TerminalTypeInput } from "../presets/TerminalType/TerminalType.schema";
+import type { ReactNode } from "react";
 
-const TERMINAL_STEPS = [
-  { at: 61, text: "Read sample records", detail: "01" },
-  { at: 83, text: "Apply example rules", detail: "02" },
-  { at: 105, text: "Prepare sample output", detail: "03" },
-] as const;
-const TERMINAL_COMMAND = "sample run --input records.csv";
+type Props = GraphicProps & { input: TerminalTypeInput };
 
-export function TerminalType({ frame, accent }: GraphicProps) {
-  const command = typed(frame, 17, TERMINAL_COMMAND, 28);
+/** Draws the bounded authored terminal-type study at an explicit frame. */
+export function TerminalType({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const terminalCommand = input.command;
+  const steps = input.steps.map((step, index) => ({
+    ...step,
+    at: 61 + index * 22,
+  }));
+  const command = typed(frame, 17, terminalCommand, 28);
   const terminalX = 130;
   return (
     <g>
-      <Eyebrow>TERMINAL TYPE</Eyebrow>
-      <CodeWindow title="terminal · conceptual example">
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["terminal-type"].terminalType,
+        })}
+      </Eyebrow>
+      <CodeWindow title={input.title}>
         <Text x={101} y={211} size={22} mono fill={accent}>
           $
         </Text>
         <Text x={terminalX} y={211} size={22} mono>
           {command}
         </Text>
-        {caretOn(frame) && frame < 61 ? (
+        {input.showCaret && caretOn(frame) && frame < 61 ? (
           <rect
             x={terminalX + command.length * 13.2 + 4}
             y={192}
@@ -39,7 +52,7 @@ export function TerminalType({ frame, accent }: GraphicProps) {
             fill={accent}
           />
         ) : null}
-        {TERMINAL_STEPS.map((step, i) => (
+        {steps.map((step, i) => (
           <Arrive frame={frame} at={step.at} key={step.at}>
             <Check x={111} y={267 + i * 54} color={accent} size={14} />
             <Text x={139} y={274 + i * 54} size={21} mono>
@@ -68,7 +81,7 @@ export function TerminalType({ frame, accent }: GraphicProps) {
             fillOpacity={0.06}
           />
           <Text x={114} y={463} size={20} mono fill={accent}>
-            Done. 3 example stages completed.
+            {input.response}
           </Text>
         </g>
       </CodeWindow>

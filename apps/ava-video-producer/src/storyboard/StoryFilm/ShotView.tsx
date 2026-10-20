@@ -1,3 +1,6 @@
+import { ContinuityScene } from "../../continuity/ContinuityScene";
+import { ContinuityI18nProvider } from "../../continuity/i18n/ContinuityI18nProvider/ContinuityI18nProvider";
+import type { ProductSegment } from "../../continuity/continuitySchema";
 import { FlowchartScene } from "../../scenes/FlowchartScene";
 import { GraphScene } from "../../scenes/GraphScene";
 import { MediaScene } from "../../scenes/MediaScene";
@@ -10,7 +13,7 @@ import type { ReactNode } from "react";
 
 /** All registered scene inputs are checked by the same storyboard schema. */
 export type ProductSceneRenderer = (
-  props: Extract<Shot, { scene: "avandar" }>["props"] & {
+  props: Pick<ProductSegment, "feature" | "mode"> & { fromFrame?: number } & {
     frame: number;
     width: number;
     height: number;
@@ -33,6 +36,16 @@ export function ShotView({
 }) {
   const common = { frame, width, height };
   switch (shot.scene) {
+    case "continuity":
+      return (
+        <ContinuityI18nProvider>
+          <ContinuityScene
+            plan={shot.props}
+            frame={frame}
+            productScene={productScene}
+          />
+        </ContinuityI18nProvider>
+      );
     case "avandar": {
       if (!productScene)
         throw new Error(

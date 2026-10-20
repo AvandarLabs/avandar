@@ -428,5 +428,149 @@
       },
       "measuredAtFrame": 539
     }
+  ],
+  "ontology": [
+    {
+      "frame": 90,
+      "target": "ontology-response-label",
+      "action": "point",
+      "x": 1157.797,
+      "y": 308.375,
+      "rect": {
+        "x": 1133.625,
+        "y": 299.375,
+        "width": 48.344,
+        "height": 18
+      },
+      "measuredAt": 90
+    },
+    {
+      "frame": 210,
+      "target": "ontology-response-source",
+      "action": "point",
+      "x": 1222.4845,
+      "y": 358.172,
+      "rect": {
+        "x": 1189.969,
+        "y": 348.875,
+        "width": 65.031,
+        "height": 18.594
+      },
+      "measuredAt": 210
+    },
+    {
+      "frame": 330,
+      "target": "ontology-facility",
+      "action": "click",
+      "x": 348.5,
+      "y": 119.4455,
+      "rect": {
+        "x": 241,
+        "y": 101.297,
+        "width": 215,
+        "height": 36.297
+      },
+      "measuredAt": 330
+    },
+    {
+      "frame": 450,
+      "target": "ontology-facility-identifier",
+      "action": "point",
+      "x": 1131.6485,
+      "y": 258.578,
+      "rect": {
+        "x": 1117.453,
+        "y": 249.578,
+        "width": 28.391,
+        "height": 18
+      },
+      "measuredAt": 450
+    }
+  ],
+  "attribute-mapping": [
+    {
+      "frame": 90,
+      "target": "mapping-single-value",
+      "action": "click",
+      "x": 512.0,
+      "y": 244.078,
+      "rect": {
+        "x": 502,
+        "y": 234.078,
+        "width": 20,
+        "height": 20
+      },
+      "measuredAt": 90
+    },
+    {
+      "frame": 150,
+      "target": "mapping-value-rule",
+      "action": "click",
+      "x": 913.0,
+      "y": 312.875,
+      "rect": {
+        "x": 502,
+        "y": 294.875,
+        "width": 822,
+        "height": 36
+      },
+      "measuredAt": 150
+    },
+    {
+      "frame": 210,
+      "target": "mapping-sum-option",
+      "action": "click",
+      "x": 913.0,
+      "y": 428.094,
+      "rect": {
+        "x": 507,
+        "y": 411.25,
+        "width": 812,
+        "height": 33.688
+      },
+      "measuredAt": 210
+    },
+    {
+      "frame": 330,
+      "target": "mapping-add-manual",
+      "action": "click",
+      "x": 913.0,
+      "y": 468.359,
+      "rect": {
+        "x": 502,
+        "y": 450.359,
+        "width": 822,
+        "height": 36
+      },
+      "measuredAt": 330
+    },
+    {
+      "frame": 350,
+      "target": "mapping-manual-name",
+      "action": "select",
+      "x": 891.0,
+      "y": 452.359,
+      "rect": {
+        "x": 502,
+        "y": 434.359,
+        "width": 778,
+        "height": 36
+      },
+      "measuredAt": 400
+    },
+    {
+      "frame": 358,
+      "target": "mapping-manual-name",
+      "action": "type",
+      "x": 891.0,
+      "y": 452.359,
+      "rect": {
+        "x": 502,
+        "y": 434.359,
+        "width": 778,
+        "height": 36
+      },
+      "measuredAt": 358
+    }
   ]
 }

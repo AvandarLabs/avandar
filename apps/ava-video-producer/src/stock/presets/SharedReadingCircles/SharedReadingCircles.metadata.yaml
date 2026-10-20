@@ -1,0 +1,122 @@
+name:
+  id: motionAtlas.shared-reading-circles.name
+  message: Bring the readers around the books
+description:
+  id: motionAtlas.shared-reading-circles.description
+  message: A fixed set of books moves from a classroom shelf to small reading circles.
+    Learners gather around the same open pages, making the sharing arrangement visible
+    without creating additional copies.
+category:
+  id: motionAtlas.shared-reading-circles.category
+  message: Shared classroom resources
+useWhen:
+  id: motionAtlas.shared-reading-circles.useWhen
+  message: Make a specific book-sharing arrangement concrete while preserving the material
+    inventory.
+prompt:
+  id: motionAtlas.shared-reading-circles.prompt
+  message: Reveal the supplied books on a shelf and the learners at separate seats. Carry
+    each book to its assigned shared table as seats pivot into the authored reading
+    circles, preserving every learner identity. Open the books and turn one page within
+    each circle. Hold reader counts against the class roster with the book inventory
+    unchanged, then fade.
+creativeDirection:
+  id: motionAtlas.shared-reading-circles.creativeDirection
+  message: Reveal the supplied books on a shelf and the learners at separate seats. Carry
+    each book to its assigned shared table as seats pivot into the authored reading
+    circles, preserving every learner identity. Open the books and turn one page within
+    each circle. Hold reader counts against the class roster with the book inventory
+    unchanged, then fade.
+intent:
+  id: motionAtlas.shared-reading-circles.intent
+  message: Make a specific book-sharing arrangement concrete while preserving the material
+    inventory.
+distinction:
+  id: motionAtlas.shared-reading-circles.distinction
+  message: Physical seats reorganize around a conserved set of open books and a shared
+    page turn. This explains simultaneous access to one object, unlike shelf
+    replenishment, source merging, or relabeling a collection of cards.
+tags:
+  - id: motionAtlas.shared-reading-circles.tags.0
+    message: learning materials
+  - id: motionAtlas.shared-reading-circles.tags.1
+    message: shared textbooks
+  - id: motionAtlas.shared-reading-circles.tags.2
+    message: reading circles
+  - id: motionAtlas.shared-reading-circles.tags.3
+    message: book access
+  - id: motionAtlas.shared-reading-circles.tags.4
+    message: classroom resources
+  - id: motionAtlas.shared-reading-circles.tags.5
+    message: group reading
+  - id: motionAtlas.shared-reading-circles.tags.6
+    message: materials inventory
+  - id: motionAtlas.shared-reading-circles.tags.7
+    message: shared pages
+goodFor:
+  - id: motionAtlas.shared-reading-circles.goodFor.0
+    message: Explain how existing classroom books are shared
+  - id: motionAtlas.shared-reading-circles.goodFor.1
+    message: Show reading-group organization around a limited material set
+  - id: motionAtlas.shared-reading-circles.goodFor.2
+    message: Distinguish the number of books from the number of learners using them
+domains:
+  - id: motionAtlas.shared-reading-circles.domains.0
+    message: Shared classroom resources
+aliases:
+  - id: motionAtlas.shared-reading-circles.aliases.0
+    message: learning materials
+  - id: motionAtlas.shared-reading-circles.aliases.1
+    message: shared textbooks
+  - id: motionAtlas.shared-reading-circles.aliases.2
+    message: reading circles
+notFor:
+  - id: motionAtlas.shared-reading-circles.notFor.0
+    message: One books entry is one physical copy. A page turn never creates another copy,
+      and the inventory is constant across the animation.
+  - id: motionAtlas.shared-reading-circles.notFor.1
+    message: Each learner belongs to one shown reading group. The default group count is 3
+      of 6 represented learners per book, while the class inventory is 2 books for 6
+      learners.
+  - id: motionAtlas.shared-reading-circles.notFor.2
+    message: Grouping does not establish that all learners can see, read, or benefit from
+      the material. The arrangement is not an adequacy threshold or an access-impact
+      claim.
+  - id: motionAtlas.shared-reading-circles.notFor.3
+    message: All books, passages, and learners are fictional schematic examples.
+motionBeats:
+  - startFrame: 0
+    endFrame: 23
+    description:
+      id: motionAtlas.shared-reading-circles.motionBeats.0
+      message: Reveal the conserved books on the chosen shelf and the full roster at separate
+        seats.
+  - startFrame: 24
+    endFrame: 43
+    description:
+      id: motionAtlas.shared-reading-circles.motionBeats.1
+      message: Front-shelf readers approach vertically from separate group seats. Side-shelf
+        readers reach their copies in top-to-bottom order.
+  - startFrame: 44
+    endFrame: 103
+    description:
+      id: motionAtlas.shared-reading-circles.motionBeats.2
+      message: Carry front-shelf books together. Side-shelf carriers lift and carry copies
+        through a shared upper lane in staggered turns, keeping reader keys distinct.
+  - startFrame: 104
+    endFrame: 115
+    description:
+      id: motionAtlas.shared-reading-circles.motionBeats.3
+      message: Both shelf arrangements finish chair pivots by 108. Side-shelf books continue
+        opening to 118, when their group counts appear.
+  - startFrame: 116
+    endFrame: 141
+    description:
+      id: motionAtlas.shared-reading-circles.motionBeats.4
+      message: "Each copy turns one page: front-shelf books from 116 to 132 and side-shelf
+        books from 126 to 142. Inventory stays fixed."
+  - startFrame: 142
+    endFrame: 179
+    description:
+      id: motionAtlas.shared-reading-circles.motionBeats.5
+      message: Hold group membership and optional array-derived counts through the shared fade.

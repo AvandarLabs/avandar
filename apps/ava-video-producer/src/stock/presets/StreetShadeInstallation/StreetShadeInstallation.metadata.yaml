@@ -1,0 +1,102 @@
+name:
+  id: motionAtlas.street-shade-installation.name
+  message: Place shade where people wait
+description:
+  id: motionAtlas.street-shade-installation.description
+  message: Authored shade footprints unfold over a schematic street after a selected
+    installation decision. The scene measures added shaded area at one stated sun
+    condition without implying a temperature or health outcome.
+category:
+  id: motionAtlas.street-shade-installation.category
+  message: Schematic plan with unfolding shade footprints
+useWhen:
+  id: motionAtlas.street-shade-installation.useWhen
+  message: Connect an implementation choice to a clearly bounded change in shade coverage.
+prompt:
+  id: motionAtlas.street-shade-installation.prompt
+  message: Reveal the supplied street zones with their existing shade footprints. At the
+    installation cue, extend awnings or open canopy footprints over the authored
+    nonoverlapping additions. Hold total shaded area against the complete zone area at
+    the supplied reference condition, retaining the unshaded ground, then fade without
+    implying a measured temperature reduction.
+creativeDirection:
+  id: motionAtlas.street-shade-installation.creativeDirection
+  message: Reveal the supplied street zones with their existing shade footprints. At the
+    installation cue, extend awnings or open canopy footprints over the authored
+    nonoverlapping additions. Hold total shaded area against the complete zone area at
+    the supplied reference condition, retaining the unshaded ground, then fade without
+    implying a measured temperature reduction.
+intent:
+  id: motionAtlas.street-shade-installation.intent
+  message: Connect an implementation choice to a clearly bounded change in shade coverage.
+distinction:
+  id: motionAtlas.street-shade-installation.distinction
+  message: Canopies unfold into visible ground footprints and preserve uncovered area.
+    This is a spatial intervention, not a chart of temperatures or a relabeled card
+    collection.
+tags:
+  - id: motionAtlas.street-shade-installation.tags.0
+    message: heat adaptation
+  - id: motionAtlas.street-shade-installation.tags.1
+    message: urban shade
+  - id: motionAtlas.street-shade-installation.tags.2
+    message: street canopy
+  - id: motionAtlas.street-shade-installation.tags.3
+    message: awning
+  - id: motionAtlas.street-shade-installation.tags.4
+    message: public space
+  - id: motionAtlas.street-shade-installation.tags.5
+    message: heat resilience
+  - id: motionAtlas.street-shade-installation.tags.6
+    message: shade coverage
+  - id: motionAtlas.street-shade-installation.tags.7
+    message: implementation
+goodFor:
+  - id: motionAtlas.street-shade-installation.goodFor.0
+    message: Explain the physical footprint of a heat-adaptation proposal
+  - id: motionAtlas.street-shade-installation.goodFor.1
+    message: Show where a shade investment is placed
+  - id: motionAtlas.street-shade-installation.goodFor.2
+    message: Distinguish installed shade area from a cooling claim
+domains:
+  - id: motionAtlas.street-shade-installation.domains.0
+    message: Schematic plan with unfolding shade footprints
+aliases:
+  - id: motionAtlas.street-shade-installation.aliases.0
+    message: heat adaptation
+  - id: motionAtlas.street-shade-installation.aliases.1
+    message: urban shade
+  - id: motionAtlas.street-shade-installation.aliases.2
+    message: street canopy
+notFor:
+  - id: motionAtlas.street-shade-installation.notFor.0
+    message: Total ground area stays constant. Final shade = existing shade + supplied
+      nonoverlapping additions; unshaded area = total ground - final shade.
+  - id: motionAtlas.street-shade-installation.notFor.1
+    message: The plan is schematic. Footprint tiling communicates area totals rather than
+      real street geometry or a solar calculation.
+  - id: motionAtlas.street-shade-installation.notFor.2
+    message: Tree-canopy dimensions are authored for the named condition, not instantaneous
+      tree growth. No temperature, exposure, health or measured efficacy claim is
+      derived.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.street-shade-installation.motionBeats.0
+      message: Reveal the supplied quantities and their physical boundary.
+  - startFrame: 36
+    endFrame: 108
+    description:
+      id: motionAtlas.street-shade-installation.motionBeats.1
+      message: Reveal the supplied street zones with their existing shade footprints. At the
+        installation cue, extend awnings or open canopy footprints over the authored
+        nonoverlapping additions. Hold total shaded area against the complete zone area
+        at the supplied reference condition, retaining the unshaded ground, then fade
+        without implying a measured temperature reduction.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.street-shade-installation.motionBeats.2
+      message: Hold conserved quantities and visible destinations. The outer envelope returns
+        to ground.

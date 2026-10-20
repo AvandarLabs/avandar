@@ -1,0 +1,300 @@
+{
+  "version": 1,
+  "id": "spatial-continuation",
+  "title": "Spatial continuation",
+  "description": "Continue across a shared horizontal space. Direction carries the relationship between the scenes.",
+  "sourceNotes": [
+    "Extracted from qetl-motion; uses the same continuity renderer and typed content contracts.",
+    "Reusable geometry, timing and editorial relationships. Product state remains scripted demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 456,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Spatial continuation",
+        "category": "motion-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "example-0",
+            "title": "Now move the question upstream.",
+            "subtitle": "The query defines the subset that crosses the boundary.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "predicate-pushdown-boundary",
+                "schemaVersion": 1,
+                "input": {
+                  "rows": [
+                    {
+                      "id": "a",
+                      "value": 2
+                    },
+                    {
+                      "id": "b",
+                      "value": 7
+                    },
+                    {
+                      "id": "c",
+                      "value": 4
+                    },
+                    {
+                      "id": "d",
+                      "value": 9
+                    }
+                  ],
+                  "predicate": {
+                    "operator": ">=",
+                    "threshold": 5
+                  },
+                  "metric": {
+                    "label": "Recorded items",
+                    "unit": "items",
+                    "rowUnit": "records"
+                  },
+                  "labels": {
+                    "source": "Source system",
+                    "destination": "Local query",
+                    "condition": "Apply at source",
+                    "retained": "Remain at source",
+                    "transferred": "Transferred rows"
+                  },
+                  "showTotals": true,
+                  "copy": {
+                    "context": "Fictional document",
+                    "source": "Original",
+                    "result": "Extracted result"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 665,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 665,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 280,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 280,
+                  "y": 325,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            },
+            "token": {
+              "label": "The question",
+              "anchor": {
+                "x": 100,
+                "y": 700,
+                "width": 360,
+                "height": 58
+              }
+            }
+          },
+          {
+            "id": "example-1",
+            "title": "Keep what this query needed.",
+            "subtitle": "An incremental cache grows with requested columns.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "query-column-cache-growth",
+                "schemaVersion": 1,
+                "input": {
+                  "columns": [
+                    {
+                      "id": "key",
+                      "label": "Case",
+                      "cells": [
+                        "HF-01",
+                        "HF-02",
+                        "HF-02"
+                      ]
+                    },
+                    {
+                      "id": "name",
+                      "label": "District",
+                      "cells": [
+                        "North",
+                        "South",
+                        "South"
+                      ]
+                    },
+                    {
+                      "id": "value",
+                      "label": "Items",
+                      "cells": [
+                        "2",
+                        "4",
+                        "4"
+                      ]
+                    }
+                  ],
+                  "cachedColumnIds": [
+                    "key",
+                    "name"
+                  ],
+                  "requests": [
+                    {
+                      "label": "Read names",
+                      "columnIds": [
+                        "name"
+                      ]
+                    },
+                    {
+                      "label": "Read items",
+                      "columnIds": [
+                        "key",
+                        "value"
+                      ]
+                    }
+                  ],
+                  "keyColumnId": "key",
+                  "showSetNotation": true,
+                  "copy": {
+                    "context": "Fictional example",
+                    "before": "Before",
+                    "after": "After"
+                  }
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 690,
+                  "y": 235,
+                  "zoom": 1.85,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 690,
+                  "y": 235,
+                  "zoom": 1.85,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 480,
+                  "y": 415,
+                  "zoom": 1.85,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 480,
+                  "y": 415,
+                  "zoom": 1.85,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "spatial",
+              "frames": 24
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "cue-0",
+      "shotId": "explanation",
+      "startFrame": 15,
+      "endFrame": 205,
+      "text": "Keep a meaningful object or relationship in view.",
+      "beatId": "example-0"
+    },
+    {
+      "id": "cue-1",
+      "shotId": "explanation",
+      "startFrame": 39,
+      "endFrame": 205,
+      "text": "Let the next scene continue the explanation.",
+      "beatId": "example-1"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

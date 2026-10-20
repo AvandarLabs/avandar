@@ -12,9 +12,11 @@ type ExportJob = ExportStatus & { key: string; filename?: string };
 /** Serialize expensive renders and make failures retryable. */
 export function createExportJobs<T>(
   render: (
-    input: T,
-    directoryId: string,
-    progress: (message: string) => void,
+    options: Readonly<{
+      input: T;
+      directoryId: string;
+      progress: (message: string) => void;
+    }>,
   ) => Promise<string>,
 ) {
   const jobs = new Map<string, ExportJob>();
@@ -47,8 +49,12 @@ export function createExportJobs<T>(
     };
     jobs.set(job.id, job);
     active = job;
-    void render(input, job.id, (message) => {
-      job.message = message;
+    void render({
+      input: input,
+      directoryId: job.id,
+      progress: (message) => {
+        job.message = message;
+      },
     })
       .then((filename) => {
         job.filename = filename;

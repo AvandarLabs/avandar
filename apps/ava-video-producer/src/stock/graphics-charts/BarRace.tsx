@@ -6,25 +6,38 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { BarRaceInput } from "../presets/BarRace/BarRace.schema";
+import type { ReactNode } from "react";
 
-const BAR_DATA = [
-  { label: "Alpha", start: 42, end: 86, from: 2, to: 0, color: STOCK.mint },
-  { label: "Beta", start: 68, end: 72, from: 0, to: 1, color: STOCK.cyan },
-  { label: "Gamma", start: 34, end: 58, from: 3, to: 2, color: STOCK.orange },
-  { label: "Delta", start: 53, end: 41, from: 1, to: 3, color: STOCK.muted },
-];
+type Props = GraphicProps & { input: BarRaceInput };
 
-export function BarRace({ frame, accent }: GraphicProps) {
+/** Draws the bounded authored bar-race study at an explicit frame. */
+export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
+  const bars = input.bars;
   const t = ramp(frame, 52, 64, EASE.inOut);
   const enter = ramp(frame, 12, DUR.hero);
   const labelOpacity =
     1 - ramp(frame, 52, DUR.chip) + ramp(frame, 116, DUR.panel);
   return (
     <g>
-      <Eyebrow>RANKING IN MOTION</Eyebrow>
-      <Pill x={748} y={44} width={148} text="FICTIONAL DATA" color={accent} />
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["bar-race"].rankingInMotion,
+        })}
+      </Eyebrow>
+      <Pill
+        x={748}
+        y={44}
+        width={148}
+        text={getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["bar-race"].fictionalData,
+        })}
+        color={accent}
+      />
       <Text x={64} y={112} size={29} weight={600}>
-        Four series, one scale
+        {input.heading}
       </Text>
       {[0, 25, 50, 75, 100].map((value) => (
         <g key={value}>
@@ -48,7 +61,7 @@ export function BarRace({ frame, accent }: GraphicProps) {
           </Text>
         </g>
       ))}
-      {BAR_DATA.map((bar, i) => {
+      {bars.map((bar, i) => {
         const value = mix(t, bar.start, bar.end) * enter;
         const y = 175 + mix(t, bar.from, bar.to) * 77;
         const color = i === 0 ? accent : bar.color;
@@ -86,24 +99,35 @@ export function BarRace({ frame, accent }: GraphicProps) {
           </g>
         );
       })}
-      {BAR_DATA.map((bar, i) => (
-        <g key={bar.label}>
-          <circle
-            cx={72 + i * 216}
-            cy={546}
-            r={5}
-            fill={i === 0 ? accent : bar.color}
-          />
-          <Text x={86 + i * 216} y={552} size={17} fill={STOCK.text}>
-            {bar.label}
-          </Text>
-        </g>
-      ))}
+      {input.showLegend
+        ? bars.map((bar, i) => (
+            <g key={bar.label}>
+              <circle
+                cx={72 + i * 216}
+                cy={546}
+                r={5}
+                fill={i === 0 ? accent : bar.color}
+              />
+              <Text x={86 + i * 216} y={552} size={17} fill={STOCK.text}>
+                {bar.label}
+              </Text>
+            </g>
+          ))
+        : null}
       <Text x={64} y={580} size={12} fill={STOCK.muted}>
-        Illustrative values · fixed 0–100 scale
+        {getStockDisplayCopyFromDescriptor({
+          descriptor:
+            LEGACY_DISPLAY_COPY["bar-race"].illustrativeValuesFixed0100Scale,
+        })}
       </Text>
       <Text x={896} y={580} size={12} fill={STOCK.muted} anchor="end" mono>
-        {Math.round(mix(t, 1, 2)) === 1 ? "PERIOD 01 → 02" : "PERIOD 02"}
+        {Math.round(mix(t, 1, 2)) === 1
+          ? getStockDisplayCopyFromDescriptor({
+              descriptor: LEGACY_DISPLAY_COPY["bar-race"].periodTransition,
+            })
+          : getStockDisplayCopyFromDescriptor({
+              descriptor: LEGACY_DISPLAY_COPY["bar-race"].periodFinal,
+            })}
       </Text>
     </g>
   );

@@ -1,0 +1,96 @@
+name:
+  id: motionAtlas.chart-focus-edit.name
+  message: Refine a chart for reading
+description:
+  id: motionAtlas.chart-focus-edit.description
+  message: An already complete chart sheds visual clutter and brings a selected category
+    into focus while every supplied value and the common scale remain unchanged.
+category:
+  id: motionAtlas.chart-focus-edit.category
+  message: Editorial attention
+useWhen:
+  id: motionAtlas.chart-focus-edit.useWhen
+  message: Show that visual emphasis can improve reading while preserving the data.
+creativeDirection:
+  id: motionAtlas.chart-focus-edit.creativeDirection
+  message: Frames 12-40 show the complete bars, labels, and a light plotting grid. Between
+    frames 40-112, minor grid lines recede, label tabs move to direct reading positions
+    when requested, and nonfocused marks soften without changing length. A small context
+    heading settles beside the selected mark. Hold the cleaner chart through frame 166
+    before the standard exit.
+intent:
+  id: motionAtlas.chart-focus-edit.intent
+  message: Show that visual emphasis can improve reading while preserving the data.
+distinction:
+  id: motionAtlas.chart-focus-edit.distinction
+  message: Unlike bar-race and line-trace, the data is fully present at the start and
+    never grows, ranks, or changes. The transformation is the chart presentation itself.
+prompt:
+  id: motionAtlas.chart-focus-edit.prompt
+  message: Use Motion Atlas "Refine a chart for reading" (chart-focus-edit) as a
+    conceptual graphic. Show that visual emphasis can improve reading while preserving
+    the data. Replace fictional sample content with approved authored content before
+    making product claims.
+tags:
+  - id: motionAtlas.chart-focus-edit.tags.0
+    message: chart refinement
+  - id: motionAtlas.chart-focus-edit.tags.1
+    message: declutter
+  - id: motionAtlas.chart-focus-edit.tags.2
+    message: direct labels
+  - id: motionAtlas.chart-focus-edit.tags.3
+    message: visual hierarchy
+  - id: motionAtlas.chart-focus-edit.tags.4
+    message: focus
+  - id: motionAtlas.chart-focus-edit.tags.5
+    message: emphasize
+  - id: motionAtlas.chart-focus-edit.tags.6
+    message: data visualization
+  - id: motionAtlas.chart-focus-edit.tags.7
+    message: readability
+goodFor:
+  - id: motionAtlas.chart-focus-edit.goodFor.0
+    message: Explain editorial refinement of an existing visualization
+  - id: motionAtlas.chart-focus-edit.goodFor.1
+    message: Show how emphasis can guide attention without changing data
+  - id: motionAtlas.chart-focus-edit.goodFor.2
+    message: Bridge a broad chart to one discussed category
+domains:
+  - id: motionAtlas.chart-focus-edit.domains.0
+    message: Editorial attention
+aliases:
+  - id: motionAtlas.chart-focus-edit.aliases.0
+    message: chart refinement
+  - id: motionAtlas.chart-focus-edit.aliases.1
+    message: declutter
+  - id: motionAtlas.chart-focus-edit.aliases.2
+    message: direct labels
+  - id: motionAtlas.chart-focus-edit.aliases.3
+    message: visual hierarchy
+notFor:
+  - id: motionAtlas.chart-focus-edit.notFor.0
+    message: All default counts are fictional.
+  - id: motionAtlas.chart-focus-edit.notFor.1
+    message: Bar lengths, category order, zero baseline, and axisMaximum remain fixed.
+  - id: motionAtlas.chart-focus-edit.notFor.2
+    message: Emphasis is an editorial selection, not statistical significance or detected
+      importance.
+  - id: motionAtlas.chart-focus-edit.notFor.3
+    message: Grid removal must retain a readable zero baseline and scale endpoints.
+motionBeats:
+  - startFrame: 12
+    endFrame: 40
+    description:
+      id: motionAtlas.chart-focus-edit.motionBeats.0
+      message: Show complete bars, labels and the common plotting scale.
+  - startFrame: 40
+    endFrame: 112
+    description:
+      id: motionAtlas.chart-focus-edit.motionBeats.1
+      message: Recede minor grid lines and apply selected label and focus treatments without
+        changing values.
+  - startFrame: 112
+    endFrame: 166
+    description:
+      id: motionAtlas.chart-focus-edit.motionBeats.2
+      message: Hold refined presentation on the unchanged zero-based scale.

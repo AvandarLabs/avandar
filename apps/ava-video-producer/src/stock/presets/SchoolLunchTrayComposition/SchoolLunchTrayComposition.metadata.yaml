@@ -1,0 +1,111 @@
+name:
+  id: motionAtlas.school-lunch-tray-composition.name
+  message: What reaches the lunch table
+description:
+  id: motionAtlas.school-lunch-tray-composition.description
+  message: School lunch trays are assembled from an explicit list of planned components,
+    with an unfilled component kept visible. The scene distinguishes a tray being served
+    from a tray matching the stated plan.
+category:
+  id: motionAtlas.school-lunch-tray-composition.category
+  message: Meal assembly at a learning setting
+useWhen:
+  id: motionAtlas.school-lunch-tray-composition.useWhen
+  message: Make the contents and omissions of a stated school meal plan visible.
+prompt:
+  id: motionAtlas.school-lunch-tray-composition.prompt
+  message: Reveal the supplied learners at a lunch table with their outlined planned
+    trays. Serving utensils place only the authored components into the matching
+    compartments; missing planned components retain their outlines. Bring trays to their
+    places and hold the complete-plan numerator against every planned tray without
+    marking a learner as deficient. Fade through the shared opaque ground.
+creativeDirection:
+  id: motionAtlas.school-lunch-tray-composition.creativeDirection
+  message: Reveal the supplied learners at a lunch table with their outlined planned
+    trays. Serving utensils place only the authored components into the matching
+    compartments; missing planned components retain their outlines. Bring trays to their
+    places and hold the complete-plan numerator against every planned tray without
+    marking a learner as deficient. Fade through the shared opaque ground.
+intent:
+  id: motionAtlas.school-lunch-tray-composition.intent
+  message: Make the contents and omissions of a stated school meal plan visible.
+distinction:
+  id: motionAtlas.school-lunch-tray-composition.distinction
+  message: The hero action assembles physical meal components into separate tray
+    compartments and preserves a planned-but-unfilled compartment. It is not a generic
+    delivery handoff, shopping basket choice, or a population counter.
+tags:
+  - id: motionAtlas.school-lunch-tray-composition.tags.0
+    message: school meals
+  - id: motionAtlas.school-lunch-tray-composition.tags.1
+    message: school lunch
+  - id: motionAtlas.school-lunch-tray-composition.tags.2
+    message: meal components
+  - id: motionAtlas.school-lunch-tray-composition.tags.3
+    message: nutrition program
+  - id: motionAtlas.school-lunch-tray-composition.tags.4
+    message: food at school
+  - id: motionAtlas.school-lunch-tray-composition.tags.5
+    message: tray assembly
+  - id: motionAtlas.school-lunch-tray-composition.tags.6
+    message: planned servings
+  - id: motionAtlas.school-lunch-tray-composition.tags.7
+    message: missing component
+goodFor:
+  - id: motionAtlas.school-lunch-tray-composition.goodFor.0
+    message: Explain the composition of a fictional school meal plan
+  - id: motionAtlas.school-lunch-tray-composition.goodFor.1
+    message: Show a missing meal component without claiming nutritional adequacy
+  - id: motionAtlas.school-lunch-tray-composition.goodFor.2
+    message: Distinguish meals planned, trays represented, and complete listed component sets
+domains:
+  - id: motionAtlas.school-lunch-tray-composition.domains.0
+    message: Meal assembly at a learning setting
+aliases:
+  - id: motionAtlas.school-lunch-tray-composition.aliases.0
+    message: school meals
+  - id: motionAtlas.school-lunch-tray-composition.aliases.1
+    message: school lunch
+  - id: motionAtlas.school-lunch-tray-composition.aliases.2
+    message: meal components
+notFor:
+  - id: motionAtlas.school-lunch-tray-composition.notFor.0
+    message: The complete-plan numerator counts trays containing every supplied planned
+      component. Its denominator is all trays, which is also the learner array length in
+      this single meal occasion.
+  - id: motionAtlas.school-lunch-tray-composition.notFor.1
+    message: A component symbol means the component is listed as present. Its area does not
+      encode calories, portion size, nutrient content, or actual consumption.
+  - id: motionAtlas.school-lunch-tray-composition.notFor.2
+    message: Matching the list does not establish a balanced diet, nutritional sufficiency,
+      health improvement, or learning impact. Missing a component does not describe a
+      learner's health.
+  - id: motionAtlas.school-lunch-tray-composition.notFor.3
+    message: The example covers one fictional meal occasion and cannot represent repeated
+      meals or unique reach across days.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.SchoolLunchTrayComposition.beat.0
+      message: Reveal the full learner roster, outlined planned trays and named component
+        legend.
+  - startFrame: 36
+    endFrame: 85
+    description:
+      id: motionAtlas.SchoolLunchTrayComposition.beat.1
+      message: Serving spoons place each authored component into its compartment in four
+        bounded twelve-frame turns. Empty subsets receive no food.
+  - startFrame: 88
+    endFrame: 107
+    description:
+      id: motionAtlas.SchoolLunchTrayComposition.beat.2
+      message: "Slide every tray 24 diagram pixels into its table place, retaining learner
+        identity. When enabled, unfilled compartments receive one neutral outline-width
+        pulse: rise from 1 to 2 pixels during frames 88-92, hold through 100, then
+        return to 1 pixel by 104."
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.SchoolLunchTrayComposition.beat.3
+      message: Hold the complete-plan numerator over all planned trays through the shared fade.

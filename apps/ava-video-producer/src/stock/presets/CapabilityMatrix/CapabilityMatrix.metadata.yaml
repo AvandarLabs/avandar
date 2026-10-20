@@ -1,0 +1,147 @@
+name:
+  id: motionAtlas.capability-matrix.name
+  message: Capability by capability
+description:
+  id: motionAtlas.capability-matrix.description
+  message: A compact table reveals explicit capability states one line at a time, then
+    holds an authored row or column focus. Supported, unavailable, conditional, and
+    unknown states remain visually distinct.
+category:
+  id: motionAtlas.capability-matrix.category
+  message: Comparative reasoning
+tags:
+  - id: motionAtlas.capability-matrix.tags.0
+    message: feature matrix
+  - id: motionAtlas.capability-matrix.tags.1
+    message: capability table
+  - id: motionAtlas.capability-matrix.tags.2
+    message: comparison table
+  - id: motionAtlas.capability-matrix.tags.3
+    message: checklist
+  - id: motionAtlas.capability-matrix.tags.4
+    message: supported
+  - id: motionAtlas.capability-matrix.tags.5
+    message: unsupported
+  - id: motionAtlas.capability-matrix.tags.6
+    message: conditional
+  - id: motionAtlas.capability-matrix.tags.7
+    message: unknown
+  - id: motionAtlas.capability-matrix.tags.8
+    message: line items
+  - id: motionAtlas.capability-matrix.tags.9
+    message: task fit
+  - id: motionAtlas.capability-matrix.tags.10
+    message: resource constraints
+  - id: motionAtlas.capability-matrix.tags.11
+    message: self-serve access
+  - id: motionAtlas.capability-matrix.tags.12
+    message: lifecycle coverage
+  - id: motionAtlas.capability-matrix.tags.13
+    message: affordability
+  - id: motionAtlas.capability-matrix.tags.14
+    message: joint requirements
+  - id: motionAtlas.capability-matrix.tags.15
+    message: digital access
+  - id: motionAtlas.capability-matrix.tags.16
+    message: offline capabilities
+  - id: motionAtlas.capability-matrix.tags.17
+    message: service dependency
+  - id: motionAtlas.capability-matrix.tags.18
+    message: availability matrix
+useWhen:
+  id: motionAtlas.capability-matrix.useWhen
+  message: Compare alternatives using the same explicit list of capabilities.
+prompt:
+  id: motionAtlas.capability-matrix.prompt
+  message: Use Motion Atlas "Capability by capability" (capability-matrix) as a conceptual
+    graphic. Compare alternatives using the same explicit list of capabilities. Keep the
+    restrained motion and readable labels; replace sample content with approved facts
+    before making product claims.
+creativeDirection:
+  id: motionAtlas.capability-matrix.creativeDirection
+  message: A table skeleton and option headings settle first. A narrow horizontal rule
+    advances through the capability rows, resolving all cells in each row together so
+    the audience compares like with like. The final focus opens a bracket around one
+    selected column or row while every other cell remains legible, followed by the
+    common opaque exit.
+goodFor:
+  - id: motionAtlas.capability-matrix.goodFor.0
+    message: Compare feature support across a small set of alternatives
+  - id: motionAtlas.capability-matrix.goodFor.1
+    message: Explain what each plan includes
+  - id: motionAtlas.capability-matrix.goodFor.2
+    message: Separate conditional support from unknown information
+  - id: motionAtlas.capability-matrix.goodFor.3
+    message: Compare task needs with an explicitly supplied capability set
+  - id: motionAtlas.capability-matrix.goodFor.4
+    message: Explain fit across affordability, usability, and lifecycle coverage
+  - id: motionAtlas.capability-matrix.goodFor.5
+    message: Show whether affordability and defined quality requirements are both met in an
+      authored example
+  - id: motionAtlas.capability-matrix.goodFor.6
+    message: Compare local and network-dependent operations
+  - id: motionAtlas.capability-matrix.goodFor.7
+    message: Show unknown or planned capability support honestly
+intent:
+  id: motionAtlas.capability-matrix.intent
+  message: Compare alternatives using the same explicit list of capabilities.
+domains:
+  - id: motionAtlas.capability-matrix.domains.0
+    message: Comparative reasoning
+aliases:
+  - id: motionAtlas.capability-matrix.aliases.0
+    message: feature matrix
+  - id: motionAtlas.capability-matrix.aliases.1
+    message: capability table
+  - id: motionAtlas.capability-matrix.aliases.2
+    message: comparison table
+  - id: motionAtlas.capability-matrix.aliases.3
+    message: checklist
+notFor:
+  - id: motionAtlas.capability-matrix.notFor.0
+    message: Cells are categorical statements, not performance scores or quantities.
+  - id: motionAtlas.capability-matrix.notFor.1
+    message: Unknown must never be rendered as absent, and conditional cells require
+      meaningful source qualifications.
+  - id: motionAtlas.capability-matrix.notFor.2
+    message: At most three options and five rows fit the intended six-second overview.
+  - id: motionAtlas.capability-matrix.notFor.3
+    message: A capability state is a supplied statement about a specific context and
+      version. Do not infer market-wide absence, universal superiority, or current
+      competitor support from a strategic comparison.
+  - id: motionAtlas.capability-matrix.notFor.4
+    message: Qualitative affordability requires a stated audience and context; included
+      features are not proof that a plan is affordable to every team.
+  - id: motionAtlas.capability-matrix.notFor.5
+    message: A quality row needs an explicit criterion and source. Included affordability
+      and quality cells do not prove that every organization can afford the tool or that
+      it is safe.
+  - id: motionAtlas.capability-matrix.notFor.6
+    message: Unavailable, conditional and unknown must stay distinct. Planned capability is
+      not currently supported.
+distinction:
+  id: motionAtlas.capability-matrix.distinction
+  message: The grid carries a two-dimensional comparison contract and four explicit cell
+    meanings. It is neither a cohort dot-matrix nor source-to-destination
+    schema-mapping, and its choreography compares each line item across all
+    alternatives.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.capability-matrix.motionBeats.0
+      message: The labeled setup establishes the authored comparison.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.capability-matrix.motionBeats.1
+      message: A table skeleton and option headings settle first. A narrow horizontal rule
+        advances through the capability rows, resolving all cells in each row together
+        so the audience compares like with like. The final focus opens a bracket around
+        one selected column or row while every other cell remains legible, followed by
+        the common opaque exit.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.capability-matrix.motionBeats.2
+      message: Both sides remain readable in the resolved hold.

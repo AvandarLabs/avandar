@@ -1,0 +1,128 @@
+name:
+  id: motionAtlas.term-limited-revenue-share.name
+  message: When a temporary share ends
+description:
+  id: motionAtlas.term-limited-revenue-share.description
+  message: Two equal-length fictional receipt periods expose the same operating outflow
+    and a temporary distribution. After the authored term boundary, that distribution no
+    longer leaves and the retained period cash increases by the exact amount, without
+    forecasting growth or solvency.
+category:
+  id: motionAtlas.term-limited-revenue-share.category
+  message: Time-bounded resource accounting
+useWhen:
+  id: motionAtlas.term-limited-revenue-share.useWhen
+  message: Make the effect of ending one temporary cash distribution inspectable while
+    other quantities remain fixed.
+intent:
+  id: motionAtlas.term-limited-revenue-share.intent
+  message: Make the effect of ending one temporary cash distribution inspectable while
+    other quantities remain fixed.
+creativeDirection:
+  id: motionAtlas.term-limited-revenue-share.creativeDirection
+  message: "Frames 0-11 reveal two equal-sized period trays and one common monetary ruler
+    on the 960x600 canvas. Frames 12-65 partition the first receipt strip into operating
+    outflow, temporary distribution, and retained cash. Frames 66-95 turn the authored
+    term marker between the trays and close only the temporary-distribution outlet.
+    Frames 96-140 lay the second identical receipt strip into the second tray: operating
+    outflow stays the same and the formerly distributed portion remains in retained
+    cash. Frames 141-167 hold both periods and their exact reconciliation side by side.
+    Exit to shared opaque ground at frames 168-179. Use frame-driven React/SVG at 30fps
+    and no stochastic timing."
+distinction:
+  id: motionAtlas.term-limited-revenue-share.distinction
+  message: Unlike pooled-donor-allocation, the explanation compares two separate
+    time-bounded receipt flows after a term changes. Unlike expiring-lease, no exclusive
+    permission token returns to neutral custody. The expired outlet changes one
+    conserved cash partition while equal receipts and operating outflow expose its exact
+    effect.
+prompt:
+  id: motionAtlas.term-limited-revenue-share.prompt
+  message: Two equal-length fictional receipt periods expose the same operating outflow
+    and a temporary distribution. After the authored term boundary, that distribution no
+    longer leaves and the retained period cash increases by the exact amount, without
+    forecasting growth or solvency.
+tags:
+  - id: motionAtlas.term-limited-revenue-share.tags.0
+    message: temporary revenue share
+  - id: motionAtlas.term-limited-revenue-share.tags.1
+    message: term boundary
+  - id: motionAtlas.term-limited-revenue-share.tags.2
+    message: cash allocation
+  - id: motionAtlas.term-limited-revenue-share.tags.3
+    message: retained cash
+  - id: motionAtlas.term-limited-revenue-share.tags.4
+    message: resource accounting
+  - id: motionAtlas.term-limited-revenue-share.tags.5
+    message: distribution expiry
+goodFor:
+  - id: motionAtlas.term-limited-revenue-share.goodFor.0
+    message: Explain the arithmetic of a temporary distribution ending
+  - id: motionAtlas.term-limited-revenue-share.goodFor.1
+    message: Separate cash received, operating outflow, distributions, and retained period cash
+  - id: motionAtlas.term-limited-revenue-share.goodFor.2
+    message: Show a bounded financing tradeoff without projecting company performance
+domains:
+  - id: motionAtlas.term-limited-revenue-share.domains.0
+    message: Time-bounded resource accounting
+aliases:
+  - id: motionAtlas.term-limited-revenue-share.aliases.0
+    message: temporary revenue share
+  - id: motionAtlas.term-limited-revenue-share.aliases.1
+    message: term boundary
+  - id: motionAtlas.term-limited-revenue-share.aliases.2
+    message: cash allocation
+notFor:
+  - id: motionAtlas.term-limited-revenue-share.notFor.0
+    message: This is an illustrative arithmetic model, not financial advice, investment
+      terms, a valuation, a profit statement, or a solvency projection. It uses no
+      company financial figures.
+  - id: motionAtlas.term-limited-revenue-share.notFor.1
+    message: Each period reconciles receipts = operating outflow + active distribution +
+      retained period cash. The second retained amount exceeds the first by the first
+      distribution, with all other inputs fixed.
+  - id: motionAtlas.term-limited-revenue-share.notFor.2
+    message: Compute the active distribution using integer basis-point arithmetic. Reject
+      fractional minor-unit distributions or negative retained amounts.
+  - id: motionAtlas.term-limited-revenue-share.notFor.3
+    message: Both periods are separate flows over equal durations. Do not carry the first
+      remainder into the second tray or display their sum as a company balance.
+  - id: motionAtlas.term-limited-revenue-share.notFor.4
+    message: Operating outflow is a supplied composite. Taxes, financing transactions,
+      accruals, other liabilities, ownership, and legal treatment are outside the model.
+      No claim about employee compensation or investor rights follows from the
+      illustration.
+  - id: motionAtlas.term-limited-revenue-share.notFor.5
+    message: Free prose is author supplied; only structural, reference, numeric and
+      documented lexical constraints are runtime-validated.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.term-limited-revenue-share.beats.0
+      message: Reveal the authored scene.
+  - startFrame: 12
+    endFrame: 65
+    description:
+      id: motionAtlas.term-limited-revenue-share.beats.1
+      message: Partition the first receipt flow exactly.
+  - startFrame: 66
+    endFrame: 95
+    description:
+      id: motionAtlas.term-limited-revenue-share.beats.2
+      message: Turn the term marker and close only the temporary distribution outlet.
+  - startFrame: 96
+    endFrame: 140
+    description:
+      id: motionAtlas.term-limited-revenue-share.beats.3
+      message: Partition equal second-period receipts without a distribution.
+  - startFrame: 141
+    endFrame: 167
+    description:
+      id: motionAtlas.term-limited-revenue-share.beats.4
+      message: Hold equal-period reconciliation on one numerical scale.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.term-limited-revenue-share.beats.5
+      message: Return to the common opaque ground.

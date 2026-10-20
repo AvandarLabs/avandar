@@ -1,3 +1,4 @@
+import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import {
   ACCENT_SWATCHES,
   BACKGROUND_SWATCHES,
@@ -5,32 +6,33 @@ import {
   DEFAULT_BACKGROUND,
 } from "../palette";
 import { PaletteSwatches } from "./PaletteSwatches";
-
 export type Props = {
   accent: string;
   background: string;
   setAccent: (color: string) => void;
   setBackground: (color: string) => void;
 };
-
 export function PaletteControls({
   accent,
   background,
   setAccent,
   setBackground,
 }: Props) {
+  const { t } = useGalleryLingui();
   return (
     <div
       className="palette-controls"
       role="group"
-      aria-label="Live preview colors"
+      aria-label={t`Live preview colors`}
     >
       <div className="palette-group">
         <label className="color-control">
-          <span>Brand color</span>
+          <span>
+            <Trans>Brand color</Trans>
+          </span>
           <input
             type="color"
-            aria-label="Brand color"
+            aria-label={t`Brand color`}
             value={accent}
             onChange={(event) => setAccent(event.target.value)}
           />
@@ -45,10 +47,12 @@ export function PaletteControls({
       </div>
       <div className="palette-group">
         <label className="color-control">
-          <span>Background</span>
+          <span>
+            <Trans>Background</Trans>
+          </span>
           <input
             type="color"
-            aria-label="Background"
+            aria-label={t`Background`}
             value={background}
             onChange={(event) => setBackground(event.target.value)}
           />
@@ -68,11 +72,13 @@ export function PaletteControls({
           setBackground(DEFAULT_BACKGROUND);
         }}
       >
-        Reset colors
+        <Trans>Reset colors</Trans>
       </button>
       <p className="palette-help">
-        Avandar theme swatches. Previews and MP4 downloads use these colors.
-        Text and secondary colors stay authored.
+        <Trans>
+          Avandar theme swatches. Previews and MP4 downloads use these colors.
+          Text and secondary colors stay authored.
+        </Trans>
       </p>
     </div>
   );

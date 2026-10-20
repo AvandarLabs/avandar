@@ -1,0 +1,99 @@
+name:
+  id: motionAtlas.state-preserving-source-refresh.name
+  message: Refresh facts while keeping human work
+description:
+  id: motionAtlas.state-preserving-source-refresh.description
+  message: A fresh source changes a record label while its stable identity, assigned
+    worker and human status remain pinned. Unchanged records produce no write, and a
+    missing source key is flagged without deleting the record.
+category:
+  id: motionAtlas.state-preserving-source-refresh.category
+  message: Incremental reconciliation
+useWhen:
+  id: motionAtlas.state-preserving-source-refresh.useWhen
+  message: Keep source-derived facts separate from human-owned case state.
+prompt:
+  id: motionAtlas.state-preserving-source-refresh.prompt
+  message: Keep source-derived facts separate from human-owned case state.
+creativeDirection:
+  id: motionAtlas.state-preserving-source-refresh.creativeDirection
+  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-50 pin identity and human fields to the record
+    edge. Frames 51-104 compare the old and fresh source strips. Frames 105-139 replace
+    only changed derived labels, mark absent keys as missing and leave every human field
+    untouched. Hold the resolved meaning during frames 140-165. Frames 166-179 return to
+    the same opaque ground for a six-second loop; reset is editorial.
+intent:
+  id: motionAtlas.state-preserving-source-refresh.intent
+  message: Keep source-derived facts separate from human-owned case state.
+distinction:
+  id: motionAtlas.state-preserving-source-refresh.distinction
+  message: Unlike field-conflict-choice, no human chooses a winner between competing
+    fields. The update mask structurally excludes human state, and a missing source does
+    not mean deleting a person or closing a case.
+tags:
+  - id: motionAtlas.state-preserving-source-refresh.tags.0
+    message: incremental sync
+  - id: motionAtlas.state-preserving-source-refresh.tags.1
+    message: case state
+  - id: motionAtlas.state-preserving-source-refresh.tags.2
+    message: stable identity
+  - id: motionAtlas.state-preserving-source-refresh.tags.3
+    message: missing source
+  - id: motionAtlas.state-preserving-source-refresh.tags.4
+    message: refresh
+goodFor:
+  - id: motionAtlas.state-preserving-source-refresh.goodFor.0
+    message: Explain refreshing derived case fields without overwriting assignment
+  - id: motionAtlas.state-preserving-source-refresh.goodFor.1
+    message: Show why missing source records should remain visible
+domains:
+  - id: motionAtlas.state-preserving-source-refresh.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.state-preserving-source-refresh.aliases.0
+    message: state preserving source refresh
+notFor:
+  - id: motionAtlas.state-preserving-source-refresh.notFor.0
+    message: This illustrates a chosen reconciliation algorithm, not a guarantee about a
+      deployed sync service.
+  - id: motionAtlas.state-preserving-source-refresh.notFor.1
+    message: Source completeness is an authored assumption. Missing is a flag, not proof
+      that an entity no longer exists.
+  - id: motionAtlas.state-preserving-source-refresh.notFor.2
+    message: No cross-page transaction or conflict-resolution guarantee is implied.
+  - id: motionAtlas.state-preserving-source-refresh.notFor.3
+    message: No real product screen, external fetch, supplied code execution, or measured
+      performance claim. All text is authored; no JSX, functions or URLs in props.
+  - id: motionAtlas.state-preserving-source-refresh.notFor.4
+    message: All existing records begin with missing-from-source=false in this bounded
+      example. Thus every source-absent record is newly flagged; repeated-refresh and
+      reappearance cases require separate inputs and are not implied.
+  - id: motionAtlas.state-preserving-source-refresh.notFor.5
+    message: Supplied prose is preserved. Fictional framing, source completeness and
+      agreement between labels and structured state are author responsibilities. Runtime
+      validation enforces structural bounds and exact cross-field rules.
+  - id: motionAtlas.state-preserving-source-refresh.notFor.6
+    message: Literal IDs and row values preserve exact whitespace using visible whitespace
+      marks at a fixed readable size.
+motionBeats:
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.state-preserving-source-refresh.motionBeats.0
+      message: Pin identity and human fields to each record.
+  - startFrame: 51
+    endFrame: 104
+    description:
+      id: motionAtlas.state-preserving-source-refresh.motionBeats.1
+      message: Compare old and fresh source strips by exact key.
+  - startFrame: 105
+    endFrame: 139
+    description:
+      id: motionAtlas.state-preserving-source-refresh.motionBeats.2
+      message: Replace changed derived labels and flag absent keys.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.state-preserving-source-refresh.motionBeats.3
+      message: Hold the resolved meaning.

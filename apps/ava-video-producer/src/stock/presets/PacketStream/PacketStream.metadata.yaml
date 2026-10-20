@@ -1,0 +1,56 @@
+name:
+  id: motionAtlas.packet-stream.name
+  message: Packet stream
+description:
+  id: motionAtlas.packet-stream.description
+  message: Small data packets travel along parallel lanes.
+category:
+  id: motionAtlas.packet-stream.category
+  message: Data flow
+tags:
+  - id: motionAtlas.packet-stream.tags.0
+    message: stream
+  - id: motionAtlas.packet-stream.tags.1
+    message: packets
+  - id: motionAtlas.packet-stream.tags.2
+    message: transfer
+  - id: motionAtlas.packet-stream.tags.3
+    message: lanes
+useWhen:
+  id: motionAtlas.packet-stream.useWhen
+  message: Suggest movement of data between two systems, without claiming real-time speed.
+prompt:
+  id: motionAtlas.packet-stream.prompt
+  message: Use Motion Atlas "Packet stream" (packet-stream) as a conceptual graphic.
+    Suggest movement of data between two systems, without claiming real-time speed. Keep
+    the restrained motion and readable labels; replace sample content with approved
+    facts before making product claims.
+creativeDirection:
+  id: motionAtlas.packet-stream.creativeDirection
+  message: Small data packets travel along parallel lanes.
+goodFor:
+  - id: motionAtlas.packet-stream.goodFor.0
+    message: Suggest movement of data between two systems, without claiming real-time speed.
+intent:
+  id: motionAtlas.packet-stream.intent
+  message: Suggest movement of data between two systems, without claiming real-time speed.
+domains:
+  - id: motionAtlas.packet-stream.domains.0
+    message: Data flow
+aliases:
+  - id: motionAtlas.packet-stream.aliases.0
+    message: stream
+  - id: motionAtlas.packet-stream.aliases.1
+    message: packets
+  - id: motionAtlas.packet-stream.aliases.2
+    message: transfer
+  - id: motionAtlas.packet-stream.aliases.3
+    message: lanes
+notFor:
+  - id: motionAtlas.packet-stream.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.packet-stream.distinction
+  message: Small data packets travel along parallel lanes.

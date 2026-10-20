@@ -1,0 +1,99 @@
+name:
+  id: motionAtlas.exception-detour.name
+  message: The rule and its exception
+description:
+  id: motionAtlas.exception-detour.description
+  message: A standard path meets a clearly labeled rule gate, while one named exception
+    opens a separate route. The two outcomes stay distinct so the exception never
+    silently changes the general rule.
+category:
+  id: motionAtlas.exception-detour.category
+  message: Conditional reasoning
+useWhen:
+  id: motionAtlas.exception-detour.useWhen
+  message: State a general rule while making a specific exception explicit.
+prompt:
+  id: motionAtlas.exception-detour.prompt
+  message: Use Motion Atlas "The rule and its exception" (exception-detour) as a
+    conceptual graphic. State a general rule while making a specific exception explicit.
+    Replace fictional sample content with approved authored content before making
+    product claims.
+creativeDirection:
+  id: motionAtlas.exception-detour.creativeDirection
+  message: The standard rule and straight destination appear first. A single labeled case
+    approaches the gate, pauses as its exception condition opens a side latch, and
+    follows a curved detour to the exception outcome. The standard path remains intact
+    and visible throughout. The final hold brackets the case, condition, and special
+    outcome before the shared exit.
+intent:
+  id: motionAtlas.exception-detour.intent
+  message: State a general rule while making a specific exception explicit.
+distinction:
+  id: motionAtlas.exception-detour.distinction
+  message: The semantic structure is a standing rule plus a visibly gated exception, not
+    an unqualified pipeline or an arbitrary network path. Only the exceptional case
+    moves.
+tags:
+  - id: motionAtlas.exception-detour.tags.0
+    message: exception
+  - id: motionAtlas.exception-detour.tags.1
+    message: unless
+  - id: motionAtlas.exception-detour.tags.2
+    message: special case
+  - id: motionAtlas.exception-detour.tags.3
+    message: default rule
+  - id: motionAtlas.exception-detour.tags.4
+    message: detour
+  - id: motionAtlas.exception-detour.tags.5
+    message: override
+  - id: motionAtlas.exception-detour.tags.6
+    message: qualification
+  - id: motionAtlas.exception-detour.tags.7
+    message: edge case
+goodFor:
+  - id: motionAtlas.exception-detour.goodFor.0
+    message: Explain an exception to a general workflow
+  - id: motionAtlas.exception-detour.goodFor.1
+    message: Qualify a broad statement with one explicit special case
+  - id: motionAtlas.exception-detour.goodFor.2
+    message: Show why a named case requires different handling
+domains:
+  - id: motionAtlas.exception-detour.domains.0
+    message: Conditional reasoning
+aliases:
+  - id: motionAtlas.exception-detour.aliases.0
+    message: exception
+  - id: motionAtlas.exception-detour.aliases.1
+    message: unless
+  - id: motionAtlas.exception-detour.aliases.2
+    message: special case
+  - id: motionAtlas.exception-detour.aliases.3
+    message: default rule
+notFor:
+  - id: motionAtlas.exception-detour.notFor.0
+    message: One general rule and one exception are supported.
+  - id: motionAtlas.exception-detour.notFor.1
+    message: The reference and moving markers are illustrative roles, not a sample
+      population or exception frequency.
+  - id: motionAtlas.exception-detour.notFor.2
+    message: The animation does not validate whether a rule or its exception is correct.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.exception-detour.motionBeats.0
+      message: Establish the authored starting arrangement.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.exception-detour.motionBeats.1
+      message: The standard rule and straight destination appear first. A single labeled case
+        approaches the gate, pauses as its exception condition opens a side latch, and
+        follows a curved detour to the exception outcome. The standard path remains
+        intact and visible throughout. The final hold brackets the case, condition, and
+        special outcome before the shared exit.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.exception-detour.motionBeats.2
+      message: Hold the resolved authored relationships before the shared exit.

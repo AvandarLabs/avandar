@@ -1,0 +1,100 @@
+name:
+  id: motionAtlas.habitat-corridor-reconnection.name
+  message: Build a route between habitats
+description:
+  id: motionAtlas.habitat-corridor-reconnection.description
+  message: A planned habitat strip and crossing physically reconnect two separated patches
+    on a schematic land-use map. The same mapped area changes use, and an optional
+    illustrative traversal shows designed connectivity without asserting ecological
+    recovery.
+category:
+  id: motionAtlas.habitat-corridor-reconnection.category
+  message: Schematic land-use map and constructed crossing
+useWhen:
+  id: motionAtlas.habitat-corridor-reconnection.useWhen
+  message: Show the physical land-use change required to connect separated habitat patches.
+prompt:
+  id: motionAtlas.habitat-corridor-reconnection.prompt
+  message: Use Build a route between habitats (habitat-corridor-reconnection) with
+    complete authored inputs and preserve the stated limits.
+creativeDirection:
+  id: motionAtlas.habitat-corridor-reconnection.creativeDirection
+  message: Reveal habitat patches separated by working land and a road. At the
+    land-management cue, lay the authored corridor footprint across the gap and lift its
+    crossing over the road. Transfer that footprint's area from other land to habitat
+    within the fixed boundary. Optionally move an explicitly illustrative marker along
+    the supplied connection, then hold the conserved land balance.
+intent:
+  id: motionAtlas.habitat-corridor-reconnection.intent
+  message: Show the physical land-use change required to connect separated habitat patches.
+distinction:
+  id: motionAtlas.habitat-corridor-reconnection.distinction
+  message: A physical strip changes land use and bridges a barrier before a route can be
+    traversed. Unlike network-graph or node-traversal, the connection requires a visible
+    spatial intervention and an area budget.
+tags:
+  - id: motionAtlas.habitat-corridor-reconnection.tags.0
+    message: habitat corridor
+  - id: motionAtlas.habitat-corridor-reconnection.tags.1
+    message: land restoration
+  - id: motionAtlas.habitat-corridor-reconnection.tags.2
+    message: ecological connectivity
+  - id: motionAtlas.habitat-corridor-reconnection.tags.3
+    message: wildlife crossing
+  - id: motionAtlas.habitat-corridor-reconnection.tags.4
+    message: fragmentation
+  - id: motionAtlas.habitat-corridor-reconnection.tags.5
+    message: habitat reconnection
+  - id: motionAtlas.habitat-corridor-reconnection.tags.6
+    message: land use
+  - id: motionAtlas.habitat-corridor-reconnection.tags.7
+    message: restoration implementation
+goodFor:
+  - id: motionAtlas.habitat-corridor-reconnection.goodFor.0
+    message: Explain spatial habitat reconnection
+  - id: motionAtlas.habitat-corridor-reconnection.goodFor.1
+    message: Show the land commitment behind a corridor proposal
+  - id: motionAtlas.habitat-corridor-reconnection.goodFor.2
+    message: Distinguish a designed route from evidence of animal use
+domains:
+  - id: motionAtlas.habitat-corridor-reconnection.domains.0
+    message: Schematic land-use map and constructed crossing
+aliases:
+  - id: motionAtlas.habitat-corridor-reconnection.aliases.0
+    message: habitat corridor
+  - id: motionAtlas.habitat-corridor-reconnection.aliases.1
+    message: land restoration
+  - id: motionAtlas.habitat-corridor-reconnection.aliases.2
+    message: ecological connectivity
+notFor:
+  - id: motionAtlas.habitat-corridor-reconnection.notFor.0
+    message: "Total mapped area is conserved: existing habitat + other land before =
+      existing habitat + corridor + other land after. The crossing is part of the
+      corridor footprint, not additional habitat area."
+  - id: motionAtlas.habitat-corridor-reconnection.notFor.1
+    message: Geometry is schematic; footprint area is calculated from supplied rectangular
+      dimensions, while visual patch shape is not a geographic measurement.
+  - id: motionAtlas.habitat-corridor-reconnection.notFor.2
+    message: Designed connectivity does not establish species suitability, movement,
+      survival, biodiversity gain or long-term restoration success. Traversal is
+      optional and explicitly illustrative; defaults are fictional.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.habitat-corridor-reconnection.motionBeats.0
+      message: Reveal the authored setup.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.habitat-corridor-reconnection.motionBeats.1
+      message: Reveal habitat patches separated by working land and a road. At the
+        land-management cue, lay the authored corridor footprint across the gap and lift
+        its crossing over the road. Transfer that footprint's area from other land to
+        habitat within the fixed boundary. Optionally move an explicitly illustrative
+        marker along the supplied connection, then hold the conserved land balance.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.habitat-corridor-reconnection.motionBeats.2
+      message: Hold the resolved authored state and complete accounting.

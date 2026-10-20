@@ -1,0 +1,111 @@
+name:
+  id: motionAtlas.dashboard-slot-assembly.name
+  message: Assemble a dashboard
+description:
+  id: motionAtlas.dashboard-slot-assembly.description
+  message: Loose information panels reshape and dock into a deliberately composed
+    dashboard. The motion explains how a chosen layout gives several views a shared
+    reading order.
+category:
+  id: motionAtlas.dashboard-slot-assembly.category
+  message: Spatial composition
+useWhen:
+  id: motionAtlas.dashboard-slot-assembly.useWhen
+  message: Show that arranging information changes how easily its parts can be read together.
+prompt:
+  id: motionAtlas.dashboard-slot-assembly.prompt
+  message: Show that arranging information changes how easily its parts can be read together.
+creativeDirection:
+  id: motionAtlas.dashboard-slot-assembly.creativeDirection
+  message: Frames 12-40 establish the supplied widgets as differently sized panels and an
+    empty dashboard outline. During frames 40-112, a featured panel docks first, grid
+    guides extend from its edges, and the remaining panels resize into the available
+    slots while their text keeps a fixed font size. A shared scope strip settles across
+    the board, guides withdraw, and the completed composition holds through frame 166
+    before the opaque exit.
+intent:
+  id: motionAtlas.dashboard-slot-assembly.intent
+  message: Show that arranging information changes how easily its parts can be read together.
+distinction:
+  id: motionAtlas.dashboard-slot-assembly.distinction
+  message: "Unlike stagger-cards, the hero action is constrained layout assembly: unequal
+    panels change geometry, establish alignment, and acquire a shared context. The
+    content is already visible before docking."
+tags:
+  - id: motionAtlas.dashboard-slot-assembly.tags.0
+    message: dashboard
+  - id: motionAtlas.dashboard-slot-assembly.tags.1
+    message: assemble
+  - id: motionAtlas.dashboard-slot-assembly.tags.2
+    message: layout
+  - id: motionAtlas.dashboard-slot-assembly.tags.3
+    message: widgets
+  - id: motionAtlas.dashboard-slot-assembly.tags.4
+    message: overview
+  - id: motionAtlas.dashboard-slot-assembly.tags.5
+    message: arrange panels
+  - id: motionAtlas.dashboard-slot-assembly.tags.6
+    message: compose views
+  - id: motionAtlas.dashboard-slot-assembly.tags.7
+    message: information hierarchy
+  - id: motionAtlas.dashboard-slot-assembly.tags.8
+    message: analysis to dashboard
+  - id: motionAtlas.dashboard-slot-assembly.tags.9
+    message: reusable view
+  - id: motionAtlas.dashboard-slot-assembly.tags.10
+    message: dashboard blocks
+goodFor:
+  - id: motionAtlas.dashboard-slot-assembly.goodFor.0
+    message: Introduce building a dashboard from reusable views
+  - id: motionAtlas.dashboard-slot-assembly.goodFor.1
+    message: Explain a featured insight with supporting context
+  - id: motionAtlas.dashboard-slot-assembly.goodFor.2
+    message: Bridge separate analyses into a shared overview
+  - id: motionAtlas.dashboard-slot-assembly.goodFor.3
+    message: Explain saving an analysis view into a dashboard
+  - id: motionAtlas.dashboard-slot-assembly.goodFor.4
+    message: Show a map or chart joining a composed report
+domains:
+  - id: motionAtlas.dashboard-slot-assembly.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.dashboard-slot-assembly.aliases.0
+    message: Spatial composition
+notFor:
+  - id: motionAtlas.dashboard-slot-assembly.notFor.0
+    message: All default content is fictional.
+  - id: motionAtlas.dashboard-slot-assembly.notFor.1
+    message: Panel size expresses authored editorial priority, never numeric magnitude.
+  - id: motionAtlas.dashboard-slot-assembly.notFor.2
+    message: Value strings are supplied labels rather than counters or calculated metrics.
+  - id: motionAtlas.dashboard-slot-assembly.notFor.3
+    message: This is a conceptual board builder, not a recording of a supported product feature.
+  - id: motionAtlas.dashboard-slot-assembly.notFor.4
+    message: Layout assembly does not imply that queries, source data or permissions have
+      been independently verified.
+motionBeats:
+  - startFrame: 12
+    endFrame: 40
+    description:
+      id: motionAtlas.dashboard-slot-assembly.motionBeats.0
+      message: Reveal differently sized panels and empty board.
+  - startFrame: 40
+    endFrame: 64
+    description:
+      id: motionAtlas.dashboard-slot-assembly.motionBeats.1
+      message: Dock the featured panel while supporting panels resize and stage clear of it.
+  - startFrame: 64
+    endFrame: 112
+    description:
+      id: motionAtlas.dashboard-slot-assembly.motionBeats.2
+      message: Dock supporting panels in staggered order with fixed-size text.
+  - startFrame: 112
+    endFrame: 130
+    description:
+      id: motionAtlas.dashboard-slot-assembly.motionBeats.3
+      message: Settle shared context and withdraw alignment guides.
+  - startFrame: 130
+    endFrame: 166
+    description:
+      id: motionAtlas.dashboard-slot-assembly.motionBeats.4
+      message: Hold the completed dashboard.

@@ -1,0 +1,101 @@
+name:
+  id: motionAtlas.battery-dispatch-balance.name
+  message: Store energy, deliver less
+description:
+  id: motionAtlas.battery-dispatch-balance.description
+  message: A battery cutaway connects a charging window to a later dispatch window while
+    retaining explicit conversion losses. A human dispatch instruction determines when
+    the stored energy is released.
+category:
+  id: motionAtlas.battery-dispatch-balance.category
+  message: Energy vessel and two-window dispatch
+useWhen:
+  id: motionAtlas.battery-dispatch-balance.useWhen
+  message: Explain how a dispatch decision moves usable energy between time windows with
+    losses accounted for.
+prompt:
+  id: motionAtlas.battery-dispatch-balance.prompt
+  message: Use Store energy, deliver less (battery-dispatch-balance) with complete
+    authored inputs and preserve the stated limits.
+creativeDirection:
+  id: motionAtlas.battery-dispatch-balance.creativeDirection
+  message: Reveal the battery between authored charging and delivery windows. Charging
+    input enters the boundary, a distinct loss channel peels away, and the remaining
+    energy fills storage. At the dispatch cue, delivered energy reaches the later load
+    while discharge losses enter their own channel. Hold input, delivery, losses and
+    final storage together with a conserved-energy equation before fading.
+intent:
+  id: motionAtlas.battery-dispatch-balance.intent
+  message: Explain how a dispatch decision moves usable energy between time windows with
+    losses accounted for.
+distinction:
+  id: motionAtlas.battery-dispatch-balance.distinction
+  message: A finite physical store fills and empties across distinct time windows while
+    loss branches remain visible. Unlike metric-counter or line-trace, the explanation
+    rests on conserved energy and dispatch timing.
+tags:
+  - id: motionAtlas.battery-dispatch-balance.tags.0
+    message: energy flexibility
+  - id: motionAtlas.battery-dispatch-balance.tags.1
+    message: battery storage
+  - id: motionAtlas.battery-dispatch-balance.tags.2
+    message: load shifting
+  - id: motionAtlas.battery-dispatch-balance.tags.3
+    message: dispatch
+  - id: motionAtlas.battery-dispatch-balance.tags.4
+    message: charge discharge
+  - id: motionAtlas.battery-dispatch-balance.tags.5
+    message: energy losses
+  - id: motionAtlas.battery-dispatch-balance.tags.6
+    message: kWh balance
+  - id: motionAtlas.battery-dispatch-balance.tags.7
+    message: demand response
+goodFor:
+  - id: motionAtlas.battery-dispatch-balance.goodFor.0
+    message: Explain energy time shifting
+  - id: motionAtlas.battery-dispatch-balance.goodFor.1
+    message: Show why delivered energy is below charging input
+  - id: motionAtlas.battery-dispatch-balance.goodFor.2
+    message: Present a supplied battery dispatch schedule and its losses
+domains:
+  - id: motionAtlas.battery-dispatch-balance.domains.0
+    message: Energy vessel and two-window dispatch
+aliases:
+  - id: motionAtlas.battery-dispatch-balance.aliases.0
+    message: energy flexibility
+  - id: motionAtlas.battery-dispatch-balance.aliases.1
+    message: battery storage
+  - id: motionAtlas.battery-dispatch-balance.aliases.2
+    message: load shifting
+notFor:
+  - id: motionAtlas.battery-dispatch-balance.notFor.0
+    message: Initial stored energy + charge input = final stored energy + delivered energy +
+      charge loss + discharge loss. All values are energy, never power.
+  - id: motionAtlas.battery-dispatch-balance.notFor.1
+    message: The six-second animation does not model charge rates, degradation, battery
+      chemistry, grid constraints, costs or emissions. No round-trip efficiency is
+      claimed beyond the supplied cycle arithmetic.
+  - id: motionAtlas.battery-dispatch-balance.notFor.2
+    message: Source and load labels are configurable, but electricity origin and
+      environmental benefit require separate evidence. Defaults are fictional.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.battery-dispatch-balance.motionBeats.0
+      message: Reveal the authored setup.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.battery-dispatch-balance.motionBeats.1
+      message: Reveal the battery between authored charging and delivery windows. Charging
+        input enters the boundary, a distinct loss channel peels away, and the remaining
+        energy fills storage. At the dispatch cue, delivered energy reaches the later
+        load while discharge losses enter their own channel. Hold input, delivery,
+        losses and final storage together with a conserved-energy equation before
+        fading.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.battery-dispatch-balance.motionBeats.2
+      message: Hold the resolved authored state and complete accounting.

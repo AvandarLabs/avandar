@@ -6,14 +6,21 @@ authored concepts and data; they do not recreate or make claims about Avandar's
 interface. Existing `TitleCard`, `Demo`, `TitleStudy`, and `MotionLab` remain
 separate and unchanged.
 
-The added `StockScene` accepts a named preset rather than arbitrary data; see
-the [stock catalog and API](stock-motion-library.md) for all 20 references.
-Its props are `{preset, accent?, frame, width?, height?, title?, kicker?}`.
-`preset` is a typed catalog ID, `accent` is a six-digit hex color, and its fixed
-180-frame cycle repeats for longer shots. It uses its own opaque conceptual
-palette, preserves the SVG aspect ratio, and reserves 200 px when a heading is
-provided. Labels/data remain illustrative constants in the renderer.
-The strict storyboard scene ID is `stock`; unknown presets fail validation.
+`StockScene` wraps any of the 170 registered bounded content presets. Its props
+combine the shared scene props with `StockRequest`:
+`{preset, schemaVersion?:1, input?, accent?, background?, frame, width?, height?, title?, kicker?}`.
+The typed `input` belongs to the selected preset. Only omitted input resolves a
+cloned, localized complete fictional default; supplied input must be complete.
+Both palette fields require six-digit hex colors. Unknown fields/presets,
+other versions, bad references and invalid content fail validation.
+
+The strict storyboard scene ID is `stock`, backed by the same request schema.
+Its 180-frame cycle repeats for longer shots. The opaque palette and SVG aspect
+ratio are preserved; title/kicker reserve 200px above the artwork. Supplied
+quantities and prose remain authored data. See the [complete configured React
+and storyboard examples](stock-motion-library.md#reuse-in-a-film),
+[request JSON](motion-atlas/examples/paired-contrast-request.json) and
+[full storyboard](motion-atlas/examples/paired-contrast-storyboard.json).
 
 Every scene takes `frame`, a scene-local frame number, and optional `width`
 and `height` (defaults: 1600 × 1000). Pass actual composition dimensions for
@@ -24,8 +31,8 @@ inline heading and 24 px margins to keep captured UI readable.
 The storyboard renderer owns shot duration and transitions; these components
 keep their completed state visible for the caller's reading hold.
 
-All six components use `TYPE`, the existing theme tokens, and the shared motion
-helpers. Typography moves through masks or short translations, with no text
+The parameterized editorial scenes use `TYPE`, theme tokens and the shared
+motion helpers. Stock graphics use their explicit conceptual palette. Typography moves through masks or short translations, with no text
 scaling. A font size is selected once from the complete content and dimensions,
 then remains fixed throughout the animation.
 
@@ -192,7 +199,7 @@ under random frame seeks, flow layout order, numeric formatting, fixed text
 fitting, media paths/crops, and exact caption boundaries. Run it with:
 
 ```sh
-npx tsx --test tests/scenes.test.ts
+node --import ./scripts/yaml/registerYaml.mjs --import tsx --test tests/scenes.test.ts
 npm run typecheck
 ```
 
@@ -217,3 +224,40 @@ Use the video CLI, which selects the isolated product entry automatically.
 These scenes reuse actual product code and fixture state; they do not execute
 backend writes or provide a browser automation interface. See
 [component videos](component-videos.md).
+
+**2026-10-18 evidence update:** All 170 contracts/renderers are implemented. Completed historical 167-file MP4 and 166-poster evidence retains actual 498c/source 2ad identities. R67's isolated spatial-sampling correction is reported at e5aeb3e7c/source 38c12b84; changed-scene verification and R68 continuity are complete as recorded below; whole-branch review remains pending. See [implementation evidence](motion-atlas/implementation-validation.md).
+
+
+## Historical delivered media and pending current-source verification: 2026-10-18
+
+The [completed media record](motion-atlas/implementation-media-validation-498c717d.md) preserves 167 original decoded deliveries, 166 standalone posters, the separate HTTP preview, all retained findings and corrected custody/N6 prose at actual 498c/source 2ad identities. R67's isolated spatial-sampling correction is reported at e5aeb3e7c/source 38c12b84. R67 source/media verification and R68 complete unaffected-fixture continuity are now verified. Final whole-branch review remains pending; the dated final scoped record below supersedes earlier pending wording. No historical output is relabeled as latest. These documentation updates preserve prior approved contract wording, defaults, IDs, bindings and bounds.
+
+
+## Final scoped source verification and evidence custody: 2026-10-18
+
+R67 is closed at `e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e`, stock source `38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9`. Independent source review is spec compliant and quality approved with one deferred test-helper RO-RO Minor. The controller inspected 13 actual current images. Gallery playback covered 180 states, one wrap and zero errors. The fresh default MP4 passed the unchanged gate and independent silent H.264 1280x800/30fps/180-frame/six-second probe, completed 179 decoded callbacks and ended at six seconds with zero reported dropped frames. Dense current stills show 8/12/4; default holds show 2/5/3. No globally empty selection or schema widening was introduced.
+
+R68 is satisfied: the strict three-file local diff and the complete 169-preset comparison retain 754 fixtures and 6,786 exact pre/post frame hashes. The full current 170-preset SVG harness passed. Unaffected outputs retain their actual historical source 2ad / HEAD 498c identities under this explicit versioned carry-forward. Only the changed preset's default MP4 is freshly rendered at source 38c. Finite screenshots and SVG equality do not establish uninterrupted pixels or fresh media for the other presets. All historical readability/transient concerns and the test-helper Minor remain for final whole-branch review, which is pending.
+
+R69 keeps exact raw reports, callback/clock traces, session/capture material and full original-report envelopes ignored and in Downloads mirrors. Durable records retain compact per-preset/candidate outcomes, all findings/dispositions/narrative limits and source/configuration/media/report hashes with local evidence pointers. A fresh clone cannot inspect local pixels/session files directly. No original local evidence was deleted.
+
+See [current scoped verification](motion-atlas/implementation-sampling-correction-controller-verification.json) and its linked compact continuity/delivery records.
+
+
+## Continuity compositions
+
+The strict scene registry includes `continuity`. Its nested beat schedule subtracts overlaps, supports beat-relative narration, and must fit the shot duration exactly. Product-backed continuity uses the native 1600 × 840 stage. CLI entry selection and fingerprints include nested product requirements. See [continuity compositions](continuity-compositions.md) for the API, film matrix, editorial guidance and evidence limits.
+
+Continuity stock beats accept camera tracks and optional object flights. Product and composite beats accept timed measured annotations. Composite diagrams require an overlay interval and target rectangle. Appearance overrides change editorial palette and visual treatments without modifying beat timing or product fixture state.
+
+
+Continuity appearance also accepts annotationRoughness (default 1.5) and boxRoughness (default 0), each a finite number from 0 through 3. The annotation visibility flag is independent. See continuity-compositions.md for their live controls and rendering scope.
+
+### Reusable motion options
+
+Continuity supports `content.cameraOptions`, `content.flight.motion`,
+`content.diagrams[].overlay.motion`, and `transition.motion`. Each accepts
+`preset`, `speed`, `easing`, `shutterAngle`, `samples`, and `blurStrength`. The
+[reusable motion API](reusable-motion.md) defines ranges, default compatibility,
+JSX components and the different effects on camera travel, overlay windows and
+scene overlap. `samples` affects temporal vector blur only.

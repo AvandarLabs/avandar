@@ -1,0 +1,108 @@
+name:
+  id: motionAtlas.bounded-location-displacement.name
+  message: Show displacement as an approximation
+description:
+  id: motionAtlas.bounded-location-displacement.description
+  message: A precise schematic point is replaced in a display copy by an authored offset
+    inside a stated radius. The source stays local and the displayed marker is labeled
+    approximate, never silently treated as the original location.
+category:
+  id: motionAtlas.bounded-location-displacement.category
+  message: Bounded coordinate disclosure
+useWhen:
+  id: motionAtlas.bounded-location-displacement.useWhen
+  message: Distinguish deliberately displaced display coordinates from source positions.
+prompt:
+  id: motionAtlas.bounded-location-displacement.prompt
+  message: React/SVG 960x600, shared palette, deterministic 180 frames at 30fps. Frames
+    0-12 reveal a local analysis inset with all supplied source locations and a
+    completely empty display-copy map. Frames 13-70 compute each authored offset inside
+    the local inset and show its distance against the bound. Frames 71-139 emit only the
+    displaced coordinates onto the display-copy map, labeling every point approximate.
+    Never place a source coordinate on the display map, even transiently. Hold all
+    displaced points and separated local inset at 140-165, then fade both to the same
+    opaque ground at 166-179.
+creativeDirection:
+  id: motionAtlas.bounded-location-displacement.creativeDirection
+  message: React/SVG 960x600, shared palette, deterministic 180 frames at 30fps. Frames
+    0-12 reveal a local analysis inset with all supplied source locations and a
+    completely empty display-copy map. Frames 13-70 compute each authored offset inside
+    the local inset and show its distance against the bound. Frames 71-139 emit only the
+    displaced coordinates onto the display-copy map, labeling every point approximate.
+    Never place a source coordinate on the display map, even transiently. Hold all
+    displaced points and separated local inset at 140-165, then fade both to the same
+    opaque ground at 166-179.
+intent:
+  id: motionAtlas.bounded-location-displacement.intent
+  message: Distinguish deliberately displaced display coordinates from source positions.
+distinction:
+  id: motionAtlas.bounded-location-displacement.distinction
+  message: Location-uncertainty-boundary depicts uncertainty already present in evidence.
+    This intentionally changes a display copy under a supplied disclosure policy and
+    labels the difference.
+tags:
+  - id: motionAtlas.bounded-location-displacement.tags.0
+    message: point jitter
+  - id: motionAtlas.bounded-location-displacement.tags.1
+    message: approximate location
+  - id: motionAtlas.bounded-location-displacement.tags.2
+    message: data minimization
+  - id: motionAtlas.bounded-location-displacement.tags.3
+    message: displacement
+goodFor:
+  - id: motionAtlas.bounded-location-displacement.goodFor.0
+    message: Explain a deliberately approximate location display
+  - id: motionAtlas.bounded-location-displacement.goodFor.1
+    message: Distinguish displacement from measurement uncertainty
+domains:
+  - id: motionAtlas.bounded-location-displacement.domains.0
+    message: Bounded coordinate disclosure
+aliases:
+  - id: motionAtlas.bounded-location-displacement.aliases.0
+    message: point jitter
+  - id: motionAtlas.bounded-location-displacement.aliases.1
+    message: approximate location
+  - id: motionAtlas.bounded-location-displacement.aliases.2
+    message: data minimization
+notFor:
+  - id: motionAtlas.bounded-location-displacement.notFor.0
+    message: Displacement does not guarantee anonymity, safety, k-anonymity or differential
+      privacy.
+  - id: motionAtlas.bounded-location-displacement.notFor.1
+    message: The bound is displacement from the source, not confidence radius around the
+      true position.
+  - id: motionAtlas.bounded-location-displacement.notFor.2
+    message: No fresh randomness; offsets are supplied and deterministic.
+  - id: motionAtlas.bounded-location-displacement.notFor.3
+    message: No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.bounded-location-displacement.notFor.4
+    message: Authored prose remains the author’s responsibility. Runtime validation
+      preserves supplied text without classifying its language or factual claims.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.bounded-location-displacement.beat.0
+      message: Reveal local sources and an empty public map.
+  - startFrame: 13
+    endFrame: 70
+    description:
+      id: motionAtlas.bounded-location-displacement.beat.1
+      message: Compute authored bounded offsets locally.
+  - startFrame: 71
+    endFrame: 139
+    description:
+      id: motionAtlas.bounded-location-displacement.beat.2
+      message: Disclose only approximate displaced coordinates.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.bounded-location-displacement.beat.3
+      message: Hold the resolved study.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.bounded-location-displacement.beat.4
+      message: The enclosing StockGraphic fades to opaque ground.

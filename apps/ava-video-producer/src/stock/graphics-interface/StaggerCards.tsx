@@ -8,24 +8,31 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { StaggerCardsInput } from "../presets/StaggerCards/StaggerCards.schema";
+import type { ReactNode } from "react";
 
-const CARDS = [
-  { label: "Source", detail: "Bring it together", color: STOCK.cyan },
-  { label: "Structure", detail: "Give it a shape", color: STOCK.mint },
-  { label: "Connect", detail: "Find the links", color: STOCK.orange },
-  { label: "Explore", detail: "Follow the thread", color: STOCK.orange },
-  { label: "Refine", detail: "Make it clearer", color: STOCK.cyan },
-  { label: "Share", detail: "Put it in motion", color: STOCK.mint },
-];
+type Props = GraphicProps & { input: StaggerCardsInput };
 
-export function StaggerCards({ frame, accent }: GraphicProps) {
+/** Draws the bounded authored stagger-cards study at an explicit frame. */
+export function StaggerCards({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const cards = input.cards;
   return (
     <g>
-      <Eyebrow>STAGGERED ASSEMBLY</Eyebrow>
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["stagger-cards"].staggeredAssembly,
+        })}
+      </Eyebrow>
       <Text x={64} y={111} size={31} weight={600}>
-        A system, assembled.
+        {input.heading}
       </Text>
-      {CARDS.map((card, i) => {
+      {cards.map((card, i) => {
         const x = 64 + (i % 3) * 284;
         const y = 151 + Math.floor(i / 3) * 188;
         const color = card.color === STOCK.mint ? accent : card.color;
@@ -76,17 +83,24 @@ export function StaggerCards({ frame, accent }: GraphicProps) {
                 strokeOpacity={done * 0.4}
               />
               <g opacity={done}>
-                <Check x={x + 236} y={y + 128} color={color} size={9} />
+                {input.showChecks ? (
+                  <Check x={x + 236} y={y + 128} color={color} size={9} />
+                ) : null}
               </g>
             </Panel>
           </Arrive>
         );
       })}
       <Text x={64} y={554} size={13} mono fill={STOCK.muted}>
-        CONCEPTUAL CARDS
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["stagger-cards"].conceptualCards,
+        })}
       </Text>
       <Text x={896} y={554} size={13} mono fill={STOCK.muted} anchor="end">
-        SIBLINGS ARRIVE IN SEQUENCE
+        {getStockDisplayCopyFromDescriptor({
+          descriptor:
+            LEGACY_DISPLAY_COPY["stagger-cards"].siblingsArriveInSequence,
+        })}
       </Text>
     </g>
   );

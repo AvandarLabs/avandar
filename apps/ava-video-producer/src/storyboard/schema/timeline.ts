@@ -1,3 +1,4 @@
+import { getCueWindowFromShot } from "./getCueWindowFromShot";
 import type { Storyboard } from "./storyboardSchema";
 
 /** Compute shot starts once, in the same coordinate system as exported captions. */
@@ -22,7 +23,10 @@ export function durationInFrames(plan: Storyboard): number {
 export function absoluteCues(plan: Storyboard) {
   const shots = timeline(plan);
   return plan.narration.map((cue) => {
-    const offset = shots.find((shot) => shot.id === cue.shotId)!.startFrame;
+    const shot = shots.find((candidate) => candidate.id === cue.shotId)!;
+    const offset =
+      shot.startFrame +
+      getCueWindowFromShot({ shot, beatId: cue.beatId }).start;
     return {
       ...cue,
       startFrame: offset + cue.startFrame,

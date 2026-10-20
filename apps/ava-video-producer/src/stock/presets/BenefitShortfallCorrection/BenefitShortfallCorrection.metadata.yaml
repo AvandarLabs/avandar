@@ -1,0 +1,101 @@
+name:
+  id: motionAtlas.benefit-shortfall-correction.name
+  message: Count and correct a missing payment
+description:
+  id: motionAtlas.benefit-shortfall-correction.description
+  message: A participant compares an assistance statement with the units actually
+    received. A supplied correction fills some or all of the visible shortfall while any
+    remainder stays open.
+category:
+  id: motionAtlas.benefit-shortfall-correction.category
+  message: Physical receipt and payment reconciliation
+useWhen:
+  id: motionAtlas.benefit-shortfall-correction.useWhen
+  message: Show how a participant identifies and verifies a payment shortfall.
+prompt:
+  id: motionAtlas.benefit-shortfall-correction.prompt
+  message: Open an assistance statement next to the participant's receiving tray. Outline
+    tokens show the stated amount; actual received tokens settle into matching
+    positions, leaving empty outlines. The participant points to the gap and the worker
+    adds only the authored correction tokens from a separate correction envelope. Hold
+    the original payment, correction and still-empty positions with distinct patterns so
+    the accounting remains inspectable.
+creativeDirection:
+  id: motionAtlas.benefit-shortfall-correction.creativeDirection
+  message: Open an assistance statement next to the participant's receiving tray. Outline
+    tokens show the stated amount; actual received tokens settle into matching
+    positions, leaving empty outlines. The participant points to the gap and the worker
+    adds only the authored correction tokens from a separate correction envelope. Hold
+    the original payment, correction and still-empty positions with distinct patterns so
+    the accounting remains inspectable.
+intent:
+  id: motionAtlas.benefit-shortfall-correction.intent
+  message: Show how a participant identifies and verifies a payment shortfall.
+distinction:
+  id: motionAtlas.benefit-shortfall-correction.distinction
+  message: The participant aligns real received units against a separate statement and
+    checks an additive correction, preserving the unpaid remainder. Unlike
+    metric-counter, the argument is a physical reconciliation; unlike
+    household-market-choice, there is no purchase or basket selection; unlike
+    field-conflict-choice, neither amount is chosen as the single true value.
+tags:
+  - id: motionAtlas.benefit-shortfall-correction.tags.0
+    message: social protection
+  - id: motionAtlas.benefit-shortfall-correction.tags.1
+    message: payment shortfall
+  - id: motionAtlas.benefit-shortfall-correction.tags.2
+    message: benefit discrepancy
+  - id: motionAtlas.benefit-shortfall-correction.tags.3
+    message: participant verification
+  - id: motionAtlas.benefit-shortfall-correction.tags.4
+    message: payment correction
+  - id: motionAtlas.benefit-shortfall-correction.tags.5
+    message: top-up
+  - id: motionAtlas.benefit-shortfall-correction.tags.6
+    message: cash assistance
+  - id: motionAtlas.benefit-shortfall-correction.tags.7
+    message: reconciliation
+goodFor:
+  - id: motionAtlas.benefit-shortfall-correction.goodFor.0
+    message: Explaining a reported assistance-payment discrepancy
+  - id: motionAtlas.benefit-shortfall-correction.goodFor.1
+    message: Distinguishing an original payment from a later correction
+  - id: motionAtlas.benefit-shortfall-correction.goodFor.2
+    message: Showing that a partial correction can leave an unresolved balance
+notFor:
+  - id: motionAtlas.benefit-shortfall-correction.notFor.0
+    message: These are fictional accounting units, not a determination of benefit
+      eligibility or payment entitlement.
+  - id: motionAtlas.benefit-shortfall-correction.notFor.1
+    message: The stated amount and the received amount are different measures; their
+      difference remains visible.
+  - id: motionAtlas.benefit-shortfall-correction.notFor.2
+    message: The scene covers underpayment only and never invents a successful remedy beyond
+      the supplied correction.
+domains:
+  - id: motionAtlas.benefit-shortfall-correction.domains.0
+    message: Physical receipt and payment reconciliation
+aliases:
+  - id: motionAtlas.benefit-shortfall-correction.aliases.0
+    message: social protection
+  - id: motionAtlas.benefit-shortfall-correction.aliases.1
+    message: payment shortfall
+  - id: motionAtlas.benefit-shortfall-correction.aliases.2
+    message: benefit discrepancy
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.benefit-shortfall-correction.beat.0
+      message: Statement outlines and original received units remain distinct.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.benefit-shortfall-correction.beat.1
+      message: Original units settle by 60, participant points at the gap; worker transfers
+        only supplied corrections by 108.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.benefit-shortfall-correction.beat.2
+      message: Hold originals, corrections and every remaining empty position.

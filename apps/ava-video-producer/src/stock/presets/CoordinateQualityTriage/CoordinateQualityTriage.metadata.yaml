@@ -1,0 +1,115 @@
+name:
+  id: motionAtlas.coordinate-quality-triage.name
+  message: Account for the rows that cannot be mapped
+description:
+  id: motionAtlas.coordinate-quality-triage.description
+  message: Coordinate rows pass explicit numeric and range checks before they become
+    points. Invalid or missing coordinates remain in visible reason trays instead of
+    disappearing from the denominator.
+category:
+  id: motionAtlas.coordinate-quality-triage.category
+  message: Geospatial data validation
+useWhen:
+  id: motionAtlas.coordinate-quality-triage.useWhen
+  message: Account for every input row before plotting coordinates.
+prompt:
+  id: motionAtlas.coordinate-quality-triage.prompt
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 line up coordinate rows beside latitude and longitude rulers. Frames 51-105
+    evaluate each row; valid pairs plot on a schematic graticule while failed rows move
+    into labeled missing/type/range trays. Frames 106-139 hold plotted and rejected
+    counts that reconcile to input. Hold at frames 140-165; fade to the same opaque
+    ground at frames 166-179 for an editorial loop.
+creativeDirection:
+  id: motionAtlas.coordinate-quality-triage.creativeDirection
+  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+    This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
+    13-50 line up coordinate rows beside latitude and longitude rulers. Frames 51-105
+    evaluate each row; valid pairs plot on a schematic graticule while failed rows move
+    into labeled missing/type/range trays. Frames 106-139 hold plotted and rejected
+    counts that reconcile to input. Hold at frames 140-165; fade to the same opaque
+    ground at frames 166-179 for an editorial loop.
+intent:
+  id: motionAtlas.coordinate-quality-triage.intent
+  message: Account for every input row before plotting coordinates.
+distinction:
+  id: motionAtlas.coordinate-quality-triage.distinction
+  message: Unlike cell-normalization, rejected values are not automatically repaired. This
+    is a coordinate-specific validation with complete dropped-row accounting and no
+    silent removal.
+tags:
+  - id: motionAtlas.coordinate-quality-triage.tags.0
+    message: coordinate validation
+  - id: motionAtlas.coordinate-quality-triage.tags.1
+    message: row loss
+  - id: motionAtlas.coordinate-quality-triage.tags.2
+    message: missing coordinates
+  - id: motionAtlas.coordinate-quality-triage.tags.3
+    message: range checks
+goodFor:
+  - id: motionAtlas.coordinate-quality-triage.goodFor.0
+    message: Explain coordinate row-loss diagnostics
+  - id: motionAtlas.coordinate-quality-triage.goodFor.1
+    message: Show rejected mapping rows without losing the denominator
+domains:
+  - id: motionAtlas.coordinate-quality-triage.domains.0
+    message: Geospatial data validation
+aliases:
+  - id: motionAtlas.coordinate-quality-triage.aliases.0
+    message: coordinate validation
+  - id: motionAtlas.coordinate-quality-triage.aliases.1
+    message: row loss
+  - id: motionAtlas.coordinate-quality-triage.aliases.2
+    message: missing coordinates
+notFor:
+  - id: motionAtlas.coordinate-quality-triage.notFor.0
+    message: Latitude must be numeric within [-90,90] and longitude within [-180,180],
+      endpoints inclusive. Check missing first, then numeric type, then range. These
+      global coordinate-validity bounds are fixed invariants, not editable options.
+  - id: motionAtlas.coordinate-quality-triage.notFor.1
+    message: Passing numeric/range checks does not establish that a location is correct.
+  - id: motionAtlas.coordinate-quality-triage.notFor.2
+    message: Possible latitude/longitude swaps, null-island and DMS parsing require separate
+      qualified checks and are not silently corrected here.
+  - id: motionAtlas.coordinate-quality-triage.notFor.3
+    message: Graticule is a schematic coordinate plane, not a map of real places.
+  - id: motionAtlas.coordinate-quality-triage.notFor.4
+    message: No live geography, online routing, JSX, functions, URLs, private records or
+      external requests. Maps are schematic local plans; no real-world inference
+      follows.
+  - id: motionAtlas.coordinate-quality-triage.notFor.5
+    message: Authored prose must identify schematic geography and accurately describe the
+      selected example. Runtime validation preserves supplied prose and checks explicit
+      structural and numeric rules without natural-language classification.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.coordinate-quality-triage.beat.0
+      message: Reveal the schematic study.
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.coordinate-quality-triage.beat.1
+      message: Arrange literal coordinate rows beside a labeled graticule.
+  - startFrame: 51
+    endFrame: 105
+    description:
+      id: motionAtlas.coordinate-quality-triage.beat.2
+      message: Move each row key to its valid coordinate or missing, type, or range tray.
+  - startFrame: 106
+    endFrame: 139
+    description:
+      id: motionAtlas.coordinate-quality-triage.beat.3
+      message: Hold reconciled plotted and rejected counts.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.coordinate-quality-triage.beat.4
+      message: Hold every original row identity and reason.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.coordinate-quality-triage.beat.5
+      message: The enclosing StockGraphic returns to opaque ground.

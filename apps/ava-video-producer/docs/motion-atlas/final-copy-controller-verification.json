@@ -1,0 +1,418 @@
+{
+  "status": "passed",
+  "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+  "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+  "ruling": "R70",
+  "browser": {
+    "presets": 8,
+    "distinctLabels": 12,
+    "nativeVariantChecks": 4,
+    "errors": 0,
+    "implementationIdFallbacks": 0,
+    "records": [
+      {
+        "id": "invalid-table-quarantine",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Original row",
+            "count": 3,
+            "visibleLabel": "Original row",
+            "ariaLabel": "Original row",
+            "value": "A: 2",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/invalid-table-quarantine--original-row.png"
+          },
+          {
+            "label": "Reloaded row",
+            "count": 3,
+            "visibleLabel": "Reloaded row",
+            "ariaLabel": "Reloaded row",
+            "value": "A: 2",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/invalid-table-quarantine--reloaded-row.png"
+          }
+        ],
+        "variants": [],
+        "errors": [],
+        "outcomeOptions": [
+          "Choose a value",
+          "Failed",
+          "Completed"
+        ],
+        "accessibleLabelCount": 21,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      },
+      {
+        "id": "ordered-lock-acquisition",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Requested resource",
+            "count": 4,
+            "visibleLabel": "Requested resource",
+            "ariaLabel": "Requested resource",
+            "value": "option:0",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/ordered-lock-acquisition--requested-resource.png"
+          }
+        ],
+        "variants": [],
+        "errors": [],
+        "accessibleLabelCount": 25,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      },
+      {
+        "id": "document-region-drift-check",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Coordinate",
+            "count": 4,
+            "visibleLabel": "Coordinate",
+            "ariaLabel": "Coordinate",
+            "value": "10",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/document-region-drift-check--coordinate.png"
+          }
+        ],
+        "variants": [],
+        "errors": [],
+        "accessibleLabelCount": 23,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      },
+      {
+        "id": "publication-snapshot-slice",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Cell value",
+            "count": 6,
+            "visibleLabel": "Cell value",
+            "ariaLabel": "Cell value",
+            "value": "West",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/publication-snapshot-slice--cell-value.png"
+          },
+          {
+            "label": "Selected row",
+            "count": 2,
+            "visibleLabel": "Selected row",
+            "ariaLabel": "Selected row",
+            "value": "option:0",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/publication-snapshot-slice--selected-row.png"
+          },
+          {
+            "label": "Selected column",
+            "count": 2,
+            "visibleLabel": "Selected column",
+            "ariaLabel": "Selected column",
+            "value": "option:0",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/publication-snapshot-slice--selected-column.png"
+          }
+        ],
+        "variants": [],
+        "errors": [],
+        "accessibleLabelCount": 43,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      },
+      {
+        "id": "coordinate-quality-triage",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Latitude value",
+            "count": 3,
+            "visibleLabel": "Latitude value",
+            "ariaLabel": "Latitude value",
+            "value": "20",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--latitude-value.png"
+          },
+          {
+            "label": "Longitude value",
+            "count": 4,
+            "visibleLabel": "Longitude value",
+            "ariaLabel": "Longitude value",
+            "value": "40",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--longitude-value.png"
+          }
+        ],
+        "variants": [
+          {
+            "axis": "latitude",
+            "variant": "string",
+            "label": "Latitude value",
+            "tag": "TEXTAREA",
+            "ariaLabel": "Latitude value",
+            "value": "north",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--latitude-string.png"
+          },
+          {
+            "axis": "latitude",
+            "variant": "number",
+            "label": "Latitude value",
+            "tag": "INPUT",
+            "ariaLabel": "Latitude value",
+            "value": "20",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--latitude-number.png"
+          },
+          {
+            "axis": "longitude",
+            "variant": "string",
+            "label": "Longitude value",
+            "tag": "TEXTAREA",
+            "ariaLabel": "Longitude value",
+            "value": "north",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--longitude-string.png"
+          },
+          {
+            "axis": "longitude",
+            "variant": "number",
+            "label": "Longitude value",
+            "tag": "INPUT",
+            "ariaLabel": "Longitude value",
+            "value": "20",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--longitude-number.png"
+          }
+        ],
+        "errors": [],
+        "accessibleLabelCount": 24,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      },
+      {
+        "id": "school-lunch-tray-composition",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Component",
+            "count": 11,
+            "visibleLabel": "Component",
+            "ariaLabel": "Component",
+            "value": "option:0",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/school-lunch-tray-composition--component.png"
+          }
+        ],
+        "variants": [],
+        "errors": [],
+        "accessibleLabelCount": 61,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      },
+      {
+        "id": "cluster-epicurve-link",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Investigation case",
+            "count": 3,
+            "visibleLabel": "Investigation case",
+            "ariaLabel": "Investigation case",
+            "value": "option:0",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/cluster-epicurve-link--investigation-case.png"
+          }
+        ],
+        "variants": [],
+        "errors": [],
+        "accessibleLabelCount": 53,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      },
+      {
+        "id": "stratified-spatial-sample",
+        "head": "76f3cac4d85ff9712280f1be71541534ec791d11",
+        "sourceHash": "9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1",
+        "labels": [
+          {
+            "label": "Selected site",
+            "count": 2,
+            "visibleLabel": "Selected site",
+            "ariaLabel": "Selected site",
+            "value": "option:0",
+            "screenshot": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/stratified-spatial-sample--selected-site.png"
+          }
+        ],
+        "variants": [],
+        "errors": [],
+        "accessibleLabelCount": 86,
+        "implementationIdFallbacks": [],
+        "status": "passed"
+      }
+    ]
+  },
+  "visualInspection": {
+    "reviewer": "Codex controller",
+    "method": "Actually viewed both bounded contact sheets containing all16native-sized field captures. Every label and value is clear, with no clipping or label/input overlap.",
+    "images": [
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/invalid-table-quarantine--original-row.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/invalid-table-quarantine--original-row.png",
+        "sha256": "f13a8cd7e4801a5b964a1c1cd69097db292e2ff779dc4bf37e541b96297f2851",
+        "id": "invalid-table-quarantine",
+        "label": "Original row",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/invalid-table-quarantine--reloaded-row.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/invalid-table-quarantine--reloaded-row.png",
+        "sha256": "c09f7c9ea89deb43e80aefd8f82c1e455a1d726fe0712be183ce963a9018ffac",
+        "id": "invalid-table-quarantine",
+        "label": "Reloaded row",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/ordered-lock-acquisition--requested-resource.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/ordered-lock-acquisition--requested-resource.png",
+        "sha256": "734e200407b5149a02151186d1ab9b1a4c6936805621982f0b270f02882c5199",
+        "id": "ordered-lock-acquisition",
+        "label": "Requested resource",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/document-region-drift-check--coordinate.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/document-region-drift-check--coordinate.png",
+        "sha256": "9baf166e04f8f28b56586f36d8ee7c91d0049c658e6b44a8e49037de0e9f904c",
+        "id": "document-region-drift-check",
+        "label": "Coordinate",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/publication-snapshot-slice--cell-value.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/publication-snapshot-slice--cell-value.png",
+        "sha256": "8b111a3f60dcfeefdfc687c98b33c9e6eae55d174ad28ecfad500346de568fce",
+        "id": "publication-snapshot-slice",
+        "label": "Cell value",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/publication-snapshot-slice--selected-row.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/publication-snapshot-slice--selected-row.png",
+        "sha256": "85e044aacef138a7bf9ecebf9d4e7eed772bd80bcc60d5522f530c8a6076cfca",
+        "id": "publication-snapshot-slice",
+        "label": "Selected row",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/publication-snapshot-slice--selected-column.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy/publication-snapshot-slice--selected-column.png",
+        "sha256": "28d06a49a077a35f697c91556ba446f090453afb21eb8b2a7e09363dace366ff",
+        "id": "publication-snapshot-slice",
+        "label": "Selected column",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/coordinate-quality-triage--latitude-value.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--latitude-value.png",
+        "sha256": "8d27c4f7b38e56af786246843eb5d1815e16d0cc59c2888c834d0de62de7fd5c",
+        "id": "coordinate-quality-triage",
+        "label": "Latitude value",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/coordinate-quality-triage--longitude-value.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--longitude-value.png",
+        "sha256": "7067340aca78bdf6b6a536f3345916aca6cb4456dfc1e9cd1de83550e71f6efc",
+        "id": "coordinate-quality-triage",
+        "label": "Longitude value",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/coordinate-quality-triage--latitude-string.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--latitude-string.png",
+        "sha256": "417aa6e8d6fd5792c099b53c9e7bbc6e8ff9c3e5b600df37260eebab384dca5c",
+        "id": "coordinate-quality-triage",
+        "label": "Latitude value",
+        "variant": "string"
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/coordinate-quality-triage--latitude-number.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--latitude-number.png",
+        "sha256": "18139b303b21a96ebf1cebd15a4ce3d1de8ac37ecb52d73c46d7f8515a437a0a",
+        "id": "coordinate-quality-triage",
+        "label": "Latitude value",
+        "variant": "number"
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/coordinate-quality-triage--longitude-string.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--longitude-string.png",
+        "sha256": "499b58de1587cd5cf19f2e64408ffe1cde9e11ef91a12e974e47eb9bc9234347",
+        "id": "coordinate-quality-triage",
+        "label": "Longitude value",
+        "variant": "string"
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/coordinate-quality-triage--longitude-number.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/coordinate-quality-triage--longitude-number.png",
+        "sha256": "7da3b1c2703096211cb2b7c10b42b745913b829753a550869bf7de8e9580661a",
+        "id": "coordinate-quality-triage",
+        "label": "Longitude value",
+        "variant": "number"
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/school-lunch-tray-composition--component.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/school-lunch-tray-composition--component.png",
+        "sha256": "fa4150b5d3e2d2f780849e43c251cb86a94c3e2316991d525047c7690fa0620d",
+        "id": "school-lunch-tray-composition",
+        "label": "Component",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/cluster-epicurve-link--investigation-case.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/cluster-epicurve-link--investigation-case.png",
+        "sha256": "7eb1b8186f96a621f3909b995932a1a0a173d649fbfeda402f573309d7747b06",
+        "id": "cluster-epicurve-link",
+        "label": "Investigation case",
+        "variant": null
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/stratified-spatial-sample--selected-site.png",
+        "source": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-9eaa04ab/final-control-copy-retry/stratified-spatial-sample--selected-site.png",
+        "sha256": "3db71f861b244ff2fd1d4d00a74c493c70a96d1fd0650d35735127fa39fd958d",
+        "id": "stratified-spatial-sample",
+        "label": "Selected site",
+        "variant": null
+      }
+    ],
+    "contacts": [
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/contact-1.png",
+        "sha256": "48b48635e138f62d03f29c6d72b32ecf44d059890446a6af0cf4fd56d48f6986"
+      },
+      {
+        "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-control-copy/contact-2.png",
+        "sha256": "51ae6942c7068fb98ebfa11829c8419885257880720c6322442d14f87deb30e3"
+      }
+    ],
+    "findings": []
+  },
+  "continuity": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-copy-source-continuity.json",
+    "sha256": "af1ad41ed652ab694739a4170a03d9aefb22c4c8ea905c4ea76a323cfa8cf5b3",
+    "presets": 170,
+    "fixtures": 758,
+    "frameHashes": 6822,
+    "supplementalUnchanged": 40,
+    "supplementalChanged": [
+      "out/showcase/browser/motion-gallery.js"
+    ]
+  },
+  "initialHarnessFailure": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-copy-ui-b-initial-raw.json",
+    "reason": "Exact getByLabel for wrapped union select omitted its option text from the actual accessible name; no source defect. Read actual DOM labels and retried with anchored combobox accessible-name prefix.",
+    "retained": true
+  },
+  "limits": [
+    "Affected actual editor labels and native type selections only, not a new MP4/playback run.",
+    "Sixteen captured fields were personally inspected; no claim for all editor pixels or every locale.",
+    "Unloaded-locale fallback was source-tested by worker, not actual browser locale-switch tested.",
+    "Historical media/source identities remain unchanged.",
+    "Union field values north/20 were intentional temporary UI edits for label verification."
+  ],
+  "downloads": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas/raw-evidence/final-control-copy"
+}

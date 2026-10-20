@@ -1,0 +1,104 @@
+name:
+  id: motionAtlas.component-material-return.name
+  message: Recover parts, account for residue
+description:
+  id: motionAtlas.component-material-return.description
+  message: A returned object opens into identifiable components that follow reuse, repair,
+    recycling or residue routes. Reassembled output and separate material bins reconcile
+    with returned mass plus any replacement inputs.
+category:
+  id: motionAtlas.component-material-return.category
+  message: Exploded assembly and material destinations
+useWhen:
+  id: motionAtlas.component-material-return.useWhen
+  message: Show which material returns to use and which material still leaves the loop.
+prompt:
+  id: motionAtlas.component-material-return.prompt
+  message: Reveal the returned assembly within its stated material boundary. An operator
+    separates its labeled parts into their supplied reuse, repair, recycling and residue
+    destinations. Separately labeled replacement inputs join the recovered parts in the
+    new assembly. Hold the new assembly, recycling and residue with an input-output mass
+    equation, then fade.
+creativeDirection:
+  id: motionAtlas.component-material-return.creativeDirection
+  message: Reveal the returned assembly within its stated material boundary. An operator
+    separates its labeled parts into their supplied reuse, repair, recycling and residue
+    destinations. Separately labeled replacement inputs join the recovered parts in the
+    new assembly. Hold the new assembly, recycling and residue with an input-output mass
+    equation, then fade.
+intent:
+  id: motionAtlas.component-material-return.intent
+  message: Show which material returns to use and which material still leaves the loop.
+distinction:
+  id: motionAtlas.component-material-return.distinction
+  message: Identifiable parts physically disassemble and some reassemble into a new whole.
+    The explicit external input and residue prevent the closed-circle illusion of a
+    generic circular arrow.
+tags:
+  - id: motionAtlas.component-material-return.tags.0
+    message: circular materials
+  - id: motionAtlas.component-material-return.tags.1
+    message: repair
+  - id: motionAtlas.component-material-return.tags.2
+    message: reuse
+  - id: motionAtlas.component-material-return.tags.3
+    message: remanufacturing
+  - id: motionAtlas.component-material-return.tags.4
+    message: disassembly
+  - id: motionAtlas.component-material-return.tags.5
+    message: recycling
+  - id: motionAtlas.component-material-return.tags.6
+    message: material balance
+  - id: motionAtlas.component-material-return.tags.7
+    message: residual waste
+goodFor:
+  - id: motionAtlas.component-material-return.goodFor.0
+    message: Explain repair and reuse before material recycling
+  - id: motionAtlas.component-material-return.goodFor.1
+    message: Account for material leaving a circular process
+  - id: motionAtlas.component-material-return.goodFor.2
+    message: Show replacement input alongside recovered components
+domains:
+  - id: motionAtlas.component-material-return.domains.0
+    message: Exploded assembly and material destinations
+aliases:
+  - id: motionAtlas.component-material-return.aliases.0
+    message: circular materials
+  - id: motionAtlas.component-material-return.aliases.1
+    message: repair
+  - id: motionAtlas.component-material-return.aliases.2
+    message: reuse
+notFor:
+  - id: motionAtlas.component-material-return.notFor.0
+    message: Returned mass + replacement input = reassembled mass + recycling-stream mass +
+      residue. Reassembled mass includes reuse and repair routes without assuming mass
+      loss.
+  - id: motionAtlas.component-material-return.notFor.1
+    message: Sent to recycling is not the same as recovered secondary material. No recovery
+      yield, virgin-material displacement, embodied-carbon saving or infinite
+      recyclability is claimed.
+  - id: motionAtlas.component-material-return.notFor.2
+    message: Repair success and component compatibility are authored assumptions in this
+      fictional example. Additional process inputs or losses require extending the
+      supplied boundary, not silently discarding mass.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.component-material-return.motionBeats.0
+      message: Reveal the supplied quantities and their physical boundary.
+  - startFrame: 36
+    endFrame: 108
+    description:
+      id: motionAtlas.component-material-return.motionBeats.1
+      message: Reveal the returned assembly within its stated material boundary. An operator
+        separates its labeled parts into their supplied reuse, repair, recycling and
+        residue destinations. Separately labeled replacement inputs join the recovered
+        parts in the new assembly. Hold the new assembly, recycling and residue with an
+        input-output mass equation, then fade.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.component-material-return.motionBeats.2
+      message: Hold conserved quantities and visible destinations. The outer envelope returns
+        to ground.

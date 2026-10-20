@@ -1,0 +1,110 @@
+name:
+  id: motionAtlas.cache-reuse.name
+  message: Reuse the stored result
+description:
+  id: motionAtlas.cache-reuse.description
+  message: A first lookup finds an empty cache and retrieves a result from its origin. A
+    repeated lookup with the same key is answered by the stored copy.
+category:
+  id: motionAtlas.cache-reuse.category
+  message: Reuse and storage
+useWhen:
+  id: motionAtlas.cache-reuse.useWhen
+  message: Show how storing one result changes the path of a repeated lookup.
+prompt:
+  id: motionAtlas.cache-reuse.prompt
+  message: Show how storing one result changes the path of a repeated lookup.
+creativeDirection:
+  id: motionAtlas.cache-reuse.creativeDirection
+  message: Reveal a requester, a small empty cache shelf, and a distant origin after frame
+    12. During 24..68, a key token probes the empty shelf, continues along the longer
+    origin route, and returns carrying the supplied result. During 68..92, an identical
+    result impression settles on the shelf while the requester receives its response.
+    During 102..138, the same key token returns, matches the visible shelf key, and
+    receives the stored result along the short local route without activating the
+    origin. Hold both the keyed cache entry and returned response through 168, then
+    exit. The second lookup visibly uses what the first lookup stored.
+intent:
+  id: motionAtlas.cache-reuse.intent
+  message: Show how storing one result changes the path of a repeated lookup.
+distinction:
+  id: motionAtlas.cache-reuse.distinction
+  message: The first trip changes persistent local state and the second trip uses it.
+    Packet-stream and node-traversal show movement through routes without explaining a
+    miss-to-hit transition for one identical key.
+tags:
+  - id: motionAtlas.cache-reuse.tags.0
+    message: cache
+  - id: motionAtlas.cache-reuse.tags.1
+    message: cache hit
+  - id: motionAtlas.cache-reuse.tags.2
+    message: cache miss
+  - id: motionAtlas.cache-reuse.tags.3
+    message: memoization
+  - id: motionAtlas.cache-reuse.tags.4
+    message: stored result
+  - id: motionAtlas.cache-reuse.tags.5
+    message: reuse
+  - id: motionAtlas.cache-reuse.tags.6
+    message: lookup
+  - id: motionAtlas.cache-reuse.tags.7
+    message: repeat request
+  - id: motionAtlas.cache-reuse.tags.8
+    message: cache-aside
+  - id: motionAtlas.cache-reuse.tags.9
+    message: two-tier cache
+  - id: motionAtlas.cache-reuse.tags.10
+    message: on-demand materialization
+goodFor:
+  - id: motionAtlas.cache-reuse.goodFor.0
+    message: Explaining cold and warm lookups
+  - id: motionAtlas.cache-reuse.goodFor.1
+    message: Introducing keyed result reuse
+  - id: motionAtlas.cache-reuse.goodFor.2
+    message: Showing why a repeated request may avoid repeating upstream work
+  - id: motionAtlas.cache-reuse.goodFor.3
+    message: Explain resident-versus-persistent cache lookup
+  - id: motionAtlas.cache-reuse.goodFor.4
+    message: Illustrate on-demand loading without upfront copying
+domains:
+  - id: motionAtlas.cache-reuse.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.cache-reuse.aliases.0
+    message: Reuse and storage
+notFor:
+  - id: motionAtlas.cache-reuse.notFor.0
+    message: The default key, result, and participants are fictional.
+  - id: motionAtlas.cache-reuse.notFor.1
+    message: Route length communicates fewer depicted steps, not a measured latency
+      improvement or a guaranteed speedup.
+  - id: motionAtlas.cache-reuse.notFor.2
+    message: The entry remains valid for both requests; expiry, invalidation, eviction,
+      freshness, and privacy guarantees are not represented.
+  - id: motionAtlas.cache-reuse.notFor.3
+    message: A cache hit does not establish source freshness or current authorization; those
+      require separate checks.
+  - id: motionAtlas.cache-reuse.notFor.4
+    message: Exact keys and values retain raw whitespace. Amber underlined presentation
+      marks distinguish spaces, tabs, and line breaks at a fixed 12px.
+motionBeats:
+  - startFrame: 24
+    endFrame: 68
+    description:
+      id: motionAtlas.cache-reuse.motionBeats.0
+      message: Probe the empty shelf and fetch from origin.
+  - startFrame: 68
+    endFrame: 92
+    description:
+      id: motionAtlas.cache-reuse.motionBeats.1
+      message: Store the exact keyed result and return a response.
+  - startFrame: 102
+    endFrame: 138
+    description:
+      id: motionAtlas.cache-reuse.motionBeats.2
+      message: Repeat the identical key through only the cache route.
+  - startFrame: 138
+    endFrame: 168
+    description:
+      id: motionAtlas.cache-reuse.motionBeats.3
+      message: Hold the stored entry and returned response.

@@ -1,3 +1,4 @@
+import { StockRect } from "../primitives/StockRect/StockRect";
 import {
   Arrive,
   Curve,
@@ -9,18 +10,31 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { SourceMergeInput } from "../presets/SourceMerge/SourceMerge.schema";
+import type { ReactNode } from "react";
 
-const SOURCES = [
-  { name: "Records", kind: "CSV", y: 148, color: STOCK.cyan },
-  { name: "Events", kind: "API", y: 280, color: STOCK.mint },
-  { name: "Documents", kind: "TXT", y: 412, color: STOCK.orange },
-] as const;
+type Props = GraphicProps & { input: SourceMergeInput };
 
-export function SourceMerge({ frame, accent }: GraphicProps) {
+/** Draws the bounded authored source-merge study at an explicit frame. */
+export function SourceMerge({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const sources = input.sources.map((source, index) => ({
+    ...source,
+    y: 148 + index * 132,
+  }));
   return (
     <g>
-      <Eyebrow>UNIFY THE INPUTS</Eyebrow>
-      {SOURCES.map((source, i) => {
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["source-merge"].unifyTheInputs,
+        })}
+      </Eyebrow>
+      {sources.map((source, i) => {
         const from = { x: 290, y: source.y + 43 };
         const to = { x: 491, y: 323 };
         const color = i === 1 ? accent : source.color;
@@ -33,16 +47,18 @@ export function SourceMerge({ frame, accent }: GraphicProps) {
               color={color}
               opacity={0.42}
             />
-            <Packet
-              frame={frame}
-              from={from}
-              to={to}
-              color={color}
-              delay={i * 22}
-            />
+            {input.showPackets ? (
+              <Packet
+                frame={frame}
+                from={from}
+                to={to}
+                color={color}
+                delay={i * 22}
+              />
+            ) : null}
             <Arrive frame={frame} index={i}>
               <Panel x={64} y={source.y} width={226} height={86}>
-                <rect
+                <StockRect
                   x={81}
                   y={source.y + 20}
                   width={46}
@@ -79,14 +95,16 @@ export function SourceMerge({ frame, accent }: GraphicProps) {
         opacity={0.5}
         width={3}
       />
-      <Packet
-        frame={frame}
-        from={{ x: 525, y: 323 }}
-        to={{ x: 662, y: 323 }}
-        color={accent}
-        period={60}
-        delay={31}
-      />
+      {input.showPackets ? (
+        <Packet
+          frame={frame}
+          from={{ x: 525, y: 323 }}
+          to={{ x: 662, y: 323 }}
+          color={accent}
+          period={60}
+          delay={31}
+        />
+      ) : null}
       <Arrive frame={frame} at={24}>
         <circle
           cx={508}
@@ -105,12 +123,14 @@ export function SourceMerge({ frame, accent }: GraphicProps) {
           strokeLinejoin="round"
         />
         <Text x={508} y={394} size={15} anchor="middle" fill={STOCK.muted}>
-          MERGE
+          {getStockDisplayCopyFromDescriptor({
+            descriptor: LEGACY_DISPLAY_COPY["source-merge"].merge,
+          })}
         </Text>
       </Arrive>
       <Arrive frame={frame} at={34}>
         <Panel x={662} y={233} width={234} height={180} stroke={accent}>
-          <rect
+          <StockRect
             x={682}
             y={252}
             width={194}
@@ -120,14 +140,14 @@ export function SourceMerge({ frame, accent }: GraphicProps) {
             fillOpacity={0.8}
           />
           <Text x={779} y={305} size={25} weight={600} anchor="middle">
-            One dataset
+            {input.destination.label}
           </Text>
           <Text x={779} y={336} size={16} fill={STOCK.muted} anchor="middle">
-            A shared structure
+            {input.destination.detail}
           </Text>
           {[0, 1, 2].map((i) => (
             <g key={i}>
-              <rect
+              <StockRect
                 x={695 + i * 59}
                 y={361}
                 width={45}
@@ -147,7 +167,9 @@ export function SourceMerge({ frame, accent }: GraphicProps) {
         </Panel>
       </Arrive>
       <Text x={896} y={552} size={13} fill={STOCK.muted} anchor="end" mono>
-        CONCEPTUAL DATA FLOW
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["source-merge"].conceptualDataFlow,
+        })}
       </Text>
     </g>
   );

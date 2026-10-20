@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { STOCK_IDS } from "../../stock/catalog";
+import { continuitySchema } from "../../continuity/continuitySchema";
+import {
+  stockRequestEnvelopeSchema,
+  stockRequestSchema,
+} from "../../stock/contracts/stockRequestSchema/stockRequestSchema";
 import {
   assetPathSchema,
   detail,
@@ -118,6 +122,15 @@ export const shotSchema = z.discriminatedUnion("scene", [
   z
     .object({
       ...shotBase,
+      scene: z.literal("continuity"),
+      // A continuity shot can contain twelve independently timed beats.
+      durationInFrames: positiveFrames.max(12 * 1800),
+      props: continuitySchema,
+    })
+    .strict(),
+  z
+    .object({
+      ...shotBase,
       scene: z.literal("avandar"),
       props: z
         .object({
@@ -148,16 +161,23 @@ export const shotSchema = z.discriminatedUnion("scene", [
     .object({
       ...shotBase,
       scene: z.literal("stock"),
-      props: z
-        .object({
-          ...heading,
-          preset: z.enum(STOCK_IDS),
-          accent: z
-            .string()
-            .regex(/^#[0-9a-fA-F]{6}$/)
-            .optional(),
-        })
-        .strict(),
+      props: stockRequestEnvelopeSchema
+        .extend(heading)
+        .transform((props, context) => {
+          const { title, kicker, ...request } = props;
+          const result = stockRequestSchema.safeParse(request);
+          if (!result.success) {
+            result.error.issues.forEach((issue) =>
+              context.addIssue({ ...issue }),
+            );
+            return z.NEVER;
+          }
+          return {
+            ...result.data,
+            ...(title === undefined ? {} : { title }),
+            ...(kicker === undefined ? {} : { kicker }),
+          };
+        }),
     })
     .strict(),
 ]);

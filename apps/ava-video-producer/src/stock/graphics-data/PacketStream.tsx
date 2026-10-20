@@ -1,3 +1,4 @@
+import { StockRect } from "../primitives/StockRect/StockRect";
 import { loopPhase, mix, wave } from "../../motion";
 import {
   Check,
@@ -6,26 +7,40 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { PacketStreamInput } from "../presets/PacketStream/PacketStream.schema";
+import type { ReactNode } from "react";
 
-const STREAM_LANES = [
-  { y: 208, label: "STREAM A", color: STOCK.cyan, offset: 0 },
-  { y: 310, label: "STREAM B", color: STOCK.mint, offset: 28 },
-  { y: 412, label: "STREAM C", color: STOCK.orange, offset: 59 },
-] as const;
+type Props = GraphicProps & { input: PacketStreamInput };
 
-export function PacketStream({ frame, accent, id }: GraphicProps) {
+/** Draws the bounded authored packet-stream study at an explicit frame. */
+export function PacketStream({
+  input,
+  frame,
+  accent,
+  id,
+}: Readonly<Props>): ReactNode {
+  const lanes = input.lanes.map((lane, index) => ({
+    ...lane,
+    y: 208 + index * 102,
+  }));
   return (
     <g>
       <defs>
         <clipPath id={`${id}-stream`}>
-          <rect x={230} y={155} width={554} height={305} />
+          <StockRect x={230} y={155} width={554} height={305} />
         </clipPath>
       </defs>
-      <Eyebrow>PACKET STREAM</Eyebrow>
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["packet-stream"].packetStream,
+        })}
+      </Eyebrow>
       <Text x={64} y={112} size={29} weight={600}>
-        Signals in motion
+        {input.heading}
       </Text>
-      {STREAM_LANES.map((lane, i) => {
+      {lanes.map((lane, i) => {
         const color = i === 1 ? accent : lane.color;
         return (
           <g key={lane.label}>
@@ -38,12 +53,19 @@ export function PacketStream({ frame, accent, id }: GraphicProps) {
               strokeWidth={1.5}
             />
             <g clipPath={`url(#${id}-stream)`}>
-              {[0, 1, 2, 3].map((p) => {
-                const t = loopPhase(frame, 130, lane.offset + p * 32.5);
+              {Array.from(
+                { length: input.packetsPerLane },
+                (_, index) => index,
+              ).map((p) => {
+                const t = loopPhase(
+                  frame,
+                  130,
+                  lane.offset + p * (130 / input.packetsPerLane),
+                );
                 const x = mix(t, 188, 820);
                 return (
                   <g key={p} opacity={0.5 + wave(frame, 90, p * 20) * 0.5}>
-                    <rect
+                    <StockRect
                       x={x - 35}
                       y={lane.y - 13}
                       width={62}
@@ -72,19 +94,27 @@ export function PacketStream({ frame, accent, id }: GraphicProps) {
               stroke={color}
               strokeOpacity={0.4}
             />
-            <Check x={824} y={lane.y} color={color} size={14} />
+            {input.showReceipts ? (
+              <Check x={824} y={lane.y} color={color} size={14} />
+            ) : null}
           </g>
         );
       })}
       <line x1={64} y1={495} x2={896} y2={495} stroke={STOCK.line} />
       <Text x={64} y={538} size={15} fill={STOCK.muted} mono>
-        PRODUCE
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["packet-stream"].produce,
+        })}
       </Text>
       <Text x={480} y={538} size={15} fill={STOCK.muted} mono anchor="middle">
-        TRANSPORT
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["packet-stream"].transport,
+        })}
       </Text>
       <Text x={896} y={538} size={15} fill={STOCK.muted} mono anchor="end">
-        RECEIVE
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["packet-stream"].receive,
+        })}
       </Text>
     </g>
   );

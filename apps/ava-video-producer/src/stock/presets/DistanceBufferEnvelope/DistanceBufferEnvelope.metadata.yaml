@@ -1,0 +1,106 @@
+name:
+  id: motionAtlas.distance-buffer-envelope.name
+  message: A buffer is a distance rule
+description:
+  id: motionAtlas.distance-buffer-envelope.description
+  message: A schematic point emits an equal-distance envelope. Nearby supplied locations
+    are classified by the explicit straight-line radius, while a distance ruler shows
+    that the envelope is not a travel-time boundary.
+category:
+  id: motionAtlas.distance-buffer-envelope.category
+  message: Geometric distance buffering
+useWhen:
+  id: motionAtlas.distance-buffer-envelope.useWhen
+  message: Define straight-line spatial inclusion without implying travel access.
+prompt:
+  id: motionAtlas.distance-buffer-envelope.prompt
+  message: 960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+    Reveal at frames 0-12. Frames 13-50 anchor the center and radius ruler. Frames
+    51-105 sweep a compass arm to draw the distance circle. Frames 106-139 compare each
+    location distance with the radius and collect only qualifying IDs in a separate
+    ledger. Hold the resolved state at 140-165; fade to the same opaque ground at
+    166-179. Reset is editorial.
+creativeDirection:
+  id: motionAtlas.distance-buffer-envelope.creativeDirection
+  message: 960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+    Reveal at frames 0-12. Frames 13-50 anchor the center and radius ruler. Frames
+    51-105 sweep a compass arm to draw the distance circle. Frames 106-139 compare each
+    location distance with the radius and collect only qualifying IDs in a separate
+    ledger. Hold the resolved state at 140-165; fade to the same opaque ground at
+    166-179. Reset is editorial.
+intent:
+  id: motionAtlas.distance-buffer-envelope.intent
+  message: Define straight-line spatial inclusion without implying travel access.
+distinction:
+  id: motionAtlas.distance-buffer-envelope.distinction
+  message: Catchment-union-gaps combines supplied coverage polygons. This derives a buffer
+    from a distance rule and classifies points without inferring service use or routes.
+tags:
+  - id: motionAtlas.distance-buffer-envelope.tags.0
+    message: buffer
+  - id: motionAtlas.distance-buffer-envelope.tags.1
+    message: Euclidean distance
+  - id: motionAtlas.distance-buffer-envelope.tags.2
+    message: radius
+  - id: motionAtlas.distance-buffer-envelope.tags.3
+    message: spatial selection
+goodFor:
+  - id: motionAtlas.distance-buffer-envelope.goodFor.0
+    message: Explain straight-line distance buffers
+  - id: motionAtlas.distance-buffer-envelope.goodFor.1
+    message: Distinguish distance inclusion from actual service access
+domains:
+  - id: motionAtlas.distance-buffer-envelope.domains.0
+    message: Geometric distance buffering
+aliases:
+  - id: motionAtlas.distance-buffer-envelope.aliases.0
+    message: buffer
+  - id: motionAtlas.distance-buffer-envelope.aliases.1
+    message: Euclidean distance
+  - id: motionAtlas.distance-buffer-envelope.aliases.2
+    message: radius
+notFor:
+  - id: motionAtlas.distance-buffer-envelope.notFor.0
+    message: No real ground-distance projection or travel network is used.
+  - id: motionAtlas.distance-buffer-envelope.notFor.1
+    message: Inside a distance buffer does not imply access, safety, capacity or service
+      coverage.
+  - id: motionAtlas.distance-buffer-envelope.notFor.2
+    message: Only the supplied locations form the denominator.
+  - id: motionAtlas.distance-buffer-envelope.notFor.3
+    message: No external requests, URLs, JSX or functions in props. Supplied examples are
+      fictional.
+  - id: motionAtlas.distance-buffer-envelope.notFor.4
+    message: Authored prose remains the author’s responsibility. Runtime validation
+      preserves supplied text without classifying its language or factual claims.
+motionBeats:
+  - startFrame: 0
+    endFrame: 12
+    description:
+      id: motionAtlas.distance-buffer-envelope.beat.0
+      message: Reveal fixed origin and locations.
+  - startFrame: 13
+    endFrame: 50
+    description:
+      id: motionAtlas.distance-buffer-envelope.beat.1
+      message: Anchor the center and radius ruler.
+  - startFrame: 51
+    endFrame: 105
+    description:
+      id: motionAtlas.distance-buffer-envelope.beat.2
+      message: Sweep a compass arm and draw the circle.
+  - startFrame: 106
+    endFrame: 139
+    description:
+      id: motionAtlas.distance-buffer-envelope.beat.3
+      message: Classify supplied locations into the inclusion ledger.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.distance-buffer-envelope.beat.4
+      message: Hold the resolved study.
+  - startFrame: 166
+    endFrame: 179
+    description:
+      id: motionAtlas.distance-buffer-envelope.beat.5
+      message: The enclosing StockGraphic fades to opaque ground.

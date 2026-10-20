@@ -1,0 +1,224 @@
+{
+  "version": 1,
+  "id": "record-to-relationships",
+  "title": "Record to relationships",
+  "description": "Begin with an actual record, then expand into the relationships that explain its fields.",
+  "sourceNotes": [
+    "Extracted from product-to-ontology; uses the same continuity renderer and typed content contracts.",
+    "Reusable geometry, timing and editorial relationships. Product state remains scripted demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1600,
+  "height": 1000,
+  "delivery": {
+    "width": 1536,
+    "height": 960
+  },
+  "shots": [
+    {
+      "id": "explanation",
+      "scene": "continuity",
+      "durationInFrames": 756,
+      "transitionInFrames": 0,
+      "props": {
+        "title": "Record to relationships",
+        "category": "product-motion",
+        "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
+        "accent": "#9fefca",
+        "beats": [
+          {
+            "id": "example-0",
+            "title": "Inspect a response case.",
+            "subtitle": "Actual case components and related-observation fixture values.",
+            "content": {
+              "kind": "product",
+              "segment": {
+                "feature": "cases",
+                "mode": "full",
+                "fromFrame": 0,
+                "toFrame": 480,
+                "leadIn": 30
+              }
+            },
+            "duration": 540,
+            "transition": {
+              "kind": "cut",
+              "frames": 0
+            }
+          },
+          {
+            "id": "example-1",
+            "title": "Trace a field back through its structure.",
+            "subtitle": "The route is a conceptual explanation of a derived field.",
+            "content": {
+              "kind": "stock",
+              "request": {
+                "preset": "node-traversal",
+                "schemaVersion": 1,
+                "input": {
+                  "nodes": [
+                    {
+                      "x": 136,
+                      "y": 302,
+                      "label": "Record"
+                    },
+                    {
+                      "x": 310,
+                      "y": 170,
+                      "label": "Identity"
+                    },
+                    {
+                      "x": 310,
+                      "y": 424,
+                      "label": "Field"
+                    },
+                    {
+                      "x": 502,
+                      "y": 302,
+                      "label": "Mapping"
+                    },
+                    {
+                      "x": 680,
+                      "y": 170,
+                      "label": "Source"
+                    },
+                    {
+                      "x": 680,
+                      "y": 424,
+                      "label": "Rule"
+                    },
+                    {
+                      "x": 842,
+                      "y": 302,
+                      "label": "Value"
+                    }
+                  ],
+                  "edges": [
+                    [
+                      0,
+                      1
+                    ],
+                    [
+                      0,
+                      2
+                    ],
+                    [
+                      1,
+                      3
+                    ],
+                    [
+                      2,
+                      3
+                    ],
+                    [
+                      3,
+                      4
+                    ],
+                    [
+                      3,
+                      5
+                    ],
+                    [
+                      4,
+                      6
+                    ],
+                    [
+                      5,
+                      6
+                    ]
+                  ],
+                  "route": [
+                    0,
+                    2,
+                    3,
+                    4,
+                    6
+                  ],
+                  "showRouteLabel": true
+                }
+              },
+              "settleFrame": 150,
+              "camera": [
+                {
+                  "at": 0,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 57,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                },
+                {
+                  "at": 81,
+                  "x": 275,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "push"
+                },
+                {
+                  "at": 136,
+                  "x": 275,
+                  "y": 350,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 150,
+                  "x": 680,
+                  "y": 275,
+                  "zoom": 1.8,
+                  "ease": "whip"
+                },
+                {
+                  "at": 198,
+                  "x": 680,
+                  "y": 275,
+                  "zoom": 1.8,
+                  "ease": "glide"
+                },
+                {
+                  "at": 226,
+                  "x": 480,
+                  "y": 300,
+                  "zoom": 1,
+                  "ease": "glide"
+                }
+              ]
+            },
+            "duration": 240,
+            "transition": {
+              "kind": "dissolve",
+              "frames": 24
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "narration": [
+    {
+      "id": "cue-0",
+      "shotId": "explanation",
+      "startFrame": 15,
+      "endFrame": 505,
+      "text": "Keep a meaningful object or relationship in view.",
+      "beatId": "example-0"
+    },
+    {
+      "id": "cue-1",
+      "shotId": "explanation",
+      "startFrame": 39,
+      "endFrame": 205,
+      "text": "Let the next scene continue the explanation.",
+      "beatId": "example-1"
+    }
+  ],
+  "captions": true,
+  "soundEffects": []
+}

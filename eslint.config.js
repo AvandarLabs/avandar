@@ -29,7 +29,7 @@ export default [
       "agent-skills/**",
       "apps/desktop/build/**",
       // Video exports and generated browser bundles are not source code.
-      ".videos/**",
+      "**/.videos/**",
       "apps/ava-video-producer/out/**",
       "apps/ava-video-producer/src/avandar/generated/**",
       "apps/ava-video-producer/showcase/motion-gallery.js",
@@ -44,7 +44,8 @@ export default [
       // scripts here, per branch). Gitignored, but still linted, so `pnpm lint`
       // failed on whatever throwaway script the last debugging session left
       // behind.
-      ".temp/**",
+      "**/.temp/**",
+      "**/.superpowers/**",
       // `supabase start` writes a minified edge-runtime bundle here. It is
       // gitignored but was still linted, so `pnpm lint` failed with hundreds of
       // errors on any machine where the local stack had been started, and

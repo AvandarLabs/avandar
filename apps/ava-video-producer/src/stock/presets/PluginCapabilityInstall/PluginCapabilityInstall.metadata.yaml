@@ -1,0 +1,127 @@
+name:
+  id: motionAtlas.plugin-capability-install.name
+  message: Fit one new tool to existing data
+description:
+  id: motionAtlas.plugin-capability-install.description
+  message: An optional utility seats into a workspace only after an authored installation
+    choice. Its category-count stencil then reads the retained records and reveals one
+    derived tally, making added capability distinct from data replacement.
+category:
+  id: motionAtlas.plugin-capability-install.category
+  message: Modular capability
+useWhen:
+  id: motionAtlas.plugin-capability-install.useWhen
+  message: Show that a chosen extension adds an operation over retained data.
+creativeDirection:
+  id: motionAtlas.plugin-capability-install.creativeDirection
+  message: Frames 0-11 reveal a work surface, a bounded record strip, and an empty tool
+    socket on the 960x600 canvas. Frames 12-55 bring the named utility beside the socket
+    and display the supplied decision. For install, frames 56-90 seat the utility and
+    align its counting stencil with the unchanged category field. Frames 91-132 draw one
+    tally mark per retained record into its category, resolving compact bars on a common
+    integer scale. For defer, the utility stays beside the empty socket and no tally
+    appears. Hold the retained records, decision, and resulting capability through frame
+    167, then use the shared opaque exit through frame 179. All movement is frame-driven
+    React/SVG at 30fps.
+intent:
+  id: motionAtlas.plugin-capability-install.intent
+  message: Show that a chosen extension adds an operation over retained data.
+distinction:
+  id: motionAtlas.plugin-capability-install.distinction
+  message: Unlike dashboard-slot-assembly, a new operation becomes available before it
+    acts on retained data. Unlike pipeline-step-splice, no processing chain is rewired.
+    The socketed stencil visibly derives a result from the existing records rather than
+    introducing a renamed card collection.
+prompt:
+  id: motionAtlas.plugin-capability-install.prompt
+  message: Use Motion Atlas "Fit one new tool to existing data"
+    (plugin-capability-install) as a conceptual graphic. Show that a chosen extension
+    adds an operation over retained data. Replace fictional examples with approved
+    authored content before making product claims.
+tags:
+  - id: motionAtlas.plugin-capability-install.tags.0
+    message: plugin
+  - id: motionAtlas.plugin-capability-install.tags.1
+    message: extension
+  - id: motionAtlas.plugin-capability-install.tags.2
+    message: optional capability
+  - id: motionAtlas.plugin-capability-install.tags.3
+    message: modular software
+  - id: motionAtlas.plugin-capability-install.tags.4
+    message: reusable utility
+  - id: motionAtlas.plugin-capability-install.tags.5
+    message: category tally
+  - id: motionAtlas.plugin-capability-install.tags.6
+    message: installation choice
+goodFor:
+  - id: motionAtlas.plugin-capability-install.goodFor.0
+    message: Explain an optional extension adding one task-specific capability
+  - id: motionAtlas.plugin-capability-install.goodFor.1
+    message: Show a team choosing a reusable utility without replacing its dataset
+  - id: motionAtlas.plugin-capability-install.goodFor.2
+    message: Introduce a plugin concept before a verified installation demonstration
+domains:
+  - id: motionAtlas.plugin-capability-install.domains.0
+    message: Modular capability
+aliases:
+  - id: motionAtlas.plugin-capability-install.aliases.0
+    message: plugin
+  - id: motionAtlas.plugin-capability-install.aliases.1
+    message: extension
+  - id: motionAtlas.plugin-capability-install.aliases.2
+    message: optional capability
+  - id: motionAtlas.plugin-capability-install.aliases.3
+    message: modular software
+notFor:
+  - id: motionAtlas.plugin-capability-install.notFor.0
+    message: One optional utility and one fixed tally operation. No executable code,
+      external URLs, marketplace requests, dependency resolution, or security review
+      occur.
+  - id: motionAtlas.plugin-capability-install.notFor.1
+    message: The sum of category counts must equal records.length and each record is counted
+      exactly once. Installation never adds, removes, or edits source records.
+  - id: motionAtlas.plugin-capability-install.notFor.2
+    message: The default is fictional. This is not evidence of a shipped plugin system,
+      one-click installation, compatibility with arbitrary data, or a particular
+      installation time.
+  - id: motionAtlas.plugin-capability-install.notFor.3
+    message: The defer outcome produces no result and no installed-state marker. Zero-count
+      categories remain visible.
+  - id: motionAtlas.plugin-capability-install.notFor.4
+    message: No medical prediction, automated risk assessment, or clinical decision is
+      represented by the utility.
+  - id: motionAtlas.plugin-capability-install.notFor.5
+    message: Supplied prose meaning, fictional status and agreement with structured choices
+      are authoring responsibilities. Runtime validation enforces structure, numeric
+      bounds, identities and references.
+motionBeats:
+  - startFrame: 0
+    endFrame: 11
+    description:
+      id: motionAtlas.plugin-capability-install.motionBeats.0
+      message: Reveal retained records and empty socket.
+  - startFrame: 12
+    endFrame: 55
+    description:
+      id: motionAtlas.plugin-capability-install.motionBeats.1
+      message: Present utility and authored choice.
+  - startFrame: 56
+    endFrame: 90
+    description:
+      id: motionAtlas.plugin-capability-install.motionBeats.2
+      message: Install seats one utility; defer leaves the socket empty.
+  - startFrame: 91
+    endFrame: 132
+    description:
+      id: motionAtlas.plugin-capability-install.motionBeats.3
+      message: Installed stencil counts every retained record.
+  - startFrame: 133
+    endFrame: 167
+    description:
+      id: motionAtlas.plugin-capability-install.motionBeats.4
+      message: Hold the chosen outcome.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.plugin-capability-install.motionBeats.5
+      message: Shared opaque exit.

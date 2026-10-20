@@ -1,0 +1,59 @@
+name:
+  id: motionAtlas.stagger-cards.name
+  message: Staggered collection
+description:
+  id: motionAtlas.stagger-cards.description
+  message: Cards settle into a grid with a short sibling delay.
+category:
+  id: motionAtlas.stagger-cards.category
+  message: Interface
+tags:
+  - id: motionAtlas.stagger-cards.tags.0
+    message: cards
+  - id: motionAtlas.stagger-cards.tags.1
+    message: stagger
+  - id: motionAtlas.stagger-cards.tags.2
+    message: entrance
+  - id: motionAtlas.stagger-cards.tags.3
+    message: collection
+useWhen:
+  id: motionAtlas.stagger-cards.useWhen
+  message: Introduce a small set of concepts, records, or capabilities with one arrival
+    sequence.
+prompt:
+  id: motionAtlas.stagger-cards.prompt
+  message: Use Motion Atlas "Staggered collection" (stagger-cards) as a conceptual
+    graphic. Introduce a small set of concepts, records, or capabilities with one
+    arrival sequence. Keep the restrained motion and readable labels; replace sample
+    content with approved facts before making product claims.
+creativeDirection:
+  id: motionAtlas.stagger-cards.creativeDirection
+  message: Cards settle into a grid with a short sibling delay.
+goodFor:
+  - id: motionAtlas.stagger-cards.goodFor.0
+    message: Introduce a small set of concepts, records, or capabilities with one arrival
+      sequence.
+intent:
+  id: motionAtlas.stagger-cards.intent
+  message: Introduce a small set of concepts, records, or capabilities with one arrival
+    sequence.
+domains:
+  - id: motionAtlas.stagger-cards.domains.0
+    message: Interface
+aliases:
+  - id: motionAtlas.stagger-cards.aliases.0
+    message: cards
+  - id: motionAtlas.stagger-cards.aliases.1
+    message: stagger
+  - id: motionAtlas.stagger-cards.aliases.2
+    message: entrance
+  - id: motionAtlas.stagger-cards.aliases.3
+    message: collection
+notFor:
+  - id: motionAtlas.stagger-cards.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.stagger-cards.distinction
+  message: Cards settle into a grid with a short sibling delay.

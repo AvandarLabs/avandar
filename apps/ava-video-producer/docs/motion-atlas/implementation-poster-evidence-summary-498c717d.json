@@ -1,0 +1,172 @@
+{
+  "status": "historical-poster-evidence-reconciled",
+  "historicalHead": "498c717d53240d15a29396830759a571a938f492",
+  "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "defaultPreparationHead": "02d6cfbb66577931dd7d7eb19f9c06ef5b1a431a",
+  "counts": {
+    "defaultPosterReports": 16,
+    "defaultCanonicalPosters": 150,
+    "configuredCliPosterReports": 3,
+    "configuredCliCanonicalPosters": 16,
+    "standaloneCanonicalPosters": 166,
+    "httpPreviewCandidateEvidence": 1,
+    "httpPreviewFiles": 2,
+    "httpStandaloneStockPosters": 0,
+    "originalReportsEmbedded": 20,
+    "originalReportsDownloadsParityVerified": 20,
+    "uniqueCanonicalPosterFiles": 166,
+    "explicitDefaultFindings": 15,
+    "explicitConfiguredCliFindings": 1,
+    "explicitHttpPreviewFindings": 0,
+    "explicitEditorialObservationEntries": 1,
+    "independentlyRecomputedConfigurationHashes": 168,
+    "validationIssueCount": 0,
+    "newImageViewsDuringConsolidation": 0
+  },
+  "aggregate": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-poster-evidence-consolidated-498c717d.json",
+    "sha256": "556a8e207a1132985bac08c4b57f17b8e0fee3059db1bda64cf59d05d85b65e7",
+    "bytes": 6762509
+  },
+  "preservedFindingIndex": [
+    {
+      "deliveryClass": "default-150",
+      "id": "reject-and-replace",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-reject-replace-incomplete-transition"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "argument-bridge",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-argument-bridge-dim-conclusion"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "shared-foundation",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-shared-foundation-gap-text-occlusion"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "cell-normalization",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "cell-normalization-frame90-poster-residual-crossfade-overprint"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "linked-parameter-rehearsal",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-linked-parameter-source-tick-overlap"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "outreach-household-revisits",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "outreach-home-b-worker-numeral-crowding-poster90"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "aid-cargo-mode-handoff",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "Transfer stack partly covers parcel 1's numeric ID"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "resident-budget-ballots",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "Reading tally shares space with moving ballot and diagonal lid"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "school-transition-rehearsal",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "Thin figure leader crosses the practice-strip caption region"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "expectation-overlay-check",
+      "candidateId": null,
+      "severity": "pending-playback",
+      "findingId": "expectation-overlay-default-frame90-overprint"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "peer-contribution-recognition",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-peer-recognition-dim-acknowledgment"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "proportional-symbol-area",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "proportional-symbol-area-mid-assembly-label-crowding-poster90"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "spatial-grid-binning",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-grid-binning-count-marker-lag"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "coordinate-quality-triage",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-coordinate-triage-count-marker-lag"
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "geometry-detail-budget",
+      "candidateId": null,
+      "severity": "low",
+      "findingId": "poster-geometry-detail-count-lag"
+    },
+    {
+      "deliveryClass": "configured-cli-16",
+      "id": "linked-parameter-rehearsal",
+      "candidateId": "N6",
+      "severity": "low",
+      "findingId": "configured-N6-source-tick-connector-overlap"
+    }
+  ],
+  "preservedEditorialIndex": [
+    {
+      "id": "referral-return-acknowledgement",
+      "candidateId": null,
+      "editorialId": "returned-acknowledgements-midword-caption-wrap-poster90"
+    }
+  ],
+  "validationIssues": [],
+  "keyBoundaries": [
+    "150 default + 16 configured CLI standalone canonical frame90 posters, plus one separate HTTP L3 preview evidence case.",
+    "Original reports and all 20 Downloads copies checked byte-for-byte; no original report edited.",
+    "Findings remain historical sampled concerns with their complete observations and phase limits, without new adjudication.",
+    "L3 uses preview150 with preview90 retained; no standalone L3 poster exists. Original L3 report playback-pending statement remains time-scoped.",
+    "Canonical configuration paths and frozen snapshots used, never latest delivery pointers; current checkout source equality is not asserted.",
+    "No new image viewing, continuous playback, loop, MP4 or production acceptance."
+  ],
+  "summaryDownloadsPath": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/final-poster-evidence-summary-498c717d.json",
+  "aggregateDownloadsPath": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/final-poster-evidence-consolidated-498c717d.json",
+  "newVisualAcceptance": false,
+  "mp4Acceptance": false,
+  "productionAcceptance": false,
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-poster-evidence-summary-498c717d.json",
+    "sha256": "0468b0209c8fd85ca1486d6b0930da41a718fa872ba0ed5040d1e42ac37e8a3e",
+    "bytes": 6138
+  }
+}

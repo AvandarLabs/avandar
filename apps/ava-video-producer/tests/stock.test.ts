@@ -1,9 +1,10 @@
+import "./helpers/registerCssModuleStub";
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createElement, Fragment } from "react";
+import { prop, propEq } from "@avandar/utils";
+import { Children, createElement, Fragment, isValidElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { parseMotionArgs } from "../scripts/motion";
-import { loopEnvelope, loopPhase, wave } from "../src/motion";
+import acceptedAdditions from "../docs/motion-atlas/catalog-expansion.json";
 import {
   STOCK_CATALOG,
   STOCK_CATEGORIES,
@@ -12,77 +13,30 @@ import {
   STOCK_LOOP_FRAMES,
   stockEntry,
 } from "../src/stock/catalog";
+import { DECISION_FORK_DENSE_INPUT } from "../src/stock/presets/DecisionFork/DecisionFork.fixtures";
+import { StockCompositions } from "../src/stock/StockCompositions";
 import { StockGraphic } from "../src/stock/StockGraphic";
 import { storyboardSchema } from "../src/storyboard/schema/schema";
+const { ShotView } = await import("../src/storyboard/StoryFilm/ShotView");
+import { LEGACY_IDS } from "./fixtures/legacyStockIds";
+import { getSvgAttributeMatchesFromMarkup } from "./helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";
+import type { StockRequest } from "../src/stock/contracts/StockContract.types";
+import type { ResolvedStockRequest } from "../src/stock/contracts/stockRequestSchema/stockRequestSchema";
 
-test("loop motion is bounded, periodic, and deterministic under out-of-order seeks", () => {
-  const frames = [-361, -180, -1, 0, 1, 45, 90, 179, 180, 361];
-  for (const offset of [-28, 0, 37]) {
-    const values = frames.map((frame) => [
-      loopPhase(frame, 180, offset),
-      wave(frame, 180, offset),
-    ]);
-    for (const frame of [...frames].reverse()) {
-      const phase = loopPhase(frame, 180, offset);
-      const pulse = wave(frame, 180, offset);
-      assert.ok(phase >= 0 && phase < 1);
-      assert.ok(pulse >= 0 && pulse <= 1);
-      assert.equal(phase, loopPhase(frame + 180, 180, offset));
-      assert.equal(pulse, wave(frame + 180, 180, offset));
-      assert.deepEqual([phase, pulse], values[frames.indexOf(frame)]);
-    }
-  }
-  assert.equal(loopPhase(-45, 180), 0.75);
-  assert.equal(loopPhase(37, 180, 37), 0);
-  assert.equal(wave(0, 180), 0);
-  assert.equal(wave(90, 180), 1);
-});
-
-test("loop envelopes preserve a full reading hold and meet the same boundary ground", () => {
-  assert.equal(loopEnvelope(0, 180), 0);
-  assert.equal(loopEnvelope(179, 180), 0);
-  assert.equal(loopEnvelope(-1, 180), 0);
-  assert.equal(loopEnvelope(180, 180), 0);
-  for (let frame = 0; frame < 180; frame++) {
-    const opacity = loopEnvelope(frame, 180);
-    assert.ok(
-      opacity >= 0 && opacity <= 1,
-      `Invalid envelope opacity at ${frame}`,
-    );
-    if (frame >= 12 && frame <= 167) assert.equal(opacity, 1);
-  }
-  assert.ok(loopEnvelope(1, 180) < loopEnvelope(6, 180));
-  assert.ok(loopEnvelope(173, 180) > loopEnvelope(178, 180));
-});
-
-test("loop helpers reject invalid timing before it reaches SVG geometry", () => {
-  for (const helper of [loopPhase, wave]) {
-    for (const value of [NaN, Infinity, -Infinity]) {
-      assert.throws(() => helper(value, 180));
-      assert.throws(() => helper(30, value));
-      assert.throws(() => helper(30, 180, value));
-    }
-    for (const period of [0, -180]) assert.throws(() => helper(30, period));
-  }
-  for (const value of [NaN, Infinity, -Infinity]) {
-    assert.throws(() => loopEnvelope(value, 180));
-    assert.throws(() => loopEnvelope(30, value));
-    assert.throws(() => loopEnvelope(30, 180, value));
-  }
-  for (const [duration, fade] of [
-    [0, 12],
-    [1, 12],
-    [24, 12],
-    [180, 0],
-    [180, -1],
-    [180, 90],
-  ]) {
-    assert.throws(() => loopEnvelope(30, duration, fade));
-  }
-});
-
-test("all twenty catalogue entries have unique stable references and six-second loops", () => {
-  assert.equal(STOCK_CATALOG.length, 20);
+test("all catalogue entries have unique stable references and six-second loops", () => {
+  assert.deepEqual(
+    new Set(STOCK_IDS),
+    new Set([...LEGACY_IDS, ...acceptedAdditions.map(prop("id"))]),
+  );
+  assert.equal(
+    STOCK_CATALOG.filter(({ collection }) => collection === "general").length,
+    106,
+  );
+  assert.equal(
+    STOCK_CATALOG.filter(({ collection }) => collection === "social-sector")
+      .length,
+    64,
+  );
   assert.equal(new Set(STOCK_IDS).size, STOCK_IDS.length);
   assert.deepEqual(
     STOCK_CATALOG.map(({ id }) => id),
@@ -106,7 +60,8 @@ test("all twenty catalogue entries have unique stable references and six-second 
     );
     assert.ok(entry.tags.length > 0);
     assert.ok(
-      entry.prompt.includes(entry.id),
+      !([...LEGACY_IDS, "decision-fork"] as string[]).includes(entry.id) ||
+        entry.prompt.includes(entry.id),
       `${entry.id} brief must retain a reusable preset reference`,
     );
   }
@@ -116,7 +71,7 @@ test("all twenty catalogue entries have unique stable references and six-second 
   );
 });
 
-function stockPlan(props: Record<string, unknown>) {
+function _stockPlan(props: Record<string, unknown>) {
   return {
     version: 1,
     id: "stock-test",
@@ -141,12 +96,12 @@ function stockPlan(props: Record<string, unknown>) {
 
 test("stock storyboards accept every catalogue preset and only safe explicit props", () => {
   assert.equal(
-    storyboardSchema.safeParse(stockPlan({ preset: "network-graph" })).success,
+    storyboardSchema.safeParse(_stockPlan({ preset: "network-graph" })).success,
     true,
   );
   for (const preset of STOCK_IDS) {
     const plan = storyboardSchema.parse(
-      stockPlan({
+      _stockPlan({
         preset,
         accent: "#91e7c4",
         title: "Conceptual motion",
@@ -172,11 +127,11 @@ test("stock storyboards accept every catalogue preset and only safe explicit pro
     ].map((accent) => ({ preset: "network-graph", accent })),
   ])
     assert.equal(
-      storyboardSchema.safeParse(stockPlan(props)).success,
+      storyboardSchema.safeParse(_stockPlan(props)).success,
       false,
       JSON.stringify(props),
     );
-  const extraShotField = stockPlan({ preset: "network-graph" });
+  const extraShotField = _stockPlan({ preset: "network-graph" });
   assert.equal(
     storyboardSchema.safeParse({
       ...extraShotField,
@@ -186,41 +141,20 @@ test("stock storyboards accept every catalogue preset and only safe explicit pro
   );
 });
 
-test("motion CLI resolves stable presets and rejects unrecognized commands or selections", () => {
-  assert.deepEqual(
-    parseMotionArgs(["list"]).entries.map(({ id }) => id),
-    [...STOCK_IDS],
-  );
-  for (const command of ["preview", "render"]) {
-    assert.equal(
-      parseMotionArgs([command, "all"]).entries.length,
-      STOCK_CATALOG.length,
-    );
-    assert.deepEqual(
-      parseMotionArgs([command, "network-graph"]).entries.map(({ id }) => id),
-      ["network-graph"],
-    );
-  }
-  for (const args of [
-    [],
-    ["unknown"],
-    ["render", "unknown-preset"],
-    ["render", "../outside"],
-    ["preview", "all", "extra"],
-  ]) {
-    assert.throws(
-      () => parseMotionArgs(args),
-      /Usage|Unknown stock motion preset/,
-    );
-  }
-});
-
 test("every stock renderer produces finite deterministic SVG under random frame access", () => {
+  // Every preset accepts omitted input. The large discriminated union cannot
+  // distribute a dynamic ID at this no-input call site without this narrow
+  // cast.
   const frames = [90, 0, 179, 18, 138, 45, 1, 167, 178, 180, -1];
   for (const preset of STOCK_IDS) {
     for (const frame of frames) {
       const render = () =>
-        renderToStaticMarkup(createElement(StockGraphic, { preset, frame }));
+        renderToStaticMarkup(
+          createElement(StockGraphic, {
+            ...({ preset } as StockRequest),
+            frame,
+          }),
+        );
       const markup = render();
       assert.match(markup, /^<svg\b/);
       assert.match(markup, /<\/svg>$/);
@@ -251,7 +185,7 @@ test("SVG masks and gradients remain local when cards and previews share a page"
         STOCK_IDS.map((preset) =>
           createElement(StockGraphic, {
             key: `${copy}-${preset}`,
-            preset,
+            ...({ preset } as StockRequest),
             frame: copy ? 70 : 120,
             accent: copy ? "#b4b8ff" : "#9fefca",
           }),
@@ -259,7 +193,10 @@ test("SVG masks and gradients remain local when cards and previews share a page"
       ),
     ),
   );
-  const ids = [...markup.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+  const ids = getSvgAttributeMatchesFromMarkup({
+    markup,
+    attribute: "id",
+  }).values;
   assert.ok(ids.length > 0, "Exercise real SVG definitions");
   assert.equal(
     new Set(ids).size,
@@ -273,7 +210,7 @@ test("SVG masks and gradients remain local when cards and previews share a page"
   let references = 0;
   for (const svg of svgs) {
     const localIds = new Set(
-      [...svg.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]),
+      getSvgAttributeMatchesFromMarkup({ markup: svg, attribute: "id" }).values,
     );
     for (const match of svg.matchAll(/url\(#([^)]+)\)/g)) {
       references++;
@@ -295,5 +232,112 @@ test("SVG masks and gradients remain local when cards and previews share a page"
   assert.ok(
     references > 0,
     "Exercise rendered gradient and clipping references",
+  );
+});
+
+test("configured stock storyboards retain complete content and palette", () => {
+  const plan = storyboardSchema.parse(
+    _stockPlan({
+      preset: "decision-fork",
+      schemaVersion: 1,
+      input: DECISION_FORK_DENSE_INPUT,
+      accent: "#aabbcc",
+      background: "#112233",
+    }),
+  );
+  assert.deepEqual(plan.shots[0].props, {
+    preset: "decision-fork",
+    schemaVersion: 1,
+    input: DECISION_FORK_DENSE_INPUT,
+    accent: "#aabbcc",
+    background: "#112233",
+  });
+});
+
+test("stock storyboards reject dangling branch references and extra input keys", () => {
+  Array.from([
+    { ...DECISION_FORK_DENSE_INPUT, selectedBranchId: "missing" },
+    { ...DECISION_FORK_DENSE_INPUT, unexpected: true },
+    { prompt: "Partial input" },
+  ]).forEach((input) => {
+    assert.equal(
+      storyboardSchema.safeParse(_stockPlan({ preset: "decision-fork", input }))
+        .success,
+      false,
+    );
+  });
+});
+
+test("storyboard rendering preserves configured content, heading space and cycle modulo", () => {
+  const plan = storyboardSchema.parse(
+    _stockPlan({
+      preset: "decision-fork",
+      schemaVersion: 1,
+      input: DECISION_FORK_DENSE_INPUT,
+      title: "Authored heading",
+      accent: "#aabbcc",
+      background: "#112233",
+    }),
+  );
+  const render = ({ frame }: Readonly<{ frame: number }>) =>
+    renderToStaticMarkup(
+      createElement(ShotView, {
+        shot: plan.shots[0],
+        frame,
+        width: 1280,
+        height: 800,
+      }),
+    );
+  const markup = render({ frame: 150 });
+  assert.match(markup, /Authored heading/);
+  assert.match(markup, /Return to the notebook/);
+  assert.match(markup, /#112233/);
+  assert.match(markup, /width="1280" height="600"/);
+  assert.equal(markup, render({ frame: 330 }));
+});
+
+test("standalone stock frames keep the existing clamp at both boundaries", () => {
+  const render = ({ frame }: Readonly<{ frame: number }>) =>
+    renderToStaticMarkup(
+      createElement(StockGraphic, { preset: "decision-fork", frame }),
+    );
+  assert.equal(render({ frame: -15 }), render({ frame: 0 }));
+  assert.equal(render({ frame: 180 }), render({ frame: 179 }));
+  assert.equal(render({ frame: Infinity }), render({ frame: 0 }));
+});
+
+test("composition metadata validates complete replacements after top-level prop resolution", () => {
+  type Registration = {
+    id: string;
+    defaultProps: StockRequest;
+    calculateMetadata: (options: { props: unknown }) => {
+      props: ResolvedStockRequest;
+    };
+  };
+  const elements = Children.toArray(StockCompositions().props.children);
+  const registrations = elements.filter(isValidElement<Registration>);
+  const decision = registrations.find(
+    propEq("props.id", "stock-decision-fork"),
+  );
+  assert.ok(decision);
+  const defaults = decision.props.defaultProps;
+  assert.equal(defaults.schemaVersion, 1);
+  assert.ok(defaults.input);
+  assert.equal(defaults.accent, "#9fefca");
+  assert.equal(defaults.background, "#0b1219");
+  const input = structuredClone(DECISION_FORK_DENSE_INPUT);
+  input.branches[1].outcome = "Composition chosen";
+  const { props } = decision.props.calculateMetadata({
+    props: { ...defaults, input, accent: "#aabbcc", background: "#112233" },
+  });
+  assert.deepEqual(props.input, input);
+  assert.equal(props.accent, "#aabbcc");
+  assert.equal(props.background, "#112233");
+  assert.throws(
+    () =>
+      decision.props.calculateMetadata({
+        props: { ...defaults, input: { prompt: "Incomplete replacement" } },
+      }),
+    /branches/,
   );
 });

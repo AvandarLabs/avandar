@@ -6,13 +6,13 @@ The input schema is [schema.ts](../src/storyboard/schema.ts). The generic Remoti
 
 ## Commands
 
-Run from the repository root with installed dependencies, Node 20 or newer, `ffprobe` on PATH and the pinned `ffmpeg-static` binary. Scratch TTS additionally needs macOS's existing `/usr/bin/say`. No global package installation or cloud voice service is required.
+Run from `apps/ava-video-producer` with installed dependencies, Node 22 or newer, `ffprobe` on PATH and the pinned `ffmpeg-static` binary. Scratch TTS additionally needs macOS's existing `/usr/bin/say`. No global package installation or cloud voice service is required.
 
 ```sh
-npx tsx scripts/video.ts validate storyboards/library.json
-npx tsx scripts/video.ts plan storyboards/library.json
-npx tsx scripts/video.ts preview storyboards/library.json
-npx tsx scripts/video.ts render storyboards/library.json
+pnpm video validate storyboards/library.json
+pnpm video plan storyboards/library.json
+pnpm video preview storyboards/library.json
+pnpm video render storyboards/library.json
 ```
 
 Inspect the preview before the render command. A generated preview manifest proves which inputs were rendered; it does not record human approval or prove visual correctness.
@@ -100,14 +100,14 @@ The numerical frame gate detects specific image repetition and luminance faults.
 ## Scratch narration
 
 ```sh
-npx tsx scripts/video.ts tts storyboards/library.json
-npx tsx scripts/video.ts tts storyboards/library.json --voice Samantha --rate 175
+pnpm video tts storyboards/library.json
+pnpm video tts storyboards/library.json --voice Samantha --rate 175
 
 # Use the derived plan for every later stage.
-npx tsx scripts/video.ts validate out/scene-library/scratch/storyboard.json
-npx tsx scripts/video.ts plan out/scene-library/scratch/storyboard.json
-npx tsx scripts/video.ts preview out/scene-library/scratch/storyboard.json
-npx tsx scripts/video.ts render out/scene-library/scratch/storyboard.json
+pnpm video validate out/scene-library/scratch/storyboard.json
+pnpm video plan out/scene-library/scratch/storyboard.json
+pnpm video preview out/scene-library/scratch/storyboard.json
+pnpm video render out/scene-library/scratch/storyboard.json
 ```
 
 The default uses the installed system voice at 175 words per minute. `--voice` names an already available system voice; availability differs by machine. `--rate` accepts 80 through 240. This is temporary narration for pacing and pipeline checks, with scratch provenance added to the derived plan and metadata. It is not a cloned voice or a final performance.
@@ -121,7 +121,7 @@ On platforms without `say`, use a supplied recording through `align`.
 ## Import a provided recording and SRT
 
 ```sh
-npx tsx scripts/video.ts align storyboards/library.json \
+pnpm video align storyboards/library.json \
   --audio /absolute/path/narration.wav \
   --srt /absolute/path/narration.srt
 ```

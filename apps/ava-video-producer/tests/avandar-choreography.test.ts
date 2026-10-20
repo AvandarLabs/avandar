@@ -33,3 +33,13 @@ test("measured cursor paths hold every destination from the click through click 
     /overlap/,
   );
 });
+
+test("selection followed by typing at the same measured field retains one dwell", () => {
+  const keys = measuredPath([
+    { frame: 330, x: 913, y: 468, action: "click" },
+    { frame: 350, x: 891, y: 452, action: "select", holdUntil: 442 },
+    { frame: 358, x: 891, y: 452, action: "type", holdUntil: 442 },
+  ]);
+  assert.deepEqual(keys.at(-1), { at: 442, x: 891, y: 452 });
+  assert.equal(keys.filter((key) => key.x === 891).length, 2);
+});

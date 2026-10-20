@@ -1,0 +1,114 @@
+name:
+  id: motionAtlas.mobile-clinic-relocation.name
+  message: Bring the service closer
+description:
+  id: motionAtlas.mobile-clinic-relocation.description
+  message: A mobile clinic relocates between two schematic community sites, carrying a
+    finite set of appointment slots. People receive only the explicitly assigned
+    bookings, with open slots and unbooked people still visible.
+category:
+  id: motionAtlas.mobile-clinic-relocation.category
+  message: Mobile service and finite allocation
+useWhen:
+  id: motionAtlas.mobile-clinic-relocation.useWhen
+  message: Show a service moving toward a community while keeping finite appointment
+    capacity and unbooked people visible.
+intent:
+  id: motionAtlas.mobile-clinic-relocation.intent
+  message: Show a service moving toward a community while keeping finite appointment
+    capacity and unbooked people visible.
+creativeDirection:
+  id: motionAtlas.mobile-clinic-relocation.creativeDirection
+  message: Frames 12..40 show a mobile clinic parked at the first site, nearby people, and
+    its finite appointment-slot strip. Frames 41..113 fold the clinic awning, drive the
+    same vehicle along a schematic road, and reopen it at the second site; assigned
+    people connect to distinct slot tabs while unmatched people remain in place. Frames
+    114..167 hold both the person-booking ledger and slot-capacity ledger together; fade
+    to ground by frame 179.
+distinction:
+  id: motionAtlas.mobile-clinic-relocation.distinction
+  message: Unlike radial-network or packet-stream, a physical service vehicle changes
+    location and unfolds into a service point. Unlike outreach-household-revisits, the
+    moving object is the service itself and the core constraint is one person per
+    supplied slot, not visit activity.
+prompt:
+  id: motionAtlas.mobile-clinic-relocation.prompt
+  message: Use Bring the service closer (mobile-clinic-relocation) for a fictional or
+    approved authored example. Show a service moving toward a community while keeping
+    finite appointment capacity and unbooked people visible.
+tags:
+  - id: motionAtlas.mobile-clinic-relocation.tags.0
+    message: mobile clinic
+  - id: motionAtlas.mobile-clinic-relocation.tags.1
+    message: community access
+  - id: motionAtlas.mobile-clinic-relocation.tags.2
+    message: service relocation
+  - id: motionAtlas.mobile-clinic-relocation.tags.3
+    message: outreach session
+  - id: motionAtlas.mobile-clinic-relocation.tags.4
+    message: appointment capacity
+  - id: motionAtlas.mobile-clinic-relocation.tags.5
+    message: unbooked people
+  - id: motionAtlas.mobile-clinic-relocation.tags.6
+    message: schematic map
+  - id: motionAtlas.mobile-clinic-relocation.tags.7
+    message: service planning
+goodFor:
+  - id: motionAtlas.mobile-clinic-relocation.goodFor.0
+    message: Explain a fictional mobile service relocation and bounded booking capacity.
+  - id: motionAtlas.mobile-clinic-relocation.goodFor.1
+    message: Show that moving a service and booking people are distinct from delivering care.
+  - id: motionAtlas.mobile-clinic-relocation.goodFor.2
+    message: Introduce community access planning while retaining unmet demand in the picture.
+domains:
+  - id: motionAtlas.mobile-clinic-relocation.domains.0
+    message: Mobile service and finite allocation
+aliases:
+  - id: motionAtlas.mobile-clinic-relocation.aliases.0
+    message: mobile clinic
+  - id: motionAtlas.mobile-clinic-relocation.aliases.1
+    message: community access
+  - id: motionAtlas.mobile-clinic-relocation.aliases.2
+    message: service relocation
+notFor:
+  - id: motionAtlas.mobile-clinic-relocation.notFor.0
+    message: The people denominator is people.length. Booked people equals the number of
+      non-null slotId values, and booked + unbooked equals the people total.
+  - id: motionAtlas.mobile-clinic-relocation.notFor.1
+    message: Slot capacity is slots.length. Occupied slots is the distinct assigned slotId
+      count; occupied + open equals capacity. Each slot can have at most one assigned
+      person, and no duplicated glyph creates extra capacity.
+  - id: motionAtlas.mobile-clinic-relocation.notFor.2
+    message: All assignments are authored. This is not a routing optimizer, access-distance
+      model, clinical prioritization rule, eligibility decision, or recommendation for
+      service placement.
+  - id: motionAtlas.mobile-clinic-relocation.notFor.3
+    message: Bookings are administrative plans, not attendance or treatment. The schematic
+      map has no real geography, scale, journey time, distance measurement, or implied
+      population coverage.
+motionBeats:
+  - startFrame: 12
+    endFrame: 40
+    description:
+      id: motionAtlas.mobile-clinic-relocation.motionBeats.0
+      message: Reveal the supplied setting and identities.
+  - startFrame: 41
+    endFrame: 113
+    description:
+      id: motionAtlas.mobile-clinic-relocation.motionBeats.1
+      message: Frames 12..40 show a mobile clinic parked at the first site, nearby people, and
+        its finite appointment-slot strip. Frames 41..113 fold the clinic awning, drive
+        the same vehicle along a schematic road, and reopen it at the second site;
+        assigned people connect to distinct slot tabs while unmatched people remain in
+        place. Frames 114..167 hold both the person-booking ledger and slot-capacity
+        ledger together; fade to ground by frame 179.
+  - startFrame: 114
+    endFrame: 167
+    description:
+      id: motionAtlas.mobile-clinic-relocation.motionBeats.2
+      message: Hold the supplied final records and separate derived quantities.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.mobile-clinic-relocation.motionBeats.3
+      message: Return to the opaque ground through the shared envelope.

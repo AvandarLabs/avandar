@@ -1,0 +1,102 @@
+name:
+  id: motionAtlas.compute-capacity-consolidation.name
+  message: Pack work, release capacity
+description:
+  id: motionAtlas.compute-capacity-consolidation.description
+  message: Fixed compute workloads move between server bays while their total resource
+    demand stays constant. An operator-approved placement leaves an empty host eligible
+    for sleep without claiming a measured energy saving.
+category:
+  id: motionAtlas.compute-capacity-consolidation.category
+  message: Physical resource packing
+useWhen:
+  id: motionAtlas.compute-capacity-consolidation.useWhen
+  message: Show how a placement decision can free capacity while preserving the work performed.
+prompt:
+  id: motionAtlas.compute-capacity-consolidation.prompt
+  message: Reveal host bays holding the supplied work blocks. After the scheduler cue,
+    slide intact blocks into the authored available capacity on retained hosts; emptied
+    hosts fold into the chosen idle-state outline. Hold unchanged total work beside
+    occupied and empty host counts derived from the inputs, then fade to ground.
+    Workload consolidation does not invent measured energy savings.
+creativeDirection:
+  id: motionAtlas.compute-capacity-consolidation.creativeDirection
+  message: Reveal host bays holding the supplied work blocks. After the scheduler cue,
+    slide intact blocks into the authored available capacity on retained hosts; emptied
+    hosts fold into the chosen idle-state outline. Hold unchanged total work beside
+    occupied and empty host counts derived from the inputs, then fade to ground.
+    Workload consolidation does not invent measured energy savings.
+intent:
+  id: motionAtlas.compute-capacity-consolidation.intent
+  message: Show how a placement decision can free capacity while preserving the work performed.
+distinction:
+  id: motionAtlas.compute-capacity-consolidation.distinction
+  message: The main action is geometric bin packing with an emptied physical resource.
+    Unlike source-merge, each job keeps its identity and size; unlike bar-race, there is
+    no ranking.
+tags:
+  - id: motionAtlas.compute-capacity-consolidation.tags.0
+    message: green software
+  - id: motionAtlas.compute-capacity-consolidation.tags.1
+    message: resource aware computing
+  - id: motionAtlas.compute-capacity-consolidation.tags.2
+    message: server consolidation
+  - id: motionAtlas.compute-capacity-consolidation.tags.3
+    message: right sizing
+  - id: motionAtlas.compute-capacity-consolidation.tags.4
+    message: workload packing
+  - id: motionAtlas.compute-capacity-consolidation.tags.5
+    message: CPU hours
+  - id: motionAtlas.compute-capacity-consolidation.tags.6
+    message: idle capacity
+  - id: motionAtlas.compute-capacity-consolidation.tags.7
+    message: sleep state
+goodFor:
+  - id: motionAtlas.compute-capacity-consolidation.goodFor.0
+    message: Explain resource-aware workload placement
+  - id: motionAtlas.compute-capacity-consolidation.goodFor.1
+    message: Show how consolidation can free an entire host
+  - id: motionAtlas.compute-capacity-consolidation.goodFor.2
+    message: Separate compute demand from a claim about electricity consumption
+domains:
+  - id: motionAtlas.compute-capacity-consolidation.domains.0
+    message: Physical resource packing
+aliases:
+  - id: motionAtlas.compute-capacity-consolidation.aliases.0
+    message: green software
+  - id: motionAtlas.compute-capacity-consolidation.aliases.1
+    message: resource aware computing
+  - id: motionAtlas.compute-capacity-consolidation.aliases.2
+    message: server consolidation
+notFor:
+  - id: motionAtlas.compute-capacity-consolidation.notFor.0
+    message: The workload total is the sum of jobs in both placements. Host counts and
+      occupied capacity are derived from assignments, never separately entered.
+  - id: motionAtlas.compute-capacity-consolidation.notFor.1
+    message: CPU-hours do not establish kWh, carbon emissions, runtime, latency or monetary
+      savings. Memory, locality, reliability and migration cost are outside this
+      schematic.
+  - id: motionAtlas.compute-capacity-consolidation.notFor.2
+    message: Defaults are fictional and represent supplied feasible placements, not a
+      scheduling algorithm or an optimization guarantee.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.compute-capacity-consolidation.motionBeats.0
+      message: Reveal the supplied quantities and their physical boundary.
+  - startFrame: 36
+    endFrame: 108
+    description:
+      id: motionAtlas.compute-capacity-consolidation.motionBeats.1
+      message: Reveal host bays holding the supplied work blocks. After the scheduler cue,
+        slide intact blocks into the authored available capacity on retained hosts;
+        emptied hosts fold into the chosen idle-state outline. Hold unchanged total work
+        beside occupied and empty host counts derived from the inputs, then fade to
+        ground. Workload consolidation does not invent measured energy savings.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.compute-capacity-consolidation.motionBeats.2
+      message: Hold conserved quantities and visible destinations. The outer envelope returns
+        to ground.

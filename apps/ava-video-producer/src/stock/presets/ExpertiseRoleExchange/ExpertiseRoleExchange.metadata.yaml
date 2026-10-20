@@ -1,0 +1,95 @@
+name:
+  id: motionAtlas.expertise-role-exchange.name
+  message: Let expertise change who teaches
+description:
+  id: motionAtlas.expertise-role-exchange.description
+  message: Two colleagues alternate teaching and learning around two concrete tasks. Their
+    job-role labels stay fixed while the demonstration position changes according to
+    subject-specific expertise.
+category:
+  id: motionAtlas.expertise-role-exchange.category
+  message: Learning and collaboration
+useWhen:
+  id: motionAtlas.expertise-role-exchange.useWhen
+  message: Separate authority in one topic from a permanent ranking of people.
+prompt:
+  id: motionAtlas.expertise-role-exchange.prompt
+  message: Separate authority in one topic from a permanent ranking of people.
+creativeDirection:
+  id: motionAtlas.expertise-role-exchange.creativeDirection
+  message: Frames 12..34 reveal two people beside one shared worktable with unchanged role
+    labels. Frames 35..82 show the first topic expert aligning a guide on the table
+    while the other observes. The topic strip then turns to the second topic. Frames
+    83..130 pass the demonstration tool to the other person, who demonstrates their
+    supplied topic while the first takes the observing position. Frames 131..167 hold
+    both topic-expert attributions and both unchanged job roles. Use deterministic
+    frame-driven React/SVG at 960x600, 180 frames and 30 fps, with the shared palette.
+    Reveal during frames 0..11 and fade to the common opaque ground during frames
+    168..179.
+intent:
+  id: motionAtlas.expertise-role-exchange.intent
+  message: Separate authority in one topic from a permanent ranking of people.
+distinction:
+  id: motionAtlas.expertise-role-exchange.distinction
+  message: Unlike contribution-weave, participants exchange the active teaching role
+    instead of combining outputs. Unlike interpreted-case-dialogue, no statement is
+    translated or mediated; each person demonstrates a different subject of expertise.
+tags:
+  - id: motionAtlas.expertise-role-exchange.tags.0
+    message: humility
+  - id: motionAtlas.expertise-role-exchange.tags.1
+    message: expertise
+  - id: motionAtlas.expertise-role-exchange.tags.2
+    message: peer learning
+  - id: motionAtlas.expertise-role-exchange.tags.3
+    message: seniority
+  - id: motionAtlas.expertise-role-exchange.tags.4
+    message: subject knowledge
+  - id: motionAtlas.expertise-role-exchange.tags.5
+    message: reciprocity
+goodFor:
+  - id: motionAtlas.expertise-role-exchange.goodFor.0
+    message: Explain that seniority is not universal expertise
+  - id: motionAtlas.expertise-role-exchange.goodFor.1
+    message: Show reciprocal peer learning
+  - id: motionAtlas.expertise-role-exchange.goodFor.2
+    message: Center knowledge from different fields or lived experience
+domains:
+  - id: motionAtlas.expertise-role-exchange.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.expertise-role-exchange.aliases.0
+    message: expertise role exchange
+notFor:
+  - id: motionAtlas.expertise-role-exchange.notFor.0
+    message: Expertise is supplied by the author and is specific to the shown topic. The
+      animation does not assess competence.
+  - id: motionAtlas.expertise-role-exchange.notFor.1
+    message: A brief demonstration does not establish mastery or prove that learning occurred.
+  - id: motionAtlas.expertise-role-exchange.notFor.2
+    message: Do not use clothing, size, age or posture to imply a hierarchy of human worth.
+  - id: motionAtlas.expertise-role-exchange.notFor.3
+    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 34
+    description:
+      id: motionAtlas.expertise-role-exchange.motionBeats.0
+      message: Reveal equal-scale people and their unchanged job roles.
+  - startFrame: 35
+    endFrame: 82
+    description:
+      id: motionAtlas.expertise-role-exchange.motionBeats.1
+      message: The first authored expert handles the guide while the other observes.
+  - startFrame: 83
+    endFrame: 130
+    description:
+      id: motionAtlas.expertise-role-exchange.motionBeats.2
+      message: Pass the demonstration tool to the second authored expert.
+  - startFrame: 131
+    endFrame: 167
+    description:
+      id: motionAtlas.expertise-role-exchange.motionBeats.3
+      message: Hold both topic attributions and unchanged identities.

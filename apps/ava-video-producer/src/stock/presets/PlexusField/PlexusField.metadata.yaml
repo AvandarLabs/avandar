@@ -1,0 +1,56 @@
+name:
+  id: motionAtlas.plexus-field.name
+  message: Plexus field
+description:
+  id: motionAtlas.plexus-field.description
+  message: Drifting particles connect as they pass nearby.
+category:
+  id: motionAtlas.plexus-field.category
+  message: Networks
+tags:
+  - id: motionAtlas.plexus-field.tags.0
+    message: plexus
+  - id: motionAtlas.plexus-field.tags.1
+    message: particles
+  - id: motionAtlas.plexus-field.tags.2
+    message: mesh
+  - id: motionAtlas.plexus-field.tags.3
+    message: ambient
+useWhen:
+  id: motionAtlas.plexus-field.useWhen
+  message: Use an abstract connected field behind a chapter opening or a broad systems idea.
+prompt:
+  id: motionAtlas.plexus-field.prompt
+  message: Use Motion Atlas "Plexus field" (plexus-field) as a conceptual graphic. Use an
+    abstract connected field behind a chapter opening or a broad systems idea. Keep the
+    restrained motion and readable labels; replace sample content with approved facts
+    before making product claims.
+creativeDirection:
+  id: motionAtlas.plexus-field.creativeDirection
+  message: Drifting particles connect as they pass nearby.
+goodFor:
+  - id: motionAtlas.plexus-field.goodFor.0
+    message: Use an abstract connected field behind a chapter opening or a broad systems idea.
+intent:
+  id: motionAtlas.plexus-field.intent
+  message: Use an abstract connected field behind a chapter opening or a broad systems idea.
+domains:
+  - id: motionAtlas.plexus-field.domains.0
+    message: Networks
+aliases:
+  - id: motionAtlas.plexus-field.aliases.0
+    message: plexus
+  - id: motionAtlas.plexus-field.aliases.1
+    message: particles
+  - id: motionAtlas.plexus-field.aliases.2
+    message: mesh
+  - id: motionAtlas.plexus-field.aliases.3
+    message: ambient
+notFor:
+  - id: motionAtlas.plexus-field.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.plexus-field.distinction
+  message: Drifting particles connect as they pass nearby.

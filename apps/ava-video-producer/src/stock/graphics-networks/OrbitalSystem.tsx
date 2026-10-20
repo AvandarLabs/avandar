@@ -1,21 +1,27 @@
 import { loopPhase, wave } from "../../motion";
 import { Eyebrow, STOCK, Text, type GraphicProps } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { OrbitalSystemInput } from "../presets/OrbitalSystem/OrbitalSystem.schema";
 
-const ORBITS = [
-  { rx: 294, ry: 122, angle: -24, color: "accent", phase: 0 },
-  { rx: 294, ry: 122, angle: 24, color: STOCK.cyan, phase: 58 },
-  { rx: 185, ry: 185, angle: 0, color: STOCK.orange, phase: 112 },
-] as const;
+type Props = GraphicProps & { input: OrbitalSystemInput };
 
+/** Draws the bounded authored orbital-system study at an explicit frame. */
 export function OrbitalSystem({
+  input,
   frame,
   accent,
   background = STOCK.ground,
-}: GraphicProps) {
+}: Readonly<Props>) {
+  const bodies = input.bodies;
   return (
     <g>
-      <Eyebrow>ORBITAL SYSTEM</Eyebrow>
-      {ORBITS.map((orbit, i) => {
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["orbital-system"].orbitalSystem,
+        })}
+      </Eyebrow>
+      {bodies.map((orbit, i) => {
         const color = orbit.color === "accent" ? accent : orbit.color;
         const angle = loopPhase(frame, 180, orbit.phase) * Math.PI * 2;
         const rotation = (orbit.angle * Math.PI) / 180;
@@ -25,17 +31,19 @@ export function OrbitalSystem({
         const py = 298 + x * Math.sin(rotation) + y * Math.cos(rotation);
         return (
           <g key={i}>
-            <ellipse
-              cx={480}
-              cy={298}
-              rx={orbit.rx}
-              ry={orbit.ry}
-              fill="none"
-              stroke={color}
-              strokeOpacity={0.24}
-              strokeWidth={1.5}
-              transform={`rotate(${orbit.angle} 480 298)`}
-            />
+            {input.showOrbits ? (
+              <ellipse
+                cx={480}
+                cy={298}
+                rx={orbit.rx}
+                ry={orbit.ry}
+                fill="none"
+                stroke={color}
+                strokeOpacity={0.24}
+                strokeWidth={1.5}
+                transform={`rotate(${orbit.angle} 480 298)`}
+              />
+            ) : null}
             <circle
               cx={px}
               cy={py}
@@ -53,7 +61,7 @@ export function OrbitalSystem({
               fontSize={12}
               fontFamily="Arial, sans-serif"
             >
-              {["ALPHA", "BETA", "GAMMA"][i]}
+              {orbit.label}
             </text>
           </g>
         );
@@ -82,7 +90,11 @@ export function OrbitalSystem({
         strokeWidth={2}
       />
       <Text x={480} y={551} size={18} anchor="middle" fill={STOCK.muted}>
-        Independent motion. Shared gravity.
+        {getStockDisplayCopyFromDescriptor({
+          descriptor:
+            LEGACY_DISPLAY_COPY["orbital-system"]
+              .independentMotionSharedGravity,
+        })}
       </Text>
     </g>
   );

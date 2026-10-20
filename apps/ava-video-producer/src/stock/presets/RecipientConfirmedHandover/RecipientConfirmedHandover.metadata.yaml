@@ -1,0 +1,113 @@
+name:
+  id: motionAtlas.recipient-confirmed-handover.name
+  message: Choose and count the handover
+description:
+  id: motionAtlas.recipient-confirmed-handover.description
+  message: A household representative selects and physically counts the goods they want
+    from an offered delivery. Only the chosen quantities move into their basket, while
+    unselected goods remain with the delivery team.
+category:
+  id: motionAtlas.recipient-confirmed-handover.category
+  message: Participatory handover
+useWhen:
+  id: motionAtlas.recipient-confirmed-handover.useWhen
+  message: Show the household controlling and checking which quantities it receives.
+intent:
+  id: motionAtlas.recipient-confirmed-handover.intent
+  message: Show the household controlling and checking which quantities it receives.
+creativeDirection:
+  id: motionAtlas.recipient-confirmed-handover.creativeDirection
+  message: Within six seconds, reveal offered goods on a delivery table and the household
+    representative indicating their configured selections. They pull exactly the
+    selected units across a counting mat into their basket, one visible object per unit;
+    untouched quantities stay on the delivery side. The chosen-quantity rows on a
+    receipt fill from those actual movements, then the recipient acknowledges that
+    specific list and keeps one copy. Hold the counted basket, retained goods, and
+    receipt together before the shared opaque exit fade. The physical choice and
+    counting occupy most of the shot; acknowledgement is only the final beat.
+distinction:
+  id: motionAtlas.recipient-confirmed-handover.distinction
+  message: The hero action is recipient-directed selection and physical counting from a
+    larger offered set, with selected and retained quantities conserved. This differs
+    from a generic custody acknowledgement or status-cycle, because acknowledgement
+    follows a visible material choice rather than merely unlocking a transfer.
+prompt:
+  id: motionAtlas.recipient-confirmed-handover.prompt
+  message: Choose and count the handover. Show the household controlling and checking
+    which quantities it receives.
+tags:
+  - id: motionAtlas.recipient-confirmed-handover.tags.0
+    message: last mile
+  - id: motionAtlas.recipient-confirmed-handover.tags.1
+    message: recipient choice
+  - id: motionAtlas.recipient-confirmed-handover.tags.2
+    message: physical quantities
+  - id: motionAtlas.recipient-confirmed-handover.tags.3
+    message: handover
+  - id: motionAtlas.recipient-confirmed-handover.tags.4
+    message: counted receipt
+  - id: motionAtlas.recipient-confirmed-handover.tags.5
+    message: household participation
+  - id: motionAtlas.recipient-confirmed-handover.tags.6
+    message: aid delivery
+  - id: motionAtlas.recipient-confirmed-handover.tags.7
+    message: selected goods
+goodFor:
+  - id: motionAtlas.recipient-confirmed-handover.goodFor.0
+    message: Show household participation in a fictional last-mile handover
+  - id: motionAtlas.recipient-confirmed-handover.goodFor.1
+    message: Explain the distinction between offered goods and selected quantities
+  - id: motionAtlas.recipient-confirmed-handover.goodFor.2
+    message: Connect a receipt to the physical goods someone chose and counted
+domains:
+  - id: motionAtlas.recipient-confirmed-handover.domains.0
+    message: Participatory handover
+aliases:
+  - id: motionAtlas.recipient-confirmed-handover.aliases.0
+    message: last mile
+  - id: motionAtlas.recipient-confirmed-handover.aliases.1
+    message: recipient choice
+  - id: motionAtlas.recipient-confirmed-handover.aliases.2
+    message: physical quantities
+notFor:
+  - id: motionAtlas.recipient-confirmed-handover.notFor.0
+    message: Each drawn object is one fictional unit; offeredUnits equals selectedUnits plus
+      retainedUnits for every good, with retainedUnits derived rather than separately
+      configured.
+  - id: motionAtlas.recipient-confirmed-handover.notFor.1
+    message: Selected quantities are authored household choices, not a recommended package,
+      nutritional target, eligibility entitlement, or real preference measurement.
+  - id: motionAtlas.recipient-confirmed-handover.notFor.2
+    message: The example assumes the offered goods may be selected individually; it does not
+      claim that any real aid program permits substitutions or partial collection.
+  - id: motionAtlas.recipient-confirmed-handover.notFor.3
+    message: The receipt is a fictional acknowledgement of quantities, not legal proof,
+      identity verification, satisfaction, or measured impact. Avoid real names,
+      signatures, and identifiers.
+motionBeats:
+  - startFrame: 12
+    endFrame: 29
+    description:
+      id: motionAtlas.recipient-confirmed-handover.motionBeats.0
+      message: Reveal the offered goods, counting mat and household basket.
+  - startFrame: 30
+    endFrame: 100
+    description:
+      id: motionAtlas.recipient-confirmed-handover.motionBeats.1
+      message: Reach for and pull each selected unit across the mat, filling receipt
+        quantities only after arrival.
+  - startFrame: 101
+    endFrame: 126
+    description:
+      id: motionAtlas.recipient-confirmed-handover.motionBeats.2
+      message: Hold the counted list, then acknowledge it with the selected mark.
+  - startFrame: 127
+    endFrame: 167
+    description:
+      id: motionAtlas.recipient-confirmed-handover.motionBeats.3
+      message: Keep the basket, retained goods and recipient receipt visible together.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.recipient-confirmed-handover.motionBeats.4
+      message: Return to the opaque ground through the shared envelope.

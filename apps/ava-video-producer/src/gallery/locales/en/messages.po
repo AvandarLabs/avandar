@@ -1,0 +1,844 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-16 15:28-0400\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+#~ msgid "Transitions & compositions"
+#~ msgstr "Transitions & compositions"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Keywords"
+msgstr "Keywords"
+
+#. placeholder {0}: swatch.name
+#: src/gallery/MotionGallery/PaletteSwatches.tsx
+msgid "{0} brand color"
+msgstr "{0} brand color"
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+msgid "Avandar Motion Atlas home"
+msgstr "Avandar Motion Atlas home"
+
+#. placeholder {0}: preset.name
+#: src/gallery/MotionGallery/MotionCard.tsx
+msgid "Remove {0} from references"
+msgstr "Remove {0} from references"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Rendering MP4…"
+msgstr "Rendering MP4…"
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "All collections ("
+#~ msgstr "All collections ("
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Preview frame"
+msgstr "Preview frame"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "LIVE PREVIEWS"
+msgstr "LIVE PREVIEWS"
+
+#: src/gallery/MotionGallery/ReferenceTray.tsx
+msgid "references saved"
+msgstr "references saved"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "Skip to motion library"
+msgstr "Skip to motion library"
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "Motion, with"
+#~ msgstr "Motion, with"
+
+#: src/gallery/MotionGallery/ContentControls/ContentControls.tsx
+msgid "Content"
+msgstr "Content"
+
+#. placeholder {0}: STOCK_CATALOG.length
+#. placeholder {1}: STOCK_CATEGORIES.length
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+msgid "{0} presets in {1} families"
+msgstr "{0} presets in {1} families"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "✳"
+msgstr "✳"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "6 SEC LOOPS"
+msgstr "6 SEC LOOPS"
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "CONCEPTUAL STUDIES /"
+#~ msgstr "CONCEPTUAL STUDIES /"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "Keep a little inspiration."
+msgstr "Keep a little inspiration."
+
+#: src/gallery/MotionGallery/ContentControls/UnionField.tsx
+#~ msgid "Value type for {label}"
+#~ msgstr "Value type for {label}"
+
+#: src/continuity/gallery/CompositionViewer/CameraPresetControl.tsx
+#~ msgid "Controls camera travel, easing, and blur. Slower presets may lengthen "
+#~ "scenes. Playback speed is separate."
+#~ msgstr "Controls camera travel, easing, and blur. Slower presets may lengthen "
+#~ "scenes. Playback speed is separate."
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "PRESETS / VOL. 01"
+#~ msgstr "PRESETS / VOL. 01"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Pause all animations"
+msgstr "Pause all animations"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Patient and investigative. Gives viewers time to inspect an unfamiliar "
+"system or a dense diagram."
+msgstr "Patient and investigative. Gives viewers time to inspect an unfamiliar "
+"system or a dense diagram."
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Confident and purposeful. Moves promptly between familiar landmarks, "
+"with a more emphatic start and stop."
+msgstr "Confident and purposeful. Moves promptly between familiar landmarks, "
+"with a more emphatic start and stop."
+
+#: src/gallery/MotionGallery/PaletteControls.tsx
+msgid "Avandar theme swatches. Previews and MP4 downloads use these colors. "
+"Text and secondary colors stay authored."
+msgstr "Avandar theme swatches. Previews and MP4 downloads use these colors. "
+"Text and secondary colors stay authored."
+
+#: src/gallery/MotionGallery/MotionCard.tsx
+msgid "Explore"
+msgstr "Explore"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "Explore all motions"
+msgstr "Explore all motions"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Copy creative brief"
+msgstr "Copy creative brief"
+
+#: src/gallery/MotionGallery/ContentControls/ContentFeedback/ContentFeedback.tsx
+msgid "Content is valid. Ready to copy or export."
+msgstr "Content is valid. Ready to copy or export."
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDialog.tsx
+msgid "Previous motion"
+msgstr "Previous motion"
+
+#. placeholder {0}: String(frame).padStart(3, "0")
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "FRAME {0}"
+msgstr "FRAME {0}"
+
+#: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
+msgid "Annotation roughness"
+msgstr "Annotation roughness"
+
+#: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
+msgid "Smooth"
+msgstr "Smooth"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "s"
+msgstr "s"
+
+#. placeholder {0}: swatch.name
+#: src/gallery/MotionGallery/PaletteSwatches.tsx
+msgid "{0} background"
+msgstr "{0} background"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Deliberate"
+msgstr "Deliberate"
+
+#: src/continuity/gallery/CompositionPreview/CompositionPreview.tsx
+msgid "Expand preview"
+msgstr "Expand preview"
+
+#: src/continuity/gallery/CompositionViewer/CameraPresetControl.tsx
+#~ msgid "Authored"
+#~ msgstr "Authored"
+
+#. placeholder {0}: context.label
+#: src/gallery/MotionGallery/ContentControls/NullableField/NullableField.tsx
+msgid "Empty value for {0}"
+msgstr "Empty value for {0}"
+
+#. placeholder {0}: STOCK_CATALOG.length
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "All collections ({0})"
+msgstr "All collections ({0})"
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Annotations"
+msgstr "Annotations"
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+msgid "avandar"
+msgstr "avandar"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "BROWSE THE COLLECTION"
+msgstr "BROWSE THE COLLECTION"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "A visual vocabulary for your next explanation."
+msgstr "A visual vocabulary for your next explanation."
+
+#: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
+#: src/gallery/MotionGallery/AtlasSections.tsx
+msgid "Compositions"
+msgstr "Compositions"
+
+#. placeholder {0}: preset.name
+#. placeholder {1}: preset.id
+#. placeholder {2}: preset.category
+#. placeholder {3}: preset.useWhen
+#. placeholder {4}: preset.prompt
+#. placeholder {5}: preset.loopFrames / 30
+#. placeholder {6}: getReferenceUrlFromPreset(preset)
+#: src/gallery/MotionGallery/useReferenceBrief.ts
+msgid "Motion reference: {0}\n"
+"Preset: {1}\n"
+"Category: {2}\n"
+"Use when: {3}\n"
+"Direction: {4}\n"
+"Timing: {5}-second loop, 30 fps\n"
+"Accent: {accent}\n"
+"Background: {background}\n"
+"Reference: {6}\n"
+"This is a conceptual motion graphic, not product footage. Replace illustrative "
+"content with approved story content."
+msgstr "Motion reference: {0}\n"
+"Preset: {1}\n"
+"Category: {2}\n"
+"Use when: {3}\n"
+"Direction: {4}\n"
+"Timing: {5}-second loop, 30 fps\n"
+"Accent: {accent}\n"
+"Background: {background}\n"
+"Reference: {6}\n"
+"This is a conceptual motion graphic, not product footage. Replace illustrative "
+"content with approved story content."
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Loop"
+msgstr "Loop"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "CONCEPTUAL GRAPHICS"
+msgstr "CONCEPTUAL GRAPHICS"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Configured JSON copied"
+msgstr "Configured JSON copied"
+
+#. placeholder {0}: saved.length
+#. placeholder {1}: savedPresets.map((preset) => referenceBrief({ preset, accent, background })).join("\n\n---\n\n")
+#: src/gallery/MotionGallery/ReferenceTray.tsx
+msgid "Motion Atlas / Creative reference brief\n"
+"{0} selected motion references\n"
+"\n"
+"{1}"
+msgstr "Motion Atlas / Creative reference brief\n"
+"{0} selected motion references\n"
+"\n"
+"{1}"
+
+#. placeholder {0}: preset.name
+#: src/gallery/MotionGallery/MotionCard.tsx
+msgid "View {0} details"
+msgstr "View {0} details"
+
+#: src/continuity/gallery/CompositionPreview/CompositionPreviewHeader.tsx
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDialog.tsx
+msgid "Close preview"
+msgstr "Close preview"
+
+#: src/gallery/MotionGallery/MotionCard.tsx
+msgid "LIVE"
+msgstr "LIVE"
+
+#: src/gallery/MotionGallery/ContentControls/ContentControls.tsx
+msgid "Edit this preset for the current visit. Preview, copied JSON, and "
+"download use the same validated content."
+msgstr "Edit this preset for the current visit. Preview, copied JSON, and "
+"download use the same validated content."
+
+#: src/gallery/MotionGallery/ContentControls/ContentFeedback/ContentFeedback.tsx
+msgid "Check this value and its related fields."
+msgstr "Check this value and its related fields."
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "FAMILIES"
+#~ msgstr "FAMILIES"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Whip"
+msgstr "Whip"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Creative direction"
+msgstr "Creative direction"
+
+#: src/gallery/MotionGallery/PaletteSwatches.tsx
+msgid "Brand swatches"
+msgstr "Brand swatches"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "01"
+msgstr "01"
+
+#: src/continuity/gallery/CompositionPreview/CompositionPreviewHeader.tsx
+msgid "Previous preview"
+msgstr "Previous preview"
+
+#. placeholder {0}: context.label
+#: src/gallery/MotionGallery/ContentControls/UnionField/UnionField.tsx
+msgid "Value type for {0}"
+msgstr "Value type for {0}"
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid ")"
+#~ msgstr ")"
+
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+msgid "MOTION PRESETS"
+msgstr "MOTION PRESETS"
+
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+msgid "Motion, with <0>meaning.</0>"
+msgstr "Motion, with <0>meaning.</0>"
+
+#: src/gallery/MotionGallery/PaletteControls.tsx
+msgid "Background"
+msgstr "Background"
+
+#. placeholder {0}: String(STOCK_CATEGORIES.length).padStart(2, "0")
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+msgid "{0} FAMILIES"
+msgstr "{0} FAMILIES"
+
+#: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
+msgid "Complete films built from the motion library."
+msgstr "Complete films built from the motion library."
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "30 FPS"
+msgstr "30 FPS"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Play preview"
+msgstr "Play preview"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDialog.tsx
+msgid "Next motion"
+msgstr "Next motion"
+
+#: src/gallery/MotionGallery/ContentControls/ContentControls.tsx
+msgid "Reset content"
+msgstr "Reset content"
+
+#: src/gallery/MotionGallery/useMotionGalleryState.ts
+msgid "Text to copy"
+msgstr "Text to copy"
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Pause"
+msgstr "Pause"
+
+#: src/gallery/MotionGallery/PreviewDialog/usePreviewDownload.ts
+msgid "Export failed. Try again."
+msgstr "Export failed. Try again."
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "("
+#~ msgstr "("
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "Use the bookmark on any preset to add it to your references."
+msgstr "Use the bookmark on any preset to add it to your references."
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Creative brief copied"
+msgstr "Creative brief copied"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "Library navigation"
+msgstr "Library navigation"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "Explore a preset. Scrub the motion. Make it yours."
+msgstr "Explore a preset. Scrub the motion. Make it yours."
+
+#. placeholder {0}: preset.name
+#: src/gallery/MotionGallery/MotionCard.tsx
+msgid "Save {0} to references"
+msgstr "Save {0} to references"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "DRAG TO EXPLORE"
+msgstr "DRAG TO EXPLORE"
+
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+msgid "THE MOTION REFERENCE COLLECTION"
+msgstr "THE MOTION REFERENCE COLLECTION"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Keeps the speed, easing, and blur already defined in each scene. There "
+"is no fixed speed multiplier: the composition may use different settings "
+"along its route. Preserves its original pacing and feel."
+msgstr "Keeps the speed, easing, and blur already defined in each scene. There "
+"is no fixed speed multiplier: the composition may use different "
+"settings along its route. Preserves its original pacing and feel."
+
+#. placeholder {0}: path.join(".")
+#: src/gallery/MotionGallery/ContentControls/useContentField.ts
+msgid "Cell {0}"
+msgstr "Cell {0}"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Balanced"
+msgstr "Balanced"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Gentle"
+msgstr "Gentle"
+
+#: src/gallery/MotionGallery/ContentControls/ContentFeedback/ContentFeedback.tsx
+msgid "Fix the marked fields to copy or export. The preview keeps your last "
+"valid content."
+msgstr "Fix the marked fields to copy or export. The preview keeps your last "
+"valid content."
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Speed"
+msgstr "Speed"
+
+#. placeholder {0}: loopFrames - 1
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Frame {frame} of {0}"
+msgstr "Frame {frame} of {0}"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "Find the movement."
+msgstr "Find the movement."
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Play all animations"
+msgstr "Play all animations"
+
+#: src/gallery/MotionGallery/PaletteSwatches.tsx
+msgid "Background swatches"
+msgstr "Background swatches"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "·"
+msgstr "·"
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Replay"
+msgstr "Replay"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Download MP4"
+msgstr "Download MP4"
+
+#: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
+msgid "Box roughness"
+msgstr "Box roughness"
+
+#. placeholder {0}: preset.name
+#: src/gallery/MotionGallery/MotionCard.tsx
+msgid "Explore {0}"
+msgstr "Explore {0}"
+
+#: src/gallery/MotionGallery/PreviewDialog.tsx
+#~ msgid "FRAME"
+#~ msgstr "FRAME"
+
+#: src/gallery/MotionGallery/PaletteControls.tsx
+msgid "Reset colors"
+msgstr "Reset colors"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Calm and instructional. A gradual change of focus for tutorials and "
+"teaching."
+msgstr "Calm and instructional. A gradual change of focus for tutorials and "
+"teaching."
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+msgid "Productions"
+msgstr "Productions"
+
+#: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
+msgid "Sketch"
+msgstr "Sketch"
+
+#: src/gallery/MotionGallery/PaletteControls.tsx
+msgid "Live preview colors"
+msgstr "Live preview colors"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "All motions"
+msgstr "All motions"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Save reference"
+msgstr "Save reference"
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Camera motion"
+msgstr "Camera motion"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "No matching motions."
+msgstr "No matching motions."
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Restart preview"
+msgstr "Restart preview"
+
+#. placeholder {0}: preset.loopFrames
+#: src/gallery/MotionGallery/PreviewDialogContent.tsx
+#~ msgid "{0} FRAMES"
+#~ msgstr "{0} FRAMES"
+
+#. placeholder {0}: index + 1
+#: src/gallery/MotionGallery/ContentControls/CollectionField.tsx
+#~ msgid "Remove {label} item {0}"
+#~ msgstr "Remove {label} item {0}"
+
+#: src/gallery/MotionGallery/AtlasSections.tsx
+msgid "Atlas sections"
+msgstr "Atlas sections"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Composition default"
+msgstr "Composition default"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDialog.tsx
+msgid "Preview controls"
+msgstr "Preview controls"
+
+#: src/gallery/MotionGallery/ReferenceTray.tsx
+msgid "reference saved"
+msgstr "reference saved"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Good for"
+msgstr "Good for"
+
+#: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
+#: src/gallery/MotionGallery/AtlasSections.tsx
+msgid "Sample films"
+msgstr "Sample films"
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+msgid "A LIBRARY IN MOTION"
+msgstr "A LIBRARY IN MOTION"
+
+#. placeholder {0}: option.label
+#: src/continuity/gallery/CompositionViewer/CameraPresetControl.tsx
+msgid "About {0}"
+msgstr "About {0}"
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Captions"
+msgstr "Captions"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Collection"
+msgstr "Collection"
+
+#: src/gallery/MotionGallery/ReferenceTray.tsx
+msgid "Saved reference actions"
+msgstr "Saved reference actions"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "General and technology"
+msgstr "General and technology"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Copy configured JSON"
+msgstr "Copy configured JSON"
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+msgid "Motion Atlas"
+msgstr "Motion Atlas"
+
+#. placeholder {0}: context.label
+#. placeholder {1}: index + 1
+#: src/gallery/MotionGallery/ContentControls/CollectionItem/CollectionItem.tsx
+msgid "Remove {0} item {1}"
+msgstr "Remove {0} item {1}"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Brisk"
+msgstr "Brisk"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Current time"
+msgstr "Current time"
+
+#. placeholder {0}: STOCK_CATALOG.length
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "CONCEPTUAL STUDIES / {0} PRESETS / VOL. 01"
+msgstr "CONCEPTUAL STUDIES / {0} PRESETS / VOL. 01"
+
+#: src/gallery/MotionGallery/PreviewDialog.tsx
+#~ msgid "FRAMES"
+#~ msgstr "FRAMES"
+
+#: src/gallery/MotionGallery/AtlasSections.tsx
+msgid "Motions"
+msgstr "Motions"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Pause all"
+msgstr "Pause all"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Search motions"
+msgstr "Search motions"
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "meaning."
+#~ msgstr "meaning."
+
+#: src/gallery/MotionGallery/ContentControls/SelectField.tsx
+msgid "Choose a value"
+msgstr "Choose a value"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Fast and energetic. Adds a brief burst of momentum at a major subject "
+"change. Best used sparingly, with a clear destination."
+msgstr "Fast and energetic. Adds a brief burst of momentum at a major subject "
+"change. Best used sparingly, with a clear destination."
+
+#: src/gallery/MotionGallery/ContentControls/ContentField.tsx
+#~ msgid "Empty value for {label}"
+#~ msgstr "Empty value for {label}"
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Colors affect editorial graphics. Product components retain their native "
+"theme."
+msgstr "Colors affect editorial graphics. Product components retain their "
+"native theme."
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Social sector"
+msgstr "Social sector"
+
+#: src/gallery/MotionGallery/ContentControls/CollectionItem/CollectionItem.tsx
+msgid "Remove"
+msgstr "Remove"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Measured and readable. Connects related ideas without drawing attention "
+"away from the explanation."
+msgstr "Measured and readable. Connects related ideas without drawing attention "
+"away from the explanation."
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Play"
+msgstr "Play"
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Only camera travel changes. Reading holds stay intact; slower moves may "
+"extend the scene. The Motion blur toggle can turn blur off."
+msgstr "Only camera travel changes. Reading holds stay intact; slower moves may "
+"extend the scene. The Motion blur toggle can turn blur off."
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Conceptual graphics. No Avandar product footage."
+msgstr "Conceptual graphics. No Avandar product footage."
+
+#: src/gallery/MotionGallery/ReferenceTray.tsx
+msgid "Reference brief copied"
+msgstr "Reference brief copied"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Play all"
+msgstr "Play all"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Search motions, ideas…"
+msgstr "Search motions, ideas…"
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+#: src/gallery/MotionGallery/MotionCard.tsx
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "/"
+msgstr "/"
+
+#: src/gallery/MotionGallery/PaletteControls.tsx
+msgid "Brand color"
+msgstr "Brand color"
+
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Clear search"
+msgstr "Clear search"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "Pause preview"
+msgstr "Pause preview"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Saved to references"
+msgstr "Saved to references"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
+msgid "{loopFrames} FRAMES"
+msgstr "{loopFrames} FRAMES"
+
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Motion blur"
+msgstr "Motion blur"
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "Small movements. Clear ideas."
+#~ msgstr "Small movements. Clear ideas."
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "Shape the story."
+msgstr "Shape the story."
+
+#: src/gallery/MotionGallery.tsx
+#~ msgid "reusable motion presets for the moments a screenshot can’t explain."
+#~ msgstr "reusable motion presets for the moments a screenshot can’t explain."
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "Your references, ready for a creative brief."
+msgstr "Your references, ready for a creative brief."
+
+#: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+msgid "Camera travel speed: {speed}×. Easing: {easing}. Blur shutter angle: "
+"{shutterAngle}°. Blur strength: 1; temporal samples: 10."
+msgstr "Camera travel speed: {speed}×. Easing: {easing}. Blur shutter angle: "
+"{shutterAngle}°. Blur strength: 1; temporal samples: 10."
+
+#: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
+msgid "Reusable units that combine two or more motions."
+msgstr "Reusable units that combine two or more motions."
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+msgid "Starter showcase"
+msgstr "Starter showcase"
+
+#: src/gallery/MotionGallery/ContentControls/CollectionField/CollectionField.tsx
+msgid "Add {label} item"
+msgstr "Add {label} item"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "Save a few references, then copy a creative brief for your next film."
+msgstr "Save a few references, then copy a creative brief for your next film."
+
+#: src/gallery/MotionGallery/ReferenceTray.tsx
+msgid "Clear"
+msgstr "Clear"
+
+#: src/gallery/MotionGallery/MotionCard.tsx
+msgid "PAUSED"
+msgstr "PAUSED"
+
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+msgid "CURATED COLLECTION"
+msgstr "CURATED COLLECTION"
+
+#: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
+msgid "Subtle"
+msgstr "Subtle"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Reference link copied"
+msgstr "Reference link copied"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "LOCAL MOTION LIBRARY"
+msgstr "LOCAL MOTION LIBRARY"
+
+#. placeholder {0}: STOCK_CATALOG.length
+#: src/gallery/MotionGallery/GalleryIntroduction.tsx
+msgid "Small movements. Clear ideas. {0} reusable motion presets for the "
+"moments a screenshot can’t explain."
+msgstr "Small movements. Clear ideas. {0} reusable motion presets for the "
+"moments a screenshot can’t explain."
+
+#. placeholder {0}: index + 1
+#: src/gallery/MotionGallery/ContentControls/CollectionItem/CollectionItem.tsx
+msgid "Item {0}"
+msgstr "Item {0}"
+
+#: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
+msgid "Copy link"
+msgstr "Copy link"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+msgid "NOT PRODUCT FOOTAGE"
+msgstr "NOT PRODUCT FOOTAGE"
+
+#: src/continuity/gallery/CompositionPreview/CompositionPreviewHeader.tsx
+msgid "Next preview"
+msgstr "Next preview"
+
+#: src/gallery/MotionGallery/GalleryNavigation.tsx
+#: src/gallery/MotionGallery/GalleryToolbar.tsx
+msgid "Saved references"
+msgstr "Saved references"
+
+#. placeholder {0}: swatch.name
+#. placeholder {1}: swatch.color
+#. placeholder {2}: swatch.token
+#: src/gallery/MotionGallery/PaletteSwatches.tsx
+msgid "{0}: {1} ({2})"
+msgstr "{0}: {1} ({2})"
+
+#: src/gallery/MotionGallery/GalleryHeader.tsx
+msgid "Showcase"
+msgstr "Showcase"
+
+#: src/gallery/MotionGallery/useMotionGalleryState.ts
+msgid "Copy unavailable. Select the reference text and copy it manually."
+msgstr "Copy unavailable. Select the reference text and copy it manually."
+
+#: src/continuity/gallery/CompositionViewer/CameraPresetControl.tsx
+msgid "Camera motion preset"
+msgstr "Camera motion preset"
+
+#: src/gallery/MotionGallery/MotionGallery.tsx
+msgid "Try a different keyword, or explore the full collection."
+msgstr "Try a different keyword, or explore the full collection."
+
+#: src/gallery/MotionGallery/ReferenceTray.tsx
+msgid "Copy brief"
+msgstr "Copy brief"
+
+#: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
+msgid "Rough"
+msgstr "Rough"

@@ -1,0 +1,91 @@
+name:
+  id: motionAtlas.retry-backoff.name
+  message: Wait longer before retrying
+description:
+  id: motionAtlas.retry-backoff.description
+  message: One operation returns from unsuccessful attempts and waits through successively
+    wider intervals. Its final attempt either completes or stops, according to the
+    supplied outcome.
+category:
+  id: motionAtlas.retry-backoff.category
+  message: Time and resilience
+useWhen:
+  id: motionAtlas.retry-backoff.useWhen
+  message: Explain that repeated attempts can be deliberately spaced farther apart.
+prompt:
+  id: motionAtlas.retry-backoff.prompt
+  message: Explain that repeated attempts can be deliberately spaced farther apart.
+creativeDirection:
+  id: motionAtlas.retry-backoff.creativeDirection
+  message: Frames 12..36 introduce the operation token and its first attempt marker. The
+    token makes a short out-and-back trip for each retry outcome, then traverses a
+    visibly wider waiting bracket before the next attempt. Bracket widths are
+    proportional to the authored delay values, while the full action is compressed into
+    frames 36..140. At the final marker, the token either docks in a completed socket or
+    rests against a stop cap. Hold the final outcome and the complete chain of attempts
+    through frame 168, then fade to ground. The growing gaps, not repeated flashes,
+    explain the backoff.
+intent:
+  id: motionAtlas.retry-backoff.intent
+  message: Explain that repeated attempts can be deliberately spaced farther apart.
+distinction:
+  id: motionAtlas.retry-backoff.distinction
+  message: Status-cycle advances once through states; this repeatedly returns the same
+    operation to an attempt point and makes increasing wait intervals the main
+    explanatory device. It does not change the operation after feedback.
+tags:
+  - id: motionAtlas.retry-backoff.tags.0
+    message: retry
+  - id: motionAtlas.retry-backoff.tags.1
+    message: backoff
+  - id: motionAtlas.retry-backoff.tags.2
+    message: delay
+  - id: motionAtlas.retry-backoff.tags.3
+    message: temporary failure
+  - id: motionAtlas.retry-backoff.tags.4
+    message: attempt
+  - id: motionAtlas.retry-backoff.tags.5
+    message: waiting
+  - id: motionAtlas.retry-backoff.tags.6
+    message: recovery
+  - id: motionAtlas.retry-backoff.tags.7
+    message: stop condition
+goodFor:
+  - id: motionAtlas.retry-backoff.goodFor.0
+    message: Explaining increasing waits after temporary failures
+  - id: motionAtlas.retry-backoff.goodFor.1
+    message: Introducing a bounded retry policy
+  - id: motionAtlas.retry-backoff.goodFor.2
+    message: Showing that retries can end without eventual success
+domains:
+  - id: motionAtlas.retry-backoff.domains.0
+    message: Editorial explanation
+aliases:
+  - id: motionAtlas.retry-backoff.aliases.0
+    message: Time and resilience
+notFor:
+  - id: motionAtlas.retry-backoff.notFor.0
+    message: All default outcomes and waits are fictional; the animation does not recommend
+      a retry policy.
+  - id: motionAtlas.retry-backoff.notFor.1
+    message: Timeline widths represent supplied relative waits, but playback is editorially
+      compressed and is not a wall clock.
+  - id: motionAtlas.retry-backoff.notFor.2
+    message: No probability of eventual success, randomized jitter, or independent
+      concurrent requests is implied.
+motionBeats:
+  - startFrame: 12
+    endFrame: 36
+    description:
+      id: motionAtlas.retry-backoff.motionBeats.0
+      message: Reveal the operation and first attempt.
+  - startFrame: 36
+    endFrame: 140
+    description:
+      id: motionAtlas.retry-backoff.motionBeats.1
+      message: Return from each retry and traverse proportionally growing waits.
+  - startFrame: 140
+    endFrame: 168
+    description:
+      id: motionAtlas.retry-backoff.motionBeats.2
+      message: Hold the declared final outcome and exact attempt chain.

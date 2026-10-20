@@ -1,0 +1,1497 @@
+{
+  "schemaVersion": 1,
+  "status": "historical-findings-preserved-no-new-adjudication",
+  "head": "498c717d53240d15a29396830759a571a938f492",
+  "sourceHash": "2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae",
+  "canonical108Unchanged": "implementation-findings.json",
+  "canonicalSupplementUnchanged": "implementation-findings-supplement.json",
+  "counts": {
+    "mp4": {
+      "default": 150,
+      "configuredCli": 16,
+      "httpDownload": 1,
+      "entries": 167,
+      "imageInspectionReports": 35,
+      "assignments": 34,
+      "actualNaturalCaptures": 835,
+      "recordedPersonallyViewedImages": 368,
+      "primaryFindingOccurrences": 20,
+      "findingRegistryEntriesIncludingNestedPriorEvidence": 27,
+      "allFindingOccurrenceReferences": 31,
+      "reportedDroppedVideoFrames": 1
+    },
+    "poster": {
+      "defaultPosterReports": 16,
+      "defaultCanonicalPosters": 150,
+      "configuredCliPosterReports": 3,
+      "configuredCliCanonicalPosters": 16,
+      "standaloneCanonicalPosters": 166,
+      "httpPreviewCandidateEvidence": 1,
+      "httpPreviewFiles": 2,
+      "httpStandaloneStockPosters": 0,
+      "originalReportsEmbedded": 20,
+      "originalReportsDownloadsParityVerified": 20,
+      "uniqueCanonicalPosterFiles": 166,
+      "explicitDefaultFindings": 15,
+      "explicitConfiguredCliFindings": 1,
+      "explicitHttpPreviewFindings": 0,
+      "explicitEditorialObservationEntries": 1,
+      "independentlyRecomputedConfigurationHashes": 168,
+      "validationIssueCount": 0,
+      "newImageViewsDuringConsolidation": 0
+    }
+  },
+  "mp4PrimaryFindings": [
+    {
+      "key": "default-reject-and-replace",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-000-inspection.json",
+      "recordIndex": 2,
+      "finding": {
+        "findingId": "poster-reject-replace-incomplete-transition",
+        "severity": "low",
+        "type": "retained-static-poster-and-transient-action-content-coverage",
+        "status": "retained-prior-concern-later-hold-clear",
+        "scope": "canonical-frame90-poster-and-native-early-action",
+        "description": "At the native action-early capture window 2.812456..2.904181 s, the incoming replacement is dim and clipped by the right edge while the dashed central slot is empty, matching the earlier canonical poster concern.",
+        "laterHoldAssessment": "At the native hold capture window 4.810773..4.898344 s both cards, their reasons and the selected replacement are fully inside the image. No lasting hold clipping or missing selected content is observed.",
+        "isNewFinding": false,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-argument-bridge",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-001-inspection.json",
+      "recordIndex": 1,
+      "finding": {
+        "findingId": "decoded-argument-bridge-early-dim-conclusion",
+        "severity": "low",
+        "type": "sampled-transition-readability",
+        "status": "retained-poster-concern-later-hold-clear",
+        "priorFindingId": "poster-argument-bridge-dim-conclusion",
+        "phase": "action-early",
+        "description": "The conclusion is extremely faint while premise texts and Together, these support are fully readable in the native early decoded sample.",
+        "laterHold": "The conclusion is fully readable in the native hold and the late-action contact tile.",
+        "impact": "Retains the static poster's incomplete conclusion communication. Does not establish a lasting contrast defect in the MP4.",
+        "duration": "Unknown from separated samples. The before/after capture window bounds the screenshot operation, not the whole duration of the faint state."
+      }
+    },
+    {
+      "key": "default-shared-foundation",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-001-inspection.json",
+      "recordIndex": 4,
+      "finding": {
+        "findingId": "decoded-shared-foundation-early-join-gap",
+        "severity": "low",
+        "type": "sampled-transition-text-occlusion",
+        "status": "retained-poster-concern-later-hold-clear",
+        "priorFindingId": "poster-shared-foundation-gap-text-occlusion",
+        "phase": "action-early",
+        "location": "Native1280x800 lower foundation gap approximately x594..686,y520..733 in this early decoded sample.",
+        "description": "The central join gap masks middle letters of the foundation heading and shared-principle sentence.",
+        "laterHold": "The native hold shows both complete sentences on one continuous foundation panel with both approach stems attached.",
+        "impact": "The early sample and static poster incompletely communicate the shared purpose, while the later hold is readable.",
+        "duration": "Unknown from separated samples. No uninterrupted pixel review or exact frame identity is claimed."
+      }
+    },
+    {
+      "key": "default-cell-normalization",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-004-inspection.json",
+      "recordIndex": 1,
+      "finding": {
+        "findingId": "decoded-cell-normalization-early-crossfade-overprint",
+        "relatedPriorFindingId": "cell-normalization-frame90-poster-residual-crossfade-overprint",
+        "severity": "low",
+        "type": "sampled-transition-readability",
+        "status": "retained-poster-concern-later-hold-clear",
+        "phase": "action-early",
+        "description": "Faint displaced old-value letters compete with the first prepared Bay A; a displaced old heading layer is also visible in the native early sample.",
+        "laterHold": "The native held prepared values Bay A, Bay B and Bay C are clean and the exact originals remain in the right rail.",
+        "impact": "The early sample retains local letter competition from the poster concern. No lasting wrong prepared value is established.",
+        "duration": "Unknown from separated samples; no continuous pixel or exact-frame review is claimed."
+      }
+    },
+    {
+      "key": "default-batch-release",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-006-inspection.json",
+      "recordIndex": 4,
+      "finding": {
+        "findingId": "mp4-batch-release-entrance-heading-overlap",
+        "severity": "low",
+        "type": "transient-entrance-label-overlap",
+        "status": "controller-review-later-hold-clear",
+        "scope": "native-entrance-capture",
+        "captureWindow": [
+          0.609264,
+          0.694131
+        ],
+        "description": "The incoming A item card covers part of Bundle A, and the card's lower border crosses the heading letters.",
+        "laterHoldAssessment": "At 4.807801..4.893479 s Bundle A, A/B/C and Group complete are clear on the collected side. No lasting hold overlap is observed.",
+        "isNewFinding": true,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-linked-parameter-rehearsal",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-007-inspection.json",
+      "recordIndex": 4,
+      "finding": {
+        "findingId": "decoded-linked-parameter-source-tick-overlap",
+        "relatedPriorFindingId": "poster-linked-parameter-source-tick-overlap",
+        "severity": "low",
+        "type": "sampled-text-line-overlap",
+        "status": "retained-concern-visible-in-native-hold",
+        "phase": [
+          "action-early",
+          "action-late",
+          "hold"
+        ],
+        "location": "Native1280x800 source ruler endpoint 0 around x506..516,y255.",
+        "description": "The source connector's horizontal segment runs along/through the lower edge of the small source ruler 0 label in all three separately viewed full-size samples.",
+        "impact": "Local line/text separation is reduced while the endpoint numeral and main arithmetic values remain readable. It is not resolved by the later held pose.",
+        "duration": "Only the three separated native capture windows are inspected; continuous duration is not established.",
+        "relationshipToPrior": "Additional default decoded evidence for the retained default-poster concern. The distinct configured N6 extreme-value configuration and its evidence remain independent and are not closed."
+      }
+    },
+    {
+      "key": "default-outreach-household-revisits",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-009-inspection.json",
+      "recordIndex": 2,
+      "finding": {
+        "findingId": "outreach-home-b-worker-numeral-crowding-poster90",
+        "severity": "low",
+        "type": "retained-static-poster-transition-readability",
+        "status": "retained-prior-concern-later-hold-clear",
+        "scope": "separate-canonical-frame90-poster",
+        "description": "The native canonical poster shows the worker sharing Home B's roof/number area and crowding the local 2. The numeral remains decipherable and the separate 2/Home B legend preserves identity.",
+        "laterHoldAssessment": "The native decoded hold shows Home B's 2 clear and the worker beside Home D. No lasting lost identity is observed; no duration is inferred from the poster.",
+        "isNewFinding": false,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-aid-cargo-mode-handoff",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-010-inspection.json",
+      "recordIndex": 1,
+      "finding": {
+        "findingId": "retained-poster-cargo-parcel1-id-occlusion",
+        "severity": "low",
+        "type": "retained-source-frame-poster-readability",
+        "status": "poster-concern-preserved-decoded-early-and-hold-ids-clear",
+        "phase": "canonical-poster-tile6",
+        "description": "The canonical frame90 poster retains parcel2 partly covering parcel1's numeric ID, as documented in the original poster report and visible in the poster tile.",
+        "decodedSamples": "The native early decoded sample has two adjacent readable ID cards over the truck; the later native hold has both readable on the cargo bike, with earlier carriers empty.",
+        "impact": "The static poster remains a sampled ID-readability concern. The reviewed decoded holds do not show lasting identity loss, cargo duplication or simultaneous loads on multiple carriers.",
+        "duration": "Not established; separated decoded captures do not cover every moment between their windows.",
+        "relatedPriorEvidence": "final-default-posters-498c717d-050-060.json, aid-cargo-mode-handoff sampled-intermediate-id-occlusion"
+      }
+    },
+    {
+      "key": "default-stratified-spatial-sample",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-016-inspection.json",
+      "recordIndex": 2,
+      "finding": {
+        "findingId": "decoded-stratified-unpopulated-summary-captions",
+        "severity": null,
+        "severityStatus": "pending-controller-adjudication",
+        "type": "confirmed-held-display-omission",
+        "status": "source-confirmed-no-fix-made",
+        "phase": [
+          "action-late",
+          "hold"
+        ],
+        "description": "Selected, Eligible sites and Not selected are visible bottom summary captions, but no aggregate numbers appear beneath them in the full-size decoded late and held samples.",
+        "sourceDerivedExpectedTotals": {
+          "selected": 2,
+          "eligible": 5,
+          "notSelected": 3
+        },
+        "sourceDerivedScope": "These quantities are computed from the exact accepted input; they are not claimed to be visible in the screenshot.",
+        "sourceExplanation": "SampleCopy.tsx lines9–11 render only the caption strings, without numeric totals. The root component composes no aggregate-total renderer, and SampleCopy accepts no frame, ruling out a delayed numeric reveal in that component.",
+        "schemaStatus": "Accepted input preserves all five sites and selectedSiteIds a/d. Schema has no aggregate-total option. Core documented per-stratum fractions1/3 and1/2 are correct; no selected-site/denominator semantic failure is asserted.",
+        "impact": "Bottom summary labels appear unpopulated despite enough information to derive the totals. Presentation severity and acceptance are for controller disposition.",
+        "timingAndCropping": "Native action-late and hold each show the complete1280x800 scene with blank summary areas inside the frame. Source inspection confirms omission rather than snapshot cropping or a delayed total reveal. Continuous duration is not claimed."
+      }
+    },
+    {
+      "key": "default-resident-budget-ballots",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-018-inspection.json",
+      "recordIndex": 4,
+      "finding": {
+        "findingId": "resident-ballot-reading-tally-crowding-poster90",
+        "severity": "low",
+        "type": "retained-static-poster-intermediate-tally-crowding",
+        "status": "retained-prior-concern-later-hold-clear",
+        "scope": "separate-canonical-frame90-poster",
+        "description": "The canonical poster's reading count 1 shares space with the moving ballot and diagonal box lid; those edges crowd/cross the count area while the numeral and project label remain discernible.",
+        "laterHoldAssessment": "At 4.803592..4.892198 s the native decoded hold has separate clear 2/1/1 tallies and b1/b3, b2, b4 in the correct columns. No lasting count occlusion or wrong total is observed.",
+        "isNewFinding": false,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-school-transition-rehearsal",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-019-inspection.json",
+      "recordIndex": 1,
+      "finding": {
+        "findingId": "decoded-school-practice-caption-leader-crossing",
+        "severity": "low",
+        "type": "sampled-transition-leader-text-crowding",
+        "status": "retained-poster-concern-later-hold-clear",
+        "phase": "action-early",
+        "description": "A thin vertical actor leader crosses the Try the locker text region in the native early decoded sample. The text remains readable.",
+        "laterHold": "The shifted held strip has both captions clear; the blue figure is behind the figure at the classroom.",
+        "impact": "Retains the concrete earlier line/text crowding concern. It does not establish a wrong actor role, permanent obstruction or attendance/enrollment outcome.",
+        "roleBoundary": "The prior raw poster report's actor-label phrasing is preserved. This finding identifies the visible leader geometrically and does not infer an actor-role error from that phrasing.",
+        "duration": "Unknown from separated samples; no continuous pixel review is claimed."
+      }
+    },
+    {
+      "key": "default-actor-attribution-split",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-021-inspection.json",
+      "recordIndex": 0,
+      "finding": {
+        "findingId": "actor-attribution-split-natural120-stamp-occlusion",
+        "severity": "low",
+        "type": "retained-transient-account-stamp-occlusion",
+        "status": "retained-prior-concern-later-hold-clear",
+        "scope": "native-late-action-capture",
+        "captureWindow": [
+          4.005175,
+          4.099856
+        ],
+        "description": "The moving Demo account B stamp crosses the left part of the Draft revised/Demo account A history card, hiding part of its account label.",
+        "laterHoldAssessment": "At 4.805071..4.900423 s all four account-history rows are fully readable and correctly labelled, with earlier shared labels unchanged.",
+        "isNewFinding": false,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-expectation-overlay-check",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-021-inspection.json",
+      "recordIndex": 3,
+      "finding": {
+        "findingId": "expectation-overlay-default-overprint-current-natural-window",
+        "relatedPosterFindingId": "expectation-overlay-default-frame90-overprint",
+        "severity": "low",
+        "priorSeverity": "pending-playback",
+        "type": "retained-intentional-registration-transient-overprint",
+        "status": "retained-transient-observation-no-source-change",
+        "scope": "native-early-action-capture-and-separate-prior-poster",
+        "captureWindow": [
+          2.80572,
+          2.884661
+        ],
+        "description": "Expired-ticket expected Hold and observed Admit overprint into combined letters at the same result-box position; they are not independently readable in this natural decoded action sample.",
+        "laterHoldAssessment": "At 4.804351..4.890389 s Hold and Admit are separated and readable with Differs/amber bracket, while the known row has Admit/Matches.",
+        "isNewFinding": false,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-peer-contribution-recognition",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-022-inspection.json",
+      "recordIndex": 1,
+      "finding": {
+        "findingId": "retained-poster-peer-dim-acknowledgment",
+        "relatedPriorFindingId": "poster-peer-recognition-dim-acknowledgment",
+        "severity": "low",
+        "type": "retained-source-frame-poster-readability",
+        "status": "poster-concern-preserved-later-native-hold-clear",
+        "phase": "canonical-poster-tile6",
+        "description": "The canonical frame90 poster retains very low-contrast acknowledgment text while contribution/ownership labels are readable.",
+        "laterHold": "The native decoded hold has a bright complete Your guide made the steps clear. speech bubble and retains Rin's authorship tab.",
+        "impact": "The static poster weakly communicates the authored acknowledgment. The viewed later held pixels do not show a lasting contrast defect.",
+        "duration": "Not established from separated captures; early action is before the visible bubble and later action/hold are readable."
+      }
+    },
+    {
+      "key": "default-filter-subscription-scope",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-027-inspection.json",
+      "recordIndex": 0,
+      "finding": {
+        "findingId": "filter-subscription-mask-before-count-settlement",
+        "severity": "low",
+        "type": "retained-transient-filter-mask-count-mismatch",
+        "status": "retained-prior-concern-later-hold-correct",
+        "scope": "native-late-action-capture",
+        "captureWindow": [
+          4.007939,
+          4.0963
+        ],
+        "description": "Both subscribed views already dim/exclude East 5 while still displaying unfiltered 10 items/3 records totals.",
+        "laterHoldAssessment": "At 4.806921..4.892306 s both subscribed totals are 5 items/2 records and reference remains 10/3.",
+        "isNewFinding": false,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-proportional-symbol-area",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-027-inspection.json",
+      "recordIndex": 3,
+      "finding": {
+        "findingId": "proportional-symbol-area-mid-assembly-label-crowding-poster90",
+        "severity": "low",
+        "type": "retained-static-poster-transition-readability",
+        "status": "retained-prior-concern-later-hold-clear",
+        "scope": "separate-canonical-frame90-poster",
+        "description": "Mint assembly components and edges crowd the local Site B numeral 2. The separate 2/Site B/4 items legend remains clear.",
+        "laterHoldAssessment": "At 4.816359..4.899616 s the settled Site B circle has a clear local 2 and the area/radius comparison is visible.",
+        "isNewFinding": false,
+        "isLastingHoldFinding": false
+      }
+    },
+    {
+      "key": "default-spatial-grid-binning",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+      "recordIndex": 0,
+      "finding": {
+        "findingId": "poster-grid-binning-count-marker-lag",
+        "severity": "low",
+        "type": "retained-poster-transitional-count-marker-mismatch",
+        "status": "retained-for-controller-disposition",
+        "description": "Original frame90 poster has counts2/0/0/0 despite4markers and total4. Actual early decoded sample also has marker/counter lag; later and native hold settle to2/1/0/1.",
+        "impact": "Static poster and sampled assembly undercount pictured occupants. No lasting held defect is observed; exact duration is not established."
+      }
+    },
+    {
+      "key": "default-coordinate-quality-triage",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+      "recordIndex": 2,
+      "finding": {
+        "findingId": "poster-coordinate-triage-count-marker-lag",
+        "severity": "low",
+        "type": "retained-poster-transitional-count-marker-mismatch",
+        "status": "retained-for-controller-disposition",
+        "description": "Original frame90 poster and early decoded sample have occupied rejection trays with zero counters. Actual late and native hold show1/1/1rejections plus plotted1,total4.",
+        "impact": "Static poster and sampled assembly undercount assigned rows. Later held counts are correct; duration and continuous visibility remain unassessed."
+      }
+    },
+    {
+      "key": "default-geometry-detail-budget",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+      "recordIndex": 4,
+      "finding": {
+        "findingId": "poster-geometry-detail-count-lag",
+        "severity": "low",
+        "type": "retained-poster-transitional-count-marker-mismatch",
+        "status": "retained-for-controller-disposition",
+        "description": "Original frame90 poster and early decoded sample display0kept/0removed while geometry is present. Native hold has5kept/1removed and the correct completed path.",
+        "impact": "Static poster has unsettled counts. No held counter or final-geometry defect is observed; exact transition duration is unassessed."
+      }
+    },
+    {
+      "key": "configured-n6",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-configured-002-inspection.json",
+      "recordIndex": 1,
+      "finding": {
+        "findingId": "configured-N6-source-tick-connector-overlap",
+        "severity": "low",
+        "type": "retained-text-line-overlap-in-decoded-samples",
+        "status": "minor-deferred-for-final-review",
+        "description": "Native early and late trial screenshots reproduce the connector across the lower edge of the source -1e+308 endpoint label. In native restored hold, the long segment retracts but the connector elbow still meets the leading minus/lower-left label edge aroundx506,y255.",
+        "impact": "Tick text and main values remain readable, but text/line separation is imperfect. Correct restored values do not erase this geometric readability concern.",
+        "evidencePhases": [
+          "action-early",
+          "action-late",
+          "hold"
+        ],
+        "durationEstablished": false,
+        "lastingWrongValueEstablished": false,
+        "priorDispositionPreserved": true,
+        "currentHoldQualification": "Earlier controller disposition called hold clear. Current native decoded hold specifically shows remaining leading-minus/elbow contact; it does not show the long trial segment crossing the full tick."
+      }
+    }
+  ],
+  "mp4FindingRegistry": [
+    {
+      "explicitFindingId": "poster-reject-replace-incomplete-transition",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-000-inspection.json",
+          "jsonPointer": "/records/2/findings/0",
+          "finding": {
+            "findingId": "poster-reject-replace-incomplete-transition",
+            "severity": "low",
+            "type": "retained-static-poster-and-transient-action-content-coverage",
+            "status": "retained-prior-concern-later-hold-clear",
+            "scope": "canonical-frame90-poster-and-native-early-action",
+            "description": "At the native action-early capture window 2.812456..2.904181 s, the incoming replacement is dim and clipped by the right edge while the dashed central slot is empty, matching the earlier canonical poster concern.",
+            "laterHoldAssessment": "At the native hold capture window 4.810773..4.898344 s both cards, their reasons and the selected replacement are fully inside the image. No lasting hold clipping or missing selected content is observed.",
+            "isNewFinding": false,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "decoded-argument-bridge-early-dim-conclusion",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-001-inspection.json",
+          "jsonPointer": "/records/1/findings/0",
+          "finding": {
+            "findingId": "decoded-argument-bridge-early-dim-conclusion",
+            "severity": "low",
+            "type": "sampled-transition-readability",
+            "status": "retained-poster-concern-later-hold-clear",
+            "priorFindingId": "poster-argument-bridge-dim-conclusion",
+            "phase": "action-early",
+            "description": "The conclusion is extremely faint while premise texts and Together, these support are fully readable in the native early decoded sample.",
+            "laterHold": "The conclusion is fully readable in the native hold and the late-action contact tile.",
+            "impact": "Retains the static poster's incomplete conclusion communication. Does not establish a lasting contrast defect in the MP4.",
+            "duration": "Unknown from separated samples. The before/after capture window bounds the screenshot operation, not the whole duration of the faint state."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "poster-argument-bridge-dim-conclusion",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-001-inspection.json",
+          "jsonPointer": "/records/1/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "poster-argument-bridge-dim-conclusion",
+            "severity": "low",
+            "type": "poster-transitional-readability",
+            "status": "controller-review",
+            "frame": 90,
+            "description": "The main conclusion is very dim in the canonical poster while supporting premises and connector are fully readable.",
+            "impact": "Poster incompletely communicates the argument's conclusion at first paint. This does not establish a lasting contrast defect in later clip frames."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "decoded-shared-foundation-early-join-gap",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-001-inspection.json",
+          "jsonPointer": "/records/4/findings/0",
+          "finding": {
+            "findingId": "decoded-shared-foundation-early-join-gap",
+            "severity": "low",
+            "type": "sampled-transition-text-occlusion",
+            "status": "retained-poster-concern-later-hold-clear",
+            "priorFindingId": "poster-shared-foundation-gap-text-occlusion",
+            "phase": "action-early",
+            "location": "Native1280x800 lower foundation gap approximately x594..686,y520..733 in this early decoded sample.",
+            "description": "The central join gap masks middle letters of the foundation heading and shared-principle sentence.",
+            "laterHold": "The native hold shows both complete sentences on one continuous foundation panel with both approach stems attached.",
+            "impact": "The early sample and static poster incompletely communicate the shared purpose, while the later hold is readable.",
+            "duration": "Unknown from separated samples. No uninterrupted pixel review or exact frame identity is claimed."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "poster-shared-foundation-gap-text-occlusion",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-001-inspection.json",
+          "jsonPointer": "/records/4/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "poster-shared-foundation-gap-text-occlusion",
+            "severity": "low",
+            "type": "poster-transitional-text-occlusion",
+            "status": "controller-review",
+            "frame": 90,
+            "location": "Native1280x800 poster central lower gap around x607..674,y520..735.",
+            "description": "Still-separated foundation halves mask the center of both shared-purpose heading and shared-principle text.",
+            "impact": "The exported static poster does not fully state the authored common purpose. No lasting final-state omission is established."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "decoded-cell-normalization-early-crossfade-overprint",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-004-inspection.json",
+          "jsonPointer": "/records/1/findings/0",
+          "finding": {
+            "findingId": "decoded-cell-normalization-early-crossfade-overprint",
+            "relatedPriorFindingId": "cell-normalization-frame90-poster-residual-crossfade-overprint",
+            "severity": "low",
+            "type": "sampled-transition-readability",
+            "status": "retained-poster-concern-later-hold-clear",
+            "phase": "action-early",
+            "description": "Faint displaced old-value letters compete with the first prepared Bay A; a displaced old heading layer is also visible in the native early sample.",
+            "laterHold": "The native held prepared values Bay A, Bay B and Bay C are clean and the exact originals remain in the right rail.",
+            "impact": "The early sample retains local letter competition from the poster concern. No lasting wrong prepared value is established.",
+            "duration": "Unknown from separated samples; no continuous pixel or exact-frame review is claimed."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "cell-normalization-frame90-poster-residual-crossfade-overprint",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-004-inspection.json",
+          "jsonPointer": "/records/1/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "cell-normalization-frame90-poster-residual-crossfade-overprint",
+            "relatedPriorFindingId": "cell-normalization-crossfade-text-overprint",
+            "classification": "retained-sampled-transition-readability; static-poster-concern",
+            "severity": "low",
+            "observation": "Faint displaced old-value paint remains behind and to the right of the prepared first-row Bay A, reducing local letter separation in the native exported frame90 poster.",
+            "location": "First prepared-value row near x117..181,y205..222 in the1280x800 canonical poster.",
+            "impact": "Prepared Bay A is decipherable, but the exported static poster preserves competing old-value letters. No lasting wrong value or continuous unreadability is established.",
+            "evidenceFiles": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/cell-normalization/8612c1cc0d68fd38e2ece79424e559cbf777f88a6512bb6332f22c58b84375f4/cell-normalization-poster.jpg"
+            ],
+            "posterFrame": 90,
+            "durationEstablished": false,
+            "mp4PlaybackInspected": false,
+            "disposition": "Preserve for controller poster/temporal adjudication. This task requests no source change.",
+            "priorEvidence": {
+              "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-live-2ad04707-008-inspection.json",
+              "sha256": "6c5d05494a6083b8d4a18d379e6dd54627eb6e59ec865ec0fe736e0a7449e1e4",
+              "bytes": 43158
+            }
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "mp4-batch-release-entrance-heading-overlap",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-006-inspection.json",
+          "jsonPointer": "/records/4/findings/0",
+          "finding": {
+            "findingId": "mp4-batch-release-entrance-heading-overlap",
+            "severity": "low",
+            "type": "transient-entrance-label-overlap",
+            "status": "controller-review-later-hold-clear",
+            "scope": "native-entrance-capture",
+            "captureWindow": [
+              0.609264,
+              0.694131
+            ],
+            "description": "The incoming A item card covers part of Bundle A, and the card's lower border crosses the heading letters.",
+            "laterHoldAssessment": "At 4.807801..4.893479 s Bundle A, A/B/C and Group complete are clear on the collected side. No lasting hold overlap is observed.",
+            "isNewFinding": true,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "decoded-linked-parameter-source-tick-overlap",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-007-inspection.json",
+          "jsonPointer": "/records/4/findings/0",
+          "finding": {
+            "findingId": "decoded-linked-parameter-source-tick-overlap",
+            "relatedPriorFindingId": "poster-linked-parameter-source-tick-overlap",
+            "severity": "low",
+            "type": "sampled-text-line-overlap",
+            "status": "retained-concern-visible-in-native-hold",
+            "phase": [
+              "action-early",
+              "action-late",
+              "hold"
+            ],
+            "location": "Native1280x800 source ruler endpoint 0 around x506..516,y255.",
+            "description": "The source connector's horizontal segment runs along/through the lower edge of the small source ruler 0 label in all three separately viewed full-size samples.",
+            "impact": "Local line/text separation is reduced while the endpoint numeral and main arithmetic values remain readable. It is not resolved by the later held pose.",
+            "duration": "Only the three separated native capture windows are inspected; continuous duration is not established.",
+            "relationshipToPrior": "Additional default decoded evidence for the retained default-poster concern. The distinct configured N6 extreme-value configuration and its evidence remain independent and are not closed."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "poster-linked-parameter-source-tick-overlap",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-007-inspection.json",
+          "jsonPointer": "/records/4/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "poster-linked-parameter-source-tick-overlap",
+            "severity": "low",
+            "type": "poster-sampled-text-line-overlap",
+            "status": "controller-review",
+            "frame": 90,
+            "location": "Native1280x800 poster source left endpoint tick0 around x506..516,y255.",
+            "description": "Source connector horizontal segment runs along/through the lower edge of the source ruler tick0.",
+            "impact": "Small local text/line separation concern. Main trial values4/12/4/1 remain correct and readable.",
+            "relationshipToPrior": "Additional default-poster manifestation of retained configured-N6-source-tick-connector-overlap. Different configurationHash, so prior extreme-value evidence is preserved independently."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "outreach-home-b-worker-numeral-crowding-poster90",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-009-inspection.json",
+          "jsonPointer": "/records/2/findings/0",
+          "finding": {
+            "findingId": "outreach-home-b-worker-numeral-crowding-poster90",
+            "severity": "low",
+            "type": "retained-static-poster-transition-readability",
+            "status": "retained-prior-concern-later-hold-clear",
+            "scope": "separate-canonical-frame90-poster",
+            "description": "The native canonical poster shows the worker sharing Home B's roof/number area and crowding the local 2. The numeral remains decipherable and the separate 2/Home B legend preserves identity.",
+            "laterHoldAssessment": "The native decoded hold shows Home B's 2 clear and the worker beside Home D. No lasting lost identity is observed; no duration is inferred from the poster.",
+            "isNewFinding": false,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "retained-poster-cargo-parcel1-id-occlusion",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-010-inspection.json",
+          "jsonPointer": "/records/1/findings/0",
+          "finding": {
+            "findingId": "retained-poster-cargo-parcel1-id-occlusion",
+            "severity": "low",
+            "type": "retained-source-frame-poster-readability",
+            "status": "poster-concern-preserved-decoded-early-and-hold-ids-clear",
+            "phase": "canonical-poster-tile6",
+            "description": "The canonical frame90 poster retains parcel2 partly covering parcel1's numeric ID, as documented in the original poster report and visible in the poster tile.",
+            "decodedSamples": "The native early decoded sample has two adjacent readable ID cards over the truck; the later native hold has both readable on the cargo bike, with earlier carriers empty.",
+            "impact": "The static poster remains a sampled ID-readability concern. The reviewed decoded holds do not show lasting identity loss, cargo duplication or simultaneous loads on multiple carriers.",
+            "duration": "Not established; separated decoded captures do not cover every moment between their windows.",
+            "relatedPriorEvidence": "final-default-posters-498c717d-050-060.json, aid-cargo-mode-handoff sampled-intermediate-id-occlusion"
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": null,
+      "deduplication": "No explicit identity; preserved as separate occurrence",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-010-inspection.json",
+          "jsonPointer": "/records/1/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "severity": "low",
+            "category": "sampled-intermediate-id-occlusion",
+            "title": "Transfer stack partly covers parcel 1's numeric ID",
+            "observation": "In the actual frame 90 poster, parcel 2 overlaps the lower-right corner of parcel 1 and partly covers its numeral. Both parcel symbols and the bottom 1/2 legend remain readable.",
+            "evidenceFiles": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/aid-cargo-mode-handoff/449ca46551974b94dc0433f281411940c2b3df6ada51d0c89f0223cc459dda48/aid-cargo-mode-handoff-poster.jpg"
+            ],
+            "frame": 90,
+            "scope": "One intermediate rendered source-frame poster. No decoded MP4 playback or duration inspection.",
+            "durationEstablished": false,
+            "duplicationEstablished": false,
+            "lastingClipDefectEstablished": false,
+            "controllerDisposition": "Pending temporal context. Retain the visible occlusion as a sampled readability concern without inferring parcel duplication or lasting identity loss."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "decoded-stratified-unpopulated-summary-captions",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-016-inspection.json",
+          "jsonPointer": "/records/2/findings/0",
+          "finding": {
+            "findingId": "decoded-stratified-unpopulated-summary-captions",
+            "severity": null,
+            "severityStatus": "pending-controller-adjudication",
+            "type": "confirmed-held-display-omission",
+            "status": "source-confirmed-no-fix-made",
+            "phase": [
+              "action-late",
+              "hold"
+            ],
+            "description": "Selected, Eligible sites and Not selected are visible bottom summary captions, but no aggregate numbers appear beneath them in the full-size decoded late and held samples.",
+            "sourceDerivedExpectedTotals": {
+              "selected": 2,
+              "eligible": 5,
+              "notSelected": 3
+            },
+            "sourceDerivedScope": "These quantities are computed from the exact accepted input; they are not claimed to be visible in the screenshot.",
+            "sourceExplanation": "SampleCopy.tsx lines9–11 render only the caption strings, without numeric totals. The root component composes no aggregate-total renderer, and SampleCopy accepts no frame, ruling out a delayed numeric reveal in that component.",
+            "schemaStatus": "Accepted input preserves all five sites and selectedSiteIds a/d. Schema has no aggregate-total option. Core documented per-stratum fractions1/3 and1/2 are correct; no selected-site/denominator semantic failure is asserted.",
+            "impact": "Bottom summary labels appear unpopulated despite enough information to derive the totals. Presentation severity and acceptance are for controller disposition.",
+            "timingAndCropping": "Native action-late and hold each show the complete1280x800 scene with blank summary areas inside the frame. Source inspection confirms omission rather than snapshot cropping or a delayed total reveal. Continuous duration is not claimed."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "resident-ballot-reading-tally-crowding-poster90",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-018-inspection.json",
+          "jsonPointer": "/records/4/findings/0",
+          "finding": {
+            "findingId": "resident-ballot-reading-tally-crowding-poster90",
+            "severity": "low",
+            "type": "retained-static-poster-intermediate-tally-crowding",
+            "status": "retained-prior-concern-later-hold-clear",
+            "scope": "separate-canonical-frame90-poster",
+            "description": "The canonical poster's reading count 1 shares space with the moving ballot and diagonal box lid; those edges crowd/cross the count area while the numeral and project label remain discernible.",
+            "laterHoldAssessment": "At 4.803592..4.892198 s the native decoded hold has separate clear 2/1/1 tallies and b1/b3, b2, b4 in the correct columns. No lasting count occlusion or wrong total is observed.",
+            "isNewFinding": false,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "decoded-school-practice-caption-leader-crossing",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-019-inspection.json",
+          "jsonPointer": "/records/1/findings/0",
+          "finding": {
+            "findingId": "decoded-school-practice-caption-leader-crossing",
+            "severity": "low",
+            "type": "sampled-transition-leader-text-crowding",
+            "status": "retained-poster-concern-later-hold-clear",
+            "phase": "action-early",
+            "description": "A thin vertical actor leader crosses the Try the locker text region in the native early decoded sample. The text remains readable.",
+            "laterHold": "The shifted held strip has both captions clear; the blue figure is behind the figure at the classroom.",
+            "impact": "Retains the concrete earlier line/text crowding concern. It does not establish a wrong actor role, permanent obstruction or attendance/enrollment outcome.",
+            "roleBoundary": "The prior raw poster report's actor-label phrasing is preserved. This finding identifies the visible leader geometrically and does not infer an actor-role error from that phrasing.",
+            "duration": "Unknown from separated samples; no continuous pixel review is claimed."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": null,
+      "deduplication": "No explicit identity; preserved as separate occurrence",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-019-inspection.json",
+          "jsonPointer": "/records/1/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "severity": "low",
+            "category": "sampled-leader-text-crowding",
+            "title": "Thin figure leader crosses the practice-strip caption region",
+            "observation": "In the native frame 90 poster, the vertical leader from Demo learner to the left figure crosses the practice-strip area at the start of Try the locker. The caption remains readable.",
+            "evidenceFiles": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/school-transition-rehearsal/f924f5cc50ab6553cc18ab8c3642ca893b92638a3f64ad5b761f285bc87f8138/school-transition-rehearsal-poster.jpg"
+            ],
+            "frame": 90,
+            "durationEstablished": false,
+            "actorRoleErrorEstablished": false,
+            "lastingClipDefectEstablished": false,
+            "controllerDisposition": "Retain the visible leader/text crowding without inferring persistence or incorrect actor roles."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "actor-attribution-split-natural120-stamp-occlusion",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-021-inspection.json",
+          "jsonPointer": "/records/0/findings/0",
+          "finding": {
+            "findingId": "actor-attribution-split-natural120-stamp-occlusion",
+            "severity": "low",
+            "type": "retained-transient-account-stamp-occlusion",
+            "status": "retained-prior-concern-later-hold-clear",
+            "scope": "native-late-action-capture",
+            "captureWindow": [
+              4.005175,
+              4.099856
+            ],
+            "description": "The moving Demo account B stamp crosses the left part of the Draft revised/Demo account A history card, hiding part of its account label.",
+            "laterHoldAssessment": "At 4.805071..4.900423 s all four account-history rows are fully readable and correctly labelled, with earlier shared labels unchanged.",
+            "isNewFinding": false,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "expectation-overlay-default-overprint-current-natural-window",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-021-inspection.json",
+          "jsonPointer": "/records/3/findings/0",
+          "finding": {
+            "findingId": "expectation-overlay-default-overprint-current-natural-window",
+            "relatedPosterFindingId": "expectation-overlay-default-frame90-overprint",
+            "severity": "low",
+            "priorSeverity": "pending-playback",
+            "type": "retained-intentional-registration-transient-overprint",
+            "status": "retained-transient-observation-no-source-change",
+            "scope": "native-early-action-capture-and-separate-prior-poster",
+            "captureWindow": [
+              2.80572,
+              2.884661
+            ],
+            "description": "Expired-ticket expected Hold and observed Admit overprint into combined letters at the same result-box position; they are not independently readable in this natural decoded action sample.",
+            "laterHoldAssessment": "At 4.804351..4.890389 s Hold and Admit are separated and readable with Differs/amber bracket, while the known row has Admit/Matches.",
+            "isNewFinding": false,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "retained-poster-peer-dim-acknowledgment",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-022-inspection.json",
+          "jsonPointer": "/records/1/findings/0",
+          "finding": {
+            "findingId": "retained-poster-peer-dim-acknowledgment",
+            "relatedPriorFindingId": "poster-peer-recognition-dim-acknowledgment",
+            "severity": "low",
+            "type": "retained-source-frame-poster-readability",
+            "status": "poster-concern-preserved-later-native-hold-clear",
+            "phase": "canonical-poster-tile6",
+            "description": "The canonical frame90 poster retains very low-contrast acknowledgment text while contribution/ownership labels are readable.",
+            "laterHold": "The native decoded hold has a bright complete Your guide made the steps clear. speech bubble and retains Rin's authorship tab.",
+            "impact": "The static poster weakly communicates the authored acknowledgment. The viewed later held pixels do not show a lasting contrast defect.",
+            "duration": "Not established from separated captures; early action is before the visible bubble and later action/hold are readable."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "poster-peer-recognition-dim-acknowledgment",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-022-inspection.json",
+          "jsonPointer": "/records/1/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "poster-peer-recognition-dim-acknowledgment",
+            "severity": "low",
+            "type": "poster-transitional-readability",
+            "status": "controller-review",
+            "frame": 90,
+            "description": "Authored acknowledgment text is very dim in the speech bubble while contribution and ownership labels are readable.",
+            "impact": "Static poster weakly communicates the acknowledgment itself. This does not establish a lasting contrast defect in later clip frames."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "filter-subscription-mask-before-count-settlement",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-027-inspection.json",
+          "jsonPointer": "/records/0/findings/0",
+          "finding": {
+            "findingId": "filter-subscription-mask-before-count-settlement",
+            "severity": "low",
+            "type": "retained-transient-filter-mask-count-mismatch",
+            "status": "retained-prior-concern-later-hold-correct",
+            "scope": "native-late-action-capture",
+            "captureWindow": [
+              4.007939,
+              4.0963
+            ],
+            "description": "Both subscribed views already dim/exclude East 5 while still displaying unfiltered 10 items/3 records totals.",
+            "laterHoldAssessment": "At 4.806921..4.892306 s both subscribed totals are 5 items/2 records and reference remains 10/3.",
+            "isNewFinding": false,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "proportional-symbol-area-mid-assembly-label-crowding-poster90",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-027-inspection.json",
+          "jsonPointer": "/records/3/findings/0",
+          "finding": {
+            "findingId": "proportional-symbol-area-mid-assembly-label-crowding-poster90",
+            "severity": "low",
+            "type": "retained-static-poster-transition-readability",
+            "status": "retained-prior-concern-later-hold-clear",
+            "scope": "separate-canonical-frame90-poster",
+            "description": "Mint assembly components and edges crowd the local Site B numeral 2. The separate 2/Site B/4 items legend remains clear.",
+            "laterHoldAssessment": "At 4.816359..4.899616 s the settled Site B circle has a clear local 2 and the area/radius comparison is visible.",
+            "isNewFinding": false,
+            "isLastingHoldFinding": false
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "poster-grid-binning-count-marker-lag",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+          "jsonPointer": "/records/0/findings/0",
+          "finding": {
+            "findingId": "poster-grid-binning-count-marker-lag",
+            "severity": "low",
+            "type": "retained-poster-transitional-count-marker-mismatch",
+            "status": "retained-for-controller-disposition",
+            "description": "Original frame90 poster has counts2/0/0/0 despite4markers and total4. Actual early decoded sample also has marker/counter lag; later and native hold settle to2/1/0/1.",
+            "impact": "Static poster and sampled assembly undercount pictured occupants. No lasting held defect is observed; exact duration is not established."
+          }
+        },
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+          "jsonPointer": "/records/0/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "poster-grid-binning-count-marker-lag",
+            "severity": "low",
+            "type": "poster-transitional-count-marker-mismatch",
+            "status": "controller-review",
+            "frame": 90,
+            "description": "Upper-right and lower-right cells show visible IDs3/4but numeric0. Displayed cell counts total2while supplied total/markers are4.",
+            "impact": "Static poster can read as zero observations in occupied cells during assembly. No lasting final bin-count defect is established."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "poster-coordinate-triage-count-marker-lag",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+          "jsonPointer": "/records/2/findings/0",
+          "finding": {
+            "findingId": "poster-coordinate-triage-count-marker-lag",
+            "severity": "low",
+            "type": "retained-poster-transitional-count-marker-mismatch",
+            "status": "retained-for-controller-disposition",
+            "description": "Original frame90 poster and early decoded sample have occupied rejection trays with zero counters. Actual late and native hold show1/1/1rejections plus plotted1,total4.",
+            "impact": "Static poster and sampled assembly undercount assigned rows. Later held counts are correct; duration and continuous visibility remain unassessed."
+          }
+        },
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+          "jsonPointer": "/records/2/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "poster-coordinate-triage-count-marker-lag",
+            "severity": "low",
+            "type": "poster-transitional-count-marker-mismatch",
+            "status": "controller-review",
+            "frame": 90,
+            "description": "Each rejection tray has its correct IDmarker while all three numeric counters still show0.",
+            "impact": "Static poster undercounts the pictured assigned rows. Later1/1/1tray totals are not assessed, so no lasting counting defect is established."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "poster-geometry-detail-count-lag",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+          "jsonPointer": "/records/4/findings/0",
+          "finding": {
+            "findingId": "poster-geometry-detail-count-lag",
+            "severity": "low",
+            "type": "retained-poster-transitional-count-marker-mismatch",
+            "status": "retained-for-controller-disposition",
+            "description": "Original frame90 poster and early decoded sample display0kept/0removed while geometry is present. Native hold has5kept/1removed and the correct completed path.",
+            "impact": "Static poster has unsettled counts. No held counter or final-geometry defect is observed; exact transition duration is unassessed."
+          }
+        },
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-028-inspection.json",
+          "jsonPointer": "/records/4/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "poster-geometry-detail-count-lag",
+            "severity": "low",
+            "type": "poster-transitional-count-marker-mismatch",
+            "status": "controller-review",
+            "frame": 90,
+            "description": "Kept vertices and Removed vertices both display 0 while original geometry, the partial mint simplified path and recursion events are visible.",
+            "impact": "The exported static poster presents unsettled counts. This sample does not establish a lasting counter or final-geometry defect."
+          }
+        }
+      ]
+    },
+    {
+      "explicitFindingId": "configured-N6-source-tick-connector-overlap",
+      "deduplication": "Only identical explicit findingId; no semantic/related-prior-ID merging",
+      "references": [
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-configured-002-inspection.json",
+          "jsonPointer": "/records/1/findings/0",
+          "finding": {
+            "findingId": "configured-N6-source-tick-connector-overlap",
+            "severity": "low",
+            "type": "retained-text-line-overlap-in-decoded-samples",
+            "status": "minor-deferred-for-final-review",
+            "description": "Native early and late trial screenshots reproduce the connector across the lower edge of the source -1e+308 endpoint label. In native restored hold, the long segment retracts but the connector elbow still meets the leading minus/lower-left label edge aroundx506,y255.",
+            "impact": "Tick text and main values remain readable, but text/line separation is imperfect. Correct restored values do not erase this geometric readability concern.",
+            "evidencePhases": [
+              "action-early",
+              "action-late",
+              "hold"
+            ],
+            "durationEstablished": false,
+            "lastingWrongValueEstablished": false,
+            "priorDispositionPreserved": true,
+            "currentHoldQualification": "Earlier controller disposition called hold clear. Current native decoded hold specifically shows remaining leading-minus/elbow contact; it does not show the long trial segment crossing the full tick."
+          }
+        },
+        {
+          "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-configured-002-inspection.json",
+          "jsonPointer": "/records/1/priorPosterComparison/originalFindings/0",
+          "finding": {
+            "findingId": "configured-N6-source-tick-connector-overlap",
+            "severity": "low",
+            "type": "sampled-text-line-overlap; retained-static-poster-concern",
+            "status": "minor-deferred-for-final-review",
+            "observation": "The source-to-Linked connector horizontal segment shares the lower edge of Extreme source tick label -1e+308 at frame90. The text and main values remain readable.",
+            "evidenceFiles": [
+              "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/linked-parameter-rehearsal/906276b0ee4a967323edaad29eb863e4199f618c57734b575d9562725d082371/linked-parameter-rehearsal-poster.jpg"
+            ],
+            "posterFrame": 90,
+            "durationEstablished": false,
+            "lastingWrongValueEstablished": false,
+            "mp4PlaybackInspected": false,
+            "controllerDisposition": {
+              "candidateId": "N6",
+              "classification": "minor deferred for final review",
+              "findingId": "configured-N6-source-tick-connector-overlap",
+              "disposition": "Controller independently viewed frame90 and confirms connector crosses the lower edge of the negative endpoint tick label. Main values and relationships remain readable; final hold clear per reviewer. Preserve as concrete low concern for final whole-branch triage. No continuous-clearance claim."
+            },
+            "scope": "Concrete low current-poster concern retained. Prior clear baseline/hold states do not erase the trial overlap or establish continuous clearance."
+          }
+        }
+      ]
+    }
+  ],
+  "posterFindings": [
+    {
+      "deliveryClass": "default-150",
+      "id": "reject-and-replace",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-000-005.json",
+      "finding": {
+        "findingId": "poster-reject-replace-incomplete-transition",
+        "severity": "low",
+        "type": "poster-transitional-content-coverage",
+        "status": "controller-review",
+        "frame": 90,
+        "description": "Canonical poster catches an empty center and a dim replacement card clipped by the right image edge; selected label and replacement reason are not visible.",
+        "impact": "This exported static poster does not convey the complete authored replacement. It does not establish clipping or missing content later in the clip."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "argument-bridge",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-005-015.json",
+      "finding": {
+        "findingId": "poster-argument-bridge-dim-conclusion",
+        "severity": "low",
+        "type": "poster-transitional-readability",
+        "status": "controller-review",
+        "frame": 90,
+        "description": "The main conclusion is very dim in the canonical poster while supporting premises and connector are fully readable.",
+        "impact": "Poster incompletely communicates the argument's conclusion at first paint. This does not establish a lasting contrast defect in later clip frames."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "shared-foundation",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-005-015.json",
+      "finding": {
+        "findingId": "poster-shared-foundation-gap-text-occlusion",
+        "severity": "low",
+        "type": "poster-transitional-text-occlusion",
+        "status": "controller-review",
+        "frame": 90,
+        "location": "Native1280x800 poster central lower gap around x607..674,y520..735.",
+        "description": "Still-separated foundation halves mask the center of both shared-purpose heading and shared-principle text.",
+        "impact": "The exported static poster does not fully state the authored common purpose. No lasting final-state omission is established."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "cell-normalization",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-015-025.json",
+      "finding": {
+        "findingId": "cell-normalization-frame90-poster-residual-crossfade-overprint",
+        "relatedPriorFindingId": "cell-normalization-crossfade-text-overprint",
+        "classification": "retained-sampled-transition-readability; static-poster-concern",
+        "severity": "low",
+        "observation": "Faint displaced old-value paint remains behind and to the right of the prepared first-row Bay A, reducing local letter separation in the native exported frame90 poster.",
+        "location": "First prepared-value row near x117..181,y205..222 in the1280x800 canonical poster.",
+        "impact": "Prepared Bay A is decipherable, but the exported static poster preserves competing old-value letters. No lasting wrong value or continuous unreadability is established.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/cell-normalization/8612c1cc0d68fd38e2ece79424e559cbf777f88a6512bb6332f22c58b84375f4/cell-normalization-poster.jpg"
+        ],
+        "posterFrame": 90,
+        "durationEstablished": false,
+        "mp4PlaybackInspected": false,
+        "disposition": "Preserve for controller poster/temporal adjudication. This task requests no source change.",
+        "priorEvidence": {
+          "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-live-2ad04707-008-inspection.json",
+          "sha256": "6c5d05494a6083b8d4a18d379e6dd54627eb6e59ec865ec0fe736e0a7449e1e4",
+          "bytes": 43158
+        }
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "linked-parameter-rehearsal",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-030-040.json",
+      "finding": {
+        "findingId": "poster-linked-parameter-source-tick-overlap",
+        "severity": "low",
+        "type": "poster-sampled-text-line-overlap",
+        "status": "controller-review",
+        "frame": 90,
+        "location": "Native1280x800 poster source left endpoint tick0 around x506..516,y255.",
+        "description": "Source connector horizontal segment runs along/through the lower edge of the source ruler tick0.",
+        "impact": "Small local text/line separation concern. Main trial values4/12/4/1 remain correct and readable.",
+        "relationshipToPrior": "Additional default-poster manifestation of retained configured-N6-source-tick-connector-overlap. Different configurationHash, so prior extreme-value evidence is preserved independently."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "outreach-household-revisits",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-040-050.json",
+      "finding": {
+        "findingId": "outreach-home-b-worker-numeral-crowding-poster90",
+        "severity": "low",
+        "classification": "sampled-transition-readability; static-poster-concern",
+        "status": "sampled-poster-concern; duration-and-controller-disposition-unresolved",
+        "observation": "The visiting worker shares Home B's roof/interior number area and crowds the local2 numeral. The2 remains decipherable and the separate2/Home B ledger still resolves identity.",
+        "location": "Home B near x339..374,y210..246 in the1280x800 canonical frame90 poster.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/outreach-household-revisits/a1307aae9a2bc356ce8c399e0537f1aeb9b502d96ca5ac4719b9007a9c11fece/outreach-household-revisits-poster.jpg"
+        ],
+        "posterFrame": 90,
+        "durationEstablished": false,
+        "lastingLostIdentityEstablished": false,
+        "mp4PlaybackInspected": false,
+        "disposition": "Retain the small sampled crowding observation for controller review. No source change or lasting defect is inferred from one poster."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "aid-cargo-mode-handoff",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-050-060.json",
+      "finding": {
+        "severity": "low",
+        "category": "sampled-intermediate-id-occlusion",
+        "title": "Transfer stack partly covers parcel 1's numeric ID",
+        "observation": "In the actual frame 90 poster, parcel 2 overlaps the lower-right corner of parcel 1 and partly covers its numeral. Both parcel symbols and the bottom 1/2 legend remain readable.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/aid-cargo-mode-handoff/449ca46551974b94dc0433f281411940c2b3df6ada51d0c89f0223cc459dda48/aid-cargo-mode-handoff-poster.jpg"
+        ],
+        "frame": 90,
+        "scope": "One intermediate rendered source-frame poster. No decoded MP4 playback or duration inspection.",
+        "durationEstablished": false,
+        "duplicationEstablished": false,
+        "lastingClipDefectEstablished": false,
+        "controllerDisposition": "Pending temporal context. Retain the visible occlusion as a sampled readability concern without inferring parcel duplication or lasting identity loss."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "resident-budget-ballots",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-090-100.json",
+      "finding": {
+        "severity": "low",
+        "category": "sampled-intermediate-tally-crowding",
+        "title": "Reading tally shares space with moving ballot and diagonal lid",
+        "observation": "The frame 90 reading-project count 1 is crowded/crossed by the moving-ballot and diagonal ballot-box-lid area. The displayed numeral and project label remain discernible.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/resident-budget-ballots/f0f033f32815d16be57ccaebaf29e35007ef1e3802cc57d50fe0921107ae1e2c/resident-budget-ballots-poster.jpg"
+        ],
+        "frame": 90,
+        "durationEstablished": false,
+        "wrongTotalEstablished": false,
+        "lastingClipDefectEstablished": false,
+        "controllerDisposition": "Retain this sampled readability concern for temporal context; no wrong preference total or funding result is inferred."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "school-transition-rehearsal",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-090-100.json",
+      "finding": {
+        "severity": "low",
+        "category": "sampled-leader-text-crowding",
+        "title": "Thin figure leader crosses the practice-strip caption region",
+        "observation": "In the native frame 90 poster, the vertical leader from Demo learner to the left figure crosses the practice-strip area at the start of Try the locker. The caption remains readable.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/school-transition-rehearsal/f924f5cc50ab6553cc18ab8c3642ca893b92638a3f64ad5b761f285bc87f8138/school-transition-rehearsal-poster.jpg"
+        ],
+        "frame": 90,
+        "durationEstablished": false,
+        "actorRoleErrorEstablished": false,
+        "lastingClipDefectEstablished": false,
+        "controllerDisposition": "Retain the visible leader/text crowding without inferring persistence or incorrect actor roles."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "expectation-overlay-check",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-100-110.json",
+      "finding": {
+        "findingId": "expectation-overlay-default-frame90-overprint",
+        "relatedCurrentNaturalFindingId": "expectation-overlay-default-overprint-current-natural-window",
+        "classification": "retained-sampled-correctness-readability; static-poster-concern",
+        "severity": "pending-playback",
+        "status": "retained-transient-observation-no-source-change",
+        "observation": "Expired ticket expected Hold and observed Admit overprint at the same result-box position in the native exported frame90 poster; neither different value is independently readable. The matching Admit row remains readable.",
+        "location": "Expired-ticket result text around x699..743,y412..428 in the1280x800 canonical poster.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/expectation-overlay-check/91c53379f72ccbc32cc8b66d5b610bad4705f35637160fa6608384782904642c/expectation-overlay-check-poster.jpg"
+        ],
+        "posterFrame": 90,
+        "durationEstablished": false,
+        "lastingMismatchEstablished": false,
+        "mp4PlaybackInspected": false,
+        "priorControllerDisposition": "Retain the intentional registration/transition observation for final editorial review, without claiming every action frame is unobstructed.",
+        "scope": "The report preserves the current exported-poster concern and existing source-change disposition. Prior separate clear holds do not erase the frame90 overprint; no new source change or permanent mismatch is inferred."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "peer-contribution-recognition",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-110-120.json",
+      "finding": {
+        "findingId": "poster-peer-recognition-dim-acknowledgment",
+        "severity": "low",
+        "type": "poster-transitional-readability",
+        "status": "controller-review",
+        "frame": 90,
+        "description": "Authored acknowledgment text is very dim in the speech bubble while contribution and ownership labels are readable.",
+        "impact": "Static poster weakly communicates the acknowledgment itself. This does not establish a lasting contrast defect in later clip frames."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "proportional-symbol-area",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-130-140.json",
+      "finding": {
+        "findingId": "proportional-symbol-area-mid-assembly-label-crowding-poster90",
+        "classification": "sampled-transition-readability; static-poster-concern",
+        "severity": "low",
+        "status": "sampled-poster-concern; duration-and-controller-disposition-unresolved",
+        "observation": "Mint component edges and overlapping parts crowd the small local Site B numeral2 during area assembly, reducing its separation from nearby marks. The separate2/Site B and4items labels remain clearly readable.",
+        "location": "Site B assembly around x407..467,y461..522, with local numeral near x431..445,y483..498 in the1280x800 canonical poster.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/proportional-symbol-area/862badbd212790ad72357ad4c1d22d26047e2d62e43066e6849c6c556e4102ba/proportional-symbol-area-poster.jpg"
+        ],
+        "posterFrame": 90,
+        "durationEstablished": false,
+        "lastingLostIdentityEstablished": false,
+        "exactAreaMeasured": false,
+        "mp4PlaybackInspected": false,
+        "disposition": "Preserve this small sampled readability concern for controller poster/temporal review. No source change, settled area error or permanent missing identity is inferred from one poster."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "spatial-grid-binning",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-140-150.json",
+      "finding": {
+        "findingId": "poster-grid-binning-count-marker-lag",
+        "severity": "low",
+        "type": "poster-transitional-count-marker-mismatch",
+        "status": "controller-review",
+        "frame": 90,
+        "description": "Upper-right and lower-right cells show visible IDs3/4but numeric0. Displayed cell counts total2while supplied total/markers are4.",
+        "impact": "Static poster can read as zero observations in occupied cells during assembly. No lasting final bin-count defect is established."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "coordinate-quality-triage",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-140-150.json",
+      "finding": {
+        "findingId": "poster-coordinate-triage-count-marker-lag",
+        "severity": "low",
+        "type": "poster-transitional-count-marker-mismatch",
+        "status": "controller-review",
+        "frame": 90,
+        "description": "Each rejection tray has its correct IDmarker while all three numeric counters still show0.",
+        "impact": "Static poster undercounts the pictured assigned rows. Later1/1/1tray totals are not assessed, so no lasting counting defect is established."
+      }
+    },
+    {
+      "deliveryClass": "default-150",
+      "id": "geometry-detail-budget",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-140-150.json",
+      "finding": {
+        "findingId": "poster-geometry-detail-count-lag",
+        "severity": "low",
+        "type": "poster-transitional-count-marker-mismatch",
+        "status": "controller-review",
+        "frame": 90,
+        "description": "Kept vertices and Removed vertices both display 0 while original geometry, the partial mint simplified path and recursion events are visible.",
+        "impact": "The exported static poster presents unsettled counts. This sample does not establish a lasting counter or final-geometry defect."
+      }
+    },
+    {
+      "deliveryClass": "configured-cli-16",
+      "id": "linked-parameter-rehearsal",
+      "candidateId": "N6",
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-configured-posters-498c717d-b.json",
+      "finding": {
+        "findingId": "configured-N6-source-tick-connector-overlap",
+        "severity": "low",
+        "type": "sampled-text-line-overlap; retained-static-poster-concern",
+        "status": "minor-deferred-for-final-review",
+        "observation": "The source-to-Linked connector horizontal segment shares the lower edge of Extreme source tick label -1e+308 at frame90. The text and main values remain readable.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/linked-parameter-rehearsal/906276b0ee4a967323edaad29eb863e4199f618c57734b575d9562725d082371/linked-parameter-rehearsal-poster.jpg"
+        ],
+        "posterFrame": 90,
+        "durationEstablished": false,
+        "lastingWrongValueEstablished": false,
+        "mp4PlaybackInspected": false,
+        "controllerDisposition": {
+          "candidateId": "N6",
+          "classification": "minor deferred for final review",
+          "findingId": "configured-N6-source-tick-connector-overlap",
+          "disposition": "Controller independently viewed frame90 and confirms connector crosses the lower edge of the negative endpoint tick label. Main values and relationships remain readable; final hold clear per reviewer. Preserve as concrete low concern for final whole-branch triage. No continuous-clearance claim."
+        },
+        "scope": "Concrete low current-poster concern retained. Prior clear baseline/hold states do not erase the trial overlap or establish continuous clearance."
+      }
+    }
+  ],
+  "posterEditorialObservations": [
+    {
+      "deliveryClass": "default-150",
+      "id": "referral-return-acknowledgement",
+      "candidateId": null,
+      "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-default-posters-498c717d-040-050.json",
+      "editorialObservation": {
+        "id": "returned-acknowledgements-midword-caption-wrap-poster90",
+        "classification": "nonblocking-editorial-wrap-observation",
+        "observation": "The last bottom caption breaks acknowledgements into acknowl and edgements on separate lines. All letters remain visible, with no clipping or wrong count.",
+        "evidenceFiles": [
+          "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/render/referral-return-acknowledgement/98a0bfd8cf27946705a9d597e647674068d53c22ece8d072caa273079db6b84c/referral-return-acknowledgement-poster.jpg"
+        ],
+        "scope": "Retain as a static caption-layout observation, without claiming a semantic defect or requiring a source change."
+      }
+    }
+  ],
+  "specialConcernsAndCorrections": {
+    "stratifiedSamplingHeldOmission": {
+      "key": "default-stratified-spatial-sample",
+      "findingId": "decoded-stratified-unpopulated-summary-captions",
+      "status": "Frozen498c source-confirmed held omission; pending R67 correction and fresh separate evidence. No later fix is inferred here."
+    },
+    "batchReleaseEntrance": {
+      "key": "default-batch-release",
+      "findingId": "mp4-batch-release-entrance-heading-overlap",
+      "status": "Low sampled entrance overlap; later held caption clear per original report."
+    },
+    "defaultTickOverlap": {
+      "key": "default-linked-parameter-rehearsal",
+      "findingId": "decoded-linked-parameter-source-tick-overlap",
+      "status": "Retained readability concern visible in separately inspected native hold; main values readable."
+    },
+    "configuredN6TickOverlap": {
+      "key": "configured-n6",
+      "findingId": "configured-N6-source-tick-connector-overlap",
+      "status": "Retained independently configured extreme-value concern. Current report qualifies earlier hold-clear prose; long trial crossing retracts, leading-minus/elbow contact remains."
+    },
+    "custodyProseCorrection": [
+      {
+        "reportPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-mp4-default-008-inspection.json",
+        "jsonPointer": "/records/0/editorialObservations",
+        "value": [
+          {
+            "severity": "evidence-prose-correction",
+            "observation": "Earlier live-source report 012 states Received at destination2. That numeric 2 is not present in the personally viewed current native decoded hold or action-late image. Read-only CustodyLegend.tsx shows only arrival label text and a data-physical-receipt attribute set to all three crates, with no rendered numeric arrival value. The earlier artifact is preserved unchanged and its 2 must not be treated as verified pixel evidence.",
+            "scope": "Correction to prior report prose; not a new claimed visual defect and not a change to the source."
+          }
+        ]
+      }
+    ],
+    "reportedLeaseFrameDrop": [
+      {
+        "key": "default-expiring-lease",
+        "quality": {
+          "totalVideoFrames": 180,
+          "droppedVideoFrames": 1
+        }
+      }
+    ]
+  },
+  "currentCorrectionOverlay": {
+    "preset": "stratified-spatial-sample",
+    "findingId": "decoded-stratified-unpopulated-summary-captions",
+    "head": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
+    "sourceHash": "38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9",
+    "status": "R67-closed-R68-satisfied-historical-original-finding-retained",
+    "ruling68Continuity": "169 unchanged presets,754 fixtures,6786 exact frame hashes verified with three local source/test files changed. Original media identities preserved."
+  },
+  "durableOriginals": [
+    "implementation-mp4-evidence-summary-498c717d.json",
+    "implementation-mp4-evidence-consolidated-498c717d.json",
+    "implementation-poster-evidence-summary-498c717d.json",
+    "implementation-poster-evidence-consolidated-498c717d.json",
+    "implementation-decoded-playback-summary-498c717d.json",
+    "implementation-http-l3-decoded-inspection-498c717d.json"
+  ],
+  "limits": [
+    "Source reports, finding variants, prior references, all narrative observations and original limits remain embedded in the byte-exact consolidated originals.",
+    "The27 MP4 registry entries retain31 occurrence references. They are not27 newly adjudicated defects and do not replace the canonical108 findings.",
+    "Default tick overlap and configured N6 are independent findings. N6 held minus/elbow contact remains despite retraction of its long trial connector.",
+    "Custody has no separately rendered numeric arrival value. Earlier Received at destination2 wording remains historical prose and is not verified current pixel evidence.",
+    "Clear later holds do not erase historical transient/poster concerns. No whole-branch or production acceptance is inferred."
+  ],
+  "finalAdjudication": null,
+  "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
+  "preservedIgnoredOriginal": {
+    "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/task-8-finalization-raw-drafts/motion-atlas/implementation-media-findings-498c717d.json",
+    "sha256": "1e95350abd9ce39e41f17ce12f89b399b481787211ef2bd74390ee7dd7dd8f1a",
+    "bytes": 93684
+  },
+  "currentSourceReviewMinor": [
+    {
+      "id": "sampling-summary-test-helper-roro",
+      "file": "src/stock/presets/StratifiedSpatialSample/StratifiedSpatialSample.test.ts:45",
+      "finding": "Two positional helper arguments violate RO-RO convention",
+      "status": "deferred to final whole-branch review"
+    }
+  ]
+}

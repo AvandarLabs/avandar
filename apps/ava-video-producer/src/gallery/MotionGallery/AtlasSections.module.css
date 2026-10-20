@@ -1,0 +1,24 @@
+.sections {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 24px;
+  padding: 0 32px;
+}
+
+.section {
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 16px 0;
+  text-decoration: none;
+}
+
+.section:hover {
+  color: var(--ink);
+}
+
+.active {
+  border-bottom-color: var(--ava-primary-6);
+  color: var(--ink);
+}

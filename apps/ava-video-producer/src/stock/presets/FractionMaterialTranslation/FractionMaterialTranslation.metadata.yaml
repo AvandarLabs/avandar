@@ -1,0 +1,113 @@
+name:
+  id: motionAtlas.fraction-material-translation.name
+  message: One fraction, several ways to show it
+description:
+  id: motionAtlas.fraction-material-translation.description
+  message: Learners demonstrate the same fictional lesson using folded paper, counters,
+    and a shaded board. The objects change while the mathematical relationship stays
+    constant.
+category:
+  id: motionAtlas.fraction-material-translation.category
+  message: Learning materials transform
+useWhen:
+  id: motionAtlas.fraction-material-translation.useWhen
+  message: Show that one mathematical idea can be expressed through different physical
+    representations.
+prompt:
+  id: motionAtlas.fraction-material-translation.prompt
+  message: "Reveal one learner and work surface per supplied representation facing a
+    shared fraction prompt. Animate only the chosen materials: folded paper divides into
+    equal parts, counters gather into equal units, and shaded-board cells select their
+    authored fraction. Every representation selects the same numerator out of the same
+    denominator. Briefly align corresponding selected parts without merging or ranking
+    learners. Hold the supplied representations and common fraction, then use the shared
+    fade."
+creativeDirection:
+  id: motionAtlas.fraction-material-translation.creativeDirection
+  message: "Reveal one learner and work surface per supplied representation facing a
+    shared fraction prompt. Animate only the chosen materials: folded paper divides into
+    equal parts, counters gather into equal units, and shaded-board cells select their
+    authored fraction. Every representation selects the same numerator out of the same
+    denominator. Briefly align corresponding selected parts without merging or ranking
+    learners. Hold the supplied representations and common fraction, then use the shared
+    fade."
+intent:
+  id: motionAtlas.fraction-material-translation.intent
+  message: Show that one mathematical idea can be expressed through different physical
+    representations.
+distinction:
+  id: motionAtlas.fraction-material-translation.distinction
+  message: Each material undergoes a different physical operation that preserves an exact
+    mathematical relationship. This is neither relabeled comparison cards nor a
+    branching workflow that sorts learners into fixed ability tracks.
+tags:
+  - id: motionAtlas.fraction-material-translation.tags.0
+    message: differentiated learning
+  - id: motionAtlas.fraction-material-translation.tags.1
+    message: multiple representations
+  - id: motionAtlas.fraction-material-translation.tags.2
+    message: fractions
+  - id: motionAtlas.fraction-material-translation.tags.3
+    message: manipulatives
+  - id: motionAtlas.fraction-material-translation.tags.4
+    message: paper folding
+  - id: motionAtlas.fraction-material-translation.tags.5
+    message: counters
+  - id: motionAtlas.fraction-material-translation.tags.6
+    message: visual learning materials
+  - id: motionAtlas.fraction-material-translation.tags.7
+    message: shared lesson goal
+goodFor:
+  - id: motionAtlas.fraction-material-translation.goodFor.0
+    message: Explain differentiated materials for a common lesson goal
+  - id: motionAtlas.fraction-material-translation.goodFor.1
+    message: Introduce equivalent concrete representations of a fraction
+  - id: motionAtlas.fraction-material-translation.goodFor.2
+    message: Show a teacher offering more than one way to demonstrate an idea
+domains:
+  - id: motionAtlas.fraction-material-translation.domains.0
+    message: Learning materials transform
+aliases:
+  - id: motionAtlas.fraction-material-translation.aliases.0
+    message: differentiated learning
+  - id: motionAtlas.fraction-material-translation.aliases.1
+    message: multiple representations
+  - id: motionAtlas.fraction-material-translation.aliases.2
+    message: fractions
+notFor:
+  - id: motionAtlas.fraction-material-translation.notFor.0
+    message: Numerator means selected equal parts and denominator means all equal parts of
+      that representation. The default is 1 of 2 in each material, not 3 of 6 learners.
+  - id: motionAtlas.fraction-material-translation.notFor.1
+    message: Counter groups and board partitions are generated from the fraction
+      denominator. No independent part-count input can contradict it.
+  - id: motionAtlas.fraction-material-translation.notFor.2
+    message: Representation choices do not diagnose learning styles or prove superior
+      learning outcomes. The sequence does not rank learners.
+  - id: motionAtlas.fraction-material-translation.notFor.3
+    message: This bounded preset explains fractions only. Every example classroom, learner,
+      and lesson is fictional.
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.fraction-material-translation.motionBeats.0
+      message: Reveal one learner and surface per chosen material, facing the shared prompt.
+  - startFrame: 36
+    endFrame: 83
+    description:
+      id: motionAtlas.fraction-material-translation.motionBeats.1
+      message: Fold equal paper parts, gather equal counters and shade equal board cells using
+        the same fraction.
+  - startFrame: 84
+    endFrame: 125
+    description:
+      id: motionAtlas.fraction-material-translation.motionBeats.2
+      message: Briefly align selected part rows and move only the work surfaces into the
+        supplied comparison arrangement.
+  - startFrame: 126
+    endFrame: 179
+    description:
+      id: motionAtlas.fraction-material-translation.motionBeats.3
+      message: Hold distinct learners, materials and the common fraction through the shared
+        fade.

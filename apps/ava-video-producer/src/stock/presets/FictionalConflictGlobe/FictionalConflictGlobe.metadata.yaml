@@ -1,0 +1,114 @@
+name:
+  id: motionAtlas.fictional-conflict-globe.name
+  message: A world of separate crises
+description:
+  id: motionAtlas.fictional-conflict-globe.description
+  message: A slowly turning globe reveals fictional conflict X markers on recognizable
+    world land outlines. Separate callouts stay distinct so a global overview does not
+    collapse different situations into one story.
+category:
+  id: motionAtlas.fictional-conflict-globe.category
+  message: Geographic orientation
+useWhen:
+  id: motionAtlas.fictional-conflict-globe.useWhen
+  message: Show the geographic separation of several hypothetical response contexts
+    without suggesting that one action resolves them.
+intent:
+  id: motionAtlas.fictional-conflict-globe.intent
+  message: Show the geographic separation of several hypothetical response contexts
+    without suggesting that one action resolves them.
+creativeDirection:
+  id: motionAtlas.fictional-conflict-globe.creativeDirection
+  message: Over six seconds, reveal an orthographic globe with simplified but recognizable
+    continental outlines. Rotate through the supplied longitude interval, revealing each
+    X only while its surface location faces the viewer; leader lines connect it to a
+    fixed outside label slot. Ease the rotation to a stop, hold the visible markers and
+    their scenario labels, then fade all scene elements to the opaque ground using the
+    shared entrance and exit envelope. Keep the fictional-scenario caption visible with
+    the globe, and never animate explosions, spreading red territory, or a conflict
+    disappearing.
+distinction:
+  id: motionAtlas.fictional-conflict-globe.distinction
+  message: Unlike orbital-system, the central object is recognizable geographic land with
+    front/back occlusion and surface-anchored incident markers. Unlike network-graph, no
+    edges imply relationships among the incidents.
+prompt:
+  id: motionAtlas.fictional-conflict-globe.prompt
+  message: Use A world of separate crises (fictional-conflict-globe) for a fictional or
+    approved authored example. Show the geographic separation of several hypothetical
+    response contexts without suggesting that one action resolves them.
+tags:
+  - id: motionAtlas.fictional-conflict-globe.tags.0
+    message: humanitarian
+  - id: motionAtlas.fictional-conflict-globe.tags.1
+    message: globe
+  - id: motionAtlas.fictional-conflict-globe.tags.2
+    message: world map
+  - id: motionAtlas.fictional-conflict-globe.tags.3
+    message: conflict markers
+  - id: motionAtlas.fictional-conflict-globe.tags.4
+    message: crisis overview
+  - id: motionAtlas.fictional-conflict-globe.tags.5
+    message: rotating earth
+  - id: motionAtlas.fictional-conflict-globe.tags.6
+    message: incident locations
+  - id: motionAtlas.fictional-conflict-globe.tags.7
+    message: fictional scenario
+goodFor:
+  - id: motionAtlas.fictional-conflict-globe.goodFor.0
+    message: Open an explicitly fictional global humanitarian scenario
+  - id: motionAtlas.fictional-conflict-globe.goodFor.1
+    message: Explain that response planning concerns several separate situations
+  - id: motionAtlas.fictional-conflict-globe.goodFor.2
+    message: Introduce a geographical overview before a local logistics example
+domains:
+  - id: motionAtlas.fictional-conflict-globe.domains.0
+    message: Geographic orientation
+aliases:
+  - id: motionAtlas.fictional-conflict-globe.aliases.0
+    message: humanitarian
+  - id: motionAtlas.fictional-conflict-globe.aliases.1
+    message: globe
+  - id: motionAtlas.fictional-conflict-globe.aliases.2
+    message: world map
+notFor:
+  - id: motionAtlas.fictional-conflict-globe.notFor.0
+    message: The land outline is real geographic context; every conflict location and label
+      is invented and must be marked as such.
+  - id: motionAtlas.fictional-conflict-globe.notFor.1
+    message: X markers denote separate authored situations, not incident totals, severity,
+      casualty counts, territorial control, or live intelligence.
+  - id: motionAtlas.fictional-conflict-globe.notFor.2
+    message: No country borders or ownership claims are drawn. Marker visibility follows the
+      chosen view and is not a statement that hidden regions lack need.
+  - id: motionAtlas.fictional-conflict-globe.notFor.3
+    message: Six seconds supports orientation only; this is not a navigable map or an
+      incident monitoring system.
+motionBeats:
+  - startFrame: 12
+    endFrame: 23
+    description:
+      id: motionAtlas.fictional-conflict-globe.motionBeats.0
+      message: Reveal the supplied setting and identities.
+  - startFrame: 24
+    endFrame: 107
+    description:
+      id: motionAtlas.fictional-conflict-globe.motionBeats.1
+      message: Over six seconds, reveal an orthographic globe with simplified but recognizable
+        continental outlines. Rotate through the supplied longitude interval, revealing
+        each X only while its surface location faces the viewer; leader lines connect it
+        to a fixed outside label slot. Ease the rotation to a stop, hold the visible
+        markers and their scenario labels, then fade all scene elements to the opaque
+        ground using the shared entrance and exit envelope. Keep the fictional-scenario
+        caption visible with the globe, and never animate explosions, spreading red
+        territory, or a conflict disappearing.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.fictional-conflict-globe.motionBeats.2
+      message: Hold the supplied final records and separate derived quantities.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.fictional-conflict-globe.motionBeats.3
+      message: Return to the opaque ground through the shared envelope.

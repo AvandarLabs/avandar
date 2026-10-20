@@ -1,0 +1,99 @@
+name:
+  id: motionAtlas.argument-bridge.name
+  message: From reasons to conclusion
+description:
+  id: motionAtlas.argument-bridge.description
+  message: A few authored premises form a visible support beneath one conclusion. The
+    connecting language states whether they support, require, or merely suggest the
+    conclusion.
+category:
+  id: motionAtlas.argument-bridge.category
+  message: Argument structure
+useWhen:
+  id: motionAtlas.argument-bridge.useWhen
+  message: Show which stated reasons support an authored conclusion.
+prompt:
+  id: motionAtlas.argument-bridge.prompt
+  message: Use Motion Atlas "From reasons to conclusion" (argument-bridge) as a conceptual
+    graphic. Show which stated reasons support an authored conclusion. Replace fictional
+    sample content with approved authored content before making product claims.
+creativeDirection:
+  id: motionAtlas.argument-bridge.creativeDirection
+  message: Two or three premise strips arrive separately along the lower third. Their ends
+    extend and join into a single bridge deck, with a central connector label appearing
+    only once the premises are readable. The conclusion rises onto that deck and holds
+    above all visible premises. Nothing is transported through the bridge; it is an
+    explicit visual model of an argument's support.
+intent:
+  id: motionAtlas.argument-bridge.intent
+  message: Show which stated reasons support an authored conclusion.
+distinction:
+  id: motionAtlas.argument-bridge.distinction
+  message: Unlike source-merge, premises remain separate and readable as reasons rather
+    than moving as data into a destination. The deck and relationship text distinguish
+    logical support from transport or aggregation.
+tags:
+  - id: motionAtlas.argument-bridge.tags.0
+    message: because
+  - id: motionAtlas.argument-bridge.tags.1
+    message: therefore
+  - id: motionAtlas.argument-bridge.tags.2
+    message: reasoning
+  - id: motionAtlas.argument-bridge.tags.3
+    message: premises
+  - id: motionAtlas.argument-bridge.tags.4
+    message: conclusion
+  - id: motionAtlas.argument-bridge.tags.5
+    message: argument
+  - id: motionAtlas.argument-bridge.tags.6
+    message: supports
+  - id: motionAtlas.argument-bridge.tags.7
+    message: logical connector
+  - id: motionAtlas.argument-bridge.tags.8
+    message: rationale
+goodFor:
+  - id: motionAtlas.argument-bridge.goodFor.0
+    message: Explain why a recommendation follows from stated reasons
+  - id: motionAtlas.argument-bridge.goodFor.1
+    message: Connect evidence to a qualified conclusion
+  - id: motionAtlas.argument-bridge.goodFor.2
+    message: Summarize an argument before the next chapter
+domains:
+  - id: motionAtlas.argument-bridge.domains.0
+    message: Argument structure
+aliases:
+  - id: motionAtlas.argument-bridge.aliases.0
+    message: because
+  - id: motionAtlas.argument-bridge.aliases.1
+    message: therefore
+  - id: motionAtlas.argument-bridge.aliases.2
+    message: reasoning
+  - id: motionAtlas.argument-bridge.aliases.3
+    message: premises
+notFor:
+  - id: motionAtlas.argument-bridge.notFor.0
+    message: The renderer does not prove validity, establish causality, or derive a conclusion.
+  - id: motionAtlas.argument-bridge.notFor.1
+    message: At most three concise reasons fit the six-second argument.
+  - id: motionAtlas.argument-bridge.notFor.2
+    message: Support geometry is rhetorical and carries no confidence score or evidence weight.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.argument-bridge.motionBeats.0
+      message: Establish the authored starting arrangement.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.argument-bridge.motionBeats.1
+      message: Two or three premise strips arrive separately along the lower third. Their ends
+        extend and join into a single bridge deck, with a central connector label
+        appearing only once the premises are readable. The conclusion rises onto that
+        deck and holds above all visible premises. Nothing is transported through the
+        bridge; it is an explicit visual model of an argument's support.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.argument-bridge.motionBeats.2
+      message: Hold the resolved authored relationships before the shared exit.

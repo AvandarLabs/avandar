@@ -26,12 +26,10 @@ export function FilmComposition({
   if (film.kind === "stock" && film.preset) {
     return (
       <StockGraphic
-        preset={film.preset}
+        {...film}
         frame={frame}
         width={film.width}
         height={film.height}
-        accent={film.accent}
-        background={film.background}
       />
     );
   }

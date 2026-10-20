@@ -482,9 +482,16 @@ vocabulary and rationale: `references/motion.md`. The rules:
     move — and a target that happens to be followed by a key at the same
     coordinates hides the bug completely, which is why it went unnoticed.
 
-Everything comes from `src/motion.ts`. If a curve or duration is missing,
-add it there so every clip inherits it — never hand-roll one in a
+Use `src/motion.ts` for pure frame math and timing tokens, and
+`src/motion-components` for reusable cameras, object departures, anchored
+overlays, shared elements and scene transitions. Do not hand-roll those in a
 composition.
+
+Before directing camera movement, choosing a speed/blur preset or an easing
+curve, read [Camera direction](references/camera-direction.md). It explains
+when to zoom, pan, hold or cut, the five presets, numeric overrides and custom
+cubic Beziers. Preserve reading holds, keep narration and product clocks
+independent of camera speed, and use temporal blur only on vector artwork.
 
 ---
 
@@ -520,11 +527,14 @@ understood. Debugging guide: `references/render.md`.
    UI. A handful out of several hundred, so it reads as flicker, and it is
    random. `--gl=swangle` does **not** fix it.
 2. **No CSS camera on the chrome.** Do not wrap the title bar, header or
-   nav in a lasting `transform: scale()`. *This bans moving the **frame**.
-   It does not ban moving what is inside it — see §3.* A click punch is
+   nav in a lasting `transform: scale()`. Keep the product frame stable
+   during explanation. A brief native-size spatial scene transition may
+   translate it and settle, using single-instance CSS blur. A click punch is
    allowed: a short bell returning to exactly `1`.
-3. **Scale footage, never type.** A slow push on a video panel is a camera
-   move. The same push on a UI is shimmering text.
+3. **Keep live UI and title type at native scale.** A slow push on a video
+   panel is a camera move. A CSS-scaled live UI can shimmer. `DiagramCamera`
+   may zoom SVG artwork and its labels through a viewBox; fixed headings and
+   native product chrome stay stable. See the camera direction reference.
 4. **One layer of any given shot.** Hard-cut and unmount rather than fading
    a video in over an editor already playing it.
 5. **Dark ground, dark loop** — *for a page-section clip.* Start and end on

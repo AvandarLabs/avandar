@@ -1,0 +1,94 @@
+name:
+  id: motionAtlas.stratified-spatial-sample.name
+  message: Choose sites across the whole frame
+description:
+  id: motionAtlas.stratified-spatial-sample.description
+  message: A schematic sampling frame separates into named geographic strata. Authored
+    sampling sites lift from each stratum while unsampled eligible sites remain visible
+    underneath.
+category:
+  id: motionAtlas.stratified-spatial-sample.category
+  message: spatial sample selection
+useWhen:
+  id: motionAtlas.stratified-spatial-sample.useWhen
+  message: Make the supplied selection and its geographic sampling frame visible together.
+prompt:
+  id: motionAtlas.stratified-spatial-sample.prompt
+  message: Open on a complete field of eligible site markers. Thin boundaries divide the
+    frame into supplied strata, then selected markers rise onto short sampling stems
+    without leaving their coordinates. Hold each stratum's selected count over its
+    eligible-site denominator.
+creativeDirection:
+  id: motionAtlas.stratified-spatial-sample.creativeDirection
+  message: Open on a complete field of eligible site markers. Thin boundaries divide the
+    frame into supplied strata, then selected markers rise onto short sampling stems
+    without leaving their coordinates. Hold each stratum's selected count over its
+    eligible-site denominator.
+intent:
+  id: motionAtlas.stratified-spatial-sample.intent
+  message: Make the supplied selection and its geographic sampling frame visible together.
+distinction:
+  id: motionAtlas.stratified-spatial-sample.distinction
+  message: The transformation is an explicit sample drawn from a retained, partitioned
+    eligible frame. Unlike environmental-observation-gaps, it explains selection before
+    observation and never adds measurements or fills missing geography.
+tags:
+  - id: motionAtlas.stratified-spatial-sample.tags.0
+    message: spatial sampling
+  - id: motionAtlas.stratified-spatial-sample.tags.1
+    message: stratified sample
+  - id: motionAtlas.stratified-spatial-sample.tags.2
+    message: sampling frame
+  - id: motionAtlas.stratified-spatial-sample.tags.3
+    message: survey design
+  - id: motionAtlas.stratified-spatial-sample.tags.4
+    message: field sites
+  - id: motionAtlas.stratified-spatial-sample.tags.5
+    message: eligible sites
+  - id: motionAtlas.stratified-spatial-sample.tags.6
+    message: geographic strata
+  - id: motionAtlas.stratified-spatial-sample.tags.7
+    message: selection
+goodFor:
+  - id: motionAtlas.stratified-spatial-sample.goodFor.0
+    message: Explain a spatial sampling plan
+  - id: motionAtlas.stratified-spatial-sample.goodFor.1
+    message: Show selected versus eligible sites by stratum
+  - id: motionAtlas.stratified-spatial-sample.goodFor.2
+    message: Introduce field survey allocation without claiming representativeness
+notFor:
+  - id: motionAtlas.stratified-spatial-sample.notFor.0
+    message: Selection is authored, not random. No sample weights, confidence intervals, or
+      representativeness are calculated.
+  - id: motionAtlas.stratified-spatial-sample.notFor.1
+    message: Each site counts once. Site fractions are not population fractions unless
+      supplied through a different, explicit data contract.
+  - id: motionAtlas.stratified-spatial-sample.notFor.2
+    message: Only schematic local geography is supported; boundaries do not describe real
+      administrative areas.
+domains:
+  - id: motionAtlas.stratified-spatial-sample.domains.0
+    message: spatial sample selection
+aliases:
+  - id: motionAtlas.stratified-spatial-sample.aliases.0
+    message: spatial sampling
+  - id: motionAtlas.stratified-spatial-sample.aliases.1
+    message: stratified sample
+  - id: motionAtlas.stratified-spatial-sample.aliases.2
+    message: sampling frame
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.stratified-spatial-sample.beat.0
+      message: Show all eligible sites and draw the supplied strata during frames 18–36.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.stratified-spatial-sample.beat.1
+      message: Raise selected markers onto stems while their coordinate anchors remain fixed.
+  - startFrame: 108
+    endFrame: 179
+    description:
+      id: motionAtlas.stratified-spatial-sample.beat.2
+      message: Hold every stratum denominator, including any stratum with zero selected sites.

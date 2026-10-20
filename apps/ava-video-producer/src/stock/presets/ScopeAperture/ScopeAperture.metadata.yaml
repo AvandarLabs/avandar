@@ -1,0 +1,115 @@
+name:
+  id: motionAtlas.scope-aperture.name
+  message: Narrow the question
+description:
+  id: motionAtlas.scope-aperture.description
+  message: A broad subject remains visible while a movable frame isolates the subset under
+    discussion. Excluded topics stay outside the frame with explicit context rather than
+    disappearing without explanation.
+category:
+  id: motionAtlas.scope-aperture.category
+  message: Editorial connectors
+useWhen:
+  id: motionAtlas.scope-aperture.useWhen
+  message: Make the boundary of the current explanation explicit.
+prompt:
+  id: motionAtlas.scope-aperture.prompt
+  message: Use Motion Atlas "Narrow the question" (scope-aperture) as a conceptual
+    graphic. Make the boundary of the current explanation explicit. Replace fictional
+    sample content with approved authored content before making product claims.
+creativeDirection:
+  id: motionAtlas.scope-aperture.creativeDirection
+  message: A broad heading and a flat field of topic labels appear together. A rectangular
+    aperture draws around the full field, then its edges contract and selected labels
+    slide together within it while other labels remain outside. The narrowed question
+    replaces the broad heading inside the frame. A final outside caption clarifies what
+    is deferred before the common exit envelope.
+intent:
+  id: motionAtlas.scope-aperture.intent
+  message: Make the boundary of the current explanation explicit.
+distinction:
+  id: motionAtlas.scope-aperture.distinction
+  message: The explanatory action is a changing semantic boundary with explicit
+    membership. Unlike stagger-cards or word-reveal, the labels begin visible and the
+    animation changes which topics belong to the current question.
+tags:
+  - id: motionAtlas.scope-aperture.tags.0
+    message: scope
+  - id: motionAtlas.scope-aperture.tags.1
+    message: focus
+  - id: motionAtlas.scope-aperture.tags.2
+    message: narrow down
+  - id: motionAtlas.scope-aperture.tags.3
+    message: boundary
+  - id: motionAtlas.scope-aperture.tags.4
+    message: in scope
+  - id: motionAtlas.scope-aperture.tags.5
+    message: out of scope
+  - id: motionAtlas.scope-aperture.tags.6
+    message: zoom in
+  - id: motionAtlas.scope-aperture.tags.7
+    message: specify
+  - id: motionAtlas.scope-aperture.tags.8
+    message: topic selection
+  - id: motionAtlas.scope-aperture.tags.9
+    message: current scope
+  - id: motionAtlas.scope-aperture.tags.10
+    message: future vision
+  - id: motionAtlas.scope-aperture.tags.11
+    message: product focus
+  - id: motionAtlas.scope-aperture.tags.12
+    message: domain boundary
+goodFor:
+  - id: motionAtlas.scope-aperture.goodFor.0
+    message: Define what an explainer will cover
+  - id: motionAtlas.scope-aperture.goodFor.1
+    message: Move from a broad subject to one bounded question
+  - id: motionAtlas.scope-aperture.goodFor.2
+    message: Separate current scope from deferred topics
+  - id: motionAtlas.scope-aperture.goodFor.3
+    message: Separate a long-term lifecycle vision from a bounded present focus
+  - id: motionAtlas.scope-aperture.goodFor.4
+    message: Clarify the domain and tasks an example is intended to cover
+domains:
+  - id: motionAtlas.scope-aperture.domains.0
+    message: Editorial connectors
+aliases:
+  - id: motionAtlas.scope-aperture.aliases.0
+    message: scope
+  - id: motionAtlas.scope-aperture.aliases.1
+    message: focus
+  - id: motionAtlas.scope-aperture.aliases.2
+    message: narrow down
+  - id: motionAtlas.scope-aperture.aliases.3
+    message: boundary
+notFor:
+  - id: motionAtlas.scope-aperture.notFor.0
+    message: The frame expresses topic membership, not physical geography or measured area.
+  - id: motionAtlas.scope-aperture.notFor.1
+    message: Included topics are authored; the renderer performs no text classification.
+  - id: motionAtlas.scope-aperture.notFor.2
+    message: This is a single narrowing step, not an animated camera zoom through a hierarchy.
+  - id: motionAtlas.scope-aperture.notFor.3
+    message: Topics outside the aperture may be future, deferred, unsupported, or simply out
+      of this explanation. Supply the correct outside label and do not imply they are
+      shipped features.
+motionBeats:
+  - startFrame: 12
+    endFrame: 35
+    description:
+      id: motionAtlas.scope-aperture.motionBeats.0
+      message: Establish the authored starting arrangement.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.scope-aperture.motionBeats.1
+      message: A broad heading and a flat field of topic labels appear together. A rectangular
+        aperture draws around the full field, then its edges contract and selected
+        labels slide together within it while other labels remain outside. The narrowed
+        question replaces the broad heading inside the frame. A final outside caption
+        clarifies what is deferred before the common exit envelope.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.scope-aperture.motionBeats.2
+      message: Hold the resolved authored relationships before the shared exit.

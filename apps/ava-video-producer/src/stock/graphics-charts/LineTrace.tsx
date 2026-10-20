@@ -6,35 +6,51 @@ import {
   Text,
   type GraphicProps,
 } from "../graphics-common";
+import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import type { LineTraceInput } from "../presets/LineTrace/LineTrace.schema";
+import type { ReactNode } from "react";
 
-const TRACE_VALUES = [18, 24, 21, 39, 35, 51, 47, 61, 58, 76, 73, 88];
-const TRACE_REFERENCE = [12, 18, 23, 21, 30, 33, 41, 40, 43, 49, 51, 57];
-const chartPoint = (value: number, i: number) => ({
-  x: 121 + i * (718 / 11),
-  y: 458 - value * 3.1,
-});
-const TRACE_PATH = TRACE_VALUES.map(
-  (v, i) => `${i ? "L" : "M"}${chartPoint(v, i).x} ${chartPoint(v, i).y}`,
-).join(" ");
-const REFERENCE_PATH = TRACE_REFERENCE.map(
-  (v, i) => `${i ? "L" : "M"}${chartPoint(v, i).x} ${chartPoint(v, i).y}`,
-).join(" ");
+type Props = GraphicProps & { input: LineTraceInput };
 
-export function LineTrace({ frame, accent, id }: GraphicProps) {
+/** Draws the bounded authored line-trace study at an explicit frame. */
+export function LineTrace({
+  input,
+  frame,
+  accent,
+  id,
+}: Readonly<Props>): ReactNode {
+  const points = input.points;
+  const chartPoint = (value: number, index: number) => ({
+    x: 121 + index * (718 / (points.length - 1)),
+    y: 458 - value * 3.1,
+  });
+  const tracePath = points
+    .map(
+      (value, index) =>
+        `${index ? "L" : "M"}${chartPoint(value, index).x} ${chartPoint(value, index).y}`,
+    )
+    .join(" ");
+  const referencePath = input.reference
+    .map(
+      (value, index) =>
+        `${index ? "L" : "M"}${chartPoint(value, index).x} ${chartPoint(value, index).y}`,
+    )
+    .join(" ");
   const t = ramp(frame, 23, 94, EASE.inOut);
-  const tracePosition = t * (TRACE_VALUES.length - 1);
-  const index = Math.min(10, Math.floor(tracePosition));
+  const tracePosition = t * (points.length - 1);
+  const index = Math.min(points.length - 2, Math.floor(tracePosition));
   const between = tracePosition - index;
   const head = {
     x: mix(
       between,
-      chartPoint(TRACE_VALUES[index], index).x,
-      chartPoint(TRACE_VALUES[index + 1], index + 1).x,
+      chartPoint(points[index], index).x,
+      chartPoint(points[index + 1], index + 1).x,
     ),
     y: mix(
       between,
-      chartPoint(TRACE_VALUES[index], index).y,
-      chartPoint(TRACE_VALUES[index + 1], index + 1).y,
+      chartPoint(points[index], index).y,
+      chartPoint(points[index + 1], index + 1).y,
     ),
   };
   return (
@@ -53,10 +69,22 @@ export function LineTrace({ frame, accent, id }: GraphicProps) {
           />
         </clipPath>
       </defs>
-      <Eyebrow>LINE TRACE</Eyebrow>
-      <Pill x={748} y={44} width={148} text="FICTIONAL DATA" color={accent} />
+      <Eyebrow>
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["line-trace"].lineTrace,
+        })}
+      </Eyebrow>
+      <Pill
+        x={748}
+        y={44}
+        width={148}
+        text={getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["line-trace"].fictionalData,
+        })}
+        color={accent}
+      />
       <Text x={64} y={111} size={29} weight={600}>
-        A trend takes shape
+        {input.heading}
       </Text>
       {[0, 25, 50, 75, 100].map((value) => (
         <g key={value}>
@@ -77,28 +105,30 @@ export function LineTrace({ frame, accent, id }: GraphicProps) {
           </Text>
         </g>
       ))}
-      <path
-        d={REFERENCE_PATH}
-        fill="none"
-        stroke={STOCK.cyan}
-        strokeOpacity={0.38}
-        strokeWidth={2}
-        strokeDasharray="5 7"
-      />
+      {input.showReference ? (
+        <path
+          d={referencePath}
+          fill="none"
+          stroke={STOCK.cyan}
+          strokeOpacity={0.38}
+          strokeWidth={2}
+          strokeDasharray="5 7"
+        />
+      ) : null}
       <g clipPath={`url(#${id}-chart-clip)`}>
         <path
-          d={`${TRACE_PATH} L839 458 H121 Z`}
+          d={`${tracePath} L839 458 H121 Z`}
           fill={`url(#${id}-chart-fill)`}
         />
         <path
-          d={TRACE_PATH}
+          d={tracePath}
           fill="none"
           stroke={accent}
           strokeWidth={3.5}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {TRACE_VALUES.map((v, i) => (
+        {points.map((v, i) => (
           <circle
             key={i}
             cx={chartPoint(v, i).x}
@@ -120,18 +150,24 @@ export function LineTrace({ frame, accent, id }: GraphicProps) {
         01
       </Text>
       <Text x={839} y={491} size={14} mono fill={STOCK.muted} anchor="end">
-        12
+        {String(points.length).padStart(2, "0")}
       </Text>
       <circle cx={121} cy={543} r={4} fill={accent} />
       <Text x={137} y={548} size={15} fill={STOCK.muted}>
-        Series A
+        {input.seriesLabel}
       </Text>
-      <circle cx={260} cy={543} r={4} fill={STOCK.cyan} fillOpacity={0.5} />
-      <Text x={276} y={548} size={15} fill={STOCK.muted}>
-        Reference
-      </Text>
+      {input.showReference ? (
+        <>
+          <circle cx={260} cy={543} r={4} fill={STOCK.cyan} fillOpacity={0.5} />
+          <Text x={276} y={548} size={15} fill={STOCK.muted}>
+            {input.referenceLabel}
+          </Text>
+        </>
+      ) : null}
       <Text x={896} y={548} size={13} fill={STOCK.muted} anchor="end">
-        SAMPLE PERIODS
+        {getStockDisplayCopyFromDescriptor({
+          descriptor: LEGACY_DISPLAY_COPY["line-trace"].samplePeriods,
+        })}
       </Text>
     </g>
   );

@@ -1,0 +1,72 @@
+- id: qetl-motion
+  title: Ask before moving data
+  category: motion-motion
+  description: Batch ETL and query-led retrieval, connected through a persistent question and a
+    selective data boundary.
+  frames: 1542
+  path: explainers/film-qetl-motion
+  family: films
+- id: qetl-to-product
+  title: From question to query
+  category: motion-product
+  description: An aperture and a code-frame match bring query intent into the actual Explorer.
+  frames: 1852
+  path: explainers/film-qetl-to-product
+  family: films
+- id: product-to-qetl
+  title: A source is the beginning
+  category: product-motion
+  description: The actual import sequence opens into an explanation of integration and execution placement.
+  frames: 1626
+  path: explainers/film-product-to-qetl
+  family: films
+- id: qetl-composite
+  title: Follow the result back
+  category: composite
+  description: Follow a dashboard result through explanations that emerge over the native interface.
+  frames: 1675
+  path: explainers/film-qetl-composite
+  family: films
+- id: ontology-motion
+  title: One grammar, many missions
+  category: motion-motion
+  description: Entities, descriptors and relationships carry through mapping and schema change.
+  frames: 1533
+  path: explainers/film-ontology-motion
+  family: films
+- id: ontology-to-product
+  title: A model becomes a workspace
+  category: motion-product
+  description: Entity grain resolves into actual ontology inspection and attribute lists.
+  frames: 1664
+  path: explainers/film-ontology-to-product
+  family: films
+- id: product-to-ontology
+  title: A record reveals its structure
+  category: product-motion
+  description: A Case Manager record opens into an explanatory relationship graph.
+  frames: 1641
+  path: explainers/film-product-to-ontology
+  family: films
+- id: ontology-composite
+  title: Configure the meaning
+  category: composite
+  description: Measured field controls anchor floating explanations of mapping and value selection.
+  frames: 1648
+  path: explainers/film-ontology-composite
+  family: films
+- id: plugin-ecosystem
+  title: A platform shaped by its community
+  category: motion-motion
+  description: A future plugin ecosystem moves from mission needs to modules, integration and contributions.
+  frames: 1818
+  path: explainers/film-plugin-ecosystem
+  family: films
+- id: right-sized-data
+  title: The right scale changes the design
+  category: motion-motion
+  description: A workload, selected transfer, local execution and resource allocation explain the
+    small-to-medium data thesis.
+  frames: 1989
+  path: explainers/film-right-sized-data
+  family: films

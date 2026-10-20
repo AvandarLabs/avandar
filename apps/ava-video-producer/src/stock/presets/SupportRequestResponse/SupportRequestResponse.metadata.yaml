@@ -1,0 +1,96 @@
+name:
+  id: motionAtlas.support-request-response.name
+  message: Ask for help without losing ownership
+description:
+  id: motionAtlas.support-request-response.description
+  message: A team member makes a concrete request for support. A colleague gives an
+    authored response and joins the same work surface only when the response accepts,
+    while the requester keeps ownership of the task.
+category:
+  id: motionAtlas.support-request-response.category
+  message: Learning and collaboration
+useWhen:
+  id: motionAtlas.support-request-response.useWhen
+  message: Show a respectful request and response while preserving both people's agency.
+prompt:
+  id: motionAtlas.support-request-response.prompt
+  message: Show a respectful request and response while preserving both people's agency.
+creativeDirection:
+  id: motionAtlas.support-request-response.creativeDirection
+  message: Frames 12..42 show the requester with one unfinished work object and a short
+    help request. Frames 43..88 let the colleague turn toward the requester, pause to
+    acknowledge them and display the supplied response. Frames 89..130 bring a second
+    chair to the same worktable only for joins. For later or declines, the colleague
+    remains at their position and the task stays visibly open. Frames 131..167 hold the
+    requester, unchanged work object and explicit response. Do not replace the request
+    with a completed or emotionally resolved state. Use deterministic frame-driven
+    React/SVG at 960x600, 180 frames and 30 fps, with the shared palette. Reveal during
+    frames 0..11 and fade to the common opaque ground during frames 168..179.
+intent:
+  id: motionAtlas.support-request-response.intent
+  message: Show a respectful request and response while preserving both people's agency.
+distinction:
+  id: motionAtlas.support-request-response.distinction
+  message: Unlike custody-transfer, responsibility does not move to a successor. Unlike
+    grievance-remedy-retest, there is no complaint, repair or acceptance test; the
+    explanatory action is requesting support and joining ongoing work.
+tags:
+  - id: motionAtlas.support-request-response.tags.0
+    message: asking for help
+  - id: motionAtlas.support-request-response.tags.1
+    message: vulnerability
+  - id: motionAtlas.support-request-response.tags.2
+    message: support
+  - id: motionAtlas.support-request-response.tags.3
+    message: psychological safety
+  - id: motionAtlas.support-request-response.tags.4
+    message: shared work
+  - id: motionAtlas.support-request-response.tags.5
+    message: boundaries
+goodFor:
+  - id: motionAtlas.support-request-response.goodFor.0
+    message: Show a concrete support request
+  - id: motionAtlas.support-request-response.goodFor.1
+    message: Distinguish hearing a concern from agreeing to help now
+  - id: motionAtlas.support-request-response.goodFor.2
+    message: Depict collaboration without an ownership handoff
+domains:
+  - id: motionAtlas.support-request-response.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.support-request-response.aliases.0
+    message: support request response
+notFor:
+  - id: motionAtlas.support-request-response.notFor.0
+    message: One supportive exchange does not establish psychological safety or a lasting
+      level of trust.
+  - id: motionAtlas.support-request-response.notFor.1
+    message: A respectful decline or later response remains a valid visible outcome.
+  - id: motionAtlas.support-request-response.notFor.2
+    message: Do not imply that support automatically resolves distress, improves performance
+      or completes the task.
+  - id: motionAtlas.support-request-response.notFor.3
+    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 12
+    endFrame: 42
+    description:
+      id: motionAtlas.support-request-response.motionBeats.0
+      message: Reveal the requester, unfinished task and request.
+  - startFrame: 43
+    endFrame: 88
+    description:
+      id: motionAtlas.support-request-response.motionBeats.1
+      message: The colleague turns and displays the exact response.
+  - startFrame: 89
+    endFrame: 130
+    description:
+      id: motionAtlas.support-request-response.motionBeats.2
+      message: Only joins brings a second chair and a shared-work gesture.
+  - startFrame: 131
+    endFrame: 167
+    description:
+      id: motionAtlas.support-request-response.motionBeats.3
+      message: Hold the original owner, open task and explicit response.

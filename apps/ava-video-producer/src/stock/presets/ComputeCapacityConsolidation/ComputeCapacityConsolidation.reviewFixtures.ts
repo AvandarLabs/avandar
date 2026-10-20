@@ -1,0 +1,298 @@
+import type { Input } from "./ComputeCapacityConsolidation.schema";
+/** Accepted inputs that expose transfer overlap and destination ownership. */
+export const REVIEW_FIXTURES: Array<{ id: string; input: Input }> = [
+  {
+    id: "full-swap-sleep",
+    input: {
+      hosts: [
+        {
+          id: "",
+          label: "Host A",
+          capacityCpuHours: 8,
+        },
+        {
+          id: "b",
+          label: "Host B",
+          capacityCpuHours: 8,
+        },
+      ],
+      jobs: [
+        {
+          id: "",
+          label: "Batch A",
+          cpuHours: 8,
+          initialHostId: "",
+          finalHostId: "b",
+        },
+        {
+          id: "two",
+          label: "Batch B",
+          cpuHours: 8,
+          initialHostId: "b",
+          finalHostId: "",
+        },
+      ],
+      windowLabel: "Same 2-hour work window",
+      decision: {
+        actorLabel: "Platform operator",
+        actionLabel: "Apply approved placement",
+      },
+      emptyHostState: "sleep",
+      showCapacityGuides: false,
+      copy: {
+        before: "Initial placement",
+        after: "Approved placement",
+        work: "Work conserved",
+        occupied: "Occupied hosts",
+        sleep: "Sleep",
+        available: "Available",
+        unit: "CPU-hours",
+        disclaimer: "Fictional resource allocation",
+      },
+    },
+  },
+  {
+    id: "full-swap-available",
+    input: {
+      hosts: [
+        {
+          id: "",
+          label: "Host A",
+          capacityCpuHours: 8,
+        },
+        {
+          id: "b",
+          label: "Host B",
+          capacityCpuHours: 8,
+        },
+      ],
+      jobs: [
+        {
+          id: "",
+          label: "Batch A",
+          cpuHours: 8,
+          initialHostId: "",
+          finalHostId: "b",
+        },
+        {
+          id: "two",
+          label: "Batch B",
+          cpuHours: 8,
+          initialHostId: "b",
+          finalHostId: "",
+        },
+      ],
+      windowLabel: "Same 2-hour work window",
+      decision: {
+        actorLabel: "Platform operator",
+        actionLabel: "Apply approved placement",
+      },
+      emptyHostState: "available",
+      showCapacityGuides: false,
+      copy: {
+        before: "Initial placement",
+        after: "Approved placement",
+        work: "Work conserved",
+        occupied: "Occupied hosts",
+        sleep: "Sleep",
+        available: "Available",
+        unit: "CPU-hours",
+        disclaimer: "Fictional resource allocation",
+      },
+    },
+  },
+  {
+    id: "four-unequal-hosts",
+    input: {
+      hosts: [
+        {
+          id: "h0",
+          label: "Host 1",
+          capacityCpuHours: 1,
+        },
+        {
+          id: "h1",
+          label: "Host 2",
+          capacityCpuHours: 2,
+        },
+        {
+          id: "h2",
+          label: "Host 3",
+          capacityCpuHours: 4,
+        },
+        {
+          id: "h3",
+          label: "Host 4",
+          capacityCpuHours: 8,
+        },
+      ],
+      jobs: [
+        {
+          id: "j0",
+          label: "Job 1",
+          cpuHours: 1,
+          initialHostId: "h0",
+          finalHostId: "h3",
+        },
+        {
+          id: "j1",
+          label: "Job 2",
+          cpuHours: 1,
+          initialHostId: "h1",
+          finalHostId: "h3",
+        },
+        {
+          id: "j2",
+          label: "Job 3",
+          cpuHours: 1,
+          initialHostId: "h1",
+          finalHostId: "h3",
+        },
+        {
+          id: "j3",
+          label: "Job 4",
+          cpuHours: 1,
+          initialHostId: "h2",
+          finalHostId: "h3",
+        },
+        {
+          id: "j4",
+          label: "Job 5",
+          cpuHours: 1,
+          initialHostId: "h2",
+          finalHostId: "h3",
+        },
+        {
+          id: "j5",
+          label: "Job 6",
+          cpuHours: 1,
+          initialHostId: "h2",
+          finalHostId: "h3",
+        },
+        {
+          id: "j6",
+          label: "Job 7",
+          cpuHours: 1,
+          initialHostId: "h2",
+          finalHostId: "h3",
+        },
+        {
+          id: "j7",
+          label: "Job 8",
+          cpuHours: 1,
+          initialHostId: "h3",
+          finalHostId: "h3",
+        },
+      ],
+      windowLabel: "Same 2-hour work window",
+      decision: {
+        actorLabel: "Platform operator",
+        actionLabel: "Apply approved placement",
+      },
+      emptyHostState: "sleep",
+      showCapacityGuides: true,
+      copy: {
+        before: "Initial placement",
+        after: "Approved placement",
+        work: "Work conserved",
+        occupied: "Occupied hosts",
+        sleep: "Sleep",
+        available: "Available",
+        unit: "CPU-hours",
+        disclaimer: "Fictional resource allocation",
+      },
+    },
+  },
+  {
+    id: "fractional-full-stack",
+    input: {
+      hosts: [
+        {
+          id: "a",
+          label: "A",
+          capacityCpuHours: 36.3,
+        },
+        {
+          id: "b",
+          label: "B",
+          capacityCpuHours: 18.3,
+        },
+      ],
+      jobs: [
+        {
+          id: "job-0",
+          label: "Job 0",
+          cpuHours: 16,
+          initialHostId: "a",
+          finalHostId: "b",
+        },
+        {
+          id: "job-1",
+          label: "Job 1",
+          cpuHours: 0.7,
+          initialHostId: "a",
+          finalHostId: "b",
+        },
+        {
+          id: "job-2",
+          label: "Job 2",
+          cpuHours: 0.7,
+          initialHostId: "a",
+          finalHostId: "b",
+        },
+        {
+          id: "job-3",
+          label: "Job 3",
+          cpuHours: 2,
+          initialHostId: "a",
+          finalHostId: "a",
+        },
+        {
+          id: "job-4",
+          label: "Job 4",
+          cpuHours: 8,
+          initialHostId: "a",
+          finalHostId: "a",
+        },
+        {
+          id: "job-5",
+          label: "Job 5",
+          cpuHours: 0.2,
+          initialHostId: "a",
+          finalHostId: "b",
+        },
+        {
+          id: "job-6",
+          label: "Job 6",
+          cpuHours: 8,
+          initialHostId: "a",
+          finalHostId: "a",
+        },
+        {
+          id: "job-7",
+          label: "Job 7",
+          cpuHours: 0.7,
+          initialHostId: "a",
+          finalHostId: "b",
+        },
+      ],
+      windowLabel: "Same 2-hour work window",
+      decision: {
+        actorLabel: "Platform operator",
+        actionLabel: "Apply approved placement",
+      },
+      emptyHostState: "sleep",
+      showCapacityGuides: true,
+      copy: {
+        before: "Initial placement",
+        after: "Approved placement",
+        work: "Work conserved",
+        occupied: "Occupied hosts",
+        sleep: "Sleep",
+        available: "Available",
+        unit: "CPU-hours",
+        disclaimer: "Fictional resource allocation",
+      },
+    },
+  },
+];

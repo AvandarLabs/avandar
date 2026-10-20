@@ -1,0 +1,110 @@
+name:
+  id: motionAtlas.school-transition-rehearsal.name
+  message: Rehearse the new school routine
+description:
+  id: motionAtlas.school-transition-rehearsal.description
+  message: A learner practices a short routine in an unfamiliar school setting with a
+    chosen companion. A supplied final step can be tried independently, while the scene
+    remains explicitly a rehearsal.
+category:
+  id: motionAtlas.school-transition-rehearsal.category
+  message: Supported rehearsal in a physical setting
+useWhen:
+  id: motionAtlas.school-transition-rehearsal.useWhen
+  message: Show how a learner can practice an unfamiliar school routine before it becomes
+    a daily expectation.
+prompt:
+  id: motionAtlas.school-transition-rehearsal.prompt
+  message: Open on a learner and companion beside a simple interior containing a locker
+    and a classroom doorway. The learner consults a two-step practice strip, opens the
+    named locker, then approaches the named room. The companion either stays alongside
+    or deliberately stands back for the final step, according to the supplied choice.
+    Hold the learner at the final practice stop with the rehearsal label visible,
+    without changing it to enrolled or attended.
+creativeDirection:
+  id: motionAtlas.school-transition-rehearsal.creativeDirection
+  message: Open on a learner and companion beside a simple interior containing a locker
+    and a classroom doorway. The learner consults a two-step practice strip, opens the
+    named locker, then approaches the named room. The companion either stays alongside
+    or deliberately stands back for the final step, according to the supplied choice.
+    Hold the learner at the final practice stop with the rehearsal label visible,
+    without changing it to enrolled or attended.
+intent:
+  id: motionAtlas.school-transition-rehearsal.intent
+  message: Show how a learner can practice an unfamiliar school routine before it becomes
+    a daily expectation.
+distinction:
+  id: motionAtlas.school-transition-rehearsal.distinction
+  message: The learner rehearses concrete object use and a short routine while choosing
+    the companion's role. Unlike returning-learner-worktable, no prior learning artifact
+    is carried back into a lesson; unlike chosen-service-access, the scene does not
+    remove an admission barrier or claim successful service uptake.
+tags:
+  - id: motionAtlas.school-transition-rehearsal.tags.0
+    message: school transition
+  - id: motionAtlas.school-transition-rehearsal.tags.1
+    message: orientation visit
+  - id: motionAtlas.school-transition-rehearsal.tags.2
+    message: learner agency
+  - id: motionAtlas.school-transition-rehearsal.tags.3
+    message: routine rehearsal
+  - id: motionAtlas.school-transition-rehearsal.tags.4
+    message: education retention
+  - id: motionAtlas.school-transition-rehearsal.tags.5
+    message: chosen companion
+  - id: motionAtlas.school-transition-rehearsal.tags.6
+    message: new school
+  - id: motionAtlas.school-transition-rehearsal.tags.7
+    message: practice visit
+goodFor:
+  - id: motionAtlas.school-transition-rehearsal.goodFor.0
+    message: Explaining a supported transition to a new school
+  - id: motionAtlas.school-transition-rehearsal.goodFor.1
+    message: Showing orientation as a concrete practice activity
+  - id: motionAtlas.school-transition-rehearsal.goodFor.2
+    message: Distinguishing a rehearsed routine from recorded school attendance
+notFor:
+  - id: motionAtlas.school-transition-rehearsal.notFor.0
+    message: A practice visit is not enrollment, attendance, learning progress or a
+      retention outcome.
+  - id: motionAtlas.school-transition-rehearsal.notFor.1
+    message: The two-room interior is schematic and does not reproduce a real school layout.
+  - id: motionAtlas.school-transition-rehearsal.notFor.2
+    message: Supported and independent practice are alternatives, not a hierarchy of
+      participant worth or ability.
+domains:
+  - id: motionAtlas.school-transition-rehearsal.domains.0
+    message: Supported rehearsal in a physical setting
+aliases:
+  - id: motionAtlas.school-transition-rehearsal.aliases.0
+    message: school transition
+  - id: motionAtlas.school-transition-rehearsal.aliases.1
+    message: orientation visit
+  - id: motionAtlas.school-transition-rehearsal.aliases.2
+    message: learner agency
+motionBeats:
+  - startFrame: 0
+    endFrame: 35
+    description:
+      id: motionAtlas.school-transition-rehearsal.beat.0
+      message: Establish the authored people, objects and supplied starting state.
+  - startFrame: 36
+    endFrame: 107
+    description:
+      id: motionAtlas.school-transition-rehearsal.beat.1
+      message: Open on a learner and companion beside a simple interior containing a locker
+        and a classroom doorway. The learner consults a two-step practice strip, opens
+        the named locker, then approaches the named room. The companion either stays
+        alongside or deliberately stands back for the final step, according to the
+        supplied choice. Hold the learner at the final practice stop with the rehearsal
+        label visible, without changing it to enrolled or attended.
+  - startFrame: 108
+    endFrame: 167
+    description:
+      id: motionAtlas.school-transition-rehearsal.beat.2
+      message: Hold the supplied result, identities and limits.
+  - startFrame: 168
+    endFrame: 179
+    description:
+      id: motionAtlas.school-transition-rehearsal.beat.3
+      message: The shared opaque envelope fades the illustration for its loop seam.

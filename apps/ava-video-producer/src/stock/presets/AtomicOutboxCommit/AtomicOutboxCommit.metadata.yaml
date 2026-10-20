@@ -1,0 +1,88 @@
+name:
+  id: motionAtlas.atomic-outbox-commit.name
+  message: Save the change and its delivery obligation together
+description:
+  id: motionAtlas.atomic-outbox-commit.description
+  message: A local edit and its matching outbound journal entry sit under one transaction
+    latch. Both become durable together, or neither does, so an accepted edit cannot
+    lose the obligation to synchronize it.
+category:
+  id: motionAtlas.atomic-outbox-commit.category
+  message: Atomic transaction boundary
+useWhen:
+  id: motionAtlas.atomic-outbox-commit.useWhen
+  message: Bind a durable local change to its durable synchronization obligation.
+prompt:
+  id: motionAtlas.atomic-outbox-commit.prompt
+  message: Bind a durable local change to its durable synchronization obligation.
+creativeDirection:
+  id: motionAtlas.atomic-outbox-commit.creativeDirection
+  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+    0-12 reveal the scene. Frames 13-55 write a local change and matching journal ticket
+    on two halves of one sheet. Frames 56-110 close one shared commit latch. Frames
+    111-139 stamp both halves when committed, or withdraw both provisional halves when
+    aborted. Hold the resolved meaning during frames 140-165. Frames 166-179 return to
+    the same opaque ground for a six-second loop; reset is editorial.
+intent:
+  id: motionAtlas.atomic-outbox-commit.intent
+  message: Bind a durable local change to its durable synchronization obligation.
+distinction:
+  id: motionAtlas.atomic-outbox-commit.distinction
+  message: Journal-receipts starts with an existing outbox and closes obligations after
+    acknowledgment. This explains how the obligation is created atomically with the
+    source mutation before any network activity.
+tags:
+  - id: motionAtlas.atomic-outbox-commit.tags.0
+    message: transactional outbox
+  - id: motionAtlas.atomic-outbox-commit.tags.1
+    message: atomicity
+  - id: motionAtlas.atomic-outbox-commit.tags.2
+    message: offline sync
+  - id: motionAtlas.atomic-outbox-commit.tags.3
+    message: crash safety
+goodFor:
+  - id: motionAtlas.atomic-outbox-commit.goodFor.0
+    message: Explain transactional outbox crash safety
+  - id: motionAtlas.atomic-outbox-commit.goodFor.1
+    message: Show that local persistence and sync obligations commit together
+domains:
+  - id: motionAtlas.atomic-outbox-commit.domains.0
+    message: Editorial illustration
+aliases:
+  - id: motionAtlas.atomic-outbox-commit.aliases.0
+    message: atomic outbox commit
+notFor:
+  - id: motionAtlas.atomic-outbox-commit.notFor.0
+    message: The shared transaction boundary is an authored protocol assumption.
+  - id: motionAtlas.atomic-outbox-commit.notFor.1
+    message: Atomic local commit does not imply exactly-once remote delivery.
+  - id: motionAtlas.atomic-outbox-commit.notFor.2
+    message: No network success is depicted. The committed journal entry remains pending.
+  - id: motionAtlas.atomic-outbox-commit.notFor.3
+    message: No real product screen, external fetch, supplied code execution, or measured
+      performance claim. All text is authored; no JSX, functions or URLs in props.
+  - id: motionAtlas.atomic-outbox-commit.notFor.4
+    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+      wording and selected states are authoring responsibilities. Runtime validation
+      enforces structural bounds and explicit cross-field rules.
+motionBeats:
+  - startFrame: 13
+    endFrame: 55
+    description:
+      id: motionAtlas.atomic-outbox-commit.motionBeats.0
+      message: Write the local proposal and matching journal proposal.
+  - startFrame: 56
+    endFrame: 110
+    description:
+      id: motionAtlas.atomic-outbox-commit.motionBeats.1
+      message: Close one latch around both provisional halves.
+  - startFrame: 111
+    endFrame: 139
+    description:
+      id: motionAtlas.atomic-outbox-commit.motionBeats.2
+      message: Stamp both durable halves or withdraw both proposals.
+  - startFrame: 140
+    endFrame: 165
+    description:
+      id: motionAtlas.atomic-outbox-commit.motionBeats.3
+      message: Hold the resolved relationship.

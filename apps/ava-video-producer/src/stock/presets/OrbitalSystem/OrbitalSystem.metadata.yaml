@@ -1,0 +1,57 @@
+name:
+  id: motionAtlas.orbital-system.name
+  message: Orbital system
+description:
+  id: motionAtlas.orbital-system.description
+  message: Satellites orbit a stable center on layered paths.
+category:
+  id: motionAtlas.orbital-system.category
+  message: Networks
+tags:
+  - id: motionAtlas.orbital-system.tags.0
+    message: orbit
+  - id: motionAtlas.orbital-system.tags.1
+    message: ecosystem
+  - id: motionAtlas.orbital-system.tags.2
+    message: satellites
+  - id: motionAtlas.orbital-system.tags.3
+    message: ambient
+useWhen:
+  id: motionAtlas.orbital-system.useWhen
+  message: Suggest an ecosystem around one central idea without implying measured relationships.
+prompt:
+  id: motionAtlas.orbital-system.prompt
+  message: Use Motion Atlas "Orbital system" (orbital-system) as a conceptual graphic.
+    Suggest an ecosystem around one central idea without implying measured
+    relationships. Keep the restrained motion and readable labels; replace sample
+    content with approved facts before making product claims.
+creativeDirection:
+  id: motionAtlas.orbital-system.creativeDirection
+  message: Satellites orbit a stable center on layered paths.
+goodFor:
+  - id: motionAtlas.orbital-system.goodFor.0
+    message: Suggest an ecosystem around one central idea without implying measured
+      relationships.
+intent:
+  id: motionAtlas.orbital-system.intent
+  message: Suggest an ecosystem around one central idea without implying measured relationships.
+domains:
+  - id: motionAtlas.orbital-system.domains.0
+    message: Networks
+aliases:
+  - id: motionAtlas.orbital-system.aliases.0
+    message: orbit
+  - id: motionAtlas.orbital-system.aliases.1
+    message: ecosystem
+  - id: motionAtlas.orbital-system.aliases.2
+    message: satellites
+  - id: motionAtlas.orbital-system.aliases.3
+    message: ambient
+notFor:
+  - id: motionAtlas.orbital-system.notFor.0
+    message: Only the fixed authored layout and declared collection bounds are supported. No
+      measured relationships are inferred.
+motionBeats: []
+distinction:
+  id: motionAtlas.orbital-system.distinction
+  message: Satellites orbit a stable center on layered paths.
