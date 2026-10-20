@@ -11,12 +11,18 @@ import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 /** CKAN's largest `package_search` page. */
 export const HDX_PAGE_SIZE = 1000;
 
-type _PageArgs = Readonly<{
+type _ExtractArgs = Readonly<{
   drive: Readonly<HdxDrive>;
   window: EtlRunWindow;
   discovery: CkanDiscoveryClient;
   pageSize: number;
-  cursor: CkanDatasetSearchCursor | undefined;
+}>;
+
+/** One page's new datasets, and where the next page starts. */
+type _FetchedPage = Readonly<{
+  datasets: readonly CkanPackage[];
+  /** `undefined` when this was the last page. */
+  nextCursor: CkanDatasetSearchCursor | undefined;
 }>;
 
 /**
@@ -50,40 +56,82 @@ function _warnAboutSkippedDatasets(
   });
 }
 
-async function* _pagesAfter(
-  args: _PageArgs,
-): AsyncGenerator<readonly CkanPackage[]> {
+/**
+ * Warns when the first page is short but not empty. That normally means the
+ * window holds fewer datasets than one page, but a server whose `rows_max`
+ * is below the page size would also end the crawl here, silently.
+ */
+function _warnIfFirstPageIsShort(
+  args: _ExtractArgs,
+  page: CkanDatasetSearchPage,
+): void {
+  if (page.resultCount < args.pageSize && page.nextCursor !== undefined) {
+    console.warn(
+      `[hdx] drive ${args.drive.baseUrl}: the first page held ` +
+        `${String(page.resultCount)} of ${String(args.pageSize)} rows, so ` +
+        "the crawl ends there. If the server caps rows per request below " +
+        "that, the rest of the window was not read.",
+    );
+  }
+}
+
+/**
+ * Fetches the page after `cursor` and keeps only its datasets strictly after
+ * the cursor.
+ *
+ * @throws When a full page does not move the cursor forward.
+ */
+async function _fetchPageAfter(
+  args: _ExtractArgs,
+  cursor: CkanDatasetSearchCursor | undefined,
+): Promise<_FetchedPage> {
   const page = await args.discovery.searchDatasets({
     baseUrl: args.drive.baseUrl,
     modifiedSince: args.window.since,
     modifiedBefore: args.window.until,
-    after: args.cursor,
+    after: cursor,
     rows: args.pageSize,
   });
   _warnAboutSkippedDatasets(args.drive, page);
+  if (cursor === undefined) {
+    _warnIfFirstPageIsShort(args, page);
+  }
   const isFullPage = page.resultCount === args.pageSize;
   const { nextCursor } = page;
   if (
     isFullPage &&
-    (nextCursor === undefined || !_isAfterCursor(nextCursor, args.cursor))
+    (nextCursor === undefined || !_isAfterCursor(nextCursor, cursor))
   ) {
     throw new Error(
       `HDX drive ${args.drive.baseUrl} returned a full page with nothing after ` +
-        `${args.cursor?.name ?? "the start"}, so it stopped instead of ` +
+        `${cursor?.name ?? "the start"}, so it stopped instead of ` +
         "requesting the same page again.",
     );
   }
-  yield page.datasets.filter((ckanPackage) => {
-    const position = {
-      modifiedAt: getHdxDatasetTimestamp(ckanPackage),
-      name: ckanPackage.name,
-    };
-    return _isAfterCursor(position, args.cursor);
-  });
-  if (!isFullPage || nextCursor === undefined) {
-    return;
-  }
-  yield* _pagesAfter({ ...args, cursor: nextCursor });
+  return {
+    datasets: page.datasets.filter((ckanPackage) => {
+      const position = {
+        modifiedAt: getHdxDatasetTimestamp(ckanPackage),
+        name: ckanPackage.name,
+      };
+      return _isAfterCursor(position, cursor);
+    }),
+    nextCursor: isFullPage ? nextCursor : undefined,
+  };
+}
+
+async function* _pages(
+  args: _ExtractArgs,
+): AsyncGenerator<readonly CkanPackage[]> {
+  let cursor: CkanDatasetSearchCursor | undefined = undefined;
+  // Sequential on purpose: each request starts after the previous page's
+  // cursor, and a loop holds only the current page, so a page is released
+  // as soon as the engine has loaded it.
+  do {
+    const page = await _fetchPageAfter(args, cursor);
+    yield page.datasets;
+    cursor = page.nextCursor;
+  } while (cursor !== undefined);
 }
 
 /**
@@ -92,7 +140,8 @@ async function* _pagesAfter(
  * strictly after the previous page's last `(metadata_modified, name)` pair,
  * so a dataset modified mid-crawl is neither skipped nor repeated. A
  * dataset that failed validation is logged with `console.warn` and left
- * out, and paging still moves past it.
+ * out, and paging still moves past it. A short first page is logged too,
+ * since a server row cap below the page size would end the crawl there.
  *
  * @throws When a full page has nothing after the cursor, which would
  * otherwise request the same page forever.
@@ -103,11 +152,10 @@ export function extractHdxDatasets(args: {
   discovery: CkanDiscoveryClient;
   pageSize?: number;
 }): AsyncGenerator<readonly CkanPackage[]> {
-  return _pagesAfter({
+  return _pages({
     drive: args.drive,
     window: args.window,
     discovery: args.discovery,
     pageSize: args.pageSize ?? HDX_PAGE_SIZE,
-    cursor: undefined,
   });
 }

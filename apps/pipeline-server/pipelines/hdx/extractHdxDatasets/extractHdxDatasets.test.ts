@@ -162,6 +162,21 @@ describe("extractHdxDatasets", () => {
     expect(vi.mocked(discovery.searchDatasets).mock.calls.length).toBe(3);
   });
 
+  it("sends no further request once the caller closes the crawl", async () => {
+    const discovery = _keysetDiscovery(CATALOG);
+    const pages = extractHdxDatasets({
+      drive: DRIVE,
+      window: OPEN_WINDOW,
+      discovery,
+      pageSize: 2,
+    });
+
+    await pages.next();
+    await pages.return(undefined);
+
+    expect(vi.mocked(discovery.searchDatasets).mock.calls.length).toBe(1);
+  });
+
   it("stops with an error on a full page with nothing after the cursor", async () => {
     const stuck: CkanDiscoveryClient = {
       searchDatasets: vi.fn(async () => {
@@ -186,6 +201,41 @@ describe("extractHdxDatasets", () => {
       after: undefined,
       rows: 2,
     });
+  });
+
+  it("keeps the window's until on every request after the first", async () => {
+    const discovery = _keysetDiscovery(CATALOG);
+    const until = new Date("2026-10-05T00:00:00.000Z");
+
+    await _collect(discovery, { since: undefined, until });
+
+    expect(
+      vi
+        .mocked(discovery.searchDatasets)
+        .mock.calls.slice(1)
+        .map(([params]) => {
+          return [params.modifiedBefore, params.after?.name];
+        }),
+    ).toEqual([
+      [until, "b"],
+      [until, "d"],
+    ]);
+  });
+
+  it("warns when the first page is short, since a server row cap would end the crawl there", async () => {
+    const warn = _silenceWarnings();
+    const capped: CkanDiscoveryClient = {
+      searchDatasets: vi.fn(async () => {
+        return _page([CATALOG[0]!]);
+      }),
+    };
+
+    const pages = await _collect(capped);
+
+    expect(_names(pages)).toEqual(["a"]);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/https:\/\/data\.humdata\.org.*1 of 2 rows/),
+    );
   });
 
   it("pages on from an invalid dataset that ends a page, and warns about it", async () => {
