@@ -11,9 +11,20 @@ export type SocrataDiscoveryResult = {
   updatedAt: string;
 };
 
+/** A Discovery API result left out of a page because it failed validation. */
+export type SocrataSkippedResult = {
+  /** The result's dataset id, or `undefined` when it has none to read. */
+  datasetId: string | undefined;
+  /** Which fields failed validation, and why. */
+  reason: string;
+};
+
 /** One page of a Discovery API search, with the search's total size. */
 export type SocrataDiscoverySearchPage = {
+  /** The page's results that passed validation, in sort order. */
   results: SocrataDiscoveryResult[];
+  /** The page's results that failed validation, in sort order. */
+  skippedResults: SocrataSkippedResult[];
   /** How many assets match the whole search, across every page. */
   resultSetSize: number;
 };

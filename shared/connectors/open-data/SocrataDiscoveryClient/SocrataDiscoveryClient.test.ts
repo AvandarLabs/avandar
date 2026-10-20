@@ -27,6 +27,21 @@ function _http(overrides: Partial<OpenDataHttp> = {}): OpenDataHttp {
   };
 }
 
+/** A raw Discovery result on the wire, with any field overridden. */
+function _rawResult(
+  overrides: Record<string, unknown> & { id: string },
+): unknown {
+  return {
+    resource: {
+      name: "Some dataset",
+      createdAt: "2025-03-01T00:00:00.000Z",
+      updatedAt: "2026-10-19T08:30:00.000Z",
+      ...overrides,
+    },
+    metadata: { domain: "data.cdc.gov" },
+  };
+}
+
 describe("SocrataDiscoveryClient.search", () => {
   it("searches across every portal when no domain is given", async () => {
     const http = _http();
@@ -69,6 +84,7 @@ describe("SocrataDiscoveryClient.search", () => {
         },
       ],
       resultSetSize: 1,
+      skippedResults: [],
     });
   });
 
@@ -85,31 +101,68 @@ describe("SocrataDiscoveryClient.search", () => {
   });
 
   it.each([
-    ["missing", undefined],
-    ["not a date", "yesterday"],
-    ["a date with no time zone", "2026-10-19T08:30:00"],
-  ])("rejects a result whose updatedAt is %s", async (_label, updatedAt) => {
+    ["updatedAt", "missing", undefined],
+    ["updatedAt", "not a date", "yesterday"],
+    ["updatedAt", "a date with no time zone", "2026-10-19T08:30:00"],
+    ["createdAt", "not a date", "yesterday"],
+  ])(
+    "skips a result whose %s is %s and keeps the rest of the page",
+    async (field, _label, badValue) => {
+      const http = _http({
+        get: vi.fn(async () => {
+          return {
+            results: [
+              _rawResult({ id: "good-0001" }),
+              _rawResult({ id: "bad--0001", [field]: badValue }),
+              _rawResult({ id: "good-0002" }),
+            ],
+            resultSetSize: 3,
+          };
+        }),
+      });
+
+      const page = await createSocrataDiscoveryClient(http).search({
+        query: "measles",
+      });
+
+      expect(page.results.map((result) => {return result.datasetId})).toEqual([
+        "good-0001",
+        "good-0002",
+      ]);
+      expect(page.resultSetSize).toBe(3);
+      expect(page.skippedResults).toHaveLength(1);
+      expect(page.skippedResults[0]?.datasetId).toBe("bad--0001");
+      expect(page.skippedResults[0]?.reason).toContain(
+        `resource.${field}`,
+      );
+    },
+  );
+
+  it("lists a skipped result with no readable id as undefined", async () => {
     const http = _http({
       get: vi.fn(async () => {
-        return {
-          results: [
-            {
-              resource: {
-                id: "akvg-8vrb",
-                name: "CDC Wastewater Data for Measles",
-                createdAt: "2025-03-01T00:00:00.000Z",
-                updatedAt,
-              },
-              metadata: { domain: "data.cdc.gov" },
-            },
-          ],
-          resultSetSize: 1,
-        };
+        return { results: [{ metadata: {} }], resultSetSize: 1 };
       }),
     });
 
+    const page = await createSocrataDiscoveryClient(http).search({});
+
+    expect(page.results).toEqual([]);
+    expect(page.skippedResults).toEqual([
+      { datasetId: undefined, reason: expect.any(String) },
+    ]);
+  });
+
+  it.each([
+    ["a missing resultSetSize", { results: [] }],
+    ["a negative resultSetSize", { results: [], resultSetSize: -1 }],
+    ["a fractional resultSetSize", { results: [], resultSetSize: 1.5 }],
+    ["a results value that is not an array", { results: {}, resultSetSize: 0 }],
+  ])("fails the page on %s", async (_label, body) => {
+    const http = _http({ get: vi.fn(async () => {return body}) });
+
     await expect(
-      createSocrataDiscoveryClient(http).search({ query: "measles" }),
+      createSocrataDiscoveryClient(http).search({}),
     ).rejects.toThrow();
   });
 

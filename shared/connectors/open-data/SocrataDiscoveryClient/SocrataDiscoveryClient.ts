@@ -1,11 +1,58 @@
-import { SocrataDiscoveryResponseSchema } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.schemas.ts";
+import {
+  SocrataDiscoveryResponseSchema,
+  SocrataDiscoveryResultSchema,
+} from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.schemas.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type {
   SocrataDiscoveryClient,
+  SocrataDiscoveryResult,
   SocrataDiscoverySearchPage,
+  SocrataSkippedResult,
 } from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types.ts";
 
 const DISCOVERY_BASE_URL = "https://api.us.socrata.com/api/catalog/v1";
+
+/** Reads a raw result's dataset id, if it has a string one. */
+function _readDatasetId(rawResult: unknown): string | undefined {
+  const id = (rawResult as { resource?: { id?: unknown } } | null)?.resource
+    ?.id;
+  return typeof id === "string" ? id : undefined;
+}
+
+/**
+ * Validates each raw result on its own, so one malformed result is skipped
+ * and reported rather than failing the page.
+ */
+function _splitValidResults(rawResults: readonly unknown[]): {
+  results: SocrataDiscoveryResult[];
+  skippedResults: SocrataSkippedResult[];
+} {
+  const results: SocrataDiscoveryResult[] = [];
+  const skippedResults: SocrataSkippedResult[] = [];
+  rawResults.forEach((rawResult) => {
+    const parsed = SocrataDiscoveryResultSchema.safeParse(rawResult);
+    if (!parsed.success) {
+      skippedResults.push({
+        datasetId: _readDatasetId(rawResult),
+        reason: parsed.error.issues
+          .map((issue) => {
+            return `${issue.path.join(".")}: ${issue.message}`;
+          })
+          .join("; "),
+      });
+      return;
+    }
+    const { resource, metadata } = parsed.data;
+    results.push({
+      datasetId: resource.id,
+      name: resource.name,
+      domain: metadata.domain,
+      createdAt: resource.createdAt,
+      updatedAt: resource.updatedAt,
+    });
+  });
+  return { results, skippedResults };
+}
 
 /**
  * Searches Socrata's cross-portal Discovery API over an injected HTTP layer.
@@ -48,15 +95,7 @@ export function createSocrataDiscoveryClient(
       );
       const parsed = SocrataDiscoveryResponseSchema.parse(body);
       return {
-        results: parsed.results.map((result) => {
-          return {
-            datasetId: result.resource.id,
-            name: result.resource.name,
-            domain: result.metadata.domain,
-            createdAt: result.resource.createdAt,
-            updatedAt: result.resource.updatedAt,
-          };
-        }),
+        ..._splitValidResults(parsed.results),
         resultSetSize: parsed.resultSetSize,
       };
     },

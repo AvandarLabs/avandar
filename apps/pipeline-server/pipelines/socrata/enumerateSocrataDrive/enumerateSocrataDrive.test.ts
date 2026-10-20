@@ -27,6 +27,7 @@ function _discoveryOver(size: number): SocrataDiscoveryClient {
       return {
         results: catalog.slice(offset, offset + limit),
         resultSetSize: size,
+        skippedResults: [],
       };
     }),
   };
