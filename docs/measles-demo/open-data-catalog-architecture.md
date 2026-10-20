@@ -238,8 +238,9 @@ constraint data_catalog_listings__cache_complete check (
 ```
 
 The cached object lives in a new, dedicated, private bucket
-(`open-data-catalog`), not the pipeline's existing public bucket
-(`catalogOpenDataInsert.ts`'s target). Unlike the pipeline's bucket, nothing
+(`open-data-catalog`), not the pipelines' existing public `opendata` bucket
+(where `@avandar/etl`'s `EtlEngine` uploads `pipeline_parquet` objects, as
+`getPipelineEtlDestination.ts` configures it). Unlike the pipelines' bucket, nothing
 ever reads this one directly: every reader is the `open-data` edge function's
 `SupabaseAdmin` (service-role) client, which bypasses storage RLS entirely
 (section 5), so the bucket needs no `authenticated`-facing storage policy at
@@ -450,23 +451,36 @@ lists several resources side by side.
 
 ### 6.5 Upsert semantics
 
-The pipeline writes rows with `access_kind: 'api_resource'`, hand-built as
-plain snake_case objects, matching the existing (not `@avandar/models`-based)
-convention `apps/pipeline-server/pipelines/world-bank__wdi/catalogOpenDataInsert.ts`
-already uses for `pipeline_parquet` rows. It upserts against the existing
-partial unique index:
+The `hdx` and `socrata` pipelines do not write rows themselves. Their
+`transform` returns relations, and `@avandar/etl`'s `EtlEngine` builds each
+`access_kind: 'api_resource'` row from one as a plain snake_case object
+(`buildListingRowFromRelation.ts`, not `@avandar/models`-based), the same way
+it builds `world-bank__wdi`'s `pipeline_parquet` rows. The engine's Supabase
+listings store (`createSupabaseListingsStore.ts`) upserts those rows with
+`on conflict (api_service, api_base_url, external_dataset_id,
+api_resource_id)`, against a plain (not partial) unique index:
 
 ```sql
--- already exists, from section 4 / the original schema:
+-- supabase/schemas/10.data_catalog_listings.sql
 create unique index data_catalog_listings__api_resource_unique on public.data_catalog_listings (
-  api_service, api_base_url, external_dataset_id, api_resource_id
-) where access_kind = 'api_resource';
+  api_service,
+  api_base_url,
+  external_dataset_id,
+  api_resource_id
+);
 ```
+
+The index is plain because Postgres cannot infer a partial index as the
+arbiter of a bare `on conflict` column list. It still only constrains
+`api_resource` rows: every `pipeline_parquet` row has `api_service`,
+`api_base_url`, and `api_resource_id` forced `NULL`, and a `NULL` anywhere in
+the tuple exempts a row from a unique-index conflict.
 
 Re-running the pipeline is safe and idempotent: a dataset's `display_name`,
 `external_organization_name`, or `api_resource_format` can change on a
 re-run (upstream renamed something), but **the upserted row objects never
-include `cached_object_path`, `cached_source_version`, or `cached_at`** - so
+include `cached_object_path`, `cached_source_version`, or `cached_at`**
+(the store writes only `LISTING_CONTRACT_COLUMNS`) - so
 those columns are left untouched by the upsert for every row that already
 has a cache, and stay `null` for every row that doesn't. The write-back
 cache (section 5) is completely unaffected by this pipeline; it still
