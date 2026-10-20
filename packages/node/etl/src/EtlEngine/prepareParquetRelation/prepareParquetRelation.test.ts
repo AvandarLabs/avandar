@@ -6,6 +6,7 @@ import {
   resetEtlPathsRootForTesting,
   setEtlPathsRootForTesting,
 } from "@etl/EtlEngine/etlPaths";
+import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isListingRowUnchanged";
 import { prepareParquetRelation } from "@etl/EtlEngine/prepareParquetRelation/prepareParquetRelation";
 import { createInMemoryObjectStore } from "@etl/stores/InMemoryObjectStore/createInMemoryObjectStore";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -57,7 +58,7 @@ function _relation(
 function _prepare(args: {
   relation?: PipelineParquetRelation;
   stored?: StoredListingRow;
-  objects?: InMemoryObjectStore;
+  objects?: InMemoryObjectStore | undefined;
   bucket?: string | undefined;
 }) {
   const relation = args.relation ?? _relation();
@@ -74,7 +75,7 @@ function _prepare(args: {
     stored: args.stored,
     pipelineName: PIPELINE_NAME,
     pipelineRunId: RUN_ID,
-    objects: args.objects ?? createInMemoryObjectStore(),
+    objects: "objects" in args ? args.objects : createInMemoryObjectStore(),
     bucket: "bucket" in args ? args.bucket : "opendata",
   });
 }
@@ -116,6 +117,31 @@ describe("prepareParquetRelation", () => {
     ]).toEqual([[OBJECT_PATH], first.row.metadata?.parquet_sha256]);
   });
 
+  it("uploads when the stored row names a different bucket", async () => {
+    const first = await _prepare({});
+    const objects = createInMemoryObjectStore();
+
+    await _prepare({
+      objects,
+      stored: {
+        ...first.row,
+        id: "listing-1",
+        metadata: { ...first.row.metadata, open_data_bucket: "old-bucket" },
+      },
+    });
+
+    expect(objects.getUploadedPaths()).toEqual([OBJECT_PATH]);
+  });
+
+  it("returns a row equal to the stored one when the CSV has not changed", async () => {
+    const first = await _prepare({});
+    const stored = { ...first.row, id: "listing-1" };
+
+    const second = await _prepare({ stored });
+
+    expect(isListingRowUnchanged({ stored, next: second.row })).toBe(true);
+  });
+
   it("adds the table summary and object path over the relation's own metadata", async () => {
     const { row } = await _prepare({
       relation: _relation({ metadata: { year_coverage: { min_year: 1960 } } }),
@@ -145,6 +171,16 @@ describe("prepareParquetRelation", () => {
     ]);
   });
 
+  it("lists the public URL once when the relation already lists it", async () => {
+    const publicUrl = `https://objects.invalid/${OBJECT_PATH}`;
+
+    const { row } = await _prepare({
+      relation: _relation({ canonicalUrls: [publicUrl] }),
+    });
+
+    expect(row.canonical_urls).toEqual([publicUrl]);
+  });
+
   it("derives the relation columns from the Parquet file", async () => {
     const { columns } = await _prepare({});
 
@@ -167,5 +203,26 @@ describe("prepareParquetRelation", () => {
     await expect(_prepare({ bucket: undefined })).rejects.toThrow(
       "output.bucket",
     );
+  });
+
+  it("rejects naming the Supabase credentials when no object store is configured", async () => {
+    await expect(_prepare({ objects: undefined })).rejects.toThrow(
+      "supabase.url and supabase.serviceRoleKey, or a stores.objects override",
+    );
+  });
+
+  it("rejects naming the table and CSV path when the CSV cannot be converted", async () => {
+    const missingCsvPath = join(testRoot, "missing", "WDICSV.csv");
+
+    const error = await _prepare({
+      relation: _relation({ csvPath: missingCsvPath }),
+    }).catch((caught: unknown) => {
+      return caught;
+    });
+
+    expect(error).toMatchObject({
+      message: `Could not convert the CSV for "WDICSV" at ${missingCsvPath} to Parquet.`,
+      cause: expect.any(Error),
+    });
   });
 });

@@ -18,6 +18,13 @@ import type {
 
 const PARQUET_CONTENT_TYPE = "application/vnd.apache.parquet";
 
+/** Metadata keys that must all match the stored row to skip an upload. */
+const UPLOADED_OBJECT_KEYS = [
+  "parquet_sha256",
+  "open_data_bucket",
+  "storage_object_path",
+] as const;
+
 type _ParquetFile = Readonly<{
   bytes: Uint8Array;
   sha256: string;
@@ -60,12 +67,9 @@ async function _summarizeParquetFile(
   }
 }
 
-async function _buildParquetFile(args: {
-  relation: PipelineParquetRelation;
-  pipelineName: string;
-  pipelineRunId: EtlPipelineRunId;
-}): Promise<_ParquetFile> {
-  const { relation } = args;
+async function _convertCsvToParquetBytes(
+  relation: PipelineParquetRelation,
+): Promise<Uint8Array> {
   const [blob] = await transformedCsvsToParquetBlobs({
     transformOutputDir: dirname(relation.csvPath),
     descriptions: [
@@ -74,13 +78,27 @@ async function _buildParquetFile(args: {
         columns: relation.csvColumns,
       },
     ],
+  }).catch((error: unknown) => {
+    throw new Error(
+      `Could not convert the CSV for "${relation.tableBaseName}" at ${relation.csvPath} to Parquet.`,
+      { cause: error },
+    );
   });
   if (blob === undefined) {
     throw new Error(
       `No Parquet was produced for "${relation.tableBaseName}".`,
     );
   }
-  const bytes = new Uint8Array(await blob.arrayBuffer());
+  return new Uint8Array(await blob.arrayBuffer());
+}
+
+async function _buildParquetFile(args: {
+  relation: PipelineParquetRelation;
+  pipelineName: string;
+  pipelineRunId: EtlPipelineRunId;
+}): Promise<_ParquetFile> {
+  const { relation } = args;
+  const bytes = await _convertCsvToParquetBytes(relation);
   const loadDir = getEtlLoadDir(args.pipelineName, args.pipelineRunId);
   await mkdir(loadDir, { recursive: true });
   const parquetPath = join(loadDir, `${relation.tableBaseName}.parquet`);
@@ -104,34 +122,63 @@ function _buildColumnRows(parquet: _ParquetFile): RelationColumnRow[] {
   });
 }
 
-/**
- * Converts a Parquet relation's CSV to ZSTD Parquet, uploads it unless the
- * stored row already records the same SHA-256, and returns the row with the
- * engine's Parquet metadata (`open_data_bucket`, `storage_object_path`,
- * `table`, `parquet_sha256`) merged over the relation's own and the object's
- * public URL appended to `canonical_urls`. The columns come from the Parquet
- * file's `DESCRIBE`.
- *
- * @throws When no bucket is configured.
- */
-export async function prepareParquetRelation(
+function _isStoredObjectCurrent(options: {
+  stored: StoredListingRow | undefined;
+  metadata: Readonly<Record<string, unknown>>;
+}): boolean {
+  return UPLOADED_OBJECT_KEYS.every((key) => {
+    return options.stored?.metadata?.[key] === options.metadata[key];
+  });
+}
+
+function _requireObjectStore(
   args: _PrepareParquetRelationArgs,
-): Promise<PreparedParquetRelation> {
-  const { relation, row, objects, bucket } = args;
-  if (objects === undefined || bucket === undefined) {
+): Readonly<{ objects: ObjectStore; bucket: string }> {
+  const { relation, objects, bucket } = args;
+  if (bucket === undefined) {
     throw new Error(
       `EtlEngine needs output.bucket to write the pipeline_parquet relation "${relation.tableBaseName}".`,
     );
   }
+  if (objects === undefined) {
+    throw new Error(
+      `EtlEngine needs supabase.url and supabase.serviceRoleKey, or a stores.objects override, to upload the pipeline_parquet relation "${relation.tableBaseName}".`,
+    );
+  }
+  return { objects, bucket };
+}
+
+function _appendPublicUrl(options: {
+  canonicalUrls: readonly string[] | null;
+  publicUrl: string;
+}): string[] {
+  const urls = [...(options.canonicalUrls ?? [])];
+  return urls.includes(options.publicUrl) ? urls : [...urls, options.publicUrl];
+}
+
+/**
+ * Converts a Parquet relation's CSV to ZSTD Parquet, uploads it unless the
+ * stored row already records the same SHA-256, bucket, and object path, and
+ * returns the row with the engine's Parquet metadata (`open_data_bucket`,
+ * `storage_object_path`, `table`, `parquet_sha256`) merged over the
+ * relation's own and the object's public URL added to `canonical_urls`. The
+ * columns come from the Parquet file's `DESCRIBE`.
+ *
+ * The skip trusts the stored row: an object deleted outside the pipeline is
+ * not uploaded again while its row still records a matching hash. Run
+ * `ava pipeline reset <pipeline>` to delete the rows, so the next run
+ * uploads every object.
+ *
+ * @throws When no bucket or no object store is configured, or when the CSV
+ * cannot be converted to Parquet.
+ */
+export async function prepareParquetRelation(
+  args: _PrepareParquetRelationArgs,
+): Promise<PreparedParquetRelation> {
+  const { relation, row } = args;
+  const { objects, bucket } = _requireObjectStore(args);
   const parquet = await _buildParquetFile(args);
   const storagePath = `${args.pipelineName}/datasets/${relation.tableBaseName}.parquet`;
-  if (args.stored?.metadata?.parquet_sha256 !== parquet.sha256) {
-    await objects.upload({
-      path: storagePath,
-      bytes: parquet.bytes,
-      contentType: PARQUET_CONTENT_TYPE,
-    });
-  }
   const metadata = {
     ...(row.metadata ?? {}),
     open_data_bucket: bucket,
@@ -143,10 +190,17 @@ export async function prepareParquetRelation(
     },
     parquet_sha256: parquet.sha256,
   };
-  const canonicalUrls = [
-    ...(row.canonical_urls ?? []),
-    objects.getPublicUrl(storagePath),
-  ];
+  if (!_isStoredObjectCurrent({ stored: args.stored, metadata })) {
+    await objects.upload({
+      path: storagePath,
+      bytes: parquet.bytes,
+      contentType: PARQUET_CONTENT_TYPE,
+    });
+  }
+  const canonicalUrls = _appendPublicUrl({
+    canonicalUrls: row.canonical_urls,
+    publicUrl: objects.getPublicUrl(storagePath),
+  });
   return {
     row: { ...row, metadata, canonical_urls: canonicalUrls },
     columns: _buildColumnRows(parquet),
