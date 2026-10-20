@@ -15,9 +15,9 @@ function _dropRepeats<TConnection>(args: {
   page: readonly TConnection[];
   seenIds: ReadonlySet<string>;
   getConnectionId: (connection: TConnection) => string;
-}): TConnection[] {
+}): Readonly<{ unseen: TConnection[]; knownIds: ReadonlySet<string> }> {
   const knownIds = new Set(args.seenIds);
-  return args.page.filter((connection) => {
+  const unseen = args.page.filter((connection) => {
     const id = args.getConnectionId(connection);
     if (knownIds.has(id)) {
       return false;
@@ -25,6 +25,7 @@ function _dropRepeats<TConnection>(args: {
     knownIds.add(id);
     return true;
   });
+  return { unseen, knownIds };
 }
 
 function _assertOldestFirst<TConnection>(args: {
@@ -37,6 +38,11 @@ function _assertOldestFirst<TConnection>(args: {
   return args.connections.reduce<Date | undefined>(
     (previousTimestamp, connection) => {
       const timestamp = args.getConnectionTimestamp(connection);
+      if (Number.isNaN(timestamp.getTime())) {
+        throw new Error(
+          `Drive ${args.driveKey} returned ${args.getConnectionId(connection)} with a timestamp that is not a valid date.`,
+        );
+      }
       if (
         previousTimestamp !== undefined &&
         timestamp.getTime() < previousTimestamp.getTime()
@@ -70,6 +76,8 @@ function _isInWindow(timestamp: Date, window: EtlRunWindow): boolean {
  * @returns The connections to process and the drive's updated state.
  * @throws OutOfOrderConnectionError when a connection is older than the one
  * before it.
+ * @throws Error when a connection's timestamp is not a valid date, because
+ * it would otherwise disable the order check for the rest of the drive.
  */
 export function selectPageConnections<TConnection>(args: {
   page: readonly TConnection[];
@@ -83,7 +91,7 @@ export function selectPageConnections<TConnection>(args: {
   state: ConnectionSelectionState;
 }> {
   const { state, getConnectionId, getConnectionTimestamp } = args;
-  const unseen = _dropRepeats({
+  const { unseen, knownIds } = _dropRepeats({
     page: args.page,
     seenIds: state.seenIds,
     getConnectionId,
@@ -108,7 +116,7 @@ export function selectPageConnections<TConnection>(args: {
   return {
     connections,
     state: {
-      seenIds: new Set([...state.seenIds, ...unseen.map(getConnectionId)]),
+      seenIds: knownIds,
       lastTimestamp,
       remaining: state.remaining - connections.length,
     },

@@ -14,10 +14,7 @@ export class OutOfOrderConnectionError extends Error {
     previousTimestamp: Date;
   }) {
     super(
-      `Drive ${args.driveKey} returned ${args.connectionId} at ` +
-        `${args.timestamp.toISOString()}, older than the connection before ` +
-        `it at ${args.previousTimestamp.toISOString()}. Connections must ` +
-        "arrive oldest first.",
+      `Drive ${args.driveKey} returned ${args.connectionId} at ${args.timestamp.toISOString()}, older than the connection before it at ${args.previousTimestamp.toISOString()}. Connections must arrive oldest first.`,
     );
     this.name = "OutOfOrderConnectionError";
     this.driveKey = args.driveKey;

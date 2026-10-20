@@ -119,6 +119,66 @@ describe("selectPageConnections", () => {
     expect(_ids(connections)).toEqual(["a"]);
   });
 
+  it("throws naming the drive and connection for an invalid timestamp", () => {
+    const invalidConnection: Connection = {
+      id: "broken",
+      modifiedAt: new Date("not a date"),
+    };
+
+    expect(() => {
+      return _select({ page: [_connection("a", 1), invalidConnection] });
+    }).toThrow(
+      "Drive https://data.cityofnewyork.us returned broken with a timestamp that is not a valid date",
+    );
+  });
+
+  it("accepts connections with equal timestamps", () => {
+    const { connections } = _select({
+      page: [_connection("a", 3), _connection("b", 3)],
+    });
+
+    expect(_ids(connections)).toEqual(["a", "b"]);
+  });
+
+  it("advances the last timestamp past connections outside the window", () => {
+    const window: EtlRunWindow = { since: _at(10), until: undefined };
+    const first = _select({ page: [_connection("a", 5)], window });
+
+    expect([_ids(first.connections), first.state.lastTimestamp]).toEqual([
+      [],
+      _at(5),
+    ]);
+    expect(() => {
+      return _select({
+        page: [_connection("b", 2)],
+        window,
+        state: first.state,
+      });
+    }).toThrow(OutOfOrderConnectionError);
+  });
+
+  it("adds this page's ids to the seen ids", () => {
+    const { state } = _select({
+      page: [_connection("a", 1), _connection("b", 2)],
+      state: _state({ seenIds: new Set(["x"]) }),
+    });
+
+    expect([...state.seenIds].sort()).toEqual(["a", "b", "x"]);
+  });
+
+  it("does not mutate the state it was given", () => {
+    const seenIds = new Set(["x"]);
+    const state = _state({ seenIds, lastTimestamp: _at(1), remaining: 5 });
+
+    _select({ page: [_connection("a", 2)], state });
+
+    expect([[...seenIds], state.lastTimestamp, state.remaining]).toEqual([
+      ["x"],
+      _at(1),
+      5,
+    ]);
+  });
+
   it("trims the page to the remaining limit and counts it down", () => {
     const { connections, state } = _select({
       page: [_connection("a", 1), _connection("b", 2), _connection("c", 3)],
