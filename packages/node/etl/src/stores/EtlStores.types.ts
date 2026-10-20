@@ -68,6 +68,10 @@ export type ListingsStore = Readonly<{
    * rows. The result is in no particular order and has at most one entry per
    * key, so callers match rows with `buildListingKeyFromRow`. Two rows in one
    * call that share a key fail the whole call.
+   *
+   * The engine relies on each call being all-or-nothing: a call that fails
+   * writes none of its rows. Callers pass rows of one listing kind per call,
+   * since each kind has its own conflict target.
    */
   upsertRows: (
     rows: readonly ListingRowValues[],
