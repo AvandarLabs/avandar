@@ -1,10 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { createSupabaseObjectStore } from "@etl/stores/SupabaseObjectStore/createSupabaseObjectStore";
 import { createClient } from "@supabase/supabase-js";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
 const BUCKET = "opendata";
-const OBJECT_PATH = `etl-fixture/${randomUUID()}.parquet`;
+const FIXTURE_FOLDER = "etl-fixture";
+const OBJECT_PATH = `${FIXTURE_FOLDER}/${randomUUID()}.parquet`;
 
 const client = createClient(
   process.env.SUPABASE_URL ?? "",
@@ -13,8 +14,26 @@ const client = createClient(
 );
 const store = createSupabaseObjectStore({ client, bucket: BUCKET });
 
+beforeAll(async () => {
+  // Removes what a crashed earlier run left behind in the fixture folder.
+  const { data, error } = await client.storage
+    .from(BUCKET)
+    .list(FIXTURE_FOLDER, { limit: 1000 });
+  expect(error).toBeNull();
+  const leftoverPaths = (data ?? []).map((object) => {
+    return `${FIXTURE_FOLDER}/${object.name}`;
+  });
+  if (leftoverPaths.length > 0) {
+    const { error: removeError } = await client.storage
+      .from(BUCKET)
+      .remove(leftoverPaths);
+    expect(removeError).toBeNull();
+  }
+});
+
 afterEach(async () => {
-  await client.storage.from(BUCKET).remove([OBJECT_PATH]);
+  const { error } = await client.storage.from(BUCKET).remove([OBJECT_PATH]);
+  expect(error).toBeNull();
 });
 
 describe("createSupabaseObjectStore", () => {

@@ -176,6 +176,27 @@ describe("createInMemoryListingsStore", () => {
     ]);
   });
 
+  it("fails the whole batch when it mixes listing kinds", async () => {
+    const store = createInMemoryListingsStore();
+
+    await expect(
+      store.upsertRows([
+        _row(),
+        _row({
+          access_kind: "pipeline_parquet",
+          api_service: null,
+          api_base_url: null,
+          api_resource_id: null,
+          api_resource_format: null,
+          parquet_file_name: "a.parquet",
+        }),
+      ]),
+    ).rejects.toThrow("upsertRows takes rows of one listing kind per call");
+    expect([store.getRows().length, store.getUpsertBatches().length]).toEqual([
+      0, 0,
+    ]);
+  });
+
   it("returns a stored row once when several rows match its key", async () => {
     const store = createInMemoryListingsStore({ rows: [_stored("a")] });
 

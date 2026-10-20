@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { assertOneListingKind } from "@etl/stores/assertOneListingKind";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import type {
   ListingRowValues,
@@ -71,8 +72,9 @@ function _throwOnRepeatedKey(rows: readonly ListingRowValues[]): void {
  * Creates a listings store that keeps rows in memory, for testing a pipeline
  * or the engine without Supabase. It behaves like Postgres where a pipeline
  * can tell the difference: upserts keep a row's id and merge over any columns
- * outside the contract, a batch with a repeated key fails whole, and every
- * row crosses the store boundary as a JSON copy.
+ * outside the contract, a batch with a repeated key or with more than one
+ * listing kind fails whole, and every row crosses the store boundary as a
+ * JSON copy.
  *
  * @param options.rows - Rows to start with.
  * @returns The store.
@@ -112,6 +114,7 @@ export function createInMemoryListingsStore(
       );
     },
     upsertRows: async (rows) => {
+      assertOneListingKind(rows);
       _throwOnRepeatedKey(rows);
       upsertBatches.push(_copyThroughJson([...rows]));
       return _copyThroughJson(

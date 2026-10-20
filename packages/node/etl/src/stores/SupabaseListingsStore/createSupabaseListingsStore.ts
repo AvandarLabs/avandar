@@ -1,3 +1,4 @@
+import { assertOneListingKind } from "@etl/stores/assertOneListingKind";
 import { buildListingKeyFromRow } from "@etl/stores/buildListingKeyFromRow/buildListingKeyFromRow";
 import { LISTING_CONTRACT_COLUMNS } from "@etl/stores/listingContractColumns";
 import type {
@@ -14,25 +15,57 @@ const API_RESOURCE_CONFLICT =
 const PIPELINE_PARQUET_CONFLICT = "parquet_file_name,pipeline_name";
 
 /**
- * Values per `.in(...)` filter. A read is a GET, and the API gateway rejects
- * a request URL over about 8 KB with "URI too long". A CKAN dataset name can
- * be 100 characters, so 50 of them keep the URL near 6 KB.
+ * Rows per read. A read is a GET whose URL lists the rows' dataset ids and
+ * resource ids, and the API gateway rejects a URL over about 8 KB with "URI
+ * too long". With 100-character ids in both lists, 25 rows measure 5,760
+ * characters.
  */
-const IN_FILTER_CHUNK_SIZE = 50;
+const ROWS_PER_READ = 25;
 
-type _Tables = Readonly<{
+/**
+ * PostgREST's default `max_rows`. A read that returns this many rows may have
+ * been cut short, and PostgREST does not say so.
+ */
+const POSTGREST_MAX_ROWS = 1000;
+
+/** The Supabase client and table names a listings store reads and writes. */
+export type SupabaseListingsStoreOptions = Readonly<{
+  /** A service-role client, since listings bypass RLS. */
   client: SupabaseClient;
+  /** The listings table. */
   listingsTable: string;
+  /** The relation columns table. */
   relationColumnsTable: string;
 }>;
 
+type _KeyColumn = "external_dataset_id" | "api_resource_id" | "parquet_file_name";
+
+type _SupabaseError = Readonly<{
+  message: string;
+  code?: string;
+  details?: string | null;
+  hint?: string | null;
+}>;
+
 function _throwOnError(args: {
-  error: { message: string } | null;
+  error: _SupabaseError | null;
   action: string;
 }): void {
-  if (args.error) {
-    throw new Error(`Supabase failed ${args.action}: ${args.error.message}`);
+  const { error } = args;
+  if (!error) {
+    return;
   }
+  const extras = [
+    error.code ? `code ${error.code}` : "",
+    error.details ? `details: ${error.details}` : "",
+    error.hint ? `hint: ${error.hint}` : "",
+  ].filter((extra) => {
+    return extra !== "";
+  });
+  const suffix = extras.length === 0 ? "" : ` (${extras.join("; ")})`;
+  throw new Error(`Supabase failed ${args.action}: ${error.message}${suffix}`, {
+    cause: error,
+  });
 }
 
 function _groupBy<T>(
@@ -47,25 +80,36 @@ function _groupBy<T>(
   return groups;
 }
 
-function _unique(values: ReadonlyArray<string | null>): string[] {
+function _uniqueValues(
+  rows: readonly ListingRowValues[],
+  column: _KeyColumn,
+): string[] {
   return [
     ...new Set(
-      values.filter((value): value is string => {
-        return value !== null;
+      rows.flatMap((row) => {
+        const value = row[column];
+        return value === null ? [] : [value];
       }),
     ),
   ];
 }
 
-function _splitIntoInFilterChunks(values: readonly string[]): string[][] {
+function _splitIntoReadChunks<T>(items: readonly T[]): T[][] {
   return Array.from(
-    { length: Math.ceil(values.length / IN_FILTER_CHUNK_SIZE) },
+    { length: Math.ceil(items.length / ROWS_PER_READ) },
     (_, index) => {
-      return values.slice(
-        index * IN_FILTER_CHUNK_SIZE,
-        (index + 1) * IN_FILTER_CHUNK_SIZE,
-      );
+      return items.slice(index * ROWS_PER_READ, (index + 1) * ROWS_PER_READ);
     },
+  );
+}
+
+function _pickContractColumns(
+  row: ListingRowValues,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    LISTING_CONTRACT_COLUMNS.map((column) => {
+      return [column, row[column]];
+    }),
   );
 }
 
@@ -81,7 +125,10 @@ function _toStoredRows(data: unknown[] | null): StoredListingRow[] {
 }
 
 async function _readHighWaterMark(
-  args: _Tables & { pipelineName: string; apiBaseUrl: string },
+  args: SupabaseListingsStoreOptions & {
+    pipelineName: string;
+    apiBaseUrl: string;
+  },
 ): Promise<Date | undefined> {
   const { data, error } = await args.client
     .from(args.listingsTable)
@@ -100,14 +147,17 @@ async function _readHighWaterMark(
   return newest === undefined ? undefined : new Date(newest);
 }
 
-async function _readGroupChunk(args: {
-  tables: _Tables;
-  first: ListingRowValues;
-  keyValues: readonly string[];
+async function _readChunk(args: {
+  options: SupabaseListingsStoreOptions;
+  rows: readonly ListingRowValues[];
 }): Promise<readonly StoredListingRow[]> {
-  const { first, keyValues } = args;
-  const base = args.tables.client
-    .from(args.tables.listingsTable)
+  const { options, rows } = args;
+  const [first] = rows;
+  if (first === undefined) {
+    return [];
+  }
+  const base = options.client
+    .from(options.listingsTable)
     .select(SELECT_COLUMNS);
   const query =
     first.access_kind === "api_resource" ?
@@ -115,57 +165,38 @@ async function _readGroupChunk(args: {
         .eq("access_kind", "api_resource")
         .eq("api_service", first.api_service ?? "")
         .eq("api_base_url", first.api_base_url ?? "")
-        .in("external_dataset_id", keyValues)
+        .in("external_dataset_id", _uniqueValues(rows, "external_dataset_id"))
+        .in("api_resource_id", _uniqueValues(rows, "api_resource_id"))
     : base
         .eq("access_kind", "pipeline_parquet")
         .eq("pipeline_name", first.pipeline_name)
-        .in("parquet_file_name", keyValues);
+        .in("parquet_file_name", _uniqueValues(rows, "parquet_file_name"));
   const { data, error } = await query;
-  _throwOnError({
-    error,
-    action: `reading rows from ${args.tables.listingsTable}`,
-  });
-  return _toStoredRows(data);
-}
-
-async function _readGroup(args: {
-  tables: _Tables;
-  group: readonly ListingRowValues[];
-}): Promise<readonly StoredListingRow[]> {
-  const [first] = args.group;
-  if (first === undefined) {
-    return [];
+  _throwOnError({ error, action: `reading rows from ${options.listingsTable}` });
+  const stored = _toStoredRows(data);
+  if (stored.length >= POSTGREST_MAX_ROWS) {
+    throw new Error(
+      `Reading rows from ${options.listingsTable} returned ${stored.length} rows, PostgREST's row cap, so the result may be missing rows.`,
+    );
   }
-  const keyValues = _unique(
-    args.group.map((row) => {
-      return first.access_kind === "api_resource" ?
-          row.external_dataset_id
-        : row.parquet_file_name;
-    }),
-  );
-  const storedChunks = await Promise.all(
-    _splitIntoInFilterChunks(keyValues).map((chunk) => {
-      return _readGroupChunk({ tables: args.tables, first, keyValues: chunk });
-    }),
-  );
-  return storedChunks.flat();
+  return stored;
 }
 
 async function _readRowsMatching(args: {
-  tables: _Tables;
+  options: SupabaseListingsStoreOptions;
   rows: readonly ListingRowValues[];
 }): Promise<readonly StoredListingRow[]> {
-  // An API dataset's resources share an `external_dataset_id`, so a group
-  // reads every resource of each dataset and the key filter keeps only the
-  // ones asked for.
+  // One read matches every pairing of its rows' dataset ids and resource
+  // ids, so it can return a stored row nobody asked for. The key filter keeps
+  // only the ones asked for.
   const groups = _groupBy(args.rows, (row) => {
     return row.access_kind === "api_resource" ?
         JSON.stringify([row.access_kind, row.api_service, row.api_base_url])
       : JSON.stringify([row.access_kind, row.pipeline_name]);
   });
   const stored = await Promise.all(
-    [...groups.values()].map((group) => {
-      return _readGroup({ tables: args.tables, group });
+    [...groups.values()].flatMap(_splitIntoReadChunks).map((rows) => {
+      return _readChunk({ options: args.options, rows });
     }),
   );
   const wantedKeys = new Set(args.rows.map(buildListingKeyFromRow));
@@ -174,59 +205,38 @@ async function _readRowsMatching(args: {
   });
 }
 
-async function _upsertKind(args: {
-  tables: _Tables;
+async function _upsertRows(args: {
+  options: SupabaseListingsStoreOptions;
   rows: readonly ListingRowValues[];
-  onConflict: string;
 }): Promise<readonly StoredListingRow[]> {
-  if (args.rows.length === 0) {
+  assertOneListingKind(args.rows);
+  const [first] = args.rows;
+  if (first === undefined) {
     return [];
   }
-  const { data, error } = await args.tables.client
-    .from(args.tables.listingsTable)
-    .upsert(
-      args.rows.map((row) => {
-        return { ...row };
-      }),
-      { onConflict: args.onConflict },
-    )
+  // One upsert statement, so the call is all-or-nothing.
+  const { data, error } = await args.options.client
+    .from(args.options.listingsTable)
+    .upsert(args.rows.map(_pickContractColumns), {
+      onConflict:
+        first.access_kind === "api_resource" ?
+          API_RESOURCE_CONFLICT
+        : PIPELINE_PARQUET_CONFLICT,
+    })
     .select(SELECT_COLUMNS);
   _throwOnError({
     error,
-    action: `upserting rows into ${args.tables.listingsTable}`,
+    action: `upserting rows into ${args.options.listingsTable}`,
   });
   return _toStoredRows(data);
 }
 
-async function _upsertRows(args: {
-  tables: _Tables;
-  rows: readonly ListingRowValues[];
-}): Promise<readonly StoredListingRow[]> {
-  // Each kind is one upsert statement, so a call with rows of one kind, as
-  // the engine makes, is all-or-nothing.
-  const apiRows = await _upsertKind({
-    tables: args.tables,
-    rows: args.rows.filter((row) => {
-      return row.access_kind === "api_resource";
-    }),
-    onConflict: API_RESOURCE_CONFLICT,
-  });
-  const parquetRows = await _upsertKind({
-    tables: args.tables,
-    rows: args.rows.filter((row) => {
-      return row.access_kind === "pipeline_parquet";
-    }),
-    onConflict: PIPELINE_PARQUET_CONFLICT,
-  });
-  return [...apiRows, ...parquetRows];
-}
-
 async function _replaceRelationColumns(args: {
-  tables: _Tables;
+  options: SupabaseListingsStoreOptions;
   listingId: string;
   columns: readonly RelationColumnRow[];
 }): Promise<void> {
-  const { client, relationColumnsTable } = args.tables;
+  const { client, relationColumnsTable } = args.options;
   const { error: deleteError } = await client
     .from(relationColumnsTable)
     .delete()
@@ -254,24 +264,24 @@ async function _replaceRelationColumns(args: {
  * engine's output contract (see the README). Every method throws with the
  * table name and Supabase's message when a request fails.
  *
- * @param tables.client - A service-role client, since listings bypass RLS.
- * @param tables.listingsTable - The listings table.
- * @param tables.relationColumnsTable - The relation columns table.
+ * @param options - The client and the two tables.
  * @returns The store.
  */
-export function createSupabaseListingsStore(tables: _Tables): ListingsStore {
+export function createSupabaseListingsStore(
+  options: SupabaseListingsStoreOptions,
+): ListingsStore {
   return {
     readHighWaterMark: (args) => {
-      return _readHighWaterMark({ ...tables, ...args });
+      return _readHighWaterMark({ ...options, ...args });
     },
     readRowsMatching: (rows) => {
-      return _readRowsMatching({ tables, rows });
+      return _readRowsMatching({ options, rows });
     },
     upsertRows: (rows) => {
-      return _upsertRows({ tables, rows });
+      return _upsertRows({ options, rows });
     },
     replaceRelationColumns: (args) => {
-      return _replaceRelationColumns({ tables, ...args });
+      return _replaceRelationColumns({ options, ...args });
     },
   };
 }

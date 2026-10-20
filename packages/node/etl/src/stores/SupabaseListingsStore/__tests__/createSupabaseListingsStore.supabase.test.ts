@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isListingRowUnchanged";
 import { createSupabaseListingsStore } from "@etl/stores/SupabaseListingsStore/createSupabaseListingsStore";
 import { createClient } from "@supabase/supabase-js";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import type { ListingRowValues } from "@etl/stores/EtlStores.types";
 
 const LISTINGS_TABLE = "data_catalog_listings";
@@ -66,6 +66,26 @@ function _parquetRow(
   });
 }
 
+function _resourceRows(args: {
+  datasetId: string;
+  count: number;
+}): ListingRowValues[] {
+  return Array.from({ length: args.count }, (_, index) => {
+    return _apiRow({
+      external_dataset_id: args.datasetId,
+      api_resource_id: `etl-fixture-resource-${index}`,
+    });
+  });
+}
+
+function _resourceIdsOf(rows: readonly ListingRowValues[]): string[] {
+  return rows
+    .map((row) => {
+      return row.api_resource_id ?? "";
+    })
+    .sort();
+}
+
 async function _countRows(): Promise<number> {
   const { count } = await client
     .from(LISTINGS_TABLE)
@@ -74,11 +94,26 @@ async function _countRows(): Promise<number> {
   return count ?? 0;
 }
 
+beforeAll(async () => {
+  // Removes what a crashed earlier run left behind, so no fixture key below
+  // lands on a stale row.
+  const sweeps = await Promise.all([
+    client.from(LISTINGS_TABLE).delete().like("pipeline_name", "etl-fixture-%"),
+    client.from(LISTINGS_TABLE).delete().in("api_base_url", [DRIVE, OTHER_DRIVE]),
+  ]);
+  expect(
+    sweeps.map(({ error }) => {
+      return error;
+    }),
+  ).toEqual([null, null]);
+});
+
 afterEach(async () => {
-  await client
+  const { error } = await client
     .from(LISTINGS_TABLE)
     .delete()
     .in("pipeline_name", [PIPELINE_NAME, OTHER_PIPELINE_NAME]);
+  expect(error).toBeNull();
 });
 
 describe("createSupabaseListingsStore", () => {
@@ -114,6 +149,38 @@ describe("createSupabaseListingsStore", () => {
     expect(await _countRows()).toBe(0);
   });
 
+  it("rejects a batch that mixes listing kinds and writes none of its rows", async () => {
+    await expect(
+      store.upsertRows([_apiRow(), _parquetRow()]),
+    ).rejects.toThrow("upsertRows takes rows of one listing kind per call");
+    expect(await _countRows()).toBe(0);
+  });
+
+  it("names PostgREST's error code and keeps its error as the cause", async () => {
+    await expect(
+      store.upsertRows([_apiRow(), _apiRow({ display_name: "Renamed" })]),
+    ).rejects.toMatchObject({
+      message: expect.stringContaining("code 21000"),
+      cause: { code: "21000" },
+    });
+  });
+
+  it("writes only contract columns when a row carries other properties", async () => {
+    const rowWithCacheColumn = {
+      ..._apiRow(),
+      cached_object_path: "etl-fixture/stray.csv",
+    };
+
+    const [stored] = await store.upsertRows([rowWithCacheColumn]);
+
+    const { data } = await client
+      .from(LISTINGS_TABLE)
+      .select("cached_object_path")
+      .eq("id", stored?.id ?? "")
+      .single();
+    expect(data).toEqual({ cached_object_path: null });
+  });
+
   it("reads the newest date_of_last_update for one pipeline and drive only", async () => {
     await store.upsertRows([
       _apiRow({
@@ -124,6 +191,7 @@ describe("createSupabaseListingsStore", () => {
         external_dataset_id: "b",
         date_of_last_update: "2026-10-05T00:00:00.000Z",
       }),
+      _apiRow({ external_dataset_id: "undated", date_of_last_update: null }),
       _apiRow({
         external_dataset_id: "c",
         date_of_last_update: "2026-10-09T00:00:00.000Z",
@@ -164,28 +232,39 @@ describe("createSupabaseListingsStore", () => {
     expect(stored).toHaveLength(1);
   });
 
-  it("reads only the asked-for resource of a dataset that has several", async () => {
-    const wanted = _apiRow({ api_resource_id: "etl-fixture-resource-1" });
-    await store.upsertRows([
-      wanted,
-      _apiRow({ api_resource_id: "etl-fixture-resource-2" }),
-    ]);
+  it("reads exactly the 2 asked-for resources of a dataset that has 5", async () => {
+    const rows = _resourceRows({ datasetId: "etl-fixture-dataset", count: 5 });
+    await store.upsertRows(rows);
+    const wanted = rows.filter((_, index) => {
+      return index === 1 || index === 3;
+    });
 
-    const stored = await store.readRowsMatching([wanted]);
+    const stored = await store.readRowsMatching(wanted);
 
-    expect(
-      stored.map((row) => {
-        return row.api_resource_id;
-      }),
-    ).toEqual(["etl-fixture-resource-1"]);
+    expect(_resourceIdsOf(stored)).toEqual(_resourceIdsOf(wanted));
   });
 
-  it("reads back every row of a 200-row chunk whose dataset ids are 100 characters", async () => {
+  it("reads every resource of a dataset with more resources than one response holds", async () => {
+    // PostgREST returns at most 1000 rows per request, without an error.
+    const rows = _resourceRows({
+      datasetId: "etl-fixture-dataset",
+      count: 1001,
+    });
+    await store.upsertRows(rows);
+
+    const stored = await store.readRowsMatching(rows);
+
+    expect(stored).toHaveLength(1001);
+  });
+
+  it("reads back every row of a 200-row chunk whose ids are 100 characters", async () => {
     // 100 characters is CKAN's longest dataset name, and HDX listings use the
-    // name as `external_dataset_id`.
+    // name as `external_dataset_id`. Resource ids get the same length, to
+    // leave room beyond CKAN's 36-character resource UUIDs.
     const rows = Array.from({ length: 200 }, () => {
       return _apiRow({
         external_dataset_id: `etl-fixture-${randomUUID()}`.padEnd(100, "x"),
+        api_resource_id: `etl-fixture-${randomUUID()}`.padEnd(100, "y"),
       });
     });
     await store.upsertRows(rows);
@@ -193,6 +272,22 @@ describe("createSupabaseListingsStore", () => {
     const stored = await store.readRowsMatching(rows);
 
     expect(stored).toHaveLength(200);
+  });
+
+  it("reads a Parquet listing back by its pipeline and file name", async () => {
+    const wanted = _parquetRow({ parquet_file_name: "etl-fixture-a.parquet" });
+    await store.upsertRows([
+      wanted,
+      _parquetRow({ parquet_file_name: "etl-fixture-b.parquet" }),
+    ]);
+
+    const stored = await store.readRowsMatching([wanted]);
+
+    expect(
+      stored.map((row) => {
+        return row.parquet_file_name;
+      }),
+    ).toEqual(["etl-fixture-a.parquet"]);
   });
 
   it("replaces a listing's relation columns as a whole", async () => {
