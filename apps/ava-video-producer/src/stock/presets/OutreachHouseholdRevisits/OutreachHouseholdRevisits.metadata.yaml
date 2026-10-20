@@ -3,7 +3,8 @@ name:
   message: Visits are not unique reach
 description:
   id: motionAtlas.outreach-household-revisits.description
-  message: An outreach worker walks a schematic neighborhood, visiting some homes more
+  message:
+    An outreach worker walks a schematic neighborhood, visiting some homes more
     than once. A repeated visit adds to the activity count while the unique-household
     count stays unchanged.
 category:
@@ -11,27 +12,32 @@ category:
   message: Schematic neighborhood activity
 useWhen:
   id: motionAtlas.outreach-household-revisits.useWhen
-  message: Separate repeated outreach activity from the number of distinct households
+  message:
+    Separate repeated outreach activity from the number of distinct households
     actually contacted.
 intent:
   id: motionAtlas.outreach-household-revisits.intent
-  message: Separate repeated outreach activity from the number of distinct households
+  message:
+    Separate repeated outreach activity from the number of distinct households
     actually contacted.
 creativeDirection:
   id: motionAtlas.outreach-household-revisits.creativeDirection
-  message: Reveal the supplied homes on a schematic neighborhood map. Move a worker
+  message:
+    Reveal the supplied homes on a schematic neighborhood map. Move a worker
     through the authored visit sequence and leave event stamps at each stop. On repeat
     visits, add an activity stamp without changing the household's unique-reach outline.
     Hold contacted, not-contacted and unvisited households beside distinct event and
     unique-contact totals before fading.
 distinction:
   id: motionAtlas.outreach-household-revisits.distinction
-  message: Unlike node-traversal or dot-matrix, revisiting the same physical home
+  message:
+    Unlike node-traversal or dot-matrix, revisiting the same physical home
     deliberately increments one measure without incrementing another, making
     event-versus-entity semantics the central animation.
 prompt:
   id: motionAtlas.outreach-household-revisits.prompt
-  message: Use Visits are not unique reach (outreach-household-revisits) for a fictional
+  message:
+    Use Visits are not unique reach (outreach-household-revisits) for a fictional
     or approved authored example. Separate repeated outreach activity from the number of
     distinct households actually contacted.
 tags:
@@ -70,19 +76,23 @@ aliases:
     message: unique reach
 notFor:
   - id: motionAtlas.outreach-household-revisits.notFor.0
-    message: The denominator is households.length and represents households, never residents
+    message:
+      The denominator is households.length and represents households, never residents
       or eligible people. Each home glyph is one household, independent of drawn house
       size.
   - id: motionAtlas.outreach-household-revisits.notFor.1
-    message: Total visits is visits.length. Unique visited households is the distinct
+    message:
+      Total visits is visits.length. Unique visited households is the distinct
       householdId count; unique contacted households is the distinct householdId count
       among visits marked contacted. These nested measures must not be added together.
   - id: motionAtlas.outreach-household-revisits.notFor.2
-    message: Each household's final exclusive state is contacted if any visit made contact,
+    message:
+      Each household's final exclusive state is contacted if any visit made contact,
       visited-no-contact if visited but never contacted, or unvisited. These three state
       counts sum to the household denominator.
   - id: motionAtlas.outreach-household-revisits.notFor.3
-    message: The local map is invented, normalized, and not georeferenced. Contact means
+    message:
+      The local map is invented, normalized, and not georeferenced. Contact means
       only the supplied outreach encounter, not consent, service receipt, vaccination,
       health impact, or complete community coverage.
 motionBeats:
@@ -95,7 +105,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.outreach-household-revisits.motionBeats.1
-      message: Reveal the supplied homes on a schematic neighborhood map. Move a worker
+      message:
+        Reveal the supplied homes on a schematic neighborhood map. Move a worker
         through the authored visit sequence and leave event stamps at each stop. On
         repeat visits, add an activity stamp without changing the household's
         unique-reach outline. Hold contacted, not-contacted and unvisited households

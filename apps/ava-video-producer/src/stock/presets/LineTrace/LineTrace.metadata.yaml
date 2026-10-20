@@ -21,7 +21,8 @@ useWhen:
   message: Introduce an observed trend using approved values, units, and time range.
 prompt:
   id: motionAtlas.line-trace.prompt
-  message: Use Motion Atlas "Trend trace" (line-trace) as a conceptual graphic. Introduce
+  message:
+    Use Motion Atlas "Trend trace" (line-trace) as a conceptual graphic. Introduce
     an observed trend using approved values, units, and time range. Keep the restrained
     motion and readable labels; replace sample content with approved facts before making
     product claims.
@@ -48,7 +49,8 @@ aliases:
     message: draw-on
 notFor:
   - id: motionAtlas.line-trace.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

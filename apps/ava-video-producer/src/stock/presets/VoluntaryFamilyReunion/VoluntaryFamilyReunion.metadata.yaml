@@ -3,7 +3,8 @@ name:
   message: Meet by mutual agreement
 description:
   id: motionAtlas.voluntary-family-reunion.description
-  message: Two fictional family groups independently accept an arranged meeting and travel
+  message:
+    Two fictional family groups independently accept an arranged meeting and travel
     toward a shared meeting place. The scene centers their decisions and reunion rather
     than surveillance or automatic identity matching.
 category:
@@ -11,15 +12,18 @@ category:
   message: Human connection and movement
 useWhen:
   id: motionAtlas.voluntary-family-reunion.useWhen
-  message: Show a reunion as a mutually chosen meeting between people, not a system
+  message:
+    Show a reunion as a mutually chosen meeting between people, not a system
     matching records.
 intent:
   id: motionAtlas.voluntary-family-reunion.intent
-  message: Show a reunion as a mutually chosen meeting between people, not a system
+  message:
+    Show a reunion as a mutually chosen meeting between people, not a system
     matching records.
 creativeDirection:
   id: motionAtlas.voluntary-family-reunion.creativeDirection
-  message: Over six seconds, reveal the two groups on opposite sides of a schematic local
+  message:
+    Over six seconds, reveal the two groups on opposite sides of a schematic local
     setting, each holding their own invitation. Each group actively marks its invitation
     accepted; only after both marks appear do the groups begin walking toward the chosen
     meeting place. They arrive, turn toward each other, and make the configured greeting
@@ -27,12 +31,14 @@ creativeDirection:
     invitations, then fade with the standard opaque envelope.
 distinction:
   id: motionAtlas.voluntary-family-reunion.distinction
-  message: Two independent acts of agreement precede self-directed physical movement and a
+  message:
+    Two independent acts of agreement precede self-directed physical movement and a
     human greeting. Unlike source-merge, the people remain individuals; unlike
     schema-mapping, there is no inferred identity match.
 prompt:
   id: motionAtlas.voluntary-family-reunion.prompt
-  message: Meet by mutual agreement. Show a reunion as a mutually chosen meeting between
+  message:
+    Meet by mutual agreement. Show a reunion as a mutually chosen meeting between
     people, not a system matching records.
 tags:
   - id: motionAtlas.voluntary-family-reunion.tags.0
@@ -70,16 +76,20 @@ aliases:
     message: mutual agreement
 notFor:
   - id: motionAtlas.voluntary-family-reunion.notFor.0
-    message: This portrays an already arranged fictional meeting, not tracing operations,
+    message:
+      This portrays an already arranged fictional meeting, not tracing operations,
       identity verification, legal reunification, or safeguarding assessment.
   - id: motionAtlas.voluntary-family-reunion.notFor.1
-    message: Group membership and silhouette counts come only from the supplied arrays and
+    message:
+      Group membership and silhouette counts come only from the supplied arrays and
       are illustrative, not statistics about displaced families.
   - id: motionAtlas.voluntary-family-reunion.notFor.2
-    message: The setting has no geographic scale, real addresses, border crossings, or
+    message:
+      The setting has no geographic scale, real addresses, border crossings, or
       recommendations for travel.
   - id: motionAtlas.voluntary-family-reunion.notFor.3
-    message: No photographs, biometric matching, distress imagery, or real personal data are
+    message:
+      No photographs, biometric matching, distress imagery, or real personal data are
       used.
 motionBeats:
   - startFrame: 12

@@ -3,7 +3,8 @@ name:
   message: Keep the delivery moving
 description:
   id: motionAtlas.convoy-route-detour.description
-  message: A delivery vehicle encounters a marked obstruction and takes an authored
+  message:
+    A delivery vehicle encounters a marked obstruction and takes an authored
     alternative road through a schematic local map. The destination remains the same
     while the route visibly changes.
 category:
@@ -11,15 +12,18 @@ category:
   message: Ground transport and access
 useWhen:
   id: motionAtlas.convoy-route-detour.useWhen
-  message: Make an adaptation to a blocked route visible while preserving the original
+  message:
+    Make an adaptation to a blocked route visible while preserving the original
     delivery purpose.
 intent:
   id: motionAtlas.convoy-route-detour.intent
-  message: Make an adaptation to a blocked route visible while preserving the original
+  message:
+    Make an adaptation to a blocked route visible while preserving the original
     delivery purpose.
 creativeDirection:
   id: motionAtlas.convoy-route-detour.creativeDirection
-  message: Reveal a depot, destination, and two roads within six seconds. The vehicle
+  message:
+    Reveal a depot, destination, and two roads within six seconds. The vehicle
     rolls toward the blocked segment, brakes before the barrier, then pivots at the
     preceding junction as the alternative route gains emphasis. The vehicle follows that
     authored detour to the destination, where the receiving team opens the gate; hold
@@ -27,12 +31,14 @@ creativeDirection:
     fade. Do not erase the obstruction or imply that a route was automatically verified.
 distinction:
   id: motionAtlas.convoy-route-detour.distinction
-  message: The physical braking, turn, obstacle persistence, and gate arrival explain
+  message:
+    The physical braking, turn, obstacle persistence, and gate arrival explain
     adaptation. node-traversal only traces a fixed connection, while this scene replaces
     an unusable physical journey with a supplied detour.
 prompt:
   id: motionAtlas.convoy-route-detour.prompt
-  message: Keep the delivery moving. Make an adaptation to a blocked route visible while
+  message:
+    Keep the delivery moving. Make an adaptation to a blocked route visible while
     preserving the original delivery purpose.
 tags:
   - id: motionAtlas.convoy-route-detour.tags.0
@@ -70,19 +76,24 @@ aliases:
     message: detour
 notFor:
   - id: motionAtlas.convoy-route-detour.notFor.0
-    message: Routes are schematic and supplied by the author; the scene performs no routing,
+    message:
+      Routes are schematic and supplied by the author; the scene performs no routing,
       safety assessment, or access negotiation.
   - id: motionAtlas.convoy-route-detour.notFor.1
-    message: One vehicle represents one illustrative trip, never a fleet total or a delivery
+    message:
+      One vehicle represents one illustrative trip, never a fleet total or a delivery
       capacity.
   - id: motionAtlas.convoy-route-detour.notFor.2
-    message: Travel distance, speed, and elapsed animation time have no geographic or
+    message:
+      Travel distance, speed, and elapsed animation time have no geographic or
       operational scale.
   - id: motionAtlas.convoy-route-detour.notFor.3
-    message: An open receiving gate denotes the authored arrival, not proof of permission,
+    message:
+      An open receiving gate denotes the authored arrival, not proof of permission,
       safety, or completed distribution.
   - id: motionAtlas.convoy-route-detour.notFor.4
-    message: Repeated authored waypoints hold stationary; a zero-length closed segment
+    message:
+      Repeated authored waypoints hold stationary; a zero-length closed segment
       retains its visible closure annotation.
 motionBeats:
   - startFrame: 12
@@ -94,7 +105,8 @@ motionBeats:
     endFrame: 77
     description:
       id: motionAtlas.convoy-route-detour.motionBeats.1
-      message: Approach and brake before the earliest closure encounter, then return to the
+      message:
+        Approach and brake before the earliest closure encounter, then return to the
         branch junction.
   - startFrame: 78
     endFrame: 126

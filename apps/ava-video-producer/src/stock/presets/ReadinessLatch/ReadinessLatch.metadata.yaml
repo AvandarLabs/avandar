@@ -3,7 +3,8 @@ name:
   message: Wait for every required branch
 description:
   id: motionAtlas.readiness-latch.description
-  message: Independent work ribbons reach a shared readiness latch. Completed branches
+  message:
+    Independent work ribbons reach a shared readiness latch. Completed branches
     release their own pins, but the common result can pass only after every required
     branch is ready.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Explain a shared action that waits for every named participant's readiness.
 creativeDirection:
   id: motionAtlas.readiness-latch.creativeDirection
-  message: Reveal two to five work ribbons ending at a shared latch. Their progress
+  message:
+    Reveal two to five work ribbons ending at a shared latch. Their progress
     advances with authored relative work units during frames 24..112; ready participants
     withdraw their pins as they finish, while unready participants retain theirs. At
     frame 122, the latch opens only if every pin is withdrawn, releasing the labeled
@@ -90,24 +92,30 @@ aliases:
     message: Coordination constraints
 notFor:
   - id: motionAtlas.readiness-latch.notFor.0
-    message: The condition is all supplied participants, not a majority, weighted vote, or
+    message:
+      The condition is all supplied participants, not a majority, weighted vote, or
       consensus algorithm.
   - id: motionAtlas.readiness-latch.notFor.1
-    message: Readiness and ordering are authored. The small latch test and reveal are
+    message:
+      Readiness and ordering are authored. The small latch test and reveal are
       illustrative timing, not measured coordination latency.
   - id: motionAtlas.readiness-latch.notFor.2
-    message: A blocked final state is valid. Waiting must not be styled as a participant's
+    message:
+      A blocked final state is valid. Waiting must not be styled as a participant's
       fault or as proof of a failure outside the example.
   - id: motionAtlas.readiness-latch.notFor.3
     message: The default branches and work quantities are fictional.
   - id: motionAtlas.readiness-latch.notFor.4
-    message: Work units establish relative authored timing only; the six-second playback is
+    message:
+      Work units establish relative authored timing only; the six-second playback is
       not a duration forecast.
   - id: motionAtlas.readiness-latch.notFor.5
-    message: Every branch is required. An unready branch remains incomplete and keeps the
+    message:
+      Every branch is required. An unready branch remains incomplete and keeps the
       latch closed. Quorum and optional checks require another scene.
   - id: motionAtlas.readiness-latch.notFor.6
-    message: A cached dependency list does not establish that every other product capability
+    message:
+      A cached dependency list does not establish that every other product capability
       works offline.
 motionBeats:
   - startFrame: 12

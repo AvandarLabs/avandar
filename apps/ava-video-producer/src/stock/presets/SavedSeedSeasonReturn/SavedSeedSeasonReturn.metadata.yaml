@@ -3,7 +3,8 @@ name:
   message: Save seed for the next planting
 description:
   id: motionAtlas.saved-seed-season-return.description
-  message: A household or cooperative chooses how much of its supplied harvest to retain
+  message:
+    A household or cooperative chooses how much of its supplied harvest to retain
     as seed. The same seed lot crosses a fallow interval and returns to the same plot
     for sowing, with current use, recorded storage loss, and remaining seed kept
     visible.
@@ -12,11 +13,13 @@ category:
   message: Seasonal livelihood continuity
 useWhen:
   id: motionAtlas.saved-seed-season-return.useWhen
-  message: Explain how retaining part of a harvest connects one season's work to the next
+  message:
+    Explain how retaining part of a harvest connects one season's work to the next
     planting without promising a future yield.
 prompt:
   id: motionAtlas.saved-seed-season-return.prompt
-  message: Frames 0-11 reveal a schematic plot, harvested crop on a mat, and its named
+  message:
+    Frames 0-11 reveal a schematic plot, harvested crop on a mat, and its named
     cultivator. Frames 12-48 show the cultivator sliding a chosen portion into a seed
     jar while the current-use portion stays on the mat. Frames 49-100 first close the
     jar as the backdrop changes to fallow ground. Only nonzero supplied storage loss
@@ -29,7 +32,8 @@ prompt:
     opaque ground for the six-second seam.
 creativeDirection:
   id: motionAtlas.saved-seed-season-return.creativeDirection
-  message: Frames 0-11 reveal a schematic plot, harvested crop on a mat, and its named
+  message:
+    Frames 0-11 reveal a schematic plot, harvested crop on a mat, and its named
     cultivator. Frames 12-48 show the cultivator sliding a chosen portion into a seed
     jar while the current-use portion stays on the mat. Frames 49-100 first close the
     jar as the backdrop changes to fallow ground. Only nonzero supplied storage loss
@@ -42,11 +46,13 @@ creativeDirection:
     opaque ground for the six-second seam.
 intent:
   id: motionAtlas.saved-seed-season-return.intent
-  message: Explain how retaining part of a harvest connects one season's work to the next
+  message:
+    Explain how retaining part of a harvest connects one season's work to the next
     planting without promising a future yield.
 distinction:
   id: motionAtlas.saved-seed-season-return.distinction
-  message: The same cultivator sets aside part of its own harvest and returns that
+  message:
+    The same cultivator sets aside part of its own harvest and returns that
     physical seed to the same plot after a visible fallow interval. Its defining action
     is seasonal reuse as planting material, not donor allocation, replenishing retail
     shelves, a service handoff, or movement through pipeline boxes. Unlike
@@ -83,28 +89,34 @@ goodFor:
     message: Distinguish seed reserved, seed actually sown, and seed remaining
 notFor:
   - id: motionAtlas.saved-seed-season-return.notFor.0
-    message: One crop, one decision maker, one schematic plot, and one harvest-to-planting
+    message:
+      One crop, one decision maker, one schematic plot, and one harvest-to-planting
       interval. No real geography, household demographics, or cooperative membership
       count is inferred.
   - id: motionAtlas.saved-seed-season-return.notFor.1
-    message: All material quantities are supplied or exact balance differences. The final
+    message:
+      All material quantities are supplied or exact balance differences. The final
       balance is harvest = current use + storage loss + sown seed + remaining seed.
       Reservation is an intermediate subtotal, not an extra destination.
   - id: motionAtlas.saved-seed-season-return.notFor.2
-    message: The seed glyphs illustrate the material and are not individual seeds, yield
+    message:
+      The seed glyphs illustrate the material and are not individual seeds, yield
       units, or counts of plants. Material bands use one common mass scale across the
       mat, jar, tray, and furrow; labels provide precise quantities.
   - id: motionAtlas.saved-seed-season-return.notFor.3
-    message: Zero reservation leaves the jar empty and suppresses sowing. Zero storage loss
+    message:
+      Zero reservation leaves the jar empty and suppresses sowing. Zero storage loss
       leaves a labeled empty loss tray. Zero sowing keeps usable seed in storage. These
       cases never receive invented motion suggesting use.
   - id: motionAtlas.saved-seed-season-return.notFor.4
-    message: This is neither seed-storage advice nor a germination, food-security, income,
+    message:
+      This is neither seed-storage advice nor a germination, food-security, income,
       or efficacy claim. Storage practices, viability, weather, harvest costs, and the
       next yield are outside the scene. The supplied storage loss is recorded, never
       estimated from duration.
   - id: motionAtlas.saved-seed-season-return.notFor.5
-    message: Sowing concludes the narrative. The editorial loop fades out before returning
+    message:
+      Sowing concludes the narrative. The editorial loop fades out before returning
       to the earlier harvest and does not imply that the sown seed immediately produced
       that harvest. All visible text comes from the supplied inputs or formatted
       quantities.
@@ -133,7 +145,8 @@ motionBeats:
     endFrame: 100
     description:
       id: motionAtlas.saved-seed-season-return.beat.2
-      message: Close the jar for storage. Only nonzero supplied loss briefly opens it for
+      message:
+        Close the jar for storage. Only nonzero supplied loss briefly opens it for
         extraction, with full clearance and smooth reclosure before planting at frame
         101. Zero-loss storage stays closed.
   - startFrame: 101

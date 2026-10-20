@@ -3,7 +3,8 @@ name:
   message: Reconcile conflicting values
 description:
   id: motionAtlas.field-conflict-choice.description
-  message: Alternative values for the same record remain visible while explicit per-field
+  message:
+    Alternative values for the same record remain visible while explicit per-field
     choices build a reconciled result. Unresolved fields stay open instead of receiving
     an automatic answer.
 category:
@@ -11,11 +12,13 @@ category:
   message: Decision comparison
 useWhen:
   id: motionAtlas.field-conflict-choice.useWhen
-  message: Show that combining records can require explicit decisions rather than silent
+  message:
+    Show that combining records can require explicit decisions rather than silent
     overwrites.
 creativeDirection:
   id: motionAtlas.field-conflict-choice.creativeDirection
-  message: Frames 12-42 show one record with parallel source columns. Between frames
+  message:
+    Frames 12-42 show one record with parallel source columns. Between frames
     42-112, authored choice rails move toward the selected source for each resolved
     field, lifting that value into the result column. An unresolved field keeps both
     alternatives separated by a review bracket. Rejected alternatives remain in a
@@ -23,15 +26,18 @@ creativeDirection:
     through frame 166 before exiting.
 intent:
   id: motionAtlas.field-conflict-choice.intent
-  message: Show that combining records can require explicit decisions rather than silent
+  message:
+    Show that combining records can require explicit decisions rather than silent
     overwrites.
 distinction:
   id: motionAtlas.field-conflict-choice.distinction
-  message: Unlike source-merge and schema-mapping, this centers disagreement and explicit
+  message:
+    Unlike source-merge and schema-mapping, this centers disagreement and explicit
     per-field choices. It never turns multiple inputs into an unexplained single answer.
 prompt:
   id: motionAtlas.field-conflict-choice.prompt
-  message: Use Motion Atlas "Reconcile conflicting values" (field-conflict-choice) as a
+  message:
+    Use Motion Atlas "Reconcile conflicting values" (field-conflict-choice) as a
     conceptual graphic. Show that combining records can require explicit decisions
     rather than silent overwrites. Replace fictional sample content with approved
     authored content before making product claims.
@@ -73,13 +79,15 @@ aliases:
     message: resolve differences
 notFor:
   - id: motionAtlas.field-conflict-choice.notFor.literal-whitespace
-    message: "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
+    message:
+      "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
       breaks and other whitespace remain distinct from authored marker glyphs. Input,
       accessible text and equality preserve the original values."
   - id: motionAtlas.field-conflict-choice.notFor.0
     message: All default values and choices are fictional.
   - id: motionAtlas.field-conflict-choice.notFor.1
-    message: The supplied choice is an editorial decision, not a recommendation, confidence
+    message:
+      The supplied choice is an editorial decision, not a recommendation, confidence
       score, or automatic truth finding.
   - id: motionAtlas.field-conflict-choice.notFor.2
     message: The animation neither edits source records nor discards alternatives.

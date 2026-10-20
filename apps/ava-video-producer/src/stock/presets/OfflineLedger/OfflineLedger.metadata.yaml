@@ -3,7 +3,8 @@ name:
   message: Work Keeps Its Place
 description:
   id: motionAtlas.offline-ledger.description
-  message: A local notebook continues accepting entries while its connection indicator
+  message:
+    A local notebook continues accepting entries while its connection indicator
     goes quiet. Every new entry leaves a retained impression in the device's storage
     drawer.
 category:
@@ -40,17 +41,20 @@ tags:
     message: offline document
 useWhen:
   id: motionAtlas.offline-ledger.useWhen
-  message: Show that losing a connection does not have to interrupt the work already
+  message:
+    Show that losing a connection does not have to interrupt the work already
     supported on a device.
 prompt:
   id: motionAtlas.offline-ledger.prompt
-  message: Use Motion Atlas "Work Keeps Its Place" (offline-ledger) as an illustrative
+  message:
+    Use Motion Atlas "Work Keeps Its Place" (offline-ledger) as an illustrative
     conceptual graphic. Show that losing a connection does not have to interrupt the
     work already supported on a device. Bind complete authored inputs and preserve the
     stated limits.
 creativeDirection:
   id: motionAtlas.offline-ledger.creativeDirection
-  message: Within the six-second envelope, reveal a notebook held inside a device outline.
+  message:
+    Within the six-second envelope, reveal a notebook held inside a device outline.
     At the first entry, the small connection arc gently collapses and the supplied
     offline caption appears; the writing strokes continue at the same cadence. Each
     entry presses a matching impression into a shallow local drawer directly beneath the
@@ -62,7 +66,8 @@ goodFor:
   - id: motionAtlas.offline-ledger.goodFor.1
     message: Introduce local-first capture before a verified product demonstration
   - id: motionAtlas.offline-ledger.goodFor.2
-    message: Illustrate a field notebook or rehearsal log that remains useful away from a
+    message:
+      Illustrate a field notebook or rehearsal log that remains useful away from a
       shared office
   - id: motionAtlas.offline-ledger.goodFor.3
     message: Explain a bounded local collection task in an intermittent-connectivity setting
@@ -72,7 +77,8 @@ goodFor:
     message: Show local-only document storage
 intent:
   id: motionAtlas.offline-ledger.intent
-  message: Show that losing a connection does not have to interrupt the work already
+  message:
+    Show that losing a connection does not have to interrupt the work already
     supported on a device.
 domains:
   - id: motionAtlas.offline-ledger.domains.0
@@ -88,28 +94,35 @@ aliases:
     message: local save
 notFor:
   - id: motionAtlas.offline-ledger.notFor.0
-    message: The number of impressions equals entries.length and is an authored example
+    message:
+      The number of impressions equals entries.length and is an authored example
       count, not storage capacity or throughput.
   - id: motionAtlas.offline-ledger.notFor.1
-    message: This scene does not imply that every product action works offline, that data is
+    message:
+      This scene does not imply that every product action works offline, that data is
       encrypted, or that remote synchronization has occurred.
   - id: motionAtlas.offline-ledger.notFor.2
-    message: No duration on screen represents actual outage duration or save latency.
+    message:
+      No duration on screen represents actual outage duration or save latency.
       Notebook casing is a metaphor and should not be described as proof of digital
       persistence.
   - id: motionAtlas.offline-ledger.notFor.3
-    message: Show only the illustrated local operation. Do not imply that authentication,
+    message:
+      Show only the illustrated local operation. Do not imply that authentication,
       sharing, remote queries, or every product capability continues without a
       connection.
   - id: motionAtlas.offline-ledger.notFor.4
-    message: A stored impression does not establish backup, encryption, eviction resistance,
+    message:
+      A stored impression does not establish backup, encryption, eviction resistance,
       unlimited storage, synchronization, or zero device energy and maintenance cost.
   - id: motionAtlas.offline-ledger.notFor.5
-    message: A derived table cannot reconstruct the original PDF page. Local retention is
+    message:
+      A derived table cannot reconstruct the original PDF page. Local retention is
       distinct from remote backup.
 distinction:
   id: motionAtlas.offline-ledger.distinction
-  message: Unlike status-cycle, the useful operation visibly continues after a dependency
+  message:
+    Unlike status-cycle, the useful operation visibly continues after a dependency
     disappears. The page-to-drawer impressions depict local retention without a
     connection graph, packet stream, or new row of cards.
 motionBeats:
@@ -122,7 +135,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.offline-ledger.motionBeats.1
-      message: Within the six-second envelope, reveal a notebook held inside a device outline.
+      message:
+        Within the six-second envelope, reveal a notebook held inside a device outline.
         At the first entry, the small connection arc gently collapses and the supplied
         offline caption appears; the writing strokes continue at the same cadence. Each
         entry presses a matching impression into a shallow local drawer directly beneath

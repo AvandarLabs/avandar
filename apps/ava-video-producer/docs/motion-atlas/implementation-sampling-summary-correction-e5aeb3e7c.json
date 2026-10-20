@@ -28,10 +28,7 @@
           "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-default-016/records/default-stratified-spatial-sample/hold.png",
           "sha256": "b63ad64fb85a453fd71aadaa87009af71e1a11aa3a65c29e1a0e87f4f658f43a",
           "phase": "native decoded hold",
-          "captureWindow": [
-            4.806438,
-            4.894701
-          ]
+          "captureWindow": [4.806438, 4.894701]
         }
       ],
       "observation": "Selected, Eligible sites and Not selected headings have empty numeric regions. West1/3 and East1/2 are readable above correct site geometry. All summaryregions lie inside the native image.",
@@ -41,26 +38,10 @@
     }
   },
   "acceptedCases": {
-    "default": [
-      2,
-      5,
-      3
-    ],
-    "oneStratumUnsampled": [
-      1,
-      5,
-      4
-    ],
-    "allSelected": [
-      5,
-      5,
-      0
-    ],
-    "dense": [
-      8,
-      12,
-      4
-    ]
+    "default": [2, 5, 3],
+    "oneStratumUnsampled": [1, 5, 4],
+    "allSelected": [5, 5, 0],
+    "dense": [8, 12, 4]
   },
   "schemaBoundary": "selectedSiteIds min1 remains binding. The permitted ['a'] case has East0/2. No globally empty selection, schema widening or invalid-input bypass.",
   "reportedTiming": "Numbers enter at108/110/112 and all settle by140. Authored headings retain490, quantity baseline552, unit578.",

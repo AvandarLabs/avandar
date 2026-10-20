@@ -3,7 +3,8 @@ name:
   message: Place shade where people wait
 description:
   id: motionAtlas.street-shade-installation.description
-  message: Authored shade footprints unfold over a schematic street after a selected
+  message:
+    Authored shade footprints unfold over a schematic street after a selected
     installation decision. The scene measures added shaded area at one stated sun
     condition without implying a temperature or health outcome.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Connect an implementation choice to a clearly bounded change in shade coverage.
 prompt:
   id: motionAtlas.street-shade-installation.prompt
-  message: Reveal the supplied street zones with their existing shade footprints. At the
+  message:
+    Reveal the supplied street zones with their existing shade footprints. At the
     installation cue, extend awnings or open canopy footprints over the authored
     nonoverlapping additions. Hold total shaded area against the complete zone area at
     the supplied reference condition, retaining the unshaded ground, then fade without
     implying a measured temperature reduction.
 creativeDirection:
   id: motionAtlas.street-shade-installation.creativeDirection
-  message: Reveal the supplied street zones with their existing shade footprints. At the
+  message:
+    Reveal the supplied street zones with their existing shade footprints. At the
     installation cue, extend awnings or open canopy footprints over the authored
     nonoverlapping additions. Hold total shaded area against the complete zone area at
     the supplied reference condition, retaining the unshaded ground, then fade without
@@ -31,7 +34,8 @@ intent:
   message: Connect an implementation choice to a clearly bounded change in shade coverage.
 distinction:
   id: motionAtlas.street-shade-installation.distinction
-  message: Canopies unfold into visible ground footprints and preserve uncovered area.
+  message:
+    Canopies unfold into visible ground footprints and preserve uncovered area.
     This is a spatial intervention, not a chart of temperatures or a relabeled card
     collection.
 tags:
@@ -70,13 +74,16 @@ aliases:
     message: street canopy
 notFor:
   - id: motionAtlas.street-shade-installation.notFor.0
-    message: Total ground area stays constant. Final shade = existing shade + supplied
+    message:
+      Total ground area stays constant. Final shade = existing shade + supplied
       nonoverlapping additions; unshaded area = total ground - final shade.
   - id: motionAtlas.street-shade-installation.notFor.1
-    message: The plan is schematic. Footprint tiling communicates area totals rather than
+    message:
+      The plan is schematic. Footprint tiling communicates area totals rather than
       real street geometry or a solar calculation.
   - id: motionAtlas.street-shade-installation.notFor.2
-    message: Tree-canopy dimensions are authored for the named condition, not instantaneous
+    message:
+      Tree-canopy dimensions are authored for the named condition, not instantaneous
       tree growth. No temperature, exposure, health or measured efficacy claim is
       derived.
 motionBeats:
@@ -89,7 +96,8 @@ motionBeats:
     endFrame: 108
     description:
       id: motionAtlas.street-shade-installation.motionBeats.1
-      message: Reveal the supplied street zones with their existing shade footprints. At the
+      message:
+        Reveal the supplied street zones with their existing shade footprints. At the
         installation cue, extend awnings or open canopy footprints over the authored
         nonoverlapping additions. Hold total shaded area against the complete zone area
         at the supplied reference condition, retaining the unshaded ground, then fade
@@ -98,5 +106,6 @@ motionBeats:
     endFrame: 167
     description:
       id: motionAtlas.street-shade-installation.motionBeats.2
-      message: Hold conserved quantities and visible destinations. The outer envelope returns
+      message:
+        Hold conserved quantities and visible destinations. The outer envelope returns
         to ground.

@@ -34,10 +34,7 @@
             "subtitle": "Future product vision",
             "content": {
               "kind": "thesis",
-              "lines": [
-                "A shared foundation.",
-                "Tools that fit the mission."
-              ],
+              "lines": ["A shared foundation.", "Tools that fit the mission."],
               "emphasis": "A plugin ecosystem."
             },
             "duration": 308,
@@ -198,26 +195,19 @@
                       "id": "curve",
                       "title": "Cholera",
                       "kind": "value",
-                      "lines": [
-                        "Epicurves"
-                      ]
+                      "lines": ["Epicurves"]
                     },
                     {
                       "id": "care",
                       "title": "HIV and PrEP",
                       "kind": "list",
-                      "lines": [
-                        "Follow-up",
-                        "Risk tools"
-                      ]
+                      "lines": ["Follow-up", "Risk tools"]
                     },
                     {
                       "id": "outreach",
                       "title": "Volunteers",
                       "kind": "note",
-                      "lines": [
-                        "Outreach tools"
-                      ]
+                      "lines": ["Outreach tools"]
                     }
                   ],
                   "featuredWidgetId": "curve",
@@ -304,16 +294,8 @@
                 "preset": "event-bus",
                 "schemaVersion": 1,
                 "input": {
-                  "producers": [
-                    "Create",
-                    "Update",
-                    "Event"
-                  ],
-                  "subscribers": [
-                    "Chart",
-                    "Report",
-                    "Notify"
-                  ],
+                  "producers": ["Create", "Update", "Event"],
+                  "subscribers": ["Chart", "Report", "Notify"],
                   "heading": "A connected tool ecosystem",
                   "showPackets": true
                 }

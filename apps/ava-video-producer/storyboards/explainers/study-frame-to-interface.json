@@ -57,11 +57,7 @@
                       }
                     ]
                   ],
-                  "highlight": [
-                    0,
-                    1,
-                    2
-                  ],
+                  "highlight": [0, 1, 2],
                   "title": "An illustrative question as SQL",
                   "footer": "Question \u2192 fields \u2192 operation",
                   "showHighlight": true

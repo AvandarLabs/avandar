@@ -3,7 +3,8 @@ name:
   message: Break the work into parts
 description:
   id: motionAtlas.work-decomposition.description
-  message: A single block representing an undertaking is cut into a bounded set of labeled
+  message:
+    A single block representing an undertaking is cut into a bounded set of labeled
     work packages. The pieces separate into a distinct enclosing reserve while the
     original contour remains fixed, keeping their relationship to the whole visible.
 category:
@@ -14,13 +15,15 @@ useWhen:
   message: Make a large undertaking understandable as an explicit set of constituent parts.
 prompt:
   id: motionAtlas.work-decomposition.prompt
-  message: Use Motion Atlas "Break the work into parts" (work-decomposition) as a
+  message:
+    Use Motion Atlas "Break the work into parts" (work-decomposition) as a
     conceptual graphic. Make a large undertaking understandable as an explicit set of
     constituent parts. Replace fictional sample content with approved authored content
     before making product claims.
 creativeDirection:
   id: motionAtlas.work-decomposition.creativeDirection
-  message: "Reveal one continuous filled slab with the parent label during 12..38. During
+  message:
+    "Reveal one continuous filled slab with the parent label during 12..38. During
     38..86, ruled cut lines travel across the slab in the chosen partition layout,
     dividing its area according to the supplied effort weights. During 86..124, the
     resulting pieces separate by a small equal gap and their individual labels settle
@@ -34,7 +37,8 @@ intent:
   message: Make a large undertaking understandable as an explicit set of constituent parts.
 distinction:
   id: motionAtlas.work-decomposition.distinction
-  message: Stagger-cards introduces separate siblings; this starts with one continuous
+  message:
+    Stagger-cards introduces separate siblings; this starts with one continuous
     whole and visibly partitions its conserved area. It does not imply a sequential
     pipeline or relationships among independently existing nodes.
 tags:
@@ -77,14 +81,17 @@ notFor:
   - id: motionAtlas.work-decomposition.notFor.0
     message: The default undertaking and effort values are fictional.
   - id: motionAtlas.work-decomposition.notFor.1
-    message: Piece area represents the supplied relative effort allocation, not task
+    message:
+      Piece area represents the supplied relative effort allocation, not task
       duration, staffing, cost, or measured productivity unless the caller explicitly
       supplies that meaning and unit.
   - id: motionAtlas.work-decomposition.notFor.2
-    message: All pieces together exhaust the depicted whole; overlapping work, unallocated
+    message:
+      All pieces together exhaust the depicted whole; overlapping work, unallocated
       effort, dependencies, and recursive subtasks are excluded.
   - id: motionAtlas.work-decomposition.notFor.3
-    message: The original slab contour remains a thin fixed reference. A distinct enclosing
+    message:
+      The original slab contour remains a thin fixed reference. A distinct enclosing
       bracket reserves space for equal-gap translations without resizing any material.
       External label slots identify even the smallest pieces.
 motionBeats:

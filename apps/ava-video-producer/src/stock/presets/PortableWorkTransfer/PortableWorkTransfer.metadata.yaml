@@ -3,7 +3,8 @@ name:
   message: Take the work to another tool
 description:
   id: motionAtlas.portable-work-transfer.description
-  message: A person packs copies of their work into a portable folio and brings it to
+  message:
+    A person packs copies of their work into a portable folio and brings it to
     another workbench. Artifact identities survive the transfer, and the original work
     remains visible at the source.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Show that changing a tool should not erase the person's work.
 creativeDirection:
   id: motionAtlas.portable-work-transfer.creativeDirection
-  message: Frames 12..42 reveal the owner with a bounded collection at the source tool.
+  message:
+    Frames 12..42 reveal the owner with a bounded collection at the source tool.
     Frames 43..92 lift one labeled copy of each artifact into a single portable folio
     while originals stay anchored in place. Frames 93..130 let the owner carry the folio
     to the destination. For accepted, open it and place each same-ID copy on the
@@ -32,7 +34,8 @@ intent:
   message: Show that changing a tool should not erase the person's work.
 distinction:
   id: motionAtlas.portable-work-transfer.distinction
-  message: Unlike report-page-bind, a heterogeneous existing work collection changes tool
+  message:
+    Unlike report-page-bind, a heterogeneous existing work collection changes tool
     without being rewritten into a new report. Unlike custody-transfer, ownership stays
     with the same person and source originals remain present. Unlike sealed-handoff,
     confidentiality is not the explanatory purpose.
@@ -64,16 +67,20 @@ aliases:
     message: portable work transfer
 notFor:
   - id: motionAtlas.portable-work-transfer.notFor.0
-    message: The portable folio illustrates a portability principle. It is not evidence of
+    message:
+      The portable folio illustrates a portability principle. It is not evidence of
       an implemented export or import feature.
   - id: motionAtlas.portable-work-transfer.notFor.1
-    message: No file format, schema conversion, compatibility, migration completeness or
+    message:
+      No file format, schema conversion, compatibility, migration completeness or
       vendor policy is demonstrated.
   - id: motionAtlas.portable-work-transfer.notFor.2
-    message: Source and destination copies represent the same unique work IDs and must not
+    message:
+      Source and destination copies represent the same unique work IDs and must not
       inflate a unique-artifact total.
   - id: motionAtlas.portable-work-transfer.notFor.3
-    message: Supplied prose is preserved. Fictional framing, evidence, and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence, and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

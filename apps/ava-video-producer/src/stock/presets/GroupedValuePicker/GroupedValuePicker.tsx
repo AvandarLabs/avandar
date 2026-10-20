@@ -1,8 +1,8 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { propEq } from "@avandar/utils";
 import { EASE, mix, ramp } from "../../../motion";
 import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { getPickedValueFromInput } from "./getPickedValueFromInput";
 import { controls } from "./GroupedValuePicker.controls";

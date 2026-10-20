@@ -3,7 +3,7 @@
  */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { propEq, prop  } from "@avandar/utils";
+import { propEq, prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { INVALID_INPUTS } from "../rejectedInputs.constants";

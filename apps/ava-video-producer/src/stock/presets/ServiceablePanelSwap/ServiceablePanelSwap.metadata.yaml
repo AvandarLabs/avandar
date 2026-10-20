@@ -3,7 +3,8 @@ name:
   message: Change one part through a designed seam
 description:
   id: motionAtlas.serviceable-panel-swap.description
-  message: A modular enclosure exposes one replaceable panel. A worker removes and
+  message:
+    A modular enclosure exposes one replaceable panel. A worker removes and
     replaces only that part while the surrounding modules retain their positions, labels
     and identities.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Make planned replaceability visible through one bounded operation.
 creativeDirection:
   id: motionAtlas.serviceable-panel-swap.creativeDirection
-  message: Frames 12..42 reveal a single enclosure with a bounded row of modules. Frames
+  message:
+    Frames 12..42 reveal a single enclosure with a bounded row of modules. Frames
     43..78 open a service latch around the targeted module and expose its existing
     connector. Frames 79..116 withdraw that module into a retained-parts tray, seat the
     supplied replacement on the same connector and close the latch. Frames 117..167 hold
@@ -31,7 +33,8 @@ intent:
   message: Make planned replaceability visible through one bounded operation.
 distinction:
   id: motionAtlas.serviceable-panel-swap.distinction
-  message: Unlike component-material-return, the object is not dismantled into recovery
+  message:
+    Unlike component-material-return, the object is not dismantled into recovery
     streams or rebuilt from mixed material. Unlike revision-restore, it does not revert
     the whole artifact to an earlier snapshot. Only one designed seam opens around a
     local replacement.
@@ -63,16 +66,20 @@ aliases:
     message: serviceable panel swap
 notFor:
   - id: motionAtlas.serviceable-panel-swap.notFor.0
-    message: This is a physical metaphor for maintainability, not a claim that a software
+    message:
+      This is a physical metaphor for maintainability, not a claim that a software
       dependency can always be replaced independently.
   - id: motionAtlas.serviceable-panel-swap.notFor.1
-    message: A seated replacement is not a functional test, a compatibility guarantee or
+    message:
+      A seated replacement is not a functional test, a compatibility guarantee or
       evidence of zero downtime.
   - id: motionAtlas.serviceable-panel-swap.notFor.2
-    message: "All original modules remain accounted for: unchanged modules stay inside and
+    message:
+      "All original modules remain accounted for: unchanged modules stay inside and
       the removed module remains in its tray."
   - id: motionAtlas.serviceable-panel-swap.notFor.3
-    message: Supplied prose is preserved. Fictional framing, evidence, and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence, and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

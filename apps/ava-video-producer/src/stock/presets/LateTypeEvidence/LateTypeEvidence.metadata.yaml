@@ -3,7 +3,8 @@ name:
   message: Keep the late value that changes the column
 description:
   id: motionAtlas.late-type-evidence.description
-  message: A column initially appears numeric. A later text value widens the proposed type
+  message:
+    A column initially appears numeric. A later text value widens the proposed type
     to text while every original cell stays intact, showing why a short initial sample
     must not silently discard contrary evidence.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Preserve contrary late evidence during column-type inference.
 prompt:
   id: motionAtlas.late-type-evidence.prompt
-  message: 960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
     Reveal at frames 0-12. Frames 13-55 reveal the initial numeric-looking rows under a
     provisional numeric type label. Frames 56-100 append the authored text row and open
     a type-review bracket. Frames 101-139 widen the column type to text or hold the
@@ -23,7 +25,8 @@ prompt:
     editorial.
 creativeDirection:
   id: motionAtlas.late-type-evidence.creativeDirection
-  message: 960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
     Reveal at frames 0-12. Frames 13-55 reveal the initial numeric-looking rows under a
     provisional numeric type label. Frames 56-100 append the authored text row and open
     a type-review bracket. Frames 101-139 widen the column type to text or hold the
@@ -35,7 +38,8 @@ intent:
   message: Preserve contrary late evidence during column-type inference.
 distinction:
   id: motionAtlas.late-type-evidence.distinction
-  message: Cell-normalization edits explicitly supplied characters. This changes a
+  message:
+    Cell-normalization edits explicitly supplied characters. This changes a
     proposed column type in response to late evidence while refusing to change or
     discard any cell.
 tags:
@@ -66,18 +70,22 @@ aliases:
     message: late evidence
 notFor:
   - id: motionAtlas.late-type-evidence.notFor.0
-    message: The widening rule is illustrative, not a claim that all import engines infer
+    message:
+      The widening rule is illustrative, not a claim that all import engines infer
       types this way.
   - id: motionAtlas.late-type-evidence.notFor.1
     message: Text preservation does not make the column ready for numeric aggregation.
   - id: motionAtlas.late-type-evidence.notFor.2
-    message: One column and one contradictory value are shown; general type lattices and
+    message:
+      One column and one contradictory value are shown; general type lattices and
       date inference are outside scope.
   - id: motionAtlas.late-type-evidence.notFor.3
-    message: No external requests, URLs, JSX or functions in props. Supplied examples are
+    message:
+      No external requests, URLs, JSX or functions in props. Supplied examples are
       fictional.
   - id: motionAtlas.late-type-evidence.notFor.4
-    message: Authored prose remains the author’s responsibility. Runtime validation
+    message:
+      Authored prose remains the author’s responsibility. Runtime validation
       preserves supplied text without classifying its language or factual claims.
 motionBeats:
   - startFrame: 0

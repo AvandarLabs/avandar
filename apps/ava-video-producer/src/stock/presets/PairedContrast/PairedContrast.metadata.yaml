@@ -3,7 +3,8 @@ name:
   message: Two approaches, one question
 description:
   id: motionAtlas.paired-contrast.description
-  message: Two alternatives align around the same question, then matched attributes
+  message:
+    Two alternatives align around the same question, then matched attributes
     connect across a center divider. One authored difference receives a final underline
     without declaring an automatic winner.
 category:
@@ -39,13 +40,15 @@ useWhen:
   message: Make the difference between two alternatives easy to see on equal terms.
 prompt:
   id: motionAtlas.paired-contrast.prompt
-  message: Use Motion Atlas "Two approaches, one question" (paired-contrast) as a
+  message:
+    Use Motion Atlas "Two approaches, one question" (paired-contrast) as a
     conceptual graphic. Make the difference between two alternatives easy to see on
     equal terms. Keep the restrained motion and readable labels; replace sample content
     with approved facts before making product claims.
 creativeDirection:
   id: motionAtlas.paired-contrast.creativeDirection
-  message: Within six seconds, two labeled halves slide apart to reveal a shared question
+  message:
+    Within six seconds, two labeled halves slide apart to reveal a shared question
     in the center. Matching attribute pairs enter on the same horizontal baselines,
     their center brackets draw simultaneously, and the nominated contrast expands into a
     single readable comparison band. Both alternatives remain visible during the
@@ -78,23 +81,28 @@ aliases:
     message: comparison
 notFor:
   - id: motionAtlas.paired-contrast.notFor.0
-    message: Exactly two alternatives and at most three criteria keep both sides readable in
+    message:
+      Exactly two alternatives and at most three criteria keep both sides readable in
       six seconds.
   - id: motionAtlas.paired-contrast.notFor.1
-    message: Equal panel areas express equal editorial attention, not equal effectiveness,
+    message:
+      Equal panel areas express equal editorial attention, not equal effectiveness,
       cost, or prevalence.
   - id: motionAtlas.paired-contrast.notFor.2
     message: The nominated contrast is supplied by the author and is not inferred from the text.
   - id: motionAtlas.paired-contrast.notFor.3
-    message: Free access to source code is not zero operating cost. Comparison labels must
+    message:
+      Free access to source code is not zero operating cost. Comparison labels must
       account for the supplied hosting and maintenance responsibilities without
       inventing monetary amounts.
   - id: motionAtlas.paired-contrast.notFor.4
-    message: Moving computation to a user device changes the resource owner. It does not
+    message:
+      Moving computation to a user device changes the resource owner. It does not
       establish zero total cost, zero energy, or that one option is universally cheaper.
 distinction:
   id: motionAtlas.paired-contrast.distinction
-  message: Unlike stagger-cards, the action is the synchronized alignment and expansion of
+  message:
+    Unlike stagger-cards, the action is the synchronized alignment and expansion of
     matched differences. Unlike bar-race, it compares supplied qualitative attributes
     without ranking or invented numeric scores.
 motionBeats:
@@ -107,7 +115,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.paired-contrast.motionBeats.1
-      message: Within six seconds, two labeled halves slide apart to reveal a shared question
+      message:
+        Within six seconds, two labeled halves slide apart to reveal a shared question
         in the center. Matching attribute pairs enter on the same horizontal baselines,
         their center brackets draw simultaneously, and the nominated contrast expands
         into a single readable comparison band. Both alternatives remain visible during

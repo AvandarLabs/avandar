@@ -3,7 +3,8 @@ name:
   message: Capacity starts with usable floor area
 description:
   id: motionAtlas.shelter-usable-area-capacity.description
-  message: A fictional shelter floor plan separates sleeping area from circulation,
+  message:
+    A fictional shelter floor plan separates sleeping area from circulation,
     storage and closed space. Only the remaining area enters an explicitly authored
     area-per-place calculation, which is compared with registered people.
 category:
@@ -11,29 +12,34 @@ category:
   message: usable-space accounting
 useWhen:
   id: motionAtlas.shelter-usable-area-capacity.useWhen
-  message: Expose the space exclusions and assumed denominator behind an illustrative
+  message:
+    Expose the space exclusions and assumed denominator behind an illustrative
     capacity figure.
 prompt:
   id: motionAtlas.shelter-usable-area-capacity.prompt
-  message: Begin with one gross floor outline. Raise the non-sleeping tiles into shallow
+  message:
+    Begin with one gross floor outline. Raise the non-sleeping tiles into shallow
     labeled cutaways, revealing the smaller sleeping-area footprint beneath. Unroll only
     that usable area into a measured strip, divide it by the supplied illustration
     benchmark, and hold the resulting place equivalents beside registered people and any
     shortfall.
 creativeDirection:
   id: motionAtlas.shelter-usable-area-capacity.creativeDirection
-  message: Begin with one gross floor outline. Raise the non-sleeping tiles into shallow
+  message:
+    Begin with one gross floor outline. Raise the non-sleeping tiles into shallow
     labeled cutaways, revealing the smaller sleeping-area footprint beneath. Unroll only
     that usable area into a measured strip, divide it by the supplied illustration
     benchmark, and hold the resulting place equivalents beside registered people and any
     shortfall.
 intent:
   id: motionAtlas.shelter-usable-area-capacity.intent
-  message: Expose the space exclusions and assumed denominator behind an illustrative
+  message:
+    Expose the space exclusions and assumed denominator behind an illustrative
     capacity figure.
 distinction:
   id: motionAtlas.shelter-usable-area-capacity.distinction
-  message: The hero action subtracts unusable floor geometry before dividing the remaining
+  message:
+    The hero action subtracts unusable floor geometry before dividing the remaining
     area by an explicit assumption. Unlike compute-capacity-consolidation, nothing is
     packed or migrated; unlike queue-relief, no service slots open or waiting people
     move.
@@ -63,13 +69,16 @@ goodFor:
     message: Discuss displaced-population shelter planning without implying a safety standard
 notFor:
   - id: motionAtlas.shelter-usable-area-capacity.notFor.0
-    message: The floor plan is schematic and all default figures are fictional. The divisor
+    message:
+      The floor plan is schematic and all default figures are fictional. The divisor
       is not a humanitarian, legal, health, or safety recommendation.
   - id: motionAtlas.shelter-usable-area-capacity.notFor.1
-    message: Sleeping, circulation, storage and closed areas must sum to gross area. Only
+    message:
+      Sleeping, circulation, storage and closed areas must sum to gross area. Only
       sleeping tiles contribute to the illustrated numerator.
   - id: motionAtlas.shelter-usable-area-capacity.notFor.2
-    message: Area-only place equivalents are not operational shelter capacity; layout,
+    message:
+      Area-only place equivalents are not operational shelter capacity; layout,
       safeguarding, access, household composition and other constraints are not modeled.
 domains:
   - id: motionAtlas.shelter-usable-area-capacity.domains.0
@@ -91,11 +100,13 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.shelter-usable-area-capacity.beat.1
-      message: Raise excluded floor tiles, then unroll only sleeping tiles into the measured
+      message:
+        Raise excluded floor tiles, then unroll only sleeping tiles into the measured
         usable-area strip.
   - startFrame: 108
     endFrame: 179
     description:
       id: motionAtlas.shelter-usable-area-capacity.beat.2
-      message: Reveal divisor ticks and hold exact area-only equivalents beside demand,
+      message:
+        Reveal divisor ticks and hold exact area-only equivalents beside demand,
         shortfall and spare equivalents.

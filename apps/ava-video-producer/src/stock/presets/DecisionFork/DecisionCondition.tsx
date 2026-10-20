@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { DUR, ramp } from "../../../motion";
 import { Arrive, STOCK } from "../../graphics-common";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";

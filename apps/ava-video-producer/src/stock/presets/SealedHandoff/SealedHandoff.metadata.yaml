@@ -3,7 +3,8 @@ name:
   message: The Contents Stay Covered
 description:
   id: motionAtlas.sealed-handoff.description
-  message: An open brief folds into an opaque envelope, moves to its named recipient, and
+  message:
+    An open brief folds into an opaque envelope, moves to its named recipient, and
     opens only at the authored reveal point. The address remains visible while the
     contents are covered.
 category:
@@ -37,7 +38,8 @@ prompt:
     limits.
 creativeDirection:
   id: motionAtlas.sealed-handoff.creativeDirection
-  message: Begin with a short open brief resting over an unfolded envelope. Fold the lower
+  message:
+    Begin with a short open brief resting over an unfolded envelope. Fold the lower
     and side flaps over the brief, then lower the final flap so the contents are fully
     occluded rather than faded. Move the closed envelope along one shallow hand-carried
     arc to a recipient tray. If the configured reveal rule is recipient, peel the flap
@@ -49,7 +51,8 @@ goodFor:
   - id: motionAtlas.sealed-handoff.goodFor.1
     message: Explain a confidential briefing metaphor
   - id: motionAtlas.sealed-handoff.goodFor.2
-    message: Introduce a restricted handoff before separately documenting the actual
+    message:
+      Introduce a restricted handoff before separately documenting the actual
       security mechanism
 intent:
   id: motionAtlas.sealed-handoff.intent
@@ -68,17 +71,21 @@ aliases:
     message: recipient
 notFor:
   - id: motionAtlas.sealed-handoff.notFor.0
-    message: A sealed-envelope metaphor is not proof of encryption, identity verification,
+    message:
+      A sealed-envelope metaphor is not proof of encryption, identity verification,
       authorization, secure deletion, or protection from any particular adversary.
   - id: motionAtlas.sealed-handoff.notFor.1
-    message: Exterior address and reference are deliberately visible. Do not describe the
+    message:
+      Exterior address and reference are deliberately visible. Do not describe the
       depiction as hiding all metadata.
   - id: motionAtlas.sealed-handoff.notFor.2
-    message: The brief contains exactly the supplied lines and does not represent a measured
+    message:
+      The brief contains exactly the supplied lines and does not represent a measured
       payload size.
 distinction:
   id: motionAtlas.sealed-handoff.distinction
-  message: This is a fold, opaque enclosure, and recipient-controlled reveal, unlike
+  message:
+    This is a fold, opaque enclosure, and recipient-controlled reveal, unlike
     packet-stream's visible abstract packets. It covers the complete payload rather than
     the field subset selection in disclosure-aperture.
 motionBeats:

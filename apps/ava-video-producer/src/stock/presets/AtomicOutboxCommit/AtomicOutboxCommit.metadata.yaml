@@ -3,7 +3,8 @@ name:
   message: Save the change and its delivery obligation together
 description:
   id: motionAtlas.atomic-outbox-commit.description
-  message: A local edit and its matching outbound journal entry sit under one transaction
+  message:
+    A local edit and its matching outbound journal entry sit under one transaction
     latch. Both become durable together, or neither does, so an accepted edit cannot
     lose the obligation to synchronize it.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Bind a durable local change to its durable synchronization obligation.
 creativeDirection:
   id: motionAtlas.atomic-outbox-commit.creativeDirection
-  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-55 write a local change and matching journal ticket
     on two halves of one sheet. Frames 56-110 close one shared commit latch. Frames
     111-139 stamp both halves when committed, or withdraw both provisional halves when
@@ -28,7 +30,8 @@ intent:
   message: Bind a durable local change to its durable synchronization obligation.
 distinction:
   id: motionAtlas.atomic-outbox-commit.distinction
-  message: Journal-receipts starts with an existing outbox and closes obligations after
+  message:
+    Journal-receipts starts with an existing outbox and closes obligations after
     acknowledgment. This explains how the obligation is created atomically with the
     source mutation before any network activity.
 tags:
@@ -59,10 +62,12 @@ notFor:
   - id: motionAtlas.atomic-outbox-commit.notFor.2
     message: No network success is depicted. The committed journal entry remains pending.
   - id: motionAtlas.atomic-outbox-commit.notFor.3
-    message: No real product screen, external fetch, supplied code execution, or measured
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
       performance claim. All text is authored; no JSX, functions or URLs in props.
   - id: motionAtlas.atomic-outbox-commit.notFor.4
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

@@ -3,7 +3,8 @@ name:
   message: Insert a processing step
 description:
   id: motionAtlas.pipeline-step-splice.description
-  message: A new operation is fitted into the middle of an existing processing sequence.
+  message:
+    A new operation is fitted into the middle of an existing processing sequence.
     The sequence physically makes room, reconnects, and presents an authored
     input/output example.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show that a process can be changed by inserting one explicit operation.
 creativeDirection:
   id: motionAtlas.pipeline-step-splice.creativeDirection
-  message: Frames 12-38 establish the existing strip of operations with the new module
+  message:
+    Frames 12-38 establish the existing strip of operations with the new module
     parked above its future position. During frames 38-98, the strip separates at that
     position, later modules move aside, and the inserted module slides down into the
     open gap. End joints close across the new module. A small before/after preview opens
@@ -25,12 +27,14 @@ intent:
   message: Show that a process can be changed by inserting one explicit operation.
 distinction:
   id: motionAtlas.pipeline-step-splice.distinction
-  message: Unlike data-pipeline, no packet walks through a fixed process. The process
+  message:
+    Unlike data-pipeline, no packet walks through a fixed process. The process
     topology itself changes through an observable insertion, with one new operation
     taking a precise place.
 prompt:
   id: motionAtlas.pipeline-step-splice.prompt
-  message: Use Motion Atlas "Insert a processing step" (pipeline-step-splice) as a
+  message:
+    Use Motion Atlas "Insert a processing step" (pipeline-step-splice) as a
     conceptual graphic. Show that a process can be changed by inserting one explicit
     operation. Replace fictional sample content with approved authored content before
     making product claims.
@@ -74,7 +78,8 @@ notFor:
   - id: motionAtlas.pipeline-step-splice.notFor.0
     message: All default operations and values are fictional.
   - id: motionAtlas.pipeline-step-splice.notFor.1
-    message: This supports a single middle insertion, not branching, arbitrary execution, or
+    message:
+      This supports a single middle insertion, not branching, arbitrary execution, or
       reorder validation.
   - id: motionAtlas.pipeline-step-splice.notFor.2
     message: Preview strings are supplied; the animation does not execute operations.

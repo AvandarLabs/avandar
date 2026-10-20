@@ -3,7 +3,8 @@ name:
   message: Widen the cache without losing rows
 description:
   id: motionAtlas.query-column-cache-growth.description
-  message: A cached table answers a narrower column request, then grows to include newly
+  message:
+    A cached table answers a narrower column request, then grows to include newly
     requested columns. Every original row remains in the same order and only one live
     cache entry remains.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Explain exact column coverage and monotone cache growth without changing row grain.
 creativeDirection:
   id: motionAtlas.query-column-cache-growth.creativeDirection
-  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-60 align the first request with the cached columns
     and pass it. Frames 61-105 show the next request exposing the missing column set.
     Frames 106-139 widen the single cached table to the union of old and required
@@ -29,7 +31,8 @@ intent:
   message: Explain exact column coverage and monotone cache growth without changing row grain.
 distinction:
   id: motionAtlas.query-column-cache-growth.distinction
-  message: Cache-reuse compares identical keys. This changes the needed set, tests
+  message:
+    Cache-reuse compares identical keys. This changes the needed set, tests
     containment, and replaces one narrower relation with a wider relation without
     joining fragments.
 tags:
@@ -56,22 +59,27 @@ aliases:
     message: query column cache growth
 notFor:
   - id: motionAtlas.query-column-cache-growth.notFor.0
-    message: Projection removes columns only. Duplicate rows and physical row order must not
+    message:
+      Projection removes columns only. Duplicate rows and physical row order must not
       change.
   - id: motionAtlas.query-column-cache-growth.notFor.1
-    message: The origin may still deliver every column; drawn cache savings do not imply
+    message:
+      The origin may still deliver every column; drawn cache savings do not imply
       network pushdown.
   - id: motionAtlas.query-column-cache-growth.notFor.2
     message: Freshness, authorization and source version changes are not modeled.
   - id: motionAtlas.query-column-cache-growth.notFor.3
-    message: No real product screen, external fetch, supplied code execution, or measured
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
       performance claim. All text is authored; no JSX, functions or URLs in props.
   - id: motionAtlas.query-column-cache-growth.notFor.4
-    message: Supplied prose is preserved. Fictional framing, evidence, and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence, and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
   - id: motionAtlas.query-column-cache-growth.notFor.5
-    message: Exact local cell whitespace uses distinct visible space, tab and newline marks.
+    message:
+      Exact local cell whitespace uses distinct visible space, tab and newline marks.
       Repeated rows remain separate occurrences.
 motionBeats:
   - startFrame: 13

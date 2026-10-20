@@ -3,7 +3,8 @@ name:
   message: Restore a saved version
 description:
   id: motionAtlas.revision-restore.description
-  message: A chosen earlier version returns as an aligned impression over the current
+  message:
+    A chosen earlier version returns as an aligned impression over the current
     document. Current content changes while every saved version remains visible on the
     history rail.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Show that a saved earlier state can become current without erasing the history.
 creativeDirection:
   id: motionAtlas.revision-restore.creativeDirection
-  message: Reveal the current artifact and two to four labeled saved impressions. Select
+  message:
+    Reveal the current artifact and two to four labeled saved impressions. Select
     the authored earlier revision, lift its impression from the optional local drawer,
     and align it over the current document without moving historical snapshots. Between
     frames 78..126 replace changed lines in place and clear their change notches. Hold
@@ -27,7 +29,8 @@ intent:
   message: Show that a saved earlier state can become current without erasing the history.
 distinction:
   id: motionAtlas.revision-restore.distinction
-  message: One restoration preset combines a local checkpoint impression with a selectable
+  message:
+    One restoration preset combines a local checkpoint impression with a selectable
     history. Unlike status-cycle, content is reverted; unlike a destructive rewind,
     later saved versions stay on the rail.
 tags:
@@ -80,22 +83,28 @@ aliases:
     message: History and recovery
 notFor:
   - id: motionAtlas.revision-restore.notFor.0
-    message: The default document and revisions are fictional and use short text impressions
+    message:
+      The default document and revisions are fictional and use short text impressions
       rather than a full editor.
   - id: motionAtlas.revision-restore.notFor.1
-    message: The scene shows restored content, not a claim about how a product records a
+    message:
+      The scene shows restored content, not a claim about how a product records a
       restoration, resolves conflicts, or persists it.
   - id: motionAtlas.revision-restore.notFor.2
-    message: There is one linear revision history and one restoration; branches, merges, and
+    message:
+      There is one linear revision history and one restoration; branches, merges, and
       simultaneous edits are excluded.
   - id: motionAtlas.revision-restore.notFor.3
-    message: Only the listed fields are represented. Do not imply restoration of an entire
+    message:
+      Only the listed fields are represented. Do not imply restoration of an entire
       device, database, or application unless supported separately.
   - id: motionAtlas.revision-restore.notFor.4
-    message: Later values are deliberately replaced in the final state. The scene must not
+    message:
+      Later values are deliberately replaced in the final state. The scene must not
       imply that unsaved edits are also recovered.
   - id: motionAtlas.revision-restore.notFor.5
-    message: The checkpoint is an authored example, not evidence of an actual backup, tested
+    message:
+      The checkpoint is an authored example, not evidence of an actual backup, tested
       recovery process, version history, or guaranteed data durability.
 motionBeats:
   - startFrame: 12

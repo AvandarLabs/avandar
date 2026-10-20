@@ -27,7 +27,8 @@ useWhen:
   message: Explain field correspondence or data normalization with an authored mapping.
 prompt:
   id: motionAtlas.schema-mapping.prompt
-  message: Use Motion Atlas "Field mapping" (schema-mapping) as a conceptual graphic.
+  message:
+    Use Motion Atlas "Field mapping" (schema-mapping) as a conceptual graphic.
     Explain field correspondence or data normalization with an authored mapping. Keep
     the restrained motion and readable labels; replace sample content with approved
     facts before making product claims.

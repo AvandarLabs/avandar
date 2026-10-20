@@ -1,7 +1,8 @@
 - id: shared-object-handoff
   title: Shared-object handoff
   category: transitions
-  description: Carry one identified object between two diagrams. Change its position while retaining a
+  description:
+    Carry one identified object between two diagrams. Change its position while retaining a
     single rendered copy.
   frames: 456
   path: explainers/study-shared-object-handoff
@@ -16,7 +17,8 @@
     - query first
     - predicate pushdown
     - reading holds
-  creativeDirection: Establish the batch pipeline, visit its details, and let the query region depart
+  creativeDirection:
+    Establish the batch pipeline, visit its details, and let the query region depart
     before carrying the single question label into the source-filtering diagram. The 24-frame
     handoff relocates that identity while each diagram receives an eight-second beat with brief
     camera travel between sharp reading holds. Keep the movement purposeful and traceable so the
@@ -34,7 +36,8 @@
       description: Reserve overlap for the move and leave both beats a reading hold.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
     - path: beats[].content.flight
       label: Object departure
@@ -42,7 +45,8 @@
 - id: frame-to-interface
   title: Frame-to-interface morph
   category: transitions
-  description: A conceptual query frame changes bounds and opens onto the actual product. Use measured
+  description:
+    A conceptual query frame changes bounds and opens onto the actual product. Use measured
     destination geometry.
   frames: 600
   path: explainers/study-frame-to-interface
@@ -57,12 +61,14 @@
     - query inspection
     - native scale
     - concept to product
-  creativeDirection: Begin with the illustrative SQL request, moving between its selected fields and
+  creativeDirection:
+    Begin with the illustrative SQL request, moving between its selected fields and
     operation before returning to the wide diagram. Over 30 frames, expand the Query label into the
     measured editor outline and reveal the scripted Explorer sequence after its lead-in. Let the
     actual editor and result components remain at native scale through the longer inspection beat
     for a precise, deliberate handoff.
-  avoid: The interface destination has not been measured, or the frame would obscure the control being
+  avoid:
+    The interface destination has not been measured, or the frame would obscure the control being
     explained.
   controls:
     - path: beats[].token.anchor
@@ -76,12 +82,14 @@
       description: Choose a forward fixture interval within its adapter horizon.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
 - id: aperture-detail
   title: Aperture into detail
   category: transitions
-  description: Reveal the next explanation through a bounded opening. Useful when moving from
+  description:
+    Reveal the next explanation through a bounded opening. Useful when moving from
     structure to detail.
   frames: 456
   path: explainers/study-aperture-detail
@@ -96,7 +104,8 @@
     - schema mapping
     - source columns
     - context preservation
-  creativeDirection: Establish the fictional Case network and inspect its central entity and
+  creativeDirection:
+    Establish the fictional Case network and inspect its central entity and
     relationships before opening onto the source-to-attribute mapping. A 24-frame aperture from the
     authored central origin connects the two eight-second diagram beats, followed by camera holds on
     the source columns and corresponding attributes. Keep the reveal contained and the pace
@@ -117,7 +126,8 @@
       description: Place the opening on the source idea that leads into the next scene.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
 - id: spatial-continuation
   title: Spatial continuation
@@ -136,7 +146,8 @@
     - incremental cache
     - column requests
     - diagram sequence
-  creativeDirection: Show which fictional rows cross the source boundary, then continue horizontally
+  creativeDirection:
+    Show which fictional rows cross the source boundary, then continue horizontally
     into the cache diagram that adds columns requested by a query. The 24-frame spatial transition
     joins two eight-second beats, with quick camera moves separated by stable detail holds and a
     return to the wide view. Preserve a clear sense of forward progression while giving the retained
@@ -154,7 +165,8 @@
       description: Leave a stable hold before the next spatial move.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
 - id: occlusion-wipe
   title: Occlusion wipe
@@ -173,7 +185,8 @@
     - execution placement
     - decision fork
     - scene change
-  creativeDirection: Introduce the Cases, Visits, and Facilities sources converging on query inputs,
+  creativeDirection:
+    Introduce the Cases, Visits, and Facilities sources converging on query inputs,
     then carry an opaque edge across the stage to reveal the execution-placement decision. Keep the
     wipe to 24 frames between two eight-second diagram beats, allowing the camera to inspect the
     source and destination details on either side. The effect should feel like a clean change of
@@ -192,18 +205,21 @@
       description: Hold the incoming state once the wipe has cleared.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
 - id: graphic-match
   title: Aligned-layout dissolve
   category: transitions
-  description: Keep the editorial heading and stage layout aligned while a short opacity overlap
+  description:
+    Keep the editorial heading and stage layout aligned while a short opacity overlap
     changes the explanatory diagrams.
   frames: 456
   path: explainers/study-graphic-match
   family: vocabulary
   sourceFilm: ontology-motion
-  goodFor: Keep attention within a shared editorial heading and stage layout while changing
+  goodFor:
+    Keep attention within a shared editorial heading and stage layout while changing
     explanatory content.
   tags:
     - aligned layout
@@ -213,7 +229,8 @@
     - entity network
     - schema correspondence
     - gentle transition
-  creativeDirection: Introduce the fictional Case network, then dissolve into the source-column
+  creativeDirection:
+    Introduce the fictional Case network, then dissolve into the source-column
     mappings while retaining the editorial heading region and stage layout. Use the 24-frame opacity
     overlap as a brief bridge between eight-second beats, with detail camera holds before returning
     each diagram to its wide context. Aim for a gentle change of representation whose continuity
@@ -222,7 +239,8 @@
   controls:
     - path: beats[].transition.kind
       label: Layout overlap
-      description: The dissolve kind applies a short opacity overlap. It preserves the layout without
+      description:
+        The dissolve kind applies a short opacity overlap. It preserves the layout without
         matching individual object geometry.
     - path: beats[].transition.frames
       label: Overlap duration
@@ -232,12 +250,14 @@
       description: Choose a resolved source frame instead of its reset phase.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
 - id: causal-signal
   title: Action, signal, consequence
   category: compositing
-  description: An explanation emerges from a measured control after its action, then returns attention
+  description:
+    An explanation emerges from a measured control after its action, then returns attention
     to the source.
   frames: 870
   path: explainers/study-causal-signal
@@ -252,7 +272,8 @@
     - attribute mapping
     - sum aggregation
     - source spotlight
-  creativeDirection: Open with the relationship between identity, observations, and fields, then use a
+  creativeDirection:
+    Open with the relationship between identity, observations, and fields, then use a
     30-frame wipe into the scripted attribute-mapping interface. Let the keyed case-and-visit detail
     appear first, then time the source signal after the rule action and bring out the sum
     explanation with a longer reading hold. Keep the measured control as the visual origin and
@@ -289,7 +310,8 @@
     - anchored diagram
     - keyed join
     - sum rule
-  creativeDirection: Establish why a field needs a source and a rule, then wipe into the scripted
+  creativeDirection:
+    Establish why a field needs a source and a rule, then wipe into the scripted
     mapping form and draw a stable bracket around the measured control group. Show the keyed
     case-and-visit detail briefly before holding the sum explanation below the controls, keeping the
     form at native scale throughout the 24-second composite beat. Use the bracket and brief circle
@@ -312,7 +334,8 @@
 - id: focus-handoff
   title: Focus without a connector
   category: compositing
-  description: Mark the active product region while a separate diagram explains it. Useful when a line
+  description:
+    Mark the active product region while a separate diagram explains it. Useful when a line
     would imply a false data flow.
   frames: 870
   path: explainers/study-focus-handoff
@@ -327,7 +350,8 @@
     - floating diagram
     - mapping controls
     - contextual teaching
-  creativeDirection: Move from the short configuration thesis into the full scripted mapping
+  creativeDirection:
+    Move from the short configuration thesis into the full scripted mapping
     interface, marking the measured source region while its explanation floats below. The keyed
     relationship detail appears briefly before the longer sum-rule hold, with timed bracket and
     circle annotations supporting the focus treatment throughout the composite beat. Keep attention
@@ -350,7 +374,8 @@
 - id: teaching-underline
   title: A restrained teaching underline
   category: compositing
-  description: Underline one takeaway with a fixed seed and frame-driven progress. Keep the rest of
+  description:
+    Underline one takeaway with a fixed seed and frame-driven progress. Keep the rest of
     the typography still.
   frames: 402
   path: explainers/study-teaching-underline
@@ -365,7 +390,8 @@
     - thesis card
     - reading pause
     - workload fit
-  creativeDirection: Present two short thesis cards about fitting infrastructure to the work,
+  creativeDirection:
+    Present two short thesis cards about fitting infrastructure to the work,
     emphasizing one takeaway phrase on each with a deterministic drawn underline. Give each card
     seven seconds and connect them with an 18-frame dissolve while the supporting typography remains
     still. Keep the gesture quiet and editorial so the viewer reads the argument before dwelling on
@@ -384,7 +410,8 @@
 - id: model-to-workspace
   title: Model to workspace
   category: compositions
-  description: An entity model resolves into an inspectable product configuration. Retain the
+  description:
+    An entity model resolves into an inspectable product configuration. Retain the
     conceptual thread through the reveal.
   frames: 810
   path: explainers/study-model-to-workspace
@@ -399,7 +426,8 @@
     - ontology inspection
     - native interface
     - entity spine
-  creativeDirection: Assemble the fictional observations around stable entity identities, inspecting
+  creativeDirection:
+    Assemble the fictional observations around stable entity identities, inspecting
     the source rows and resulting record model before restoring the wide diagram. Morph the Record
     model label into the measured product frame over 30 frames, then reveal the scripted
     concept-navigation and attribute sequence after its lead-in. Give the native interface the
@@ -418,7 +446,8 @@
       description: Give the model-to-interface reveal enough overlap to remain traceable.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
 - id: record-to-relationships
   title: Record to relationships
@@ -437,7 +466,8 @@
     - derived field
     - source mapping
     - conceptual provenance
-  creativeDirection: Begin with an 18-second scripted Case inspection so the record and
+  creativeDirection:
+    Begin with an 18-second scripted Case inspection so the record and
     related-observation fixture values are readable before the explanation changes. A 24-frame
     dissolve introduces a conceptual route from Record through Field, Mapping, and Source to Value,
     with brief camera travel between held details. Finish on the wide graph for an analytical,
@@ -455,7 +485,8 @@
       description: Provide complete stock inputs that agree with the displayed record.
     - path: beats[].content.camera
       label: Camera route
-      description: Hold on a detail, travel quickly to the next, then restore the wide context.
+      description:
+        Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
 - id: controls-and-meaning
   title: Controls and their meaning
@@ -474,7 +505,8 @@
     - value selection
     - sum calculation
     - domain modeling
-  creativeDirection: Keep the full scripted mapping interface visible while a bracket groups the
+  creativeDirection:
+    Keep the full scripted mapping interface visible while a bracket groups the
     relevant controls and floating details explain keyed case-and-visit relationships followed by
     the sum rule. Let the first overlay return before the longer arithmetic hold, then dissolve over
     18 frames into a seven-second closing thesis about choosing sources, relationships, and field

@@ -3,7 +3,8 @@ name:
   message: Distinct Work, Shared Fabric
 description:
   id: motionAtlas.contribution-weave.description
-  message: Named contributions become a woven surface while keeping their own visible
+  message:
+    Named contributions become a woven surface while keeping their own visible
     thread patterns. Their interdependence is shown by alternating over-and-under
     crossings rather than convergence into a hub.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Show that a shared result depends on distinct contributions that remain identifiable.
 creativeDirection:
   id: motionAtlas.contribution-weave.creativeDirection
-  message: Reveal a small loom frame with two or three vertical bands and the same bounded
+  message:
+    Reveal a small loom frame with two or three vertical bands and the same bounded
     set of horizontal shuttles. Tension the vertical contributions first; sweep each
     horizontal shuttle once through an alternating over-under mask so the crossing
     pattern visibly locks together. Keep a short labeled end of every contributor's band
@@ -28,7 +30,8 @@ intent:
   message: Show that a shared result depends on distinct contributions that remain identifiable.
 distinction:
   id: motionAtlas.contribution-weave.distinction
-  message: Source-merge collapses inputs toward a destination. This creates alternating
+  message:
+    Source-merge collapses inputs toward a destination. This creates alternating
     physical interlocks, preserves every contribution through the finished structure,
     and uses neither nodes nor connecting paths.
 tags:
@@ -73,16 +76,20 @@ aliases:
     message: Interlocking contributions
 notFor:
   - id: motionAtlas.contribution-weave.notFor.0
-    message: Band count is the exact number of supplied contributions. Equal band width is
+    message:
+      Band count is the exact number of supplied contributions. Equal band width is
       decorative and does not represent equal effort, value, ownership, or impact.
   - id: motionAtlas.contribution-weave.notFor.1
-    message: Over-under order is a weave construction, not a ranking of contributors or a
+    message:
+      Over-under order is a weave construction, not a ranking of contributors or a
       chronology of all real work.
   - id: motionAtlas.contribution-weave.notFor.2
-    message: The scene is not a dependency graph or proof of conflict-free collaborative
+    message:
+      The scene is not a dependency graph or proof of conflict-free collaborative
       editing. Suppressing contributor ends reduces attribution clarity.
   - id: motionAtlas.contribution-weave.notFor.3
-    message: The weave is a relationship metaphor. Thread widths and crossings do not
+    message:
+      The weave is a relationship metaphor. Thread widths and crossings do not
       quantify labor, ownership, compensation or social impact.
 motionBeats:
   - startFrame: 12

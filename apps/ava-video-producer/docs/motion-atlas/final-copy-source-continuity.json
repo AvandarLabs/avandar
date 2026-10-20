@@ -885,9 +885,7 @@
   "supplementalGallery": {
     "beforeManifest": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-freeze/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/supplemental-gallery-source.json",
     "afterManifest": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-freeze/9eaa04ab9c5d98e7323569807d6d098672bca7eca75e407cb8a63bc6feab9ac1/supplemental-gallery-source.json",
-    "changedFiles": [
-      "out/showcase/browser/motion-gallery.js"
-    ],
+    "changedFiles": ["out/showcase/browser/motion-gallery.js"],
     "unchangedFiles": 40,
     "newManifestHash": "a45c8795d9bb2cbe0ccb503d3217f8650e4c2af66aab94bd37afbf9f4f8c4d57"
   },

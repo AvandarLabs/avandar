@@ -1,5 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { EASE, mix, ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { FocusedQuestion } from "./FocusedQuestion";
 import { OutsideCaption } from "./OutsideCaption";
 import { ScopeHeading } from "./ScopeHeading";

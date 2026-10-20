@@ -28,10 +28,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-entrance.png",
       "capture": {
         "phase": "entrance",
-        "requestedWindow": [
-          18,
-          40
-        ],
+        "requestedWindow": [18, 40],
         "observedBefore": 19,
         "observedAfter": 21,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/entrance.png"
@@ -45,10 +42,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-action-early.png",
       "capture": {
         "phase": "action-early",
-        "requestedWindow": [
-          85,
-          103
-        ],
+        "requestedWindow": [85, 103],
         "observedBefore": 85,
         "observedAfter": 87,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/action-early.png"
@@ -62,10 +56,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-action-late.png",
       "capture": {
         "phase": "action-late",
-        "requestedWindow": [
-          120,
-          137
-        ],
+        "requestedWindow": [120, 137],
         "observedBefore": 120,
         "observedAfter": 123,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/action-late.png"
@@ -79,10 +70,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-hold.png",
       "capture": {
         "phase": "hold",
-        "requestedWindow": [
-          145,
-          165
-        ],
+        "requestedWindow": [145, 165],
         "observedBefore": 145,
         "observedAfter": 148,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/hold.png"
@@ -96,10 +84,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/live-seam.png",
       "capture": {
         "phase": "seam",
-        "requestedWindow": [
-          174,
-          179
-        ],
+        "requestedWindow": [174, 179],
         "observedBefore": 174,
         "observedAfter": 176,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-live/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/stratified-spatial-sample/seam.png"
@@ -127,10 +112,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-entrance.png",
       "capture": {
         "phase": "entrance",
-        "window": [
-          0.6,
-          1.3
-        ],
+        "window": [0.6, 1.3],
         "before": 0.607345,
         "after": 0.697109,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/entrance.png"
@@ -144,10 +126,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-action-early.png",
       "capture": {
         "phase": "action-early",
-        "window": [
-          2.8,
-          3.4
-        ],
+        "window": [2.8, 3.4],
         "before": 2.807897,
         "after": 2.900504,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/action-early.png"
@@ -161,10 +140,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-action-late.png",
       "capture": {
         "phase": "action-late",
-        "window": [
-          4,
-          4.6
-        ],
+        "window": [4, 4.6],
         "before": 4.007735,
         "after": 4.094504,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/action-late.png"
@@ -178,10 +154,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-hold.png",
       "capture": {
         "phase": "hold",
-        "window": [
-          4.8,
-          5.5
-        ],
+        "window": [4.8, 5.5],
         "before": 4.807615,
         "after": 4.896313,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/hold.png"
@@ -195,10 +168,7 @@
       "downloadsCopy": "/Users/juanpablosarmiento/Downloads/avandar_motion-catalog/motion-atlas-visual-inspections/sampling-correction-evidence/mp4-seam.png",
       "capture": {
         "phase": "seam",
-        "window": [
-          5.8,
-          6
-        ],
+        "window": [5.8, 6],
         "before": 5.807454,
         "after": 5.888723,
         "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-38c12b84/final-mp4/38c12b84bbbe3ab14171946e12b702ceb0fe2e5805504015352b0f6bedf5fdb9/e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e/sampling-corrected-default/4fdd3cb39d925ab4508831b158388df36d91473ae1b059246e07a42c6c0a619a/seam.png"

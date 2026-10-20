@@ -3,7 +3,8 @@ name:
   message: Let the buffer absorb a delay
 description:
   id: motionAtlas.schedule-buffer.description
-  message: A scheduled sequence leaves a visible reserve before a fixed deadline. An
+  message:
+    A scheduled sequence leaves a visible reserve before a fixed deadline. An
     interruption shifts later work into that reserve while the deadline stays in place.
 category:
   id: motionAtlas.schedule-buffer.category
@@ -16,7 +17,8 @@ prompt:
   message: Show how unused schedule capacity can absorb a specific interruption.
 creativeDirection:
   id: motionAtlas.schedule-buffer.creativeDirection
-  message: During 12..44, assemble one horizontal schedule from proportionally sized task
+  message:
+    During 12..44, assemble one horizontal schedule from proportionally sized task
     blocks followed by a hatched reserve segment and a stationary deadline pin. During
     44..74, reveal the supplied interruption block immediately after its named task.
     During 74..118, the remaining task blocks translate together by the interruption's
@@ -29,7 +31,8 @@ intent:
   message: Show how unused schedule capacity can absorb a specific interruption.
 distinction:
   id: motionAtlas.schedule-buffer.distinction
-  message: This conserves one schedule's total width while reallocating reserve time. It
+  message:
+    This conserves one schedule's total width while reallocating reserve time. It
     is neither a chart of changing rankings nor a pipeline whose stages merely activate
     in order.
 tags:
@@ -64,13 +67,16 @@ aliases:
     message: Time allocation
 notFor:
   - id: motionAtlas.schedule-buffer.notFor.0
-    message: The default schedule is fictional; segment widths exactly encode supplied
+    message:
+      The default schedule is fictional; segment widths exactly encode supplied
       duration units, not evidence of real delivery performance.
   - id: motionAtlas.schedule-buffer.notFor.1
-    message: The interruption must fit within the supplied reserve; overruns and moving
+    message:
+      The interruption must fit within the supplied reserve; overruns and moving
       deadlines are intentionally excluded.
   - id: motionAtlas.schedule-buffer.notFor.2
-    message: Tasks are sequential, indivisible, and unchanged in duration; parallel work and
+    message:
+      Tasks are sequential, indivisible, and unchanged in duration; parallel work and
       resource calendars are not modeled.
 motionBeats:
   - startFrame: 12

@@ -3,7 +3,8 @@ name:
   message: Count each point in one grid cell
 description:
   id: motionAtlas.spatial-grid-binning.description
-  message: A fixed square grid overlays point records. Each point contributes once to its
+  message:
+    A fixed square grid overlays point records. Each point contributes once to its
     containing cell, leaving empty cells at zero and avoiding any implication that the
     grid measures continuous population density.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Assign each supplied observation to exactly one spatial count cell.
 prompt:
   id: motionAtlas.spatial-grid-binning.prompt
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-50 draw the grid over stationary points. Frames 51-110 slide one count token from
     each point into its cell ledger. Frames 111-139 shade cells by derived count while
@@ -22,7 +24,8 @@ prompt:
     ground at frames 166-179 for an editorial loop.
 creativeDirection:
   id: motionAtlas.spatial-grid-binning.creativeDirection
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-50 draw the grid over stationary points. Frames 51-110 slide one count token from
     each point into its cell ledger. Frames 111-139 shade cells by derived count while
@@ -33,7 +36,8 @@ intent:
   message: Assign each supplied observation to exactly one spatial count cell.
 distinction:
   id: motionAtlas.spatial-grid-binning.distinction
-  message: Unlike catchment-union-gaps, a disjoint regular partition assigns every point
+  message:
+    Unlike catchment-union-gaps, a disjoint regular partition assigns every point
     once rather than testing coverage by overlapping service polygons. Unlike heatmap,
     counts are exact and cell-bounded.
 tags:
@@ -64,16 +68,19 @@ notFor:
   - id: motionAtlas.spatial-grid-binning.notFor.0
     message: Grid size is schematic and has no physical area unit.
   - id: motionAtlas.spatial-grid-binning.notFor.1
-    message: Count is not density per square kilometre unless real area is explicitly
+    message:
+      Count is not density per square kilometre unless real area is explicitly
       provided elsewhere.
   - id: motionAtlas.spatial-grid-binning.notFor.2
     message: Missing observations outside this supplied set are unknown, not zero population.
   - id: motionAtlas.spatial-grid-binning.notFor.3
-    message: No live geography, online routing, JSX, functions, URLs, private records or
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
       external requests. Maps are schematic local plans; no real-world inference
       follows.
   - id: motionAtlas.spatial-grid-binning.notFor.4
-    message: Authored prose must identify schematic geography and accurately describe the
+    message:
+      Authored prose must identify schematic geography and accurately describe the
       selected example. Runtime validation preserves supplied prose and checks explicit
       structural and numeric rules without natural-language classification.
 motionBeats:

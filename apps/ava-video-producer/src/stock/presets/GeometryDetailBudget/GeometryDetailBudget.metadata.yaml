@@ -3,7 +3,8 @@ name:
   message: Remove detail without moving the kept vertices
 description:
   id: motionAtlas.geometry-detail-budget.description
-  message: A schematic polyline shows all source vertices, then simplifies under a
+  message:
+    A schematic polyline shows all source vertices, then simplifies under a
     supplied perpendicular-distance tolerance. Removed vertices stay as ghosts with
     their deviation visible, while endpoints remain fixed.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Make geometric simplification and its tolerance inspectable.
 prompt:
   id: motionAtlas.geometry-detail-budget.prompt
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-50 reveal a jagged source line and its vertices. Frames 51-110 run recursive
     farthest-deviation splits, retaining a vertex only when its deviation exceeds the
@@ -23,7 +25,8 @@ prompt:
     frames 166-179 for an editorial loop.
 creativeDirection:
   id: motionAtlas.geometry-detail-budget.creativeDirection
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-50 reveal a jagged source line and its vertices. Frames 51-110 run recursive
     farthest-deviation splits, retaining a vertex only when its deviation exceeds the
@@ -35,7 +38,8 @@ intent:
   message: Make geometric simplification and its tolerance inspectable.
 distinction:
   id: motionAtlas.geometry-detail-budget.distinction
-  message: Unlike chart-focus-edit, actual geometry detail is reduced under a stated
+  message:
+    Unlike chart-focus-edit, actual geometry detail is reduced under a stated
     algorithmic tolerance. The original trace remains visible so simplification is
     inspectable.
 tags:
@@ -64,19 +68,23 @@ aliases:
     message: vertex budget
 notFor:
   - id: motionAtlas.geometry-detail-budget.notFor.0
-    message: This is an open-polyline teaching example, not topology-preserving polygon
+    message:
+      This is an open-polyline teaching example, not topology-preserving polygon
       simplification.
   - id: motionAtlas.geometry-detail-budget.notFor.1
-    message: Douglas-Peucker is the explicit teaching algorithm; other simplifiers may
+    message:
+      Douglas-Peucker is the explicit teaching algorithm; other simplifiers may
       produce different vertices.
   - id: motionAtlas.geometry-detail-budget.notFor.2
     message: Tolerance is not GPS accuracy or evidence uncertainty.
   - id: motionAtlas.geometry-detail-budget.notFor.3
-    message: No live geography, online routing, JSX, functions, URLs, private records or
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
       external requests. Maps are schematic local plans; no real-world inference
       follows.
   - id: motionAtlas.geometry-detail-budget.notFor.4
-    message: Authored prose must identify schematic geography and accurately describe the
+    message:
+      Authored prose must identify schematic geography and accurately describe the
       selected example. Runtime validation preserves supplied prose and checks explicit
       structural and numeric rules without natural-language classification.
 motionBeats:
@@ -94,13 +102,15 @@ motionBeats:
     endFrame: 110
     description:
       id: motionAtlas.geometry-detail-budget.beat.2
-      message: Inspect recursive finite-segment deviations and draw qualifying splits in
+      message:
+        Inspect recursive finite-segment deviations and draw qualifying splits in
         depth-first order.
   - startFrame: 111
     endFrame: 139
     description:
       id: motionAtlas.geometry-detail-budget.beat.3
-      message: Draw the simplified trace over the ghost original with retained and removed
+      message:
+        Draw the simplified trace over the ghost original with retained and removed
         counts.
   - startFrame: 140
     endFrame: 165

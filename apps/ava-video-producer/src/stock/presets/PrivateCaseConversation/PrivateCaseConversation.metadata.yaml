@@ -3,7 +3,8 @@ name:
   message: Make room for a private conversation
 description:
   id: motionAtlas.private-case-conversation.description
-  message: A participant asks to continue part of a case meeting without a supporter
+  message:
+    A participant asks to continue part of a case meeting without a supporter
     present. The supporter steps into a waiting area, and the worker continues speaking
     directly with the participant.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show that the participant can choose who is present for a conversation.
 prompt:
   id: motionAtlas.private-case-conversation.prompt
-  message: Begin with three people seated around one small consultation table. The
+  message:
+    Begin with three people seated around one small consultation table. The
     participant displays the authored privacy request; the supporter acknowledges,
     stands and walks to a separate waiting seat. A door or screen closes between the two
     spaces while the participant and worker remain at the original table. Hold the
@@ -22,7 +24,8 @@ prompt:
     portraying abandonment or a completed assessment.
 creativeDirection:
   id: motionAtlas.private-case-conversation.creativeDirection
-  message: Begin with three people seated around one small consultation table. The
+  message:
+    Begin with three people seated around one small consultation table. The
     participant displays the authored privacy request; the supporter acknowledges,
     stands and walks to a separate waiting seat. A door or screen closes between the two
     spaces while the participant and worker remain at the original table. Hold the
@@ -33,7 +36,8 @@ intent:
   message: Show that the participant can choose who is present for a conversation.
 distinction:
   id: motionAtlas.private-case-conversation.distinction
-  message: The explanatory change is a participant-requested alteration of who is
+  message:
+    The explanatory change is a participant-requested alteration of who is
     physically present during an ongoing conversation. Unlike chosen-service-access, no
     barrier is removed to admit someone to a service; unlike scope-aperture, actual
     participants change rooms and the meeting continues.
@@ -63,13 +67,16 @@ goodFor:
     message: Introducing confidential conversation arrangements in a social-service setting
 notFor:
   - id: motionAtlas.private-case-conversation.notFor.0
-    message: A room boundary illustrates an arrangement, not soundproofing, data security or
+    message:
+      A room boundary illustrates an arrangement, not soundproofing, data security or
       legal confidentiality.
   - id: motionAtlas.private-case-conversation.notFor.1
-    message: The supporter leaves by agreement; do not portray family or supporters as
+    message:
+      The supporter leaves by agreement; do not portray family or supporters as
       inherently unsafe.
   - id: motionAtlas.private-case-conversation.notFor.2
-    message: The scene does not assert that a private conversation automatically produces
+    message:
+      The scene does not assert that a private conversation automatically produces
       disclosure or resolves a case.
 domains:
   - id: motionAtlas.private-case-conversation.domains.0
@@ -91,11 +98,13 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.private-case-conversation.beat.1
-      message: Supporter stands during 36–44, walks out during 44–84; separator closes during
+      message:
+        Supporter stands during 36–44, walks out during 44–84; separator closes during
         86–108.
   - startFrame: 108
     endFrame: 179
     description:
       id: motionAtlas.private-case-conversation.beat.2
-      message: Participant and worker remain seated; optional waiting inset retains the
+      message:
+        Participant and worker remain seated; optional waiting inset retains the
         supporter.

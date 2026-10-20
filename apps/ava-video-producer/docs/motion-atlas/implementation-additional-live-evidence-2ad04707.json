@@ -185,13 +185,8 @@
                 "severity": "low",
                 "type": "sampled-text-line-overlap",
                 "status": "controller-review",
-                "framesObserved": [
-                  90
-                ],
-                "comparisonFramesClear": [
-                  36,
-                  150
-                ],
+                "framesObserved": [90],
+                "comparisonFramesClear": [36, 150],
                 "description": "At frame90, the source-to-Linked connector horizontal segment runs along/through the lower edge of the Extreme source left endpoint tick label -1e+308. The text is still readable, but the line and label visibly share space.",
                 "impact": "Small local readability concern. The main values remain1e+308/1e+308/0 and the final restored values remain-1e+308/-1e+308/0. No sustained wrong state or lost value is established.",
                 "evidenceFiles": [
@@ -271,10 +266,7 @@
               {
                 "classification": "expected-visible-change-mismatch",
                 "severity": "low",
-                "frames": [
-                  90,
-                  150
-                ],
+                "frames": [90, 150],
                 "files": [
                   "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/benefit-shortfall-correction/df70e47625243fd6904d80c7ae4e9afe88cfff34f1053f8cae60d4712034e06e/still-003.jpg",
                   "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/benefit-shortfall-correction/df70e47625243fd6904d80c7ae4e9afe88cfff34f1053f8cae60d4712034e06e/still-004.jpg"
@@ -492,10 +484,7 @@
                 "nativePaletteSamples": [
                   {
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race--configured-l1/decisive.png",
-                    "size": [
-                      1210,
-                      757
-                    ],
+                    "size": [1210, 757],
                     "exactRgbPixelCounts": {
                       "#111318": 883229,
                       "#d5e681": 194,
@@ -535,50 +524,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race--configured-l1/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race--configured-l1/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race--configured-l1/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race--configured-l1/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race--configured-l1/seam.png"
@@ -619,9 +593,7 @@
                         }
                       ]
                     ],
-                    "highlight": [
-                      0
-                    ],
+                    "highlight": [0],
                     "title": "authored.example.ts",
                     "footer": "Authored code example",
                     "showHighlight": true
@@ -642,9 +614,7 @@
                       }
                     ]
                   ],
-                  "highlight": [
-                    0
-                  ],
+                  "highlight": [0],
                   "title": "authored.example.ts",
                   "footer": "Authored code example",
                   "showHighlight": true
@@ -664,10 +634,7 @@
                 "nativePaletteSamples": [
                   {
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/code-focus--configured-l2/decisive.png",
-                    "size": [
-                      1210,
-                      757
-                    ],
+                    "size": [1210, 757],
                     "exactRgbPixelCounts": {
                       "#111318": 365982,
                       "#d5e681": 196,
@@ -699,50 +666,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/code-focus--configured-l2/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/code-focus--configured-l2/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/code-focus--configured-l2/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/code-focus--configured-l2/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/code-focus--configured-l2/seam.png"
@@ -830,10 +782,7 @@
                 "nativePaletteSamples": [
                   {
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/schema-mapping--configured-l3/decisive.png",
-                    "size": [
-                      1210,
-                      757
-                    ],
+                    "size": [1210, 757],
                     "exactRgbPixelCounts": {
                       "#111318": 550773,
                       "#d5e681": 269,
@@ -865,50 +814,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/schema-mapping--configured-l3/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/schema-mapping--configured-l3/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/schema-mapping--configured-l3/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/schema-mapping--configured-l3/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/schema-mapping--configured-l3/seam.png"
@@ -985,12 +919,7 @@
                         "label": "East"
                       }
                     ],
-                    "edges": [
-                      [
-                        0,
-                        1
-                      ]
-                    ],
+                    "edges": [[0, 1]],
                     "showPackets": true
                   },
                   "accent": "#d5e681",
@@ -1014,12 +943,7 @@
                       "label": "East"
                     }
                   ],
-                  "edges": [
-                    [
-                      0,
-                      1
-                    ]
-                  ],
+                  "edges": [[0, 1]],
                   "showPackets": true
                 },
                 "accent": "#d5e681",
@@ -1037,10 +961,7 @@
                 "nativePaletteSamples": [
                   {
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph--configured-l4-retry-1/decisive.png",
-                    "size": [
-                      1210,
-                      757
-                    ],
+                    "size": [1210, 757],
                     "exactRgbPixelCounts": {
                       "#111318": 892502,
                       "#d5e681": 314,
@@ -1053,10 +974,7 @@
                   },
                   {
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph--configured-l4-retry-1/action-early.png",
-                    "size": [
-                      1210,
-                      757
-                    ],
+                    "size": [1210, 757],
                     "exactRgbPixelCounts": {
                       "#111318": 892127,
                       "#d5e681": 328,
@@ -1106,50 +1024,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph--configured-l4-retry-1/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph--configured-l4-retry-1/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph--configured-l4-retry-1/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph--configured-l4-retry-1/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph--configured-l4-retry-1/seam.png"
@@ -1225,10 +1128,7 @@
                 "nativePaletteSamples": [
                   {
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/stagger-cards--configured-l5-retry-1/decisive.png",
-                    "size": [
-                      1210,
-                      757
-                    ],
+                    "size": [1210, 757],
                     "exactRgbPixelCounts": {
                       "#111318": 834915,
                       "#d5e681": 129,
@@ -1260,50 +1160,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/stagger-cards--configured-l5-retry-1/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/stagger-cards--configured-l5-retry-1/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/stagger-cards--configured-l5-retry-1/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/stagger-cards--configured-l5-retry-1/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/stagger-cards--configured-l5-retry-1/seam.png"
@@ -1469,50 +1354,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/keyed-row-zipper--configured-n2/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/keyed-row-zipper--configured-n2/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/keyed-row-zipper--configured-n2/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/keyed-row-zipper--configured-n2/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/keyed-row-zipper--configured-n2/seam.png"
@@ -1536,10 +1406,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/keyed-row-zipper--configured-n2/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 771628,
                     "#d5e681": 85,
@@ -1827,50 +1694,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cold-chain-custody--configured-n3/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cold-chain-custody--configured-n3/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cold-chain-custody--configured-n3/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cold-chain-custody--configured-n3/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cold-chain-custody--configured-n3/seam.png"
@@ -1894,10 +1746,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cold-chain-custody--configured-n3/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 885026,
                     "#d5e681": 1777,
@@ -2017,50 +1866,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/fictional-conflict-globe--configured-n4/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/fictional-conflict-globe--configured-n4/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/fictional-conflict-globe--configured-n4/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/fictional-conflict-globe--configured-n4/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/fictional-conflict-globe--configured-n4/seam.png"
@@ -2084,10 +1918,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/fictional-conflict-globe--configured-n4/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 715486,
                     "#d5e681": 318,
@@ -2231,50 +2062,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/habitat-corridor-reconnection--configured-n5/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 88,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/habitat-corridor-reconnection--configured-n5/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/habitat-corridor-reconnection--configured-n5/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 148,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/habitat-corridor-reconnection--configured-n5/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/habitat-corridor-reconnection--configured-n5/seam.png"
@@ -2298,10 +2114,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/habitat-corridor-reconnection--configured-n5/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 791368,
                     "#d5e681": 15054,
@@ -2357,10 +2170,10 @@
                 "input": {
                   "source": {
                     "label": "Extreme source",
-                    "baseline": -1e+308,
-                    "trial": 1e+308,
-                    "min": -1e+308,
-                    "max": 1e+308,
+                    "baseline": -1e308,
+                    "trial": 1e308,
+                    "min": -1e308,
+                    "max": 1e308,
                     "unit": "units"
                   },
                   "outputs": [
@@ -2369,8 +2182,8 @@
                       "label": "Linked",
                       "multiplier": 1,
                       "offset": 0,
-                      "min": -1e+308,
-                      "max": 1e+308,
+                      "min": -1e308,
+                      "max": 1e308,
                       "unit": "units"
                     },
                     {
@@ -2378,8 +2191,8 @@
                       "label": "Independent",
                       "multiplier": 0,
                       "offset": 0,
-                      "min": -1e+308,
-                      "max": 1e+308,
+                      "min": -1e308,
+                      "max": 1e308,
                       "unit": "units"
                     }
                   ],
@@ -2404,10 +2217,10 @@
                   "input": {
                     "source": {
                       "label": "Extreme source",
-                      "baseline": -1e+308,
-                      "trial": 1e+308,
-                      "min": -1e+308,
-                      "max": 1e+308,
+                      "baseline": -1e308,
+                      "trial": 1e308,
+                      "min": -1e308,
+                      "max": 1e308,
                       "unit": "units"
                     },
                     "outputs": [
@@ -2416,8 +2229,8 @@
                         "label": "Linked",
                         "multiplier": 1,
                         "offset": 0,
-                        "min": -1e+308,
-                        "max": 1e+308,
+                        "min": -1e308,
+                        "max": 1e308,
                         "unit": "units"
                       },
                       {
@@ -2425,8 +2238,8 @@
                         "label": "Independent",
                         "multiplier": 0,
                         "offset": 0,
-                        "min": -1e+308,
-                        "max": 1e+308,
+                        "min": -1e308,
+                        "max": 1e308,
                         "unit": "units"
                       }
                     ],
@@ -2472,14 +2285,8 @@
                   "status": "preserved-and-reproduced",
                   "isNew": false,
                   "naturalCaptureWindows": [
-                    [
-                      85,
-                      87
-                    ],
-                    [
-                      120,
-                      122
-                    ]
+                    [85, 87],
+                    [120, 122]
                   ],
                   "location": "Native1210x757 image: connector horizontal segment around y243 across source endpoint label area x478..535.",
                   "description": "The source-to-Linked connector shares the lower edge of the source left tick label -1e+308 in both viewed action samples.",
@@ -2501,50 +2308,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 19,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/seam.png"
@@ -2568,10 +2360,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 898527,
                     "#d5e681": 726,
@@ -2583,10 +2372,7 @@
                 },
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/action-early.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 898516,
                     "#d5e681": 599,
@@ -2598,10 +2384,7 @@
                 },
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/linked-parameter-rehearsal--configured-n6/action-late.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 896459,
                     "#d5e681": 600,
@@ -2631,44 +2414,20 @@
                       "id": "a",
                       "label": "Demo exposure zone",
                       "polygon": [
-                        [
-                          10,
-                          10
-                        ],
-                        [
-                          65,
-                          10
-                        ],
-                        [
-                          65,
-                          80
-                        ],
-                        [
-                          10,
-                          80
-                        ]
+                        [10, 10],
+                        [65, 10],
+                        [65, 80],
+                        [10, 80]
                       ]
                     },
                     {
                       "id": "b",
                       "label": "Demo planning zone",
                       "polygon": [
-                        [
-                          40,
-                          25
-                        ],
-                        [
-                          90,
-                          25
-                        ],
-                        [
-                          90,
-                          90
-                        ],
-                        [
-                          40,
-                          90
-                        ]
+                        [40, 25],
+                        [90, 25],
+                        [90, 90],
+                        [40, 90]
                       ]
                     }
                   ],
@@ -2730,44 +2489,20 @@
                         "id": "a",
                         "label": "Demo exposure zone",
                         "polygon": [
-                          [
-                            10,
-                            10
-                          ],
-                          [
-                            65,
-                            10
-                          ],
-                          [
-                            65,
-                            80
-                          ],
-                          [
-                            10,
-                            80
-                          ]
+                          [10, 10],
+                          [65, 10],
+                          [65, 80],
+                          [10, 80]
                         ]
                       },
                       {
                         "id": "b",
                         "label": "Demo planning zone",
                         "polygon": [
-                          [
-                            40,
-                            25
-                          ],
-                          [
-                            90,
-                            25
-                          ],
-                          [
-                            90,
-                            90
-                          ],
-                          [
-                            40,
-                            90
-                          ]
+                          [40, 25],
+                          [90, 25],
+                          [90, 90],
+                          [40, 90]
                         ]
                       }
                     ],
@@ -2841,50 +2576,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/gis-layer-intersection-tally--configured-n7/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 88,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/gis-layer-intersection-tally--configured-n7/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/gis-layer-intersection-tally--configured-n7/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/gis-layer-intersection-tally--configured-n7/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 177,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/gis-layer-intersection-tally--configured-n7/seam.png"
@@ -2908,10 +2628,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/gis-layer-intersection-tally--configured-n7/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 806285,
                     "#d5e681": 2607,
@@ -2940,44 +2657,20 @@
                       "id": "w",
                       "label": "Demo West",
                       "polygon": [
-                        [
-                          0,
-                          0
-                        ],
-                        [
-                          50,
-                          0
-                        ],
-                        [
-                          50,
-                          100
-                        ],
-                        [
-                          0,
-                          100
-                        ]
+                        [0, 0],
+                        [50, 0],
+                        [50, 100],
+                        [0, 100]
                       ]
                     },
                     {
                       "id": "e",
                       "label": "Demo East",
                       "polygon": [
-                        [
-                          50,
-                          0
-                        ],
-                        [
-                          100,
-                          0
-                        ],
-                        [
-                          100,
-                          100
-                        ],
-                        [
-                          50,
-                          100
-                        ]
+                        [50, 0],
+                        [100, 0],
+                        [100, 100],
+                        [50, 100]
                       ]
                     }
                   ],
@@ -3031,44 +2724,20 @@
                         "id": "w",
                         "label": "Demo West",
                         "polygon": [
-                          [
-                            0,
-                            0
-                          ],
-                          [
-                            50,
-                            0
-                          ],
-                          [
-                            50,
-                            100
-                          ],
-                          [
-                            0,
-                            100
-                          ]
+                          [0, 0],
+                          [50, 0],
+                          [50, 100],
+                          [0, 100]
                         ]
                       },
                       {
                         "id": "e",
                         "label": "Demo East",
                         "polygon": [
-                          [
-                            50,
-                            0
-                          ],
-                          [
-                            100,
-                            0
-                          ],
-                          [
-                            100,
-                            100
-                          ],
-                          [
-                            50,
-                            100
-                          ]
+                          [50, 0],
+                          [100, 0],
+                          [100, 100],
+                          [50, 100]
                         ]
                       }
                     ],
@@ -3134,50 +2803,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/location-uncertainty-boundary--configured-n8/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/location-uncertainty-boundary--configured-n8/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/location-uncertainty-boundary--configured-n8/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/location-uncertainty-boundary--configured-n8/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/location-uncertainty-boundary--configured-n8/seam.png"
@@ -3201,10 +2855,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/location-uncertainty-boundary--configured-n8/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 678306,
                     "#d5e681": 2443,
@@ -3299,18 +2950,12 @@
                         {
                           "id": "w",
                           "label": "West",
-                          "cellIds": [
-                            "nw",
-                            "sw"
-                          ]
+                          "cellIds": ["nw", "sw"]
                         },
                         {
                           "id": "e",
                           "label": "East",
-                          "cellIds": [
-                            "ne",
-                            "se"
-                          ]
+                          "cellIds": ["ne", "se"]
                         }
                       ]
                     },
@@ -3320,18 +2965,12 @@
                         {
                           "id": "n",
                           "label": "North",
-                          "cellIds": [
-                            "nw",
-                            "ne"
-                          ]
+                          "cellIds": ["nw", "ne"]
                         },
                         {
                           "id": "s",
                           "label": "South",
-                          "cellIds": [
-                            "sw",
-                            "se"
-                          ]
+                          "cellIds": ["sw", "se"]
                         }
                       ]
                     }
@@ -3398,18 +3037,12 @@
                           {
                             "id": "w",
                             "label": "West",
-                            "cellIds": [
-                              "nw",
-                              "sw"
-                            ]
+                            "cellIds": ["nw", "sw"]
                           },
                           {
                             "id": "e",
                             "label": "East",
-                            "cellIds": [
-                              "ne",
-                              "se"
-                            ]
+                            "cellIds": ["ne", "se"]
                           }
                         ]
                       },
@@ -3419,18 +3052,12 @@
                           {
                             "id": "n",
                             "label": "North",
-                            "cellIds": [
-                              "nw",
-                              "ne"
-                            ]
+                            "cellIds": ["nw", "ne"]
                           },
                           {
                             "id": "s",
                             "label": "South",
-                            "cellIds": [
-                              "sw",
-                              "se"
-                            ]
+                            "cellIds": ["sw", "se"]
                           }
                         ]
                       }
@@ -3474,50 +3101,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/boundary-regrouping-effect--configured-n9-retry-1/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/boundary-regrouping-effect--configured-n9-retry-1/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/boundary-regrouping-effect--configured-n9-retry-1/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/boundary-regrouping-effect--configured-n9-retry-1/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/boundary-regrouping-effect--configured-n9-retry-1/seam.png"
@@ -3541,10 +3153,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/boundary-regrouping-effect--configured-n9-retry-1/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 819513,
                     "#d5e681": 2343,
@@ -3677,50 +3286,35 @@
                 "naturalClockScreenshots": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 19,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/benefit-shortfall-correction--configured-n10-retry-1/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/benefit-shortfall-correction--configured-n10-retry-1/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/benefit-shortfall-correction--configured-n10-retry-1/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/benefit-shortfall-correction--configured-n10-retry-1/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/benefit-shortfall-correction--configured-n10-retry-1/seam.png"
@@ -3744,10 +3338,7 @@
               "nativePaletteSamples": [
                 {
                   "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/benefit-shortfall-correction--configured-n10-retry-1/decisive.png",
-                  "size": [
-                    1210,
-                    757
-                  ],
+                  "size": [1210, 757],
                   "exactRgbPixelCounts": {
                     "#111318": 872506,
                     "#d5e681": 5357,
@@ -3883,50 +3474,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/decision-fork--configured-n11/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/decision-fork--configured-n11/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/decision-fork--configured-n11/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/decision-fork--configured-n11/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/decision-fork--configured-n11/seam.png"
@@ -4042,50 +3618,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/grouped-value-picker--configured-n12/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/grouped-value-picker--configured-n12/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/grouped-value-picker--configured-n12/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/grouped-value-picker--configured-n12/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 177,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/grouped-value-picker--configured-n12/seam.png"
@@ -4339,50 +3900,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-omitted-english/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-omitted-english/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-omitted-english/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-omitted-english/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-omitted-english/seam.png"
@@ -4578,50 +4124,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-authored-bypass/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 88,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-authored-bypass/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-authored-bypass/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-authored-bypass/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-authored-bypass/seam.png"
@@ -4817,50 +4348,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shorter/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shorter/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shorter/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shorter/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shorter/seam.png"
@@ -5056,50 +4572,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shifted-prefix/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shifted-prefix/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shifted-prefix/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shifted-prefix/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-shifted-prefix/seam.png"
@@ -5295,50 +4796,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 19,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-unicode-prefix/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-unicode-prefix/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-unicode-prefix/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-unicode-prefix/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-unicode-prefix/seam.png"
@@ -5565,50 +5051,35 @@
                 "screenshotBrackets": [
                   {
                     "phase": "entrance",
-                    "requestedWindow": [
-                      18,
-                      40
-                    ],
+                    "requestedWindow": [18, 40],
                     "observedBefore": 18,
                     "observedAfter": 20,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-numeric-span/entrance.png"
                   },
                   {
                     "phase": "action-early",
-                    "requestedWindow": [
-                      85,
-                      103
-                    ],
+                    "requestedWindow": [85, 103],
                     "observedBefore": 85,
                     "observedAfter": 87,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-numeric-span/action-early.png"
                   },
                   {
                     "phase": "action-late",
-                    "requestedWindow": [
-                      120,
-                      137
-                    ],
+                    "requestedWindow": [120, 137],
                     "observedBefore": 120,
                     "observedAfter": 122,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-numeric-span/action-late.png"
                   },
                   {
                     "phase": "hold",
-                    "requestedWindow": [
-                      145,
-                      165
-                    ],
+                    "requestedWindow": [145, 165],
                     "observedBefore": 145,
                     "observedAfter": 147,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-numeric-span/hold.png"
                   },
                   {
                     "phase": "seam",
-                    "requestedWindow": [
-                      174,
-                      179
-                    ],
+                    "requestedWindow": [174, 179],
                     "observedBefore": 174,
                     "observedAfter": 176,
                     "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/prose-measurement-ledger--span-numeric-span/seam.png"
@@ -5678,11 +5149,7 @@
             "configurationBinding": "Exact supplied real readiness-gallery UI state and evidence SHA. No catalog configuration hash is supplied.",
             "uiState": {
               "orientation": "horizontal",
-              "readiness": [
-                false,
-                true,
-                true
-              ]
+              "readiness": [false, true, true]
             },
             "uiStateHash": "04e92395fbef36ede78c385f6fd11846841de678d602a16cd076149ecff8a8a4",
             "paletteVerification": {
@@ -5708,10 +5175,7 @@
                 "role": "contactSheet",
                 "frame": null,
                 "captureMethod": "sheet of six natural-clock and four separately labeled keyboard pictures",
-                "nativePngDimensions": [
-                  1800,
-                  1620
-                ]
+                "nativePngDimensions": [1800, 1620]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/exact-122.png",
@@ -5722,10 +5186,7 @@
                 "role": "exact",
                 "frame": 122,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/exact-130.png",
@@ -5736,10 +5197,7 @@
                 "role": "exact",
                 "frame": 130,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/exact-138.png",
@@ -5750,10 +5208,7 @@
                 "role": "exact",
                 "frame": 138,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/exact-150.png",
@@ -5764,10 +5219,7 @@
                 "role": "exact",
                 "frame": 150,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               }
             ],
             "observations": [
@@ -5784,10 +5236,7 @@
               "naturalScreenshotBrackets": [
                 {
                   "phase": "work",
-                  "window": [
-                    87,
-                    96
-                  ],
+                  "window": [87, 96],
                   "before": 87,
                   "after": 89,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/work.png",
@@ -5796,10 +5245,7 @@
                 },
                 {
                   "phase": "pins",
-                  "window": [
-                    114,
-                    121
-                  ],
+                  "window": [114, 121],
                   "before": 114,
                   "after": 116,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/pins.png",
@@ -5808,10 +5254,7 @@
                 },
                 {
                   "phase": "gate-opening",
-                  "window": [
-                    124,
-                    129
-                  ],
+                  "window": [124, 129],
                   "before": 124,
                   "after": 126,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/gate-opening.png",
@@ -5820,10 +5263,7 @@
                 },
                 {
                   "phase": "result-crossing",
-                  "window": [
-                    134,
-                    142
-                  ],
+                  "window": [134, 142],
                   "before": 134,
                   "after": 136,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/result-crossing.png",
@@ -5832,10 +5272,7 @@
                 },
                 {
                   "phase": "hold",
-                  "window": [
-                    148,
-                    158
-                  ],
+                  "window": [148, 158],
                   "before": 148,
                   "after": 150,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/hold.png",
@@ -5844,10 +5281,7 @@
                 },
                 {
                   "phase": "seam",
-                  "window": [
-                    174,
-                    179
-                  ],
+                  "window": [174, 179],
                   "before": 174,
                   "after": 176,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-blocked/seam.png",
@@ -6038,11 +5472,7 @@
             "configurationBinding": "Exact supplied real readiness-gallery UI state and evidence SHA. No catalog configuration hash is supplied.",
             "uiState": {
               "orientation": "horizontal",
-              "readiness": [
-                true,
-                true,
-                true
-              ]
+              "readiness": [true, true, true]
             },
             "uiStateHash": "f564855e5cab854ccd91fb09d5ec2773ec3ddeed005bae4a58891fad402d9d10",
             "paletteVerification": {
@@ -6068,10 +5498,7 @@
                 "role": "contactSheet",
                 "frame": null,
                 "captureMethod": "sheet of six natural-clock and four separately labeled keyboard pictures",
-                "nativePngDimensions": [
-                  1800,
-                  1620
-                ]
+                "nativePngDimensions": [1800, 1620]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/exact-122.png",
@@ -6082,10 +5509,7 @@
                 "role": "exact",
                 "frame": 122,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/exact-130.png",
@@ -6096,10 +5520,7 @@
                 "role": "exact",
                 "frame": 130,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/exact-138.png",
@@ -6110,10 +5531,7 @@
                 "role": "exact",
                 "frame": 138,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/exact-150.png",
@@ -6124,10 +5542,7 @@
                 "role": "exact",
                 "frame": 150,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               }
             ],
             "observations": [
@@ -6144,10 +5559,7 @@
               "naturalScreenshotBrackets": [
                 {
                   "phase": "work",
-                  "window": [
-                    87,
-                    96
-                  ],
+                  "window": [87, 96],
                   "before": 87,
                   "after": 89,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/work.png",
@@ -6156,10 +5568,7 @@
                 },
                 {
                   "phase": "pins",
-                  "window": [
-                    114,
-                    121
-                  ],
+                  "window": [114, 121],
                   "before": 114,
                   "after": 116,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/pins.png",
@@ -6168,10 +5577,7 @@
                 },
                 {
                   "phase": "gate-opening",
-                  "window": [
-                    124,
-                    129
-                  ],
+                  "window": [124, 129],
                   "before": 124,
                   "after": 126,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/gate-opening.png",
@@ -6180,10 +5586,7 @@
                 },
                 {
                   "phase": "result-crossing",
-                  "window": [
-                    134,
-                    142
-                  ],
+                  "window": [134, 142],
                   "before": 134,
                   "after": 136,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/result-crossing.png",
@@ -6192,10 +5595,7 @@
                 },
                 {
                   "phase": "hold",
-                  "window": [
-                    148,
-                    158
-                  ],
+                  "window": [148, 158],
                   "before": 148,
                   "after": 150,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/hold.png",
@@ -6204,10 +5604,7 @@
                 },
                 {
                   "phase": "seam",
-                  "window": [
-                    174,
-                    179
-                  ],
+                  "window": [174, 179],
                   "before": 174,
                   "after": 176,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/horizontal-released/seam.png",
@@ -6398,11 +5795,7 @@
             "configurationBinding": "Exact supplied real readiness-gallery UI state and evidence SHA. No catalog configuration hash is supplied.",
             "uiState": {
               "orientation": "vertical",
-              "readiness": [
-                false,
-                true,
-                true
-              ]
+              "readiness": [false, true, true]
             },
             "uiStateHash": "a706da0aa831b9ca066612957dbf5b2338c97e747a91b49c6785cfa205567fa2",
             "paletteVerification": {
@@ -6428,10 +5821,7 @@
                 "role": "contactSheet",
                 "frame": null,
                 "captureMethod": "sheet of six natural-clock and four separately labeled keyboard pictures",
-                "nativePngDimensions": [
-                  1800,
-                  1620
-                ]
+                "nativePngDimensions": [1800, 1620]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/exact-122.png",
@@ -6442,10 +5832,7 @@
                 "role": "exact",
                 "frame": 122,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/exact-130.png",
@@ -6456,10 +5843,7 @@
                 "role": "exact",
                 "frame": 130,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/exact-138.png",
@@ -6470,10 +5854,7 @@
                 "role": "exact",
                 "frame": 138,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/exact-150.png",
@@ -6484,10 +5865,7 @@
                 "role": "exact",
                 "frame": 150,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               }
             ],
             "observations": [
@@ -6504,10 +5882,7 @@
               "naturalScreenshotBrackets": [
                 {
                   "phase": "work",
-                  "window": [
-                    87,
-                    96
-                  ],
+                  "window": [87, 96],
                   "before": 87,
                   "after": 89,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/work.png",
@@ -6516,10 +5891,7 @@
                 },
                 {
                   "phase": "pins",
-                  "window": [
-                    114,
-                    121
-                  ],
+                  "window": [114, 121],
                   "before": 114,
                   "after": 116,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/pins.png",
@@ -6528,10 +5900,7 @@
                 },
                 {
                   "phase": "gate-opening",
-                  "window": [
-                    124,
-                    129
-                  ],
+                  "window": [124, 129],
                   "before": 124,
                   "after": 126,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/gate-opening.png",
@@ -6540,10 +5909,7 @@
                 },
                 {
                   "phase": "result-crossing",
-                  "window": [
-                    134,
-                    142
-                  ],
+                  "window": [134, 142],
                   "before": 134,
                   "after": 136,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/result-crossing.png",
@@ -6552,10 +5918,7 @@
                 },
                 {
                   "phase": "hold",
-                  "window": [
-                    148,
-                    158
-                  ],
+                  "window": [148, 158],
                   "before": 148,
                   "after": 150,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/hold.png",
@@ -6564,10 +5927,7 @@
                 },
                 {
                   "phase": "seam",
-                  "window": [
-                    174,
-                    179
-                  ],
+                  "window": [174, 179],
                   "before": 174,
                   "after": 176,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-blocked/seam.png",
@@ -6758,11 +6118,7 @@
             "configurationBinding": "Exact supplied real readiness-gallery UI state and evidence SHA. No catalog configuration hash is supplied.",
             "uiState": {
               "orientation": "vertical",
-              "readiness": [
-                true,
-                true,
-                true
-              ]
+              "readiness": [true, true, true]
             },
             "uiStateHash": "c530be44970353a891311e4a17e2fb48d94feaa97d20a951921667d183266cea",
             "paletteVerification": {
@@ -6788,10 +6144,7 @@
                 "role": "contactSheet",
                 "frame": null,
                 "captureMethod": "sheet of six natural-clock and four separately labeled keyboard pictures",
-                "nativePngDimensions": [
-                  1800,
-                  1620
-                ]
+                "nativePngDimensions": [1800, 1620]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/exact-122.png",
@@ -6802,10 +6155,7 @@
                 "role": "exact",
                 "frame": 122,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/exact-130.png",
@@ -6816,10 +6166,7 @@
                 "role": "exact",
                 "frame": 130,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/exact-138.png",
@@ -6830,10 +6177,7 @@
                 "role": "exact",
                 "frame": 138,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               },
               {
                 "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/exact-150.png",
@@ -6844,10 +6188,7 @@
                 "role": "exact",
                 "frame": 150,
                 "captureMethod": "Real keyboard slider after natural-clock observation",
-                "nativePngDimensions": [
-                  1210,
-                  757
-                ]
+                "nativePngDimensions": [1210, 757]
               }
             ],
             "observations": [
@@ -6864,10 +6205,7 @@
               "naturalScreenshotBrackets": [
                 {
                   "phase": "work",
-                  "window": [
-                    87,
-                    96
-                  ],
+                  "window": [87, 96],
                   "before": 87,
                   "after": 89,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/work.png",
@@ -6876,10 +6214,7 @@
                 },
                 {
                   "phase": "pins",
-                  "window": [
-                    114,
-                    121
-                  ],
+                  "window": [114, 121],
                   "before": 114,
                   "after": 116,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/pins.png",
@@ -6888,10 +6223,7 @@
                 },
                 {
                   "phase": "gate-opening",
-                  "window": [
-                    124,
-                    129
-                  ],
+                  "window": [124, 129],
                   "before": 124,
                   "after": 126,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/gate-opening.png",
@@ -6900,10 +6232,7 @@
                 },
                 {
                   "phase": "result-crossing",
-                  "window": [
-                    134,
-                    142
-                  ],
+                  "window": [134, 142],
                   "before": 134,
                   "after": 136,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/result-crossing.png",
@@ -6912,10 +6241,7 @@
                 },
                 {
                   "phase": "hold",
-                  "window": [
-                    148,
-                    158
-                  ],
+                  "window": [148, 158],
                   "before": 148,
                   "after": 150,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/hold.png",
@@ -6924,10 +6250,7 @@
                 },
                 {
                   "phase": "seam",
-                  "window": [
-                    174,
-                    179
-                  ],
+                  "window": [174, 179],
                   "before": 174,
                   "after": 176,
                   "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/readiness-final/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/vertical-released/seam.png",

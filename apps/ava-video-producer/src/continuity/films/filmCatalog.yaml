@@ -1,7 +1,8 @@
 - id: qetl-motion
   title: Ask before moving data
   category: motion-motion
-  description: Batch ETL and query-led retrieval, connected through a persistent question and a
+  description:
+    Batch ETL and query-led retrieval, connected through a persistent question and a
     selective data boundary.
   frames: 1542
   path: explainers/film-qetl-motion
@@ -65,7 +66,8 @@
 - id: right-sized-data
   title: The right scale changes the design
   category: motion-motion
-  description: A workload, selected transfer, local execution and resource allocation explain the
+  description:
+    A workload, selected transfer, local execution and resource allocation explain the
     small-to-medium data thesis.
   frames: 1989
   path: explainers/film-right-sized-data

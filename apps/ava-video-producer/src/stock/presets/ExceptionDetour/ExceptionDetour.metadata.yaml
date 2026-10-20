@@ -3,7 +3,8 @@ name:
   message: The rule and its exception
 description:
   id: motionAtlas.exception-detour.description
-  message: A standard path meets a clearly labeled rule gate, while one named exception
+  message:
+    A standard path meets a clearly labeled rule gate, while one named exception
     opens a separate route. The two outcomes stay distinct so the exception never
     silently changes the general rule.
 category:
@@ -20,7 +21,8 @@ prompt:
     product claims.
 creativeDirection:
   id: motionAtlas.exception-detour.creativeDirection
-  message: The standard rule and straight destination appear first. A single labeled case
+  message:
+    The standard rule and straight destination appear first. A single labeled case
     approaches the gate, pauses as its exception condition opens a side latch, and
     follows a curved detour to the exception outcome. The standard path remains intact
     and visible throughout. The final hold brackets the case, condition, and special
@@ -30,7 +32,8 @@ intent:
   message: State a general rule while making a specific exception explicit.
 distinction:
   id: motionAtlas.exception-detour.distinction
-  message: The semantic structure is a standing rule plus a visibly gated exception, not
+  message:
+    The semantic structure is a standing rule plus a visibly gated exception, not
     an unqualified pipeline or an arbitrary network path. Only the exceptional case
     moves.
 tags:
@@ -73,7 +76,8 @@ notFor:
   - id: motionAtlas.exception-detour.notFor.0
     message: One general rule and one exception are supported.
   - id: motionAtlas.exception-detour.notFor.1
-    message: The reference and moving markers are illustrative roles, not a sample
+    message:
+      The reference and moving markers are illustrative roles, not a sample
       population or exception frequency.
   - id: motionAtlas.exception-detour.notFor.2
     message: The animation does not validate whether a rule or its exception is correct.
@@ -87,7 +91,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.exception-detour.motionBeats.1
-      message: The standard rule and straight destination appear first. A single labeled case
+      message:
+        The standard rule and straight destination appear first. A single labeled case
         approaches the gate, pauses as its exception condition opens a side latch, and
         follows a curved detour to the exception outcome. The standard path remains
         intact and visible throughout. The final hold brackets the case, condition, and

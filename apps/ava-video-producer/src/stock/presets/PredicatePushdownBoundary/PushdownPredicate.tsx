@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { ramp, mix, EASE } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";

@@ -18,44 +18,20 @@
             "id": "w",
             "label": "West stratum",
             "polygon": [
-              [
-                5,
-                5
-              ],
-              [
-                50,
-                5
-              ],
-              [
-                50,
-                95
-              ],
-              [
-                5,
-                95
-              ]
+              [5, 5],
+              [50, 5],
+              [50, 95],
+              [5, 95]
             ]
           },
           {
             "id": "e",
             "label": "East stratum",
             "polygon": [
-              [
-                50,
-                5
-              ],
-              [
-                95,
-                5
-              ],
-              [
-                95,
-                95
-              ],
-              [
-                50,
-                95
-              ]
+              [50, 5],
+              [95, 5],
+              [95, 95],
+              [50, 95]
             ]
           }
         ],
@@ -96,10 +72,7 @@
             "y": 75
           }
         ],
-        "selectedSiteIds": [
-          "a",
-          "d"
-        ],
+        "selectedSiteIds": ["a", "d"],
         "copy": {
           "context": "Fictional schematic sampling plan",
           "selected": "Selected",

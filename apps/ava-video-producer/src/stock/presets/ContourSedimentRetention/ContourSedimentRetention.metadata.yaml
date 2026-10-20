@@ -3,7 +3,8 @@ name:
   message: Keep sediment within the slope
 description:
   id: motionAtlas.contour-sediment-retention.description
-  message: A hillside cross-section shows a supplied sediment load encountering an
+  message:
+    A hillside cross-section shows a supplied sediment load encountering an
     installed contour barrier. Retained soil settles visibly upstream while exported
     sediment crosses the catchment boundary.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Show where supplied sediment ends up after a particular land-management intervention.
 prompt:
   id: motionAtlas.contour-sediment-retention.prompt
-  message: Reveal a bare schematic slope and its outlet boundary. A land steward places
+  message:
+    Reveal a bare schematic slope and its outlet boundary. A land steward places
     the selected contour treatment, then the supplied sediment ribbon moves downslope
     and separates into retained material behind the strip and export beyond the
     boundary. Hold both destinations against their common incoming mass, then fade
     rather than reversing erosion.
 creativeDirection:
   id: motionAtlas.contour-sediment-retention.creativeDirection
-  message: Reveal a bare schematic slope and its outlet boundary. A land steward places
+  message:
+    Reveal a bare schematic slope and its outlet boundary. A land steward places
     the selected contour treatment, then the supplied sediment ribbon moves downslope
     and separates into retained material behind the strip and export beyond the
     boundary. Hold both destinations against their common incoming mass, then fade
@@ -31,7 +34,8 @@ intent:
   message: Show where supplied sediment ends up after a particular land-management intervention.
 distinction:
   id: motionAtlas.contour-sediment-retention.distinction
-  message: Particles settle into a persistent landform while the remainder crosses a
+  message:
+    Particles settle into a persistent landform while the remainder crosses a
     boundary. It demonstrates selective deposition, not simple packet movement through
     stages.
 tags:
@@ -70,14 +74,17 @@ aliases:
     message: contour planting
 notFor:
   - id: motionAtlas.contour-sediment-retention.notFor.0
-    message: Mobilized sediment = retained sediment + exported sediment. The water carrying
+    message:
+      Mobilized sediment = retained sediment + exported sediment. The water carrying
       it is illustrative and unquantified; do not equate water-particle counts with
       sediment kilograms.
   - id: motionAtlas.contour-sediment-retention.notFor.1
-    message: The retained mass is supplied content, never inferred from barrier type, slope
+    message:
+      The retained mass is supplied content, never inferred from barrier type, slope
       angle or vegetation. No before/after efficacy comparison is manufactured.
   - id: motionAtlas.contour-sediment-retention.notFor.2
-    message: No soil formation rate, crop yield, water quality outcome or ecological
+    message:
+      No soil formation rate, crop yield, water quality outcome or ecological
       recovery is predicted. Defaults are fictional.
 motionBeats:
   - startFrame: 0
@@ -89,7 +96,8 @@ motionBeats:
     endFrame: 108
     description:
       id: motionAtlas.contour-sediment-retention.motionBeats.1
-      message: Reveal a bare schematic slope and its outlet boundary. A land steward places
+      message:
+        Reveal a bare schematic slope and its outlet boundary. A land steward places
         the selected contour treatment, then the supplied sediment ribbon moves
         downslope and separates into retained material behind the strip and export
         beyond the boundary. Hold both destinations against their common incoming mass,
@@ -98,5 +106,6 @@ motionBeats:
     endFrame: 167
     description:
       id: motionAtlas.contour-sediment-retention.motionBeats.2
-      message: Hold conserved quantities and visible destinations. The outer envelope returns
+      message:
+        Hold conserved quantities and visible destinations. The outer envelope returns
         to ground.

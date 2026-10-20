@@ -1,7 +1,7 @@
 /** Observable semantic and motion assertions for the authored scene. */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { propEq, prop  } from "@avandar/utils";
+import { propEq, prop } from "@avandar/utils";
 import { registerStockLocalizationAssertions } from "../../../../../tests/helpers/registerStockLocalizationAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";

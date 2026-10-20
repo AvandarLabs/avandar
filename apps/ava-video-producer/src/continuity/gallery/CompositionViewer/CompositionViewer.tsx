@@ -1,12 +1,12 @@
-import { CompositionControls } from "./CompositionControls";
-import { useCompositionAppearance } from "./useCompositionAppearance";
 import { useRef } from "react";
 import { useContinuityCopy } from "../../useContinuityCopy";
 import { CompositionActions } from "./CompositionActions/CompositionActions";
+import { CompositionControls } from "./CompositionControls";
 import { CompositionSummary } from "./CompositionSummary";
+import css from "./CompositionViewer.module.css";
+import { useCompositionAppearance } from "./useCompositionAppearance";
 import { useCompositionPlayer } from "./useCompositionPlayer";
 import { VocabularyGuide } from "./VocabularyGuide/VocabularyGuide";
-import css from "./CompositionViewer.module.css";
 import type { ContinuityCatalogEntry } from "../../continuityCatalog";
 
 type Props = {

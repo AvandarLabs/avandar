@@ -1,4 +1,3 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
 import {
   Arrive,
   Curve,
@@ -12,6 +11,7 @@ import {
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { StockRect } from "../primitives/StockRect/StockRect";
 import type { SourceMergeInput } from "../presets/SourceMerge/SourceMerge.schema";
 import type { ReactNode } from "react";
 

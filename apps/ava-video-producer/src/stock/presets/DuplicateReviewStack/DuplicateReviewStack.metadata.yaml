@@ -3,7 +3,8 @@ name:
   message: Review duplicate candidates
 description:
   id: motionAtlas.duplicate-review-stack.description
-  message: Records already designated as possible duplicates align on a comparison field,
+  message:
+    Records already designated as possible duplicates align on a comparison field,
     then fold behind an explicitly retained record. Candidate groups without a choice
     stay fanned open for review.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show duplicate review as a visible grouping and selection decision.
 creativeDirection:
   id: motionAtlas.duplicate-review-stack.creativeDirection
-  message: Frames 12-42 show candidate slips separated within authored group brackets.
+  message:
+    Frames 12-42 show candidate slips separated within authored group brackets.
     During frames 42-100, each group aligns its comparison values along one shared
     ruler, making the repeated detail visible. Where a retained record is supplied, the
     other slips fold into an offset stack behind it while their ID tabs remain
@@ -25,12 +27,14 @@ intent:
   message: Show duplicate review as a visible grouping and selection decision.
 distinction:
   id: motionAtlas.duplicate-review-stack.distinction
-  message: Unlike stagger-cards, the content aligns around a shared comparison value and
+  message:
+    Unlike stagger-cards, the content aligns around a shared comparison value and
     then consolidates through an explicit selection. Unlike field-conflict-choice, this
     chooses a record identity rather than separate values for individual fields.
 prompt:
   id: motionAtlas.duplicate-review-stack.prompt
-  message: Use Motion Atlas "Review duplicate candidates" (duplicate-review-stack) as a
+  message:
+    Use Motion Atlas "Review duplicate candidates" (duplicate-review-stack) as a
     conceptual graphic. Show duplicate review as a visible grouping and selection
     decision. Replace fictional sample content with approved authored content before
     making product claims.
@@ -72,19 +76,23 @@ aliases:
     message: record matching
 notFor:
   - id: motionAtlas.duplicate-review-stack.notFor.literal-whitespace
-    message: "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
+    message:
+      "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
       breaks and other whitespace remain distinct from authored marker glyphs. Input,
       accessible text and equality preserve the original values."
   - id: motionAtlas.duplicate-review-stack.notFor.0
     message: All default records and candidate groups are fictional.
   - id: motionAtlas.duplicate-review-stack.notFor.1
-    message: Groups are supplied by the author; no duplicate-detection algorithm, similarity
+    message:
+      Groups are supplied by the author; no duplicate-detection algorithm, similarity
       score, or match accuracy is implied.
   - id: motionAtlas.duplicate-review-stack.notFor.2
-    message: Matching comparison values alone do not establish that records describe the
+    message:
+      Matching comparison values alone do not establish that records describe the
       same real entity.
   - id: motionAtlas.duplicate-review-stack.notFor.3
-    message: A retainedId demonstrates an authored selection, not actual deletion or merging
+    message:
+      A retainedId demonstrates an authored selection, not actual deletion or merging
       of data.
   - id: motionAtlas.duplicate-review-stack.notFor.4
     message: Record and group counts come only from the nested arrays.

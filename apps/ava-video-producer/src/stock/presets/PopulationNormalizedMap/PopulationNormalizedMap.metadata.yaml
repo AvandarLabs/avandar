@@ -3,7 +3,8 @@ name:
   message: Put the denominator on the map
 description:
   id: motionAtlas.population-normalized-map.description
-  message: A fictional zone map changes from record counts to records per supplied
+  message:
+    A fictional zone map changes from record counts to records per supplied
     population. Each zone exposes its numerator and denominator before its fill changes
     under the new labeled legend.
 category:
@@ -14,13 +15,15 @@ useWhen:
   message: Show how population size changes the meaning of a mapped count.
 prompt:
   id: motionAtlas.population-normalized-map.prompt
-  message: Begin with count-colored polygons. Lift each polygon like a shallow lid to
+  message:
+    Begin with count-colored polygons. Lift each polygon like a shallow lid to
     reveal a numerator-over-denominator fraction, then settle it with the recalculated
     population-normalized shade. Replace the legend explicitly and hold both raw
     fractions so the change remains accountable.
 creativeDirection:
   id: motionAtlas.population-normalized-map.creativeDirection
-  message: Begin with count-colored polygons. Lift each polygon like a shallow lid to
+  message:
+    Begin with count-colored polygons. Lift each polygon like a shallow lid to
     reveal a numerator-over-denominator fraction, then settle it with the recalculated
     population-normalized shade. Replace the legend explicitly and hold both raw
     fractions so the change remains accountable.
@@ -29,7 +32,8 @@ intent:
   message: Show how population size changes the meaning of a mapped count.
 distinction:
   id: motionAtlas.population-normalized-map.distinction
-  message: The polygon physically exposes its denominator before changing the mapped
+  message:
+    The polygon physically exposes its denominator before changing the mapped
     measure. Unlike chart-focus-edit, the numeric measure changes; unlike bar-race, no
     items reorder and both numerator and denominator remain inspectable.
 tags:
@@ -58,10 +62,12 @@ goodFor:
     message: Prevent a large population from being mistaken for a high rate
 notFor:
   - id: motionAtlas.population-normalized-map.notFor.0
-    message: This displays arithmetic for supplied unique records, not disease incidence,
+    message:
+      This displays arithmetic for supplied unique records, not disease incidence,
       individual risk, standardized rates, or causal inequity findings.
   - id: motionAtlas.population-normalized-map.notFor.1
-    message: Population denominators must refer to the same geography, period and record
+    message:
+      Population denominators must refer to the same geography, period and record
       universe. No uncertainty correction is inferred.
   - id: motionAtlas.population-normalized-map.notFor.2
     message: Separate labeled legends are mandatory because the two views use different units.
@@ -85,7 +91,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.population-normalized-map.beat.1
-      message: Lift lids during frames 36–72, reveal connected fraction shelves, and settle
+      message:
+        Lift lids during frames 36–72, reveal connected fraction shelves, and settle
         with rate shades during 72–108.
   - startFrame: 108
     endFrame: 179

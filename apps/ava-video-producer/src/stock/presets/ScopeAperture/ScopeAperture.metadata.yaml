@@ -3,7 +3,8 @@ name:
   message: Narrow the question
 description:
   id: motionAtlas.scope-aperture.description
-  message: A broad subject remains visible while a movable frame isolates the subset under
+  message:
+    A broad subject remains visible while a movable frame isolates the subset under
     discussion. Excluded topics stay outside the frame with explicit context rather than
     disappearing without explanation.
 category:
@@ -14,12 +15,14 @@ useWhen:
   message: Make the boundary of the current explanation explicit.
 prompt:
   id: motionAtlas.scope-aperture.prompt
-  message: Use Motion Atlas "Narrow the question" (scope-aperture) as a conceptual
+  message:
+    Use Motion Atlas "Narrow the question" (scope-aperture) as a conceptual
     graphic. Make the boundary of the current explanation explicit. Replace fictional
     sample content with approved authored content before making product claims.
 creativeDirection:
   id: motionAtlas.scope-aperture.creativeDirection
-  message: A broad heading and a flat field of topic labels appear together. A rectangular
+  message:
+    A broad heading and a flat field of topic labels appear together. A rectangular
     aperture draws around the full field, then its edges contract and selected labels
     slide together within it while other labels remain outside. The narrowed question
     replaces the broad heading inside the frame. A final outside caption clarifies what
@@ -90,7 +93,8 @@ notFor:
   - id: motionAtlas.scope-aperture.notFor.2
     message: This is a single narrowing step, not an animated camera zoom through a hierarchy.
   - id: motionAtlas.scope-aperture.notFor.3
-    message: Topics outside the aperture may be future, deferred, unsupported, or simply out
+    message:
+      Topics outside the aperture may be future, deferred, unsupported, or simply out
       of this explanation. Supply the correct outside label and do not imply they are
       shipped features.
 motionBeats:
@@ -103,7 +107,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.scope-aperture.motionBeats.1
-      message: A broad heading and a flat field of topic labels appear together. A rectangular
+      message:
+        A broad heading and a flat field of topic labels appear together. A rectangular
         aperture draws around the full field, then its edges contract and selected
         labels slide together within it while other labels remain outside. The narrowed
         question replaces the broad heading inside the frame. A final outside caption

@@ -3,7 +3,8 @@ name:
   message: Return with earlier work intact
 description:
   id: motionAtlas.returning-learner-worktable.description
-  message: A learner returns to a classroom with earlier work still visible while a
+  message:
+    A learner returns to a classroom with earlier work still visible while a
     teacher adds an explicitly chosen return activity. A break in schooling is shown as
     time away, not as erased knowledge.
 category:
@@ -11,11 +12,13 @@ category:
   message: Classroom return and retained artifacts
 useWhen:
   id: motionAtlas.returning-learner-worktable.useWhen
-  message: Present reentry as building from known prior work rather than restarting a
+  message:
+    Present reentry as building from known prior work rather than restarting a
     learner from zero.
 prompt:
   id: motionAtlas.returning-learner-worktable.prompt
-  message: Reveal one learner at a classroom desk with the supplied prior-work samples,
+  message:
+    Reveal one learner at a classroom desk with the supplied prior-work samples,
     preserving their authored forms and marks without grading them. Move the learner and
     the same portfolio to a side table while the interruption-period label appears.
     Bring the learner back to the desk, where the teacher places exactly the supplied
@@ -24,7 +27,8 @@ prompt:
     supplied activities together, then fade out.
 creativeDirection:
   id: motionAtlas.returning-learner-worktable.creativeDirection
-  message: Reveal one learner at a classroom desk with the supplied prior-work samples,
+  message:
+    Reveal one learner at a classroom desk with the supplied prior-work samples,
     preserving their authored forms and marks without grading them. Move the learner and
     the same portfolio to a side table while the interruption-period label appears.
     Bring the learner back to the desk, where the teacher places exactly the supplied
@@ -33,11 +37,13 @@ creativeDirection:
     supplied activities together, then fade out.
 intent:
   id: motionAtlas.returning-learner-worktable.intent
-  message: Present reentry as building from known prior work rather than restarting a
+  message:
+    Present reentry as building from known prior work rather than restarting a
     learner from zero.
 distinction:
   id: motionAtlas.returning-learner-worktable.distinction
-  message: A learner carries tangible prior work through a discontinuity and joins a
+  message:
+    A learner carries tangible prior work through a discontinuity and joins a
     physical teaching session. Unlike missed-visit followup or restoring a software
     checkpoint, nothing is retrieved by an alert and no human knowledge is rolled back
     or automatically recovered.
@@ -77,16 +83,20 @@ aliases:
     message: reentry
 notFor:
   - id: motionAtlas.returning-learner-worktable.notFor.0
-    message: One learner is represented. Work samples count artifacts only, not mastered
+    message:
+      One learner is represented. Work samples count artifacts only, not mastered
       competencies, credits, or school days.
   - id: motionAtlas.returning-learner-worktable.notFor.1
-    message: The middle beat does not specify why schooling was interrupted, where the
+    message:
+      The middle beat does not specify why schooling was interrupted, where the
       learner lived, or what learning happened while away.
   - id: motionAtlas.returning-learner-worktable.notFor.2
-    message: Review and new are authored activity roles, not diagnostic judgments. A return
+    message:
+      Review and new are authored activity roles, not diagnostic judgments. A return
       scene does not prove reenrollment or learning recovery.
   - id: motionAtlas.returning-learner-worktable.notFor.3
-    message: All defaults are fictional. Durations are editorial and the loop reset is not
+    message:
+      All defaults are fictional. Durations are editorial and the loop reset is not
       another interruption.
 motionBeats:
   - startFrame: 0
@@ -108,7 +118,8 @@ motionBeats:
     endFrame: 137
     description:
       id: motionAtlas.returning-learner-worktable.motionBeats.3
-      message: The teacher picks up and places one to three review or new activities,
+      message:
+        The teacher picks up and places one to three review or new activities,
         preserving every original artifact.
   - startFrame: 138
     endFrame: 179

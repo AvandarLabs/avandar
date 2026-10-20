@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { DashboardContext } from "./DashboardContext";
 import { DashboardGuides } from "./DashboardGuides";

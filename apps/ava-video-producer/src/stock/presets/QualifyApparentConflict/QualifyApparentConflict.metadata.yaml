@@ -3,7 +3,8 @@ name:
   message: Both can be true
 description:
   id: motionAtlas.qualify-apparent-conflict.description
-  message: Two apparently conflicting statements first face each other, then separate into
+  message:
+    Two apparently conflicting statements first face each other, then separate into
     explicit contexts that explain how both can apply. The qualifier is supplied by the
     author and stays visible in the final arrangement.
 category:
@@ -14,13 +15,15 @@ useWhen:
   message: Explain how two statements can coexist when their contexts differ.
 prompt:
   id: motionAtlas.qualify-apparent-conflict.prompt
-  message: Use Motion Atlas "Both can be true" (qualify-apparent-conflict) as a conceptual
+  message:
+    Use Motion Atlas "Both can be true" (qualify-apparent-conflict) as a conceptual
     graphic. Explain how two statements can coexist when their contexts differ. Replace
     fictional sample content with approved authored content before making product
     claims.
 creativeDirection:
   id: motionAtlas.qualify-apparent-conflict.creativeDirection
-  message: Two short claims enter on opposing horizontal tracks and stop at a central
+  message:
+    Two short claims enter on opposing horizontal tracks and stop at a central
     question mark. A context divider unfolds vertically, moving each claim to its own
     labeled region. The question mark resolves into a small joining brace with the
     authored qualifier below it. Both context-claim pairs hold together before the
@@ -30,7 +33,8 @@ intent:
   message: Explain how two statements can coexist when their contexts differ.
 distinction:
   id: motionAtlas.qualify-apparent-conflict.distinction
-  message: Unlike paired-contrast, this begins with apparent incompatibility and resolves
+  message:
+    Unlike paired-contrast, this begins with apparent incompatibility and resolves
     it by revealing distinct scopes of truth. The semantic transformation is
     qualification rather than comparison or choosing a winner.
 tags:
@@ -93,22 +97,27 @@ aliases:
     message: qualification
 notFor:
   - id: motionAtlas.qualify-apparent-conflict.notFor.0
-    message: The author must provide a valid contextual reconciliation; the renderer cannot
+    message:
+      The author must provide a valid contextual reconciliation; the renderer cannot
       establish that both claims are true.
   - id: motionAtlas.qualify-apparent-conflict.notFor.1
     message: Exactly two claims are shown, each with one context.
   - id: motionAtlas.qualify-apparent-conflict.notFor.2
-    message: The graphic must not be used to hide a genuine unresolved contradiction behind
+    message:
+      The graphic must not be used to hide a genuine unresolved contradiction behind
       decorative separation.
   - id: motionAtlas.qualify-apparent-conflict.notFor.3
-    message: Show only supplied policy statements and their distinct objects. The animation
+    message:
+      Show only supplied policy statements and their distinct objects. The animation
       does not interpret licenses, determine ownership, confer rights, or prove that any
       legal position is correct.
   - id: motionAtlas.qualify-apparent-conflict.notFor.4
-    message: A low price, paid plan, or free offer by itself proves neither high nor low
+    message:
+      A low price, paid plan, or free offer by itself proves neither high nor low
       technical quality.
   - id: motionAtlas.qualify-apparent-conflict.notFor.5
-    message: Separate time contexts explain how the authored statements can coexist. They do
+    message:
+      Separate time contexts explain how the authored statements can coexist. They do
       not establish a measured speed improvement or a guarantee of emergency
       performance.
 motionBeats:
@@ -121,7 +130,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.qualify-apparent-conflict.motionBeats.1
-      message: Two short claims enter on opposing horizontal tracks and stop at a central
+      message:
+        Two short claims enter on opposing horizontal tracks and stop at a central
         question mark. A context divider unfolds vertically, moving each claim to its
         own labeled region. The question mark resolves into a small joining brace with
         the authored qualifier below it. Both context-claim pairs hold together before

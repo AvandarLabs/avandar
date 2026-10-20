@@ -3,7 +3,8 @@ name:
   message: Fix the source after containing the leak
 description:
   id: motionAtlas.recurring-leak-prevention.description
-  message: A worker first contains a recurring leak, then repairs its source and performs
+  message:
+    A worker first contains a recurring leak, then repairs its source and performs
     one supplied retest. Temporary containment and prevention remain visibly different
     actions.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Make source repair visibly different from repeatedly managing its consequences.
 creativeDirection:
   id: motionAtlas.recurring-leak-prevention.creativeDirection
-  message: Frames 12..38 reveal a schematic pipe joint leaking beside its normal outlet.
+  message:
+    Frames 12..38 reveal a schematic pipe joint leaking beside its normal outlet.
     Frames 39..62 place a catch tray under the leak while flow continues through the
     joint. Frames 63..106 pause the flow and let the worker apply the authored joint
     repair. Frames 107..140 restore the normal outlet flow only when a retest exists,
@@ -64,16 +66,20 @@ aliases:
     message: recurring leak prevention
 notFor:
   - id: motionAtlas.recurring-leak-prevention.notFor.0
-    message: This is a schematic operational metaphor, not a plumbing tutorial or a
+    message:
+      This is a schematic operational metaphor, not a plumbing tutorial or a
       diagnosis of a real incident.
   - id: motionAtlas.recurring-leak-prevention.notFor.1
-    message: Drops and line thickness are nonquantitative motion cues. No volume, loss rate
+    message:
+      Drops and line thickness are nonquantitative motion cues. No volume, loss rate
       or saved cost is claimed.
   - id: motionAtlas.recurring-leak-prevention.notFor.2
-    message: One authored observation cannot establish permanent prevention. A repair action
+    message:
+      One authored observation cannot establish permanent prevention. A repair action
       alone never determines the test outcome.
   - id: motionAtlas.recurring-leak-prevention.notFor.3
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

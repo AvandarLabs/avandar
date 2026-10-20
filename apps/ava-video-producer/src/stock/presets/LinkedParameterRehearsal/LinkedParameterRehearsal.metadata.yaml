@@ -3,7 +3,8 @@ name:
   message: Try a change, then return
 description:
   id: motionAtlas.linked-parameter-rehearsal.description
-  message: One source control moves to a trial value while explicitly coupled output
+  message:
+    One source control moves to a trial value while explicitly coupled output
     scales respond. Returning the source restores every dependent value and leaves the
     independent example unchanged.
 category:
@@ -11,17 +12,20 @@ category:
   message: Dependency mechanics
 useWhen:
   id: motionAtlas.linked-parameter-rehearsal.useWhen
-  message: Show the precise scope of a reversible change without implying every nearby
+  message:
+    Show the precise scope of a reversible change without implying every nearby
     quantity is affected.
 prompt:
   id: motionAtlas.linked-parameter-rehearsal.prompt
-  message: Use Motion Atlas "Try a change, then return" (linked-parameter-rehearsal) as a
+  message:
+    Use Motion Atlas "Try a change, then return" (linked-parameter-rehearsal) as a
     conceptual graphic. Show the precise scope of a reversible change without implying
     every nearby quantity is affected. Replace fictional sample content with approved
     authored content before making product claims.
 creativeDirection:
   id: motionAtlas.linked-parameter-rehearsal.creativeDirection
-  message: A source slider and two to four output rulers appear at their baseline
+  message:
+    A source slider and two to four output rulers appear at their baseline
     positions. Visible mechanical couplings connect only outputs with nonzero
     multipliers. Over the middle two seconds the source slides to its trial setting and
     coupled pointers move simultaneously according to their supplied affine rules, with
@@ -31,11 +35,13 @@ creativeDirection:
     then fade to the same opaque ground within six seconds.
 intent:
   id: motionAtlas.linked-parameter-rehearsal.intent
-  message: Show the precise scope of a reversible change without implying every nearby
+  message:
+    Show the precise scope of a reversible change without implying every nearby
     quantity is affected.
 distinction:
   id: motionAtlas.linked-parameter-rehearsal.distinction
-  message: Unlike node-traversal or event-bus, no signal tours a graph. Physically coupled
+  message:
+    Unlike node-traversal or event-bus, no signal tours a graph. Physically coupled
     pointers move together under explicit equations, then reverse. Revision-restore
     replaces a saved document; this restores one source assumption and recomputes only
     its declared numeric dependents. Cell-normalization corrects values once, whereas
@@ -90,28 +96,35 @@ aliases:
     message: reversible change
 notFor:
   - id: motionAtlas.linked-parameter-rehearsal.notFor.0
-    message: Only one source and direct affine dependencies are supported. No arbitrary
+    message:
+      Only one source and direct affine dependencies are supported. No arbitrary
       graphs, cycles, chained expressions or inferred causal links.
   - id: motionAtlas.linked-parameter-rehearsal.notFor.1
-    message: Each output uses its own labeled fixed scale. Equal visual travel across rulers
+    message:
+      Each output uses its own labeled fixed scale. Equal visual travel across rulers
       does not imply equal numerical change or comparable units.
   - id: motionAtlas.linked-parameter-rehearsal.notFor.2
-    message: Pointer positions always use multiplier times the current source plus offset,
+    message:
+      Pointer positions always use multiplier times the current source plus offset,
       including intermediate frames. Fractions during movement are interpolation, not
       discrete operations performed.
   - id: motionAtlas.linked-parameter-rehearsal.notFor.3
-    message: Returning the parameter represents reversible arithmetic only. It does not
+    message:
+      Returning the parameter represents reversible arithmetic only. It does not
       claim that real-world impacts or external side effects can be undone.
   - id: motionAtlas.linked-parameter-rehearsal.notFor.4
-    message: Use the existing affine contract only. Tier cliffs, nonlinear growth, churn,
+    message:
+      Use the existing affine contract only. Tier cliffs, nonlinear growth, churn,
       caps, payment fees, and compounding require a separately specified model and must
       not be approximated silently.
   - id: motionAtlas.linked-parameter-rehearsal.notFor.5
-    message: A trial value is an authored scenario, not measured demand, market validation,
+    message:
+      A trial value is an authored scenario, not measured demand, market validation,
       or a prediction of financial performance. Use fictional values and explicit units
       and periods.
   - id: motionAtlas.linked-parameter-rehearsal.notFor.6
-    message: Affine calculations use IEEE-754 arithmetic. Overflowing products use
+    message:
+      Affine calculations use IEEE-754 arithmetic. Overflowing products use
       half-scaled cancellation where the resulting value remains finite. Displayed and
       exported input values are not clamped.
 motionBeats:

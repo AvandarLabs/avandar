@@ -1,9 +1,9 @@
-import { getCompositionTransportUpdates } from "./compositionTransport";
 import { useCallback, useEffect, useState, type RefObject } from "react";
 import {
   continuityAppearanceSchema,
   type ContinuityAppearance,
 } from "../../continuityAppearance";
+import { getCompositionTransportUpdates } from "./compositionTransport";
 
 /** Synchronize validated options only with the active, same-origin film. */
 export function useCompositionAppearance(
@@ -36,11 +36,14 @@ export function useCompositionAppearance(
     id: string;
     options: ContinuityAppearance;
   }>();
-  const send = useCallback((action: string, value?: unknown) =>
-    player.current?.contentWindow?.postMessage(
-      { type: "film-control", id, action, value },
-      location.origin,
-    ), [id, player]);
+  const send = useCallback(
+    (action: string, value?: unknown) =>
+      player.current?.contentWindow?.postMessage(
+        { type: "film-control", id, action, value },
+        location.origin,
+      ),
+    [id, player],
+  );
   useEffect(() => {
     const receive = (event: MessageEvent) => {
       if (
@@ -69,14 +72,18 @@ export function useCompositionAppearance(
     send("appearance", draft);
     try {
       localStorage.setItem("composition-appearance", JSON.stringify(draft));
-    } catch { /* Preferences remain usable when storage is unavailable. */ }
+    } catch {
+      /* Preferences remain usable when storage is unavailable. */
+    }
   }, [draft, send]);
   useEffect(() => {
     send("speed", transport.speed);
     send("loop", transport.loop);
     try {
       localStorage.setItem("composition-transport", JSON.stringify(transport));
-    } catch { /* Preferences remain usable when storage is unavailable. */ }
+    } catch {
+      /* Preferences remain usable when storage is unavailable. */
+    }
   }, [transport, send]);
   const options =
     acknowledged?.id === id &&

@@ -3,7 +3,8 @@ name:
   message: Transform coordinates before combining layers
 description:
   id: motionAtlas.coordinate-frame-registration.description
-  message: Two schematic layers describe the same landmarks using different coordinate
+  message:
+    Two schematic layers describe the same landmarks using different coordinate
     frames. A supplied affine transformation moves one layer into the other frame so
     matching landmarks register without changing their identities.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Align spatial coordinate frames without implying physical movement.
 prompt:
   id: motionAtlas.coordinate-frame-registration.prompt
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-52 show two labeled coordinate grids with corresponding landmarks offset. Frames
     53-110 transform every source point using the same affine coefficients while axes
@@ -23,7 +25,8 @@ prompt:
     editorial loop.
 creativeDirection:
   id: motionAtlas.coordinate-frame-registration.creativeDirection
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-52 show two labeled coordinate grids with corresponding landmarks offset. Frames
     53-110 transform every source point using the same affine coefficients while axes
@@ -35,7 +38,8 @@ intent:
   message: Align spatial coordinate frames without implying physical movement.
 distinction:
   id: motionAtlas.coordinate-frame-registration.distinction
-  message: Unlike GIS layer intersection, the action aligns coordinate systems before
+  message:
+    Unlike GIS layer intersection, the action aligns coordinate systems before
     overlay. Identity is stable even though coordinate numbers change.
 tags:
   - id: motionAtlas.coordinate-frame-registration.tags.0
@@ -63,18 +67,21 @@ aliases:
     message: frame registration
 notFor:
   - id: motionAtlas.coordinate-frame-registration.notFor.0
-    message: This is an affine teaching analogy, not a real geodetic projection or
+    message:
+      This is an affine teaching analogy, not a real geodetic projection or
       Earth-curvature calculation.
   - id: motionAtlas.coordinate-frame-registration.notFor.1
     message: No inference of the correct CRS or transform from point positions.
   - id: motionAtlas.coordinate-frame-registration.notFor.2
     message: Spatial transformation must not be confused with moving the physical landmarks.
   - id: motionAtlas.coordinate-frame-registration.notFor.3
-    message: No live geography, online routing, JSX, functions, URLs, private records or
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
       external requests. Maps are schematic local plans; no real-world inference
       follows.
   - id: motionAtlas.coordinate-frame-registration.notFor.4
-    message: Authored prose must identify schematic geography and accurately describe the
+    message:
+      Authored prose must identify schematic geography and accurately describe the
       selected example. Runtime validation preserves supplied prose and checks explicit
       structural and numeric rules without natural-language classification.
 motionBeats:

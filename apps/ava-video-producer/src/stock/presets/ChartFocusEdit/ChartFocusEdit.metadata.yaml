@@ -3,7 +3,8 @@ name:
   message: Refine a chart for reading
 description:
   id: motionAtlas.chart-focus-edit.description
-  message: An already complete chart sheds visual clutter and brings a selected category
+  message:
+    An already complete chart sheds visual clutter and brings a selected category
     into focus while every supplied value and the common scale remain unchanged.
 category:
   id: motionAtlas.chart-focus-edit.category
@@ -13,7 +14,8 @@ useWhen:
   message: Show that visual emphasis can improve reading while preserving the data.
 creativeDirection:
   id: motionAtlas.chart-focus-edit.creativeDirection
-  message: Frames 12-40 show the complete bars, labels, and a light plotting grid. Between
+  message:
+    Frames 12-40 show the complete bars, labels, and a light plotting grid. Between
     frames 40-112, minor grid lines recede, label tabs move to direct reading positions
     when requested, and nonfocused marks soften without changing length. A small context
     heading settles beside the selected mark. Hold the cleaner chart through frame 166
@@ -23,7 +25,8 @@ intent:
   message: Show that visual emphasis can improve reading while preserving the data.
 distinction:
   id: motionAtlas.chart-focus-edit.distinction
-  message: Unlike bar-race and line-trace, the data is fully present at the start and
+  message:
+    Unlike bar-race and line-trace, the data is fully present at the start and
     never grows, ranks, or changes. The transformation is the chart presentation itself.
 prompt:
   id: motionAtlas.chart-focus-edit.prompt
@@ -73,7 +76,8 @@ notFor:
   - id: motionAtlas.chart-focus-edit.notFor.1
     message: Bar lengths, category order, zero baseline, and axisMaximum remain fixed.
   - id: motionAtlas.chart-focus-edit.notFor.2
-    message: Emphasis is an editorial selection, not statistical significance or detected
+    message:
+      Emphasis is an editorial selection, not statistical significance or detected
       importance.
   - id: motionAtlas.chart-focus-edit.notFor.3
     message: Grid removal must retain a readable zero baseline and scale endpoints.
@@ -87,7 +91,8 @@ motionBeats:
     endFrame: 112
     description:
       id: motionAtlas.chart-focus-edit.motionBeats.1
-      message: Recede minor grid lines and apply selected label and focus treatments without
+      message:
+        Recede minor grid lines and apply selected label and focus treatments without
         changing values.
   - startFrame: 112
     endFrame: 166

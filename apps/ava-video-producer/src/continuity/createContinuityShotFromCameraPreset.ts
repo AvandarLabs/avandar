@@ -1,8 +1,8 @@
 import { retimeCameraTrack } from "../motion-components/cameraTrack";
 import { getContinuityTimeline } from "./continuityTimeline";
 import type { MotionOptions } from "../motion-components/motionSettings";
-import type { ContinuityBeat } from "./continuitySchema";
 import type { Storyboard } from "../storyboard/schema/schema";
+import type { ContinuityBeat } from "./continuitySchema";
 
 type Shot = Extract<Storyboard["shots"][number], { scene: "continuity" }>;
 

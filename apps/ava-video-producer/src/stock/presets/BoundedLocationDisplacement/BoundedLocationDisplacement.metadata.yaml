@@ -3,7 +3,8 @@ name:
   message: Show displacement as an approximation
 description:
   id: motionAtlas.bounded-location-displacement.description
-  message: A precise schematic point is replaced in a display copy by an authored offset
+  message:
+    A precise schematic point is replaced in a display copy by an authored offset
     inside a stated radius. The source stays local and the displayed marker is labeled
     approximate, never silently treated as the original location.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Distinguish deliberately displaced display coordinates from source positions.
 prompt:
   id: motionAtlas.bounded-location-displacement.prompt
-  message: React/SVG 960x600, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    React/SVG 960x600, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal a local analysis inset with all supplied source locations and a
     completely empty display-copy map. Frames 13-70 compute each authored offset inside
     the local inset and show its distance against the bound. Frames 71-139 emit only the
@@ -24,7 +26,8 @@ prompt:
     opaque ground at 166-179.
 creativeDirection:
   id: motionAtlas.bounded-location-displacement.creativeDirection
-  message: React/SVG 960x600, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    React/SVG 960x600, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal a local analysis inset with all supplied source locations and a
     completely empty display-copy map. Frames 13-70 compute each authored offset inside
     the local inset and show its distance against the bound. Frames 71-139 emit only the
@@ -37,7 +40,8 @@ intent:
   message: Distinguish deliberately displaced display coordinates from source positions.
 distinction:
   id: motionAtlas.bounded-location-displacement.distinction
-  message: Location-uncertainty-boundary depicts uncertainty already present in evidence.
+  message:
+    Location-uncertainty-boundary depicts uncertainty already present in evidence.
     This intentionally changes a display copy under a supplied disclosure policy and
     labels the difference.
 tags:
@@ -66,19 +70,23 @@ aliases:
     message: data minimization
 notFor:
   - id: motionAtlas.bounded-location-displacement.notFor.0
-    message: Displacement does not guarantee anonymity, safety, k-anonymity or differential
+    message:
+      Displacement does not guarantee anonymity, safety, k-anonymity or differential
       privacy.
   - id: motionAtlas.bounded-location-displacement.notFor.1
-    message: The bound is displacement from the source, not confidence radius around the
+    message:
+      The bound is displacement from the source, not confidence radius around the
       true position.
   - id: motionAtlas.bounded-location-displacement.notFor.2
     message: No fresh randomness; offsets are supplied and deterministic.
   - id: motionAtlas.bounded-location-displacement.notFor.3
-    message: No live geography, online routing, JSX, functions, URLs, private records or
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
       external requests. Maps are schematic local plans; no real-world inference
       follows.
   - id: motionAtlas.bounded-location-displacement.notFor.4
-    message: Authored prose remains the author’s responsibility. Runtime validation
+    message:
+      Authored prose remains the author’s responsibility. Runtime validation
       preserves supplied text without classifying its language or factual claims.
 motionBeats:
   - startFrame: 0

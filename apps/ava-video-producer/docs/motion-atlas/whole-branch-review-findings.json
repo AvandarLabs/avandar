@@ -30,9 +30,7 @@
       "id": "WB-M1",
       "severity": "Minor",
       "title": "Empty nested control labels expose message IDs, and outcome descriptors retain template IDs",
-      "canonicalIds": [
-        "packet-25/review/M4"
-      ],
+      "canonicalIds": ["packet-25/review/M4"],
       "recommendation": "Correct before final handoff as bounded control-copy work. Keep descriptor paths, schema values, inputs and renderer behavior unchanged.",
       "impact": "Eleven nested descriptor occurrences across five presets contain an empty message. useContentField passes these descriptors to Lingui, whose installed implementation falls back to the message ID. The resulting visible labels and accessible names expose long implementation identifiers. Two InvalidTableQuarantine outcome options also use the non-preset PLACE namespace.",
       "evidence": [
@@ -45,25 +43,18 @@
           "file": "apps/ava-video-producer/src/stock/presets/InvalidTableQuarantine/InvalidTableQuarantine.controls.ts",
           "line": 31,
           "occurrences": 2,
-          "otherLines": [
-            122
-          ],
+          "otherLines": [122],
           "messageIds": [
             "motionAtlas.invalid-table-quarantine.controls.originalRows.",
             "motionAtlas.invalid-table-quarantine.controls.reload.rows."
           ],
-          "suggestedMessages": [
-            "Original row",
-            "Reloaded row"
-          ]
+          "suggestedMessages": ["Original row", "Reloaded row"]
         },
         {
           "file": "apps/ava-video-producer/src/stock/presets/InvalidTableQuarantine/InvalidTableQuarantine.controls.ts",
           "line": 80,
           "occurrences": 2,
-          "otherLines": [
-            85
-          ],
+          "otherLines": [85],
           "messageIds": [
             "PLACE.attempt.outcome.failed",
             "PLACE.attempt.outcome.completed"
@@ -72,10 +63,7 @@
             "motionAtlas.invalid-table-quarantine.controls.attempt.outcome.failed",
             "motionAtlas.invalid-table-quarantine.controls.attempt.outcome.completed"
           ],
-          "suggestedMessages": [
-            "Failed",
-            "Completed"
-          ]
+          "suggestedMessages": ["Failed", "Completed"]
         },
         {
           "file": "apps/ava-video-producer/src/stock/presets/OrderedLockAcquisition/OrderedLockAcquisition.controls.ts",
@@ -84,9 +72,7 @@
           "messageIds": [
             "motionAtlas.ordered-lock-acquisition.controls.operations.requestedIds."
           ],
-          "suggestedMessages": [
-            "Requested resource"
-          ]
+          "suggestedMessages": ["Requested resource"]
         },
         {
           "file": "apps/ava-video-producer/src/stock/presets/DocumentRegionDriftCheck/DocumentRegionDriftCheck.controls.ts",
@@ -95,42 +81,27 @@
           "messageIds": [
             "motionAtlas.document-region-drift-check.controls.saved.box.coordinate"
           ],
-          "suggestedMessages": [
-            "Coordinate"
-          ],
+          "suggestedMessages": ["Coordinate"],
           "note": "Override the label for the empty-path tuple item; do not change its path or shared numeric bounds."
         },
         {
           "file": "apps/ava-video-producer/src/stock/presets/PublicationSnapshotSlice/PublicationSnapshotSlice.controls.ts",
           "line": 110,
           "occurrences": 3,
-          "otherLines": [
-            129,
-            140
-          ],
+          "otherLines": [129, 140],
           "messageIds": [
             "motionAtlas.publication-snapshot-slice.controls.table.rows.cells.value",
             "motionAtlas.publication-snapshot-slice.controls.selection.rowIds.value",
             "motionAtlas.publication-snapshot-slice.controls.selection.columnIds.value"
           ],
-          "suggestedMessages": [
-            "Cell value",
-            "Selected row",
-            "Selected column"
-          ]
+          "suggestedMessages": ["Cell value", "Selected row", "Selected column"]
         },
         {
           "file": "apps/ava-video-producer/src/stock/presets/CoordinateQualityTriage/CoordinateQualityTriage.controls.ts",
           "line": 44,
           "occurrences": 4,
-          "otherLines": [
-            61,
-            89,
-            106
-          ],
-          "messageIds": [
-            "motionAtlas.coordinate-quality-triage.controls."
-          ],
+          "otherLines": [61, 89, 106],
+          "messageIds": ["motionAtlas.coordinate-quality-triage.controls."],
           "suggestedMessages": [
             "Latitude value",
             "Latitude value",
@@ -152,10 +123,7 @@
       "id": "WB-M2",
       "severity": "Minor",
       "title": "Three reference selectors describe domain items as coordinates",
-      "canonicalIds": [
-        "packet-16/review/M1",
-        "packet-17/review/M2"
-      ],
+      "canonicalIds": ["packet-16/review/M1", "packet-17/review/M2"],
       "recommendation": "Replace only the three authored descriptor messages, retaining their existing preset-scoped IDs.",
       "impact": "These are reference selectors for lunch components, investigation cases and selected sites. Their label and accessible name currently say Coordinate, misleading the author about what selection changes.",
       "locations": [
@@ -165,9 +133,7 @@
           "messageIds": [
             "motionAtlas.school-lunch-tray-composition.controls.trays.componentIds.item"
           ],
-          "suggestedMessages": [
-            "Component"
-          ]
+          "suggestedMessages": ["Component"]
         },
         {
           "file": "apps/ava-video-producer/src/stock/presets/ClusterEpicurveLink/investigationCaseIdsControl.ts",
@@ -175,9 +141,7 @@
           "messageIds": [
             "motionAtlas.cluster-epicurve-link.controls.investigationCaseIds.item"
           ],
-          "suggestedMessages": [
-            "Investigation case"
-          ]
+          "suggestedMessages": ["Investigation case"]
         },
         {
           "file": "apps/ava-video-producer/src/stock/presets/StratifiedSpatialSample/selectedSiteIdsControl.ts",
@@ -185,9 +149,7 @@
           "messageIds": [
             "motionAtlas.stratified-spatial-sample.controls.selectedSiteIds.item"
           ],
-          "suggestedMessages": [
-            "Selected site"
-          ]
+          "suggestedMessages": ["Selected site"]
         }
       ],
       "verificationAfterFix": "Fresh affected selector labels/accessibility checks, with explicit source/version continuity. No domain, geometry or numeric changes are indicated.",
@@ -197,19 +159,14 @@
       "id": "WB-M3",
       "severity": "Minor",
       "title": "JournalReceipts claims a complete hold before the fifth receipt and tab settle",
-      "canonicalIds": [
-        "packet-03/review/M1"
-      ],
+      "canonicalIds": ["packet-03/review/M1"],
       "recommendation": "Keep the existing choreography. Change the metadata action endFrame from 107 to 135 and the completed hold startFrame from 108 to 136; retain hold endFrame 167.",
       "impact": "The public sequence metadata promises that the completed authored state remains held from 108, but at the maximum five receipts the last transfer starts at 108, arrives at 128, and its tab closes through 136. Retrieval/authoring consumers therefore receive an inaccurate completed-state window.",
       "locations": [
         {
           "file": "apps/ava-video-producer/src/stock/presets/JournalReceipts/JournalReceipts.metadata.ts",
           "line": 94,
-          "otherLines": [
-            101,
-            105
-          ],
+          "otherLines": [101, 105],
           "suggestedActionEndFrame": 135,
           "suggestedHoldStartFrame": 136,
           "suggestedHoldEndFrame": 167
@@ -229,9 +186,7 @@
   ],
   "scope": {
     "changedFiles": 2450,
-    "outsideProducer": [
-      "pnpm-lock.yaml"
-    ],
+    "outsideProducer": ["pnpm-lock.yaml"],
     "additions": 150,
     "addedGeneral": 86,
     "addedSocialSector": 64,
@@ -636,9 +591,7 @@
       },
       "priorDisposition": "pending-final-whole-branch-triage",
       "closureOverlay": null,
-      "wholeBranchFindingIds": [
-        "WB-M3"
-      ]
+      "wholeBranchFindingIds": ["WB-M3"]
     },
     {
       "id": "packet-03/review/M2",
@@ -1166,9 +1119,7 @@
       },
       "priorDisposition": "pending-final-whole-branch-triage",
       "closureOverlay": null,
-      "wholeBranchFindingIds": [
-        "WB-M2"
-      ]
+      "wholeBranchFindingIds": ["WB-M2"]
     },
     {
       "id": "packet-16/review/M2",
@@ -1232,9 +1183,7 @@
       },
       "priorDisposition": "pending-final-whole-branch-triage",
       "closureOverlay": null,
-      "wholeBranchFindingIds": [
-        "WB-M2"
-      ]
+      "wholeBranchFindingIds": ["WB-M2"]
     },
     {
       "id": "packet-17/review/M3",
@@ -1666,9 +1615,7 @@
       },
       "priorDisposition": "pending-final-whole-branch-triage",
       "closureOverlay": null,
-      "wholeBranchFindingIds": [
-        "WB-M1"
-      ]
+      "wholeBranchFindingIds": ["WB-M1"]
     },
     {
       "id": "packet-26/review/M1",

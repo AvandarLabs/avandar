@@ -3,7 +3,8 @@ name:
   message: Agree who uses the shared machine when
 description:
   id: motionAtlas.shared-workshop-booking.description
-  message: Two or three livelihood participants resolve a supplied overlap in requests for
+  message:
+    Two or three livelihood participants resolve a supplied overlap in requests for
     one shared machine. Their agreed bookings become separate usage windows while the
     machine itself remains a single finite resource.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show how people share one productive asset by agreeing distinct times.
 prompt:
   id: motionAtlas.shared-workshop-booking.prompt
-  message: Show one sewing machine beside a compact time ruler, with the supplied
+  message:
+    Show one sewing machine beside a compact time ruler, with the supplied
     participant request strips overlapping above it. The participants slide only the
     authored changed strips into their agreed non-overlapping windows and place
     agreement tabs. A short physical turn at the same machine is shown for each booked
@@ -23,7 +25,8 @@ prompt:
     than masquerading as bookings.
 creativeDirection:
   id: motionAtlas.shared-workshop-booking.creativeDirection
-  message: Show one sewing machine beside a compact time ruler, with the supplied
+  message:
+    Show one sewing machine beside a compact time ruler, with the supplied
     participant request strips overlapping above it. The participants slide only the
     authored changed strips into their agreed non-overlapping windows and place
     agreement tabs. A short physical turn at the same machine is shown for each booked
@@ -35,7 +38,8 @@ intent:
   message: Show how people share one productive asset by agreeing distinct times.
 distinction:
   id: motionAtlas.shared-workshop-booking.distinction
-  message: The participants negotiate contention over a physical machine that remains
+  message:
+    The participants negotiate contention over a physical machine that remains
     single, then occupy it at separate authored times. Unlike queue-relief, capacity
     never increases; unlike schedule-buffer, no deadline reserve absorbs a delay; unlike
     priority-insertion, the change is a mutually agreed reservation rather than imposed
@@ -69,7 +73,8 @@ notFor:
     message: This is a small authored schedule, not an allocation algorithm or a
       demonstration of fair access at scale.
   - id: motionAtlas.shared-workshop-booking.notFor.1
-    message: No revenue, employment or productivity outcome is implied by a booked or
+    message:
+      No revenue, employment or productivity outcome is implied by a booked or
       illustrated equipment turn.
   - id: motionAtlas.shared-workshop-booking.notFor.2
     message: A null agreed slot stays unresolved and never receives a use gesture.
@@ -93,7 +98,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.shared-workshop-booking.beat.1
-      message: Show one sewing machine beside a compact time ruler, with the supplied
+      message:
+        Show one sewing machine beside a compact time ruler, with the supplied
         participant request strips overlapping above it. The participants slide only the
         authored changed strips into their agreed non-overlapping windows and place
         agreement tabs. A short physical turn at the same machine is shown for each

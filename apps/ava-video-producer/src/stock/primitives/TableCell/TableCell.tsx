@@ -1,6 +1,6 @@
-import { StockRect } from "../StockRect/StockRect";
 import { STOCK } from "../../graphics-common";
 import { FitText } from "../FitText/FitText";
+import { StockRect } from "../StockRect/StockRect";
 import type { ReactNode } from "react";
 
 type Props = {

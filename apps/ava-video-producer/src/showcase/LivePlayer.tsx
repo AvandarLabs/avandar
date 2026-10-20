@@ -1,8 +1,3 @@
-import { durationInFrames } from "../storyboard/schema/timeline";
-import {
-  continuityAppearanceSchema,
-  createContinuityPlanFromOptions,
-} from "../continuity/continuityAppearance";
 import { i18n } from "@lingui/core";
 import { compileMessage } from "@lingui/message-utils/compileMessage";
 import { I18nProvider } from "@lingui/react";
@@ -10,6 +5,11 @@ import { Trans } from "@lingui/react/macro";
 import { Player, type PlayerRef } from "@remotion/player";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import {
+  continuityAppearanceSchema,
+  createContinuityPlanFromOptions,
+} from "../continuity/continuityAppearance";
+import { durationInFrames } from "../storyboard/schema/timeline";
 import { FilmComposition } from "./FilmComposition";
 import type { Film } from "./showcase.types";
 import "../theme.css";
@@ -74,10 +74,13 @@ function LivePlayer({ film }: { film: Film }) {
         : {},
     ),
   );
-  const previewPlan = film.plan && continuity
-    ? createContinuityPlanFromOptions(film.plan, appearance)
-    : film.plan;
-  const previewFrames = previewPlan ? durationInFrames(previewPlan) : film.frames;
+  const previewPlan =
+    film.plan && continuity
+      ? createContinuityPlanFromOptions(film.plan, appearance)
+      : film.plan;
+  const previewFrames = previewPlan
+    ? durationInFrames(previewPlan)
+    : film.frames;
   const [captions, setCaptions] = useState(saved?.captions ?? true);
   const [speed, setSpeed] = useState(saved?.speed ?? 1);
   const [loop, setLoop] = useState(saved?.loop ?? false);
@@ -135,7 +138,9 @@ function LivePlayer({ film }: { film: Film }) {
           player.current?.play();
         }
         if (action === "seek" && Number.isFinite(value)) {
-          player.current?.seekTo(Math.max(0, Math.min(previewFrames - 1, value)));
+          player.current?.seekTo(
+            Math.max(0, Math.min(previewFrames - 1, value)),
+          );
           player.current?.play();
         }
         if (action === "speed" && [0.5, 1, 1.5, 2].includes(value)) {

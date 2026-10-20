@@ -21,7 +21,8 @@ useWhen:
   message: Bridge a document or data intake story into a verified result.
 prompt:
   id: motionAtlas.scan-lines.prompt
-  message: Use Motion Atlas "Document scan" (scan-lines) as a conceptual graphic. Bridge a
+  message:
+    Use Motion Atlas "Document scan" (scan-lines) as a conceptual graphic. Bridge a
     document or data intake story into a verified result. Keep the restrained motion and
     readable labels; replace sample content with approved facts before making product
     claims.
@@ -48,7 +49,8 @@ aliases:
     message: validation
 notFor:
   - id: motionAtlas.scan-lines.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

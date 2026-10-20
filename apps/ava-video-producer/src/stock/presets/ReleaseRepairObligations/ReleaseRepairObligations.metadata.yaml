@@ -3,7 +3,8 @@ name:
   message: Deliver with the remaining repair obligations visible
 description:
   id: motionAtlas.release-repair-obligations.description
-  message: An artifact may move to a recipient only when no open blocking issue remains.
+  message:
+    An artifact may move to a recipient only when no open blocking issue remains.
     Every open follow-up issue stays attached as a visible limitation and creates an
     owned, dated repair obligation.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Separate delivery from the continuing duty to address known flaws.
 creativeDirection:
   id: motionAtlas.release-repair-obligations.creativeDirection
-  message: Frames 12..40 reveal an artifact with its authored issue tabs and an empty
+  message:
+    Frames 12..40 reveal an artifact with its authored issue tabs and an empty
     repair register. Frames 41..90 unfold each open follow-up tab into a matching
     register entry with its owner and due label, leaving the original limitation
     attached to the artifact. Resolved issues keep a resolved mark. Frames 91..130 move
@@ -32,7 +34,8 @@ intent:
   message: Separate delivery from the continuing duty to address known flaws.
 distinction:
   id: motionAtlas.release-repair-obligations.distinction
-  message: Unlike readiness-latch, the result may move while explicitly classified
+  message:
+    Unlike readiness-latch, the result may move while explicitly classified
     follow-up obligations remain open. Unlike feedback-refinement, delivery does not
     imply a finished revision cycle; unresolved work retains identity, an owner and a
     due label.
@@ -64,16 +67,20 @@ aliases:
     message: release repair obligations
 notFor:
   - id: motionAtlas.release-repair-obligations.notFor.0
-    message: Issue severity and release acceptability are authored, never inferred from
+    message:
+      Issue severity and release acceptability are authored, never inferred from
       text. The renderer cannot decide whether a flaw is safe.
   - id: motionAtlas.release-repair-obligations.notFor.1
-    message: Do not use the generic example to justify releasing software with dangerous or
+    message:
+      Do not use the generic example to justify releasing software with dangerous or
       unknown consequences.
   - id: motionAtlas.release-repair-obligations.notFor.2
-    message: The register proves only that a commitment was stated. It does not show or
+    message:
+      The register proves only that a commitment was stated. It does not show or
       guarantee that a later repair occurs.
   - id: motionAtlas.release-repair-obligations.notFor.3
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

@@ -3,7 +3,8 @@ name:
   message: Combine the grants that actually apply
 description:
   id: motionAtlas.effective-permission-grants.description
-  message: Candidate grants line up on a role ladder. Ineligible grants fold away and the
+  message:
+    Candidate grants line up on a role ladder. Ineligible grants fold away and the
     highest remaining role determines access; a restricted resource removes the default
     app grant without removing explicit shares.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Resolve eligible grants and compare the result with an action requirement.
 creativeDirection:
   id: motionAtlas.effective-permission-grants.creativeDirection
-  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-52 place each candidate on the none/view/edit/admin
     ladder. Frames 53-100 close gates for disabled conditions and for the app default
     when restriction applies. Frames 101-139 raise a result marker to the maximum
@@ -30,7 +32,8 @@ intent:
   message: Resolve eligible grants and compare the result with an action requirement.
 distinction:
   id: motionAtlas.effective-permission-grants.distinction
-  message: Unlike capability-matrix, this computes a maximum over eligible grants and
+  message:
+    Unlike capability-matrix, this computes a maximum over eligible grants and
     explains why a candidate is excluded. It is neither first-match precedence nor a
     blanket role inheritance ladder.
 tags:
@@ -57,18 +60,22 @@ aliases:
     message: effective permission grants
 notFor:
   - id: motionAtlas.effective-permission-grants.notFor.0
-    message: Bounded grant composition only. Owner/admin short circuits, public publication
+    message:
+      Bounded grant composition only. Owner/admin short circuits, public publication
       and extra row-selection policies are outside this simplified algorithm.
   - id: motionAtlas.effective-permission-grants.notFor.1
     message: No permissions are actually granted by this graphic.
   - id: motionAtlas.effective-permission-grants.notFor.2
-    message: No real product screen, external fetch, supplied code execution, or measured
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
       performance claim. All text is authored; no JSX, functions or URLs in props.
   - id: motionAtlas.effective-permission-grants.notFor.3
-    message: This simplified grant calculation excludes independent read-visibility
+    message:
+      This simplified grant calculation excludes independent read-visibility
       policies. Do not infer every operation from one effective-role result.
   - id: motionAtlas.effective-permission-grants.notFor.4
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

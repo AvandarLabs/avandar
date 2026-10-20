@@ -1,4 +1,4 @@
-import { propEq, prop  } from "@avandar/utils";
+import { propEq, prop } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 /** Each withdrawn permission turns in authored permission order. */

@@ -21,7 +21,8 @@ useWhen:
   message: Direct attention to one line in an illustrative query or code excerpt.
 prompt:
   id: motionAtlas.code-focus.prompt
-  message: Use Motion Atlas "Code spotlight" (code-focus) as a conceptual graphic. Direct
+  message:
+    Use Motion Atlas "Code spotlight" (code-focus) as a conceptual graphic. Direct
     attention to one line in an illustrative query or code excerpt. Keep the restrained
     motion and readable labels; replace sample content with approved facts before making
     product claims.
@@ -48,7 +49,8 @@ aliases:
     message: execution
 notFor:
   - id: motionAtlas.code-focus.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

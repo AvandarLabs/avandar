@@ -1,4 +1,3 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
 import { EASE, ramp } from "../../motion";
 import {
   Eyebrow,
@@ -9,6 +8,7 @@ import {
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { StockRect } from "../primitives/StockRect/StockRect";
 import { CodeWindow } from "./CodeWindow";
 import type { CodeFocusInput } from "../presets/CodeFocus/CodeFocus.schema";
 import type { ReactNode } from "react";

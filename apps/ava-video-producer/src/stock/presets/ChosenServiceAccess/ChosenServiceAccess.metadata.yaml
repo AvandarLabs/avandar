@@ -3,7 +3,8 @@ name:
   message: Open the service someone chooses
 description:
   id: motionAtlas.chosen-service-access.description
-  message: A participant chooses a named community service and an access barrier is
+  message:
+    A participant chooses a named community service and an access barrier is
     visibly addressed at its entrance. The person then approaches and enters by the
     accessible path shown in the example.
 category:
@@ -11,15 +12,18 @@ category:
   message: Access and participation
 useWhen:
   id: motionAtlas.chosen-service-access.useWhen
-  message: Show that a service becomes usable when a person can choose it and physically
+  message:
+    Show that a service becomes usable when a person can choose it and physically
     reach its entrance.
 intent:
   id: motionAtlas.chosen-service-access.intent
-  message: Show that a service becomes usable when a person can choose it and physically
+  message:
+    Show that a service becomes usable when a person can choose it and physically
     reach its entrance.
 creativeDirection:
   id: motionAtlas.chosen-service-access.creativeDirection
-  message: Within six seconds, reveal two or three modest service entrances and a
+  message:
+    Within six seconds, reveal two or three modest service entrances and a
     participant considering their labels. The participant points to the configured
     choice. At that entrance, either unfold a ramp over the step or roll a physical
     obstruction clear, according to the supplied access change; the staff member holds
@@ -28,12 +32,14 @@ creativeDirection:
     apply the shared opaque exit fade.
 distinction:
   id: motionAtlas.chosen-service-access.distinction
-  message: The central transformation changes physical access to a doorway, followed by
+  message:
+    The central transformation changes physical access to a doorway, followed by
     participant-directed entry. It is not node-traversal, a generic status transition,
     or merely labels arriving on cards.
 prompt:
   id: motionAtlas.chosen-service-access.prompt
-  message: Open the service someone chooses. Show that a service becomes usable when a
+  message:
+    Open the service someone chooses. Show that a service becomes usable when a
     person can choose it and physically reach its entrance.
 tags:
   - id: motionAtlas.chosen-service-access.tags.0
@@ -71,16 +77,20 @@ aliases:
     message: accessibility
 notFor:
   - id: motionAtlas.chosen-service-access.notFor.0
-    message: The ramp and entrance are conceptual silhouettes, not dimensional design
+    message:
+      The ramp and entrance are conceptual silhouettes, not dimensional design
       guidance or a certification of accessibility.
   - id: motionAtlas.chosen-service-access.notFor.1
-    message: Removing one depicted physical barrier does not imply that language,
+    message:
+      Removing one depicted physical barrier does not imply that language,
       eligibility, safety, affordability, or other barriers have been resolved.
   - id: motionAtlas.chosen-service-access.notFor.2
-    message: Entry into a shelter desk does not imply a shelter placement, admission
+    message:
+      Entry into a shelter desk does not imply a shelter placement, admission
       entitlement, or guaranteed housing.
   - id: motionAtlas.chosen-service-access.notFor.3
-    message: The scene shows one fictional participant; it makes no population-level access
+    message:
+      The scene shows one fictional participant; it makes no population-level access
       or impact claim.
 motionBeats:
   - startFrame: 12

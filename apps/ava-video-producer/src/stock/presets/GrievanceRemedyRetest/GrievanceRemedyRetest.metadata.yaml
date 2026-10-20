@@ -3,7 +3,8 @@ name:
   message: Let the person test the remedy
 description:
   id: motionAtlas.grievance-remedy-retest.description
-  message: A participant reports a specific unusable object and tests it again after an
+  message:
+    A participant reports a specific unusable object and tests it again after an
     authored repair. The repair action and the participant's acceptance remain separate
     events.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show that a reported repair is checked by the person who raised the problem.
 prompt:
   id: motionAtlas.grievance-remedy-retest.prompt
-  message: Show a participant trying a locker latch that will not close, then placing a
+  message:
+    Show a participant trying a locker latch that will not close, then placing a
     complaint marker beside it. A worker replaces the latch while the participant stays
     present. The participant, rather than the worker, operates the latch again; it
     closes only in the supplied functioning outcome. Hold the tested object and the
@@ -22,7 +24,8 @@ prompt:
     non-functioning or unaccepted remedy visibly open.
 creativeDirection:
   id: motionAtlas.grievance-remedy-retest.creativeDirection
-  message: Show a participant trying a locker latch that will not close, then placing a
+  message:
+    Show a participant trying a locker latch that will not close, then placing a
     complaint marker beside it. A worker replaces the latch while the participant stays
     present. The participant, rather than the worker, operates the latch again; it
     closes only in the supplied functioning outcome. Hold the tested object and the
@@ -33,7 +36,8 @@ intent:
   message: Show that a reported repair is checked by the person who raised the problem.
 distinction:
   id: motionAtlas.grievance-remedy-retest.distinction
-  message: A material object is repaired and then physically operated by the affected
+  message:
+    A material object is repaired and then physically operated by the affected
     person, with acceptance independent of the worker's action. Unlike
     feedback-refinement, the exchange does not edit a draft; unlike status-cycle,
     closure cannot be inferred merely from the repair step.
@@ -63,7 +67,8 @@ goodFor:
     message: Showing a complainant checking a tangible correction
 notFor:
   - id: motionAtlas.grievance-remedy-retest.notFor.0
-    message: Only a small visible object defect is represented; this is not a model for
+    message:
+      Only a small visible object defect is represented; this is not a model for
       resolving violence, legal disputes or complex safeguarding concerns.
   - id: motionAtlas.grievance-remedy-retest.notFor.1
     message: An operating object is not automatically an accepted remedy.
@@ -84,13 +89,15 @@ motionBeats:
     endFrame: 35
     description:
       id: motionAtlas.grievance-remedy-retest.beat.0
-      message: Participant operates the defective object and places an optional complaint
+      message:
+        Participant operates the defective object and places an optional complaint
         marker.
   - startFrame: 36
     endFrame: 107
     description:
       id: motionAtlas.grievance-remedy-retest.beat.1
-      message: Worker replaces the part during 44–78; participant retests during 88–108 unless
+      message:
+        Worker replaces the part during 44–78; participant retests during 88–108 unless
         not-tested.
   - startFrame: 108
     endFrame: 179

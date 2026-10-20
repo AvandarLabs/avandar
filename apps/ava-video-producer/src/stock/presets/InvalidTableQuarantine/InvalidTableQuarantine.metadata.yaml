@@ -3,7 +3,8 @@ name:
   message: Keep partial data out of the next read
 description:
   id: motionAtlas.invalid-table-quarantine.description
-  message: A stored table is marked invalid before a mutation starts. If the operation
+  message:
+    A stored table is marked invalid before a mutation starts. If the operation
     fails, a read cannot use the partial contents; a complete replacement restores
     readability.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Keep potentially partial state out of later reads.
 creativeDirection:
   id: motionAtlas.invalid-table-quarantine.creativeDirection
-  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-45 close a visible read shutter before altering one
     row. Frames 46-95 show the authored mutation outcome with an invalid band still
     covering the table. Frames 96-139 either insert a full replacement sheet and reopen
@@ -29,7 +31,8 @@ intent:
   message: Keep potentially partial state out of later reads.
 distinction:
   id: motionAtlas.invalid-table-quarantine.distinction
-  message: "Unlike revision-restore, the point is refusing reads of potentially partial
+  message:
+    "Unlike revision-restore, the point is refusing reads of potentially partial
     state. It is not a rollback: only a complete reload clears invalidity."
 tags:
   - id: motionAtlas.invalid-table-quarantine.tags.0
@@ -59,14 +62,17 @@ notFor:
   - id: motionAtlas.invalid-table-quarantine.notFor.2
     message: The shutter represents validity, not encryption or deletion.
   - id: motionAtlas.invalid-table-quarantine.notFor.3
-    message: No real product screen, external fetch, supplied code execution, or measured
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
       performance claim. All text is authored; no JSX, functions or URLs in props.
   - id: motionAtlas.invalid-table-quarantine.notFor.4
-    message: Supplied prose is preserved. Fictional framing, source completeness and
+    message:
+      Supplied prose is preserved. Fictional framing, source completeness and
       agreement between labels and structured state are author responsibilities. Runtime
       validation enforces structural bounds and exact cross-field rules.
   - id: motionAtlas.invalid-table-quarantine.notFor.5
-    message: Literal IDs and row values preserve exact whitespace using visible whitespace
+    message:
+      Literal IDs and row values preserve exact whitespace using visible whitespace
       marks at a fixed readable size.
 motionBeats:
   - startFrame: 13

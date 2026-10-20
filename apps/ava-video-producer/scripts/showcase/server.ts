@@ -153,8 +153,12 @@ async function api(
     }
     const parameters = new URL(req.url ?? "/", "http://localhost").searchParams;
     const film = await ShowcaseFilms.load(filmMatch[1], {
-      ...(parameters.has("cameraPreset") ? { cameraPreset: parameters.get("cameraPreset") } : {}),
-      ...(parameters.has("cameraMotion") ? { cameraMotion: parameters.get("cameraMotion") !== "false" } : {}),
+      ...(parameters.has("cameraPreset")
+        ? { cameraPreset: parameters.get("cameraPreset") }
+        : {}),
+      ...(parameters.has("cameraMotion")
+        ? { cameraMotion: parameters.get("cameraMotion") !== "false" }
+        : {}),
     });
     if (!film.plan) {
       res.writeHead(404).end();

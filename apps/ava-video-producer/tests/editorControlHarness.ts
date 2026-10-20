@@ -5,7 +5,10 @@ import { pathToFileURL } from "node:url";
 import { isPlainObject } from "@avandar/utils";
 import { transformAsync } from "@babel/core";
 import { build } from "esbuild";
-import type { StockMessageDescriptor, StockControl  } from "../src/stock/contracts/StockContract.types";
+import type {
+  StockMessageDescriptor,
+  StockControl,
+} from "../src/stock/contracts/StockContract.types";
 
 const require: NodeJS.Require = createRequire(import.meta.url);
 

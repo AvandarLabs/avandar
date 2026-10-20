@@ -12,15 +12,18 @@ category:
   message: Description and conceptual structure
 useWhen:
   id: motionAtlas.utterance-to-model-draft.useWhen
-  message: Make an authored phrase-to-model interpretation inspectable without treating it
+  message:
+    Make an authored phrase-to-model interpretation inspectable without treating it
     as automatic truth.
 intent:
   id: motionAtlas.utterance-to-model-draft.intent
-  message: Make an authored phrase-to-model interpretation inspectable without treating it
+  message:
+    Make an authored phrase-to-model interpretation inspectable without treating it
     as automatic truth.
 creativeDirection:
   id: motionAtlas.utterance-to-model-draft.creativeDirection
-  message: Frames 0-11 reveal a short sentence on a 960x600 canvas. Frames 12-48 underline
+  message:
+    Frames 0-11 reveal a short sentence on a 960x600 canvas. Frames 12-48 underline
     the supplied entity and relation tokens while all connector words remain in place.
     Frames 49-105 lift duplicate phrase slips from those exact spans into two entity
     sockets and one relationship hinge; an optional attribute slip docks to its declared
@@ -31,7 +34,8 @@ creativeDirection:
     executed.
 distinction:
   id: motionAtlas.utterance-to-model-draft.distinction
-  message: Unlike schema-mapping, the starting material is a sentence rather than two
+  message:
+    Unlike schema-mapping, the starting material is a sentence rather than two
     field schemas. Unlike entity-spine-assembly, no source records are materialized and
     no unique-member set is calculated. The hero action preserves the origin of each
     authored concept as language becomes a proposed structure. Unlike
@@ -80,24 +84,30 @@ aliases:
     message: entities
 notFor:
   - id: motionAtlas.utterance-to-model-draft.notFor.0
-    message: One short sentence, two entities, one relation, and at most one attribute fit
+    message:
+      One short sentence, two entities, one relation, and at most one attribute fit
       the six-second loop. More complex domain modeling belongs in a longer explanation.
   - id: motionAtlas.utterance-to-model-draft.notFor.1
-    message: All mappings and labels are authored inputs, not generated model output. The
+    message:
+      All mappings and labels are authored inputs, not generated model output. The
       scene does not implement description-logic reasoning, model training,
       natural-language parsing, or arbitrary-domain configuration.
   - id: motionAtlas.utterance-to-model-draft.notFor.2
-    message: No cardinality, uniqueness, datatype, relationship inference, or business rule
+    message:
+      No cardinality, uniqueness, datatype, relationship inference, or business rule
       may be added unless explicitly present in a future separately specified contract.
   - id: motionAtlas.utterance-to-model-draft.notFor.3
-    message: Pending review remains pending without a success marker. Accepted marks only
+    message:
+      Pending review remains pending without a success marker. Accepted marks only
       the supplied owner decision, not objective model correctness or a deployed
       workspace.
   - id: motionAtlas.utterance-to-model-draft.notFor.4
-    message: The stock animation makes no claim that a particular product provides
+    message:
+      The stock animation makes no claim that a particular product provides
       natural-language configuration or that a proposed model has been deployed.
   - id: motionAtlas.utterance-to-model-draft.notFor.5
-    message: Free prose is author supplied; only structural, reference, numeric and
+    message:
+      Free prose is author supplied; only structural, reference, numeric and
       documented lexical constraints are runtime-validated.
 motionBeats:
   - startFrame: 0

@@ -3,7 +3,8 @@ name:
   message: Apply the row condition before transfer
 description:
   id: motionAtlas.predicate-pushdown-boundary.description
-  message: A source table applies one explicit row predicate before selected record copies
+  message:
+    A source table applies one explicit row predicate before selected record copies
     cross a transfer boundary. Excluded rows stay at the source and the destination
     displays exactly the transferred subset.
 category:
@@ -19,7 +20,8 @@ prompt:
     transfer boundary explicit. Supply approved authored content before making claims.
 creativeDirection:
   id: motionAtlas.predicate-pushdown-boundary.creativeDirection
-  message: 960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-50 show a query predicate arriving at the source.
     Frames 51-95 close source gates for nonmatching rows. Frames 96-139 move only
     matching row copies across the boundary while the full source remains intact. Hold
@@ -30,7 +32,8 @@ intent:
   message: Make the location of filtering relative to a transfer boundary explicit.
 distinction:
   id: motionAtlas.predicate-pushdown-boundary.distinction
-  message: Unlike a generic data-pipeline, selection occurs before the boundary and only
+  message:
+    Unlike a generic data-pipeline, selection occurs before the boundary and only
     the matching rows are transferred. It differs from column-cache growth, which
     retains every row.
 tags:
@@ -61,21 +64,25 @@ aliases:
     message: source filtering
 notFor:
   - id: motionAtlas.predicate-pushdown-boundary.notFor.0
-    message: The source is assumed to support this predicate; source capabilities must be
+    message:
+      The source is assumed to support this predicate; source capabilities must be
       established before presenting a real implementation claim.
   - id: motionAtlas.predicate-pushdown-boundary.notFor.1
     message: "Rows are not bytes: fewer rows does not establish a measured bandwidth reduction."
   - id: motionAtlas.predicate-pushdown-boundary.notFor.2
     message: Predicate correctness and source capability are supplied assumptions.
   - id: motionAtlas.predicate-pushdown-boundary.notFor.3
-    message: No JSX, functions, URLs or external fetch in props. The animation is an
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
       authored explanation, not actual document extraction or product evidence.
   - id: motionAtlas.predicate-pushdown-boundary.notFor.4
-    message: Authored prose and schematic context are the author's responsibility. Runtime
+    message:
+      Authored prose and schematic context are the author's responsibility. Runtime
       validation checks structural bounds and numeric, reference and geometry
       constraints, without classifying natural-language claims.
   - id: motionAtlas.predicate-pushdown-boundary.notFor.5
-    message: Source IDs preserve exact authored characters, including empty strings.
+    message:
+      Source IDs preserve exact authored characters, including empty strings.
       Whitespace uses distinct literal-data marks.
 motionBeats:
   - startFrame: 0
@@ -87,7 +94,8 @@ motionBeats:
     endFrame: 50
     description:
       id: motionAtlas.predicate-pushdown-boundary.motionBeats.1
-      message: A source table applies one explicit row predicate before selected record copies
+      message:
+        A source table applies one explicit row predicate before selected record copies
         cross a transfer boundary. Excluded rows stay at the source and the destination
         displays exactly the transferred subset.
   - startFrame: 51

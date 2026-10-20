@@ -3,7 +3,8 @@ name:
   message: Hold water, show the spill
 description:
   id: motionAtlas.stormwater-storage-spill.description
-  message: A local cutaway routes a bounded stormwater volume through infiltration,
+  message:
+    A local cutaway routes a bounded stormwater volume through infiltration,
     controlled discharge and finite detention. Any remaining water visibly spills
     instead of disappearing.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Make the limit of an adaptation measure visible alongside the water it manages.
 prompt:
   id: motionAtlas.stormwater-storage-spill.prompt
-  message: Reveal a schematic street and basin with a marked storage lip. At the operator
+  message:
+    Reveal a schematic street and basin with a marked storage lip. At the operator
     cue, the supplied inflow divides into infiltration, controlled outflow and detention
     compartments. Once detention reaches its capacity, the remaining water crosses a
     distinct overflow crest. Hold all destinations with an explicit conserved-volume
     equation before fading.
 creativeDirection:
   id: motionAtlas.stormwater-storage-spill.creativeDirection
-  message: Reveal a schematic street and basin with a marked storage lip. At the operator
+  message:
+    Reveal a schematic street and basin with a marked storage lip. At the operator
     cue, the supplied inflow divides into infiltration, controlled outflow and detention
     compartments. Once detention reaches its capacity, the remaining water crosses a
     distinct overflow crest. Hold all destinations with an explicit conserved-volume
@@ -31,7 +34,8 @@ intent:
   message: Make the limit of an adaptation measure visible alongside the water it manages.
 distinction:
   id: motionAtlas.stormwater-storage-spill.distinction
-  message: A vessel physically reaches capacity and activates a spill path. This explains
+  message:
+    A vessel physically reaches capacity and activates a spill path. This explains
     a finite storage boundary rather than a generic stream or state progression.
 tags:
   - id: motionAtlas.stormwater-storage-spill.tags.0
@@ -69,13 +73,16 @@ aliases:
     message: detention basin
 notFor:
   - id: motionAtlas.stormwater-storage-spill.notFor.0
-    message: The basin begins empty. Incoming = infiltrated + controlled discharge + final
+    message:
+      The basin begins empty. Incoming = infiltrated + controlled discharge + final
       detention + overflow; no water is deleted or counted in two destinations.
   - id: motionAtlas.stormwater-storage-spill.notFor.1
-    message: Inputs describe aggregate event volumes, not simultaneous flow rates. Terrain,
+    message:
+      Inputs describe aggregate event volumes, not simultaneous flow rates. Terrain,
       drainage capacity, soil and downstream risk are not simulated.
   - id: motionAtlas.stormwater-storage-spill.notFor.2
-    message: The scene does not claim flood prevention or predict a real flood extent.
+    message:
+      The scene does not claim flood prevention or predict a real flood extent.
       Defaults and local geography are fictional.
 motionBeats:
   - startFrame: 0
@@ -87,7 +94,8 @@ motionBeats:
     endFrame: 108
     description:
       id: motionAtlas.stormwater-storage-spill.motionBeats.1
-      message: Reveal a schematic street and basin with a marked storage lip. At the operator
+      message:
+        Reveal a schematic street and basin with a marked storage lip. At the operator
         cue, the supplied inflow divides into infiltration, controlled outflow and
         detention compartments. Once detention reaches its capacity, the remaining water
         crosses a distinct overflow crest. Hold all destinations with an explicit
@@ -96,5 +104,6 @@ motionBeats:
     endFrame: 167
     description:
       id: motionAtlas.stormwater-storage-spill.motionBeats.2
-      message: Hold conserved quantities and visible destinations. The outer envelope returns
+      message:
+        Hold conserved quantities and visible destinations. The outer envelope returns
         to ground.

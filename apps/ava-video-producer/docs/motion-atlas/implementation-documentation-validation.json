@@ -5,10 +5,7 @@
   "requestStoryboardReact": {
     "status": "passed-focused-documentation-examples",
     "head": "e5aeb3e7cb83e23f12a9255df018e25a76cc8c0e",
-    "productionSchemas": [
-      "stockRequestSchema",
-      "storyboardSchema"
-    ],
+    "productionSchemas": ["stockRequestSchema", "storyboardSchema"],
     "checks": {
       "completeRequest": "passed with exact supplied-input preservation",
       "completeStoryboard": "passed with exact supplied-input preservation",
@@ -193,11 +190,7 @@
       },
       {
         "label": "diff-check",
-        "argv": [
-          "git",
-          "diff",
-          "--check"
-        ],
+        "argv": ["git", "diff", "--check"],
         "cwd": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog",
         "startedAtUtc": "2026-10-18T02:27:44.378907+00:00",
         "finishedAtUtc": "2026-10-18T02:27:44.401982+00:00",
@@ -213,10 +206,7 @@
     "schemaReact": {
       "status": "passed-focused-documentation-examples",
       "head": "4814054116cb4be8cb0ca0096f22686022b4ff8e",
-      "productionSchemas": [
-        "stockRequestSchema",
-        "storyboardSchema"
-      ],
+      "productionSchemas": ["stockRequestSchema", "storyboardSchema"],
       "checks": {
         "completeRequest": "passed with exact supplied-input preservation",
         "completeStoryboard": "passed with exact supplied-input preservation",

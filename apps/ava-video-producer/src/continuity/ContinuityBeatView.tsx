@@ -1,10 +1,10 @@
 import { useCurrentFrame } from "remotion";
 import { enter } from "../motion";
 import { ContinuityContent } from "./ContinuityContent";
-import { useContinuityCopy } from "./useContinuityCopy";
 import css from "./ContinuityScene.module.css";
-import type { ContinuityBeat } from "./continuitySchema";
+import { useContinuityCopy } from "./useContinuityCopy";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
+import type { ContinuityBeat } from "./continuitySchema";
 
 type Props = {
   beat: ContinuityBeat;

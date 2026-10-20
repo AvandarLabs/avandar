@@ -21,7 +21,8 @@ useWhen:
   message: Use an abstract connected field behind a chapter opening or a broad systems idea.
 prompt:
   id: motionAtlas.plexus-field.prompt
-  message: Use Motion Atlas "Plexus field" (plexus-field) as a conceptual graphic. Use an
+  message:
+    Use Motion Atlas "Plexus field" (plexus-field) as a conceptual graphic. Use an
     abstract connected field behind a chapter opening or a broad systems idea. Keep the
     restrained motion and readable labels; replace sample content with approved facts
     before making product claims.
@@ -48,7 +49,8 @@ aliases:
     message: ambient
 notFor:
   - id: motionAtlas.plexus-field.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

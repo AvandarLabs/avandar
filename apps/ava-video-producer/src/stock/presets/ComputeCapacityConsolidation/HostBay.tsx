@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { propEq, prop } from "@avandar/utils";
 import { ramp, mix } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { HostLabels } from "./HostLabels";
 import type { Input } from "./ComputeCapacityConsolidation.schema";

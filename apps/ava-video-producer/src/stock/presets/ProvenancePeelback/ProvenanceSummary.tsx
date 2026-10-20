@@ -1,5 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { EASE, mix, ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { CitationTab } from "./CitationTab";
 import { SummaryCopy } from "./SummaryCopy";

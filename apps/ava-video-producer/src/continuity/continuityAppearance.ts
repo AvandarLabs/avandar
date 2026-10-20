@@ -1,7 +1,7 @@
-import { motionOptionsSchema } from "../motion-components/motionSettings";
-import { createContinuityShotFromCameraPreset } from "./createContinuityShotFromCameraPreset";
 import { z } from "zod";
 import { DEFAULT_ACCENT } from "../gallery/palette";
+import { motionOptionsSchema } from "../motion-components/motionSettings";
+import { createContinuityShotFromCameraPreset } from "./createContinuityShotFromCameraPreset";
 import type { Storyboard } from "../storyboard/schema/schema";
 
 /** Validated editorial controls shared by previews and exports. */

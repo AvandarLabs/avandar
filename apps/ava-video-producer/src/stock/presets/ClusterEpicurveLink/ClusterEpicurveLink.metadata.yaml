@@ -3,7 +3,8 @@ name:
   message: Locate the cluster in time
 description:
   id: motionAtlas.cluster-epicurve-link.description
-  message: A supplied investigation group on a schematic map is linked to its recorded
+  message:
+    A supplied investigation group on a schematic map is linked to its recorded
     onset bins in an epidemic curve. The same selected case IDs remain highlighted in
     both views, including an explicit unknown-time compartment.
 category:
@@ -15,13 +16,15 @@ useWhen:
     transmission links.
 prompt:
   id: motionAtlas.cluster-epicurve-link.prompt
-  message: Begin with all case pins and a complete histogram. An authored group receives a
+  message:
+    Begin with all case pins and a complete histogram. An authored group receives a
     map bracket; thin identity guides lift its highlighted tokens into the corresponding
     histogram segments. A chosen time bin then outlines its matching map pins. Hold both
     views with selected and total case counts.
 creativeDirection:
   id: motionAtlas.cluster-epicurve-link.creativeDirection
-  message: Begin with all case pins and a complete histogram. An authored group receives a
+  message:
+    Begin with all case pins and a complete histogram. An authored group receives a
     map bracket; thin identity guides lift its highlighted tokens into the corresponding
     histogram segments. A chosen time bin then outlines its matching map pins. Hold both
     views with selected and total case counts.
@@ -31,7 +34,8 @@ intent:
     transmission links.
 distinction:
   id: motionAtlas.cluster-epicurve-link.distinction
-  message: The same case identities drive a geographic selection and a binned epidemic
+  message:
+    The same case identities drive a geographic selection and a binned epidemic
     curve. Unlike contact-window-overlap, no venue intervals intersect; unlike
     line-trace, the explanation is linked selection between two complete
     representations.
@@ -61,13 +65,16 @@ goodFor:
     message: Keep unknown onset dates visible during case review
 notFor:
   - id: motionAtlas.cluster-epicurve-link.notFor.0
-    message: The investigation group is supplied, not statistically detected. Proximity and
+    message:
+      The investigation group is supplied, not statistically detected. Proximity and
       timing do not establish a common source or transmission.
   - id: motionAtlas.cluster-epicurve-link.notFor.1
-    message: Histogram bars plus unknown-time cases equal the entire case array; highlights
+    message:
+      Histogram bars plus unknown-time cases equal the entire case array; highlights
       are subsets, not extra cases.
   - id: motionAtlas.cluster-epicurve-link.notFor.2
-    message: Counts describe supplied case records only. No population denominator, disease
+    message:
+      Counts describe supplied case records only. No population denominator, disease
       incidence, or clinical guidance is implied.
 domains:
   - id: motionAtlas.cluster-epicurve-link.domains.0
@@ -89,7 +96,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.cluster-epicurve-link.beat.1
-      message: Lift selected identity copies to their bins during frames 36–84; focus returns
+      message:
+        Lift selected identity copies to their bins during frames 36–84; focus returns
         to matching map pins during 90–108.
   - startFrame: 108
     endFrame: 179

@@ -3,7 +3,8 @@ name:
   message: Pack work, release capacity
 description:
   id: motionAtlas.compute-capacity-consolidation.description
-  message: Fixed compute workloads move between server bays while their total resource
+  message:
+    Fixed compute workloads move between server bays while their total resource
     demand stays constant. An operator-approved placement leaves an empty host eligible
     for sleep without claiming a measured energy saving.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Show how a placement decision can free capacity while preserving the work performed.
 prompt:
   id: motionAtlas.compute-capacity-consolidation.prompt
-  message: Reveal host bays holding the supplied work blocks. After the scheduler cue,
+  message:
+    Reveal host bays holding the supplied work blocks. After the scheduler cue,
     slide intact blocks into the authored available capacity on retained hosts; emptied
     hosts fold into the chosen idle-state outline. Hold unchanged total work beside
     occupied and empty host counts derived from the inputs, then fade to ground.
     Workload consolidation does not invent measured energy savings.
 creativeDirection:
   id: motionAtlas.compute-capacity-consolidation.creativeDirection
-  message: Reveal host bays holding the supplied work blocks. After the scheduler cue,
+  message:
+    Reveal host bays holding the supplied work blocks. After the scheduler cue,
     slide intact blocks into the authored available capacity on retained hosts; emptied
     hosts fold into the chosen idle-state outline. Hold unchanged total work beside
     occupied and empty host counts derived from the inputs, then fade to ground.
@@ -31,7 +34,8 @@ intent:
   message: Show how a placement decision can free capacity while preserving the work performed.
 distinction:
   id: motionAtlas.compute-capacity-consolidation.distinction
-  message: The main action is geometric bin packing with an emptied physical resource.
+  message:
+    The main action is geometric bin packing with an emptied physical resource.
     Unlike source-merge, each job keeps its identity and size; unlike bar-race, there is
     no ranking.
 tags:
@@ -70,14 +74,17 @@ aliases:
     message: server consolidation
 notFor:
   - id: motionAtlas.compute-capacity-consolidation.notFor.0
-    message: The workload total is the sum of jobs in both placements. Host counts and
+    message:
+      The workload total is the sum of jobs in both placements. Host counts and
       occupied capacity are derived from assignments, never separately entered.
   - id: motionAtlas.compute-capacity-consolidation.notFor.1
-    message: CPU-hours do not establish kWh, carbon emissions, runtime, latency or monetary
+    message:
+      CPU-hours do not establish kWh, carbon emissions, runtime, latency or monetary
       savings. Memory, locality, reliability and migration cost are outside this
       schematic.
   - id: motionAtlas.compute-capacity-consolidation.notFor.2
-    message: Defaults are fictional and represent supplied feasible placements, not a
+    message:
+      Defaults are fictional and represent supplied feasible placements, not a
       scheduling algorithm or an optimization guarantee.
 motionBeats:
   - startFrame: 0
@@ -89,7 +96,8 @@ motionBeats:
     endFrame: 108
     description:
       id: motionAtlas.compute-capacity-consolidation.motionBeats.1
-      message: Reveal host bays holding the supplied work blocks. After the scheduler cue,
+      message:
+        Reveal host bays holding the supplied work blocks. After the scheduler cue,
         slide intact blocks into the authored available capacity on retained hosts;
         emptied hosts fold into the chosen idle-state outline. Hold unchanged total work
         beside occupied and empty host counts derived from the inputs, then fade to
@@ -98,5 +106,6 @@ motionBeats:
     endFrame: 167
     description:
       id: motionAtlas.compute-capacity-consolidation.motionBeats.2
-      message: Hold conserved quantities and visible destinations. The outer envelope returns
+      message:
+        Hold conserved quantities and visible destinations. The outer envelope returns
         to ground.

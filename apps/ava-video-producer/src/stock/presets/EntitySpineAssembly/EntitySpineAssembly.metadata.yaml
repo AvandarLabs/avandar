@@ -3,7 +3,8 @@ name:
   message: Keep one record per entity
 description:
   id: motionAtlas.entity-spine-assembly.description
-  message: A fixed list of unique entity keys forms a central record spine. Repeated
+  message:
+    A fixed list of unique entity keys forms a central record spine. Repeated
     source observations feed values into those records while unmatched fields remain
     missing and source rows never multiply the entity count.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Preserve entity membership while deriving fields from repeated observations.
 creativeDirection:
   id: motionAtlas.entity-spine-assembly.creativeDirection
-  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-48 align a unique key spine down the center. Frames
     49-105 stack repeated observations beside their key and collapse their numeric
     values by sum. Frames 106-139 attach the derived value to each spine row, leaving a
@@ -29,7 +31,8 @@ intent:
   message: Preserve entity membership while deriving fields from repeated observations.
 distinction:
   id: motionAtlas.entity-spine-assembly.distinction
-  message: Unlike keyed-row-zipper, this is not a two-table row join. A unique spine fixes
+  message:
+    Unlike keyed-row-zipper, this is not a two-table row join. A unique spine fixes
     output grain before repeated observations are aggregated, avoiding join fan-out.
 tags:
   - id: motionAtlas.entity-spine-assembly.tags.0
@@ -57,20 +60,25 @@ notFor:
   - id: motionAtlas.entity-spine-assembly.notFor.0
     message: No identity matching is inferred; key equality is explicit.
   - id: motionAtlas.entity-spine-assembly.notFor.1
-    message: Stored entity membership and computed attribute values are separate, and the
+    message:
+      Stored entity membership and computed attribute values are separate, and the
       animation makes no permanent-value storage claim.
   - id: motionAtlas.entity-spine-assembly.notFor.2
-    message: Sum is the only calculation in this preset; use grouped-value-picker to explain
+    message:
+      Sum is the only calculation in this preset; use grouped-value-picker to explain
       alternatives.
   - id: motionAtlas.entity-spine-assembly.notFor.3
-    message: No real product screen, external fetch, supplied code execution, or measured
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
       performance claim. All text is authored; no JSX, functions or URLs in props.
   - id: motionAtlas.entity-spine-assembly.notFor.4
-    message: Supplied prose is preserved. Fictional framing, source completeness and
+    message:
+      Supplied prose is preserved. Fictional framing, source completeness and
       agreement between labels and structured state are author responsibilities. Runtime
       validation enforces structural bounds and exact cross-field rules.
   - id: motionAtlas.entity-spine-assembly.notFor.5
-    message: Literal IDs and row values preserve exact whitespace using visible whitespace
+    message:
+      Literal IDs and row values preserve exact whitespace using visible whitespace
       marks at a fixed readable size.
 motionBeats:
   - startFrame: 13

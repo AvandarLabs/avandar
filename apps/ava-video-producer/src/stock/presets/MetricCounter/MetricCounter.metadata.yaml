@@ -18,11 +18,13 @@ tags:
     message: progress
 useWhen:
   id: motionAtlas.metric-counter.useWhen
-  message: Give one sourced number a clear visual emphasis without implying an unsupported
+  message:
+    Give one sourced number a clear visual emphasis without implying an unsupported
     outcome.
 prompt:
   id: motionAtlas.metric-counter.prompt
-  message: Use Motion Atlas "Metric landing" (metric-counter) as a conceptual graphic.
+  message:
+    Use Motion Atlas "Metric landing" (metric-counter) as a conceptual graphic.
     Give one sourced number a clear visual emphasis without implying an unsupported
     outcome. Keep the restrained motion and readable labels; replace sample content with
     approved facts before making product claims.
@@ -31,11 +33,13 @@ creativeDirection:
   message: A number counts into place above a small bar series.
 goodFor:
   - id: motionAtlas.metric-counter.goodFor.0
-    message: Give one sourced number a clear visual emphasis without implying an unsupported
+    message:
+      Give one sourced number a clear visual emphasis without implying an unsupported
       outcome.
 intent:
   id: motionAtlas.metric-counter.intent
-  message: Give one sourced number a clear visual emphasis without implying an unsupported
+  message:
+    Give one sourced number a clear visual emphasis without implying an unsupported
     outcome.
 domains:
   - id: motionAtlas.metric-counter.domains.0
@@ -51,7 +55,8 @@ aliases:
     message: progress
 notFor:
   - id: motionAtlas.metric-counter.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

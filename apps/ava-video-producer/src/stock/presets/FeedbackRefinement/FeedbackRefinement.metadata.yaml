@@ -3,7 +3,8 @@ name:
   message: Revise through feedback
 description:
   id: motionAtlas.feedback-refinement.description
-  message: A short draft travels to a reviewer and returns with an attached note. The
+  message:
+    A short draft travels to a reviewer and returns with an attached note. The
     author changes the draft in response and sends the revised version back for the
     supplied closing outcome.
 category:
@@ -20,7 +21,8 @@ prompt:
     product claims.
 creativeDirection:
   id: motionAtlas.feedback-refinement.creativeDirection
-  message: Frames 12..32 establish an author station, a reviewer station, and one readable
+  message:
+    Frames 12..32 establish an author station, a reviewer station, and one readable
     draft between them. During 32..62, the draft crosses to the reviewer and an authored
     feedback tab attaches to its edge. During 62..94, it returns with that tab visibly
     tethered to the draft, and the draft text wipes into the supplied revised wording.
@@ -34,7 +36,8 @@ intent:
   message: Connect a concrete piece of feedback to an authored revision.
 distinction:
   id: motionAtlas.feedback-refinement.distinction
-  message: Retry-backoff repeats an unchanged operation; this makes feedback alter the
+  message:
+    Retry-backoff repeats an unchanged operation; this makes feedback alter the
     artifact before it returns. Data cleanup transforms records according to a rule,
     whereas this shows an authored human review exchange with its note retained.
 tags:
@@ -101,18 +104,21 @@ notFor:
   - id: motionAtlas.feedback-refinement.notFor.0
     message: The default exchange and outcome are fictional.
   - id: motionAtlas.feedback-refinement.notFor.1
-    message: The renderer displays supplied revisions and does not generate, evaluate, or
+    message:
+      The renderer displays supplied revisions and does not generate, evaluate, or
       infer improvements.
   - id: motionAtlas.feedback-refinement.notFor.2
     message: Short text snippets stand for the artifact; simultaneous reviewers,
       contradictory notes, approvals with legal effect, and full document editing are
       outside this scene.
   - id: motionAtlas.feedback-refinement.notFor.3
-    message: The depicted revision must follow the supplied note and closing outcome. A
+    message:
+      The depicted revision must follow the supplied note and closing outcome. A
       contribution does not imply automatic upstream acceptance, deployment, broad
       representativeness, or improved social outcomes.
   - id: motionAtlas.feedback-refinement.notFor.4
-    message: A submitted comment does not prove consent, adoption, representation of the
+    message:
+      A submitted comment does not prove consent, adoption, representation of the
       whole community or that every concern has been resolved. The closing label must
       reflect the authored outcome.
 motionBeats:
@@ -125,7 +131,8 @@ motionBeats:
     endFrame: 144
     description:
       id: motionAtlas.feedback-refinement.motionBeats.1
-      message: Carry feedback back with each draft and wipe into the supplied revision. Two
+      message:
+        Carry feedback back with each draft and wipe into the supplied revision. Two
         rounds divide this span equally.
   - startFrame: 144
     endFrame: 168

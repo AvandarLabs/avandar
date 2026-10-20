@@ -1,4 +1,3 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
 import { EASE, ramp } from "../../motion";
 import {
   Arrive,
@@ -12,6 +11,7 @@ import {
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { StockRect } from "../primitives/StockRect/StockRect";
 import type { DataPipelineInput } from "../presets/DataPipeline/DataPipeline.schema";
 import type { ReactNode } from "react";
 

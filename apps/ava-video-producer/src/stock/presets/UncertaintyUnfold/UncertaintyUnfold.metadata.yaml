@@ -3,7 +3,8 @@ name:
   message: Show the range behind the estimate
 description:
   id: motionAtlas.uncertainty-unfold.description
-  message: A point estimate opens into a bounded interval on one fixed scale. An optional
+  message:
+    A point estimate opens into a bounded interval on one fixed scale. An optional
     reference remains visible so the interval's relation to that reference can be read
     without turning uncertainty into certainty.
 category:
@@ -14,13 +15,15 @@ useWhen:
   message: Make the limits around an estimate as visible as the estimate itself.
 prompt:
   id: motionAtlas.uncertainty-unfold.prompt
-  message: Use Motion Atlas "Show the range behind the estimate" (uncertainty-unfold) as a
+  message:
+    Use Motion Atlas "Show the range behind the estimate" (uncertainty-unfold) as a
     conceptual graphic. Make the limits around an estimate as visible as the estimate
     itself. Replace fictional sample content with approved authored content before
     making product claims.
 creativeDirection:
   id: motionAtlas.uncertainty-unfold.creativeDirection
-  message: At the entrance, a supplied estimate marker stands on a fixed ruler. Two folded
+  message:
+    At the entrance, a supplied estimate marker stands on a fixed ruler. Two folded
     sleeves extend from the marker to the supplied lower and upper endpoints, exposing a
     patterned interval and its explicit meaning. An optional reference blade then lowers
     across the ruler, with its position preserved even when it crosses the interval.
@@ -32,7 +35,8 @@ intent:
   message: Make the limits around an estimate as visible as the estimate itself.
 distinction:
   id: motionAtlas.uncertainty-unfold.distinction
-  message: Unlike line-trace, the scale has no time axis and no observed series is drawn.
+  message:
+    Unlike line-trace, the scale has no time axis and no observed series is drawn.
     Unlike chart-focus-edit, this reveals the uncertainty contract hidden by a point
     alone. Contact-window-overlap compares recorded visits in time; this unfolds one
     numerical estimate into its explicitly named epistemic bounds.
@@ -84,27 +88,34 @@ aliases:
     message: error bars
 notFor:
   - id: motionAtlas.uncertainty-unfold.notFor.0
-    message: One estimate and at most one reference. Endpoints are supplied, never
+    message:
+      One estimate and at most one reference. Endpoints are supplied, never
       statistically calculated or narrowed by the animation.
   - id: motionAtlas.uncertainty-unfold.notFor.1
-    message: Interval width represents numeric span on a linear scale, not probability
+    message:
+      Interval width represents numeric span on a linear scale, not probability
       density, likelihood or sample size.
   - id: motionAtlas.uncertainty-unfold.notFor.2
-    message: Confidence intervals, measurement ranges and scenario ranges are different
+    message:
+      Confidence intervals, measurement ranges and scenario ranges are different
       meanings. The selected kind and label must match the source.
   - id: motionAtlas.uncertainty-unfold.notFor.3
-    message: Crossing or not crossing a reference is not automatically a significance test,
+    message:
+      Crossing or not crossing a reference is not automatically a significance test,
       recommendation or certainty claim. No automatic success or failure color is
       applied.
   - id: motionAtlas.uncertainty-unfold.notFor.4
-    message: A conservative adjustment or downside scenario is not a confidence interval, a
+    message:
+      A conservative adjustment or downside scenario is not a confidence interval, a
       validated error margin, or a representative population estimate. Match
       interval.kind and its visible label to the actual evidence.
   - id: motionAtlas.uncertainty-unfold.notFor.5
-    message: No endpoints, probabilities, sample precision, or validation status are
+    message:
+      No endpoints, probabilities, sample precision, or validation status are
       inferred from a business plan or the width of the displayed band.
   - id: motionAtlas.uncertainty-unfold.notFor.6
-    message: Endpoint values use external slots and leader lines so coincident point and
+    message:
+      Endpoint values use external slots and leader lines so coincident point and
       endpoint positions remain readable. Finite extreme spans use stable normalization
       without changing the axis.
 motionBeats:

@@ -3,7 +3,8 @@ name:
   message: Relieve the bottleneck
 description:
   id: motionAtlas.queue-relief.description
-  message: A visible queue builds behind limited service capacity. Additional service
+  message:
+    A visible queue builds behind limited service capacity. Additional service
     slots open and the same waiting items clear through them.
 category:
   id: motionAtlas.queue-relief.category
@@ -13,7 +14,8 @@ useWhen:
   message: Show that opening more service capacity allows an existing backlog to move.
 creativeDirection:
   id: motionAtlas.queue-relief.creativeDirection
-  message: Frames 0..12 reveal a queue corridor and named service slots. During 12..54,
+  message:
+    Frames 0..12 reveal a queue corridor and named service slots. During 12..54,
     every supplied item arrives and only initially open slots accept work, making the
     waiting line visible. Keep initial service items occupied until the capacity
     expansion beat so a backlog remains visible. During 54..90, the additional slots
@@ -27,12 +29,14 @@ intent:
   message: Show that opening more service capacity allows an existing backlog to move.
 distinction:
   id: motionAtlas.queue-relief.distinction
-  message: Unlike packet-stream, movement is initially constrained and the waiting
+  message:
+    Unlike packet-stream, movement is initially constrained and the waiting
     inventory matters. Unlike status-cycle, the central change is service capacity
     across several work items, not the status of one task.
 prompt:
   id: motionAtlas.queue-relief.prompt
-  message: Use Motion Atlas "Relieve the bottleneck" (queue-relief) as a conceptual
+  message:
+    Use Motion Atlas "Relieve the bottleneck" (queue-relief) as a conceptual
     graphic. Show that opening more service capacity allows an existing backlog to move.
     Replace fictional sample content with approved authored content before making
     product claims.
@@ -74,13 +78,16 @@ aliases:
     message: capacity
 notFor:
   - id: motionAtlas.queue-relief.notFor.0
-    message: The default is a fictional five-request example; each token represents exactly
+    message:
+      The default is a fictional five-request example; each token represents exactly
       one supplied item.
   - id: motionAtlas.queue-relief.notFor.1
-    message: Timing demonstrates the authored sequence, not a measured arrival rate,
+    message:
+      Timing demonstrates the authored sequence, not a measured arrival rate,
       throughput increase, or staffing forecast.
   - id: motionAtlas.queue-relief.notFor.2
-    message: All work is homogeneous and completes within the scene; priorities, varying
+    message:
+      All work is homogeneous and completes within the scene; priorities, varying
       task durations, and continuous arrivals are outside this proposal.
 motionBeats:
   - startFrame: 0

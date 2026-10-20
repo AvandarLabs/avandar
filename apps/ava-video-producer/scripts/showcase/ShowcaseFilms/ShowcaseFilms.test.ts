@@ -327,10 +327,25 @@ test("continuity appearance options preserve the timeline", async () => {
 
 test("camera preset exports include the complete extended timeline", async () => {
   const original = await ShowcaseFilms.load("shared-object-handoff");
-  const adjusted = await ShowcaseFilms.load("shared-object-handoff", { cameraPreset: "deliberate" });
+  const adjusted = await ShowcaseFilms.load("shared-object-handoff", {
+    cameraPreset: "deliberate",
+  });
   assert.ok(adjusted.frames > original.frames);
-  assert.equal(adjusted.frames, adjusted.plan!.shots.reduce((total, shot) => total + shot.durationInFrames, 0));
+  assert.equal(
+    adjusted.frames,
+    adjusted.plan!.shots.reduce(
+      (total, shot) => total + shot.durationInFrames,
+      0,
+    ),
+  );
   const shot = adjusted.plan!.shots[0];
-  assert.equal(shot.scene === "continuity" && shot.props.beats[0].content.kind === "stock" && shot.props.beats[0].content.cameraOptions?.preset, "deliberate");
-  await assert.rejects(ShowcaseFilms.load("shared-object-handoff", { cameraPreset: "fast" }));
+  assert.equal(
+    shot.scene === "continuity" &&
+      shot.props.beats[0].content.kind === "stock" &&
+      shot.props.beats[0].content.cameraOptions?.preset,
+    "deliberate",
+  );
+  await assert.rejects(
+    ShowcaseFilms.load("shared-object-handoff", { cameraPreset: "fast" }),
+  );
 });

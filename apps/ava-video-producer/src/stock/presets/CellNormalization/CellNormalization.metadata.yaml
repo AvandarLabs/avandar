@@ -3,7 +3,8 @@ name:
   message: Clean values in place
 description:
   id: motionAtlas.cell-normalization.description
-  message: A stable table exposes small inconsistencies, then replaces only the authored
+  message:
+    A stable table exposes small inconsistencies, then replaces only the authored
     changed characters. Original values remain available as a compact comparison rail.
 category:
   id: motionAtlas.cell-normalization.category
@@ -29,7 +30,8 @@ distinction:
     characters of the same cells.
 prompt:
   id: motionAtlas.cell-normalization.prompt
-  message: Use Motion Atlas "Clean values in place" (cell-normalization) as a conceptual
+  message:
+    Use Motion Atlas "Clean values in place" (cell-normalization) as a conceptual
     graphic. Make small, explicit data corrections understandable and reviewable.
     Replace fictional sample content with approved authored content before making
     product claims.
@@ -85,7 +87,8 @@ notFor:
   - id: motionAtlas.cell-normalization.notFor.0
     message: All default rows are fictional.
   - id: motionAtlas.cell-normalization.notFor.1
-    message: Before and after strings are authored examples; the animation performs no
+    message:
+      Before and after strings are authored examples; the animation performs no
       inferred cleanup.
   - id: motionAtlas.cell-normalization.notFor.2
     message: An unchanged pair stays unchanged and receives no correction flourish.
@@ -94,7 +97,8 @@ notFor:
   - id: motionAtlas.cell-normalization.notFor.4
     message: Parentheses after a number may be a second measure rather than a negative sign.
   - id: motionAtlas.cell-normalization.notFor.5
-    message: Removing a percent sign must retain a percent-unit label and does not imply
+    message:
+      Removing a percent sign must retain a percent-unit label and does not imply
       division by 100.
 motionBeats:
   - startFrame: 12
@@ -106,7 +110,8 @@ motionBeats:
     endFrame: 112
     description:
       id: motionAtlas.cell-normalization.motionBeats.1
-      message: Bracket changed cells and crossfade only authored replacements. Unfold the
+      message:
+        Bracket changed cells and crossfade only authored replacements. Unfold the
         original-value rail.
   - startFrame: 112
     endFrame: 166

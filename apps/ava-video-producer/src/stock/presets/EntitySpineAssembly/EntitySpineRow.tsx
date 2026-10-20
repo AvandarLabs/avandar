@@ -1,7 +1,7 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { EASE, mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";

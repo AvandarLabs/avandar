@@ -3,7 +3,8 @@ name:
   message: Shared place, overlapping time
 description:
   id: motionAtlas.contact-window-overlap.description
-  message: Place-time strips reveal which recorded visits overlap a supplied investigation
+  message:
+    Place-time strips reveal which recorded visits overlap a supplied investigation
     window. Unknown times remain unresolved, and overlap never becomes an inferred
     transmission link.
 category:
@@ -11,27 +12,32 @@ category:
   message: Time and place intersection
 useWhen:
   id: motionAtlas.contact-window-overlap.useWhen
-  message: Explain the difference between sharing a place and being recorded there during
+  message:
+    Explain the difference between sharing a place and being recorded there during
     the same defined window.
 intent:
   id: motionAtlas.contact-window-overlap.intent
-  message: Explain the difference between sharing a place and being recorded there during
+  message:
+    Explain the difference between sharing a place and being recorded there during
     the same defined window.
 creativeDirection:
   id: motionAtlas.contact-window-overlap.creativeDirection
-  message: Reveal the shared place above the supplied person-specific time ribbons.
+  message:
+    Reveal the shared place above the supplied person-specific time ribbons.
     Position the authored intervals on one axis and lower the investigation-window
     stencil over them; outline only actual interval intersections. Hold overlapping,
     nonoverlapping and unknown records alongside the same people, then fade. The
     intersection represents a review candidate, not a confirmed transmission.
 distinction:
   id: motionAtlas.contact-window-overlap.distinction
-  message: Unlike network-graph, node-traversal, or line-trace, the hero action is a
+  message:
+    Unlike network-graph, node-traversal, or line-trace, the hero action is a
     window stencil intersecting interval lengths attached to people and a physical
     venue. No traveling signal implies transmission.
 prompt:
   id: motionAtlas.contact-window-overlap.prompt
-  message: Use Shared place, overlapping time (contact-window-overlap) for a fictional or
+  message:
+    Use Shared place, overlapping time (contact-window-overlap) for a fictional or
     approved authored example. Explain the difference between sharing a place and being
     recorded there during the same defined window.
 tags:
@@ -70,19 +76,23 @@ aliases:
     message: temporal overlap
 notFor:
   - id: motionAtlas.contact-window-overlap.notFor.0
-    message: The denominator is records.length, one record per distinct person in this
+    message:
+      The denominator is records.length, one record per distinct person in this
       bounded example. Overlap + no overlap + unknown equals that denominator; counts
       are derived from interval intersection.
   - id: motionAtlas.contact-window-overlap.notFor.1
-    message: Intervals and the supplied investigation window use half-open bounds
+    message:
+      Intervals and the supplied investigation window use half-open bounds
       [start,end), so touching endpoints alone do not count as overlap. Unknown means
       both bounds are null.
   - id: motionAtlas.contact-window-overlap.notFor.2
-    message: Any overlap is only recorded co-presence under the supplied window. It is not a
+    message:
+      Any overlap is only recorded co-presence under the supplied window. It is not a
       case definition, exposure determination, disease-specific contact rule, causal
       link, or medical recommendation.
   - id: motionAtlas.contact-window-overlap.notFor.3
-    message: The time axis is a fictional relative scale, not an epidemiological duration.
+    message:
+      The time axis is a fictional relative scale, not an epidemiological duration.
       No transmission arrows or infection probabilities may be added.
 motionBeats:
   - startFrame: 12
@@ -94,7 +104,8 @@ motionBeats:
     endFrame: 115
     description:
       id: motionAtlas.contact-window-overlap.motionBeats.1
-      message: Reveal the shared place above the supplied person-specific time ribbons.
+      message:
+        Reveal the shared place above the supplied person-specific time ribbons.
         Position the authored intervals on one axis and lower the investigation-window
         stencil over them; outline only actual interval intersections. Hold overlapping,
         nonoverlapping and unknown records alongside the same people, then fade. The

@@ -3,7 +3,8 @@ name:
   message: Keep the shelf supplied
 description:
   id: motionAtlas.retail-shelf-replenishment.description
-  message: A retailer notices empty shelf spaces, receives a small replenishment, and
+  message:
+    A retailer notices empty shelf spaces, receives a small replenishment, and
     makes the goods available for a shopper to choose. Physical inventory changes
     connect retail supply to usable assistance.
 category:
@@ -17,7 +18,8 @@ intent:
   message: Show that purchasing choice depends on goods reaching and remaining on the shelf.
 creativeDirection:
   id: motionAtlas.retail-shelf-replenishment.creativeDirection
-  message: Over six seconds, reveal the supplied opening stock as individual objects on a
+  message:
+    Over six seconds, reveal the supplied opening stock as individual objects on a
     cutaway shelf. The retailer points to the empty spaces and places an order slip on
     the counter; a small delivery trolley arrives with exactly the incoming objects,
     which the retailer places into those spaces. A shopper then selects the authored
@@ -26,13 +28,15 @@ creativeDirection:
     the opaque ground.
 distinction:
   id: motionAtlas.retail-shelf-replenishment.distinction
-  message: Unlike data-pipeline, quantities physically leave a vehicle, occupy shelf
+  message:
+    Unlike data-pipeline, quantities physically leave a vehicle, occupy shelf
     slots, and move into a customer basket. Unlike household-market-choice, the main
     action is restoring availability before the purchase, with explicit conservation of
     inventory.
 prompt:
   id: motionAtlas.retail-shelf-replenishment.prompt
-  message: Keep the shelf supplied. Show that purchasing choice depends on goods reaching
+  message:
+    Keep the shelf supplied. Show that purchasing choice depends on goods reaching
     and remaining on the shelf.
 tags:
   - id: motionAtlas.retail-shelf-replenishment.tags.0
@@ -70,16 +74,20 @@ aliases:
     message: shelf stock
 notFor:
   - id: motionAtlas.retail-shelf-replenishment.notFor.0
-    message: Every visible product object corresponds to one authored example unit; no real
+    message:
+      Every visible product object corresponds to one authored example unit; no real
       stock, sales, price, or availability data is represented.
   - id: motionAtlas.retail-shelf-replenishment.notFor.1
-    message: This animation illustrates an authored sequence, not a demand forecast,
+    message:
+      This animation illustrates an authored sequence, not a demand forecast,
       inventory optimization system, or guarantee against shortages.
   - id: motionAtlas.retail-shelf-replenishment.notFor.2
-    message: Incoming supply and shopper choice are configured separately and validated for
+    message:
+      Incoming supply and shopper choice are configured separately and validated for
       feasible quantities; no goods are silently invented.
   - id: motionAtlas.retail-shelf-replenishment.notFor.3
-    message: The process is inspired by the relationship between retail supply and cash
+    message:
+      The process is inspired by the relationship between retail supply and cash
       assistance, without copying agency assets or asserting any measured result.
 motionBeats:
   - startFrame: 12

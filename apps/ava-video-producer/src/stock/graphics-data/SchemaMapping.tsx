@@ -1,4 +1,3 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
 import { prop } from "@avandar/utils";
 import { DUR, ramp } from "../../motion";
 import {
@@ -14,6 +13,7 @@ import {
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { StockRect } from "../primitives/StockRect/StockRect";
 import type { SchemaMappingInput } from "../presets/SchemaMapping/SchemaMapping.schema";
 
 type Props = GraphicProps & { input: SchemaMappingInput };

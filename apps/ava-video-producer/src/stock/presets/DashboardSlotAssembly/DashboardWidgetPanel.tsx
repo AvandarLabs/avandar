@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { DashboardWidgetContent } from "./DashboardWidgetContent";
 import { getWidgetRectFromInput } from "./getWidgetRectFromInput";
@@ -53,7 +53,11 @@ export function DashboardWidgetPanel({
   };
   return (
     <g data-widget-panel={widget.id} opacity={ramp(frame, 12 + index * 2, 12)}>
-      <StockRect data-widget={widget.id} data-widget-kind={widget.kind} {...panel} />
+      <StockRect
+        data-widget={widget.id}
+        data-widget-kind={widget.kind}
+        {...panel}
+      />
       <FitText {...title} />
       <DashboardWidgetContent {...content} />
     </g>

@@ -16,11 +16,7 @@
         "Explain configurable case fields backed by datasets",
         "Show source identifiers and label fields explicitly"
       ],
-      "tags": [
-        "case schema",
-        "dataset-backed fields",
-        "identifier mapping"
-      ],
+      "tags": ["case schema", "dataset-backed fields", "identifier mapping"],
       "limits": [
         "Mapping is not entity resolution, a reasoning engine or manual-field persistence."
       ],

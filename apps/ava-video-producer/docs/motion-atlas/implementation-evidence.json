@@ -292,9 +292,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -577,9 +575,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -862,9 +858,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -1147,9 +1141,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -1533,9 +1525,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -1786,10 +1776,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "21aba3e49",
-          "reports": [
-            "packet-02-review.md",
-            "packet-02-rereview-1.md"
-          ],
+          "reports": ["packet-02-review.md", "packet-02-rereview-1.md"],
           "deferredMinors": "M1-M5 in packet-02-review.md",
           "integrationPending": true
         },
@@ -1935,9 +1922,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -2070,10 +2055,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "21aba3e49",
-          "reports": [
-            "packet-02-review.md",
-            "packet-02-rereview-1.md"
-          ],
+          "reports": ["packet-02-review.md", "packet-02-rereview-1.md"],
           "deferredMinors": "M1-M5 in packet-02-review.md",
           "integrationPending": true
         },
@@ -2219,9 +2201,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -2354,10 +2334,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "21aba3e49",
-          "reports": [
-            "packet-02-review.md",
-            "packet-02-rereview-1.md"
-          ],
+          "reports": ["packet-02-review.md", "packet-02-rereview-1.md"],
           "deferredMinors": "M1-M5 in packet-02-review.md",
           "integrationPending": true
         },
@@ -2503,9 +2480,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -2638,10 +2613,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "21aba3e49",
-          "reports": [
-            "packet-02-review.md",
-            "packet-02-rereview-1.md"
-          ],
+          "reports": ["packet-02-review.md", "packet-02-rereview-1.md"],
           "deferredMinors": "M1-M5 in packet-02-review.md",
           "integrationPending": true
         },
@@ -2787,9 +2759,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -2922,10 +2892,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "21aba3e49",
-          "reports": [
-            "packet-02-review.md",
-            "packet-02-rereview-1.md"
-          ],
+          "reports": ["packet-02-review.md", "packet-02-rereview-1.md"],
           "deferredMinors": "M1-M5 in packet-02-review.md",
           "integrationPending": true
         },
@@ -3071,9 +3038,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -3206,10 +3171,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "7e753392e",
-          "reports": [
-            "packet-03-review.md",
-            "packet-03-rereview-1.md"
-          ],
+          "reports": ["packet-03-review.md", "packet-03-rereview-1.md"],
           "deferredMinor": "M1-M8 in packet-03-review.md",
           "integrationPending": true
         },
@@ -3357,9 +3319,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -3492,10 +3452,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "7e753392e",
-          "reports": [
-            "packet-03-review.md",
-            "packet-03-rereview-1.md"
-          ],
+          "reports": ["packet-03-review.md", "packet-03-rereview-1.md"],
           "deferredMinor": "M1-M8 in packet-03-review.md",
           "integrationPending": true
         },
@@ -3643,9 +3600,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -3778,10 +3733,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "7e753392e",
-          "reports": [
-            "packet-03-review.md",
-            "packet-03-rereview-1.md"
-          ],
+          "reports": ["packet-03-review.md", "packet-03-rereview-1.md"],
           "deferredMinor": "M1-M8 in packet-03-review.md",
           "integrationPending": true
         },
@@ -3929,9 +3881,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -4064,10 +4014,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "7e753392e",
-          "reports": [
-            "packet-03-review.md",
-            "packet-03-rereview-1.md"
-          ],
+          "reports": ["packet-03-review.md", "packet-03-rereview-1.md"],
           "deferredMinor": "M1-M8 in packet-03-review.md",
           "integrationPending": true
         },
@@ -4215,9 +4162,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -4350,10 +4295,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "7e753392e",
-          "reports": [
-            "packet-03-review.md",
-            "packet-03-rereview-1.md"
-          ],
+          "reports": ["packet-03-review.md", "packet-03-rereview-1.md"],
           "deferredMinor": "M1-M8 in packet-03-review.md",
           "integrationPending": true
         },
@@ -4501,9 +4443,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -4636,10 +4576,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "46e4af45d",
-          "reports": [
-            "packet-04-review.md",
-            "packet-04-rereview-1.md"
-          ],
+          "reports": ["packet-04-review.md", "packet-04-rereview-1.md"],
           "deferredMinor": "M1 custody seal/detail clearance",
           "integrationPending": true
         },
@@ -4786,9 +4723,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -4921,10 +4856,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "46e4af45d",
-          "reports": [
-            "packet-04-review.md",
-            "packet-04-rereview-1.md"
-          ],
+          "reports": ["packet-04-review.md", "packet-04-rereview-1.md"],
           "deferredMinor": "M1 custody seal/detail clearance",
           "integrationPending": true
         },
@@ -5071,9 +5003,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -5218,10 +5148,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "46e4af45d",
-          "reports": [
-            "packet-04-review.md",
-            "packet-04-rereview-1.md"
-          ],
+          "reports": ["packet-04-review.md", "packet-04-rereview-1.md"],
           "deferredMinor": "M1 custody seal/detail clearance",
           "integrationPending": true
         },
@@ -5368,9 +5295,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -5503,10 +5428,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "46e4af45d",
-          "reports": [
-            "packet-04-review.md",
-            "packet-04-rereview-1.md"
-          ],
+          "reports": ["packet-04-review.md", "packet-04-rereview-1.md"],
           "deferredMinor": "M1 custody seal/detail clearance",
           "integrationPending": true
         },
@@ -5653,9 +5575,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -5788,10 +5708,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "46e4af45d",
-          "reports": [
-            "packet-04-review.md",
-            "packet-04-rereview-1.md"
-          ],
+          "reports": ["packet-04-review.md", "packet-04-rereview-1.md"],
           "deferredMinor": "M1 custody seal/detail clearance",
           "integrationPending": true
         },
@@ -5938,9 +5855,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -6073,10 +5988,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "40f42c324",
-          "reports": [
-            "packet-05-review.md",
-            "packet-05-rereview-1.md"
-          ],
+          "reports": ["packet-05-review.md", "packet-05-rereview-1.md"],
           "deferredMinor": "M1 four parameter-destructuring cases; M2 three geometry helper filenames",
           "integrationPending": true
         },
@@ -6223,9 +6135,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -6358,10 +6268,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "40f42c324",
-          "reports": [
-            "packet-05-review.md",
-            "packet-05-rereview-1.md"
-          ],
+          "reports": ["packet-05-review.md", "packet-05-rereview-1.md"],
           "deferredMinor": "M1 four parameter-destructuring cases; M2 three geometry helper filenames",
           "integrationPending": true
         },
@@ -6508,9 +6415,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -6643,10 +6548,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "40f42c324",
-          "reports": [
-            "packet-05-review.md",
-            "packet-05-rereview-1.md"
-          ],
+          "reports": ["packet-05-review.md", "packet-05-rereview-1.md"],
           "deferredMinor": "M1 four parameter-destructuring cases; M2 three geometry helper filenames",
           "integrationPending": true
         },
@@ -6793,9 +6695,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -6928,10 +6828,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "40f42c324",
-          "reports": [
-            "packet-05-review.md",
-            "packet-05-rereview-1.md"
-          ],
+          "reports": ["packet-05-review.md", "packet-05-rereview-1.md"],
           "deferredMinor": "M1 four parameter-destructuring cases; M2 three geometry helper filenames",
           "integrationPending": true
         },
@@ -7078,9 +6975,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -7213,10 +7108,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "40f42c324",
-          "reports": [
-            "packet-05-review.md",
-            "packet-05-rereview-1.md"
-          ],
+          "reports": ["packet-05-review.md", "packet-05-rereview-1.md"],
           "deferredMinor": "M1 four parameter-destructuring cases; M2 three geometry helper filenames",
           "integrationPending": true
         },
@@ -7363,9 +7255,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -7498,10 +7388,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a67fd2e6b8bc14753856e7278128e662c2e98d52",
-          "reports": [
-            "packet-06-review.md",
-            "packet-06-rereview-1.md"
-          ],
+          "reports": ["packet-06-review.md", "packet-06-rereview-1.md"],
           "deferredMinors": "M3 private test-helper underscore prefix in packet-06-review.md",
           "integrationPending": true
         },
@@ -7648,9 +7535,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -7884,10 +7769,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a67fd2e6b8bc14753856e7278128e662c2e98d52",
-          "reports": [
-            "packet-06-review.md",
-            "packet-06-rereview-1.md"
-          ],
+          "reports": ["packet-06-review.md", "packet-06-rereview-1.md"],
           "deferredMinors": "M3 private test-helper underscore prefix in packet-06-review.md",
           "integrationPending": true
         },
@@ -8034,9 +7916,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -8169,10 +8049,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a67fd2e6b8bc14753856e7278128e662c2e98d52",
-          "reports": [
-            "packet-06-review.md",
-            "packet-06-rereview-1.md"
-          ],
+          "reports": ["packet-06-review.md", "packet-06-rereview-1.md"],
           "deferredMinors": "M3 private test-helper underscore prefix in packet-06-review.md",
           "integrationPending": true
         },
@@ -8319,9 +8196,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -8454,10 +8329,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a67fd2e6b8bc14753856e7278128e662c2e98d52",
-          "reports": [
-            "packet-06-review.md",
-            "packet-06-rereview-1.md"
-          ],
+          "reports": ["packet-06-review.md", "packet-06-rereview-1.md"],
           "deferredMinors": "M3 private test-helper underscore prefix in packet-06-review.md",
           "integrationPending": true
         },
@@ -8604,9 +8476,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -8739,10 +8609,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a67fd2e6b8bc14753856e7278128e662c2e98d52",
-          "reports": [
-            "packet-06-review.md",
-            "packet-06-rereview-1.md"
-          ],
+          "reports": ["packet-06-review.md", "packet-06-rereview-1.md"],
           "deferredMinors": "M3 private test-helper underscore prefix in packet-06-review.md",
           "integrationPending": true
         },
@@ -8889,9 +8756,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -9024,9 +8889,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "1bfa1edcbdd2e41372bc8d22c6a3c9d640507235",
-          "reports": [
-            "packet-07-review.md"
-          ],
+          "reports": ["packet-07-review.md"],
           "deferredMinors": "M1 physical regression-oracle additions; M2 named BatchLayout type in packet-07-review.md",
           "processLimitation": "Initial per-entry REDs were missing-module failures, not executed behavioral assertions. Later CacheReuse regressions have actual assertion RED/GREEN.",
           "integrationPending": true
@@ -9174,9 +9037,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -9309,9 +9170,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "1bfa1edcbdd2e41372bc8d22c6a3c9d640507235",
-          "reports": [
-            "packet-07-review.md"
-          ],
+          "reports": ["packet-07-review.md"],
           "deferredMinors": "M1 physical regression-oracle additions; M2 named BatchLayout type in packet-07-review.md",
           "processLimitation": "Initial per-entry REDs were missing-module failures, not executed behavioral assertions. Later CacheReuse regressions have actual assertion RED/GREEN.",
           "integrationPending": true
@@ -9459,9 +9318,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -9594,9 +9451,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "1bfa1edcbdd2e41372bc8d22c6a3c9d640507235",
-          "reports": [
-            "packet-07-review.md"
-          ],
+          "reports": ["packet-07-review.md"],
           "deferredMinors": "M1 physical regression-oracle additions; M2 named BatchLayout type in packet-07-review.md",
           "processLimitation": "Initial per-entry REDs were missing-module failures, not executed behavioral assertions. Later CacheReuse regressions have actual assertion RED/GREEN.",
           "integrationPending": true
@@ -9744,9 +9599,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -9879,9 +9732,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "1bfa1edcbdd2e41372bc8d22c6a3c9d640507235",
-          "reports": [
-            "packet-07-review.md"
-          ],
+          "reports": ["packet-07-review.md"],
           "deferredMinors": "M1 physical regression-oracle additions; M2 named BatchLayout type in packet-07-review.md",
           "processLimitation": "Initial per-entry REDs were missing-module failures, not executed behavioral assertions. Later CacheReuse regressions have actual assertion RED/GREEN.",
           "integrationPending": true
@@ -10029,9 +9880,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -10164,9 +10013,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "1bfa1edcbdd2e41372bc8d22c6a3c9d640507235",
-          "reports": [
-            "packet-07-review.md"
-          ],
+          "reports": ["packet-07-review.md"],
           "deferredMinors": "M1 physical regression-oracle additions; M2 named BatchLayout type in packet-07-review.md",
           "processLimitation": "Initial per-entry REDs were missing-module failures, not executed behavioral assertions. Later CacheReuse regressions have actual assertion RED/GREEN.",
           "integrationPending": true
@@ -10314,9 +10161,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -10611,9 +10456,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -10908,9 +10751,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -11205,9 +11046,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -11502,9 +11341,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -11799,9 +11636,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -12035,10 +11870,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "172f6c95dc8f2aa316e962545f20a7d26a143335",
-          "reports": [
-            "packet-09-review.md",
-            "packet-09-rereview-1.md"
-          ],
+          "reports": ["packet-09-review.md", "packet-09-rereview-1.md"],
           "deferredMinor": "M1 initial test names overclaim; M2 remaining Readonly/optional-render conventions",
           "integrationPending": true
         },
@@ -12192,9 +12024,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -12428,10 +12258,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "172f6c95dc8f2aa316e962545f20a7d26a143335",
-          "reports": [
-            "packet-09-review.md",
-            "packet-09-rereview-1.md"
-          ],
+          "reports": ["packet-09-review.md", "packet-09-rereview-1.md"],
           "deferredMinor": "M1 initial test names overclaim; M2 remaining Readonly/optional-render conventions",
           "integrationPending": true
         },
@@ -12585,9 +12412,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -12720,10 +12545,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "172f6c95dc8f2aa316e962545f20a7d26a143335",
-          "reports": [
-            "packet-09-review.md",
-            "packet-09-rereview-1.md"
-          ],
+          "reports": ["packet-09-review.md", "packet-09-rereview-1.md"],
           "deferredMinor": "M1 initial test names overclaim; M2 remaining Readonly/optional-render conventions",
           "integrationPending": true
         },
@@ -12877,9 +12699,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -13012,10 +12832,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "172f6c95dc8f2aa316e962545f20a7d26a143335",
-          "reports": [
-            "packet-09-review.md",
-            "packet-09-rereview-1.md"
-          ],
+          "reports": ["packet-09-review.md", "packet-09-rereview-1.md"],
           "deferredMinor": "M1 initial test names overclaim; M2 remaining Readonly/optional-render conventions",
           "integrationPending": true
         },
@@ -13169,9 +12986,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -13304,10 +13119,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "172f6c95dc8f2aa316e962545f20a7d26a143335",
-          "reports": [
-            "packet-09-review.md",
-            "packet-09-rereview-1.md"
-          ],
+          "reports": ["packet-09-review.md", "packet-09-rereview-1.md"],
           "deferredMinor": "M1 initial test names overclaim; M2 remaining Readonly/optional-render conventions",
           "integrationPending": true
         },
@@ -13461,9 +13273,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -13759,9 +13569,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -14057,9 +13865,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -14355,9 +14161,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -14653,9 +14457,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -14951,9 +14753,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -15339,9 +15139,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -15626,9 +15424,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -15913,9 +15709,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -16200,9 +15994,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -16487,9 +16279,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -16776,9 +16566,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -17065,9 +16853,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -17354,9 +17140,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -17643,9 +17427,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -17932,9 +17714,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -18219,9 +17999,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -18506,9 +18284,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -18793,9 +18569,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -19080,9 +18854,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -19367,9 +19139,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -19502,10 +19272,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "778ca93f4145af1b6b25937eec4bd77d60ed6f1d",
-          "reports": [
-            "packet-14-review.md",
-            "packet-14-rereview-1.md"
-          ],
+          "reports": ["packet-14-review.md", "packet-14-rereview-1.md"],
           "deferredMinor": "M1 aquifer unit occlusion; M2 long cohesive JSX functions; fourteen prior Doctor warnings and serialization-test naming for final triage",
           "integrationPending": true
         },
@@ -19661,9 +19428,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -19796,10 +19561,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "778ca93f4145af1b6b25937eec4bd77d60ed6f1d",
-          "reports": [
-            "packet-14-review.md",
-            "packet-14-rereview-1.md"
-          ],
+          "reports": ["packet-14-review.md", "packet-14-rereview-1.md"],
           "deferredMinor": "M1 aquifer unit occlusion; M2 long cohesive JSX functions; fourteen prior Doctor warnings and serialization-test naming for final triage",
           "integrationPending": true
         },
@@ -19955,9 +19717,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -20090,10 +19850,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "778ca93f4145af1b6b25937eec4bd77d60ed6f1d",
-          "reports": [
-            "packet-14-review.md",
-            "packet-14-rereview-1.md"
-          ],
+          "reports": ["packet-14-review.md", "packet-14-rereview-1.md"],
           "deferredMinor": "M1 aquifer unit occlusion; M2 long cohesive JSX functions; fourteen prior Doctor warnings and serialization-test naming for final triage",
           "integrationPending": true
         },
@@ -20249,9 +20006,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -20384,10 +20139,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "778ca93f4145af1b6b25937eec4bd77d60ed6f1d",
-          "reports": [
-            "packet-14-review.md",
-            "packet-14-rereview-1.md"
-          ],
+          "reports": ["packet-14-review.md", "packet-14-rereview-1.md"],
           "deferredMinor": "M1 aquifer unit occlusion; M2 long cohesive JSX functions; fourteen prior Doctor warnings and serialization-test naming for final triage",
           "integrationPending": true
         },
@@ -20543,9 +20295,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -20779,10 +20529,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "778ca93f4145af1b6b25937eec4bd77d60ed6f1d",
-          "reports": [
-            "packet-14-review.md",
-            "packet-14-rereview-1.md"
-          ],
+          "reports": ["packet-14-review.md", "packet-14-rereview-1.md"],
           "deferredMinor": "M1 aquifer unit occlusion; M2 long cohesive JSX functions; fourteen prior Doctor warnings and serialization-test naming for final triage",
           "integrationPending": true
         },
@@ -20938,9 +20685,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -21073,10 +20818,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "78471da1217a31b5cca4a5cadaefcb0fae8ad318",
-          "reports": [
-            "packet-15-review.md",
-            "packet-15-rereview-1.md"
-          ],
+          "reports": ["packet-15-review.md", "packet-15-rereview-1.md"],
           "deferredMinor": "M1 four contextual Doctor warnings; M2 SharedReadingCircles test file 612 lines",
           "integrationPending": true
         },
@@ -21232,9 +20974,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -21367,10 +21107,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "78471da1217a31b5cca4a5cadaefcb0fae8ad318",
-          "reports": [
-            "packet-15-review.md",
-            "packet-15-rereview-1.md"
-          ],
+          "reports": ["packet-15-review.md", "packet-15-rereview-1.md"],
           "deferredMinor": "M1 four contextual Doctor warnings; M2 SharedReadingCircles test file 612 lines",
           "integrationPending": true
         },
@@ -21526,9 +21263,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -21661,10 +21396,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "78471da1217a31b5cca4a5cadaefcb0fae8ad318",
-          "reports": [
-            "packet-15-review.md",
-            "packet-15-rereview-1.md"
-          ],
+          "reports": ["packet-15-review.md", "packet-15-rereview-1.md"],
           "deferredMinor": "M1 four contextual Doctor warnings; M2 SharedReadingCircles test file 612 lines",
           "integrationPending": true
         },
@@ -21820,9 +21552,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -21955,10 +21685,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "78471da1217a31b5cca4a5cadaefcb0fae8ad318",
-          "reports": [
-            "packet-15-review.md",
-            "packet-15-rereview-1.md"
-          ],
+          "reports": ["packet-15-review.md", "packet-15-rereview-1.md"],
           "deferredMinor": "M1 four contextual Doctor warnings; M2 SharedReadingCircles test file 612 lines",
           "integrationPending": true
         },
@@ -22114,9 +21841,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -22249,10 +21974,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "78471da1217a31b5cca4a5cadaefcb0fae8ad318",
-          "reports": [
-            "packet-15-review.md",
-            "packet-15-rereview-1.md"
-          ],
+          "reports": ["packet-15-review.md", "packet-15-rereview-1.md"],
           "deferredMinor": "M1 four contextual Doctor warnings; M2 SharedReadingCircles test file 612 lines",
           "integrationPending": true
         },
@@ -22408,9 +22130,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -22543,10 +22263,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a7c40987f3ce750b2cb82fbf377c3fe47ddb2b48",
-          "reports": [
-            "packet-16-review.md",
-            "packet-16-rereview-1.md"
-          ],
+          "reports": ["packet-16-review.md", "packet-16-rereview-1.md"],
           "deferredMinor": "M1 lunch component selector Coordinate label; M2 two literal-only clearance assertions; nine contextual Doctor observations",
           "integrationPending": true
         },
@@ -22702,9 +22419,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -22837,10 +22552,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a7c40987f3ce750b2cb82fbf377c3fe47ddb2b48",
-          "reports": [
-            "packet-16-review.md",
-            "packet-16-rereview-1.md"
-          ],
+          "reports": ["packet-16-review.md", "packet-16-rereview-1.md"],
           "deferredMinor": "M1 lunch component selector Coordinate label; M2 two literal-only clearance assertions; nine contextual Doctor observations",
           "integrationPending": true
         },
@@ -22996,9 +22708,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -23131,10 +22841,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a7c40987f3ce750b2cb82fbf377c3fe47ddb2b48",
-          "reports": [
-            "packet-16-review.md",
-            "packet-16-rereview-1.md"
-          ],
+          "reports": ["packet-16-review.md", "packet-16-rereview-1.md"],
           "deferredMinor": "M1 lunch component selector Coordinate label; M2 two literal-only clearance assertions; nine contextual Doctor observations",
           "integrationPending": true
         },
@@ -23290,9 +22997,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -23425,10 +23130,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a7c40987f3ce750b2cb82fbf377c3fe47ddb2b48",
-          "reports": [
-            "packet-16-review.md",
-            "packet-16-rereview-1.md"
-          ],
+          "reports": ["packet-16-review.md", "packet-16-rereview-1.md"],
           "deferredMinor": "M1 lunch component selector Coordinate label; M2 two literal-only clearance assertions; nine contextual Doctor observations",
           "integrationPending": true
         },
@@ -23584,9 +23286,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -23719,10 +23419,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "a7c40987f3ce750b2cb82fbf377c3fe47ddb2b48",
-          "reports": [
-            "packet-16-review.md",
-            "packet-16-rereview-1.md"
-          ],
+          "reports": ["packet-16-review.md", "packet-16-rereview-1.md"],
           "deferredMinor": "M1 lunch component selector Coordinate label; M2 two literal-only clearance assertions; nine contextual Doctor observations",
           "integrationPending": true
         },
@@ -23878,9 +23575,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -24114,10 +23809,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "62196e68436f17736fc711ea82aa32815c764d1c",
-          "reports": [
-            "packet-17-review.md",
-            "packet-17-rereview-1.md"
-          ],
+          "reports": ["packet-17-review.md", "packet-17-rereview-1.md"],
           "deferredMinor": "M1 opening test names; M2 Coordinate selector labels; M3 dense temporary moving case copies; contextual Doctor observations.",
           "integrationPending": true
         },
@@ -24273,9 +23965,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -24408,10 +24098,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "62196e68436f17736fc711ea82aa32815c764d1c",
-          "reports": [
-            "packet-17-review.md",
-            "packet-17-rereview-1.md"
-          ],
+          "reports": ["packet-17-review.md", "packet-17-rereview-1.md"],
           "deferredMinor": "M1 opening test names; M2 Coordinate selector labels; M3 dense temporary moving case copies; contextual Doctor observations.",
           "integrationPending": true
         },
@@ -24567,9 +24254,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -24702,10 +24387,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "62196e68436f17736fc711ea82aa32815c764d1c",
-          "reports": [
-            "packet-17-review.md",
-            "packet-17-rereview-1.md"
-          ],
+          "reports": ["packet-17-review.md", "packet-17-rereview-1.md"],
           "deferredMinor": "M1 opening test names; M2 Coordinate selector labels; M3 dense temporary moving case copies; contextual Doctor observations.",
           "integrationPending": true
         },
@@ -24832,9 +24514,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -24978,10 +24658,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "62196e68436f17736fc711ea82aa32815c764d1c",
-          "reports": [
-            "packet-17-review.md",
-            "packet-17-rereview-1.md"
-          ],
+          "reports": ["packet-17-review.md", "packet-17-rereview-1.md"],
           "deferredMinor": "M1 opening test names; M2 Coordinate selector labels; M3 dense temporary moving case copies; contextual Doctor observations.",
           "integrationPending": true
         },
@@ -25137,9 +24814,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -25272,10 +24947,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "62196e68436f17736fc711ea82aa32815c764d1c",
-          "reports": [
-            "packet-17-review.md",
-            "packet-17-rereview-1.md"
-          ],
+          "reports": ["packet-17-review.md", "packet-17-rereview-1.md"],
           "deferredMinor": "M1 opening test names; M2 Coordinate selector labels; M3 dense temporary moving case copies; contextual Doctor observations.",
           "integrationPending": true
         },
@@ -25431,9 +25103,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -25566,10 +25236,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "f4761294bd7b43e8f8095833d05407bd6ba2763d",
-          "reports": [
-            "packet-18-review.md",
-            "packet-18-rereview-1.md"
-          ],
+          "reports": ["packet-18-review.md", "packet-18-rereview-1.md"],
           "deferredMinor": "M1 six bounded lookup Doctor advisories. Historical initial clean lint claim withdrawn; correction lint is separately verified.",
           "integrationPending": true
         },
@@ -25725,9 +25392,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -25961,10 +25626,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "f4761294bd7b43e8f8095833d05407bd6ba2763d",
-          "reports": [
-            "packet-18-review.md",
-            "packet-18-rereview-1.md"
-          ],
+          "reports": ["packet-18-review.md", "packet-18-rereview-1.md"],
           "deferredMinor": "M1 six bounded lookup Doctor advisories. Historical initial clean lint claim withdrawn; correction lint is separately verified.",
           "integrationPending": true
         },
@@ -26120,9 +25782,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -26255,10 +25915,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "f4761294bd7b43e8f8095833d05407bd6ba2763d",
-          "reports": [
-            "packet-18-review.md",
-            "packet-18-rereview-1.md"
-          ],
+          "reports": ["packet-18-review.md", "packet-18-rereview-1.md"],
           "deferredMinor": "M1 six bounded lookup Doctor advisories. Historical initial clean lint claim withdrawn; correction lint is separately verified.",
           "integrationPending": true
         },
@@ -26414,9 +26071,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -26650,10 +26305,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "f4761294bd7b43e8f8095833d05407bd6ba2763d",
-          "reports": [
-            "packet-18-review.md",
-            "packet-18-rereview-1.md"
-          ],
+          "reports": ["packet-18-review.md", "packet-18-rereview-1.md"],
           "deferredMinor": "M1 six bounded lookup Doctor advisories. Historical initial clean lint claim withdrawn; correction lint is separately verified.",
           "integrationPending": true
         },
@@ -26809,9 +26461,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -26944,10 +26594,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "f4761294bd7b43e8f8095833d05407bd6ba2763d",
-          "reports": [
-            "packet-18-review.md",
-            "packet-18-rereview-1.md"
-          ],
+          "reports": ["packet-18-review.md", "packet-18-rereview-1.md"],
           "deferredMinor": "M1 six bounded lookup Doctor advisories. Historical initial clean lint claim withdrawn; correction lint is separately verified.",
           "integrationPending": true
         },
@@ -27103,9 +26750,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -27238,10 +26883,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "256220cadf1d5086a76e9d016cca433047eba4b7",
-          "reports": [
-            "packet-19-review.md",
-            "packet-19-rereview-1.md"
-          ],
+          "reports": ["packet-19-review.md", "packet-19-rereview-1.md"],
           "deferredMinor": "M1 dense ballot transit congestion; M2 initial full fixture expansion followed callable RED and implementation. Historical sequence remains disclosed.",
           "integrationPending": true
         },
@@ -27409,9 +27051,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -27544,10 +27184,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "256220cadf1d5086a76e9d016cca433047eba4b7",
-          "reports": [
-            "packet-19-review.md",
-            "packet-19-rereview-1.md"
-          ],
+          "reports": ["packet-19-review.md", "packet-19-rereview-1.md"],
           "deferredMinor": "M1 dense ballot transit congestion; M2 initial full fixture expansion followed callable RED and implementation. Historical sequence remains disclosed.",
           "integrationPending": true
         },
@@ -27715,9 +27352,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -27850,10 +27485,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "256220cadf1d5086a76e9d016cca433047eba4b7",
-          "reports": [
-            "packet-19-review.md",
-            "packet-19-rereview-1.md"
-          ],
+          "reports": ["packet-19-review.md", "packet-19-rereview-1.md"],
           "deferredMinor": "M1 dense ballot transit congestion; M2 initial full fixture expansion followed callable RED and implementation. Historical sequence remains disclosed.",
           "integrationPending": true
         },
@@ -28021,9 +27653,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -28257,10 +27887,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "256220cadf1d5086a76e9d016cca433047eba4b7",
-          "reports": [
-            "packet-19-review.md",
-            "packet-19-rereview-1.md"
-          ],
+          "reports": ["packet-19-review.md", "packet-19-rereview-1.md"],
           "deferredMinor": "M1 dense ballot transit congestion; M2 initial full fixture expansion followed callable RED and implementation. Historical sequence remains disclosed.",
           "integrationPending": true
         },
@@ -28428,9 +28055,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -28563,10 +28188,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "256220cadf1d5086a76e9d016cca433047eba4b7",
-          "reports": [
-            "packet-19-review.md",
-            "packet-19-rereview-1.md"
-          ],
+          "reports": ["packet-19-review.md", "packet-19-rereview-1.md"],
           "deferredMinor": "M1 dense ballot transit congestion; M2 initial full fixture expansion followed callable RED and implementation. Historical sequence remains disclosed.",
           "integrationPending": true
         },
@@ -28734,9 +28356,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -28869,10 +28489,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "865bff9346174203a881b1fbe274b653a00e89b5",
-          "reports": [
-            "packet-20-review.md",
-            "packet-20-rereview-1.md"
-          ],
+          "reports": ["packet-20-review.md", "packet-20-rereview-1.md"],
           "deferredMinor": "Dense booking returning actors1/3 overlap at150, predates caption correction; identities remain keyed. Final broad review to triage.",
           "integrationPending": true
         },
@@ -29030,9 +28647,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -29165,10 +28780,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "865bff9346174203a881b1fbe274b653a00e89b5",
-          "reports": [
-            "packet-20-review.md",
-            "packet-20-rereview-1.md"
-          ],
+          "reports": ["packet-20-review.md", "packet-20-rereview-1.md"],
           "deferredMinor": "Dense booking returning actors1/3 overlap at150, predates caption correction; identities remain keyed. Final broad review to triage.",
           "integrationPending": true
         },
@@ -29326,9 +28938,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -29461,10 +29071,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "865bff9346174203a881b1fbe274b653a00e89b5",
-          "reports": [
-            "packet-20-review.md",
-            "packet-20-rereview-1.md"
-          ],
+          "reports": ["packet-20-review.md", "packet-20-rereview-1.md"],
           "deferredMinor": "Dense booking returning actors1/3 overlap at150, predates caption correction; identities remain keyed. Final broad review to triage.",
           "integrationPending": true
         },
@@ -29622,9 +29229,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -29757,10 +29362,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "865bff9346174203a881b1fbe274b653a00e89b5",
-          "reports": [
-            "packet-20-review.md",
-            "packet-20-rereview-1.md"
-          ],
+          "reports": ["packet-20-review.md", "packet-20-rereview-1.md"],
           "deferredMinor": "Dense booking returning actors1/3 overlap at150, predates caption correction; identities remain keyed. Final broad review to triage.",
           "integrationPending": true
         },
@@ -29918,9 +29520,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -30053,10 +29653,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "865bff9346174203a881b1fbe274b653a00e89b5",
-          "reports": [
-            "packet-20-review.md",
-            "packet-20-rereview-1.md"
-          ],
+          "reports": ["packet-20-review.md", "packet-20-rereview-1.md"],
           "deferredMinor": "Dense booking returning actors1/3 overlap at150, predates caption correction; identities remain keyed. Final broad review to triage.",
           "integrationPending": true
         },
@@ -30214,9 +29811,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -30349,10 +29944,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b07546a9d6d9b10edc9f4a31327274990cf16297",
-          "reports": [
-            "packet-21-review.md",
-            "packet-21-rereview-1.md"
-          ],
+          "reports": ["packet-21-review.md", "packet-21-rereview-1.md"],
           "deferredMinor": "M1 transient header containment; M2 tiny-unit rounded-zero ambiguity; M3 stable source-role index keys; M4 static tuple allocation; M5 repetitive fixtures; N1 split-test directory convention",
           "integrationPending": true
         },
@@ -30509,9 +30101,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -30644,10 +30234,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b07546a9d6d9b10edc9f4a31327274990cf16297",
-          "reports": [
-            "packet-21-review.md",
-            "packet-21-rereview-1.md"
-          ],
+          "reports": ["packet-21-review.md", "packet-21-rereview-1.md"],
           "deferredMinor": "M1 transient header containment; M2 tiny-unit rounded-zero ambiguity; M3 stable source-role index keys; M4 static tuple allocation; M5 repetitive fixtures; N1 split-test directory convention",
           "integrationPending": true
         },
@@ -30804,9 +30391,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -30939,10 +30524,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b07546a9d6d9b10edc9f4a31327274990cf16297",
-          "reports": [
-            "packet-21-review.md",
-            "packet-21-rereview-1.md"
-          ],
+          "reports": ["packet-21-review.md", "packet-21-rereview-1.md"],
           "deferredMinor": "M1 transient header containment; M2 tiny-unit rounded-zero ambiguity; M3 stable source-role index keys; M4 static tuple allocation; M5 repetitive fixtures; N1 split-test directory convention",
           "integrationPending": true
         },
@@ -31099,9 +30681,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -31234,10 +30814,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b07546a9d6d9b10edc9f4a31327274990cf16297",
-          "reports": [
-            "packet-21-review.md",
-            "packet-21-rereview-1.md"
-          ],
+          "reports": ["packet-21-review.md", "packet-21-rereview-1.md"],
           "deferredMinor": "M1 transient header containment; M2 tiny-unit rounded-zero ambiguity; M3 stable source-role index keys; M4 static tuple allocation; M5 repetitive fixtures; N1 split-test directory convention",
           "integrationPending": true
         },
@@ -31394,9 +30971,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -31529,10 +31104,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b07546a9d6d9b10edc9f4a31327274990cf16297",
-          "reports": [
-            "packet-21-review.md",
-            "packet-21-rereview-1.md"
-          ],
+          "reports": ["packet-21-review.md", "packet-21-rereview-1.md"],
           "deferredMinor": "M1 transient header containment; M2 tiny-unit rounded-zero ambiguity; M3 stable source-role index keys; M4 static tuple allocation; M5 repetitive fixtures; N1 split-test directory convention",
           "integrationPending": true
         },
@@ -31689,9 +31261,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -31824,10 +31394,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "74ed4389ef84aec8eed7614266284a6342d89ef5",
-          "reports": [
-            "packet-22-review.md",
-            "packet-22-rereview-1.md"
-          ],
+          "reports": ["packet-22-review.md", "packet-22-rereview-1.md"],
           "deferredMinor": "M1 bounded source lookup; M2 bounded spread accumulator. Controller duplicate-account-label settled-history clarity observation retained for final broad review.",
           "integrationPending": true
         },
@@ -31989,9 +31556,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -32124,10 +31689,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "74ed4389ef84aec8eed7614266284a6342d89ef5",
-          "reports": [
-            "packet-22-review.md",
-            "packet-22-rereview-1.md"
-          ],
+          "reports": ["packet-22-review.md", "packet-22-rereview-1.md"],
           "deferredMinor": "M1 bounded source lookup; M2 bounded spread accumulator. Controller duplicate-account-label settled-history clarity observation retained for final broad review.",
           "integrationPending": true
         },
@@ -32289,9 +31851,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -32424,10 +31984,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "74ed4389ef84aec8eed7614266284a6342d89ef5",
-          "reports": [
-            "packet-22-review.md",
-            "packet-22-rereview-1.md"
-          ],
+          "reports": ["packet-22-review.md", "packet-22-rereview-1.md"],
           "deferredMinor": "M1 bounded source lookup; M2 bounded spread accumulator. Controller duplicate-account-label settled-history clarity observation retained for final broad review.",
           "integrationPending": true
         },
@@ -32589,9 +32146,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -32724,10 +32279,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "74ed4389ef84aec8eed7614266284a6342d89ef5",
-          "reports": [
-            "packet-22-review.md",
-            "packet-22-rereview-1.md"
-          ],
+          "reports": ["packet-22-review.md", "packet-22-rereview-1.md"],
           "deferredMinor": "M1 bounded source lookup; M2 bounded spread accumulator. Controller duplicate-account-label settled-history clarity observation retained for final broad review.",
           "integrationPending": true
         },
@@ -32889,9 +32441,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -33024,10 +32574,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "74ed4389ef84aec8eed7614266284a6342d89ef5",
-          "reports": [
-            "packet-22-review.md",
-            "packet-22-rereview-1.md"
-          ],
+          "reports": ["packet-22-review.md", "packet-22-rereview-1.md"],
           "deferredMinor": "M1 bounded source lookup; M2 bounded spread accumulator. Controller duplicate-account-label settled-history clarity observation retained for final broad review.",
           "integrationPending": true
         },
@@ -33189,9 +32736,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -33324,10 +32869,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b08d3be504fa1a05026797bad514dba8beb79b55",
-          "reports": [
-            "packet-23-review.md",
-            "packet-23-rereview-1.md"
-          ],
+          "reports": ["packet-23-review.md", "packet-23-rereview-1.md"],
           "deferredMinor": "M1 participant stress-test claims exceed aria-only assertions in original tests. M2 schema-protected non-null Doctor warning. I2-specific visible-name coverage added, broader M1 remains for final review.",
           "integrationPending": true
         },
@@ -33484,9 +33026,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -33619,10 +33159,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b08d3be504fa1a05026797bad514dba8beb79b55",
-          "reports": [
-            "packet-23-review.md",
-            "packet-23-rereview-1.md"
-          ],
+          "reports": ["packet-23-review.md", "packet-23-rereview-1.md"],
           "deferredMinor": "M1 participant stress-test claims exceed aria-only assertions in original tests. M2 schema-protected non-null Doctor warning. I2-specific visible-name coverage added, broader M1 remains for final review.",
           "integrationPending": true
         },
@@ -33779,9 +33316,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -33914,10 +33449,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b08d3be504fa1a05026797bad514dba8beb79b55",
-          "reports": [
-            "packet-23-review.md",
-            "packet-23-rereview-1.md"
-          ],
+          "reports": ["packet-23-review.md", "packet-23-rereview-1.md"],
           "deferredMinor": "M1 participant stress-test claims exceed aria-only assertions in original tests. M2 schema-protected non-null Doctor warning. I2-specific visible-name coverage added, broader M1 remains for final review.",
           "integrationPending": true
         },
@@ -34074,9 +33606,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -34209,10 +33739,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b08d3be504fa1a05026797bad514dba8beb79b55",
-          "reports": [
-            "packet-23-review.md",
-            "packet-23-rereview-1.md"
-          ],
+          "reports": ["packet-23-review.md", "packet-23-rereview-1.md"],
           "deferredMinor": "M1 participant stress-test claims exceed aria-only assertions in original tests. M2 schema-protected non-null Doctor warning. I2-specific visible-name coverage added, broader M1 remains for final review.",
           "integrationPending": true
         },
@@ -34369,9 +33896,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -34504,10 +34029,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "b08d3be504fa1a05026797bad514dba8beb79b55",
-          "reports": [
-            "packet-23-review.md",
-            "packet-23-rereview-1.md"
-          ],
+          "reports": ["packet-23-review.md", "packet-23-rereview-1.md"],
           "deferredMinor": "M1 participant stress-test claims exceed aria-only assertions in original tests. M2 schema-protected non-null Doctor warning. I2-specific visible-name coverage added, broader M1 remains for final review.",
           "integrationPending": true
         },
@@ -34664,9 +34186,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -34799,10 +34319,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "ef93060a0aa0851dad832271ccf6d3a590e4bf76",
-          "reports": [
-            "packet-24-review.md",
-            "packet-24-rereview-1.md"
-          ],
+          "reports": ["packet-24-review.md", "packet-24-rereview-1.md"],
           "deferredMinor": "Initial M1 JSX function lengths, M2 private-child hierarchy, M3 eight bounded Doctor warnings, M4 maker arm scale. Correction M1 transfer scene calculator 57 lines.",
           "integrationPending": true
         },
@@ -34959,9 +34476,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -35094,10 +34609,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "ef93060a0aa0851dad832271ccf6d3a590e4bf76",
-          "reports": [
-            "packet-24-review.md",
-            "packet-24-rereview-1.md"
-          ],
+          "reports": ["packet-24-review.md", "packet-24-rereview-1.md"],
           "deferredMinor": "Initial M1 JSX function lengths, M2 private-child hierarchy, M3 eight bounded Doctor warnings, M4 maker arm scale. Correction M1 transfer scene calculator 57 lines.",
           "integrationPending": true
         },
@@ -35254,9 +34766,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -35389,10 +34899,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "ef93060a0aa0851dad832271ccf6d3a590e4bf76",
-          "reports": [
-            "packet-24-review.md",
-            "packet-24-rereview-1.md"
-          ],
+          "reports": ["packet-24-review.md", "packet-24-rereview-1.md"],
           "deferredMinor": "Initial M1 JSX function lengths, M2 private-child hierarchy, M3 eight bounded Doctor warnings, M4 maker arm scale. Correction M1 transfer scene calculator 57 lines.",
           "integrationPending": true
         },
@@ -35549,9 +35056,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -35684,10 +35189,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "ef93060a0aa0851dad832271ccf6d3a590e4bf76",
-          "reports": [
-            "packet-24-review.md",
-            "packet-24-rereview-1.md"
-          ],
+          "reports": ["packet-24-review.md", "packet-24-rereview-1.md"],
           "deferredMinor": "Initial M1 JSX function lengths, M2 private-child hierarchy, M3 eight bounded Doctor warnings, M4 maker arm scale. Correction M1 transfer scene calculator 57 lines.",
           "integrationPending": true
         },
@@ -35844,9 +35346,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -35979,10 +35479,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "ef93060a0aa0851dad832271ccf6d3a590e4bf76",
-          "reports": [
-            "packet-24-review.md",
-            "packet-24-rereview-1.md"
-          ],
+          "reports": ["packet-24-review.md", "packet-24-rereview-1.md"],
           "deferredMinor": "Initial M1 JSX function lengths, M2 private-child hierarchy, M3 eight bounded Doctor warnings, M4 maker arm scale. Correction M1 transfer scene calculator 57 lines.",
           "integrationPending": true
         },
@@ -36139,9 +35636,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -36440,9 +35935,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -36741,9 +36234,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -37042,9 +36533,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -37343,9 +36832,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -37745,9 +37232,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -37880,10 +37365,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "eb1f98ae613a1bc1c83e7968b062dba902fe0407",
-          "reports": [
-            "packet-26-review.md",
-            "packet-26-rereview-1.md"
-          ],
+          "reports": ["packet-26-review.md", "packet-26-rereview-1.md"],
           "deferredMinor": "Stateless literal-line array-index key and faint ruling emphasis.",
           "integrationPending": true
         },
@@ -38031,9 +37513,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -38166,10 +37646,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "eb1f98ae613a1bc1c83e7968b062dba902fe0407",
-          "reports": [
-            "packet-26-review.md",
-            "packet-26-rereview-1.md"
-          ],
+          "reports": ["packet-26-review.md", "packet-26-rereview-1.md"],
           "deferredMinor": "Stateless literal-line array-index key and faint ruling emphasis.",
           "integrationPending": true
         },
@@ -38317,9 +37794,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -38452,10 +37927,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "eb1f98ae613a1bc1c83e7968b062dba902fe0407",
-          "reports": [
-            "packet-26-review.md",
-            "packet-26-rereview-1.md"
-          ],
+          "reports": ["packet-26-review.md", "packet-26-rereview-1.md"],
           "deferredMinor": "Stateless literal-line array-index key and faint ruling emphasis.",
           "integrationPending": true
         },
@@ -38603,9 +38075,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -38738,10 +38208,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "eb1f98ae613a1bc1c83e7968b062dba902fe0407",
-          "reports": [
-            "packet-26-review.md",
-            "packet-26-rereview-1.md"
-          ],
+          "reports": ["packet-26-review.md", "packet-26-rereview-1.md"],
           "deferredMinor": "Stateless literal-line array-index key and faint ruling emphasis.",
           "integrationPending": true
         },
@@ -38889,9 +38356,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -39024,10 +38489,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "eb1f98ae613a1bc1c83e7968b062dba902fe0407",
-          "reports": [
-            "packet-26-review.md",
-            "packet-26-rereview-1.md"
-          ],
+          "reports": ["packet-26-review.md", "packet-26-rereview-1.md"],
           "deferredMinor": "Stateless literal-line array-index key and faint ruling emphasis.",
           "integrationPending": true
         },
@@ -39175,9 +38637,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -39463,9 +38923,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -39751,9 +39209,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -40039,9 +39495,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -40327,9 +39781,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -40615,9 +40067,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -40903,9 +40353,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -41191,9 +40639,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -41479,9 +40925,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -41767,9 +41211,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -42055,9 +41497,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -42190,10 +41630,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "720cc3aba6759842630c6e9f3e220200e69f2a14",
-          "reports": [
-            "packet-29-review.md",
-            "packet-29-rereview-1.md"
-          ],
+          "reports": ["packet-29-review.md", "packet-29-rereview-1.md"],
           "deferredMinor": "N1 connector strokes cross representative point glyphs; M3 recursive descriptor test coverage remains integration concern. M1/M2 corrected.",
           "integrationPending": true
         },
@@ -42341,9 +41778,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -42476,10 +41911,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "720cc3aba6759842630c6e9f3e220200e69f2a14",
-          "reports": [
-            "packet-29-review.md",
-            "packet-29-rereview-1.md"
-          ],
+          "reports": ["packet-29-review.md", "packet-29-rereview-1.md"],
           "deferredMinor": "N1 connector strokes cross representative point glyphs; M3 recursive descriptor test coverage remains integration concern. M1/M2 corrected.",
           "integrationPending": true
         },
@@ -42627,9 +42059,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -42762,10 +42192,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "720cc3aba6759842630c6e9f3e220200e69f2a14",
-          "reports": [
-            "packet-29-review.md",
-            "packet-29-rereview-1.md"
-          ],
+          "reports": ["packet-29-review.md", "packet-29-rereview-1.md"],
           "deferredMinor": "N1 connector strokes cross representative point glyphs; M3 recursive descriptor test coverage remains integration concern. M1/M2 corrected.",
           "integrationPending": true
         },
@@ -42913,9 +42340,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -43048,10 +42473,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "720cc3aba6759842630c6e9f3e220200e69f2a14",
-          "reports": [
-            "packet-29-review.md",
-            "packet-29-rereview-1.md"
-          ],
+          "reports": ["packet-29-review.md", "packet-29-rereview-1.md"],
           "deferredMinor": "N1 connector strokes cross representative point glyphs; M3 recursive descriptor test coverage remains integration concern. M1/M2 corrected.",
           "integrationPending": true
         },
@@ -43199,9 +42621,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -43334,10 +42754,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "720cc3aba6759842630c6e9f3e220200e69f2a14",
-          "reports": [
-            "packet-29-review.md",
-            "packet-29-rereview-1.md"
-          ],
+          "reports": ["packet-29-review.md", "packet-29-rereview-1.md"],
           "deferredMinor": "N1 connector strokes cross representative point glyphs; M3 recursive descriptor test coverage remains integration concern. M1/M2 corrected.",
           "integrationPending": true
         },
@@ -43485,9 +42902,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -43620,10 +43035,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "550eff3673df2a5edfef71647cef015fbe5c76e9",
-          "reports": [
-            "packet-30-review.md",
-            "packet-30-rereview-1.md"
-          ],
+          "reports": ["packet-30-review.md", "packet-30-rereview-1.md"],
           "deferredMinor": "Kernel solid legend and two bounded network-schema lookup warnings",
           "integrationPending": true
         },
@@ -43771,9 +43183,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -43906,10 +43316,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "550eff3673df2a5edfef71647cef015fbe5c76e9",
-          "reports": [
-            "packet-30-review.md",
-            "packet-30-rereview-1.md"
-          ],
+          "reports": ["packet-30-review.md", "packet-30-rereview-1.md"],
           "deferredMinor": "Kernel solid legend and two bounded network-schema lookup warnings",
           "integrationPending": true
         },
@@ -44057,9 +43464,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -44192,10 +43597,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "550eff3673df2a5edfef71647cef015fbe5c76e9",
-          "reports": [
-            "packet-30-review.md",
-            "packet-30-rereview-1.md"
-          ],
+          "reports": ["packet-30-review.md", "packet-30-rereview-1.md"],
           "deferredMinor": "Kernel solid legend and two bounded network-schema lookup warnings",
           "integrationPending": true
         },
@@ -44343,9 +43745,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -44478,10 +43878,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "550eff3673df2a5edfef71647cef015fbe5c76e9",
-          "reports": [
-            "packet-30-review.md",
-            "packet-30-rereview-1.md"
-          ],
+          "reports": ["packet-30-review.md", "packet-30-rereview-1.md"],
           "deferredMinor": "Kernel solid legend and two bounded network-schema lookup warnings",
           "integrationPending": true
         },
@@ -44629,9 +44026,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -44764,10 +44159,7 @@
         "implementationReview": {
           "status": "accepted",
           "head": "550eff3673df2a5edfef71647cef015fbe5c76e9",
-          "reports": [
-            "packet-30-review.md",
-            "packet-30-rereview-1.md"
-          ],
+          "reports": ["packet-30-review.md", "packet-30-rereview-1.md"],
           "deferredMinor": "Kernel solid legend and two bounded network-schema lookup warnings",
           "integrationPending": true
         },
@@ -44915,9 +44307,7 @@
                   "duration": "6.000000",
                   "nb_frames": "180",
                   "nb_read_frames": "180",
-                  "side_data_list": [
-                    {}
-                  ]
+                  "side_data_list": [{}]
                 }
               ],
               "format": {
@@ -47959,10 +47349,7 @@
     "verification": "final-copy-controller-verification.json",
     "continuity": "final-copy-source-continuity.json",
     "closure": "implementation-final-closure.json",
-    "rulings": [
-      "R70",
-      "R71"
-    ]
+    "rulings": ["R70", "R71"]
   },
   "publicationPolicy": "R69 compact durable record. Raw session/clock/callback traces and full original report envelopes remain ignored and in exact Downloads mirrors. This record preserves outcomes, all findings/dispositions/narratives, identities and limits.",
   "preservedIgnoredOriginal": {

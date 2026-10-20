@@ -1,12 +1,12 @@
-import { MantineProvider, Checkbox } from "@mantine/core";
-import "@mantine/core/styles.layer.css";
-import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
-import { CameraPresetControl } from "./CameraPresetControl";
-import { CompositionRoughnessControls } from "./CompositionRoughnessControls";
 import { Trans, useLingui } from "@lingui/react/macro";
+import "@mantine/core/styles.layer.css";
+import { MantineProvider, Checkbox } from "@mantine/core";
+import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
 import { PaletteControls } from "../../../gallery/MotionGallery/PaletteControls";
-import type { useCompositionAppearance } from "./useCompositionAppearance";
+import { CameraPresetControl } from "./CameraPresetControl";
 import css from "./CompositionControls.module.css";
+import { CompositionRoughnessControls } from "./CompositionRoughnessControls";
+import type { useCompositionAppearance } from "./useCompositionAppearance";
 
 type Props = { appearance: ReturnType<typeof useCompositionAppearance> };
 /** Shared Atlas palette and transport controls for the active composition. */

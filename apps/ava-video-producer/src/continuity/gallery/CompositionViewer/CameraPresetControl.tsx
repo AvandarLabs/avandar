@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon, Tooltip } from "@mantine/core";
-import { useState } from "react";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { useState } from "react";
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
 import { continuityAppearanceSchema } from "../../continuityAppearance";
-import { useCameraPresetOptions } from "./useCameraPresetOptions";
 import css from "./CameraPresetControl.module.css";
+import { useCameraPresetOptions } from "./useCameraPresetOptions";
 import type { useCompositionAppearance } from "./useCompositionAppearance";
 
 type Props = { appearance: ReturnType<typeof useCompositionAppearance> };

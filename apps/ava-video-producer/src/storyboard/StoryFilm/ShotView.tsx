@@ -1,6 +1,5 @@
 import { ContinuityScene } from "../../continuity/ContinuityScene";
 import { ContinuityI18nProvider } from "../../continuity/i18n/ContinuityI18nProvider/ContinuityI18nProvider";
-import type { ProductSegment } from "../../continuity/continuitySchema";
 import { FlowchartScene } from "../../scenes/FlowchartScene";
 import { GraphScene } from "../../scenes/GraphScene";
 import { MediaScene } from "../../scenes/MediaScene";
@@ -8,6 +7,7 @@ import { MetricScene } from "../../scenes/MetricScene";
 import { StockScene } from "../../scenes/StockScene";
 import { TypographyScene } from "../../scenes/TypographyScene";
 import { TitleCard } from "../../title-card";
+import type { ProductSegment } from "../../continuity/continuitySchema";
 import type { Shot } from "../schema/schema";
 import type { ReactNode } from "react";
 

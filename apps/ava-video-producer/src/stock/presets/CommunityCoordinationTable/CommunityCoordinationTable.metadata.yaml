@@ -3,7 +3,8 @@ name:
   message: Rebalance a shared response
 description:
   id: motionAtlas.community-coordination-table.description
-  message: Community representatives and response teams rearrange physical service markers
+  message:
+    Community representatives and response teams rearrange physical service markers
     on a shared schematic tabletop map. An overlapping assignment moves to a requested
     location so the final plan reflects an explicit community priority.
 category:
@@ -11,15 +12,18 @@ category:
   message: Participatory spatial planning
 useWhen:
   id: motionAtlas.community-coordination-table.useWhen
-  message: Show a community request changing a shared plan while preserving visibility of
+  message:
+    Show a community request changing a shared plan while preserving visibility of
     what remains unassigned.
 intent:
   id: motionAtlas.community-coordination-table.intent
-  message: Show a community request changing a shared plan while preserving visibility of
+  message:
+    Show a community request changing a shared plan while preserving visibility of
     what remains unassigned.
 creativeDirection:
   id: motionAtlas.community-coordination-table.creativeDirection
-  message: Within six seconds, reveal a tabletop map with authored community requests and
+  message:
+    Within six seconds, reveal a tabletop map with authored community requests and
     team markers at their starting assignments. Where two team markers overlap, the
     community representative points to the requested destination; the reassigned team
     lifts its own marker and places it at that destination. Turn the relevant request
@@ -28,13 +32,15 @@ creativeDirection:
     envelope, and avoid turning the whole map green.
 distinction:
   id: motionAtlas.community-coordination-table.distinction
-  message: The main action is a participant lifting and relocating a physical assignment
+  message:
+    The main action is a participant lifting and relocating a physical assignment
     in response to a visible community request. Unlike radial-network or schema-mapping,
     no abstract hub distributes signals and the plan is revised rather than merely
     connected.
 prompt:
   id: motionAtlas.community-coordination-table.prompt
-  message: Rebalance a shared response. Show a community request changing a shared plan
+  message:
+    Rebalance a shared response. Show a community request changing a shared plan
     while preserving visibility of what remains unassigned.
 tags:
   - id: motionAtlas.community-coordination-table.tags.0
@@ -72,23 +78,28 @@ aliases:
     message: response planning
 notFor:
   - id: motionAtlas.community-coordination-table.notFor.0
-    message: Markers represent authored team assignments, not measured coverage, beneficiary
+    message:
+      Markers represent authored team assignments, not measured coverage, beneficiary
       counts, delivery capacity, or verified access.
   - id: motionAtlas.community-coordination-table.notFor.1
-    message: The final scene is an agreed illustrative plan, not evidence that a service
+    message:
+      The final scene is an agreed illustrative plan, not evidence that a service
       reached a location.
   - id: motionAtlas.community-coordination-table.notFor.2
-    message: The map is schematic and has no real geography or travel scale; no automatic
+    message:
+      The map is schematic and has no real geography or travel scale; no automatic
       allocation or route calculation is implied.
   - id: motionAtlas.community-coordination-table.notFor.3
-    message: Service compatibility is an author-validated semantic constraint; the renderer
+    message:
+      Service compatibility is an author-validated semantic constraint; the renderer
       cannot infer needs or determine an appropriate humanitarian response.
 motionBeats:
   - startFrame: 12
     endFrame: 43
     description:
       id: motionAtlas.community-coordination-table.motionBeats.0
-      message: Reveal the map and initial assignments; representative indicates the requested
+      message:
+        Reveal the map and initial assignments; representative indicates the requested
         destination.
   - startFrame: 44
     endFrame: 100

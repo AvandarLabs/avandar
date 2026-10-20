@@ -3,7 +3,8 @@ name:
   message: Change the boundary, keep the people
 description:
   id: motionAtlas.boundary-regrouping-effect.description
-  message: The same small geographic cells regroup under two supplied zoning schemes. Zone
+  message:
+    The same small geographic cells regroup under two supplied zoning schemes. Zone
     totals and population-normalized values change while every underlying cell and the
     overall denominator stay fixed.
 category:
@@ -14,13 +15,15 @@ useWhen:
   message: Show that a geographic summary can change when only the grouping boundaries change.
 prompt:
   id: motionAtlas.boundary-regrouping-effect.prompt
-  message: Show the supplied fixed cells and the first grouping boundary. Lift only the
+  message:
+    Show the supplied fixed cells and the first grouping boundary. Lift only the
     outer grouping seams, redraw them in the second arrangement, and gather each zone's
     arithmetic along the new outline. Hold the unchanged underlying cell values and
     unchanged overall total beneath the new summaries.
 creativeDirection:
   id: motionAtlas.boundary-regrouping-effect.creativeDirection
-  message: Show the supplied fixed cells and the first grouping boundary. Lift only the
+  message:
+    Show the supplied fixed cells and the first grouping boundary. Lift only the
     outer grouping seams, redraw them in the second arrangement, and gather each zone's
     arithmetic along the new outline. Hold the unchanged underlying cell values and
     unchanged overall total beneath the new summaries.
@@ -29,7 +32,8 @@ intent:
   message: Show that a geographic summary can change when only the grouping boundaries change.
 distinction:
   id: motionAtlas.boundary-regrouping-effect.distinction
-  message: Only aggregation seams move; stable atomic cells produce different zone
+  message:
+    Only aggregation seams move; stable atomic cells produce different zone
     summaries. Unlike nested-drilldown-window, this replaces one complete partition with
     another rather than selecting a smaller subset.
 tags:
@@ -60,10 +64,12 @@ notFor:
   - id: motionAtlas.boundary-regrouping-effect.notFor.0
     message: Square cells are schematic accounting units, not real neighborhoods.
   - id: motionAtlas.boundary-regrouping-effect.notFor.1
-    message: Overall numerator and denominator must be identical across both groupings; no
+    message:
+      Overall numerator and denominator must be identical across both groupings; no
       resident moves and no record is created.
   - id: motionAtlas.boundary-regrouping-effect.notFor.2
-    message: The scene explains aggregation sensitivity, not individual risk, a preferred
+    message:
+      The scene explains aggregation sensitivity, not individual risk, a preferred
       zoning plan, or a causal explanation for inequality.
 domains:
   - id: motionAtlas.boundary-regrouping-effect.domains.0
@@ -85,7 +91,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.boundary-regrouping-effect.beat.1
-      message: Lift only the first seams, then redraw the second grouping from frame 72 while
+      message:
+        Lift only the first seams, then redraw the second grouping from frame 72 while
         the cells remain fixed.
   - startFrame: 108
     endFrame: 179

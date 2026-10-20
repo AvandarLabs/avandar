@@ -19,10 +19,7 @@
         "evidenceFiles": [
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph/hold.png"
         ],
-        "observedClockBracket": [
-          145,
-          147
-        ],
+        "observedClockBracket": [145, 147],
         "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
         "priorDisposition": "preserve-baseline-carry-to-final-review",
         "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
@@ -41,10 +38,7 @@
         "evidenceFiles": [
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/radial-network/hold.png"
         ],
-        "observedClockBracket": [
-          145,
-          148
-        ],
+        "observedClockBracket": [145, 148],
         "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
         "priorDisposition": "preserve-baseline-carry-to-final-review",
         "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
@@ -63,10 +57,7 @@
         "evidenceFiles": [
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/orbital-system/hold.png"
         ],
-        "observedClockBracket": [
-          145,
-          147
-        ],
+        "observedClockBracket": [145, 147],
         "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
         "priorDisposition": "preserve-baseline-carry-to-final-review",
         "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
@@ -79,12 +70,7 @@
       "finding": {
         "classification": "preserved-legacy-action-observation",
         "severity": "editorial-review",
-        "observedClockBrackets": [
-          [
-            85,
-            87
-          ]
-        ],
+        "observedClockBrackets": [[85, 87]],
         "files": [
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race/action-early.png"
         ],
@@ -111,15 +97,9 @@
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/capability-matrix/decisive.png",
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/capability-matrix/hold.png"
         ],
-        "naturalObservedClockBracket": [
-          85,
-          87
-        ],
+        "naturalObservedClockBracket": [85, 87],
         "clearKeyboardScrubbedFrame": 90,
-        "clearNaturalHoldClockBracket": [
-          145,
-          147
-        ],
+        "clearNaturalHoldClockBracket": [145, 147],
         "priorDisposition": "retain-transient-observation-no-source-change",
         "temporalLimits": "One natural action bracket and separated clear samples do not establish exact duration or continuous perceptual severity."
       }
@@ -140,15 +120,9 @@
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/shared-foundation/decisive.png",
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/shared-foundation/hold.png"
         ],
-        "naturalObservedClockBracket": [
-          85,
-          87
-        ],
+        "naturalObservedClockBracket": [85, 87],
         "clearKeyboardScrubbedFrame": 114,
-        "clearNaturalHoldClockBracket": [
-          145,
-          147
-        ],
+        "clearNaturalHoldClockBracket": [145, 147],
         "priorDisposition": "retain-transient-observation-no-source-change",
         "temporalLimits": "One natural action bracket and separated clear samples do not establish exact duration or continuous perceptual severity."
       }
@@ -170,14 +144,8 @@
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cell-normalization/hold.png"
         ],
         "keyboardScrubbedFrame": 76,
-        "naturalObservedClockBracket": [
-          85,
-          87
-        ],
-        "clearNaturalHoldClockBracket": [
-          145,
-          147
-        ],
+        "naturalObservedClockBracket": [85, 87],
+        "clearNaturalHoldClockBracket": [145, 147],
         "temporalLimits": "This appears to be the authored old-to-prepared crossfade. Exact duration and full perceptual severity cannot be inferred from these pictures. No source correction or acceptance is prescribed."
       }
     },
@@ -196,10 +164,7 @@
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/action-late.png",
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/hold.png"
         ],
-        "observedClockBracket": [
-          120,
-          122
-        ],
+        "observedClockBracket": [120, 122],
         "resolvedHold": "Native145..147 displays correct separate A and B attributions, with earlier shared labels unchanged.",
         "limits": "This finding records actual sampled occlusion. It does not infer sustained duration, a permanent false attribution, or the need for a source change without temporal review."
       }
@@ -220,10 +185,7 @@
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/decisive.png",
           "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/hold.png"
         ],
-        "observedClockBracket": [
-          85,
-          87
-        ],
+        "observedClockBracket": [85, 87],
         "priorControllerDisposition": "Retain the intentional registration/transition observation for final editorial review, without claiming every action frame is unobstructed.",
         "limits": "No exact overlap duration, continuous readability or new permanent mismatch is established. Correct hold does not erase current transition overprint."
       }
@@ -347,18 +309,12 @@
     },
     {
       "id": "shared-workshop-booking",
-      "frameRange": [
-        145,
-        147
-      ],
+      "frameRange": [145, 147],
       "limit": "The named natural hold window still contains sequential machine use. Earlier dense 150 transit and targeted 158 clarification remain separately scoped."
     },
     {
       "id": "ordered-lock-acquisition",
-      "frameRange": [
-        145,
-        147
-      ],
+      "frameRange": [145, 147],
       "limit": "The named natural hold window still contains token returns. It must not be treated as a fully motionless terminal picture."
     }
   ],

@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections";
 import { GalleryHeader } from "../../../gallery/MotionGallery/GalleryHeader";
-import { CompositionSidebar } from "../CompositionSidebar/CompositionSidebar";
 import { CompositionPreview } from "../CompositionPreview/CompositionPreview";
+import { CompositionSidebar } from "../CompositionSidebar/CompositionSidebar";
 import { useCompositionGallery } from "../useCompositionGallery";
 import css from "./CompositionGallery.module.css";
 

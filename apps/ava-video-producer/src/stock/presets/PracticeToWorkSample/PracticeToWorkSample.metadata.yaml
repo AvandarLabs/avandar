@@ -3,7 +3,8 @@ name:
   message: Try the learned action in a new setting
 description:
   id: motionAtlas.practice-to-work-sample.description
-  message: A learner repeats an authored measuring-and-marking action first on a practice
+  message:
+    A learner repeats an authored measuring-and-marking action first on a practice
     sheet and then on a workshop material. Both artifacts remain visible so the
     connection is concrete without implying a job outcome.
 category:
@@ -11,25 +12,29 @@ category:
   message: Repeated action across learning environments
 useWhen:
   id: motionAtlas.practice-to-work-sample.useWhen
-  message: Connect a specific practiced action to an application in a different physical
+  message:
+    Connect a specific practiced action to an application in a different physical
     setting.
 prompt:
   id: motionAtlas.practice-to-work-sample.prompt
-  message: Show one learner using a ruler to place a labeled measurement on a practice
+  message:
+    Show one learner using a ruler to place a labeled measurement on a practice
     sheet at a classroom desk. Slide the surrounding furniture into a simple workshop
     arrangement while retaining the learner and the first marked sheet at the side.
     Repeat the same ruler placement and marking gesture on the chosen work material,
     then hold the two measured artifacts together. Fade to the shared background.
 creativeDirection:
   id: motionAtlas.practice-to-work-sample.creativeDirection
-  message: Show one learner using a ruler to place a labeled measurement on a practice
+  message:
+    Show one learner using a ruler to place a labeled measurement on a practice
     sheet at a classroom desk. Slide the surrounding furniture into a simple workshop
     arrangement while retaining the learner and the first marked sheet at the side.
     Repeat the same ruler placement and marking gesture on the chosen work material,
     then hold the two measured artifacts together. Fade to the shared background.
 intent:
   id: motionAtlas.practice-to-work-sample.intent
-  message: Connect a specific practiced action to an application in a different physical
+  message:
+    Connect a specific practiced action to an application in a different physical
     setting.
 distinction:
   id: motionAtlas.practice-to-work-sample.distinction
@@ -73,16 +78,20 @@ aliases:
     message: vocational learning
 notFor:
   - id: motionAtlas.practice-to-work-sample.notFor.0
-    message: One learner performs two authored attempts. Two artifacts are not two
+    message:
+      One learner performs two authored attempts. Two artifacts are not two
       graduates, two skills certifications, or two employment outcomes.
   - id: motionAtlas.practice-to-work-sample.notFor.1
-    message: The numeric label is an illustrative target measurement. SVG length is a
+    message:
+      The numeric label is an illustrative target measurement. SVG length is a
       normalized diagram representation, not a usable real-world measuring instrument.
   - id: motionAtlas.practice-to-work-sample.notFor.2
-    message: Repeating a gesture does not prove competence, retention, successful transfer,
+    message:
+      Repeating a gesture does not prove competence, retention, successful transfer,
       workplace readiness, or a job placement.
   - id: motionAtlas.practice-to-work-sample.notFor.3
-    message: This bounded motif supports measuring and marking only. Participants,
+    message:
+      This bounded motif supports measuring and marking only. Participants,
       materials, and setting names are fictional defaults.
 motionBeats:
   - startFrame: 0
@@ -99,17 +108,20 @@ motionBeats:
     endFrame: 81
     description:
       id: motionAtlas.PracticeToWorkSample.beat.2
-      message: Slide classroom furniture and the first artifact aside as the learner enters
+      message:
+        Slide classroom furniture and the first artifact aside as the learner enters
         the workshop arrangement.
   - startFrame: 82
     endFrame: 111
     description:
       id: motionAtlas.PracticeToWorkSample.beat.3
-      message: Repeat ruler placement and pencil marking on the selected material with the
+      message:
+        Repeat ruler placement and pencil marking on the selected material with the
         identical value and unit.
   - startFrame: 112
     endFrame: 179
     description:
       id: motionAtlas.PracticeToWorkSample.beat.4
-      message: Hold the measured work sample and optional first artifact through the shared
+      message:
+        Hold the measured work sample and optional first artifact through the shared
         fade.

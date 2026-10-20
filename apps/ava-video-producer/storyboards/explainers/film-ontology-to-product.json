@@ -34,10 +34,7 @@
             "subtitle": "Repeated observations should not multiply its identity.",
             "content": {
               "kind": "thesis",
-              "lines": [
-                "One entity.",
-                "Many observations."
-              ],
+              "lines": ["One entity.", "Many observations."],
               "emphasis": "Keep the record grain clear."
             },
             "duration": 308,

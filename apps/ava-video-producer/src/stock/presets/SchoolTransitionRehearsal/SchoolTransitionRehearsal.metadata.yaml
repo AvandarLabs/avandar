@@ -3,7 +3,8 @@ name:
   message: Rehearse the new school routine
 description:
   id: motionAtlas.school-transition-rehearsal.description
-  message: A learner practices a short routine in an unfamiliar school setting with a
+  message:
+    A learner practices a short routine in an unfamiliar school setting with a
     chosen companion. A supplied final step can be tried independently, while the scene
     remains explicitly a rehearsal.
 category:
@@ -11,11 +12,13 @@ category:
   message: Supported rehearsal in a physical setting
 useWhen:
   id: motionAtlas.school-transition-rehearsal.useWhen
-  message: Show how a learner can practice an unfamiliar school routine before it becomes
+  message:
+    Show how a learner can practice an unfamiliar school routine before it becomes
     a daily expectation.
 prompt:
   id: motionAtlas.school-transition-rehearsal.prompt
-  message: Open on a learner and companion beside a simple interior containing a locker
+  message:
+    Open on a learner and companion beside a simple interior containing a locker
     and a classroom doorway. The learner consults a two-step practice strip, opens the
     named locker, then approaches the named room. The companion either stays alongside
     or deliberately stands back for the final step, according to the supplied choice.
@@ -23,7 +26,8 @@ prompt:
     without changing it to enrolled or attended.
 creativeDirection:
   id: motionAtlas.school-transition-rehearsal.creativeDirection
-  message: Open on a learner and companion beside a simple interior containing a locker
+  message:
+    Open on a learner and companion beside a simple interior containing a locker
     and a classroom doorway. The learner consults a two-step practice strip, opens the
     named locker, then approaches the named room. The companion either stays alongside
     or deliberately stands back for the final step, according to the supplied choice.
@@ -31,11 +35,13 @@ creativeDirection:
     without changing it to enrolled or attended.
 intent:
   id: motionAtlas.school-transition-rehearsal.intent
-  message: Show how a learner can practice an unfamiliar school routine before it becomes
+  message:
+    Show how a learner can practice an unfamiliar school routine before it becomes
     a daily expectation.
 distinction:
   id: motionAtlas.school-transition-rehearsal.distinction
-  message: The learner rehearses concrete object use and a short routine while choosing
+  message:
+    The learner rehearses concrete object use and a short routine while choosing
     the companion's role. Unlike returning-learner-worktable, no prior learning artifact
     is carried back into a lesson; unlike chosen-service-access, the scene does not
     remove an admission barrier or claim successful service uptake.
@@ -65,12 +71,14 @@ goodFor:
     message: Distinguishing a rehearsed routine from recorded school attendance
 notFor:
   - id: motionAtlas.school-transition-rehearsal.notFor.0
-    message: A practice visit is not enrollment, attendance, learning progress or a
+    message:
+      A practice visit is not enrollment, attendance, learning progress or a
       retention outcome.
   - id: motionAtlas.school-transition-rehearsal.notFor.1
     message: The two-room interior is schematic and does not reproduce a real school layout.
   - id: motionAtlas.school-transition-rehearsal.notFor.2
-    message: Supported and independent practice are alternatives, not a hierarchy of
+    message:
+      Supported and independent practice are alternatives, not a hierarchy of
       participant worth or ability.
 domains:
   - id: motionAtlas.school-transition-rehearsal.domains.0
@@ -92,7 +100,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.school-transition-rehearsal.beat.1
-      message: Open on a learner and companion beside a simple interior containing a locker
+      message:
+        Open on a learner and companion beside a simple interior containing a locker
         and a classroom doorway. The learner consults a two-step practice strip, opens
         the named locker, then approaches the named room. The companion either stays
         alongside or deliberately stands back for the final step, according to the

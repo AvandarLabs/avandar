@@ -3,7 +3,8 @@ name:
   message: Travel time follows the network
 description:
   id: motionAtlas.travel-time-network-frontier.description
-  message: A time budget expands through a small weighted road network from one origin. A
+  message:
+    A time budget expands through a small weighted road network from one origin. A
     farther-looking destination can be reached before a nearer-looking one because only
     supplied edge travel times determine access.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Explain accessibility through cumulative network cost.
 prompt:
   id: motionAtlas.travel-time-network-frontier.prompt
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-45 reveal schematic roads and their minute costs. Frames 46-110 propagate a
     frontier along minimum cumulative travel time, filling reachable nodes and holding
@@ -23,7 +25,8 @@ prompt:
     166-179 for an editorial loop.
 creativeDirection:
   id: motionAtlas.travel-time-network-frontier.creativeDirection
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-45 reveal schematic roads and their minute costs. Frames 46-110 propagate a
     frontier along minimum cumulative travel time, filling reachable nodes and holding
@@ -35,7 +38,8 @@ intent:
   message: Explain accessibility through cumulative network cost.
 distinction:
   id: motionAtlas.travel-time-network-frontier.distinction
-  message: Catchment-union-gaps starts from supplied polygons. This derives reachability
+  message:
+    Catchment-union-gaps starts from supplied polygons. This derives reachability
     from weighted network cost, showing why a travel-time catchment is not a distance
     circle.
 tags:
@@ -67,21 +71,26 @@ notFor:
     message: This graph illustrates minimum cumulative edge costs; it is not a
       polygon-routing engine or a real routing-service result.
   - id: motionAtlas.travel-time-network-frontier.notFor.1
-    message: Does not infer roads, safety, accessibility, facility capacity or actual travel
+    message:
+      Does not infer roads, safety, accessibility, facility capacity or actual travel
       times.
   - id: motionAtlas.travel-time-network-frontier.notFor.2
-    message: No polygons are invented from nodes; only represented network destinations are
+    message:
+      No polygons are invented from nodes; only represented network destinations are
       classified.
   - id: motionAtlas.travel-time-network-frontier.notFor.3
-    message: No live geography, online routing, JSX, functions, URLs, private records or
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
       external requests. Maps are schematic local plans; no real-world inference
       follows.
   - id: motionAtlas.travel-time-network-frontier.notFor.4
-    message: Shortest paths use nonnegative edge costs. On equal cumulative cost, keep the
+    message:
+      Shortest paths use nonnegative edge costs. On equal cumulative cost, keep the
       first discovered predecessor using node input order for queue ties and road input
       order for neighbor traversal. No random tie resolution.
   - id: motionAtlas.travel-time-network-frontier.notFor.5
-    message: Authored prose remains the author’s responsibility. Runtime validation
+    message:
+      Authored prose remains the author’s responsibility. Runtime validation
       preserves supplied text without classifying its language or factual claims.
 motionBeats:
   - startFrame: 0

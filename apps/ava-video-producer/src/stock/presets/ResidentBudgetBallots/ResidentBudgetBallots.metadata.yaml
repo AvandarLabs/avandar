@@ -3,7 +3,8 @@ name:
   message: Count residents' project ballots
 description:
   id: motionAtlas.resident-budget-ballots.description
-  message: Residents cast fictional project-choice ballots into a shared box. The same
+  message:
+    Residents cast fictional project-choice ballots into a shared box. The same
     ballots unfold into an inspectable tally, while abstentions remain separate and no
     funding decision is inferred.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Show how resident choices become a transparent project-preference tally.
 prompt:
   id: motionAtlas.resident-budget-ballots.prompt
-  message: Begin with a small row of anonymous residents and a project display. Each
+  message:
+    Begin with a small row of anonymous residents and a project display. Each
     resident marks one paper behind a short screen, then places it in the ballot box or
     keeps an abstention slip. The box opens and the same papers unfold into stacks under
     their chosen project symbols. Hold every cast ballot, the abstention slips and
     derived totals. Do not transform votes into money or automatically crown a winner.
 creativeDirection:
   id: motionAtlas.resident-budget-ballots.creativeDirection
-  message: Begin with a small row of anonymous residents and a project display. Each
+  message:
+    Begin with a small row of anonymous residents and a project display. Each
     resident marks one paper behind a short screen, then places it in the ballot box or
     keeps an abstention slip. The box opens and the same papers unfold into stacks under
     their chosen project symbols. Hold every cast ballot, the abstention slips and
@@ -31,7 +34,8 @@ intent:
   message: Show how resident choices become a transparent project-preference tally.
 distinction:
   id: motionAtlas.resident-budget-ballots.distinction
-  message: The same privately marked paper ballots move from individual choice through a
+  message:
+    The same privately marked paper ballots move from individual choice through a
     ballot box into an auditable tally. Unlike pooled-donor-allocation, the units are
     votes and never become funds; unlike bar-race, there is no animated rank change or
     automatic winner.
@@ -61,13 +65,16 @@ goodFor:
     message: Distinguishing ballots cast from residents who abstain
 notFor:
   - id: motionAtlas.resident-budget-ballots.notFor.0
-    message: This is an illustrative preference count, not a secure voting system or a
+    message:
+      This is an illustrative preference count, not a secure voting system or a
       complete electoral rule.
   - id: motionAtlas.resident-budget-ballots.notFor.1
-    message: One ballot equals one anonymous illustrative resident; no population estimate
+    message:
+      One ballot equals one anonymous illustrative resident; no population estimate
       is implied.
   - id: motionAtlas.resident-budget-ballots.notFor.2
-    message: Ties, eligibility, quorum, invalid ballots and final funding decisions are
+    message:
+      Ties, eligibility, quorum, invalid ballots and final funding decisions are
       outside the scene.
 domains:
   - id: motionAtlas.resident-budget-ballots.domains.0
@@ -89,7 +96,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.resident-budget-ballots.beat.1
-      message: Cast papers enter the box by 78, then unfold into the tally during 84–108;
+      message:
+        Cast papers enter the box by 78, then unfold into the tally during 84–108;
         abstentions stay separate.
   - startFrame: 108
     endFrame: 179

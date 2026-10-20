@@ -3,7 +3,8 @@ name:
   message: Carry the unit and qualifier with the number
 description:
   id: motionAtlas.prose-measurement-ledger.description
-  message: An authored sentence separates into subject, metric, value, unit and period
+  message:
+    An authored sentence separates into subject, metric, value, unit and period
     strips that assemble into an observation row. Uncertainty qualifiers remain attached
     to the value.
 category:
@@ -20,7 +21,8 @@ prompt:
     claims.
 creativeDirection:
   id: motionAtlas.prose-measurement-ledger.creativeDirection
-  message: 960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-55 underline the supplied sentence fragments with
     distinct patterns. Frames 56-110 move copies of those exact fragments into labeled
     observation slots. Frames 111-139 hold the original sentence above the structured
@@ -31,7 +33,8 @@ intent:
   message: Preserve the context that gives a number meaning.
 distinction:
   id: motionAtlas.prose-measurement-ledger.distinction
-  message: Unlike word-reveal, the action changes a sentence into an observation schema
+  message:
+    Unlike word-reveal, the action changes a sentence into an observation schema
     with explicit semantic roles, not merely typography. Value and unit cannot detach
     from period or qualifier.
 tags:
@@ -64,20 +67,24 @@ notFor:
   - id: motionAtlas.prose-measurement-ledger.notFor.0
     message: No automatic language understanding or verified factual extraction is performed.
   - id: motionAtlas.prose-measurement-ledger.notFor.1
-    message: One sentence and one observation only; multi-clause ambiguities require a
+    message:
+      One sentence and one observation only; multi-clause ambiguities require a
       longer scene.
   - id: motionAtlas.prose-measurement-ledger.notFor.2
     message: Method and confidence are separate. A model-produced row is not inherently correct.
   - id: motionAtlas.prose-measurement-ledger.notFor.3
-    message: No JSX, functions, URLs or external fetch in props. The animation is an
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
       authored explanation, not actual document extraction or product evidence.
   - id: motionAtlas.prose-measurement-ledger.notFor.4
-    message: Every output field derives only from its corresponding role fragment by the
+    message:
+      Every output field derives only from its corresponding role fragment by the
       specified substring and whitespace trim. Preserve casing; numeric value alone
       converts the exact selected plain-decimal substring with Number. No independent
       normalized-row prop may contradict the source.
   - id: motionAtlas.prose-measurement-ledger.notFor.5
-    message: All IDs are unique and exactly one of each semantic role occurs. Concatenated
+    message:
+      All IDs are unique and exactly one of each semantic role occurs. Concatenated
       UTF-16 text length <=110. Semantic offsets are integers with
       0<=start<end<=fragment.text.length and trimmed selections are 1..20 UTF-16 units.
       Connectors have start=end=0. The value selection is a finite plain decimal,
@@ -85,7 +92,8 @@ notFor:
       independent. Source and every output value derive from exact authored fragments,
       never independent output props.
   - id: motionAtlas.prose-measurement-ledger.notFor.6
-    message: Prose meaning is an author responsibility. Runtime validation enforces
+    message:
+      Prose meaning is an author responsibility. Runtime validation enforces
       structural bounds, exact references and numeric/geometric rules.
 motionBeats:
   - startFrame: 0
@@ -107,5 +115,6 @@ motionBeats:
     endFrame: 165
     description:
       id: motionAtlas.prose-measurement-ledger.motionBeats.3
-      message: Hold the original sentence, all extracted fields, qualifier and independent
+      message:
+        Hold the original sentence, all extracted fields, qualifier and independent
         method/review status. The outer renderer fades at 166..179.

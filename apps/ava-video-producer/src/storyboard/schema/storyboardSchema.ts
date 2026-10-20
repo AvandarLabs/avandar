@@ -1,7 +1,7 @@
-import { getCueWindowFromShot } from "./getCueWindowFromShot";
-import { getContinuityTimeline } from "../../continuity/continuityTimeline";
 import { z } from "zod";
+import { getContinuityTimeline } from "../../continuity/continuityTimeline";
 import { captionBand } from "../../scenes/layout/layout";
+import { getCueWindowFromShot } from "./getCueWindowFromShot";
 import { assetPathSchema, frame, id, positiveFrames, text } from "./primitives";
 import { shotSchema } from "./shotSchema";
 

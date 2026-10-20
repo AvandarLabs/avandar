@@ -5,18 +5,7 @@
       "sourceId": "values-pdf",
       "path": "~/brain/areas/avandar/docs/avandar-values.pdf",
       "title": "Avandar Values",
-      "pages": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10
-      ],
+      "pages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       "headings": [
         "Advocacy and Justice",
         "Community and Wholeness",
@@ -39,9 +28,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "argument-bridge"
-      ],
+      "targetIds": ["argument-bridge"],
       "reason": "Existing authored premises, connector and conclusion can state this relationship without inventing a culture score."
     },
     {
@@ -54,10 +41,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "paired-contrast",
-        "capability-matrix"
-      ],
+      "targetIds": ["paired-contrast", "capability-matrix"],
       "reason": "Existing comparisons can distinguish affordability, fit and availability using authored evidence. No additional reskinned comparison is needed."
     },
     {
@@ -70,9 +54,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "capability-matrix"
-      ],
+      "targetIds": ["capability-matrix"],
       "reason": "Add this use case and an explicit claim boundary to the existing categorical comparison contract."
     },
     {
@@ -85,10 +67,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "chosen-service-access",
-        "person-led-support-calendar"
-      ],
+      "targetIds": ["chosen-service-access", "person-led-support-calendar"],
       "reason": "Existing participant-directed actions already preserve the person and goal while a service arrangement changes."
     },
     {
@@ -101,9 +80,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "decision-fork"
-      ],
+      "targetIds": ["decision-fork"],
       "reason": "Authored decision conditions can express ethical constraints without calculating moral correctness."
     },
     {
@@ -129,9 +106,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "expectation-overlay-check"
-      ],
+      "targetIds": ["expectation-overlay-check"],
       "reason": "The expected-versus-observed overlay makes verification inspectable without reusing the source's mortality claims."
     },
     {
@@ -144,9 +119,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "expectation-overlay-check"
-      ],
+      "targetIds": ["expectation-overlay-check"],
       "reason": "The same bounded oracle comparison accepts adversarial case labels and retains failures or missing observations. It does not imply exhaustive red teaming."
     },
     {
@@ -172,10 +145,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "feedback-refinement",
-        "grievance-remedy-retest"
-      ],
+      "targetIds": ["feedback-refinement", "grievance-remedy-retest"],
       "reason": "Existing revision and retest actions cover concrete repair. The broad attitude does not require another generic task-progress scene."
     },
     {
@@ -188,9 +158,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "support-request-response"
-      ],
+      "targetIds": ["support-request-response"],
       "reason": "A request and authored response can add shared effort without transferring task ownership."
     },
     {
@@ -203,10 +171,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "shared-foundation",
-        "support-request-response"
-      ],
+      "targetIds": ["shared-foundation", "support-request-response"],
       "reason": "A shared-principle graphic can frame mutual obligations, while the support exchange supplies one bounded observable behavior."
     },
     {
@@ -249,10 +214,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "contribution-weave",
-        "feedback-refinement"
-      ],
+      "targetIds": ["contribution-weave", "feedback-refinement"],
       "reason": "Retained contributor identities and explicit review notes already express participation. Add provenance-aware co-creation use cases rather than a duplicate merge animation."
     },
     {
@@ -265,9 +227,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "support-request-response"
-      ],
+      "targetIds": ["support-request-response"],
       "reason": "A specific help request and respectful authored response is an observable slice. The broader safety condition is not inferred."
     },
     {
@@ -280,10 +240,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "qualify-apparent-conflict",
-        "capability-matrix"
-      ],
+      "targetIds": ["qualify-apparent-conflict", "capability-matrix"],
       "reason": "Authored claims can distinguish how value is defined and show whether two requirements are met. No salary figure or universal compensation benchmark is introduced."
     },
     {
@@ -296,9 +253,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "protected-work-boundary"
-      ],
+      "targetIds": ["protected-work-boundary"],
       "reason": "A visible boundary and explicit deferral explain what happens to a new request when protected time remains protected."
     },
     {
@@ -311,9 +266,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "protected-work-boundary"
-      ],
+      "targetIds": ["protected-work-boundary"],
       "reason": "The worker makes the placement decision. The animation does not silently allocate overtime or assign a manager-imposed timetable."
     },
     {
@@ -326,9 +279,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "protected-work-boundary"
-      ],
+      "targetIds": ["protected-work-boundary"],
       "reason": "The protected-kind choices preserve these distinct uses without treating them as spare capacity for new work."
     },
     {
@@ -354,10 +305,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "community-coordination-table",
-        "contribution-weave"
-      ],
+      "targetIds": ["community-coordination-table", "contribution-weave"],
       "reason": "Existing participant-led action can show membership and contribution without savior imagery or an invented social outcome."
     },
     {
@@ -370,9 +318,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "expertise-role-exchange"
-      ],
+      "targetIds": ["expertise-role-exchange"],
       "reason": "A bounded exchange shows learning from another person without claiming mastery or simulating a long course."
     },
     {
@@ -385,9 +331,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "decision-fork"
-      ],
+      "targetIds": ["decision-fork"],
       "reason": "The choice can retain an explicit community concern as an authored condition; this does not become an automated ethics test."
     },
     {
@@ -400,9 +344,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "expertise-role-exchange"
-      ],
+      "targetIds": ["expertise-role-exchange"],
       "reason": "Teaching roles change between topics while the organizational role labels remain stable."
     },
     {
@@ -415,9 +357,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "expertise-role-exchange"
-      ],
+      "targetIds": ["expertise-role-exchange"],
       "reason": "Topic-specific teaching roles can center a community adviser without transferring all authority or assigning a numerical knowledge score."
     },
     {
@@ -430,10 +370,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "scope-aperture",
-        "expertise-role-exchange"
-      ],
+      "targetIds": ["scope-aperture", "expertise-role-exchange"],
       "reason": "The existing scope boundary and the topic-specific exchange show limits to a current question or expertise. An invented numeric uncertainty range would be inappropriate."
     },
     {
@@ -446,9 +383,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "portable-work-transfer"
-      ],
+      "targetIds": ["portable-work-transfer"],
       "reason": "A person carrying retained work identities to another tool is a generic visual response, explicitly marked as source-inferred rather than an implemented capability."
     },
     {
@@ -461,10 +396,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "provenance-peelback",
-        "feedback-refinement"
-      ],
+      "targetIds": ["provenance-peelback", "feedback-refinement"],
       "reason": "The existing source sheet and review exchange can expose a decision record and subsequent community comment without new mechanics."
     },
     {
@@ -477,9 +409,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "feedback-refinement"
-      ],
+      "targetIds": ["feedback-refinement"],
       "reason": "Add a respectful peer-review context while preserving authored outcomes and unresolved comments."
     },
     {
@@ -505,9 +435,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "peer-contribution-recognition"
-      ],
+      "targetIds": ["peer-contribution-recognition"],
       "reason": "A person-to-person acknowledgment tied to an intact work object is distinct from correcting the object."
     },
     {
@@ -520,10 +448,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "feedback-refinement",
-        "peer-contribution-recognition"
-      ],
+      "targetIds": ["feedback-refinement", "peer-contribution-recognition"],
       "reason": "Brief authored wording can demonstrate the principle within an existing exchange, without a separate decorative text animation."
     },
     {
@@ -536,10 +461,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "scope-aperture",
-        "decision-fork"
-      ],
+      "targetIds": ["scope-aperture", "decision-fork"],
       "reason": "Existing scope narrowing and an authored choice already represent this semantic operation."
     },
     {
@@ -552,9 +474,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "release-repair-obligations"
-      ],
+      "targetIds": ["release-repair-obligations"],
       "reason": "An unresolved limitation remains attached to the delivered artifact and a named commitment, rather than vanishing at release."
     },
     {
@@ -567,9 +487,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "decision-fork"
-      ],
+      "targetIds": ["decision-fork"],
       "reason": "An authored decision criterion can express the priority without inventing comparative financial figures."
     },
     {
@@ -612,10 +530,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "contribution-weave",
-        "expertise-role-exchange"
-      ],
+      "targetIds": ["contribution-weave", "expertise-role-exchange"],
       "reason": "Distinct contributions and topic-specific expertise preserve difference without inventing demographic characteristics."
     },
     {
@@ -644,9 +559,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "recurring-leak-prevention"
-      ],
+      "targetIds": ["recurring-leak-prevention"],
       "reason": "Containing the consequence and changing the source become separate visible operations, with an explicit retest outcome."
     },
     {
@@ -659,9 +572,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "qualify-apparent-conflict"
-      ],
+      "targetIds": ["qualify-apparent-conflict"],
       "reason": "Its apparently conflicting statements apply to different time horizons, exactly the existing context-reveal mechanic."
     },
     {
@@ -687,9 +598,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "shared-jig-preparation"
-      ],
+      "targetIds": ["shared-jig-preparation"],
       "reason": "A reusable guide acts on distinct colleagues' workpieces without asserting a speed multiplier."
     },
     {
@@ -702,9 +611,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "serviceable-panel-swap"
-      ],
+      "targetIds": ["serviceable-panel-swap"],
       "reason": "A single designed seam enables a bounded local change while the rest of the system remains visually intact."
     },
     {
@@ -717,10 +624,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "serviceable-panel-swap",
-        "release-repair-obligations"
-      ],
+      "targetIds": ["serviceable-panel-swap", "release-repair-obligations"],
       "reason": "Designed replaceability and visible remaining obligations cover the maintenance principle without claiming all debt is removed."
     },
     {
@@ -733,9 +637,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "release-repair-obligations"
-      ],
+      "targetIds": ["release-repair-obligations"],
       "reason": "Open blocking issues stop delivery, while explicitly classified follow-ups remain attached and owned. The author supplies the classification."
     },
     {
@@ -748,9 +650,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "feedback-refinement"
-      ],
+      "targetIds": ["feedback-refinement"],
       "reason": "The existing repeated review exchange already shows a changing artifact and preserved notes."
     },
     {
@@ -763,9 +663,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "release-repair-obligations"
-      ],
+      "targetIds": ["release-repair-obligations"],
       "reason": "The repair register keeps flaw identity, owner and due wording together without claiming that future repair has occurred."
     },
     {
@@ -2247,11 +2145,7 @@
         "goodFor": [
           "Show whether affordability and defined quality requirements are both met in an authored example"
         ],
-        "tags": [
-          "affordability",
-          "joint requirements",
-          "digital access"
-        ],
+        "tags": ["affordability", "joint requirements", "digital access"],
         "limits": [
           "A quality row needs an explicit criterion and source. Included affordability and quality cells do not prove that every organization can afford the tool or that it is safe."
         ]
@@ -2273,11 +2167,7 @@
           "Explain a decision constrained by an explicitly stated community concern",
           "Show a principled next action in a bounded scenario"
         ],
-        "tags": [
-          "ethical constraint",
-          "community concern",
-          "next action"
-        ],
+        "tags": ["ethical constraint", "community concern", "next action"],
         "limits": [
           "Branch conditions and moral priorities are authored. The animation neither determines ethical correctness nor infers absence of harm."
         ]
@@ -2299,11 +2189,7 @@
           "Explain sector-wide co-creation without erasing contributor identity",
           "Show partnership without a central savior"
         ],
-        "tags": [
-          "co-creation",
-          "partnership",
-          "community contribution"
-        ],
+        "tags": ["co-creation", "partnership", "community contribution"],
         "limits": [
           "The weave is a relationship metaphor. Thread widths and crossings do not quantify labor, ownership, compensation or social impact."
         ]
@@ -2348,14 +2234,8 @@
         }
       ],
       "suggestedChanges": {
-        "goodFor": [
-          "Show the decision record behind a design choice"
-        ],
-        "tags": [
-          "decision rationale",
-          "transparency",
-          "documented choice"
-        ],
+        "goodFor": ["Show the decision record behind a design choice"],
+        "tags": ["decision rationale", "transparency", "documented choice"],
         "limits": [
           "An exposed decision record makes reasoning inspectable. It does not prove that the decision was correct or publicly accepted."
         ]
@@ -2376,12 +2256,7 @@
         "goodFor": [
           "Separate the time spent preparing from the time needed for a later response"
         ],
-        "tags": [
-          "preparation",
-          "time horizon",
-          "deliberate work",
-          "readiness"
-        ],
+        "tags": ["preparation", "time horizon", "deliberate work", "readiness"],
         "limits": [
           "Separate time contexts explain how the authored statements can coexist. They do not establish a measured speed improvement or a guarantee of emergency performance."
         ]

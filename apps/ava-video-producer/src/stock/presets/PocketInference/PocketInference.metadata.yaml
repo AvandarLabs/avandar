@@ -3,7 +3,8 @@ name:
   message: A Model Inside the Device
 description:
   id: motionAtlas.pocket-inference.description
-  message: A small model cartridge seats inside a device and transforms supplied input
+  message:
+    A small model cartridge seats inside a device and transforms supplied input
     into an authored response without crossing the device outline. The casing remains
     the explicit boundary of the illustrated computation.
 category:
@@ -32,7 +33,8 @@ tags:
     message: offline SQL
 useWhen:
   id: motionAtlas.pocket-inference.useWhen
-  message: Make the location of the illustrated computation clear without claiming model
+  message:
+    Make the location of the illustrated computation clear without claiming model
     quality or speed.
 prompt:
   id: motionAtlas.pocket-inference.prompt
@@ -42,7 +44,8 @@ prompt:
     preserve the stated limits.
 creativeDirection:
   id: motionAtlas.pocket-inference.creativeDirection
-  message: Open on a fixed device cutaway with an empty cartridge socket. Seat a compact
+  message:
+    Open on a fixed device cutaway with an empty cartridge socket. Seat a compact
     labeled model cartridge in the socket, then let a narrow fold of input text enter
     the device's internal writing area. A single restrained ripple crosses the cartridge
     face and the supplied response unfurls beneath the input, entirely inside the
@@ -61,7 +64,8 @@ goodFor:
     message: Show inference inside the device boundary
 intent:
   id: motionAtlas.pocket-inference.intent
-  message: Make the location of the illustrated computation clear without claiming model
+  message:
+    Make the location of the illustrated computation clear without claiming model
     quality or speed.
 domains:
   - id: motionAtlas.pocket-inference.domains.0
@@ -77,21 +81,26 @@ aliases:
     message: edge computing
 notFor:
   - id: motionAtlas.pocket-inference.notFor.0
-    message: The response is authored illustrative copy, not model output or evidence of
+    message:
+      The response is authored illustrative copy, not model output or evidence of
       correctness, safety, or measured accuracy.
   - id: motionAtlas.pocket-inference.notFor.1
-    message: Cartridge size is metaphorical and must not stand in for actual weights, memory
+    message:
+      Cartridge size is metaphorical and must not stand in for actual weights, memory
       usage, energy use, or latency.
   - id: motionAtlas.pocket-inference.notFor.2
-    message: Keeping the illustrated task inside the outline does not establish system-wide
+    message:
+      Keeping the illustrated task inside the outline does not establish system-wide
       privacy, absence of telemetry, or offline support for unrelated operations.
   - id: motionAtlas.pocket-inference.notFor.3
-    message: Model installation may need a prior network download and sufficient device
+    message:
+      Model installation may need a prior network download and sufficient device
       resources. Local inference for this task does not establish parity with every
       online tool.
 distinction:
   id: motionAtlas.pocket-inference.distinction
-  message: The hero action seats a persistent computational object inside a bounded device
+  message:
+    The hero action seats a persistent computational object inside a bounded device
     and produces a response there. It is not terminal typing or a general processing
     pipeline, and it does not draw a local-versus-cloud comparison.
 motionBeats:
@@ -104,7 +113,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.pocket-inference.motionBeats.1
-      message: Open on a fixed device cutaway with an empty cartridge socket. Seat a compact
+      message:
+        Open on a fixed device cutaway with an empty cartridge socket. Seat a compact
         labeled model cartridge in the socket, then let a narrow fold of input text
         enter the device's internal writing area. A single restrained ripple crosses the
         cartridge face and the supplied response unfurls beneath the input, entirely

@@ -3,7 +3,8 @@ name:
   message: Make room for urgent work
 description:
   id: motionAtlas.priority-insertion.description
-  message: A newly prioritized item enters an existing ordered queue. One slot opens ahead
+  message:
+    A newly prioritized item enters an existing ordered queue. One slot opens ahead
     of a chosen waiting item while every existing item keeps its relative order.
 category:
   id: motionAtlas.priority-insertion.category
@@ -13,13 +14,15 @@ useWhen:
   message: Show exactly which waiting work moves when one new item gains precedence.
 prompt:
   id: motionAtlas.priority-insertion.prompt
-  message: Use Motion Atlas "Make room for urgent work" (priority-insertion) as a
+  message:
+    Use Motion Atlas "Make room for urgent work" (priority-insertion) as a
     conceptual graphic. Show exactly which waiting work moves when one new item gains
     precedence. Replace fictional sample content with approved authored content before
     making product claims.
 creativeDirection:
   id: motionAtlas.priority-insertion.creativeDirection
-  message: During 12..38, lay an existing queue into numbered track slots, with its
+  message:
+    During 12..38, lay an existing queue into numbered track slots, with its
     service end visibly marked. During 38..64, the new item arrives on a small side spur
     carrying the authored priority caption. During 64..108, the chosen insertion slot
     opens and all items from that position onward shift exactly one slot away from
@@ -32,7 +35,8 @@ intent:
   message: Show exactly which waiting work moves when one new item gains precedence.
 distinction:
   id: motionAtlas.priority-insertion.distinction
-  message: Bar-race reorders measured rankings; this makes one explicit queue insertion
+  message:
+    Bar-race reorders measured rankings; this makes one explicit queue insertion
     without scores or a wholesale sort. Queue-relief changes service capacity, whereas
     this changes precedence while service capacity is absent from the argument.
 tags:
@@ -76,10 +80,12 @@ notFor:
     message: The default tasks and priority are fictional and do not prescribe a
       prioritization policy.
   - id: motionAtlas.priority-insertion.notFor.1
-    message: Only waiting items are reordered; there is no interruption of work already in
+    message:
+      Only waiting items are reordered; there is no interruption of work already in
       progress.
   - id: motionAtlas.priority-insertion.notFor.2
-    message: Slot positions encode precedence only, not duration, importance scores,
+    message:
+      Slot positions encode precedence only, not duration, importance scores,
       fairness, or a delivery commitment.
 motionBeats:
   - startFrame: 12

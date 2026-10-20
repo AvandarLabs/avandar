@@ -3,7 +3,8 @@ name:
   message: Reconnect after a missed visit
 description:
   id: motionAtlas.missed-visit-reconnect.description
-  message: A field worker follows up a small, explicitly defined group whose visits were
+  message:
+    A field worker follows up a small, explicitly defined group whose visits were
     missed. A conversation, a booking, and an attended return resolve into separate
     outcomes.
 category:
@@ -11,15 +12,18 @@ category:
   message: Human outreach and return
 useWhen:
   id: motionAtlas.missed-visit-reconnect.useWhen
-  message: Show that reaching someone, booking a visit, and recording attendance are
+  message:
+    Show that reaching someone, booking a visit, and recording attendance are
     different achievements.
 intent:
   id: motionAtlas.missed-visit-reconnect.intent
-  message: Show that reaching someone, booking a visit, and recording attendance are
+  message:
+    Show that reaching someone, booking a visit, and recording attendance are
     different achievements.
 creativeDirection:
   id: motionAtlas.missed-visit-reconnect.creativeDirection
-  message: Frames 12..38 show four silhouettes with empty appointment marks beside their
+  message:
+    Frames 12..38 show four silhouettes with empty appointment marks beside their
     homes. Frames 39..114 animate one worker making the authored phone or doorstep
     contacts; a booking tab folds onto a calendar for one person, while only a
     documented attendee walks back through the clinic door. Frames 115..167 hold
@@ -27,13 +31,15 @@ creativeDirection:
     frame 179.
 distinction:
   id: motionAtlas.missed-visit-reconnect.distinction
-  message: Unlike status-cycle or node-traversal, this shows a worker contacting people in
+  message:
+    Unlike status-cycle or node-traversal, this shows a worker contacting people in
     their physical setting and an actual return through a clinic doorway only for
     attended records. Unlike dose-cohort-return-paths, its denominator is a preselected
     missed-visit group and its action is reconnection.
 prompt:
   id: motionAtlas.missed-visit-reconnect.prompt
-  message: Use Reconnect after a missed visit (missed-visit-reconnect) for a fictional or
+  message:
+    Use Reconnect after a missed visit (missed-visit-reconnect) for a fictional or
     approved authored example. Show that reaching someone, booking a visit, and
     recording attendance are different achievements.
 tags:
@@ -72,17 +78,21 @@ aliases:
     message: outreach worker
 notFor:
   - id: motionAtlas.missed-visit-reconnect.notFor.0
-    message: "The denominator is cases.length: the authored missed-visit group, not the
+    message:
+      "The denominator is cases.length: the authored missed-visit group, not the
       whole service population. Each person has one exclusive final state, so state
       subtotals sum to the group total."
   - id: motionAtlas.missed-visit-reconnect.notFor.1
-    message: Attempts are contact events and may exceed unique people. A contact or booking
+    message:
+      Attempts are contact events and may exceed unique people. A contact or booking
       does not imply attendance, vaccination, eligibility, or health benefit.
   - id: motionAtlas.missed-visit-reconnect.notFor.2
-    message: The sequence depicts recorded administrative outcomes and supplies no follow-up
+    message:
+      The sequence depicts recorded administrative outcomes and supplies no follow-up
       timing, clinical priority, or dosing advice.
   - id: motionAtlas.missed-visit-reconnect.notFor.3
-    message: Identities are fictional. Household and phone graphics must not imply a
+    message:
+      Identities are fictional. Household and phone graphics must not imply a
       particular reason for the missed visit.
 motionBeats:
   - startFrame: 12
@@ -94,7 +104,8 @@ motionBeats:
     endFrame: 115
     description:
       id: motionAtlas.missed-visit-reconnect.motionBeats.1
-      message: Frames 12..38 show four silhouettes with empty appointment marks beside their
+      message:
+        Frames 12..38 show four silhouettes with empty appointment marks beside their
         homes. Frames 39..114 animate one worker making the authored phone or doorstep
         contacts; a booking tab folds onto a calendar for one person, while only a
         documented attendee walks back through the clinic door. Frames 115..167 hold

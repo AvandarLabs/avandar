@@ -3,7 +3,8 @@ name:
   message: Choose the replacement
 description:
   id: motionAtlas.reject-and-replace.description
-  message: An initially proposed option fails a stated criterion, moves aside, and hands
+  message:
+    An initially proposed option fails a stated criterion, moves aside, and hands
     the same position to a selected replacement. The rejected option stays visible with
     its authored reason.
 category:
@@ -31,13 +32,15 @@ useWhen:
   message: Explain a deliberate replacement through a clear selection criterion.
 prompt:
   id: motionAtlas.reject-and-replace.prompt
-  message: Use Motion Atlas "Choose the replacement" (reject-and-replace) as a conceptual
+  message:
+    Use Motion Atlas "Choose the replacement" (reject-and-replace) as a conceptual
     graphic. Explain a deliberate replacement through a clear selection criterion. Keep
     the restrained motion and readable labels; replace sample content with approved
     facts before making product claims.
 creativeDirection:
   id: motionAtlas.reject-and-replace.creativeDirection
-  message: A proposed label settles into a central selection slot beneath a criterion. A
+  message:
+    A proposed label settles into a central selection slot beneath a criterion. A
     small strike crosses its selection marker, then the option slides into a left-side
     rejected position as its reason appears. The replacement enters the vacated slot
     from the right, receives a selection bracket, and holds with its rationale and the
@@ -68,13 +71,15 @@ notFor:
   - id: motionAtlas.reject-and-replace.notFor.0
     message: Exactly one rejection and one replacement are shown.
   - id: motionAtlas.reject-and-replace.notFor.1
-    message: Selection is authored, not calculated from the wording or treated as a
+    message:
+      Selection is authored, not calculated from the wording or treated as a
       universal recommendation.
   - id: motionAtlas.reject-and-replace.notFor.2
     message: Rejection styling must not make the rejected option or rationale unreadable.
 distinction:
   id: motionAtlas.reject-and-replace.distinction
-  message: Unlike status-cycle, two distinct alternatives exchange one selection role and
+  message:
+    Unlike status-cycle, two distinct alternatives exchange one selection role and
     retain a visible reason for rejection. The hero action is the replacement of an
     option, not progress through states.
 motionBeats:
@@ -87,7 +92,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.reject-and-replace.motionBeats.1
-      message: A proposed label settles into a central selection slot beneath a criterion. A
+      message:
+        A proposed label settles into a central selection slot beneath a criterion. A
         small strike crosses its selection marker, then the option slides into a
         left-side rejected position as its reason appears. The replacement enters the
         vacated slot from the right, receives a selection bracket, and holds with its

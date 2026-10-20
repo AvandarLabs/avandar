@@ -3,7 +3,8 @@ name:
   message: The same classroom, different days
 description:
   id: motionAtlas.classroom-day-presence.description
-  message: A fixed classroom shows which members of one fictional roster are present
+  message:
+    A fixed classroom shows which members of one fictional roster are present
     across several school days. Empty seats and unknown attendance remain visibly
     different.
 category:
@@ -14,11 +15,13 @@ useWhen:
   message: Distinguish who belongs to a class from who is recorded present on each day.
 prompt:
   id: motionAtlas.classroom-day-presence.prompt
-  message: Use The same classroom, different days (classroom-day-presence) with complete
+  message:
+    Use The same classroom, different days (classroom-day-presence) with complete
     authored inputs and preserve the stated limits.
 creativeDirection:
   id: motionAtlas.classroom-day-presence.creativeDirection
-  message: Reveal the supplied roster at named desks and a day label. Across the authored
+  message:
+    Reveal the supplied roster at named desks and a day label. Across the authored
     day changes, the same learner silhouettes occupy or vacate their own desks while
     absent seats keep empty outlines and unknown seats keep question markers. Preserve
     small day impressions beneath each desk instead of sending people through lanes.
@@ -28,7 +31,8 @@ intent:
   message: Distinguish who belongs to a class from who is recorded present on each day.
 distinction:
   id: motionAtlas.classroom-day-presence.distinction
-  message: Uses persistent desks and occupied space across school days, rather than a dot
+  message:
+    Uses persistent desks and occupied space across school days, rather than a dot
     matrix or a cohort flowing through dose-return lanes. The explanatory change is
     daily room occupancy, with absent and unknown records retained as separate states.
 tags:
@@ -69,14 +73,17 @@ notFor:
   - id: motionAtlas.classroom-day-presence.notFor.0
     message: Each silhouette represents one roster member, not a sample weight.
   - id: motionAtlas.classroom-day-presence.notFor.1
-    message: Every daily present numerator is divided by the full supplied roster length.
+    message:
+      Every daily present numerator is divided by the full supplied roster length.
       Absent and unknown counts are shown separately and all three states sum to that
       denominator.
   - id: motionAtlas.classroom-day-presence.notFor.2
-    message: Unknown does not mean absent. The animation never infers reasons for absence,
+    message:
+      Unknown does not mean absent. The animation never infers reasons for absence,
       dropout, retention, or educational impact.
   - id: motionAtlas.classroom-day-presence.notFor.3
-    message: The three day changes are editorial beats, not proportional elapsed time. All
+    message:
+      The three day changes are editorial beats, not proportional elapsed time. All
       defaults are fictional.
 motionBeats:
   - startFrame: 12

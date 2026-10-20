@@ -1,10 +1,10 @@
-import { StockBoxRoughnessContext } from "./primitives/StockRect/StockRect";
 import { useId } from "react";
 import { loopEnvelope } from "../motion";
 import { stockRequestEnvelopeSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
 import { STOCK } from "./graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "./i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { STOCK_GRAPHIC_COPY } from "./i18n/stockGraphicCopy";
+import { StockBoxRoughnessContext } from "./primitives/StockRect/StockRect";
 import { stockRenderers } from "./registry/stockRenderers/stockRenderers";
 import type { StockRequest } from "./contracts/StockContract.types";
 
@@ -62,16 +62,20 @@ export function StockGraphic({
           preset: preset.replaceAll("-", " "),
         },
       })}
-      style={{ display: "block", background: transparent ? "transparent" : background, fontFamily: "Arial, sans-serif" }}
+      style={{
+        display: "block",
+        background: transparent ? "transparent" : background,
+        fontFamily: "Arial, sans-serif",
+      }}
     >
       {!transparent && <rect width={960} height={600} fill={background} />}
       <StockBoxRoughnessContext.Provider value={boxRoughness}>
-      <g opacity={loopEnvelope(localFrame, 180)}>
-        {stockRenderers[preset](
-          { frame: localFrame, accent, background, id },
-          input,
-        )}
-      </g>
+        <g opacity={loopEnvelope(localFrame, 180)}>
+          {stockRenderers[preset](
+            { frame: localFrame, accent, background, id },
+            input,
+          )}
+        </g>
       </StockBoxRoughnessContext.Provider>
     </svg>
   );

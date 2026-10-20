@@ -71,50 +71,35 @@
           "screenshots": [
             {
               "phase": "entrance",
-              "requestedWindow": [
-                18,
-                40
-              ],
+              "requestedWindow": [18, 40],
               "observedBefore": 18,
               "observedAfter": 20,
               "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/entrance.png"
             },
             {
               "phase": "action-early",
-              "requestedWindow": [
-                85,
-                103
-              ],
+              "requestedWindow": [85, 103],
               "observedBefore": 85,
               "observedAfter": 88,
               "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-early.png"
             },
             {
               "phase": "action-late",
-              "requestedWindow": [
-                120,
-                137
-              ],
+              "requestedWindow": [120, 137],
               "observedBefore": 120,
               "observedAfter": 122,
               "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-late.png"
             },
             {
               "phase": "hold",
-              "requestedWindow": [
-                145,
-                165
-              ],
+              "requestedWindow": [145, 165],
               "observedBefore": 145,
               "observedAfter": 147,
               "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/hold.png"
             },
             {
               "phase": "seam",
-              "requestedWindow": [
-                174,
-                179
-              ],
+              "requestedWindow": [174, 179],
               "observedBefore": 174,
               "observedAfter": 177,
               "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/seam.png"
@@ -210,50 +195,35 @@
           "screenshots": [
             {
               "phase": "entrance",
-              "requestedWindow": [
-                18,
-                40
-              ],
+              "requestedWindow": [18, 40],
               "observedBefore": 18,
               "observedAfter": 20,
               "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/entrance.png"
             },
             {
               "phase": "action-early",
-              "requestedWindow": [
-                85,
-                103
-              ],
+              "requestedWindow": [85, 103],
               "observedBefore": 85,
               "observedAfter": 88,
               "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-early.png"
             },
             {
               "phase": "action-late",
-              "requestedWindow": [
-                120,
-                137
-              ],
+              "requestedWindow": [120, 137],
               "observedBefore": 120,
               "observedAfter": 122,
               "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/action-late.png"
             },
             {
               "phase": "hold",
-              "requestedWindow": [
-                145,
-                165
-              ],
+              "requestedWindow": [145, 165],
               "observedBefore": 145,
               "observedAfter": 147,
               "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/hold.png"
             },
             {
               "phase": "seam",
-              "requestedWindow": [
-                174,
-                179
-              ],
+              "requestedWindow": [174, 179],
               "observedBefore": 174,
               "observedAfter": 177,
               "filename": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/tradeoff-pivot--configured-n1-editor-498c717d/seam.png"

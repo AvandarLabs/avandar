@@ -6,37 +6,8 @@
       "path": "~/brain/areas/avandar/docs/avandar-business-plan.pdf",
       "title": "Avandar Business Plan",
       "pages": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
       ],
       "headings": [
         "History",
@@ -57,43 +28,10 @@
       "path": "~/brain/areas/avandar/fundraising/avandar-business-plan-2026-02-20.pdf",
       "title": "Avandar Business Plan (dated comparison copy)",
       "pages": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
       ],
-      "headings": [
-        "Budget",
-        "Projections",
-        "The Team"
-      ],
+      "headings": ["Budget", "Projections", "The Team"],
       "status": "strategy",
       "sha256": "6c690b23cabf467672675526f541fcb8a2b744eab2308cf514970c45d234a0b6",
       "locationKind": "personal-vault"
@@ -110,10 +48,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "readiness-latch",
-        "work-decomposition"
-      ],
+      "targetIds": ["readiness-latch", "work-decomposition"],
       "reason": "A bounded readiness condition and explicit work breakdown already express preparedness. The historical outcome and response speed are not generalized into claims."
     },
     {
@@ -126,9 +61,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "schema-column-evolution"
-      ],
+      "targetIds": ["schema-column-evolution"],
       "reason": "Adding a field while preserving earlier missingness is a distinct explanatory transformation not represented by cell corrections or field correspondence."
     },
     {
@@ -141,9 +74,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "offline-ledger"
-      ],
+      "targetIds": ["offline-ledger"],
       "reason": "Reuse local entry retention and clarify which bounded task continues offline."
     },
     {
@@ -156,9 +87,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "scope-aperture"
-      ],
+      "targetIds": ["scope-aperture"],
       "reason": "An authored semantic boundary can explain the chosen scope without classifying organizations automatically or treating one business definition as universal."
     },
     {
@@ -188,9 +117,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "capability-matrix"
-      ],
+      "targetIds": ["capability-matrix"],
       "reason": "Compare explicit requirements and states without repeating unsupported market sizes or a universal winner."
     },
     {
@@ -203,9 +130,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "tradeoff-pivot"
-      ],
+      "targetIds": ["tradeoff-pivot"],
       "reason": "The existing benefit/concession form preserves a stated constraint and human priority without implying more impact from less input."
     },
     {
@@ -218,9 +143,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "custody-transfer"
-      ],
+      "targetIds": ["custody-transfer"],
       "reason": "Explicitly accepted maintenance responsibility is a useful bounded aspect; the scene must not claim the handoff alone ensures maintainability."
     },
     {
@@ -298,9 +221,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "schema-plan-local-execution"
-      ],
+      "targetIds": ["schema-plan-local-execution"],
       "reason": "The architecture group owns the concrete separation of remote metadata planning and local analytical rows. No speed, capacity, or energy advantage is inferred here."
     },
     {
@@ -313,9 +234,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "offline-ledger"
-      ],
+      "targetIds": ["offline-ledger"],
       "reason": "The existing retained local impression already explains the storage location, with explicit limits on durability and remote synchronization."
     },
     {
@@ -328,10 +247,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "paired-contrast",
-        "schema-plan-local-execution"
-      ],
+      "targetIds": ["paired-contrast", "schema-plan-local-execution"],
       "reason": "The useful generic distinction is where the same bounded operation executes. Runtime internals are not described, so no compilation or desktop-IPC algorithm is invented."
     },
     {
@@ -344,10 +260,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "predicate-pushdown-boundary",
-        "query-column-cache-growth"
-      ],
+      "targetIds": ["predicate-pushdown-boundary", "query-column-cache-growth"],
       "reason": "Architecture-owned proposals provide concrete source filtering and retained-cache containment; another pipeline would duplicate them."
     },
     {
@@ -360,9 +273,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "decision-fork"
-      ],
+      "targetIds": ["decision-fork"],
       "reason": "One authored condition can explain one choice, without inventing a cost-optimization algorithm."
     },
     {
@@ -375,10 +286,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "query-column-cache-growth",
-        "cache-reuse"
-      ],
+      "targetIds": ["query-column-cache-growth", "cache-reuse"],
       "reason": "The architecture proposal explains column-set growth; the baseline already explains a basic cache hit."
     },
     {
@@ -391,9 +299,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "state-preserving-source-refresh"
-      ],
+      "targetIds": ["state-preserving-source-refresh"],
       "reason": "The architecture group owns a refresh mechanism with source and user-state boundaries. The business plan's universal currentness claims are not adopted."
     },
     {
@@ -406,11 +312,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "entity-spine-assembly",
-        "schema-mapping",
-        "network-graph"
-      ],
+      "targetIds": ["entity-spine-assembly", "schema-mapping", "network-graph"],
       "reason": "The source adds domain motivation to existing and architecture-owned structures, not a separately specified logical inference algorithm."
     },
     {
@@ -423,9 +325,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "utterance-to-model-draft"
-      ],
+      "targetIds": ["utterance-to-model-draft"],
       "reason": "Phrase identity and an authored interpretation remain visible across a language-to-structure transformation; human review is an illustrative boundary added for inspectability."
     },
     {
@@ -451,9 +351,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "plugin-capability-install"
-      ],
+      "targetIds": ["plugin-capability-install"],
       "reason": "A chosen module adds an operation over retained records. This is more specific than layout assembly or a catalog of cards, and it remains a planned concept rather than shipped evidence."
     },
     {
@@ -466,9 +364,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "cluster-epicurve-link"
-      ],
+      "targetIds": ["cluster-epicurve-link"],
       "reason": "The existing linked map/epicurve contract already explains a genuine identity-preserving action; a disease-specific plugin wrapper would duplicate it."
     },
     {
@@ -481,10 +377,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "dose-cohort-return-paths",
-        "missed-visit-reconnect"
-      ],
+      "targetIds": ["dose-cohort-return-paths", "missed-visit-reconnect"],
       "reason": "The retained-cohort denominator and distinct contacted/booked/attended outcomes already express the useful generic concern without a new disease-specific preset."
     },
     {
@@ -510,10 +403,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "event-bus",
-        "custody-transfer"
-      ],
+      "targetIds": ["event-bus", "custody-transfer"],
       "reason": "The baseline already depicts channel fan-out and acknowledged responsibility. No real outreach, recipient selection, or implied delivery is required for a generic explanation."
     },
     {
@@ -526,9 +416,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "charge-reference-alignment"
-      ],
+      "targetIds": ["charge-reference-alignment"],
       "reason": "Exact comparison context gates a signed amount difference. It does not correct a payment or decide legal entitlement."
     },
     {
@@ -541,10 +429,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "cell-normalization",
-        "schema-mapping"
-      ],
+      "targetIds": ["cell-normalization", "schema-mapping"],
       "reason": "Existing controlled character edits and field correspondence explain bounded cleanup. Parsing failures and repairs need supplied cases rather than a generic success sweep."
     },
     {
@@ -570,9 +455,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "disclosure-aperture"
-      ],
+      "targetIds": ["disclosure-aperture"],
       "reason": "An explicit disclosure subset can be shown without claiming privacy compliance or undocumented model behavior."
     },
     {
@@ -585,10 +468,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "scope-aperture",
-        "paired-contrast"
-      ],
+      "targetIds": ["scope-aperture", "paired-contrast"],
       "reason": "A bounded scope or plan comparison covers the conceptual separation. Neither is proof of technical tenant isolation, billing enforcement, or permission correctness."
     },
     {
@@ -601,9 +481,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "qualify-apparent-conflict"
-      ],
+      "targetIds": ["qualify-apparent-conflict"],
       "reason": "The existing context qualification resolves the apparent contradiction without stereotyping a whole sector."
     },
     {
@@ -616,9 +494,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "uncertainty-unfold"
-      ],
+      "targetIds": ["uncertainty-unfold"],
       "reason": "A supplied scenario range is useful, but the document's adjustment must not be treated as a statistical confidence interval."
     },
     {
@@ -631,9 +507,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "equal-count-unequal-volume"
-      ],
+      "targetIds": ["equal-count-unequal-volume"],
       "reason": "The objects keep equal counts while their byte strips expose unequal amounts. This adds a clear measurement action rather than another chart skin."
     },
     {
@@ -646,9 +520,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "workspace-capacity-extension"
-      ],
+      "targetIds": ["workspace-capacity-extension"],
       "reason": "The unchanged workspace expands only after an authored choice and retains pending requests when declined."
     },
     {
@@ -661,9 +533,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "disclosure-aperture"
-      ],
+      "targetIds": ["disclosure-aperture"],
       "reason": "The existing permitted-copy boundary can represent approved summary fields while retaining private details. It does not compute anonymization or safe aggregation."
     },
     {
@@ -689,9 +559,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "linked-parameter-rehearsal"
-      ],
+      "targetIds": ["linked-parameter-rehearsal"],
       "reason": "Use one bounded affine example with fictional quantities. No automatic value score or model-quality improvement follows from higher allowance."
     },
     {
@@ -717,10 +585,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "qualify-apparent-conflict",
-        "tradeoff-pivot"
-      ],
+      "targetIds": ["qualify-apparent-conflict", "tradeoff-pivot"],
       "reason": "Qualitative distinctions can be stated. No animation should assert a psychological effect, optimum price, or actual customer reaction."
     },
     {
@@ -733,9 +598,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "tradeoff-pivot"
-      ],
+      "targetIds": ["tradeoff-pivot"],
       "reason": "Keep the time/effort concession alongside the stated relationship benefit rather than using an unmeasured trust meter."
     },
     {
@@ -765,9 +628,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "feedback-refinement"
-      ],
+      "targetIds": ["feedback-refinement"],
       "reason": "A supplied contribution, response, and revision are sufficient. A new upstream-patch animation would duplicate the review loop."
     },
     {
@@ -780,9 +641,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "contribution-weave"
-      ],
+      "targetIds": ["contribution-weave"],
       "reason": "Existing distinct contributions retain attribution within a shared result without implying equal effort or a productivity ranking."
     },
     {
@@ -811,10 +670,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "work-decomposition",
-        "term-limited-revenue-share"
-      ],
+      "targetIds": ["work-decomposition", "term-limited-revenue-share"],
       "reason": "A bounded fictional decomposition or conserved cash example carries the generic concept. All source amounts and personnel costs are excluded."
     },
     {
@@ -827,10 +683,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "linked-parameter-rehearsal",
-        "uncertainty-unfold"
-      ],
+      "targetIds": ["linked-parameter-rehearsal", "uncertainty-unfold"],
       "reason": "Only bounded fictional assumption effects or labeled scenario ranges are suitable. Full compounding forecasts and source figures exceed this six-second stock scope."
     },
     {
@@ -843,10 +696,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "tradeoff-pivot",
-        "term-limited-revenue-share"
-      ],
+      "targetIds": ["tradeoff-pivot", "term-limited-revenue-share"],
       "reason": "The generic tradeoff and temporary-distribution arithmetic are retained without legal, fiduciary, valuation, or investment assertions."
     },
     {
@@ -892,9 +742,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "capability-matrix"
-      ],
+      "targetIds": ["capability-matrix"],
       "reason": "The existing categorical matrix can compare supplied criteria. Named competitor ratings, current pricing, and unsupported uniqueness claims are excluded."
     },
     {
@@ -924,9 +772,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "actor-attribution-split"
-      ],
+      "targetIds": ["actor-attribution-split"],
       "reason": "A fictional account-stamping example makes one bounded collaboration benefit visible while preserving historical attribution limits. The exact mechanism is an illustrative interpretation, not a described product feature."
     },
     {
@@ -939,9 +785,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "uncertainty-unfold"
-      ],
+      "targetIds": ["uncertainty-unfold"],
       "reason": "Keep the hypothesis label separate from evidence and avoid reclassifying a strategy claim as a benchmark."
     },
     {
@@ -954,9 +798,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "paired-contrast"
-      ],
+      "targetIds": ["paired-contrast"],
       "reason": "Compare responsibility boundaries rather than claiming the computation has no cost anywhere."
     },
     {
@@ -969,9 +811,7 @@
         }
       ],
       "disposition": "new",
-      "targetIds": [
-        "term-limited-revenue-share"
-      ],
+      "targetIds": ["term-limited-revenue-share"],
       "reason": "Two equal-period cash partitions isolate the ending distribution while preserving exact accounting and avoiding private figures."
     },
     {
@@ -997,9 +837,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "scope-aperture"
-      ],
+      "targetIds": ["scope-aperture"],
       "reason": "The existing aperture preserves deferred topics and can label current versus planned scope without inventing delivery milestones."
     },
     {
@@ -1012,9 +850,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "feedback-refinement"
-      ],
+      "targetIds": ["feedback-refinement"],
       "reason": "A specific authored feedback/revision example is covered by the baseline, with no unsupported claim of market fit."
     },
     {
@@ -1027,9 +863,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "qualify-apparent-conflict"
-      ],
+      "targetIds": ["qualify-apparent-conflict"],
       "reason": "Separate the two statements and contexts, without adopting comparative quality claims."
     },
     {
@@ -1055,9 +889,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "paired-contrast"
-      ],
+      "targetIds": ["paired-contrast"],
       "reason": "The existing two-approach comparison handles who operates and maintains the same tool. It must not imply self-hosting is free or universally more expensive."
     },
     {
@@ -1070,9 +902,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "qualify-apparent-conflict"
-      ],
+      "targetIds": ["qualify-apparent-conflict"],
       "reason": "The apparent conflict resolves through object-specific policy scope. No legal conclusion or default entitlement is inferred."
     },
     {
@@ -1085,10 +915,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "plugin-capability-install",
-        "capability-matrix"
-      ],
+      "targetIds": ["plugin-capability-install", "capability-matrix"],
       "reason": "Utility selection can use an explicit criterion and then the new installation action. Search ranking and licensing are not specified, so no discovery algorithm is invented."
     },
     {
@@ -1101,9 +928,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "tradeoff-pivot"
-      ],
+      "targetIds": ["tradeoff-pivot"],
       "reason": "An authored priority and concession convey the choice. No generalized claim about investors or private-sector organizations is adopted."
     },
     {
@@ -1133,9 +958,7 @@
         }
       ],
       "disposition": "enrich",
-      "targetIds": [
-        "decision-fork"
-      ],
+      "targetIds": ["decision-fork"],
       "reason": "A single supplied condition can explain a path while remaining separate from a legal or automated eligibility finding."
     },
     {
@@ -1161,10 +984,7 @@
         }
       ],
       "disposition": "covered",
-      "targetIds": [
-        "work-decomposition",
-        "community-coordination-table"
-      ],
+      "targetIds": ["work-decomposition", "community-coordination-table"],
       "reason": "Use the docs copy as primary. Do not create a second proposal from changed figures, staffing details, or the earlier copy's expense categories."
     }
   ],
@@ -2792,11 +2612,7 @@
           "Explain one supplied local-or-remote execution choice",
           "Show how a declared eligibility condition selects an illustrative plan path"
         ],
-        "tags": [
-          "execution placement",
-          "declared conditions",
-          "eligibility"
-        ],
+        "tags": ["execution placement", "declared conditions", "eligibility"],
         "limits": [
           "An authored branch is not a cost optimizer, legal eligibility assessment, or automatic classifier. No sector, intent, affordability, or trustworthiness may be inferred from dataset names or descriptive text.",
           "If illustrating execution placement, retain the stated feasibility and data-boundary conditions. Do not imply that every task can run on either side."
@@ -2824,11 +2640,7 @@
           "Explain which authored summary fields a team chooses to publish",
           "Show a minimal remote planning request while private details remain local"
         ],
-        "tags": [
-          "public summary",
-          "publication boundary",
-          "AI context"
-        ],
+        "tags": ["public summary", "publication boundary", "AI context"],
         "limits": [
           "A published summary field must already be approved and supplied. This preset neither computes safe aggregation nor proves anonymity, privacy, consent, or correct access control.",
           "Public visibility of selected fields does not grant access to the underlying records or establish a customer-acquisition result."

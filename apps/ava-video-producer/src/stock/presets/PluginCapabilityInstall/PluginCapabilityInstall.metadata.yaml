@@ -3,7 +3,8 @@ name:
   message: Fit one new tool to existing data
 description:
   id: motionAtlas.plugin-capability-install.description
-  message: An optional utility seats into a workspace only after an authored installation
+  message:
+    An optional utility seats into a workspace only after an authored installation
     choice. Its category-count stencil then reads the retained records and reveals one
     derived tally, making added capability distinct from data replacement.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show that a chosen extension adds an operation over retained data.
 creativeDirection:
   id: motionAtlas.plugin-capability-install.creativeDirection
-  message: Frames 0-11 reveal a work surface, a bounded record strip, and an empty tool
+  message:
+    Frames 0-11 reveal a work surface, a bounded record strip, and an empty tool
     socket on the 960x600 canvas. Frames 12-55 bring the named utility beside the socket
     and display the supplied decision. For install, frames 56-90 seat the utility and
     align its counting stencil with the unchanged category field. Frames 91-132 draw one
@@ -28,7 +30,8 @@ intent:
   message: Show that a chosen extension adds an operation over retained data.
 distinction:
   id: motionAtlas.plugin-capability-install.distinction
-  message: Unlike dashboard-slot-assembly, a new operation becomes available before it
+  message:
+    Unlike dashboard-slot-assembly, a new operation becomes available before it
     acts on retained data. Unlike pipeline-step-splice, no processing chain is rewired.
     The socketed stencil visibly derives a result from the existing records rather than
     introducing a renamed card collection.
@@ -74,24 +77,30 @@ aliases:
     message: modular software
 notFor:
   - id: motionAtlas.plugin-capability-install.notFor.0
-    message: One optional utility and one fixed tally operation. No executable code,
+    message:
+      One optional utility and one fixed tally operation. No executable code,
       external URLs, marketplace requests, dependency resolution, or security review
       occur.
   - id: motionAtlas.plugin-capability-install.notFor.1
-    message: The sum of category counts must equal records.length and each record is counted
+    message:
+      The sum of category counts must equal records.length and each record is counted
       exactly once. Installation never adds, removes, or edits source records.
   - id: motionAtlas.plugin-capability-install.notFor.2
-    message: The default is fictional. This is not evidence of a shipped plugin system,
+    message:
+      The default is fictional. This is not evidence of a shipped plugin system,
       one-click installation, compatibility with arbitrary data, or a particular
       installation time.
   - id: motionAtlas.plugin-capability-install.notFor.3
-    message: The defer outcome produces no result and no installed-state marker. Zero-count
+    message:
+      The defer outcome produces no result and no installed-state marker. Zero-count
       categories remain visible.
   - id: motionAtlas.plugin-capability-install.notFor.4
-    message: No medical prediction, automated risk assessment, or clinical decision is
+    message:
+      No medical prediction, automated risk assessment, or clinical decision is
       represented by the utility.
   - id: motionAtlas.plugin-capability-install.notFor.5
-    message: Supplied prose meaning, fictional status and agreement with structured choices
+    message:
+      Supplied prose meaning, fictional status and agreement with structured choices
       are authoring responsibilities. Runtime validation enforces structure, numeric
       bounds, identities and references.
 motionBeats:

@@ -292,48 +292,28 @@
                     {
                       "id": "key",
                       "label": "Case",
-                      "cells": [
-                        "HF-01",
-                        "HF-02",
-                        "HF-02"
-                      ]
+                      "cells": ["HF-01", "HF-02", "HF-02"]
                     },
                     {
                       "id": "name",
                       "label": "District",
-                      "cells": [
-                        "North",
-                        "South",
-                        "South"
-                      ]
+                      "cells": ["North", "South", "South"]
                     },
                     {
                       "id": "value",
                       "label": "Items",
-                      "cells": [
-                        "2",
-                        "4",
-                        "4"
-                      ]
+                      "cells": ["2", "4", "4"]
                     }
                   ],
-                  "cachedColumnIds": [
-                    "key",
-                    "name"
-                  ],
+                  "cachedColumnIds": ["key", "name"],
                   "requests": [
                     {
                       "label": "Read names",
-                      "columnIds": [
-                        "name"
-                      ]
+                      "columnIds": ["name"]
                     },
                     {
                       "label": "Read items",
-                      "columnIds": [
-                        "key",
-                        "value"
-                      ]
+                      "columnIds": ["key", "value"]
                     }
                   ],
                   "keyColumnId": "key",
@@ -410,10 +390,7 @@
             "subtitle": "The architecture follows the question.",
             "content": {
               "kind": "thesis",
-              "lines": [
-                "Ask for a subset.",
-                "Move and process what it needs."
-              ],
+              "lines": ["Ask for a subset.", "Move and process what it needs."],
               "emphasis": "Less unnecessary work is the aim."
             },
             "duration": 302,

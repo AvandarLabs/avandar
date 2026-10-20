@@ -3,7 +3,8 @@ name:
   message: Leave room around the site
 description:
   id: motionAtlas.parcel-setback-inset.description
-  message: Schematic parcels shrink inward by a supplied clearance distance to reveal
+  message:
+    Schematic parcels shrink inward by a supplied clearance distance to reveal
     their buildable envelopes. A chosen public-service structure seats inside one
     envelope with its surrounding space still visible.
 category:
@@ -14,13 +15,15 @@ useWhen:
   message: Show why the whole structure and its clearance must fit inside a site.
 prompt:
   id: motionAtlas.parcel-setback-inset.prompt
-  message: Start with parcel edges and dimension ticks. Slide an inner edge inward equally
+  message:
+    Start with parcel edges and dimension ticks. Slide an inner edge inward equally
     on every side, leaving the setback as a hatched perimeter band. Lower the authored
     structure footprint into the remaining envelope and hold the original parcel,
     clearance band and occupied footprint together.
 creativeDirection:
   id: motionAtlas.parcel-setback-inset.creativeDirection
-  message: Start with parcel edges and dimension ticks. Slide an inner edge inward equally
+  message:
+    Start with parcel edges and dimension ticks. Slide an inner edge inward equally
     on every side, leaving the setback as a hatched perimeter band. Lower the authored
     structure footprint into the remaining envelope and hold the original parcel,
     clearance band and occupied footprint together.
@@ -29,7 +32,8 @@ intent:
   message: Show why the whole structure and its clearance must fit inside a site.
 distinction:
   id: motionAtlas.parcel-setback-inset.distinction
-  message: The hero motion erodes parcel edges by a measured inset and fits an entire
+  message:
+    The hero motion erodes parcel edges by a measured inset and fits an entire
     footprint. It neither relocates a service along a route nor exchanges rejected
     options; unlike layer intersection, the second geometry is derived from clearance
     rather than an independent map layer.
@@ -59,13 +63,16 @@ goodFor:
     message: Show an authored kiosk or service-post placement
 notFor:
   - id: motionAtlas.parcel-setback-inset.notFor.0
-    message: This is rectangular schematic geometry, not a legal setback, construction
+    message:
+      This is rectangular schematic geometry, not a legal setback, construction
       recommendation, or optimized site choice.
   - id: motionAtlas.parcel-setback-inset.notFor.1
-    message: Clearance is an authored illustration. Accessibility, utilities, terrain and
+    message:
+      Clearance is an authored illustration. Accessibility, utilities, terrain and
       operating capacity require separate evidence.
   - id: motionAtlas.parcel-setback-inset.notFor.2
-    message: All dimensions share one coordinate unit; there is no implied geographic scale
+    message:
+      All dimensions share one coordinate unit; there is no implied geographic scale
       or population denominator.
 domains:
   - id: motionAtlas.parcel-setback-inset.domains.0

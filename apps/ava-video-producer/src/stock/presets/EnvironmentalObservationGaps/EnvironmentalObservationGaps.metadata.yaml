@@ -3,7 +3,8 @@ name:
   message: Keep gaps visible in the evidence
 description:
   id: motionAtlas.environmental-observation-gaps.description
-  message: A recognizable globe opens onto a schematic environmental observation tile. A
+  message:
+    A recognizable globe opens onto a schematic environmental observation tile. A
     cloud mask leaves missing cells blank, and a field-check marker adds point evidence
     without filling the surrounding unsampled area.
 category:
@@ -11,26 +12,31 @@ category:
   message: Globe-to-tile reveal with masked observations
 useWhen:
   id: motionAtlas.environmental-observation-gaps.useWhen
-  message: Show that an additional observation does not automatically resolve every nearby
+  message:
+    Show that an additional observation does not automatically resolve every nearby
     evidence gap.
 prompt:
   id: motionAtlas.environmental-observation-gaps.prompt
-  message: Use Keep gaps visible in the evidence (environmental-observation-gaps) with
+  message:
+    Use Keep gaps visible in the evidence (environmental-observation-gaps) with
     complete authored inputs and preserve the stated limits.
 creativeDirection:
   id: motionAtlas.environmental-observation-gaps.creativeDirection
-  message: Reveal the globe as geographic context, then unfold a detached schematic
+  message:
+    Reveal the globe as geographic context, then unfold a detached schematic
     observation tile. A cloud layer lifts to reveal supplied cell readings while missing
     cells retain their hatch. A field team places the supplied point checks without
     replacing any whole-cell missing value. Hold the distinction between point sampling
     and area coverage, then fade.
 intent:
   id: motionAtlas.environmental-observation-gaps.intent
-  message: Show that an additional observation does not automatically resolve every nearby
+  message:
+    Show that an additional observation does not automatically resolve every nearby
     evidence gap.
 distinction:
   id: motionAtlas.environmental-observation-gaps.distinction
-  message: Masks preserve spatial gaps while a second sampling support is layered over
+  message:
+    Masks preserve spatial gaps while a second sampling support is layered over
     them. This is neither a scanning band nor a node network, and it avoids converting
     point evidence into invented area coverage.
 tags:
@@ -69,14 +75,17 @@ aliases:
     message: cloud mask
 notFor:
   - id: motionAtlas.environmental-observation-gaps.notFor.0
-    message: Observed area + missing area = number of cells times cellAreaHa. Field checks
+    message:
+      Observed area + missing area = number of cells times cellAreaHa. Field checks
       have point support and contribute no hectares to coverage totals.
   - id: motionAtlas.environmental-observation-gaps.notFor.1
-    message: The globe is recognizable context only; the tile is explicitly schematic. No
+    message:
+      The globe is recognizable context only; the tile is explicitly schematic. No
       real region, live sensor, remote basemap, satellite accuracy or environmental
       trend is implied.
   - id: motionAtlas.environmental-observation-gaps.notFor.2
-    message: Values are fictional and share one variable, unit and authored observation
+    message:
+      Values are fictional and share one variable, unit and authored observation
       period. The graphic cannot establish measurement comparability or field validation
       accuracy.
 motionBeats:
@@ -89,7 +98,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.environmental-observation-gaps.motionBeats.1
-      message: Reveal the globe as geographic context, then unfold a detached schematic
+      message:
+        Reveal the globe as geographic context, then unfold a detached schematic
         observation tile. A cloud layer lifts to reveal supplied cell readings while
         missing cells retain their hatch. A field team places the supplied point checks
         without replacing any whole-cell missing value. Hold the distinction between

@@ -120,10 +120,7 @@
         "type": "transient-entrance-label-overlap",
         "status": "controller-review-later-hold-clear",
         "scope": "native-entrance-capture",
-        "captureWindow": [
-          0.609264,
-          0.694131
-        ],
+        "captureWindow": [0.609264, 0.694131],
         "description": "The incoming A item card covers part of Bundle A, and the card's lower border crosses the heading letters.",
         "laterHoldAssessment": "At 4.807801..4.893479 s Bundle A, A/B/C and Group complete are clear on the collected side. No lasting hold overlap is observed.",
         "isNewFinding": true,
@@ -140,11 +137,7 @@
         "severity": "low",
         "type": "sampled-text-line-overlap",
         "status": "retained-concern-visible-in-native-hold",
-        "phase": [
-          "action-early",
-          "action-late",
-          "hold"
-        ],
+        "phase": ["action-early", "action-late", "hold"],
         "location": "Native1280x800 source ruler endpoint 0 around x506..516,y255.",
         "description": "The source connector's horizontal segment runs along/through the lower edge of the small source ruler 0 label in all three separately viewed full-size samples.",
         "impact": "Local line/text separation is reduced while the endpoint numeral and main arithmetic values remain readable. It is not resolved by the later held pose.",
@@ -195,10 +188,7 @@
         "severityStatus": "pending-controller-adjudication",
         "type": "confirmed-held-display-omission",
         "status": "source-confirmed-no-fix-made",
-        "phase": [
-          "action-late",
-          "hold"
-        ],
+        "phase": ["action-late", "hold"],
         "description": "Selected, Eligible sites and Not selected are visible bottom summary captions, but no aggregate numbers appear beneath them in the full-size decoded late and held samples.",
         "sourceDerivedExpectedTotals": {
           "selected": 2,
@@ -255,10 +245,7 @@
         "type": "retained-transient-account-stamp-occlusion",
         "status": "retained-prior-concern-later-hold-clear",
         "scope": "native-late-action-capture",
-        "captureWindow": [
-          4.005175,
-          4.099856
-        ],
+        "captureWindow": [4.005175, 4.099856],
         "description": "The moving Demo account B stamp crosses the left part of the Draft revised/Demo account A history card, hiding part of its account label.",
         "laterHoldAssessment": "At 4.805071..4.900423 s all four account-history rows are fully readable and correctly labelled, with earlier shared labels unchanged.",
         "isNewFinding": false,
@@ -277,10 +264,7 @@
         "type": "retained-intentional-registration-transient-overprint",
         "status": "retained-transient-observation-no-source-change",
         "scope": "native-early-action-capture-and-separate-prior-poster",
-        "captureWindow": [
-          2.80572,
-          2.884661
-        ],
+        "captureWindow": [2.80572, 2.884661],
         "description": "Expired-ticket expected Hold and observed Admit overprint into combined letters at the same result-box position; they are not independently readable in this natural decoded action sample.",
         "laterHoldAssessment": "At 4.804351..4.890389 s Hold and Admit are separated and readable with Differs/amber bracket, while the known row has Admit/Matches.",
         "isNewFinding": false,
@@ -314,10 +298,7 @@
         "type": "retained-transient-filter-mask-count-mismatch",
         "status": "retained-prior-concern-later-hold-correct",
         "scope": "native-late-action-capture",
-        "captureWindow": [
-          4.007939,
-          4.0963
-        ],
+        "captureWindow": [4.007939, 4.0963],
         "description": "Both subscribed views already dim/exclude East 5 while still displaying unfiltered 10 items/3 records totals.",
         "laterHoldAssessment": "At 4.806921..4.892306 s both subscribed totals are 5 items/2 records and reference remains 10/3.",
         "isNewFinding": false,
@@ -390,11 +371,7 @@
         "status": "minor-deferred-for-final-review",
         "description": "Native early and late trial screenshots reproduce the connector across the lower edge of the source -1e+308 endpoint label. In native restored hold, the long segment retracts but the connector elbow still meets the leading minus/lower-left label edge aroundx506,y255.",
         "impact": "Tick text and main values remain readable, but text/line separation is imperfect. Correct restored values do not erase this geometric readability concern.",
-        "evidencePhases": [
-          "action-early",
-          "action-late",
-          "hold"
-        ],
+        "evidencePhases": ["action-early", "action-late", "hold"],
         "durationEstablished": false,
         "lastingWrongValueEstablished": false,
         "priorDispositionPreserved": true,
@@ -574,10 +551,7 @@
             "type": "transient-entrance-label-overlap",
             "status": "controller-review-later-hold-clear",
             "scope": "native-entrance-capture",
-            "captureWindow": [
-              0.609264,
-              0.694131
-            ],
+            "captureWindow": [0.609264, 0.694131],
             "description": "The incoming A item card covers part of Bundle A, and the card's lower border crosses the heading letters.",
             "laterHoldAssessment": "At 4.807801..4.893479 s Bundle A, A/B/C and Group complete are clear on the collected side. No lasting hold overlap is observed.",
             "isNewFinding": true,
@@ -599,11 +573,7 @@
             "severity": "low",
             "type": "sampled-text-line-overlap",
             "status": "retained-concern-visible-in-native-hold",
-            "phase": [
-              "action-early",
-              "action-late",
-              "hold"
-            ],
+            "phase": ["action-early", "action-late", "hold"],
             "location": "Native1280x800 source ruler endpoint 0 around x506..516,y255.",
             "description": "The source connector's horizontal segment runs along/through the lower edge of the small source ruler 0 label in all three separately viewed full-size samples.",
             "impact": "Local line/text separation is reduced while the endpoint numeral and main arithmetic values remain readable. It is not resolved by the later held pose.",
@@ -715,10 +685,7 @@
             "severityStatus": "pending-controller-adjudication",
             "type": "confirmed-held-display-omission",
             "status": "source-confirmed-no-fix-made",
-            "phase": [
-              "action-late",
-              "hold"
-            ],
+            "phase": ["action-late", "hold"],
             "description": "Selected, Eligible sites and Not selected are visible bottom summary captions, but no aggregate numbers appear beneath them in the full-size decoded late and held samples.",
             "sourceDerivedExpectedTotals": {
               "selected": 2,
@@ -814,10 +781,7 @@
             "type": "retained-transient-account-stamp-occlusion",
             "status": "retained-prior-concern-later-hold-clear",
             "scope": "native-late-action-capture",
-            "captureWindow": [
-              4.005175,
-              4.099856
-            ],
+            "captureWindow": [4.005175, 4.099856],
             "description": "The moving Demo account B stamp crosses the left part of the Draft revised/Demo account A history card, hiding part of its account label.",
             "laterHoldAssessment": "At 4.805071..4.900423 s all four account-history rows are fully readable and correctly labelled, with earlier shared labels unchanged.",
             "isNewFinding": false,
@@ -841,10 +805,7 @@
             "type": "retained-intentional-registration-transient-overprint",
             "status": "retained-transient-observation-no-source-change",
             "scope": "native-early-action-capture-and-separate-prior-poster",
-            "captureWindow": [
-              2.80572,
-              2.884661
-            ],
+            "captureWindow": [2.80572, 2.884661],
             "description": "Expired-ticket expected Hold and observed Admit overprint into combined letters at the same result-box position; they are not independently readable in this natural decoded action sample.",
             "laterHoldAssessment": "At 4.804351..4.890389 s Hold and Admit are separated and readable with Differs/amber bracket, while the known row has Admit/Matches.",
             "isNewFinding": false,
@@ -907,10 +868,7 @@
             "type": "retained-transient-filter-mask-count-mismatch",
             "status": "retained-prior-concern-later-hold-correct",
             "scope": "native-late-action-capture",
-            "captureWindow": [
-              4.007939,
-              4.0963
-            ],
+            "captureWindow": [4.007939, 4.0963],
             "description": "Both subscribed views already dim/exclude East 5 while still displaying unfiltered 10 items/3 records totals.",
             "laterHoldAssessment": "At 4.806921..4.892306 s both subscribed totals are 5 items/2 records and reference remains 10/3.",
             "isNewFinding": false,
@@ -1047,11 +1005,7 @@
             "status": "minor-deferred-for-final-review",
             "description": "Native early and late trial screenshots reproduce the connector across the lower edge of the source -1e+308 endpoint label. In native restored hold, the long segment retracts but the connector elbow still meets the leading minus/lower-left label edge aroundx506,y255.",
             "impact": "Tick text and main values remain readable, but text/line separation is imperfect. Correct restored values do not erase this geometric readability concern.",
-            "evidencePhases": [
-              "action-early",
-              "action-late",
-              "hold"
-            ],
+            "evidencePhases": ["action-early", "action-late", "hold"],
             "durationEstablished": false,
             "lastingWrongValueEstablished": false,
             "priorDispositionPreserved": true,

@@ -3,7 +3,8 @@ name:
   message: The same count can hold different amounts
 description:
   id: motionAtlas.equal-count-unequal-volume.description
-  message: Two equal-count collections begin with matching item marks. Each item unfolds
+  message:
+    Two equal-count collections begin with matching item marks. Each item unfolds
     into a strip proportional to its supplied byte size, revealing different total data
     volumes on one common ruler without changing the item count.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Expose what an item count does not tell us about the amount of data.
 creativeDirection:
   id: motionAtlas.equal-count-unequal-volume.creativeDirection
-  message: Frames 0-11 reveal two labeled shelves containing the same number of authored
+  message:
+    Frames 0-11 reveal two labeled shelves containing the same number of authored
     items. Frames 12-48 align their count marks one for one. Frames 49-110 unfold each
     item horizontally into an adjacent byte-length strip while retaining its small
     identity tab; both shelves share one fixed zero and scale. Frames 111-145 show the
@@ -27,7 +29,8 @@ intent:
   message: Expose what an item count does not tell us about the amount of data.
 distinction:
   id: motionAtlas.equal-count-unequal-volume.distinction
-  message: Unlike capability-matrix, this changes the represented measure from a discrete
+  message:
+    Unlike capability-matrix, this changes the represented measure from a discrete
     count to item-weighted size. Unlike bar-race, no rank changes over time and no data
     values evolve. Unlike population-normalized-map, no denominator division or
     geographic fill is used; the animation opens each counted object to expose its
@@ -76,23 +79,29 @@ aliases:
     message: data size
 notFor:
   - id: motionAtlas.equal-count-unequal-volume.notFor.0
-    message: Exactly two equal-count groups and at most three items per group. Quantities
+    message:
+      Exactly two equal-count groups and at most three items per group. Quantities
       are fictional measurement examples, not actual compression, transfer, memory, or
       storage benchmarks.
   - id: motionAtlas.equal-count-unequal-volume.notFor.1
-    message: Every displayed total equals the sum of item bytes. Item count and byte volume
+    message:
+      Every displayed total equals the sum of item bytes. Item count and byte volume
       remain distinct units; no conversion from count to bytes is inferred.
   - id: motionAtlas.equal-count-unequal-volume.notFor.2
-    message: Both shelves use one zero, one scale, and one measurement basis. An empty-byte
+    message:
+      Both shelves use one zero, one scale, and one measurement basis. An empty-byte
       item keeps its count mark even though its size strip has zero length.
   - id: motionAtlas.equal-count-unequal-volume.notFor.3
-    message: The selected datasets or rows grain applies to all items. A dataset and a row
+    message:
+      The selected datasets or rows grain applies to all items. A dataset and a row
       must never count as interchangeable units.
   - id: motionAtlas.equal-count-unequal-volume.notFor.4
-    message: This does not assess whether a pricing policy is fair or predict actual costs.
+    message:
+      This does not assess whether a pricing policy is fair or predict actual costs.
       It illustrates a limitation of a proxy named in the strategy.
   - id: motionAtlas.equal-count-unequal-volume.notFor.5
-    message: Supplied prose meaning, fictional status and agreement with structured choices
+    message:
+      Supplied prose meaning, fictional status and agreement with structured choices
       are authoring responsibilities. Runtime validation enforces structure, numeric
       bounds, identities and references.
 motionBeats:

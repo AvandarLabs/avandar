@@ -3,7 +3,8 @@ name:
   message: What reaches the lunch table
 description:
   id: motionAtlas.school-lunch-tray-composition.description
-  message: School lunch trays are assembled from an explicit list of planned components,
+  message:
+    School lunch trays are assembled from an explicit list of planned components,
     with an unfilled component kept visible. The scene distinguishes a tray being served
     from a tray matching the stated plan.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Make the contents and omissions of a stated school meal plan visible.
 prompt:
   id: motionAtlas.school-lunch-tray-composition.prompt
-  message: Reveal the supplied learners at a lunch table with their outlined planned
+  message:
+    Reveal the supplied learners at a lunch table with their outlined planned
     trays. Serving utensils place only the authored components into the matching
     compartments; missing planned components retain their outlines. Bring trays to their
     places and hold the complete-plan numerator against every planned tray without
     marking a learner as deficient. Fade through the shared opaque ground.
 creativeDirection:
   id: motionAtlas.school-lunch-tray-composition.creativeDirection
-  message: Reveal the supplied learners at a lunch table with their outlined planned
+  message:
+    Reveal the supplied learners at a lunch table with their outlined planned
     trays. Serving utensils place only the authored components into the matching
     compartments; missing planned components retain their outlines. Bring trays to their
     places and hold the complete-plan numerator against every planned tray without
@@ -70,37 +73,44 @@ aliases:
     message: meal components
 notFor:
   - id: motionAtlas.school-lunch-tray-composition.notFor.0
-    message: The complete-plan numerator counts trays containing every supplied planned
+    message:
+      The complete-plan numerator counts trays containing every supplied planned
       component. Its denominator is all trays, which is also the learner array length in
       this single meal occasion.
   - id: motionAtlas.school-lunch-tray-composition.notFor.1
-    message: A component symbol means the component is listed as present. Its area does not
+    message:
+      A component symbol means the component is listed as present. Its area does not
       encode calories, portion size, nutrient content, or actual consumption.
   - id: motionAtlas.school-lunch-tray-composition.notFor.2
-    message: Matching the list does not establish a balanced diet, nutritional sufficiency,
+    message:
+      Matching the list does not establish a balanced diet, nutritional sufficiency,
       health improvement, or learning impact. Missing a component does not describe a
       learner's health.
   - id: motionAtlas.school-lunch-tray-composition.notFor.3
-    message: The example covers one fictional meal occasion and cannot represent repeated
+    message:
+      The example covers one fictional meal occasion and cannot represent repeated
       meals or unique reach across days.
 motionBeats:
   - startFrame: 0
     endFrame: 35
     description:
       id: motionAtlas.SchoolLunchTrayComposition.beat.0
-      message: Reveal the full learner roster, outlined planned trays and named component
+      message:
+        Reveal the full learner roster, outlined planned trays and named component
         legend.
   - startFrame: 36
     endFrame: 85
     description:
       id: motionAtlas.SchoolLunchTrayComposition.beat.1
-      message: Serving spoons place each authored component into its compartment in four
+      message:
+        Serving spoons place each authored component into its compartment in four
         bounded twelve-frame turns. Empty subsets receive no food.
   - startFrame: 88
     endFrame: 107
     description:
       id: motionAtlas.SchoolLunchTrayComposition.beat.2
-      message: "Slide every tray 24 diagram pixels into its table place, retaining learner
+      message:
+        "Slide every tray 24 diagram pixels into its table place, retaining learner
         identity. When enabled, unfilled compartments receive one neutral outline-width
         pulse: rise from 1 to 2 pixels during frames 88-92, hold through 100, then
         return to 1 pixel by 104."

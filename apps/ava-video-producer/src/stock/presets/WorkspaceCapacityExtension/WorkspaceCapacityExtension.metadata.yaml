@@ -3,7 +3,8 @@ name:
   message: Make room without replacing the work
 description:
   id: motionAtlas.workspace-capacity-extension.description
-  message: A bounded workspace retains its existing resources while additional requests
+  message:
+    A bounded workspace retains its existing resources while additional requests
     wait outside its current allowance. An authored plan choice expands the available
     slots or leaves the requests pending, preserving both user agency and resource
     identity.
@@ -12,11 +13,13 @@ category:
   message: Bounded workspace growth
 useWhen:
   id: motionAtlas.workspace-capacity-extension.useWhen
-  message: Show that an authorized capacity change creates room while the current work
+  message:
+    Show that an authorized capacity change creates room while the current work
     stays intact.
 creativeDirection:
   id: motionAtlas.workspace-capacity-extension.creativeDirection
-  message: Frames 0-11 reveal the current workspace as a shallow tray with its exact slot
+  message:
+    Frames 0-11 reveal the current workspace as a shallow tray with its exact slot
     allowance on the 960x600 canvas. Frames 12-50 bring requested resource tabs
     alongside the filled tray while the existing tabs stay fixed. Frames 51-80 show the
     supplied choice. For expand, frames 81-125 extend the same tray along a hinged side,
@@ -26,11 +29,13 @@ creativeDirection:
     frames 168-179. Use deterministic frame-driven React/SVG at 30fps.
 intent:
   id: motionAtlas.workspace-capacity-extension.intent
-  message: Show that an authorized capacity change creates room while the current work
+  message:
+    Show that an authorized capacity change creates room while the current work
     stays intact.
 distinction:
   id: motionAtlas.workspace-capacity-extension.distinction
-  message: Unlike stagger-cards, the explanatory action changes a finite containing
+  message:
+    Unlike stagger-cards, the explanatory action changes a finite containing
     boundary after an explicit choice. Unlike queue-relief, resources occupy persistent
     workspace slots rather than leaving after service. Unlike dashboard-slot-assembly,
     no layout rearrangement or content reshaping makes the new capacity.
@@ -76,24 +81,30 @@ aliases:
     message: retained work
 notFor:
   - id: motionAtlas.workspace-capacity-extension.notFor.0
-    message: One workspace, two allowance choices, and at most nine total resources. No
+    message:
+      One workspace, two allowance choices, and at most nine total resources. No
       actual billing, subscription entitlement, import, connection, or checkout is
       performed.
   - id: motionAtlas.workspace-capacity-extension.notFor.1
-    message: The combined collection lengths determine resource count. Capacity is supplied
+    message:
+      The combined collection lengths determine resource count. Capacity is supplied
       separately and must contain the final count when expansion is selected. Invalid
       combinations are rejected, not silently truncated.
   - id: motionAtlas.workspace-capacity-extension.notFor.2
-    message: Existing resource identity and content remain unchanged. Pending resources are
+    message:
+      Existing resource identity and content remain unchanged. Pending resources are
       not shown as already imported or connected.
   - id: motionAtlas.workspace-capacity-extension.notFor.3
-    message: No real plan names, prices, conversion rate, automatic charge, or guaranteed
+    message:
+      No real plan names, prices, conversion rate, automatic charge, or guaranteed
       growth is illustrated.
   - id: motionAtlas.workspace-capacity-extension.notFor.4
-    message: A kept allowance is a valid outcome with visible pending demand. No celebratory
+    message:
+      A kept allowance is a valid outcome with visible pending demand. No celebratory
       failure mark or forced-upgrade message punishes that choice.
   - id: motionAtlas.workspace-capacity-extension.notFor.5
-    message: Supplied prose meaning, fictional status and agreement with structured choices
+    message:
+      Supplied prose meaning, fictional status and agreement with structured choices
       are authoring responsibilities. Runtime validation enforces structure, numeric
       bounds, identities and references.
 motionBeats:

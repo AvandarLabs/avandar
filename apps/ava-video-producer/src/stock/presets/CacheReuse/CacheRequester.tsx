@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";

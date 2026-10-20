@@ -34,11 +34,7 @@
         ],
         "variants": [],
         "errors": [],
-        "outcomeOptions": [
-          "Choose a value",
-          "Failed",
-          "Completed"
-        ],
+        "outcomeOptions": ["Choose a value", "Failed", "Completed"],
         "accessibleLabelCount": 21,
         "implementationIdFallbacks": [],
         "status": "passed"
@@ -398,9 +394,7 @@
     "fixtures": 758,
     "frameHashes": 6822,
     "supplementalUnchanged": 40,
-    "supplementalChanged": [
-      "out/showcase/browser/motion-gallery.js"
-    ]
+    "supplementalChanged": ["out/showcase/browser/motion-gallery.js"]
   },
   "initialHarnessFailure": {
     "path": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/final-copy-ui-b-initial-raw.json",

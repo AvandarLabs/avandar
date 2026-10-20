@@ -3,7 +3,8 @@ name:
   message: One load, several carriers
 description:
   id: motionAtlas.aid-cargo-mode-handoff.description
-  message: The same labeled aid parcels move between physical transport modes. Keeping
+  message:
+    The same labeled aid parcels move between physical transport modes. Keeping
     each parcel visible through the handoffs explains how a load can continue when the
     carrier changes.
 category:
@@ -17,7 +18,8 @@ intent:
   message: Show that assistance continues as the same physical load across different carriers.
 creativeDirection:
   id: motionAtlas.aid-cargo-mode-handoff.creativeDirection
-  message: "Within six seconds, reveal a boat or truck carrying the supplied parcels at
+  message:
+    "Within six seconds, reveal a boat or truck carrying the supplied parcels at
     the first transfer point. Animate one restrained unload-and-load motion per
     boundary: a dock hoist or handcart moves those exact parcels onto the next carrier,
     then the carrier advances into the next part of the cutaway landscape. End with the
@@ -26,12 +28,14 @@ creativeDirection:
     entrance and opaque exit envelope."
 distinction:
   id: motionAtlas.aid-cargo-mode-handoff.distinction
-  message: This is a physical transshipment cutaway with unloading, loading, and conserved
+  message:
+    This is a physical transshipment cutaway with unloading, loading, and conserved
     parcel identity. data-pipeline changes abstract stages; packet-stream moves
     interchangeable packets without carrier changes or handling actions.
 prompt:
   id: motionAtlas.aid-cargo-mode-handoff.prompt
-  message: One load, several carriers. Show that assistance continues as the same physical
+  message:
+    One load, several carriers. Show that assistance continues as the same physical
     load across different carriers.
 tags:
   - id: motionAtlas.aid-cargo-mode-handoff.tags.0
@@ -69,16 +73,20 @@ aliases:
     message: cargo handoff
 notFor:
   - id: motionAtlas.aid-cargo-mode-handoff.notFor.0
-    message: Parcel glyphs count the authored example parcels only; they are not weights,
+    message:
+      Parcel glyphs count the authored example parcels only; they are not weights,
       pallet equivalents, or reported distributions.
   - id: motionAtlas.aid-cargo-mode-handoff.notFor.1
-    message: Transfer speed and carrier sizes are illustrative, not travel times or
+    message:
+      Transfer speed and carrier sizes are illustrative, not travel times or
       engineering capacity.
   - id: motionAtlas.aid-cargo-mode-handoff.notFor.2
-    message: The scene ends at a receiving point, before household receipt; use a separate
+    message:
+      The scene ends at a receiving point, before household receipt; use a separate
       handover concept to explain confirmation by recipients.
   - id: motionAtlas.aid-cargo-mode-handoff.notFor.3
-    message: No real route, organization branding, vehicle markings, or third-party assets
+    message:
+      No real route, organization branding, vehicle markings, or third-party assets
       are required.
 motionBeats:
   - startFrame: 12
@@ -90,7 +98,8 @@ motionBeats:
     endFrame: 111
     description:
       id: motionAtlas.aid-cargo-mode-handoff.motionBeats.1
-      message: Unload each parcel, advance the fully loaded receiver, then repeat at the next
+      message:
+        Unload each parcel, advance the fully loaded receiver, then repeat at the next
         boundary when present.
   - startFrame: 112
     endFrame: 132

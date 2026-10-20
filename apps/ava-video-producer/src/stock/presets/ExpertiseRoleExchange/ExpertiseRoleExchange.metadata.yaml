@@ -3,7 +3,8 @@ name:
   message: Let expertise change who teaches
 description:
   id: motionAtlas.expertise-role-exchange.description
-  message: Two colleagues alternate teaching and learning around two concrete tasks. Their
+  message:
+    Two colleagues alternate teaching and learning around two concrete tasks. Their
     job-role labels stay fixed while the demonstration position changes according to
     subject-specific expertise.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Separate authority in one topic from a permanent ranking of people.
 creativeDirection:
   id: motionAtlas.expertise-role-exchange.creativeDirection
-  message: Frames 12..34 reveal two people beside one shared worktable with unchanged role
+  message:
+    Frames 12..34 reveal two people beside one shared worktable with unchanged role
     labels. Frames 35..82 show the first topic expert aligning a guide on the table
     while the other observes. The topic strip then turns to the second topic. Frames
     83..130 pass the demonstration tool to the other person, who demonstrates their
@@ -31,7 +33,8 @@ intent:
   message: Separate authority in one topic from a permanent ranking of people.
 distinction:
   id: motionAtlas.expertise-role-exchange.distinction
-  message: Unlike contribution-weave, participants exchange the active teaching role
+  message:
+    Unlike contribution-weave, participants exchange the active teaching role
     instead of combining outputs. Unlike interpreted-case-dialogue, no statement is
     translated or mediated; each person demonstrates a different subject of expertise.
 tags:
@@ -62,14 +65,16 @@ aliases:
     message: expertise role exchange
 notFor:
   - id: motionAtlas.expertise-role-exchange.notFor.0
-    message: Expertise is supplied by the author and is specific to the shown topic. The
+    message:
+      Expertise is supplied by the author and is specific to the shown topic. The
       animation does not assess competence.
   - id: motionAtlas.expertise-role-exchange.notFor.1
     message: A brief demonstration does not establish mastery or prove that learning occurred.
   - id: motionAtlas.expertise-role-exchange.notFor.2
     message: Do not use clothing, size, age or posture to imply a hierarchy of human worth.
   - id: motionAtlas.expertise-role-exchange.notFor.3
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

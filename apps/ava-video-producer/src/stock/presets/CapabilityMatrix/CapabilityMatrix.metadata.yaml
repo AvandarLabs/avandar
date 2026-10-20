@@ -3,7 +3,8 @@ name:
   message: Capability by capability
 description:
   id: motionAtlas.capability-matrix.description
-  message: A compact table reveals explicit capability states one line at a time, then
+  message:
+    A compact table reveals explicit capability states one line at a time, then
     holds an authored row or column focus. Supported, unavailable, conditional, and
     unknown states remain visually distinct.
 category:
@@ -53,13 +54,15 @@ useWhen:
   message: Compare alternatives using the same explicit list of capabilities.
 prompt:
   id: motionAtlas.capability-matrix.prompt
-  message: Use Motion Atlas "Capability by capability" (capability-matrix) as a conceptual
+  message:
+    Use Motion Atlas "Capability by capability" (capability-matrix) as a conceptual
     graphic. Compare alternatives using the same explicit list of capabilities. Keep the
     restrained motion and readable labels; replace sample content with approved facts
     before making product claims.
 creativeDirection:
   id: motionAtlas.capability-matrix.creativeDirection
-  message: A table skeleton and option headings settle first. A narrow horizontal rule
+  message:
+    A table skeleton and option headings settle first. A narrow horizontal rule
     advances through the capability rows, resolving all cells in each row together so
     the audience compares like with like. The final focus opens a bracket around one
     selected column or row while every other cell remains legible, followed by the
@@ -76,7 +79,8 @@ goodFor:
   - id: motionAtlas.capability-matrix.goodFor.4
     message: Explain fit across affordability, usability, and lifecycle coverage
   - id: motionAtlas.capability-matrix.goodFor.5
-    message: Show whether affordability and defined quality requirements are both met in an
+    message:
+      Show whether affordability and defined quality requirements are both met in an
       authored example
   - id: motionAtlas.capability-matrix.goodFor.6
     message: Compare local and network-dependent operations
@@ -101,27 +105,33 @@ notFor:
   - id: motionAtlas.capability-matrix.notFor.0
     message: Cells are categorical statements, not performance scores or quantities.
   - id: motionAtlas.capability-matrix.notFor.1
-    message: Unknown must never be rendered as absent, and conditional cells require
+    message:
+      Unknown must never be rendered as absent, and conditional cells require
       meaningful source qualifications.
   - id: motionAtlas.capability-matrix.notFor.2
     message: At most three options and five rows fit the intended six-second overview.
   - id: motionAtlas.capability-matrix.notFor.3
-    message: A capability state is a supplied statement about a specific context and
+    message:
+      A capability state is a supplied statement about a specific context and
       version. Do not infer market-wide absence, universal superiority, or current
       competitor support from a strategic comparison.
   - id: motionAtlas.capability-matrix.notFor.4
-    message: Qualitative affordability requires a stated audience and context; included
+    message:
+      Qualitative affordability requires a stated audience and context; included
       features are not proof that a plan is affordable to every team.
   - id: motionAtlas.capability-matrix.notFor.5
-    message: A quality row needs an explicit criterion and source. Included affordability
+    message:
+      A quality row needs an explicit criterion and source. Included affordability
       and quality cells do not prove that every organization can afford the tool or that
       it is safe.
   - id: motionAtlas.capability-matrix.notFor.6
-    message: Unavailable, conditional and unknown must stay distinct. Planned capability is
+    message:
+      Unavailable, conditional and unknown must stay distinct. Planned capability is
       not currently supported.
 distinction:
   id: motionAtlas.capability-matrix.distinction
-  message: The grid carries a two-dimensional comparison contract and four explicit cell
+  message:
+    The grid carries a two-dimensional comparison contract and four explicit cell
     meanings. It is neither a cohort dot-matrix nor source-to-destination
     schema-mapping, and its choreography compares each line item across all
     alternatives.
@@ -135,7 +145,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.capability-matrix.motionBeats.1
-      message: A table skeleton and option headings settle first. A narrow horizontal rule
+      message:
+        A table skeleton and option headings settle first. A narrow horizontal rule
         advances through the capability rows, resolving all cells in each row together
         so the audience compares like with like. The final focus opens a bracket around
         one selected column or row while every other cell remains legible, followed by

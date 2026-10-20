@@ -3,7 +3,8 @@ name:
   message: Bind a shareable report
 description:
   id: motionAtlas.report-page-bind.description
-  message: Analysis excerpts flow into a paginated document, then gather into a compact
+  message:
+    Analysis excerpts flow into a paginated document, then gather into a compact
     report at a named handoff destination. The source order stays visible through the
     transformation.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show information becoming a self-contained document someone else can use.
 creativeDirection:
   id: motionAtlas.report-page-bind.creativeDirection
-  message: Frames 12-38 present two or three source excerpts on a work surface. Between
+  message:
+    Frames 12-38 present two or three source excerpts on a work surface. Between
     frames 38-104, paper margins extend around the excerpts, each excerpt takes its own
     page, and a title strip becomes the first page header. The pages slide into an
     offset bound stack beside a destination tray during frames 104-136. Hold the report
@@ -24,12 +26,14 @@ intent:
   message: Show information becoming a self-contained document someone else can use.
 distinction:
   id: motionAtlas.report-page-bind.distinction
-  message: Unlike scan-lines, this constructs and paginates a document rather than
+  message:
+    Unlike scan-lines, this constructs and paginates a document rather than
     examining one. Unlike source-merge, source excerpts retain their page identity and
     become a portable editorial artifact.
 prompt:
   id: motionAtlas.report-page-bind.prompt
-  message: Use Motion Atlas "Bind a shareable report" (report-page-bind) as a conceptual
+  message:
+    Use Motion Atlas "Bind a shareable report" (report-page-bind) as a conceptual
     graphic. Show information becoming a self-contained document someone else can use.
     Replace fictional sample content with approved authored content before making
     product claims.
@@ -87,12 +91,14 @@ notFor:
   - id: motionAtlas.report-page-bind.notFor.1
     message: One section equals one page; this is an authored diagram, not a text-layout engine.
   - id: motionAtlas.report-page-bind.notFor.2
-    message: Arrival at the destination tray means prepared for handoff, not transmitted or
+    message:
+      Arrival at the destination tray means prepared for handoff, not transmitted or
       read.
   - id: motionAtlas.report-page-bind.notFor.3
     message: No actual PDF generation, network sharing, or product capability is demonstrated.
   - id: motionAtlas.report-page-bind.notFor.4
-    message: An exported map needs its units, classification legend, source and limitation
+    message:
+      An exported map needs its units, classification legend, source and limitation
       note; a decorative map image alone is incomplete.
 motionBeats:
   - startFrame: 12

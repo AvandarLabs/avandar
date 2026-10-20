@@ -1,5 +1,5 @@
-import { StockRect } from "./primitives/StockRect/StockRect";
 import { DUR, EASE, loopPhase, mix, ramp, STAGGER } from "../motion";
+import { StockRect } from "./primitives/StockRect/StockRect";
 import { STOCK } from "./stockPalette";
 import type { ReactNode } from "react";
 

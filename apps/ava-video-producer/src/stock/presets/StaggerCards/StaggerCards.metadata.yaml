@@ -18,11 +18,13 @@ tags:
     message: collection
 useWhen:
   id: motionAtlas.stagger-cards.useWhen
-  message: Introduce a small set of concepts, records, or capabilities with one arrival
+  message:
+    Introduce a small set of concepts, records, or capabilities with one arrival
     sequence.
 prompt:
   id: motionAtlas.stagger-cards.prompt
-  message: Use Motion Atlas "Staggered collection" (stagger-cards) as a conceptual
+  message:
+    Use Motion Atlas "Staggered collection" (stagger-cards) as a conceptual
     graphic. Introduce a small set of concepts, records, or capabilities with one
     arrival sequence. Keep the restrained motion and readable labels; replace sample
     content with approved facts before making product claims.
@@ -31,11 +33,13 @@ creativeDirection:
   message: Cards settle into a grid with a short sibling delay.
 goodFor:
   - id: motionAtlas.stagger-cards.goodFor.0
-    message: Introduce a small set of concepts, records, or capabilities with one arrival
+    message:
+      Introduce a small set of concepts, records, or capabilities with one arrival
       sequence.
 intent:
   id: motionAtlas.stagger-cards.intent
-  message: Introduce a small set of concepts, records, or capabilities with one arrival
+  message:
+    Introduce a small set of concepts, records, or capabilities with one arrival
     sequence.
 domains:
   - id: motionAtlas.stagger-cards.domains.0
@@ -51,7 +55,8 @@ aliases:
     message: collection
 notFor:
   - id: motionAtlas.stagger-cards.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

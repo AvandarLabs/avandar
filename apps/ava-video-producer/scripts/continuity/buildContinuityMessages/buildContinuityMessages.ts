@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { collectContinuityMessages } from "../collectContinuityMessages/collectContinuityMessages";
 import { requireLicense } from "../../require-license.mjs";
+import { collectContinuityMessages } from "../collectContinuityMessages/collectContinuityMessages";
 
 async function _writeChanged(options: { filename: string; source: string }) {
   const { filename, source } = options;

@@ -1,4 +1,3 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
 import { loopPhase, mix, wave } from "../../motion";
 import {
   Check,
@@ -9,6 +8,7 @@ import {
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { StockRect } from "../primitives/StockRect/StockRect";
 import type { PacketStreamInput } from "../presets/PacketStream/PacketStream.schema";
 import type { ReactNode } from "react";
 

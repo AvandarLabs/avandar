@@ -3,7 +3,8 @@ name:
   message: One fraction, several ways to show it
 description:
   id: motionAtlas.fraction-material-translation.description
-  message: Learners demonstrate the same fictional lesson using folded paper, counters,
+  message:
+    Learners demonstrate the same fictional lesson using folded paper, counters,
     and a shaded board. The objects change while the mathematical relationship stays
     constant.
 category:
@@ -11,11 +12,13 @@ category:
   message: Learning materials transform
 useWhen:
   id: motionAtlas.fraction-material-translation.useWhen
-  message: Show that one mathematical idea can be expressed through different physical
+  message:
+    Show that one mathematical idea can be expressed through different physical
     representations.
 prompt:
   id: motionAtlas.fraction-material-translation.prompt
-  message: "Reveal one learner and work surface per supplied representation facing a
+  message:
+    "Reveal one learner and work surface per supplied representation facing a
     shared fraction prompt. Animate only the chosen materials: folded paper divides into
     equal parts, counters gather into equal units, and shaded-board cells select their
     authored fraction. Every representation selects the same numerator out of the same
@@ -24,7 +27,8 @@ prompt:
     fade."
 creativeDirection:
   id: motionAtlas.fraction-material-translation.creativeDirection
-  message: "Reveal one learner and work surface per supplied representation facing a
+  message:
+    "Reveal one learner and work surface per supplied representation facing a
     shared fraction prompt. Animate only the chosen materials: folded paper divides into
     equal parts, counters gather into equal units, and shaded-board cells select their
     authored fraction. Every representation selects the same numerator out of the same
@@ -33,11 +37,13 @@ creativeDirection:
     fade."
 intent:
   id: motionAtlas.fraction-material-translation.intent
-  message: Show that one mathematical idea can be expressed through different physical
+  message:
+    Show that one mathematical idea can be expressed through different physical
     representations.
 distinction:
   id: motionAtlas.fraction-material-translation.distinction
-  message: Each material undergoes a different physical operation that preserves an exact
+  message:
+    Each material undergoes a different physical operation that preserves an exact
     mathematical relationship. This is neither relabeled comparison cards nor a
     branching workflow that sorts learners into fixed ability tracks.
 tags:
@@ -76,16 +82,19 @@ aliases:
     message: fractions
 notFor:
   - id: motionAtlas.fraction-material-translation.notFor.0
-    message: Numerator means selected equal parts and denominator means all equal parts of
+    message:
+      Numerator means selected equal parts and denominator means all equal parts of
       that representation. The default is 1 of 2 in each material, not 3 of 6 learners.
   - id: motionAtlas.fraction-material-translation.notFor.1
     message: Counter groups and board partitions are generated from the fraction
       denominator. No independent part-count input can contradict it.
   - id: motionAtlas.fraction-material-translation.notFor.2
-    message: Representation choices do not diagnose learning styles or prove superior
+    message:
+      Representation choices do not diagnose learning styles or prove superior
       learning outcomes. The sequence does not rank learners.
   - id: motionAtlas.fraction-material-translation.notFor.3
-    message: This bounded preset explains fractions only. Every example classroom, learner,
+    message:
+      This bounded preset explains fractions only. Every example classroom, learner,
       and lesson is fictional.
 motionBeats:
   - startFrame: 0
@@ -97,17 +106,20 @@ motionBeats:
     endFrame: 83
     description:
       id: motionAtlas.fraction-material-translation.motionBeats.1
-      message: Fold equal paper parts, gather equal counters and shade equal board cells using
+      message:
+        Fold equal paper parts, gather equal counters and shade equal board cells using
         the same fraction.
   - startFrame: 84
     endFrame: 125
     description:
       id: motionAtlas.fraction-material-translation.motionBeats.2
-      message: Briefly align selected part rows and move only the work surfaces into the
+      message:
+        Briefly align selected part rows and move only the work surfaces into the
         supplied comparison arrangement.
   - startFrame: 126
     endFrame: 179
     description:
       id: motionAtlas.fraction-material-translation.motionBeats.3
-      message: Hold distinct learners, materials and the common fraction through the shared
+      message:
+        Hold distinct learners, materials and the common fraction through the shared
         fade.

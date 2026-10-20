@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import test from "node:test";
 import { readFileSync } from "node:fs";
+import test from "node:test";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { previewFrames } from "../planHelpers";
 import { productRequirements } from "./productRequirements";

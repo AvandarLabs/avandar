@@ -3,7 +3,8 @@ name:
   message: One filter changes only the subscribed views
 description:
   id: motionAtlas.filter-subscription-scope.description
-  message: A category selection becomes a shared filter strip that reaches some views and
+  message:
+    A category selection becomes a shared filter strip that reaches some views and
     stops at an unsubscribed view. Each subscribed view recalculates from the same
     retained records while the independent view keeps its full denominator.
 category:
@@ -19,7 +20,8 @@ prompt:
     condition. Supply approved authored content before making claims.
 creativeDirection:
   id: motionAtlas.filter-subscription-scope.creativeDirection
-  message: 960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-50 reveal three compact tables with subscription
     connectors. Frames 51-90 place one category filter into its source socket. Frames
     91-139 mask only nonmatching records in subscribed views, recompute their sums and
@@ -30,7 +32,8 @@ intent:
   message: Show which views inherit a shared row-selection condition.
 distinction:
   id: motionAtlas.filter-subscription-scope.distinction
-  message: Linked-parameter-rehearsal applies affine equations to quantities. This applies
+  message:
+    Linked-parameter-rehearsal applies affine equations to quantities. This applies
     an equality predicate to row membership across explicit view subscriptions and
     preserves an independent reference denominator.
 tags:
@@ -61,24 +64,29 @@ aliases:
     message: record denominator
 notFor:
   - id: motionAtlas.filter-subscription-scope.notFor.0
-    message: Only one global equality filter is shown; local filters, complex joins and SQL
+    message:
+      Only one global equality filter is shown; local filters, complex joins and SQL
       wrapping are outside scope.
   - id: motionAtlas.filter-subscription-scope.notFor.1
     message: Counts are record counts, not unique people unless the author supplies that grain.
   - id: motionAtlas.filter-subscription-scope.notFor.2
     message: No causal change in the underlying records is implied.
   - id: motionAtlas.filter-subscription-scope.notFor.3
-    message: No JSX, functions, URLs or external fetch in props. The animation is an
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
       authored explanation, not actual document extraction or product evidence.
   - id: motionAtlas.filter-subscription-scope.notFor.4
-    message: Every sum uses metric.valueUnit and every row count uses metric.countUnit. The
+    message:
+      Every sum uses metric.valueUnit and every row count uses metric.countUnit. The
       same value measure is used in every subscribed and unsubscribed view.
   - id: motionAtlas.filter-subscription-scope.notFor.5
-    message: Authored prose and schematic context are the author's responsibility. Runtime
+    message:
+      Authored prose and schematic context are the author's responsibility. Runtime
       validation checks structural bounds and numeric, reference and geometry
       constraints, without classifying natural-language claims.
   - id: motionAtlas.filter-subscription-scope.notFor.6
-    message: Category keys preserve exact whitespace. Whitespace is shown using distinct
+    message:
+      Category keys preserve exact whitespace. Whitespace is shown using distinct
       literal-data marks. Record and view IDs allow empty strings and are bounded to 12
       characters.
 motionBeats:
@@ -91,7 +99,8 @@ motionBeats:
     endFrame: 50
     description:
       id: motionAtlas.filter-subscription-scope.motionBeats.1
-      message: A category selection becomes a shared filter strip that reaches some views and
+      message:
+        A category selection becomes a shared filter strip that reaches some views and
         stops at an unsubscribed view. Each subscribed view recalculates from the same
         retained records while the independent view keeps its full denominator.
   - startFrame: 51

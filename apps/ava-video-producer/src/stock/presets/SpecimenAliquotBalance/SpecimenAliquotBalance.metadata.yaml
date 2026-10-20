@@ -3,7 +3,8 @@ name:
   message: One sample, several aliquots
 description:
   id: motionAtlas.specimen-aliquot-balance.description
-  message: A parent specimen divides into labeled aliquot tubes while the parent identity
+  message:
+    A parent specimen divides into labeled aliquot tubes while the parent identity
     stays visible. The remaining parent volume and the aliquot volumes reconcile
     exactly.
 category:
@@ -11,28 +12,33 @@ category:
   message: Material division and lineage
 useWhen:
   id: motionAtlas.specimen-aliquot-balance.useWhen
-  message: Show that splitting a specimen increases container count without creating more
+  message:
+    Show that splitting a specimen increases container count without creating more
     source specimens or volume.
 intent:
   id: motionAtlas.specimen-aliquot-balance.intent
-  message: Show that splitting a specimen increases container count without creating more
+  message:
+    Show that splitting a specimen increases container count without creating more
     source specimens or volume.
 creativeDirection:
   id: motionAtlas.specimen-aliquot-balance.creativeDirection
-  message: Reveal the parent sample tube with its supplied volume. Move only the authored
+  message:
+    Reveal the parent sample tube with its supplied volume. Move only the authored
     aliquot volumes into their child tubes while identity tethers retain the parent
     relationship; the parent level falls by the transferred amount. Hold the remaining
     parent volume plus all child volumes beside a derived equality and a separate
     specimen-family count, then fade.
 distinction:
   id: motionAtlas.specimen-aliquot-balance.distinction
-  message: Unlike source-merge or network-graph, matter visibly divides rather than
+  message:
+    Unlike source-merge or network-graph, matter visibly divides rather than
     information merely branching, and the parent liquid level changes to preserve
     volume. Unlike specimen-custody-seal, this explicitly creates child containers while
     preserving one source identity.
 prompt:
   id: motionAtlas.specimen-aliquot-balance.prompt
-  message: Use One sample, several aliquots (specimen-aliquot-balance) for a fictional or
+  message:
+    Use One sample, several aliquots (specimen-aliquot-balance) for a fictional or
     approved authored example. Show that splitting a specimen increases container count
     without creating more source specimens or volume.
 tags:
@@ -75,14 +81,17 @@ notFor:
       aliquots.length; total shown tube count is 1 + aliquots.length, regardless of
       whether the parent remainder is zero.
   - id: motionAtlas.specimen-aliquot-balance.notFor.1
-    message: sum(aliquots.volume) must be <= parent.volume. Parent remainder is derived by
+    message:
+      sum(aliquots.volume) must be <= parent.volume. Parent remainder is derived by
       subtraction, so source volume equals child volume plus remainder; no loss or
       separate remainder input exists.
   - id: motionAtlas.specimen-aliquot-balance.notFor.2
-    message: Volume units are fictional schematic units. Tube geometry is illustrative, not
+    message:
+      Volume units are fictional schematic units. Tube geometry is illustrative, not
       a calibrated laboratory instrument or a practical aliquoting procedure.
   - id: motionAtlas.specimen-aliquot-balance.notFor.3
-    message: This shows lineage and bookkeeping only. No assay, sample suitability,
+    message:
+      This shows lineage and bookkeeping only. No assay, sample suitability,
       diagnostic result, laboratory method, or clinical recommendation is implied.
 motionBeats:
   - startFrame: 12
@@ -94,7 +103,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.specimen-aliquot-balance.motionBeats.1
-      message: Reveal the parent sample tube with its supplied volume. Move only the authored
+      message:
+        Reveal the parent sample tube with its supplied volume. Move only the authored
         aliquot volumes into their child tubes while identity tethers retain the parent
         relationship; the parent level falls by the transferred amount. Hold the
         remaining parent volume plus all child volumes beside a derived equality and a

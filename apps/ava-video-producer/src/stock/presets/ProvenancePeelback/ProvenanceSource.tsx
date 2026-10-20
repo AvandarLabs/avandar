@@ -1,5 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { ramp } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { CitationUnderline } from "./CitationUnderline";
 import { getSourceSheetGeometryFromSelectionAndFrame } from "./getSourceSheetGeometryFromSelectionAndFrame";

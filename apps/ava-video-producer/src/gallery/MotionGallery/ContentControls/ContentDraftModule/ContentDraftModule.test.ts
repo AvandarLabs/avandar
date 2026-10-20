@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { propEq, prop  } from "@avandar/utils";
+import { propEq, prop } from "@avandar/utils";
 import { stockContracts } from "../../../../stock/registry/stockContracts";
 import { ContentDraftModule } from "./ContentDraftModule";
 

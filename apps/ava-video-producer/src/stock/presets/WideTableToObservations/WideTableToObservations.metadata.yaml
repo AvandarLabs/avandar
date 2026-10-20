@@ -3,7 +3,8 @@ name:
   message: Turn each measurement into a row
 description:
   id: motionAtlas.wide-table-to-observations.description
-  message: A wide table unfolds each measure column into its own observation row while
+  message:
+    A wide table unfolds each measure column into its own observation row while
     repeating the correct subject and preserving the measurement name and unit.
 category:
   id: motionAtlas.wide-table-to-observations.category
@@ -19,7 +20,8 @@ prompt:
     product claims.
 creativeDirection:
   id: motionAtlas.wide-table-to-observations.creativeDirection
-  message: 960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-50 reveal a two-measure wide table. Frames 51-110
     peel the measure columns into vertical strips, carrying a subject-key copy with each
     cell. Frames 111-139 stack the strips as a long observation ledger with explicit
@@ -30,7 +32,8 @@ intent:
   message: Explain a change in measurement grain while preserving values.
 distinction:
   id: motionAtlas.wide-table-to-observations.distinction
-  message: Unlike source-merge, no datasets converge and no values are combined. Output
+  message:
+    Unlike source-merge, no datasets converge and no values are combined. Output
     grain changes from one row per subject to one row per subject-measure pair.
 tags:
   - id: motionAtlas.wide-table-to-observations.tags.0
@@ -64,20 +67,24 @@ notFor:
   - id: motionAtlas.wide-table-to-observations.notFor.2
     message: Duplicate subject labels remain distinct by ID.
   - id: motionAtlas.wide-table-to-observations.notFor.3
-    message: No JSX, functions, URLs or external fetch in props. The animation is an
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
       authored explanation, not actual document extraction or product evidence.
   - id: motionAtlas.wide-table-to-observations.notFor.4
-    message: "Conservation counts only measurement cells: subjects.length*measures.length
+    message:
+      "Conservation counts only measurement cells: subjects.length*measures.length
       equals output measurement rows plus explicitly omitted missing measurement cells.
       Subject labels, headers and identifiers are not measurement cells."
   - id: motionAtlas.wide-table-to-observations.notFor.5
-    message: Measure IDs and subject IDs are unique exact strings of maximum length 12 with
+    message:
+      Measure IDs and subject IDs are unique exact strings of maximum length 12 with
       no minimum. Each of exactly two subjects has exactly one value for each of exactly
       two existing measure IDs, independent of value-array order. Measurement pairs are
       unique. Measurement-cell count 4 = output rows + omitted null cells. Null never
       converts to zero. Units travel with the referenced measure.
   - id: motionAtlas.wide-table-to-observations.notFor.6
-    message: Prose meaning is an author responsibility. Runtime validation enforces
+    message:
+      Prose meaning is an author responsibility. Runtime validation enforces
       structural bounds, exact references and numeric/geometric rules.
 motionBeats:
   - startFrame: 0
@@ -94,12 +101,14 @@ motionBeats:
     endFrame: 110
     description:
       id: motionAtlas.wide-table-to-observations.motionBeats.2
-      message: Peel measure strips into disjoint vertical lanes, then carry subject copies
+      message:
+        Peel measure strips into disjoint vertical lanes, then carry subject copies
         horizontally into one long ledger.
   - startFrame: 111
     endFrame: 165
     description:
       id: motionAtlas.wide-table-to-observations.motionBeats.3
-      message: Hold explicit subject, measure, value and unit columns, optional source-cell
+      message:
+        Hold explicit subject, measure, value and unit columns, optional source-cell
         keys and the omission ledger including zero-output cases. The outer renderer
         fades at 166..179.

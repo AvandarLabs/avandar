@@ -1,6 +1,6 @@
-import type { ContinuityAppearance } from "../../../continuityAppearance";
 import { useState } from "react";
 import { downloadFilm } from "../../../../../showcase/download.js";
+import type { ContinuityAppearance } from "../../../continuityAppearance";
 
 /** On-demand rendering, with progress scoped to the selected film. */
 export function useCompositionDownload(options: {

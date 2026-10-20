@@ -74,10 +74,7 @@
       "path": "final-copy-source-continuity.json",
       "sha256": "af1ad41ed652ab694739a4170a03d9aefb22c4c8ea905c4ea76a323cfa8cf5b3"
     },
-    "rulings": [
-      "R70",
-      "R71"
-    ],
+    "rulings": ["R70", "R71"],
     "rendererChanged": false,
     "sourceScope": [
       "apps/ava-video-producer/src/stock/contracts/recursiveControls.test.ts",
@@ -103,26 +100,11 @@
     },
     "metadata": {
       "preset": "journal-receipts",
-      "setup": [
-        12,
-        35
-      ],
-      "action": [
-        36,
-        135
-      ],
-      "completedHold": [
-        136,
-        167
-      ],
-      "fifthReceiptTransfer": [
-        108,
-        128
-      ],
-      "fifthTabClosure": [
-        128,
-        136
-      ],
+      "setup": [12, 35],
+      "action": [36, 135],
+      "completedHold": [136, 167],
+      "fifthReceiptTransfer": [108, 128],
+      "fifthTabClosure": [128, 136],
       "publicContentHash": "adb91a3b0a8b2caeeb1acea70355f822acd7159826386e40a30f7a2a0385c7c0"
     },
     "focusedVerification": {
@@ -158,17 +140,12 @@
         "sha256": "c92a1f098711da24523d433edc9f5c9814b97cb19f210447dc7b07c5578e1ce8"
       },
       "supplementalUnchangedFiles": 40,
-      "supplementalChangedFiles": [
-        "out/showcase/browser/motion-gallery.js"
-      ]
+      "supplementalChangedFiles": ["out/showcase/browser/motion-gallery.js"]
     },
     "affectedGallery": {
       "presets": 8,
       "distinctFieldLabels": 12,
-      "outcomeOptions": [
-        "Failed",
-        "Completed"
-      ],
+      "outcomeOptions": ["Failed", "Completed"],
       "nativeUnionVariants": 4,
       "personallyViewedFieldCaptures": 16,
       "errors": 0,
@@ -198,9 +175,7 @@
   "findingOverlays": [
     {
       "id": "WB-M1",
-      "originalCanonicalIds": [
-        "packet-25/review/M4"
-      ],
+      "originalCanonicalIds": ["packet-25/review/M4"],
       "status": "addressed-by-scoped-fix-and-independent-rereview",
       "originalFindingPreserved": true,
       "rootCauseClarification": "The current generated English stockI18n resolves the empty descriptors to empty strings, producing blank/missing visible or accessible labels. An unloaded locale falls back to the raw message ID. The original reviewer Lingui fallback probe was correct but did not establish which path the actual current gallery took. Source descriptor and derived catalog corrections must cover both.",
@@ -208,19 +183,14 @@
     },
     {
       "id": "WB-M2",
-      "originalCanonicalIds": [
-        "packet-16/review/M1",
-        "packet-17/review/M2"
-      ],
+      "originalCanonicalIds": ["packet-16/review/M1", "packet-17/review/M2"],
       "status": "addressed-by-scoped-fix-and-independent-rereview",
       "originalFindingPreserved": true,
       "acceptedChange": "Correct only Component, Investigation case and Selected site messages while preserving existing preset-scoped IDs and selection semantics."
     },
     {
       "id": "WB-M3",
-      "originalCanonicalIds": [
-        "packet-03/review/M1"
-      ],
+      "originalCanonicalIds": ["packet-03/review/M1"],
       "status": "addressed-by-scoped-fix-and-independent-rereview",
       "originalFindingPreserved": true,
       "acceptedChange": "Retain choreography. Public metadata action ends at 135 and completed hold is 136..167 for the fifth receipt/tab."
@@ -326,10 +296,7 @@
     ],
     "closedBy": "76f3cac4d85ff9712280f1be71541534ec791d11",
     "review": "final-copy-rereview.md",
-    "rulings": [
-      "R70",
-      "R71"
-    ],
+    "rulings": ["R70", "R71"],
     "originalReview9550GroupsUnchanged": true,
     "policy": "The four original copy/metadata recommendations are closed by this overlay. All other exact original and later dispositions remain in the unmodified whole-branch review."
   },

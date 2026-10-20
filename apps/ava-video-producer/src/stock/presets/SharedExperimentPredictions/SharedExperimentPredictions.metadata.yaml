@@ -3,7 +3,8 @@ name:
   message: Predict together, then observe
 description:
   id: motionAtlas.shared-experiment-predictions.description
-  message: Learners place separate predictions along a shared tabletop track before an
+  message:
+    Learners place separate predictions along a shared tabletop track before an
     experiment reveals one authored observation. Their different expectations remain
     visible beside the result.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Separate what participants expect from what is recorded in a shared demonstration.
 prompt:
   id: motionAtlas.shared-experiment-predictions.prompt
-  message: Reveal a tabletop ramp and a labeled distance track with the supplied learners
+  message:
+    Reveal a tabletop ramp and a labeled distance track with the supplied learners
     around it. Each learner places a distinct labeled prediction flag before a single
     ball is released. The ball travels to the supplied observation position and stops;
     retain every prediction without scoring or ranking learners. Hold the observed
     marker and predicted positions together, then fade out before resetting.
 creativeDirection:
   id: motionAtlas.shared-experiment-predictions.creativeDirection
-  message: Reveal a tabletop ramp and a labeled distance track with the supplied learners
+  message:
+    Reveal a tabletop ramp and a labeled distance track with the supplied learners
     around it. Each learner places a distinct labeled prediction flag before a single
     ball is released. The ball travels to the supplied observation position and stops;
     retain every prediction without scoring or ranking learners. Hold the observed
@@ -31,7 +34,8 @@ intent:
   message: Separate what participants expect from what is recorded in a shared demonstration.
 distinction:
   id: motionAtlas.shared-experiment-predictions.distinction
-  message: Participants physically commit separate predictions before one common test, and
+  message:
+    Participants physically commit separate predictions before one common test, and
     the final frame preserves disagreement alongside the observation. This differs from
     source merging, network signals, shared-fabric contributions, or a generic feedback
     revision loop.
@@ -71,18 +75,22 @@ aliases:
     message: shared experiment
 notFor:
   - id: motionAtlas.shared-experiment-predictions.notFor.0
-    message: Each learner contributes exactly one prediction. The number of predictions
+    message:
+      Each learner contributes exactly one prediction. The number of predictions
       equals the learner array length and is not a sample of measured scientific
       accuracy.
   - id: motionAtlas.shared-experiment-predictions.notFor.1
-    message: Distances use a shared zero and unit. Optional differences are absolute
+    message:
+      Distances use a shared zero and unit. Optional differences are absolute
       distances with the same unit; no denominator or success rate is implied.
   - id: motionAtlas.shared-experiment-predictions.notFor.2
-    message: The ball trajectory is illustrative motion toward an authored stopping point.
+    message:
+      The ball trajectory is illustrative motion toward an authored stopping point.
       It is not a physics simulation, measured experiment, or validation of a real
       hypothesis.
   - id: motionAtlas.shared-experiment-predictions.notFor.3
-    message: No learner is ranked or labeled correct by proximity. The fictional scene shows
+    message:
+      No learner is ranked or labeled correct by proximity. The fictional scene shows
       participation and comparison, not learning efficacy.
 motionBeats:
   - startFrame: 0
@@ -94,23 +102,27 @@ motionBeats:
     endFrame: 65
     description:
       id: motionAtlas.SharedExperimentPredictions.beat.1
-      message: Each participant carries a keyed flag to a distinct label lane at their
+      message:
+        Each participant carries a keyed flag to a distinct label lane at their
         authored prediction distance.
   - startFrame: 66
     endFrame: 75
     description:
       id: motionAtlas.SharedExperimentPredictions.beat.2
-      message: Hold all predictions before ball release. Coincident values keep separate
+      message:
+        Hold all predictions before ball release. Coincident values keep separate
         identities.
   - startFrame: 76
     endFrame: 107
     description:
       id: motionAtlas.SharedExperimentPredictions.beat.3
-      message: Release one ball down the ramp, then move it to the supplied observation
+      message:
+        Release one ball down the ramp, then move it to the supplied observation
         position.
   - startFrame: 108
     endFrame: 179
     description:
       id: motionAtlas.SharedExperimentPredictions.beat.4
-      message: Keep every prediction beside the observed stop and optional absolute-distance
+      message:
+        Keep every prediction beside the observed stop and optional absolute-distance
         brackets through the shared fade.

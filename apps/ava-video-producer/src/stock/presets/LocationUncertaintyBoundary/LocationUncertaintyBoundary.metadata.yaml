@@ -3,7 +3,8 @@ name:
   message: A pin can straddle a boundary
 description:
   id: motionAtlas.location-uncertainty-boundary.description
-  message: A schematic location pin unfolds into its supplied positional-uncertainty
+  message:
+    A schematic location pin unfolds into its supplied positional-uncertainty
     footprint. A footprint spanning two districts remains unresolved for district
     assignment rather than being forced into the district under its center.
 category:
@@ -14,14 +15,16 @@ useWhen:
   message: Show how uncertain position limits an otherwise simple geographic classification.
 prompt:
   id: motionAtlas.location-uncertainty-boundary.prompt
-  message: Begin with district outlines and nominal location pins. Expand the focused pin
+  message:
+    Begin with district outlines and nominal location pins. Expand the focused pin
     into a translucent circle, letting its edge visibly cross the boundary. Lift the two
     possible district labels beside that footprint and move its accounting marker into
     an unresolved bracket. Hold definite and unresolved counts over all supplied
     records.
 creativeDirection:
   id: motionAtlas.location-uncertainty-boundary.creativeDirection
-  message: Begin with district outlines and nominal location pins. Expand the focused pin
+  message:
+    Begin with district outlines and nominal location pins. Expand the focused pin
     into a translucent circle, letting its edge visibly cross the boundary. Lift the two
     possible district labels beside that footprint and move its accounting marker into
     an unresolved bracket. Hold definite and unresolved counts over all supplied
@@ -31,7 +34,8 @@ intent:
   message: Show how uncertain position limits an otherwise simple geographic classification.
 distinction:
   id: motionAtlas.location-uncertainty-boundary.distinction
-  message: A point expands into a bounded possible-position area, changing the certainty
+  message:
+    A point expands into a bounded possible-position area, changing the certainty
     of spatial membership. Unlike environmental-observation-gaps, evidence is present
     but imprecisely located; unlike a scope aperture, the uncertainty belongs to the
     record itself.
@@ -61,14 +65,17 @@ goodFor:
     message: Keep ambiguous records out of false geographic certainty
 notFor:
   - id: motionAtlas.location-uncertainty-boundary.notFor.0
-    message: A definite assignment requires the entire footprint strictly inside one
+    message:
+      A definite assignment requires the entire footprint strictly inside one
       district. Boundary-touching, crossing, or outside-district footprints remain
       unresolved.
   - id: motionAtlas.location-uncertainty-boundary.notFor.1
-    message: No confidence level, probability, population exposure, or epidemiological
+    message:
+      No confidence level, probability, population exposure, or epidemiological
       relationship is inferred from a radius.
   - id: motionAtlas.location-uncertainty-boundary.notFor.2
-    message: Definite plus unresolved records equal the location array length; ambiguous
+    message:
+      Definite plus unresolved records equal the location array length; ambiguous
       records are never counted once in each possible district.
 domains:
   - id: motionAtlas.location-uncertainty-boundary.domains.0
@@ -90,11 +97,13 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.location-uncertainty-boundary.beat.1
-      message: Expand full uncertainty disks by frame 84, lift possible district labels, and
+      message:
+        Expand full uncertainty disks by frame 84, lift possible district labels, and
         shift unresolved accounting brackets.
   - startFrame: 108
     endFrame: 179
     description:
       id: motionAtlas.location-uncertainty-boundary.beat.2
-      message: Hold strict full-disk assignments over every supplied location, including
+      message:
+        Hold strict full-disk assignments over every supplied location, including
         hidden nonfocused footprints.

@@ -3,7 +3,8 @@ name:
   message: Assemble a dashboard
 description:
   id: motionAtlas.dashboard-slot-assembly.description
-  message: Loose information panels reshape and dock into a deliberately composed
+  message:
+    Loose information panels reshape and dock into a deliberately composed
     dashboard. The motion explains how a chosen layout gives several views a shared
     reading order.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Show that arranging information changes how easily its parts can be read together.
 creativeDirection:
   id: motionAtlas.dashboard-slot-assembly.creativeDirection
-  message: Frames 12-40 establish the supplied widgets as differently sized panels and an
+  message:
+    Frames 12-40 establish the supplied widgets as differently sized panels and an
     empty dashboard outline. During frames 40-112, a featured panel docks first, grid
     guides extend from its edges, and the remaining panels resize into the available
     slots while their text keeps a fixed font size. A shared scope strip settles across
@@ -28,7 +30,8 @@ intent:
   message: Show that arranging information changes how easily its parts can be read together.
 distinction:
   id: motionAtlas.dashboard-slot-assembly.distinction
-  message: "Unlike stagger-cards, the hero action is constrained layout assembly: unequal
+  message:
+    "Unlike stagger-cards, the hero action is constrained layout assembly: unequal
     panels change geometry, establish alignment, and acquire a shared context. The
     content is already visible before docking."
 tags:
@@ -81,7 +84,8 @@ notFor:
   - id: motionAtlas.dashboard-slot-assembly.notFor.3
     message: This is a conceptual board builder, not a recording of a supported product feature.
   - id: motionAtlas.dashboard-slot-assembly.notFor.4
-    message: Layout assembly does not imply that queries, source data or permissions have
+    message:
+      Layout assembly does not imply that queries, source data or permissions have
       been independently verified.
 motionBeats:
   - startFrame: 12

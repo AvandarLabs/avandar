@@ -1,4 +1,4 @@
-import { propEq, prop  } from "@avandar/utils";
+import { propEq, prop } from "@avandar/utils";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 /** Data for makeObservationLayoutFromInput. */
 type CreateObservationLayoutCells = {

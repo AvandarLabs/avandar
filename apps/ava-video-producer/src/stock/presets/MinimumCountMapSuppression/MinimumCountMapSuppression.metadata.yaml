@@ -3,7 +3,8 @@ name:
   message: Keep small-cell counts undisclosed
 description:
   id: motionAtlas.minimum-count-map-suppression.description
-  message: A derived cell-count map applies a minimum-release threshold. Cells below it
+  message:
+    A derived cell-count map applies a minimum-release threshold. Cells below it
     receive a distinct suppressed pattern and no public numeric label, while zeros,
     missing cells and released counts retain separate meanings.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Keep release thresholds distinct from zero and missing observations.
 prompt:
   id: motionAtlas.minimum-count-map-suppression.prompt
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-50 show only the aggregate-count sheet inside a local analysis boundary, with no
     individual points. Frames 51-105 apply a threshold shutter cell by cell. Frames
@@ -23,7 +25,8 @@ prompt:
     opaque ground at frames 166-179 for an editorial loop.
 creativeDirection:
   id: motionAtlas.minimum-count-map-suppression.creativeDirection
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-50 show only the aggregate-count sheet inside a local analysis boundary, with no
     individual points. Frames 51-105 apply a threshold shutter cell by cell. Frames
@@ -35,7 +38,8 @@ intent:
   message: Keep release thresholds distinct from zero and missing observations.
 distinction:
   id: motionAtlas.minimum-count-map-suppression.distinction
-  message: Unlike disclosure-aperture, an explicit numerical release rule is applied to
+  message:
+    Unlike disclosure-aperture, an explicit numerical release rule is applied to
     aggregate cells, with zero, suppression and no data distinct. No source point or
     location is ever exposed.
 tags:
@@ -64,19 +68,23 @@ aliases:
     message: protection data
 notFor:
   - id: motionAtlas.minimum-count-map-suppression.notFor.0
-    message: A minimum-count threshold is one release rule, not a complete privacy guarantee
+    message:
+      A minimum-count threshold is one release rule, not a complete privacy guarantee
       or anonymization proof.
   - id: motionAtlas.minimum-count-map-suppression.notFor.1
     message: Do not show grand totals from which hidden cells can be recovered by subtraction.
   - id: motionAtlas.minimum-count-map-suppression.notFor.2
-    message: Illustrative policy releases reported zero separately; real policies may also
+    message:
+      Illustrative policy releases reported zero separately; real policies may also
       suppress zeros.
   - id: motionAtlas.minimum-count-map-suppression.notFor.3
-    message: No live geography, online routing, JSX, functions, URLs, private records or
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
       external requests. Maps are schematic local plans; no real-world inference
       follows.
   - id: motionAtlas.minimum-count-map-suppression.notFor.4
-    message: Authored prose must identify schematic geography and accurately describe the
+    message:
+      Authored prose must identify schematic geography and accurately describe the
       selected example. Runtime validation preserves supplied prose and checks explicit
       structural and numeric rules without natural-language classification.
 motionBeats:
@@ -99,7 +107,8 @@ motionBeats:
     endFrame: 139
     description:
       id: motionAtlas.minimum-count-map-suppression.beat.3
-      message: Copy only released counts and zero to the public map, preserving suppression
+      message:
+        Copy only released counts and zero to the public map, preserving suppression
         and missing symbols.
   - startFrame: 140
     endFrame: 165

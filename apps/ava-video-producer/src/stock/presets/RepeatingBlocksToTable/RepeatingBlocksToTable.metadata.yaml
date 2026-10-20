@@ -3,7 +3,8 @@ name:
   message: Read the same fields across repeated sections
 description:
   id: motionAtlas.repeating-blocks-to-table.description
-  message: Repeated labeled paragraphs unfold into rows of one table. Shared run-in labels
+  message:
+    Repeated labeled paragraphs unfold into rows of one table. Shared run-in labels
     become columns, and an absent section stays missing instead of shifting neighboring
     text into its place.
 category:
@@ -20,7 +21,8 @@ prompt:
     product claims.
 creativeDirection:
   id: motionAtlas.repeating-blocks-to-table.creativeDirection
-  message: 960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-55 reveal repeated heading blocks with their field
     labels. Frames 56-105 line up equal labels vertically and rotate the block
     organization into a compact row-based table. Frames 106-139 hold each block beside
@@ -31,7 +33,8 @@ intent:
   message: Expose tabular structure inside repeated prose sections.
 distinction:
   id: motionAtlas.repeating-blocks-to-table.distinction
-  message: Unlike schema-mapping, the field labels already match. The animation reveals a
+  message:
+    Unlike schema-mapping, the field labels already match. The animation reveals a
     tabular structure concealed by repeated prose layout and preserves absent cells.
 tags:
   - id: motionAtlas.repeating-blocks-to-table.tags.0
@@ -65,16 +68,19 @@ notFor:
   - id: motionAtlas.repeating-blocks-to-table.notFor.2
     message: Multicolumn reading-order ambiguity is excluded from this compact example.
   - id: motionAtlas.repeating-blocks-to-table.notFor.3
-    message: No JSX, functions, URLs or external fetch in props. The animation is an
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
       authored explanation, not actual document extraction or product evidence.
   - id: motionAtlas.repeating-blocks-to-table.notFor.4
-    message: Fields and blocks each have unique exact IDs, including at most one empty ID.
+    message:
+      Fields and blocks each have unique exact IDs, including at most one empty ID.
       Block IDs and field IDs have maximum length 12, no minimum. Every block has
       exactly one cell for each existing field ID, independent of cell array order. Null
       means missing and never zero. Output columns follow fields array order, rows
       follow blocks array order. Duplicate headings remain distinct by ID.
   - id: motionAtlas.repeating-blocks-to-table.notFor.5
-    message: Prose meaning is an author responsibility. Runtime validation enforces
+    message:
+      Prose meaning is an author responsibility. Runtime validation enforces
       structural bounds, exact references and numeric/geometric rules.
 motionBeats:
   - startFrame: 0
@@ -91,11 +97,13 @@ motionBeats:
     endFrame: 105
     description:
       id: motionAtlas.repeating-blocks-to-table.motionBeats.2
-      message: Reorient field-value strips from vertical block stacks into horizontal table
+      message:
+        Reorient field-value strips from vertical block stacks into horizontal table
         rows.
   - startFrame: 106
     endFrame: 165
     description:
       id: motionAtlas.repeating-blocks-to-table.motionBeats.3
-      message: Hold each original block identity beside its row and retain explicit missing
+      message:
+        Hold each original block identity beside its row and retain explicit missing
         cells. The outer renderer fades at 166..179.

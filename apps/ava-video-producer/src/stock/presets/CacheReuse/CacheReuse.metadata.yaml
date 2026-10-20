@@ -3,7 +3,8 @@ name:
   message: Reuse the stored result
 description:
   id: motionAtlas.cache-reuse.description
-  message: A first lookup finds an empty cache and retrieves a result from its origin. A
+  message:
+    A first lookup finds an empty cache and retrieves a result from its origin. A
     repeated lookup with the same key is answered by the stored copy.
 category:
   id: motionAtlas.cache-reuse.category
@@ -16,7 +17,8 @@ prompt:
   message: Show how storing one result changes the path of a repeated lookup.
 creativeDirection:
   id: motionAtlas.cache-reuse.creativeDirection
-  message: Reveal a requester, a small empty cache shelf, and a distant origin after frame
+  message:
+    Reveal a requester, a small empty cache shelf, and a distant origin after frame
     12. During 24..68, a key token probes the empty shelf, continues along the longer
     origin route, and returns carrying the supplied result. During 68..92, an identical
     result impression settles on the shelf while the requester receives its response.
@@ -29,7 +31,8 @@ intent:
   message: Show how storing one result changes the path of a repeated lookup.
 distinction:
   id: motionAtlas.cache-reuse.distinction
-  message: The first trip changes persistent local state and the second trip uses it.
+  message:
+    The first trip changes persistent local state and the second trip uses it.
     Packet-stream and node-traversal show movement through routes without explaining a
     miss-to-hit transition for one identical key.
 tags:
@@ -76,16 +79,20 @@ notFor:
   - id: motionAtlas.cache-reuse.notFor.0
     message: The default key, result, and participants are fictional.
   - id: motionAtlas.cache-reuse.notFor.1
-    message: Route length communicates fewer depicted steps, not a measured latency
+    message:
+      Route length communicates fewer depicted steps, not a measured latency
       improvement or a guaranteed speedup.
   - id: motionAtlas.cache-reuse.notFor.2
-    message: The entry remains valid for both requests; expiry, invalidation, eviction,
+    message:
+      The entry remains valid for both requests; expiry, invalidation, eviction,
       freshness, and privacy guarantees are not represented.
   - id: motionAtlas.cache-reuse.notFor.3
-    message: A cache hit does not establish source freshness or current authorization; those
+    message:
+      A cache hit does not establish source freshness or current authorization; those
       require separate checks.
   - id: motionAtlas.cache-reuse.notFor.4
-    message: Exact keys and values retain raw whitespace. Amber underlined presentation
+    message:
+      Exact keys and values retain raw whitespace. Amber underlined presentation
       marks distinguish spaces, tabs, and line breaks at a fixed 12px.
 motionBeats:
   - startFrame: 24

@@ -28,17 +28,20 @@ tags:
     message: retained copy
 useWhen:
   id: motionAtlas.journal-receipts.useWhen
-  message: Explain that confirmation closes a pending entry while missing confirmation
+  message:
+    Explain that confirmation closes a pending entry while missing confirmation
     leaves it visibly unresolved.
 prompt:
   id: motionAtlas.journal-receipts.prompt
-  message: Use Motion Atlas "Receipts Close the Journal" (journal-receipts) as an
+  message:
+    Use Motion Atlas "Receipts Close the Journal" (journal-receipts) as an
     illustrative conceptual graphic. Explain that confirmation closes a pending entry
     while missing confirmation leaves it visibly unresolved. Bind complete authored
     inputs and preserve the stated limits.
 creativeDirection:
   id: motionAtlas.journal-receipts.creativeDirection
-  message: Reveal a compact accordion journal with one folded tab per pending entry. As
+  message:
+    Reveal a compact accordion journal with one folded tab per pending entry. As
     the connection caption changes, unfold the journal just enough to expose each
     identifier. Authored receipt halves emerge from a separate acknowledgment pocket and
     register precisely against matching journal tabs; the paired tabs flatten into the
@@ -50,11 +53,13 @@ goodFor:
   - id: motionAtlas.journal-receipts.goodFor.1
     message: Show reconnection clearing only acknowledged offline changes
   - id: motionAtlas.journal-receipts.goodFor.2
-    message: Illustrate a dispatch log, expense envelope, or hand-carried register with
+    message:
+      Illustrate a dispatch log, expense envelope, or hand-carried register with
       signed receipts
 intent:
   id: motionAtlas.journal-receipts.intent
-  message: Explain that confirmation closes a pending entry while missing confirmation
+  message:
+    Explain that confirmation closes a pending entry while missing confirmation
     leaves it visibly unresolved.
 domains:
   - id: motionAtlas.journal-receipts.domains.0
@@ -70,18 +75,21 @@ aliases:
     message: pending changes
 notFor:
   - id: motionAtlas.journal-receipts.notFor.0
-    message: One supplied receipt closes exactly one entry. A missing receipt means
+    message:
+      One supplied receipt closes exactly one entry. A missing receipt means
       acknowledgment is absent from this illustration, not that remote processing
       failed.
   - id: motionAtlas.journal-receipts.notFor.1
     message: No retransmission, conflict resolution, deduplication guarantee, or
       exactly-once delivery claim is implied.
   - id: motionAtlas.journal-receipts.notFor.2
-    message: The final state may intentionally contain pending entries. The loop reset is
+    message:
+      The final state may intentionally contain pending entries. The loop reset is
       editorial, not a depiction of receipts being revoked.
 distinction:
   id: motionAtlas.journal-receipts.distinction
-  message: Packet-stream depicts movement; this depicts identity-matched acknowledgments
+  message:
+    Packet-stream depicts movement; this depicts identity-matched acknowledgments
     changing the physical condition of a retained journal. Source-merge combines
     sources, whereas the original entries remain in place and a matching receipt closes
     each obligation.
@@ -95,7 +103,8 @@ motionBeats:
     endFrame: 135
     description:
       id: motionAtlas.journal-receipts.motionBeats.1
-      message: Reveal a compact accordion journal with one folded tab per pending entry. As
+      message:
+        Reveal a compact accordion journal with one folded tab per pending entry. As
         the connection caption changes, unfold the journal just enough to expose each
         identifier. Authored receipt halves emerge from a separate acknowledgment pocket
         and register precisely against matching journal tabs; the paired tabs flatten

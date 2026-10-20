@@ -3,7 +3,8 @@ name:
   message: Recover cells from page geometry
 description:
   id: motionAtlas.pdf-grid-reconstruction.description
-  message: Positioned text on a schematic document acquires row and column boundaries,
+  message:
+    Positioned text on a schematic document acquires row and column boundaries,
     then becomes a table while the original page remains visible. A selected structural
     signal stays named.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Reveal the geometric evidence behind an extracted table.
 creativeDirection:
   id: motionAtlas.pdf-grid-reconstruction.creativeDirection
-  message: "960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+  message:
+    "960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-55 draw the selected evidence: tagged-cell
     outlines, ruling lines or whitespace corridors. Frames 56-105 register the supplied
     text items inside their cells. Frames 106-139 unfold an equal-sized grid beside the
@@ -29,7 +31,8 @@ intent:
   message: Reveal the geometric evidence behind an extracted table.
 distinction:
   id: motionAtlas.pdf-grid-reconstruction.distinction
-  message: Unlike schema-mapping, field names are not translated. Cell structure is
+  message:
+    Unlike schema-mapping, field names are not translated. Cell structure is
     recovered from two-dimensional page evidence before textual data becomes a grid.
 tags:
   - id: motionAtlas.pdf-grid-reconstruction.tags.0
@@ -57,15 +60,18 @@ notFor:
   - id: motionAtlas.pdf-grid-reconstruction.notFor.0
     message: The preset depicts a bounded supplied grid, not a general PDF detector.
   - id: motionAtlas.pdf-grid-reconstruction.notFor.1
-    message: The evidence signal is supplied and may be incomplete or misleading in a real
+    message:
+      The evidence signal is supplied and may be incomplete or misleading in a real
       document.
   - id: motionAtlas.pdf-grid-reconstruction.notFor.2
     message: No OCR or image-only reading is implied.
   - id: motionAtlas.pdf-grid-reconstruction.notFor.3
-    message: No JSX, functions, URLs or external fetch in props. The animation is an
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
       authored explanation, not actual document extraction or product evidence.
   - id: motionAtlas.pdf-grid-reconstruction.notFor.4
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

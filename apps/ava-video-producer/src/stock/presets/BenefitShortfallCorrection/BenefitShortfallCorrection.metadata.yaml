@@ -3,7 +3,8 @@ name:
   message: Count and correct a missing payment
 description:
   id: motionAtlas.benefit-shortfall-correction.description
-  message: A participant compares an assistance statement with the units actually
+  message:
+    A participant compares an assistance statement with the units actually
     received. A supplied correction fills some or all of the visible shortfall while any
     remainder stays open.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show how a participant identifies and verifies a payment shortfall.
 prompt:
   id: motionAtlas.benefit-shortfall-correction.prompt
-  message: Open an assistance statement next to the participant's receiving tray. Outline
+  message:
+    Open an assistance statement next to the participant's receiving tray. Outline
     tokens show the stated amount; actual received tokens settle into matching
     positions, leaving empty outlines. The participant points to the gap and the worker
     adds only the authored correction tokens from a separate correction envelope. Hold
@@ -22,7 +24,8 @@ prompt:
     the accounting remains inspectable.
 creativeDirection:
   id: motionAtlas.benefit-shortfall-correction.creativeDirection
-  message: Open an assistance statement next to the participant's receiving tray. Outline
+  message:
+    Open an assistance statement next to the participant's receiving tray. Outline
     tokens show the stated amount; actual received tokens settle into matching
     positions, leaving empty outlines. The participant points to the gap and the worker
     adds only the authored correction tokens from a separate correction envelope. Hold
@@ -33,7 +36,8 @@ intent:
   message: Show how a participant identifies and verifies a payment shortfall.
 distinction:
   id: motionAtlas.benefit-shortfall-correction.distinction
-  message: The participant aligns real received units against a separate statement and
+  message:
+    The participant aligns real received units against a separate statement and
     checks an additive correction, preserving the unpaid remainder. Unlike
     metric-counter, the argument is a physical reconciliation; unlike
     household-market-choice, there is no purchase or basket selection; unlike
@@ -64,13 +68,16 @@ goodFor:
     message: Showing that a partial correction can leave an unresolved balance
 notFor:
   - id: motionAtlas.benefit-shortfall-correction.notFor.0
-    message: These are fictional accounting units, not a determination of benefit
+    message:
+      These are fictional accounting units, not a determination of benefit
       eligibility or payment entitlement.
   - id: motionAtlas.benefit-shortfall-correction.notFor.1
-    message: The stated amount and the received amount are different measures; their
+    message:
+      The stated amount and the received amount are different measures; their
       difference remains visible.
   - id: motionAtlas.benefit-shortfall-correction.notFor.2
-    message: The scene covers underpayment only and never invents a successful remedy beyond
+    message:
+      The scene covers underpayment only and never invents a successful remedy beyond
       the supplied correction.
 domains:
   - id: motionAtlas.benefit-shortfall-correction.domains.0
@@ -92,7 +99,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.benefit-shortfall-correction.beat.1
-      message: Original units settle by 60, participant points at the gap; worker transfers
+      message:
+        Original units settle by 60, participant points at the gap; worker transfers
         only supplied corrections by 108.
   - startFrame: 108
     endFrame: 179

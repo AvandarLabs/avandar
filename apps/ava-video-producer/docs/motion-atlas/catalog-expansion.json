@@ -551,9 +551,7 @@
       "Rejection styling must not make the rejected option or rationale unreadable."
     ],
     "collection": "general",
-    "proposalSources": [
-      "01:reject-and-replace"
-    ],
+    "proposalSources": ["01:reject-and-replace"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 3,
@@ -858,10 +856,7 @@
       "A stated strategic preference does not establish investor duties, future behavior, customer conversion, financial return, or moral superiority. Keep the authored context and concession visible."
     ],
     "collection": "general",
-    "proposalSources": [
-      "01:tradeoff-pivot",
-      "business-plan:8:tradeoff-pivot"
-    ],
+    "proposalSources": ["01:tradeoff-pivot", "business-plan:8:tradeoff-pivot"],
     "schemaVersion": 1,
     "metadataVersion": 2,
     "number": 5,
@@ -995,9 +990,7 @@
       "The animation does not validate whether a rule or its exception is correct."
     ],
     "collection": "general",
-    "proposalSources": [
-      "01:exception-detour"
-    ],
+    "proposalSources": ["01:exception-detour"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 6,
@@ -1115,9 +1108,7 @@
       "Support geometry is rhetorical and carries no confidence score or evidence weight."
     ],
     "collection": "general",
-    "proposalSources": [
-      "01:argument-bridge"
-    ],
+    "proposalSources": ["01:argument-bridge"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 7,
@@ -1266,10 +1257,7 @@
       "Topics outside the aperture may be future, deferred, unsupported, or simply out of this explanation. Supply the correct outside label and do not imply they are shipped features."
     ],
     "collection": "general",
-    "proposalSources": [
-      "01:scope-aperture",
-      "business-plan:10:scope-aperture"
-    ],
+    "proposalSources": ["01:scope-aperture", "business-plan:10:scope-aperture"],
     "schemaVersion": 1,
     "metadataVersion": 2,
     "number": 8,
@@ -1558,9 +1546,7 @@
       "The commonality must be explicitly authored and should not imply identical capabilities or interchangeable outcomes."
     ],
     "collection": "general",
-    "proposalSources": [
-      "01:shared-foundation"
-    ],
+    "proposalSources": ["01:shared-foundation"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 10,
@@ -1895,9 +1881,7 @@
       "The final state may intentionally contain pending entries. The loop reset is editorial, not a depiction of receipts being revoked."
     ],
     "collection": "general",
-    "proposalSources": [
-      "02:journal-receipts"
-    ],
+    "proposalSources": ["02:journal-receipts"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 12,
@@ -1960,9 +1944,7 @@
         "type": "{label:string;lines:Array<string>}",
         "default": {
           "label": "Authored example response",
-          "lines": [
-            "Blue shed, noon."
-          ]
+          "lines": ["Blue shed, noon."]
         },
         "control": "object",
         "description": "Literal response content supplied by the author, never generated or evaluated by the animation.",
@@ -2018,9 +2000,7 @@
         },
         "response": {
           "label": "Authored example response",
-          "lines": [
-            "Blue shed, noon."
-          ]
+          "lines": ["Blue shed, noon."]
         },
         "copy": {
           "device": "Example tablet",
@@ -2385,9 +2365,7 @@
       "The brief contains exactly the supplied lines and does not represent a measured payload size."
     ],
     "collection": "general",
-    "proposalSources": [
-      "02:sealed-handoff"
-    ],
+    "proposalSources": ["02:sealed-handoff"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 15,
@@ -2439,10 +2417,7 @@
         "type": "{label:string;details:Array<string>}",
         "default": {
           "label": "Example shift brief",
-          "details": [
-            "Blue shed",
-            "Crate labels"
-          ]
+          "details": ["Blue shed", "Crate labels"]
         },
         "control": "object",
         "description": "The single transferred object and its visible content lines.",
@@ -2504,10 +2479,7 @@
         },
         "object": {
           "label": "Example shift brief",
-          "details": [
-            "Blue shed",
-            "Crate labels"
-          ]
+          "details": ["Blue shed", "Crate labels"]
         },
         "outcome": "accepted",
         "copy": {
@@ -2729,9 +2701,7 @@
       "04:parallel-barrier",
       "architecture:10:readiness-latch"
     ],
-    "mergedFrom": [
-      "parallel-barrier"
-    ],
+    "mergedFrom": ["parallel-barrier"],
     "schemaVersion": 1,
     "metadataVersion": 2,
     "number": 17,
@@ -2893,10 +2863,7 @@
       "The weave is a relationship metaphor. Thread widths and crossings do not quantify labor, ownership, compensation or social impact."
     ],
     "collection": "general",
-    "proposalSources": [
-      "02:contribution-weave",
-      "values:2:contribution-weave"
-    ],
+    "proposalSources": ["02:contribution-weave", "values:2:contribution-weave"],
     "schemaVersion": 1,
     "metadataVersion": 2,
     "number": 18,
@@ -3055,9 +3022,7 @@
       "This illustrates an authored lease concept, not a verified distributed lock, fairness guarantee, race-condition solution, or automatic permission policy."
     ],
     "collection": "general",
-    "proposalSources": [
-      "02:expiring-lease"
-    ],
+    "proposalSources": ["02:expiring-lease"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 19,
@@ -3110,27 +3075,19 @@
             "id": "stock",
             "title": "Available units",
             "kind": "value",
-            "lines": [
-              "18 units"
-            ]
+            "lines": ["18 units"]
           },
           {
             "id": "supplies",
             "title": "Supplies",
             "kind": "list",
-            "lines": [
-              "Paper",
-              "Ink",
-              "Labels"
-            ]
+            "lines": ["Paper", "Ink", "Labels"]
           },
           {
             "id": "note",
             "title": "Context",
             "kind": "note",
-            "lines": [
-              "Sample inventory only"
-            ]
+            "lines": ["Sample inventory only"]
           }
         ],
         "control": "collection",
@@ -3179,27 +3136,19 @@
             "id": "stock",
             "title": "Available units",
             "kind": "value",
-            "lines": [
-              "18 units"
-            ]
+            "lines": ["18 units"]
           },
           {
             "id": "supplies",
             "title": "Supplies",
             "kind": "list",
-            "lines": [
-              "Paper",
-              "Ink",
-              "Labels"
-            ]
+            "lines": ["Paper", "Ink", "Labels"]
           },
           {
             "id": "note",
             "title": "Context",
             "kind": "note",
-            "lines": [
-              "Sample inventory only"
-            ]
+            "lines": ["Sample inventory only"]
           }
         ],
         "featuredWidgetId": "stock",
@@ -3697,9 +3646,7 @@
       "Grid removal must retain a readable zero baseline and scale endpoints."
     ],
     "collection": "general",
-    "proposalSources": [
-      "03:chart-focus-edit"
-    ],
+    "proposalSources": ["03:chart-focus-edit"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 23,
@@ -3841,9 +3788,7 @@
       "The final step array owns both order and count."
     ],
     "collection": "general",
-    "proposalSources": [
-      "03:pipeline-step-splice"
-    ],
+    "proposalSources": ["03:pipeline-step-splice"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 24,
@@ -4380,9 +4325,7 @@
       "Exact raw data in fields[].candidates[].value uses fixed 12px LiteralDataText. Whole-grapheme whitespace is presented with amber underlined marks: space ·, tab ⇥, line break ↵, carriage return ␍ and fallback ␣. Authored literal marker glyphs remain unmarked text. Raw input, accessible text, data attributes, equality and bounds are unchanged. This is presentation, not normalization."
     ],
     "collection": "general",
-    "proposalSources": [
-      "03:field-conflict-choice"
-    ],
+    "proposalSources": ["03:field-conflict-choice"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 27,
@@ -4421,34 +4364,22 @@
           {
             "id": "a",
             "label": "Paper",
-            "groups": [
-              "North",
-              "Stored"
-            ]
+            "groups": ["North", "Stored"]
           },
           {
             "id": "b",
             "label": "Ink",
-            "groups": [
-              "North",
-              "Review"
-            ]
+            "groups": ["North", "Review"]
           },
           {
             "id": "c",
             "label": "Labels",
-            "groups": [
-              "South",
-              "Stored"
-            ]
+            "groups": ["South", "Stored"]
           },
           {
             "id": "d",
             "label": "Folders",
-            "groups": [
-              "North",
-              "Stored"
-            ]
+            "groups": ["North", "Stored"]
           }
         ],
         "control": "collection",
@@ -4458,10 +4389,7 @@
       {
         "name": "dimensions",
         "type": "[string,string]",
-        "default": [
-          "Area",
-          "State"
-        ],
+        "default": ["Area", "State"],
         "control": "collection",
         "description": "Ordered names of the two grouping dimensions.",
         "constraints": "Exactly 2 strings, each 1..22 characters; array positions match each record.groups position"
@@ -4469,10 +4397,7 @@
       {
         "name": "selectionPath",
         "type": "string[]",
-        "default": [
-          "North",
-          "Stored"
-        ],
+        "default": ["North", "Stored"],
         "control": "collection",
         "description": "One or two exact group values selected in dimension order.",
         "constraints": "1..2 strings; each <= 18 characters; the full prefix must match at least one record; no inferred fuzzy matching"
@@ -4514,44 +4439,26 @@
           {
             "id": "a",
             "label": "Paper",
-            "groups": [
-              "North",
-              "Stored"
-            ]
+            "groups": ["North", "Stored"]
           },
           {
             "id": "b",
             "label": "Ink",
-            "groups": [
-              "North",
-              "Review"
-            ]
+            "groups": ["North", "Review"]
           },
           {
             "id": "c",
             "label": "Labels",
-            "groups": [
-              "South",
-              "Stored"
-            ]
+            "groups": ["South", "Stored"]
           },
           {
             "id": "d",
             "label": "Folders",
-            "groups": [
-              "North",
-              "Stored"
-            ]
+            "groups": ["North", "Stored"]
           }
         ],
-        "dimensions": [
-          "Area",
-          "State"
-        ],
-        "selectionPath": [
-          "North",
-          "Stored"
-        ],
+        "dimensions": ["Area", "State"],
+        "selectionPath": ["North", "Stored"],
         "labels": {
           "title": "Fictional supply drilldown",
           "root": "All sample records",
@@ -4572,9 +4479,7 @@
       "Exact raw data in records[].groups[] and selectionPath[] uses fixed 12px LiteralDataText. Whole-grapheme whitespace is presented with amber underlined marks: space ·, tab ⇥, line break ↵, carriage return ␍ and fallback ␣. Authored literal marker glyphs remain unmarked text. Raw input, accessible text, data attributes, equality and bounds are unchanged. This is presentation, not normalization."
     ],
     "collection": "general",
-    "proposalSources": [
-      "03:nested-drilldown-window"
-    ],
+    "proposalSources": ["03:nested-drilldown-window"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 28,
@@ -4754,9 +4659,7 @@
       "Exact raw data in groups[].records[].comparisonValue and, when showRecordIds is true, groups[].records[].id uses fixed 12px LiteralDataText. Whole-grapheme whitespace is presented with amber underlined marks: space ·, tab ⇥, line break ↵, carriage return ␍ and fallback ␣. Authored literal marker glyphs remain unmarked text. Raw input, accessible text, data attributes, equality and bounds are unchanged. This is presentation, not normalization."
     ],
     "collection": "general",
-    "proposalSources": [
-      "03:duplicate-review-stack"
-    ],
+    "proposalSources": ["03:duplicate-review-stack"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 29,
@@ -4919,9 +4822,7 @@
       "All work is homogeneous and completes within the scene; priorities, varying task durations, and continuous arrivals are outside this proposal."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:queue-relief"
-    ],
+    "proposalSources": ["04:queue-relief"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 30,
@@ -5062,9 +4963,7 @@
       "No probability of eventual success, randomized jitter, or independent concurrent requests is implied."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:retry-backoff"
-    ],
+    "proposalSources": ["04:retry-backoff"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 31,
@@ -5197,10 +5096,7 @@
       "A cache hit does not establish source freshness or current authorization; those require separate checks."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:cache-reuse",
-      "architecture:0:cache-reuse"
-    ],
+    "proposalSources": ["04:cache-reuse", "architecture:0:cache-reuse"],
     "schemaVersion": 1,
     "metadataVersion": 2,
     "number": 32,
@@ -5255,26 +5151,17 @@
           {
             "id": "v1",
             "label": "Draft A",
-            "content": [
-              "Field notes",
-              "Open questions"
-            ]
+            "content": ["Field notes", "Open questions"]
           },
           {
             "id": "v2",
             "label": "Draft B",
-            "content": [
-              "Field notes",
-              "Next steps"
-            ]
+            "content": ["Field notes", "Next steps"]
           },
           {
             "id": "v3",
             "label": "Draft C",
-            "content": [
-              "Field summary",
-              "Next steps"
-            ]
+            "content": ["Field summary", "Next steps"]
           }
         ],
         "control": "collection",
@@ -5349,26 +5236,17 @@
           {
             "id": "v1",
             "label": "Draft A",
-            "content": [
-              "Field notes",
-              "Open questions"
-            ]
+            "content": ["Field notes", "Open questions"]
           },
           {
             "id": "v2",
             "label": "Draft B",
-            "content": [
-              "Field notes",
-              "Next steps"
-            ]
+            "content": ["Field notes", "Next steps"]
           },
           {
             "id": "v3",
             "label": "Draft C",
-            "content": [
-              "Field summary",
-              "Next steps"
-            ]
+            "content": ["Field summary", "Next steps"]
           }
         ],
         "restoreRevisionId": "v1",
@@ -5394,13 +5272,8 @@
       "The checkpoint is an authored example, not evidence of an actual backup, tested recovery process, version history, or guaranteed data durability."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:revision-restore",
-      "02:checkpoint-return"
-    ],
-    "mergedFrom": [
-      "checkpoint-return"
-    ],
+    "proposalSources": ["04:revision-restore", "02:checkpoint-return"],
+    "mergedFrom": ["checkpoint-return"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 33,
@@ -5554,9 +5427,7 @@
       "Tasks are sequential, indivisible, and unchanged in duration; parallel work and resource calendars are not modeled."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:schedule-buffer"
-    ],
+    "proposalSources": ["04:schedule-buffer"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 34,
@@ -5693,9 +5564,7 @@
       "No processing-efficiency or cost improvement is quantified by the animation."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:batch-release"
-    ],
+    "proposalSources": ["04:batch-release"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 35,
@@ -5980,9 +5849,7 @@
       "All pieces together exhaust the depicted whole; overlapping work, unallocated effort, dependencies, and recursive subtasks are excluded."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:work-decomposition"
-    ],
+    "proposalSources": ["04:work-decomposition"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 37,
@@ -6121,9 +5988,7 @@
       "Slot positions encode precedence only, not duration, importance scores, fairness, or a delivery commitment."
     ],
     "collection": "general",
-    "proposalSources": [
-      "04:priority-insertion"
-    ],
+    "proposalSources": ["04:priority-insertion"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 38,
@@ -6826,13 +6691,8 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:cold-chain-custody",
-      "05:specimen-custody-seal"
-    ],
-    "mergedFrom": [
-      "specimen-custody-seal"
-    ],
+    "proposalSources": ["05:cold-chain-custody", "05:specimen-custody-seal"],
+    "mergedFrom": ["specimen-custody-seal"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 41,
@@ -7034,9 +6894,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:vaccination-session-balance"
-    ],
+    "proposalSources": ["05:vaccination-session-balance"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 42,
@@ -7394,9 +7252,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:dose-cohort-return-paths"
-    ],
+    "proposalSources": ["05:dose-cohort-return-paths"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 43,
@@ -7576,9 +7432,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:missed-visit-reconnect"
-    ],
+    "proposalSources": ["05:missed-visit-reconnect"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 44,
@@ -7758,9 +7612,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:contact-window-overlap"
-    ],
+    "proposalSources": ["05:contact-window-overlap"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 45,
@@ -7911,9 +7763,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:specimen-aliquot-balance"
-    ],
+    "proposalSources": ["05:specimen-aliquot-balance"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 46,
@@ -8071,9 +7921,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:referral-return-acknowledgement"
-    ],
+    "proposalSources": ["05:referral-return-acknowledgement"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 47,
@@ -8305,9 +8153,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:outreach-household-revisits"
-    ],
+    "proposalSources": ["05:outreach-household-revisits"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 48,
@@ -8544,9 +8390,7 @@
       }
     },
     "collection": "social-sector",
-    "proposalSources": [
-      "05:mobile-clinic-relocation"
-    ],
+    "proposalSources": ["05:mobile-clinic-relocation"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 49,
@@ -8690,9 +8534,7 @@
       "Six seconds supports orientation only; this is not a navigable map or an incident monitoring system."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:fictional-conflict-globe"
-    ],
+    "proposalSources": ["06:fictional-conflict-globe"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 50,
@@ -8910,9 +8752,7 @@
       "An open receiving gate denotes the authored arrival, not proof of permission, safety, or completed distribution."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:convoy-route-detour"
-    ],
+    "proposalSources": ["06:convoy-route-detour"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 51,
@@ -9066,9 +8906,7 @@
       "No real route, organization branding, vehicle markings, or third-party assets are required."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:aid-cargo-mode-handoff"
-    ],
+    "proposalSources": ["06:aid-cargo-mode-handoff"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 52,
@@ -9243,9 +9081,7 @@
       "The receipt is a fictional acknowledgement of quantities, not legal proof, identity verification, satisfaction, or measured impact. Avoid real names, signatures, and identifiers."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:recipient-confirmed-handover"
-    ],
+    "proposalSources": ["06:recipient-confirmed-handover"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 53,
@@ -9475,9 +9311,7 @@
       "The scene is a small authored example, not accounting software, a fundraising transaction, a financial recommendation, or real donor reporting."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:pooled-donor-allocation"
-    ],
+    "proposalSources": ["06:pooled-donor-allocation"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 54,
@@ -9635,9 +9469,7 @@
       "One shopper represents the example household role, not household size or a reported beneficiary count."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:household-market-choice"
-    ],
+    "proposalSources": ["06:household-market-choice"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 55,
@@ -9783,9 +9615,7 @@
       "The process is inspired by the relationship between retail supply and cash assistance, without copying agency assets or asserting any measured result."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:retail-shelf-replenishment"
-    ],
+    "proposalSources": ["06:retail-shelf-replenishment"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 56,
@@ -9924,9 +9754,7 @@
       "The scene shows one fictional participant; it makes no population-level access or impact claim."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:chosen-service-access"
-    ],
+    "proposalSources": ["06:chosen-service-access"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 57,
@@ -10082,9 +9910,7 @@
       "No photographs, biometric matching, distress imagery, or real personal data are used."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:voluntary-family-reunion"
-    ],
+    "proposalSources": ["06:voluntary-family-reunion"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 58,
@@ -10275,9 +10101,7 @@
       "Service compatibility is an author-validated semantic constraint; the renderer cannot infer needs or determine an appropriate humanitarian response."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "06:community-coordination-table"
-    ],
+    "proposalSources": ["06:community-coordination-table"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 59,
@@ -10437,9 +10261,7 @@
       "All defaults are fictional. The six-second motion compresses one supplied reporting period and is not a capture-rate simulation."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:carbon-storage-accounting"
-    ],
+    "proposalSources": ["07:carbon-storage-accounting"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 60,
@@ -10647,9 +10469,7 @@
       "Defaults are fictional and represent supplied feasible placements, not a scheduling algorithm or an optimization guarantee."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:compute-capacity-consolidation"
-    ],
+    "proposalSources": ["07:compute-capacity-consolidation"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 61,
@@ -10795,9 +10615,7 @@
       "The scene does not claim flood prevention or predict a real flood extent. Defaults and local geography are fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:stormwater-storage-spill"
-    ],
+    "proposalSources": ["07:stormwater-storage-spill"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 62,
@@ -10980,9 +10798,7 @@
       "Tree-canopy dimensions are authored for the named condition, not instantaneous tree growth. No temperature, exposure, health or measured efficacy claim is derived."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:street-shade-installation"
-    ],
+    "proposalSources": ["07:street-shade-installation"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 63,
@@ -11119,9 +10935,7 @@
       "No soil formation rate, crop yield, water quality outcome or ecological recovery is predicted. Defaults are fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:contour-sediment-retention"
-    ],
+    "proposalSources": ["07:contour-sediment-retention"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 64,
@@ -11308,9 +11122,7 @@
       "Repair success and component compatibility are authored assumptions in this fictional example. Additional process inputs or losses require extending the supplied boundary, not silently discarding mass."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:component-material-return"
-    ],
+    "proposalSources": ["07:component-material-return"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 65,
@@ -11468,9 +11280,7 @@
       "Source and load labels are configurable, but electricity origin and environmental benefit require separate evidence. Defaults are fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:battery-dispatch-balance"
-    ],
+    "proposalSources": ["07:battery-dispatch-balance"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 66,
@@ -11714,9 +11524,7 @@
       "Values are fictional and share one variable, unit and authored observation period. The graphic cannot establish measurement comparability or field validation accuracy."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:environmental-observation-gaps"
-    ],
+    "proposalSources": ["07:environmental-observation-gaps"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 67,
@@ -11865,9 +11673,7 @@
       "Neither final storage nor a reduced request proves sustainable use, legal compliance or equity. Defaults and the cutaway are fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:aquifer-allocation-balance"
-    ],
+    "proposalSources": ["07:aquifer-allocation-balance"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 68,
@@ -12041,9 +11847,7 @@
       "Designed connectivity does not establish species suitability, movement, survival, biodiversity gain or long-term restoration success. Traversal is optional and explicitly illustrative; defaults are fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "07:habitat-corridor-reconnection"
-    ],
+    "proposalSources": ["07:habitat-corridor-reconnection"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 69,
@@ -12385,9 +12189,7 @@
       "The three day changes are editorial beats, not proportional elapsed time. All defaults are fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:classroom-day-presence"
-    ],
+    "proposalSources": ["08:classroom-day-presence"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 70,
@@ -12543,9 +12345,7 @@
       "Distinct IDs denote distinct authored costs. These fields cannot detect one real-world expense entered under multiple IDs; the author must prevent that duplication. Equal label, kind and amount tuples remain valid under different IDs."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:school-cost-satchel"
-    ],
+    "proposalSources": ["08:school-cost-satchel"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 71,
@@ -12724,9 +12524,7 @@
       "All defaults are fictional. Durations are editorial and the loop reset is not another interruption."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:returning-learner-worktable"
-    ],
+    "proposalSources": ["08:returning-learner-worktable"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 72,
@@ -12870,9 +12668,7 @@
       "This bounded preset explains fractions only. Every example classroom, learner, and lesson is fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:fraction-material-translation"
-    ],
+    "proposalSources": ["08:fraction-material-translation"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 73,
@@ -13063,9 +12859,7 @@
       "Default participants, activity, and class are fictional."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:teacher-learning-cover"
-    ],
+    "proposalSources": ["08:teacher-learning-cover"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 74,
@@ -13155,19 +12949,11 @@
         "default": [
           {
             "bookId": "book-a",
-            "learnerIds": [
-              "a",
-              "b",
-              "c"
-            ]
+            "learnerIds": ["a", "b", "c"]
           },
           {
             "bookId": "book-b",
-            "learnerIds": [
-              "d",
-              "e",
-              "f"
-            ]
+            "learnerIds": ["d", "e", "f"]
           }
         ],
         "control": "collection",
@@ -13255,19 +13041,11 @@
         "readingGroups": [
           {
             "bookId": "book-a",
-            "learnerIds": [
-              "a",
-              "b",
-              "c"
-            ]
+            "learnerIds": ["a", "b", "c"]
           },
           {
             "bookId": "book-b",
-            "learnerIds": [
-              "d",
-              "e",
-              "f"
-            ]
+            "learnerIds": ["d", "e", "f"]
           }
         ],
         "startingShelf": "front",
@@ -13288,9 +13066,7 @@
       "All books, passages, and learners are fictional schematic examples."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:shared-reading-circles"
-    ],
+    "proposalSources": ["08:shared-reading-circles"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 75,
@@ -13377,34 +13153,19 @@
         "default": [
           {
             "learnerId": "a",
-            "componentIds": [
-              "grain",
-              "beans",
-              "fruit"
-            ]
+            "componentIds": ["grain", "beans", "fruit"]
           },
           {
             "learnerId": "b",
-            "componentIds": [
-              "grain",
-              "beans",
-              "fruit"
-            ]
+            "componentIds": ["grain", "beans", "fruit"]
           },
           {
             "learnerId": "c",
-            "componentIds": [
-              "grain",
-              "beans",
-              "fruit"
-            ]
+            "componentIds": ["grain", "beans", "fruit"]
           },
           {
             "learnerId": "d",
-            "componentIds": [
-              "grain",
-              "beans"
-            ]
+            "componentIds": ["grain", "beans"]
           }
         ],
         "control": "collection",
@@ -13490,34 +13251,19 @@
         "trays": [
           {
             "learnerId": "a",
-            "componentIds": [
-              "grain",
-              "beans",
-              "fruit"
-            ]
+            "componentIds": ["grain", "beans", "fruit"]
           },
           {
             "learnerId": "b",
-            "componentIds": [
-              "grain",
-              "beans",
-              "fruit"
-            ]
+            "componentIds": ["grain", "beans", "fruit"]
           },
           {
             "learnerId": "c",
-            "componentIds": [
-              "grain",
-              "beans",
-              "fruit"
-            ]
+            "componentIds": ["grain", "beans", "fruit"]
           },
           {
             "learnerId": "d",
-            "componentIds": [
-              "grain",
-              "beans"
-            ]
+            "componentIds": ["grain", "beans"]
           }
         ],
         "labels": {
@@ -13539,9 +13285,7 @@
       "The example covers one fictional meal occasion and cannot represent repeated meals or unique reach across days."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:school-lunch-tray-composition"
-    ],
+    "proposalSources": ["08:school-lunch-tray-composition"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 76,
@@ -13736,9 +13480,7 @@
       "The fictional schematic cannot establish that the selected changes meet any real learner's complete access requirements."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:classroom-access-rearrangement"
-    ],
+    "proposalSources": ["08:classroom-access-rearrangement"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 77,
@@ -13869,9 +13611,7 @@
       "This bounded motif supports measuring and marking only. Participants, materials, and setting names are fictional defaults."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:practice-to-work-sample"
-    ],
+    "proposalSources": ["08:practice-to-work-sample"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 78,
@@ -14028,9 +13768,7 @@
       "No learner is ranked or labeled correct by proximity. The fictional scene shows participation and comparison, not learning efficacy."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "08:shared-experiment-predictions"
-    ],
+    "proposalSources": ["08:shared-experiment-predictions"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 79,
@@ -14070,44 +13808,20 @@
             "id": "a",
             "label": "Demo exposure zone",
             "polygon": [
-              [
-                10,
-                10
-              ],
-              [
-                65,
-                10
-              ],
-              [
-                65,
-                80
-              ],
-              [
-                10,
-                80
-              ]
+              [10, 10],
+              [65, 10],
+              [65, 80],
+              [10, 80]
             ]
           },
           {
             "id": "b",
             "label": "Demo planning zone",
             "polygon": [
-              [
-                40,
-                25
-              ],
-              [
-                90,
-                25
-              ],
-              [
-                90,
-                90
-              ],
-              [
-                40,
-                90
-              ]
+              [40, 25],
+              [90, 25],
+              [90, 90],
+              [40, 90]
             ]
           }
         ],
@@ -14201,44 +13915,20 @@
             "id": "a",
             "label": "Demo exposure zone",
             "polygon": [
-              [
-                10,
-                10
-              ],
-              [
-                65,
-                10
-              ],
-              [
-                65,
-                80
-              ],
-              [
-                10,
-                80
-              ]
+              [10, 10],
+              [65, 10],
+              [65, 80],
+              [10, 80]
             ]
           },
           {
             "id": "b",
             "label": "Demo planning zone",
             "polygon": [
-              [
-                40,
-                25
-              ],
-              [
-                90,
-                25
-              ],
-              [
-                90,
-                90
-              ],
-              [
-                40,
-                90
-              ]
+              [40, 25],
+              [90, 25],
+              [90, 90],
+              [40, 90]
             ]
           }
         ],
@@ -14293,9 +13983,7 @@
       "Selected members divided by all supplied members is a record-based share, not population prevalence or an area-weighted estimate."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:gis-layer-intersection-tally"
-    ],
+    "proposalSources": ["10:gis-layer-intersection-tally"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 80,
@@ -14335,44 +14023,20 @@
             "id": "west",
             "label": "Service A footprint",
             "polygon": [
-              [
-                5,
-                10
-              ],
-              [
-                60,
-                10
-              ],
-              [
-                60,
-                85
-              ],
-              [
-                5,
-                85
-              ]
+              [5, 10],
+              [60, 10],
+              [60, 85],
+              [5, 85]
             ]
           },
           {
             "id": "east",
             "label": "Service B footprint",
             "polygon": [
-              [
-                40,
-                15
-              ],
-              [
-                85,
-                15
-              ],
-              [
-                85,
-                85
-              ],
-              [
-                40,
-                85
-              ]
+              [40, 15],
+              [85, 15],
+              [85, 85],
+              [40, 85]
             ]
           }
         ],
@@ -14466,44 +14130,20 @@
             "id": "west",
             "label": "Service A footprint",
             "polygon": [
-              [
-                5,
-                10
-              ],
-              [
-                60,
-                10
-              ],
-              [
-                60,
-                85
-              ],
-              [
-                5,
-                85
-              ]
+              [5, 10],
+              [60, 10],
+              [60, 85],
+              [5, 85]
             ]
           },
           {
             "id": "east",
             "label": "Service B footprint",
             "polygon": [
-              [
-                40,
-                15
-              ],
-              [
-                85,
-                15
-              ],
-              [
-                85,
-                85
-              ],
-              [
-                40,
-                85
-              ]
+              [40, 15],
+              [85, 15],
+              [85, 85],
+              [40, 85]
             ]
           }
         ],
@@ -14558,9 +14198,7 @@
       "No facility capacity, service quality, physical accessibility, or health outcome is inferred."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:catchment-union-gaps"
-    ],
+    "proposalSources": ["10:catchment-union-gaps"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 81,
@@ -14660,11 +14298,7 @@
       {
         "name": "investigationCaseIds",
         "type": "string[]",
-        "default": [
-          "a",
-          "b",
-          "c"
-        ],
+        "default": ["a", "b", "c"],
         "control": "collection",
         "description": "The explicitly authored investigation group, not a detected statistical cluster.",
         "constraints": "1..8 unique IDs, all present in cases."
@@ -14756,11 +14390,7 @@
             "label": "Day 3"
           }
         ],
-        "investigationCaseIds": [
-          "a",
-          "b",
-          "c"
-        ],
+        "investigationCaseIds": ["a", "b", "c"],
         "focusedBinId": "d2",
         "copy": {
           "context": "Fictional case review; schematic map",
@@ -14781,9 +14411,7 @@
       "Counts describe supplied case records only. No population denominator, disease incidence, or clinical guidance is implied."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:cluster-epicurve-link"
-    ],
+    "proposalSources": ["10:cluster-epicurve-link"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 82,
@@ -14823,44 +14451,20 @@
             "id": "w",
             "label": "West stratum",
             "polygon": [
-              [
-                5,
-                5
-              ],
-              [
-                50,
-                5
-              ],
-              [
-                50,
-                95
-              ],
-              [
-                5,
-                95
-              ]
+              [5, 5],
+              [50, 5],
+              [50, 95],
+              [5, 95]
             ]
           },
           {
             "id": "e",
             "label": "East stratum",
             "polygon": [
-              [
-                50,
-                5
-              ],
-              [
-                95,
-                5
-              ],
-              [
-                95,
-                95
-              ],
-              [
-                50,
-                95
-              ]
+              [50, 5],
+              [95, 5],
+              [95, 95],
+              [50, 95]
             ]
           }
         ],
@@ -14915,10 +14519,7 @@
       {
         "name": "selectedSiteIds",
         "type": "string[]",
-        "default": [
-          "a",
-          "d"
-        ],
+        "default": ["a", "d"],
         "control": "collection",
         "description": "Explicit sites selected for this plan.",
         "constraints": "1..8 unique existing site IDs; selection may leave a stratum unsampled, which must remain visible."
@@ -14954,44 +14555,20 @@
             "id": "w",
             "label": "West stratum",
             "polygon": [
-              [
-                5,
-                5
-              ],
-              [
-                50,
-                5
-              ],
-              [
-                50,
-                95
-              ],
-              [
-                5,
-                95
-              ]
+              [5, 5],
+              [50, 5],
+              [50, 95],
+              [5, 95]
             ]
           },
           {
             "id": "e",
             "label": "East stratum",
             "polygon": [
-              [
-                50,
-                5
-              ],
-              [
-                95,
-                5
-              ],
-              [
-                95,
-                95
-              ],
-              [
-                50,
-                95
-              ]
+              [50, 5],
+              [95, 5],
+              [95, 95],
+              [50, 95]
             ]
           }
         ],
@@ -15032,10 +14609,7 @@
             "y": 75
           }
         ],
-        "selectedSiteIds": [
-          "a",
-          "d"
-        ],
+        "selectedSiteIds": ["a", "d"],
         "copy": {
           "context": "Fictional schematic sampling plan",
           "selected": "Selected",
@@ -15053,9 +14627,7 @@
       "Only schematic local geography is supported; boundaries do not describe real administrative areas."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:stratified-spatial-sample"
-    ],
+    "proposalSources": ["10:stratified-spatial-sample"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 83,
@@ -15218,9 +14790,7 @@
       "All dimensions share one coordinate unit; there is no implied geographic scale or population denominator."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:parcel-setback-inset"
-    ],
+    "proposalSources": ["10:parcel-setback-inset"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 84,
@@ -15260,22 +14830,10 @@
             "id": "a",
             "label": "Demo West",
             "polygon": [
-              [
-                5,
-                10
-              ],
-              [
-                45,
-                10
-              ],
-              [
-                45,
-                90
-              ],
-              [
-                5,
-                90
-              ]
+              [5, 10],
+              [45, 10],
+              [45, 90],
+              [5, 90]
             ],
             "records": 4,
             "population": 40
@@ -15284,22 +14842,10 @@
             "id": "b",
             "label": "Demo East",
             "polygon": [
-              [
-                55,
-                10
-              ],
-              [
-                95,
-                10
-              ],
-              [
-                95,
-                90
-              ],
-              [
-                55,
-                90
-              ]
+              [55, 10],
+              [95, 10],
+              [95, 90],
+              [55, 90]
             ],
             "records": 3,
             "population": 10
@@ -15368,22 +14914,10 @@
             "id": "a",
             "label": "Demo West",
             "polygon": [
-              [
-                5,
-                10
-              ],
-              [
-                45,
-                10
-              ],
-              [
-                45,
-                90
-              ],
-              [
-                5,
-                90
-              ]
+              [5, 10],
+              [45, 10],
+              [45, 90],
+              [5, 90]
             ],
             "records": 4,
             "population": 40
@@ -15392,22 +14926,10 @@
             "id": "b",
             "label": "Demo East",
             "polygon": [
-              [
-                55,
-                10
-              ],
-              [
-                95,
-                10
-              ],
-              [
-                95,
-                90
-              ],
-              [
-                55,
-                90
-              ]
+              [55, 10],
+              [95, 10],
+              [95, 90],
+              [55, 90]
             ],
             "records": 3,
             "population": 10
@@ -15437,9 +14959,7 @@
       "Separate labeled legends are mandatory because the two views use different units."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:population-normalized-map"
-    ],
+    "proposalSources": ["10:population-normalized-map"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 85,
@@ -15522,18 +15042,12 @@
               {
                 "id": "w",
                 "label": "West",
-                "cellIds": [
-                  "nw",
-                  "sw"
-                ]
+                "cellIds": ["nw", "sw"]
               },
               {
                 "id": "e",
                 "label": "East",
-                "cellIds": [
-                  "ne",
-                  "se"
-                ]
+                "cellIds": ["ne", "se"]
               }
             ]
           },
@@ -15543,18 +15057,12 @@
               {
                 "id": "n",
                 "label": "North",
-                "cellIds": [
-                  "nw",
-                  "ne"
-                ]
+                "cellIds": ["nw", "ne"]
               },
               {
                 "id": "s",
                 "label": "South",
-                "cellIds": [
-                  "sw",
-                  "se"
-                ]
+                "cellIds": ["sw", "se"]
               }
             ]
           }
@@ -15646,18 +15154,12 @@
               {
                 "id": "w",
                 "label": "West",
-                "cellIds": [
-                  "nw",
-                  "sw"
-                ]
+                "cellIds": ["nw", "sw"]
               },
               {
                 "id": "e",
                 "label": "East",
-                "cellIds": [
-                  "ne",
-                  "se"
-                ]
+                "cellIds": ["ne", "se"]
               }
             ]
           },
@@ -15667,18 +15169,12 @@
               {
                 "id": "n",
                 "label": "North",
-                "cellIds": [
-                  "nw",
-                  "ne"
-                ]
+                "cellIds": ["nw", "ne"]
               },
               {
                 "id": "s",
                 "label": "South",
-                "cellIds": [
-                  "sw",
-                  "se"
-                ]
+                "cellIds": ["sw", "se"]
               }
             ]
           }
@@ -15702,9 +15198,7 @@
       "The scene explains aggregation sensitivity, not individual risk, a preferred zoning plan, or a causal explanation for inequality."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:boundary-regrouping-effect"
-    ],
+    "proposalSources": ["10:boundary-regrouping-effect"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 86,
@@ -15910,9 +15404,7 @@
       "Histogram counts are record totals, not incidence rates. This does not assess an outbreak or offer medical guidance."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:surveillance-reporting-backfill"
-    ],
+    "proposalSources": ["10:surveillance-reporting-backfill"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 87,
@@ -15952,44 +15444,20 @@
             "id": "w",
             "label": "Demo West",
             "polygon": [
-              [
-                0,
-                0
-              ],
-              [
-                50,
-                0
-              ],
-              [
-                50,
-                100
-              ],
-              [
-                0,
-                100
-              ]
+              [0, 0],
+              [50, 0],
+              [50, 100],
+              [0, 100]
             ]
           },
           {
             "id": "e",
             "label": "Demo East",
             "polygon": [
-              [
-                50,
-                0
-              ],
-              [
-                100,
-                0
-              ],
-              [
-                100,
-                100
-              ],
-              [
-                50,
-                100
-              ]
+              [50, 0],
+              [100, 0],
+              [100, 100],
+              [50, 100]
             ]
           }
         ],
@@ -16068,44 +15536,20 @@
             "id": "w",
             "label": "Demo West",
             "polygon": [
-              [
-                0,
-                0
-              ],
-              [
-                50,
-                0
-              ],
-              [
-                50,
-                100
-              ],
-              [
-                0,
-                100
-              ]
+              [0, 0],
+              [50, 0],
+              [50, 100],
+              [0, 100]
             ]
           },
           {
             "id": "e",
             "label": "Demo East",
             "polygon": [
-              [
-                50,
-                0
-              ],
-              [
-                100,
-                0
-              ],
-              [
-                100,
-                100
-              ],
-              [
-                50,
-                100
-              ]
+              [50, 0],
+              [100, 0],
+              [100, 100],
+              [50, 100]
             ]
           }
         ],
@@ -16152,9 +15596,7 @@
       "Definite plus unresolved records equal the location array length; ambiguous records are never counted once in each possible district."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:location-uncertainty-boundary"
-    ],
+    "proposalSources": ["10:location-uncertainty-boundary"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 88,
@@ -16355,9 +15797,7 @@
       "Area-only place equivalents are not operational shelter capacity; layout, safeguarding, access, household composition and other constraints are not modeled."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "10:shelter-usable-area-capacity"
-    ],
+    "proposalSources": ["10:shelter-usable-area-capacity"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 89,
@@ -16544,9 +15984,7 @@
       "No service is automatically withdrawn when a person proposes a different time."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:person-led-support-calendar"
-    ],
+    "proposalSources": ["11:person-led-support-calendar"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 90,
@@ -16725,9 +16163,7 @@
       "No contact is portrayed as completed merely because permission remains active."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:referral-consent-withdrawal"
-    ],
+    "proposalSources": ["11:referral-consent-withdrawal"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 91,
@@ -16872,9 +16308,7 @@
       "The scene does not assert that a private conversation automatically produces disclosure or resolves a case."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:private-case-conversation"
-    ],
+    "proposalSources": ["11:private-case-conversation"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 92,
@@ -17005,9 +16439,7 @@
       "The scene covers underpayment only and never invents a successful remedy beyond the supplied correction."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:benefit-shortfall-correction"
-    ],
+    "proposalSources": ["11:benefit-shortfall-correction"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 93,
@@ -17140,9 +16572,7 @@
       "No measured satisfaction or program impact is implied."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:grievance-remedy-retest"
-    ],
+    "proposalSources": ["11:grievance-remedy-retest"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 94,
@@ -17311,9 +16741,7 @@
       "Ties, eligibility, quorum, invalid ballots and final funding decisions are outside the scene."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:resident-budget-ballots"
-    ],
+    "proposalSources": ["11:resident-budget-ballots"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 95,
@@ -17456,9 +16884,7 @@
       "The layout is schematic and contains no real geography; scale applies only to the displayed measured dimension."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:public-works-measurement-check"
-    ],
+    "proposalSources": ["11:public-works-measurement-check"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 96,
@@ -17600,9 +17026,7 @@
       "The author must make labels.choice agree with finalStepSupport. The renderer preserves supplied prose exactly and derives support geometry/state only from structured inputs. It does not infer natural-language meaning or rewrite the choice into canned English."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:school-transition-rehearsal"
-    ],
+    "proposalSources": ["11:school-transition-rehearsal"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 97,
@@ -17769,9 +17193,7 @@
       "A null agreed slot stays unresolved and never receives a use gesture."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:shared-workshop-booking"
-    ],
+    "proposalSources": ["11:shared-workshop-booking"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 98,
@@ -17918,9 +17340,7 @@
       "The default English copies under fictional language labels demonstrate bindings only and must not be presented as an actual bilingual exchange."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "11:interpreted-case-dialogue"
-    ],
+    "proposalSources": ["11:interpreted-case-dialogue"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 99,
@@ -18070,9 +17490,7 @@
       "A temporary storage-phase opening occurs only for nonzero recorded loss: loss clears the opening before a smooth closure, completed before the planting reopening begins at frame 101. Zero loss keeps the storage jar closed without an extraction-opening pulse. The initial post-reservation closure and explicit planting reopening remain distinct."
     ],
     "collection": "social-sector",
-    "proposalSources": [
-      "12:saved-seed-season-return"
-    ],
+    "proposalSources": ["12:saved-seed-season-return"],
     "schemaVersion": 1,
     "metadataVersion": 1,
     "number": 100,
@@ -18235,9 +17653,7 @@
         "rationale": "The strategy calls for configuration across changing domain needs; the proposal isolates one bounded schema extension."
       }
     ],
-    "proposalSources": [
-      "business-plan:schema-column-evolution"
-    ],
+    "proposalSources": ["business-plan:schema-column-evolution"],
     "status": "planned",
     "number": 101,
     "componentName": "SchemaColumnEvolution",
@@ -18426,9 +17842,7 @@
         "rationale": "The long-term strategy describes teams installing mission-specific utilities over a common platform; the proposal uses a non-clinical counting example."
       }
     ],
-    "proposalSources": [
-      "business-plan:plugin-capability-install"
-    ],
+    "proposalSources": ["business-plan:plugin-capability-install"],
     "status": "planned",
     "number": 102,
     "componentName": "PluginCapabilityInstall",
@@ -18597,9 +18011,7 @@
         "rationale": "The plan describes comparing provider- and insurer-specific procedure prices with billed charges. The stock concept preserves matching context but does not repeat patient outcomes or legal assertions."
       }
     ],
-    "proposalSources": [
-      "business-plan:charge-reference-alignment"
-    ],
+    "proposalSources": ["business-plan:charge-reference-alignment"],
     "status": "planned",
     "number": 103,
     "componentName": "ChargeReferenceAlignment",
@@ -18786,9 +18198,7 @@
         "rationale": "The strategy links voluntary plan expansion to increased team and data needs after users have experienced value. The proposal isolates resource capacity without real pricing or adoption claims."
       }
     ],
-    "proposalSources": [
-      "business-plan:workspace-capacity-extension"
-    ],
+    "proposalSources": ["business-plan:workspace-capacity-extension"],
     "status": "planned",
     "number": 104,
     "componentName": "WorkspaceCapacityExtension",
@@ -19007,9 +18417,7 @@
         "rationale": "The plan describes row counts as approximations for byte-scale categories, supporting a generic warning about counting proxies."
       }
     ],
-    "proposalSources": [
-      "business-plan:equal-count-unequal-volume"
-    ],
+    "proposalSources": ["business-plan:equal-count-unequal-volume"],
     "status": "planned",
     "number": 105,
     "componentName": "EqualCountUnequalVolume",
@@ -19228,9 +18636,7 @@
         "rationale": "The strategy treats shared accounts as a loss of collaborative value and favors explaining individual participation over punitive restriction. Attribution is a bounded illustrative interpretation of that concern."
       }
     ],
-    "proposalSources": [
-      "business-plan:actor-attribution-split"
-    ],
+    "proposalSources": ["business-plan:actor-attribution-split"],
     "status": "planned",
     "number": 106,
     "componentName": "ActorAttributionSplit",
@@ -19392,9 +18798,7 @@
         "rationale": "The strategy discusses finite-duration distributions and the resources retained after they end. The proposal uses fictional cash-flow arithmetic and avoids the document's broader claims about working capital and incentives."
       }
     ],
-    "proposalSources": [
-      "business-plan:term-limited-revenue-share"
-    ],
+    "proposalSources": ["business-plan:term-limited-revenue-share"],
     "status": "planned",
     "number": 107,
     "componentName": "TermLimitedRevenueShare",
@@ -19609,9 +19013,7 @@
         "rationale": "The strategy describes translating natural-language domain descriptions into entities, descriptors, and relationships. The proposal makes that authored translation and its review status explicit instead of claiming general AI inference."
       }
     ],
-    "proposalSources": [
-      "business-plan:utterance-to-model-draft"
-    ],
+    "proposalSources": ["business-plan:utterance-to-model-draft"],
     "status": "planned",
     "number": 108,
     "componentName": "UtteranceToModelDraft",
@@ -19758,9 +19160,7 @@
         "rationale": "The source connects dependable tools to consequential work and calls for extensive testing and adversarial model review."
       }
     ],
-    "proposalSources": [
-      "values:expectation-overlay-check"
-    ],
+    "proposalSources": ["values:expectation-overlay-check"],
     "status": "planned",
     "number": 109,
     "componentName": "ExpectationOverlayCheck",
@@ -19945,9 +19345,7 @@
         "rationale": "The source advocates avoiding overwork and preserving employee-directed time for recovery, learning and participation in community."
       }
     ],
-    "proposalSources": [
-      "values:protected-work-boundary"
-    ],
+    "proposalSources": ["values:protected-work-boundary"],
     "status": "planned",
     "number": 110,
     "componentName": "ProtectedWorkBoundary",
@@ -20107,9 +19505,7 @@
         "rationale": "The source distinguishes subject expertise from organizational seniority and calls for listening to domain experts, coworkers and community members."
       }
     ],
-    "proposalSources": [
-      "values:expertise-role-exchange"
-    ],
+    "proposalSources": ["values:expertise-role-exchange"],
     "status": "planned",
     "number": 111,
     "componentName": "ExpertiseRoleExchange",
@@ -20237,9 +19633,7 @@
         "rationale": "The source treats gratitude, specific praise and celebrating colleagues as part of honest team relationships."
       }
     ],
-    "proposalSources": [
-      "values:peer-contribution-recognition"
-    ],
+    "proposalSources": ["values:peer-contribution-recognition"],
     "status": "planned",
     "number": 112,
     "componentName": "PeerContributionRecognition",
@@ -20371,9 +19765,7 @@
         "rationale": "The source calls for offering practical help and maintaining relationships where people can speak candidly and receive a respectful response."
       }
     ],
-    "proposalSources": [
-      "values:support-request-response"
-    ],
+    "proposalSources": ["values:support-request-response"],
     "status": "planned",
     "number": 113,
     "componentName": "SupportRequestResponse",
@@ -20499,9 +19891,7 @@
         "rationale": "The source distinguishes appreciating emergency effort from investigating recurring causes and preventing environments that require repeated emergency work."
       }
     ],
-    "proposalSources": [
-      "values:recurring-leak-prevention"
-    ],
+    "proposalSources": ["values:recurring-leak-prevention"],
     "status": "planned",
     "number": 114,
     "componentName": "RecurringLeakPrevention",
@@ -20661,9 +20051,7 @@
         "rationale": "The source rejects endless perfectionism while requiring flaws to be bounded, documented and followed by a committed repair plan."
       }
     ],
-    "proposalSources": [
-      "values:release-repair-obligations"
-    ],
+    "proposalSources": ["values:release-repair-obligations"],
     "status": "planned",
     "number": 115,
     "componentName": "ReleaseRepairObligations",
@@ -20810,9 +20198,7 @@
         "rationale": "The source argues for deliberate preparation that makes later maintenance and change easier."
       }
     ],
-    "proposalSources": [
-      "values:shared-jig-preparation"
-    ],
+    "proposalSources": ["values:shared-jig-preparation"],
     "status": "planned",
     "number": 116,
     "componentName": "SharedJigPreparation",
@@ -20958,9 +20344,7 @@
         "rationale": "The source identifies vendor lock-in as a reason that mission-driven organizations need earned trust and transparency. Portability is a generalized visual response to that concern."
       }
     ],
-    "proposalSources": [
-      "values:portable-work-transfer"
-    ],
+    "proposalSources": ["values:portable-work-transfer"],
     "status": "planned",
     "number": 117,
     "componentName": "PortableWorkTransfer",
@@ -21110,9 +20494,7 @@
         "rationale": "The source emphasizes readable, editable software and foundations that avoid repeated reconstruction during later maintenance."
       }
     ],
-    "proposalSources": [
-      "values:serviceable-panel-swap"
-    ],
+    "proposalSources": ["values:serviceable-panel-swap"],
     "status": "planned",
     "number": 118,
     "componentName": "ServiceablePanelSwap",
@@ -21291,9 +20673,7 @@
         "rationale": "Concrete values and user text have separately supported crossings, so an unconditional privacy claim would be false."
       }
     ],
-    "proposalSources": [
-      "architecture:schema-plan-local-execution"
-    ],
+    "proposalSources": ["architecture:schema-plan-local-execution"],
     "status": "planned",
     "number": 119,
     "componentName": "SchemaPlanLocalExecution",
@@ -21325,29 +20705,17 @@
           {
             "id": "key",
             "label": "Key",
-            "cells": [
-              "A",
-              "B",
-              "B"
-            ]
+            "cells": ["A", "B", "B"]
           },
           {
             "id": "name",
             "label": "Name",
-            "cells": [
-              "Ash",
-              "Birch",
-              "Birch"
-            ]
+            "cells": ["Ash", "Birch", "Birch"]
           },
           {
             "id": "value",
             "label": "Items",
-            "cells": [
-              "2",
-              "4",
-              "4"
-            ]
+            "cells": ["2", "4", "4"]
           }
         ],
         "control": "collection",
@@ -21357,10 +20725,7 @@
       {
         "name": "cachedColumnIds",
         "type": "Array<string>",
-        "default": [
-          "key",
-          "name"
-        ],
+        "default": ["key", "name"],
         "control": "collection",
         "description": "Columns initially held.",
         "constraints": "Nonempty unique subset of column ids; must include keyColumnId."
@@ -21371,16 +20736,11 @@
         "default": [
           {
             "label": "Read names",
-            "columnIds": [
-              "name"
-            ]
+            "columnIds": ["name"]
           },
           {
             "label": "Read items",
-            "columnIds": [
-              "key",
-              "value"
-            ]
+            "columnIds": ["key", "value"]
           }
         ],
         "control": "collection",
@@ -21423,48 +20783,28 @@
           {
             "id": "key",
             "label": "Key",
-            "cells": [
-              "A",
-              "B",
-              "B"
-            ]
+            "cells": ["A", "B", "B"]
           },
           {
             "id": "name",
             "label": "Name",
-            "cells": [
-              "Ash",
-              "Birch",
-              "Birch"
-            ]
+            "cells": ["Ash", "Birch", "Birch"]
           },
           {
             "id": "value",
             "label": "Items",
-            "cells": [
-              "2",
-              "4",
-              "4"
-            ]
+            "cells": ["2", "4", "4"]
           }
         ],
-        "cachedColumnIds": [
-          "key",
-          "name"
-        ],
+        "cachedColumnIds": ["key", "name"],
         "requests": [
           {
             "label": "Read names",
-            "columnIds": [
-              "name"
-            ]
+            "columnIds": ["name"]
           },
           {
             "label": "Read items",
-            "columnIds": [
-              "key",
-              "value"
-            ]
+            "columnIds": ["key", "value"]
           }
         ],
         "keyColumnId": "key",
@@ -21500,9 +20840,7 @@
         "rationale": "A partial miss acquires the union and projects without DISTINCT or ORDER BY."
       }
     ],
-    "proposalSources": [
-      "architecture:query-column-cache-growth"
-    ],
+    "proposalSources": ["architecture:query-column-cache-growth"],
     "status": "planned",
     "number": 120,
     "componentName": "QueryColumnCacheGrowth",
@@ -21550,18 +20888,12 @@
           {
             "id": "one",
             "label": "Operation 1",
-            "requestedIds": [
-              "a",
-              "b"
-            ]
+            "requestedIds": ["a", "b"]
           },
           {
             "id": "two",
             "label": "Operation 2",
-            "requestedIds": [
-              "b",
-              "a"
-            ]
+            "requestedIds": ["b", "a"]
           }
         ],
         "control": "collection",
@@ -21614,18 +20946,12 @@
           {
             "id": "one",
             "label": "Operation 1",
-            "requestedIds": [
-              "a",
-              "b"
-            ]
+            "requestedIds": ["a", "b"]
           },
           {
             "id": "two",
             "label": "Operation 2",
-            "requestedIds": [
-              "b",
-              "a"
-            ]
+            "requestedIds": ["b", "a"]
           }
         ],
         "firstOperationId": "one",
@@ -21655,9 +20981,7 @@
         "rationale": "Sorted resource names prevent circular cross-tab locking; nested holders reuse coverage rather than locking again."
       }
     ],
-    "proposalSources": [
-      "architecture:ordered-lock-acquisition"
-    ],
+    "proposalSources": ["architecture:ordered-lock-acquisition"],
     "status": "planned",
     "number": 121,
     "componentName": "OrderedLockAcquisition",
@@ -21684,11 +21008,7 @@
       {
         "name": "originalRows",
         "type": "Array<string>",
-        "default": [
-          "A: 2",
-          "B: 4",
-          "C: 3"
-        ],
+        "default": ["A: 2", "B: 4", "C: 3"],
         "control": "collection",
         "description": "Original readable contents.",
         "constraints": "2..4 rows, each 1..18 characters."
@@ -21710,11 +21030,7 @@
         "type": "{performed:boolean;rows:Array<string>}",
         "default": {
           "performed": true,
-          "rows": [
-            "A: 2",
-            "B: 4",
-            "C: 3"
-          ]
+          "rows": ["A: 2", "B: 4", "C: 3"]
         },
         "control": "object",
         "description": "Complete authoritative reload.",
@@ -21745,11 +21061,7 @@
     "bindingExample": {
       "shortSourceText": "Before changing B from 4 to 9, close reads. The attempt fails. Reload the complete rows A:2, B:4 and C:3 before reopening the table.",
       "inputBindings": {
-        "originalRows": [
-          "A: 2",
-          "B: 4",
-          "C: 3"
-        ],
+        "originalRows": ["A: 2", "B: 4", "C: 3"],
         "attempt": {
           "rowIndex": 1,
           "replacement": "B: 9",
@@ -21757,11 +21069,7 @@
         },
         "reload": {
           "performed": true,
-          "rows": [
-            "A: 2",
-            "B: 4",
-            "C: 3"
-          ]
+          "rows": ["A: 2", "B: 4", "C: 3"]
         },
         "labels": {
           "readable": "Readable",
@@ -21790,9 +21098,7 @@
         "rationale": "Mutations poison tables before execution; failed partial writes remain unreadable until full reload."
       }
     ],
-    "proposalSources": [
-      "architecture:invalid-table-quarantine"
-    ],
+    "proposalSources": ["architecture:invalid-table-quarantine"],
     "status": "planned",
     "number": 122,
     "componentName": "InvalidTableQuarantine",
@@ -21960,9 +21266,7 @@
         "rationale": "Membership is materialized but attribute values stay virtual; correlated subqueries preserve one row per individual."
       }
     ],
-    "proposalSources": [
-      "architecture:entity-spine-assembly"
-    ],
+    "proposalSources": ["architecture:entity-spine-assembly"],
     "status": "planned",
     "number": 123,
     "componentName": "EntitySpineAssembly",
@@ -22104,9 +21408,7 @@
         "rationale": "Seven explicit collapse rules and divergent NULL handling make the rule itself part of a record field meaning."
       }
     ],
-    "proposalSources": [
-      "architecture:grouped-value-picker"
-    ],
+    "proposalSources": ["architecture:grouped-value-picker"],
     "status": "planned",
     "number": 124,
     "componentName": "GroupedValuePicker",
@@ -22275,9 +21577,7 @@
         "rationale": "Narrow upserts preserve user state, skip no-ops and flag missing keys rather than deleting them."
       }
     ],
-    "proposalSources": [
-      "architecture:state-preserving-source-refresh"
-    ],
+    "proposalSources": ["architecture:state-preserving-source-refresh"],
     "status": "planned",
     "number": 125,
     "componentName": "StatePreservingSourceRefresh",
@@ -22431,9 +21731,7 @@
         "rationale": "Qualifying candidates combine by max rank, while restriction removes app defaults and group shares may require app access."
       }
     ],
-    "proposalSources": [
-      "architecture:effective-permission-grants"
-    ],
+    "proposalSources": ["architecture:effective-permission-grants"],
     "status": "planned",
     "number": 126,
     "componentName": "EffectivePermissionGrants",
@@ -22561,9 +21859,7 @@
         "rationale": "The roadmap explicitly describes the engine as unbuilt."
       }
     ],
-    "proposalSources": [
-      "architecture:atomic-outbox-commit"
-    ],
+    "proposalSources": ["architecture:atomic-outbox-commit"],
     "status": "planned",
     "number": 127,
     "componentName": "AtomicOutboxCommit",
@@ -22674,9 +21970,7 @@
         "rationale": "Resumable transfers persist acknowledged byte progress so interrupted uploads can continue."
       }
     ],
-    "proposalSources": [
-      "architecture:resumable-byte-transfer"
-    ],
+    "proposalSources": ["architecture:resumable-byte-transfer"],
     "status": "planned",
     "number": 128,
     "componentName": "ResumableByteTransfer",
@@ -22705,19 +21999,10 @@
         "name": "grid",
         "type": "{columnLabels:Array<string>;rows:Array<Array<string>>}",
         "default": {
-          "columnLabels": [
-            "Site",
-            "Items"
-          ],
+          "columnLabels": ["Site", "Items"],
           "rows": [
-            [
-              "West",
-              "12"
-            ],
-            [
-              "East",
-              "8"
-            ]
+            ["West", "12"],
+            ["East", "8"]
           ]
         },
         "control": "object",
@@ -22765,19 +22050,10 @@
       "shortSourceText": "The page has columns Site and Items, with West 12 and East 8. Ruling lines define the four data cells, which copy into the extracted table without changing order.",
       "inputBindings": {
         "grid": {
-          "columnLabels": [
-            "Site",
-            "Items"
-          ],
+          "columnLabels": ["Site", "Items"],
           "rows": [
-            [
-              "West",
-              "12"
-            ],
-            [
-              "East",
-              "8"
-            ]
+            ["West", "12"],
+            ["East", "8"]
           ]
         },
         "signal": "ruling-lines",
@@ -22813,9 +22089,7 @@
         "rationale": "Automatic table detection remains a separate outstanding phase."
       }
     ],
-    "proposalSources": [
-      "architecture:pdf-grid-reconstruction"
-    ],
+    "proposalSources": ["architecture:pdf-grid-reconstruction"],
     "status": "planned",
     "number": 129,
     "componentName": "PdfGridReconstruction",
@@ -22960,9 +22234,7 @@
         "rationale": "Proximity pairing can silently misassociate labels; the design requires uncertainty flags and inspectable source positions."
       }
     ],
-    "proposalSources": [
-      "architecture:pdf-nearest-label-review"
-    ],
+    "proposalSources": ["architecture:pdf-nearest-label-review"],
     "status": "planned",
     "number": 130,
     "componentName": "PdfNearestLabelReview",
@@ -23151,9 +22423,7 @@
         "rationale": "Prose observations retain subject, unit, time and qualifier, while production method and confidence are independent."
       }
     ],
-    "proposalSources": [
-      "architecture:prose-measurement-ledger"
-    ],
+    "proposalSources": ["architecture:prose-measurement-ledger"],
     "status": "planned",
     "number": 131,
     "componentName": "ProseMeasurementLedger",
@@ -23330,9 +22600,7 @@
         "rationale": "Repeated headings with run-in labels can form a table even without a printed grid."
       }
     ],
-    "proposalSources": [
-      "architecture:repeating-blocks-to-table"
-    ],
+    "proposalSources": ["architecture:repeating-blocks-to-table"],
     "status": "planned",
     "number": 132,
     "componentName": "RepeatingBlocksToTable",
@@ -23347,12 +22615,7 @@
       "Explain unpivoting wide measurements to a long table",
       "Show how reshaping changes grain without creating measurements"
     ],
-    "tags": [
-      "unpivot",
-      "wide to long",
-      "tidy observations",
-      "data grain"
-    ],
+    "tags": ["unpivot", "wide to long", "tidy observations", "data grain"],
     "intent": "Explain a change in measurement grain while preserving values.",
     "family": "Wide-to-long reshaping",
     "inputs": [
@@ -23519,9 +22782,7 @@
         "rationale": "Different regions can normalize to a common observation schema with retained units and provenance."
       }
     ],
-    "proposalSources": [
-      "architecture:wide-table-to-observations"
-    ],
+    "proposalSources": ["architecture:wide-table-to-observations"],
     "status": "planned",
     "number": 133,
     "componentName": "WideTableToObservations",
@@ -23536,12 +22797,7 @@
       "Explain why PDF table ordinal numbers are unstable identifiers",
       "Show a saved region fingerprint detecting source drift"
     ],
-    "tags": [
-      "source drift",
-      "fingerprint",
-      "PDF provenance",
-      "stable locator"
-    ],
+    "tags": ["source drift", "fingerprint", "PDF provenance", "stable locator"],
     "intent": "Detect changed source content without relying on unstable ordinal labels.",
     "family": "Source identity validation",
     "inputs": [
@@ -23550,12 +22806,7 @@
         "type": "{page:number;box:[number,number,number,number];header:string;fingerprint:string}",
         "default": {
           "page": 2,
-          "box": [
-            10,
-            20,
-            85,
-            70
-          ],
+          "box": [10, 20, 85, 70],
           "header": "Site | Items",
           "fingerprint": "FP-A"
         },
@@ -23615,12 +22866,7 @@
       "inputBindings": {
         "saved": {
           "page": 2,
-          "box": [
-            10,
-            20,
-            85,
-            70
-          ],
+          "box": [10, 20, 85, 70],
           "header": "Site | Items",
           "fingerprint": "FP-A"
         },
@@ -23662,9 +22908,7 @@
         "rationale": "Table numbering can change with detector versions; persisted geometry plus fingerprint notices source drift."
       }
     ],
-    "proposalSources": [
-      "architecture:document-region-drift-check"
-    ],
+    "proposalSources": ["architecture:document-region-drift-check"],
     "status": "planned",
     "number": 134,
     "componentName": "DocumentRegionDriftCheck",
@@ -23709,19 +22953,11 @@
           "rows": [
             {
               "id": "a",
-              "cells": [
-                "West",
-                "12",
-                "Review"
-              ]
+              "cells": ["West", "12", "Review"]
             },
             {
               "id": "b",
-              "cells": [
-                "East",
-                "8",
-                "Draft"
-              ]
+              "cells": ["East", "8", "Draft"]
             }
           ]
         },
@@ -23733,14 +22969,8 @@
         "name": "selection",
         "type": "{rowIds:Array<string>;columnIds:Array<string>}",
         "default": {
-          "rowIds": [
-            "a",
-            "b"
-          ],
-          "columnIds": [
-            "site",
-            "items"
-          ]
+          "rowIds": ["a", "b"],
+          "columnIds": ["site", "items"]
         },
         "control": "object",
         "description": "Exact rows and columns copied.",
@@ -23812,31 +23042,17 @@
           "rows": [
             {
               "id": "a",
-              "cells": [
-                "West",
-                "12",
-                "Review"
-              ]
+              "cells": ["West", "12", "Review"]
             },
             {
               "id": "b",
-              "cells": [
-                "East",
-                "8",
-                "Draft"
-              ]
+              "cells": ["East", "8", "Draft"]
             }
           ]
         },
         "selection": {
-          "rowIds": [
-            "a",
-            "b"
-          ],
-          "columnIds": [
-            "site",
-            "items"
-          ]
+          "rowIds": ["a", "b"],
+          "columnIds": ["site", "items"]
         },
         "liveEdit": {
           "rowId": "a",
@@ -23879,9 +23095,7 @@
         "rationale": "Published snapshot ownership is scoped to dashboard and revision."
       }
     ],
-    "proposalSources": [
-      "architecture:publication-snapshot-slice"
-    ],
+    "proposalSources": ["architecture:publication-snapshot-slice"],
     "status": "planned",
     "number": 135,
     "componentName": "PublicationSnapshotSlice",
@@ -24064,9 +23278,7 @@
         "rationale": "Global filters have all/selected/none subscriptions and compose separately from local filters."
       }
     ],
-    "proposalSources": [
-      "architecture:filter-subscription-scope"
-    ],
+    "proposalSources": ["architecture:filter-subscription-scope"],
     "status": "planned",
     "number": 136,
     "componentName": "FilterSubscriptionScope",
@@ -24241,9 +23453,7 @@
         "rationale": "The current engine has no pushdown or capability-driven planning; this must remain a generic planned concept."
       }
     ],
-    "proposalSources": [
-      "architecture:predicate-pushdown-boundary"
-    ],
+    "proposalSources": ["architecture:predicate-pushdown-boundary"],
     "status": "planned",
     "number": 137,
     "componentName": "PredicatePushdownBoundary",
@@ -24303,19 +23513,11 @@
         "default": [
           {
             "label": "Equal-width example",
-            "breaks": [
-              0,
-              5,
-              10
-            ]
+            "breaks": [0, 5, 10]
           },
           {
             "label": "Alternative breaks",
-            "breaks": [
-              0,
-              3,
-              10
-            ]
+            "breaks": [0, 3, 10]
           }
         ],
         "control": "collection",
@@ -24387,19 +23589,11 @@
         "schemes": [
           {
             "label": "Equal-width example",
-            "breaks": [
-              0,
-              5,
-              10
-            ]
+            "breaks": [0, 5, 10]
           },
           {
             "label": "Alternative breaks",
-            "breaks": [
-              0,
-              3,
-              10
-            ]
+            "breaks": [0, 3, 10]
           }
         ],
         "unitLabel": "recorded items",
@@ -24430,9 +23624,7 @@
         "rationale": "Classification and mandatory no-data rendering are distinct from normalization."
       }
     ],
-    "proposalSources": [
-      "architecture:choropleth-class-breaks"
-    ],
+    "proposalSources": ["architecture:choropleth-class-breaks"],
     "status": "planned",
     "number": 138,
     "componentName": "ChoroplethClassBreaks",
@@ -24564,9 +23756,7 @@
         "rationale": "The GIS design defaults proportional-symbol radius to square-root scaling so symbol area encodes value."
       }
     ],
-    "proposalSources": [
-      "architecture:proportional-symbol-area"
-    ],
+    "proposalSources": ["architecture:proportional-symbol-area"],
     "status": "planned",
     "number": 139,
     "componentName": "ProportionalSymbolArea",
@@ -24759,9 +23949,7 @@
         "rationale": "Clustering is a distinct symbology over underlying points."
       }
     ],
-    "proposalSources": [
-      "architecture:map-cluster-unfold"
-    ],
+    "proposalSources": ["architecture:map-cluster-unfold"],
     "status": "planned",
     "number": 140,
     "componentName": "MapClusterUnfold",
@@ -24918,9 +24106,7 @@
         "rationale": "Hex/grid binning aggregates point observations into fixed geographic cells."
       }
     ],
-    "proposalSources": [
-      "architecture:spatial-grid-binning"
-    ],
+    "proposalSources": ["architecture:spatial-grid-binning"],
     "status": "planned",
     "number": 141,
     "componentName": "SpatialGridBinning",
@@ -25075,9 +24261,7 @@
         "rationale": "Aggregate-only policy enforces minimum counts and forbids exact point layers."
       }
     ],
-    "proposalSources": [
-      "architecture:minimum-count-map-suppression"
-    ],
+    "proposalSources": ["architecture:minimum-count-map-suppression"],
     "status": "planned",
     "number": 142,
     "componentName": "MinimumCountMapSuppression",
@@ -25224,9 +24408,7 @@
         "rationale": "Conversion returns reasoned dropped-row counts instead of silently filtering invalid coordinates."
       }
     ],
-    "proposalSources": [
-      "architecture:coordinate-quality-triage"
-    ],
+    "proposalSources": ["architecture:coordinate-quality-triage"],
     "status": "planned",
     "number": 143,
     "componentName": "CoordinateQualityTriage",
@@ -25385,9 +24567,7 @@
         "rationale": "CRS reprojection is required before incompatible spatial coordinates can be combined."
       }
     ],
-    "proposalSources": [
-      "architecture:coordinate-frame-registration"
-    ],
+    "proposalSources": ["architecture:coordinate-frame-registration"],
     "status": "planned",
     "number": 144,
     "componentName": "CoordinateFrameRegistration",
@@ -25415,30 +24595,12 @@
         "name": "vertices",
         "type": "Array<[number,number]> ",
         "default": [
-          [
-            10,
-            50
-          ],
-          [
-            25,
-            53
-          ],
-          [
-            40,
-            49
-          ],
-          [
-            55,
-            72
-          ],
-          [
-            70,
-            50
-          ],
-          [
-            90,
-            52
-          ]
+          [10, 50],
+          [25, 53],
+          [40, 49],
+          [55, 72],
+          [70, 50],
+          [90, 52]
         ],
         "control": "collection",
         "description": "Ordered open-polyline vertices in a normalized plane.",
@@ -25491,30 +24653,12 @@
       "shortSourceText": "Simplify the six supplied line vertices with a six-unit Douglas-Peucker tolerance. Preserve endpoints and show how removed vertices relate to the retained segments.",
       "inputBindings": {
         "vertices": [
-          [
-            10,
-            50
-          ],
-          [
-            25,
-            53
-          ],
-          [
-            40,
-            49
-          ],
-          [
-            55,
-            72
-          ],
-          [
-            70,
-            50
-          ],
-          [
-            90,
-            52
-          ]
+          [10, 50],
+          [25, 53],
+          [40, 49],
+          [55, 72],
+          [70, 50],
+          [90, 52]
         ],
         "tolerance": 6,
         "labels": {
@@ -25550,9 +24694,7 @@
         "rationale": "The design calls for zoom-based simplification to bound geometry detail."
       }
     ],
-    "proposalSources": [
-      "architecture:geometry-detail-budget"
-    ],
+    "proposalSources": ["architecture:geometry-detail-budget"],
     "status": "planned",
     "number": 145,
     "componentName": "GeometryDetailBudget",
@@ -25743,9 +24885,7 @@
         "rationale": "Travel-time catchments use an origin, mode and explicit durations and are saved as reproducible snapshots."
       }
     ],
-    "proposalSources": [
-      "architecture:travel-time-network-frontier"
-    ],
+    "proposalSources": ["architecture:travel-time-network-frontier"],
     "status": "planned",
     "number": 146,
     "componentName": "TravelTimeNetworkFrontier",
@@ -25890,9 +25030,7 @@
         "rationale": "Sensitivity policy includes jitter/centroid displacement separately from aggregate-only release."
       }
     ],
-    "proposalSources": [
-      "architecture:bounded-location-displacement"
-    ],
+    "proposalSources": ["architecture:bounded-location-displacement"],
     "status": "planned",
     "number": 147,
     "componentName": "BoundedLocationDisplacement",
@@ -25907,12 +25045,7 @@
       "Explain how a heatmap radius changes smoothing",
       "Distinguish modeled intensity from observed cell counts"
     ],
-    "tags": [
-      "heatmap",
-      "kernel",
-      "smoothing radius",
-      "intensity surface"
-    ],
+    "tags": ["heatmap", "kernel", "smoothing radius", "intensity surface"],
     "intent": "Expose smoothing assumptions without presenting intensity as observed counts.",
     "family": "Spatial smoothing",
     "inputs": [
@@ -26048,9 +25181,7 @@
         "rationale": "Heatmap symbology has a weight, radius and ramp, distinct from clustering and binning."
       }
     ],
-    "proposalSources": [
-      "architecture:kernel-density-spread"
-    ],
+    "proposalSources": ["architecture:kernel-density-spread"],
     "status": "planned",
     "number": 148,
     "componentName": "KernelDensitySpread",
@@ -26065,12 +25196,7 @@
       "Explain straight-line distance buffers",
       "Distinguish distance inclusion from actual service access"
     ],
-    "tags": [
-      "buffer",
-      "Euclidean distance",
-      "radius",
-      "spatial selection"
-    ],
+    "tags": ["buffer", "Euclidean distance", "radius", "spatial selection"],
     "intent": "Define straight-line spatial inclusion without implying travel access.",
     "family": "Geometric distance buffering",
     "inputs": [
@@ -26216,9 +25342,7 @@
         "rationale": "Buffer and distance analysis are explicit geometric operations, distinct from travel-time isochrones."
       }
     ],
-    "proposalSources": [
-      "architecture:distance-buffer-envelope"
-    ],
+    "proposalSources": ["architecture:distance-buffer-envelope"],
     "status": "planned",
     "number": 149,
     "componentName": "DistanceBufferEnvelope",
@@ -26246,12 +25370,7 @@
       {
         "name": "values",
         "type": "Array<string>",
-        "default": [
-          "12",
-          "8",
-          "4",
-          "Pending"
-        ],
+        "default": ["12", "8", "4", "Pending"],
         "control": "collection",
         "description": "Complete source strings in order.",
         "constraints": "3..6 strings 1..16 characters; first 2..5 must be finite decimal numeric strings; final must be nonnumeric; no null ambiguity in this preset."
@@ -26302,12 +25421,7 @@
     "bindingExample": {
       "shortSourceText": "A column begins 12, 8 and 4, then contains Pending. Widen the proposed numeric type to text while preserving all four original strings.",
       "inputBindings": {
-        "values": [
-          "12",
-          "8",
-          "4",
-          "Pending"
-        ],
+        "values": ["12", "8", "4", "Pending"],
         "policy": "widen-to-text",
         "labels": {
           "column": "Fictional item value",
@@ -26342,9 +25456,7 @@
         "rationale": "The fixture tests a late prose value after numeric rows to prevent aborted imports or dropped rows."
       }
     ],
-    "proposalSources": [
-      "architecture:late-type-evidence"
-    ],
+    "proposalSources": ["architecture:late-type-evidence"],
     "status": "planned",
     "number": 150,
     "componentName": "LateTypeEvidence",

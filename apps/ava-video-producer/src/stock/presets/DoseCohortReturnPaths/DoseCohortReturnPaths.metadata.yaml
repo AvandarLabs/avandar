@@ -3,7 +3,8 @@ name:
   message: The same cohort returns
 description:
   id: motionAtlas.dose-cohort-return-paths.description
-  message: Keep the same people visible as a fictional multi-dose cohort returns for
+  message:
+    Keep the same people visible as a fictional multi-dose cohort returns for
     successive recorded visits. Missed and unobserved visits leave visible gaps instead
     of removing people from the denominator.
 category:
@@ -11,28 +12,33 @@ category:
   message: People over repeated visits
 useWhen:
   id: motionAtlas.dose-cohort-return-paths.useWhen
-  message: Show who returned across visits without silently changing the population being
+  message:
+    Show who returned across visits without silently changing the population being
     compared.
 intent:
   id: motionAtlas.dose-cohort-return-paths.intent
-  message: Show who returned across visits without silently changing the population being
+  message:
+    Show who returned across visits without silently changing the population being
     compared.
 creativeDirection:
   id: motionAtlas.dose-cohort-return-paths.creativeDirection
-  message: "Introduce the supplied cohort at the first visit arch. Slide later visit
+  message:
+    "Introduce the supplied cohort at the first visit arch. Slide later visit
     arches across the same identity lanes: a person enters an arch only when that visit
     is recorded, while missed, not-yet-due and unknown marks remain distinct. Hold the
     attendance fabric with separate visit numerators over one fixed cohort denominator
     before the opaque exit."
 distinction:
   id: motionAtlas.dose-cohort-return-paths.distinction
-  message: Unlike dot-matrix or status-cycle, each person retains identity across multiple
+  message:
+    Unlike dot-matrix or status-cycle, each person retains identity across multiple
     visit gates, and missing observations stay spatially visible. Unlike
     missed-visit-reconnect, this compares the entire baseline cohort rather than the
     work of following up an already missed group.
 prompt:
   id: motionAtlas.dose-cohort-return-paths.prompt
-  message: Use The same cohort returns (dose-cohort-return-paths) for a fictional or
+  message:
+    Use The same cohort returns (dose-cohort-return-paths) for a fictional or
     approved authored example. Show who returned across visits without silently changing
     the population being compared.
 tags:
@@ -71,17 +77,21 @@ aliases:
     message: return visits
 notFor:
   - id: motionAtlas.dose-cohort-return-paths.notFor.0
-    message: The fixed baseline denominator is participants.length. Each per-visit recorded
+    message:
+      The fixed baseline denominator is participants.length. Each per-visit recorded
       numerator counts participant records with that visit marked recorded; no
       population coverage or protection percentage is inferred.
   - id: motionAtlas.dose-cohort-return-paths.notFor.1
-    message: Missing, missed, and not-yet-due are different supplied states. They are never
+    message:
+      Missing, missed, and not-yet-due are different supplied states. They are never
       auto-converted into clinical noncompliance or a recommendation.
   - id: motionAtlas.dose-cohort-return-paths.notFor.2
-    message: Visit order is ordinal only. No elapsed time, vaccine name, interval, dose
+    message:
+      Visit order is ordinal only. No elapsed time, vaccine name, interval, dose
       schedule, eligibility, or catch-up dosing advice is supplied.
   - id: motionAtlas.dose-cohort-return-paths.notFor.3
-    message: Each participant occupies one lane throughout; a returning participant is not a
+    message:
+      Each participant occupies one lane throughout; a returning participant is not a
       newly added person. Arrays, not independent totals, own all counts.
 motionBeats:
   - startFrame: 12
@@ -93,7 +103,8 @@ motionBeats:
     endFrame: 115
     description:
       id: motionAtlas.dose-cohort-return-paths.motionBeats.1
-      message: "Introduce the supplied cohort at the first visit arch. Slide later visit
+      message:
+        "Introduce the supplied cohort at the first visit arch. Slide later visit
         arches across the same identity lanes: a person enters an arch only when that
         visit is recorded, while missed, not-yet-due and unknown marks remain distinct.
         Hold the attendance fabric with separate visit numerators over one fixed cohort

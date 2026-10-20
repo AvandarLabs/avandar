@@ -172,18 +172,16 @@ test("land remains finite and bounded at antimeridian, tilted and polar views af
     assert.ok(path);
     _bounded(path);
   });
-  [...centers]
-    .reverse()
-    .forEach(([centerLongitude, centerLatitude], index) =>
-      assert.equal(
-        GlobeProjection.getLandPathFromView({
-          ...VIEW,
-          centerLongitude,
-          centerLatitude,
-        }),
-        paths[paths.length - index - 1],
-      ),
-    );
+  [...centers].reverse().forEach(([centerLongitude, centerLatitude], index) =>
+    assert.equal(
+      GlobeProjection.getLandPathFromView({
+        ...VIEW,
+        centerLongitude,
+        centerLatitude,
+      }),
+      paths[paths.length - index - 1],
+    ),
+  );
   assert.equal(
     GlobeProjection.getLandPathFromView({ ...VIEW, centerLongitude: 360 }),
     paths[0],

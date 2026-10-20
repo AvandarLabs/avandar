@@ -3,7 +3,8 @@ name:
   message: Take shared resources in one order
 description:
   id: motionAtlas.ordered-lock-acquisition.description
-  message: Two operations request the same resource pair in opposite authored orders. Both
+  message:
+    Two operations request the same resource pair in opposite authored orders. Both
     reorder their requests to one common sequence so the second waits without holding
     the later resource.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Show how one resource order removes a circular-wait pattern.
 creativeDirection:
   id: motionAtlas.ordered-lock-acquisition.creativeDirection
-  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-52 show each operation reaching for its first
     requested key and a potential crossed dependency. Before any lock is granted, frames
     53-90 sort both request strips identically. Frames 91-139 let the first operation
@@ -29,7 +31,8 @@ intent:
   message: Show how one resource order removes a circular-wait pattern.
 distinction:
   id: motionAtlas.ordered-lock-acquisition.distinction
-  message: Unlike queue-relief, capacity does not increase. Unlike expiring-lease, there
+  message:
+    Unlike queue-relief, capacity does not increase. Unlike expiring-lease, there
     is no timer; a global resource order prevents the illustrated circular wait.
 tags:
   - id: motionAtlas.ordered-lock-acquisition.tags.0
@@ -53,22 +56,27 @@ aliases:
     message: ordered lock acquisition
 notFor:
   - id: motionAtlas.ordered-lock-acquisition.notFor.0
-    message: Illustrates ordered locking, not a proof of fairness, throughput or freedom
+    message:
+      Illustrates ordered locking, not a proof of fairness, throughput or freedom
       from every deadlock.
   - id: motionAtlas.ordered-lock-acquisition.notFor.1
     message: No two operations hold the same exclusive resource simultaneously.
   - id: motionAtlas.ordered-lock-acquisition.notFor.2
-    message: The initial crossed arrows depict a potential deadlock, not an already-held
+    message:
+      The initial crossed arrows depict a potential deadlock, not an already-held
       state that can be fixed by renaming.
   - id: motionAtlas.ordered-lock-acquisition.notFor.3
-    message: No real product screen, external fetch, supplied code execution, or measured
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
       performance claim. All text is authored; no JSX, functions or URLs in props.
   - id: motionAtlas.ordered-lock-acquisition.notFor.4
-    message: Supplied prose is preserved. Fictional framing, source completeness and
+    message:
+      Supplied prose is preserved. Fictional framing, source completeness and
       agreement between labels and structured state are author responsibilities. Runtime
       validation enforces structural bounds and exact cross-field rules.
   - id: motionAtlas.ordered-lock-acquisition.notFor.5
-    message: Literal IDs and row values preserve exact whitespace using visible whitespace
+    message:
+      Literal IDs and row values preserve exact whitespace using visible whitespace
       marks at a fixed readable size.
 motionBeats:
   - startFrame: 13

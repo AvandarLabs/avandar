@@ -1,5 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { getSpineContributionFromFrame } from "./getSpineContributionFromFrame";
 import type { Input } from "./EntitySpineAssembly.schema";

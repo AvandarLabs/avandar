@@ -18,11 +18,13 @@ tags:
     message: command
 useWhen:
   id: motionAtlas.terminal-type.useWhen
-  message: Present an illustrative command sequence; substitute a real command when
+  message:
+    Present an illustrative command sequence; substitute a real command when
     teaching usage.
 prompt:
   id: motionAtlas.terminal-type.prompt
-  message: Use Motion Atlas "Terminal typing" (terminal-type) as a conceptual graphic.
+  message:
+    Use Motion Atlas "Terminal typing" (terminal-type) as a conceptual graphic.
     Present an illustrative command sequence; substitute a real command when teaching
     usage. Keep the restrained motion and readable labels; replace sample content with
     approved facts before making product claims.
@@ -31,11 +33,13 @@ creativeDirection:
   message: A command types, executes, and reveals its response.
 goodFor:
   - id: motionAtlas.terminal-type.goodFor.0
-    message: Present an illustrative command sequence; substitute a real command when
+    message:
+      Present an illustrative command sequence; substitute a real command when
       teaching usage.
 intent:
   id: motionAtlas.terminal-type.intent
-  message: Present an illustrative command sequence; substitute a real command when
+  message:
+    Present an illustrative command sequence; substitute a real command when
     teaching usage.
 domains:
   - id: motionAtlas.terminal-type.domains.0
@@ -51,7 +55,8 @@ aliases:
     message: command
 notFor:
   - id: motionAtlas.terminal-type.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

@@ -3,7 +3,8 @@ name:
   message: Choose one branch
 description:
   id: motionAtlas.decision-fork.description
-  message: One explicit decision opens into a small number of labeled alternatives. An
+  message:
+    One explicit decision opens into a small number of labeled alternatives. An
     authored choice closes the unused gates and carries one marker to the selected
     outcome.
 category:
@@ -43,13 +44,15 @@ useWhen:
   message: Show one chosen path and the condition that selects it.
 prompt:
   id: motionAtlas.decision-fork.prompt
-  message: Use Motion Atlas "Choose one branch" (decision-fork) as a conceptual graphic.
+  message:
+    Use Motion Atlas "Choose one branch" (decision-fork) as a conceptual graphic.
     Show one chosen path and the condition that selects it. Keep the restrained motion
     and readable labels; replace sample content with approved facts before making
     product claims.
 creativeDirection:
   id: motionAtlas.decision-fork.creativeDirection
-  message: The decision prompt enters at the root and two to four equal branches draw
+  message:
+    The decision prompt enters at the root and two to four equal branches draw
     outward with condition labels. A single marker pauses at the junction while the
     selected condition receives emphasis. The unused branch gates close gently, the
     marker travels down the chosen branch, and its outcome opens into a final hold while
@@ -92,37 +95,44 @@ notFor:
   - id: motionAtlas.decision-fork.notFor.2
     message: Branch lengths and angles do not encode probability, duration, or preference.
   - id: motionAtlas.decision-fork.notFor.3
-    message: An authored branch is not a cost optimizer, legal eligibility assessment, or
+    message:
+      An authored branch is not a cost optimizer, legal eligibility assessment, or
       automatic classifier. No sector, intent, affordability, or trustworthiness may be
       inferred from dataset names or descriptive text.
   - id: motionAtlas.decision-fork.notFor.4
-    message: If illustrating execution placement, retain the stated feasibility and
+    message:
+      If illustrating execution placement, retain the stated feasibility and
       data-boundary conditions. Do not imply that every task can run on either side.
   - id: motionAtlas.decision-fork.notFor.5
-    message: Branch conditions and moral priorities are authored. The animation neither
+    message:
+      Branch conditions and moral priorities are authored. The animation neither
       determines ethical correctness nor infers absence of harm.
 motionBeats:
   - startFrame: 12
     endFrame: 35
     description:
       id: motionAtlas.decision-fork.motionBeats.0
-      message: The decision prompt enters at the root and two to four equal branches draw
+      message:
+        The decision prompt enters at the root and two to four equal branches draw
         outward with condition labels.
   - startFrame: 36
     endFrame: 119
     description:
       id: motionAtlas.decision-fork.motionBeats.1
-      message: A single marker pauses at the junction while the selected condition receives
+      message:
+        A single marker pauses at the junction while the selected condition receives
         emphasis. The unused branch gates close gently, the marker travels down the
         chosen branch.
   - startFrame: 120
     endFrame: 167
     description:
       id: motionAtlas.decision-fork.motionBeats.2
-      message: Its outcome opens into a final hold while alternate outcomes remain subdued and
+      message:
+        Its outcome opens into a final hold while alternate outcomes remain subdued and
         labeled.
 distinction:
   id: motionAtlas.decision-fork.distinction
-  message: Unlike node-traversal, this exposes the decision conditions and explicitly
+  message:
+    Unlike node-traversal, this exposes the decision conditions and explicitly
     closes untaken branches. It is a bounded choice at one junction, not a tour of
     arbitrary graph connectivity.

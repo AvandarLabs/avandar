@@ -3,7 +3,8 @@ name:
   message: From reasons to conclusion
 description:
   id: motionAtlas.argument-bridge.description
-  message: A few authored premises form a visible support beneath one conclusion. The
+  message:
+    A few authored premises form a visible support beneath one conclusion. The
     connecting language states whether they support, require, or merely suggest the
     conclusion.
 category:
@@ -14,12 +15,14 @@ useWhen:
   message: Show which stated reasons support an authored conclusion.
 prompt:
   id: motionAtlas.argument-bridge.prompt
-  message: Use Motion Atlas "From reasons to conclusion" (argument-bridge) as a conceptual
+  message:
+    Use Motion Atlas "From reasons to conclusion" (argument-bridge) as a conceptual
     graphic. Show which stated reasons support an authored conclusion. Replace fictional
     sample content with approved authored content before making product claims.
 creativeDirection:
   id: motionAtlas.argument-bridge.creativeDirection
-  message: Two or three premise strips arrive separately along the lower third. Their ends
+  message:
+    Two or three premise strips arrive separately along the lower third. Their ends
     extend and join into a single bridge deck, with a central connector label appearing
     only once the premises are readable. The conclusion rises onto that deck and holds
     above all visible premises. Nothing is transported through the bridge; it is an
@@ -29,7 +32,8 @@ intent:
   message: Show which stated reasons support an authored conclusion.
 distinction:
   id: motionAtlas.argument-bridge.distinction
-  message: Unlike source-merge, premises remain separate and readable as reasons rather
+  message:
+    Unlike source-merge, premises remain separate and readable as reasons rather
     than moving as data into a destination. The deck and relationship text distinguish
     logical support from transport or aggregation.
 tags:
@@ -87,7 +91,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.argument-bridge.motionBeats.1
-      message: Two or three premise strips arrive separately along the lower third. Their ends
+      message:
+        Two or three premise strips arrive separately along the lower third. Their ends
         extend and join into a single bridge deck, with a central connector label
         appearing only once the premises are readable. The conclusion rises onto that
         deck and holds above all visible premises. Nothing is transported through the

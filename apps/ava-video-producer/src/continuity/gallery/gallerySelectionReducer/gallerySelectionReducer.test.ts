@@ -101,9 +101,9 @@ test("vocabulary links resolve to full films and controls name actual beat schem
     ),
     ...continuityBeatSchema.shape.content.options.flatMap((variant) =>
       "diagrams" in variant.shape
-        ? variant.shape.diagrams.element.keyof().options.map(
-            (key) => `beats[].content.diagrams[].${key}`,
-          )
+        ? variant.shape.diagrams.element
+            .keyof()
+            .options.map((key) => `beats[].content.diagrams[].${key}`)
         : [],
     ),
   ]);

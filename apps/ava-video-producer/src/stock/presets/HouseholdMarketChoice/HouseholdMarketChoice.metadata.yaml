@@ -3,7 +3,8 @@ name:
   message: A household chooses its basket
 description:
   id: motionAtlas.household-market-choice.description
-  message: A household shopper chooses goods from a small market shelf and pays with
+  message:
+    A household shopper chooses goods from a small market shelf and pays with
     fictional cash assistance or a voucher. The scene connects assistance to an authored
     choice instead of prescribing the same package for everyone.
 category:
@@ -17,7 +18,8 @@ intent:
   message: Show that assistance can support a household making its own purchase choices.
 creativeDirection:
   id: motionAtlas.household-market-choice.creativeDirection
-  message: Reveal a shelf of configurable products and a shopper holding the chosen tender
+  message:
+    Reveal a shelf of configurable products and a shopper holding the chosen tender
     within six seconds. The shopper considers the shelf, reaches only for products
     marked chosen, and places those items into their own basket while the other options
     stay available. At the counter, move the cash or voucher to the retailer and show
@@ -25,12 +27,14 @@ creativeDirection:
     shopper. Hold the chosen basket, then use the shared opaque exit fade.
 distinction:
   id: motionAtlas.household-market-choice.distinction
-  message: The distinguishing action is an actor choosing among physical shelf goods and
+  message:
+    The distinguishing action is an actor choosing among physical shelf goods and
     completing a purchase. This is neither source-merge nor metric-counter; the
     arithmetic supports the visible choice and does not become the hero motion.
 prompt:
   id: motionAtlas.household-market-choice.prompt
-  message: A household chooses its basket. Show that assistance can support a household
+  message:
+    A household chooses its basket. Show that assistance can support a household
     making its own purchase choices.
 tags:
   - id: motionAtlas.household-market-choice.tags.0
@@ -68,16 +72,20 @@ aliases:
     message: household choice
 notFor:
   - id: motionAtlas.household-market-choice.notFor.0
-    message: All prices and balances are small fictional values in demo credits, never real
+    message:
+      All prices and balances are small fictional values in demo credits, never real
       currency or current market information.
   - id: motionAtlas.household-market-choice.notFor.1
-    message: No nutritional, financial, or program eligibility recommendation is implied by
+    message:
+      No nutritional, financial, or program eligibility recommendation is implied by
       the selected basket.
   - id: motionAtlas.household-market-choice.notFor.2
-    message: The scene assumes the authored goods are available and the authored tender is
+    message:
+      The scene assumes the authored goods are available and the authored tender is
       accepted; it does not establish real program rules.
   - id: motionAtlas.household-market-choice.notFor.3
-    message: One shopper represents the example household role, not household size or a
+    message:
+      One shopper represents the example household role, not household size or a
       reported beneficiary count.
 motionBeats:
   - startFrame: 12
@@ -94,7 +102,8 @@ motionBeats:
     endFrame: 126
     description:
       id: motionAtlas.household-market-choice.motionBeats.2
-      message: Move the chosen tender to the retailer and retain the exact remaining balance
+      message:
+        Move the chosen tender to the retailer and retain the exact remaining balance
         with the household.
   - startFrame: 127
     endFrame: 167

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { propNotEq, prop, propEq  } from "@avandar/utils";
+import { propNotEq, prop, propEq } from "@avandar/utils";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { SvgPaintAssertions } from "../../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
 import { DEFAULT_INPUT, fixtures } from "../DistanceBufferEnvelope.fixtures";

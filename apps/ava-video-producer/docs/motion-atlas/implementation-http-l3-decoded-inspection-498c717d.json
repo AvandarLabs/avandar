@@ -524,88 +524,58 @@
   "viewedFiles": [
     {
       "phase": "entrance",
-      "window": [
-        0.6,
-        1.3
-      ],
+      "window": [0.6, 1.3],
       "before": 0.616173,
       "after": 0.706436,
       "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/entrance.png",
       "sha256": "a3e723797e26adee764e2ec1783f73c8c7442ea10444eddfe0527dde5895e10f",
       "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/entrance.png",
       "personallyViewedBy": "root",
-      "nativeSize": [
-        1280,
-        800
-      ]
+      "nativeSize": [1280, 800]
     },
     {
       "phase": "action-early",
-      "window": [
-        2.8,
-        3.4
-      ],
+      "window": [2.8, 3.4],
       "before": 2.81768,
       "after": 2.901897,
       "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/action-early.png",
       "sha256": "6328b4f5a6d68bc2c78249c872a9e0a76e16c6f84d830f73a1ec50394f7b3c8d",
       "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/action-early.png",
       "personallyViewedBy": "root",
-      "nativeSize": [
-        1280,
-        800
-      ]
+      "nativeSize": [1280, 800]
     },
     {
       "phase": "action-late",
-      "window": [
-        4,
-        4.6
-      ],
+      "window": [4, 4.6],
       "before": 4.015386,
       "after": 4.100239,
       "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/action-late.png",
       "sha256": "59a16e01b18303473d3c4d074a0779289565d11cf7381da2c861a2f65e5c98ba",
       "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/action-late.png",
       "personallyViewedBy": "root",
-      "nativeSize": [
-        1280,
-        800
-      ]
+      "nativeSize": [1280, 800]
     },
     {
       "phase": "hold",
-      "window": [
-        4.8,
-        5.5
-      ],
+      "window": [4.8, 5.5],
       "before": 4.820848,
       "after": 4.901675,
       "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/hold.png",
       "sha256": "59a16e01b18303473d3c4d074a0779289565d11cf7381da2c861a2f65e5c98ba",
       "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/hold.png",
       "personallyViewedBy": "root",
-      "nativeSize": [
-        1280,
-        800
-      ]
+      "nativeSize": [1280, 800]
     },
     {
       "phase": "seam",
-      "window": [
-        5.8,
-        6
-      ],
+      "window": [5.8, 6],
       "before": 5.815683,
       "after": 5.901126,
       "filename": "/Users/juanpablosarmiento/src/avandar/.playwright-mcp/motion-catalog-2ad04707/final-mp4/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/configured-l3/4889cd0aafba9cb199d403c0877d90c03e3efec6b02777e0a51814c76e315e47/seam.png",
       "sha256": "a859b261184db6001d96acbf75c25b90716572ddf4b5cee0c51079926079aba3",
       "mirror": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-mp4-review/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/498c717d53240d15a29396830759a571a938f492/final-mp4-http-000/seam.png",
       "personallyViewedBy": "root",
-      "nativeSize": [
-        1280,
-        800
-      ]
+      "nativeSize": [1280, 800]
     }
   ],
   "observations": [

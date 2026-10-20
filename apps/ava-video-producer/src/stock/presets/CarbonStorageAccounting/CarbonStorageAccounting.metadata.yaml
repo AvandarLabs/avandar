@@ -3,7 +3,8 @@ name:
   message: Account for captured carbon
 description:
   id: motionAtlas.carbon-storage-accounting.description
-  message: A cutaway follows atmospheric CO2 into storage while separately accounting for
+  message:
+    A cutaway follows atmospheric CO2 into storage while separately accounting for
     releases and operating emissions. The retained mass and the net accounting result
     remain visibly different quantities.
 category:
@@ -17,7 +18,8 @@ intent:
   message: Show exactly what is counted before presenting a carbon removal total.
 creativeDirection:
   id: motionAtlas.carbon-storage-accounting.creativeDirection
-  message: Reveal an air boundary, capture unit and underground vessel. At the operator
+  message:
+    Reveal an air boundary, capture unit and underground vessel. At the operator
     cue, divide the supplied captured-carbon ribbon into retained and released portions
     while a separate operating-emissions ribbon enters the accounting bracket. Hold the
     explicit retained-minus-operating-emissions calculation, including a negative result
@@ -25,12 +27,14 @@ creativeDirection:
     screen.
 distinction:
   id: motionAtlas.carbon-storage-accounting.distinction
-  message: Uses a split physical mass stream, a visible storage boundary and a separate
+  message:
+    Uses a split physical mass stream, a visible storage boundary and a separate
     emissions subtraction. It is neither a renamed data pipeline nor a standalone metric
     counter.
 prompt:
   id: motionAtlas.carbon-storage-accounting.prompt
-  message: Account for captured carbon. Show exactly what is counted before presenting a
+  message:
+    Account for captured carbon. Show exactly what is counted before presenting a
     carbon removal total.
 tags:
   - id: motionAtlas.carbon-storage-accounting.tags.0
@@ -68,14 +72,17 @@ aliases:
     message: carbon storage
 notFor:
   - id: motionAtlas.carbon-storage-accounting.notFor.0
-    message: Retained CO2 = captured CO2 - released CO2. Net result = retained CO2 expressed
+    message:
+      Retained CO2 = captured CO2 - released CO2. Net result = retained CO2 expressed
       as CO2e - summed operating emissions. CO2 has a conversion factor of one here; no
       other captured gas is modeled.
   - id: motionAtlas.carbon-storage-accounting.notFor.1
-    message: Storage beyond the named reporting period, additionality, displacement and
+    message:
+      Storage beyond the named reporting period, additionality, displacement and
       verification are not inferred. A positive balance is not a durability certificate.
   - id: motionAtlas.carbon-storage-accounting.notFor.2
-    message: All defaults are fictional. The six-second motion compresses one supplied
+    message:
+      All defaults are fictional. The six-second motion compresses one supplied
       reporting period and is not a capture-rate simulation.
 motionBeats:
   - startFrame: 12

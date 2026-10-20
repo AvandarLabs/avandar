@@ -1,10 +1,13 @@
-import { continuityAppearanceSchema, createContinuityPlanFromOptions } from "../../../src/continuity/continuityAppearance";
-import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { z } from "zod";
+import {
+  continuityAppearanceSchema,
+  createContinuityPlanFromOptions,
+} from "../../../src/continuity/continuityAppearance";
+import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import {
   storyboardSchema,
   durationInFrames,
@@ -71,7 +74,9 @@ const optionsSchema = z
   .object({
     captions: z.boolean().optional(),
     cameraMotion: z.boolean().optional(),
-    cameraPreset: continuityAppearanceSchema.shape.cameraPreset.unwrap().optional(),
+    cameraPreset: continuityAppearanceSchema.shape.cameraPreset
+      .unwrap()
+      .optional(),
     motionBlur: z.boolean().optional(),
     annotations: z.boolean().optional(),
     annotationRoughness: z.number().min(0).max(3).optional(),
@@ -173,7 +178,9 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   const plan = storyboardSchema.parse(
     JSON.parse(await fs.readFile(path.join(appRoot, source), "utf8")),
   );
-  const configuredPlan = continuity ? createContinuityPlanFromOptions(plan, options) : plan;
+  const configuredPlan = continuity
+    ? createContinuityPlanFromOptions(plan, options)
+    : plan;
   return {
     ...base,
     kind: "storyboard",

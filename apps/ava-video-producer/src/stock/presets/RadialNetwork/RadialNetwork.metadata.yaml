@@ -21,7 +21,8 @@ useWhen:
   message: Explain a shared workspace, central service, or coordination point.
 prompt:
   id: motionAtlas.radial-network.prompt
-  message: Use Motion Atlas "Hub & spokes" (radial-network) as a conceptual graphic.
+  message:
+    Use Motion Atlas "Hub & spokes" (radial-network) as a conceptual graphic.
     Explain a shared workspace, central service, or coordination point. Keep the
     restrained motion and readable labels; replace sample content with approved facts
     before making product claims.
@@ -48,7 +49,8 @@ aliases:
     message: sync
 notFor:
   - id: motionAtlas.radial-network.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

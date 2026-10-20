@@ -1,5 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { useMemo } from "react";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { getJobPlacementFromPlanAndFrame } from "./getJobPlacementFromPlanAndFrame";
 import { makeJobTransfersFromInput } from "./makeJobTransfersFromInput";

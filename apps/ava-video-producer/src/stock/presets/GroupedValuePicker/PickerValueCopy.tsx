@@ -1,5 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { getPickerCopyFromFrame } from "./getPickerCopyFromFrame";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";

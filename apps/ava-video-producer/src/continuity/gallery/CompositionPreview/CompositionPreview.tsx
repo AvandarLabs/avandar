@@ -1,9 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { useExpandedPreview } from "./useExpandedPreview";
-import { CompositionPreviewHeader } from "./CompositionPreviewHeader";
-import { CompositionViewer } from "../CompositionViewer/CompositionViewer";
 import { usePreviewKeys } from "../../../gallery/MotionGallery/usePreviewKeys";
+import { CompositionViewer } from "../CompositionViewer/CompositionViewer";
 import css from "./CompositionPreview.module.css";
+import { CompositionPreviewHeader } from "./CompositionPreviewHeader";
+import { useExpandedPreview } from "./useExpandedPreview";
 import type { ComponentProps } from "react";
 
 type Props = ComponentProps<typeof CompositionViewer> & {

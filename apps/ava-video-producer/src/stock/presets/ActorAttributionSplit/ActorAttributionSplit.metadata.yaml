@@ -3,7 +3,8 @@ name:
   message: Separate accounts preserve separate attribution
 description:
   id: motionAtlas.actor-attribution-split.description
-  message: Two fictional collaborators first stamp events with one shared account label.
+  message:
+    Two fictional collaborators first stamp events with one shared account label.
     After choosing distinct accounts, their later events receive distinct account stamps
     while the historical shared-account events retain their limited attribution.
 category:
@@ -17,7 +18,8 @@ intent:
   message: Show what separate account identities make distinguishable in future records.
 creativeDirection:
   id: motionAtlas.actor-attribution-split.creativeDirection
-  message: Frames 0-11 reveal two collaborators, one shared stamp, and an empty event
+  message:
+    Frames 0-11 reveal two collaborators, one shared stamp, and an empty event
     ledger. Frames 12-60 let each collaborator stamp one authored historical event with
     that same account mark. Frames 61-95 move the shared stamp aside and place the
     supplied distinct account stamps beside the collaborators. Frames 96-140 stamp the
@@ -28,13 +30,15 @@ creativeDirection:
     authentication occurs.
 distinction:
   id: motionAtlas.actor-attribution-split.distinction
-  message: Unlike contribution-weave, this explicitly contrasts indistinguishable recorded
+  message:
+    Unlike contribution-weave, this explicitly contrasts indistinguishable recorded
     accounts with distinguishable later accounts and retains the historical limitation.
     Unlike journal-receipts, the changing information is account attribution rather than
     receipt status. No old event is assigned a newly inferred human author.
 prompt:
   id: motionAtlas.actor-attribution-split.prompt
-  message: Two fictional collaborators first stamp events with one shared account label.
+  message:
+    Two fictional collaborators first stamp events with one shared account label.
     After choosing distinct accounts, their later events receive distinct account stamps
     while the historical shared-account events retain their limited attribution.
 tags:
@@ -71,24 +75,30 @@ aliases:
     message: shared account
 notFor:
   - id: motionAtlas.actor-attribution-split.notFor.0
-    message: Account attribution is one illustrative collaboration benefit. This scene does
+    message:
+      Account attribution is one illustrative collaboration benefit. This scene does
       not claim a particular product implementation or prescribe punitive
       account-sharing restrictions.
   - id: motionAtlas.actor-attribution-split.notFor.1
-    message: An account label is not proof of a real person, consent, authorization, legal
+    message:
+      An account label is not proof of a real person, consent, authorization, legal
       signature, or secure identity. No credential or permission mechanism is modeled.
   - id: motionAtlas.actor-attribution-split.notFor.2
-    message: The source authors of the fictional choreography are known to the animation,
+    message:
+      The source authors of the fictional choreography are known to the animation,
       but the shared-account ledger retains only the shared identity. Do not add
       individual attribution to earlier entries.
   - id: motionAtlas.actor-attribution-split.notFor.3
-    message: Four authored events are the entire illustrated history. No hidden total,
+    message:
+      Four authored events are the entire illustrated history. No hidden total,
       productivity comparison, or financial conversion is inferred.
   - id: motionAtlas.actor-attribution-split.notFor.4
-    message: The decision to separate accounts is authored and voluntary; the animation does
+    message:
+      The decision to separate accounts is authored and voluntary; the animation does
       not lock collaborators out or claim all collaboration problems are solved.
   - id: motionAtlas.actor-attribution-split.notFor.5
-    message: Free prose is author supplied; only structural, reference, numeric and
+    message:
+      Free prose is author supplied; only structural, reference, numeric and
       documented lexical constraints are runtime-validated.
 motionBeats:
   - startFrame: 0

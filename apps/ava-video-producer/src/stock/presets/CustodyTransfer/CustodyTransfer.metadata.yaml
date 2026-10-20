@@ -3,7 +3,8 @@ name:
   message: Release After Acceptance
 description:
   id: motionAtlas.custody-transfer.description
-  message: A work object remains supported by its current holder until the next holder
+  message:
+    A work object remains supported by its current holder until the next holder
     visibly accepts it. Acknowledgment changes responsibility before the first support
     withdraws.
 category:
@@ -11,15 +12,18 @@ category:
   message: Custody and responsibility
 useWhen:
   id: motionAtlas.custody-transfer.useWhen
-  message: Show that responsibility transfers only after the receiving party accepts the
+  message:
+    Show that responsibility transfers only after the receiving party accepts the
     handoff.
 prompt:
   id: motionAtlas.custody-transfer.prompt
-  message: Show that responsibility transfers only after the receiving party accepts the
+  message:
+    Show that responsibility transfers only after the receiving party accepts the
     handoff.
 creativeDirection:
   id: motionAtlas.custody-transfer.creativeDirection
-  message: Reveal one labeled object held by the sender's bracket. The receiving bracket
+  message:
+    Reveal one labeled object held by the sender's bracket. The receiving bracket
     approaches from the opposite side and makes contact while the sender still supports
     the object. In the accepted outcome, the recipient's acknowledgment seal lands, the
     responsibility marker crosses the shared contact zone, and only then does the sender
@@ -28,11 +32,13 @@ creativeDirection:
     six-second envelope.
 intent:
   id: motionAtlas.custody-transfer.intent
-  message: Show that responsibility transfers only after the receiving party accepts the
+  message:
+    Show that responsibility transfers only after the receiving party accepts the
     handoff.
 distinction:
   id: motionAtlas.custody-transfer.distinction
-  message: The key action is overlapping physical support with delayed release, not a task
+  message:
+    The key action is overlapping physical support with delayed release, not a task
     passing through pipeline stages. Unlike journal-receipts, there is one
     responsibility marker and custody changes only after acceptance.
 tags:
@@ -66,7 +72,8 @@ goodFor:
   - id: motionAtlas.custody-transfer.goodFor.2
     message: Show why sending work is distinct from another person taking responsibility
   - id: motionAtlas.custody-transfer.goodFor.3
-    message: Explain an explicit maintenance-responsibility handoff before a project
+    message:
+      Explain an explicit maintenance-responsibility handoff before a project
       specialist leaves
 domains:
   - id: motionAtlas.custody-transfer.domains.0
@@ -76,16 +83,20 @@ aliases:
     message: Custody and responsibility
 notFor:
   - id: motionAtlas.custody-transfer.notFor.0
-    message: Exactly one object and two holders are depicted. Temporary double support does
+    message:
+      Exactly one object and two holders are depicted. Temporary double support does
       not mean duplicate ownership.
   - id: motionAtlas.custody-transfer.notFor.1
-    message: Acceptance is authored data, not a verified signature, legal transfer, or live
+    message:
+      Acceptance is authored data, not a verified signature, legal transfer, or live
       confirmation.
   - id: motionAtlas.custody-transfer.notFor.2
-    message: This scene does not prescribe a legal chain-of-custody process or imply
+    message:
+      This scene does not prescribe a legal chain-of-custody process or imply
       real-world compliance.
   - id: motionAtlas.custody-transfer.notFor.3
-    message: Acceptance of responsibility does not prove that documentation, skills, access,
+    message:
+      Acceptance of responsibility does not prove that documentation, skills, access,
       funding, or a maintainable codebase are sufficient. A continuity story may need
       separate evidence for those prerequisites.
 motionBeats:

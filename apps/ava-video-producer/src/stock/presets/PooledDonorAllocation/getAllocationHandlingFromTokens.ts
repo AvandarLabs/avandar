@@ -1,4 +1,4 @@
-import { propEq, prop  } from "@avandar/utils";
+import { propEq, prop } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";

@@ -3,7 +3,8 @@ name:
   message: Reveal the source behind a claim
 description:
   id: motionAtlas.provenance-peelback.description
-  message: A summary statement lifts like a transparent sheet to expose the source
+  message:
+    A summary statement lifts like a transparent sheet to expose the source
     excerpts beneath it. One cited passage is aligned with the statement so its origin
     can be inspected without a network diagram.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Connect a summary to an inspectable source passage.
 creativeDirection:
   id: motionAtlas.provenance-peelback.creativeDirection
-  message: Frames 12-40 hold a summary strip resting over a short stack of source sheets.
+  message:
+    Frames 12-40 hold a summary strip resting over a short stack of source sheets.
     During frames 40-104, the summary lifts in place and the source sheets fan out with
     their text kept upright. The selected source rises, its excerpt receives a narrow
     underline, and a citation tab aligns with the summary edge. Hold the statement and
@@ -24,12 +26,14 @@ intent:
   message: Connect a summary to an inspectable source passage.
 distinction:
   id: motionAtlas.provenance-peelback.distinction
-  message: Unlike node-traversal or network-graph, lineage is conveyed by physical layers,
+  message:
+    Unlike node-traversal or network-graph, lineage is conveyed by physical layers,
     citation alignment, and readable excerpts. Unlike scan-lines, the focal action is
     exposing an already identified source.
 prompt:
   id: motionAtlas.provenance-peelback.prompt
-  message: Use Motion Atlas "Reveal the source behind a claim" (provenance-peelback) as a
+  message:
+    Use Motion Atlas "Reveal the source behind a claim" (provenance-peelback) as a
     conceptual graphic. Connect a summary to an inspectable source passage. Replace
     fictional sample content with approved authored content before making product
     claims.
@@ -91,18 +95,22 @@ notFor:
   - id: motionAtlas.provenance-peelback.notFor.0
     message: All default documents and statements are fictional.
   - id: motionAtlas.provenance-peelback.notFor.1
-    message: A citation indicates supplied attribution, not independent verification or
+    message:
+      A citation indicates supplied attribution, not independent verification or
       factual truth.
   - id: motionAtlas.provenance-peelback.notFor.2
     message: One focal source is inspected per cycle; the remaining sheets supply context.
   - id: motionAtlas.provenance-peelback.notFor.3
-    message: Source locators are literal labels, not live document links or page lookup
+    message:
+      Source locators are literal labels, not live document links or page lookup
       instructions.
   - id: motionAtlas.provenance-peelback.notFor.4
-    message: An exposed decision record makes reasoning inspectable. It does not prove that
+    message:
+      An exposed decision record makes reasoning inspectable. It does not prove that
       the decision was correct or publicly accepted.
   - id: motionAtlas.provenance-peelback.notFor.5
-    message: A source locator documents attribution, not proof that extraction or
+    message:
+      A source locator documents attribution, not proof that extraction or
       interpretation is correct.
 motionBeats:
   - startFrame: 12
@@ -114,7 +122,8 @@ motionBeats:
     endFrame: 104
     description:
       id: motionAtlas.provenance-peelback.motionBeats.1
-      message: Lift the summary, open the source sheets and align the selected passage with
+      message:
+        Lift the summary, open the source sheets and align the selected passage with
         its citation tab.
   - startFrame: 104
     endFrame: 166

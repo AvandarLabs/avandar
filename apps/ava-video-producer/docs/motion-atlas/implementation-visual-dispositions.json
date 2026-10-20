@@ -212,9 +212,7 @@
       "fixture": "dense",
       "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-050-060.json",
       "observation": {
-        "frames": [
-          90
-        ],
+        "frames": [90],
         "location": "1280x800 image, parcel1 box around x\u2248587-636,y\u2248320-370, overlapped by parcel2 beginning around x\u2248610,y\u2248351.",
         "observation": "The staggered moving stack partially covers the lower part of parcel1's number.",
         "reasonForTemporalReview": "The overlap is part of the depicted handoff and is absent at the hold. Stills cannot establish whether its duration impairs tracking through the handoff.",
@@ -230,9 +228,7 @@
       "fixture": "dense",
       "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095.json",
       "observation": {
-        "frames": [
-          90
-        ],
+        "frames": [90],
         "location": "1280x800 image, blue worker gesture line from x\u22481013,y\u2248200 toward x\u22481197,y\u2248530 across the right contact column.",
         "observation": "The action gesture crosses portions of the first and second planned-contact text.",
         "reasonForTemporalReview": "The line is associated with the depicted contact-handling gesture and disappears in the hold. Stills cannot establish whether it remains long enough to hinder reading.",
@@ -248,9 +244,7 @@
       "fixture": "dense",
       "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-085-095.json",
       "observation": {
-        "frames": [
-          90
-        ],
+        "frames": [90],
         "location": "1280x800 image, ballot box/lid around x\u2248559-720,y\u2248269-419, in the same region as the garden symbol and adjacent project labels.",
         "observation": "The unfolding box/lid overlaps the future tally row's geometry while the tally is being arranged.",
         "reasonForTemporalReview": "This appears to be purposeful transformation overlap and clears completely at the hold. Playback is needed to judge whether the object-to-tally handoff is clear.",
@@ -266,9 +260,7 @@
       "fixture": "dense",
       "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-120-130.json",
       "observation": {
-        "frames": [
-          90
-        ],
+        "frames": [90],
         "location": "Floating 100-value cards between the seven source observations and the first entity.",
         "observation": "Converging cards share the source numeric-value region during aggregation.",
         "reasonForTemporalReview": "The hold has a readable source list and correct 700 aggregate. The overlap appears purposeful; stills do not establish whether its duration harms the handoff.",
@@ -415,10 +407,7 @@
             "severity": "low",
             "category": "readability",
             "input": "nodes[0] Nexus / CENTRAL NODE, nodes[3] Gamma, edges [3,0] and [0,6]",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "Full-size 1280x800 image, vertical centerline x\u2248640. Gamma at y\u2248213-232, Nexus at y\u2248454-474 and CENTRAL NODE at y\u2248491-503.",
             "observation": "The Gamma-to-Nexus line continues through the Gamma label, and the Nexus-to-Zeta line continues behind Nexus and CENTRAL NODE. At frame90 a signal marker also sits immediately above Nexus on the same line.",
             "consequence": "The connector paint visibly bisects label areas and weakens text separation. The words are still readable, so this is a low-impact readability defect rather than missing or incorrect content."
@@ -442,10 +431,7 @@
             "severity": "low",
             "category": "readability",
             "input": "spokes[0] Input and the hub-to-Input spoke",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "Full-size 1280x800 image, x\u2248640, Input text at y\u2248203-223 between the top node and hub.",
             "observation": "The vertical connector from the top Input node to the central hub continues behind the center of the Input label in both full-size samples.",
             "consequence": "The visible connector bisects the label and reduces text separation. Input remains readable, so the impact is low."
@@ -469,10 +455,7 @@
             "severity": "low",
             "category": "readability",
             "input": "bodies[2].label GAMMA with showOrbits true",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "Full-size 1280x800 image. Frame90 GAMMA at x\u2248788-849, y\u2248178-191. Frame150 GAMMA at x\u2248670-730, y\u2248590-603.",
             "observation": "At frame90 the green orbit runs through the GAMMA text area. At frame150 the blue orbit crosses the lower part of the GAMMA text area.",
             "consequence": "Orbit paint competes with the colored satellite label and reduces separation. GAMMA remains readable, making this a low-impact readability defect."
@@ -558,10 +541,7 @@
             "severity": "low",
             "category": "readability",
             "input": "pathLabels.exception = Except when, detourSide = below",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "1280x800 full-size image, Except when at x\u2248625-747,y\u2248467-485. The orange curve crosses the word when around x\u2248710-745.",
             "observation": "The detour curve is painted directly across the right side of Except when in both full-size samples.",
             "consequence": "The route label competes with a line of the same accent color. The words remain readable, so impact is low."
@@ -576,10 +556,7 @@
             "severity": "low",
             "category": "readability",
             "input": "pathLabels.exception (18 CJK characters), detourSide below",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "1280x800 image, exception path label at x\u2248549-823,y\u2248466-514. The orange curve crosses the first line around x\u2248710-744,y\u2248466-490.",
             "observation": "The detour curve runs across the label's glyphs.",
             "consequence": "The label remains decipherable but competes with same-color route paint.",
@@ -604,9 +581,7 @@
             "severity": "medium",
             "category": "readability",
             "input": "foundationReveal = join; foundationLabel = A shared purpose; sharedPrinciple = Make the fictional route understandable",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 full-size image, opaque vertical center gap x\u2248607-673,y\u2248520-733. It intersects the foundation label at y\u2248545-563 and principle at y\u2248594-614.",
             "observation": "A dark center strip removes the middle letters of both already-visible foundation text lines while the two foundation halves are separated.",
             "consequence": "Both labels are incomplete in this action state. Frame150 resolves the obstruction, but the sampled action does not keep the shared statement readable."
@@ -621,9 +596,7 @@
             "severity": "medium",
             "category": "readability",
             "input": "foundationReveal join; maximum CJK foundationLabel and sharedPrinciple",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 image, opaque center gap x\u2248607-673,y\u2248520-733. It intersects the label at y\u2248545-564 and principle at y\u2248593-651.",
             "observation": "The gap removes the middle glyphs of the label and both principle lines while they are already visible.",
             "consequence": "The shared statement is incomplete in this action state. The hold clears the mask.",
@@ -648,9 +621,7 @@
             "severity": "low",
             "category": "readability",
             "input": "address.recipient = Example coordinator; showExteriorReference = true",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 full-size image, Example coordinator at x\u2248550-695,y\u2248392-405. The two envelope diagonals cross the lower left and lower right edges of this label.",
             "observation": "The envelope fold seams run into the lower ends of the recipient address text instead of leaving a clear label area.",
             "consequence": "The address remains decipherable, but seam paint reduces its separation from the envelope. This is a low-impact readability defect."
@@ -665,9 +636,7 @@
             "severity": "low",
             "category": "readability",
             "input": "address.sender, recipient and reference, each 28 W characters; showExteriorReference true",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 image, address lines span x\u2248412-836 at y\u2248333-346,y\u2248392-405 and y\u2248512-525. Diagonal fold seams cross portions of these lines.",
             "observation": "Both upper seams intersect the sender and recipient strings, and a lower seam intersects the reference string.",
             "consequence": "The address remains legible but its glyphs compete with envelope linework. Brief contents remain properly covered.",
@@ -692,10 +661,7 @@
             "severity": "medium",
             "category": "correctness-readability",
             "input": "categories Paper=4, Ink=7, Labels=5; treatment=both; showValueLabels=true",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "1280x800 image. At frame150, category labels begin at x\u2248458,y\u2248190/286/382. Bar centers are y\u2248245/341/437. Value labels at x\u22481173,y\u2248283/379/475.",
             "observation": "Final category labels sit roughly 55 px above their associated bar centers, while value labels sit roughly 38 px below them. Ink and 4 are on the same row, as are Labels and 7. At frame90, category labels are already above the bars, but still positioned to their left.",
             "consequence": "Although values and lengths are correct, the final alignment gives misleading category-to-value associations and weakens the intended reading improvement."
@@ -710,9 +676,7 @@
             "severity": "low",
             "category": "readability",
             "input": "headings.after = Refined presentation; treatment = both",
-            "frames": [
-              150
-            ],
+            "frames": [150],
             "location": "1280x800 full-size hold, Refined presentation at x\u224885,y\u2248145-160 and again at x\u224827,y\u2248279-294.",
             "observation": "The after-stage label is rendered twice, with the second copy in the left margin level with Ink's category label.",
             "consequence": "The duplicate introduces a stray apparent chart-row label and visual clutter in the refined presentation. Impact is lower than the category/value alignment defect."
@@ -751,10 +715,7 @@
                 }
               ]
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/fictional-conflict-globe/361699210fdd0010158b49c6f459e488675601e768442400a2a54222d55ca9fa/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/fictional-conflict-globe/361699210fdd0010158b49c6f459e488675601e768442400a2a54222d55ca9fa/still-004.jpg"
@@ -782,10 +743,7 @@
             "severity": "low",
             "category": "readability",
             "input": "copy.unit = m3",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "1280x800 full-size image, small unit text at x\u2248946-969,y\u2248520-534 on the tank's lower-right edge.",
             "observation": "The unit's left m is partly covered by the tank/background, leaving lower m-like strokes and the3 visible. This is present in the action frame and hold.",
             "consequence": "The sole small unit tag near the tank is partially unreadable. The numeric budget remains correct, so the finding is low impact."
@@ -800,11 +758,7 @@
             "classification": "readability",
             "severity": "low",
             "input": "Dense aquifer fixture uses copy.unit containing8 repeated\u754ccharacters, horizontal tank capacity2, final storage1, and all maximum-length boundary/decision/copy strings.",
-            "frames": [
-              36,
-              90,
-              150
-            ],
+            "frames": [36, 90, 150],
             "viewedFiles": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/aquifer-allocation-balance/fbbafb952939a43e162df02465b2287e824ff9b0c22c7fdef327cecaebfdc47e/still-002.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/aquifer-allocation-balance/fbbafb952939a43e162df02465b2287e824ff9b0c22c7fdef327cecaebfdc47e/still-003.jpg",
@@ -833,17 +787,10 @@
             "classification": "identity-readability",
             "severity": "medium",
             "input": {
-              "investigationCaseIds": [
-                "a",
-                "b",
-                "c"
-              ],
+              "investigationCaseIds": ["a", "b", "c"],
               "showIdentityGuides": true
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-004.jpg"
@@ -862,16 +809,7 @@
             "severity": "medium",
             "relatedDefaultReport": "default-visual-095-110.json",
             "input": {
-              "investigationCaseIds": [
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7"
-              ],
+              "investigationCaseIds": ["0", "1", "2", "3", "4", "5", "6", "7"],
               "showIdentityGuides": true,
               "casesCount": 12,
               "coincidentLocation": {
@@ -880,10 +818,7 @@
               },
               "onsetBinId": "0"
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-004.jpg"
@@ -946,10 +881,7 @@
                 }
               ]
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/ba568dbcda5c26e5f008fced2de53656b1cfcd486ca47d483fcd13543dfce025/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/ba568dbcda5c26e5f008fced2de53656b1cfcd486ca47d483fcd13543dfce025/still-004.jpg"
@@ -974,10 +906,7 @@
               },
               "minimum": 5
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/f88aaf9478ff8889f38d39e4cebf87cabb5cabdafd3be0e0d6c233efb742c57a/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/minimum-count-map-suppression/f88aaf9478ff8889f38d39e4cebf87cabb5cabdafd3be0e0d6c233efb742c57a/still-004.jpg"
@@ -1011,10 +940,7 @@
                 "unit": "kernel units"
               }
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/10772459e83cb711a9459a82d0ce2a693e9b57a1fab61afbc45b72aa2999bf85/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/10772459e83cb711a9459a82d0ce2a693e9b57a1fab61afbc45b72aa2999bf85/still-004.jpg"
@@ -1039,10 +965,7 @@
               "pointCount": 5,
               "pointWeight": 5
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/716cf3f165a52fbb62fe1c6f66a9b077f19e7dcc7977e23b1fb0d423542cb95a/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/716cf3f165a52fbb62fe1c6f66a9b077f19e7dcc7977e23b1fb0d423542cb95a/still-004.jpg"
@@ -1071,9 +994,7 @@
             "severity": "low",
             "category": "readability",
             "input": "capabilities[4] row-4, showNotes=true, focus column c",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 action image, horizontal green line y\u2248622 from x\u224872 to1210 through the fifth row. It crosses the left label, three notes and the check/dash/conditional symbols.",
             "observation": "The reveal/scan line is painted on top of the already-visible last row, cutting across glyphs instead of staying between rows.",
             "consequence": "Row text and state symbols remain decipherable but visually compete with the bright line. Frame150 clears the overlap, so this is low-impact action-state interference.",
@@ -1098,9 +1019,7 @@
             "severity": "low",
             "category": "readability",
             "input": "topics[3..5] excluded, each with a 22-character CJK label; showExcludedTopics true",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 image. Left aperture edge x\u2248291 intersects the two left excluded labels at y\u2248271-344 and y\u2248421-493. Right edge x\u2248989 intersects the right excluded label at y\u2248291-363.",
             "observation": "All three long excluded labels straddle the aperture boundary, and the border passes through several glyphs.",
             "consequence": "The transient state makes the excluded text compete with the inclusion boundary. Labels remain readable, and frame 150 resolves the overlap.",
@@ -1125,9 +1044,7 @@
             "severity": "low",
             "category": "readability-congestion",
             "input": "five entries with maximum identifiers and W titles; receipts ordered 4,3,2,1,0",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 image, moving receipt for suffix 2 at x\u2248960-1160,y\u2248425-565, over the right side of entry 4 and its settled receipt.",
             "observation": "The arriving receipt masks the right part of entry 4's first identifier line and part of receipt 4's title. The suffix 4 itself remains visible.",
             "consequence": "Several neighboring text strokes are temporarily hidden, although identifier suffixes still distinguish the cards and the hold is clear.",
@@ -1152,10 +1069,7 @@
             "severity": "low",
             "category": "readability",
             "input": "object.details[0] with 28 W characters; accepted outcome",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "1280x800 image, acceptance badge centered around x\u2248907,y\u2248307 with bottom edge y\u2248337. First detail line begins around x\u2248711,y\u2248334.",
             "observation": "The lower edge of the badge crosses the upper strokes of the long first detail line near x\u2248900-913.",
             "consequence": "A small part of the first line visually competes with the acceptance badge. All details remain decipherable.",
@@ -1180,10 +1094,7 @@
             "severity": "low",
             "category": "readability",
             "input": "holderId person 3 (rightmost participant); lifetime.unit with 20 W characters",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "1280x800 image, lifetime-unit text at x\u2248640-993,y\u2248453-468. The diagonal dotted line crosses it around x\u2248840-870.",
             "observation": "The holder-to-pool connector passes through the long unit label.",
             "consequence": "The unit text competes with connector paint. Token identity, expiration state and final custody remain correct.",
@@ -1208,9 +1119,7 @@
             "severity": "medium",
             "category": "readability",
             "input": "four widgets; featuredWidgetId widget 3; layout feature-left; widget 2 is a three-line note",
-            "frames": [
-              90
-            ],
+            "frames": [90],
             "location": "1280x800 image. Featured widget 3 occupies x\u224832-560,y\u2248175-768. Moving widget 2 is behind it at x\u224870-616,y\u2248465-783.",
             "observation": "The featured panel masks widget 2's title and nearly all three note lines, leaving only tiny trailing W strokes near x\u2248560.",
             "consequence": "One of the four supplied views becomes unreadable in this action sample. The final hold restores the panel and all its content.",
@@ -1262,10 +1171,7 @@
             "severity": "medium",
             "category": "readability",
             "input": "capture.capturedTonnesCO 2 = 0.0000010000000000000002; copy.massUnit has 10 W characters",
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "location": "1280 x 800 image. Captured-value text starts x\u2248253,y\u2248508 and extends across the vertical mint pipe x\u2248332-361. The mass-unit label at y\u2248558-571 crosses the same pipe.",
             "observation": "The pale captured-value digits and mass-unit glyphs are drawn over the bright mint pipe, creating white-on-mint regions in both action and hold.",
             "consequence": "Part of the precise captured quantity and its unit become difficult to read in the sustained final accounting layout.",

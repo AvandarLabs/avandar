@@ -21,7 +21,8 @@ useWhen:
   message: Suggest movement of data between two systems, without claiming real-time speed.
 prompt:
   id: motionAtlas.packet-stream.prompt
-  message: Use Motion Atlas "Packet stream" (packet-stream) as a conceptual graphic.
+  message:
+    Use Motion Atlas "Packet stream" (packet-stream) as a conceptual graphic.
     Suggest movement of data between two systems, without claiming real-time speed. Keep
     the restrained motion and readable labels; replace sample content with approved
     facts before making product claims.
@@ -48,7 +49,8 @@ aliases:
     message: lanes
 notFor:
   - id: motionAtlas.packet-stream.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

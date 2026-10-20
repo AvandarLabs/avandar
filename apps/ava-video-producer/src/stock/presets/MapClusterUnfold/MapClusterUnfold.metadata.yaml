@@ -3,7 +3,8 @@ name:
   message: A cluster is the same points grouped
 description:
   id: motionAtlas.map-cluster-unfold.description
-  message: Several fixed point records gather into authored map clusters at one zoom
+  message:
+    Several fixed point records gather into authored map clusters at one zoom
     state. The clusters unfold into their original members when the view changes,
     preserving every identity and the total count.
 category:
@@ -14,12 +15,14 @@ useWhen:
   message: Preserve point identities and counts through display grouping.
 prompt:
   id: motionAtlas.map-cluster-unfold.prompt
-  message: Use Motion Atlas A cluster is the same points grouped (map-cluster-unfold) to
+  message:
+    Use Motion Atlas A cluster is the same points grouped (map-cluster-unfold) to
     preserve point identities and counts through display grouping. Supply approved
     authored content before making claims.
 creativeDirection:
   id: motionAtlas.map-cluster-unfold.creativeDirection
-  message: React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
+  message:
+    React/SVG 960x600 canvas, shared palette, deterministic 180 frames at 30fps.
     This is schematic local geography with no real basemap. Frames 0-12 reveal. Frames
     13-52 draw all points on a schematic map. Frames 53-82 contract members into their
     supplied cluster centers with derived count labels. Frames 82-99 hold the exact
@@ -32,7 +35,8 @@ intent:
   message: Preserve point identities and counts through display grouping.
 distinction:
   id: motionAtlas.map-cluster-unfold.distinction
-  message: Unlike plexus-field or radial-network, cluster membership is explicit,
+  message:
+    Unlike plexus-field or radial-network, cluster membership is explicit,
     count-conserving and reversible. These are grouped observations, not connections or
     epidemiological clusters.
 tags:
@@ -63,23 +67,28 @@ aliases:
     message: count conservation
 notFor:
   - id: motionAtlas.map-cluster-unfold.notFor.0
-    message: Cluster assignments are authored, not a spatial clustering algorithm or a
+    message:
+      Cluster assignments are authored, not a spatial clustering algorithm or a
       detection claim.
   - id: motionAtlas.map-cluster-unfold.notFor.1
-    message: Screen grouping is not geographic proximity evidence, incidence, exposure or
+    message:
+      Screen grouping is not geographic proximity evidence, incidence, exposure or
       common cause.
   - id: motionAtlas.map-cluster-unfold.notFor.2
     message: No records disappear when clusters collapse.
   - id: motionAtlas.map-cluster-unfold.notFor.3
-    message: No live geography, online routing, JSX, functions, URLs, private records or
+    message:
+      No live geography, online routing, JSX, functions, URLs, private records or
       external requests. Maps are schematic local plans; no real-world inference
       follows.
   - id: motionAtlas.map-cluster-unfold.notFor.4
-    message: Authored prose and schematic context are the author's responsibility. Runtime
+    message:
+      Authored prose and schematic context are the author's responsibility. Runtime
       validation checks structural bounds and numeric, reference and geometry
       constraints, without classifying natural-language claims.
   - id: motionAtlas.map-cluster-unfold.notFor.5
-    message: Point and cluster IDs allow empty strings and are bounded to 12 characters.
+    message:
+      Point and cluster IDs allow empty strings and are bounded to 12 characters.
       Coincident authored points and cluster centers share an aggregate location count,
       with separate keyed ledgers retaining every identity. Literal ID whitespace uses
       distinct visible marks when IDs are enabled.

@@ -3,7 +3,8 @@ name:
   message: Ask for help without losing ownership
 description:
   id: motionAtlas.support-request-response.description
-  message: A team member makes a concrete request for support. A colleague gives an
+  message:
+    A team member makes a concrete request for support. A colleague gives an
     authored response and joins the same work surface only when the response accepts,
     while the requester keeps ownership of the task.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Show a respectful request and response while preserving both people's agency.
 creativeDirection:
   id: motionAtlas.support-request-response.creativeDirection
-  message: Frames 12..42 show the requester with one unfinished work object and a short
+  message:
+    Frames 12..42 show the requester with one unfinished work object and a short
     help request. Frames 43..88 let the colleague turn toward the requester, pause to
     acknowledge them and display the supplied response. Frames 89..130 bring a second
     chair to the same worktable only for joins. For later or declines, the colleague
@@ -31,7 +33,8 @@ intent:
   message: Show a respectful request and response while preserving both people's agency.
 distinction:
   id: motionAtlas.support-request-response.distinction
-  message: Unlike custody-transfer, responsibility does not move to a successor. Unlike
+  message:
+    Unlike custody-transfer, responsibility does not move to a successor. Unlike
     grievance-remedy-retest, there is no complaint, repair or acceptance test; the
     explanatory action is requesting support and joining ongoing work.
 tags:
@@ -62,15 +65,18 @@ aliases:
     message: support request response
 notFor:
   - id: motionAtlas.support-request-response.notFor.0
-    message: One supportive exchange does not establish psychological safety or a lasting
+    message:
+      One supportive exchange does not establish psychological safety or a lasting
       level of trust.
   - id: motionAtlas.support-request-response.notFor.1
     message: A respectful decline or later response remains a valid visible outcome.
   - id: motionAtlas.support-request-response.notFor.2
-    message: Do not imply that support automatically resolves distress, improves performance
+    message:
+      Do not imply that support automatically resolves distress, improves performance
       or completes the task.
   - id: motionAtlas.support-request-response.notFor.3
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

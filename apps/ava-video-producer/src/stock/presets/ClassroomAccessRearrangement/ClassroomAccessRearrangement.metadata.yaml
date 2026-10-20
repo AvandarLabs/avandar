@@ -3,7 +3,8 @@ name:
   message: Make space in the same classroom
 description:
   id: motionAtlas.classroom-access-rearrangement.description
-  message: A classroom rearranges its furniture and shared teaching surface so named
+  message:
+    A classroom rearranges its furniture and shared teaching surface so named
     learners can approach and participate in the same group. The room changes while the
     people remain themselves.
 category:
@@ -11,29 +12,34 @@ category:
   message: Classroom spatial transformation
 useWhen:
   id: motionAtlas.classroom-access-rearrangement.useWhen
-  message: Show that changing the learning environment can address a stated participation
+  message:
+    Show that changing the learning environment can address a stated participation
     barrier.
 prompt:
   id: motionAtlas.classroom-access-rearrangement.prompt
-  message: Reveal a crowded row arrangement with the same learners waiting at its edge.
+  message:
+    Reveal a crowded row arrangement with the same learners waiting at its edge.
     Pull desks apart to make a clear schematic approach, rotate the shared table toward
     the group, and reveal the selected teaching-surface adaptations. Move every learner
     into the common activity space; retain the selected access cues during the hold. Do
     not transform bodies or separate one learner into a distant special zone. Fade out.
 creativeDirection:
   id: motionAtlas.classroom-access-rearrangement.creativeDirection
-  message: Reveal a crowded row arrangement with the same learners waiting at its edge.
+  message:
+    Reveal a crowded row arrangement with the same learners waiting at its edge.
     Pull desks apart to make a clear schematic approach, rotate the shared table toward
     the group, and reveal the selected teaching-surface adaptations. Move every learner
     into the common activity space; retain the selected access cues during the hold. Do
     not transform bodies or separate one learner into a distant special zone. Fade out.
 intent:
   id: motionAtlas.classroom-access-rearrangement.intent
-  message: Show that changing the learning environment can address a stated participation
+  message:
+    Show that changing the learning environment can address a stated participation
     barrier.
 distinction:
   id: motionAtlas.classroom-access-rearrangement.distinction
-  message: Furniture and instructional surfaces physically change within one shared
+  message:
+    Furniture and instructional surfaces physically change within one shared
     classroom while learner identities remain constant. Unlike a generic service-access
     gate, the scene explains the geometry and materials of participation rather than
     admission or referral.
@@ -73,16 +79,20 @@ aliases:
     message: accessible route
 notFor:
   - id: motionAtlas.classroom-access-rearrangement.notFor.0
-    message: The learner array is the complete represented group. All are shown at the final
+    message:
+      The learner array is the complete represented group. All are shown at the final
       activity; this is an authored staging choice, not an enrollment or inclusion rate.
   - id: motionAtlas.classroom-access-rearrangement.notFor.1
-    message: No dimensions, turning-radius compliance, visual-acuity threshold, building
+    message:
+      No dimensions, turning-radius compliance, visual-acuity threshold, building
       standard, or universal accessibility claim is encoded.
   - id: motionAtlas.classroom-access-rearrangement.notFor.2
-    message: A wheeled icon does not imply a diagnosis, dependence, or inability to learn.
+    message:
+      A wheeled icon does not imply a diagnosis, dependence, or inability to learn.
       Adaptations alter the environment rather than a person.
   - id: motionAtlas.classroom-access-rearrangement.notFor.3
-    message: The fictional schematic cannot establish that the selected changes meet any
+    message:
+      The fictional schematic cannot establish that the selected changes meet any
       real learner's complete access requirements.
 motionBeats:
   - startFrame: 0
@@ -94,19 +104,22 @@ motionBeats:
     endFrame: 75
     description:
       id: motionAtlas.ClassroomAccessRearrangement.beat.1
-      message: Pull desks apart, rotate the shared table only if selected, and reveal the
+      message:
+        Pull desks apart, rotate the shared table only if selected, and reveal the
         selected larger board text.
   - startFrame: 76
     endFrame: 95
     description:
       id: motionAtlas.ClassroomAccessRearrangement.beat.2
-      message: Learners enter through cleared side lanes while their keyed roster remains
+      message:
+        Learners enter through cleared side lanes while their keyed roster remains
         readable.
   - startFrame: 96
     endFrame: 107
     description:
       id: motionAtlas.ClassroomAccessRearrangement.beat.3
-      message: Finish the selected shared-circle or open-horseshoe arrangement inside the same
+      message:
+        Finish the selected shared-circle or open-horseshoe arrangement inside the same
         common activity.
   - startFrame: 108
     endFrame: 179

@@ -3,7 +3,8 @@ name:
   message: Review a number near two labels
 description:
   id: motionAtlas.pdf-nearest-label-review.description
-  message: A figure on a schematic page measures its distance to two possible labels. A
+  message:
+    A figure on a schematic page measures its distance to two possible labels. A
     close runner-up leaves the pairing flagged until an authored human choice identifies
     the intended label.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Keep uncertain document associations reviewable.
 creativeDirection:
   id: motionAtlas.pdf-nearest-label-review.creativeDirection
-  message: 960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, frame-driven 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-50 reveal one numeric token and two nearby label
     boxes. Frames 51-95 extend distance guides from the token to both boxes. Frames
     96-139 show either the reviewer choosing one label or an unresolved bracket
@@ -29,7 +31,8 @@ intent:
   message: Keep uncertain document associations reviewable.
 distinction:
   id: motionAtlas.pdf-nearest-label-review.distinction
-  message: Unlike keyed-row-zipper, labels are associated by spatial evidence rather than
+  message:
+    Unlike keyed-row-zipper, labels are associated by spatial evidence rather than
     equal keys. Unlike location-uncertainty-boundary, uncertainty concerns document
     interpretation, not a position on Earth.
 tags:
@@ -56,18 +59,22 @@ aliases:
     message: pdf nearest label review
 notFor:
   - id: motionAtlas.pdf-nearest-label-review.notFor.0
-    message: Distance is an association heuristic, not evidence that a number truly belongs
+    message:
+      Distance is an association heuristic, not evidence that a number truly belongs
       to a region.
   - id: motionAtlas.pdf-nearest-label-review.notFor.1
-    message: No default association should silently become accepted when a close alternative
+    message:
+      No default association should silently become accepted when a close alternative
       exists.
   - id: motionAtlas.pdf-nearest-label-review.notFor.2
     message: Source text stays unchanged after review.
   - id: motionAtlas.pdf-nearest-label-review.notFor.3
-    message: No JSX, functions, URLs or external fetch in props. The animation is an
+    message:
+      No JSX, functions, URLs or external fetch in props. The animation is an
       authored explanation, not actual document extraction or product evidence.
   - id: motionAtlas.pdf-nearest-label-review.notFor.4
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

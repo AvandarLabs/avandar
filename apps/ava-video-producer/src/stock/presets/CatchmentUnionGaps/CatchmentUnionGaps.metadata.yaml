@@ -3,7 +3,8 @@ name:
   message: Coverage without counting twice
 description:
   id: motionAtlas.catchment-union-gaps.description
-  message: Authored service catchments join into one footprint around a fixed set of
+  message:
+    Authored service catchments join into one footprint around a fixed set of
     households. Overlap loses its duplicate shading while households outside every
     catchment remain visible as gaps.
 category:
@@ -14,12 +15,14 @@ useWhen:
   message: Explain why overlapping service areas do not create additional people served.
 prompt:
   id: motionAtlas.catchment-union-gaps.prompt
-  message: Draw the separate catchment outlines around stationary homes. Where catchments
+  message:
+    Draw the separate catchment outlines around stationary homes. Where catchments
     overlap, peel away the second tint and fuse the outer boundary. Finish with covered
     homes enclosed and uncovered homes ringed, alongside one unique covered share.
 creativeDirection:
   id: motionAtlas.catchment-union-gaps.creativeDirection
-  message: Draw the separate catchment outlines around stationary homes. Where catchments
+  message:
+    Draw the separate catchment outlines around stationary homes. Where catchments
     overlap, peel away the second tint and fuse the outer boundary. Finish with covered
     homes enclosed and uncovered homes ringed, alongside one unique covered share.
 intent:
@@ -27,7 +30,8 @@ intent:
   message: Explain why overlapping service areas do not create additional people served.
 distinction:
   id: motionAtlas.catchment-union-gaps.distinction
-  message: A geometric union removes overlapping coverage while preserving uncovered
+  message:
+    A geometric union removes overlapping coverage while preserving uncovered
     locations. Unlike household revisits, the duplicate comes from simultaneous polygon
     membership; unlike mobile-clinic relocation, no service or person travels.
 tags:
@@ -56,13 +60,16 @@ goodFor:
     message: Prevent double counting overlapping service footprints
 notFor:
   - id: motionAtlas.catchment-union-gaps.notFor.0
-    message: Catchments are authored schematic footprints, not inferred travel-time areas or
+    message:
+      Catchments are authored schematic footprints, not inferred travel-time areas or
       proof of actual service use.
   - id: motionAtlas.catchment-union-gaps.notFor.1
-    message: Covered plus uncovered equals the complete supplied denominator. Empty map
+    message:
+      Covered plus uncovered equals the complete supplied denominator. Empty map
       space is not evidence of absent population.
   - id: motionAtlas.catchment-union-gaps.notFor.2
-    message: No facility capacity, service quality, physical accessibility, or health
+    message:
+      No facility capacity, service quality, physical accessibility, or health
       outcome is inferred.
 domains:
   - id: motionAtlas.catchment-union-gaps.domains.0
@@ -84,7 +91,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.catchment-union-gaps.beat.1
-      message: Remove duplicate tint and fuse the outer union boundary from frames 36 through
+      message:
+        Remove duplicate tint and fuse the outer union boundary from frames 36 through
         108.
   - startFrame: 108
     endFrame: 179

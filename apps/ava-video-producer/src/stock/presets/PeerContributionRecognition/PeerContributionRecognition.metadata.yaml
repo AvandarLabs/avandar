@@ -3,7 +3,8 @@ name:
   message: Recognize the person behind a specific contribution
 description:
   id: motionAtlas.peer-contribution-recognition.description
-  message: A colleague identifies a concrete contribution, turns toward its maker, and
+  message:
+    A colleague identifies a concrete contribution, turns toward its maker, and
     gives a supplied acknowledgment. The contribution keeps its authorship and receives
     no ranking or score.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Tie appreciation to a person and a concrete contribution.
 creativeDirection:
   id: motionAtlas.peer-contribution-recognition.creativeDirection
-  message: Frames 12..44 establish the contributor beside one or two authored work
+  message:
+    Frames 12..44 establish the contributor beside one or two authored work
     objects. Frames 45..88 let the colleague point to the focused object and trace its
     existing authorship tab back toward the contributor. Frames 89..128 turn the
     colleague toward the person and deliver the acknowledgment as a speech bubble or
@@ -32,7 +34,8 @@ intent:
   message: Tie appreciation to a person and a concrete contribution.
 distinction:
   id: motionAtlas.peer-contribution-recognition.distinction
-  message: Unlike word-reveal, meaning comes from one person identifying another person's
+  message:
+    Unlike word-reveal, meaning comes from one person identifying another person's
     work and directing appreciation to them. Unlike feedback-refinement, the artifact
     does not need to be corrected or returned for another approval.
 tags:
@@ -63,14 +66,16 @@ aliases:
     message: peer contribution recognition
 notFor:
   - id: motionAtlas.peer-contribution-recognition.notFor.0
-    message: Acknowledgment is not a measurement of performance, trust, wellbeing or team
+    message:
+      Acknowledgment is not a measurement of performance, trust, wellbeing or team
       success.
   - id: motionAtlas.peer-contribution-recognition.notFor.1
     message: The recipient is not obliged to respond with a prescribed emotion or gesture.
   - id: motionAtlas.peer-contribution-recognition.notFor.2
     message: The same work object and authorship remain intact throughout.
   - id: motionAtlas.peer-contribution-recognition.notFor.3
-    message: Supplied prose is preserved. Fictional framing, evidence and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
 motionBeats:

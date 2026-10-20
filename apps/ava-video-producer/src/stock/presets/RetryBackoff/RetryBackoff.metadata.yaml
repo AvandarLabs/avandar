@@ -3,7 +3,8 @@ name:
   message: Wait longer before retrying
 description:
   id: motionAtlas.retry-backoff.description
-  message: One operation returns from unsuccessful attempts and waits through successively
+  message:
+    One operation returns from unsuccessful attempts and waits through successively
     wider intervals. Its final attempt either completes or stops, according to the
     supplied outcome.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Explain that repeated attempts can be deliberately spaced farther apart.
 creativeDirection:
   id: motionAtlas.retry-backoff.creativeDirection
-  message: Frames 12..36 introduce the operation token and its first attempt marker. The
+  message:
+    Frames 12..36 introduce the operation token and its first attempt marker. The
     token makes a short out-and-back trip for each retry outcome, then traverses a
     visibly wider waiting bracket before the next attempt. Bracket widths are
     proportional to the authored delay values, while the full action is compressed into
@@ -30,7 +32,8 @@ intent:
   message: Explain that repeated attempts can be deliberately spaced farther apart.
 distinction:
   id: motionAtlas.retry-backoff.distinction
-  message: Status-cycle advances once through states; this repeatedly returns the same
+  message:
+    Status-cycle advances once through states; this repeatedly returns the same
     operation to an attempt point and makes increasing wait intervals the main
     explanatory device. It does not change the operation after feedback.
 tags:
@@ -65,13 +68,16 @@ aliases:
     message: Time and resilience
 notFor:
   - id: motionAtlas.retry-backoff.notFor.0
-    message: All default outcomes and waits are fictional; the animation does not recommend
+    message:
+      All default outcomes and waits are fictional; the animation does not recommend
       a retry policy.
   - id: motionAtlas.retry-backoff.notFor.1
-    message: Timeline widths represent supplied relative waits, but playback is editorially
+    message:
+      Timeline widths represent supplied relative waits, but playback is editorially
       compressed and is not a wall clock.
   - id: motionAtlas.retry-backoff.notFor.2
-    message: No probability of eventual success, randomized jitter, or independent
+    message:
+      No probability of eventual success, randomized jitter, or independent
       concurrent requests is implied.
 motionBeats:
   - startFrame: 12

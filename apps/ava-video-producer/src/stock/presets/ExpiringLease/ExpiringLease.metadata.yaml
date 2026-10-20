@@ -3,7 +3,8 @@ name:
   message: Borrowed Permission Returns
 description:
   id: motionAtlas.expiring-lease.description
-  message: A single permission token temporarily occupies one participant's socket while
+  message:
+    A single permission token temporarily occupies one participant's socket while
     its authored lifetime runs down. When the lease ends, the token returns to neutral
     custody before another participant can hold it.
 category:
@@ -11,15 +12,18 @@ category:
   message: Temporary ownership
 useWhen:
   id: motionAtlas.expiring-lease.useWhen
-  message: Explain that temporary permission can end without transferring directly to
+  message:
+    Explain that temporary permission can end without transferring directly to
     another holder.
 prompt:
   id: motionAtlas.expiring-lease.prompt
-  message: Explain that temporary permission can end without transferring directly to
+  message:
+    Explain that temporary permission can end without transferring directly to
     another holder.
 creativeDirection:
   id: motionAtlas.expiring-lease.creativeDirection
-  message: Reveal a neutral permission dock and a short arc of participant sockets. Seat
+  message:
+    Reveal a neutral permission dock and a short arc of participant sockets. Seat
     the one token in the chosen holder's socket while all other sockets remain empty. A
     finite segmented collar around that socket drains in evenly spaced editorial beats;
     when it empties, the socket opens and the token retracts to the neutral dock. Hold
@@ -27,11 +31,13 @@ creativeDirection:
     different from a direct handoff, then fade to the opaque ground.
 intent:
   id: motionAtlas.expiring-lease.intent
-  message: Explain that temporary permission can end without transferring directly to
+  message:
+    Explain that temporary permission can end without transferring directly to
     another holder.
 distinction:
   id: motionAtlas.expiring-lease.distinction
-  message: Custody-transfer moves responsibility after acceptance. This permission expires
+  message:
+    Custody-transfer moves responsibility after acceptance. This permission expires
     and returns to neutral custody with no successor, while a physically exclusive token
     makes its temporary nature visible. It is not an orbital ecosystem or a generic
     status cycle.
@@ -67,13 +73,16 @@ aliases:
     message: Temporary ownership
 notFor:
   - id: motionAtlas.expiring-lease.notFor.0
-    message: There is always exactly one permission token. Socket count comes only from
+    message:
+      There is always exactly one permission token. Socket count comes only from
       participants, and collar segment count comes only from lifetime.value.
   - id: motionAtlas.expiring-lease.notFor.1
-    message: The six-second loop compresses the supplied lifetime and must not be
+    message:
+      The six-second loop compresses the supplied lifetime and must not be
       interpreted as actual elapsed time or server-clock behavior.
   - id: motionAtlas.expiring-lease.notFor.2
-    message: This illustrates an authored lease concept, not a verified distributed lock,
+    message:
+      This illustrates an authored lease concept, not a verified distributed lock,
       fairness guarantee, race-condition solution, or automatic permission policy.
 motionBeats:
   - startFrame: 12

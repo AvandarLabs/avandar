@@ -3,7 +3,8 @@ name:
   message: Send the structure, run the question locally
 description:
   id: motionAtlas.schema-plan-local-execution.description
-  message: A table keeps its row records inside a device while its column names and an
+  message:
+    A table keeps its row records inside a device while its column names and an
     authored question travel to a remote planner. A query plan returns and selects a
     result inside the original device.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Separate remote query planning from the location of raw-data execution.
 creativeDirection:
   id: motionAtlas.schema-plan-local-execution.creativeDirection
-  message: 960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
+  message:
+    960x600 React/SVG, shared palette, deterministic 180 frames at 30fps. Frames
     0-12 reveal the scene. Frames 13-55 lift a copy of the header strip and the authored
     question card from the device and send both across a clearly labeled boundary to the
     remote planner, while every row record stays inside the device. Frames 56-100 unfold
@@ -30,7 +32,8 @@ intent:
   message: Separate remote query planning from the location of raw-data execution.
 distinction:
   id: motionAtlas.schema-plan-local-execution.distinction
-  message: Unlike pocket-inference, the model is remote. Unlike disclosure-aperture, the
+  message:
+    Unlike pocket-inference, the model is remote. Unlike disclosure-aperture, the
     shared header is a schema, a plan returns, and computation visibly occurs over
     retained rows.
 tags:
@@ -57,24 +60,30 @@ aliases:
     message: schema plan local execution
 notFor:
   - id: motionAtlas.schema-plan-local-execution.notFor.0
-    message: This illustrates one metadata-only query mode, not a claim that all AI traffic
+    message:
+      This illustrates one metadata-only query mode, not a claim that all AI traffic
       excludes row data. Questions, schema labels and returned SQL may themselves be
       sensitive.
   - id: motionAtlas.schema-plan-local-execution.notFor.1
-    message: Optional value discovery, pasted text, samples and PDF model assistance are
+    message:
+      Optional value discovery, pasted text, samples and PDF model assistance are
       separate boundary crossings and are deliberately absent from this mode.
   - id: motionAtlas.schema-plan-local-execution.notFor.2
-    message: The plan is authored, not inferred by an LLM. Selected membership and sum are
+    message:
+      The plan is authored, not inferred by an LLM. Selected membership and sum are
       calculated from the supplied rows.
   - id: motionAtlas.schema-plan-local-execution.notFor.3
-    message: No real product screen, external fetch, supplied code execution, or measured
+    message:
+      No real product screen, external fetch, supplied code execution, or measured
       performance claim. All text is authored; no JSX, functions or URLs in props.
   - id: motionAtlas.schema-plan-local-execution.notFor.4
-    message: Supplied prose is preserved. Fictional framing, evidence, and agreement between
+    message:
+      Supplied prose is preserved. Fictional framing, evidence, and agreement between
       wording and selected states are authoring responsibilities. Runtime validation
       enforces structural bounds and explicit cross-field rules.
   - id: motionAtlas.schema-plan-local-execution.notFor.5
-    message: Exact local cell whitespace uses distinct visible space, tab and newline marks.
+    message:
+      Exact local cell whitespace uses distinct visible space, tab and newline marks.
       Repeated rows remain separate occurrences.
 motionBeats:
   - startFrame: 13

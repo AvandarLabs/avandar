@@ -3,7 +3,8 @@ name:
   message: Keep protected time inside a finite schedule
 description:
   id: motionAtlas.protected-work-boundary.description
-  message: A worker declines to squeeze a new request into a protected time block. The
+  message:
+    A worker declines to squeeze a new request into a protected time block. The
     request moves to a visible deferred tray, or to an explicitly available work block,
     while the schedule retains its original size.
 category:
@@ -17,7 +18,8 @@ intent:
   message: Make a work boundary concrete without claiming a productivity or health effect.
 creativeDirection:
   id: motionAtlas.protected-work-boundary.creativeDirection
-  message: Frames 12..38 reveal one fixed strip of equal time blocks containing existing
+  message:
+    Frames 12..38 reveal one fixed strip of equal time blocks containing existing
     commitments and protected rest, learning or community time. Frames 39..76 bring a
     new request toward its named protected block. The worker lifts the request away
     before it covers that block. Frames 77..130 place it in the deferred tray or the
@@ -34,7 +36,8 @@ distinction:
     appointment.
 prompt:
   id: motionAtlas.protected-work-boundary.prompt
-  message: A worker declines to squeeze a new request into a protected time block. The
+  message:
+    A worker declines to squeeze a new request into a protected time block. The
     request moves to a visible deferred tray, or to an explicitly available work block,
     while the schedule retains its original size.
 tags:
@@ -71,16 +74,20 @@ aliases:
     message: capacity
 notFor:
   - id: motionAtlas.protected-work-boundary.notFor.0
-    message: This is an authored scheduling decision, not a clinical burnout model or a
+    message:
+      This is an authored scheduling decision, not a clinical burnout model or a
       claim about productivity.
   - id: motionAtlas.protected-work-boundary.notFor.1
-    message: Rest, learning and community time are illustrative categories. The animation
+    message:
+      Rest, learning and community time are illustrative categories. The animation
       does not reproduce any company leave or working-hours policy.
   - id: motionAtlas.protected-work-boundary.notFor.2
-    message: A deferred request remains outstanding. Deferral does not assign it to someone
+    message:
+      A deferred request remains outstanding. Deferral does not assign it to someone
       else or invent future capacity.
   - id: motionAtlas.protected-work-boundary.notFor.3
-    message: Free prose is author supplied; only structural, reference, numeric and
+    message:
+      Free prose is author supplied; only structural, reference, numeric and
       documented lexical constraints are runtime-validated.
 motionBeats:
   - startFrame: 0

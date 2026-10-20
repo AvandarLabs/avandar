@@ -3,7 +3,8 @@ name:
   message: Add a field without inventing the past
 description:
   id: motionAtlas.schema-column-evolution.description
-  message: A small table gains one new field while every earlier record keeps its identity
+  message:
+    A small table gains one new field while every earlier record keeps its identity
     and its uncollected value. A later record supplies a value under the expanded
     schema, leaving the older gaps visible.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Separate the addition of a field from the collection of a value for that field.
 creativeDirection:
   id: motionAtlas.schema-column-evolution.creativeDirection
-  message: On a 960x600 React/SVG canvas, frames 0-11 reveal a compact table of earlier
+  message:
+    On a 960x600 React/SVG canvas, frames 0-11 reveal a compact table of earlier
     records. Frames 12-48 slide the existing columns left and unfold one new column from
     the header seam. Frames 49-92 place an explicit not-collected mark in that column
     for each earlier record without changing any original value. Frames 93-132 seat one
@@ -27,7 +29,8 @@ intent:
   message: Separate the addition of a field from the collection of a value for that field.
 distinction:
   id: motionAtlas.schema-column-evolution.distinction
-  message: Unlike cell-normalization, this changes the available field structure without
+  message:
+    Unlike cell-normalization, this changes the available field structure without
     correcting existing values. Unlike schema-mapping, no fields are paired across two
     schemas. Unlike state-preserving-source-refresh, the visible change is a new
     collection question and its historical absence, not refreshing values from an
@@ -74,23 +77,29 @@ aliases:
     message: historical records
 notFor:
   - id: motionAtlas.schema-column-evolution.notFor.0
-    message: One retained field, one added field, one later row, and at most three earlier
+    message:
+      One retained field, one added field, one later row, and at most three earlier
       rows fit the six-second explanation.
   - id: motionAtlas.schema-column-evolution.notFor.1
-    message: The ending record count is earlierRecords.length + 1. A new column does not
+    message:
+      The ending record count is earlierRecords.length + 1. A new column does not
       create or remove earlier records.
   - id: motionAtlas.schema-column-evolution.notFor.2
-    message: The earlier records always retain missing marks in the added column. No
+    message:
+      The earlier records always retain missing marks in the added column. No
       default, imputation, migration, enrichment, or retrospectively inferred answer is
       shown.
   - id: motionAtlas.schema-column-evolution.notFor.3
-    message: The sequence is a conceptual collection example. It makes no claim about a
+    message:
+      The sequence is a conceptual collection example. It makes no claim about a
       particular database migration system or any shipped form-editing feature.
   - id: motionAtlas.schema-column-evolution.notFor.4
-    message: The editorial fade resets the illustration, not the stored records. All labels
+    message:
+      The editorial fade resets the illustration, not the stored records. All labels
       are supplied inputs.
   - id: motionAtlas.schema-column-evolution.notFor.5
-    message: Supplied prose meaning, fictional status and agreement with structured choices
+    message:
+      Supplied prose meaning, fictional status and agreement with structured choices
       are authoring responsibilities. Runtime validation enforces structure, numeric
       bounds, identities and references.
 motionBeats:

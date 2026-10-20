@@ -17,7 +17,8 @@ intent:
   message: Show that a referral is not fully communicated merely because the person attended.
 creativeDirection:
   id: motionAtlas.referral-return-acknowledgement.creativeDirection
-  message: Frames 12..40 reveal the referring clinic with three people and three matching
+  message:
+    Frames 12..40 reveal the referring clinic with three people and three matching
     referral slips. Frames 41..113 let only attended people cross to the receiving
     service, then send a returned acknowledgement slip back for only the supplied
     completed loop. Frames 114..167 hold one returned loop, one
@@ -25,12 +26,14 @@ creativeDirection:
     fade to ground by frame 179.
 distinction:
   id: motionAtlas.referral-return-acknowledgement.distinction
-  message: Unlike node-traversal or data-pipeline, person movement and document return are
+  message:
+    Unlike node-traversal or data-pipeline, person movement and document return are
     independent motions traveling in opposite directions. The resolved view can contain
     attendance without a returned acknowledgement.
 prompt:
   id: motionAtlas.referral-return-acknowledgement.prompt
-  message: Use Close the referral loop (referral-return-acknowledgement) for a fictional
+  message:
+    Use Close the referral loop (referral-return-acknowledgement) for a fictional
     or approved authored example. Show that a referral is not fully communicated merely
     because the person attended.
 tags:
@@ -54,7 +57,8 @@ goodFor:
   - id: motionAtlas.referral-return-acknowledgement.goodFor.0
     message: Explain referral tracking across separate care teams.
   - id: motionAtlas.referral-return-acknowledgement.goodFor.1
-    message: Distinguish attendance at another service from confirmation returned to the
+    message:
+      Distinguish attendance at another service from confirmation returned to the
       referring team.
   - id: motionAtlas.referral-return-acknowledgement.goodFor.2
     message: Show an unresolved handoff without implying treatment failure.
@@ -70,19 +74,23 @@ aliases:
     message: closed loop
 notFor:
   - id: motionAtlas.referral-return-acknowledgement.notFor.0
-    message: The denominator is referrals.length, one referral for one distinct person in
+    message:
+      The denominator is referrals.length, one referral for one distinct person in
       this example. Waiting + attended without return + returned acknowledgement equals
       the total.
   - id: motionAtlas.referral-return-acknowledgement.notFor.1
-    message: acknowledged=true requires attended=true. Derived attendance counts and
+    message:
+      acknowledged=true requires attended=true. Derived attendance counts and
       returned-acknowledgement counts are labeled separately and may overlap; they must
       not be summed as exclusive categories.
   - id: motionAtlas.referral-return-acknowledgement.notFor.2
-    message: An acknowledgement is communication evidence only. It does not establish
+    message:
+      An acknowledgement is communication evidence only. It does not establish
       diagnosis, treatment completion, recovery, clinical quality, or an appropriate
       referral.
   - id: motionAtlas.referral-return-acknowledgement.notFor.3
-    message: No emergency priorities, treatment choices, clinical referral criteria, travel
+    message:
+      No emergency priorities, treatment choices, clinical referral criteria, travel
       durations, or personal medical information are depicted.
 motionBeats:
   - startFrame: 12
@@ -94,7 +102,8 @@ motionBeats:
     endFrame: 113
     description:
       id: motionAtlas.referral-return-acknowledgement.motionBeats.1
-      message: Frames 12..40 reveal the referring clinic with three people and three matching
+      message:
+        Frames 12..40 reveal the referring clinic with three people and three matching
         referral slips. Frames 41..113 let only attended people cross to the receiving
         service, then send a returned acknowledgement slip back for only the supplied
         completed loop. Frames 114..167 hold one returned loop, one

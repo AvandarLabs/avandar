@@ -1517,9 +1517,7 @@
                     "severity": "low",
                     "category": "readability-congestion",
                     "input": "five entries with maximum identifiers and W titles; receipts ordered 4,3,2,1,0",
-                    "frames": [
-                      90
-                    ],
+                    "frames": [90],
                     "location": "1280x800 image, moving receipt for suffix 2 at x≈960-1160,y≈425-565, over the right side of entry 4 and its settled receipt.",
                     "observation": "The arriving receipt masks the right part of entry 4's first identifier line and part of receipt 4's title. The suffix 4 itself remains visible.",
                     "consequence": "Several neighboring text strokes are temporarily hidden, although identifier suffixes still distinguish the cards and the hold is clear.",
@@ -1594,9 +1592,7 @@
           },
           "response": {
             "label": "Authored example response",
-            "lines": [
-              "Blue shed, noon."
-            ]
+            "lines": ["Blue shed, noon."]
           },
           "copy": {
             "device": "Example tablet",
@@ -1951,9 +1947,7 @@
                     "severity": "low",
                     "category": "readability",
                     "input": "address.recipient = Example coordinator; showExteriorReference = true",
-                    "frames": [
-                      90
-                    ],
+                    "frames": [90],
                     "location": "1280x800 full-size image, Example coordinator at x≈550-695,y≈392-405. The two envelope diagonals cross the lower left and lower right edges of this label.",
                     "observation": "The envelope fold seams run into the lower ends of the recipient address text instead of leaving a clear label area.",
                     "consequence": "The address remains decipherable, but seam paint reduces its separation from the envelope. This is a low-impact readability defect."
@@ -1968,9 +1962,7 @@
                     "severity": "low",
                     "category": "readability",
                     "input": "address.sender, recipient and reference, each 28 W characters; showExteriorReference true",
-                    "frames": [
-                      90
-                    ],
+                    "frames": [90],
                     "location": "1280x800 image, address lines span x≈412-836 at y≈333-346,y≈392-405 and y≈512-525. Diagonal fold seams cross portions of these lines.",
                     "observation": "Both upper seams intersect the sender and recipient strings, and a lower seam intersects the reference string.",
                     "consequence": "The address remains legible but its glyphs compete with envelope linework. Brief contents remain properly covered.",
@@ -2041,10 +2033,7 @@
           },
           "object": {
             "label": "Example shift brief",
-            "details": [
-              "Blue shed",
-              "Crate labels"
-            ]
+            "details": ["Blue shed", "Crate labels"]
           },
           "outcome": "accepted",
           "copy": {
@@ -2511,27 +2500,19 @@
               "id": "stock",
               "title": "Available units",
               "kind": "value",
-              "lines": [
-                "18 units"
-              ]
+              "lines": ["18 units"]
             },
             {
               "id": "supplies",
               "title": "Supplies",
               "kind": "list",
-              "lines": [
-                "Paper",
-                "Ink",
-                "Labels"
-              ]
+              "lines": ["Paper", "Ink", "Labels"]
             },
             {
               "id": "note",
               "title": "Context",
               "kind": "note",
-              "lines": [
-                "Sample inventory only"
-              ]
+              "lines": ["Sample inventory only"]
             }
           ],
           "featuredWidgetId": "stock",
@@ -3561,44 +3542,26 @@
             {
               "id": "a",
               "label": "Paper",
-              "groups": [
-                "North",
-                "Stored"
-              ]
+              "groups": ["North", "Stored"]
             },
             {
               "id": "b",
               "label": "Ink",
-              "groups": [
-                "North",
-                "Review"
-              ]
+              "groups": ["North", "Review"]
             },
             {
               "id": "c",
               "label": "Labels",
-              "groups": [
-                "South",
-                "Stored"
-              ]
+              "groups": ["South", "Stored"]
             },
             {
               "id": "d",
               "label": "Folders",
-              "groups": [
-                "North",
-                "Stored"
-              ]
+              "groups": ["North", "Stored"]
             }
           ],
-          "dimensions": [
-            "Area",
-            "State"
-          ],
-          "selectionPath": [
-            "North",
-            "Stored"
-          ],
+          "dimensions": ["Area", "State"],
+          "selectionPath": ["North", "Stored"],
           "labels": {
             "title": "Fictional supply drilldown",
             "root": "All sample records",
@@ -4243,26 +4206,17 @@
             {
               "id": "v1",
               "label": "Draft A",
-              "content": [
-                "Field notes",
-                "Open questions"
-              ]
+              "content": ["Field notes", "Open questions"]
             },
             {
               "id": "v2",
               "label": "Draft B",
-              "content": [
-                "Field notes",
-                "Next steps"
-              ]
+              "content": ["Field notes", "Next steps"]
             },
             {
               "id": "v3",
               "label": "Draft C",
-              "content": [
-                "Field summary",
-                "Next steps"
-              ]
+              "content": ["Field summary", "Next steps"]
             }
           ],
           "restoreRevisionId": "v1",
@@ -4562,10 +4516,7 @@
           "type": "transient-entrance-label-overlap",
           "status": "controller-review-later-hold-clear",
           "scope": "native-entrance-capture",
-          "captureWindow": [
-            0.609264,
-            0.694131
-          ],
+          "captureWindow": [0.609264, 0.694131],
           "description": "The incoming A item card covers part of Bundle A, and the card's lower border crosses the heading letters.",
           "laterHoldAssessment": "At 4.807801..4.893479 s Bundle A, A/B/C and Group complete are clear on the collected side. No lasting hold overlap is observed.",
           "isNewFinding": true,
@@ -5178,11 +5129,7 @@
           "severity": "low",
           "type": "sampled-text-line-overlap",
           "status": "retained-concern-visible-in-native-hold",
-          "phase": [
-            "action-early",
-            "action-late",
-            "hold"
-          ],
+          "phase": ["action-early", "action-late", "hold"],
           "location": "Native1280x800 source ruler endpoint 0 around x506..516,y255.",
           "description": "The source connector's horizontal segment runs along/through the lower edge of the small source ruler 0 label in all three separately viewed full-size samples.",
           "impact": "Local line/text separation is reduced while the endpoint numeral and main arithmetic values remain readable. It is not resolved by the later held pose.",
@@ -8242,10 +8189,7 @@
                     "severity": "medium",
                     "category": "readability",
                     "input": "capture.capturedTonnesCO 2 = 0.0000010000000000000002; copy.massUnit has 10 W characters",
-                    "frames": [
-                      90,
-                      150
-                    ],
+                    "frames": [90, 150],
                     "location": "1280 x 800 image. Captured-value text starts x≈253,y≈508 and extends across the vertical mint pipe x≈332-361. The mass-unit label at y≈558-571 crosses the same pipe.",
                     "observation": "The pale captured-value digits and mass-unit glyphs are drawn over the bright mint pipe, creating white-on-mint regions in both action and hold.",
                     "consequence": "Part of the precise captured quantity and its unit become difficult to read in the sustained final accounting layout.",
@@ -10343,19 +10287,11 @@
           "readingGroups": [
             {
               "bookId": "book-a",
-              "learnerIds": [
-                "a",
-                "b",
-                "c"
-              ]
+              "learnerIds": ["a", "b", "c"]
             },
             {
               "bookId": "book-b",
-              "learnerIds": [
-                "d",
-                "e",
-                "f"
-              ]
+              "learnerIds": ["d", "e", "f"]
             }
           ],
           "startingShelf": "front",
@@ -10510,34 +10446,19 @@
           "trays": [
             {
               "learnerId": "a",
-              "componentIds": [
-                "grain",
-                "beans",
-                "fruit"
-              ]
+              "componentIds": ["grain", "beans", "fruit"]
             },
             {
               "learnerId": "b",
-              "componentIds": [
-                "grain",
-                "beans",
-                "fruit"
-              ]
+              "componentIds": ["grain", "beans", "fruit"]
             },
             {
               "learnerId": "c",
-              "componentIds": [
-                "grain",
-                "beans",
-                "fruit"
-              ]
+              "componentIds": ["grain", "beans", "fruit"]
             },
             {
               "learnerId": "d",
-              "componentIds": [
-                "grain",
-                "beans"
-              ]
+              "componentIds": ["grain", "beans"]
             }
           ],
           "labels": {
@@ -11010,44 +10931,20 @@
               "id": "a",
               "label": "Demo exposure zone",
               "polygon": [
-                [
-                  10,
-                  10
-                ],
-                [
-                  65,
-                  10
-                ],
-                [
-                  65,
-                  80
-                ],
-                [
-                  10,
-                  80
-                ]
+                [10, 10],
+                [65, 10],
+                [65, 80],
+                [10, 80]
               ]
             },
             {
               "id": "b",
               "label": "Demo planning zone",
               "polygon": [
-                [
-                  40,
-                  25
-                ],
-                [
-                  90,
-                  25
-                ],
-                [
-                  90,
-                  90
-                ],
-                [
-                  40,
-                  90
-                ]
+                [40, 25],
+                [90, 25],
+                [90, 90],
+                [40, 90]
               ]
             }
           ],
@@ -11187,44 +11084,20 @@
               "id": "west",
               "label": "Service A footprint",
               "polygon": [
-                [
-                  5,
-                  10
-                ],
-                [
-                  60,
-                  10
-                ],
-                [
-                  60,
-                  85
-                ],
-                [
-                  5,
-                  85
-                ]
+                [5, 10],
+                [60, 10],
+                [60, 85],
+                [5, 85]
               ]
             },
             {
               "id": "east",
               "label": "Service B footprint",
               "polygon": [
-                [
-                  40,
-                  15
-                ],
-                [
-                  85,
-                  15
-                ],
-                [
-                  85,
-                  85
-                ],
-                [
-                  40,
-                  85
-                ]
+                [40, 15],
+                [85, 15],
+                [85, 85],
+                [40, 85]
               ]
             }
           ],
@@ -11411,11 +11284,7 @@
               "label": "Day 3"
             }
           ],
-          "investigationCaseIds": [
-            "a",
-            "b",
-            "c"
-          ],
+          "investigationCaseIds": ["a", "b", "c"],
           "focusedBinId": "d2",
           "copy": {
             "context": "Fictional case review; schematic map",
@@ -11522,44 +11391,20 @@
               "id": "w",
               "label": "West stratum",
               "polygon": [
-                [
-                  5,
-                  5
-                ],
-                [
-                  50,
-                  5
-                ],
-                [
-                  50,
-                  95
-                ],
-                [
-                  5,
-                  95
-                ]
+                [5, 5],
+                [50, 5],
+                [50, 95],
+                [5, 95]
               ]
             },
             {
               "id": "e",
               "label": "East stratum",
               "polygon": [
-                [
-                  50,
-                  5
-                ],
-                [
-                  95,
-                  5
-                ],
-                [
-                  95,
-                  95
-                ],
-                [
-                  50,
-                  95
-                ]
+                [50, 5],
+                [95, 5],
+                [95, 95],
+                [50, 95]
               ]
             }
           ],
@@ -11600,10 +11445,7 @@
               "y": 75
             }
           ],
-          "selectedSiteIds": [
-            "a",
-            "d"
-          ],
+          "selectedSiteIds": ["a", "d"],
           "copy": {
             "context": "Fictional schematic sampling plan",
             "selected": "Selected",
@@ -11674,10 +11516,7 @@
           "severityStatus": "pending-controller-adjudication",
           "type": "confirmed-held-display-omission",
           "status": "source-confirmed-no-fix-made",
-          "phase": [
-            "action-late",
-            "hold"
-          ],
+          "phase": ["action-late", "hold"],
           "description": "Selected, Eligible sites and Not selected are visible bottom summary captions, but no aggregate numbers appear beneath them in the full-size decoded late and held samples.",
           "sourceDerivedExpectedTotals": {
             "selected": 2,
@@ -11864,22 +11703,10 @@
               "id": "a",
               "label": "Demo West",
               "polygon": [
-                [
-                  5,
-                  10
-                ],
-                [
-                  45,
-                  10
-                ],
-                [
-                  45,
-                  90
-                ],
-                [
-                  5,
-                  90
-                ]
+                [5, 10],
+                [45, 10],
+                [45, 90],
+                [5, 90]
               ],
               "records": 4,
               "population": 40
@@ -11888,22 +11715,10 @@
               "id": "b",
               "label": "Demo East",
               "polygon": [
-                [
-                  55,
-                  10
-                ],
-                [
-                  95,
-                  10
-                ],
-                [
-                  95,
-                  90
-                ],
-                [
-                  55,
-                  90
-                ]
+                [55, 10],
+                [95, 10],
+                [95, 90],
+                [55, 90]
               ],
               "records": 3,
               "population": 10
@@ -12055,18 +11870,12 @@
                 {
                   "id": "w",
                   "label": "West",
-                  "cellIds": [
-                    "nw",
-                    "sw"
-                  ]
+                  "cellIds": ["nw", "sw"]
                 },
                 {
                   "id": "e",
                   "label": "East",
-                  "cellIds": [
-                    "ne",
-                    "se"
-                  ]
+                  "cellIds": ["ne", "se"]
                 }
               ]
             },
@@ -12076,18 +11885,12 @@
                 {
                   "id": "n",
                   "label": "North",
-                  "cellIds": [
-                    "nw",
-                    "ne"
-                  ]
+                  "cellIds": ["nw", "ne"]
                 },
                 {
                   "id": "s",
                   "label": "South",
-                  "cellIds": [
-                    "sw",
-                    "se"
-                  ]
+                  "cellIds": ["sw", "se"]
                 }
               ]
             }
@@ -12384,44 +12187,20 @@
               "id": "w",
               "label": "Demo West",
               "polygon": [
-                [
-                  0,
-                  0
-                ],
-                [
-                  50,
-                  0
-                ],
-                [
-                  50,
-                  100
-                ],
-                [
-                  0,
-                  100
-                ]
+                [0, 0],
+                [50, 0],
+                [50, 100],
+                [0, 100]
               ]
             },
             {
               "id": "e",
               "label": "Demo East",
               "polygon": [
-                [
-                  50,
-                  0
-                ],
-                [
-                  100,
-                  0
-                ],
-                [
-                  100,
-                  100
-                ],
-                [
-                  50,
-                  100
-                ]
+                [50, 0],
+                [100, 0],
+                [100, 100],
+                [50, 100]
               ]
             }
           ],
@@ -15027,10 +14806,7 @@
           "type": "retained-transient-account-stamp-occlusion",
           "status": "retained-prior-concern-later-hold-clear",
           "scope": "native-late-action-capture",
-          "captureWindow": [
-            4.005175,
-            4.099856
-          ],
+          "captureWindow": [4.005175, 4.099856],
           "description": "The moving Demo account B stamp crosses the left part of the Draft revised/Demo account A history card, hiding part of its account label.",
           "laterHoldAssessment": "At 4.805071..4.900423 s all four account-history rows are fully readable and correctly labelled, with earlier shared labels unchanged.",
           "isNewFinding": false,
@@ -15439,10 +15215,7 @@
           "type": "retained-intentional-registration-transient-overprint",
           "status": "retained-transient-observation-no-source-change",
           "scope": "native-early-action-capture-and-separate-prior-poster",
-          "captureWindow": [
-            2.80572,
-            2.884661
-          ],
+          "captureWindow": [2.80572, 2.884661],
           "description": "Expired-ticket expected Hold and observed Admit overprint into combined letters at the same result-box position; they are not independently readable in this natural decoded action sample.",
           "laterHoldAssessment": "At 4.804351..4.890389 s Hold and Admit are separated and readable with Differs/amber bracket, while the known row has Admit/Matches.",
           "isNewFinding": false,
@@ -16795,48 +16568,28 @@
             {
               "id": "key",
               "label": "Key",
-              "cells": [
-                "A",
-                "B",
-                "B"
-              ]
+              "cells": ["A", "B", "B"]
             },
             {
               "id": "name",
               "label": "Name",
-              "cells": [
-                "Ash",
-                "Birch",
-                "Birch"
-              ]
+              "cells": ["Ash", "Birch", "Birch"]
             },
             {
               "id": "value",
               "label": "Items",
-              "cells": [
-                "2",
-                "4",
-                "4"
-              ]
+              "cells": ["2", "4", "4"]
             }
           ],
-          "cachedColumnIds": [
-            "key",
-            "name"
-          ],
+          "cachedColumnIds": ["key", "name"],
           "requests": [
             {
               "label": "Read names",
-              "columnIds": [
-                "name"
-              ]
+              "columnIds": ["name"]
             },
             {
               "label": "Read items",
-              "columnIds": [
-                "key",
-                "value"
-              ]
+              "columnIds": ["key", "value"]
             }
           ],
           "keyColumnId": "key",
@@ -16968,18 +16721,12 @@
             {
               "id": "one",
               "label": "Operation 1",
-              "requestedIds": [
-                "a",
-                "b"
-              ]
+              "requestedIds": ["a", "b"]
             },
             {
               "id": "two",
               "label": "Operation 2",
-              "requestedIds": [
-                "b",
-                "a"
-              ]
+              "requestedIds": ["b", "a"]
             }
           ],
           "firstOperationId": "one",
@@ -17103,11 +16850,7 @@
         "accent": "#9fefca",
         "background": "#0b1219",
         "input": {
-          "originalRows": [
-            "A: 2",
-            "B: 4",
-            "C: 3"
-          ],
+          "originalRows": ["A: 2", "B: 4", "C: 3"],
           "attempt": {
             "rowIndex": 1,
             "replacement": "B: 9",
@@ -17115,11 +16858,7 @@
           },
           "reload": {
             "performed": true,
-            "rows": [
-              "A: 2",
-              "B: 4",
-              "C: 3"
-            ]
+            "rows": ["A: 2", "B: 4", "C: 3"]
           },
           "labels": {
             "readable": "Readable",
@@ -17335,9 +17074,7 @@
               "fixture": "dense",
               "report": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.superpowers/sdd/2026-10-16-motion-atlas-expansion/dense-visual-120-130.json",
               "observation": {
-                "frames": [
-                  90
-                ],
+                "frames": [90],
                 "location": "Floating 100-value cards between the seven source observations and the first entity.",
                 "observation": "Converging cards share the source numeric-value region during aggregation.",
                 "reasonForTemporalReview": "The hold has a readable source list and correct 700 aggregate. The overlap appears purposeful; stills do not establish whether its duration harms the handoff.",
@@ -18028,19 +17765,10 @@
         "background": "#0b1219",
         "input": {
           "grid": {
-            "columnLabels": [
-              "Site",
-              "Items"
-            ],
+            "columnLabels": ["Site", "Items"],
             "rows": [
-              [
-                "West",
-                "12"
-              ],
-              [
-                "East",
-                "8"
-              ]
+              ["West", "12"],
+              ["East", "8"]
             ]
           },
           "signal": "ruling-lines",
@@ -18726,12 +18454,7 @@
         "input": {
           "saved": {
             "page": 2,
-            "box": [
-              10,
-              20,
-              85,
-              70
-            ],
+            "box": [10, 20, 85, 70],
             "header": "Site | Items",
             "fingerprint": "FP-A"
           },
@@ -18879,31 +18602,17 @@
             "rows": [
               {
                 "id": "a",
-                "cells": [
-                  "West",
-                  "12",
-                  "Review"
-                ]
+                "cells": ["West", "12", "Review"]
               },
               {
                 "id": "b",
-                "cells": [
-                  "East",
-                  "8",
-                  "Draft"
-                ]
+                "cells": ["East", "8", "Draft"]
               }
             ]
           },
           "selection": {
-            "rowIds": [
-              "a",
-              "b"
-            ],
-            "columnIds": [
-              "site",
-              "items"
-            ]
+            "rowIds": ["a", "b"],
+            "columnIds": ["site", "items"]
           },
           "liveEdit": {
             "rowId": "a",
@@ -19141,10 +18850,7 @@
           "type": "retained-transient-filter-mask-count-mismatch",
           "status": "retained-prior-concern-later-hold-correct",
           "scope": "native-late-action-capture",
-          "captureWindow": [
-            4.007939,
-            4.0963
-          ],
+          "captureWindow": [4.007939, 4.0963],
           "description": "Both subscribed views already dim/exclude East 5 while still displaying unfiltered 10 items/3 records totals.",
           "laterHoldAssessment": "At 4.806921..4.892306 s both subscribed totals are 5 items/2 records and reference remains 10/3.",
           "isNewFinding": false,
@@ -19353,19 +19059,11 @@
           "schemes": [
             {
               "label": "Equal-width example",
-              "breaks": [
-                0,
-                5,
-                10
-              ]
+              "breaks": [0, 5, 10]
             },
             {
               "label": "Alternative breaks",
-              "breaks": [
-                0,
-                3,
-                10
-              ]
+              "breaks": [0, 3, 10]
             }
           ],
           "unitLabel": "recorded items",
@@ -20265,30 +19963,12 @@
         "background": "#0b1219",
         "input": {
           "vertices": [
-            [
-              10,
-              50
-            ],
-            [
-              25,
-              53
-            ],
-            [
-              40,
-              49
-            ],
-            [
-              55,
-              72
-            ],
-            [
-              70,
-              50
-            ],
-            [
-              90,
-              52
-            ]
+            [10, 50],
+            [25, 53],
+            [40, 49],
+            [55, 72],
+            [70, 50],
+            [90, 52]
           ],
           "tolerance": 6,
           "labels": {
@@ -20802,10 +20482,7 @@
                         "unit": "kernel units"
                       }
                     },
-                    "frames": [
-                      90,
-                      150
-                    ],
+                    "frames": [90, 150],
                     "files": [
                       "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/10772459e83cb711a9459a82d0ce2a693e9b57a1fab61afbc45b72aa2999bf85/still-003.jpg",
                       "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/10772459e83cb711a9459a82d0ce2a693e9b57a1fab61afbc45b72aa2999bf85/still-004.jpg"
@@ -20830,10 +20507,7 @@
                       "pointCount": 5,
                       "pointWeight": 5
                     },
-                    "frames": [
-                      90,
-                      150
-                    ],
+                    "frames": [90, 150],
                     "files": [
                       "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/716cf3f165a52fbb62fe1c6f66a9b077f19e7dcc7977e23b1fb0d423542cb95a/still-003.jpg",
                       "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/kernel-density-spread/716cf3f165a52fbb62fe1c6f66a9b077f19e7dcc7977e23b1fb0d423542cb95a/still-004.jpg"
@@ -21049,12 +20723,7 @@
         "accent": "#9fefca",
         "background": "#0b1219",
         "input": {
-          "values": [
-            "12",
-            "8",
-            "4",
-            "Pending"
-          ],
+          "values": ["12", "8", "4", "Pending"],
           "policy": "widen-to-text",
           "labels": {
             "column": "Fictional item value",
@@ -21348,9 +21017,7 @@
               }
             ]
           ],
-          "highlight": [
-            0
-          ],
+          "highlight": [0],
           "title": "authored.example.ts",
           "footer": "Authored code example",
           "showHighlight": true
@@ -21475,12 +21142,7 @@
               "label": "East"
             }
           ],
-          "edges": [
-            [
-              0,
-              1
-            ]
-          ],
+          "edges": [[0, 1]],
           "showPackets": true
         },
         "accent": "#d5e681",
@@ -21568,10 +21230,7 @@
                     "severity": "low",
                     "category": "readability",
                     "input": "nodes[0] Nexus / CENTRAL NODE, nodes[3] Gamma, edges [3,0] and [0,6]",
-                    "frames": [
-                      90,
-                      150
-                    ],
+                    "frames": [90, 150],
                     "location": "Full-size 1280x800 image, vertical centerline x≈640. Gamma at y≈213-232, Nexus at y≈454-474 and CENTRAL NODE at y≈491-503.",
                     "observation": "The Gamma-to-Nexus line continues through the Gamma label, and the Nexus-to-Zeta line continues behind Nexus and CENTRAL NODE. At frame90 a signal marker also sits immediately above Nexus on the same line.",
                     "consequence": "The connector paint visibly bisects label areas and weakens text separation. The words are still readable, so this is a low-impact readability defect rather than missing or incorrect content."
@@ -22449,10 +22108,10 @@
         "input": {
           "source": {
             "label": "Extreme source",
-            "baseline": -1e+308,
-            "trial": 1e+308,
-            "min": -1e+308,
-            "max": 1e+308,
+            "baseline": -1e308,
+            "trial": 1e308,
+            "min": -1e308,
+            "max": 1e308,
             "unit": "units"
           },
           "outputs": [
@@ -22461,8 +22120,8 @@
               "label": "Linked",
               "multiplier": 1,
               "offset": 0,
-              "min": -1e+308,
-              "max": 1e+308,
+              "min": -1e308,
+              "max": 1e308,
               "unit": "units"
             },
             {
@@ -22470,8 +22129,8 @@
               "label": "Independent",
               "multiplier": 0,
               "offset": 0,
-              "min": -1e+308,
-              "max": 1e+308,
+              "min": -1e308,
+              "max": 1e308,
               "unit": "units"
             }
           ],
@@ -22554,11 +22213,7 @@
           "status": "minor-deferred-for-final-review",
           "description": "Native early and late trial screenshots reproduce the connector across the lower edge of the source -1e+308 endpoint label. In native restored hold, the long segment retracts but the connector elbow still meets the leading minus/lower-left label edge aroundx506,y255.",
           "impact": "Tick text and main values remain readable, but text/line separation is imperfect. Correct restored values do not erase this geometric readability concern.",
-          "evidencePhases": [
-            "action-early",
-            "action-late",
-            "hold"
-          ],
+          "evidencePhases": ["action-early", "action-late", "hold"],
           "durationEstablished": false,
           "lastingWrongValueEstablished": false,
           "priorDispositionPreserved": true,
@@ -22608,44 +22263,20 @@
               "id": "a",
               "label": "Demo exposure zone",
               "polygon": [
-                [
-                  10,
-                  10
-                ],
-                [
-                  65,
-                  10
-                ],
-                [
-                  65,
-                  80
-                ],
-                [
-                  10,
-                  80
-                ]
+                [10, 10],
+                [65, 10],
+                [65, 80],
+                [10, 80]
               ]
             },
             {
               "id": "b",
               "label": "Demo planning zone",
               "polygon": [
-                [
-                  40,
-                  25
-                ],
-                [
-                  90,
-                  25
-                ],
-                [
-                  90,
-                  90
-                ],
-                [
-                  40,
-                  90
-                ]
+                [40, 25],
+                [90, 25],
+                [90, 90],
+                [40, 90]
               ]
             }
           ],
@@ -22786,44 +22417,20 @@
               "id": "w",
               "label": "Demo West",
               "polygon": [
-                [
-                  0,
-                  0
-                ],
-                [
-                  50,
-                  0
-                ],
-                [
-                  50,
-                  100
-                ],
-                [
-                  0,
-                  100
-                ]
+                [0, 0],
+                [50, 0],
+                [50, 100],
+                [0, 100]
               ]
             },
             {
               "id": "e",
               "label": "Demo East",
               "polygon": [
-                [
-                  50,
-                  0
-                ],
-                [
-                  100,
-                  0
-                ],
-                [
-                  100,
-                  100
-                ],
-                [
-                  50,
-                  100
-                ]
+                [50, 0],
+                [100, 0],
+                [100, 100],
+                [50, 100]
               ]
             }
           ],
@@ -22992,18 +22599,12 @@
                 {
                   "id": "w",
                   "label": "West",
-                  "cellIds": [
-                    "nw",
-                    "sw"
-                  ]
+                  "cellIds": ["nw", "sw"]
                 },
                 {
                   "id": "e",
                   "label": "East",
-                  "cellIds": [
-                    "ne",
-                    "se"
-                  ]
+                  "cellIds": ["ne", "se"]
                 }
               ]
             },
@@ -23013,18 +22614,12 @@
                 {
                   "id": "n",
                   "label": "North",
-                  "cellIds": [
-                    "nw",
-                    "ne"
-                  ]
+                  "cellIds": ["nw", "ne"]
                 },
                 {
                   "id": "s",
                   "label": "South",
-                  "cellIds": [
-                    "sw",
-                    "se"
-                  ]
+                  "cellIds": ["sw", "se"]
                 }
               ]
             }
@@ -23788,10 +23383,7 @@
         "type": "transient-entrance-label-overlap",
         "status": "controller-review-later-hold-clear",
         "scope": "native-entrance-capture",
-        "captureWindow": [
-          0.609264,
-          0.694131
-        ],
+        "captureWindow": [0.609264, 0.694131],
         "description": "The incoming A item card covers part of Bundle A, and the card's lower border crosses the heading letters.",
         "laterHoldAssessment": "At 4.807801..4.893479 s Bundle A, A/B/C and Group complete are clear on the collected side. No lasting hold overlap is observed.",
         "isNewFinding": true,
@@ -23808,11 +23400,7 @@
         "severity": "low",
         "type": "sampled-text-line-overlap",
         "status": "retained-concern-visible-in-native-hold",
-        "phase": [
-          "action-early",
-          "action-late",
-          "hold"
-        ],
+        "phase": ["action-early", "action-late", "hold"],
         "location": "Native1280x800 source ruler endpoint 0 around x506..516,y255.",
         "description": "The source connector's horizontal segment runs along/through the lower edge of the small source ruler 0 label in all three separately viewed full-size samples.",
         "impact": "Local line/text separation is reduced while the endpoint numeral and main arithmetic values remain readable. It is not resolved by the later held pose.",
@@ -23863,10 +23451,7 @@
         "severityStatus": "pending-controller-adjudication",
         "type": "confirmed-held-display-omission",
         "status": "source-confirmed-no-fix-made",
-        "phase": [
-          "action-late",
-          "hold"
-        ],
+        "phase": ["action-late", "hold"],
         "description": "Selected, Eligible sites and Not selected are visible bottom summary captions, but no aggregate numbers appear beneath them in the full-size decoded late and held samples.",
         "sourceDerivedExpectedTotals": {
           "selected": 2,
@@ -23923,10 +23508,7 @@
         "type": "retained-transient-account-stamp-occlusion",
         "status": "retained-prior-concern-later-hold-clear",
         "scope": "native-late-action-capture",
-        "captureWindow": [
-          4.005175,
-          4.099856
-        ],
+        "captureWindow": [4.005175, 4.099856],
         "description": "The moving Demo account B stamp crosses the left part of the Draft revised/Demo account A history card, hiding part of its account label.",
         "laterHoldAssessment": "At 4.805071..4.900423 s all four account-history rows are fully readable and correctly labelled, with earlier shared labels unchanged.",
         "isNewFinding": false,
@@ -23945,10 +23527,7 @@
         "type": "retained-intentional-registration-transient-overprint",
         "status": "retained-transient-observation-no-source-change",
         "scope": "native-early-action-capture-and-separate-prior-poster",
-        "captureWindow": [
-          2.80572,
-          2.884661
-        ],
+        "captureWindow": [2.80572, 2.884661],
         "description": "Expired-ticket expected Hold and observed Admit overprint into combined letters at the same result-box position; they are not independently readable in this natural decoded action sample.",
         "laterHoldAssessment": "At 4.804351..4.890389 s Hold and Admit are separated and readable with Differs/amber bracket, while the known row has Admit/Matches.",
         "isNewFinding": false,
@@ -23982,10 +23561,7 @@
         "type": "retained-transient-filter-mask-count-mismatch",
         "status": "retained-prior-concern-later-hold-correct",
         "scope": "native-late-action-capture",
-        "captureWindow": [
-          4.007939,
-          4.0963
-        ],
+        "captureWindow": [4.007939, 4.0963],
         "description": "Both subscribed views already dim/exclude East 5 while still displaying unfiltered 10 items/3 records totals.",
         "laterHoldAssessment": "At 4.806921..4.892306 s both subscribed totals are 5 items/2 records and reference remains 10/3.",
         "isNewFinding": false,
@@ -24058,11 +23634,7 @@
         "status": "minor-deferred-for-final-review",
         "description": "Native early and late trial screenshots reproduce the connector across the lower edge of the source -1e+308 endpoint label. In native restored hold, the long segment retracts but the connector elbow still meets the leading minus/lower-left label edge aroundx506,y255.",
         "impact": "Tick text and main values remain readable, but text/line separation is imperfect. Correct restored values do not erase this geometric readability concern.",
-        "evidencePhases": [
-          "action-early",
-          "action-late",
-          "hold"
-        ],
+        "evidencePhases": ["action-early", "action-late", "hold"],
         "durationEstablished": false,
         "lastingWrongValueEstablished": false,
         "priorDispositionPreserved": true,
@@ -24242,10 +23814,7 @@
             "type": "transient-entrance-label-overlap",
             "status": "controller-review-later-hold-clear",
             "scope": "native-entrance-capture",
-            "captureWindow": [
-              0.609264,
-              0.694131
-            ],
+            "captureWindow": [0.609264, 0.694131],
             "description": "The incoming A item card covers part of Bundle A, and the card's lower border crosses the heading letters.",
             "laterHoldAssessment": "At 4.807801..4.893479 s Bundle A, A/B/C and Group complete are clear on the collected side. No lasting hold overlap is observed.",
             "isNewFinding": true,
@@ -24267,11 +23836,7 @@
             "severity": "low",
             "type": "sampled-text-line-overlap",
             "status": "retained-concern-visible-in-native-hold",
-            "phase": [
-              "action-early",
-              "action-late",
-              "hold"
-            ],
+            "phase": ["action-early", "action-late", "hold"],
             "location": "Native1280x800 source ruler endpoint 0 around x506..516,y255.",
             "description": "The source connector's horizontal segment runs along/through the lower edge of the small source ruler 0 label in all three separately viewed full-size samples.",
             "impact": "Local line/text separation is reduced while the endpoint numeral and main arithmetic values remain readable. It is not resolved by the later held pose.",
@@ -24383,10 +23948,7 @@
             "severityStatus": "pending-controller-adjudication",
             "type": "confirmed-held-display-omission",
             "status": "source-confirmed-no-fix-made",
-            "phase": [
-              "action-late",
-              "hold"
-            ],
+            "phase": ["action-late", "hold"],
             "description": "Selected, Eligible sites and Not selected are visible bottom summary captions, but no aggregate numbers appear beneath them in the full-size decoded late and held samples.",
             "sourceDerivedExpectedTotals": {
               "selected": 2,
@@ -24482,10 +24044,7 @@
             "type": "retained-transient-account-stamp-occlusion",
             "status": "retained-prior-concern-later-hold-clear",
             "scope": "native-late-action-capture",
-            "captureWindow": [
-              4.005175,
-              4.099856
-            ],
+            "captureWindow": [4.005175, 4.099856],
             "description": "The moving Demo account B stamp crosses the left part of the Draft revised/Demo account A history card, hiding part of its account label.",
             "laterHoldAssessment": "At 4.805071..4.900423 s all four account-history rows are fully readable and correctly labelled, with earlier shared labels unchanged.",
             "isNewFinding": false,
@@ -24509,10 +24068,7 @@
             "type": "retained-intentional-registration-transient-overprint",
             "status": "retained-transient-observation-no-source-change",
             "scope": "native-early-action-capture-and-separate-prior-poster",
-            "captureWindow": [
-              2.80572,
-              2.884661
-            ],
+            "captureWindow": [2.80572, 2.884661],
             "description": "Expired-ticket expected Hold and observed Admit overprint into combined letters at the same result-box position; they are not independently readable in this natural decoded action sample.",
             "laterHoldAssessment": "At 4.804351..4.890389 s Hold and Admit are separated and readable with Differs/amber bracket, while the known row has Admit/Matches.",
             "isNewFinding": false,
@@ -24575,10 +24131,7 @@
             "type": "retained-transient-filter-mask-count-mismatch",
             "status": "retained-prior-concern-later-hold-correct",
             "scope": "native-late-action-capture",
-            "captureWindow": [
-              4.007939,
-              4.0963
-            ],
+            "captureWindow": [4.007939, 4.0963],
             "description": "Both subscribed views already dim/exclude East 5 while still displaying unfiltered 10 items/3 records totals.",
             "laterHoldAssessment": "At 4.806921..4.892306 s both subscribed totals are 5 items/2 records and reference remains 10/3.",
             "isNewFinding": false,
@@ -24715,11 +24268,7 @@
             "status": "minor-deferred-for-final-review",
             "description": "Native early and late trial screenshots reproduce the connector across the lower edge of the source -1e+308 endpoint label. In native restored hold, the long segment retracts but the connector elbow still meets the leading minus/lower-left label edge aroundx506,y255.",
             "impact": "Tick text and main values remain readable, but text/line separation is imperfect. Correct restored values do not erase this geometric readability concern.",
-            "evidencePhases": [
-              "action-early",
-              "action-late",
-              "hold"
-            ],
+            "evidencePhases": ["action-early", "action-late", "hold"],
             "durationEstablished": false,
             "lastingWrongValueEstablished": false,
             "priorDispositionPreserved": true,
@@ -30916,14 +30465,7 @@
           "luminanceJumpMaximum": 25
         },
         "parameters": {
-          "samples": [
-            0,
-            18,
-            36,
-            90,
-            150,
-            179
-          ],
+          "samples": [0, 18, 36, 90, 150, 179],
           "frames": 180,
           "fps": 30,
           "width": 1280,
@@ -31028,9 +30570,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31185,9 +30725,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31285,9 +30823,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31392,9 +30928,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31500,9 +31034,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31600,9 +31132,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31700,9 +31230,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31812,9 +31340,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -31914,9 +31440,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32016,9 +31540,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32129,9 +31651,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32250,9 +31770,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32288,9 +31806,7 @@
                 },
                 "response": {
                   "label": "Authored example response",
-                  "lines": [
-                    "Blue shed, noon."
-                  ]
+                  "lines": ["Blue shed, noon."]
                 },
                 "copy": {
                   "device": "Example tablet",
@@ -32357,9 +31873,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32474,9 +31988,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32584,9 +32096,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32618,10 +32128,7 @@
                 },
                 "object": {
                   "label": "Example shift brief",
-                  "details": [
-                    "Blue shed",
-                    "Crate labels"
-                  ]
+                  "details": ["Blue shed", "Crate labels"]
                 },
                 "outcome": "accepted",
                 "copy": {
@@ -32691,9 +32198,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32809,9 +32314,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -32925,9 +32428,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33039,9 +32540,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33073,27 +32572,19 @@
                     "id": "stock",
                     "title": "Available units",
                     "kind": "value",
-                    "lines": [
-                      "18 units"
-                    ]
+                    "lines": ["18 units"]
                   },
                   {
                     "id": "supplies",
                     "title": "Supplies",
                     "kind": "list",
-                    "lines": [
-                      "Paper",
-                      "Ink",
-                      "Labels"
-                    ]
+                    "lines": ["Paper", "Ink", "Labels"]
                   },
                   {
                     "id": "note",
                     "title": "Context",
                     "kind": "note",
-                    "lines": [
-                      "Sample inventory only"
-                    ]
+                    "lines": ["Sample inventory only"]
                   }
                 ],
                 "featuredWidgetId": "stock",
@@ -33157,9 +32648,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33260,9 +32749,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33374,9 +32861,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33487,9 +32972,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33599,9 +33082,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33706,9 +33187,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33831,9 +33310,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33967,9 +33444,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -33999,44 +33474,26 @@
                   {
                     "id": "a",
                     "label": "Paper",
-                    "groups": [
-                      "North",
-                      "Stored"
-                    ]
+                    "groups": ["North", "Stored"]
                   },
                   {
                     "id": "b",
                     "label": "Ink",
-                    "groups": [
-                      "North",
-                      "Review"
-                    ]
+                    "groups": ["North", "Review"]
                   },
                   {
                     "id": "c",
                     "label": "Labels",
-                    "groups": [
-                      "South",
-                      "Stored"
-                    ]
+                    "groups": ["South", "Stored"]
                   },
                   {
                     "id": "d",
                     "label": "Folders",
-                    "groups": [
-                      "North",
-                      "Stored"
-                    ]
+                    "groups": ["North", "Stored"]
                   }
                 ],
-                "dimensions": [
-                  "Area",
-                  "State"
-                ],
-                "selectionPath": [
-                  "North",
-                  "Stored"
-                ],
+                "dimensions": ["Area", "State"],
+                "selectionPath": ["North", "Stored"],
                 "labels": {
                   "title": "Fictional supply drilldown",
                   "root": "All sample records",
@@ -34102,9 +33559,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -34232,9 +33687,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -34355,9 +33808,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -34467,9 +33918,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -34572,9 +34021,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -34604,26 +34051,17 @@
                   {
                     "id": "v1",
                     "label": "Draft A",
-                    "content": [
-                      "Field notes",
-                      "Open questions"
-                    ]
+                    "content": ["Field notes", "Open questions"]
                   },
                   {
                     "id": "v2",
                     "label": "Draft B",
-                    "content": [
-                      "Field notes",
-                      "Next steps"
-                    ]
+                    "content": ["Field notes", "Next steps"]
                   },
                   {
                     "id": "v3",
                     "label": "Draft C",
-                    "content": [
-                      "Field summary",
-                      "Next steps"
-                    ]
+                    "content": ["Field summary", "Next steps"]
                   }
                 ],
                 "restoreRevisionId": "v1",
@@ -34694,9 +34132,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -34809,9 +34245,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -34919,9 +34353,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -35020,9 +34452,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -35127,9 +34557,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -35238,9 +34666,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -35345,9 +34771,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -35475,9 +34899,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -35672,9 +35094,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -35814,9 +35234,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36034,9 +35452,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36165,9 +35581,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36296,9 +35710,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36409,9 +35821,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36529,9 +35939,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36686,9 +36094,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36842,9 +36248,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -36955,9 +36359,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37105,9 +36507,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37223,9 +36623,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37348,9 +36746,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37500,9 +36896,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37620,9 +37014,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37734,9 +37126,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37841,9 +37231,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -37960,9 +37348,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38093,9 +37479,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38211,9 +37595,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38353,9 +37735,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38464,9 +37844,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38597,9 +37975,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38707,9 +38083,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38842,9 +38216,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -38959,9 +38331,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -39119,9 +38489,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -39235,9 +38603,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -39360,9 +38726,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -39572,9 +38936,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -39687,9 +39049,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -39814,9 +39174,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -39927,9 +39285,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40060,9 +39416,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40129,19 +39483,11 @@
                 "readingGroups": [
                   {
                     "bookId": "book-a",
-                    "learnerIds": [
-                      "a",
-                      "b",
-                      "c"
-                    ]
+                    "learnerIds": ["a", "b", "c"]
                   },
                   {
                     "bookId": "book-b",
-                    "learnerIds": [
-                      "d",
-                      "e",
-                      "f"
-                    ]
+                    "learnerIds": ["d", "e", "f"]
                   }
                 ],
                 "startingShelf": "front",
@@ -40209,9 +39555,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40275,34 +39619,19 @@
                 "trays": [
                   {
                     "learnerId": "a",
-                    "componentIds": [
-                      "grain",
-                      "beans",
-                      "fruit"
-                    ]
+                    "componentIds": ["grain", "beans", "fruit"]
                   },
                   {
                     "learnerId": "b",
-                    "componentIds": [
-                      "grain",
-                      "beans",
-                      "fruit"
-                    ]
+                    "componentIds": ["grain", "beans", "fruit"]
                   },
                   {
                     "learnerId": "c",
-                    "componentIds": [
-                      "grain",
-                      "beans",
-                      "fruit"
-                    ]
+                    "componentIds": ["grain", "beans", "fruit"]
                   },
                   {
                     "learnerId": "d",
-                    "componentIds": [
-                      "grain",
-                      "beans"
-                    ]
+                    "componentIds": ["grain", "beans"]
                   }
                 ],
                 "labels": {
@@ -40371,9 +39700,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40506,9 +39833,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40609,9 +39934,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40725,9 +40048,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40758,44 +40079,20 @@
                     "id": "a",
                     "label": "Demo exposure zone",
                     "polygon": [
-                      [
-                        10,
-                        10
-                      ],
-                      [
-                        65,
-                        10
-                      ],
-                      [
-                        65,
-                        80
-                      ],
-                      [
-                        10,
-                        80
-                      ]
+                      [10, 10],
+                      [65, 10],
+                      [65, 80],
+                      [10, 80]
                     ]
                   },
                   {
                     "id": "b",
                     "label": "Demo planning zone",
                     "polygon": [
-                      [
-                        40,
-                        25
-                      ],
-                      [
-                        90,
-                        25
-                      ],
-                      [
-                        90,
-                        90
-                      ],
-                      [
-                        40,
-                        90
-                      ]
+                      [40, 25],
+                      [90, 25],
+                      [90, 90],
+                      [40, 90]
                     ]
                   }
                 ],
@@ -40898,9 +40195,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -40931,44 +40226,20 @@
                     "id": "west",
                     "label": "Service A footprint",
                     "polygon": [
-                      [
-                        5,
-                        10
-                      ],
-                      [
-                        60,
-                        10
-                      ],
-                      [
-                        60,
-                        85
-                      ],
-                      [
-                        5,
-                        85
-                      ]
+                      [5, 10],
+                      [60, 10],
+                      [60, 85],
+                      [5, 85]
                     ]
                   },
                   {
                     "id": "east",
                     "label": "Service B footprint",
                     "polygon": [
-                      [
-                        40,
-                        15
-                      ],
-                      [
-                        85,
-                        15
-                      ],
-                      [
-                        85,
-                        85
-                      ],
-                      [
-                        40,
-                        85
-                      ]
+                      [40, 15],
+                      [85, 15],
+                      [85, 85],
+                      [40, 85]
                     ]
                   }
                 ],
@@ -41071,9 +40342,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -41150,11 +40419,7 @@
                     "label": "Day 3"
                   }
                 ],
-                "investigationCaseIds": [
-                  "a",
-                  "b",
-                  "c"
-                ],
+                "investigationCaseIds": ["a", "b", "c"],
                 "focusedBinId": "d2",
                 "copy": {
                   "context": "Fictional case review; schematic map",
@@ -41223,9 +40488,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -41256,44 +40519,20 @@
                     "id": "w",
                     "label": "West stratum",
                     "polygon": [
-                      [
-                        5,
-                        5
-                      ],
-                      [
-                        50,
-                        5
-                      ],
-                      [
-                        50,
-                        95
-                      ],
-                      [
-                        5,
-                        95
-                      ]
+                      [5, 5],
+                      [50, 5],
+                      [50, 95],
+                      [5, 95]
                     ]
                   },
                   {
                     "id": "e",
                     "label": "East stratum",
                     "polygon": [
-                      [
-                        50,
-                        5
-                      ],
-                      [
-                        95,
-                        5
-                      ],
-                      [
-                        95,
-                        95
-                      ],
-                      [
-                        50,
-                        95
-                      ]
+                      [50, 5],
+                      [95, 5],
+                      [95, 95],
+                      [50, 95]
                     ]
                   }
                 ],
@@ -41334,10 +40573,7 @@
                     "y": 75
                   }
                 ],
-                "selectedSiteIds": [
-                  "a",
-                  "d"
-                ],
+                "selectedSiteIds": ["a", "d"],
                 "copy": {
                   "context": "Fictional schematic sampling plan",
                   "selected": "Selected",
@@ -41403,9 +40639,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -41526,9 +40760,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -41559,22 +40791,10 @@
                     "id": "a",
                     "label": "Demo West",
                     "polygon": [
-                      [
-                        5,
-                        10
-                      ],
-                      [
-                        45,
-                        10
-                      ],
-                      [
-                        45,
-                        90
-                      ],
-                      [
-                        5,
-                        90
-                      ]
+                      [5, 10],
+                      [45, 10],
+                      [45, 90],
+                      [5, 90]
                     ],
                     "records": 4,
                     "population": 40
@@ -41583,22 +40803,10 @@
                     "id": "b",
                     "label": "Demo East",
                     "polygon": [
-                      [
-                        55,
-                        10
-                      ],
-                      [
-                        95,
-                        10
-                      ],
-                      [
-                        95,
-                        90
-                      ],
-                      [
-                        55,
-                        90
-                      ]
+                      [55, 10],
+                      [95, 10],
+                      [95, 90],
+                      [55, 90]
                     ],
                     "records": 3,
                     "population": 10
@@ -41676,9 +40884,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -41745,18 +40951,12 @@
                       {
                         "id": "w",
                         "label": "West",
-                        "cellIds": [
-                          "nw",
-                          "sw"
-                        ]
+                        "cellIds": ["nw", "sw"]
                       },
                       {
                         "id": "e",
                         "label": "East",
-                        "cellIds": [
-                          "ne",
-                          "se"
-                        ]
+                        "cellIds": ["ne", "se"]
                       }
                     ]
                   },
@@ -41766,18 +40966,12 @@
                       {
                         "id": "n",
                         "label": "North",
-                        "cellIds": [
-                          "nw",
-                          "ne"
-                        ]
+                        "cellIds": ["nw", "ne"]
                       },
                       {
                         "id": "s",
                         "label": "South",
-                        "cellIds": [
-                          "sw",
-                          "se"
-                        ]
+                        "cellIds": ["sw", "se"]
                       }
                     ]
                   }
@@ -41849,9 +41043,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -41997,9 +41189,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -42030,44 +41220,20 @@
                     "id": "w",
                     "label": "Demo West",
                     "polygon": [
-                      [
-                        0,
-                        0
-                      ],
-                      [
-                        50,
-                        0
-                      ],
-                      [
-                        50,
-                        100
-                      ],
-                      [
-                        0,
-                        100
-                      ]
+                      [0, 0],
+                      [50, 0],
+                      [50, 100],
+                      [0, 100]
                     ]
                   },
                   {
                     "id": "e",
                     "label": "Demo East",
                     "polygon": [
-                      [
-                        50,
-                        0
-                      ],
-                      [
-                        100,
-                        0
-                      ],
-                      [
-                        100,
-                        100
-                      ],
-                      [
-                        50,
-                        100
-                      ]
+                      [50, 0],
+                      [100, 0],
+                      [100, 100],
+                      [50, 100]
                     ]
                   }
                 ],
@@ -42162,9 +41328,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -42304,9 +41468,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -42439,9 +41601,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -42570,9 +41730,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -42684,9 +41842,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -42791,9 +41947,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -42899,9 +42053,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43025,9 +42177,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43138,9 +42288,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43250,9 +42398,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43375,9 +42521,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43490,9 +42634,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43603,9 +42745,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43718,9 +42858,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43850,9 +42988,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -43972,9 +43108,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -44103,9 +43237,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -44247,9 +43379,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -44394,9 +43524,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -44513,9 +43641,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -44657,9 +43783,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -44769,9 +43893,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -44900,9 +44022,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45019,9 +44139,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45122,9 +44240,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45227,9 +44343,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45329,9 +44443,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45448,9 +44560,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45558,9 +44668,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45670,9 +44778,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45784,9 +44890,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45908,9 +45012,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -45940,48 +45042,28 @@
                   {
                     "id": "key",
                     "label": "Key",
-                    "cells": [
-                      "A",
-                      "B",
-                      "B"
-                    ]
+                    "cells": ["A", "B", "B"]
                   },
                   {
                     "id": "name",
                     "label": "Name",
-                    "cells": [
-                      "Ash",
-                      "Birch",
-                      "Birch"
-                    ]
+                    "cells": ["Ash", "Birch", "Birch"]
                   },
                   {
                     "id": "value",
                     "label": "Items",
-                    "cells": [
-                      "2",
-                      "4",
-                      "4"
-                    ]
+                    "cells": ["2", "4", "4"]
                   }
                 ],
-                "cachedColumnIds": [
-                  "key",
-                  "name"
-                ],
+                "cachedColumnIds": ["key", "name"],
                 "requests": [
                   {
                     "label": "Read names",
-                    "columnIds": [
-                      "name"
-                    ]
+                    "columnIds": ["name"]
                   },
                   {
                     "label": "Read items",
-                    "columnIds": [
-                      "key",
-                      "value"
-                    ]
+                    "columnIds": ["key", "value"]
                   }
                 ],
                 "keyColumnId": "key",
@@ -46048,9 +45130,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46090,18 +45170,12 @@
                   {
                     "id": "one",
                     "label": "Operation 1",
-                    "requestedIds": [
-                      "a",
-                      "b"
-                    ]
+                    "requestedIds": ["a", "b"]
                   },
                   {
                     "id": "two",
                     "label": "Operation 2",
-                    "requestedIds": [
-                      "b",
-                      "a"
-                    ]
+                    "requestedIds": ["b", "a"]
                   }
                 ],
                 "firstOperationId": "one",
@@ -46168,9 +45242,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46196,11 +45268,7 @@
               "accent": "#9fefca",
               "background": "#0b1219",
               "input": {
-                "originalRows": [
-                  "A: 2",
-                  "B: 4",
-                  "C: 3"
-                ],
+                "originalRows": ["A: 2", "B: 4", "C: 3"],
                 "attempt": {
                   "rowIndex": 1,
                   "replacement": "B: 9",
@@ -46208,11 +45276,7 @@
                 },
                 "reload": {
                   "performed": true,
-                  "rows": [
-                    "A: 2",
-                    "B: 4",
-                    "C: 3"
-                  ]
+                  "rows": ["A: 2", "B: 4", "C: 3"]
                 },
                 "labels": {
                   "readable": "Readable",
@@ -46278,9 +45342,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46405,9 +45467,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46519,9 +45579,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46646,9 +45704,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46766,9 +45822,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46871,9 +45925,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46970,9 +46022,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -46999,19 +46049,10 @@
               "background": "#0b1219",
               "input": {
                 "grid": {
-                  "columnLabels": [
-                    "Site",
-                    "Items"
-                  ],
+                  "columnLabels": ["Site", "Items"],
                   "rows": [
-                    [
-                      "West",
-                      "12"
-                    ],
-                    [
-                      "East",
-                      "8"
-                    ]
+                    ["West", "12"],
+                    ["East", "8"]
                   ]
                 },
                 "signal": "ruling-lines",
@@ -47079,9 +46120,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -47191,9 +46230,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -47328,9 +46365,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -47460,9 +46495,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -47594,9 +46627,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -47624,12 +46655,7 @@
               "input": {
                 "saved": {
                   "page": 2,
-                  "box": [
-                    10,
-                    20,
-                    85,
-                    70
-                  ],
+                  "box": [10, 20, 85, 70],
                   "header": "Site | Items",
                   "fingerprint": "FP-A"
                 },
@@ -47708,9 +46734,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -47754,31 +46778,17 @@
                   "rows": [
                     {
                       "id": "a",
-                      "cells": [
-                        "West",
-                        "12",
-                        "Review"
-                      ]
+                      "cells": ["West", "12", "Review"]
                     },
                     {
                       "id": "b",
-                      "cells": [
-                        "East",
-                        "8",
-                        "Draft"
-                      ]
+                      "cells": ["East", "8", "Draft"]
                     }
                   ]
                 },
                 "selection": {
-                  "rowIds": [
-                    "a",
-                    "b"
-                  ],
-                  "columnIds": [
-                    "site",
-                    "items"
-                  ]
+                  "rowIds": ["a", "b"],
+                  "columnIds": ["site", "items"]
                 },
                 "liveEdit": {
                   "rowId": "a",
@@ -47853,9 +46863,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -47984,9 +46992,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48109,9 +47115,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48162,19 +47166,11 @@
                 "schemes": [
                   {
                     "label": "Equal-width example",
-                    "breaks": [
-                      0,
-                      5,
-                      10
-                    ]
+                    "breaks": [0, 5, 10]
                   },
                   {
                     "label": "Alternative breaks",
-                    "breaks": [
-                      0,
-                      3,
-                      10
-                    ]
+                    "breaks": [0, 3, 10]
                   }
                 ],
                 "unitLabel": "recorded items",
@@ -48242,9 +47238,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48351,9 +47345,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48491,9 +47483,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48613,9 +47603,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48734,9 +47722,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48854,9 +47840,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -48977,9 +47961,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49006,30 +47988,12 @@
               "background": "#0b1219",
               "input": {
                 "vertices": [
-                  [
-                    10,
-                    50
-                  ],
-                  [
-                    25,
-                    53
-                  ],
-                  [
-                    40,
-                    49
-                  ],
-                  [
-                    55,
-                    72
-                  ],
-                  [
-                    70,
-                    50
-                  ],
-                  [
-                    90,
-                    52
-                  ]
+                  [10, 50],
+                  [25, 53],
+                  [40, 49],
+                  [55, 72],
+                  [70, 50],
+                  [90, 52]
                 ],
                 "tolerance": 6,
                 "labels": {
@@ -49102,9 +48066,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49237,9 +48199,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49353,9 +48313,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49471,9 +48429,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49594,9 +48550,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49622,12 +48576,7 @@
               "accent": "#9fefca",
               "background": "#0b1219",
               "input": {
-                "values": [
-                  "12",
-                  "8",
-                  "4",
-                  "Pending"
-                ],
+                "values": ["12", "8", "4", "Pending"],
                 "policy": "widen-to-text",
                 "labels": {
                   "column": "Fictional item value",
@@ -49699,9 +48648,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49761,14 +48708,7 @@
         "inputManifestPath": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/final-configured-inputs/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/manifest.json",
         "inputManifestSha256": "51d2927ee383ee6cbe81634ea43746ada27492456e08c2a0f28e0aba8c7102f9",
         "parameters": {
-          "samples": [
-            0,
-            18,
-            36,
-            90,
-            150,
-            179
-          ],
+          "samples": [0, 18, 36, 90, 150, 179],
           "frames": 180,
           "fps": 30,
           "width": 1280,
@@ -49869,9 +48809,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -49925,9 +48863,7 @@
                     }
                   ]
                 ],
-                "highlight": [
-                  0
-                ],
+                "highlight": [0],
                 "title": "authored.example.ts",
                 "footer": "Authored code example",
                 "showHighlight": true
@@ -49998,9 +48934,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -50059,12 +48993,7 @@
                     "label": "East"
                   }
                 ],
-                "edges": [
-                  [
-                    0,
-                    1
-                  ]
-                ],
+                "edges": [[0, 1]],
                 "showPackets": true
               },
               "accent": "#d5e681",
@@ -50133,9 +49062,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -50257,9 +49184,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -50407,9 +49332,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -50554,9 +49477,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -50781,9 +49702,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -50924,9 +49843,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -51079,9 +49996,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -51129,10 +50044,10 @@
               "input": {
                 "source": {
                   "label": "Extreme source",
-                  "baseline": -1e+308,
-                  "trial": 1e+308,
-                  "min": -1e+308,
-                  "max": 1e+308,
+                  "baseline": -1e308,
+                  "trial": 1e308,
+                  "min": -1e308,
+                  "max": 1e308,
                   "unit": "units"
                 },
                 "outputs": [
@@ -51141,8 +50056,8 @@
                     "label": "Linked",
                     "multiplier": 1,
                     "offset": 0,
-                    "min": -1e+308,
-                    "max": 1e+308,
+                    "min": -1e308,
+                    "max": 1e308,
                     "unit": "units"
                   },
                   {
@@ -51150,8 +50065,8 @@
                     "label": "Independent",
                     "multiplier": 0,
                     "offset": 0,
-                    "min": -1e+308,
-                    "max": 1e+308,
+                    "min": -1e308,
+                    "max": 1e308,
                     "unit": "units"
                   }
                 ],
@@ -51230,9 +50145,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -51283,44 +50196,20 @@
                     "id": "a",
                     "label": "Demo exposure zone",
                     "polygon": [
-                      [
-                        10,
-                        10
-                      ],
-                      [
-                        65,
-                        10
-                      ],
-                      [
-                        65,
-                        80
-                      ],
-                      [
-                        10,
-                        80
-                      ]
+                      [10, 10],
+                      [65, 10],
+                      [65, 80],
+                      [10, 80]
                     ]
                   },
                   {
                     "id": "b",
                     "label": "Demo planning zone",
                     "polygon": [
-                      [
-                        40,
-                        25
-                      ],
-                      [
-                        90,
-                        25
-                      ],
-                      [
-                        90,
-                        90
-                      ],
-                      [
-                        40,
-                        90
-                      ]
+                      [40, 25],
+                      [90, 25],
+                      [90, 90],
+                      [40, 90]
                     ]
                   }
                 ],
@@ -51433,9 +50322,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -51486,44 +50373,20 @@
                     "id": "w",
                     "label": "Demo West",
                     "polygon": [
-                      [
-                        0,
-                        0
-                      ],
-                      [
-                        50,
-                        0
-                      ],
-                      [
-                        50,
-                        100
-                      ],
-                      [
-                        0,
-                        100
-                      ]
+                      [0, 0],
+                      [50, 0],
+                      [50, 100],
+                      [0, 100]
                     ]
                   },
                   {
                     "id": "e",
                     "label": "Demo East",
                     "polygon": [
-                      [
-                        50,
-                        0
-                      ],
-                      [
-                        100,
-                        0
-                      ],
-                      [
-                        100,
-                        100
-                      ],
-                      [
-                        50,
-                        100
-                      ]
+                      [50, 0],
+                      [100, 0],
+                      [100, 100],
+                      [50, 100]
                     ]
                   }
                 ],
@@ -51628,9 +50491,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -51717,18 +50578,12 @@
                       {
                         "id": "w",
                         "label": "West",
-                        "cellIds": [
-                          "nw",
-                          "sw"
-                        ]
+                        "cellIds": ["nw", "sw"]
                       },
                       {
                         "id": "e",
                         "label": "East",
-                        "cellIds": [
-                          "ne",
-                          "se"
-                        ]
+                        "cellIds": ["ne", "se"]
                       }
                     ]
                   },
@@ -51738,18 +50593,12 @@
                       {
                         "id": "n",
                         "label": "North",
-                        "cellIds": [
-                          "nw",
-                          "ne"
-                        ]
+                        "cellIds": ["nw", "ne"]
                       },
                       {
                         "id": "s",
                         "label": "South",
-                        "cellIds": [
-                          "sw",
-                          "se"
-                        ]
+                        "cellIds": ["sw", "se"]
                       }
                     ]
                   }
@@ -51831,9 +50680,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -51968,9 +50815,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -52105,9 +50950,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {
@@ -52245,9 +51088,7 @@
                     "duration": "6.000000",
                     "nb_frames": "180",
                     "nb_read_frames": "180",
-                    "side_data_list": [
-                      {}
-                    ]
+                    "side_data_list": [{}]
                   }
                 ],
                 "format": {

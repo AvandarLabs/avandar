@@ -1,5 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { FitText } from "../../primitives/FitText/FitText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { CacheOrigin } from "./CacheOrigin";
 import { CacheRequester } from "./CacheRequester";

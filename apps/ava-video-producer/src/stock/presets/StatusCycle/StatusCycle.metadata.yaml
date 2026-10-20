@@ -18,11 +18,13 @@ tags:
     message: confirmation
 useWhen:
   id: motionAtlas.status-cycle.useWhen
-  message: Explain a generic state progression; show real product footage to prove actual
+  message:
+    Explain a generic state progression; show real product footage to prove actual
     behavior.
 prompt:
   id: motionAtlas.status-cycle.prompt
-  message: Use Motion Atlas "State progression" (status-cycle) as a conceptual graphic.
+  message:
+    Use Motion Atlas "State progression" (status-cycle) as a conceptual graphic.
     Explain a generic state progression; show real product footage to prove actual
     behavior. Keep the restrained motion and readable labels; replace sample content
     with approved facts before making product claims.
@@ -31,11 +33,13 @@ creativeDirection:
   message: A task moves through waiting, active, and complete states.
 goodFor:
   - id: motionAtlas.status-cycle.goodFor.0
-    message: Explain a generic state progression; show real product footage to prove actual
+    message:
+      Explain a generic state progression; show real product footage to prove actual
       behavior.
 intent:
   id: motionAtlas.status-cycle.intent
-  message: Explain a generic state progression; show real product footage to prove actual
+  message:
+    Explain a generic state progression; show real product footage to prove actual
     behavior.
 domains:
   - id: motionAtlas.status-cycle.domains.0
@@ -51,7 +55,8 @@ aliases:
     message: confirmation
 notFor:
   - id: motionAtlas.status-cycle.notFor.0
-    message: Only the fixed authored layout and declared collection bounds are supported. No
+    message:
+      Only the fixed authored layout and declared collection bounds are supported. No
       measured relationships are inferred.
 motionBeats: []
 distinction:

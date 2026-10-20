@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { productRequirements } from "./lib/productRequirements/productRequirements";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -38,6 +37,7 @@ import {
   previewFrames,
   requireMatchingPreview,
 } from "./lib/planHelpers";
+import { productRequirements } from "./lib/productRequirements/productRequirements";
 import { videoWorkspace } from "./lib/video-workspace.mjs";
 import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "./require-license.mjs";
@@ -199,7 +199,10 @@ async function stageAssets(
   const target = path.join(directory, "bundle-public");
   await fs.mkdir(target);
   await fs.mkdir(path.join(target, "fonts"));
-  await fs.copyFile(await publicAsset(ROOT, "fonts/geist-latin.woff2"), path.join(target, "fonts/geist-latin.woff2"));
+  await fs.copyFile(
+    await publicAsset(ROOT, "fonts/geist-latin.woff2"),
+    path.join(target, "fonts/geist-latin.woff2"),
+  );
   for (const asset of assetReferences(plan)) {
     const destination = path.join(target, asset);
     await fs.mkdir(path.dirname(destination), { recursive: true });
@@ -239,9 +242,7 @@ async function preview(plan: Storyboard, filename: string, workspace: string) {
   // can fail WebGL2 context creation. This does not replace serial rendering.
   const chromiumOptions = {
     headless: true,
-    ...(productRequirements(plan).needsMap
-      ? { gl: "angle" as const }
-      : {}),
+    ...(productRequirements(plan).needsMap ? { gl: "angle" as const } : {}),
   };
   const browser = await openBrowser("chrome", {
     ...browserOptions,
@@ -361,9 +362,7 @@ async function render(plan: Storyboard, filename: string, workspace: string) {
           ? "src/avandar-entry.tsx"
           : "src/index.ts",
         RENDER_PUBLIC_DIR: publicDir,
-        RENDER_GL: productRequirements(plan).needsMap
-          ? "angle"
-          : "",
+        RENDER_GL: productRequirements(plan).needsMap ? "angle" : "",
         REMOTION_PROPS_FILE: props,
         DELIVER: `${plan.delivery.width}:${plan.delivery.height}`,
         STANDALONE: plan.purpose === "standalone" ? "1" : "0",

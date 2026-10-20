@@ -3,7 +3,8 @@ name:
   message: Collect, then release a batch
 description:
   id: motionAtlas.batch-release.description
-  message: Individual items wait together inside a forming batch boundary. Once every item
+  message:
+    Individual items wait together inside a forming batch boundary. Once every item
     in the supplied group arrives, the boundary closes and the group crosses the
     dispatch boundary as one unit.
 category:
@@ -17,7 +18,8 @@ prompt:
   message: Show why individual arrivals are held and then handled together.
 creativeDirection:
   id: motionAtlas.batch-release.creativeDirection
-  message: After the entrance, item tokens arrive separately at a shallow loading cradle
+  message:
+    After the entrance, item tokens arrive separately at a shallow loading cradle
     during 18..62. A bracket grows around the supplied group but remains open while any
     member is missing. At 68, the final item docks, the bracket closes into an envelope,
     and the supplied release caption appears. During 82..112, the envelope crosses one
@@ -31,7 +33,8 @@ intent:
   message: Show why individual arrivals are held and then handled together.
 distinction:
   id: motionAtlas.batch-release.distinction
-  message: Source-merge converges inputs into a shared destination; this preserves
+  message:
+    Source-merge converges inputs into a shared destination; this preserves
     separate items inside a new handling boundary and explains the wait before one
     dispatch. The batch envelope, not a relabeled row of cards, is the hero
     transformation.
@@ -67,10 +70,12 @@ aliases:
     message: Work grouping
 notFor:
   - id: motionAtlas.batch-release.notFor.0
-    message: Default groups and items are fictional; every token is one supplied item and
+    message:
+      Default groups and items are fictional; every token is one supplied item and
       every envelope is one supplied batch.
   - id: motionAtlas.batch-release.notFor.1
-    message: The authored membership defines completion; no scheduler, elapsed-time rule,
+    message:
+      The authored membership defines completion; no scheduler, elapsed-time rule,
       transaction guarantee, or automatic grouping algorithm is implied.
   - id: motionAtlas.batch-release.notFor.2
     message: No processing-efficiency or cost improvement is quantified by the animation.

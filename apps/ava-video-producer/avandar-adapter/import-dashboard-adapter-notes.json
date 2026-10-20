@@ -1,9 +1,5 @@
 {
-  "screens": [
-    "Data Sources import",
-    "Dashboard editor",
-    "Dashboard preview"
-  ],
+  "screens": ["Data Sources import", "Dashboard editor", "Dashboard preview"],
   "layoutSources": [
     "src/views/DataManagerApp/DataImportView/DataImportView.tsx",
     "src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx",

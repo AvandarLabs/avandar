@@ -3,7 +3,8 @@ name:
   message: Drill into a selected group
 description:
   id: motionAtlas.nested-drilldown-window.description
-  message: Nested selection windows isolate a group and then a subgroup while retaining
+  message:
+    Nested selection windows isolate a group and then a subgroup while retaining
     the parent context. The remaining record tiles expand into readable detail without
     changing membership.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Show how a specific answer is reached by narrowing an explicit set of records.
 creativeDirection:
   id: motionAtlas.nested-drilldown-window.creativeDirection
-  message: Frames 12-40 show record slips organized by the first supplied dimension. A
+  message:
+    Frames 12-40 show record slips organized by the first supplied dimension. A
     window outlines the first selected group, and other groups recede into a parent
     strip. For a two-element selectionPath, frames 74-118 open second-dimension
     compartments and isolate the supplied subgroup. For a one-element path, omit that
@@ -26,12 +28,14 @@ intent:
   message: Show how a specific answer is reached by narrowing an explicit set of records.
 distinction:
   id: motionAtlas.nested-drilldown-window.distinction
-  message: Unlike dot-matrix, units do not arrive to illustrate a proportion. Existing
+  message:
+    Unlike dot-matrix, units do not arrive to illustrate a proportion. Existing
     named records retain identity while hierarchical membership determines which records
     occupy the detail view.
 prompt:
   id: motionAtlas.nested-drilldown-window.prompt
-  message: Use Motion Atlas "Drill into a selected group" (nested-drilldown-window) as a
+  message:
+    Use Motion Atlas "Drill into a selected group" (nested-drilldown-window) as a
     conceptual graphic. Show how a specific answer is reached by narrowing an explicit
     set of records. Replace fictional sample content with approved authored content
     before making product claims.
@@ -73,20 +77,23 @@ aliases:
     message: subset
 notFor:
   - id: motionAtlas.nested-drilldown-window.notFor.literal-whitespace
-    message: "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
+    message:
+      "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
       breaks and other whitespace remain distinct from authored marker glyphs. Input,
       accessible text and equality preserve the original values."
   - id: motionAtlas.nested-drilldown-window.notFor.0
     message: All default records and group names are fictional.
   - id: motionAtlas.nested-drilldown-window.notFor.1
-    message: Every slip denotes one supplied record; visible totals, if shown, must derive
+    message:
+      Every slip denotes one supplied record; visible totals, if shown, must derive
       from records and exact-prefix matching.
   - id: motionAtlas.nested-drilldown-window.notFor.2
     message: No geographical shape or location precision is implied by area names.
   - id: motionAtlas.nested-drilldown-window.notFor.3
     message: At most two selection levels fit the six-second cycle.
   - id: motionAtlas.nested-drilldown-window.notFor.4
-    message: Record text is re-laid out at a fixed font size rather than enlarged with a
+    message:
+      Record text is re-laid out at a fixed font size rather than enlarged with a
       camera scale.
 motionBeats:
   - startFrame: 12

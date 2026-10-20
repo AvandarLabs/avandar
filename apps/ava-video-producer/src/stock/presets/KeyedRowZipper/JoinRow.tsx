@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { propEq } from "@avandar/utils";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { getJoinRowLayoutFromInputAndFrame } from "./getJoinRowLayoutFromInputAndFrame";
 import { JoinKeyCell } from "./JoinKeyCell";

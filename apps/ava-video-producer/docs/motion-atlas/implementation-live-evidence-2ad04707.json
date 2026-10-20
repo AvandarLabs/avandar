@@ -5584,10 +5584,7 @@
               "evidenceFiles": [
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/network-graph/hold.png"
               ],
-              "observedClockBracket": [
-                145,
-                147
-              ],
+              "observedClockBracket": [145, 147],
               "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
               "priorDisposition": "preserve-baseline-carry-to-final-review",
               "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
@@ -5600,10 +5597,7 @@
         },
         {
           "jsonPointer": "/records/0/findings/0/observedClockBracket",
-          "value": [
-            145,
-            147
-          ]
+          "value": [145, 147]
         },
         {
           "jsonPointer": "/records/0/findings/0/priorDisposition",
@@ -5773,10 +5767,7 @@
               "evidenceFiles": [
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/radial-network/hold.png"
               ],
-              "observedClockBracket": [
-                145,
-                148
-              ],
+              "observedClockBracket": [145, 148],
               "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
               "priorDisposition": "preserve-baseline-carry-to-final-review",
               "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
@@ -5789,10 +5780,7 @@
         },
         {
           "jsonPointer": "/records/2/findings/0/observedClockBracket",
-          "value": [
-            145,
-            148
-          ]
+          "value": [145, 148]
         },
         {
           "jsonPointer": "/records/2/findings/0/priorDisposition",
@@ -5970,10 +5958,7 @@
               "evidenceFiles": [
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/orbital-system/hold.png"
               ],
-              "observedClockBracket": [
-                145,
-                147
-              ],
+              "observedClockBracket": [145, 147],
               "impact": "Text remains readable. No missing value or sustained wrong relationship is established.",
               "priorDisposition": "preserve-baseline-carry-to-final-review",
               "temporalLimits": "This is a current sampled picture observation. Exact overlap duration and perceptual impact over continuous playback were not inspected."
@@ -5986,10 +5971,7 @@
         },
         {
           "jsonPointer": "/records/4/findings/0/observedClockBracket",
-          "value": [
-            145,
-            147
-          ]
+          "value": [145, 147]
         },
         {
           "jsonPointer": "/records/4/findings/0/priorDisposition",
@@ -6672,12 +6654,7 @@
             {
               "classification": "preserved-legacy-action-observation",
               "severity": "editorial-review",
-              "observedClockBrackets": [
-                [
-                  85,
-                  87
-                ]
-              ],
+              "observedClockBrackets": [[85, 87]],
               "files": [
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/bar-race/action-early.png"
               ],
@@ -6691,12 +6668,7 @@
         },
         {
           "jsonPointer": "/records/3/findings/0/observedClockBrackets",
-          "value": [
-            [
-              85,
-              87
-            ]
-          ]
+          "value": [[85, 87]]
         },
         {
           "jsonPointer": "/records/3/findings/0/observation",
@@ -7308,15 +7280,9 @@
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/capability-matrix/decisive.png",
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/capability-matrix/hold.png"
               ],
-              "naturalObservedClockBracket": [
-                85,
-                87
-              ],
+              "naturalObservedClockBracket": [85, 87],
               "clearKeyboardScrubbedFrame": 90,
-              "clearNaturalHoldClockBracket": [
-                145,
-                147
-              ],
+              "clearNaturalHoldClockBracket": [145, 147],
               "priorDisposition": "retain-transient-observation-no-source-change",
               "temporalLimits": "One natural action bracket and separated clear samples do not establish exact duration or continuous perceptual severity."
             }
@@ -7328,10 +7294,7 @@
         },
         {
           "jsonPointer": "/records/1/findings/0/naturalObservedClockBracket",
-          "value": [
-            85,
-            87
-          ]
+          "value": [85, 87]
         },
         {
           "jsonPointer": "/records/1/findings/0/priorDisposition",
@@ -8077,15 +8040,9 @@
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/shared-foundation/decisive.png",
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/shared-foundation/hold.png"
               ],
-              "naturalObservedClockBracket": [
-                85,
-                87
-              ],
+              "naturalObservedClockBracket": [85, 87],
               "clearKeyboardScrubbedFrame": 114,
-              "clearNaturalHoldClockBracket": [
-                145,
-                147
-              ],
+              "clearNaturalHoldClockBracket": [145, 147],
               "priorDisposition": "retain-transient-observation-no-source-change",
               "temporalLimits": "One natural action bracket and separated clear samples do not establish exact duration or continuous perceptual severity."
             }
@@ -8097,10 +8054,7 @@
         },
         {
           "jsonPointer": "/records/4/findings/0/naturalObservedClockBracket",
-          "value": [
-            85,
-            87
-          ]
+          "value": [85, 87]
         },
         {
           "jsonPointer": "/records/4/findings/0/priorDisposition",
@@ -8487,12 +8441,7 @@
           "value": [
             {
               "classification": "partial-opening-text-cover",
-              "observedClockBrackets": [
-                [
-                  120,
-                  122
-                ]
-              ],
+              "observedClockBrackets": [[120, 122]],
               "file": "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/sealed-handoff/action-late.png",
               "location": "Left unfolding envelope flap over the beginning of the second brief line, near x469..500,y396 in the native late-action image.",
               "observation": "The word Example is partly covered while the side folds are still opening.",
@@ -8503,12 +8452,7 @@
         },
         {
           "jsonPointer": "/records/4/temporalObservations/0/observedClockBrackets",
-          "value": [
-            [
-              120,
-              122
-            ]
-          ]
+          "value": [[120, 122]]
         },
         {
           "jsonPointer": "/records/4/temporalObservations/0/observation",
@@ -9127,14 +9071,8 @@
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/cell-normalization/hold.png"
               ],
               "keyboardScrubbedFrame": 76,
-              "naturalObservedClockBracket": [
-                85,
-                87
-              ],
-              "clearNaturalHoldClockBracket": [
-                145,
-                147
-              ],
+              "naturalObservedClockBracket": [85, 87],
+              "clearNaturalHoldClockBracket": [145, 147],
               "temporalLimits": "This appears to be the authored old-to-prepared crossfade. Exact duration and full perceptual severity cannot be inferred from these pictures. No source correction or acceptance is prescribed."
             }
           ]
@@ -9145,10 +9083,7 @@
         },
         {
           "jsonPointer": "/records/1/findings/0/naturalObservedClockBracket",
-          "value": [
-            85,
-            87
-          ]
+          "value": [85, 87]
         },
         {
           "jsonPointer": "/records/1/findings/0/temporalLimits",
@@ -14061,17 +13996,10 @@
                       "classification": "identity-readability",
                       "severity": "medium",
                       "input": {
-                        "investigationCaseIds": [
-                          "a",
-                          "b",
-                          "c"
-                        ],
+                        "investigationCaseIds": ["a", "b", "c"],
                         "showIdentityGuides": true
                       },
-                      "frames": [
-                        90,
-                        150
-                      ],
+                      "frames": [90, 150],
                       "files": [
                         "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-003.jpg",
                         "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-004.jpg"
@@ -14108,10 +14036,7 @@
                         },
                         "onsetBinId": "0"
                       },
-                      "frames": [
-                        90,
-                        150
-                      ],
+                      "frames": [90, 150],
                       "files": [
                         "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-003.jpg",
                         "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-004.jpg"
@@ -14142,17 +14067,10 @@
                 "classification": "identity-readability",
                 "severity": "medium",
                 "input": {
-                  "investigationCaseIds": [
-                    "a",
-                    "b",
-                    "c"
-                  ],
+                  "investigationCaseIds": ["a", "b", "c"],
                   "showIdentityGuides": true
                 },
-                "frames": [
-                  90,
-                  150
-                ],
+                "frames": [90, 150],
                 "files": [
                   "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-003.jpg",
                   "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-004.jpg"
@@ -14189,10 +14107,7 @@
                   },
                   "onsetBinId": "0"
                 },
-                "frames": [
-                  90,
-                  150
-                ],
+                "frames": [90, 150],
                 "files": [
                   "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-003.jpg",
                   "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-004.jpg"
@@ -14210,17 +14125,10 @@
             "classification": "identity-readability",
             "severity": "medium",
             "input": {
-              "investigationCaseIds": [
-                "a",
-                "b",
-                "c"
-              ],
+              "investigationCaseIds": ["a", "b", "c"],
               "showIdentityGuides": true
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/f2b93349f2af0420cde0b75463767947f340c21dd95ea75b841b8baf7dab8df8/still-004.jpg"
@@ -14241,16 +14149,7 @@
             "severity": "medium",
             "relatedDefaultReport": "default-visual-095-110.json",
             "input": {
-              "investigationCaseIds": [
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7"
-              ],
+              "investigationCaseIds": ["0", "1", "2", "3", "4", "5", "6", "7"],
               "showIdentityGuides": true,
               "casesCount": 12,
               "coincidentLocation": {
@@ -14259,10 +14158,7 @@
               },
               "onsetBinId": "0"
             },
-            "frames": [
-              90,
-              150
-            ],
+            "frames": [90, 150],
             "files": [
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-003.jpg",
               "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/apps/ava-video-producer/out/motion/preview/cluster-epicurve-link/7be0936b16853b47b5432760c4b455fd569b41fe0126d289cbf9465ce9458e76/still-004.jpg"
@@ -16417,10 +16313,7 @@
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/action-late.png",
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/hold.png"
               ],
-              "observedClockBracket": [
-                120,
-                122
-              ],
+              "observedClockBracket": [120, 122],
               "resolvedHold": "Native145..147 displays correct separate A and B attributions, with earlier shared labels unchanged.",
               "limits": "This finding records actual sampled occlusion. It does not infer sustained duration, a permanent false attribution, or the need for a source change without temporal review."
             }
@@ -16432,10 +16325,7 @@
         },
         {
           "jsonPointer": "/records/0/findings/0/observedClockBracket",
-          "value": [
-            120,
-            122
-          ]
+          "value": [120, 122]
         },
         {
           "jsonPointer": "/records/0/findings/0/limits",
@@ -16749,10 +16639,7 @@
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/decisive.png",
                 "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/hold.png"
               ],
-              "observedClockBracket": [
-                85,
-                87
-              ],
+              "observedClockBracket": [85, 87],
               "priorControllerDisposition": "Retain the intentional registration/transition observation for final editorial review, without claiming every action frame is unobstructed.",
               "limits": "No exact overlap duration, continuous readability or new permanent mismatch is established. Correct hold does not erase current transition overprint."
             }
@@ -16768,10 +16655,7 @@
         },
         {
           "jsonPointer": "/records/3/findings/0/observedClockBracket",
-          "value": [
-            85,
-            87
-          ]
+          "value": [85, 87]
         },
         {
           "jsonPointer": "/records/3/findings/0/priorControllerDisposition",

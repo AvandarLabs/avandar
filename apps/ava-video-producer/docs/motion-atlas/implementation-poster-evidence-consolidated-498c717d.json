@@ -138,14 +138,7 @@
       "role": "frozen-HTTP-L3-snapshot"
     },
     "configurationParameters": {
-      "samples": [
-        0,
-        18,
-        36,
-        90,
-        150,
-        179
-      ],
+      "samples": [0, 18, 36, 90, 150, 179],
       "frames": 180,
       "fps": 30,
       "width": 1280,
@@ -2259,9 +2252,7 @@
           },
           "response": {
             "label": "Authored example response",
-            "lines": [
-              "Blue shed, noon."
-            ]
+            "lines": ["Blue shed, noon."]
           },
           "copy": {
             "device": "Example tablet",
@@ -2551,10 +2542,7 @@
           },
           "object": {
             "label": "Example shift brief",
-            "details": [
-              "Blue shed",
-              "Crate labels"
-            ]
+            "details": ["Blue shed", "Crate labels"]
           },
           "outcome": "accepted",
           "copy": {
@@ -2958,27 +2946,19 @@
               "id": "stock",
               "title": "Available units",
               "kind": "value",
-              "lines": [
-                "18 units"
-              ]
+              "lines": ["18 units"]
             },
             {
               "id": "supplies",
               "title": "Supplies",
               "kind": "list",
-              "lines": [
-                "Paper",
-                "Ink",
-                "Labels"
-              ]
+              "lines": ["Paper", "Ink", "Labels"]
             },
             {
               "id": "note",
               "title": "Context",
               "kind": "note",
-              "lines": [
-                "Sample inventory only"
-              ]
+              "lines": ["Sample inventory only"]
             }
           ],
           "featuredWidgetId": "stock",
@@ -3794,44 +3774,26 @@
             {
               "id": "a",
               "label": "Paper",
-              "groups": [
-                "North",
-                "Stored"
-              ]
+              "groups": ["North", "Stored"]
             },
             {
               "id": "b",
               "label": "Ink",
-              "groups": [
-                "North",
-                "Review"
-              ]
+              "groups": ["North", "Review"]
             },
             {
               "id": "c",
               "label": "Labels",
-              "groups": [
-                "South",
-                "Stored"
-              ]
+              "groups": ["South", "Stored"]
             },
             {
               "id": "d",
               "label": "Folders",
-              "groups": [
-                "North",
-                "Stored"
-              ]
+              "groups": ["North", "Stored"]
             }
           ],
-          "dimensions": [
-            "Area",
-            "State"
-          ],
-          "selectionPath": [
-            "North",
-            "Stored"
-          ],
+          "dimensions": ["Area", "State"],
+          "selectionPath": ["North", "Stored"],
           "labels": {
             "title": "Fictional supply drilldown",
             "root": "All sample records",
@@ -4313,26 +4275,17 @@
             {
               "id": "v1",
               "label": "Draft A",
-              "content": [
-                "Field notes",
-                "Open questions"
-              ]
+              "content": ["Field notes", "Open questions"]
             },
             {
               "id": "v2",
               "label": "Draft B",
-              "content": [
-                "Field notes",
-                "Next steps"
-              ]
+              "content": ["Field notes", "Next steps"]
             },
             {
               "id": "v3",
               "label": "Draft C",
-              "content": [
-                "Field summary",
-                "Next steps"
-              ]
+              "content": ["Field summary", "Next steps"]
             }
           ],
           "restoreRevisionId": "v1",
@@ -9312,19 +9265,11 @@
           "readingGroups": [
             {
               "bookId": "book-a",
-              "learnerIds": [
-                "a",
-                "b",
-                "c"
-              ]
+              "learnerIds": ["a", "b", "c"]
             },
             {
               "bookId": "book-b",
-              "learnerIds": [
-                "d",
-                "e",
-                "f"
-              ]
+              "learnerIds": ["d", "e", "f"]
             }
           ],
           "startingShelf": "front",
@@ -9447,34 +9392,19 @@
           "trays": [
             {
               "learnerId": "a",
-              "componentIds": [
-                "grain",
-                "beans",
-                "fruit"
-              ]
+              "componentIds": ["grain", "beans", "fruit"]
             },
             {
               "learnerId": "b",
-              "componentIds": [
-                "grain",
-                "beans",
-                "fruit"
-              ]
+              "componentIds": ["grain", "beans", "fruit"]
             },
             {
               "learnerId": "c",
-              "componentIds": [
-                "grain",
-                "beans",
-                "fruit"
-              ]
+              "componentIds": ["grain", "beans", "fruit"]
             },
             {
               "learnerId": "d",
-              "componentIds": [
-                "grain",
-                "beans"
-              ]
+              "componentIds": ["grain", "beans"]
             }
           ],
           "labels": {
@@ -9886,44 +9816,20 @@
               "id": "a",
               "label": "Demo exposure zone",
               "polygon": [
-                [
-                  10,
-                  10
-                ],
-                [
-                  65,
-                  10
-                ],
-                [
-                  65,
-                  80
-                ],
-                [
-                  10,
-                  80
-                ]
+                [10, 10],
+                [65, 10],
+                [65, 80],
+                [10, 80]
               ]
             },
             {
               "id": "b",
               "label": "Demo planning zone",
               "polygon": [
-                [
-                  40,
-                  25
-                ],
-                [
-                  90,
-                  25
-                ],
-                [
-                  90,
-                  90
-                ],
-                [
-                  40,
-                  90
-                ]
+                [40, 25],
+                [90, 25],
+                [90, 90],
+                [40, 90]
               ]
             }
           ],
@@ -10048,44 +9954,20 @@
               "id": "west",
               "label": "Service A footprint",
               "polygon": [
-                [
-                  5,
-                  10
-                ],
-                [
-                  60,
-                  10
-                ],
-                [
-                  60,
-                  85
-                ],
-                [
-                  5,
-                  85
-                ]
+                [5, 10],
+                [60, 10],
+                [60, 85],
+                [5, 85]
               ]
             },
             {
               "id": "east",
               "label": "Service B footprint",
               "polygon": [
-                [
-                  40,
-                  15
-                ],
-                [
-                  85,
-                  15
-                ],
-                [
-                  85,
-                  85
-                ],
-                [
-                  40,
-                  85
-                ]
+                [40, 15],
+                [85, 15],
+                [85, 85],
+                [40, 85]
               ]
             }
           ],
@@ -10254,11 +10136,7 @@
               "label": "Day 3"
             }
           ],
-          "investigationCaseIds": [
-            "a",
-            "b",
-            "c"
-          ],
+          "investigationCaseIds": ["a", "b", "c"],
           "focusedBinId": "d2",
           "copy": {
             "context": "Fictional case review; schematic map",
@@ -10348,44 +10226,20 @@
               "id": "w",
               "label": "West stratum",
               "polygon": [
-                [
-                  5,
-                  5
-                ],
-                [
-                  50,
-                  5
-                ],
-                [
-                  50,
-                  95
-                ],
-                [
-                  5,
-                  95
-                ]
+                [5, 5],
+                [50, 5],
+                [50, 95],
+                [5, 95]
               ]
             },
             {
               "id": "e",
               "label": "East stratum",
               "polygon": [
-                [
-                  50,
-                  5
-                ],
-                [
-                  95,
-                  5
-                ],
-                [
-                  95,
-                  95
-                ],
-                [
-                  50,
-                  95
-                ]
+                [50, 5],
+                [95, 5],
+                [95, 95],
+                [50, 95]
               ]
             }
           ],
@@ -10426,10 +10280,7 @@
               "y": 75
             }
           ],
-          "selectedSiteIds": [
-            "a",
-            "d"
-          ],
+          "selectedSiteIds": ["a", "d"],
           "copy": {
             "context": "Fictional schematic sampling plan",
             "selected": "Selected",
@@ -10625,22 +10476,10 @@
               "id": "a",
               "label": "Demo West",
               "polygon": [
-                [
-                  5,
-                  10
-                ],
-                [
-                  45,
-                  10
-                ],
-                [
-                  45,
-                  90
-                ],
-                [
-                  5,
-                  90
-                ]
+                [5, 10],
+                [45, 10],
+                [45, 90],
+                [5, 90]
               ],
               "records": 4,
               "population": 40
@@ -10649,22 +10488,10 @@
               "id": "b",
               "label": "Demo East",
               "polygon": [
-                [
-                  55,
-                  10
-                ],
-                [
-                  95,
-                  10
-                ],
-                [
-                  95,
-                  90
-                ],
-                [
-                  55,
-                  90
-                ]
+                [55, 10],
+                [95, 10],
+                [95, 90],
+                [55, 90]
               ],
               "records": 3,
               "population": 10
@@ -10798,18 +10625,12 @@
                 {
                   "id": "w",
                   "label": "West",
-                  "cellIds": [
-                    "nw",
-                    "sw"
-                  ]
+                  "cellIds": ["nw", "sw"]
                 },
                 {
                   "id": "e",
                   "label": "East",
-                  "cellIds": [
-                    "ne",
-                    "se"
-                  ]
+                  "cellIds": ["ne", "se"]
                 }
               ]
             },
@@ -10819,18 +10640,12 @@
                 {
                   "id": "n",
                   "label": "North",
-                  "cellIds": [
-                    "nw",
-                    "ne"
-                  ]
+                  "cellIds": ["nw", "ne"]
                 },
                 {
                   "id": "s",
                   "label": "South",
-                  "cellIds": [
-                    "sw",
-                    "se"
-                  ]
+                  "cellIds": ["sw", "se"]
                 }
               ]
             }
@@ -11057,44 +10872,20 @@
               "id": "w",
               "label": "Demo West",
               "polygon": [
-                [
-                  0,
-                  0
-                ],
-                [
-                  50,
-                  0
-                ],
-                [
-                  50,
-                  100
-                ],
-                [
-                  0,
-                  100
-                ]
+                [0, 0],
+                [50, 0],
+                [50, 100],
+                [0, 100]
               ]
             },
             {
               "id": "e",
               "label": "Demo East",
               "polygon": [
-                [
-                  50,
-                  0
-                ],
-                [
-                  100,
-                  0
-                ],
-                [
-                  100,
-                  100
-                ],
-                [
-                  50,
-                  100
-                ]
+                [50, 0],
+                [100, 0],
+                [100, 100],
+                [50, 100]
               ]
             }
           ],
@@ -13138,10 +12929,7 @@
                     "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/action-late.png",
                     "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/actor-attribution-split/hold.png"
                   ],
-                  "observedClockBracket": [
-                    120,
-                    122
-                  ],
+                  "observedClockBracket": [120, 122],
                   "resolvedHold": "Native145..147 displays correct separate A and B attributions, with earlier shared labels unchanged.",
                   "limits": "This finding records actual sampled occlusion. It does not infer sustained duration, a permanent false attribution, or the need for a source change without temporal review."
                 }
@@ -13552,10 +13340,7 @@
                     "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/decisive.png",
                     "/Users/juanpablosarmiento/src/worktrees/avandar/feat/motion-catalog/.temp/feat-motion-catalog/final-live/2ad047077f26a17ebb71df914e02e1819860328e7229befc57360b202e0b21ae/expectation-overlay-check/hold.png"
                   ],
-                  "observedClockBracket": [
-                    85,
-                    87
-                  ],
+                  "observedClockBracket": [85, 87],
                   "priorControllerDisposition": "Retain the intentional registration/transition observation for final editorial review, without claiming every action frame is unobstructed.",
                   "limits": "No exact overlap duration, continuous readability or new permanent mismatch is established. Correct hold does not erase current transition overprint."
                 }
@@ -14701,48 +14486,28 @@
             {
               "id": "key",
               "label": "Key",
-              "cells": [
-                "A",
-                "B",
-                "B"
-              ]
+              "cells": ["A", "B", "B"]
             },
             {
               "id": "name",
               "label": "Name",
-              "cells": [
-                "Ash",
-                "Birch",
-                "Birch"
-              ]
+              "cells": ["Ash", "Birch", "Birch"]
             },
             {
               "id": "value",
               "label": "Items",
-              "cells": [
-                "2",
-                "4",
-                "4"
-              ]
+              "cells": ["2", "4", "4"]
             }
           ],
-          "cachedColumnIds": [
-            "key",
-            "name"
-          ],
+          "cachedColumnIds": ["key", "name"],
           "requests": [
             {
               "label": "Read names",
-              "columnIds": [
-                "name"
-              ]
+              "columnIds": ["name"]
             },
             {
               "label": "Read items",
-              "columnIds": [
-                "key",
-                "value"
-              ]
+              "columnIds": ["key", "value"]
             }
           ],
           "keyColumnId": "key",
@@ -14838,18 +14603,12 @@
             {
               "id": "one",
               "label": "Operation 1",
-              "requestedIds": [
-                "a",
-                "b"
-              ]
+              "requestedIds": ["a", "b"]
             },
             {
               "id": "two",
               "label": "Operation 2",
-              "requestedIds": [
-                "b",
-                "a"
-              ]
+              "requestedIds": ["b", "a"]
             }
           ],
           "firstOperationId": "one",
@@ -14924,11 +14683,7 @@
         "accent": "#9fefca",
         "background": "#0b1219",
         "input": {
-          "originalRows": [
-            "A: 2",
-            "B: 4",
-            "C: 3"
-          ],
+          "originalRows": ["A: 2", "B: 4", "C: 3"],
           "attempt": {
             "rowIndex": 1,
             "replacement": "B: 9",
@@ -14936,11 +14691,7 @@
           },
           "reload": {
             "performed": true,
-            "rows": [
-              "A: 2",
-              "B: 4",
-              "C: 3"
-            ]
+            "rows": ["A: 2", "B: 4", "C: 3"]
           },
           "labels": {
             "readable": "Readable",
@@ -15591,19 +15342,10 @@
         "background": "#0b1219",
         "input": {
           "grid": {
-            "columnLabels": [
-              "Site",
-              "Items"
-            ],
+            "columnLabels": ["Site", "Items"],
             "rows": [
-              [
-                "West",
-                "12"
-              ],
-              [
-                "East",
-                "8"
-              ]
+              ["West", "12"],
+              ["East", "8"]
             ]
           },
           "signal": "ruling-lines",
@@ -16148,12 +15890,7 @@
         "input": {
           "saved": {
             "page": 2,
-            "box": [
-              10,
-              20,
-              85,
-              70
-            ],
+            "box": [10, 20, 85, 70],
             "header": "Site | Items",
             "fingerprint": "FP-A"
           },
@@ -16268,31 +16005,17 @@
             "rows": [
               {
                 "id": "a",
-                "cells": [
-                  "West",
-                  "12",
-                  "Review"
-                ]
+                "cells": ["West", "12", "Review"]
               },
               {
                 "id": "b",
-                "cells": [
-                  "East",
-                  "8",
-                  "Draft"
-                ]
+                "cells": ["East", "8", "Draft"]
               }
             ]
           },
           "selection": {
-            "rowIds": [
-              "a",
-              "b"
-            ],
-            "columnIds": [
-              "site",
-              "items"
-            ]
+            "rowIds": ["a", "b"],
+            "columnIds": ["site", "items"]
           },
           "liveEdit": {
             "rowId": "a",
@@ -16714,19 +16437,11 @@
           "schemes": [
             {
               "label": "Equal-width example",
-              "breaks": [
-                0,
-                5,
-                10
-              ]
+              "breaks": [0, 5, 10]
             },
             {
               "label": "Alternative breaks",
-              "breaks": [
-                0,
-                3,
-                10
-              ]
+              "breaks": [0, 3, 10]
             }
           ],
           "unitLabel": "recorded items",
@@ -17514,30 +17229,12 @@
         "background": "#0b1219",
         "input": {
           "vertices": [
-            [
-              10,
-              50
-            ],
-            [
-              25,
-              53
-            ],
-            [
-              40,
-              49
-            ],
-            [
-              55,
-              72
-            ],
-            [
-              70,
-              50
-            ],
-            [
-              90,
-              52
-            ]
+            [10, 50],
+            [25, 53],
+            [40, 49],
+            [55, 72],
+            [70, 50],
+            [90, 52]
           ],
           "tolerance": 6,
           "labels": {
@@ -18083,12 +17780,7 @@
         "accent": "#9fefca",
         "background": "#0b1219",
         "input": {
-          "values": [
-            "12",
-            "8",
-            "4",
-            "Pending"
-          ],
+          "values": ["12", "8", "4", "Pending"],
           "policy": "widen-to-text",
           "labels": {
             "column": "Fictional item value",
@@ -18276,9 +17968,7 @@
               }
             ]
           ],
-          "highlight": [
-            0
-          ],
+          "highlight": [0],
           "title": "authored.example.ts",
           "footer": "Authored code example",
           "showHighlight": true
@@ -18377,12 +18067,7 @@
               "label": "East"
             }
           ],
-          "edges": [
-            [
-              0,
-              1
-            ]
-          ],
+          "edges": [[0, 1]],
           "showPackets": true
         },
         "accent": "#d5e681",
@@ -19197,10 +18882,10 @@
         "input": {
           "source": {
             "label": "Extreme source",
-            "baseline": -1e+308,
-            "trial": 1e+308,
-            "min": -1e+308,
-            "max": 1e+308,
+            "baseline": -1e308,
+            "trial": 1e308,
+            "min": -1e308,
+            "max": 1e308,
             "unit": "units"
           },
           "outputs": [
@@ -19209,8 +18894,8 @@
               "label": "Linked",
               "multiplier": 1,
               "offset": 0,
-              "min": -1e+308,
-              "max": 1e+308,
+              "min": -1e308,
+              "max": 1e308,
               "unit": "units"
             },
             {
@@ -19218,8 +18903,8 @@
               "label": "Independent",
               "multiplier": 0,
               "offset": 0,
-              "min": -1e+308,
-              "max": 1e+308,
+              "min": -1e308,
+              "max": 1e308,
               "unit": "units"
             }
           ],
@@ -19283,10 +18968,10 @@
                 "input": {
                   "source": {
                     "label": "Extreme source",
-                    "baseline": -1e+308,
-                    "trial": 1e+308,
-                    "min": -1e+308,
-                    "max": 1e+308,
+                    "baseline": -1e308,
+                    "trial": 1e308,
+                    "min": -1e308,
+                    "max": 1e308,
                     "unit": "units"
                   },
                   "outputs": [
@@ -19295,8 +18980,8 @@
                       "label": "Linked",
                       "multiplier": 1,
                       "offset": 0,
-                      "min": -1e+308,
-                      "max": 1e+308,
+                      "min": -1e308,
+                      "max": 1e308,
                       "unit": "units"
                     },
                     {
@@ -19304,8 +18989,8 @@
                       "label": "Independent",
                       "multiplier": 0,
                       "offset": 0,
-                      "min": -1e+308,
-                      "max": 1e+308,
+                      "min": -1e308,
+                      "max": 1e308,
                       "unit": "units"
                     }
                   ],
@@ -19378,13 +19063,8 @@
                   "severity": "low",
                   "type": "sampled-text-line-overlap",
                   "status": "controller-review",
-                  "framesObserved": [
-                    90
-                  ],
-                  "comparisonFramesClear": [
-                    36,
-                    150
-                  ],
+                  "framesObserved": [90],
+                  "comparisonFramesClear": [36, 150],
                   "description": "At frame90, the source-to-Linked connector horizontal segment runs along/through the lower edge of the Extreme source left endpoint tick label -1e+308. The text is still readable, but the line and label visibly share space.",
                   "impact": "Small local readability concern. The main values remain1e+308/1e+308/0 and the final restored values remain-1e+308/-1e+308/0. No sustained wrong state or lost value is established.",
                   "evidenceFiles": [
@@ -19486,44 +19166,20 @@
               "id": "a",
               "label": "Demo exposure zone",
               "polygon": [
-                [
-                  10,
-                  10
-                ],
-                [
-                  65,
-                  10
-                ],
-                [
-                  65,
-                  80
-                ],
-                [
-                  10,
-                  80
-                ]
+                [10, 10],
+                [65, 10],
+                [65, 80],
+                [10, 80]
               ]
             },
             {
               "id": "b",
               "label": "Demo planning zone",
               "polygon": [
-                [
-                  40,
-                  25
-                ],
-                [
-                  90,
-                  25
-                ],
-                [
-                  90,
-                  90
-                ],
-                [
-                  40,
-                  90
-                ]
+                [40, 25],
+                [90, 25],
+                [90, 90],
+                [40, 90]
               ]
             }
           ],
@@ -19668,44 +19324,20 @@
               "id": "w",
               "label": "Demo West",
               "polygon": [
-                [
-                  0,
-                  0
-                ],
-                [
-                  50,
-                  0
-                ],
-                [
-                  50,
-                  100
-                ],
-                [
-                  0,
-                  100
-                ]
+                [0, 0],
+                [50, 0],
+                [50, 100],
+                [0, 100]
               ]
             },
             {
               "id": "e",
               "label": "Demo East",
               "polygon": [
-                [
-                  50,
-                  0
-                ],
-                [
-                  100,
-                  0
-                ],
-                [
-                  100,
-                  100
-                ],
-                [
-                  50,
-                  100
-                ]
+                [50, 0],
+                [100, 0],
+                [100, 100],
+                [50, 100]
               ]
             }
           ],
@@ -19861,18 +19493,12 @@
                 {
                   "id": "w",
                   "label": "West",
-                  "cellIds": [
-                    "nw",
-                    "sw"
-                  ]
+                  "cellIds": ["nw", "sw"]
                 },
                 {
                   "id": "e",
                   "label": "East",
-                  "cellIds": [
-                    "ne",
-                    "se"
-                  ]
+                  "cellIds": ["ne", "se"]
                 }
               ]
             },
@@ -19882,18 +19508,12 @@
                 {
                   "id": "n",
                   "label": "North",
-                  "cellIds": [
-                    "nw",
-                    "ne"
-                  ]
+                  "cellIds": ["nw", "ne"]
                 },
                 {
                   "id": "s",
                   "label": "South",
-                  "cellIds": [
-                    "sw",
-                    "se"
-                  ]
+                  "cellIds": ["sw", "se"]
                 }
               ]
             }

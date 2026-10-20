@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";

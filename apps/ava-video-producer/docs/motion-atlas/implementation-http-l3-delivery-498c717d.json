@@ -1546,9 +1546,7 @@
       "assessment": {
         "ready": false,
         "jobId": "44a973da-32d7-48a7-9dfe-dfedd7a2add3",
-        "problems": [
-          "Actual same-origin GET MP4 response missing"
-        ],
+        "problems": ["Actual same-origin GET MP4 response missing"],
         "expectedPost": {
           "id": "stock-schema-mapping",
           "options": {

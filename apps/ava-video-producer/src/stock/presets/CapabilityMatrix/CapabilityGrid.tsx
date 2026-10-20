@@ -1,6 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { StockRect } from "../../primitives/StockRect/StockRect";
 import { STOCK } from "../../stockPalette";
 import { CapabilityColumn } from "./CapabilityColumn";
 import type { Input } from "./CapabilityMatrix.schema";

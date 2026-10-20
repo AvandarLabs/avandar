@@ -3,7 +3,8 @@ name:
   message: Find the common ground
 description:
   id: motionAtlas.shared-foundation.description
-  message: Two different approaches lift to reveal one explicitly shared foundation. Their
+  message:
+    Two different approaches lift to reveal one explicitly shared foundation. Their
     distinguishing traits remain attached, so commonality does not erase their
     differences.
 category:
@@ -14,13 +15,15 @@ useWhen:
   message: Reveal the shared principle beneath two distinct approaches.
 prompt:
   id: motionAtlas.shared-foundation.prompt
-  message: Use Motion Atlas "Find the common ground" (shared-foundation) as a conceptual
+  message:
+    Use Motion Atlas "Find the common ground" (shared-foundation) as a conceptual
     graphic. Reveal the shared principle beneath two distinct approaches. Replace
     fictional sample content with approved authored content before making product
     claims.
 creativeDirection:
   id: motionAtlas.shared-foundation.creativeDirection
-  message: Two labeled structures stand apart with their distinct traits underneath. Their
+  message:
+    Two labeled structures stand apart with their distinct traits underneath. Their
     lower edges rise in parallel, exposing matching fragments of a shared foundation
     phrase. The fragments join into one continuous base spanning both structures, then
     short supports reconnect each approach to it. The final hold reads as two approaches
@@ -30,7 +33,8 @@ intent:
   message: Reveal the shared principle beneath two distinct approaches.
 distinction:
   id: motionAtlas.shared-foundation.distinction
-  message: Unlike source-merge, the two approaches never collapse into a single output.
+  message:
+    Unlike source-merge, the two approaches never collapse into a single output.
     Unlike a comparison panel, the hero action uncovers and connects one common base
     while preserving the two distinct identities.
 tags:
@@ -75,7 +79,8 @@ notFor:
   - id: motionAtlas.shared-foundation.notFor.1
     message: The base width does not measure the amount of agreement or similarity.
   - id: motionAtlas.shared-foundation.notFor.2
-    message: The commonality must be explicitly authored and should not imply identical
+    message:
+      The commonality must be explicitly authored and should not imply identical
       capabilities or interchangeable outcomes.
 motionBeats:
   - startFrame: 12
@@ -87,7 +92,8 @@ motionBeats:
     endFrame: 107
     description:
       id: motionAtlas.shared-foundation.motionBeats.1
-      message: Two labeled structures stand apart with their distinct traits underneath. Their
+      message:
+        Two labeled structures stand apart with their distinct traits underneath. Their
         lower edges rise in parallel, exposing matching fragments of a shared foundation
         phrase. The fragments join into one continuous base spanning both structures,
         then short supports reconnect each approach to it. The final hold reads as two

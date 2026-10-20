@@ -3,7 +3,8 @@ name:
   message: Join matching records
 description:
   id: motionAtlas.keyed-row-zipper.description
-  message: Two small tables align on equal keys and zip their matched rows together.
+  message:
+    Two small tables align on equal keys and zip their matched rows together.
     Unmatched rows remain visibly distinct, making the selected join rule
     understandable.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Explain which records combine and what happens when a matching key is absent.
 creativeDirection:
   id: motionAtlas.keyed-row-zipper.creativeDirection
-  message: Frames 12-42 establish two tables with key columns facing each other. Between
+  message:
+    Frames 12-42 establish two tables with key columns facing each other. Between
     frames 42-108, equal keys align vertically, their key cells meet at a shared seam,
     and each matched pair closes into one wider row. Rows without a partner move into a
     context tray for an inner join, or retain a labeled empty partner for a left join.
@@ -24,12 +26,14 @@ intent:
   message: Explain which records combine and what happens when a matching key is absent.
 distinction:
   id: motionAtlas.keyed-row-zipper.distinction
-  message: Unlike schema-mapping, the relation is between records with equal key values
+  message:
+    Unlike schema-mapping, the relation is between records with equal key values
     rather than corresponding field names. Unlike source-merge, unmatched rows and the
     selected join rule determine the result.
 prompt:
   id: motionAtlas.keyed-row-zipper.prompt
-  message: Use Motion Atlas "Join matching records" (keyed-row-zipper) as a conceptual
+  message:
+    Use Motion Atlas "Join matching records" (keyed-row-zipper) as a conceptual
     graphic. Explain which records combine and what happens when a matching key is
     absent. Replace fictional sample content with approved authored content before
     making product claims.
@@ -81,23 +85,27 @@ aliases:
     message: inner join
 notFor:
   - id: motionAtlas.keyed-row-zipper.notFor.literal-whitespace
-    message: "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
+    message:
+      "Exact data uses amber underlined marks for whitespace: spaces, tabs, line
       breaks and other whitespace remain distinct from authored marker glyphs. Input,
       accessible text and equality preserve the original values."
   - id: motionAtlas.keyed-row-zipper.notFor.0
     message: All default rows are fictional.
   - id: motionAtlas.keyed-row-zipper.notFor.1
-    message: Keys are unique within each table; many-to-many joins and row multiplication
+    message:
+      Keys are unique within each table; many-to-many joins and row multiplication
       are excluded.
   - id: motionAtlas.keyed-row-zipper.notFor.2
     message: Equality is exact and case-sensitive with no inferred normalization.
   - id: motionAtlas.keyed-row-zipper.notFor.3
     message: Result count is derived from the arrays and joinType, never supplied independently.
   - id: motionAtlas.keyed-row-zipper.notFor.4
-    message: An empty partner means no matching input row, not proof the real-world value
+    message:
+      An empty partner means no matching input row, not proof the real-world value
       does not exist.
   - id: motionAtlas.keyed-row-zipper.notFor.5
-    message: Use exact matching in this preset. If normalization is needed, show it
+    message:
+      Use exact matching in this preset. If normalization is needed, show it
       explicitly in a separate cell-normalization scene before the join.
   - id: motionAtlas.keyed-row-zipper.notFor.6
     message: Missing matches are not zero geographic measures.

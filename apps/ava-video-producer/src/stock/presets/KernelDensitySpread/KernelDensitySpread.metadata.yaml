@@ -3,7 +3,8 @@ name:
   message: A smooth surface depends on its radius
 description:
   id: motionAtlas.kernel-density-spread.description
-  message: Each supplied point contributes a bounded kernel to a schematic grid. The
+  message:
+    Each supplied point contributes a bounded kernel to a schematic grid. The
     kernels add into one intensity field, then a second radius changes the smoothing
     without creating or deleting any point observations.
 category:
@@ -14,7 +15,8 @@ useWhen:
   message: Expose smoothing assumptions without presenting intensity as observed counts.
 prompt:
   id: motionAtlas.kernel-density-spread.prompt
-  message: 960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
     Reveal at frames 0-12. Frames 13-55 raise a small cone over each point. Frames
     56-105 add cone heights into a sampled grid intensity. Frames 106-139 widen or
     narrow every cone to the second radius and recompute the grid while point markers
@@ -22,7 +24,8 @@ prompt:
     166-179. Reset is editorial.
 creativeDirection:
   id: motionAtlas.kernel-density-spread.creativeDirection
-  message: 960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
+  message:
+    960x600 React/SVG with shared palette, deterministic 180 frames at 30fps.
     Reveal at frames 0-12. Frames 13-55 raise a small cone over each point. Frames
     56-105 add cone heights into a sampled grid intensity. Frames 106-139 widen or
     narrow every cone to the second radius and recompute the grid while point markers
@@ -33,7 +36,8 @@ intent:
   message: Expose smoothing assumptions without presenting intensity as observed counts.
 distinction:
   id: motionAtlas.kernel-density-spread.distinction
-  message: Spatial-grid-binning assigns each point once to an exact count cell. This
+  message:
+    Spatial-grid-binning assigns each point once to an exact count cell. This
     spreads each contribution across neighboring cells and makes radius a visible
     modeling choice.
 tags:
@@ -64,19 +68,24 @@ notFor:
   - id: motionAtlas.kernel-density-spread.zeroQualifier
     message: Zero modeled intensity does not establish zero population.
   - id: motionAtlas.kernel-density-spread.notFor.0
-    message: This specified cone kernel is an instructional design, not a claim about a
+    message:
+      This specified cone kernel is an instructional design, not a claim about a
       mapping library kernel.
   - id: motionAtlas.kernel-density-spread.notFor.1
-    message: Intensity is neither case count, population, probability nor risk. Grid cell
+    message:
+      Intensity is neither case count, population, probability nor risk. Grid cell
       intensities do not sum to point count.
   - id: motionAtlas.kernel-density-spread.notFor.2
-    message: A smooth field does not fill gaps in actual observations or establish
+    message:
+      A smooth field does not fill gaps in actual observations or establish
       conditions between points.
   - id: motionAtlas.kernel-density-spread.notFor.3
-    message: No external requests, URLs, JSX or functions in props. Supplied examples are
+    message:
+      No external requests, URLs, JSX or functions in props. Supplied examples are
       fictional.
   - id: motionAtlas.kernel-density-spread.notFor.4
-    message: Authored prose remains the author’s responsibility. Runtime validation
+    message:
+      Authored prose remains the author’s responsibility. Runtime validation
       preserves supplied text without classifying its language or factual claims.
 motionBeats:
   - startFrame: 0

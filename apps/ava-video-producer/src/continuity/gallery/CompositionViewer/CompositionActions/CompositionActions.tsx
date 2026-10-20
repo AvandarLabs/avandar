@@ -1,7 +1,7 @@
-import type { ContinuityAppearance } from "../../../continuityAppearance";
 import { useContinuityCopy } from "../../../useContinuityCopy";
-import { useCompositionDownload } from "./useCompositionDownload";
 import css from "./CompositionActions.module.css";
+import { useCompositionDownload } from "./useCompositionDownload";
+import type { ContinuityAppearance } from "../../../continuityAppearance";
 
 type Props = {
   id: string;
