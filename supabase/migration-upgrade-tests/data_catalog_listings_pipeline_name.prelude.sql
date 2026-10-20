@@ -18,6 +18,18 @@ values
    'https://pgtap-fixture.invalid', 'pgtap-fixture-other',
    'pgtap-fixture-other-resource', 'CSV');
 
+-- A Socrata API listing a pipeline already claimed: the backfill must keep its
+-- `pipeline_name` instead of overwriting it.
+insert into public.data_catalog_listings
+  (display_name, external_organization_name, access_kind, api_service,
+   api_base_url, external_dataset_id, api_resource_id, api_resource_format,
+   pipeline_name, pipeline_run_id)
+values
+  ('pgtap-fixture claimed socrata', 'City of New York', 'api_resource',
+   'socrata', 'https://data.cityofnewyork.us', 'pgtap-fixture-claimed',
+   'pgtap-fixture-claimed-resource', 'CSV', 'pgtap-fixture-pipeline',
+   'run-1');
+
 insert into public.data_catalog_listings
   (display_name, external_organization_name, parquet_file_name,
    pipeline_name, pipeline_run_id)

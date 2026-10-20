@@ -1,3 +1,6 @@
+-- Verify the backfill names the pipeline on Socrata and HDX API listings that
+-- have none, and leaves every other row alone: a ckan listing on another host,
+-- a pipeline_parquet listing, and an API listing a pipeline already claimed.
 do $$
 begin
   if (
@@ -19,6 +22,13 @@ begin
     where external_dataset_id = 'pgtap-fixture-other'
   ) is not null then
     raise exception 'a ckan listing on another host was given a pipeline';
+  end if;
+
+  if (
+    select pipeline_name from public.data_catalog_listings
+    where external_dataset_id = 'pgtap-fixture-claimed'
+  ) is distinct from 'pgtap-fixture-pipeline' then
+    raise exception 'a claimed API listing had its pipeline overwritten';
   end if;
 
   if (
