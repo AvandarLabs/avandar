@@ -23,6 +23,7 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
+    "test:supabase": "vitest run -c vitest.supabase.config.ts",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit"
   },
