@@ -111,11 +111,12 @@ a mid-page failure `relationsWritten` leaves out the rows that page wrote.
 
 - An explicit `since` later than a drive's high-water mark skips the
   connections in between, and the next incremental run starts after them.
-  Only a full run fills that gap.
+  A later run fills that gap only when its window reaches back over it: a
+  full run, or a run with an earlier `since`.
 - A failed column write (see "Engine-managed metadata" below) is repaired
-  only when a later run refetches the connection. On a pipeline that runs
-  incrementally the first upsert has already moved the high-water mark, so
-  only the next full run is certain to repair it.
+  by a later run whose window refetches the connection, such as a full run.
+  On a pipeline that runs incrementally the first upsert has already moved
+  the high-water mark, so the next incremental run may not reach it.
 
 ## Output contract
 
@@ -140,9 +141,10 @@ store reads stored rows a few at a time to keep request URLs short.
 
 **Relation columns.** The relation columns table needs `catalog_listing_id`,
 `column_name`, `display_order`, `original_data_type`, and `cast_data_type`.
-Writing a row replaces that listing's whole column set. An `api_resource`
-relation may declare `columns`, and a `pipeline_parquet` relation's columns
-always come from its Parquet file.
+A relation that declares columns replaces that listing's whole column set
+when its row is written. An `api_resource` relation may declare `columns`,
+and a `pipeline_parquet` relation's columns always come from its Parquet
+file. A relation without `columns` never touches the column table.
 
 **Engine-managed metadata.** The engine merges these keys over a relation's
 own `metadata`:
