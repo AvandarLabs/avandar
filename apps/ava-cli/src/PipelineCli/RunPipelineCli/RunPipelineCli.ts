@@ -166,8 +166,8 @@ export const RunPipelineCli = Acclimate.createCLI("run")
     type: "number",
     required: false,
     description:
-      "Process at most this many datasets. For testing a pipeline without " +
-      "a full run. The hdx and socrata pipelines support it.",
+      "Process at most this many datasets (input CSVs for world-bank__wdi). " +
+      "For testing a pipeline without a full run.",
     parser: (value: string) => {
       return Number(value);
     },
