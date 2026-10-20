@@ -1,0 +1,156 @@
+import { extractSocrataDrive } from "@pipelines/socrata/extractSocrataDrive/extractSocrataDrive";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { EtlRunWindow } from "@avandar/etl";
+import type {
+  SocrataDiscoveryClient,
+  SocrataDiscoveryResult,
+} from "$/connectors/open-data/SocrataDiscoveryClient/SocrataDiscoveryClient.types";
+import type { ConfiguredDrive } from "@pipelines/socrata/configuredDrives/configuredDrives";
+
+const DRIVE: ConfiguredDrive = {
+  baseUrl: "https://data.cityofnewyork.us",
+  organizationName: "City of New York",
+};
+const OPEN_WINDOW: EtlRunWindow = { since: undefined, until: undefined };
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+function _at(minute: number): Date {
+  return new Date(Date.UTC(2026, 9, 1, 0, minute));
+}
+
+function _catalog(size: number): SocrataDiscoveryResult[] {
+  return Array.from({ length: size }, (_, index) => {
+    return {
+      datasetId: `ds-${index}`,
+      name: `Dataset ${index}`,
+      domain: "data.cityofnewyork.us",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: _at(index).toISOString(),
+    };
+  });
+}
+
+/**
+ * A discovery client over `catalog`. A dataset id in `invalidIds` fails
+ * validation: it is left out of `results` and listed in `skippedResults`.
+ */
+function _discoveryOver(
+  catalog: readonly SocrataDiscoveryResult[],
+  options: { resultSetSize?: number; invalidIds?: readonly string[] } = {},
+): SocrataDiscoveryClient {
+  const { resultSetSize = catalog.length, invalidIds = [] } = options;
+  return {
+    search: vi.fn(async ({ limit = 100, offset = 0 }) => {
+      const page = catalog.slice(offset, offset + limit);
+      return {
+        results: page.filter((result) => {
+          return !invalidIds.includes(result.datasetId);
+        }),
+        skippedResults: page
+          .filter((result) => {
+            return invalidIds.includes(result.datasetId);
+          })
+          .map((result) => {
+            return { datasetId: result.datasetId, reason: "updatedAt: Invalid" };
+          }),
+        resultSetSize,
+      };
+    }),
+  };
+}
+
+async function _collect(
+  window: EtlRunWindow,
+  discovery: SocrataDiscoveryClient,
+) {
+  const pages: SocrataDiscoveryResult[][] = [];
+  // Sequential on purpose: the generator pages one request at a time.
+  for await (const page of extractSocrataDrive({
+    drive: DRIVE,
+    window,
+    discovery,
+  })) {
+    pages.push([...page]);
+  }
+  return pages;
+}
+
+function _offsets(discovery: SocrataDiscoveryClient): unknown[] {
+  return vi.mocked(discovery.search).mock.calls.map(([params]) => {
+    return params.offset;
+  });
+}
+
+describe("extractSocrataDrive", () => {
+  it("asks for one drive, updatedAt ASC, in pages of 1000", async () => {
+    const discovery = _discoveryOver(_catalog(10));
+
+    await _collect(OPEN_WINDOW, discovery);
+
+    expect(vi.mocked(discovery.search)).toHaveBeenCalledWith({
+      domains: ["data.cityofnewyork.us"],
+      order: "updatedAt ASC",
+      limit: 1000,
+      offset: 0,
+    });
+  });
+
+  it("starts each page 20 results before the previous page ended", async () => {
+    const discovery = _discoveryOver(_catalog(1500));
+
+    await _collect(OPEN_WINDOW, discovery);
+
+    expect(_offsets(discovery)).toEqual([0, 980]);
+  });
+
+  it("skips results before since", async () => {
+    const pages = await _collect(
+      { since: _at(3), until: undefined },
+      _discoveryOver(_catalog(5)),
+    );
+
+    expect(
+      pages.flat().map((result) => {
+        return result.datasetId;
+      }),
+    ).toEqual(["ds-3", "ds-4"]);
+  });
+
+  it("stops at the first result at or after until and asks for no further page", async () => {
+    const discovery = _discoveryOver(_catalog(1500));
+
+    const pages = await _collect(
+      { since: undefined, until: _at(500) },
+      discovery,
+    );
+
+    expect([pages.flat().length, _offsets(discovery)]).toEqual([500, [0]]);
+  });
+
+  it("fails a drive over 10,000 results before yielding a page", async () => {
+    const discovery = _discoveryOver(_catalog(5), { resultSetSize: 10_001 });
+
+    await expect(_collect(OPEN_WINDOW, discovery)).rejects.toThrow(
+      "https://data.cityofnewyork.us has 10001 results",
+    );
+  });
+
+  it("pages past a skipped result by its raw position, and warns about it", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {
+      return undefined;
+    });
+    const discovery = _discoveryOver(_catalog(1500), { invalidIds: ["ds-5"] });
+
+    const pages = await _collect(OPEN_WINDOW, discovery);
+
+    expect([pages[0]?.length, _offsets(discovery)]).toEqual([999, [0, 980]]);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /https:\/\/data\.cityofnewyork\.us.*ds-5.*updatedAt: Invalid/,
+      ),
+    );
+  });
+});

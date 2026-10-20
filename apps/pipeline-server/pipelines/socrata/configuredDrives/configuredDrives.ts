@@ -24,11 +24,10 @@ export type ConfiguredDrive = {
  * shared across deployments. See `open-data-catalog-architecture.md`
  * section 6.2.
  *
- * Before adding a drive here, confirm its real total dataset count can be
- * fully enumerated in one run. `ava pipeline run socrata` paginates each
- * drive to exhaustion (100 datasets per page) but has no retry/backoff for
- * a rate limit, so a limit hit partway through drops that drive's entire
- * run rather than silently under-indexing it.
+ * Each drive is crawled and resumed on its own, so adding one indexes it from
+ * scratch on the next run without re-indexing the others. A drive must have
+ * at most 10,000 assets, the most the Discovery API can page through; the
+ * pipeline fails a larger drive with an error naming it.
  */
 export const CONFIGURED_DRIVES: readonly ConfiguredDrive[] = [
   {
