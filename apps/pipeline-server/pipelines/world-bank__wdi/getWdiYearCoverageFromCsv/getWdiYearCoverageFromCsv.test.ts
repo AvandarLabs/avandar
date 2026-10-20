@@ -41,4 +41,10 @@ describe("getWdiYearCoverageFromCsv", () => {
       _coverageOf("Country,Topic\nAruba,Health\n", ["Country", "Topic"]),
     ).resolves.toBeUndefined();
   });
+
+  it("is undefined when the Year column holds no parseable year", async () => {
+    await expect(
+      _coverageOf("Country,Year\nAruba,n/a\nAruba,\n", ["Country", "Year"]),
+    ).resolves.toBeUndefined();
+  });
 });

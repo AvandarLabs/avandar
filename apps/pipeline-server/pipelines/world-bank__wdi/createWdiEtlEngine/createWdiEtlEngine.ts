@@ -22,8 +22,11 @@ export const WDI_PIPELINE_NAME = "world-bank__wdi";
 /** The pipeline's one implicit drive: the World Bank's WDI bulk download. */
 type WdiDrive = Readonly<{ key: typeof WDI_PIPELINE_NAME }>;
 
-/** One WDI CSV, copied into this run's extract directory. */
-type WdiCsvFile = Readonly<{ csvFilename: string; csvPath: string }>;
+/**
+ * One WDI CSV, copied into this run's extract directory as
+ * `<tableBaseName>.csv`, the name the engine converts from.
+ */
+type WdiCsvFile = Readonly<{ tableBaseName: string; csvPath: string }>;
 
 async function* _extractWdiCsvFiles(
   pipelineRunId: EtlPipelineRunId,
@@ -40,24 +43,29 @@ async function* _extractWdiCsvFiles(
       `No CSV files found under ${inputDir}. Add one or more .csv files.`,
     );
   }
-  await Promise.all(
-    csvFilenames.map((csvFilename) => {
-      return EtlEngine.storeExtractedData({
-        pipelineName: WDI_PIPELINE_NAME,
-        pipelineRunId,
-        sourcePath: join(inputDir, csvFilename),
-        destinationBasename: csvFilename,
-      });
-    }),
-  );
   const extractDir = getEtlOutputDir(
     WDI_PIPELINE_NAME,
     pipelineRunId,
     "extract",
   );
-  yield csvFilenames.map((csvFilename) => {
-    return { csvFilename, csvPath: join(extractDir, csvFilename) };
-  });
+  // The extension is matched case-insensitively above, but the engine reads
+  // `<tableBaseName>.csv`, so each copy is renamed with a lowercase one.
+  const files = await Promise.all(
+    csvFilenames.map(async (csvFilename) => {
+      const tableBaseName = csvFilename.replace(/\.csv$/i, "");
+      await EtlEngine.storeExtractedData({
+        pipelineName: WDI_PIPELINE_NAME,
+        pipelineRunId,
+        sourcePath: join(inputDir, csvFilename),
+        destinationBasename: `${tableBaseName}.csv`,
+      });
+      return {
+        tableBaseName,
+        csvPath: join(extractDir, `${tableBaseName}.csv`),
+      };
+    }),
+  );
+  yield files;
 }
 
 async function _transformWdiCsvFile(
@@ -74,7 +82,7 @@ async function _transformWdiCsvFile(
       }),
     });
     return makeWdiParquetRelation({
-      tableBaseName: file.csvFilename.replace(/\.csv$/i, ""),
+      tableBaseName: file.tableBaseName,
       csvPath: file.csvPath,
       csvColumns,
       yearCoverage,
@@ -105,7 +113,7 @@ export function createWdiEtlEngine(
       return _extractWdiCsvFiles(pipelineRunId);
     },
     getConnectionId: (file) => {
-      return file.csvFilename;
+      return file.tableBaseName;
     },
     transform: async ({ connection }) => {
       return [await _transformWdiCsvFile(connection)];

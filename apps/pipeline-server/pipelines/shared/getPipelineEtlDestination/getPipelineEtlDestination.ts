@@ -1,3 +1,4 @@
+import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import type { EtlDestination } from "@avandar/etl";
 
 /** The public bucket prebuilt Parquet relations are written to. */
@@ -6,19 +7,22 @@ const DEFAULT_OPEN_DATA_BUCKET = "opendata";
 /**
  * Where every pipeline loads: the Supabase stack named by `SUPABASE_URL` and
  * `SUPABASE_SERVICE_ROLE_KEY`, the Open Data Catalog's two tables, and the
- * public `opendata` bucket (or `SUPABASE_OPENDATA_BUCKET`). The engine
- * itself reports any missing credential when a run starts.
+ * public `opendata` bucket (or `SUPABASE_OPENDATA_BUCKET`). A blank variable
+ * counts as unset. The engine itself reports any missing credential when a
+ * run starts.
  */
 export function getPipelineEtlDestination(): EtlDestination {
   return {
     supabase: {
-      url: process.env.SUPABASE_URL,
-      serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      url: getOptionalEnvVar("SUPABASE_URL"),
+      serviceRoleKey: getOptionalEnvVar("SUPABASE_SERVICE_ROLE_KEY"),
     },
     output: {
       listingsTable: "data_catalog_listings",
       relationColumnsTable: "data_catalog_listings__relation_columns",
-      bucket: process.env.SUPABASE_OPENDATA_BUCKET ?? DEFAULT_OPEN_DATA_BUCKET,
+      bucket:
+        getOptionalEnvVar("SUPABASE_OPENDATA_BUCKET") ??
+        DEFAULT_OPEN_DATA_BUCKET,
     },
   };
 }

@@ -27,4 +27,20 @@ describe("getPipelineEtlDestination", () => {
       serviceRoleKey: "service-role-key",
     });
   });
+
+  it("falls back to the opendata bucket when SUPABASE_OPENDATA_BUCKET is blank", () => {
+    vi.stubEnv("SUPABASE_OPENDATA_BUCKET", "  ");
+
+    expect(getPipelineEtlDestination().output.bucket).toBe("opendata");
+  });
+
+  it("treats blank Supabase credentials as unset", () => {
+    vi.stubEnv("SUPABASE_URL", "");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "  ");
+
+    expect(getPipelineEtlDestination().supabase).toEqual({
+      url: undefined,
+      serviceRoleKey: undefined,
+    });
+  });
 });
