@@ -3,36 +3,13 @@ import {
   unwrapCkanActionEnvelope,
 } from "$/connectors/open-data/ckanActionApiHelpers.ts";
 import { CkanPackageSchema } from "$/connectors/open-data/CkanClient/CkanClient.schemas.ts";
+import { createCkanPackageFromWire } from "$/connectors/open-data/CkanClient/createCkanPackageFromWire/createCkanPackageFromWire.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import type {
   CkanClient,
   CkanPackage,
-  CkanResource,
   OpenDataHttp,
 } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
-import type { z } from "zod";
-
-/**
- * Normalizes one wire resource into the shape the rest of this code reads,
- * turning CKAN's absent-or-null fields into undefined and defaulting the two
- * booleans that an older deployment can omit.
- */
-function _toResource(
-  wire: z.output<typeof CkanPackageSchema>["resources"][number],
-): CkanResource {
-  return {
-    id: wire.id,
-    name: wire.name,
-    format: wire.format,
-    url: wire.url,
-    url_type: wire.url_type ?? "upload",
-    size: wire.size ?? undefined,
-    hash: wire.hash ?? "",
-    last_modified: wire.last_modified ?? undefined,
-    mimetype: wire.mimetype ?? undefined,
-    datastore_active: wire.datastore_active ?? false,
-  };
-}
 
 /**
  * Reads CKAN metadata and resource bytes over an injected HTTP layer.
@@ -54,13 +31,7 @@ export function createCkanClient(http: Readonly<OpenDataHttp>): CkanClient {
         "package_show",
         await http.get(url),
       );
-      const wire = CkanPackageSchema.parse(result);
-      return {
-        id: wire.id,
-        name: wire.name,
-        metadata_modified: wire.metadata_modified ?? undefined,
-        resources: wire.resources.map(_toResource),
-      };
+      return createCkanPackageFromWire(CkanPackageSchema.parse(result));
     },
 
     getResourceBytes: async ({ ckanResourceId, url }) => {
