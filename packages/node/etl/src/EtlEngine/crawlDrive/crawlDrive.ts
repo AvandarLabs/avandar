@@ -16,12 +16,27 @@ import type { ConnectionSelectionState } from "@etl/EtlEngine/selectPageConnecti
 export type CrawlDriveArgs<TDrive, TConnection> = Readonly<{
   config: EtlEngineConfig<TDrive, TConnection>;
   drive: TDrive;
+  /** The drive's position in `listDrives` order. */
+  driveIndex: number;
   options: EtlRunOptions;
   pipelineRunId: EtlPipelineRunId;
   stores: EtlStores;
-  /** How many more connections the run's limit allows. */
+  /**
+   * How many more connections the run's limit allows. At 0 or below the
+   * drive is skipped.
+   */
   remaining: number;
   syncedAt: Date;
+}>;
+
+/** One drive's report, plus what the drive threw when it failed. */
+export type CrawlDriveResult = Readonly<{
+  report: EtlDriveReport;
+  /**
+   * What the drive threw, kept whole so its class and stack survive. Only
+   * meaningful when `report.status` is `failed`.
+   */
+  error?: unknown;
 }>;
 
 type _DriveArgs<TDrive, TConnection> = CrawlDriveArgs<TDrive, TConnection> &
@@ -30,29 +45,85 @@ type _DriveArgs<TDrive, TConnection> = CrawlDriveArgs<TDrive, TConnection> &
 type _PagesArgs<TDrive, TConnection> = _DriveArgs<TDrive, TConnection> &
   Readonly<{ window: EtlRunWindow }>;
 
-type _DriveProgress = Readonly<{
+type _DriveCounts = Readonly<{
   connectionsFetched: number;
   relationsWritten: number;
   relationsUnchanged: number;
   newestTimestamp: Date | undefined;
-  selection: ConnectionSelectionState;
 }>;
 
-type _DriveReportArgs = Readonly<{
+type _DriveProgress = _DriveCounts &
+  Readonly<{ selection: ConnectionSelectionState }>;
+
+/**
+ * How a drive's crawl ended. A failure is its own variant, so a drive that
+ * throws `undefined` is still failed.
+ */
+type _DriveOutcome =
+  | Readonly<{ status: "ok" | "skipped" }>
+  | Readonly<{ status: "failed"; error: unknown }>;
+
+type _DriveResultArgs = Readonly<{
   driveKey: string;
   window: EtlRunWindow;
-  progress: _DriveProgress;
-  error: unknown;
+  counts: _DriveCounts;
+  outcome: _DriveOutcome;
 }>;
+
+const NO_DRIVE_COUNTS: _DriveCounts = {
+  connectionsFetched: 0,
+  relationsWritten: 0,
+  relationsUnchanged: 0,
+  newestTimestamp: undefined,
+};
 
 function _createProgress(remaining: number): _DriveProgress {
   return {
-    connectionsFetched: 0,
-    relationsWritten: 0,
-    relationsUnchanged: 0,
-    newestTimestamp: undefined,
+    ...NO_DRIVE_COUNTS,
     selection: { seenIds: new Set(), lastTimestamp: undefined, remaining },
   };
+}
+
+function _buildDriveResult(args: _DriveResultArgs): CrawlDriveResult {
+  const { counts, outcome } = args;
+  const base = {
+    driveKey: args.driveKey,
+    window: args.window,
+    connectionsFetched: counts.connectionsFetched,
+    relationsWritten: counts.relationsWritten,
+    relationsUnchanged: counts.relationsUnchanged,
+    newestTimestamp: counts.newestTimestamp,
+  };
+  if (outcome.status !== "failed") {
+    return { report: { ...base, status: outcome.status } };
+  }
+  const { error } = outcome;
+  return {
+    report: {
+      ...base,
+      status: "failed",
+      error: error instanceof Error ? error.message : String(error),
+    },
+    error,
+  };
+}
+
+/** The result for a drive that never got as far as fetching a page. */
+function _buildUncrawledDriveResult(args: {
+  driveKey: string;
+  options: EtlRunOptions;
+  outcome: _DriveOutcome;
+}): CrawlDriveResult {
+  return _buildDriveResult({
+    driveKey: args.driveKey,
+    // With no high-water mark read, the window is the run's own bounds.
+    window: resolveRunWindow({
+      options: args.options,
+      highWaterMark: undefined,
+    }),
+    counts: NO_DRIVE_COUNTS,
+    outcome: args.outcome,
+  });
 }
 
 async function _buildDriveWindow<TDrive, TConnection>(
@@ -130,7 +201,7 @@ async function _processPage<TDrive, TConnection>(
 
 async function _crawlPages<TDrive, TConnection>(
   args: _PagesArgs<TDrive, TConnection>,
-): Promise<Readonly<{ progress: _DriveProgress; error?: unknown }>> {
+): Promise<Readonly<{ progress: _DriveProgress; outcome: _DriveOutcome }>> {
   let progress = _createProgress(args.remaining);
   try {
     const pages = args.config.extract({
@@ -147,58 +218,68 @@ async function _crawlPages<TDrive, TConnection>(
         break;
       }
     }
-    return { progress };
+    return { progress, outcome: { status: "ok" } };
   } catch (error: unknown) {
-    return { progress, error };
+    return { progress, outcome: { status: "failed", error } };
   }
 }
 
-function _buildDriveReport(args: _DriveReportArgs): EtlDriveReport {
-  const { progress, error } = args;
-  const base = {
-    driveKey: args.driveKey,
-    window: args.window,
-    connectionsFetched: progress.connectionsFetched,
-    relationsWritten: progress.relationsWritten,
-    relationsUnchanged: progress.relationsUnchanged,
-    newestTimestamp: progress.newestTimestamp,
-  };
-  if (error === undefined) {
-    return { ...base, status: "ok" };
+function _readDriveKey<TDrive, TConnection>(
+  args: CrawlDriveArgs<TDrive, TConnection>,
+): Readonly<{ driveKey: string }> | Readonly<{ error: unknown }> {
+  try {
+    return { driveKey: args.config.getDriveKey(args.drive) };
+  } catch (error: unknown) {
+    return { error };
   }
-  return {
-    ...base,
-    status: "failed",
-    error: error instanceof Error ? error.message : String(error),
-  };
+}
+
+async function _crawlKeyedDrive<TDrive, TConnection>(
+  args: _DriveArgs<TDrive, TConnection>,
+): Promise<CrawlDriveResult> {
+  const { driveKey, options } = args;
+  if (args.remaining <= 0) {
+    return _buildUncrawledDriveResult({
+      driveKey,
+      options,
+      outcome: { status: "skipped" },
+    });
+  }
+  try {
+    const window = await _buildDriveWindow(args);
+    const { progress, outcome } = await _crawlPages({ ...args, window });
+    return _buildDriveResult({ driveKey, window, counts: progress, outcome });
+  } catch (error: unknown) {
+    // _crawlPages reports its own failures, so only reading the window, and
+    // with it the high-water mark, lands here.
+    return _buildUncrawledDriveResult({
+      driveKey,
+      options,
+      outcome: { status: "failed", error },
+    });
+  }
 }
 
 /**
- * Crawls one drive: resolves its window, then fetches, transforms, and loads
- * one page at a time until the source runs out or the run's limit is
- * reached. A failure never escapes: the drive is reported `failed`, with the
- * counts of what it wrote before the failure.
+ * Crawls one drive: reads its key and window, then fetches, transforms, and
+ * loads one page at a time until the source runs out or the run's limit is
+ * reached. A drive with no limit left is skipped without a request. A
+ * failure never escapes: the drive is reported `failed` with the counts of
+ * what it wrote before the failure, and the result keeps what it threw. A
+ * drive whose key cannot be read is reported as `listDrives[<index>]`.
  *
- * @returns The drive's report.
+ * @returns The drive's report and, when it failed, its error.
  */
 export async function crawlDrive<TDrive, TConnection>(
   args: CrawlDriveArgs<TDrive, TConnection>,
-): Promise<EtlDriveReport> {
-  const driveKey = args.config.getDriveKey(args.drive);
-  try {
-    const window = await _buildDriveWindow({ ...args, driveKey });
-    const { progress, error } = await _crawlPages({
-      ...args,
-      driveKey,
-      window,
-    });
-    return _buildDriveReport({ driveKey, window, progress, error });
-  } catch (error: unknown) {
-    return _buildDriveReport({
-      driveKey,
-      window: { since: args.options.since, until: args.options.until },
-      progress: _createProgress(args.remaining),
-      error,
+): Promise<CrawlDriveResult> {
+  const keyRead = _readDriveKey(args);
+  if (!("driveKey" in keyRead)) {
+    return _buildUncrawledDriveResult({
+      driveKey: `listDrives[${args.driveIndex}]`,
+      options: args.options,
+      outcome: { status: "failed", error: keyRead.error },
     });
   }
+  return _crawlKeyedDrive({ ...args, driveKey: keyRead.driveKey });
 }

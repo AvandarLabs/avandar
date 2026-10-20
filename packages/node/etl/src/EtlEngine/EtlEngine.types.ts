@@ -157,7 +157,11 @@ export type EtlEngineConfig<TDrive, TConnection> = EtlDestination &
 /** How one drive's crawl ended. `skipped` means the limit was reached first. */
 export type EtlDriveStatus = "ok" | "failed" | "skipped";
 
-/** What happened to one drive during a run. */
+/**
+ * What happened to one drive during a run. The counts and `newestTimestamp`
+ * cover only pages that finished loading: when a drive fails partway through
+ * a page, rows that page already wrote are not counted in `relationsWritten`.
+ */
 export type EtlDriveReport = Readonly<{
   driveKey: string;
   window: EtlRunWindow;
@@ -178,5 +182,17 @@ export type EtlRunReport = Readonly<{
 
 /** A pipeline's engine. */
 export type EtlEngineInstance = Readonly<{
+  /**
+   * Crawls every drive and loads what changed, resolving to the run's
+   * report when at least one drive did not fail.
+   *
+   * @throws Before listing drives, when `mode` is `incremental` on a
+   * pipeline without `incremental` config, or `limit` is not an integer of 0
+   * or more.
+   * @throws Before listing drives, when no `stores` are given and
+   * `supabase.url` or `supabase.serviceRoleKey` is missing.
+   * @throws Whatever `listDrives` throws.
+   * @throws EtlRunFailedError when every drive failed.
+   */
   run: (options: EtlRunOptions) => Promise<EtlRunReport>;
 }>;
