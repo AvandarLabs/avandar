@@ -21,32 +21,81 @@ pnpm add @avandar/etl
 pnpm add duckdb @supabase/supabase-js
 ```
 
-Both are peer dependencies. `duckdb` is a native module, and you pass a live
-Supabase client's credentials across the API boundary, so each must be a
-single copy you control.
+Both are peer dependencies, so your app picks their versions. `duckdb` is a
+native module with a compiled binary, so it should be a single copy you
+install. The engine builds its own Supabase client from `supabase.url` and
+`supabase.serviceRoleKey`, but `createSupabaseListingsStore` and
+`createSupabaseObjectStore` take a client you create, so its type must come
+from your copy of `@supabase/supabase-js`.
 
 ## Usage
 
 ```ts
 import { EtlEngine } from "@avandar/etl";
+import type { EtlEngineConfig, EtlRunWindow } from "@avandar/etl";
 
-const engine = EtlEngine.create<Portal, Dataset>({
-  name: "socrata",
-  service: "socrata",
-  supabase: { url: process.env.SUPABASE_URL, serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY },
+/** A drive: one portal. */
+type Portal = { baseUrl: string };
+/** A connection: one dataset the portal lists. */
+type Dataset = { id: string; name: string; updatedAt: string };
+
+const portals: Portal[] = [{ baseUrl: "https://data.example.org" }];
+
+/** Parse the timestamp once, and use it for both the crawl and the row. */
+function getUpdatedAt(dataset: Dataset): Date {
+  return new Date(dataset.updatedAt);
+}
+
+/**
+ * Yields pages of datasets, oldest first. `window.since` is inclusive and
+ * `window.until` is exclusive. Either may be undefined.
+ */
+async function* fetchDatasetPages(
+  portal: Portal,
+  window: EtlRunWindow,
+): AsyncGenerator<Dataset[]> {
+  const query = new URLSearchParams({ order: "updated_at.asc" });
+  if (window.since) {
+    query.set("updated_since", window.since.toISOString());
+  }
+  if (window.until) {
+    query.set("updated_before", window.until.toISOString());
+  }
+  // A real source would follow its paging links. This stub yields one page.
+  const response = await fetch(`${portal.baseUrl}/datasets?${query}`);
+  yield (await response.json()) as Dataset[];
+}
+
+const config: EtlEngineConfig<Portal, Dataset> = {
+  name: "example-portal",
+  service: "example",
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  },
   output: {
     listingsTable: "data_catalog_listings",
     relationColumnsTable: "data_catalog_listings__relation_columns",
   },
   listDrives: () => portals,
   getDriveKey: (portal) => portal.baseUrl,
-  extract: ({ drive, window }) => fetchDatasetPagesOldestFirst(drive, window),
+  extract: ({ drive, window }) => fetchDatasetPages(drive, window),
   getConnectionId: (dataset) => dataset.id,
-  transform: ({ connection }) => [toApiResourceRelation(connection)],
-  incremental: { getConnectionTimestamp: (dataset) => new Date(dataset.updatedAt) },
-});
+  transform: ({ connection }) => [
+    {
+      kind: "api_resource",
+      externalDatasetId: connection.id,
+      displayName: connection.name,
+      externalOrganizationName: "Example City",
+      sourceUpdatedAt: getUpdatedAt(connection),
+      apiResourceId: connection.id,
+      apiResourceFormat: "json",
+    },
+  ],
+  incremental: { getConnectionTimestamp: getUpdatedAt },
+};
 
-const report = await engine.run({ mode: "incremental" });
+const report = await EtlEngine.create(config).run({ mode: "incremental" });
 ```
 
 ## Run modes
@@ -79,12 +128,15 @@ last stored timestamp are fetched again and skipped if unchanged.
 pipeline's rows with `api_base_url` equal to the drive key. Override it with
 `incremental.readHighWaterMark`.
 
-**Repeats.** A connection a drive returns more than once in a run is
-processed once. A repeat is the same connection id, and with
-`incremental.getConnectionTimestamp` also the same timestamp, so a connection
-modified during the crawl reappears with a newer timestamp and is processed
-again. Separately, a page that holds the same listing twice (two relations
-with one conflict key, see the output contract) fails the drive.
+**Repeats.**
+
+- A connection a drive returns more than once in a run is processed once. A
+  repeat has the same connection id and, with
+  `incremental.getConnectionTimestamp`, the same timestamp.
+- A connection modified during the crawl reappears with a newer timestamp, so
+  it is processed again.
+- A page that holds the same listing twice (two relations with one conflict
+  key, see the output contract) fails the drive.
 
 **Ordering and timestamps.** With `incremental` config, a drive fails when:
 
@@ -96,16 +148,22 @@ with one conflict key, see the output contract) fails the drive.
   would move it past connections not yet written. Derive both from the same
   parsed value.
 
-**Failures.** A failing drive is reported `failed` with its error message,
-and the next drive still runs. `run()` rejects for invalid options (an
-`incremental` run on a pipeline without `incremental` config, or a bad
-`limit`), for missing credentials when no `stores` are given, when
-`listDrives` throws, and with `EtlRunFailedError` when every drive fails. The
-error carries `report`, `errors` (what each drive threw), and a `cause` that
-aggregates them. Otherwise `run()` resolves with the report, which lists
-every drive in crawl order, including failed and skipped ones. A drive's
-counts and `newestTimestamp` cover only pages that finished loading, so after
-a mid-page failure `relationsWritten` leaves out the rows that page wrote.
+**Failures.**
+
+- A failing drive is reported `failed` with its error message. The next
+  drive still runs.
+- `run()` rejects when:
+  - the options are invalid: an `incremental` run on a pipeline without
+    `incremental` config, or a bad `limit`,
+  - no `stores` are given and the Supabase credentials are missing,
+  - `listDrives` throws, or
+  - every drive fails, with `EtlRunFailedError`. It carries `report`,
+    `errors` (what each drive threw), and a `cause` that aggregates them.
+- Otherwise `run()` resolves with the report, which lists every drive in
+  crawl order, including failed and skipped ones.
+- A drive's counts and `newestTimestamp` cover only pages that finished
+  loading. After a mid-page failure, `relationsWritten` leaves out the rows
+  that page already wrote.
 
 **Caveats.**
 
@@ -158,25 +216,37 @@ A row's `relation_columns_sha256` is written in a second upsert, after its
 columns land. A failure in between leaves a row without the current hash,
 which the next load that reaches the row sees as changed and rewrites.
 
-**Parquet relations** are converted from CSV to ZSTD Parquet and uploaded to
-`<bucket>/<pipeline name>/datasets/<table>.parquet`. The upload is skipped
-only when the stored row's `parquet_sha256`, `open_data_bucket`, and
-`storage_object_path` all match. The skip trusts the stored row, so an object
-deleted outside the pipeline is not uploaded again while its hash matches.
-`ava pipeline reset` deletes the pipeline's rows, so the next run uploads
-every object. The object's public URL is appended to `canonical_urls`, and the
-relation columns come from the Parquet file.
+**Parquet relations** need `output.bucket`: a `pipeline_parquet` relation
+fails its drive when no bucket is set. The bucket must already exist, and
+the service-role key must be able to write to it.
+
+- Each relation's CSV is converted to ZSTD Parquet and uploaded to
+  `<output.bucket>/<pipeline name>/datasets/<tableBaseName>.parquet`.
+- The object's public URL is appended to `canonical_urls`, and the relation
+  columns come from the Parquet file.
+- The upload is skipped only when the stored row's `parquet_sha256`,
+  `open_data_bucket`, and `storage_object_path` all match.
+- The skip trusts the stored row, so an object deleted outside the pipeline
+  is not uploaded again while its hash matches. `ava pipeline reset` deletes
+  the pipeline's rows, so the next run uploads every object.
 
 ## Testing a pipeline
 
 Pass `stores` to replace Supabase:
 
 ```ts
-import { createInMemoryListingsStore, createInMemoryObjectStore } from "@avandar/etl";
+import {
+  createInMemoryListingsStore,
+  createInMemoryObjectStore,
+} from "@avandar/etl";
 
+// `config` is the config from Usage.
 const listings = createInMemoryListingsStore();
-await EtlEngine.create({ ...config, stores: { listings, objects: createInMemoryObjectStore() } })
-  .run({ mode: "full" });
+const testEngine = EtlEngine.create({
+  ...config,
+  stores: { listings, objects: createInMemoryObjectStore() },
+});
+await testEngine.run({ mode: "full" });
 listings.getRows();
 ```
 
@@ -237,8 +307,8 @@ Constructor: `new NodeDuckDb({ databasePath? })`. Defaults to `:memory:`.
 
 | Export                            | Description                                                              |
 | --------------------------------- | ------------------------------------------------------------------------ |
-| `NodeDuckDbReadCsvColumn`         | `{ name, type: DuckDbSniffableDataType }` — column spec for `read_csv`   |
-| `NodeDuckDbSniffCsvColumn`        | `{ name, type: DuckDbSniffableDataType }` — returned by `sniffCsv`       |
+| `NodeDuckDbReadCsvColumn`         | `{ name, type: DuckDbSniffableDataType }`: column spec for `read_csv`    |
+| `NodeDuckDbSniffCsvColumn`        | `{ name, type: DuckDbSniffableDataType }`: returned by `sniffCsv`        |
 | `NodeDuckDbReadCsvIntoViewOptions`| Options accepted by `readCsvIntoView` (path, view name, columns, header, skip, delimiter, autoDetect) |
 
 ### DuckDB sniffable types
