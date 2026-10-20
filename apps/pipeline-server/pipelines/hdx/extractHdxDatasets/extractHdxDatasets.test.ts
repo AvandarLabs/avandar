@@ -128,6 +128,21 @@ function _silenceWarnings() {
 }
 
 describe("extractHdxDatasets", () => {
+  it("requests 100 rows per page by default", async () => {
+    const discovery = _keysetDiscovery(CATALOG);
+    // Sequential on purpose: the generator pages one request at a time.
+    for await (const page of extractHdxDatasets({
+      drive: DRIVE,
+      window: OPEN_WINDOW,
+      discovery,
+    })) {
+      expect(page).toHaveLength(CATALOG.length);
+    }
+    expect(discovery.searchDatasets).toHaveBeenCalledWith(
+      expect.objectContaining({ rows: 100 }),
+    );
+  });
+
   it("asks for the next page after the last page's (metadata_modified, name)", async () => {
     const discovery = _keysetDiscovery(CATALOG);
 

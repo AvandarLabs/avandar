@@ -385,7 +385,8 @@ hardcoded `socrata` and `hdx` filters.
 ### 5.7 HDX pipeline
 
 - **Drive:** set `HDX_DRIVE` to `https://data.humdata.org`. A full crawl is
-  about 29 requests.
+  about 29 requests. *Superseded: pages are 100 rows, so a full crawl is about
+  280 requests. See section 10, decision 17.*
 - **`CkanDiscoveryClient.searchDatasets`** (new, in
   `shared/connectors/open-data/`): calls `package_search` with
   `sort=metadata_modified asc,name asc`, `rows=1000`, and
@@ -624,7 +625,7 @@ synthetic names and `.invalid` hosts, and every test deletes what it inserted.
 
 | Id | Claim | Spec |
 | --- | --- | --- |
-| C1 | `CkanDiscoveryClient.searchDatasets` sends `sort=metadata_modified asc,name asc` and `rows=1000` | 5.7 |
+| C1 | `CkanDiscoveryClient.searchDatasets` sends `sort=metadata_modified asc,name asc` and `rows=1000` (HDX now sends `rows=100`: see section 10, decision 17) | 5.7 |
 | C2 | A window becomes `fq=metadata_modified:[<since> TO <until>}`, with `*` for a missing bound | 5.7 |
 | C2b | A cursor becomes the two-field keyset filter on `metadata_modified` and `name` | 5.7 |
 | C3 | Window bounds are rounded down to whole milliseconds and sent as UTC with `Z` | 5.7 |
@@ -643,7 +644,7 @@ synthetic names and `.invalid` hosts, and every test deletes what it inserted.
 | H1 | `extract` pages with keyset paging: the next request asks for datasets after the last page's final `(metadata_modified, name)` pair | 5.7 |
 | H2 | Rows at or before that pair are dropped, so no dataset is returned twice | 5.7 |
 | H2b | A full page with nothing after the cursor stops with an error instead of looping | 5.7 |
-| H3 | `extract` stops when a page returns fewer than 1,000 rows | 5.7 |
+| H3 | `extract` stops when a page returns fewer than 1,000 rows (100 since decision 17) | 5.7 |
 | H4 | `transform` returns one `ApiResourceRelation` per readable resource, with `sourceUpdatedAt` set to the dataset's `metadata_modified` | 5.7 |
 | H5 | A dataset with no readable resource transforms to zero relations | 5.7 |
 | H6 | The HDX HTTP client retries a 429 up to 3 times with exponential backoff from 5 seconds, then throws | 5.7, 7 |
@@ -810,3 +811,8 @@ Where an earlier statement is superseded, it carries a note pointing here.
     leaves a gap that only a run reaching back over it fills. Relation column
     replacement is a delete then an insert, two requests, so a listing can show
     no columns until the next run repairs it.
+17. **HDX page size.** HDX pages are 100 rows, not 1,000 (see C1). Per-resource
+    `sdd_report` fields make 1,000-row `package_search` pages 6.7 to 166 MB,
+    measured against live HDX. The largest 100-row page measured was 63 MB, so
+    the HDX client's response limit is 128 MB. A full crawl is about 280
+    requests at one request per second.

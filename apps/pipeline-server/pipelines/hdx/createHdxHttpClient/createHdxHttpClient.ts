@@ -4,8 +4,12 @@ import { withRetryOnTooManyRequests } from "$/utils/HttpClientFactory/mixins/wit
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type { FetchLike } from "$/utils/HttpClientFactory/HttpClientFactory.types";
 
-/** Ceiling for a metadata JSON response - never a resource download. */
-const MAX_METADATA_BYTES = 10 * 1024 * 1024;
+/**
+ * Ceiling for a metadata JSON response - never a resource download. The
+ * largest 100-row `package_search` page measured was 63 MB, so 128 MB leaves
+ * about 2x headroom.
+ */
+const MAX_METADATA_BYTES = 128 * 1024 * 1024;
 
 /** HDX asks API clients to send at most one request per second. */
 const MIN_TIME_BETWEEN_REQUESTS_MS = 1000;

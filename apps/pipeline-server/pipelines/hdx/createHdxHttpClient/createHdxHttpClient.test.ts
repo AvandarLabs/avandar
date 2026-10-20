@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { FetchLike } from "$/utils/HttpClientFactory/HttpClientFactory.types";
 
 const HDX_BASE_URL = "https://data.humdata.org";
+const MEBIBYTE = 1024 * 1024;
 
 function _sentHeaders(fetchImpl: FetchLike): Headers {
   return new Headers(vi.mocked(fetchImpl).mock.calls[0]?.[1]?.headers);
@@ -34,5 +35,33 @@ describe("createHdxHttpClient", () => {
     }).get(`${HDX_BASE_URL}/api/3/action/package_search`);
 
     expect(vi.mocked(fetchImpl).mock.calls.length).toBe(2);
+  });
+
+  it("accepts a response up to 128 MB, since 100-row HDX pages reach 63 MB", async () => {
+    const fetchImpl: FetchLike = vi.fn(async () => {
+      return new Response("{}", {
+        headers: { "content-length": String(100 * MEBIBYTE) },
+      });
+    });
+
+    await expect(
+      createHdxHttpClient({ baseUrl: HDX_BASE_URL, fetchImpl }).get(
+        `${HDX_BASE_URL}/api/3/action/package_search`,
+      ),
+    ).resolves.toEqual({});
+  });
+
+  it("rejects a response declared above 128 MB", async () => {
+    const fetchImpl: FetchLike = vi.fn(async () => {
+      return new Response("{}", {
+        headers: { "content-length": String(128 * MEBIBYTE + 1) },
+      });
+    });
+
+    await expect(
+      createHdxHttpClient({ baseUrl: HDX_BASE_URL, fetchImpl }).get(
+        `${HDX_BASE_URL}/api/3/action/package_search`,
+      ),
+    ).rejects.toThrow(/byte limit/);
   });
 });

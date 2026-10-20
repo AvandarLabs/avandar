@@ -8,8 +8,12 @@ import type {
 } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.types";
 import type { HdxDrive } from "@pipelines/hdx/hdxDrive";
 
-/** CKAN's largest `package_search` page. */
-export const HDX_PAGE_SIZE = 1000;
+/**
+ * Datasets per `package_search` request. CKAN allows 1,000, but HDX's
+ * per-resource `sdd_report` fields make 1,000-row pages 6.7 to 166 MB, so
+ * pages stay at 100 rows (63 MB at most when measured).
+ */
+export const HDX_PAGE_SIZE = 100;
 
 type _ExtractArgs = Readonly<{
   drive: Readonly<HdxDrive>;

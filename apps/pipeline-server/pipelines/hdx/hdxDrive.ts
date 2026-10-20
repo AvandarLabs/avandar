@@ -22,10 +22,11 @@ export type HdxDrive = {
 export const HDX_BASE_URL = "https://data.humdata.org";
 
 /**
- * The HDX drive the `hdx` pipeline crawls. `package_search` returns 1,000
+ * The HDX drive the `hdx` pipeline crawls. `package_search` returns 100
  * full datasets per request, sorted by `metadata_modified`, so a full crawl
- * of HDX is about 30 requests and an incremental run reads only what
- * changed. Set it to `undefined` to switch the pipeline off.
+ * of HDX is about 280 requests (about 5 minutes at one request per second)
+ * and an incremental run reads only what changed. Set it to `undefined` to
+ * switch the pipeline off.
  */
 export const HDX_DRIVE: HdxDrive | undefined = {
   baseUrl: HDX_BASE_URL,
