@@ -6,6 +6,36 @@ export type CkanDatasetSearchCursor = Readonly<{
   name: string;
 }>;
 
+/**
+ * A `package_search` result left out of a page because it failed validation.
+ */
+export type CkanSkippedDataset = Readonly<{
+  name: string;
+  /** The raw `metadata_modified`, as CKAN wrote it. */
+  metadataModified: string;
+  /** Which fields failed validation, and why. */
+  reason: string;
+}>;
+
+/** One page of a `searchDatasets` crawl. */
+export type CkanDatasetSearchPage = Readonly<{
+  /** The page's results that passed validation, in sort order. */
+  datasets: readonly CkanPackage[];
+  /** The page's results that failed validation, in sort order. */
+  skippedDatasets: readonly CkanSkippedDataset[];
+  /**
+   * Where this page ended: the last result, whether valid or skipped, so one
+   * bad dataset never stops a crawl from moving on. `undefined` on an empty
+   * page.
+   */
+  nextCursor: CkanDatasetSearchCursor | undefined;
+  /**
+   * How many results the page held before validation, so a caller can tell a
+   * full page from the last one. Not CKAN's total `count`.
+   */
+  resultCount: number;
+}>;
+
 /** Lists and searches the datasets in one CKAN deployment. */
 export type CkanDiscoveryClient = {
   /**
@@ -21,6 +51,9 @@ export type CkanDiscoveryClient = {
    * `name`, as full datasets with their resources. `after` asks for the
    * datasets strictly after a `(metadata_modified, name)` pair, so a crawl
    * can page without offsets that shift when datasets change mid-crawl.
+   *
+   * @throws When a result has no usable `name` or `metadata_modified`,
+   * because the page's cursor could not then be placed safely.
    */
   searchDatasets: (params: {
     baseUrl: string;
@@ -30,5 +63,5 @@ export type CkanDiscoveryClient = {
     modifiedBefore?: Date;
     after?: CkanDatasetSearchCursor;
     rows: number;
-  }) => Promise<CkanPackage[]>;
+  }) => Promise<CkanDatasetSearchPage>;
 };
