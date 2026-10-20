@@ -29,8 +29,12 @@ export function findAvandarRepoRoot(): string | undefined {
 
 export type RunPipelineLocalResult = Readonly<{
   ok: boolean;
-  /** Last line of stdout when ok (pipeline run id). */
-  pipelineRunId: string;
+  /**
+   * Last line of stdout when ok: the run report as JSON. A run where every
+   * drive failed also ends stdout with its report, so a failed run carries
+   * it too. Otherwise empty.
+   */
+  reportJson: string;
   errorText: string;
 }>;
 
@@ -47,6 +51,41 @@ function _buildRunArgs(runOptions: PipelineRunRequestOptions): string[] {
       ? []
       : ["--limit", String(runOptions.limit)]),
   ];
+}
+
+/** Whether a line is a JSON object, as the runner prints its report. */
+function _isJsonObjectLine(line: string): boolean {
+  try {
+    const json: unknown = JSON.parse(line);
+    return typeof json === "object" && json !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The result of a run that exited non-zero. When stdout ends with a report,
+ * it is returned on its own and left out of the error text.
+ */
+function _buildFailedResult(args: {
+  stdout: string;
+  stderr: string;
+  status: number | null;
+}): RunPipelineLocalResult {
+  const lines = args.stdout.trim().split("\n");
+  const lastLine = lines[lines.length - 1] ?? "";
+  const hasReport = _isJsonObjectLine(lastLine);
+  const output = hasReport ? lines.slice(0, -1).join("\n") : args.stdout;
+  const combined = [args.stderr.trim(), output.trim()]
+    .filter((text) => {
+      return text !== "";
+    })
+    .join("\n");
+  return {
+    ok: false,
+    reportJson: hasReport ? lastLine : "",
+    errorText: combined || `Exit code ${String(args.status)}`,
+  };
 }
 
 /**
@@ -80,7 +119,7 @@ export function runPipelineLocal(options: {
   if (spawnResult.error) {
     return {
       ok: false,
-      pipelineRunId: "",
+      reportJson: "",
       errorText: spawnResult.error.message,
     };
   }
@@ -89,12 +128,7 @@ export function runPipelineLocal(options: {
   const stderr = spawnResult.stderr ?? "";
 
   if (spawnResult.status !== 0) {
-    const combined = `${stderr}\n${stdout}`.trim();
-    return {
-      ok: false,
-      pipelineRunId: "",
-      errorText: combined || `Exit code ${String(spawnResult.status)}`,
-    };
+    return _buildFailedResult({ stdout, stderr, status: spawnResult.status });
   }
 
   const lines = stdout.trim().split("\n");
@@ -102,7 +136,7 @@ export function runPipelineLocal(options: {
 
   return {
     ok: true,
-    pipelineRunId: lastLine,
+    reportJson: lastLine,
     errorText: "",
   };
 }

@@ -2,13 +2,41 @@ import { runPipelineLocal } from "@ava-cli/PipelineCli/runPipelineLocal";
 import { Acclimate } from "@avandar/acclimate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const REPORT = {
+  pipelineRunId: "00000000-0000-4000-8000-000000000001",
+  mode: "full",
+  drives: [
+    {
+      driveKey: "https://data.cityofnewyork.us",
+      window: {},
+      connectionsFetched: 2,
+      relationsWritten: 2,
+      relationsUnchanged: 0,
+      newestTimestamp: "2026-10-20T12:00:00.000Z",
+      status: "ok",
+    },
+  ],
+};
+
+/** A report where every drive failed, as an all-failed run sends it. */
+const FAILED_REPORT = {
+  ...REPORT,
+  drives: [
+    {
+      ...REPORT.drives[0],
+      status: "failed",
+      error: "HTTP GET request failed with status 429.",
+    },
+  ],
+};
+
 vi.mock("@ava-cli/PipelineCli/runPipelineLocal", () => {
   return {
     findAvandarRepoRoot: vi.fn(() => {
       return "/repo";
     }),
     runPipelineLocal: vi.fn(() => {
-      return { ok: true, pipelineRunId: "local-run-id", errorText: "" };
+      return { ok: true, reportJson: JSON.stringify(REPORT), errorText: "" };
     }),
   };
 });
@@ -58,9 +86,7 @@ describe("runPipelineCommand", () => {
 
   it("runs a pipeline", async () => {
     const fetchMock = _mockFetch(async () => {
-      return new Response("00000000-0000-4000-8000-000000000001", {
-        status: 200,
-      });
+      return new Response(JSON.stringify(REPORT), { status: 200 });
     });
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
@@ -76,6 +102,7 @@ describe("runPipelineCommand", () => {
     const logs = _getCombinedLogs();
     expect(logs).toContain("Running pipeline: world-bank__wdi");
     expect(logs).toContain("00000000-0000-4000-8000-000000000001");
+    expect(logs).toContain("https://data.cityofnewyork.us");
   });
 
   it("throws when AVA_PIPELINE_SERVER_URL is missing", async () => {
@@ -114,7 +141,7 @@ describe("runPipelineCommand", () => {
 
   it("sends the limit to the pipeline server as a JSON body", async () => {
     const fetchMock = _mockFetch(async () => {
-      return new Response("run-id", { status: 200 });
+      return new Response(JSON.stringify(REPORT), { status: 200 });
     });
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
@@ -129,7 +156,7 @@ describe("runPipelineCommand", () => {
 
   it("sends no body when no option is given", async () => {
     const fetchMock = _mockFetch(async () => {
-      return new Response("run-id", { status: 200 });
+      return new Response(JSON.stringify(REPORT), { status: 200 });
     });
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
@@ -151,7 +178,7 @@ describe("runPipelineCommand", () => {
 
   it("sends incremental and until to the pipeline server", async () => {
     const fetchMock = _mockFetch(async () => {
-      return new Response("run-id", { status: 200 });
+      return new Response(JSON.stringify(REPORT), { status: 200 });
     });
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
@@ -169,7 +196,7 @@ describe("runPipelineCommand", () => {
 
   it("sends only the keys the server accepts", async () => {
     const fetchMock = _mockFetch(async () => {
-      return new Response("run-id", { status: 200 });
+      return new Response(JSON.stringify(REPORT), { status: 200 });
     });
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
@@ -203,7 +230,7 @@ describe("runPipelineCommand", () => {
 
   it("rejects incremental with since before sending anything", async () => {
     const fetchMock = _mockFetch(async () => {
-      return new Response("run-id", { status: 200 });
+      return new Response(JSON.stringify(REPORT), { status: 200 });
     });
 
     const { runPipelineCommand } = await import("./RunPipelineCli");
@@ -281,6 +308,44 @@ describe("runPipelineCommand", () => {
     ).rejects.toThrow(/^--since must be earlier than --until\.$/);
     expect(_getCombinedLogs()).toContain(
       "--since must be earlier than --until.",
+    );
+  });
+  it("prints the report and fails when the server says every drive failed", async () => {
+    _mockFetch(async () => {
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          error: "Every drive failed.",
+          report: FAILED_REPORT,
+        }),
+        { status: 500, statusText: "Internal Server Error" },
+      );
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({ name: "socrata", local: false }),
+    ).rejects.toThrow(/^500 Internal Server Error: Every drive failed\.$/);
+    expect(_getCombinedLogs()).toContain(
+      "error: HTTP GET request failed with status 429.",
+    );
+  });
+
+  it("prints the report and fails when a local run says every drive failed", async () => {
+    vi.mocked(runPipelineLocal).mockReturnValueOnce({
+      ok: false,
+      reportJson: JSON.stringify(FAILED_REPORT),
+      errorText: "Every drive failed.",
+    });
+
+    const { runPipelineCommand } = await import("./RunPipelineCli");
+
+    await expect(
+      runPipelineCommand({ name: "socrata", local: true }),
+    ).rejects.toThrow(/^Every drive failed\.$/);
+    expect(_getCombinedLogs()).toContain(
+      "error: HTTP GET request failed with status 429.",
     );
   });
 });

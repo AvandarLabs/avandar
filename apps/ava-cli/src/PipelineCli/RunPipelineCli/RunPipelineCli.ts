@@ -2,13 +2,13 @@ import {
   findAvandarRepoRoot,
   runPipelineLocal,
 } from "@ava-cli/PipelineCli/runPipelineLocal";
+import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
+import { PipelineRunReportSchema } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
+import type { PipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
+import { printPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/printPipelineRunReport";
 import type { PipelineRunRequestOptions } from "@ava-cli/PipelineCli/PipelineRunRequestOptions.types";
 import { sendRunPipelineRequest } from "@ava-cli/PipelineCli/sendRunPipelineRequest";
-import {
-  printError,
-  printInfo,
-  printSuccess,
-} from "@ava-cli/utils/cliOutput/cliOutput";
+import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
 
 function _assertOneLowerBound(runOptions: PipelineRunRequestOptions): void {
@@ -19,10 +19,21 @@ function _assertOneLowerBound(runOptions: PipelineRunRequestOptions): void {
   }
 }
 
+/** Parses the local runner's report line. */
+function _parseReportJson(reportJson: string): PipelineRunReport {
+  return PipelineRunReportSchema.parse(JSON.parse(reportJson));
+}
+
+/**
+ * Runs the pipeline through the local runner and parses its report.
+ *
+ * @throws PipelineRunFailedError, carrying the report, when every drive
+ * failed.
+ */
 function _runLocally(args: {
   name: string;
   runOptions: PipelineRunRequestOptions;
-}): string {
+}): PipelineRunReport {
   const repoRoot: string | undefined = findAvandarRepoRoot();
   if (repoRoot === undefined) {
     throw new Error(
@@ -36,10 +47,16 @@ function _runLocally(args: {
     repoRoot,
     runOptions: args.runOptions,
   });
-  if (!localResult.ok) {
+  if (localResult.ok) {
+    return _parseReportJson(localResult.reportJson);
+  }
+  if (localResult.reportJson === "") {
     throw new Error(localResult.errorText);
   }
-  return localResult.pipelineRunId;
+  throw new PipelineRunFailedError({
+    message: localResult.errorText,
+    report: _parseReportJson(localResult.reportJson),
+  });
 }
 
 /**
@@ -71,14 +88,17 @@ export async function runPipelineCommand(options: {
   try {
     _assertOneLowerBound(runOptions);
     printInfo(`Running pipeline: ${name}`);
-    const result: string = local
+    const report: PipelineRunReport = local
       ? _runLocally({ name, runOptions })
       : await sendRunPipelineRequest({ pipelineName: name, runOptions });
-    printSuccess(result);
+    printPipelineRunReport(report);
   } catch (error: unknown) {
     const message: string =
       error instanceof Error ? error.message : String(error);
 
+    if (error instanceof PipelineRunFailedError) {
+      printPipelineRunReport(error.report);
+    }
     printError(`Failed to run pipeline: ${name}`);
     printError(message);
     throw error;

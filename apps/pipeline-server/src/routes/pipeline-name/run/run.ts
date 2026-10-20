@@ -1,3 +1,4 @@
+import type { EtlRunReport } from "@avandar/etl";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 
 type RunPipelineOptions = PipelineRunOptions &
@@ -6,7 +7,7 @@ type RunPipelineOptions = PipelineRunOptions &
   }>;
 
 type PipelineRunModule = Readonly<{
-  run: (options: PipelineRunOptions) => Promise<string>;
+  run: (options: PipelineRunOptions) => Promise<EtlRunReport>;
 }>;
 
 function _getPipelineModuleURL(pipelineName: string): URL {
@@ -16,7 +17,9 @@ function _getPipelineModuleURL(pipelineName: string): URL {
   );
 }
 
-export async function run(options: RunPipelineOptions): Promise<string> {
+export async function run(
+  options: RunPipelineOptions,
+): Promise<EtlRunReport> {
   const pipelineModule: unknown = await import(
     _getPipelineModuleURL(options.pipelineName).href
   );

@@ -1,4 +1,5 @@
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
+import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
 import { FastifyPluginAsync } from "fastify";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
@@ -104,28 +105,31 @@ async function _runPipeline(
   }
 
   try {
-    const result: string = await run({
+    const report = await run({
       pipelineName: request.params.pipelineName,
       ...options,
     });
-
-    reply.type("text/plain; charset=utf-8");
-    return await reply.send(result);
+    return await reply.send(report);
   } catch (error: unknown) {
     const message: string =
       error instanceof Error ? error.message : "Unknown error";
+    // When every drive failed, the report still says what each drive did.
+    const report = getEtlRunFailedReport(error);
 
     return await reply.status(_getRunErrorStatus(error)).send({
       ok: false,
       error: message,
+      ...(report === undefined ? {} : { report }),
     });
   }
 }
 
 /**
- * Registers `POST /:pipelineName/run`. Auth is checked before the body is
- * validated, so an unauthenticated caller gets 401 whatever it sends.
- * Invalid options answer 400, and the pipeline does not run.
+ * Registers `POST /:pipelineName/run`, which answers with the run's report
+ * as JSON. Auth is checked before the body is validated, so an
+ * unauthenticated caller gets 401 whatever it sends. Invalid options answer
+ * 400, and the pipeline does not run. A run where every drive failed answers
+ * 500 with the error and the report.
  */
 export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
   server.post(

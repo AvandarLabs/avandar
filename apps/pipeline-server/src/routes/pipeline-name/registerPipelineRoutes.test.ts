@@ -1,8 +1,9 @@
-import { EtlRunOptionsError } from "@avandar/etl";
+import { EtlRunFailedError, EtlRunOptionsError } from "@avandar/etl";
 import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import Fastify from "fastify";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { EtlPipelineRunId, EtlRunReport } from "@avandar/etl";
 import type { FastifyInstance } from "fastify";
 
 vi.mock("@pipeline-server/routes/pipeline-name/run/run", () => {
@@ -10,6 +11,12 @@ vi.mock("@pipeline-server/routes/pipeline-name/run/run", () => {
     run: vi.fn(),
   };
 });
+
+const REPORT: EtlRunReport = {
+  pipelineRunId: "00000000-0000-4000-8000-000000000001" as EtlPipelineRunId,
+  mode: "full",
+  drives: [],
+};
 
 const SECRET = "test-secret";
 const AUTH_HEADER = `Bearer ${SECRET}`;
@@ -29,7 +36,7 @@ describe("registerRunPipelineRoutes", () => {
 
   beforeEach(() => {
     process.env.AVA_PIPELINE_SERVER_SECRET = SECRET;
-    vi.mocked(run).mockResolvedValue("00000000-0000-4000-8000-000000000001");
+    vi.mocked(run).mockResolvedValue(REPORT);
   });
 
   afterEach(async () => {
@@ -94,20 +101,20 @@ describe("registerRunPipelineRoutes", () => {
     });
   });
 
-  it("returns the pipeline run id when auth succeeds", async () => {
+  it("answers with the run report as JSON when auth succeeds", async () => {
     server = await _createServer();
 
     const res = await server.inject({
       method: "POST",
       url: "/example-pipeline/run",
-      headers: {
-        authorization: AUTH_HEADER,
-      },
+      headers: { authorization: AUTH_HEADER },
     });
 
-    expect(res.statusCode).toBe(200);
-    expect(res.headers["content-type"]).toContain("text/plain");
-    expect(res.body).toBe("00000000-0000-4000-8000-000000000001");
+    expect([res.statusCode, res.headers["content-type"], res.json()]).toEqual([
+      200,
+      expect.stringContaining("application/json"),
+      REPORT,
+    ]);
     expect(vi.mocked(run)).toHaveBeenCalledWith({
       pipelineName: "example-pipeline",
       mode: "full",
@@ -265,6 +272,44 @@ describe("registerRunPipelineRoutes", () => {
     expect([res.statusCode, res.json()]).toEqual([
       500,
       { ok: false, error: "Source is down." },
+    ]);
+  });
+  it("returns 500 with the report when every drive failed", async () => {
+    const failedReport: EtlRunReport = {
+      ...REPORT,
+      drives: [
+        {
+          driveKey: "https://data.cityofnewyork.us",
+          window: { since: new Date("2026-10-01T00:00:00Z"), until: undefined },
+          connectionsFetched: 0,
+          relationsWritten: 0,
+          relationsUnchanged: 0,
+          newestTimestamp: undefined,
+          status: "failed",
+          error: "HTTP GET request failed with status 429.",
+        },
+      ],
+    };
+    const error = new EtlRunFailedError({
+      report: failedReport,
+      errors: [new Error("HTTP GET request failed with status 429.")],
+    });
+    vi.mocked(run).mockRejectedValue(error);
+    server = await _createServer();
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/example-pipeline/run",
+      headers: { authorization: AUTH_HEADER },
+    });
+
+    expect([res.statusCode, res.json()]).toEqual([
+      500,
+      {
+        ok: false,
+        error: error.message,
+        report: JSON.parse(JSON.stringify(failedReport)),
+      },
     ]);
   });
 });

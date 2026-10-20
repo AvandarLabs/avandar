@@ -3,6 +3,8 @@ import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
 import { readRawPipelineRunOptionsFromArgv } from "@pipelines/shared/readRawPipelineRunOptionsFromArgv/readRawPipelineRunOptionsFromArgv";
+import { runPipelineAndPrintReport } from "@pipelines/shared/runPipelineAndPrintReport/runPipelineAndPrintReport";
+import type { EtlRunReport } from "@avandar/etl";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
 
 /** Env name for ETL root; matches etl `ETL_PATHS_ROOT_ENV`. */
@@ -36,15 +38,16 @@ function _exitWithUsage(error: unknown): never {
 }
 
 /**
- * Runs the pipeline. An `EtlRunOptionsError` exits with its message and the
- * usage line, with no stack trace. Any other error is rethrown.
+ * Runs the pipeline and prints its report (see `runPipelineAndPrintReport`).
+ * An `EtlRunOptionsError` exits with its message and the usage line, with no
+ * stack trace. Any other error is rethrown.
  */
 async function _runPipeline(
-  run: (options: PipelineRunOptions) => Promise<string>,
+  run: (options: PipelineRunOptions) => Promise<EtlRunReport>,
   options: PipelineRunOptions,
-): Promise<string> {
+): Promise<void> {
   try {
-    return await run(options);
+    await runPipelineAndPrintReport({ run, options });
   } catch (error: unknown) {
     if (error instanceof Error && error.name === _ETL_RUN_OPTIONS_ERROR_NAME) {
       _exitWithUsage(error);
@@ -54,8 +57,9 @@ async function _runPipeline(
 }
 
 /**
- * Loads `apps/pipeline-server/pipelines/<name>/run.ts` and prints the return
- * value of `run()` (pipeline run id) as the last line of stdout.
+ * Loads `apps/pipeline-server/pipelines/<name>/run.ts`, runs it, and prints
+ * the run's report as JSON on the last line of stdout. When every drive
+ * failed, the report is still printed and the script exits 1.
  */
 async function main(): Promise<void> {
   const [pipelineName, ...optionArgs] = process.argv.slice(2);
@@ -92,8 +96,7 @@ async function main(): Promise<void> {
 
   const moduleUrl = pathToFileURL(runPath).href;
   const { run } = await import(moduleUrl);
-  const pipelineRunId = await _runPipeline(run, options);
-  console.log(pipelineRunId);
+  await _runPipeline(run, options);
 }
 
 void main();
